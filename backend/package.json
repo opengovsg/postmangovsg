@@ -19,5 +19,12 @@
     "concurrently": "^5.1.0",
     "nodemon": "^2.0.2",
     "typescript": "^3.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datagovsg/postmangovsg.git"
+  },
+  "bugs": {
+    "url": "https://github.com/datagovsg/postmangovsg/issues"
   }
 }
