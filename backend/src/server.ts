@@ -9,7 +9,7 @@ const app: express.Application = express()
 
 const start = async (): Promise<void> => {
   checkRequiredEnvVars(requiredEnvVars)
-  await loaders()
+  await loaders({ app })
   app.listen(port, () => console.log(`Listening on port ${port}!`))
 }
 
