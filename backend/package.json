@@ -7,7 +7,6 @@
     "build": "npx tsc",
     "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
     "start": "node build/src/server",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "watch-node": "nodemon build/src/server",
     "watch-ts": "npx tsc -w"
   },
