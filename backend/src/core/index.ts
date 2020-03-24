@@ -1,8 +1,3 @@
-import { Application } from 'express'
-
-import expressLoader from './loaders/express.loader'
-import { sequelizeLoader } from './sequelize'
-
 const checkRequiredEnvVars = (vars: Array<string>): boolean => {
   vars.forEach(v => {
     if (!process.env[v]) {
@@ -13,10 +8,6 @@ const checkRequiredEnvVars = (vars: Array<string>): boolean => {
   return true
 }
 
-const loaders = async ({ app }: { app: Application}): Promise<void> => {
-  await sequelizeLoader()
-  await expressLoader({ app })
-}
-
-export { checkRequiredEnvVars, loaders }
+export { checkRequiredEnvVars }
 export * from './config'
+export * from './loaders'
