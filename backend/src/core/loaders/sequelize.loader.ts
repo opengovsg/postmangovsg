@@ -5,10 +5,12 @@ import config from '../config'
 const DB_URI = config.database.databaseUri
 
 const sequelizeLoader = async (): Promise<Sequelize> => {
+  const dialectOptions = config.IS_PROD ? { ...config.database.dialectOptions } : {}
   const sequelize = new Sequelize(DB_URI, {
     dialect: 'postgres',
     logging: false,
     pool: config.database.poolOptions,
+    ...dialectOptions,
   })
 
   try {
