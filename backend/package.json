@@ -4,18 +4,21 @@
   "description": "Backend / API server for Postman",
   "main": "build/src/server.js",
   "scripts": {
-    "build": "npx tsc && npm run post-build",
+    "build": "tsc",
     "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
-    "post-build": "cp ./src/db-ca.pem ./build/src/",
+    "postbuild": "cp ./src/db-ca.pem ./build/src/",
     "start": "node build/src/server",
     "watch-node": "nodemon build/src/server",
-    "watch-ts": "npx tsc -w"
+    "watch-ts": "tsc -w"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "dotenv": "^8.2.0",
+    "celebrate": "^12.0.1",
     "express": "^4.17.1",
+    "express-validator": "^6.4.0",
+    "module-alias": "^2.2.2",
     "pg": "^7.18.2",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.21.5",
@@ -28,6 +31,9 @@
     "concurrently": "^5.1.0",
     "nodemon": "^2.0.2",
     "typescript": "^3.8.3"
+  },
+  "_moduleAliases": {
+    "@core": "build/src/core"
   },
   "repository": {
     "type": "git",

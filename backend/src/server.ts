@@ -1,5 +1,6 @@
 import express from 'express'
 require('dotenv').config()
+require('module-alias/register')
 
 import { checkRequiredEnvVars, loaders } from './core'
 

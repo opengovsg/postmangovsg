@@ -1,8 +1,10 @@
 import { Request, Response, Router } from 'express'
+import { ChannelType } from '@core/constants'
 
 const router = Router()
+console.log(ChannelType)
 
-// TODO: joi validators here
+// validators
 
 // route handlers here
 const listProjects = async (_req: Request, res: Response) => {
@@ -11,5 +13,7 @@ const listProjects = async (_req: Request, res: Response) => {
 
 // actual routes here
 router.get('/', listProjects)
+
+router.post('/')
 
 export const projectRoutes = router
