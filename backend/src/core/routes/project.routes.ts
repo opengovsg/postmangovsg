@@ -5,6 +5,13 @@ import { celebrate, Joi, Segments } from 'celebrate'
 const router = Router()
 
 // validators
+const listProjectsValidator = {
+  [Segments.PARAMS]: Joi.object(),
+  [Segments.QUERY]: Joi.object({
+    page: Joi.number().positive().min(1).optional()
+  })
+}
+
 const createProjectValidator = {
   [Segments.BODY]: Joi.object({
     type: Joi.string().valid(...Object.values(ChannelType)).required(),
@@ -28,13 +35,36 @@ const listProjects = async (_req: Request, res: Response) => {
 
 // actual routes here
 
-
-router.get('/', listProjects)
+/**
+ * @swagger
+ * path:
+ *  /projects:
+ *    get:
+ *      summary: List all projects for user
+ *      parameters:
+ *        - in: query
+ *          name: page
+ *          description: page number, defaults to 1
+ *          required: false
+ *          schema:
+ *            type: integer
+ *            minimum: 1
+ *                  
+ *      responses:
+ *        "200":
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: array
+ *                items:
+ *                  $ref: '#/components/schemas/ProjectMeta'
+ */
+router.get('/', celebrate(listProjectsValidator), listProjects)
 
 /**
  * @swagger
  * path:
- *  /v1/projects:
+ *  /projects:
  *    post:
  *      summary: Create a new project
  *      requestBody:
