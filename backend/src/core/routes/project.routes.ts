@@ -8,29 +8,40 @@ const router = Router()
 const listProjectsValidator = {
   [Segments.PARAMS]: Joi.object(),
   [Segments.QUERY]: Joi.object({
-    page: Joi.number().positive().min(1).optional()
-  })
+    page: Joi
+      .number()
+      .positive()
+      .min(1)
+      .optional(),
+  }),
 }
 
 const createProjectValidator = {
   [Segments.BODY]: Joi.object({
-    type: Joi.string().valid(...Object.values(ChannelType)).required(),
-    name: Joi.string().max(255).trim().required(),
+    type: Joi
+      .string()
+      .valid(...Object.values(ChannelType))
+      .required(),
+    name: Joi.
+      string()
+      .max(255)
+      .trim()
+      .required(),
   }),
 }
 
 // route handlers here
 
 // Create project
-const createProject = async (_req: Request, res: Response) => {
+async function createProject(_req: Request, res: Response): Promise<void> {
   res.json({ 
     // project details
   })
 }
 
 // List projects
-const listProjects = async (_req: Request, res: Response) => {
-  res.status(200).json({ message: 'ok' })
+async function listProjects(_req: Request, res: Response): Promise<void>  {
+  res.json({ message: 'ok' })
 }
 
 // actual routes here
@@ -40,6 +51,8 @@ const listProjects = async (_req: Request, res: Response) => {
  * path:
  *  /projects:
  *    get:
+ *      tags:
+ *        - Projects
  *      summary: List all projects for user
  *      parameters:
  *        - in: query
@@ -67,6 +80,8 @@ router.get('/', celebrate(listProjectsValidator), listProjects)
  *  /projects:
  *    post:
  *      summary: Create a new project
+ *      tags:
+ *        - Projects
  *      requestBody:
  *        required: true
  *        content:
@@ -91,4 +106,4 @@ router.get('/', celebrate(listProjectsValidator), listProjects)
  */
 router.post('/', celebrate(createProjectValidator), createProject)
 
-export const projectRoutes = router
+export default router
