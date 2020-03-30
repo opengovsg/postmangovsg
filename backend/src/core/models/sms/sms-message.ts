@@ -1,5 +1,4 @@
 import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
-
 import { Project } from '../project'
 
 @Table({ tableName: 'sms_messages' })

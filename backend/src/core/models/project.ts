@@ -1,6 +1,7 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
+import { ChannelType } from '../constants'
+import { Credential } from "./credential"
 import { User } from './user'
-import { ProjectType } from './project-type'
 
 @Table({ tableName: 'projects' })
 export class Project extends Model<Project> {
@@ -11,19 +12,26 @@ export class Project extends Model<Project> {
   name!: string
 
   @ForeignKey(() => User)
-  @Column
-  creator!: number
-
-  @ForeignKey(() => ProjectType)
-  @Column
-  type!: string
-
-  @Column(DataType.STRING)
-  credName?: string
-
-  @Column(DataType.JSON)
-  s3Object?: object
+  @Column(DataType.INTEGER)
+  userId!: number
 
   @BelongsTo(() => User)
   user!: User
+
+  @Column({
+    type: DataType.ENUM(...Object.values(ChannelType)),
+    allowNull: false,
+  })
+  type!: ChannelType
+
+  @ForeignKey(() => Credential)
+  @Column(DataType.STRING)
+  credName?: string
+
+  @BelongsTo(() => Credential)
+  credential?: Credential
+
+  @Column(DataType.JSON)
+  s3Object?: object
+  
 }

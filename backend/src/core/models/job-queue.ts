@@ -1,5 +1,5 @@
 import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript'
-
+import { JobStatus } from "../constants";
 import { Project } from './project'
 import { Worker } from './worker'
 
@@ -7,23 +7,25 @@ import { Worker } from './worker'
 export class JobQueue extends Model<JobQueue> {
   @ForeignKey(() => Project)
   @Column(DataType.INTEGER)
-  projectId!: string
+  projectId!: number
 
   @BelongsTo(() => Project)
   project!: Project
 
-  @Column({
-    type: DataType.NUMBER
-  })
-  workerId!: number
+  @ForeignKey(() => Worker)
+  @Column(DataType.INTEGER)
+  workerId?: number
 
   @BelongsTo(() => Worker)
-  worker: Worker
+  worker?: Worker
+
+  @Column(DataType.INTEGER)
+  sendRate?: number
 
   @Column({
-    type: DataType.ENUM(...Object.values(JOB_STATUS)),
+    type: DataType.ENUM(...Object.values(JobStatus)),
     allowNull: false,
   })
-  status!: JOB_STATUS
+  status!: JobStatus
 
 }

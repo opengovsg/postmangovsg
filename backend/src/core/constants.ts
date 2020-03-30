@@ -4,9 +4,9 @@ export enum ChannelType {
 }
 
 export enum JobStatus {
-  Queued = 'Queued',
-  Sending = 'Sending',
-  Done = 'Done'
+  Queued = 'queued',
+  Sending = 'sending',
+  Done = 'done'
 }
 
 /**
@@ -34,5 +34,11 @@ export enum JobStatus {
  *            type: string
  *          type:
  *            $ref: '#/components/schemas/ChannelType'
+ *      JobStatus:
+ *        type: string
+ *        enum:
+ *        - queued
+ *        - sending
+ *        - done
  */
 
