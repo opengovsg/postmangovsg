@@ -12,4 +12,7 @@ export class User extends Model<User> {
     },
   })
   email!: string
+
+  @Column(DataType.STRING)
+  apiKey?: string
 }

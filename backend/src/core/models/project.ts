@@ -1,11 +1,6 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table, HasMany } from 'sequelize-typescript'
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
 import { User } from './user'
-// import { WhatsappContent } from './whatsapp-content'
-
-export enum PROJECT_TYPE {
-  EMAIL = 'email',
-  SMS = 'sms'
-}
+import { ProjectType } from './project-type'
 
 @Table({ tableName: 'projects' })
 export class Project extends Model<Project> {
@@ -15,18 +10,19 @@ export class Project extends Model<Project> {
   })
   name!: string
 
-  @Column({
-    type: DataType.ENUM(...Object.values(PROJECT_TYPE)),
-    allowNull: false,
-  })
-  type!: PROJECT_TYPE
-
   @ForeignKey(() => User)
   @Column
-  userId!: number
+  creator!: number
+
+  @ForeignKey(() => ProjectType)
+  @Column
+  type!: string
 
   @Column(DataType.STRING)
-  credential?: string
+  credName?: string
+
+  @Column(DataType.JSON)
+  s3Object?: object
 
   @BelongsTo(() => User)
   user!: User

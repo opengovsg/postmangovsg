@@ -1,5 +1,5 @@
 import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
-import { Project } from './project'
+import { Project } from '../project'
 
 @Table({ tableName: 'sms_templates' })
 export class SmsTemplate extends Model<SmsTemplate> {
@@ -16,5 +16,5 @@ export class SmsTemplate extends Model<SmsTemplate> {
   @Column({
     type: DataType.TEXT,
   })
-  template?: string
+  body?: string
 }

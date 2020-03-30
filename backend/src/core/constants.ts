@@ -3,6 +3,12 @@ export enum ChannelType {
   Email = 'email'
 }
 
+export enum JobStatus {
+  Queued = 'Queued',
+  Sending = 'Sending',
+  Done = 'Done'
+}
+
 /**
  * @swagger
  *  components:
@@ -12,16 +18,16 @@ export enum ChannelType {
  *        enum:
  *        - sms
  *        - email
- *      
+ *
  *      Project:
  *        type: object
- * 
+ *
  *      ProjectMeta:
  *        type: object
  *        properties:
- *          name: 
+ *          name:
  *            type: string
- *          createdAt: 
+ *          createdAt:
  *            type: string
  *            format: date-time
  *          status:
