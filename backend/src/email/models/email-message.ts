@@ -1,8 +1,8 @@
 import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
-import { Project } from '../project'
+import { Project } from '../../core/models/project'
 
-@Table({ tableName: 'sms_messages' })
-export class SmsMessage extends Model<SmsMessage> {
+@Table({ tableName: 'email_messages' })
+export class EmailMessage extends Model<EmailMessage> {
   @ForeignKey(() => Project)
   @Column({
     type: DataType.INTEGER,

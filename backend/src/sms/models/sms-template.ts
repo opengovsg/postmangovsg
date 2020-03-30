@@ -1,5 +1,5 @@
 import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
-import { Project } from '../project'
+import { Project } from '../../core/models/project'
 
 @Table({ tableName: 'sms_templates' })
 export class SmsTemplate extends Model<SmsTemplate> {
