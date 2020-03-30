@@ -23,4 +23,4 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
   }
 }
 
-export { sequelizeLoader }
+export default sequelizeLoader
