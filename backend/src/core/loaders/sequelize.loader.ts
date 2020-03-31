@@ -1,4 +1,4 @@
-import { Sequelize } from  'sequelize-typescript'
+import { Sequelize } from 'sequelize-typescript'
 
 import config from '../config'
 
@@ -23,4 +23,4 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
   }
 }
 
-export { sequelizeLoader }
+export default sequelizeLoader

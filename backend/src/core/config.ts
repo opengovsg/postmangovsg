@@ -16,13 +16,13 @@ export default {
     dialectOptions: {
       ssl: {
         rejectUnauthorized: true,
-        ca: [rdsCa]
-      }
+        ca: [rdsCa],
+      },
     },
     poolOptions: {
       max: SEQUELIZE_POOL_MAX_CONNECTIONS,
       min: 0,
       acquire: SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
     },
-  }
+  },
 }

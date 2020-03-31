@@ -1,0 +1,366 @@
+import { Request, Response, Router } from 'express'
+import { celebrate, Joi, Segments } from 'celebrate'
+
+const router = Router()
+
+// validators
+const storeTemplateValidator = {
+  [Segments.BODY]: Joi.object({
+    body: Joi
+      .string(),
+  }),
+}
+
+const uploadstartValidator = {
+  [Segments.BODY]: Joi.object({
+    filename: Joi
+      .string()
+      .trim()
+      .min(5)
+      .max(100)
+      .pattern(/^[^\\/]+\.csv$/),
+  }),
+}
+
+const uploadCompleteValidator = {
+  [Segments.BODY]: Joi.object(),
+}
+
+const storeCredentialsValidator = {
+  [Segments.BODY]: Joi.object({
+    twilioAccountSid: Joi
+      .string()
+      .trim(),
+    twilioSomethingId: Joi
+      .string()
+      .trim(),
+    twilioApiKey: Joi
+      .string()
+      .trim(),
+  }),
+}
+
+const validateCredentialsValidator = {
+  [Segments.BODY]: Joi.object({
+    phoneNumber: Joi
+      .string()
+      .trim()
+      .pattern(/^\+\d{8,15}$/),
+  }),
+}
+
+const previewMessageValidator = {
+  [Segments.QUERY]: Joi.object({
+    message: Joi
+      .number()
+      .integer()
+      .positive()
+      .optional(),
+  }),
+}
+
+const sendMessagesValidator = {
+  [Segments.BODY]: Joi.object({
+    rate: Joi
+      .number()
+      .integer()
+      .positive()
+      .optional(),
+  }),
+}
+
+// handlers
+// Get project details
+async function getProjectDetails(_req: Request, res: Response): Promise<void> {
+  res.json({ message: 'OK' })
+}
+
+// Store body of message in sms template table
+async function storeTemplate(_req: Request, res: Response): Promise<void> {
+  res.json({ message: 'OK' })
+}
+
+// Returns presigned url for upload
+async function uploadStart(_req: Request, res: Response): Promise<void> {
+  res.json({ signedUrl: '' })
+}
+
+// Read file from s3 and populate messages table
+async function uploadComplete(_req: Request, res: Response): Promise<void> {
+  res.json({ numMessages: 100 })
+}
+
+// Read file from s3 and populate messages table
+async function storeCredentials(_req: Request, res: Response): Promise<void> {
+  res.json({ message: 'OK' })
+}
+
+// Send validation sms to specified phone number
+async function validateCredentials(_req: Request, res: Response): Promise<void> {
+  res.json({ message: 'OK' })
+}
+
+// Get preview of one message
+async function previewMessage(_req: Request, res: Response): Promise<void> {
+  res.json({ message: 'Message content' })
+}
+
+// Queue job for sending
+async function sendMessages(_req: Request, res: Response): Promise<void> {
+  res.json({ message: 'OK' })
+}
+
+// Routes
+/**
+ * @swagger
+ * path:
+ *  /project/{projectId}/sms:
+ *    get:
+ *      tags:
+ *        - SMS
+ *      summary: Get sms project details
+ *      parameters:
+ *        - name: projectId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *                  
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/SmsProject'
+ */
+router.get('/', getProjectDetails)
+
+/**
+ * @swagger
+ * path:
+ *  /project/{projectId}/sms/template:
+ *    put:
+ *      tags:
+ *        - SMS
+ *      summary: Stores body template for sms campaign
+ *      parameters:
+ *        - name: projectId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                body:
+ *                  type: string
+ *                  minLength: 1
+ *                  maxLength: 200
+ *                  
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
+
+/**
+ * @swagger
+ * path:
+ *  /project/{projectId}/sms/upload-start:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Gets presigned url for upload
+ *      parameters:
+ *        - name: projectId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                body:
+ *                  type: string
+ *                  minLength: 1
+ *                  maxLength: 200
+ *                  pattern: '^[^\\/]+\.csv$'
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  url:
+ *                    type:string
+ */
+router.post('/upload-start', celebrate(uploadstartValidator), uploadStart)
+
+/**
+ * @swagger
+ * path:
+ *  /project/{projectId}/sms/upload-complete:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Populate recipient list with uploaded csv
+ *      parameters:
+ *        - name: projectId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComplete)
+
+/**
+ * @swagger
+ * path:
+ *  /project/{projectId}/sms/credentials:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Store credentials for twilio
+ *      parameters:
+ *        - name: projectId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/TwilioCredentials'
+ *                  
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentials)
+
+/**
+ * @swagger
+ * path:
+ *  /project/{projectId}/sms/validate:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Vaidates stored credentials by sending to a specific phone number
+ *      parameters:
+ *        - name: projectId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                phoneNumber: 
+ *                  type: string
+ *                  pattern: '^\+\d{8,15}$'
+ *                  
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/validate', celebrate(validateCredentialsValidator), validateCredentials)
+
+
+/**
+ * @swagger
+ * path:
+ *  /project/{projectId}/sms/preview:
+ *    get:
+ *      tags:
+ *        - SMS
+ *      summary: Preview templated message
+ *      parameters:
+ *        - name: projectId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - in: query
+ *          name: message
+ *          description: message number, defaults to 1
+ *          required: false
+ *          schema:
+ *            type: integer
+ *            minimum: 1  
+ * 
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.get('/preview', celebrate(previewMessageValidator), previewMessage)
+
+/**
+ * @swagger
+ * path:
+ *  /project/{projectId}/sms/send:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Start sending campaign
+ *      parameters:
+ *        - name: projectId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                rate: 
+ *                  type: integer
+ *                  minimum: 1  
+ * 
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/send', celebrate(sendMessagesValidator), sendMessages)
+
+export default router
