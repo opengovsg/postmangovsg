@@ -15,7 +15,7 @@ const options = {
       },
     },
     servers: [
-      { url: '/api/v1' },
+      { url: '/v1' },
     ],
   },
   apis: ['build/**/*.js'],
