@@ -5,11 +5,9 @@
   "main": "build/server.js",
   "scripts": {
     "build": "rimraf build && tsc",
-    "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"npm:watch-ts\" \"npm:watch-node\"",
+    "dev": "tsc-watch --onSuccess \"node ./build/server.js\"",
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
-    "watch-node": "nodemon --watch build --delay 2.5 build/server",
-    "watch-ts": "tsc -w",
     "copy-assets": "copyfiles -u 1 src/assets/* build"
   },
   "author": "",
@@ -36,11 +34,10 @@
     "@types/validator": "^12.0.1",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
-    "concurrently": "^5.1.0",
     "copyfiles": "^2.2.0",
     "eslint": "^6.8.0",
-    "nodemon": "^2.0.2",
     "rimraf": "^3.0.2",
+    "tsc-watch": "^4.2.3",
     "typescript": "^3.8.3"
   },
   "_moduleAliases": {
