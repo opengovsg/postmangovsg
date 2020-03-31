@@ -10,8 +10,7 @@ const listProjectsValidator = {
   [Segments.QUERY]: Joi.object({
     limit: Joi
       .number()
-      .positive()
-      .min(1),
+      .min(0),
     offset: Joi
       .number()
       .positive()
@@ -60,9 +59,16 @@ async function listProjects(_req: Request, res: Response): Promise<void> {
  *      summary: List all projects for user
  *      parameters:
  *        - in: query
- *          name: page
- *          description: page number, defaults to 1
+ *          name: offset
+ *          description: offset index for projects
  *          required: false
+ *          schema:
+ *            type: integer
+ *            minimum: 0
+ *        - in: query
+ *          name: limit
+ *          description: max number of projects returned
+ *          required: true
  *          schema:
  *            type: integer
  *            minimum: 1
