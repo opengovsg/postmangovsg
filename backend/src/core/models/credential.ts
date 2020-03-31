@@ -9,10 +9,18 @@ export class Credential extends Model<Credential> {
   })
   name!: string
 
-  @Column(DataType.BOOLEAN)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  })
   validated?: boolean
 
-  @Column(DataType.BOOLEAN)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  })
   used?: boolean
 
 }
