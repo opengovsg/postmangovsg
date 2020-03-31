@@ -9,9 +9,9 @@ export interface SesCredentials {
  *      SesCredentials:
  *        type: object
  *        properties:
- *          Key1: 
+ *          Key1:
  *            type: string
- *          Key2: 
+ *          Key2:
  *            type: string
- * 
+ *
  */

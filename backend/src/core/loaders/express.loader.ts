@@ -8,7 +8,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.get('/', async (_req: Request, res: Response) => {
     res.sendStatus(200)
   })
-  app.use('/api/v1', v1Router)
+  app.use('/v1', v1Router)
 }
 
 export default expressApp

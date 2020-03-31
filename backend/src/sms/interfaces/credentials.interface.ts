@@ -10,9 +10,9 @@ export interface TwilioCredentials {
  *      TwilioCredentials:
  *        type: object
  *        properties:
- *          Key1: 
+ *          Key1:
  *            type: string
- *          Key2: 
+ *          Key2:
  *            type: string
  *          Key3:
  *            type: string

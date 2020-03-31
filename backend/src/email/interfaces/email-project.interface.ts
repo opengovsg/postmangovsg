@@ -10,9 +10,9 @@ export interface EmailProject {
  *      EmailProject:
  *        type: object
  *        properties:
- *          id: 
+ *          id:
  *            type: string
- *          number: 
+ *          number:
  *            type: string
  *          otherstuff:
  *            type: string

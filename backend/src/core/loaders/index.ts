@@ -4,7 +4,7 @@ import swaggerLoader from './swagger.loader'
 
 import { Application } from 'express'
 
-const loaders = async ({ app }: { app: Application}): Promise<void> => {
+const loaders = async ({ app }: { app: Application }): Promise<void> => {
   await sequelizeLoader()
   await expressLoader({ app })
   await swaggerLoader({ app })

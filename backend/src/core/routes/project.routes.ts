@@ -8,7 +8,11 @@ const router = Router()
 const listProjectsValidator = {
   [Segments.PARAMS]: Joi.object(),
   [Segments.QUERY]: Joi.object({
-    page: Joi
+    limit: Joi
+      .number()
+      .positive()
+      .min(1),
+    offset: Joi
       .number()
       .positive()
       .min(1)
@@ -34,13 +38,13 @@ const createProjectValidator = {
 
 // Create project
 async function createProject(_req: Request, res: Response): Promise<void> {
-  res.json({ 
+  res.json({
     // project details
   })
 }
 
 // List projects
-async function listProjects(_req: Request, res: Response): Promise<void>  {
+async function listProjects(_req: Request, res: Response): Promise<void> {
   res.json({ message: 'ok' })
 }
 
