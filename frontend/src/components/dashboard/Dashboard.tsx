@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavBar, TitleBar, ProgressPane } from '../common'
+import { NavBar, TitleBar, ProgressPane } from 'components/common'
 import styles from './Dashboard.module.scss'
 
 const steps = [

@@ -1,46 +1,47 @@
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap");
 
-html {
-  box-sizing: border-box;
-  height: 100%;
-}
+@import "styles/_variables";
 
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-}
+// Normalize.css
+@import "~normalize.css/normalize.css";
+// Bulma
+@import "~bulma/sass/utilities/_all.sass";
+@import "~bulma/sass/base/_all.sass";
+@import "~bulma/sass/elements/button.sass";
+@import "~bulma/sass/elements/container.sass";
+@import "~bulma/sass/elements/title.sass";
+@import "~bulma/sass/form/_all.sass";
+@import "~bulma/sass/components/navbar.sass";
+@import "~bulma/sass/layout/hero.sass";
+@import "~bulma/sass/layout/section.sass";
 
-*:focus {
-  outline: none !important;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-bottom: 0;
-}
-
+html,
 body {
-  font-family: 'Noto Sans', sans-serif;
-  height: 100%;
-}
-
-label {
-  font-size: 1.2rem;
-  margin-bottom: 0;
-}
-
-a {
-  text-decoration: none;
-  &:hover {
-    text-decoration: none;
-  }
+  font-size: 16px;
+  font-family: $font-stack;
 }
 
 #root {
-  height: 100%;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.5rem;
+}
+h3 {
+  font-size: 1.25rem;
+}
+h4 {
+  font-size: 1.125rem;
+}
+h5 {
+  font-size: 1rem;
+}
+
+p,
+a {
+  font-size: 0.8rem;
 }

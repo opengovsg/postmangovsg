@@ -1,7 +1,7 @@
-@import '../../../styles/variables.scss';
-@import '../../../styles/layout.scss';
+@import 'styles/_variables';
+@import 'styles/_mixins';
 
-.titlebar {
+.titleBar {
   height: $title-bar-height;
   color: $dark-blue;
   font-size: 32px;

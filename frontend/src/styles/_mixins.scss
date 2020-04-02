@@ -7,3 +7,10 @@
   display: flex;
   flex-direction: column;
 }
+
+@mixin app-name {
+  font-weight: bold;
+  font-size: 2.2rem;
+  color: $indigo-blue;
+  letter-spacing: 0.5rem;
+}

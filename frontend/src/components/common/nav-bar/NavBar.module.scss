@@ -1,5 +1,5 @@
-@import '../../../styles/variables.scss';
-@import '../../../styles/layout.scss';
+@import 'styles/_variables';
+@import 'styles/_mixins';
 
 .navBar {
   height: $nav-bar-height;

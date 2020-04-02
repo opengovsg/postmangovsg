@@ -3,7 +3,7 @@ import styles from './TitleBar.module.scss'
 
 const TitleBar = (props: any) => {
   return (
-    <div className={styles.titlebar}>
+    <div className={styles.titleBar}>
       <span>{props.title}</span>
     </div>
   )
