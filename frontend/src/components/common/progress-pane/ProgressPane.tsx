@@ -16,8 +16,8 @@ const ProgressPane = (props: any) => {
   return (
     <div className={styles.progressPane}>
       {
-        props.steps.map((step: string, index: number) => 
-          <ProgressItem step={step} number={index + 1}></ProgressItem>
+        props.steps.map((step: string, index: number) =>
+          <ProgressItem step={step} key={index} number={index + 1}></ProgressItem>
         )
       }
     </div>

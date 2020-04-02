@@ -1,18 +1,18 @@
 import React from 'react'
-import { AppBar, PageHeader, ProgressPane } from '../base'
-import styles from './AppBase.module.scss'
+import { NavBar, TitleBar, ProgressPane } from '../common'
+import styles from './Dashboard.module.scss'
 
 const steps = [
   { content: 'step one', active: true },
   { content: 'step two', active: false },
-  { content: 'step three', active: false }
+  { content: 'step three', active: false },
 ]
 
 const AppBase = () => {
   return (
     <React.Fragment>
-      <AppBar></AppBar>
-      <PageHeader title="Set page title here"></PageHeader>
+      <NavBar></NavBar>
+      <TitleBar title="Set page title here"></TitleBar>
       <div className={styles.content}>
         <ProgressPane steps={steps}></ProgressPane>
       </div>

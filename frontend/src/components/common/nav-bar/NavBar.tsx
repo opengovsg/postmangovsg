@@ -1,9 +1,9 @@
 import React from 'react'
-import styles from './AppBar.module.scss'
+import styles from './NavBar.module.scss'
 
-const AppBar = () => {
+const NavBar = () => {
   return (
-    <div className={styles.appBar}>
+    <div className={styles.navBar}>
       <div>
         <span className={styles.title}>POSTMAN</span>
         <span className={[styles.active, styles.link].join(' ')}>Campaigns</span>
@@ -19,4 +19,4 @@ const AppBar = () => {
   )
 }
 
-export default AppBar
+export default NavBar

@@ -1,8 +1,8 @@
 @import '../../../styles/variables.scss';
 @import '../../../styles/layout.scss';
 
-.appBar {
-  height: $app-bar-height;
+.navBar {
+  height: $nav-bar-height;
   background-color: $dark-blue;
   @include flex-horizontal;
   

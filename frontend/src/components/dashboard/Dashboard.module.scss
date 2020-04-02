@@ -2,7 +2,7 @@
 @import '../../styles/layout.scss';
 
 .content {
-  height: calc(100% - #{$app-bar-height} - #{$page-header-height});
+  height: calc(100% - #{$nav-bar-height} - #{$title-bar-height});
   @include flex-horizontal;
   flex-grow: 1;
 }
