@@ -1,0 +1,16 @@
+$button-width: 7rem;
+
+.inputWithButton {
+  position: relative;
+  width: 100%;
+
+  input.textInput {
+    padding-right: $button-width;
+  }
+
+  button.inputButton {
+    position: absolute;
+    right: 0;
+    width: $button-width;
+  }
+}

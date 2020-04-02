@@ -9,6 +9,7 @@
     "lint": "eslint  --ext .tsx,.ts src/"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "bulma": "^0.8.1",
     "normalize.css": "^8.0.1",
     "react": "^16.13.1",
