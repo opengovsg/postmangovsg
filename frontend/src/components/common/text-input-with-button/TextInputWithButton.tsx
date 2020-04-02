@@ -3,15 +3,21 @@ import styles from './TextInputWithButton.module.scss'
 import { PrimaryButton, TextInput } from '../'
 
 const TextInputWithButton = (props: any) => {
-  const { value, onChange, onClick, children } = props
+  const { value, onChange, onClick, children, type } = props
+
+  function onFormSubmit(e: React.FormEvent) {
+    onClick()
+    // prevents page reload
+    e.preventDefault()
+  }
 
   return (
-    <div className={styles.inputWithButton}>
-      <TextInput className={styles.textInput} value={value} onChange={onChange} />
-      <PrimaryButton className={styles.inputButton} onClick={onClick} >
+    <form className={styles.inputWithButton} onSubmit={onFormSubmit}>
+      <TextInput className={styles.textInput} value={value} onChange={onChange} type={type} />
+      <PrimaryButton className={styles.inputButton} type="submit">
         {children}
       </PrimaryButton>
-    </div>
+    </form>
   )
 }
 

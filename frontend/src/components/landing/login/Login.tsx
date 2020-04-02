@@ -20,13 +20,17 @@ const Login = () => {
     setOtpSent(true)
   }
 
-  function render(mainText: string, value: string, onChange: Function, onClick: Function, buttonText: string) {
+  function render(mainText: string, value: string, onChange: Function, onClick: Function, buttonText: string, inputType?: string) {
     return (
       <>
         <h4 className={styles.text}>
           {mainText}
         </h4>
-        <TextInputWithButton value={value} onChange={onChange} onClick={onClick}>
+        <TextInputWithButton
+          value={value}
+          type={inputType}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+          onClick={onClick}>
           {buttonText}
         </TextInputWithButton>
       </>
@@ -36,9 +40,9 @@ const Login = () => {
   return (
     <div className={styles.container}>
       {!otpSent ?
-        render(emailText, email, setEmail, sendOtp, emailButtonText)
+        render(emailText, email, setEmail, sendOtp, emailButtonText, 'email')
         :
-        render(otpText, otp, setOtp, login, otpButtonText)
+        render(otpText, otp, setOtp, login, otpButtonText, 'tel')
       }
     </div >
   )
