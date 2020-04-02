@@ -51,6 +51,8 @@ module.exports = {
         ]
       }
     ],
+    'no-multi-spaces': 'error',
+    'no-trailing-spaces': 'error',
     'quotes': [
       'error',
       'single'

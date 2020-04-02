@@ -1,0 +1,11 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/layout.scss';
+
+.titlebar {
+  height: $title-bar-height;
+  color: $dark-blue;
+  font-size: 32px;
+  border-bottom: 1px solid $indigo-blue;
+  @include flex-horizontal;
+  padding-left: 70px;
+}
