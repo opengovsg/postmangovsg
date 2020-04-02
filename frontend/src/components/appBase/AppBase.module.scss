@@ -1,0 +1,8 @@
+@import '../../styles/variables.scss';
+@import '../../styles/layout.scss';
+
+.content {
+  height: calc(100% - #{$app-bar-height} - #{$page-header-height});
+  @include flex-horizontal;
+  flex-grow: 1;
+}

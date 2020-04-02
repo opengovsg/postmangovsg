@@ -1,0 +1,52 @@
+@import '../../../styles/variables.scss';
+@import '../../../styles/layout.scss';
+
+.appBar {
+  height: $app-bar-height;
+  background-color: $dark-blue;
+  @include flex-horizontal;
+  
+  & > div {
+    width: 100%;;
+    padding-left: 70px;
+    padding-right: 70px;
+    @include flex-horizontal;
+  }
+  
+  & span {
+    color: $light-blue;
+    cursor: pointer;
+  }
+}
+
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-right: 50px;
+}
+
+.link {
+  font-size: 18px;
+  opacity: 0.5;
+  margin-right: 40px;
+
+  &.active {
+    opacity: 1;
+  }
+
+  &.stretch {
+    flex-grow: 1;
+  }
+}
+
+.userLinks {
+  font-size: 16px;
+
+  &:nth-last-child(2) {
+    margin-right: 40px;
+  }
+}
+
+.userLinks:first-child {
+  margin-right: 40px;
+}
