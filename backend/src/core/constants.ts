@@ -1,12 +1,15 @@
 export enum ChannelType {
-  SMS = 'sms',
-  Email = 'email'
+  SMS = 'SMS',
+  Email = 'EMAIL'
 }
 
 export enum JobStatus {
-  Queued = 'queued',
-  Sending = 'sending',
-  Done = 'done'
+  Ready = 'READY',
+  Enqueued = 'ENQUEUED',
+  Sending = 'SENDING',
+  Sent = 'SENT',
+  Stopped = 'STOPPED',
+  Logged = 'LOGGED'
 }
 
 /**
