@@ -1,5 +1,7 @@
 import React from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import { POSTMAN_GUIDE_URL } from 'config'
+
 import styles from './NavBar.module.scss'
 
 const NavBar = () => {
@@ -9,7 +11,7 @@ const NavBar = () => {
         <NavLink className={styles.title} to="/campaigns">POSTMAN</NavLink>
         <NavLink className={styles.link} activeClassName={styles.active} to="/campaigns">Campaigns</NavLink>
         <NavLink className={styles.link} activeClassName={styles.active} to="/create">Create</NavLink>
-        <NavLink className={styles.link} activeClassName={styles.active} to="https://guide.postman.com">Guide</NavLink>
+        <a className={styles.link} href={POSTMAN_GUIDE_URL}>Guide</a>
         <NavLink className={styles.link} activeClassName={styles.active} to="/settings">Settings</NavLink>
       </div>
       <div className={styles.right}>
