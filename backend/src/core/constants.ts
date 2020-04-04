@@ -19,8 +19,8 @@ export enum JobStatus {
  *      ChannelType:
  *        type: string
  *        enum:
- *        - sms
- *        - email
+ *        - SMS
+ *        - EMAIL
  *
  *      Project:
  *        type: object
@@ -40,8 +40,11 @@ export enum JobStatus {
  *      JobStatus:
  *        type: string
  *        enum:
- *        - queued
- *        - sending
- *        - done
+ *        - READY
+ *        - ENQUEUED
+ *        - SENDING
+ *        - SENT
+ *        - STOPPED
+ *        - LOGGED
  */
 
