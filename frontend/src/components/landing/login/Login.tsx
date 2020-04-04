@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { TextInputWithButton } from 'components/common'
+// import AuthService from 'services/auth.service'
+
 import styles from './Login.module.scss'
 
 const emailText = 'Sign in with your gov.sg email'

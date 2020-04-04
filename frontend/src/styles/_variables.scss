@@ -4,12 +4,15 @@ $indigo-blue: #2c2cdc;
 $light-blue: #f5f6fc;
 
 // Dimensions
-$nav-bar-height: 90px;
+$nav-bar-height: 70px;
 $title-bar-height: 100px;
 $button-min-width: 10rem;
 
+// Paddings
+$site-padding: 3vw;
+
 // Fonts
-$font-stack: 'Noto Sans', sans-serif;
+$font-stack: "Noto Sans", sans-serif;
 
 // Update Bulma's global variables
 $family-sans-serif: $font-stack;

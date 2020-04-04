@@ -28,6 +28,9 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', {
       'argsIgnorePattern': '^_'
     }],
+    '@typescript-eslint/no-use-before-define': ['error',
+      { 'functions': false }
+    ],
     'comma-dangle': [
       'error',
       'always-multiline'
@@ -77,8 +80,7 @@ module.exports = {
       'error',
       'always'
     ],
-    '@typescript-eslint/no-use-before-define': ['error',
-      { 'functions': false }
-    ]
+    // No need for proptypes since we're using typescript
+    'react/prop-types': 'off'
   }
 }

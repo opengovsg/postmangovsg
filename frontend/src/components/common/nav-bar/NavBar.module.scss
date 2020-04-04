@@ -1,52 +1,45 @@
-@import 'styles/_variables';
-@import 'styles/_mixins';
+@import "styles/_variables";
+@import "styles/_mixins";
+
+$navbar-link-margin: calc(1rem + 1vw);
 
 .navBar {
+  @include flex-horizontal;
   height: $nav-bar-height;
   background-color: $dark-blue;
-  @include flex-horizontal;
-  
-  & > div {
-    width: 100%;;
-    padding-left: 70px;
-    padding-right: 70px;
+  padding: 0 $site-padding;
+  justify-content: space-between;
+
+  .title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-right: 2rem;
+    color: $light-blue;
+  }
+
+  .link {
+    letter-spacing: 1.3px;
+    opacity: 0.5;
+    color: $light-blue;
+
+    &:hover,
+    &:active,
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  .left,
+  .right {
     @include flex-horizontal;
   }
-  
-  & span {
-    color: $light-blue;
-    cursor: pointer;
+
+  .left .link,
+  .left .title {
+    margin-right: $navbar-link-margin;
   }
-}
-
-.title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-right: 50px;
-}
-
-.link {
-  font-size: 18px;
-  opacity: 0.5;
-  margin-right: 40px;
-
-  &.active {
-    opacity: 1;
+  .right .link {
+    margin-left: $navbar-link-margin;
   }
-
-  &.stretch {
-    flex-grow: 1;
-  }
-}
-
-.userLinks {
-  font-size: 16px;
-
-  &:nth-last-child(2) {
-    margin-right: 40px;
-  }
-}
-
-.userLinks:first-child {
-  margin-right: 40px;
 }

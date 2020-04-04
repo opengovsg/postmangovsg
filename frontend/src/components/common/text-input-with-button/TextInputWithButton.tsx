@@ -2,7 +2,13 @@ import React from 'react'
 import styles from './TextInputWithButton.module.scss'
 import { PrimaryButton, TextInput } from '../'
 
-const TextInputWithButton = (props: any) => {
+const TextInputWithButton = (props: {
+  value: string;
+  onChange: Function;
+  onClick: Function;
+  children: React.ReactNode;
+  type: string | undefined;
+}) => {
   const { value, onChange, onClick, children, type } = props
 
   function onFormSubmit(e: React.FormEvent) {

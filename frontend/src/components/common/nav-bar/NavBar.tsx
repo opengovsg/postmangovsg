@@ -1,19 +1,20 @@
 import React from 'react'
+import { NavLink, Link } from 'react-router-dom'
 import styles from './NavBar.module.scss'
 
 const NavBar = () => {
   return (
     <div className={styles.navBar}>
-      <div>
-        <span className={styles.title}>POSTMAN</span>
-        <span className={[styles.active, styles.link].join(' ')}>Campaigns</span>
-        <span className={styles.link}>Create</span>
-        <span className={styles.link}>Guide</span>
-        <span className={[styles.link, styles.stretch].join(' ')}>Settings</span>
-
-        <span className={styles.userLinks}>postman@open.gov.sg</span>
-        <span className={styles.userLinks}>logout</span>
-
+      <div className={styles.left}>
+        <NavLink className={styles.title} to="/campaigns">POSTMAN</NavLink>
+        <NavLink className={styles.link} activeClassName={styles.active} to="/campaigns">Campaigns</NavLink>
+        <NavLink className={styles.link} activeClassName={styles.active} to="/create">Create</NavLink>
+        <NavLink className={styles.link} activeClassName={styles.active} to="https://guide.postman.com">Guide</NavLink>
+        <NavLink className={styles.link} activeClassName={styles.active} to="/settings">Settings</NavLink>
+      </div>
+      <div className={styles.right}>
+        <span className={`${styles.active} ${styles.link}`}>postman@open.gov.sg</span>
+        <a className={`${styles.active} ${styles.link}`} onClick={() => alert('logout')}>Sign out</a>
       </div>
     </div>
   )

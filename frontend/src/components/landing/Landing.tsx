@@ -1,5 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { Redirect } from 'react-router-dom'
+
 import Login from './login'
+import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Landing.module.scss'
 import landingImg from 'assets/img/landing.png'
@@ -7,6 +10,14 @@ import appLogo from 'assets/img/app-logo.png'
 import ogpLogo from 'assets/img/ogp-logo.svg'
 
 const Landing = () => {
+  const authContext = useContext(AuthContext)
+
+  if (authContext.isAuthenticated) {
+    return (
+      <Redirect to='/campaigns'></Redirect>
+    )
+  }
+
   return (
     <React.Fragment>
       <div className={styles.topContainer}>

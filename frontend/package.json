@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "react-scripts start",
+    "dev": "npm start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
     "lint": "eslint  --ext .tsx,.ts src/"
