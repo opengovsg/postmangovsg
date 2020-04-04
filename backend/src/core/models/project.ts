@@ -33,5 +33,16 @@ export class Project extends Model<Project> {
 
   @Column(DataType.JSON)
   s3Object?: object
-  
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false
+  })
+  locked!: boolean
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false
+  })
+  valid!: boolean
 }
