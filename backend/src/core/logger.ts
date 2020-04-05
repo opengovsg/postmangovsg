@@ -7,7 +7,7 @@ interface LoggerInterface {
 class Logger implements LoggerInterface {
   logger: winston.Logger
 
-  constructor () {
+  constructor() {
     this.logger = winston.createLogger({
       level: 'debug',
       levels: winston.config.npm.levels,

@@ -15,7 +15,7 @@ const start = async (): Promise<void> => {
 }
 
 start()
-  .then(() => {})
+  .then()
   .catch((err) => {
     console.error(err)
   })

@@ -27,5 +27,5 @@ export default {
       acquire: SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
     },
   },
-  MORGAN_LOG_FORMAT
+  MORGAN_LOG_FORMAT,
 }
