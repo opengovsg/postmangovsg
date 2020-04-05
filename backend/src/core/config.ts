@@ -9,6 +9,8 @@ const SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS = 600000
 
 const rdsCa = IS_PROD && fs.readFileSync(path.join(__dirname, '../db-ca.pem'))
 
+const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
+
 export default {
   IS_PROD,
   database: {
@@ -25,4 +27,5 @@ export default {
       acquire: SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
     },
   },
+  MORGAN_LOG_FORMAT
 }
