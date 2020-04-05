@@ -14,13 +14,6 @@ export class Credential extends Model<Credential> {
     allowNull: false,
     defaultValue: false
   })
-  validated!: boolean
-
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  })
   used!: boolean
 
 }
