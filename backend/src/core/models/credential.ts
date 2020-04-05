@@ -5,14 +5,14 @@ export class Credential extends Model<Credential> {
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    primaryKey: true
+    primaryKey: true,
   })
   name!: string
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: false
+    defaultValue: false,
   })
   used!: boolean
 

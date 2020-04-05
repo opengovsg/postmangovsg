@@ -15,7 +15,7 @@ export class EmailMessage extends Model<EmailMessage> {
 
   @Column({
     type: DataType.STRING,
-    primaryKey: true
+    primaryKey: true,
   })
   recipient!: string
 

@@ -1,5 +1,5 @@
 import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript'
-import { JobStatus } from "../constants";
+import { JobStatus } from '../constants'
 import { Project } from './project'
 import { Worker } from './worker'
 
