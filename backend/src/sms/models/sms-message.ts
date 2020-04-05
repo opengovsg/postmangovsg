@@ -15,7 +15,7 @@ export class SmsMessage extends Model<SmsMessage> {
 
   @Column({
     type: DataType.STRING,
-    primaryKey: true
+    primaryKey: true,
   })
   recipient!: string
 

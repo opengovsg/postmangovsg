@@ -1,6 +1,6 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
 import { ChannelType } from '../constants'
-import { Credential } from "./credential"
+import { Credential } from './credential'
 import { User } from './user'
 
 @Table({ tableName: 'projects' })
@@ -36,13 +36,7 @@ export class Project extends Model<Project> {
 
   @Column({
     type: DataType.BOOLEAN,
-    allowNull: false
-  })
-  locked!: boolean
-
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false
+    allowNull: false,
   })
   valid!: boolean
 }
