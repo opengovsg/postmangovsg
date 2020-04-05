@@ -38,11 +38,5 @@ export class Project extends Model<Project> {
     type: DataType.BOOLEAN,
     allowNull: false
   })
-  locked!: boolean
-
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false
-  })
   valid!: boolean
 }
