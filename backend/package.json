@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rimraf build && tsc",
     "dev": "tsc-watch --onSuccess \"node ./build/server.js\"",
+    "lint-and-fix": "eslint --ignore-path .gitignore --fix 'src/**/*.ts'",
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* build"
