@@ -71,42 +71,42 @@ const sendMessagesValidator = {
 
 // handlers
 // Get project details
-async function getProjectDetails(_req: Request, res: Response): Promise<void> {
+const getProjectDetails = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 
 // Store body of message in sms template table
-async function storeTemplate(_req: Request, res: Response): Promise<void> {
+const storeTemplate = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 
 // Returns presigned url for upload
-async function uploadStart(_req: Request, res: Response): Promise<void> {
+const uploadStart = async (_req: Request, res: Response): Promise<void> => {
   res.json({ signedUrl: '' })
 }
 
 // Read file from s3 and populate messages table
-async function uploadComplete(_req: Request, res: Response): Promise<void> {
+const uploadComplete = async (_req: Request, res: Response): Promise<void> => {
   res.json({ numMessages: 100 })
 }
 
 // Read file from s3 and populate messages table
-async function storeCredentials(_req: Request, res: Response): Promise<void> {
+const storeCredentials = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 
 // Send validation sms to specified phone number
-async function validateCredentials(_req: Request, res: Response): Promise<void> {
+const validateCredentials = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 
 // Get preview of one message
-async function previewMessage(_req: Request, res: Response): Promise<void> {
+const previewMessage = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Message content' })
 }
 
 // Queue job for sending
-async function sendMessages(_req: Request, res: Response): Promise<void> {
+const sendMessages = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 

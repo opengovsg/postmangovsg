@@ -36,14 +36,14 @@ const createProjectValidator = {
 // route handlers here
 
 // Create project
-async function createProject(_req: Request, res: Response): Promise<void> {
+const createProject = async (_req: Request, res: Response): Promise<void> => {
   res.json({
     // project details
   })
 }
 
 // List projects
-async function listProjects(_req: Request, res: Response): Promise<void> {
+const listProjects = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'ok' })
 }
 
