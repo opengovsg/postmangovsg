@@ -15,3 +15,6 @@ const start = async (): Promise<void> => {
 }
 
 start()
+  .catch((err) => {
+    console.error(err)
+  })
