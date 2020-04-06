@@ -45,6 +45,7 @@
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
     "copyfiles": "^2.2.0",
+    "env-cmd": "^10.1.0",
     "eslint": "^6.8.0",
     "jest": "^25.2.4",
     "rimraf": "^3.0.2",
