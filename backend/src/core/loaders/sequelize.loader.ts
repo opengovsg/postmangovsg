@@ -21,8 +21,8 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
   sequelize.addModels([...coreModels, ...emailModels])
 
   try {
-    const synced = sequelize.sync()
-    logger.info({ message: 'Database loaded' })
+    const synced = await sequelize.sync()
+    logger.info({ message: 'Database loaded.' })
     return synced
   } catch (err) {
     logger.error(`Unable to connect to database: ${err}`)
