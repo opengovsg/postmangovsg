@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import emailRoutes from './email.routes'
-import { isEmailProject } from '../middlewares'
+import { isEmailProject } from '@email/middlewares'
 
 const router = Router()
 

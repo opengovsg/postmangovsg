@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript'
 
-import config from '../config'
+import config from '@core/config'
 import { Credential, JobQueue, Project, User, Worker } from '@core/models'
 import { EmailMessage, EmailTemplate } from '@email/models'
 import logger from '@core/logger'

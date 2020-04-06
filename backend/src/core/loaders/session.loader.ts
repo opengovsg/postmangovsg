@@ -1,6 +1,6 @@
 import express from 'express'
 import session from 'express-session'
-import config from '../config'
+import config from '@core/config'
 
 const sessionLoader = ({ app }: {app: express.Application}): void => {
   //TODO: Use something persistent as a session store

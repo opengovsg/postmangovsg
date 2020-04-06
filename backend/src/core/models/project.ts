@@ -1,5 +1,5 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
-import { ChannelType } from '../constants'
+import { ChannelType } from '@core/constants'
 import { Credential } from './credential'
 import { User } from './user'
 

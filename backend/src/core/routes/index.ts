@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { verifyProjectOwner } from '../middlewares'
+import { verifyProjectOwner } from '@core/middlewares'
 const projectIdValidator = {
   [Segments.PARAMS]: Joi.object({
     projectId: Joi
