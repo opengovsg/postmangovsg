@@ -6,15 +6,14 @@ const router = Router()
 
 // validators
 const listProjectsValidator = {
-  [Segments.PARAMS]: Joi.object(),
   [Segments.QUERY]: Joi.object({
     limit: Joi
       .number()
-      .min(0),
+      .min(1),
     offset: Joi
       .number()
       .positive()
-      .min(1)
+      .min(0)
       .optional(),
   }),
 }
@@ -45,20 +44,19 @@ const createProjectValidator = {
  *      summary: List all projects for user
  *      parameters:
  *        - in: query
- *          name: offset
- *          description: offset index for projects
- *          required: false
- *          schema:
- *            type: integer
- *            minimum: 0
- *        - in: query
  *          name: limit
  *          description: max number of projects returned
  *          required: true
  *          schema:
  *            type: integer
  *            minimum: 1
- *                  
+*        - in: query
+ *          name: offset
+ *          description: offset to begin returning projects from
+ *          required: false
+ *          schema:
+ *            type: integer
+ *            minimum: 0            
  *      responses:
  *        "200":
  *          content:
