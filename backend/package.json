@@ -10,8 +10,8 @@
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* build",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:watch": "jest --watch --detectOpenHandles"
   },
   "author": "",
   "license": "MIT",
