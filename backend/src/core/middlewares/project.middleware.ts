@@ -3,10 +3,17 @@ import { Project } from '@core/models'
 import logger from '@core/logger'
 import { Sequelize } from 'sequelize-typescript'
 
-// TODO
-const verifyProjectOwner = async (_req: Request, _res: Response, next: NextFunction): Promise<Response | void> => {
-  // const { projectId } = req.params
-  next()
+const verifyProjectOwner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try{
+    const { projectId } = req.params
+    const { id: userId } = req.session?.user
+    const project = await Project.findOne({ where: { projectId, userId } })
+    return project ? next() : res.sendStatus(403)
+  }
+  catch(err){
+    logger.error(err)
+    return next(err)
+  }
 }
 
 // Create project
