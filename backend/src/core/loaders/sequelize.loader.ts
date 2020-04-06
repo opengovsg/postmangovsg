@@ -1,6 +1,8 @@
 import { Sequelize } from 'sequelize-typescript'
 
 import config from '../config'
+import { Credential, JobQueue, Project, User, Worker } from '@core/models'
+import { EmailMessage, EmailTemplate } from '@email/models'
 
 const DB_URI = config.database.databaseUri
 
@@ -12,6 +14,10 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
     pool: config.database.poolOptions,
     ...dialectOptions,
   })
+
+  const coreModels = [Credential, JobQueue, Project, User, Worker]
+  const emailModels = [EmailMessage, EmailTemplate]
+  sequelize.addModels([...coreModels, ...emailModels])
 
   try {
     const synced = sequelize.sync()

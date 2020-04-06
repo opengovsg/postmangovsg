@@ -1,6 +1,15 @@
 export enum ChannelType {
-  SMS = 'sms',
-  Email = 'email'
+  SMS = 'SMS',
+  Email = 'EMAIL'
+}
+
+export enum JobStatus {
+  Ready = 'READY',
+  Enqueued = 'ENQUEUED',
+  Sending = 'SENDING',
+  Sent = 'SENT',
+  Stopped = 'STOPPED',
+  Logged = 'LOGGED'
 }
 
 /**
@@ -10,23 +19,32 @@ export enum ChannelType {
  *      ChannelType:
  *        type: string
  *        enum:
- *        - sms
- *        - email
- *      
+ *        - SMS
+ *        - EMAIL
+ *
  *      Project:
  *        type: object
- * 
+ *
  *      ProjectMeta:
  *        type: object
  *        properties:
- *          name: 
+ *          name:
  *            type: string
- *          createdAt: 
+ *          createdAt:
  *            type: string
  *            format: date-time
  *          status:
  *            type: string
  *          type:
  *            $ref: '#/components/schemas/ChannelType'
+ *      JobStatus:
+ *        type: string
+ *        enum:
+ *        - READY
+ *        - ENQUEUED
+ *        - SENDING
+ *        - SENT
+ *        - STOPPED
+ *        - LOGGED
  */
 
