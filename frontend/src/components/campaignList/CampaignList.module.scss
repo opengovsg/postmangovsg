@@ -1,0 +1,23 @@
+@import "styles/_variables";
+
+.campaignList {
+  padding-top: 90px;
+  padding-bottom: 90px;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 35px;
+}
+
+.table > div {
+  border-bottom: 1px solid $transparent-blue;
+}
+
+.header > p{
+  font-size: 0.75em;
+}
+
+.rows > p{
+  font-size: 0.875em;
+}

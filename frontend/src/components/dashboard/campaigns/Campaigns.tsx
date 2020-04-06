@@ -1,16 +1,49 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
-import { TitleBar, PrimaryButton } from 'components/common'
+import Pagination from 'components/common/pagination'
+import { CampaignContext } from 'contexts/campaign.context'
 import styles from './Campaigns.module.scss'
 
 const Campaigns = () => {
+  const campaignContext = useContext(CampaignContext)
+  const { campaigns } = campaignContext
+
   return (
-    <>
-      <TitleBar title="Welcome, Agency">
-        <PrimaryButton>Create campaign</PrimaryButton>
-      </TitleBar>
-        Campaigns!
-    </>
+    <div className={styles.content}>
+      <h3 className={styles.title}>{campaigns.length} past campaigns</h3>
+
+      {
+        campaigns.length
+          ? (
+            <>
+              <div className={styles.table}>
+                <div className={["columns", styles.header].join(' ')}>
+                  <p className="column">Mode</p>
+                  <p className="column">Name</p>
+                  <p className="column">Time Sent</p>
+                  <p className="column">Messages Sent</p>
+                  <p className="column">Status</p>
+                </div>
+
+                {
+                  campaigns.map((item: any, index: number) => 
+                    <div className={["columns", styles.rows].join(' ')} key={index}>
+                      <p className="column">{item.Mode}</p>
+                      <p className="column">{item.Name}</p>
+                      <p className="column">{item['Time Sent']}</p>
+                      <p className="column">{item['Messages Sent']}</p>
+                      <p className="column">{item.Status}</p>
+                    </div>  
+                  )
+                }
+              </div>
+
+              <Pagination itemsCount={campaigns.length}></Pagination>
+            </>
+          )
+          : ''
+      }
+    </div>
   )
 }
 

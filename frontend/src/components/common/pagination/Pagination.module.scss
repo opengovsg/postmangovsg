@@ -1,0 +1,49 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.pagination {
+  @include flex-horizontal;
+  justify-content: center;
+  margin-top: 60px;
+}
+
+.navIcon span {
+  color: $dark-blue;
+}
+
+.navIconDisabled span {
+  color: $disabled-color;
+}
+
+.break > a {
+  color: $dark-blue;
+}
+
+.pageNumber {
+  height: 30px;
+  width: 30px;
+  margin-right: 10px;
+  margin-left: 10px;
+  @include flex-horizontal;
+  justify-content: center;
+
+  > a {
+    color: $dark-blue;
+    font-size: 0.8rem;
+  }
+}
+
+.active {
+  background-color: $indigo-blue;
+  border-radius: 15px;
+
+  > a, a:hover {
+    color: $light-blue;
+  }
+}
+
+.prev {
+  height: 24px;
+}
+
+
