@@ -1,7 +1,7 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 import { ChannelType } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
-
+import { createProject, listProjects } from '@core/middlewares'
 const router = Router()
 
 // validators
@@ -31,20 +31,6 @@ const createProjectValidator = {
       .trim()
       .required(),
   }),
-}
-
-// route handlers here
-
-// Create project
-const createProject = async (_req: Request, res: Response): Promise<void> => {
-  res.json({
-    // project details
-  })
-}
-
-// List projects
-const listProjects = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'ok' })
 }
 
 // actual routes here
@@ -108,7 +94,7 @@ router.get('/', celebrate(listProjectsValidator), listProjects)
  *              - type
  *                  
  *      responses:
- *        "200":
+ *        "201":
  *          content:
  *            application/json:
  *              schema:
