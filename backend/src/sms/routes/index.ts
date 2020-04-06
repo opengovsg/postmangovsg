@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import smsRoutes from './sms.routes'
-import { isSmsProject } from '../middlewares'
+import { isSmsProject } from '@sms/middlewares'
 
 const router = Router()
 
