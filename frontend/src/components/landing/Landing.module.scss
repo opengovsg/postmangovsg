@@ -73,6 +73,7 @@
       border-right: 1px solid white;
       padding-right: 3vw;
       text-transform: uppercase;
+      font-weight: 500;
       @include mobile() {
         border-right: none;
         margin-bottom: 1rem;
