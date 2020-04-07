@@ -3,6 +3,10 @@ import path from 'path'
 
 const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 
+// AWS settings
+const awsRegion: string = process.env.AWS_REGION as string
+const uploadBucket: string = process.env.FILE_STORAGE_BUCKET_NAME as string
+
 // Database settings
 const databaseUri: string = process.env.DB_URI as string
 const SEQUELIZE_POOL_MAX_CONNECTIONS = 150
@@ -14,7 +18,7 @@ const redisSessionUri = process.env.REDIS_SESSION_URI as string
 
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
 
-// Express session 
+// Express session
 const sessionSecret: string = process.env.SESSION_SECRET as string
 const cookieSettings = {
   httpOnly: true,
@@ -23,14 +27,18 @@ const cookieSettings = {
   sameSite: true,
 }
 
-// Node mailer 
-const mailHost = process.env.MAIL_HOST as string 
+// Node mailer
+const mailHost = process.env.MAIL_HOST as string
 const mailPort = process.env.MAIL_PORT as string
 const mailUser = process.env.MAIL_USER as string
 const mailPassword = process.env.MAIL_PASSWORD as string
 
 export default {
   IS_PROD,
+  aws: {
+    awsRegion,
+    uploadBucket,
+  },
   database: {
     databaseUri,
     dialectOptions: {
