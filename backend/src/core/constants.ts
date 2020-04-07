@@ -33,8 +33,10 @@ export enum JobStatus {
  *          createdAt:
  *            type: string
  *            format: date-time
- *          status:
- *            type: string
+ *          hasCredential:
+ *            type: boolean
+ *          valid:
+ *            type: boolean
  *          type:
  *            $ref: '#/components/schemas/ChannelType'
  *      JobStatus:

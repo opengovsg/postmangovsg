@@ -1,20 +1,21 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 import { ChannelType } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
-
+import { createProject, listProjects } from '@core/middlewares'
 const router = Router()
 
 // validators
 const listProjectsValidator = {
-  [Segments.PARAMS]: Joi.object(),
   [Segments.QUERY]: Joi.object({
     limit: Joi
       .number()
-      .min(0),
+      .integer()
+      .min(1)
+      .optional(),
     offset: Joi
       .number()
-      .positive()
-      .min(1)
+      .integer()
+      .min(0)
       .optional(),
   }),
 }
@@ -33,20 +34,6 @@ const createProjectValidator = {
   }),
 }
 
-// route handlers here
-
-// Create project
-const createProject = async (_req: Request, res: Response): Promise<void> => {
-  res.json({
-    // project details
-  })
-}
-
-// List projects
-const listProjects = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'ok' })
-}
-
 // actual routes here
 
 /**
@@ -59,20 +46,19 @@ const listProjects = async (_req: Request, res: Response): Promise<void> => {
  *      summary: List all projects for user
  *      parameters:
  *        - in: query
- *          name: offset
- *          description: offset index for projects
+ *          name: limit
+ *          description: max number of projects returned
  *          required: false
  *          schema:
  *            type: integer
- *            minimum: 0
- *        - in: query
- *          name: limit
- *          description: max number of projects returned
- *          required: true
+ *            minimum: 1
+*        - in: query
+ *          name: offset
+ *          description: offset to begin returning projects from
+ *          required: false
  *          schema:
  *            type: integer
- *            minimum: 1
- *                  
+ *            minimum: 0            
  *      responses:
  *        "200":
  *          content:
@@ -108,7 +94,7 @@ router.get('/', celebrate(listProjectsValidator), listProjects)
  *              - type
  *                  
  *      responses:
- *        "200":
+ *        "201":
  *          content:
  *            application/json:
  *              schema:
