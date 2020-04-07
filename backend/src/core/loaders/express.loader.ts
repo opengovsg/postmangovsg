@@ -22,7 +22,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(celebrateErrorMiddleware())
 
   app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    logger.error(`${err}`)
+    logger.error(`${JSON.stringify(err.stack, null, 4)}`)
     return res.sendStatus(500)
   })
 
