@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Campaign, ChannelType } from 'models/Campaign'
 
 // for dev use
 async function sleep(ms: number): Promise<void> {
@@ -7,21 +8,23 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
-async function getCampaigns(): Promise<any> {
-  const campaigns = [
+async function getCampaigns(): Promise<Array<Campaign>> {
+  const campaigns: Array<Campaign> = [
     {
-      Mode: 'sms',
-      Name: 'test sms',
-      'Time Sent': 'today',
-      'Messages Sent': 123,
-      Status: 'In progress',
+      type: ChannelType.SMS,
+      name: 'test sms',
+      valid: true,
+      timeSent: 'today',
+      msgsSent: 123,
+      status: 'In progress',
     },
     {
-      Mode: 'email',
-      Name: 'test email',
-      'Time Sent': 'today',
-      'Messages Sent': 456,
-      Status: 'Completed',
+      type: ChannelType.EMAIL,
+      name: 'test email',
+      valid: true,
+      timeSent: 'today',
+      msgsSent: 456,
+      status: 'Completed',
     },
   ]
 

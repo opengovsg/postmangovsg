@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
+import { Campaign, ChannelType } from 'models/Campaign'
 import { getCampaigns } from 'services/campaign.service'
 import Pagination from 'components/common/pagination'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -9,8 +10,8 @@ import styles from './Campaigns.module.scss'
 const ITEMS_PER_PAGE = 1
 
 const Campaigns = () => {
-  const [campaigns, setCampaigns] = useState([])
-  const [campaignsDisplayed, setCampaignsDisplayed] = useState([])
+  const [campaigns, setCampaigns] = useState(new Array<Campaign>())
+  const [campaignsDisplayed, setCampaignsDisplayed] = useState(new Array<Campaign>())
   const [selectedPage, setSelectedPage] = useState(0)
 
   async function fetchCampaigns() {
@@ -28,10 +29,10 @@ const Campaigns = () => {
   }, [campaigns, selectedPage])
 
   const modeIcons: any = {
-    email: (
+    [ChannelType.EMAIL]: (
       <FontAwesomeIcon className={styles.icon} icon={faEnvelopeOpen} />
     ),
-    sms: (
+    [ChannelType.SMS]: (
       <FontAwesomeIcon className={styles.icon} icon={faCommentAlt} />
     ),
   }
@@ -57,12 +58,12 @@ const Campaigns = () => {
                   campaignsDisplayed.map((item: any, index: number) =>
                     <div className={[styles.row, styles.body].join(' ')} key={index}>
                       <div className={styles.column}>
-                        <span className={styles.icon}>{modeIcons[item.Mode]}</span>
+                        <span className={styles.icon}>{modeIcons[item.type]}</span>
                       </div>
-                      <p className={styles.column}>{item.Name}</p>
-                      <p className={styles.column}>{item['Time Sent']}</p>
-                      <p className={styles.column}>{item['Messages Sent']}</p>
-                      <p className={styles.column}>{item.Status}</p>
+                      <p className={styles.column}>{item.name}</p>
+                      <p className={styles.column}>{item.timeSent}</p>
+                      <p className={styles.column}>{item.msgsSent}</p>
+                      <p className={styles.column}>{item.status}</p>
                     </div>
                   )
                 }
