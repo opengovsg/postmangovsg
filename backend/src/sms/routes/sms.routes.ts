@@ -1,6 +1,10 @@
 import { Request, Response, Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
+import logger from '@core/logger'
+import { uploadStartHandler } from '@core/middlewares/project.middleware'
+import { updateProjectS3Metadata } from '@core/services/project.service'
+
 const router = Router()
 
 // validators
@@ -12,18 +16,17 @@ const storeTemplateValidator = {
 }
 
 const uploadstartValidator = {
-  [Segments.BODY]: Joi.object({
-    filename: Joi
+  [Segments.QUERY]: Joi.object({
+    mimeType: Joi
       .string()
-      .trim()
-      .min(5)
-      .max(100)
-      .pattern(/^[^\\/]+\.csv$/),
+      .required()
   }),
 }
 
 const uploadCompleteValidator = {
-  [Segments.BODY]: Joi.object(),
+  [Segments.BODY]: Joi.object({
+    s3Key: Joi.string().required(),
+  }),
 }
 
 const storeCredentialsValidator = {
@@ -80,14 +83,22 @@ const storeTemplate = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 
-// Returns presigned url for upload
-const uploadStart = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ signedUrl: '' })
-}
-
 // Read file from s3 and populate messages table
-const uploadComplete = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ numMessages: 100 })
+const uploadCompleteHandler = async (req: Request, res: Response): Promise<Response | void> => {
+  try {
+    const { projectId } = req.params
+    // TODO: validate if project is in editable state
+    // Updates metadata in project
+    await updateProjectS3Metadata({ key: req.body.s3Key, projectId })
+    // TODO: delete message_logs entries
+    // TODO: carry out templating / hydration
+    // - download from s3
+    // - populate template
+    return res.status(201).json({ message: `Upload success for project ${projectId}.` })
+  } catch (err) {
+    logger.error(`${err}`)
+    res.sendStatus(500)
+  }
 }
 
 // Read file from s3 and populate messages table
@@ -125,7 +136,7 @@ const sendMessages = async (_req: Request, res: Response): Promise<void> => {
  *          required: true
  *          schema:
  *            type: string
- *                  
+ *
  *      responses:
  *        200:
  *          content:
@@ -160,7 +171,7 @@ router.get('/', getCampaignDetails)
  *                  type: string
  *                  minLength: 1
  *                  maxLength: 200
- *                  
+ *
  *      responses:
  *        200:
  *          content:
@@ -207,7 +218,7 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
  *                  url:
  *                    type:string
  */
-router.post('/upload-start', celebrate(uploadstartValidator), uploadStart)
+router.post('/upload/start', celebrate(uploadstartValidator), uploadStartHandler)
 
 /**
  * @swagger
@@ -223,7 +234,7 @@ router.post('/upload-start', celebrate(uploadstartValidator), uploadStart)
  *          required: true
  *          schema:
  *            type: string
- *      
+ *
  *      responses:
  *        200:
  *          content:
@@ -231,7 +242,7 @@ router.post('/upload-start', celebrate(uploadstartValidator), uploadStart)
  *              schema:
  *                type: object
  */
-router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComplete)
+router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadCompleteHandler)
 
 /**
  * @swagger
@@ -253,7 +264,7 @@ router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComple
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/TwilioCredentials'
- *                  
+ *
  *      responses:
  *        200:
  *          content:
@@ -284,10 +295,10 @@ router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentia
  *            schema:
  *              type: object
  *              properties:
- *                phoneNumber: 
+ *                phoneNumber:
  *                  type: string
  *                  pattern: '^\+\d{8,15}$'
- *                  
+ *
  *      responses:
  *        200:
  *          content:
@@ -318,8 +329,8 @@ router.post('/validate', celebrate(validateCredentialsValidator), validateCreden
  *          required: false
  *          schema:
  *            type: integer
- *            minimum: 1  
- * 
+ *            minimum: 1
+ *
  *      responses:
  *        200:
  *          content:
@@ -350,10 +361,10 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
  *            schema:
  *              type: object
  *              properties:
- *                rate: 
+ *                rate:
  *                  type: integer
- *                  minimum: 1  
- * 
+ *                  minimum: 1
+ *
  *      responses:
  *        200:
  *          content:
