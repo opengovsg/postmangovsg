@@ -7,7 +7,7 @@ import logger from '@core/logger'
 
 const DB_URI = config.database.databaseUri
 
-const sequelizeLoader = (): void => {
+const sequelizeLoader = async (): Promise<void> => {
   const dialectOptions = config.IS_PROD ? { ...config.database.dialectOptions } : {}
   const sequelize = new Sequelize(DB_URI, {
     dialect: 'postgres',
@@ -21,7 +21,7 @@ const sequelizeLoader = (): void => {
   sequelize.addModels([...coreModels, ...emailModels])
 
   try {
-    sequelize.sync()
+    await sequelize.sync()
     console.log('Database loaded')
   } catch (err) {
     logger.error(`Unable to connect to database: ${err}`)

@@ -5,8 +5,8 @@ import sessionLoader from './session.loader'
 
 import { Application } from 'express'
 
-const loaders = ({ app }: { app: Application }): void => {
-  sequelizeLoader()
+const loaders = async ({ app }: { app: Application }): Promise<void> => {
+  await sequelizeLoader()
   sessionLoader({ app })
   expressLoader({ app })
   swaggerLoader({ app })

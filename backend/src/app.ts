@@ -7,7 +7,10 @@ import { checkRequiredEnvVars, loaders } from './core'
 const requiredEnvVars = ['DB_URI']
 const app: express.Application = express()
 
-checkRequiredEnvVars(requiredEnvVars)
-loaders({ app })
+const getApp = async () => {
+  checkRequiredEnvVars(requiredEnvVars)
+  await loaders({ app })
+  return app
+}
 
-export default app
+export default getApp
