@@ -6,7 +6,7 @@ import styles from './Campaigns.module.scss'
 
 const Campaigns = () => {
   const campaignContext = useContext(CampaignContext)
-  const { campaigns } = campaignContext
+  const { campaigns, campaignsDisplayed } = campaignContext
 
   return (
     <div className={styles.content}>
@@ -26,7 +26,7 @@ const Campaigns = () => {
                 </div>
 
                 {
-                  campaigns.map((item: any, index: number) => 
+                  campaignsDisplayed.map((item: any, index: number) => 
                     <div className={["columns", styles.rows].join(' ')} key={index}>
                       <p className="column">{item.Mode}</p>
                       <p className="column">{item.Name}</p>
@@ -38,7 +38,7 @@ const Campaigns = () => {
                 }
               </div>
 
-              <Pagination itemsCount={campaigns.length}></Pagination>
+              <Pagination></Pagination>
             </>
           )
           : ''
