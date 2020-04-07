@@ -12,7 +12,7 @@ const projectIdValidator = {
 }
 
 import authenticationRoutes from './auth.routes'
-import projectRoutes from './project.routes'
+import projectRoutes from './campaign.routes'
 // Import channel-specific routes
 import smsRoutes from '@sms/routes'
 import emailRoutes from '@email/routes'

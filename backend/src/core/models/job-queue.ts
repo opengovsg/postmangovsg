@@ -1,6 +1,6 @@
 import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript'
 import { JobStatus } from '@core/constants'
-import { Project } from './project'
+import { Project } from './campaign'
 import { Worker } from './worker'
 
 @Table({ tableName: 'job_queue' })
