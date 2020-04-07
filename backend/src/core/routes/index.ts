@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { verifyCampaignOwner } from '@core/middlewares'
+import { canEditCampaign } from '@core/middlewares'
 const campaignIdValidator = {
   [Segments.PARAMS]: Joi.object({
     campaignId: Joi
@@ -21,7 +21,7 @@ const router = Router()
 
 router.use('/auth', authenticationRoutes)
 router.use('/campaigns', campaignRoutes)
-router.use('/campaign/:campaignId/sms', celebrate(campaignIdValidator), verifyCampaignOwner, smsRoutes)
-router.use('/campaign/:campaignId/email', celebrate(campaignIdValidator), verifyCampaignOwner, emailRoutes)
+router.use('/campaign/:campaignId/sms', celebrate(campaignIdValidator), canEditCampaign, smsRoutes)
+router.use('/campaign/:campaignId/email', celebrate(campaignIdValidator), canEditCampaign, emailRoutes)
 
 export default router
