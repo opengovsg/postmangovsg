@@ -5,8 +5,8 @@ import { Sequelize } from 'sequelize-typescript'
 const verifyCampaignOwner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
-    const { id: userId } = req.session?.user
-    const campaign = await Campaign.findOne({ where: { campaignId, userId } })
+    const { id : userId } = req.session?.user
+    const campaign = await Campaign.findOne({ where: { 'id': campaignId, userId } })
     return campaign ? next() : res.sendStatus(403)
   }
   catch(err){
@@ -18,8 +18,8 @@ const verifyCampaignOwner = async (req: Request, res: Response, next: NextFuncti
 const createCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { name, type }: { name: string; type: string} = req.body
-    const { id } = req.session?.user
-    await Campaign.create({ name, type, userId: id, valid: false }) 
+    const { id: userId } = req.session?.user
+    await Campaign.create({ name, type, userId, valid: false }) 
     return res.sendStatus(201)
   }
   catch(err){
@@ -38,10 +38,10 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
         userId,
       },
       attributes: [
-        'id', 'name', 'type', 'createdAt', 'valid', [Sequelize.literal('CASE WHEN "credName" IS NULL THEN False ELSE True END'), 'hasCredential'],
+        'id', 'name', 'type', 'created_at', 'valid', [Sequelize.literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
       ],
       order: [
-        ['createdAt', 'DESC'],
+        ['created_at', 'DESC'],
       ],
     }
     if (offset) {
