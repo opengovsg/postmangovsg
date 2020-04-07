@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import smsRoutes from './sms.routes'
-import { isSmsCampaign } from '@sms/middlewares'
+import { isSmsCampaignOwnedByUser } from '@sms/middlewares'
 
-const router = Router()
+const router = Router({ mergeParams: true })
 
-router.use('/', isSmsCampaign, smsRoutes)
+router.use('/', isSmsCampaignOwnedByUser, smsRoutes)
 
 export default router
