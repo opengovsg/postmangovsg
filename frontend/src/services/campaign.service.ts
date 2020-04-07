@@ -14,15 +14,15 @@ async function getCampaigns(): Promise<any> {
       Name: 'test sms',
       'Time Sent': 'today',
       'Messages Sent': 123,
-      Status: 'In progress'
+      Status: 'In progress',
     },
     {
       Mode: 'email',
       Name: 'test email',
       'Time Sent': 'today',
       'Messages Sent': 456,
-      Status: 'Completed'
-    }
+      Status: 'Completed',
+    },
   ]
 
   await sleep(1000)

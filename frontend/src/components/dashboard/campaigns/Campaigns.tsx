@@ -1,22 +1,39 @@
-import React, { useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 
+import { getCampaigns } from 'services/campaign.service'
 import Pagination from 'components/common/pagination'
-import { CampaignContext } from 'contexts/campaign.context'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelopeOpen, faEnvelopeOpenText } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelopeOpen, faCommentAlt } from '@fortawesome/free-solid-svg-icons'
 import styles from './Campaigns.module.scss'
 
+const ITEMS_PER_PAGE = 1
+
 const Campaigns = () => {
-  const campaignContext = useContext(CampaignContext)
-  const { campaigns, campaignsDisplayed } = campaignContext
+  const [campaigns, setCampaigns] = useState([])
+  const [campaignsDisplayed, setCampaignsDisplayed] = useState([])
+  const [selectedPage, setSelectedPage] = useState(0)
+
+  async function fetchCampaigns() {
+    const campaigns = await getCampaigns()
+    setCampaigns(campaigns)
+  }
+
+  useEffect(() => {
+    fetchCampaigns()
+  }, [])
+
+  useEffect(() => {
+    const offset = selectedPage * ITEMS_PER_PAGE
+    setCampaignsDisplayed(campaigns.slice(offset, offset + ITEMS_PER_PAGE))
+  }, [campaigns, selectedPage])
 
   const modeIcons: any = {
     email: (
       <FontAwesomeIcon className={styles.icon} icon={faEnvelopeOpen} />
     ),
     sms: (
-      <FontAwesomeIcon className={styles.icon} icon={faEnvelopeOpenText} />
-    )
+      <FontAwesomeIcon className={styles.icon} icon={faCommentAlt} />
+    ),
   }
 
   return (
@@ -37,7 +54,7 @@ const Campaigns = () => {
                 </div>
 
                 {
-                  campaignsDisplayed.map((item: any, index: number) => 
+                  campaignsDisplayed.map((item: any, index: number) =>
                     <div className={[styles.row, styles.body].join(' ')} key={index}>
                       <div className={styles.column}>
                         <span className={styles.icon}>{modeIcons[item.Mode]}</span>
@@ -46,12 +63,16 @@ const Campaigns = () => {
                       <p className={styles.column}>{item['Time Sent']}</p>
                       <p className={styles.column}>{item['Messages Sent']}</p>
                       <p className={styles.column}>{item.Status}</p>
-                    </div>  
+                    </div>
                   )
                 }
               </div>
 
-              <Pagination></Pagination>
+              <Pagination
+                itemsCount={campaigns.length}
+                setSelectedPage={setSelectedPage}
+                itemsPerPage={ITEMS_PER_PAGE}
+              ></Pagination>
             </>
           )
           : ''

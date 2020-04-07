@@ -1,18 +1,17 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import ReactPaginate from 'react-paginate'
 
-import { CampaignContext } from 'contexts/campaign.context'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import styles from './Pagination.module.scss'
 
-const PAGE_RANGE_DISPLAYED = 5    // range of pages displayed
-const MARGIN_PAGES_DISPLAYED = 2  // number of pages displayed after ellipse
+const PAGE_RANGE_DISPLAYED = 5 // range of pages displayed
+const MARGIN_PAGES_DISPLAYED = 2 // number of pages displayed after ellipse
 
-const Pagination = () => {
-  const campaignContext = useContext(CampaignContext)
-  const { setSelectedPage, pageCount } = campaignContext
+const Pagination = (props: any) => {
+  const { itemsCount, setSelectedPage, itemsPerPage } = props
 
+  const pageCount = itemsCount / itemsPerPage
 
   const previousButton = (
     <span className={styles.icon}>
@@ -29,7 +28,7 @@ const Pagination = () => {
   const handlePageClick = (data: any) => {
     // page index starts from 0
     setSelectedPage(data.selected)
-  };
+  }
 
   return (
     <ReactPaginate
