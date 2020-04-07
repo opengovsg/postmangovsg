@@ -9,10 +9,12 @@ const listProjectsValidator = {
   [Segments.QUERY]: Joi.object({
     limit: Joi
       .number()
-      .min(1),
+      .integer()
+      .min(1)
+      .optional(),
     offset: Joi
       .number()
-      .positive()
+      .integer()
       .min(0)
       .optional(),
   }),
@@ -46,7 +48,7 @@ const createProjectValidator = {
  *        - in: query
  *          name: limit
  *          description: max number of projects returned
- *          required: true
+ *          required: false
  *          schema:
  *            type: integer
  *            minimum: 1
