@@ -18,6 +18,17 @@
   }
 }
 
+.row {
+  @include flex-horizontal;
+}
+
+.column {
+  flex-basis: 0;
+  flex-grow: 1;
+  flex-shrink: 1;
+  padding: 0.75rem;
+}
+
 .title {
   font-size: 24px;
   margin-bottom: 35px;
@@ -27,10 +38,10 @@
   border-bottom: 1px solid $transparent-blue;
 }
 
-.header > p{
+.header > p {
   font-size: 0.75em;
 }
 
-.rows > p{
+.body > p {
   font-size: 0.875em;
 }

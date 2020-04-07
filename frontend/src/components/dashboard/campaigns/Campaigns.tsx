@@ -17,22 +17,22 @@ const Campaigns = () => {
           ? (
             <>
               <div className={styles.table}>
-                <div className={["columns", styles.header].join(' ')}>
-                  <p className="column">Mode</p>
-                  <p className="column">Name</p>
-                  <p className="column">Time Sent</p>
-                  <p className="column">Messages Sent</p>
-                  <p className="column">Status</p>
+                <div className={[styles.row, styles.header].join(' ')}>
+                  <p className={styles.column}>Mode</p>
+                  <p className={styles.column}>Name</p>
+                  <p className={styles.column}>Time Sent</p>
+                  <p className={styles.column}>Messages Sent</p>
+                  <p className={styles.column}>Status</p>
                 </div>
 
                 {
                   campaignsDisplayed.map((item: any, index: number) => 
-                    <div className={["columns", styles.rows].join(' ')} key={index}>
-                      <p className="column">{item.Mode}</p>
-                      <p className="column">{item.Name}</p>
-                      <p className="column">{item['Time Sent']}</p>
-                      <p className="column">{item['Messages Sent']}</p>
-                      <p className="column">{item.Status}</p>
+                    <div className={[styles.row, styles.body].join(' ')} key={index}>
+                      <p className={styles.column}>{item.Mode}</p>
+                      <p className={styles.column}>{item.Name}</p>
+                      <p className={styles.column}>{item['Time Sent']}</p>
+                      <p className={styles.column}>{item['Messages Sent']}</p>
+                      <p className={styles.column}>{item.Status}</p>
                     </div>  
                   )
                 }
