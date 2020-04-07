@@ -5,7 +5,7 @@ import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/project.middleware'
 import { updateProjectS3Metadata } from '@core/services/project.service'
 
-const router = Router()
+const router = Router({ mergeParams: true })
 
 // validators
 const storeTemplateValidator = {
