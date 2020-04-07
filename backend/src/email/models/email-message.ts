@@ -1,7 +1,7 @@
 import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'email_messages' })
+@Table({ tableName: 'email_messages' , underscored: true, timestamps: true })
 export class EmailMessage extends Model<EmailMessage> {
   @ForeignKey(() => Campaign)
   @Column({

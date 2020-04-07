@@ -3,7 +3,7 @@ import { JobStatus } from '@core/constants'
 import { Campaign } from './campaign'
 import { Worker } from './worker'
 
-@Table({ tableName: 'job_queue' })
+@Table({ tableName: 'job_queue' , underscored: true, timestamps: true })
 export class JobQueue extends Model<JobQueue> {
   @ForeignKey(() => Campaign)
   @Column(DataType.INTEGER)
