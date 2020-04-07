@@ -22,10 +22,10 @@ export enum JobStatus {
  *        - SMS
  *        - EMAIL
  *
- *      Project:
+ *      Campaign:
  *        type: object
  *
- *      ProjectMeta:
+ *      CampaignMeta:
  *        type: object
  *        properties:
  *          name:

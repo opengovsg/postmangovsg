@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import { ChannelType } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { createProject, listProjects } from '@core/middlewares'
+import { createCampaign, listCampaigns } from '@core/middlewares'
 const router = Router()
 
 // validators
-const listProjectsValidator = {
+const listCampaignsValidator = {
   [Segments.QUERY]: Joi.object({
     limit: Joi
       .number()
@@ -20,7 +20,7 @@ const listProjectsValidator = {
   }),
 }
 
-const createProjectValidator = {
+const createCampaignValidator = {
   [Segments.BODY]: Joi.object({
     type: Joi
       .string()
@@ -42,7 +42,7 @@ const createProjectValidator = {
  *  /campaigns:
  *    get:
  *      tags:
- *        - Projects
+ *        - Campaigns
  *      summary: List all campaigns for user
  *      parameters:
  *        - in: query
@@ -66,9 +66,9 @@ const createProjectValidator = {
  *              schema:
  *                type: array
  *                items:
- *                  $ref: '#/components/schemas/ProjectMeta'
+ *                  $ref: '#/components/schemas/CampaignMeta'
  */
-router.get('/', celebrate(listProjectsValidator), listProjects)
+router.get('/', celebrate(listCampaignsValidator), listCampaigns)
 
 /**
  * @swagger
@@ -77,7 +77,7 @@ router.get('/', celebrate(listProjectsValidator), listProjects)
  *    post:
  *      summary: Create a new campaign
  *      tags:
- *        - Projects
+ *        - Campaigns
  *      requestBody:
  *        required: true
  *        content:
@@ -100,6 +100,6 @@ router.get('/', celebrate(listProjectsValidator), listProjects)
  *              schema:
  *                type: object
  */
-router.post('/', celebrate(createProjectValidator), createProject)
+router.post('/', celebrate(createCampaignValidator), createCampaign)
 
 export default router

@@ -71,7 +71,7 @@ const sendMessagesValidator = {
 
 // handlers
 // Get campaign details
-const getProjectDetails = async (_req: Request, res: Response): Promise<void> => {
+const getCampaignDetails = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 
@@ -133,7 +133,7 @@ const sendMessages = async (_req: Request, res: Response): Promise<void> => {
  *              schema:
  *                $ref: '#/components/schemas/SmsCampaign'
  */
-router.get('/', getProjectDetails)
+router.get('/', getCampaignDetails)
 
 /**
  * @swagger

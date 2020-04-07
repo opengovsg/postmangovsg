@@ -2,20 +2,20 @@ import { Request, Response, NextFunction } from 'express'
 import { Campaign } from '@core/models'
 import { Sequelize } from 'sequelize-typescript'
 
-const verifyProjectOwner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const verifyCampaignOwner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
     const { id: userId } = req.session?.user
-    const project = await Campaign.findOne({ where: { campaignId, userId } })
-    return project ? next() : res.sendStatus(403)
+    const campaign = await Campaign.findOne({ where: { campaignId, userId } })
+    return campaign ? next() : res.sendStatus(403)
   }
   catch(err){
     return next(err)
   }
 }
 
-// Create project
-const createProject = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+// Create campaign
+const createCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { name, type }: { name: string; type: string} = req.body
     const { id } = req.session?.user
@@ -28,8 +28,8 @@ const createProject = async (req: Request, res: Response, next: NextFunction): P
  
 }
 
-// List projects
-const listProjects = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+// List campaigns
+const listCampaigns = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { offset, limit } = req.query 
     const { id : userId } = req.session?.user
@@ -51,12 +51,12 @@ const listProjects = async (req: Request, res: Response, next: NextFunction): Pr
       options.limit = +limit
     }
   
-    const projects = await Campaign.findAll(options)
-    return res.json(projects)
+    const campaigns = await Campaign.findAll(options)
+    return res.json(campaigns)
   }catch(err){
     return next(err)
   }
 }
 
 
-export { verifyProjectOwner, createProject, listProjects }
+export { verifyCampaignOwner, createCampaign, listCampaigns }
