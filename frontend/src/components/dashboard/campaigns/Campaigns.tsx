@@ -21,7 +21,7 @@ const Campaigns = () => {
 
   return (
     <div className={styles.content}>
-      <h3 className={styles.title}>{campaigns.length} past campaigns</h3>
+      <h2 className={styles.title}>{campaigns.length} past campaigns</h2>
 
       {
         campaigns.length

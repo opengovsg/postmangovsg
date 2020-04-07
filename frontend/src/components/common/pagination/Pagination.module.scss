@@ -4,7 +4,7 @@
 .pagination {
   @include flex-horizontal;
   justify-content: center;
-  margin-top: 60px;
+  margin-top: 3.5rem;
 }
 .icon {
   @include icon;
@@ -20,10 +20,10 @@
 }
 
 .pageNumber {
-  height: 30px;
-  width: 30px;
-  margin-right: 10px;
-  margin-left: 10px;
+  height: 1.875rem;
+  width: 1.875rem;
+  margin-right: 0.75rem;
+  margin-left: 0.75rem;
   @include flex-horizontal;
   justify-content: center;
 
@@ -36,15 +36,11 @@
 
 .active {
   background-color: $indigo-blue;
-  border-radius: 15px;
+  border-radius: 1rem;
 
   > a, a:hover {
     color: $light-blue;
   }
-}
-
-.prev {
-  height: 24px;
 }
 
 

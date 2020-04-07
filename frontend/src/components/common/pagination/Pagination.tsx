@@ -32,27 +32,23 @@ const Pagination = () => {
   };
 
   return (
-    <React.Fragment>      
-      
-      <ReactPaginate
-          previousLabel={previousButton}
-          nextLabel={nextButton}
-          breakLabel={'...'}
-          pageCount={pageCount}
-          marginPagesDisplayed={MARGIN_PAGES_DISPLAYED}
-          pageRangeDisplayed={PAGE_RANGE_DISPLAYED}
-          onPageChange={handlePageClick}
-          containerClassName={styles.pagination}
-          pageClassName={styles.pageNumber}
-          breakClassName={styles.break}
-          activeClassName={styles.active}
-          activeLinkClassName	={styles.activeLink}
-          previousClassName={styles.navIcon}
-          nextClassName={styles.navIcon}
-          disabledClassName={styles.navIconDisabled}
-        />
-
-    </React.Fragment>
+    <ReactPaginate
+      previousLabel={previousButton}
+      nextLabel={nextButton}
+      breakLabel={'...'}
+      pageCount={pageCount}
+      marginPagesDisplayed={MARGIN_PAGES_DISPLAYED}
+      pageRangeDisplayed={PAGE_RANGE_DISPLAYED}
+      onPageChange={handlePageClick}
+      containerClassName={styles.pagination}
+      pageClassName={styles.pageNumber}
+      breakClassName={styles.break}
+      activeClassName={styles.active}
+      activeLinkClassName	={styles.activeLink}
+      previousClassName={styles.navIcon}
+      nextClassName={styles.navIcon}
+      disabledClassName={styles.navIconDisabled}
+    />
   )
 }
 
