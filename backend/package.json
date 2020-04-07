@@ -50,6 +50,7 @@
     "copyfiles": "^2.2.0",
     "eslint": "^6.8.0",
     "jest": "^25.2.7",
+    "node-mocks-http": "^1.8.1",
     "rimraf": "^3.0.2",
     "ts-jest": "^25.3.1",
     "tsc-watch": "^4.2.3",
