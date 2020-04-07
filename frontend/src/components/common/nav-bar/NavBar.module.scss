@@ -1,45 +1,100 @@
 @import "styles/_variables";
 @import "styles/_mixins";
+@import "~sass-burger";
 
 $navbar-link-margin: calc(1rem + 1vw);
+$navbar-height: 4rem;
+$navbar-mobile-height: 3.5rem;
 
 .navBar {
   @include flex-horizontal;
-  height: $nav-bar-height;
+  height: $navbar-height;
   background-color: $dark-blue;
+  z-index: 100;
   padding: 0 $site-padding;
-  justify-content: space-between;
 
-  .title {
-    font-size: 1.3rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-    margin-right: 2rem;
-    color: $light-blue;
+  @include mobile() {
+    height: auto;
+    flex-direction: column;
+    padding: 0;
   }
 
-  .link {
-    letter-spacing: 1.3px;
-    opacity: 0.5;
-    color: $light-blue;
+  .navBrand {
+    @include flex-horizontal;
+    justify-content: flex-start;
 
-    &:hover,
-    &:active,
-    &.active {
-      opacity: 1;
+    @include mobile() {
+      justify-content: space-between;
+      padding: 0 $site-padding;
+      width: 100%;
+    }
+
+    .title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin-right: 2rem;
+      color: $light-blue;
+    }
+
+    .burgerButton {
+      display: none;
+      @include mobile() {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: $navbar-mobile-height;
+        width: $navbar-mobile-height;
+      }
+
+      .burger {
+        @include burger(25px, 3px, 5px, $light-blue);
+        &.isActive {
+          @include burger-to-cross;
+        }
+      }
     }
   }
 
-  .left,
-  .right {
-    @include flex-horizontal;
-  }
+  .navbarLinks {
+    display: flex;
+    flex: 1;
+    @include mobile() {
+      display: none;
 
-  .left .link,
-  .left .title {
-    margin-right: $navbar-link-margin;
-  }
-  .right .link {
-    margin-left: $navbar-link-margin;
+      &.isActive {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        background-color: $dark-blue;
+        border: $site-padding solid $dark-blue;
+      }
+    }
+
+    .link {
+      letter-spacing: 1.3px;
+      opacity: 0.5;
+      color: $light-blue;
+      margin-right: $navbar-link-margin;
+      &:last-child {
+        margin-right: 0;
+      }
+
+      @include mobile() {
+        padding: 0.8rem 0;
+        width: 100%;
+      }
+
+      &:hover,
+      &:active,
+      &.active {
+        opacity: 1;
+      }
+    }
+
+    .separator {
+      flex: 1;
+    }
   }
 }

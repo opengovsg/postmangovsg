@@ -1,11 +1,13 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+$title-bar-height: 5rem;
+
 .titleBar {
+  @include flex-horizontal;
   height: $title-bar-height;
   color: $dark-blue;
-  font-size: 32px;
   border-bottom: 1px solid $indigo-blue;
-  @include flex-horizontal;
-  padding-left: 70px;
+  padding: 0 $site-padding;
+  justify-content: space-between;
 }

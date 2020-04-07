@@ -2,10 +2,9 @@
 $dark-blue: #100c55;
 $indigo-blue: #2c2cdc;
 $light-blue: #f5f6fc;
+$light-blue-half-opacity: rgba(245, 246, 252, 0.5);
 
 // Dimensions
-$nav-bar-height: 70px;
-$title-bar-height: 100px;
 $button-min-width: 10rem;
 
 // Paddings
@@ -15,13 +14,12 @@ $site-padding: 3vw;
 $font-stack: "Noto Sans", sans-serif;
 
 // Update Bulma's global variables
-$family-sans-serif: $font-stack;
 $primary: $indigo-blue;
 $info: $dark-blue;
 $text: $dark-blue;
 $control-border-width: 1px;
 
-// override
+// bulma component override
 $button-focus-box-shadow-size: 0;
 $input-focus-box-shadow-size: 0;
 $input-background-color: transparent;
