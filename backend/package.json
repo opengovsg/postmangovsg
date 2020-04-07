@@ -10,7 +10,7 @@
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* build",
-    "test": "env-cmd -f .test-env --use-shell \"jest --detectOpenHandles --forceExit\"",
+    "test": "jest --detectOpenHandles --forceExit",
     "test:watch": "env-cmd -f .test-env --use-shell \"jest --watch --detectOpenHandles\""
   },
   "author": "",

@@ -4,6 +4,7 @@ node_js:
 
 services:
   - docker
+  - postgresql
 
 # Deploy from Dockerfile
 jobs:
@@ -11,6 +12,7 @@ jobs:
   - name: backend
     before_script:
       - cd backend
+      - psql -c 'create database postmangovsgtest;' -U postgres
     script:
       - npm install
       - npm run test
