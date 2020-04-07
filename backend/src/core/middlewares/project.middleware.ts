@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import { Project } from '@core/models'
-import logger from '@core/logger'
 import { Sequelize } from 'sequelize-typescript'
 
 const verifyProjectOwner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -11,7 +10,6 @@ const verifyProjectOwner = async (req: Request, res: Response, next: NextFunctio
     return project ? next() : res.sendStatus(403)
   }
   catch(err){
-    logger.error(err)
     return next(err)
   }
 }
@@ -25,7 +23,6 @@ const createProject = async (req: Request, res: Response, next: NextFunction): P
     return res.sendStatus(201)
   }
   catch(err){
-    logger.error(err)
     return next(err)
   }
  
@@ -57,7 +54,6 @@ const listProjects = async (req: Request, res: Response, next: NextFunction): Pr
     const projects = await Project.findAll(options)
     return res.json(projects)
   }catch(err){
-    logger.error(err)
     return next(err)
   }
 }
