@@ -15,13 +15,13 @@ const Pagination = () => {
 
 
   const previousButton = (
-    <span className="icon">
+    <span className={styles.icon}>
       <FontAwesomeIcon icon={faChevronLeft} />
     </span>
   )
 
   const nextButton = (
-    <span className="icon">
+    <span className={styles.icon}>
       <FontAwesomeIcon icon={faChevronRight} />
     </span>
   )

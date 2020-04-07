@@ -34,7 +34,7 @@ const CampaignContextProvider = ({ children }: { children: React.ReactNode }) =>
 
   useEffect(() => {
     setPageCount(campaigns.length / ITEMS_PER_PAGE)
-    setCampaignsDisplayed(campaigns.slice(ITEMS_PER_PAGE))
+    setCampaignsDisplayed(campaigns.slice(0, ITEMS_PER_PAGE))
   }, [campaigns])
 
   useEffect(() => {

@@ -18,6 +18,11 @@
   }
 }
 
+.icon {
+  @include icon;
+  font-size: 1.25rem;
+}
+
 .row {
   @include flex-horizontal;
 }

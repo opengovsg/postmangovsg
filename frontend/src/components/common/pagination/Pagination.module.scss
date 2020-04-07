@@ -6,8 +6,8 @@
   justify-content: center;
   margin-top: 60px;
 }
-
-.navIcon span {
+.icon {
+  @include icon;
   color: $dark-blue;
 }
 
@@ -30,6 +30,7 @@
   > a {
     color: $dark-blue;
     font-size: 0.8rem;
+    line-height: 1rem;
   }
 }
 
