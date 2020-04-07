@@ -1,16 +1,16 @@
 import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript'
 import { JobStatus } from '@core/constants'
-import { Project } from './campaign'
+import { Campaign } from './campaign'
 import { Worker } from './worker'
 
 @Table({ tableName: 'job_queue' })
 export class JobQueue extends Model<JobQueue> {
-  @ForeignKey(() => Project)
+  @ForeignKey(() => Campaign)
   @Column(DataType.INTEGER)
-  projectId!: number
+  campaignId!: number
 
-  @BelongsTo(() => Project)
-  project!: Project
+  @BelongsTo(() => Campaign)
+  campaign!: Campaign
 
   @ForeignKey(() => Worker)
   @Column(DataType.INTEGER)

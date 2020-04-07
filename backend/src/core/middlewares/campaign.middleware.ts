@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
-import { Project } from '@core/models'
+import { Campaign } from '@core/models'
 import { Sequelize } from 'sequelize-typescript'
 
 const verifyProjectOwner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { projectId } = req.params
     const { id: userId } = req.session?.user
-    const project = await Project.findOne({ where: { projectId, userId } })
+    const project = await Campaign.findOne({ where: { campaignId: projectId, userId } })
     return project ? next() : res.sendStatus(403)
   }
   catch(err){
@@ -19,7 +19,7 @@ const createProject = async (req: Request, res: Response, next: NextFunction): P
   try{
     const { name, type }: { name: string; type: string} = req.body
     const { id } = req.session?.user
-    await Project.create({ name, type, userId: id, valid: false }) 
+    await Campaign.create({ name, type, userId: id, valid: false }) 
     return res.sendStatus(201)
   }
   catch(err){
@@ -51,7 +51,7 @@ const listProjects = async (req: Request, res: Response, next: NextFunction): Pr
       options.limit = +limit
     }
   
-    const projects = await Project.findAll(options)
+    const projects = await Campaign.findAll(options)
     return res.json(projects)
   }catch(err){
     return next(err)

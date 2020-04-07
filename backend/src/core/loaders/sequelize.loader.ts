@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 
 import config from '@core/config'
-import { Credential, JobQueue, Project, User, Worker } from '@core/models'
+import { Credential, JobQueue, Campaign, User, Worker } from '@core/models'
 import { EmailMessage, EmailTemplate } from '@email/models'
 import logger from '@core/logger'
 
@@ -16,7 +16,7 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
     ...dialectOptions,
   })
 
-  const coreModels = [Credential, JobQueue, Project, User, Worker]
+  const coreModels = [Credential, JobQueue, Campaign, User, Worker]
   const emailModels = [EmailMessage, EmailTemplate]
   sequelize.addModels([...coreModels, ...emailModels])
 
