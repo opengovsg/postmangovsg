@@ -3,8 +3,8 @@ import { ChannelType } from '@core/constants'
 import { Credential } from './credential'
 import { User } from './user'
 
-@Table({ tableName: 'projects' })
-export class Project extends Model<Project> {
+@Table({ tableName: 'campaigns' , underscored: true, timestamps: true })
+export class Campaign extends Model<Campaign> {
   @Column({
     type: DataType.STRING,
     allowNull: false,

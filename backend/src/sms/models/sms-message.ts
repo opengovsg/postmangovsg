@@ -1,17 +1,17 @@
 import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
-import { Project } from '@core/models/project'
+import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'sms_messages' })
+@Table({ tableName: 'sms_messages' , underscored: true, timestamps: true })
 export class SmsMessage extends Model<SmsMessage> {
-  @ForeignKey(() => Project)
+  @ForeignKey(() => Campaign)
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
   })
-  projectId!: number
+  campaignId!: number
 
-  @BelongsTo(() => Project)
-  project!: Project
+  @BelongsTo(() => Campaign)
+  campaign!: Campaign
 
   @Column({
     type: DataType.STRING,

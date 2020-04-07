@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 
 // TODO
-const isSmsProject = async (_req: Request, _res: Response, next: NextFunction): Promise<Response | void> => {
-  // const { projectId } = req.params
+const isSmsCampaign = async (_req: Request, _res: Response, next: NextFunction): Promise<Response | void> => {
+  // const { campaignId } = req.params
   next()
 }
 
-export { isSmsProject }
+export { isSmsCampaign }

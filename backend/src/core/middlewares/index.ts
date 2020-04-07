@@ -1,2 +1,2 @@
-export * from './project.middleware'
+export * from './campaign.middleware'
 export * from './auth.middleware'

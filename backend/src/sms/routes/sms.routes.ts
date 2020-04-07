@@ -70,8 +70,8 @@ const sendMessagesValidator = {
 }
 
 // handlers
-// Get project details
-const getProjectDetails = async (_req: Request, res: Response): Promise<void> => {
+// Get campaign details
+const getCampaignDetails = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 
@@ -114,13 +114,13 @@ const sendMessages = async (_req: Request, res: Response): Promise<void> => {
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms:
+ *  /campaign/{campaignId}/sms:
  *    get:
  *      tags:
  *        - SMS
- *      summary: Get sms project details
+ *      summary: Get sms campaign details
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -131,20 +131,20 @@ const sendMessages = async (_req: Request, res: Response): Promise<void> => {
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/SmsProject'
+ *                $ref: '#/components/schemas/SmsCampaign'
  */
-router.get('/', getProjectDetails)
+router.get('/', getCampaignDetails)
 
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/template:
+ *  /campaign/{campaignId}/sms/template:
  *    put:
  *      tags:
  *        - SMS
  *      summary: Stores body template for sms campaign
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -173,13 +173,13 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/upload-start:
+ *  /campaign/{campaignId}/sms/upload-start:
  *    post:
  *      tags:
  *        - SMS
  *      summary: Gets presigned url for upload
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -212,13 +212,13 @@ router.post('/upload-start', celebrate(uploadstartValidator), uploadStart)
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/upload-complete:
+ *  /campaign/{campaignId}/sms/upload-complete:
  *    post:
  *      tags:
  *        - SMS
  *      summary: Populate recipient list with uploaded csv
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -236,13 +236,13 @@ router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComple
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/credentials:
+ *  /campaign/{campaignId}/sms/credentials:
  *    post:
  *      tags:
  *        - SMS
  *      summary: Store credentials for twilio
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -266,13 +266,13 @@ router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentia
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/validate:
+ *  /campaign/{campaignId}/sms/validate:
  *    post:
  *      tags:
  *        - SMS
  *      summary: Vaidates stored credentials by sending to a specific phone number
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -301,13 +301,13 @@ router.post('/validate', celebrate(validateCredentialsValidator), validateCreden
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/preview:
+ *  /campaign/{campaignId}/sms/preview:
  *    get:
  *      tags:
  *        - SMS
  *      summary: Preview templated message
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -332,13 +332,13 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/send:
+ *  /campaign/{campaignId}/sms/send:
  *    post:
  *      tags:
  *        - SMS
  *      summary: Start sending campaign
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:

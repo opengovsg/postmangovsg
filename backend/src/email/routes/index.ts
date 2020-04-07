@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import emailRoutes from './email.routes'
-import { isEmailProject } from '@email/middlewares'
+import { isEmailCampaign } from '@email/middlewares'
 
 const router = Router()
 
-router.use('/', isEmailProject, emailRoutes)
+router.use('/', isEmailCampaign, emailRoutes)
 
 export default router
