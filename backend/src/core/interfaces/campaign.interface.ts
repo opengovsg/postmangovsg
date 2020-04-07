@@ -1,6 +1,6 @@
 import { ChannelType } from '@core/constants'
 
-export interface ProjectInterface {
+export interface CampaignInterface {
     name:  string;
     userId: number;
     type: ChannelType;
