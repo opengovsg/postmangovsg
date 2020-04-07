@@ -3,7 +3,6 @@ import { Sequelize } from 'sequelize-typescript'
 import config from '@core/config'
 import { Credential, JobQueue, Project, User, Worker } from '@core/models'
 import { EmailMessage, EmailTemplate } from '@email/models'
-import logger from '@core/logger'
 
 const DB_URI = config.database.databaseUri
 
@@ -24,7 +23,7 @@ const sequelizeLoader = async (): Promise<void> => {
     await sequelize.sync()
     console.log('Database loaded')
   } catch (err) {
-    logger.error(`Unable to connect to database: ${err}`)
+    console.error(`Unable to connect to database: ${err}`)
     process.exit(1)
   }
 }
