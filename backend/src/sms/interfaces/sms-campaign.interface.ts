@@ -1,4 +1,4 @@
-export interface SmsProject {
+export interface SmsCampaign {
   id: number;
   name: string;
   otherstuff: string;
@@ -7,7 +7,7 @@ export interface SmsProject {
  * @swagger
  *  components:
  *    schemas:
- *      SmsProject:
+ *      SmsCampaign:
  *        type: object
  *        properties:
  *          id:

@@ -4,9 +4,9 @@ import { Sequelize } from 'sequelize-typescript'
 
 const verifyProjectOwner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
-    const { projectId } = req.params
+    const { campaignId } = req.params
     const { id: userId } = req.session?.user
-    const project = await Campaign.findOne({ where: { campaignId: projectId, userId } })
+    const project = await Campaign.findOne({ where: { campaignId, userId } })
     return project ? next() : res.sendStatus(403)
   }
   catch(err){

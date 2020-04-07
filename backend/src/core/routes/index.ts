@@ -3,7 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import { verifyProjectOwner } from '@core/middlewares'
 const projectIdValidator = {
   [Segments.PARAMS]: Joi.object({
-    projectId: Joi
+    campaignId: Joi
       .number()
       .integer()
       .positive()
@@ -20,8 +20,8 @@ import emailRoutes from '@email/routes'
 const router = Router()
 
 router.use('/auth', authenticationRoutes)
-router.use('/projects', projectRoutes)
-router.use('/project/:projectId/sms', celebrate(projectIdValidator), verifyProjectOwner, smsRoutes)
-router.use('/project/:projectId/email', celebrate(projectIdValidator), verifyProjectOwner, emailRoutes)
+router.use('/campaigns', projectRoutes)
+router.use('/campaign/:campaignId/sms', celebrate(projectIdValidator), verifyProjectOwner, smsRoutes)
+router.use('/campaign/:campaignId/email', celebrate(projectIdValidator), verifyProjectOwner, emailRoutes)
 
 export default router

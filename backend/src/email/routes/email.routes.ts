@@ -70,7 +70,7 @@ const sendMessagesValidator = {
 }
 
 // handlers
-// Get project details
+// Get campaign details
 const getProjectDetails = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
@@ -115,13 +115,13 @@ const sendMessages = async (_req: Request, res: Response): Promise<void> => {
 /**
  * @swagger
  * path:
- *  /project/{projectId}/email:
+ *  /campaign/{campaignId}/email:
  *    get:
  *      tags:
  *        - Email
- *      summary: Get email project details
+ *      summary: Get email campaign details
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -132,14 +132,14 @@ const sendMessages = async (_req: Request, res: Response): Promise<void> => {
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/EmailProject'
+ *                $ref: '#/components/schemas/EmailCampaign'
  */
 router.get('/', getProjectDetails)
 
 /**
  * @swagger
  * path:
- *  /project/{projectId}/email/template:
+ *  /campaign/{campaignId}/email/template:
  *    put:
  *      tags:
  *        - Email
@@ -168,7 +168,7 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
 /**
  * @swagger
  * path:
- *  /project/{projectId}/email/upload-start:
+ *  /campaign/{campaignId}/email/upload-start:
  *    post:
  *      tags:
  *        - Email
@@ -201,7 +201,7 @@ router.post('/upload-start', celebrate(uploadstartValidator), uploadStart)
 /**
  * @swagger
  * path:
- *  /project/{projectId}/email/upload-complete:
+ *  /campaign/{campaignId}/email/upload-complete:
  *    post:
  *      tags:
  *        - Email
@@ -219,7 +219,7 @@ router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComple
 /**
  * @swagger
  * path:
- *  /project/{projectId}/email/credentials:
+ *  /campaign/{campaignId}/email/credentials:
  *    post:
  *      tags:
  *        - Email
@@ -237,7 +237,7 @@ router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentia
 /**
  * @swagger
  * path:
- *  /project/{projectId}/email/validate:
+ *  /campaign/{campaignId}/email/validate:
  *    post:
  *      tags:
  *        - Email
@@ -266,7 +266,7 @@ router.post('/validate', celebrate(validateCredentialsValidator), validateCreden
 /**
  * @swagger
  * path:
- *  /project/{projectId}/email/preview:
+ *  /campaign/{campaignId}/email/preview:
  *    get:
  *      tags:
  *        - Email
@@ -292,7 +292,7 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
 /**
  * @swagger
  * path:
- *  /project/{projectId}/email/send:
+ *  /campaign/{campaignId}/email/send:
  *    post:
  *      tags:
  *        - Email

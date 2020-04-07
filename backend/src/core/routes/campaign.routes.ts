@@ -39,22 +39,22 @@ const createProjectValidator = {
 /**
  * @swagger
  * path:
- *  /projects:
+ *  /campaigns:
  *    get:
  *      tags:
  *        - Projects
- *      summary: List all projects for user
+ *      summary: List all campaigns for user
  *      parameters:
  *        - in: query
  *          name: limit
- *          description: max number of projects returned
+ *          description: max number of campaigns returned
  *          required: false
  *          schema:
  *            type: integer
  *            minimum: 1
 *        - in: query
  *          name: offset
- *          description: offset to begin returning projects from
+ *          description: offset to begin returning campaigns from
  *          required: false
  *          schema:
  *            type: integer
@@ -73,9 +73,9 @@ router.get('/', celebrate(listProjectsValidator), listProjects)
 /**
  * @swagger
  * path:
- *  /projects:
+ *  /campaigns:
  *    post:
- *      summary: Create a new project
+ *      summary: Create a new campaign
  *      tags:
  *        - Projects
  *      requestBody:
