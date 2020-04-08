@@ -3,8 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
-import { updateCampaignS3Metadata } from '@core/services/campaign.service'
-import { S3Service } from '@core/services/s3.service'
+import { updateCampaignS3Metadata, S3Service } from '@core/services'
 import S3 from 'aws-sdk/clients/s3'
 import { jwtUtils } from '@core/utils/jwt'
 
