@@ -10,6 +10,7 @@ const requiredEnvVars = [
   'AWS_SECRET_ACCESS_KEY',
   'DB_URI',
   'FILE_STORAGE_BUCKET_NAME',
+  'JWT_SECRET',
   'SESSION_SECRET',
 ]
 

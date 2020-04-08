@@ -33,6 +33,8 @@ const mailPort = process.env.MAIL_PORT as string
 const mailUser = process.env.MAIL_USER as string
 const mailPassword = process.env.MAIL_PASSWORD as string
 
+const jwtSecret = process.env.JWT_SECRET as string
+
 export default {
   IS_PROD,
   aws: {
@@ -53,6 +55,7 @@ export default {
       acquire: SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
     },
   },
+  jwtSecret,
   MORGAN_LOG_FORMAT,
   session: {
     secret: sessionSecret,
