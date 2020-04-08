@@ -6,6 +6,7 @@ import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { updateCampaignS3Metadata } from '@core/services/campaign.service'
 import { SmsService } from '@sms/services/sms.service'
 import S3 from 'aws-sdk/clients/s3'
+import { jwtUtils } from '@core/utils/jwt'
 
 const router = Router({ mergeParams: true })
 
@@ -27,7 +28,7 @@ const uploadstartValidator = {
 
 const uploadCompleteValidator = {
   [Segments.BODY]: Joi.object({
-    s3Key: Joi.string().required(),
+    transactionId: Joi.string().required(),
   }),
 }
 
@@ -90,14 +91,20 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
   try {
     const { campaignId } = req.params
     // TODO: validate if project is in editable state
+
+    // extract s3Key from transactionId
+    const { transactionId } = req.body
+    const decoded = jwtUtils.verify(transactionId)
+    const s3Key = decoded as string
+
     // Updates metadata in project
-    await updateCampaignS3Metadata({ key: req.body.s3Key, campaignId })
+    await updateCampaignS3Metadata({ key: s3Key, campaignId })
     // TODO: delete message_logs entries
     // TODO: carry out templating / hydration
     // - download from s3
     const s3 = new S3()
     const smsService = new SmsService(s3)
-    const downloadStream = smsService.download(req.body.s3Key)
+    const downloadStream = smsService.download(s3Key)
     await smsService.parseCsv(downloadStream)
     // - populate template
     return res.status(201).json({ message: `Upload success for project ${campaignId}.` })

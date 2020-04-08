@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid'
 import config from '@core/config'
 import logger from '@core/logger'
 import { Campaign } from '@core/models'
+import { jwtUtils } from '@core/utils/jwt'
 
 const AWS_REGION = config.aws.awsRegion
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
@@ -89,8 +90,10 @@ const uploadStartHandler = async (req: Request, res: Response): Promise<Response
       Expires: 180, // seconds
     }
 
+    const signedKey = jwtUtils.sign(s3Key)
+
     const presignedUrl = await s3.getSignedUrlPromise('putObject', params)
-    return res.status(200).json({ presignedUrl })
+    return res.status(200).json({ presignedUrl, transactionId: signedKey })
 
   } catch (err) {
     logger.error(`${err.message}`)
