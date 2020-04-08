@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import config from '@core/config'
 import { Credential, JobQueue, Campaign, User, Worker } from '@core/models'
 import { EmailMessage, EmailTemplate } from '@email/models'
+import { SmsMessage, SmsTemplate } from '@sms/models'
 import logger from '@core/logger'
 
 const DB_URI = config.database.databaseUri
@@ -18,7 +19,8 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
 
   const coreModels = [Credential, JobQueue, Campaign, User, Worker]
   const emailModels = [EmailMessage, EmailTemplate]
-  sequelize.addModels([...coreModels, ...emailModels])
+  const smsModels = [SmsMessage, SmsTemplate]
+  sequelize.addModels([...coreModels, ...emailModels, ...smsModels])
 
   try {
     const synced = await sequelize.sync()
