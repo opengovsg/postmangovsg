@@ -197,51 +197,67 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/upload-start:
- *    post:
- *      tags:
- *        - Email
- *      summary: Gets presigned url for upload
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                body:
- *                  type: string
- *                  minLength: 1
- *                  maxLength: 200
- *                  pattern: '^[^\\/]+\.csv$'
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  url:
- *                    type:string
+ *   /campaign/{campaignId}/email/upload/start:
+ *     get:
+ *       description: "Get a presigned URL for upload"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: mimeType
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   presignedUrl:
+ *                     type: string
+ *                   transactionId:
+ *                     type: string
  */
 router.get('/upload/start', celebrate(uploadStartValidator), uploadStartHandler)
 
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/upload-complete:
- *    post:
- *      tags:
- *        - Email
- *      summary: Populate recipient list with uploaded csv
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
+ *   /campaign/{campaignId}/email/upload/complete:
+ *     post:
+ *       description: "Complete upload session"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - transactionId
+ *               properties:
+ *                 transactionId:
+ *                   type: string
+ *       responses:
+ *         201:
+ *           description: Created
+ *         400:
+ *           description: Invalid Request
+ *         500:
+ *           description: Server Error
  */
 router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadCompleteHandler)
 

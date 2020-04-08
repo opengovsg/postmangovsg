@@ -203,55 +203,68 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/upload-start:
- *    post:
- *      tags:
- *        - SMS
- *      summary: Gets presigned url for upload
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                body:
- *                  type: string
- *                  minLength: 1
- *                  maxLength: 200
- *                  pattern: '^[^\\/]+\.csv$'
- *
-
+ *   /campaign/{campaignId}/sms/upload/start:
+ *     get:
+ *       description: "Get a presigned URL for upload"
+ *       tags:
+ *         - SMS
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: mimeType
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   presignedUrl:
+ *                     type: string
+ *                   transactionId:
+ *                     type: string
  */
 router.get('/upload/start', celebrate(uploadStartValidator), uploadStartHandler)
 
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/upload-complete:
- *    post:
- *      tags:
- *        - SMS
- *      summary: Populate recipient list with uploaded csv
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
+ *   /campaign/{campaignId}/sms/upload/complete:
+ *     post:
+ *       description: "Complete upload session"
+ *       tags:
+ *         - SMS
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - transactionId
+ *               properties:
+ *                 transactionId:
+ *                   type: string
+ *       responses:
+ *         201:
+ *           description: Created
+ *         400:
+ *           description: Invalid Request
+ *         500:
+ *           description: Server Error
  *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
  */
 router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadCompleteHandler)
 
