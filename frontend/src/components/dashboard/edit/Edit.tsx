@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { TitleBar } from 'components/common'
-import { getCampaignDetails } from 'services/campaigns.service'
+import { getCampaignDetails } from 'services/campaign.service'
 import { Campaign, SMSCampaign } from 'classes'
 
 import EditSMS from './EditSMS'

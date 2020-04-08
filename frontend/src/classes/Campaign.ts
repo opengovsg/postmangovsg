@@ -1,7 +1,6 @@
 export enum ChannelType {
   SMS = 'sms',
   Email = 'email',
-  Whatsapp = 'whatsapp',
 }
 
 export enum Status {
@@ -15,6 +14,7 @@ export class Campaign {
   name: string
   type: ChannelType
   createdAt: Date
+  sentAt: Date
   status: Status
   hasCredentials: boolean // has valid credentials
 
@@ -23,6 +23,7 @@ export class Campaign {
     this.name = input['name']
     this.type = input['type']
     this.createdAt = input['createdAt']
+    this.sentAt = input['sentAt']
     this.status = input['status']
     this.hasCredentials = input['hasCredentials']
   }

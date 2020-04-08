@@ -59,6 +59,7 @@ $navbar-mobile-height: 3.5rem;
   .navbarLinks {
     display: flex;
     flex: 1;
+
     @include mobile() {
       display: none;
 
@@ -75,6 +76,7 @@ $navbar-mobile-height: 3.5rem;
     .link {
       letter-spacing: 1.3px;
       opacity: 0.5;
+      font-size: 0.8rem;
       color: $light-blue;
       margin-right: $navbar-link-margin;
       &:last-child {

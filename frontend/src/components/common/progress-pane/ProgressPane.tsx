@@ -6,7 +6,7 @@ const ProgressItem = ({ step, number, isActive, onClick, isEnabled }: { step: st
   return (
     <a className={cx(styles.progressItem, { [styles.active]: isActive, [styles.enabled]: isEnabled })} onClick={isEnabled && onClick}>
       <div className={styles.number}>{number}</div>
-      <h5 className={styles.step}>{step}</h5>
+      <p className={styles.step}>{step}</p>
     </a>
   )
 }
