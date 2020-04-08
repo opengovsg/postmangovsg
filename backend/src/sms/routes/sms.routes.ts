@@ -102,6 +102,7 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     }
     const s3Key = decoded as string
 
+    // TODO: begin txn
     // Updates metadata in project
     await updateCampaignS3Metadata({ key: s3Key, campaignId })
     // TODO: delete message_logs entries
@@ -112,6 +113,7 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     const downloadStream = s3Service.download(s3Key)
     await s3Service.parseCsv(downloadStream)
     // - populate template
+    // TODO: end txn
     return res.status(201).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
     logger.error(`${err}`)
