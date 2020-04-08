@@ -33,8 +33,8 @@ export class MailService {
     })
   }
 
-  public async sendMail(input : MailToSend) {
-    await new Promise((resolve,reject) => {
+  public sendMail(input : MailToSend) {
+    return new Promise((resolve,reject) => {
       this.mailer.sendMail({
         from: this.email,
         to: input.recipients,
