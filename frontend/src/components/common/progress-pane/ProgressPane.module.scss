@@ -12,6 +12,7 @@ $progress-pane-width: 18rem;
 .progressItem {
   @include flex-horizontal;
   color: $dark-blue;
+  font-size: 1rem;
   opacity: 0.2;
   padding: 1.5rem 0;
   padding-left: $site-padding;

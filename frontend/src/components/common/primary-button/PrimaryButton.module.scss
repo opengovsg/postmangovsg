@@ -1,0 +1,28 @@
+@import "styles/_variables";
+@import "styles/_mixins";
+
+.button {
+  background-color: $indigo-blue;
+  border: 0;
+  color: white;
+  text-align: center;
+  height: $button-height;
+  display: inline-flex;
+  min-width: $button-min-width;
+  font-size: 1rem;
+  padding: 0 $button-height/2;
+  border-radius: $button-height/2;
+  cursor: pointer;
+  user-select: none;
+  justify-content: center;
+
+  &:hover,
+  &:focus {
+    background-color: darken($indigo-blue, 10%);
+    outline: none;
+  }
+
+  &:active {
+    background-color: darken($indigo-blue, 20%);
+  }
+}

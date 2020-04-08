@@ -27,7 +27,7 @@ const Landing = () => {
           </div>
           <div className={styles.textContainer}>
             <img className={styles.appLogo} src={appLogo} alt="Postman logo"></img>
-            <h1 className={styles.title}>POSTMAN</h1>
+            <p className={styles.title}>POSTMAN</p>
             <Login></Login>
           </div>
         </div>

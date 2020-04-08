@@ -4,7 +4,7 @@ import { TitleBar } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
 import { Campaign, SMSCampaign } from 'classes'
 
-import CreateSMS from './sms/CreateSMS'
+import CreateSMS from './sms/Create.sms'
 
 const Create = () => {
 

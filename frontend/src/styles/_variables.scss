@@ -8,6 +8,7 @@ $disabled-color: #c1c7cd;
 
 // Dimensions
 $button-min-width: 10rem;
+$button-height: 2.5rem;
 
 // Paddings
 $site-padding: 3vw;
@@ -16,13 +17,3 @@ $content-vertical-padding: 5vh;
 // Fonts
 $font-stack: "Noto Sans JP", sans-serif;
 
-// Update Bulma's global variables
-$primary: $indigo-blue;
-$info: $dark-blue;
-$text: $dark-blue;
-$control-border-width: 1px;
-
-// bulma component override
-$button-focus-box-shadow-size: 0;
-$input-focus-box-shadow-size: 0;
-$input-background-color: transparent;

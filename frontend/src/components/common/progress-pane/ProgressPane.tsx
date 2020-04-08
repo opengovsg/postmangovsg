@@ -4,7 +4,7 @@ import styles from './ProgressPane.module.scss'
 
 const ProgressItem = ({ step, number, isActive, onClick, isEnabled }: { step: string; number: number; isActive: boolean; onClick: any; isEnabled: boolean }) => {
   return (
-    <a className={cx(styles.progressItem, { [styles.active]: isActive, [styles.enabled]: isEnabled })} onClick={isEnabled && onClick}>
+    <a className={cx(styles.progressItem, { [styles.active]: isActive, [styles.enabled]: isEnabled })} onClick={isEnabled ? onClick : undefined}>
       <div className={styles.number}>{number}</div>
       <p className={styles.step}>{step}</p>
     </a>
