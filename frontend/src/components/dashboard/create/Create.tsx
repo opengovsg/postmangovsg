@@ -4,9 +4,9 @@ import { TitleBar } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
 import { Campaign, SMSCampaign } from 'classes'
 
-import EditSMS from './EditSMS'
+import CreateSMS from './sms/CreateSMS'
 
-const Edit = () => {
+const Create = () => {
 
   const [campaign, setCampaign] = useState<Campaign | null>(null)
 
@@ -23,11 +23,11 @@ const Edit = () => {
     return (
       <>
         <TitleBar title={campaign.name}> </TitleBar>
-        <EditSMS campaign={campaign}></EditSMS>
+        <CreateSMS campaign={campaign}></CreateSMS>
       </>
     )
   }
   return <p>loading..</p>
 }
 
-export default Edit
+export default Create
