@@ -2,7 +2,7 @@
 @import 'styles/_mixins';
 
 .content {
-  height: calc(100% - #{$nav-bar-height} - #{$title-bar-height});
   @include flex-horizontal;
+  height: calc(100% - #{$nav-bar-height} - #{$title-bar-height});
   flex-grow: 1;
 }

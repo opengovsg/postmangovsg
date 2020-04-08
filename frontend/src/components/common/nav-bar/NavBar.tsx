@@ -20,7 +20,6 @@ const NavBar = () => {
       </div>
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink className={styles.link} activeClassName={styles.active} to="/campaigns">Campaigns</NavLink>
-        <NavLink className={styles.link} activeClassName={styles.active} to="/create">Create</NavLink>
         <a className={styles.link} href={POSTMAN_GUIDE_URL}>Guide</a>
         <NavLink className={styles.link} activeClassName={styles.active} to="/settings">Settings</NavLink>
 
