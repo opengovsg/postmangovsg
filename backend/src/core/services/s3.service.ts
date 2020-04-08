@@ -33,7 +33,7 @@ class S3Service {
             headers = row
             isFirstLine = false
           } else {
-            let rowWithHeaders: {[key: string]: string} = {}
+            const rowWithHeaders: {[key: string]: string} = {}
             row.forEach((col: any, index: number) => {
               rowWithHeaders[headers[index]] = col
             })

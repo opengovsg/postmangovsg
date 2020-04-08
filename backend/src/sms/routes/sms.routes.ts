@@ -106,7 +106,7 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     const downloadStream = s3Service.download(s3Key)
     await s3Service.parseCsv(downloadStream)
     // - populate template
-    return res.status(201).json({ message: `Upload success for project ${campaignId}.` })
+    return res.status(201).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
     logger.error(`${err}`)
     res.sendStatus(500)
