@@ -4,6 +4,8 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { updateCampaignS3Metadata } from '@core/services/campaign.service'
+import { SmsService } from '@sms/services/sms.service'
+import S3 from 'aws-sdk/clients/s3'
 
 const router = Router({ mergeParams: true })
 
@@ -93,6 +95,10 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     // TODO: delete message_logs entries
     // TODO: carry out templating / hydration
     // - download from s3
+    const s3 = new S3()
+    const smsService = new SmsService(s3)
+    const downloadStream = smsService.download(req.body.s3Key)
+    await smsService.parseCsv(downloadStream)
     // - populate template
     return res.status(201).json({ message: `Upload success for project ${campaignId}.` })
   } catch (err) {
@@ -218,7 +224,7 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
  *                  url:
  *                    type:string
  */
-router.post('/upload/start', celebrate(uploadstartValidator), uploadStartHandler)
+router.get('/upload/start', celebrate(uploadstartValidator), uploadStartHandler)
 
 /**
  * @swagger
