@@ -14,3 +14,16 @@ export const otpClient =
     .on('error', (err: Error) => {
       logger.error(String(err))
     })
+
+if (!config.redisSessionUri) {
+  throw new Error('sessionClient: redisSessionUri not found')
+}
+
+export const sessionClient = 
+  redis.createClient({ url: config.redisSessionUri })
+    .on('connect', () => {
+      logger.info('sessionClient: Connected')
+    })
+    .on('error', (err: Error) => {
+      logger.error(String(err))
+    })

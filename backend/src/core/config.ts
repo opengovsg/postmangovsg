@@ -10,6 +10,7 @@ const SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS = 600000
 const rdsCa = IS_PROD && fs.readFileSync(path.join(__dirname, '../db-ca.pem'))
 
 const redisOtpUri = process.env.REDIS_OTP_URI as string
+const redisSessionUri = process.env.REDIS_SESSION_URI as string
 
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
 // Express session 
@@ -43,4 +44,5 @@ export default {
     cookieSettings,
   },
   redisOtpUri,
+  redisSessionUri
 }
