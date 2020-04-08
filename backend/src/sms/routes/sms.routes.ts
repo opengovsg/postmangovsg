@@ -21,7 +21,7 @@ const uploadstartValidator = {
   [Segments.QUERY]: Joi.object({
     mimeType: Joi
       .string()
-      .required()
+      .required(),
   }),
 }
 

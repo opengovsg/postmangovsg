@@ -78,8 +78,7 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
 }
 
 // Upload start
-const uploadStartHandler = async (req: Request, res: Response) : Promise<Response> => {
-  console.log(req.path, req.params, req.query)
+const uploadStartHandler = async (req: Request, res: Response): Promise<Response> => {
   try {
     const s3Key = uuid()
 

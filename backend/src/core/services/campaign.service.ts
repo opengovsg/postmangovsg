@@ -3,10 +3,10 @@ import config from '@core/config'
 
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
 
-const updateCampaignS3Metadata = ({key, campaignId} : {key: string, campaignId: string}): Promise<[number, Campaign[]]> => {
+const updateCampaignS3Metadata = ({ key, campaignId }: {key: string; campaignId: string}): Promise<[number, Campaign[]]> => {
   const s3Object = {
     key,
-    bucket: FILE_STORAGE_BUCKET_NAME
+    bucket: FILE_STORAGE_BUCKET_NAME,
   }
 
   return Campaign
@@ -14,9 +14,9 @@ const updateCampaignS3Metadata = ({key, campaignId} : {key: string, campaignId: 
       { s3Object },
       {
         where: {
-          id: campaignId
+          id: campaignId,
         },
-        returning: true
+        returning: true,
       }
     )
 }
