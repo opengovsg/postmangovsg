@@ -13,6 +13,7 @@ const WAIT_IN_SECONDS = 30 // Number of seconds to wait before resending otp
 
 const getOtp = async (_req: Request, res: Response): Promise<Response> => {
   const email = _req.body.email // TODO: use lodash to be safer?
+  await closedBetaCheckExistingUser(email) // TODO: remove when launching
   await checkPermissionToResend(email)
   const otp = generateOtp()
   const hashValue = await hash(otp)
@@ -127,4 +128,11 @@ const deleteHashedOtp = async (email: string) => {
     })
   })
 }
+
+// TODO: Remove when launch, checks if it's an existing user
+const closedBetaCheckExistingUser = async (email : string) => {
+  const user = await User.findOne({ where: { email: email } })
+  if (user === null) throw new Error('No user was found with this email')
+}
+
 export { getOtp, verifyOtp }
