@@ -11,10 +11,11 @@ $progress-pane-width: 18rem;
 
 .progressItem {
   @include flex-horizontal;
+  align-items: baseline;
   color: $dark-blue;
   font-size: 1rem;
   opacity: 0.2;
-  padding: 1.5rem 0;
+  padding: 1rem 0;
   padding-left: $site-padding;
   user-select: none;
   cursor: default;
@@ -31,16 +32,17 @@ $progress-pane-width: 18rem;
     opacity: 1;
     cursor: pointer;
   }
-}
 
-.number {
-  $number-size: 2rem;
-  height: $number-size;
-  width: $number-size;
-  background-color: $indigo-blue;
-  border-radius: 50%;
-  margin-right: 1rem;
-  color: $light-blue;
-  @include flex-horizontal;
-  justify-content: center;
+  .number {
+    $number-size: 1.8rem;
+    height: $number-size;
+    width: $number-size;
+    background-color: $indigo-blue;
+    font-size: 0.8rem;
+    border-radius: 50%;
+    margin-right: 1rem;
+    color: $light-blue;
+    @include flex-horizontal;
+    justify-content: center;
+  }
 }

@@ -10,8 +10,8 @@
   display: inline-flex;
   min-width: $button-min-width;
   font-size: 1rem;
-  padding: 0 $button-height/2;
-  border-radius: $button-height/2;
+  padding: 0 $border-radius;
+  border-radius: $border-radius;
   cursor: pointer;
   user-select: none;
   justify-content: center;

@@ -5,11 +5,11 @@
   display: flex;
   flex: 1;
   position: relative;
-  min-height: 100%;
 }
 
 .stepContainer {
-  width: 800px;
-  padding: $content-vertical-padding 0;
+  display: block;
+  width: 750px;
+  padding: $content-vertical-padding $site-padding;
   margin: 0 auto;
 }

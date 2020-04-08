@@ -1,13 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
+
+import { TextArea } from 'components/common'
 
 const TemplateSMS = ({ body }: { body: string }) => {
+
+  const [value, setValue] = useState(body)
+
   return (
     <>
       <h2>Create message template</h2>
-      <h4>Create your SMS template</h4>
+      <h4>Message</h4>
       <p>
-        Before
+
       </p>
+      <TextArea highlight={true} value={value} onChange={setValue} />
     </>
   )
 }

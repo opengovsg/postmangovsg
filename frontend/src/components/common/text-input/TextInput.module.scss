@@ -2,12 +2,12 @@
 
 .textInput {
   height: $button-height;
-  border-radius: $button-height/2;
+  border-radius: $border-radius;
   box-shadow: none;
   border: none;
   line-height: 1rem;
   font-size: 1rem;
-  padding-left: $button-height/2;
+  padding-left: $border-radius;
 
   &:focus {
     outline: none;
