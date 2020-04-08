@@ -4,7 +4,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { updateCampaignS3Metadata } from '@core/services/campaign.service'
-import { SmsService } from '@sms/services/sms.service'
+import { S3Service } from '@core/services/s3.service'
 import S3 from 'aws-sdk/clients/s3'
 import { jwtUtils } from '@core/utils/jwt'
 
@@ -102,10 +102,10 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     // TODO: delete message_logs entries
     // TODO: carry out templating / hydration
     // - download from s3
-    const s3 = new S3()
-    const smsService = new SmsService(s3)
-    const downloadStream = smsService.download(s3Key)
-    await smsService.parseCsv(downloadStream)
+    const s3Client = new S3()
+    const s3Service = new S3Service(s3Client)
+    const downloadStream = s3Service.download(s3Key)
+    await s3Service.parseCsv(downloadStream)
     // - populate template
     return res.status(201).json({ message: `Upload success for project ${campaignId}.` })
   } catch (err) {

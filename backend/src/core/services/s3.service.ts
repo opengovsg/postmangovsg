@@ -6,7 +6,7 @@ import logger from '@core/logger'
 
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
 
-class SmsService {
+class S3Service {
   s3: S3
   constructor(s3: S3) {
     this.s3 = s3
@@ -62,4 +62,4 @@ class SmsService {
   }
 }
 
-export { SmsService }
+export { S3Service }
