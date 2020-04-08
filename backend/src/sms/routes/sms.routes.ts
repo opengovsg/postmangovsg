@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express'
+import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
 import logger from '@core/logger'
@@ -86,7 +86,7 @@ const storeTemplate = async (_req: Request, res: Response): Promise<void> => {
 }
 
 // Read file from s3 and populate messages table
-const uploadCompleteHandler = async (req: Request, res: Response): Promise<Response | void> => {
+const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
     // TODO: validate if project is in editable state
@@ -116,8 +116,7 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     // TODO: end txn
     return res.status(201).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
-    logger.error(`${err}`)
-    res.sendStatus(500)
+    return next(err)
   }
 }
 
