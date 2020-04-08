@@ -1,9 +1,11 @@
 import S3 from 'aws-sdk/clients/s3'
 import CSVParse from 'csv-parse'
+import { isEmpty } from 'lodash'
 
 import config from '@core/config'
 import logger from '@core/logger'
 
+type CSVParamsInterface = {[key: string]: string}
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
 
 class S3Service {
@@ -20,45 +22,25 @@ class S3Service {
     return this.s3.getObject(params).createReadStream()
   }
 
-  parseCsv(readStream: NodeJS.ReadableStream) {
-    return new Promise((resolve, reject) => {
-      const parser = CSVParse({ delimiter: ',' })
-      let headers: string[] = []
-      let isFirstLine = true
-
-      parser.on('data', async (row) => {
-        try {
-          // TODO: do something with row
-          if (isFirstLine) {
-            headers = row
-            isFirstLine = false
-          } else {
-            const rowWithHeaders: {[key: string]: string} = {}
-            row.forEach((col: any, index: number) => {
-              rowWithHeaders[headers[index]] = col
-            })
-            // produces {header1: value1, header2: value2, ...}
-            console.log(rowWithHeaders)
-          }
-        } catch (err) {
-          parser.end()
-          reject(err)
-        }
-      })
-
-      parser.on('error', function (err) {
-        parser.end()
-        reject(err)
-      })
-
-      parser.on('end', async () => {
-        resolve()
-        logger.info({ message: 'Done parsing' })
-      })
-
-      readStream.pipe(parser)
-
-    })
+  async parseCsv(readStream: NodeJS.ReadableStream): Promise<Array<CSVParamsInterface>> {
+    const parser = CSVParse({ delimiter: ',' })
+    readStream.pipe(parser)
+    let headers: string[] = []
+    const params: Array<CSVParamsInterface> = []
+    for await (const row of parser) {
+      if (isEmpty(headers)) {
+        headers = row
+      } else {
+        const rowWithHeaders: CSVParamsInterface = {}
+        row.forEach((col: any, index: number) => {
+          rowWithHeaders[headers[index]] = col
+        })
+        // produces {header1: value1, header2: value2, ...}
+        params.push(rowWithHeaders)
+      }
+    }
+    logger.info({ message: 'Parsing complete' })
+    return params
   }
 }
 
