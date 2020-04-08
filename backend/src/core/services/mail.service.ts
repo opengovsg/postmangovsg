@@ -33,30 +33,25 @@ export class MailService {
     })
   }
 
-  public async sendMail(input : MailToSend) : Promise<boolean> {
-    try {
-      const sent: boolean = await new Promise((resolve,reject) => {
-        this.mailer.sendMail({
-          from: this.email,
-          to: input.recipients,
-          subject: input.subject,
-          html: input.body,
-        }, (err, info) => {
-          if(err !== null){
-            logger.error(String(err))
-            reject(err)
-          }
-          else{
-            logger.info(info)
-            resolve(true)
-          }
-        })
+  public async sendMail(input : MailToSend) {
+    await new Promise((resolve,reject) => {
+      this.mailer.sendMail({
+        from: this.email,
+        to: input.recipients,
+        subject: input.subject,
+        html: input.body,
+      }, (err, info) => {
+        if(err !== null){
+          logger.error(String(err))
+          reject(err)
+        }
+        else{
+          logger.info(info)
+          resolve(true)
+        }
       })
-      return sent
-    }
-    catch (err) {
+    }).catch(err => {
       logger.error(err)
-      return false
-    }
+    })
   }
 }
