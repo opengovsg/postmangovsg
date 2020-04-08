@@ -17,7 +17,7 @@ const storeTemplateValidator = {
   }),
 }
 
-const uploadstartValidator = {
+const uploadStartValidator = {
   [Segments.QUERY]: Joi.object({
     mimeType: Joi
       .string()
@@ -93,7 +93,13 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
 
     // extract s3Key from transactionId
     const { transactionId } = req.body
-    const decoded = jwtUtils.verify(transactionId)
+    let decoded: string
+    try {
+      decoded = jwtUtils.verify(transactionId) as string
+    } catch (err) {
+      logger.info(`${err.message}`)
+      return res.status(400).json({ message: 'Invalid transactionId provided' })
+    }
     const s3Key = decoded as string
 
     // Updates metadata in project
@@ -220,17 +226,9 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
  *                  maxLength: 200
  *                  pattern: '^[^\\/]+\.csv$'
  *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  url:
- *                    type:string
+
  */
-router.get('/upload/start', celebrate(uploadstartValidator), uploadStartHandler)
+router.get('/upload/start', celebrate(uploadStartValidator), uploadStartHandler)
 
 /**
  * @swagger
