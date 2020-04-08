@@ -15,6 +15,8 @@
   "license": "MIT",
   "dependencies": {
     "@types/express-session": "^1.17.0",
+    "@types/nodemailer": "^6.4.0",
+    "@types/nodemailer-direct-transport": "^1.0.31",
     "celebrate": "^12.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -22,6 +24,8 @@
     "express-validator": "^6.4.0",
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
+    "nodemailer": "^6.4.6",
+    "nodemailer-direct-transport": "^3.3.2",
     "pg": "^7.18.2",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.21.5",
