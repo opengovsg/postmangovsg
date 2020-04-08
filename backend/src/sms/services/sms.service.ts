@@ -23,12 +23,23 @@ class SmsService {
   parseCsv(readStream: NodeJS.ReadableStream) {
     return new Promise((resolve, reject) => {
       const parser = CSVParse({ delimiter: ',' })
+      let headers: string[] = []
+      let isFirstLine = true
 
       parser.on('data', async (row) => {
         try {
           // TODO: do something with row
-          console.log(row)
-          resolve()
+          if (isFirstLine) {
+            headers = row
+            isFirstLine = false
+          } else {
+            let rowWithHeaders: {[key: string]: string} = {}
+            row.forEach((col: any, index: number) => {
+              rowWithHeaders[headers[index]] = col
+            })
+            // produces {header1: value1, header2: value2, ...}
+            console.log(rowWithHeaders)
+          }
         } catch (err) {
           parser.end()
           reject(err)
@@ -41,6 +52,7 @@ class SmsService {
       })
 
       parser.on('end', async () => {
+        resolve()
         logger.info({ message: 'Done parsing' })
       })
 
