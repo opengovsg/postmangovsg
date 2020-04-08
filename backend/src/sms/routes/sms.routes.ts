@@ -2,8 +2,8 @@ import { Request, Response, Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
 import logger from '@core/logger'
-import { uploadStartHandler } from '@core/middlewares/project.middleware'
-import { updateProjectS3Metadata } from '@core/services/project.service'
+import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
+import { updateCampaignS3Metadata } from '@core/services/campaign.service'
 
 const router = Router({ mergeParams: true })
 
@@ -86,15 +86,15 @@ const storeTemplate = async (_req: Request, res: Response): Promise<void> => {
 // Read file from s3 and populate messages table
 const uploadCompleteHandler = async (req: Request, res: Response): Promise<Response | void> => {
   try {
-    const { projectId } = req.params
+    const { campaignId } = req.params
     // TODO: validate if project is in editable state
     // Updates metadata in project
-    await updateProjectS3Metadata({ key: req.body.s3Key, projectId })
+    await updateCampaignS3Metadata({ key: req.body.s3Key, campaignId })
     // TODO: delete message_logs entries
     // TODO: carry out templating / hydration
     // - download from s3
     // - populate template
-    return res.status(201).json({ message: `Upload success for project ${projectId}.` })
+    return res.status(201).json({ message: `Upload success for project ${campaignId}.` })
   } catch (err) {
     logger.error(`${err}`)
     res.sendStatus(500)
