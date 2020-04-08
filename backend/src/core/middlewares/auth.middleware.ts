@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { authenticator } from 'otplib'
 import bcrypt from 'bcrypt'
-// import { User } from '@core/models'
+import { User } from '@core/models'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import logger from '@core/logger'
 import { otpClient } from '@core/services/redis.service'
@@ -27,16 +27,14 @@ const verifyOtp = async (req: Request, res: Response): Promise<Response> => {
   const authorized = await isOtpVerified({ email, otp })
   if (!authorized) {
     return res.sendStatus(401)
-  }
-  return res.sendStatus(200)
+  }  
 
-  //TODO: Deal with session
-  // if(req.session){
-  //   const [user] = await User.findCreateFind({ where: { email: 'test@test.gov.sg' } })
-  //   req.session.user = { id: user.id }
-  //   return res.sendStatus(200)
-  // }
-  
+  if(req.session){
+    const [user] = await User.findCreateFind({ where: { email: email } })
+    req.session.user = { id: user.id, apiKey: user.apiKey, createdAt: user.createdAt, updatedAt: user.updatedAt }
+    return res.sendStatus(200)
+  }
+  return res.sendStatus(401)
 }
 
 const generateOtp = () : string => {
