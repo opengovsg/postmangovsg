@@ -1,30 +1,15 @@
 import { Request, Response } from 'express'
 import { authenticator } from 'otplib'
 import bcrypt from 'bcrypt'
-import redis from 'redis'
 // import { User } from '@core/models'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import logger from '@core/logger'
-import config from '@core/config'
+import { otpClient } from '@core/services/redis.service'
 
 const SALT_ROUNDS = 10
 const RETRIES = 4 // Number of attempts to enter otp
 const EXPIRY_IN_SECONDS = 300 //expires after 5 minutes
 const WAIT_IN_SECONDS = 30 // Number of seconds to wait before resending otp
-
-// TODO: Move this somewhere else
-const createOtpClient = () : redis.RedisClient => {
-  return redis.createClient({ url: config.redisOtpUri })
-    .on('connect', () => {
-      logger.info('otpClient: Connected')
-    })
-    .on('error', (err: Error) => {
-      logger.error(String(err))
-    })
-}
-
-// TODO: Move this to a loader or sth
-const otpClient : redis.RedisClient = createOtpClient()
 
 const getOtp = async (_req: Request, res: Response): Promise<Response> => {
   const email = _req.body.email // TODO: use lodash to be safer?
