@@ -3,7 +3,9 @@ import { celebrate, Joi, Segments } from 'celebrate'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
-import { updateCampaignS3Metadata } from '@core/services/campaign.service'
+import { updateCampaignS3Metadata, S3Service } from '@core/services'
+import S3 from 'aws-sdk/clients/s3'
+import { jwtUtils } from '@core/utils/jwt'
 
 const router = Router({ mergeParams: true })
 
@@ -27,7 +29,7 @@ const uploadstartValidator = {
 
 const uploadCompleteValidator = {
   [Segments.BODY]: Joi.object({
-    s3Key: Joi.string().required(),
+    transactionId: Joi.string().required(),
   }),
 }
 
@@ -88,13 +90,22 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
   try {
     const { campaignId } = req.params
     // TODO: validate if project is in editable state
+    // extract s3Key from transactionId
+    const { transactionId } = req.body
+    const decoded = jwtUtils.verify(transactionId)
+    const s3Key = decoded as string
+
     // Updates metadata in project
-    await updateCampaignS3Metadata({ key: req.body.s3Key, campaignId })
+    await updateCampaignS3Metadata({ key: s3Key, campaignId })
     // TODO: delete message_logs entries
     // TODO: carry out templating / hydration
     // - download from s3
+    const s3Client = new S3()
+    const s3Service = new S3Service(s3Client)
+    const downloadStream = s3Service.download(s3Key)
+    await s3Service.parseCsv(downloadStream)
     // - populate template
-    return res.status(201).json({ message: `Upload success for project ${campaignId}.` })
+    return res.status(201).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
     logger.error(`${err}`)
     res.sendStatus(500)
