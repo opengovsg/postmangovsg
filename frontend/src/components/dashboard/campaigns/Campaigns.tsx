@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import cx from 'classnames'
+import Moment from 'react-moment'
 
-import { Campaign, ChannelType } from 'models/Campaign'
+import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
-import Pagination from 'components/common/pagination'
+import { Campaign, ChannelType } from 'classes'
+
+import styles from './Campaigns.module.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelopeOpen, faCommentAlt } from '@fortawesome/free-solid-svg-icons'
-import styles from './Campaigns.module.scss'
 
-const ITEMS_PER_PAGE = 1
+const ITEMS_PER_PAGE = 2
 
 const Campaigns = () => {
   const [campaigns, setCampaigns] = useState(new Array<Campaign>())
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(new Array<Campaign>())
   const [selectedPage, setSelectedPage] = useState(0)
+  const history = useHistory()
 
   async function fetchCampaigns() {
     const campaigns = await getCampaigns()
@@ -28,57 +33,87 @@ const Campaigns = () => {
     setCampaignsDisplayed(campaigns.slice(offset, offset + ITEMS_PER_PAGE))
   }, [campaigns, selectedPage])
 
-  const modeIcons: any = {
-    [ChannelType.EMAIL]: (
-      <FontAwesomeIcon className={styles.icon} icon={faEnvelopeOpen} />
-    ),
-    [ChannelType.SMS]: (
-      <FontAwesomeIcon className={styles.icon} icon={faCommentAlt} />
-    ),
+  const channelIcons = {
+    [ChannelType.Email]: faEnvelopeOpen,
+    [ChannelType.SMS]: faCommentAlt,
+  }
+
+  const headers = [
+    {
+      name: 'Mode',
+      render: (campaign: Campaign) => <FontAwesomeIcon className={styles.icon} icon={channelIcons[campaign.type]} />,
+      width: 'xs',
+    },
+    {
+      name: 'Name',
+      render: (campaign: Campaign) => campaign.name,
+      width: 'md',
+    },
+    {
+      name: 'Created At',
+      render: (campaign: Campaign) => <Moment format='LLL'>{campaign.createdAt}</Moment>,
+      width: 'md',
+    },
+    {
+      name: 'Sent At',
+      render: (campaign: Campaign) => <Moment format='LLL'>{campaign.sentAt}</Moment>,
+      width: 'md',
+    }
+    ,
+    {
+      name: 'Status',
+      render: (campaign: Campaign) => campaign.status,
+      width: 'sm',
+    },
+  ]
+
+  function renderRow(campaign: Campaign, key: number) {
+    return (
+      <tr key={key} onClick={() => history.push(`/campaigns/${campaign.id}`)}>
+        {
+          headers.map(({ render, width, name }) => (
+            <td className={cx(styles.column, styles[width])} key={name} >
+              {render(campaign)}
+            </td>
+          ))
+        }
+      </tr>
+    )
   }
 
   return (
-    <div className={styles.content}>
-      <h2 className={styles.title}>{campaigns.length} past campaigns</h2>
+    <>
+      <TitleBar title="Welcome, Agency">
+        <PrimaryButton>Create new campaign</PrimaryButton>
+      </TitleBar>
+      <div className={styles.content}>
+        <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
+        <table>
+          <thead>
+            <tr>
+              {
+                headers.map(({ name, width }) => (
+                  <th className={styles[width]} key={name}>
+                    {name}
+                  </th>
+                ))
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              campaignsDisplayed.map(renderRow)
+            }
+          </tbody>
+        </table>
 
-      {
-        campaigns.length
-          ? (
-            <>
-              <div className={styles.table}>
-                <div className={[styles.row, styles.header].join(' ')}>
-                  <p className={styles.column}>Mode</p>
-                  <p className={styles.column}>Name</p>
-                  <p className={styles.column}>Time Sent</p>
-                  <p className={styles.column}>Messages Sent</p>
-                  <p className={styles.column}>Status</p>
-                </div>
-
-                {
-                  campaignsDisplayed.map((item: any, index: number) =>
-                    <div className={[styles.row, styles.body].join(' ')} key={index}>
-                      <div className={styles.column}>
-                        <span className={styles.icon}>{modeIcons[item.type]}</span>
-                      </div>
-                      <p className={styles.column}>{item.name}</p>
-                      <p className={styles.column}>{item.timeSent}</p>
-                      <p className={styles.column}>{item.msgsSent}</p>
-                      <p className={styles.column}>{item.status}</p>
-                    </div>
-                  )
-                }
-              </div>
-
-              <Pagination
-                itemsCount={campaigns.length}
-                setSelectedPage={setSelectedPage}
-                itemsPerPage={ITEMS_PER_PAGE}
-              ></Pagination>
-            </>
-          )
-          : ''
-      }
-    </div>
+        <Pagination
+          itemsCount={campaigns.length}
+          setSelectedPage={setSelectedPage}
+          itemsPerPage={ITEMS_PER_PAGE}
+        ></Pagination>
+      </div>
+    </>
   )
 }
 

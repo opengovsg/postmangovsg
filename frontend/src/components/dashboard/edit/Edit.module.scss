@@ -1,0 +1,9 @@
+@import "styles/_variables";
+@import "styles/_mixins";
+
+.editContainer {
+  display: flex;
+  flex: 1;
+  position: relative;
+  min-height: 100%;
+}

@@ -1,36 +1,45 @@
-@import 'styles/_variables';
-@import 'styles/_mixins';
+@import "styles/_variables";
+@import "styles/_mixins";
+
+$progress-pane-width: 18rem;
 
 .progressPane {
-  width: 400px;
+  width: $progress-pane-width;
+  min-width: $progress-pane-width;
   border-right: 1px solid $indigo-blue;
-  height: 100%;
 }
 
 .progressItem {
-  height: 90px;
-  padding-left: 70px;
   @include flex-horizontal;
+  color: $dark-blue;
+  opacity: 0.2;
+  padding: 1.5rem 0;
+  padding-left: $site-padding;
+  user-select: none;
+  cursor: default;
 
   &.active {
-    border-left: 8px solid $indigo-blue;
+    $border-left: 0.5rem;
+    border-left: $border-left solid $indigo-blue;
     background-color: $light-blue;
-    padding-left: calc(70px - 8px);
+    padding-left: calc(#{$site-padding} - #{$border-left});
+  }
+
+  &.active,
+  &.enabled {
+    opacity: 1;
+    cursor: pointer;
   }
 }
 
 .number {
-  height: 35px;
-  width: 35px;
+  $number-size: 2rem;
+  height: $number-size;
+  width: $number-size;
   background-color: $indigo-blue;
-  border-radius: 18px;
-  margin-right: 10px;
+  border-radius: 50%;
+  margin-right: 1rem;
   color: $light-blue;
   @include flex-horizontal;
   justify-content: center;
-}
-
-.title {
-  color: $dark-blue;
-  font-size: 18px;
 }

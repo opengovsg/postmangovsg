@@ -1,52 +1,60 @@
-@import 'styles/_variables';
-@import 'styles/_mixins';
+@import "styles/_variables";
+@import "styles/_mixins";
 
 .content {
   @include flex-vertical;
-  flex-grow: 1;
-  margin: auto;
-  padding-top: 5.8rem;
-  padding-bottom: 5.8rem;
-  
-  @include desktop() {
-    max-width: 900px;
-  }
-
-  @include widescreen() {
-    max-width: 900px;
-  }
+  padding: $content-vertical-padding 0;
+  margin: 0 auto;
+  width: 1000px;
+  max-width: calc(100vw - (2 * #{$site-padding}));
 }
 
-.icon {
-  @include icon;
-  font-size: 1.25rem;
-}
-
-.row {
-  @include flex-horizontal;
-}
-
-.column {
-  flex-basis: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-  padding: 0.75rem;
-}
-
-.title {
+.header {
   margin-bottom: 2rem;
-  font-weight: 500;
 }
 
-.table > div {
-  border-bottom: 1px solid $transparent-blue;
-}
+table {
 
-.header > p {
-  font-size: 0.75em;
-}
+  tbody tr {
+    &:hover {
+      cursor: pointer;
+      background-color: $transparent-blue;
+    }
 
-.body > p {
-  font-size: 0.875em;
-  font-weight: 500;
+    &:active {
+      opacity: 0.5;
+    }
+  }
+
+  tr {
+    @include flex-horizontal;
+    border-bottom: 1px solid $transparent-blue;
+
+    .icon {
+      @include icon;
+      font-size: 1.25rem;
+    }
+
+    td,
+    th {
+      padding: 0.75rem 0;
+
+      &.xs {
+        flex: 1.2;
+        text-align: center;
+      }
+
+      &.sm {
+        flex: 2;
+      }
+
+      &.md {
+        flex: 3;
+      }
+
+      &.lg {
+        flex: 4;
+      }
+    }
+  }
 }

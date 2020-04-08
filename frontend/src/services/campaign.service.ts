@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Campaign, ChannelType } from 'models/Campaign'
+import { Campaign, ChannelType, Status, SMSCampaign } from 'classes'
 
 // for dev use
 async function sleep(ms: number): Promise<void> {
@@ -8,30 +8,38 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
-async function getCampaigns(): Promise<Array<Campaign>> {
+export async function getCampaigns(): Promise<Array<Campaign>> {
   const campaigns: Array<Campaign> = [
     {
+      id: 1,
       type: ChannelType.SMS,
       name: 'test sms',
-      valid: true,
-      timeSent: 'today',
-      msgsSent: 123,
-      status: 'In progress',
+      createdAt: Date.now(),
+      sentAt: Date.now(),
+      status: 'draft',
     },
     {
-      type: ChannelType.EMAIL,
+      id: 1,
+      type: ChannelType.Email,
       name: 'test email',
-      valid: true,
-      timeSent: 'today',
-      msgsSent: 456,
-      status: 'Completed',
+      createdAt: Date.now(),
+      timeSent: Date.now(),
+      status: 'sent',
     },
-  ]
-
+  ].map((a) => new Campaign(a))
   await sleep(1000)
   return Promise.resolve(campaigns)
 }
 
-export {
-  getCampaigns,
+export async function getCampaignDetails(campaignId: number): Promise<Campaign> {
+  await sleep(1000)
+  return Promise.resolve(new SMSCampaign({
+    id: campaignId,
+    name: 'Project Name',
+    type: ChannelType.SMS,
+    status: Status.Draft,
+    createdAt: Date.now(),
+    hasCredentials: false,
+    body: 'something',
+  }))
 }

@@ -81,6 +81,7 @@ module.exports = {
       'always'
     ],
     // No need for proptypes since we're using typescript
-    'react/prop-types': 'off'
+    'react/prop-types': 'off',
+    'react/display-name': 'off',
   }
 }
