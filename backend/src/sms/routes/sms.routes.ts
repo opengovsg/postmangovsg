@@ -1,5 +1,6 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
+import { upsertTemplate } from '@sms/services/sms.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
@@ -83,8 +84,16 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
 }
 
 // Store body of message in sms template table
-const storeTemplate = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
+const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
+    await upsertTemplate(req.body.body, +req.params.campaignId)
+    return res.status(200).json({
+      message: 'ok'
+    })
+  } catch (err) {
+    console.error(err)
+    return next(err)
+  }
 }
 
 // Read file from s3 and populate messages table
