@@ -1,13 +1,18 @@
 import { Request, Response, NextFunction } from 'express'
-import { Campaign } from '@core/models'
+import { Campaign, JobQueue } from '@core/models'
 import { Sequelize } from 'sequelize-typescript'
 
-const verifyCampaignOwner = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+/**
+ *  If a campaign already has an existing job in the job queue, then it cannot be modified.
+ * @param req 
+ * @param res 
+ * @param next 
+ */
+const canEditCampaign =  async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
-    const { id : userId } = req.session?.user
-    const campaign = await Campaign.findOne({ where: { 'id': campaignId, userId } })
-    return campaign ? next() : res.sendStatus(403)
+    const job = await JobQueue.findOne({ where: { campaignId } })
+    return !job ? next() : res.sendStatus(403)
   }
   catch(err){
     return next(err)
@@ -59,4 +64,4 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
 }
 
 
-export { verifyCampaignOwner, createCampaign, listCampaigns }
+export { canEditCampaign, createCampaign, listCampaigns }
