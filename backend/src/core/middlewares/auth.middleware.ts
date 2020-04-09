@@ -17,7 +17,7 @@ const getOtp = async (_req: Request, res: Response): Promise<Response> => {
   await checkPermissionToResend(email)
   const otp = generateOtp()
   const hashValue = await hash(otp)
-  const hashedOtp : HashedOtp = { hash: hashValue, retries: RETRIES, createdAt: (new Date()).getTime() }
+  const hashedOtp : HashedOtp = { hash: hashValue, retries: RETRIES, createdAt: Date.now() }
   await saveHashedOtp(email, hashedOtp)
   // TODO: send otp to given email
   return res.sendStatus(200)
