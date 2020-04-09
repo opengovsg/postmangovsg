@@ -1,0 +1,11 @@
+@import "styles/_variables";
+
+.button {
+  background: $indigo-blue;
+  color: white;
+  border-radius: 1.875rem;
+  width: 13.75rem;
+  height: 2.9rem;
+  border: none;
+  cursor: pointer;
+}

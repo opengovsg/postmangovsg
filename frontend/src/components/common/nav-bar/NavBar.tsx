@@ -1,14 +1,25 @@
-import React, { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import React, { useState, useContext } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import cx from 'classnames'
 
+import { ModalContext } from 'contexts/modal.context'
 import { POSTMAN_GUIDE_URL } from 'config'
+import CreateCampaign from 'components/dashboard/createCampaign'
 
 import styles from './NavBar.module.scss'
 
 const NavBar = () => {
 
+  const modalContext = useContext(ModalContext)
   const [menuOpen, setMenuOpen] = useState(false)
+  const location = useLocation()
+
+  function handleCreateCampaign() {
+    modalContext.setModalContent(
+      <CreateCampaign></CreateCampaign>
+    )
+    modalContext.setModalOpen(true)
+  }
 
   return (
     <nav className={styles.navBar}>
@@ -20,11 +31,11 @@ const NavBar = () => {
       </div>
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
-        <NavLink className={styles.link} activeClassName={styles.active} isActive={
-          (_match, location) => {
-            return /^\/campaigns\/\d+$/.test(location.pathname)
-          }
-        } to={() => { return '' }}>Create</NavLink>
+        {
+          /^\/campaigns\/\d+$/.test(location.pathname)
+            ? <NavLink className={styles.link} activeClassName={styles.active}to={() => { return '' }}>Create</NavLink>
+            : <a className={styles.link} onClick={handleCreateCampaign}>Create</a>
+        }
         <a className={styles.link} href={POSTMAN_GUIDE_URL}>Guide</a>
         <NavLink className={styles.link} activeClassName={styles.active} to="/settings">Settings</NavLink>
 

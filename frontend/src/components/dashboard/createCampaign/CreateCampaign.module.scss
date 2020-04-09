@@ -1,0 +1,72 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.section {
+  margin-bottom: 1.6rem;
+
+  > * {
+    margin-bottom: 1.25rem;
+  }
+}
+
+.channelTypes {
+  @include flex-horizontal;
+  justify-content: space-between;
+
+  .button {
+    @include flex-horizontal;
+    justify-content: space-between;
+    width: 15rem;
+    height: 4.5rem;
+    padding: 1rem 1.3rem;
+    border-radius: 1.25rem;
+    background: white;
+    border: 1px solid $indigo-blue;
+    color: $indigo-blue;
+
+    &.active {
+      background: $indigo-blue;
+      color: white;
+    }
+  }
+}
+
+.button {
+  align-self: flex-end;
+  font-size: 0.875rem;
+  justify-content: center;
+  @include flex-horizontal;
+
+  & p {
+    margin-right: 0.6rem;
+  }
+
+  &.bottom {
+    margin-bottom: 0;
+  }
+}
+
+.icon {
+  @include icon;
+  font-size: 1.25rem;
+}
+
+.title {
+  font-weight: 500;
+}
+
+.subtext {
+  font-size: 0.875rem;
+  margin-bottom: 3em;
+  
+  & a {
+    font-size: 0.875rem;
+    font-style: italic;
+    color: $dark-blue;
+    text-decoration: underline;
+  }
+}
+
+.separator {
+ border-bottom: 1px solid $transparent-blue;
+}

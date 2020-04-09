@@ -1,0 +1,51 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.createCampaign {
+  @include flex-vertical;
+}
+
+.modalBg {
+  background: $transparent-dark-blue;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  z-index: 120;
+  @include flex-horizontal;
+  justify-content: center;
+}
+
+.modal {
+  height: 40rem;
+  width: 40rem;
+  border-radius: 10px;
+  background-color: $light-blue;
+  opacity: 1;
+  @include flex-vertical;
+  justify-content: center;
+  align-items: stretch;
+  padding: 2rem 3rem;
+  position: relative;
+
+  > * {
+    margin-bottom: 1.25rem;
+  }
+}
+
+.modalImg {
+  display: flex;
+  width: 240px;
+  margin-bottom: 30px;
+}
+
+.icon {
+  @include icon;
+  font-size: 1.25rem;
+
+  &.close {
+    position: absolute;
+    top: 2rem;
+    right: 3rem;
+    cursor: pointer;
+  }
+}

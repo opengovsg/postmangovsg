@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
 
+import { ModalContext } from 'contexts/modal.context'
 import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { Campaign, ChannelType } from 'classes'
+import CreateCampaign from 'components/dashboard/createCampaign'
 
 import styles from './Campaigns.module.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -14,10 +16,18 @@ import { faEnvelopeOpen, faCommentAlt } from '@fortawesome/free-solid-svg-icons'
 const ITEMS_PER_PAGE = 2
 
 const Campaigns = () => {
+  const modalContext = useContext(ModalContext)
   const [campaigns, setCampaigns] = useState(new Array<Campaign>())
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(new Array<Campaign>())
   const [selectedPage, setSelectedPage] = useState(0)
   const history = useHistory()
+
+  function handleCreateCampaign() {
+    modalContext.setModalContent(
+      <CreateCampaign></CreateCampaign>
+    )
+    modalContext.setModalOpen(true)
+  }
 
   async function fetchCampaigns() {
     const campaigns = await getCampaigns()
@@ -84,7 +94,7 @@ const Campaigns = () => {
   return (
     <>
       <TitleBar title="Welcome, Agency">
-        <PrimaryButton>Create new campaign</PrimaryButton>
+        <PrimaryButton onClick={handleCreateCampaign}>Create new campaign</PrimaryButton>
       </TitleBar>
       <div className={styles.content}>
         <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
