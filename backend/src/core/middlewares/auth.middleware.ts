@@ -32,7 +32,7 @@ const verifyOtp = async (req: Request, res: Response): Promise<Response> => {
 
   if(req.session){
     const [user] = await User.findCreateFind({ where: { email: email } })
-    req.session.user = { id: user.id, apiKey: user.apiKey, createdAt: user.createdAt, updatedAt: user.updatedAt }
+    req.session.user = { id: user.id, createdAt: user.createdAt, updatedAt: user.updatedAt }
     return res.sendStatus(200)
   }
   return res.sendStatus(401)
