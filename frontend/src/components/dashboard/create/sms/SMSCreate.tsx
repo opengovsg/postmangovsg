@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { SMSCampaign, SMSProgress } from 'classes'
 import { ProgressPane } from 'components/common'
-import TemplateSMS from './Template.sms'
+import SMSTemplate from './SMSTemplate'
 import styles from '../Create.module.scss'
 
 const SMS_PROGRESS_STEPS = [
@@ -19,7 +19,7 @@ const CreateSMS = ({ campaign }: { campaign: SMSCampaign }) => {
     switch (activeStep) {
     case SMSProgress.CreateTemplate:
       return (
-        <TemplateSMS body={campaign.body}/>
+        <SMSTemplate body={campaign.body} onSuccess={() => setActiveStep(1)}/>
       )
     case SMSProgress.UploadRecipients:
       return (

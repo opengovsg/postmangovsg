@@ -16,7 +16,6 @@ export class Campaign {
   createdAt: Date
   sentAt: Date
   status: Status
-  hasCredentials: boolean // has valid credentials
 
   constructor(input: any) {
     this.id = input['id']
@@ -25,6 +24,5 @@ export class Campaign {
     this.createdAt = input['createdAt']
     this.sentAt = input['sentAt']
     this.status = input['status']
-    this.hasCredentials = input['hasCredentials']
   }
 }

@@ -2,19 +2,24 @@
 @import "styles/_mixins";
 
 .button {
+  display: inline-flex;
+  justify-content: center;
+  height: $button-height;
+  min-width: $button-min-width;
+  font-size: 1rem;
   background-color: $indigo-blue;
   border: 0;
   color: white;
   text-align: center;
-  height: $button-height;
-  display: inline-flex;
-  min-width: $button-min-width;
-  font-size: 1rem;
-  padding: 0 $border-radius;
+  padding: 1px $border-radius 2px;
   border-radius: $border-radius;
   cursor: pointer;
   user-select: none;
-  justify-content: center;
+
+  &.alignRight {
+    margin-left: auto;
+    margin-right: 0;
+  }
 
   &:hover,
   &:focus {
@@ -24,5 +29,9 @@
 
   &:active {
     background-color: darken($indigo-blue, 20%);
+  }
+
+  &:disabled {
+    background-color: $light-grey;
   }
 }

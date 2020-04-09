@@ -4,7 +4,7 @@ import { TitleBar } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
 import { Campaign, SMSCampaign } from 'classes'
 
-import CreateSMS from './sms/Create.sms'
+import SMSCreate from './sms/SMSCreate'
 
 const Create = () => {
 
@@ -23,7 +23,7 @@ const Create = () => {
     return (
       <>
         <TitleBar title={campaign.name}> </TitleBar>
-        <CreateSMS campaign={campaign}></CreateSMS>
+        <SMSCreate campaign={campaign}></SMSCreate>
       </>
     )
   }

@@ -1,17 +1,16 @@
 import React from 'react'
 import cx from 'classnames'
 import TextareaAutosize from 'react-textarea-autosize'
+import escapeHTML from 'escape-html'
 
 import styles from './TextArea.module.scss'
 
-const HIGHLIGHT_REGEX = /{{\s*\w+\s*}}/g
+const HIGHLIGHT_REGEX = /{{\s*?\w+\s*?}}/g
 
-const TextArea = (props: any) => {
-  const { className, highlight, value, onChange } = props
-
+const TextArea = ({ highlight, value, onChange }: { highlight: boolean; value: string; onChange: Function }) => {
   return (
     <div className={styles.textAreaContainer}>
-      {highlight && <div className={styles.highlightBackdrop}>
+      {highlight && <div className={cx(styles.textArea, styles.highlightBackdrop)}>
         <p dangerouslySetInnerHTML={{
           __html: highlightHTML(value),
         }}></p>
@@ -20,8 +19,18 @@ const TextArea = (props: any) => {
         value={value}
         onChange={e => onChange(e.target.value)}
         minRows={5}
-        className={cx(styles.textArea, className)}
+        className={styles.textArea}
       />
+      {highlight && (
+        <div className={styles.instructions}>
+          <h5 >How to use - Personalisation</h5>
+          <p>
+            Use double curly braces to personalise your message.
+            <br/>
+            E.g.: Hello <mark>{'{{ name }}'}</mark>, your ID number is <mark>{'{{ id }}'}</mark>
+          </p>
+        </div>
+      )}
     </div >
   )
 }
@@ -30,18 +39,9 @@ function highlightHTML(plainText: any): string {
   if (!plainText) {
     return ''
   }
-  return escapeHtml(plainText)
+  return escapeHTML(plainText)
     .replace(/(?:\r\n|\r|\n)/g, '<br>')
-    .replace(HIGHLIGHT_REGEX, (match) => `<mark>${match}</mark>`)
-}
-
-function escapeHtml(unsafe: string): string {
-  return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
+    .replace(HIGHLIGHT_REGEX, (match: string) => `<mark>${match}</mark>`)
 }
 
 export default TextArea

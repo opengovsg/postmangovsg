@@ -27,18 +27,14 @@
     top: 0;
     left: 0;
     right: 0;
-    border: 1px solid transparent;
+    border-color: transparent;
     pointer-events: none;
-    font-size: 1rem;
-    line-height: 150%;
-    padding: $border-radius;
     color: transparent;
     z-index: -1;
+    white-space: pre;
+  }
 
-    mark {
-      background-color: rgba(255, 194, 204, 0.5);
-      border-radius: 4px;
-      padding-bottom: 2px;
-    }
+  .instructions {
+    color: $grey;
   }
 }
