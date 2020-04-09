@@ -13,13 +13,24 @@ const WAIT_IN_SECONDS = 30 // Number of seconds to wait before resending otp
 
 const getOtp = async (req: Request, res: Response): Promise<Response> => {
   const email = req.body.email
-  await closedBetaCheckExistingUser(email) // TODO: remove when launching
-  await checkPermissionToResend(email)
-  const otp = generateOtp()
-  const hashValue = await hash(otp)
-  const hashedOtp : HashedOtp = { hash: hashValue, retries: RETRIES, createdAt: Date.now() }
-  await saveHashedOtp(email, hashedOtp)
-  await sendOtp(email, otp)
+  try {
+    await closedBetaCheckExistingUser(email) // TODO: remove when launching
+    await checkPermissionToResend(email)
+  } catch (e) {
+    logger.error(`Not allowed to send OTP to. email=${email}`)
+    return res.sendStatus(401)
+  }
+  try {
+    const otp = generateOtp()
+    const hashValue = await hash(otp)
+    const hashedOtp : HashedOtp = { hash: hashValue, retries: RETRIES, createdAt: Date.now() }
+    await saveHashedOtp(email, hashedOtp)
+    await sendOtp(email, otp)
+  } catch (e) {
+    logger.error(`Error sending OTP: ${e}. email=${email}`)
+    return res.sendStatus(500)
+  }
+  
   return res.sendStatus(200)
 }
 
