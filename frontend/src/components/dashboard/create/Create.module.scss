@@ -1,0 +1,15 @@
+@import "styles/_variables";
+@import "styles/_mixins";
+
+.createContainer {
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+
+.stepContainer {
+  display: block;
+  width: 750px;
+  padding: $content-vertical-padding $site-padding;
+  margin: 0 auto;
+}

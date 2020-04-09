@@ -1,0 +1,15 @@
+@import "styles/_variables";
+
+.textInput {
+  height: $button-height;
+  border-radius: $border-radius;
+  box-shadow: none;
+  border: none;
+  line-height: 1rem;
+  font-size: 1rem;
+  padding-left: $border-radius;
+
+  &:focus {
+    outline: none;
+  }
+}

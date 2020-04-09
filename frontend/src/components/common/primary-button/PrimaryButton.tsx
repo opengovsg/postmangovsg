@@ -1,5 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
+
 import styles from './PrimaryButton.module.scss'
 
 const PrimaryButton = (props: any) => {

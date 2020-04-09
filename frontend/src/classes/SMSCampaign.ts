@@ -1,10 +1,10 @@
 import { Campaign } from './Campaign'
 
 export enum SMSProgress {
-  CreateMessage,
+  CreateTemplate,
   UploadRecipients,
   InsertCredentials,
-  ViewStatistics,
+  Send,
 }
 
 export class SMSCampaign extends Campaign {
@@ -12,7 +12,7 @@ export class SMSCampaign extends Campaign {
   csvFilename: string
   numRecipients: number
   preview: string
-  progress: SMSProgress = SMSProgress.CreateMessage
+  progress: SMSProgress = SMSProgress.CreateTemplate
 
   constructor(input: any) {
     super(input)
@@ -25,7 +25,7 @@ export class SMSCampaign extends Campaign {
 
   setProgress() {
     if (!this.body) {
-      this.progress = SMSProgress.CreateMessage
+      this.progress = SMSProgress.CreateTemplate
     }
     if (!this.numRecipients) {
       this.progress = SMSProgress.UploadRecipients
@@ -34,7 +34,7 @@ export class SMSCampaign extends Campaign {
     if (!this.hasCredentials) {
       this.progress = SMSProgress.InsertCredentials
     } else {
-      this.progress = SMSProgress.ViewStatistics
+      this.progress = SMSProgress.Send
     }
   }
 }

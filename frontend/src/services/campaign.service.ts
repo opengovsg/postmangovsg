@@ -32,7 +32,7 @@ export async function getCampaigns(): Promise<Array<Campaign>> {
 }
 
 export async function getCampaignDetails(campaignId: number): Promise<Campaign> {
-  await sleep(1000)
+  await sleep(100)
   return Promise.resolve(new SMSCampaign({
     id: campaignId,
     name: 'Project Name',
