@@ -1,0 +1,46 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.confirm {
+  @include flex-vertical;
+  align-items: center;
+}
+
+.modalImg {
+  display: flex;
+  width: 16rem;
+  margin-bottom: 2rem;
+}
+
+.icon {
+  @include icon;
+  font-size: 1.25rem;
+
+  &.send {
+    transform: rotateZ(52deg);
+  }
+}
+
+.button {
+  font-size: 0.875rem;
+  justify-content: center;
+  background-color: $light-green;
+  @include flex-horizontal;
+
+  & p {
+    margin-right: 0.6rem;
+  }
+
+  &.bottom {
+    margin-bottom: 0;
+  }
+}
+
+.title {
+  font-weight: 500;
+  margin-bottom: 1.125rem;
+}
+
+.subtitle {
+  margin-bottom: 3.125rem;
+}

@@ -4,7 +4,6 @@ const defaultValue = {
   modalOpen: false,
   setModalOpen: (open: boolean) => {},
   modalContent: <div />,
-  // setModalContent: ({type}:{type:string}) => void
   setModalContent: (content: any) => {},
 }
 

@@ -2,11 +2,7 @@
 @import 'styles/_mixins';
 
 .section {
-  margin-bottom: 1.6rem;
-
-  > * {
-    margin-bottom: 1.25rem;
-  }
+  margin-bottom: 1.875rem;
 }
 
 .channelTypes {
@@ -42,6 +38,7 @@
   }
 
   &.bottom {
+    margin-top: 1.25rem;
     margin-bottom: 0;
   }
 }
@@ -53,14 +50,21 @@
 
 .title {
   font-weight: 500;
+  margin-bottom: 0.625rem;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
 }
 
 .subtext {
-  font-size: 0.875rem;
-  margin-bottom: 3em;
+  font-size: 0.75rem;
+  margin-top: 0.625rem;
+  margin-bottom: 3.125em;
   
   & a {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-style: italic;
     color: $dark-blue;
     text-decoration: underline;
@@ -68,5 +72,5 @@
 }
 
 .separator {
- border-bottom: 1px solid $transparent-blue;
+  border-bottom: 1px solid $transparent-blue;
 }

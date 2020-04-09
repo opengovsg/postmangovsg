@@ -1,10 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.createCampaign {
-  @include flex-vertical;
-}
-
 .modalBg {
   background: $transparent-dark-blue;
   position: fixed;
@@ -16,26 +12,15 @@
 }
 
 .modal {
-  height: 40rem;
-  width: 40rem;
-  border-radius: 10px;
+  max-width: 860px;
+  border-radius: 0.625rem;
   background-color: $light-blue;
   opacity: 1;
   @include flex-vertical;
   justify-content: center;
   align-items: stretch;
-  padding: 2rem 3rem;
+  padding: 3.5rem 10.3rem;
   position: relative;
-
-  > * {
-    margin-bottom: 1.25rem;
-  }
-}
-
-.modalImg {
-  display: flex;
-  width: 240px;
-  margin-bottom: 30px;
 }
 
 .icon {
@@ -43,6 +28,7 @@
   font-size: 1.25rem;
 
   &.close {
+    color: $indigo-blue;
     position: absolute;
     top: 2rem;
     right: 3rem;

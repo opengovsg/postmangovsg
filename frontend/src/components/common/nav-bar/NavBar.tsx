@@ -41,8 +41,8 @@ const NavBar = () => {
 
         <div className={styles.separator}></div>
 
-        <span className={`${styles.active} ${styles.link}`}>postman@open.gov.sg</span>
-        <a className={`${styles.active} ${styles.link}`} onClick={() => alert('logout')}>Sign out</a>
+        <span className={cx(styles.active, styles.link)}>postman@open.gov.sg</span>
+        <a className={cx(styles.active, styles.link)} onClick={() => alert('logout')}>Sign out</a>
       </div>
     </nav >
   )
