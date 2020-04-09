@@ -31,14 +31,14 @@ const CreateCampaign = () => {
             className={cx(styles.button, { [styles.active]: selectedChannel === ChannelType.SMS })}
             onClick={() => handleSelectChannel(ChannelType.SMS)}
           >
-            <h2>SMS</h2>
+            <p>SMS</p>
             <FontAwesomeIcon className={styles.icon} icon={faEnvelopeOpenText}></FontAwesomeIcon>
           </PrimaryButton>
           <PrimaryButton
             className={cx(styles.button, { [styles.active]: selectedChannel === ChannelType.Email })}
             onClick={() => handleSelectChannel(ChannelType.Email)}
           >
-            <h2>Email</h2>
+            <p>Email</p>
             <FontAwesomeIcon className={styles.icon} icon={faEnvelopeOpen}></FontAwesomeIcon>
           </PrimaryButton>
         </div>

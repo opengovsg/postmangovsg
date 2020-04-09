@@ -34,13 +34,26 @@
   &.bottom {
     margin-bottom: 0;
   }
+
+  &:hover,
+  &:focus {
+    background-color: darken($light-green, 10%);
+    outline: none;
+  }
+
+  &:active {
+    background-color: darken($light-green, 20%);
+  }
 }
 
 .title {
   font-weight: 500;
+  margin-top: 0;
   margin-bottom: 1.125rem;
 }
 
 .subtitle {
+  font-weight: normal;
+  margin-top: 0;
   margin-bottom: 3.125rem;
 }

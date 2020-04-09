@@ -3,6 +3,7 @@
 
 .section {
   margin-bottom: 1.875rem;
+  @include flex-vertical;
 }
 
 .channelTypes {
@@ -19,9 +20,14 @@
     background: white;
     border: 1px solid $indigo-blue;
     color: $indigo-blue;
+    font-size: 1.5rem;
 
     &.active {
       background: $indigo-blue;
+      color: white;
+    }
+
+    &:hover {
       color: white;
     }
   }
@@ -50,11 +56,14 @@
 
 .title {
   font-weight: 500;
+  margin-top: 0;
   margin-bottom: 0.625rem;
 }
 
 .subtitle {
   font-size: 0.875rem;
+  font-weight: normal;
+  margin-top: 0;
   margin-bottom: 1.25rem;
 }
 
@@ -62,7 +71,7 @@
   font-size: 0.75rem;
   margin-top: 0.625rem;
   margin-bottom: 3.125em;
-  
+
   & a {
     font-size: 0.75rem;
     font-style: italic;
