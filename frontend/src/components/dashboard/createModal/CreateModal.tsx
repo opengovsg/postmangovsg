@@ -5,9 +5,9 @@ import { ChannelType } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelopeOpen, faEnvelopeOpenText, faArrowRight } from '@fortawesome/free-solid-svg-icons'
-import styles from './CreateCampaign.module.scss'
+import styles from './CreateModal.module.scss'
 
-const CreateCampaign = () => {
+const CreateModal = () => {
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
 
   const handleSelectChannel = (channel: ChannelType) => {
@@ -55,4 +55,4 @@ const CreateCampaign = () => {
   )
 }
 
-export default CreateCampaign
+export default CreateModal
