@@ -13,6 +13,7 @@ const redisOtpUri = process.env.REDIS_OTP_URI as string
 const redisSessionUri = process.env.REDIS_SESSION_URI as string
 
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
+
 // Express session 
 const sessionSecret: string = process.env.SESSION_SECRET as string
 const cookieSettings = {
@@ -21,6 +22,12 @@ const cookieSettings = {
   maxAge: 24 * 60 * 60 * 1000, // 24 hours,
   sameSite: true,
 }
+
+// Node mailer 
+const mailHost = process.env.MAIL_HOST as string 
+const mailPort = process.env.MAIL_PORT as string
+const mailUser = process.env.MAIL_USER as string
+const mailPassword = process.env.MAIL_PASSWORD as string
 
 export default {
   IS_PROD,
@@ -44,5 +51,13 @@ export default {
     cookieSettings,
   },
   redisOtpUri,
-  redisSessionUri
+  redisSessionUri,
+  mailOptions:{
+    host: mailHost,
+    port: mailPort,
+    auth: {
+      user: mailUser,
+      pass: mailPassword,
+    },
+  }
 }

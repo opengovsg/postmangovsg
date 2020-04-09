@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 import { User } from '@core/models'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import logger from '@core/logger'
-import { otpClient } from '@core/services/redis.service'
+import { otpClient, mailClient } from '@core/services'
 
 const SALT_ROUNDS = 10
 const RETRIES = 4 // Number of attempts to enter otp
@@ -19,7 +19,7 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
   const hashValue = await hash(otp)
   const hashedOtp : HashedOtp = { hash: hashValue, retries: RETRIES, createdAt: Date.now() }
   await saveHashedOtp(email, hashedOtp)
-  // TODO: send otp to given email
+  await sendOtp(email, otp)
   return res.sendStatus(200)
 }
 
@@ -133,6 +133,15 @@ const deleteHashedOtp = async (email: string) => {
 const closedBetaCheckExistingUser = async (email : string) => {
   const user = await User.findOne({ where: { email: email } })
   if (user === null) throw new Error('No user was found with this email')
+}
+
+const sendOtp = async (recipient: string, otp: string) => {
+  await mailClient.sendMail({
+    recipients: [recipient],
+    subject: 'One-Time Password (OTP) for Postman.gov.sg',
+    body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(EXPIRY_IN_SECONDS / 60)} minutes. 
+    Please use this to login to your Postman.gov.sg account. <p>If your OTP does not work, please request for a new OTP.</p>`,
+  })
 }
 
 export { getOtp, verifyOtp }

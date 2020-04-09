@@ -5,7 +5,6 @@ export interface MailToSend {
 }
 
 export interface MailCredentials {
-  email: string;
   host?: string;
   port?: string;
   user?: string;
