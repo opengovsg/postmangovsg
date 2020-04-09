@@ -11,8 +11,8 @@ const RETRIES = 4 // Number of attempts to enter otp
 const EXPIRY_IN_SECONDS = 300 //expires after 5 minutes
 const WAIT_IN_SECONDS = 30 // Number of seconds to wait before resending otp
 
-const getOtp = async (_req: Request, res: Response): Promise<Response> => {
-  const email = _req.body.email // TODO: use lodash to be safer?
+const getOtp = async (req: Request, res: Response): Promise<Response> => {
+  const email = req.body.email
   await closedBetaCheckExistingUser(email) // TODO: remove when launching
   await checkPermissionToResend(email)
   const otp = generateOtp()
@@ -24,7 +24,7 @@ const getOtp = async (_req: Request, res: Response): Promise<Response> => {
 }
 
 const verifyOtp = async (req: Request, res: Response): Promise<Response> => {
-  const { email, otp } = req.body //TODO: use lodash?
+  const { email, otp } = req.body
   const authorized = await isOtpVerified({ email, otp })
   if (!authorized) {
     return res.sendStatus(401)
