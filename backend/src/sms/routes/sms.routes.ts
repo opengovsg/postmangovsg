@@ -1,6 +1,16 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
+
+import { template, testHydration } from '@core/services/template.service'
+import { extractS3Key } from '@core/services/campaign.service'
+import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services/sms.service'
+import { storeCredentials } from '@sms/middlewares'
+
+import logger from '@core/logger'
+import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
+import { updateCampaignS3Metadata } from '@core/services'
+
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { 
@@ -211,11 +221,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     return next(err)
   }
-}
-
-// Read file from s3 and populate messages table
-const storeCredentials = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
 }
 
 // Send validation sms to specified phone number

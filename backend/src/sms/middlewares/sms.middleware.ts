@@ -14,4 +14,9 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
   }
 }
 
-export { isSmsCampaignOwnedByUser }
+// Read file from s3 and populate messages table
+const storeCredentials = async (_req: Request, res: Response): Promise<void> => {
+  res.json({ message: 'OK' })
+}
+
+export { isSmsCampaignOwnedByUser, storeCredentials }
