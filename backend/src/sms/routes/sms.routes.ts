@@ -65,12 +65,18 @@ const storeCredentialsValidator = {
     twilioAccountSid: Joi
       .string()
       .trim(),
-    twilioSomethingId: Joi
+    twilioApiSecret: Joi
       .string()
       .trim(),
     twilioApiKey: Joi
       .string()
       .trim(),
+    twilioMessagingServiceSid: Joi
+    .string()
+    .trim(),
+    testNumber: Joi
+    .string()
+    .trim(),
   }),
 }
 
