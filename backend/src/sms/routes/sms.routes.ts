@@ -92,7 +92,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
     // check if s3 file exists, and hydrate if so (?)
     // warn if params from s3 file are not a superset of saved params
     return res.status(200).json({
-      message: 'ok'
+      message: 'ok',
     })
   } catch (err) {
     console.error(err)
