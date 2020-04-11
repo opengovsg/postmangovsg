@@ -4,7 +4,7 @@ import { Campaign } from '@core/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
-import { secretsService } from '@core/services'
+import { dbService, secretsService } from '@core/services'
 
 const SALT_ROUNDS = 10
 
@@ -22,28 +22,38 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
 
 // Read file from s3 and populate messages table
 const storeCredentials = async (req: Request, res: Response): Promise<void> => {
-  const { twilioAccountSid, twilioApiKey, twilioApiSecret, twilioMessagingServiceSid, testNumber } = req.body
   //TODO: Send test message
-  console.log(testNumber)
-  await saveCredential({ 
-    accountSid: twilioAccountSid,
-    apiKey: twilioApiKey, 
-    apiSecret: twilioApiSecret,
-    messagingServiceSid: twilioMessagingServiceSid
-  })
+  const secretString = getSecretString(req)
+  const secretHash = await hash(secretString)
+  await saveCredential(secretHash, secretString)
+  const { campaignId } = req.params
+  // Update credential of the campaign
+  try {
+    await dbService.addCredentialToCampaignTable(campaignId, secretHash)
+  }catch(e) {
+    logger.error(`Error adding credential to campaign table. error=${e}`)
+    res.sendStatus(500)
+  }
 
   res.json({ message: 'OK' })
 }
 
-const saveCredential = async (credential : TwilioCredentials) => {
-  const secretString: string = JSON.stringify(credential)
-  // Hash the credential string
-  const secretHash = await hash(secretString)
-  console.log(secretHash)
+const saveCredential = async (name: string, secret: string) => {
   // Upload the credential to aws secret manager
-  await secretsService.storeSecret(secretHash, secretString)
+  await secretsService.storeSecret(name, secret)
   // Store credential to credential table
-  // Update credential of the campaign
+  await dbService.insertIntoCredentialsTable(name)
+}
+
+const getSecretString = (req: Request): string => {
+  const { twilioAccountSid, twilioApiKey, twilioApiSecret, twilioMessagingServiceSid } = req.body
+  const credential : TwilioCredentials = {
+    accountSid: twilioAccountSid,
+    apiKey: twilioApiKey, 
+    apiSecret: twilioApiSecret,
+    messagingServiceSid: twilioMessagingServiceSid
+  }
+  return JSON.stringify(credential)
 }
 
 const hash = (value: string) : Promise<string> => {
