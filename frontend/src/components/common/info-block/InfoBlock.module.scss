@@ -1,0 +1,6 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.infoBlock {
+  @include block($light-blue-half-opacity, $dark-blue);
+}

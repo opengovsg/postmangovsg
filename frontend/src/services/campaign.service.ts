@@ -40,6 +40,6 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign> 
     status: Status.Draft,
     createdAt: Date.now(),
     hasCredentials: false,
-    body: 'something',
+    body: 'something {{ hello }} ',
   }))
 }

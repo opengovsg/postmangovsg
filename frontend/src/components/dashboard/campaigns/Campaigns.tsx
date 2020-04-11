@@ -10,8 +10,6 @@ import { Campaign, ChannelType } from 'classes'
 import CreateCampaign from 'components/dashboard/createCampaign'
 
 import styles from './Campaigns.module.scss'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelopeOpen, faCommentAlt } from '@fortawesome/free-solid-svg-icons'
 
 const ITEMS_PER_PAGE = 2
 
@@ -44,14 +42,15 @@ const Campaigns = () => {
   }, [campaigns, selectedPage])
 
   const channelIcons = {
-    [ChannelType.Email]: faEnvelopeOpen,
-    [ChannelType.SMS]: faCommentAlt,
+    [ChannelType.SMS]: 'bx-message-detail',
+    [ChannelType.Email]: 'bx-envelope-open',
   }
 
   const headers = [
     {
       name: 'Mode',
-      render: (campaign: Campaign) => <FontAwesomeIcon className={styles.icon} icon={channelIcons[campaign.type]} />,
+      render: (campaign: Campaign) => <i className={cx('bx', styles.icon, channelIcons[campaign.type])}></i>
+      ,
       width: 'xs',
     },
     {

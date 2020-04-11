@@ -1,6 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.button {
-  @include button($indigo-blue);
+.errorBlock {
+  @include block($light-red, $red);
 }

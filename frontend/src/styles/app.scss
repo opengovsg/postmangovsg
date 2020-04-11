@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+@import '~boxicons/css/boxicons.min.css';
 
 @import "styles/_variables";
 
@@ -10,7 +11,7 @@ body {
   font-weight: normal;
   margin: 0;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -64,10 +65,12 @@ a {
 }
 
 p {
+  color: $grey;
   margin-block-start: 0;
-  margin-block-end: 0;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
+  margin-block-end: 1rem;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+  font-size: 0.8rem;
 }
 
 img {
@@ -85,4 +88,19 @@ th {
 
 ul {
   list-style-type: none;
+}
+
+mark {
+  background-color: rgba(255, 194, 204, 0.5);
+  border-radius: 4px;
+  padding-bottom: 2px;
+  color: inherit;
+}
+
+sub {
+  color: $light-grey;  
+}
+
+.align-right {
+  text-align: right;
 }

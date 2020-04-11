@@ -1,4 +1,4 @@
-@import "styles/_variables";
+@import 'styles/_variables';
 
 .textAreaContainer {
   margin: 2rem 0;
@@ -27,18 +27,18 @@
     top: 0;
     left: 0;
     right: 0;
-    border: 1px solid transparent;
+    border-color: transparent;
     pointer-events: none;
-    font-size: 1rem;
-    line-height: 150%;
-    padding: $border-radius;
-    color: transparent;
     z-index: -1;
-
-    mark {
-      background-color: rgba(255, 194, 204, 0.5);
-      border-radius: 4px;
-      padding-bottom: 2px;
+    white-space: pre;
+    p {
+      color: transparent;
+      font-size: 1rem;
     }
+  }
+
+  .instructions {
+    color: $grey;
+    font-size: 0.8rem;
   }
 }

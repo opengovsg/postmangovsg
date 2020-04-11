@@ -1,3 +1,5 @@
+@import 'styles/_variables';
+
 $tablet: 769px;
 $desktop: 1024px;
 $widescreen: 1216px;
@@ -47,6 +49,62 @@ $widescreen: 1216px;
   align-items: center;
   display: inline-flex;
   justify-content: center;
-  height: 1.5rem;
-  width: 1.5rem;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+}
+
+@mixin button($background-color) {
+  background-color: $background-color;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: $button-height;
+  min-width: $button-min-width;
+  font-size: 0.8rem;
+  border: 0;
+  color: white;
+  text-align: center;
+  padding: 1px $border-radius 2px;
+  border-radius: $border-radius;
+  cursor: pointer;
+  user-select: none;
+
+  &.alignRight {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: darken($background-color,  10%);
+    outline: none;
+  }
+
+  &:active {
+    background-color: darken($background-color, 20%);
+  }
+
+  &:disabled {
+    background-color: $light-grey;
+  }
+}
+
+@mixin block($backgroundColor, $color) {
+  padding: 1rem 2rem;
+  border-radius: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  background-color: $backgroundColor;
+  color: $color;
+  border-left: 0.5rem solid lighten($color, 10%);
+  margin: 2rem 0;
+
+  li {
+    margin-bottom: 0.5rem;
+    list-style: none;
+
+    i {
+      margin-right: 1.5rem;
+    }
+  }
 }

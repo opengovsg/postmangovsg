@@ -12,6 +12,7 @@ export class SMSCampaign extends Campaign {
   csvFilename: string
   numRecipients: number
   preview: string
+  hasCredentials: boolean
   progress: SMSProgress = SMSProgress.CreateTemplate
 
   constructor(input: any) {
@@ -20,6 +21,7 @@ export class SMSCampaign extends Campaign {
     this.csvFilename = input['csvFilename']
     this.numRecipients = input['numRecipients']
     this.preview = input['preview']
+    this.hasCredentials = input['hasCredentials']
     this.setProgress()
   }
 

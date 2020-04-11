@@ -4,11 +4,11 @@ import cx from 'classnames'
 import styles from './PrimaryButton.module.scss'
 
 const PrimaryButton = (props: any) => {
-  const { className, children, ...otherProps } = props
+  const { className, children, alignRight, ...otherProps } = props
   return (
-    <button className={cx(styles.button, className)} {...otherProps}>
+    <button className={cx(styles.button, { [styles.alignRight]: alignRight }, className)} {...otherProps}>
       {children}
-    </button>
+    </button >
   )
 }
 

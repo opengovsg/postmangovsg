@@ -1,33 +1,51 @@
 import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
+import { Campaign, ChannelType, SMSCampaign } from 'classes'
 import { TitleBar } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
-import { Campaign, SMSCampaign } from 'classes'
-
-import CreateSMS from './sms/Create.sms'
+import SMSCreate from './sms/SMSCreate'
 
 const Create = () => {
+  const { id } = useParams()
 
-  const [campaign, setCampaign] = useState<Campaign | null>(null)
+  const [campaign, setCampaign] = useState(new Campaign({}))
 
-  async function loadCampaign() {
-    const campaign = await getCampaignDetails(1)
-    setCampaign(campaign)
+  async function loadProject() {
+    if (id) {
+      const campaign = await getCampaignDetails(+id)
+      setCampaign(campaign)
+    }
   }
 
   useEffect(() => {
-    loadCampaign()
+    loadProject()
   }, [])
 
-  if (campaign && campaign instanceof SMSCampaign) {
-    return (
-      <>
-        <TitleBar title={campaign.name}> </TitleBar>
-        <CreateSMS campaign={campaign}></CreateSMS>
-      </>
-    )
+  function renderCreateChannel() {
+    switch (campaign.type) {
+      case ChannelType.SMS:
+        return <SMSCreate campaign={campaign as SMSCampaign} />
+      default:
+        return <p>Invalid Channel Type</p>
+    }
   }
-  return <p>loading..</p>
+
+  return (
+    <>
+      {
+        campaign ?
+          (
+            <>
+              <TitleBar title={campaign.name} > </TitleBar >
+              {renderCreateChannel()}
+            </>
+          )
+          :
+          (<p>loading..</p>)
+      }
+    </>
+  )
 }
 
 export default Create
