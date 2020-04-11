@@ -37,7 +37,8 @@ module.exports = {
     ],
     'indent': [
       'error',
-      2
+      2,
+      { 'SwitchCase': 1 }
     ],
     'newline-per-chained-call': [
       'error',
@@ -83,5 +84,6 @@ module.exports = {
     // No need for proptypes since we're using typescript
     'react/prop-types': 'off',
     'react/display-name': 'off',
+    'react-hooks/exhaustive-deps': 'off'
   }
 }

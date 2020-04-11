@@ -1,0 +1,20 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.container {
+  margin: 2rem 0;
+
+  input {
+    display: none;
+  }
+
+  label {
+    @include button($dark-blue);
+
+    i {
+      @include icon;
+      font-size: 1.2rem;
+      margin-left: 0.5rem;
+    }
+  }
+}

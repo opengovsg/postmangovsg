@@ -1,12 +1,10 @@
 import React from 'react'
 import ReactPaginate from 'react-paginate'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import styles from './Pagination.module.scss'
 
 const PAGE_RANGE_DISPLAYED = 5 // range of pages displayed
-const MARGIN_PAGES_DISPLAYED = 2 // number of pages displayed after ellipse
+const MARGIN_PAGES_DISPLAYED = 2 // number of pages displayed after ellipsis
 
 const Pagination = (props: any) => {
   const { itemsCount, setSelectedPage, itemsPerPage } = props
@@ -15,13 +13,13 @@ const Pagination = (props: any) => {
 
   const previousButton = (
     <span className={styles.icon}>
-      <FontAwesomeIcon icon={faChevronLeft} />
+      <i className='bx bx-chevron-left'></i>
     </span>
   )
 
   const nextButton = (
     <span className={styles.icon}>
-      <FontAwesomeIcon icon={faChevronRight} />
+      <i className='bx bx-chevron-right'></i>
     </span>
   )
 

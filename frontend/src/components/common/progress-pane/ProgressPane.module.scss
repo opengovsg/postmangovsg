@@ -1,5 +1,5 @@
-@import "styles/_variables";
-@import "styles/_mixins";
+@import 'styles/_variables';
+@import 'styles/_mixins';
 
 $progress-pane-width: 18rem;
 
@@ -12,7 +12,6 @@ $progress-pane-width: 18rem;
 .progressItem {
   @include flex-horizontal;
   align-items: baseline;
-  color: $dark-blue;
   font-size: 1rem;
   opacity: 0.2;
   padding: 1rem 0;

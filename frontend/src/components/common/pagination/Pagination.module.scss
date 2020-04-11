@@ -6,28 +6,30 @@
   justify-content: center;
   margin-top: 3.5rem;
 }
+
 .icon {
   @include icon;
   color: $dark-blue;
+  vertical-align: middle;
 }
 
 .navIconDisabled span {
   color: $light-grey;
 }
 
-.break > a {
+.break a {
   color: $dark-blue;
 }
 
 .pageNumber {
-  height: 1.875rem;
-  width: 1.875rem;
-  margin-right: 0.75rem;
-  margin-left: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  margin-right: 1rem;
+  margin-left: 1rem;
   @include flex-horizontal;
   justify-content: center;
 
-  > a {
+  a {
     color: $dark-blue;
     font-size: 0.8rem;
     line-height: 1rem;
@@ -38,9 +40,8 @@
   background-color: $indigo-blue;
   border-radius: 1rem;
 
-  > a, a:hover {
+  a,
+  a:hover {
     color: $light-blue;
   }
 }
-
-

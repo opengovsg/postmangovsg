@@ -2,22 +2,23 @@ import React, { useState } from 'react'
 
 import { TextArea, PrimaryButton } from 'components/common'
 
-const SMSTemplate = ({ body, onSuccess }: { body: string; onSuccess: Function }) => {
+const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [value, setValue] = useState(body)
+  const [body, setBody] = useState(initialBody)
 
-  async function onSave(): Promise<void> {
+  async function onNextClicked(): Promise<void> {
     // Save template
-    onSuccess()
+    onNext({ body })
   }
 
   return (
     <>
+      <sub>Step 1</sub>
       <h2>Create message template</h2>
       <h4>Message</h4>
-      <TextArea highlight={true} value={value} onChange={setValue} />
+      <TextArea highlight={true} value={body} onChange={setBody} />
       <div className="align-right">
-        <PrimaryButton disabled={!value} onClick={onSave}>Next →</PrimaryButton>
+        <PrimaryButton disabled={!body} onClick={onNextClicked}>Upload Recipients →</PrimaryButton>
       </div>
     </>
   )
