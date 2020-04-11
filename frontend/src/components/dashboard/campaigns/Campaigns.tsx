@@ -4,10 +4,10 @@ import cx from 'classnames'
 import Moment from 'react-moment'
 
 import { ModalContext } from 'contexts/modal.context'
-import { Pagination, TitleBar, PrimaryButton, Confirm } from 'components/common'
+import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { Campaign, ChannelType } from 'classes'
-import CreateCampaign from 'components/dashboard/createCampaign'
+import CreateCampaign from 'components/dashboard/create-modal'
 
 import styles from './Campaigns.module.scss'
 

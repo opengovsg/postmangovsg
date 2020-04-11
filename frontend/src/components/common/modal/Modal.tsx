@@ -2,8 +2,6 @@ import React, { useContext } from 'react'
 import cx from 'classnames'
 
 import { ModalContext } from 'contexts/modal.context'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import styles from './Modal.module.scss'
 
 const Modal = () => {
@@ -19,11 +17,12 @@ const Modal = () => {
         modalContext.modalOpen &&
         <div className={styles.modalBg}>
           <div className={styles.modal}>
-            <FontAwesomeIcon
+            <p
               onClick={handleCloseModal}
               className={cx(styles.icon, styles.close)}
-              icon={faTimes}
-            />
+            >
+              x
+            </p>
             {modalContext.modalContent}
           </div>
         </div>

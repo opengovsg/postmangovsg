@@ -4,7 +4,7 @@ import cx from 'classnames'
 
 import { ModalContext } from 'contexts/modal.context'
 import { POSTMAN_GUIDE_URL } from 'config'
-import CreateCampaign from 'components/dashboard/createCampaign'
+import CreateCampaign from 'components/dashboard/create-modal'
 
 import styles from './NavBar.module.scss'
 

@@ -3,8 +3,6 @@ import cx from 'classnames'
 
 import { ChannelType } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelopeOpen, faEnvelopeOpenText, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import styles from './CreateModal.module.scss'
 
 const CreateModal = () => {
@@ -32,14 +30,14 @@ const CreateModal = () => {
             onClick={() => handleSelectChannel(ChannelType.SMS)}
           >
             <p>SMS</p>
-            <FontAwesomeIcon className={styles.icon} icon={faEnvelopeOpenText}></FontAwesomeIcon>
+            <i className={cx('bx', styles.icon, 'bx-message-detail')}></i>
           </PrimaryButton>
           <PrimaryButton
             className={cx(styles.button, { [styles.active]: selectedChannel === ChannelType.Email })}
             onClick={() => handleSelectChannel(ChannelType.Email)}
           >
             <p>Email</p>
-            <FontAwesomeIcon className={styles.icon} icon={faEnvelopeOpen}></FontAwesomeIcon>
+            <i className={cx('bx', styles.icon, 'bx-envelope-open')}></i>
           </PrimaryButton>
         </div>
 
@@ -49,7 +47,7 @@ const CreateModal = () => {
 
       <PrimaryButton className={cx(styles.button, styles.bottom)}>
         <p>Create campaign</p>
-        <FontAwesomeIcon className={styles.icon} icon={faArrowRight}></FontAwesomeIcon>
+        <i className={cx('bx', styles.icon, 'send')}></i>
       </PrimaryButton>
     </>
   )
