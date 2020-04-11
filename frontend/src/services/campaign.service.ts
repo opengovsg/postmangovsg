@@ -41,7 +41,5 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign> 
     createdAt: Date.now(),
     hasCredentials: false,
     body: 'something {{ hello }} ',
-    numRecipients: 123,
-
   }))
 }
