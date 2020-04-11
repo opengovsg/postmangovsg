@@ -29,14 +29,13 @@ const storeCredentials = async (req: Request, res: Response): Promise<void> => {
   const isMessageSent = await sendMessage(testNumber, credential)
   if (!isMessageSent) res.sendStatus(400)
 
-  // SaveCredentials
-  const secretString = JSON.stringify(credential)
-  const secretHash = await hash(secretString)
-  await saveCredential(secretHash, secretString)
   const { campaignId } = req.params
 
-  // Update credential of the campaign
+  // Save the credentials and update DB
   try {
+    const secretString = JSON.stringify(credential)
+    const secretHash = await hash(secretString)
+    await saveCredential(secretHash, secretString)
     await dbService.addCredentialToCampaignTable(campaignId, secretHash)
   }catch(e) {
     logger.error(`Error adding credential to campaign table. error=${e}`)
