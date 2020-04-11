@@ -29,14 +29,14 @@ const CreateModal = () => {
             className={cx(styles.button, { [styles.active]: selectedChannel === ChannelType.SMS })}
             onClick={() => handleSelectChannel(ChannelType.SMS)}
           >
-            <p>SMS</p>
+            SMS
             <i className={cx('bx', styles.icon, 'bx-message-detail')}></i>
           </PrimaryButton>
           <PrimaryButton
             className={cx(styles.button, { [styles.active]: selectedChannel === ChannelType.Email })}
             onClick={() => handleSelectChannel(ChannelType.Email)}
           >
-            <p>Email</p>
+            Email
             <i className={cx('bx', styles.icon, 'bx-envelope-open')}></i>
           </PrimaryButton>
         </div>
@@ -45,9 +45,9 @@ const CreateModal = () => {
       </div>
 
 
-      <PrimaryButton className={cx(styles.button, styles.bottom)}>
-        <p>Create campaign</p>
-        <i className={cx('bx', styles.icon, 'send')}></i>
+      <PrimaryButton className={styles.bottomButton}>
+        Create campaign
+        <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
       </PrimaryButton>
     </>
   )

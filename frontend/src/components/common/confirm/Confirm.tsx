@@ -15,9 +15,8 @@ const Confirm = () => {
       <h2 className={styles.title}>Are you absolutely sure?</h2>
       <h4 className={styles.subtitle}>Sending out a campaign is irreversible.</h4>
       <PrimaryButton className={styles.button}>
-        <p>Confirm send now</p>
-        <i className={cx('bx', styles.icon, 'send')}></i>
-        {/* <FontAwesomeIcon className={cx(styles.icon, styles.send)} icon={faPaperPlane}></FontAwesomeIcon> */}
+        Confirm send now
+        <i className={cx('bx', styles.icon, 'bx-send')}></i>
       </PrimaryButton>
     </div>
   )

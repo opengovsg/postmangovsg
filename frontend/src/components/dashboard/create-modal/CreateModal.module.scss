@@ -15,12 +15,10 @@
     justify-content: space-between;
     width: 15rem;
     height: 4.5rem;
-    padding: 1rem 1.3rem;
-    border-radius: 1.25rem;
     background: white;
     border: 1px solid $indigo-blue;
     color: $indigo-blue;
-    font-size: 1.5rem;
+    font-size: 1.375rem;
 
     &.active {
       background: $indigo-blue;
@@ -33,25 +31,19 @@
   }
 }
 
-.button {
+.bottomButton {
   align-self: flex-end;
-  font-size: 0.875rem;
-  justify-content: center;
-  @include flex-horizontal;
+  margin-top: 1.25rem;
+  margin-bottom: 0;
 
-  & p {
-    margin-right: 0.6rem;
-  }
-
-  &.bottom {
-    margin-top: 1.25rem;
-    margin-bottom: 0;
+  .icon {
+    line-height: normal;
+    margin-left: 0.2rem;
   }
 }
 
 .icon {
   @include icon;
-  font-size: 1.25rem;
 }
 
 .title {

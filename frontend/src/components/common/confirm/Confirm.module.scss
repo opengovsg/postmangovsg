@@ -22,27 +22,10 @@
 }
 
 .button {
-  font-size: 0.875rem;
-  justify-content: center;
-  background-color: $light-green;
-  @include flex-horizontal;
+  @include button($light-green);
 
-  & p {
-    margin-right: 0.6rem;
-  }
-
-  &.bottom {
-    margin-bottom: 0;
-  }
-
-  &:hover,
-  &:focus {
-    background-color: darken($light-green, 10%);
-    outline: none;
-  }
-
-  &:active {
-    background-color: darken($light-green, 20%);
+  .icon {
+    margin-left: 0.2rem;
   }
 }
 
