@@ -5,6 +5,7 @@ import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
 import { dbService, secretsService } from '@core/services'
+import { TwilioService } from '@sms/services' 
 
 const SALT_ROUNDS = 10
 
@@ -22,11 +23,18 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
 
 // Read file from s3 and populate messages table
 const storeCredentials = async (req: Request, res: Response): Promise<void> => {
-  //TODO: Send test message
-  const secretString = getSecretString(req)
+  const credential: TwilioCredentials = getCredential(req)
+  // Send test message
+  const { testNumber } = req.body
+  const isMessageSent = await sendMessage(testNumber, credential)
+  if (!isMessageSent) res.sendStatus(400)
+
+  // SaveCredentials
+  const secretString = JSON.stringify(credential)
   const secretHash = await hash(secretString)
   await saveCredential(secretHash, secretString)
   const { campaignId } = req.params
+
   // Update credential of the campaign
   try {
     await dbService.addCredentialToCampaignTable(campaignId, secretHash)
@@ -45,7 +53,7 @@ const saveCredential = async (name: string, secret: string) => {
   await dbService.insertIntoCredentialsTable(name)
 }
 
-const getSecretString = (req: Request): string => {
+const getCredential = (req: Request): TwilioCredentials => {
   const { twilioAccountSid, twilioApiKey, twilioApiSecret, twilioMessagingServiceSid } = req.body
   const credential : TwilioCredentials = {
     accountSid: twilioAccountSid,
@@ -53,7 +61,7 @@ const getSecretString = (req: Request): string => {
     apiSecret: twilioApiSecret,
     messagingServiceSid: twilioMessagingServiceSid
   }
-  return JSON.stringify(credential)
+  return credential
 }
 
 const hash = (value: string) : Promise<string> => {
@@ -66,6 +74,13 @@ const hash = (value: string) : Promise<string> => {
       resolve(hash as string)
     })
   }) 
+}
+
+const sendMessage = async (recipient: string, credential: TwilioCredentials) : Promise<boolean> => {
+  const msg = 'You have successfully verified your Twilio credentials with Postman.'
+  const twilioClient = new TwilioService(credential)
+  const isSendSuccessful = await twilioClient.send(recipient, msg)
+  return isSendSuccessful
 }
 
 
