@@ -1,6 +1,7 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { upsertTemplate } from '@sms/services/sms.service'
+import { retrieveCampaign } from '@core/services/campaign.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
@@ -86,22 +87,31 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
+    const { campaignId } = req.params
     // extract params from template, save to db (this will be done with hook)
-    const updatedTemplate = await upsertTemplate(req.body.body, +req.params.campaignId)
+    const updatedTemplate = await upsertTemplate(req.body.body, +campaignId)
 
+    const campaign = await retrieveCampaign(+campaignId)
     // check if params exist
     // check if s3 file exists, and hydrate if so (?)
-    // FIXME: this is a stub
-    const stubbedParamsFromS3 = ['name', 'event']
-    // warn if params from s3 file are not a superset of saved params
+    if (campaign.s3Object) {
+      // fetch from S3
+      // s3ServiceInstance.fetch(...)
+      // FIXME: this is a stub
+      const stubbedParamsFromS3 = ['name', 'event']
+      // warn if params from s3 file are not a superset of saved params
 
-    // returns true if A is superset of B
-    const isSuperSet = (a: Array<string>, b: Array<string>) => a.every(s => b.indexOf(s) !== -1)
+      // returns true if A is superset of B
+      const isSuperSet = (a: Array<string>, b: Array<string>) => a.every(s => b.indexOf(s) !== -1)
 
-    if (!isSuperSet(updatedTemplate[0].params!, stubbedParamsFromS3)) {
-      throw new Error('Template contains keys that are not in file')
+      if (!isSuperSet(updatedTemplate[0].params!, stubbedParamsFromS3)) {
+        return res.status(400).json({
+          message: 'Template contains keys that are not in file',
+        })
+      }
+      // hydrate template
+      // try hydrate(...), return 4xx if unable to do so
     }
-
     return res.status(200).json({
       message: 'ok',
     })

@@ -21,4 +21,8 @@ const updateCampaignS3Metadata = ({ key, campaignId }: {key: string; campaignId:
     )
 }
 
-export { updateCampaignS3Metadata }
+const retrieveCampaign = (id: number): Promise<Campaign> => {
+  return Campaign.findByPk(id)
+}
+
+export { retrieveCampaign, updateCampaignS3Metadata }
