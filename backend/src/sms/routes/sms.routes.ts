@@ -86,7 +86,11 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
+    // extract params from template, save to db (this will be done with hook)
     await upsertTemplate(req.body.body, +req.params.campaignId)
+    // check if params exist
+    // check if s3 file exists, and hydrate if so (?)
+    // warn if params from s3 file are not a superset of saved params
     return res.status(200).json({
       message: 'ok'
     })
