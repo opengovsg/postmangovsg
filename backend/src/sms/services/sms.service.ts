@@ -64,9 +64,11 @@ const template = (templateBody: string, params: {[key: string]: string}): string
   return parsed.tokens.join('')
 }
 
-const upsertTemplate = (body: string, campaignId: number) => {
+const upsertTemplate = (body: string, campaignId: number): Promise<[SmsTemplate, boolean]> => {
   return SmsTemplate.upsert({
     campaignId, body,
+  }, {
+    returning: true,
   })
 }
 

@@ -87,10 +87,21 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     // extract params from template, save to db (this will be done with hook)
-    await upsertTemplate(req.body.body, +req.params.campaignId)
+    const updatedTemplate = await upsertTemplate(req.body.body, +req.params.campaignId)
+
     // check if params exist
     // check if s3 file exists, and hydrate if so (?)
+    // FIXME: this is a stub
+    const stubbedParamsFromS3 = ['name', 'event']
     // warn if params from s3 file are not a superset of saved params
+
+    // returns true if A is superset of B
+    const isSuperSet = (a: Array<string>, b: Array<string>) => a.every(s => b.indexOf(s) !== -1)
+
+    if (!isSuperSet(updatedTemplate[0].params!, stubbedParamsFromS3)) {
+      throw new Error('Template contains keys that are not in file')
+    }
+
     return res.status(200).json({
       message: 'ok',
     })
