@@ -1,5 +1,7 @@
 import { BeforeCreate, BeforeUpdate, BeforeUpsert, BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
+
 import { Campaign } from '@core/models/campaign'
+import { parseTemplate } from '@sms/services/sms.service'
 
 @Table({ tableName: 'sms_templates' , underscored: true, timestamps: true })
 export class SmsTemplate extends Model<SmsTemplate> {
@@ -20,16 +22,17 @@ export class SmsTemplate extends Model<SmsTemplate> {
 
   @Column({
     type: DataType.STRING,
-    allowNull: true
+    allowNull: true,
   })
-  params?: Array<String>
+  params?: Array<string>
 
   @BeforeUpdate
   @BeforeCreate
   @BeforeUpsert
   static generateParams(instance: SmsTemplate) {
-    // stubbed
-    instance.params = ['name', 'event']
+    if (!instance.body) return
+    const parsedTemplate = parseTemplate(instance.body)
+    instance.params = parsedTemplate.variables
   }
 
 }
