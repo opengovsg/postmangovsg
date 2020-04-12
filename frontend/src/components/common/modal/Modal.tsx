@@ -21,7 +21,9 @@ const Modal = ({ onClose, children }: { onClose: any; children: React.ReactNode 
             >
               x
             </p>
-            {children}
+            <div className={styles.content}>
+              {children}
+            </div>
           </div>
         </div>
       </>

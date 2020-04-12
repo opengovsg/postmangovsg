@@ -2,7 +2,7 @@ import React, { createContext, useState } from 'react'
 import Modal from 'components/common/modal'
 
 const defaultValue = {
-  setModalContent: (content: any) => {},
+  setModalContent: (_content: any) => { },
 }
 
 export const ModalContext = createContext(defaultValue)

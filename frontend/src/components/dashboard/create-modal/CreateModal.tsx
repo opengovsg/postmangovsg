@@ -37,14 +37,16 @@ const CreateModal = () => {
           </PrimaryButton>
         </div>
 
-        <p className={styles.subtext}>Get your credentials ready. <a>What is this?</a></p>
+        <p className={styles.subtext}>Get your credentials ready. <a href="#">What is this?</a></p>
       </div>
 
 
-      <PrimaryButton className={styles.bottomButton}>
-        Create campaign
-        <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
-      </PrimaryButton>
+      <div className="align-right">
+        <PrimaryButton className={styles.bottomButton}>
+          Create campaign
+          <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
+        </PrimaryButton>
+      </div>
     </>
   )
 }

@@ -1,26 +1,39 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+$content-width: 600px;
+
 .modalBg {
+  @include flex-center();
   background: $transparent-dark-blue;
   position: fixed;
   width: 100vw;
   height: 100vh;
   z-index: 120;
-  @include flex-horizontal;
-  justify-content: center;
 }
 
 .modal {
-  max-width: 860px;
-  border-radius: 0.6rem;
+  width: $tablet;
+  max-width: 100vw;
+  border-radius: $border-radius;
   background-color: $light-blue;
-  opacity: 1;
-  @include flex-vertical;
-  justify-content: center;
-  align-items: stretch;
-  padding: 3.5rem 10.3rem;
+  height: auto;
+  max-height: calc(100vh - 4rem);
   position: relative;
+  overflow: hidden;
+  overflow-y: auto;
+
+  @include mobile {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .content {
+    width: $content-width;
+    max-width: 100vw;
+    padding: 4rem 3rem;
+    margin: auto;
+  }
 }
 
 .icon {

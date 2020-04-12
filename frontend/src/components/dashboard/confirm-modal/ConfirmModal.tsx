@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { PrimaryButton } from 'components/common'
 import ModalImage from 'assets/img/modal.png'
-import styles from './Confirm.module.scss'
+import styles from './ConfirmModal.module.scss'
 
 const Confirm = () => {
 
