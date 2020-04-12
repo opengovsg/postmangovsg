@@ -7,6 +7,8 @@ import { updateCampaignS3Metadata, S3Service } from '@core/services'
 import S3 from 'aws-sdk/clients/s3'
 import { jwtUtils } from '@core/utils/jwt'
 
+const s3Client = new S3()
+
 const router = Router({ mergeParams: true })
 
 // validators
@@ -107,7 +109,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // TODO: delete message_logs entries
     // TODO: carry out templating / hydration
     // - download from s3
-    const s3Client = new S3()
     const s3Service = new S3Service(s3Client)
     const downloadStream = s3Service.download(s3Key)
     await s3Service.parseCsv(downloadStream)
