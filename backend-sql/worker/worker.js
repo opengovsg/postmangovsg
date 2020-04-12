@@ -27,8 +27,8 @@ module.exports = class Worker {
   }
 
   enqueueMessages(jobId) {
-    return this.connection.query('CALL enqueue_messages(:job_id); ',
-      { replacements: { job_id: jobId }, type: QueryTypes.CALL }
+    return this.connection.query('SELECT enqueue_messages(:job_id); ',
+      { replacements: { job_id: jobId }, type: QueryTypes.SELECT }
     ).then(() => {
       this.log(`enqueue job_id=${jobId}`)
     })

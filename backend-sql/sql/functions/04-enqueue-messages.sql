@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "email_ops" ("campaign_id" INTEGER  REFERENCES "campaigns" ("id") ON DELETE NO ACTION ON UPDATE CASCADE, "recipient" VARCHAR(255) , "params" JSON, "message_id" VARCHAR(255), "error_code" VARCHAR(255), "dequeued_at" TIMESTAMP WITH TIME ZONE, "sent_at" TIMESTAMP WITH TIME ZONE, "delivered_at" TIMESTAMP WITH TIME ZONE, "received_at" TIMESTAMP WITH TIME ZONE, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL, 
 id SERIAL PRIMARY KEY);
 
-CREATE OR REPLACE PROCEDURE enqueue_messages(jid int) LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION enqueue_messages(jid int) RETURNS VOID LANGUAGE plpgsql AS $$
 DECLARE 
     selected_campaign_id int;
 BEGIN
@@ -41,5 +41,4 @@ BEGIN
 	received_at,
 	created_at,
 	updated_at FROM messages);
-COMMIT;
 END $$;
