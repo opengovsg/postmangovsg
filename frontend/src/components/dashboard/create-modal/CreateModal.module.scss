@@ -2,7 +2,7 @@
 @import 'styles/_mixins';
 
 .section {
-  margin-bottom: 1.875rem;
+  margin-bottom: 1.85rem;
   @include flex-vertical;
 }
 
@@ -18,7 +18,7 @@
     background: white;
     border: 1px solid $indigo-blue;
     color: $indigo-blue;
-    font-size: 1.375rem;
+    font-size: 1.35rem;
 
     &.active {
       background: $indigo-blue;
@@ -49,11 +49,11 @@
 .title {
   font-weight: 500;
   margin-top: 0;
-  margin-bottom: 0.625rem;
+  margin-bottom: 0.65rem;
 }
 
 .subtitle {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: normal;
   margin-top: 0;
   margin-bottom: 1.25rem;
@@ -61,10 +61,10 @@
 
 .subtext {
   font-size: 0.75rem;
-  margin-top: 0.625rem;
+  margin-top: 0.65rem;
   margin-bottom: 3.125em;
 
-  & a {
+  a {
     font-size: 0.75rem;
     font-style: italic;
     color: $dark-blue;

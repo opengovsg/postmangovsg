@@ -13,7 +13,7 @@
 
 .modal {
   max-width: 860px;
-  border-radius: 0.625rem;
+  border-radius: 0.6rem;
   background-color: $light-blue;
   opacity: 1;
   @include flex-vertical;
@@ -25,7 +25,6 @@
 
 .icon {
   @include icon;
-  font-size: 1.25rem;
 
   &.close {
     color: $indigo-blue;
