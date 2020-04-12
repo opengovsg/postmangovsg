@@ -6,7 +6,7 @@ BEGIN
 	UPDATE email_ops SET sent_at=clock_timestamp() WHERE 
 		id in (
 			SELECT id FROM email_ops WHERE
-			campaign_id = (SELECT q.id FROM job_queue q WHERE q.id = jid AND status = 'SENDING')
+			campaign_id = (SELECT q.campaign_id FROM job_queue q WHERE q.id = jid AND status = 'SENDING')
 			AND sent_at IS NULL
 			LIMIT lim
 			FOR UPDATE SKIP LOCKED

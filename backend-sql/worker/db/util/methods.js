@@ -64,15 +64,6 @@ const createData = (numRecipients, numCampaigns) => {
     `)
 }
 
-const insertJob = (campaignId) => {
-  console.log(`Creating job for campaignID ${campaignId}`)
-  return sequelize.query(
-    `INSERT INTO job_queue ("campaign_id", "send_rate", "status", "created_at", "updated_at")
-        VALUES (${campaignId}, 100, 'READY', clock_timestamp(), clock_timestamp());
-        `
-  )    
-}
-
 const insertJobs = (numCampaigns) => {
   console.log(`Creating ${numCampaigns} jobs`)
   return sequelize.query(
@@ -82,6 +73,33 @@ const insertJobs = (numCampaigns) => {
   )
 }
 
+const insertJob = (campaignId) => {
+  console.log(`Creating one job for campaignId ${campaignId}`)
+  return sequelize.query(
+    `INSERT INTO job_queue ("campaign_id", "send_rate", "status", "created_at", "updated_at")
+        VALUES (${campaignId}, 100, 'READY', clock_timestamp(), clock_timestamp());
+        `
+  )    
+}
+
+const stopJobs = (campaignId) => {
+  console.log(`Stopping jobs for campaignId ${campaignId}`)
+  return sequelize.query(
+    `UPDATE job_queue SET status = 'STOPPED' WHERE campaign_id = ${campaignId} AND status <> 'LOGGED';`
+  )    
+}
+
+const retryJobs = (campaignId) => {
+  console.log(`Retrying jobs for campaignId ${campaignId}`)
+  return sequelize.query(
+    `UPDATE job_queue SET status = 'READY' WHERE campaign_id = ${campaignId} AND
+    NOT EXISTS (
+      -- Check that all of the jobs have been logged for this campaign id
+      SELECT 1 FROM job_queue q WHERE q.campaign_id = ${campaignId} AND status <> 'LOGGED' LIMIT 1
+    );
+    `
+  )    
+}
 
 const createFunctionFromFile = (filePath) => {
   return new Promise((resolve, reject) => {
@@ -106,7 +124,9 @@ module.exports = (connection) => {
     createWorkers,
     createData,
     createFunctionFromFile,
-    insertJob,
     insertJobs,
+    insertJob,
+    stopJobs,
+    retryJobs
   }
 }

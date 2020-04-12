@@ -7,10 +7,10 @@ WITH logged_jobs AS (
 	UPDATE job_queue SET status = 'LOGGED'
 	WHERE campaign_id IN ( SELECT q1.campaign_id
 	    FROM job_queue q1
-	    WHERE q1.status = 'SENT'
+	    WHERE q1.status IN ('SENT','STOPPED')
 		AND NOT EXISTS (
 			-- Check that all of the jobs have been stopped or sent for this campaign id
-			SELECT 1 FROM job_queue q2 WHERE q2.campaign_id = q1.campaign_id AND status NOT IN ('SENT', 'STOPPED') LIMIT 1
+			SELECT 1 FROM job_queue q2 WHERE q2.campaign_id = q1.campaign_id AND status NOT IN ('SENT', 'STOPPED', 'LOGGED') LIMIT 1
 		)
 	    FOR UPDATE SKIP LOCKED
 	    LIMIT 1

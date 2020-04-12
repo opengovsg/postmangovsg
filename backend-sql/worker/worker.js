@@ -20,7 +20,7 @@ module.exports = class Worker {
     ).then((result) => {
       const tuple = _.get(result, ('[0].get_next_job'),'()')
       const [jobId, campaignId] = tuple.substring(1, tuple.length-1).split(',')
-      this.log(`getNextJob job_id=${jobId} campaign_id=${campaignId}`)
+      if(jobId) { this.log(`getNextJob job_id=${jobId} campaign_id=${campaignId}`) }
       return { jobId, campaignId }
     })
   }
@@ -50,7 +50,7 @@ module.exports = class Worker {
     return this.connection.query('UPDATE email_ops SET message_id=\'test\' WHERE id=:id;',
       { replacements: { id }, type: QueryTypes.UPDATE }
     ).then(() => {
-      this.log(`sendMessage jobId=${jobId} id=${id}`)
+      this.log(`sendMessage jobId=${this.jobId} id=${id}`)
     })
   }
 
@@ -58,7 +58,7 @@ module.exports = class Worker {
     return this.connection.query('SELECT log_next_job();'
     ).then(([result, metadata]) => {
       const campaignId = _.get(result, ('[0].log_next_job'),'')
-      this.log(`finalized campaignId=${campaignId}`)
+      if(campaignId) this.log(`finalized campaignId=${campaignId}`)
     })
   }
 

@@ -1,18 +1,18 @@
 ## Preparing the db with mock data
 
-`node reset.js -d postgres://localhost:5432/postmangovsg`
+`node db/index.js -d postgres://localhost:5432/postmangovsg`
 
 ```
 Usage: reset [options]
 
 Options:
   -d, --database <uri>               database uri
+  -f, --dir <function directory>     path to sql functions (default: "../../sql/functions")
   -c, --num-creds <creds>            number of credentials (default: 10)
   -p, --num-campaigns <campaigns>    number of campaigns per credential (default: 2)
   -w, --num-workers <workers>        number of workers (default: 3)
   -r, --num-recipients <recipients>  number of recipients per campaign (default: 1000)
   -j, --jobs                         set flag to insert all jobs (default: false)
-  -i, --campaign-id <campaign-id>    insert a single job for this campaign. Overrides all other opts
   -h, --help                         display help for command
 ```
 
@@ -38,3 +38,26 @@ Options:
 
 `node index.js -r -w 2 -d "postgres://localhost:5432/postmangovsg"`
 
+## Inserting / stopping / retrying campaigns
+
+```
+Usage: campaign [options]
+
+Options:
+  -d, --database <uri>             database uri
+  -i, --campaign-id <campaign-id>  call a method for this campaign
+  -m, --method <method>            method to be called <start|stop|retry>
+  -h, --help                       display help for command
+```
+
+**Inserting a job for campaign 5**
+
+`node db/campaign.js -d postgres://localhost:5432/postmangovsg -i 5 -m start`
+
+**Stopping all jobs for campaign 5**
+
+`node db/campaign.js -d postgres://localhost:5432/postmangovsg -i 5 -m stop`
+
+**Retrying all jobs for campaign 5**
+
+`node db/campaign.js -d postgres://localhost:5432/postmangovsg -i 5 -m retry`
