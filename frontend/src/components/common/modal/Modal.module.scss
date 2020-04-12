@@ -36,14 +36,8 @@ $content-width: 600px;
   }
 }
 
-.icon {
-  @include icon;
-
-  &.close {
-    color: $indigo-blue;
-    position: absolute;
-    top: 2rem;
-    right: 3rem;
-    cursor: pointer;
-  }
+.close {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
 }
