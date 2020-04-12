@@ -1,34 +1,34 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import cx from 'classnames'
 
-import { ModalContext } from 'contexts/modal.context'
 import styles from './Modal.module.scss'
 
-const Modal = () => {
-  const modalContext = useContext(ModalContext)
+const Modal = ({ onClose, children }: { onClose: any; children: React.ReactNode }) => {
 
-  const handleCloseModal = () => {
-    modalContext.setModalOpen(false)
+  function handleClickBackground(event: any) {
+    if (event.target.className === styles.modalBg) {
+      onClose()
+    }
   }
-
-  return (
-    <>
-      {
-        modalContext.modalOpen &&
-        <div className={styles.modalBg}>
+  if (children) {
+    return (
+      <>
+        <div className={styles.modalBg} onClick={handleClickBackground}>
           <div className={styles.modal}>
             <p
-              onClick={handleCloseModal}
+              onClick={onClose}
               className={cx(styles.icon, styles.close)}
             >
               x
             </p>
-            {modalContext.modalContent}
+            {children}
           </div>
         </div>
-      }
-    </>
-  )
+      </>
+    )
+  }
+
+  return null
 }
 
 export default Modal

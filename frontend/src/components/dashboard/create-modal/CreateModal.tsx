@@ -8,10 +8,6 @@ import styles from './CreateModal.module.scss'
 const CreateModal = () => {
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
 
-  const handleSelectChannel = (channel: ChannelType) => {
-    setSelectedChannel(channel)
-  }
-
   return (
     <>
       <div className={styles.section}>
@@ -27,14 +23,14 @@ const CreateModal = () => {
         <div className={styles.channelTypes}>
           <PrimaryButton
             className={cx(styles.button, { [styles.active]: selectedChannel === ChannelType.SMS })}
-            onClick={() => handleSelectChannel(ChannelType.SMS)}
+            onClick={() => setSelectedChannel(ChannelType.SMS)}
           >
             SMS
             <i className={cx('bx', styles.icon, 'bx-message-detail')}></i>
           </PrimaryButton>
           <PrimaryButton
             className={cx(styles.button, { [styles.active]: selectedChannel === ChannelType.Email })}
-            onClick={() => handleSelectChannel(ChannelType.Email)}
+            onClick={() => setSelectedChannel(ChannelType.Email)}
           >
             Email
             <i className={cx('bx', styles.icon, 'bx-envelope-open')}></i>

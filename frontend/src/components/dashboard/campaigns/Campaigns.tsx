@@ -4,7 +4,7 @@ import cx from 'classnames'
 import Moment from 'react-moment'
 
 import { ModalContext } from 'contexts/modal.context'
-import { Pagination, TitleBar, PrimaryButton, Confirm } from 'components/common'
+import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { Campaign, ChannelType } from 'classes'
 import CreateCampaign from 'components/dashboard/create-modal'
@@ -19,14 +19,6 @@ const Campaigns = () => {
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(new Array<Campaign>())
   const [selectedPage, setSelectedPage] = useState(0)
   const history = useHistory()
-
-  function handleCreateCampaign() {
-    modalContext.setModalContent(
-      // <CreateCampaign></CreateCampaign>
-      <Confirm></Confirm>
-    )
-    modalContext.setModalOpen(true)
-  }
 
   async function fetchCampaigns() {
     const campaigns = await getCampaigns()
@@ -94,7 +86,12 @@ const Campaigns = () => {
   return (
     <>
       <TitleBar title="Welcome, Agency">
-        <PrimaryButton onClick={handleCreateCampaign}>Create new campaign</PrimaryButton>
+        <PrimaryButton
+          onClick={() => modalContext.setModalContent(
+            <CreateCampaign></CreateCampaign>
+          )}>
+          Create new campaign
+        </PrimaryButton>
       </TitleBar>
       <div className={styles.content}>
         <h2 className={styles.header}>{campaigns.length} past campaigns</h2>

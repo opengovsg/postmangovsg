@@ -18,7 +18,10 @@ const NavBar = () => {
     modalContext.setModalContent(
       <CreateCampaign></CreateCampaign>
     )
-    modalContext.setModalOpen(true)
+  }
+
+  function isCreatePath() {
+    return /^\/campaigns\/\d+$/.test(location.pathname)
   }
 
   return (
@@ -31,11 +34,7 @@ const NavBar = () => {
       </div>
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
-        {
-          /^\/campaigns\/\d+$/.test(location.pathname)
-            ? <NavLink className={styles.link} activeClassName={styles.active}to={() => { return '' }}>Create</NavLink>
-            : <a className={styles.link} onClick={handleCreateCampaign}>Create</a>
-        }
+        <a className={cx(styles.link, { [styles.active]: isCreatePath() })} onClick={handleCreateCampaign}>Create</a>
         <a className={styles.link} href={POSTMAN_GUIDE_URL}>Guide</a>
         <NavLink className={styles.link} activeClassName={styles.active} to="/settings">Settings</NavLink>
 

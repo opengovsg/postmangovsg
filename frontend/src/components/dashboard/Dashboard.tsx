@@ -2,7 +2,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import ModalContextProvider from 'contexts/modal.context'
-import { NavBar, Modal } from 'components/common'
+import { NavBar } from 'components/common'
 import Campaigns from './campaigns'
 import Create from './create'
 
@@ -10,7 +10,6 @@ import Create from './create'
 const Dashboard = () => {
   return (
     <ModalContextProvider>
-      <Modal></Modal>
       <NavBar></NavBar>
       <Switch>
         <Route exact path="/campaigns" component={Campaigns}></Route>

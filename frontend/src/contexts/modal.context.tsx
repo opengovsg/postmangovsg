@@ -1,25 +1,18 @@
 import React, { createContext, useState } from 'react'
+import Modal from 'components/common/modal'
 
 const defaultValue = {
-  modalOpen: false,
-  setModalOpen: (open: boolean) => {},
-  modalContent: <div />,
   setModalContent: (content: any) => {},
 }
 
 export const ModalContext = createContext(defaultValue)
 
 const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [modalContent, setModalContent] = useState(<div />)
+  const [modalContent, setModalContent] = useState(null)
 
   return (
-    <ModalContext.Provider value={{
-      modalOpen,
-      setModalOpen,
-      modalContent,
-      setModalContent,
-    }}>
+    <ModalContext.Provider value={{ setModalContent }}>
+      <Modal onClose={() => setModalContent(null)}>{modalContent}</Modal>
       {children}
     </ModalContext.Provider>
   )
