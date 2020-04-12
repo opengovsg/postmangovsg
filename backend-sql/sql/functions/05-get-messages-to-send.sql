@@ -14,6 +14,7 @@ BEGIN
 	RETURNING id, recipient, params;
 	-- If there are no messages found, we assume the job is done
 	-- This is only correct because enqueue and send are serialized. All messages are enqueued before sending occurs
+	-- This doesnt work!!! messages might get logged and deleted before the sendmessage callback returns for updating message_id
 	IF NOT FOUND THEN
 		UPDATE job_queue SET status = 'SENT' where id = jid AND status = 'SENDING';
 	END IF;

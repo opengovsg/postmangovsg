@@ -12,6 +12,7 @@ module.exports = class Worker {
         (:worker_id, clock_timestamp(), clock_timestamp()) ON CONFLICT (id) DO NOTHING;`, 
     { replacements: { worker_id: this.workerId  }, type: QueryTypes.INSERT }
     )
+    // TODO: On respawn with this same workerId, look for any existing jobs that are in SENDING state, and resume it.
   }
    
   getNextJob(){
@@ -47,9 +48,16 @@ module.exports = class Worker {
   }
 
   sendMessage({ id, recipient, params }){
-    return this.connection.query('UPDATE email_ops SET message_id=\'test\' WHERE id=:id;',
-      { replacements: { id }, type: QueryTypes.UPDATE }
-    ).then(() => {
+    return Promise.resolve()
+    .then(()=>{
+      //do some sending get a response
+      return 'message-test'
+    })
+    .then((messageId)=>{
+      return this.connection.query('UPDATE email_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
+      { replacements: { id, messageId }, type: QueryTypes.UPDATE })
+    })
+    .then(() => {
       this.log(`sendMessage jobId=${this.jobId} id=${id}`)
     })
   }
