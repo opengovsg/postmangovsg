@@ -21,7 +21,7 @@ export class SmsTemplate extends Model<SmsTemplate> {
   body?: string
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.ARRAY(DataType.STRING),
     allowNull: true,
   })
   params?: Array<string>
