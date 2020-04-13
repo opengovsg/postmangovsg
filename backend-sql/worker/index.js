@@ -6,11 +6,11 @@ program
   .option('-s, --batch-size <batch-size>', 'number of messages to sebd per second', cmdParseInt, 100)
   .option('-r, --grim-reaper', 'set this flag for grim reaper mode')
   .option('-v, --verbose', 'set this flag true for verbose')
- 
+
 program.parse(process.argv)
 console.log(program.opts())
 
-/****** START ******/
+/** **** START ******/
 const { workerId, database, grimReaper, verbose, batchSize } = program.opts()
 const { Sequelize } = require('sequelize')
 const connection = new Sequelize(
@@ -19,12 +19,8 @@ const connection = new Sequelize(
     logging: false,
   })
 const workerRunner = require('./worker-runner')
-main = async () => {
+const main = async () => {
   await connection.sync()
   await workerRunner.start({ connection, workerId, grimReaper, verbose, batchSize })
-  return
 }
 main()
-
-
-

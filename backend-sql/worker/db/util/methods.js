@@ -4,7 +4,7 @@ const truncateTables = () => {
   console.log('Truncating tables')
   return sequelize.query(
     `TRUNCATE users, job_queue, credentials, campaigns, workers,
-        email_messages, email_templates, email_ops RESTART IDENTITY;`
+        email_messages, email_templates, email_ops RESTART IDENTITY;`,
   )
 }
 
@@ -12,7 +12,7 @@ const createUser = () => {
   console.log('Creating user')
   return sequelize.query(
     `INSERT INTO users ("id", "email","created_at", "updated_at") VALUES 
-        (1, 'test@test.gov.sg', clock_timestamp(), clock_timestamp());`
+        (1, 'test@test.gov.sg', clock_timestamp(), clock_timestamp());`,
   )
 }
 
@@ -24,7 +24,7 @@ const createCredentials = (numCredentials) => {
 
 const createCampaigns = (numCampaignsPerCredential, numCredentials) => {
   console.log(`Creating ${numCampaignsPerCredential} campaigns per credential, 
-    for a total of ${numCampaignsPerCredential*numCredentials} campaigns`)
+    for a total of ${numCampaignsPerCredential * numCredentials} campaigns`)
   return sequelize.query(`
     INSERT INTO campaigns ("id", "name", "user_id", "type", "cred_name", "valid", "created_at", "updated_at" ) 
     SELECT ROW_NUMBER () OVER (ORDER BY name) as id,  t.name, t.user_id, enum_campaigns_type(t.type), t.cred_name, t.valid, t.created_at, t.updated_at 
@@ -54,7 +54,7 @@ const createWorkers = (numWorkers) => {
 
 const createData = (numRecipients, numCampaigns) => {
   console.log(`Creating ${numRecipients} recipients per campaign, 
-    for a total of ${numRecipients*numCampaigns} recipients`)
+    for a total of ${numRecipients * numCampaigns} recipients`)
   return sequelize.query(`
     INSERT INTO email_messages ("campaign_id", "recipient", "params", "created_at", "updated_at")
     SELECT t.* FROM  generate_series(1,${numRecipients}) num_recipient
@@ -69,7 +69,7 @@ const insertJobs = (numCampaigns) => {
   return sequelize.query(
     `INSERT INTO job_queue ("campaign_id", "send_rate", "status", "created_at", "updated_at")
     SELECT generate_series(1,${numCampaigns}), 100 as send_rate, 'READY' as status, clock_timestamp() as created_at, clock_timestamp() as updated_at;
-    `
+    `,
   )
 }
 
@@ -78,15 +78,15 @@ const insertJob = (campaignId) => {
   return sequelize.query(
     `INSERT INTO job_queue ("campaign_id", "send_rate", "status", "created_at", "updated_at")
         VALUES (${campaignId}, 100, 'READY', clock_timestamp(), clock_timestamp());
-        `
-  )    
+        `,
+  )
 }
 
 const stopJobs = (campaignId) => {
   console.log(`Stopping jobs for campaignId ${campaignId}`)
   return sequelize.query(
-    `UPDATE job_queue SET status = 'STOPPED' WHERE campaign_id = ${campaignId} AND status <> 'LOGGED';`
-  )    
+    `UPDATE job_queue SET status = 'STOPPED' WHERE campaign_id = ${campaignId} AND status <> 'LOGGED';`,
+  )
 }
 
 const retryJobs = (campaignId) => {
@@ -97,15 +97,15 @@ const retryJobs = (campaignId) => {
       -- Check that all of the jobs have been logged for this campaign id
       SELECT 1 FROM job_queue q WHERE q.campaign_id = ${campaignId} AND status <> 'LOGGED' LIMIT 1
     );
-    `
-  )    
+    `,
+  )
 }
 
 const createFunctionFromFile = (filePath) => {
   return new Promise((resolve, reject) => {
     console.log('Creating functions from' + filePath)
     fs.readFile(filePath, 'utf8', (err, data) => {
-      if(err) reject(err)
+      if (err) reject(err)
       resolve(data)
     })
   }).then((data) => {
@@ -127,6 +127,6 @@ module.exports = (connection) => {
     insertJobs,
     insertJob,
     stopJobs,
-    retryJobs
+    retryJobs,
   }
 }

@@ -10,8 +10,7 @@ program
   .option('-j, --jobs', 'set flag to insert all jobs', false)
 program.parse(process.argv)
 
-
-/****** START ******/
+/** **** START ******/
 const { database, dir, numCreds, numCampaigns, numWorkers, numRecipients, jobs } = program.opts()
 const { Sequelize } = require('sequelize')
 const connection = new Sequelize(
