@@ -8,6 +8,9 @@
   line-height: 1rem;
   font-size: 1rem;
   padding-left: $border-radius;
+  border: 1px solid $indigo-blue;
+  background-color: $light-blue;
+  color: $dark-blue;
 
   &:focus {
     outline: none;

@@ -1,14 +1,28 @@
-import React, { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import React, { useState, useContext } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import cx from 'classnames'
 
+import { ModalContext } from 'contexts/modal.context'
 import { POSTMAN_GUIDE_URL } from 'config'
+import CreateModal from 'components/dashboard/create-modal'
 
 import styles from './NavBar.module.scss'
 
 const NavBar = () => {
 
+  const modalContext = useContext(ModalContext)
   const [menuOpen, setMenuOpen] = useState(false)
+  const location = useLocation()
+
+  function handleCreateCampaign() {
+    modalContext.setModalContent(
+      <CreateModal></CreateModal>
+    )
+  }
+
+  function isCreatePath() {
+    return /^\/campaigns\/\d+$/.test(location.pathname)
+  }
 
   return (
     <nav className={styles.navBar}>
@@ -20,18 +34,14 @@ const NavBar = () => {
       </div>
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
-        <NavLink className={styles.link} activeClassName={styles.active} isActive={
-          (_match, location) => {
-            return /^\/campaigns\/\d+$/.test(location.pathname)
-          }
-        } to={() => { return '' }}>Create</NavLink>
+        <a className={cx(styles.link, { [styles.active]: isCreatePath() })} onClick={handleCreateCampaign}>Create</a>
         <a className={styles.link} href={POSTMAN_GUIDE_URL}>Guide</a>
         <NavLink className={styles.link} activeClassName={styles.active} to="/settings">Settings</NavLink>
 
         <div className={styles.separator}></div>
 
-        <span className={`${styles.active} ${styles.link}`}>postman@open.gov.sg</span>
-        <a className={`${styles.active} ${styles.link}`} onClick={() => alert('logout')}>Sign out</a>
+        <span className={cx(styles.active, styles.link)}>postman@open.gov.sg</span>
+        <a className={cx(styles.active, styles.link)} onClick={() => alert('logout')}>Sign out</a>
       </div>
     </nav >
   )
