@@ -58,7 +58,7 @@ const createCampaignValidator = {
  *          required: false
  *          schema:
  *            type: integer
- *            minimum: 0            
+ *            minimum: 0
  *      responses:
  *        "200":
  *          content:
@@ -87,12 +87,12 @@ router.get('/', celebrate(listCampaignsValidator), listCampaigns)
  *              properties:
  *                name:
  *                  type: string
- *                type: 
+ *                type:
  *                   $ref: '#/components/schemas/ChannelType'
  *              required:
  *              - name
  *              - type
- *                  
+ *
  *      responses:
  *        "201":
  *          content:

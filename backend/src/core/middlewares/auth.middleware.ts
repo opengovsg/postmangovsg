@@ -24,7 +24,7 @@ const hash = (value: string): Promise<string> => {
       }
       resolve(hash as string)
     })
-  }) 
+  })
 }
 
 const saveHashedOtp = (email: string, hashedOtp: HashedOtp): Promise<boolean> => {
@@ -112,7 +112,7 @@ const sendOtp = (recipient: string, otp: string): Promise<boolean> => {
   return mailClient.sendMail({
     recipients: [recipient],
     subject: 'One-Time Password (OTP) for Postman.gov.sg',
-    body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(EXPIRY_IN_SECONDS / 60)} minutes. 
+    body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(EXPIRY_IN_SECONDS / 60)} minutes.
     Please use this to login to your Postman.gov.sg account. <p>If your OTP does not work, please request for a new OTP.</p>`,
   })
 }
