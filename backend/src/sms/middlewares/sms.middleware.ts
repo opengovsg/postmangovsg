@@ -9,42 +9,6 @@ import { TwilioService } from '@sms/services'
 
 const SALT_ROUNDS = 10
 
-// TODO
-const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
-    const { campaignId } = req.params
-    const { id: userId } = req.session?.user
-    const campaign = await Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.SMS } })
-    return campaign ? next() : res.sendStatus(400)
-  }catch(err){
-    return next(err)
-  }
-}
-
-// Read file from s3 and populate messages table
-const storeCredentials = async (req: Request, res: Response): Promise<void> => {
-  const credential: TwilioCredentials = getCredential(req)
-  // Send test message
-  const { testNumber } = req.body
-  const isMessageSent = await sendMessage(testNumber, credential)
-  if (!isMessageSent) res.sendStatus(400)
-
-  const { campaignId } = req.params
-
-  // Save the credentials and update DB
-  try {
-    const secretString = JSON.stringify(credential)
-    const secretHash = await hash(secretString)
-    await saveCredential(secretHash, secretString)
-    await dbService.addCredentialToCampaignTable(campaignId, secretHash)
-  }catch(e) {
-    logger.error(`Error adding credential to campaign table. error=${e}`)
-    res.sendStatus(500)
-  }
-
-  res.json({ message: 'OK' })
-}
-
 const saveCredential = async (name: string, secret: string) => {
   // Upload the credential to aws secret manager
   await secretsService.storeSecret(name, secret)
@@ -80,6 +44,42 @@ const sendMessage = async (recipient: string, credential: TwilioCredentials) : P
   const twilioClient = new TwilioService(credential)
   const isSendSuccessful = await twilioClient.send(recipient, msg)
   return isSendSuccessful
+}
+
+// TODO
+const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try{
+    const { campaignId } = req.params
+    const { id: userId } = req.session?.user
+    const campaign = await Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.SMS } })
+    return campaign ? next() : res.sendStatus(400)
+  }catch(err){
+    return next(err)
+  }
+}
+
+// Read file from s3 and populate messages table
+const storeCredentials = async (req: Request, res: Response): Promise<void> => {
+  const credential: TwilioCredentials = getCredential(req)
+  // Send test message
+  const { testNumber } = req.body
+  const isMessageSent = await sendMessage(testNumber, credential)
+  if (!isMessageSent) res.sendStatus(400)
+
+  const { campaignId } = req.params
+
+  // Save the credentials and update DB
+  try {
+    const secretString = JSON.stringify(credential)
+    const secretHash = await hash(secretString)
+    await saveCredential(secretHash, secretString)
+    await dbService.addCredentialToCampaignTable(campaignId, secretHash)
+  }catch(e) {
+    logger.error(`Error adding credential to campaign table. error=${e}`)
+    res.sendStatus(500)
+  }
+
+  res.json({ message: 'OK' })
 }
 
 
