@@ -8,6 +8,9 @@ const router = Router()
 const getOtpValidator = {
   [Segments.BODY]: Joi.object({
     email: Joi.string().email()
+      .options({ convert: true }) // Converts email to lowercase if it isn't
+      .lowercase()
+      .regex(/^.*\.gov\.sg$/)
       .required(), // TODO: Add other validation 
   }),
 }

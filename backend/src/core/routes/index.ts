@@ -4,6 +4,7 @@ import { Request, Response } from 'express'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { canEditCampaign } from '@core/middlewares'
+import { isCookieAuthenticated } from '@core/middlewares'
 
 // Core routes
 import authenticationRoutes from './auth.routes'
@@ -53,9 +54,8 @@ const redirectToChannelRoute = async (req: Request, res: Response): Promise<Resp
 const router = Router()
 
 router.use('/auth', authenticationRoutes)
-router.use('/campaigns', campaignRoutes)
-router.use('/campaign/:campaignId/sms', celebrate(campaignIdValidator), canEditCampaign, smsRoutes)
-router.use('/campaign/:campaignId/email', celebrate(campaignIdValidator), canEditCampaign, emailRoutes)
-router.use('/campaign/:campaignId', celebrate(campaignIdValidator), redirectToChannelRoute)
-
+router.use('/campaigns', isCookieAuthenticated, campaignRoutes)
+router.use('/campaign/:campaignId/sms', isCookieAuthenticated, celebrate(campaignIdValidator), canEditCampaign, smsRoutes)
+router.use('/campaign/:campaignId/email', isCookieAuthenticated, celebrate(campaignIdValidator), canEditCampaign, emailRoutes)
+router.use('/campaign/:campaignId', isCookieAuthenticated, celebrate(campaignIdValidator), redirectToChannelRoute)
 export default router
