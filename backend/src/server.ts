@@ -5,9 +5,7 @@ require('module-alias/register')
 import { checkRequiredEnvVars, loaders } from './core'
 
 const requiredEnvVars = [
-  'AWS_ACCESS_KEY_ID',
   'AWS_REGION',
-  'AWS_SECRET_ACCESS_KEY',
   'DB_URI',
   'FILE_STORAGE_BUCKET_NAME',
   'JWT_SECRET',
