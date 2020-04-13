@@ -16,7 +16,8 @@ const SMS_PROGRESS_STEPS = [
 ]
 
 const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => {
-  const [activeStep, setActiveStep] = useState(initialCampaign.progress)
+  const [activeStep, setActiveStep] = useState(2)
+  // const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
 
   // Modifies campaign object in state and navigates to next step

@@ -2,7 +2,7 @@
 
 .textInput {
   height: $button-height;
-  border: 1px solid $indigo-blue;
+  border: 1px solid $light-grey;
   border-radius: $border-radius;
   box-shadow: none;
   line-height: 1rem;
@@ -13,5 +13,6 @@
 
   &:focus {
     outline: none;
+    border-color: $indigo-blue;
   }
 }

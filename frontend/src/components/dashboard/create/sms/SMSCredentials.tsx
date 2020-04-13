@@ -59,7 +59,7 @@ const SMSCredentials = ({ hasCredentials, onNext }: { hasCredentials: boolean; o
         onClick={() => testCredentials}
         disabled={isDisabled()}
       >
-        Send a test sms
+        Validate credential
       </TextInputWithButton>
 
       <div className="separator"></div>
