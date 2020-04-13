@@ -11,7 +11,7 @@ const connection = new Sequelize(
 const dbRunner = require('../db/db-runner')
 const Worker = require('../worker')
 
-describe('Test 1', function () {
+describe('Test 1', () => {
   let testWorker = null
   let dbUtil
   before(async () => {
@@ -30,23 +30,23 @@ describe('Test 1', function () {
     testWorker = new Worker(connection, 1, false)
   })
   describe('db runner', () => {
-    it('should contain 1 credential', async function () {
+    it('should contain 1 credential', async () => {
       const [rows] = await connection.query('SELECT COUNT(*) FROM credentials;')
       expect(rows[0].count).to.equal('1')
     })
-    it('should contain 1 campaign', async function () {
+    it('should contain 1 campaign', async () => {
       const [rows] = await connection.query('SELECT COUNT(*) FROM campaigns;')
       expect(rows[0].count).to.equal('1')
     })
-    it('should contain 1 worker', async function () {
+    it('should contain 1 worker', async () => {
       const [rows] = await connection.query('SELECT COUNT(*) FROM workers;')
       expect(rows[0].count).to.equal('1')
     })
-    it('should contain 10 messages to be sent', async function () {
+    it('should contain 10 messages to be sent', async () => {
       const [rows] = await connection.query('SELECT COUNT(*) FROM email_messages;')
       expect(rows[0].count).to.equal('10')
     })
-    it('should contain 1 READY job', async function () {
+    it('should contain 1 READY job', async () => {
       const [rows] = await connection.query('SELECT * FROM job_queue;')
       expect(rows.length).to.equal(1)
       expect(rows[0].status).to.equal('READY')
@@ -56,7 +56,7 @@ describe('Test 1', function () {
     let currentJob = null
     let currentCampaign = null
     let currentMessages = null
-    it('should pick up a job', async function () {
+    it('should pick up a job', async () => {
       const { jobId, campaignId } = await testWorker.getNextJob()
       expect(jobId).to.equal('1')
       expect(campaignId).to.equal('1')
@@ -68,7 +68,7 @@ describe('Test 1', function () {
       expect(jobs[0].status).to.equal('ENQUEUED')
       expect(jobs[0].worker_id).to.equal(testWorker.workerId)
     })
-    it('should enqueue messages', async function () {
+    it('should enqueue messages', async () => {
       await testWorker.enqueueMessages(currentJob)
 
       // Make sure status is changed to sending
@@ -93,7 +93,7 @@ describe('Test 1', function () {
         expect(emailOp.campaign_id).to.equal(currentCampaign)
       })
     })
-    it('should get messages to send', async function () {
+    it('should get messages to send', async () => {
       let messages = await testWorker.getMessages(currentJob, 10)
       expect(messages.length).to.equal(10)
       currentMessages = messages
@@ -120,7 +120,7 @@ describe('Test 1', function () {
       )
       expect(batchTwo[0].status).to.equal('SENT')
     })
-    it('should send a message', async function () {
+    it('should send a message', async () => {
       await Promise.all(currentMessages.map(m => testWorker.sendMessage(m)))
       // Make sure delivered_at and message_id in ops table was set
       const [emailOps] = await connection.query('SELECT delivered_at, message_id FROM email_ops;')
@@ -129,7 +129,7 @@ describe('Test 1', function () {
         expect(emailOp.message_id).to.not.be.null
       })
     })
-    it('should log messages back to ground truth', async function () {
+    it('should log messages back to ground truth', async () => {
       const [expectedUpdate] = await connection.query('SELECT recipient, delivered_at, message_id, error_code FROM email_ops;')
       await testWorker.finalize()
 
@@ -158,7 +158,7 @@ describe('Test 1', function () {
   })
 })
 
-describe('Test 2', function () {
+describe('Test 2', () => {
   let testWorker = null
   let dbUtil
   before(async () => {
@@ -179,7 +179,7 @@ describe('Test 2', function () {
   describe('worker', () => {
     let currentJob = null
     let currentCampaign = null
-    it('should stop a campaign', async function () {
+    it('should stop a campaign', async () => {
       // Start a campaign
       const { jobId, campaignId } = await testWorker.getNextJob()
       currentJob = parseInt(jobId)
@@ -204,7 +204,7 @@ describe('Test 2', function () {
       messages = await testWorker.getMessages(currentJob, 5)
       expect(messages.length).to.equal(0)
     })
-    it('should finalize a stopped campaign', async function () {
+    it('should finalize a stopped campaign', async () => {
       const [expectedUpdate] = await connection.query('SELECT recipient, delivered_at, message_id, error_code FROM email_ops;')
       await testWorker.finalize()
 
@@ -241,7 +241,7 @@ describe('Test 2', function () {
       expect(emailOps.length).to.equal(0)
     })
 
-    it('should retry a campaign', async function () {
+    it('should retry a campaign', async () => {
       await dbUtil.retryJobs(currentCampaign)
       await testWorker.getNextJob()
       // The same job should be enqueued
@@ -251,4 +251,5 @@ describe('Test 2', function () {
       expect(rows[0].status).to.equal('ENQUEUED')
     })
   })
+
 })
