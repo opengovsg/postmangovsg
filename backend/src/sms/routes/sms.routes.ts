@@ -107,15 +107,19 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // TODO: begin txn
     // Updates metadata in project
     await updateCampaignS3Metadata({ key: s3Key, campaignId })
+    res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
     // TODO: delete message_logs entries
     // TODO: carry out templating / hydration
     // - download from s3
-    const s3Service = new S3Service(s3Client)
-    const downloadStream = s3Service.download(s3Key)
-    await s3Service.parseCsv(downloadStream)
-    // - populate template
-    // TODO: end txn
-    return res.status(201).json({ message: `Upload success for campaign ${campaignId}.` })
+    try {
+      const s3Service = new S3Service(s3Client)
+      const downloadStream = s3Service.download(s3Key)
+      await s3Service.parseCsv(downloadStream)
+      // - populate template
+      // TODO: end txn
+    } catch (err) {
+      logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
+    }
   } catch (err) {
     return next(err)
   }
