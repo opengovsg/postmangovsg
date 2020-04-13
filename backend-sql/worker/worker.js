@@ -9,11 +9,16 @@ module.exports = class Worker {
   }
 
   init() {
-    return this.connection.query(`INSERT INTO workers ("id",  "created_at", "updated_at") VALUES 
-        (:worker_id, clock_timestamp(), clock_timestamp()) ON CONFLICT (id) DO NOTHING;`,
+    // TODO: On respawn with this same workerId, look for any existing jobs that are in SENDING state, and resume it.
+    // Currently resume_worker just stops all the jobs for that campaign id.
+    return this.connection.query(`
+        INSERT INTO workers ("id",  "created_at", "updated_at") VALUES 
+        (:worker_id, clock_timestamp(), clock_timestamp()) ON CONFLICT (id) DO NOTHING;
+
+        SELECT resume_worker(:worker_id);
+    `,
     { replacements: { worker_id: this.workerId }, type: QueryTypes.INSERT },
     )
-    // TODO: On respawn with this same workerId, look for any existing jobs that are in SENDING state, and resume it.
   }
 
   getNextJob() {
