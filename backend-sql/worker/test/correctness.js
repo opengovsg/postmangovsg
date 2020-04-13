@@ -47,9 +47,9 @@ describe('Test 1', function () {
       expect(rows[0].count).to.equal('10')
     })
     it('should contain 1 READY job', async function () {
-        const [rows] = await connection.query('SELECT * FROM job_queue;')
-        expect(rows.length).to.equal(1)
-        expect(rows[0].status).to.equal('READY')
+      const [rows] = await connection.query('SELECT * FROM job_queue;')
+      expect(rows.length).to.equal(1)
+      expect(rows[0].status).to.equal('READY')
     })
   })
   describe('worker', () => {
@@ -182,8 +182,8 @@ describe('Test 2', function () {
     it('should stop a campaign', async function () {
       // Start a campaign
       const { jobId, campaignId } = await testWorker.getNextJob()
-      currentJob = jobId
-      currentCampaign = campaignId
+      currentJob = parseInt(jobId)
+      currentCampaign = parseInt(campaignId)
       await testWorker.enqueueMessages(currentJob)
       const [emailOps] = await connection.query('SELECT campaign_id FROM email_ops;')
       expect(emailOps.length).to.equal(10)
@@ -191,6 +191,7 @@ describe('Test 2', function () {
       // Get some messages (5 out of 10)
       let messages = await testWorker.getMessages(currentJob, 5)
       expect(messages.length).to.equal(5)
+      await Promise.all(messages.map(m => testWorker.sendMessage(m)))
 
       // Stop the job
       await dbUtil.stopJobs(campaignId)
@@ -220,12 +221,16 @@ describe('Test 2', function () {
 
       emailMessages.forEach(message => {
         const emailOp = expectedUpdate.find(x => x.recipient === message.recipient)
-
-        emailOp.delivered_at === null
-        // Stopped message
-          ? expect(message.delivered_at).to.be.null
-        // Sent message
-          : expect(message.delivered_at).to.equalDate(emailOp.delivered_at)
+        try {
+          emailOp.delivered_at === null
+            // Stopped message
+            ? expect(message.delivered_at).to.be.null
+            // Sent message
+            : expect(message.delivered_at).to.equalDate(emailOp.delivered_at)
+        } catch (err) {
+          console.log(message, emailOp)
+          throw err
+        }
 
         expect(message.message_id).to.equal(emailOp.message_id)
         expect(message.error_code).to.equal(emailOp.error_code)
@@ -234,6 +239,16 @@ describe('Test 2', function () {
       // Make sure email ops has been cleared
       const [emailOps] = await connection.query('SELECT campaign_id FROM email_ops;')
       expect(emailOps.length).to.equal(0)
+    })
+
+    it('should retry a campaign', async function () {
+      await dbUtil.retryJobs(currentCampaign)
+      await testWorker.getNextJob()
+      // The same job should be enqueued
+      const [rows] = await connection.query('SELECT id, campaign_id, status FROM job_queue;')
+      expect(rows[0].id).to.equal(currentJob)
+      expect(rows[0].campaign_id).to.equal(currentCampaign)
+      expect(rows[0].status).to.equal('ENQUEUED')
     })
   })
 })

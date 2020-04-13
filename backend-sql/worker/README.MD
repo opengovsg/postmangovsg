@@ -3,7 +3,7 @@
 `node db/index.js -d postgres://localhost:5432/postmangovsg`
 
 ```
-Usage: reset [options]
+Usage: index [options]
 
 Options:
   -d, --database <uri>               database uri

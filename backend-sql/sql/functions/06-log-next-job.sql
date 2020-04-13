@@ -7,12 +7,19 @@ WITH logged_jobs AS (
 	UPDATE job_queue SET status = 'LOGGED'
 	WHERE campaign_id IN ( SELECT q1.campaign_id
 	    FROM job_queue q1
-	    WHERE q1.status IN ('SENT','STOPPED')
-		-- if status is sent, then we need to check all messages have delivered_at (meaning the sending client had responded)
-		-- if status is stopped, then we need to check that all messages with sent_at, also have delivered_at.
-		AND NOT EXISTS (
-			-- Check that all of the jobs have been stopped or sent for this campaign id
-			SELECT 1 FROM job_queue q2 WHERE q2.campaign_id = q1.campaign_id AND status NOT IN ('SENT', 'STOPPED', 'LOGGED') LIMIT 1
+	    WHERE 
+		(
+			-- if status is sent, then we need to check all messages have delivered_at (meaning the sending client had responded)
+			q1.status = 'SENT' 
+			AND
+			NOT EXISTS ( SELECT 1 FROM email_ops p WHERE p.campaign_id = q1.campaign_id AND  delivered_at IS NULL LIMIT 1) 
+		)
+		OR
+		(  
+			-- if status is stopped, then we need to check that all messages with sent_at, also have delivered_at.
+			q1.status = 'STOPPED'
+			AND
+			NOT EXISTS ( SELECT 1 FROM email_ops p WHERE p.campaign_id = q1.campaign_id AND sent_at IS NOT NULL AND delivered_at IS NULL LIMIT  1) 
 		)
 	    FOR UPDATE SKIP LOCKED
 	    LIMIT 1
@@ -31,7 +38,8 @@ SET dequeued_at = p.dequeued_at,
 	updated_at = p.updated_at
 FROM email_ops p WHERE 
 p.campaign_id = selected_campaign_id 
-AND m.campaign_id = p.campaign_id;
+AND m.campaign_id = p.campaign_id
+AND m.recipient = p.recipient;
 
 DELETE FROM email_ops p WHERE  p.campaign_id = selected_campaign_id;
 

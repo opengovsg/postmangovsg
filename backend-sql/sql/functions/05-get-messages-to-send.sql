@@ -12,9 +12,13 @@ BEGIN
 			FOR UPDATE SKIP LOCKED
 		)
 	RETURNING id, recipient, params;
+
 	-- If there are no messages found, we assume the job is done
 	-- This is only correct because enqueue and send are serialized. All messages are enqueued before sending occurs
-	-- This doesnt work!!! messages might get logged and deleted before the sendmessage callback returns for updating message_id
+
+	-- An edge case exists where the status of a job is set to 'SENT', but the sending client hasn't responded to all the sent messages
+	-- In that case, finalization of the job has to be deferred, so that the response can be updated in the ops table
+	-- The check for this edge case is carried out in the log_next_job function. 
 	IF NOT FOUND THEN
 		UPDATE job_queue SET status = 'SENT' where id = jid AND status = 'SENDING';
 	END IF;
