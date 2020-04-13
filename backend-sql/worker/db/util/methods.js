@@ -18,8 +18,8 @@ const createUser = () => {
 
 const createCredentials = (numCredentials) => {
   console.log(`Creating ${numCredentials} credentials`)
-  return sequelize.query(`INSERT INTO credentials ("name", "used", "created_at", "updated_at")
-    SELECT concat('CRED-',generate_series(1, ${numCredentials})),FALSE,clock_timestamp(), clock_timestamp();`)
+  return sequelize.query(`INSERT INTO credentials ("name", "created_at", "updated_at")
+    SELECT concat('CRED-',generate_series(1, ${numCredentials})),clock_timestamp(), clock_timestamp();`)
 }
 
 const createCampaigns = (numCampaignsPerCredential, numCredentials) => {
