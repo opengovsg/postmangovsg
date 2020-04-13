@@ -1,10 +1,8 @@
 import AWS from 'aws-sdk'
 import logger from '@core/logger'
+import config from '@core/config'
 
-//TODO: Move this to env var 
-const REGION = 'southeast ap'
-
-const secretsManager = new AWS.SecretsManager({ region: REGION })
+const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
 
 const storeSecret = async (name: string, secret: string) => {
   const params = {
