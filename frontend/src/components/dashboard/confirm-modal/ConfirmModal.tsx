@@ -5,7 +5,7 @@ import { PrimaryButton } from 'components/common'
 import ModalImage from 'assets/img/modal.png'
 import styles from './Confirm.module.scss'
 
-const Confirm = () => {
+const ConfirmModal = () => {
 
   return (
     <div className={styles.confirm}>
@@ -22,4 +22,4 @@ const Confirm = () => {
   )
 }
 
-export default Confirm
+export default ConfirmModal
