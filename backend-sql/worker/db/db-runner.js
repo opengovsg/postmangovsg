@@ -3,12 +3,12 @@ const fs = require('fs')
 const path = require('path')
 const start = async ({ connection, dir, numCreds, numCampaigns, numWorkers, numRecipients, jobs }) =>{
     const dbUtil = require('./util/methods')(connection)
-    const createFunctions = () => {
+    const createFunctions = async () => {
         const functionDirPath = path.resolve(__dirname, dir)
         const functionDir = fs.readdirSync(functionDirPath)
-        return Promise.all(functionDir.map(sqlFile =>
-          dbUtil.createFunctionFromFile(path.resolve(functionDirPath, sqlFile)))
-        )
+        functionDir.forEach(async sqlFile =>{
+            await dbUtil.createFunctionFromFile(path.resolve(functionDirPath, sqlFile))
+        })
     }
 
     await createFunctions()

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --exit test/**/*.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +13,10 @@
     "lodash": "^4.17.15",
     "pg": "^8.0.2",
     "sequelize": "^5.21.6"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-datetime": "^1.5.0",
+    "mocha": "^7.1.1"
   }
 }
