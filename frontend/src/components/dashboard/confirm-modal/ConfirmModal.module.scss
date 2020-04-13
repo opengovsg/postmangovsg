@@ -22,10 +22,6 @@
 
 .button {
   @include button($light-green);
-
-  .icon {
-    margin-left: 0.2rem;
-  }
 }
 
 .title {

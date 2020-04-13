@@ -1,30 +1,30 @@
 import React from 'react'
-import cx from 'classnames'
 
+import { CloseButton } from 'components/common'
 import styles from './Modal.module.scss'
 
 const Modal = ({ onClose, children }: { onClose: any; children: React.ReactNode }) => {
 
+  const modalBackgroundId = 'modal-background'
+
   function handleClickBackground(event: any) {
-    if (event.target.className === styles.modalBg) {
+    if (event.target.id === modalBackgroundId) {
       onClose()
     }
   }
   if (children) {
     return (
-      <>
-        <div className={styles.modalBg} onClick={handleClickBackground}>
-          <div className={styles.modal}>
-            <p
-              onClick={onClose}
-              className={cx(styles.icon, styles.close)}
-            >
-              x
-            </p>
+      <div id={modalBackgroundId} className={styles.modalBg} onClick={handleClickBackground}>
+        <div className={styles.modal}>
+          <CloseButton
+            onClick={onClose}
+            className={styles.close}
+          />
+          <div className={styles.content}>
             {children}
           </div>
         </div>
-      </>
+      </div>
     )
   }
 

@@ -36,6 +36,13 @@ $widescreen: 1216px;
 @mixin flex-vertical {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+}
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @mixin app-name {
@@ -74,18 +81,27 @@ $widescreen: 1216px;
     margin-right: 0;
   }
 
-  &:hover,
+  &:hover {
+    background-color: darken($background-color, 10%);
+    outline: none;
+  }
+
   &:focus {
-    background-color: darken($background-color,  10%);
     outline: none;
   }
 
   &:active {
-    background-color: darken($background-color, 20%);
+    background-color: darken($background-color, 18%);
   }
 
   &:disabled {
     background-color: $light-grey;
+  }
+
+  i {
+    @include icon;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
   }
 }
 

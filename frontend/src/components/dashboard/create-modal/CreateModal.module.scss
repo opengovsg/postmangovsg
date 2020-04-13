@@ -2,7 +2,7 @@
 @import 'styles/_mixins';
 
 .section {
-  margin-bottom: 1.85rem;
+  margin-bottom: 2rem;
   @include flex-vertical;
 }
 
@@ -13,32 +13,25 @@
   .button {
     @include flex-horizontal;
     justify-content: space-between;
-    width: 15rem;
+    flex: 1;
     height: 4.5rem;
-    background: white;
     border: 1px solid $indigo-blue;
-    color: $indigo-blue;
-    font-size: 1.35rem;
+    font-size: 1.3rem;
+    margin-right: 2rem;
 
-    &.active {
-      background: $indigo-blue;
-      color: white;
+    &:last-child {
+      margin-right: 0;
     }
 
-    &:hover {
-      color: white;
+    &:not(.active) {
+      color: $indigo-blue;
+      background: white;
+
+      &:hover {
+        background: $indigo-blue;
+        color: white;
+      }
     }
-  }
-}
-
-.bottomButton {
-  align-self: flex-end;
-  margin-top: 1.25rem;
-  margin-bottom: 0;
-
-  .icon {
-    line-height: normal;
-    margin-left: 0.2rem;
   }
 }
 
@@ -59,10 +52,13 @@
   margin-bottom: 1.25rem;
 }
 
+.separator {
+  border-bottom: 1px solid $transparent-blue;
+}
+
 .subtext {
   font-size: 0.75rem;
-  margin-top: 0.65rem;
-  margin-bottom: 3.125em;
+  margin-top: 1rem;
 
   a {
     font-size: 0.75rem;
@@ -70,8 +66,4 @@
     color: $dark-blue;
     text-decoration: underline;
   }
-}
-
-.separator {
-  border-bottom: 1px solid $transparent-blue;
 }
