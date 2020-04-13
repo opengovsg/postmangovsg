@@ -101,6 +101,12 @@ sub {
   color: $light-grey;
 }
 
-.align-right {
+.separator {
+  border-bottom: 1px solid $transparent-blue;
+  margin: 3rem 0;
+}
+
+.progress-button {
   text-align: right;
+  margin-top: 3rem;
 }
