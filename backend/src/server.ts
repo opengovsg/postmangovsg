@@ -4,7 +4,14 @@ require('module-alias/register')
 
 import { checkRequiredEnvVars, loaders } from './core'
 
-const requiredEnvVars = ['DB_URI']
+const requiredEnvVars = [
+  'AWS_REGION',
+  'DB_URI',
+  'FILE_STORAGE_BUCKET_NAME',
+  'JWT_SECRET',
+  'SESSION_SECRET',
+]
+
 const port = Number(process.env.PORT) || 4000
 const app: express.Application = express()
 

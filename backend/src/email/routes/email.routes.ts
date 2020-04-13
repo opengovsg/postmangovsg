@@ -1,7 +1,15 @@
-import { Request, Response, Router } from 'express'
+import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
-const router = Router()
+import logger from '@core/logger'
+import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
+import { updateCampaignS3Metadata, S3Service } from '@core/services'
+import S3 from 'aws-sdk/clients/s3'
+import { jwtUtils } from '@core/utils/jwt'
+
+const s3Client = new S3()
+
+const router = Router({ mergeParams: true })
 
 // validators
 const storeTemplateValidator = {
@@ -13,19 +21,18 @@ const storeTemplateValidator = {
   }),
 }
 
-const uploadstartValidator = {
-  [Segments.BODY]: Joi.object({
-    filename: Joi
+const uploadStartValidator = {
+  [Segments.QUERY]: Joi.object({
+    mimeType: Joi
       .string()
-      .trim()
-      .min(5)
-      .max(100)
-      .pattern(/^[^\\/]+\.csv$/),
+      .required(),
   }),
 }
 
 const uploadCompleteValidator = {
-  [Segments.BODY]: Joi.object(),
+  [Segments.BODY]: Joi.object({
+    transactionId: Joi.string().required(),
+  }),
 }
 
 const storeCredentialsValidator = {
@@ -80,14 +87,41 @@ const storeTemplate = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
 }
 
-// Returns presigned url for upload
-const uploadStart = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ signedUrl: '' })
-}
-
 // Read file from s3 and populate messages table
-const uploadComplete = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ numMessages: 100 })
+const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    // TODO: validate if project is in editable state
+    // extract s3Key from transactionId
+    const { transactionId } = req.body
+    let decoded: string
+    try {
+      decoded = jwtUtils.verify(transactionId) as string
+    } catch (err) {
+      logger.info(`${err.message}`)
+      return res.status(400).json({ message: 'Invalid transactionId provided' })
+    }
+    const s3Key = decoded as string
+
+    // TODO: begin txn
+    // Updates metadata in project
+    await updateCampaignS3Metadata({ key: s3Key, campaignId })
+    res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
+    // TODO: delete message_logs entries
+    // TODO: carry out templating / hydration
+    // - download from s3
+    try {
+      const s3Service = new S3Service(s3Client)
+      const downloadStream = s3Service.download(s3Key)
+      await s3Service.parseCsv(downloadStream)
+      // - populate template
+      // TODO: end txn
+    } catch (err) {
+      logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
+    }
+  } catch (err) {
+    return next(err)
+  }
 }
 
 // Read file from s3 and populate messages table
@@ -126,7 +160,7 @@ const sendMessages = async (_req: Request, res: Response): Promise<void> => {
  *          required: true
  *          schema:
  *            type: string
- *                  
+ *
  *      responses:
  *        200:
  *          content:
@@ -155,7 +189,7 @@ router.get('/', getCampaignDetails)
  *                  type: string
  *                body:
  *                  type: string
- *                  
+ *
  *      responses:
  *        200:
  *          content:
@@ -168,53 +202,69 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/upload-start:
- *    post:
- *      tags:
- *        - Email
- *      summary: Gets presigned url for upload
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                body:
- *                  type: string
- *                  minLength: 1
- *                  maxLength: 200
- *                  pattern: '^[^\\/]+\.csv$'
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  url:
- *                    type:string
+ *   /campaign/{campaignId}/email/upload/start:
+ *     get:
+ *       description: "Get a presigned URL for upload"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: mimeType
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   presignedUrl:
+ *                     type: string
+ *                   transactionId:
+ *                     type: string
  */
-router.post('/upload-start', celebrate(uploadstartValidator), uploadStart)
+router.get('/upload/start', celebrate(uploadStartValidator), uploadStartHandler)
 
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/upload-complete:
- *    post:
- *      tags:
- *        - Email
- *      summary: Populate recipient list with uploaded csv
- *                  
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
+ *   /campaign/{campaignId}/email/upload/complete:
+ *     post:
+ *       description: "Complete upload session"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - transactionId
+ *               properties:
+ *                 transactionId:
+ *                   type: string
+ *       responses:
+ *         201:
+ *           description: Created
+ *         400:
+ *           description: Invalid Request
+ *         500:
+ *           description: Server Error
  */
-router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComplete)
+router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadCompleteHandler)
 
 /**
  * @swagger
@@ -224,7 +274,7 @@ router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComple
  *      tags:
  *        - Email
  *      summary: Store credentials for SES
- *                  
+ *
  *      responses:
  *        200:
  *          content:
@@ -249,10 +299,10 @@ router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentia
  *            schema:
  *              type: object
  *              properties:
- *                emailAddress: 
+ *                emailAddress:
  *                  type: string
  *                  pattern: '^\+\d{8,15}$'
- *                  
+ *
  *      responses:
  *        200:
  *          content:
@@ -278,8 +328,8 @@ router.post('/validate', celebrate(validateCredentialsValidator), validateCreden
  *          required: false
  *          schema:
  *            type: integer
- *            minimum: 1  
- * 
+ *            minimum: 1
+ *
  *      responses:
  *        200:
  *          content:
@@ -304,10 +354,10 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
  *            schema:
  *              type: object
  *              properties:
- *                rate: 
+ *                rate:
  *                  type: integer
- *                  minimum: 1  
- * 
+ *                  minimum: 1
+ *
  *      responses:
  *        200:
  *          content:

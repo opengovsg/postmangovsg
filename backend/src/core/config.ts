@@ -3,6 +3,13 @@ import path from 'path'
 
 const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 
+// AWS settings
+const awsRegion: string = process.env.AWS_REGION as string
+const uploadBucket: string = process.env.FILE_STORAGE_BUCKET_NAME as string
+
+// Upload csv
+const jwtSecret = process.env.JWT_SECRET as string
+
 // Database settings
 const databaseUri: string = process.env.DB_URI as string
 const SEQUELIZE_POOL_MAX_CONNECTIONS = 150
@@ -16,7 +23,7 @@ const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 // Format for logging
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
 
-// Express session 
+// Express session
 const sessionSecret: string = process.env.SESSION_SECRET as string
 const cookieSettings = {
   httpOnly: true,
@@ -31,8 +38,13 @@ const mailPort: number = Number(process.env.SES_PORT)
 const mailUser: string = process.env.SES_USER as string
 const mailPass: string = process.env.SES_PASS as string
 
+
 export default {
   IS_PROD,
+  aws: {
+    awsRegion,
+    uploadBucket,
+  },
   database: {
     databaseUri,
     dialectOptions: {
@@ -47,6 +59,7 @@ export default {
       acquire: SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
     },
   },
+  jwtSecret,
   MORGAN_LOG_FORMAT,
   session: {
     secret: sessionSecret,

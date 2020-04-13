@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
+import { errors as celebrateErrorMiddleware } from 'celebrate'
 import morgan from 'morgan'
 
 import config from '@core/config'
@@ -18,12 +19,13 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   })
 
   app.use('/v1', v1Router)
- 
+  app.use(celebrateErrorMiddleware())
+
   app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    logger.error(`${err}`)
+    logger.error(`${JSON.stringify(err.stack, null, 4)}`)
     return res.sendStatus(500)
   })
-  
+
   logger.info({ message: 'Express routes loaded' })
 }
 
