@@ -8,12 +8,4 @@ export class Credential extends Model<Credential> {
     primaryKey: true,
   })
   name!: string
-
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  })
-  used!: boolean
-
 }
