@@ -33,8 +33,8 @@ export default class MailService {
     })
   }
 
-  public sendMail(input: MailToSend) {
-    return new Promise((resolve,reject) => {
+  public sendMail(input: MailToSend): Promise<boolean> {
+    return new Promise<boolean>((resolve,reject) => {
       this.mailer.sendMail({
         from: this.email,
         to: input.recipients,
@@ -52,6 +52,7 @@ export default class MailService {
       })
     }).catch(err => {
       logger.error(err)
+      return false
     })
   }
 }

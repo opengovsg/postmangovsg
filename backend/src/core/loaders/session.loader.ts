@@ -5,7 +5,7 @@ import config from '@core/config'
 import { sessionClient } from '@core/services'
 
 const sessionLoader = ({ app }: {app: express.Application}): void => {
-  const sessionStore : connectRedis.RedisStore = connectRedis(session)
+  const sessionStore: connectRedis.RedisStore = connectRedis(session)
   if (!config.session.secret) {
     throw new Error('config.session.secret required but missing')
   }
@@ -18,7 +18,7 @@ const sessionLoader = ({ app }: {app: express.Application}): void => {
     store: new sessionStore({
       client: sessionClient,
       logErrors: true,
-    })
+    }),
   }
   app.set('trust proxy', 1) // For HTTPS cookies (our TLS terminates at load balancer, not ec2)
   app.use(session(sessionOptions))
