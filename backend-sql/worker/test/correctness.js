@@ -248,18 +248,17 @@ describe('Stop and retry the same campaign', () => {
     expect(rows[0].id).to.equal(currentJob)
     expect(rows[0].campaign_id).to.equal(currentCampaign)
     expect(rows[0].status).to.equal('ENQUEUED')
-    
+
     // It should enqueue the remaining 5 messages that did not get sent
     await testWorker.enqueueMessages(currentJob)
     const emailOps = await connection.query('SELECT sent_at FROM email_ops WHERE campaign_id=:campaignId;',
-        { replacements: { campaignId: currentCampaign }, type: QueryTypes.SELECT },
-      )
+      { replacements: { campaignId: currentCampaign }, type: QueryTypes.SELECT },
+    )
     expect(emailOps.length).to.equal(5)
 
     // Check that the currently enqueued messages were not part of the messages that were sent
     const recipients = new Set(emailOps.map(emailOp => emailOp.recipient))
     expect(messagesToSend.every(({ recipient }) => !recipients.has(recipient))).to.be.true
-   
   })
 })
 
