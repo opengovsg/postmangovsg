@@ -8,8 +8,8 @@ export default class MailService {
   private email: string
   private mailer: nodemailer.Transporter
 
-  constructor(email :string, credentials: MailCredentials) {
-    const { host, port, user, password } = credentials
+  constructor(email: string, credentials: MailCredentials) {
+    const { host, port, auth } = credentials
 
     if (!email) throw new Error('Missing email from credentials while constructing MailService.')
     this.email = email
@@ -20,21 +20,21 @@ export default class MailService {
       return
     }
 
-    if (!port || !user || !password) throw new Error('Missing credentials while constructing MailService')
+    if (!port || !auth.user || !auth.pass) throw new Error('Missing credentials while constructing MailService')
 
     logger.info('Mailer: Using SMTP transport')
     this.mailer = nodemailer.createTransport({
       host: host,
-      port: Number(port),
+      port: +port,
       auth: {
-        user: user,
-        pass: password,
-      }
+        user: auth.user,
+        pass: auth.pass,
+      },
     })
   }
 
-  public sendMail(input : MailToSend) {
-    return new Promise((resolve,reject) => {
+  public sendMail(input: MailToSend): Promise<boolean> {
+    return new Promise<boolean>((resolve,reject) => {
       this.mailer.sendMail({
         from: this.email,
         to: input.recipients,
@@ -52,6 +52,7 @@ export default class MailService {
       })
     }).catch(err => {
       logger.error(err)
+      return false
     })
   }
 }

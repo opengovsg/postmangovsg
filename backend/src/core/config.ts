@@ -7,11 +7,13 @@ const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 const databaseUri: string = process.env.DB_URI as string
 const SEQUELIZE_POOL_MAX_CONNECTIONS = 150
 const SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS = 600000
-const rdsCa = IS_PROD && fs.readFileSync(path.join(__dirname, '../db-ca.pem'))
+const rdsCa: false | Buffer = IS_PROD && fs.readFileSync(path.join(__dirname, '../db-ca.pem'))
 
-const redisOtpUri = process.env.REDIS_OTP_URI as string
-const redisSessionUri = process.env.REDIS_SESSION_URI as string
+// Cache settings
+const redisOtpUri: string = process.env.REDIS_OTP_URI as string
+const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 
+// Format for logging
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
 
 // Express session 
@@ -24,10 +26,10 @@ const cookieSettings = {
 }
 
 // Node mailer 
-const mailHost = process.env.MAIL_HOST as string 
-const mailPort = process.env.MAIL_PORT as string
-const mailUser = process.env.MAIL_USER as string
-const mailPassword = process.env.MAIL_PASSWORD as string
+const mailHost: string = process.env.SES_HOST as string 
+const mailPort: number = Number(process.env.SES_PORT) 
+const mailUser: string = process.env.SES_USER as string
+const mailPass: string = process.env.SES_PASS as string
 
 export default {
   IS_PROD,
@@ -57,7 +59,7 @@ export default {
     port: mailPort,
     auth: {
       user: mailUser,
-      pass: mailPassword,
+      pass: mailPass,
     },
-  }
+  },
 }
