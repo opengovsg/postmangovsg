@@ -6,7 +6,6 @@ import { v4 as uuid } from 'uuid'
 
 import config from '@core/config'
 import logger from '@core/logger'
-import { Campaign } from '@core/models'
 import { jwtUtils } from '@core/utils/jwt'
 
 const AWS_REGION = config.aws.awsRegion
@@ -101,4 +100,4 @@ const uploadStartHandler = async (req: Request, res: Response): Promise<Response
   }
 }
 
-export { verifyCampaignOwner, createCampaign, listCampaigns, uploadStartHandler }
+export { canEditCampaign, createCampaign, listCampaigns, uploadStartHandler }
