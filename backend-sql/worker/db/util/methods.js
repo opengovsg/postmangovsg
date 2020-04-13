@@ -92,11 +92,20 @@ const stopJobs = (campaignId) => {
 const retryJobs = (campaignId) => {
   console.log(`Retrying jobs for campaignId ${campaignId}`)
   return sequelize.query(
-    `UPDATE job_queue SET status = 'READY' WHERE campaign_id = ${campaignId} AND
-    NOT EXISTS (
-      -- Check that all of the jobs have been logged for this campaign id
-      SELECT 1 FROM job_queue q WHERE q.campaign_id = ${campaignId} AND status <> 'LOGGED' LIMIT 1
-    );
+    `DO $$
+    DECLARE retry_disabled BOOLEAN;
+    BEGIN
+    -- Check that all of the jobs have been logged for this campaign id
+    SELECT TRUE INTO retry_disabled FROM job_queue q WHERE q.campaign_id = ${campaignId} AND status <> 'LOGGED' LIMIT 1;
+
+    IF retry_disabled IS NULL THEN
+
+    UPDATE job_queue SET status = 'READY' WHERE campaign_id = ${campaignId};
+    UPDATE email_messages SET dequeued_at = NULL WHERE campaign_id = ${campaignId};
+    
+    END IF;
+    COMMIT;
+    END $$;
     `,
   )
 }

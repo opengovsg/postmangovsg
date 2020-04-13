@@ -10,6 +10,8 @@ BEGIN
 	WITH messages AS 
 	(UPDATE email_messages m SET dequeued_at = clock_timestamp() 
 	WHERE m.campaign_id = selected_campaign_id
+	-- enqueue only those that have not been enqueued - this means that when we retry, we will have to set dequeued_at to null
+	AND m.dequeued_at IS NULL
 	-- check for message_id is null because we dont want to enqueue messages that have already been sent
 	AND m.message_id is NULL
 	RETURNING * )
