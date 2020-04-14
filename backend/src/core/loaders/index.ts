@@ -1,17 +1,18 @@
 import expressLoader from './express.loader'
-import sequelizeLoader from './sequelize.loader'
 import swaggerLoader from './swagger.loader'
 import sessionLoader from './session.loader'
 import scriptsLoader from './scripts.loader'
+import SequelizeLoader from './sequelize.loader'
 import { Application } from 'express'
 
 
 const loaders = async ({ app }: { app: Application }): Promise<void> => {
-  const connection = await sequelizeLoader()
-  await scriptsLoader({ connection })
+  await SequelizeLoader.load()
+  await scriptsLoader({ sequelize: SequelizeLoader.sequelize })
   await sessionLoader({ app })
   await expressLoader({ app })
   await swaggerLoader({ app })
+
 }
 
 export { loaders }
