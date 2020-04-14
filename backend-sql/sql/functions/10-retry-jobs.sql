@@ -8,9 +8,10 @@ SELECT TRUE INTO retry_disabled FROM job_queue q WHERE q.campaign_id = selected_
 
 IF retry_disabled IS NULL THEN
 
-UPDATE job_queue SET status = 'READY' WHERE campaign_id = selected_campaign_id;
 UPDATE email_messages SET dequeued_at = NULL WHERE campaign_id = selected_campaign_id;
+UPDATE job_queue SET status = 'READY' WHERE campaign_id = selected_campaign_id;
 
 END IF;
 
 END $$
+

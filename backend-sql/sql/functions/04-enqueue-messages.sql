@@ -14,7 +14,17 @@ BEGIN
 	AND m.dequeued_at IS NULL
 	-- check for message_id is null because we dont want to enqueue messages that have already been sent
 	AND m.message_id is NULL
-	RETURNING * )
+	RETURNING 
+	campaign_id, 
+	recipient, 
+	params, 
+	message_id,
+	error_code,
+	dequeued_at,
+	delivered_at,
+	received_at,
+	created_at,
+	updated_at )
 
 	INSERT INTO email_ops 
 	(campaign_id, 
@@ -22,23 +32,12 @@ BEGIN
 	params, 
 	message_id,
 	error_code,
-	dequeued_at, 
-	sent_at, 
+	dequeued_at,
+	-- note that sent_at is not set. It remains as null as that the sending step will pick it up.
 	delivered_at,
 	received_at,
 	created_at,
 	updated_at)  
-	(SELECT  
-	campaign_id, 
-	recipient, 
-	params, 
-	message_id,
-	error_code,
-	dequeued_at,
-	-- sent_at is set to null so that the sending step will pick up this message
-	NULL,
-	delivered_at,
-	received_at,
-	created_at,
-	updated_at FROM messages);
+	(SELECT * 
+	 FROM messages);
 END $$;
