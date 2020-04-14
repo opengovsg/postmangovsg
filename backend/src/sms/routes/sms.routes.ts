@@ -3,14 +3,14 @@ import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { keys } from 'lodash'
 
-import { upsertTemplate } from '@sms/services/sms.service'
+import { template, upsertTemplate } from '@sms/services/sms.service'
 import { retrieveCampaign } from '@core/services/campaign.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { updateCampaignS3Metadata, S3Service } from '@core/services'
 import { jwtUtils } from '@core/utils/jwt'
-import { SmsMessage } from '@sms/models'
+import { SmsMessage, SmsTemplate } from '@sms/models'
 
 
 const s3Client = new S3()
@@ -88,6 +88,8 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
   res.json({ message: 'OK' })
 }
 
+const isSuperSet = (a: Array<string>, b: Array<string>): boolean => b.every(s => a.indexOf(s) !== -1)
+
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
@@ -109,7 +111,6 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
       const paramsFromS3 = keys(firstRecord.params)
       // warn if params from s3 file are not a superset of saved params
       // returns true if A is superset of B
-      const isSuperSet = (a: Array<string>, b: Array<string>): boolean => b.every(s => a.indexOf(s) !== -1)
 
       if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
         return res.status(400).json({
@@ -146,16 +147,25 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     const s3Key = decoded as string
 
+    // check if template exists
+    const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
+    if (smsTemplate === null || smsTemplate.body === null) {
+      return res.status(400).json({
+        message: 'Template does not exist, please create a template'
+      })
+    }
+
+
     // Updates metadata in project
     await updateCampaignS3Metadata({ key: s3Key, campaignId })
     res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
-    // TODO: carry out templating / hydration
+
+    // carry out templating / hydration
     // - download from s3
     try {
       const s3Service = new S3Service(s3Client)
       const downloadStream = s3Service.download(s3Key)
       const fileContents = await s3Service.parseCsv(downloadStream)
-      // - populate template
       // FIXME / TODO: dedupe
       const records: Array<object> = fileContents.map(entry => {
         return {
@@ -165,6 +175,15 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         }
       })
 
+      // attempt to hydrate
+      const firstRecord = fileContents[0]
+      // if body exists, smsTemplate.params should also exist
+      if (!isSuperSet(keys(firstRecord), smsTemplate.params!)) {
+        // TODO: lodash diff to show missing keys
+        logger.error(`Hydration failed: Template contains keys that are not in file.`)
+      }
+
+      // START populate template
       // begin txn
       let transaction
       try {
@@ -180,7 +199,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       } catch (err) {
         await transaction?.rollback()
         logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
-        throw err
       }
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
