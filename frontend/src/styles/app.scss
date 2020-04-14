@@ -101,6 +101,11 @@ sub {
   color: $light-grey;
 }
 
+.separator {
+  border-bottom: 1px solid $transparent-blue;
+  margin: 3rem 0;
+}
+
 .align-right {
   text-align: right;
 }
