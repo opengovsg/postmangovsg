@@ -104,7 +104,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
       // returns true if A is superset of B
       const isSuperSet = (a: Array<string>, b: Array<string>) => a.every(s => b.indexOf(s) !== -1)
 
-      if (!isSuperSet(updatedTemplate[0].params!, stubbedParamsFromS3)) {
+      if (!isSuperSet(updatedTemplate.params!, stubbedParamsFromS3)) {
         return res.status(400).json({
           message: 'Template contains keys that are not in file',
         })

@@ -86,12 +86,35 @@ const template = (templateBody: string, params: {[key: string]: string}): string
   return parsed.tokens.join('')
 }
 
-const upsertTemplate = (body: string, campaignId: number): Promise<[SmsTemplate, boolean]> => {
-  return SmsTemplate.upsert({
-    campaignId, body,
-  }, {
-    returning: true,
-  })
+const upsertTemplate = async (body: string, campaignId: number): Promise<SmsTemplate> => {
+  let transaction
+  try {
+    transaction = await SmsTemplate.sequelize?.transaction()
+    if (await SmsTemplate.findByPk(campaignId, { transaction }) !== null) {
+      // .update is actually a bulkUpdate
+      const updatedTemplate: [number, SmsTemplate[]] = await SmsTemplate.update({
+        body
+      }, {
+        where: { campaignId },
+        individualHooks: true, // required so that BeforeUpdate hook runs
+        returning: true,
+        transaction
+      })
+
+      transaction?.commit()
+      return updatedTemplate[1][0]
+    }
+    const createdTemplate = await SmsTemplate.create({
+      campaignId, body,
+      transaction
+    })
+
+    transaction?.commit()
+    return createdTemplate
+  } catch (err) {
+    transaction?.rollback()
+    throw err
+  }
 }
 
 export { template, parseTemplate, upsertTemplate }

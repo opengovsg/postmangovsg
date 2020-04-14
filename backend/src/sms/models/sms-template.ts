@@ -1,4 +1,4 @@
-import { BeforeCreate, BeforeUpdate, BeforeUpsert, BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
+import { BeforeCreate, BeforeUpdate, BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
 
 import { Campaign } from '@core/models/campaign'
 import { parseTemplate } from '@sms/services/sms.service'
@@ -26,9 +26,10 @@ export class SmsTemplate extends Model<SmsTemplate> {
   })
   params?: Array<string>
 
+  // Does not work with beforeUpsert
+  // @see https://github.com/RobinBuschmann/sequelize-typescript/blob/883cb2c92c09160a82b9a39fb0c33b6b12a4051c/test/specs/hooks/hooks.spec.ts#L97
   @BeforeUpdate
   @BeforeCreate
-  @BeforeUpsert
   static generateParams(instance: SmsTemplate) {
     if (!instance.body) return
     const parsedTemplate = parseTemplate(instance.body)
