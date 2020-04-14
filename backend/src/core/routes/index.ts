@@ -3,7 +3,6 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import { Request, Response } from 'express'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
-import { canEditCampaign } from '@core/middlewares'
 import { isCookieAuthenticated } from '@core/middlewares'
 
 // Core routes
@@ -55,7 +54,7 @@ const router = Router()
 
 router.use('/auth', authenticationRoutes)
 router.use('/campaigns', isCookieAuthenticated, campaignRoutes)
-router.use('/campaign/:campaignId/sms', isCookieAuthenticated, celebrate(campaignIdValidator), canEditCampaign, smsRoutes)
-router.use('/campaign/:campaignId/email', isCookieAuthenticated, celebrate(campaignIdValidator), canEditCampaign, emailRoutes)
+router.use('/campaign/:campaignId/sms', isCookieAuthenticated, celebrate(campaignIdValidator), smsRoutes)
+router.use('/campaign/:campaignId/email', isCookieAuthenticated, celebrate(campaignIdValidator), emailRoutes)
 router.use('/campaign/:campaignId', isCookieAuthenticated, celebrate(campaignIdValidator), redirectToChannelRoute)
 export default router

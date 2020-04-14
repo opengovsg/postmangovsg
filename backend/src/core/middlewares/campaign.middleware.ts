@@ -1,12 +1,13 @@
 import S3 from 'aws-sdk/clients/s3'
 import { Request, Response, NextFunction } from 'express'
 import { Campaign, JobQueue } from '@core/models'
-import { Sequelize } from 'sequelize-typescript'
+import { Op, literal } from 'sequelize'
 import { v4 as uuid } from 'uuid'
 
 import config from '@core/config'
 import logger from '@core/logger'
 import { jwtUtils } from '@core/utils/jwt'
+import { JobStatus } from '@core/constants'
 
 const AWS_REGION = config.aws.awsRegion
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
@@ -17,7 +18,7 @@ const s3 = new S3({
 })
 
 /**
- *  If a campaign already has an existing job in the job queue, then it cannot be modified.
+ *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
  * @param req
  * @param res
  * @param next
@@ -25,7 +26,7 @@ const s3 = new S3({
 const canEditCampaign =  async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
-    const job = await JobQueue.findOne({ where: { campaignId } })
+    const job = await JobQueue.findOne({ where: { campaignId, status: { [Op.not]: JobStatus.Logged } } })
     return !job ? next() : res.sendStatus(403)
   }
   catch(err){
@@ -57,7 +58,7 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
         userId,
       },
       attributes: [
-        'id', 'name', 'type', 'created_at', 'valid', [Sequelize.literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+        'id', 'name', 'type', 'created_at', 'valid', [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
       ],
       order: [
         ['created_at', 'DESC'],

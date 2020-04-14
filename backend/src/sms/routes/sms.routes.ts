@@ -7,7 +7,7 @@ import { extractS3Key } from '@core/services/campaign.service'
 import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services/sms.service'
 
 import logger from '@core/logger'
-import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
+import { uploadStartHandler, sendCampaign, stopCampaign, retryCampaign, canEditCampaign } from '@core/middlewares'
 import { updateCampaignS3Metadata } from '@core/services'
 
 import { Campaign } from '@core/models'
@@ -74,7 +74,7 @@ const previewMessageValidator = {
   }),
 }
 
-const sendMessagesValidator = {
+const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
     rate: Joi
       .number()
@@ -217,11 +217,6 @@ const previewMessage = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Message content' })
 }
 
-// Queue job for sending
-const sendMessages = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
-}
-
 // Routes
 /**
  * @swagger
@@ -280,7 +275,7 @@ router.get('/', getCampaignDetails)
  *              schema:
  *                type: object
  */
-router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
+router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, storeTemplate)
 
 /**
  * @swagger
@@ -314,7 +309,7 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
  *                   transactionId:
  *                     type: string
  */
-router.get('/upload/start', celebrate(uploadStartValidator), uploadStartHandler)
+router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, uploadStartHandler)
 
 /**
  * @swagger
@@ -348,7 +343,7 @@ router.get('/upload/start', celebrate(uploadStartValidator), uploadStartHandler)
  *           description: Server Error
  *
  */
-router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadCompleteHandler)
+router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampaign, uploadCompleteHandler)
 
 /**
  * @swagger
@@ -378,7 +373,7 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadComple
  *              schema:
  *                type: object
  */
-router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentials)
+router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaign, storeCredentials)
 
 /**
  * @swagger
@@ -412,7 +407,7 @@ router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentia
  *              schema:
  *                type: object
  */
-router.post('/validate', celebrate(validateCredentialsValidator), validateCredentials)
+router.post('/validate', celebrate(validateCredentialsValidator), canEditCampaign, validateCredentials)
 
 
 /**
@@ -461,13 +456,14 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
  *          schema:
  *            type: string
  *      requestBody:
- *        required: true
+ *        required: false
  *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              properties:
  *                rate:
+ *                  example: 10
  *                  type: integer
  *                  minimum: 1
  *
@@ -478,6 +474,43 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
  *              schema:
  *                type: object
  */
-router.post('/send', celebrate(sendMessagesValidator), sendMessages)
+router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCampaign)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/stop:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Stop sending campaign
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/stop', stopCampaign)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/retry:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Retry sending campaign
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/retry', canEditCampaign, retryCampaign)
+
 
 export default router
