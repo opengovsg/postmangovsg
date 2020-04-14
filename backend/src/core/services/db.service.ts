@@ -1,12 +1,12 @@
 import { Credential, Campaign } from '@core/models'
 
-const insertIntoCredentialsTable = async (hash: string): Promise<Credential> => {
-  return Credential.create({
+const insertCredential = async (hash: string) => {
+  await Credential.create({
     name: hash,
   })
 }
 
-const addCredentialToCampaignTable = async (campaignId: string, credentialName: string) => {
+const updateCampaignWithCredential = async (campaignId: string, credentialName: string) => {
   return Campaign.update({
     credName: credentialName,
   },{
@@ -25,4 +25,4 @@ const isExistingCredential = async (name: string): Promise<Boolean> => {
   return false
 }
 
-export const dbService = { insertIntoCredentialsTable, addCredentialToCampaignTable, isExistingCredential }
+export const dbService = { insertCredential, updateCampaignWithCredential, isExistingCredential }

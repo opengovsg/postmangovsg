@@ -20,7 +20,7 @@ const saveCredential = async (name: string, secret: string) => {
   }
 
   // Store credential to credential tableg
-  await dbService.insertIntoCredentialsTable(name)
+  await dbService.insertCredential(name)
   // Upload the credential to aws secret manager
   await secretsService.storeSecret(name, secret)  
 }
@@ -52,8 +52,8 @@ const sendMessage = async (recipient: string, credential: TwilioCredentials) : P
   const msg = 'You have successfully verified your Twilio credentials with Postman.'
   logger.info('Sending sms using Twilio.')
   const twilioClient = new TwilioService(credential)
-  const isSendSuccessful = await twilioClient.send(recipient, msg)
-  return isSendSuccessful
+  const isSuccessful = await twilioClient.send(recipient, msg)
+  return isSuccessful
 }
 
 const getEncodedHash = async (secret : string): Promise<string> => {
@@ -73,7 +73,7 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
   }
 }
 
-// Read file from s3 and populate messages table
+// Stores the twilio credential in AWS secret manager and db, as well as updating the campaign table.
 const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
   const credential: TwilioCredentials = getCredential(req)
   // Send test message
@@ -87,7 +87,7 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
     const secretString = JSON.stringify(credential)
     const credentialName = await getEncodedHash(secretString)
     await saveCredential(credentialName, secretString)
-    await dbService.addCredentialToCampaignTable(campaignId, credentialName)
+    await dbService.updateCampaignWithCredential(campaignId, credentialName)
   }catch(e) {
     logger.error(`Error saving credentials. error=${e}`)
     return res.sendStatus(500)
