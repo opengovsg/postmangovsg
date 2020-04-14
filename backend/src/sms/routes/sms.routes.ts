@@ -8,6 +8,8 @@ import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { updateCampaignS3Metadata, S3Service } from '@core/services'
 import S3 from 'aws-sdk/clients/s3'
 import { jwtUtils } from '@core/utils/jwt'
+import { SmsMessage } from '@sms/models'
+
 
 const s3Client = new S3()
 
@@ -138,19 +140,42 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     const s3Key = decoded as string
 
-    // TODO: begin txn
     // Updates metadata in project
     await updateCampaignS3Metadata({ key: s3Key, campaignId })
     res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
-    // TODO: delete message_logs entries
     // TODO: carry out templating / hydration
     // - download from s3
     try {
       const s3Service = new S3Service(s3Client)
       const downloadStream = s3Service.download(s3Key)
-      await s3Service.parseCsv(downloadStream)
+      const fileContents = await s3Service.parseCsv(downloadStream)
       // - populate template
-      // TODO: end txn
+      // FIXME / TODO: dedupe
+      const records: Array<object> = fileContents.map(entry => {
+        return {
+          campaignId,
+          recipient: entry['recipient'],
+          params: entry
+        }
+      })
+
+      // begin txn
+      let transaction
+      try {
+        transaction = await SmsMessage.sequelize?.transaction()
+        // delete message_logs entries
+        await SmsMessage.destroy({
+          where: { campaignId },
+          transaction
+        })
+        await SmsMessage.bulkCreate(records, { transaction })
+        // TODO: end txn
+        await transaction?.commit()
+      } catch (err) {
+        await transaction?.rollback()
+        logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
+        throw err
+      }
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
     }
