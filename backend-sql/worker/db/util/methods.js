@@ -4,7 +4,8 @@ const truncateTables = () => {
   console.log('Truncating tables')
   return sequelize.query(
     `TRUNCATE users, job_queue, credentials, campaigns, workers,
-        email_messages, email_templates, email_ops RESTART IDENTITY;`,
+        email_messages, email_templates, email_ops,
+        sms_messages, sms_templates, sms_ops  RESTART IDENTITY;`,
   )
 }
 
@@ -16,32 +17,87 @@ const createUser = () => {
   )
 }
 
-const createCredentials = (numCredentials) => {
-  console.log(`Creating ${numCredentials} credentials`)
-  return sequelize.query(`INSERT INTO credentials ("name", "created_at", "updated_at")
-    SELECT concat('CRED-',generate_series(1, ${numCredentials})),clock_timestamp(), clock_timestamp();`)
+const createCredentials = (numEmailCredentials, numSmsCredentials) => {
+  const numCreds = numEmailCredentials + numSmsCredentials
+  console.log(`Creating ${numCreds} credentials`)
+  let idx = 1
+  let chain = Promise.resolve()
+  if(numEmailCredentials>0){
+    idx = idx + numEmailCredentials
+    chain = chain.then(() => {
+      return sequelize.query(`INSERT INTO credentials ("name", "created_at", "updated_at")
+      SELECT concat('CRED-',generate_series(1, ${numEmailCredentials})),clock_timestamp(), clock_timestamp();`)
+    })
+  }
+  if(numSmsCredentials>0){
+    chain = chain.then(() => {
+      return sequelize.query(`INSERT INTO credentials ("name", "created_at", "updated_at")
+      SELECT concat('CRED-',generate_series(${idx}, ${numCreds})),clock_timestamp(), clock_timestamp();`)
+    })
+  }
+  return chain
 }
 
-const createCampaigns = (numCampaignsPerCredential, numCredentials) => {
+const createCampaigns = (numCampaignsPerCredential, numEmailCredentials, numSmsCredentials) => {
+  const numCreds = numEmailCredentials + numSmsCredentials
   console.log(`Creating ${numCampaignsPerCredential} campaigns per credential, 
-    for a total of ${numCampaignsPerCredential * numCredentials} campaigns`)
-  return sequelize.query(`
-    INSERT INTO campaigns ("id", "name", "user_id", "type", "cred_name", "valid", "created_at", "updated_at" ) 
-    SELECT ROW_NUMBER () OVER (ORDER BY name) as id,  t.name, t.user_id, enum_campaigns_type(t.type), t.cred_name, t.valid, t.created_at, t.updated_at 
-    FROM  generate_series(1,${numCredentials}) num_credentials
-    CROSS JOIN LATERAL ( 
-    SELECT generate_series(1,${numCampaignsPerCredential}) as num_campaign, 'email-campaign' as name, 1 as user_id, 'EMAIL' as type, concat('CRED-', num_credentials) as cred_name, TRUE as valid, 
-    clock_timestamp() as created_at, clock_timestamp() as updated_at
-    ) t;
- `)
+    for a total of ${numCampaignsPerCredential * numCreds} campaigns`)
+  let idx = 1
+  let chain = Promise.resolve()
+  if(numEmailCredentials>0){
+    idx = idx + numEmailCredentials
+    chain = chain.then(() => {
+      return sequelize.query(`
+      INSERT INTO campaigns ("name", "user_id", "type", "cred_name", "valid", "created_at", "updated_at" ) 
+      SELECT  t.name, t.user_id, enum_campaigns_type(t.type), t.cred_name, t.valid, t.created_at, t.updated_at 
+      FROM  generate_series(1,${numEmailCredentials}) num_credentials
+      CROSS JOIN LATERAL ( 
+      SELECT generate_series(1,${numCampaignsPerCredential}) as num_campaign, 'email-campaign' as name, 1 as user_id, 'EMAIL' as type, concat('CRED-', num_credentials) as cred_name, TRUE as valid, 
+      clock_timestamp() as created_at, clock_timestamp() as updated_at
+      ) t;
+    `)
+    })
+  }
+  if(numSmsCredentials>0){
+    chain = chain.then(() => {
+      return sequelize.query(`
+      INSERT INTO campaigns ("name", "user_id", "type", "cred_name", "valid", "created_at", "updated_at" ) 
+      SELECT  t.name, t.user_id, enum_campaigns_type(t.type), t.cred_name, t.valid, t.created_at, t.updated_at 
+      FROM  generate_series(${idx}, ${numCreds}) num_credentials
+      CROSS JOIN LATERAL ( 
+      SELECT generate_series(1,${numCampaignsPerCredential}) as num_campaign, 'sms-campaign' as name, 1 as user_id, 'SMS' as type, concat('CRED-', num_credentials) as cred_name, TRUE as valid, 
+      clock_timestamp() as created_at, clock_timestamp() as updated_at
+      ) t;
+    `)
+    })
+  }
+  return chain
+
+  
 }
 
-const createTemplates = (numCampaigns) => {
-  console.log(`Creating ${numCampaigns} templates`)
-  return sequelize.query(`
-    INSERT INTO email_templates ("campaign_id", "body", "subject", "created_at", "updated_at")
-    SELECT generate_series(1,${numCampaigns}), 'body' as body, 'subject', clock_timestamp(), clock_timestamp();
-    `)
+const createTemplates = (numCampaignsPerCredential, numEmailCredentials, numSmsCredentials) => {
+  const numTemplates = (numEmailCredentials + numSmsCredentials) * numCampaignsPerCredential
+  console.log(`Creating ${numTemplates} templates`)
+  let idx = 1
+  let chain = Promise.resolve()
+  if(numEmailCredentials>0){
+    idx = idx + (numEmailCredentials * numCampaignsPerCredential)
+    chain = chain.then(() => {
+      return sequelize.query(`
+        INSERT INTO email_templates ("campaign_id", "body", "subject", "created_at", "updated_at")
+        SELECT generate_series(1,${numEmailCredentials * numCampaignsPerCredential}), 'body' as body, 'subject', clock_timestamp(), clock_timestamp();
+      `)
+    })
+  }
+  if(numSmsCredentials>0){
+    chain = chain.then(() => {
+      return sequelize.query(`
+        INSERT INTO sms_templates ("campaign_id", "body", "created_at", "updated_at")
+        SELECT generate_series(${idx},${numTemplates}), 'body' as body,  clock_timestamp(), clock_timestamp();
+      `)
+    })
+  }
 }
 
 const createWorkers = (numWorkers) => {
@@ -52,16 +108,37 @@ const createWorkers = (numWorkers) => {
     `)
 }
 
-const createData = (numRecipients, numCampaigns) => {
-  console.log(`Creating ${numRecipients} recipients per campaign, 
-    for a total of ${numRecipients * numCampaigns} recipients`)
-  return sequelize.query(`
-    INSERT INTO email_messages ("campaign_id", "recipient", "params", "created_at", "updated_at")
-    SELECT t.* FROM  generate_series(1,${numRecipients}) num_recipient
-    CROSS JOIN LATERAL ( 
-    SELECT generate_series(1,${numCampaigns}) as "campaign_id", concat(num_recipient, 'test@test.gov.sg') as "recipient", CAST('{}' AS json) as "params",clock_timestamp() as "created_at", clock_timestamp() as "updated_at" 
-    ) t;
-    `)
+const createData = (numRecipients, numCampaignsPerCredential, numEmailCredentials, numSmsCredentials) => {
+  let idx = 1
+  let chain = Promise.resolve()
+  if(numEmailCredentials>0){
+    console.log(`Creating ${numRecipients} recipients per email campaign, 
+    for a total of ${numRecipients * numCampaignsPerCredential * numEmailCredentials} recipients`)
+    idx = idx + (numEmailCredentials * numCampaignsPerCredential)
+    chain = chain.then(() => {
+      return sequelize.query(`
+      INSERT INTO email_messages ("campaign_id", "recipient", "params", "created_at", "updated_at")
+      SELECT t.* FROM  generate_series(1,${numRecipients}) num_recipient
+      CROSS JOIN LATERAL ( 
+      SELECT generate_series(1,${numCampaignsPerCredential * numEmailCredentials}) as "campaign_id", concat(num_recipient, 'test@test.gov.sg') as "recipient", CAST('{}' AS json) as "params",clock_timestamp() as "created_at", clock_timestamp() as "updated_at" 
+      ) t;
+      `)
+    })
+  }
+  if(numSmsCredentials>0){
+    console.log(`Creating ${numRecipients} recipients per sms campaign, 
+    for a total of ${numRecipients * numCampaignsPerCredential * numSmsCredentials} recipients`)
+    chain = chain.then(() => {
+      return sequelize.query(`
+      INSERT INTO sms_messages ("campaign_id", "recipient", "params", "created_at", "updated_at")
+      SELECT t.* FROM  generate_series(1,${numRecipients}) num_recipient
+      CROSS JOIN LATERAL (  
+      SELECT generate_series(${idx},${numCampaignsPerCredential * (numSmsCredentials + numEmailCredentials)}) as "campaign_id", concat(num_recipient, 'test@test.gov.sg') as "recipient", CAST('{}' AS json) as "params",clock_timestamp() as "created_at", clock_timestamp() as "updated_at" 
+      ) t;
+      `)
+    })
+  }
+  return chain
 }
 
 const insertJobs = (numCampaigns) => {

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_messages_to_send(jid int, lim int) RETURNS TABLE(res_id int, res_recipient varchar(255), res_params json) 
+CREATE OR REPLACE FUNCTION get_messages_to_send_email(jid int, lim int) RETURNS TABLE(res_id bigint, res_recipient varchar(255), res_params json) 
 LANGUAGE plpgsql AS $$
 BEGIN
 	RETURN QUERY

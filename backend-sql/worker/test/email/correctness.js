@@ -8,8 +8,8 @@ const connection = new Sequelize(
     dialect: 'postgres',
     logging: false,
   })
-const dbRunner = require('../db/db-runner')
-const Worker = require('../worker')
+const dbRunner = require('../../db/db-runner')
+const Worker = require('../../worker')
 
 describe('Basic flow - one campaign, one credential', () => {
   let testWorker = null
@@ -18,7 +18,8 @@ describe('Basic flow - one campaign, one credential', () => {
             {
               connection,
               dir: '../../sql/functions',
-              numCreds: 1,
+              numEmailCreds: 1,
+              numSmsCreds: 0,
               numCampaigns: 1,
               numWorkers: 1,
               numRecipients: 10,
@@ -163,12 +164,13 @@ describe('Stop and retry the same campaign', () => {
   let currentCampaign = null
   let messagesToSend = []
   before(async () => {
-    dbUtil = require('../db/util/methods')(connection)
+    dbUtil = require('../../db/util/methods')(connection)
     const dbConfig =
             {
               connection,
               dir: '../../sql/functions',
-              numCreds: 1,
+              numEmailCreds: 1,
+              numSmsCreds: 0,
               numCampaigns: 1,
               numWorkers: 1,
               numRecipients: 10,
@@ -269,12 +271,13 @@ describe('Campaigns competing for the same credential', () => {
   let dbUtil
   let currentCampaign = null
   before(async () => {
-    dbUtil = require('../db/util/methods')(connection)
+    dbUtil = require('../../db/util/methods')(connection)
     const dbConfig =
               {
                 connection,
                 dir: '../../sql/functions',
-                numCreds: 1,
+                numEmailCreds: 1,
+                numSmsCreds: 0,
                 numCampaigns: 2, // 2 campaigns to compete for the same credential
                 numWorkers: numWorkers,
                 numRecipients: numRecipients,
@@ -372,7 +375,8 @@ describe('Campaigns with different credentials', () => {
               {
                 connection,
                 dir: '../../sql/functions',
-                numCreds: 2, // Two different credentials
+                numEmailCreds: 2,// Two different credentials
+                numSmsCreds: 0,
                 numCampaigns: 1, // One campaign for each credential
                 numWorkers: numWorkers,
                 numRecipients: 10,

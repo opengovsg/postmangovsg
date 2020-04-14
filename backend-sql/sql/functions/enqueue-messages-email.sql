@@ -1,5 +1,4 @@
-
-CREATE OR REPLACE FUNCTION enqueue_messages(jid int) RETURNS VOID LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION enqueue_messages_email(jid int) RETURNS VOID LANGUAGE plpgsql AS $$
 DECLARE 
     selected_campaign_id int;
 BEGIN

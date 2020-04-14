@@ -6,6 +6,7 @@ module.exports = class Worker {
     this.workerId = workerId
     this.verbose = verbose
     this.jobId = null // this is not necessary, I'm using it for logging
+    this.campaignType = null
   }
 
   init() {
@@ -26,46 +27,119 @@ module.exports = class Worker {
       { replacements: { worker_id: this.workerId }, type: QueryTypes.SELECT },
     ).then((result) => {
       const tuple = _.get(result, ('[0].get_next_job'), '()')
-      const [jobId, campaignId] = tuple.substring(1, tuple.length - 1).split(',')
-      if (jobId) { this.log(`getNextJob job_id=${jobId} campaign_id=${campaignId}`) }
-      return { jobId, campaignId }
+      const [jobId, campaignId, campaignType] = tuple.substring(1, tuple.length - 1).split(',')
+      if (jobId &&  campaignId && campaignType) {
+        this.jobId = jobId
+        this.campaignType = campaignType  
+        this.log(`getNextJob job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType}`) 
+      }
+      return { jobId, campaignId, campaignType }
+    })
+  }
+
+  _enqueueMessagesSms(jobId){
+    return this.connection.query('SELECT enqueue_messages_sms(:job_id); ',
+    { replacements: { job_id: jobId }, type: QueryTypes.SELECT },
+    ).then(() => {
+      this.log(`_enqueueMessagesSms job_id=${jobId}`)
+    })
+  }
+
+  _enqueueMessagesEmail(jobId){
+    return this.connection.query('SELECT enqueue_messages_email(:job_id); ',
+    { replacements: { job_id: jobId }, type: QueryTypes.SELECT },
+    ).then(() => {
+      this.log(`_enqueueMessagesSms job_id=${jobId}`)
     })
   }
 
   enqueueMessages(jobId) {
-    return this.connection.query('SELECT enqueue_messages(:job_id); ',
-      { replacements: { job_id: jobId }, type: QueryTypes.SELECT },
-    ).then(() => {
-      this.log(`enqueue job_id=${jobId}`)
-    })
+    switch(this.campaignType){
+      case 'EMAIL':
+        return this._enqueueMessagesEmail(jobId)
+      case 'SMS':
+        return this._enqueueMessagesSms(jobId)
+      default:
+        throw new Error(`${this.campaignType} not suppored`)
+    }
+   
   }
 
-  getMessages(jobId, limit) {
-    this.jobId = jobId
-    return this.connection.query('SELECT get_messages_to_send(:job_id, :limit) ;',
+  _getMessagesSms(jobId,limit){
+    return this.connection.query('SELECT get_messages_to_send_sms(:job_id, :limit) ;',
       { replacements: { job_id: jobId, limit }, type: QueryTypes.SELECT },
     ).then((result) => {
       return result.map(record => {
-        const tuple = _.get(record, ('get_messages_to_send'), '()')
+        const tuple = _.get(record, ('get_messages_to_send_sms'), '()')
         const [id, recipient, params] = tuple.substring(1, tuple.length - 1).split(',')
         return { id, recipient, params: params && JSON.parse(params) }
       })
     })
   }
 
-  sendMessage({ id, recipient, params }) {
+  _getMessagesEmail(jobId, limit){
+    return this.connection.query('SELECT get_messages_to_send_email(:job_id, :limit) ;',
+      { replacements: { job_id: jobId, limit }, type: QueryTypes.SELECT },
+    ).then((result) => {
+      return result.map(record => {
+        const tuple = _.get(record, ('get_messages_to_send_email'), '()')
+        const [id, recipient, params] = tuple.substring(1, tuple.length - 1).split(',')
+        return { id, recipient, params: params && JSON.parse(params) }
+      })
+    })
+  }
+
+  getMessages(jobId,limit) {
+    switch(this.campaignType){
+      case 'EMAIL':
+        return this._getMessagesEmail(jobId,limit)
+      case 'SMS':
+        return this._getMessagesSms(jobId,limit)
+      default:
+        throw new Error(`${this.campaignType} not suppored`)
+    }
+  }
+
+  _sendMessageSms({ id, recipient, params }){
     return Promise.resolve()
-      .then(() => {
-      // do some sending get a response
-        return 'message-test'
-      })
-      .then((messageId) => {
-        return this.connection.query('UPDATE email_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
-          { replacements: { id, messageId }, type: QueryTypes.UPDATE })
-      })
-      .then(() => {
-        this.log(`sendMessage jobId=${this.jobId} id=${id}`)
-      })
+    .then(() => {
+    // do some sending get a response
+      return 'sms-test'
+    })
+    .then((messageId) => {
+      return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
+        { replacements: { id, messageId }, type: QueryTypes.UPDATE })
+    })
+    .then(() => {
+      this.log(`sendMessage jobId=${this.jobId} id=${id}`)
+    })
+  }
+  
+
+  _sendMessageEmail({ id, recipient, params }){
+    return Promise.resolve()
+    .then(() => {
+    // do some sending get a response
+      return 'email-test'
+    })
+    .then((messageId) => {
+      return this.connection.query('UPDATE email_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
+        { replacements: { id, messageId }, type: QueryTypes.UPDATE })
+    })
+    .then(() => {
+      this.log(`sendMessage jobId=${this.jobId} id=${id}`)
+    })
+  }
+
+  sendMessage(message) {
+    switch(this.campaignType){
+      case 'EMAIL':
+        return this._sendMessageEmail(message)
+      case 'SMS':
+        return this._sendMessageSms(message)
+      default:
+        throw new Error(`${this.campaignType} not suppored`)
+    }
   }
 
   finalize() {

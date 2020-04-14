@@ -1,15 +1,4 @@
--- Postman Job Status Query next job query
--- Notes:
--- FOR UPDATE will lock selected rows
--- In this case, 1 row from credential, campaign and job_queue each
--- SKIP LOCKED will look for the next unlocked row
-
--- Do we need a constraint on job_queue such that a worker_id can only be associated with 1 row whose status is 'ENQUEUED'?
-
--- https://www.postgresql.org/docs/11/plpgsql-transactions.html
--- Transaction control is only possible in CALL or DO invocations from the top level or nested CALL or DO invocations without any other intervening command. 
-
-CREATE OR REPLACE FUNCTION get_next_job(worker int, out selected_job_id int, out selected_campaign_id int)
+CREATE OR REPLACE FUNCTION get_next_job(worker int, out selected_job_id int, out selected_campaign_id int, out selected_campaign_type text)
 LANGUAGE plpgsql AS $$
 BEGIN
 UPDATE job_queue
@@ -30,6 +19,5 @@ WHERE id = ( SELECT q.id
     -- Assigns that job with a worker (but this doesn’t take effect until commit)
 )
 RETURNING id, campaign_id into selected_job_id, selected_campaign_id;
+SELECT "type" into selected_campaign_type FROM campaigns WHERE id = selected_campaign_id;
 END $$;
-
-
