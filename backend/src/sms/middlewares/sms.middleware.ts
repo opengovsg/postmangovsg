@@ -7,7 +7,8 @@ import logger from '@core/logger'
 import { dbService, secretsService } from '@core/services'
 import { TwilioService } from '@sms/services' 
 
-const SALT_ROUNDS = 10
+// Move this to env var
+const SALT = '$2b$10$tC8FcAwKXzJDjLV7k.U7NO'
 
 const saveCredential = async (name: string, secret: string) => {
   // Upload the credential to aws secret manager
@@ -29,7 +30,7 @@ const getCredential = (req: Request): TwilioCredentials => {
 
 const hash = (value: string) : Promise<string> => {
   return new Promise((resolve, reject) => {
-    bcrypt.hash(value, SALT_ROUNDS, (error, hash) => {
+    bcrypt.hash(value, SALT, (error, hash) => {
       if (error) {
         logger.error(`Failed to hash value: ${error}`)
         reject(error)
@@ -72,9 +73,9 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
   // Save the credentials and update DB
   try {
     const secretString = JSON.stringify(credential)
-    const secretHash = await hash(secretString)
-    await saveCredential(secretHash, secretString)
-    await dbService.addCredentialToCampaignTable(campaignId, secretHash)
+    const credentialName = await getEncodedHash(secretString)
+    await saveCredential(credentialName, secretString)
+    await dbService.addCredentialToCampaignTable(campaignId, credentialName)
   }catch(e) {
     logger.error(`Error saving credentials. error=${e}`)
     return res.sendStatus(500)
@@ -83,5 +84,9 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
   res.json({ message: 'OK' })
 }
 
+const getEncodedHash = async (secret : string): Promise<string> => {
+  const secretHash = await hash(secret)
+  return Buffer.from(secretHash).toString('base64')
+}
 
 export { isSmsCampaignOwnedByUser, storeCredentials }
