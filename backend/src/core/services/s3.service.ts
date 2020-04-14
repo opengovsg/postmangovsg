@@ -14,7 +14,7 @@ class S3Service {
     this.s3 = s3
   }
 
-  download(key: string) {
+  download(key: string): NodeJS.ReadableStream {
     const params: S3.GetObjectRequest = {
       Bucket: FILE_STORAGE_BUCKET_NAME,
       Key: key,

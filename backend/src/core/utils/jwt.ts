@@ -5,6 +5,6 @@ import config from '@core/config'
 const JWT_SECRET = config.jwtSecret
 
 export const jwtUtils = {
-  sign: (payload: any) => jwt.sign(payload, JWT_SECRET, { algorithm: 'HS256' }),
-  verify: (token: string) => jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }),
+  sign: (payload: any): string => jwt.sign(payload, JWT_SECRET, { algorithm: 'HS256' }),
+  verify: (token: string): string | object => jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }),
 }

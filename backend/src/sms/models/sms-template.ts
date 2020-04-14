@@ -30,7 +30,7 @@ export class SmsTemplate extends Model<SmsTemplate> {
   // @see https://github.com/RobinBuschmann/sequelize-typescript/blob/883cb2c92c09160a82b9a39fb0c33b6b12a4051c/test/specs/hooks/hooks.spec.ts#L97
   @BeforeUpdate
   @BeforeCreate
-  static generateParams(instance: SmsTemplate) {
+  static generateParams(instance: SmsTemplate): void {
     if (!instance.body) return
     const parsedTemplate = parseTemplate(instance.body)
     instance.params = parsedTemplate.variables

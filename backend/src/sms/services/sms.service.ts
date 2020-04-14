@@ -13,7 +13,10 @@ import logger from '@core/logger'
  * @param templateBody - template body
  * @param params - dict of param variables used for interpolation
  */
-const parseTemplate = (templateBody: string, params?: {[key: string]: string}) => {
+const parseTemplate = (templateBody: string, params?: {[key: string]: string}): {
+  variables: Array<string>;
+  tokens: Array<string>;
+} => {
   const variables: Array<string> = []
   const tokens: Array<string> = []
   try {
@@ -48,7 +51,6 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}) =
             if (params) {
               if (params[key]) {
                 const templated = params[key]
-                // prevents code execution
                 tokens.push(templated)
               } else {
                 throw new Error(`Param ${templateObject.c} not found`)
@@ -93,12 +95,12 @@ const upsertTemplate = async (body: string, campaignId: number): Promise<SmsTemp
     if (await SmsTemplate.findByPk(campaignId, { transaction }) !== null) {
       // .update is actually a bulkUpdate
       const updatedTemplate: [number, SmsTemplate[]] = await SmsTemplate.update({
-        body
+        body,
       }, {
         where: { campaignId },
         individualHooks: true, // required so that BeforeUpdate hook runs
         returning: true,
-        transaction
+        transaction,
       })
 
       transaction?.commit()
@@ -106,7 +108,7 @@ const upsertTemplate = async (body: string, campaignId: number): Promise<SmsTemp
     }
     const createdTemplate = await SmsTemplate.create({
       campaignId, body,
-      transaction
+      transaction,
     })
 
     transaction?.commit()
