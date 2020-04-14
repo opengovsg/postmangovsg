@@ -6,11 +6,11 @@ const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
 
 const storeSecret = async (name: string, secret: string) => {
   const params = {
-    SecretId: name,
+    Name: name,
     SecretString: secret
   }
   logger.info('Storing secret in AWS secrets manager.')
-  await secretsManager.putSecretValue(params).promise()
+  await secretsManager.createSecret(params).promise()
   logger.info('Successfully stored secret in AWS secrets manager.')
 }
 
