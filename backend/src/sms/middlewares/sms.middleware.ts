@@ -5,10 +5,8 @@ import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
 import { dbService, secretsService } from '@core/services'
-import { TwilioService } from '@sms/services' 
-
-// SWTODO: Move this to env var
-const SALT = '$2b$10$tC8FcAwKXzJDjLV7k.U7NO'
+import { TwilioService } from '@sms/services'
+import config from '@core/config'
 
 const saveCredential = async (name: string, secret: string) => {
   // Check if credential is already in the credential table
@@ -38,7 +36,7 @@ const getCredential = (req: Request): TwilioCredentials => {
 
 const hash = (value: string) : Promise<string> => {
   return new Promise((resolve, reject) => {
-    bcrypt.hash(value, SALT, (error, hash) => {
+    bcrypt.hash(value, config.aws.secretManagerSalt, (error, hash) => {
       if (error) {
         logger.error(`Failed to hash value: ${error}`)
         reject(error)
@@ -80,8 +78,8 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
   const { testNumber } = req.body
   const isMessageSent = await sendMessage(testNumber, credential)
   if (!isMessageSent) res.sendStatus(400)
-  const { campaignId } = req.params
 
+  const { campaignId } = req.params
   // Save the credentials and update DB
   try {
     const secretString = JSON.stringify(credential)

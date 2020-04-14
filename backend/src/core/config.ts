@@ -11,6 +11,7 @@ const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 // AWS settings
 const awsRegion: string = process.env.AWS_REGION as string
 const uploadBucket: string = process.env.FILE_STORAGE_BUCKET_NAME as string
+const secretManagerSalt: string = process.env.AWS_SECRET_MANAGER_SALT as string
 
 // Upload csv
 const jwtSecret = process.env.JWT_SECRET as string
@@ -55,6 +56,7 @@ export default {
   aws: {
     awsRegion,
     uploadBucket,
+    secretManagerSalt,
   },
   database: {
     databaseUri,
