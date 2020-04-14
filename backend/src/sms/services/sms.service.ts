@@ -1,6 +1,7 @@
 import * as Sqrl from 'squirrelly'
 import { SmsTemplate } from '@sms/models'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
+import logger from '@core/logger'
 
 // FIXME: handle edge case of x.y
 
@@ -25,20 +26,41 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}) =
         // templateObject.raw means ???
         // templateObject.f refers to filter (eg. {{ var | humanize }}), we want to make sure this is empty
         if (templateObject.t === 'r' && !templateObject.raw && templateObject.f?.length === 0) {
-          if (params) {
-            // templateObject.c contains the param key, c stands for content
-            if (templateObject.c && params[templateObject.c]) {
-              const key = params[templateObject.c]
-              // prevents code execution
-              const keyHasValidChars = (key.match(/[^a-zA-z0-9]/) === null)
-              if (!keyHasValidChars) {
-                throw new Error(`invalid characters in param ${key}`)
-              }
-              variables.push(key)
-              tokens.push(key)
-            } else {
-              throw new Error(`Param ${templateObject.c} not found`)
+          // templateObject.c has type string | undefined
+          // templateObject.c contains the param key, c stands for content
+          // this is the extracted variable name from the template AST
+          const key = templateObject.c
+
+          if (key !== undefined) {
+
+            if (key.length === 0) {
+              throw new Error('Blank template variable provided')
             }
+
+            // only allow alphanumeric template, prevents code execution
+            const keyHasValidChars = (key.match(/[^a-zA-z0-9]/) === null)
+            if (!keyHasValidChars) {
+              console.log('error: invalid chars')
+              throw new Error(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
+            }
+
+            // if params provided == attempt to carry out templating
+            if (params) {
+              if (params[key]) {
+                const templated = params[key]
+                // prevents code execution
+                tokens.push(templated)
+              } else {
+                throw new Error(`Param ${templateObject.c} not found`)
+              }
+            }
+
+            // add key regardless
+            variables.push(key)
+
+          } else { // I have not found an edge case that trips this yet
+            logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)
+            throw new Error('TemplateObject has no content')
           }
         } else {
           // FIXME: be more specific about templateObject, just pass the error itself?
