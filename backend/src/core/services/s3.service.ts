@@ -29,6 +29,7 @@ class S3Service {
     const params: Array<CSVParamsInterface> = []
     for await (const row of parser) {
       if (isEmpty(headers)) {
+        if (row.indexOf('recipient') === -1) throw new Error('No recipients column.')
         headers = row
       } else {
         const rowWithHeaders: CSVParamsInterface = {}
