@@ -16,11 +16,19 @@ program.parse(process.argv)
 console.log(program.opts())
 const main = async () => {
   const { database, campaignId, method } = program.opts()
+  const fs = require('fs')
+  const path = require('path')
+  const rdsCa = fs.readFileSync(path.resolve(__dirname, '../../../backend/src/assets/db-ca.pem'))
   const { Sequelize } = require('sequelize')
   const connection = new Sequelize(
     database, {
       dialect: 'postgres',
       logging: false,
+      pool: { max: 150, min: 0, acquire: 600000 },
+      ssl: {
+        rejectUnauthorized: true,
+        ca: [rdsCa]
+      }
     })
   const dbUtil = require('./util/methods')(connection)
   switch (method) {

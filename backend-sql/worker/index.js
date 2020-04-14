@@ -12,11 +12,19 @@ console.log(program.opts())
 
 /** **** START ******/
 const { workerId, database, grimReaper, verbose, batchSize } = program.opts()
-const { Sequelize } = require('sequelize')
+const fs = require('fs')
+const path = require('path')
+const rdsCa = fs.readFileSync(path.resolve(__dirname, '../../backend/src/assets/db-ca.pem'))
+const { Sequelize, QueryTypes } = require('sequelize')
 const connection = new Sequelize(
   database, {
     dialect: 'postgres',
     logging: false,
+    pool: { max: 150, min: 0, acquire: 600000 },
+    ssl: {
+      rejectUnauthorized: true,
+      ca: [rdsCa]
+    }
   })
 const workerRunner = require('./worker-runner')
 const main = async () => {

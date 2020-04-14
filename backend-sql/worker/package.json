@@ -11,7 +11,7 @@
   "dependencies": {
     "commander": "^5.0.0",
     "lodash": "^4.17.15",
-    "pg": "^8.0.2",
+    "pg": "^7.18.2",
     "sequelize": "^5.21.6"
   },
   "devDependencies": {

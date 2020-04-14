@@ -12,11 +12,19 @@ program.parse(process.argv)
 
 /** **** START ******/
 const { database, dir, numCreds, numCampaigns, numWorkers, numRecipients, jobs } = program.opts()
+const fs = require('fs')
+const path = require('path')
+const rdsCa = fs.readFileSync(path.resolve(__dirname, '../../../backend/src/assets/db-ca.pem'))
 const { Sequelize } = require('sequelize')
 const connection = new Sequelize(
   database, {
     dialect: 'postgres',
     logging: false,
+    pool: { max: 150, min: 0, acquire: 600000 },
+    ssl: {
+      rejectUnauthorized: true,
+      ca: [rdsCa]
+    }
   })
 const dbRunner = require('./db-runner')
 const main = async () => {
