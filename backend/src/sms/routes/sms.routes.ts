@@ -1,12 +1,14 @@
+import S3 from 'aws-sdk/clients/s3'
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
+import { keys } from 'lodash'
+
 import { upsertTemplate } from '@sms/services/sms.service'
 import { retrieveCampaign } from '@core/services/campaign.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { updateCampaignS3Metadata, S3Service } from '@core/services'
-import S3 from 'aws-sdk/clients/s3'
 import { jwtUtils } from '@core/utils/jwt'
 import { SmsMessage } from '@sms/models'
 
@@ -94,20 +96,24 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
     const updatedTemplate = await upsertTemplate(req.body.body, +campaignId)
 
     const campaign = await retrieveCampaign(+campaignId)
-    // check if params exist
-    // check if s3 file exists, and hydrate if so (?)
-    if (campaign.s3Object) {
-      // fetch from S3
-      // s3ServiceInstance.fetch(...)
-      // FIXME: this is a stub
-      const stubbedParamsFromS3 = ['name', 'event']
+    // check if s3Object, params exist
+    if (campaign.s3Object && updatedTemplate.params) {
+      // FIXME: to check - is campaign.s3Object and sms_message_logs in sync?
+      // fetch from message logs
+      const firstRecord = await SmsMessage.findOne({
+        where: { campaignId }
+      })
+      if (firstRecord === null) {
+        throw new Error(`no SmsMessage records found for campaignId ${campaignId}`)
+      }
+      const paramsFromS3 = keys(firstRecord.params)
       // warn if params from s3 file are not a superset of saved params
-
       // returns true if A is superset of B
-      const isSuperSet = (a: Array<string>, b: Array<string>): boolean => a.every(s => b.indexOf(s) !== -1)
+      const isSuperSet = (a: Array<string>, b: Array<string>): boolean => b.every(s => a.indexOf(s) !== -1)
 
-      if (!isSuperSet(updatedTemplate.params, stubbedParamsFromS3)) {
+      if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
         return res.status(400).json({
+          // TODO: lodash diff to show missing keys
           message: 'Template contains keys that are not in file',
         })
       }
