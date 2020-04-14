@@ -7,14 +7,22 @@ import logger from '@core/logger'
 import { dbService, secretsService } from '@core/services'
 import { TwilioService } from '@sms/services' 
 
-// Move this to env var
+// SWTODO: Move this to env var
 const SALT = '$2b$10$tC8FcAwKXzJDjLV7k.U7NO'
 
 const saveCredential = async (name: string, secret: string) => {
-  // Upload the credential to aws secret manager
-  await secretsService.storeSecret(name, secret)
-  // Store credential to credential table
+  // Check if credential is already in the credential table
+  const isExisting = await dbService.isExistingCredential(name)
+
+  // Dont have to save if it is an old credential
+  if (isExisting) {
+    return
+  }
+
+  // Store credential to credential tableg
   await dbService.insertIntoCredentialsTable(name)
+  // Upload the credential to aws secret manager
+  await secretsService.storeSecret(name, secret)  
 }
 
 const getCredential = (req: Request): TwilioCredentials => {
@@ -48,6 +56,11 @@ const sendMessage = async (recipient: string, credential: TwilioCredentials) : P
   return isSendSuccessful
 }
 
+const getEncodedHash = async (secret : string): Promise<string> => {
+  const secretHash = await hash(secret)
+  return Buffer.from(secretHash).toString('base64')
+}
+
 // TODO
 const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
@@ -67,7 +80,6 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
   const { testNumber } = req.body
   const isMessageSent = await sendMessage(testNumber, credential)
   if (!isMessageSent) res.sendStatus(400)
-
   const { campaignId } = req.params
 
   // Save the credentials and update DB
@@ -82,11 +94,6 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
   }
 
   res.json({ message: 'OK' })
-}
-
-const getEncodedHash = async (secret : string): Promise<string> => {
-  const secretHash = await hash(secret)
-  return Buffer.from(secretHash).toString('base64')
 }
 
 export { isSmsCampaignOwnedByUser, storeCredentials }

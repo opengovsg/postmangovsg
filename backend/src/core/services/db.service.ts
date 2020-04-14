@@ -8,11 +8,21 @@ const insertIntoCredentialsTable = async (hash: string): Promise<Credential> => 
 
 const addCredentialToCampaignTable = async (campaignId: string, credentialName: string) => {
   return Campaign.update({
-    cred_name: credentialName,
+    credName: credentialName,
   },{
     where: {id: campaignId},
     returning: false
   })
 }
 
-export const dbService = { insertIntoCredentialsTable, addCredentialToCampaignTable }
+const isExistingCredential = async (name: string): Promise<Boolean> => {
+  const result = await Credential.findOne({
+    where: {
+      name: name
+    },
+  })
+  if (result) return true
+  return false
+}
+
+export const dbService = { insertIntoCredentialsTable, addCredentialToCampaignTable, isExistingCredential }
