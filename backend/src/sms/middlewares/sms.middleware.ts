@@ -41,6 +41,7 @@ const hash = (value: string) : Promise<string> => {
 
 const sendMessage = async (recipient: string, credential: TwilioCredentials) : Promise<boolean> => {
   const msg = 'You have successfully verified your Twilio credentials with Postman.'
+  logger.info('Sending sms using Twilio.')
   const twilioClient = new TwilioService(credential)
   const isSendSuccessful = await twilioClient.send(recipient, msg)
   return isSendSuccessful
@@ -59,7 +60,7 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
 }
 
 // Read file from s3 and populate messages table
-const storeCredentials = async (req: Request, res: Response): Promise<void> => {
+const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
   const credential: TwilioCredentials = getCredential(req)
   // Send test message
   const { testNumber } = req.body
@@ -75,8 +76,8 @@ const storeCredentials = async (req: Request, res: Response): Promise<void> => {
     await saveCredential(secretHash, secretString)
     await dbService.addCredentialToCampaignTable(campaignId, secretHash)
   }catch(e) {
-    logger.error(`Error adding credential to campaign table. error=${e}`)
-    res.sendStatus(500)
+    logger.error(`Error saving credentials. error=${e}`)
+    return res.sendStatus(500)
   }
 
   res.json({ message: 'OK' })

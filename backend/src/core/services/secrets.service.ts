@@ -11,6 +11,7 @@ const storeSecret = async (name: string, secret: string) => {
   }
   logger.info('Storing secret in AWS secrets manager.')
   await secretsManager.putSecretValue(params).promise()
+  logger.info('Successfully stored secret in AWS secrets manager.')
 }
 
 
