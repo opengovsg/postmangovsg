@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_next_job(worker int, out selected_job_id int, out selected_campaign_id int, out selected_campaign_type text)
+CREATE OR REPLACE FUNCTION get_next_job(worker int, out selected_job_id int, out selected_campaign_id int, out selected_campaign_type text, out selected_rate int)
 LANGUAGE plpgsql AS $$
 BEGIN
 UPDATE job_queue
@@ -18,6 +18,6 @@ WHERE id = ( SELECT q.id
     -- Returns the id of the locked job
     -- Assigns that job with a worker (but this doesn’t take effect until commit)
 )
-RETURNING id, campaign_id into selected_job_id, selected_campaign_id;
+RETURNING id, campaign_id, send_rate into selected_job_id, selected_campaign_id, selected_rate;
 SELECT "type" into selected_campaign_type FROM campaigns WHERE id = selected_campaign_id;
 END $$;

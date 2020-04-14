@@ -46,6 +46,8 @@
     "squirrelly": "^8.0.0-beta.10",
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4",
+    "threads": "^1.4.0",
+    "tiny-worker": "^2.3.0",
     "uuid": "^7.0.3",
     "winston": "^3.2.1"
   },
