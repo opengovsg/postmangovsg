@@ -3,20 +3,21 @@ import { Campaign } from '@core/models/campaign'
 
 @Table({ tableName: 'email_messages' , underscored: true, timestamps: true })
 export class EmailMessage extends Model<EmailMessage> {
-  @ForeignKey(() => Campaign)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.BIGINT,
+    autoIncrement: true,
     primaryKey: true,
   })
+  id!: number
+
+  @ForeignKey(() => Campaign)
+  @Column(DataType.INTEGER)
   campaignId!: number
 
   @BelongsTo(() => Campaign)
   campaign!: Campaign
 
-  @Column({
-    type: DataType.STRING,
-    primaryKey: true,
-  })
+  @Column(DataType.STRING)
   recipient!: string
 
   @Column(DataType.JSON)
