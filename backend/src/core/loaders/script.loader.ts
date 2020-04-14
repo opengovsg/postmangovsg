@@ -5,7 +5,7 @@ import { sqlFilePaths } from '@core/resources/sql'
 import { sqlFilePaths as emailSqlFilePaths } from '@email/resources/sql'
 import { sqlFilePaths as smsSqlFilePaths } from '@sms/resources/sql'
 
-const scriptsLoader = async ({ sequelize }: {sequelize: Sequelize | undefined}): Promise<void> => {
+const scriptLoader = async ({ sequelize }: {sequelize: Sequelize | undefined}): Promise<void> => {
   if(sequelize){
     const scriptsFilePaths = [
       ...sqlFilePaths,
@@ -36,4 +36,4 @@ const scriptsLoader = async ({ sequelize }: {sequelize: Sequelize | undefined}):
  
 }
 
-export default scriptsLoader
+export default scriptLoader
