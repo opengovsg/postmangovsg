@@ -49,9 +49,14 @@ const hash = (value: string) : Promise<string> => {
 const sendMessage = async (recipient: string, credential: TwilioCredentials) : Promise<boolean> => {
   const msg = 'You have successfully verified your Twilio credentials with Postman.'
   logger.info('Sending sms using Twilio.')
-  const twilioClient = new TwilioService(credential)
-  const isSuccessful = await twilioClient.send(recipient, msg)
-  return isSuccessful
+  try {
+    const twilioClient = new TwilioService(credential)
+    const isSuccessful = await twilioClient.send(recipient, msg)
+    return isSuccessful
+  } catch(e) {
+    logger.error(`Twilio client fails to send message. error=${e}`)
+    return false
+  }
 }
 
 const getEncodedHash = async (secret : string): Promise<string> => {
@@ -77,7 +82,7 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
   // Send test message
   const { testNumber } = req.body
   const isMessageSent = await sendMessage(testNumber, credential)
-  if (!isMessageSent) res.sendStatus(400)
+  if (!isMessageSent) return res.sendStatus(400)
 
   const { campaignId } = req.params
   // Save the credentials and update DB
