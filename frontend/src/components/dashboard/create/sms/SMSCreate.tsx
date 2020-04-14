@@ -4,6 +4,7 @@ import { SMSCampaign, SMSProgress } from 'classes'
 import { ProgressPane } from 'components/common'
 import SMSTemplate from './SMSTemplate'
 import SMSRecipients from './SMSRecipients'
+import SMSSend from './SMSSend'
 
 import styles from '../Create.module.scss'
 
@@ -43,7 +44,7 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
         )
       case SMSProgress.Send:
         return (
-          <>Send</>
+          <SMSSend body={campaign.body} numRecipients={campaign.numRecipients} />
         )
       default:
         return (<p>Invalid step</p>)
