@@ -50,8 +50,8 @@ const sendMessage = async (recipient: string, credential: TwilioCredentials) : P
   const msg = 'You have successfully verified your Twilio credentials with Postman.'
   logger.info('Sending sms using Twilio.')
   try {
-    const twilioClient = new TwilioService(credential)
-    const isSuccessful = await twilioClient.send(recipient, msg)
+    const twilioService = new TwilioService(credential)
+    const isSuccessful = await twilioService.send(recipient, msg)
     return isSuccessful
   } catch(e) {
     logger.error(`Twilio client fails to send message. error=${e}`)
