@@ -17,10 +17,7 @@ BEGIN
 	campaign_id, 
 	recipient, 
 	params, 
-	message_id,
-	error_code,
 	dequeued_at,
-	received_at,
 	created_at,
 	updated_at )
 
@@ -28,12 +25,9 @@ BEGIN
 	(campaign_id, 
 	recipient, 
 	params, 
-	message_id,
-	error_code,
 	dequeued_at,
 	-- note that sent_at is not set. It remains as null so that the sending step will pick it up.
 	-- note that delivered_at is not set. It remains as null so we can set it when the sending client responds.
-	received_at,
 	created_at,
 	updated_at)  
 	(SELECT * 
