@@ -113,7 +113,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
       await Campaign.update({
         valid: false,
       }, {
-        where: { campaignId },
+        where: { id: campaignId },
       })
 
       const paramsFromS3 = keys(firstRecord.params)
@@ -131,7 +131,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         await Campaign.update({
           valid: true,
         }, {
-          where: { campaignId },
+          where: { id: campaignId },
         })
       } catch (err) {
         logger.error(`Hydration error: ${err.stack}`)
@@ -159,7 +159,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     await Campaign.update({
       valid: false,
     }, {
-      where: { campaignId },
+      where: { id: campaignId },
     })
 
 
@@ -224,7 +224,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
           valid: true,
         }, {
           where: {
-            campaignId,
+            id: campaignId,
           },
           transaction,
         })
