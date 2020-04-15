@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash'
 
 import config from '@core/config'
 import logger from '@core/logger'
+import { RecipientColumnMissing } from '@core/errors/s3.errors'
 
 type CSVParamsInterface = {[key: string]: string}
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
@@ -29,7 +30,8 @@ class S3Service {
     const params: Array<CSVParamsInterface> = []
     for await (const row of parser) {
       if (isEmpty(headers)) {
-        if (row.indexOf('recipient') === -1) throw new Error('No recipients column.')
+        const lowercaseHeaders = row.map((col: string) => col.toLowerCase())
+        if (lowercaseHeaders.indexOf('recipient') === -1) throw new RecipientColumnMissing()
         headers = row
       } else {
         const rowWithHeaders: CSVParamsInterface = {}
