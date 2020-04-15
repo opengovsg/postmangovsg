@@ -56,15 +56,6 @@ const storeCredentialsValidator = {
   }),
 }
 
-const validateCredentialsValidator = {
-  [Segments.BODY]: Joi.object({
-    email: Joi
-      .string()
-      .trim()
-      .pattern(/^\+\d{8,15}$/),
-  }),
-}
-
 const previewMessageValidator = {
   [Segments.BODY]: Joi.object({
     message: Joi
@@ -206,11 +197,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     return next(err)
   }
-}
-
-// Send validation email to specified phone number
-const validateCredentials = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
 }
 
 // Get preview of one message
@@ -362,35 +348,6 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadComple
  *                type: object
  */
 router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentials)
-
-/**
- * @swagger
- * path:
- *  /campaign/{campaignId}/email/validate:
- *    post:
- *      tags:
- *        - Email
- *      summary: Vaidates stored credentials by sending to a specific phone number
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                emailAddress:
- *                  type: string
- *                  pattern: '^\+\d{8,15}$'
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- */
-router.post('/validate', celebrate(validateCredentialsValidator), validateCredentials)
-
 
 /**
  * @swagger
