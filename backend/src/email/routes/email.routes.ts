@@ -2,12 +2,15 @@ import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
 import logger from '@core/logger'
+import { Campaign } from '@core/models'
+import { extractS3Key } from '@core/services/campaign.service'
+import { testHydration } from '@core/services/template.service'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
-import { updateCampaignS3Metadata, S3Service } from '@core/services'
-import S3 from 'aws-sdk/clients/s3'
-import { jwtUtils } from '@core/utils/jwt'
-
-const s3Client = new S3()
+import { updateCampaignS3Metadata } from '@core/services'
+import { EmailTemplate } from '@email/models'
+import { populateEmailTemplate } from '@email/services/email.service'
+import { MissingTemplateKeysError } from '@core/errors/template.errors'
+import { RecipientColumnMissing } from '@core/errors/s3.errors'
 
 const router = Router({ mergeParams: true })
 
@@ -92,34 +95,49 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   try {
     const { campaignId } = req.params
     // TODO: validate if project is in editable state
+
+    // switch campaign to invalid - this is for the case of uploading over an existing file
+    await Campaign.update({
+      valid: false,
+    }, {
+      where: { id: +campaignId },
+    })
+
     // extract s3Key from transactionId
     const { transactionId } = req.body
-    let decoded: string
+    let s3Key: string
     try {
-      decoded = jwtUtils.verify(transactionId) as string
+      s3Key = extractS3Key(transactionId)
     } catch (err) {
-      logger.info(`${err.message}`)
-      return res.status(400).json({ message: 'Invalid transactionId provided' })
+      return res.status(400).json(err.message)
     }
-    const s3Key = decoded as string
 
-    // TODO: begin txn
+    // check if template exists
+    const emailTemplate = await EmailTemplate.findOne({ where: { campaignId } })
+    if (emailTemplate === null || emailTemplate.body === null) {
+      return res.status(400).json({
+        message: 'Template does not exist, please create a template',
+      })
+    }
+
     // Updates metadata in project
     await updateCampaignS3Metadata({ key: s3Key, campaignId })
-    res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
-    // TODO: delete message_logs entries
-    // TODO: carry out templating / hydration
+
+    // carry out templating / hydration
     // - download from s3
     try {
-      const s3Service = new S3Service(s3Client)
-      const downloadStream = s3Service.download(s3Key)
-      await s3Service.parseCsv(downloadStream)
-      // - populate template
-      // TODO: end txn
+      const records = await testHydration(+campaignId, s3Key, emailTemplate.params!)
+      // START populate template
+      populateEmailTemplate(+campaignId, records)
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
+      throw err
     }
+    return res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
+    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
+      return res.status(400).json({ message: err.message })
+    }
     return next(err)
   }
 }
