@@ -1,8 +1,14 @@
-import { mapKeys } from 'lodash'
+import S3 from 'aws-sdk/clients/s3'
+import { difference, keys, mapKeys } from 'lodash'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 
+import { S3Service } from '@core/services'
+import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
+import { MissingTemplateKeysError } from '@core/errors/template.errors'
+
+const s3Client = new S3()
 
 // FIXME: handle edge case of x.y
 
@@ -100,4 +106,32 @@ const template = (templateBody: string, params: {[key: string]: string}): string
   return parsed.tokens.join('')
 }
 
-export { template, parseTemplate }
+const testHydration = async (campaignId: number, s3Key: string, templateParams: Array<string>): Promise<Array<object>> => {
+  try {
+    const s3Service = new S3Service(s3Client)
+    const downloadStream = s3Service.download(s3Key)
+    const fileContents = await s3Service.parseCsv(downloadStream)
+    // FIXME / TODO: dedupe
+    const records: Array<object> = fileContents.map(entry => {
+      return {
+        campaignId,
+        recipient: entry['recipient'],
+        params: entry,
+      }
+    })
+
+    // attempt to hydrate
+    const firstRecord = fileContents[0]
+    // if body exists, smsTemplate.params should also exist
+    if (!isSuperSet(keys(firstRecord), templateParams)) {
+      // TODO: lodash diff to show missing keys
+      const missingKeys = difference(templateParams, keys(firstRecord))
+      throw new MissingTemplateKeysError(missingKeys)
+    }
+    return records
+  } catch (err) {
+    throw err
+  }
+}
+
+export { template, parseTemplate, testHydration }
