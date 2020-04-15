@@ -1,6 +1,6 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { keys } from 'lodash'
+import { difference, keys } from 'lodash'
 
 import { template } from '@core/services/template.service'
 import { extractS3Key, populateTemplate, testHydration, upsertTemplate } from '@sms/services/sms.service'
@@ -13,6 +13,7 @@ import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 
 import { isSuperSet } from '@core/utils'
+import { MissingTemplateKeysError, HydrationError } from '@sms/errors/sms.errors'
 
 const router = Router({ mergeParams: true })
 
@@ -87,6 +88,37 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
   res.json({ message: 'OK' })
 }
 
+const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: SmsTemplate; firstRecord: SmsMessage}): Promise<void> => {
+  if (!updatedTemplate.params) return
+
+  // first set project.valid to false, switch this back to true only when hydration succeeds
+  await Campaign.update({
+    valid: false,
+  }, {
+    where: { id: campaignId },
+  })
+
+  const paramsFromS3 = keys(firstRecord.params)
+  // warn if params from s3 file are not a superset of saved params
+  if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
+    const missingKeys = difference(updatedTemplate.params, paramsFromS3)
+    throw new MissingTemplateKeysError(missingKeys)
+  }
+  // try hydrate(...), return 4xx if unable to do so
+  try {
+    template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
+    // set campaign.valid to true since templating suceeded AND file has been uploaded
+    await Campaign.update({
+      valid: true,
+    }, {
+      where: { id: campaignId },
+    })
+  } catch (err) {
+    logger.error(`Hydration error: ${err.stack}`)
+    throw new HydrationError()
+  }
+}
+
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
@@ -100,42 +132,18 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
 
     // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
     if (firstRecord && updatedTemplate.params) {
-      // first set project.valid to false, switch this back to true only when hydration succeeds
-      await Campaign.update({
-        valid: false,
-      }, {
-        where: { id: campaignId },
-      })
-
-      const paramsFromS3 = keys(firstRecord.params)
-      // warn if params from s3 file are not a superset of saved params
-      if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
-        return res.status(400).json({
-          // TODO: lodash diff to show missing keys
-          message: 'Template contains keys that are not in file',
-        })
-      }
-      // try hydrate(...), return 4xx if unable to do so
-      try {
-        template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
-        // set campaign.valid to true since templating suceeded AND file has been uploaded
-        await Campaign.update({
-          valid: true,
-        }, {
-          where: { id: campaignId },
-        })
-      } catch (err) {
-        logger.error(`Hydration error: ${err.stack}`)
-        return res.status(400).json({
-          message: 'Unable to hydrate message.',
-        })
-      }
-
+      await checkNewTemplateParams({ campaignId: +campaignId, updatedTemplate, firstRecord })
     }
     return res.status(200).json({
-      message: 'ok',
+      message: `Template for campaign ${campaignId} updated`,
     })
   } catch (err) {
+    if (err instanceof HydrationError) {
+      return res.status(400).json({ message: err.message })
+    }
+    if (err instanceof MissingTemplateKeysError) {
+      return res.status(400).json({ message: err.message })
+    }
     return next(err)
   }
 }
