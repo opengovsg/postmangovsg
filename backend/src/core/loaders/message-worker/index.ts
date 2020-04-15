@@ -111,14 +111,14 @@ const createAndResumeWorker = (): Promise<void> => {
   })
 }
   
-const init = async (index: number, reaper = false): Promise<void> => {
+const init = async (index: number, isLogger = false): Promise<void> => {
   workerId = index
   connection = createConnection()
   createAndResumeWorker()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
 
-  if(!reaper){
+  if(!isLogger){
     for(;;){
       enqueueAndSend()
       await waitForMs(2000)
