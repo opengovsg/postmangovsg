@@ -80,15 +80,6 @@ const storeCredentialsValidator = {
   }),
 }
 
-const validateCredentialsValidator = {
-  [Segments.BODY]: Joi.object({
-    phoneNumber: Joi
-      .string()
-      .trim()
-      .pattern(/^\+\d{8,15}$/),
-  }),
-}
-
 const previewMessageValidator = {
   [Segments.QUERY]: Joi.object({
     message: Joi
@@ -227,11 +218,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     return next(err)
   }
-}
-
-// Send validation sms to specified phone number
-const validateCredentials = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
 }
 
 // Get preview of one message
@@ -418,9 +404,16 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *            schema:
  *              type: object
  *              properties:
- *                phoneNumber:
+ *                twilioAccountSid:
  *                  type: string
- *                  pattern: '^\+\d{8,15}$'
+ *                twilioApiSecret:
+ *                  type: string
+ *                twilioApiKey:
+ *                  type: string
+ *                twilioMessagingServiceSid:
+ *                  type: string 
+ *                testNumber:
+ *                  type: string 
  *
  *      responses:
  *        200:
