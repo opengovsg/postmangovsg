@@ -14,7 +14,7 @@ class Email {
       this.mailService = new MailService('Postman.gov.sg <donotreply@mail.postman.gov.sg>', config.mailOptions)
     }
    
-    async enqueueMessages(jobId: number): Promise<void>{
+    enqueueMessages(jobId: number): Promise<void>{
       return this.connection.query('SELECT enqueue_messages_email(:job_id); ',
         { replacements: { 'job_id': jobId }, type: QueryTypes.SELECT },
       ).then(() => {
@@ -23,7 +23,7 @@ class Email {
     }
     
     
-    async getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any}[]>   {
+    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any}[]>   {
       return this.connection.query('SELECT get_messages_to_send_email(:job_id, :rate) ;',
         { replacements: { 'job_id': jobId, rate }, type: QueryTypes.SELECT },
       ).then((result) => {
@@ -35,7 +35,7 @@ class Email {
       })
     }
       
-    async sendMessage({ id, recipient, params }: { id: number; recipient: string; params: string }): Promise<void> {
+    sendMessage({ id, recipient, params }: { id: number; recipient: string; params: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
           return { subject: 'subject', hydratedBody: `${id}.${recipient}.${params}` }
@@ -51,9 +51,9 @@ class Email {
           return this.connection.query('UPDATE email_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
             { replacements: { id, messageId }, type: QueryTypes.UPDATE })
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           return this.connection.query('UPDATE email_ops SET delivered_at=clock_timestamp(), error_code=:error WHERE id=:id;',
-            { replacements: { id, error: error.substring(0,255) }, type: QueryTypes.UPDATE })
+            { replacements: { id, error: error.message.substring(0,255) }, type: QueryTypes.UPDATE })
         })
         .then(() => {
           logger.info(`${this.workerId}: sendMessage id=${id}`)

@@ -3,7 +3,7 @@ import { expose } from 'threads/worker'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-require('module-alias/register')
+require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 import config from '@core/config'
 import logger from '@core/logger'
 import Email from './email.class'
@@ -26,7 +26,7 @@ const service = (): Email | SMS => {
   }
 }
 
-const getNextJob =  (): Promise< { jobId: number | undefined; campaignId: number | undefined; campaignType: string | undefined; rate: number | undefined}>  => {
+const getNextJob = (): Promise< { jobId: number | undefined; campaignId: number | undefined; campaignType: string | undefined; rate: number | undefined}>  => {
   return connection.query('SELECT get_next_job(:worker_id);',
     { replacements: { 'worker_id': workerId }, type: QueryTypes.SELECT },
   ).then((result) => {
@@ -44,7 +44,7 @@ const enqueueMessages = (jobId: number): Promise<void> => {
   return service().enqueueMessages(jobId)
 }
   
-const getMessages =  (jobId: number, rate: number): Promise<{id: number; recipient: string; params: any}[]>  => {
+const getMessages = (jobId: number, rate: number): Promise<{id: number; recipient: string; params: any}[]>  => {
   return service().getMessages(jobId, rate)
 }
 

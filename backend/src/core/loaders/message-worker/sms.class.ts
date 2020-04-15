@@ -11,7 +11,7 @@ class SMS {
       this.connection = connection
     }
    
-    async enqueueMessages(jobId: number): Promise<void>{
+    enqueueMessages(jobId: number): Promise<void>{
       return this.connection.query('SELECT enqueue_messages_sms(:job_id); ',
         { replacements: { 'job_id': jobId }, type: QueryTypes.SELECT },
       ).then(() => {
@@ -20,7 +20,7 @@ class SMS {
     }
     
     
-    async getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any}[]>   {
+    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any}[]>   {
       return this.connection.query('SELECT get_messages_to_send_sms(:job_id, :rate) ;',
         { replacements: { 'job_id': jobId, rate }, type: QueryTypes.SELECT },
       ).then((result) => {
@@ -32,7 +32,7 @@ class SMS {
       })
     }
       
-    async sendMessage({ id, recipient, params }: { id: number; recipient: string; params: string }): Promise<void> {
+    sendMessage({ id, recipient, params }: { id: number; recipient: string; params: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
         // do some sending get a response

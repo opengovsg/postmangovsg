@@ -41,8 +41,7 @@ export default class MailService {
         html: input.body,
       }, (err, info) => {
         if(err !== null){
-          logger.error(String(err))
-          reject(err.message)
+          reject(new Error(`${err}`))
         }
         else{
           resolve(info.messageId)
