@@ -1,3 +1,5 @@
+import { chunk } from 'lodash'
+
 import { Campaign } from '@core/models'
 import logger from '@core/logger'
 import { EmailMessage, EmailTemplate } from '@email/models'
@@ -45,7 +47,9 @@ const upsertEmailTemplate = async ({subject, body, campaignId}: {subject: string
  * @param records
  */
 const populateEmailTemplate = async (campaignId: number, records: Array<object>) => {
+  logger.info({ message: `Started populateEmailTemplate for ${campaignId}` })
   let transaction
+
   try {
     transaction = await EmailMessage.sequelize?.transaction()
     // delete message_logs entries
@@ -53,7 +57,13 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
       where: { campaignId },
       transaction,
     })
-    await EmailMessage.bulkCreate(records, { transaction })
+
+    const chunks = chunk(records, 5000)
+    for (let idx = 0; idx < chunks.length; idx++) {
+      const batch = chunks[idx]
+      await EmailMessage.bulkCreate(batch, { transaction })
+    }
+
     await Campaign.update({
       valid: true,
     }, {
@@ -63,6 +73,7 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
       transaction,
     })
     await transaction?.commit()
+    logger.info({ message: `Finished populateEmailTemplate for ${campaignId}` })
   } catch (err) {
     await transaction?.rollback()
     logger.error(`EmailMessage: destroy / bulkcreate failure. ${err.stack}`)

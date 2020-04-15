@@ -1,3 +1,5 @@
+import { chunk } from 'lodash'
+
 import { Campaign } from '@core/models'
 import logger from '@core/logger'
 import { SmsMessage, SmsTemplate } from '@sms/models'
@@ -46,13 +48,20 @@ const upsertSmsTemplate = async (body: string, campaignId: number): Promise<SmsT
 const populateSmsTemplate = async (campaignId: number, records: Array<object>) => {
   let transaction
   try {
+    logger.info({ message: `Started populateSmsTemplate for ${campaignId}` })
     transaction = await SmsMessage.sequelize?.transaction()
     // delete message_logs entries
     await SmsMessage.destroy({
       where: { campaignId },
       transaction,
     })
-    await SmsMessage.bulkCreate(records, { transaction })
+
+    const chunks = chunk(records, 5000)
+    for (let idx = 0; idx < chunks.length; idx++) {
+      const batch = chunks[idx]
+      await SmsMessage.bulkCreate(batch, { transaction })
+    }
+
     await Campaign.update({
       valid: true,
     }, {
@@ -62,6 +71,7 @@ const populateSmsTemplate = async (campaignId: number, records: Array<object>) =
       transaction,
     })
     await transaction?.commit()
+    logger.info({ message: `Finished populateSmsTemplate for ${campaignId}`})
   } catch (err) {
     await transaction?.rollback()
     logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
