@@ -108,7 +108,7 @@ const doesUserExist = async (email: string): Promise<void> => {
   if (user === null) throw new Error('No user was found with this email')
 }
 
-const sendOtp = (recipient: string, otp: string): Promise<boolean> => {
+const sendOtp = (recipient: string, otp: string): Promise<string | void> => {
   return mailClient.sendMail({
     recipients: [recipient],
     subject: 'One-Time Password (OTP) for Postman.gov.sg',

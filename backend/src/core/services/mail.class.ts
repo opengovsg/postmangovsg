@@ -3,7 +3,6 @@ import directTransport from 'nodemailer-direct-transport'
 import { MailToSend, MailCredentials } from '@core/interfaces'
 import logger from '@core/logger'
 
-
 export default class MailService {
   private email: string
   private mailer: nodemailer.Transporter
@@ -33,8 +32,8 @@ export default class MailService {
     })
   }
 
-  public sendMail(input: MailToSend): Promise<boolean> {
-    return new Promise<boolean>((resolve,reject) => {
+  public sendMail(input: MailToSend): Promise<string | void> {
+    return new Promise<string | void>((resolve,reject) => {
       this.mailer.sendMail({
         from: this.email,
         to: input.recipients,
@@ -43,16 +42,12 @@ export default class MailService {
       }, (err, info) => {
         if(err !== null){
           logger.error(String(err))
-          reject(err)
+          reject(err.message)
         }
         else{
-          logger.info(info)
-          resolve(true)
+          resolve(info.messageId)
         }
       })
-    }).catch(err => {
-      logger.error(err)
-      return false
     })
   }
 }

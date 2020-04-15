@@ -3,11 +3,11 @@ import { expose } from 'threads/worker'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-import config from '../../config'
-import logger from '../../logger'
+require('module-alias/register')
+import config from '@core/config'
+import logger from '@core/logger'
 import Email from './email.class'
 import SMS from './sms.class'
-
 
 let connection: Sequelize, 
   workerId: number, 

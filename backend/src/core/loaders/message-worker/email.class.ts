@@ -1,14 +1,17 @@
 import logger from '../../logger'
+import config from '../../config'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-
+import MailService from '../../services/mail.class'
 class Email {
     private workerId: number
     private connection: Sequelize
+    private mailService: MailService
     constructor(workerId: number, connection: Sequelize){
       this.workerId = workerId
       this.connection = connection
+      this.mailService = new MailService('Postman.gov.sg <donotreply@mail.postman.gov.sg>', config.mailOptions)
     }
    
     async enqueueMessages(jobId: number): Promise<void>{
@@ -35,12 +38,22 @@ class Email {
     async sendMessage({ id, recipient, params }: { id: number; recipient: string; params: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
-          // do some sending get a response
-          return `${id}.${recipient}.${params}`
+          return { subject: 'subject', hydratedBody: `${id}.${recipient}.${params}` }
+        })
+        .then(({ subject, hydratedBody }: {subject: string; hydratedBody: string}) => {
+          return this.mailService.sendMail({
+            recipients: [recipient],
+            subject,
+            body: hydratedBody,
+          })
         })
         .then((messageId) => {
           return this.connection.query('UPDATE email_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
             { replacements: { id, messageId }, type: QueryTypes.UPDATE })
+        })
+        .catch((error) => {
+          return this.connection.query('UPDATE email_ops SET delivered_at=clock_timestamp(), error_code=:error WHERE id=:id;',
+            { replacements: { id, error: error.substring(0,255) }, type: QueryTypes.UPDATE })
         })
         .then(() => {
           logger.info(`${this.workerId}: sendMessage id=${id}`)
