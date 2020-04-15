@@ -51,8 +51,8 @@ const sendMessage = async (recipient: string, credential: TwilioCredentials) : P
   logger.info('Sending sms using Twilio.')
   try {
     const twilioService = new TwilioService(credential)
-    const isSuccessful = await twilioService.send(recipient, msg)
-    return isSuccessful
+    const isMessageSent = await twilioService.send(recipient, msg)
+    return isMessageSent
   } catch(e) {
     logger.error(`Twilio client fails to send message. error=${e}`)
     return false
