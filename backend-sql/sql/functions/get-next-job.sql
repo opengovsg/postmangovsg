@@ -3,7 +3,10 @@ LANGUAGE plpgsql AS $$
 BEGIN
 UPDATE job_queue
 SET worker_id = worker, status = 'ENQUEUED'
-WHERE id = ( SELECT q.id
+WHERE 
+-- worker is not already operating on a job 
+NOT EXISTS (SELECT 1 FROM job_queue q WHERE q.worker_id = worker LIMIT 1)
+AND id = ( SELECT q.id
     FROM job_queue q, campaigns p, credentials c
     WHERE q.status = 'READY'
     AND q.campaign_id = p.id
@@ -19,5 +22,7 @@ WHERE id = ( SELECT q.id
     -- Assigns that job with a worker (but this doesn’t take effect until commit)
 )
 RETURNING id, campaign_id, send_rate into selected_job_id, selected_campaign_id, selected_rate;
-SELECT "type" into selected_campaign_type FROM campaigns WHERE id = selected_campaign_id;
+IF FOUND THEN
+    SELECT "type" into selected_campaign_type FROM campaigns WHERE id = selected_campaign_id;
+END IF;
 END $$;
