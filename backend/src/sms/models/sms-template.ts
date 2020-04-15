@@ -1,7 +1,7 @@
 import { BeforeCreate, BeforeUpdate, BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
 
 import { Campaign } from '@core/models/campaign'
-import { parseTemplate } from '@sms/services/sms.service'
+import { parseTemplate } from '@core/services/template.service'
 
 @Table({ tableName: 'sms_templates' , underscored: true, timestamps: true })
 export class SmsTemplate extends Model<SmsTemplate> {

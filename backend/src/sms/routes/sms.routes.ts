@@ -2,7 +2,8 @@ import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { keys } from 'lodash'
 
-import { extractS3Key, populateTemplate, template, testHydration, upsertTemplate } from '@sms/services/sms.service'
+import { template } from '@core/services/template.service'
+import { extractS3Key, populateTemplate, testHydration, upsertTemplate } from '@sms/services/sms.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
