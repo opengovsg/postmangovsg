@@ -17,7 +17,7 @@ const saveCredential = async (name: string, secret: string) => {
     return
   }
 
-  // Store credential to credential tableg
+  // Store credential to credential table
   await dbService.insertCredential(name)
   // Upload the credential to aws secret manager
   await secretsService.storeSecret(name, secret)  
@@ -76,7 +76,8 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
   }
 }
 
-// Stores the twilio credential in AWS secret manager and db, as well as updating the campaign table.
+// Sends out a test message. 
+// If it is successful, stores the twilio credential in AWS secret manager and db, as well as updating the campaign table.
 const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
   const credential: TwilioCredentials = getCredential(req)
   // Send test message
