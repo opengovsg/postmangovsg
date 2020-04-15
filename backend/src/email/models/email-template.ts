@@ -2,6 +2,8 @@ import { BeforeCreate, BeforeUpdate, Column, DataType, ForeignKey, Model, Table,
 import { Campaign } from '@core/models/campaign'
 import { parseTemplate } from '@core/services/template.service'
 
+import { union } from 'lodash'
+
 @Table({ tableName: 'email_templates' , underscored: true, timestamps: true })
 export class EmailTemplate extends Model<EmailTemplate> {
   @ForeignKey(() => Campaign)
@@ -36,8 +38,9 @@ export class EmailTemplate extends Model<EmailTemplate> {
   @BeforeCreate
   static generateParams(instance: EmailTemplate): void {
     if (!instance.body) return
-    const parsedTemplate = parseTemplate(instance.body)
-    instance.params = parsedTemplate.variables
+    const parsedTemplateVariables = parseTemplate(instance.body).variables
+    const parsedSubjectVariables = parseTemplate(instance.subject).variables
+    instance.params = union(parsedTemplateVariables, parsedSubjectVariables)
   }
 
 
