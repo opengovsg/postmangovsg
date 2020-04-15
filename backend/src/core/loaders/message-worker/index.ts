@@ -120,12 +120,12 @@ const init = async (index: number, isLogger = false): Promise<void> => {
 
   if(!isLogger){
     for(;;){
-      enqueueAndSend()
+      await enqueueAndSend()
       await waitForMs(2000)
     }
   } else{
     for(;;){
-      finalize()
+      await finalize()
       await waitForMs(2000)
     }
   }
