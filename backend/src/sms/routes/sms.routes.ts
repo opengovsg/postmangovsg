@@ -13,7 +13,7 @@ import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 
 import { isSuperSet } from '@core/utils'
-import { MissingTemplateKeysError, HydrationError } from '@sms/errors/sms.errors'
+import { MissingTemplateKeysError, HydrationError } from '@core/errors/template.errors'
 import { RecipientColumnMissing } from '@core/errors/s3.errors'
 
 const router = Router({ mergeParams: true })
