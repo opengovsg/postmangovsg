@@ -1,3 +1,4 @@
+import { mapKeys } from 'lodash'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 
@@ -19,6 +20,13 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
 } => {
   const variables: Array<string> = []
   const tokens: Array<string> = []
+
+  /**
+   * dict used for checking keys in lowercase
+   * dict === {} if param === undefined
+  */
+  const dict = mapKeys(params, (_value, key) => key.toLowerCase())
+
   try {
     const parseTree = (Sqrl.parse(templateBody, Sqrl.defaultConfig))
     parseTree.forEach((astObject: AstObject) => {
@@ -29,10 +37,14 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
         // templateObject.raw means ???
         // templateObject.f refers to filter (eg. {{ var | humanize }}), we want to make sure this is empty
         if (templateObject.t === 'r' && !templateObject.raw && templateObject.f?.length === 0) {
-          // templateObject.c has type string | undefined
-          // templateObject.c contains the param key, c stands for content
-          // this is the extracted variable name from the template AST
-          const key = templateObject.c
+          /**
+           * - templateObject.c has type string | undefined
+           * - templateObject.c contains the param key, c stands for content
+           * - this is the extracted variable name from the template AST
+           * - this extracted key is already trimmed (ie. no leading nor trailing spaces)
+           * - coerce to lowercase for comparison
+          */
+          const key = templateObject.c?.toLowerCase()
 
           if (key !== undefined) {
 
@@ -49,15 +61,15 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
 
             // if params provided == attempt to carry out templating
             if (params) {
-              if (params[key]) {
-                const templated = params[key]
+              if (dict[key]) {
+                const templated = dict[key]
                 tokens.push(templated)
               } else {
                 throw new Error(`Param ${templateObject.c} not found`)
               }
             }
 
-            // add key regardless
+            // add key regardless, note that this is also returned in lowercase
             variables.push(key)
 
           } else { // I have not found an edge case that trips this yet
