@@ -15,6 +15,10 @@ let connection: Sequelize,
   email: Email,
   sms: SMS
 
+/**
+ *  Different channel types operate on their own channel type tables.
+ *  Helper method to decide which queries to use, depending on channel type
+ */
 const service = (): Email | SMS => {
   switch(currentCampaignType){
   case 'EMAIL':
@@ -96,9 +100,11 @@ const enqueueAndSend = async (): Promise<void>  => {
   }
 }
 
+/**
+ * When a worker is spawned, it adds itself to the database, 
+ * and checks if it was working on any existing jobs
+ */
 const createAndResumeWorker = (): Promise<void> => {
-  // TODO: On respawn with this same workerId, look for any existing jobs that are in SENDING state, and resume it.
-  // Currently resume_worker just stops all the jobs for that campaign id.
   return connection.query(`
             INSERT INTO workers ("id",  "created_at", "updated_at") VALUES 
             (:worker_id, clock_timestamp(), clock_timestamp()) ON CONFLICT (id) DO NOTHING;

@@ -31,7 +31,7 @@ const scriptLoader = async ({ sequelize }: {sequelize: Sequelize | undefined}): 
         process.exit(1)
       })
   } else{
-    logger.error('Sequelize connection was not instantiasted')
+    logger.error('Sequelize connection was not instantiated')
   }
  
 }
