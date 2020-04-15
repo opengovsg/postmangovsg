@@ -1,14 +1,17 @@
 ## Preparing the db with mock data
 
-`node db/index.js -d postgres://localhost:5432/postmangovsg`
+`export DB_URI= postgres://localhost:5432/postmangovsg`
+
+`node db/index.js -d $DB_URI`
 
 ```
-Usage: index [options]
+Usage: db [options]
 
 Options:
   -d, --database <uri>               database uri
   -f, --dir <function directory>     path to sql functions (default: "../../sql/functions")
-  -c, --num-creds <creds>            number of credentials (default: 10)
+  -e, --num-email-creds <creds>      number of email credentials (default: 5)
+  -s, --num-sms-creds <creds>        number of sms credentials (default: 5)
   -p, --num-campaigns <campaigns>    number of campaigns per credential (default: 2)
   -w, --num-workers <workers>        number of workers (default: 3)
   -r, --num-recipients <recipients>  number of recipients per campaign (default: 1000)
@@ -32,11 +35,11 @@ Options:
 
 **Enqueue + send worker** 
 
-`node index.js -w 1 -d "postgres://localhost:5432/postmangovsg"`
+`node index.js -w 1 -d $DB_URI`
 
 **Logger worker**
 
-`node index.js -r -w 2 -d "postgres://localhost:5432/postmangovsg"`
+`node index.js -r -w 2 -d $DB_URI`
 
 ## Inserting / stopping / retrying campaigns
 
