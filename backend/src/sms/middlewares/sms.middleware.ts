@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import bcrypt from 'bcrypt'
 import { Campaign } from '@core/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
-import { dbService, secretsService } from '@core/services'
+import { dbService, secretsService, hashService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
 
@@ -34,18 +33,6 @@ const getCredential = (req: Request): TwilioCredentials => {
   return credential
 }
 
-const hash = (value: string) : Promise<string> => {
-  return new Promise((resolve, reject) => {
-    bcrypt.hash(value, config.aws.secretManagerSalt, (error, hash) => {
-      if (error) {
-        logger.error(`Failed to hash value: ${error}`)
-        reject(error)
-      }
-      resolve(hash as string)
-    })
-  }) 
-}
-
 const sendMessage = async (recipient: string, credential: TwilioCredentials) : Promise<boolean> => {
   const msg = 'You have successfully verified your Twilio credentials with Postman.'
   logger.info('Sending sms using Twilio.')
@@ -60,7 +47,7 @@ const sendMessage = async (recipient: string, credential: TwilioCredentials) : P
 }
 
 const getEncodedHash = async (secret : string): Promise<string> => {
-  const secretHash = await hash(secret)
+  const secretHash = await hashService.specifySalt(secret, config.aws.secretManagerSalt)
   return Buffer.from(secretHash).toString('base64')
 }
 
