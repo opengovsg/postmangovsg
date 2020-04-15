@@ -4,7 +4,6 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import { keys } from 'lodash'
 
 import { template, upsertTemplate } from '@sms/services/sms.service'
-import { retrieveCampaign } from '@core/services/campaign.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
@@ -88,6 +87,11 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
   res.json({ message: 'OK' })
 }
 
+/**
+ * returns true if A is superset of B
+ * @param a - list
+ * @param b - list
+ */
 const isSuperSet = (a: Array<string>, b: Array<string>): boolean => b.every(s => a.indexOf(s) !== -1)
 
 // Store body of message in sms template table
@@ -97,35 +101,35 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
     // extract params from template, save to db (this will be done with hook)
     const updatedTemplate = await upsertTemplate(req.body.body, +campaignId)
 
-    const campaign = await retrieveCampaign(+campaignId)
-    // check if s3Object, params exist
-    if (campaign.s3Object && updatedTemplate.params) {
-      // FIXME: to check - is campaign.s3Object and sms_message_logs in sync?
-      // fetch from message logs
-      const firstRecord = await SmsMessage.findOne({
-        where: { campaignId }
-      })
-      if (firstRecord === null) {
-        throw new Error(`no SmsMessage records found for campaignId ${campaignId}`)
-      }
+    const firstRecord = await SmsMessage.findOne({
+      where: { campaignId },
+    })
+
+    // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
+    if (firstRecord && updatedTemplate.params) {
       const paramsFromS3 = keys(firstRecord.params)
       // warn if params from s3 file are not a superset of saved params
-      // returns true if A is superset of B
-
       if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
         return res.status(400).json({
           // TODO: lodash diff to show missing keys
           message: 'Template contains keys that are not in file',
         })
       }
-      // hydrate template
       // try hydrate(...), return 4xx if unable to do so
+      try {
+        template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
+      } catch (err) {
+        logger.error(`Hydration error: ${err.stack}`)
+        return res.status(400).json({
+          message: 'Unable to hydrate message.',
+        })
+      }
+
     }
     return res.status(200).json({
       message: 'ok',
     })
   } catch (err) {
-    console.error(err)
     return next(err)
   }
 }
@@ -151,10 +155,9 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
     if (smsTemplate === null || smsTemplate.body === null) {
       return res.status(400).json({
-        message: 'Template does not exist, please create a template'
+        message: 'Template does not exist, please create a template',
       })
     }
-
 
     // Updates metadata in project
     await updateCampaignS3Metadata({ key: s3Key, campaignId })
@@ -171,7 +174,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         return {
           campaignId,
           recipient: entry['recipient'],
-          params: entry
+          params: entry,
         }
       })
 
@@ -180,7 +183,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       // if body exists, smsTemplate.params should also exist
       if (!isSuperSet(keys(firstRecord), smsTemplate.params!)) {
         // TODO: lodash diff to show missing keys
-        logger.error(`Hydration failed: Template contains keys that are not in file.`)
+        logger.error('Hydration failed: Template contains keys that are not in file.')
       }
 
       // START populate template
@@ -191,7 +194,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         // delete message_logs entries
         await SmsMessage.destroy({
           where: { campaignId },
-          transaction
+          transaction,
         })
         await SmsMessage.bulkCreate(records, { transaction })
         // TODO: end txn
