@@ -1,0 +1,15 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.bar {
+  background-color: $light-blue;
+  border-radius: $border-radius;
+  height: 10px;
+}
+
+.completed {
+  background-color: $indigo-blue;
+  border-radius: $border-radius;
+  height: 100%;
+  transition: all 1s;
+}
