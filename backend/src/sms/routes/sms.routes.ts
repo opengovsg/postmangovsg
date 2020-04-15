@@ -1,13 +1,21 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
+import { difference, keys } from 'lodash'
+
+import { template, testHydration } from '@core/services/template.service'
+import { extractS3Key } from '@core/services/campaign.service'
+import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services/sms.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
-import { updateCampaignS3Metadata, S3Service } from '@core/services'
-import S3 from 'aws-sdk/clients/s3'
-import { jwtUtils } from '@core/utils/jwt'
+import { updateCampaignS3Metadata } from '@core/services'
 
-const s3Client = new S3()
+import { Campaign } from '@core/models'
+import { SmsMessage, SmsTemplate } from '@sms/models'
+
+import { isSuperSet } from '@core/utils'
+import { MissingTemplateKeysError, HydrationError } from '@core/errors/template.errors'
+import { RecipientColumnMissing } from '@core/errors/s3.errors'
 
 const router = Router({ mergeParams: true })
 
@@ -82,9 +90,64 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
   res.json({ message: 'OK' })
 }
 
+const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: SmsTemplate; firstRecord: SmsMessage}): Promise<void> => {
+  if (!updatedTemplate.params) return
+
+  // first set project.valid to false, switch this back to true only when hydration succeeds
+  await Campaign.update({
+    valid: false,
+  }, {
+    where: { id: campaignId },
+  })
+
+  const paramsFromS3 = keys(firstRecord.params)
+  // warn if params from s3 file are not a superset of saved params
+  if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
+    const missingKeys = difference(updatedTemplate.params, paramsFromS3)
+    throw new MissingTemplateKeysError(missingKeys)
+  }
+  // try hydrate(...), return 4xx if unable to do so
+  try {
+    template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
+    // set campaign.valid to true since templating suceeded AND file has been uploaded
+    await Campaign.update({
+      valid: true,
+    }, {
+      where: { id: campaignId },
+    })
+  } catch (err) {
+    logger.error(`Hydration error: ${err.stack}`)
+    throw new HydrationError()
+  }
+}
+
 // Store body of message in sms template table
-const storeTemplate = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
+const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    // extract params from template, save to db (this will be done with hook)
+    const updatedTemplate = await upsertSmsTemplate(req.body.body, +campaignId)
+
+    const firstRecord = await SmsMessage.findOne({
+      where: { campaignId },
+    })
+
+    // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
+    if (firstRecord && updatedTemplate.params) {
+      await checkNewTemplateParams({ campaignId: +campaignId, updatedTemplate, firstRecord })
+    }
+    return res.status(200).json({
+      message: `Template for campaign ${campaignId} updated`,
+    })
+  } catch (err) {
+    if (err instanceof HydrationError) {
+      return res.status(400).json({ message: err.message })
+    }
+    if (err instanceof MissingTemplateKeysError) {
+      return res.status(400).json({ message: err.message })
+    }
+    return next(err)
+  }
 }
 
 // Read file from s3 and populate messages table
@@ -93,34 +156,48 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     const { campaignId } = req.params
     // TODO: validate if project is in editable state
 
+    // switch campaign to invalid - this is for the case of uploading over an existing file
+    await Campaign.update({
+      valid: false,
+    }, {
+      where: { id: +campaignId },
+    })
+
     // extract s3Key from transactionId
     const { transactionId } = req.body
-    let decoded: string
+    let s3Key: string
     try {
-      decoded = jwtUtils.verify(transactionId) as string
+      s3Key = extractS3Key(transactionId)
     } catch (err) {
-      logger.info(`${err.message}`)
-      return res.status(400).json({ message: 'Invalid transactionId provided' })
+      return res.status(400).json(err.message)
     }
-    const s3Key = decoded as string
 
-    // TODO: begin txn
+    // check if template exists
+    const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
+    if (smsTemplate === null || smsTemplate.body === null) {
+      return res.status(400).json({
+        message: 'Template does not exist, please create a template',
+      })
+    }
+
     // Updates metadata in project
     await updateCampaignS3Metadata({ key: s3Key, campaignId })
-    res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
-    // TODO: delete message_logs entries
-    // TODO: carry out templating / hydration
+
+    // carry out templating / hydration
     // - download from s3
     try {
-      const s3Service = new S3Service(s3Client)
-      const downloadStream = s3Service.download(s3Key)
-      await s3Service.parseCsv(downloadStream)
-      // - populate template
-      // TODO: end txn
+      const records = await testHydration(+campaignId, s3Key, smsTemplate.params!)
+      // START populate template
+      populateSmsTemplate(+campaignId, records)
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
+      throw err
     }
+    return res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
+    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
+      return res.status(400).json({ message: err.message })
+    }
     return next(err)
   }
 }

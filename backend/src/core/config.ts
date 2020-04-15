@@ -32,9 +32,9 @@ const cookieSettings = {
   sameSite: true,
 }
 
-// Node mailer 
-const mailHost: string = process.env.SES_HOST as string 
-const mailPort: number = Number(process.env.SES_PORT) 
+// Node mailer
+const mailHost: string = process.env.SES_HOST as string
+const mailPort = Number(process.env.SES_PORT)
 const mailUser: string = process.env.SES_USER as string
 const mailPass: string = process.env.SES_PASS as string
 

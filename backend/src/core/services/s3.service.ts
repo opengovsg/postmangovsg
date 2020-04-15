@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash'
 
 import config from '@core/config'
 import logger from '@core/logger'
+import { RecipientColumnMissing } from '@core/errors/s3.errors'
 
 type CSVParamsInterface = {[key: string]: string}
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
@@ -14,7 +15,7 @@ class S3Service {
     this.s3 = s3
   }
 
-  download(key: string) {
+  download(key: string): NodeJS.ReadableStream {
     const params: S3.GetObjectRequest = {
       Bucket: FILE_STORAGE_BUCKET_NAME,
       Key: key,
@@ -29,7 +30,9 @@ class S3Service {
     const params: Array<CSVParamsInterface> = []
     for await (const row of parser) {
       if (isEmpty(headers)) {
-        headers = row
+        const lowercaseHeaders = row.map((col: string) => col.toLowerCase())
+        if (lowercaseHeaders.indexOf('recipient') === -1) throw new RecipientColumnMissing()
+        headers = lowercaseHeaders
       } else {
         const rowWithHeaders: CSVParamsInterface = {}
         row.forEach((col: any, index: number) => {
