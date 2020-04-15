@@ -15,7 +15,7 @@ const randomSalt = (value: string): Promise<string> => {
   })
 }
 
-const specifySalt = (value: string, salt: string) : Promise<string> => {
+const specifySalt = (value: string, salt: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     bcrypt.hash(value, salt, (error, hash) => {
       if (error) {

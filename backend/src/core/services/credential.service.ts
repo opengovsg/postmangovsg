@@ -17,15 +17,15 @@ const updateCampaignWithCredential = async (campaignId: string, credentialName: 
   return Campaign.update({
     credName: credentialName,
   },{
-    where: {id: campaignId},
-    returning: false
+    where: { id: campaignId },
+    returning: false,
   })
 }
 
-const isExistingCredential = async (name: string): Promise<Boolean> => {
+const isExistingCredential = async (name: string): Promise<boolean> => {
   const result = await Credential.findOne({
     where: {
-      name: name
+      name: name,
     },
   })
   if (result) return true
@@ -35,7 +35,7 @@ const isExistingCredential = async (name: string): Promise<Boolean> => {
 const storeSecret = async (name: string, secret: string) => {
   const params = {
     Name: name,
-    SecretString: secret
+    SecretString: secret,
   }
   logger.info('Storing secret in AWS secrets manager.')
   await secretsManager.createSecret(params).promise()
@@ -44,7 +44,7 @@ const storeSecret = async (name: string, secret: string) => {
 
 const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> => {
   logger.info('Getting secret from AWS secrets manager.')
-  const data = await secretsManager.getSecretValue({SecretId: name}).promise()
+  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   logger.info('Gotten secret from AWS secrets manager.')
   const secretString = get(data, 'SecretString', '')
   if (!secretString) throw new Error('Missing secret string from AWS secrets manager.')

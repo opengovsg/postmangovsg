@@ -24,16 +24,16 @@ const saveCredential = async (name: string, secret: string) => {
 
 const getCredential = (req: Request): TwilioCredentials => {
   const { twilioAccountSid, twilioApiKey, twilioApiSecret, twilioMessagingServiceSid } = req.body
-  const credential : TwilioCredentials = {
+  const credential: TwilioCredentials = {
     accountSid: twilioAccountSid,
     apiKey: twilioApiKey, 
     apiSecret: twilioApiSecret,
-    messagingServiceSid: twilioMessagingServiceSid
+    messagingServiceSid: twilioMessagingServiceSid,
   }
   return credential
 }
 
-const sendMessage = async (recipient: string, credential: TwilioCredentials) : Promise<boolean> => {
+const sendMessage = async (recipient: string, credential: TwilioCredentials): Promise<boolean> => {
   const msg = 'You have successfully verified your Twilio credentials with Postman.'
   logger.info('Sending sms using Twilio.')
   try {
@@ -46,7 +46,7 @@ const sendMessage = async (recipient: string, credential: TwilioCredentials) : P
   }
 }
 
-const getEncodedHash = async (secret : string): Promise<string> => {
+const getEncodedHash = async (secret: string): Promise<string> => {
   const secretHash = await hashService.specifySalt(secret, config.aws.secretManagerSalt)
   return Buffer.from(secretHash).toString('base64')
 }

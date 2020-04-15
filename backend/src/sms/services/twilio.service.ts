@@ -3,12 +3,12 @@ import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
 
 export class TwilioService {
-  private client : any;
+  private client: any;
   private messagingServiceSid: string;
 
   constructor(credential: TwilioCredentials) {
     const { accountSid, apiKey, apiSecret, messagingServiceSid } = credential
-    this.client = twilio(apiKey, apiSecret, {accountSid})
+    this.client = twilio(apiKey, apiSecret, { accountSid })
     this.messagingServiceSid = messagingServiceSid
   }
 
@@ -16,7 +16,7 @@ export class TwilioService {
     const result = await this.client.messages.create({
       to: recipient,
       body: message,
-      from: this.messagingServiceSid
+      from: this.messagingServiceSid,
     })
     const { status, sid, error_codes: errorCode } = result
     if (!sid || errorCode) {
