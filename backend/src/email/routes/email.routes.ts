@@ -10,6 +10,10 @@ import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { extractS3Key, updateCampaignS3Metadata } from '@core/services/campaign.service'
 import { template, testHydration } from '@core/services/template.service'
 import { isSuperSet } from '@core/utils'
+import { updateCampaignS3Metadata, S3Service } from '@core/services'
+import S3 from 'aws-sdk/clients/s3'
+import { jwtUtils } from '@core/utils/jwt'
+import { storeCredentials } from '@email/middlewares'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { populateEmailTemplate, upsertEmailTemplate } from '@email/services/email.service'
@@ -202,11 +206,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     return next(err)
   }
-}
-
-// Read file from s3 and populate messages table
-const storeCredentials = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
 }
 
 // Send validation email to specified phone number

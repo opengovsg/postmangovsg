@@ -14,4 +14,9 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
   }
 }
 
-export { isEmailCampaignOwnedByUser }
+// Sends a test message
+const storeCredentials = async (_req: Request, res: Response): Promise<void> => {
+  res.json({ message: 'OK' })
+}
+
+export { isEmailCampaignOwnedByUser, storeCredentials }
