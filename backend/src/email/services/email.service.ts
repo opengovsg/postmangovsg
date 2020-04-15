@@ -26,8 +26,9 @@ const upsertEmailTemplate = async ({subject, body, campaignId}: {subject: string
     }
     // else create
     const createdTemplate = await EmailTemplate.create({
-      campaignId, body,
-      transaction,
+      campaignId, body, subject,
+    }, {
+       transaction,
     })
 
     transaction?.commit()
