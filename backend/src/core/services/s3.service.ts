@@ -32,7 +32,7 @@ class S3Service {
       if (isEmpty(headers)) {
         const lowercaseHeaders = row.map((col: string) => col.toLowerCase())
         if (lowercaseHeaders.indexOf('recipient') === -1) throw new RecipientColumnMissing()
-        headers = row
+        headers = lowercaseHeaders
       } else {
         const rowWithHeaders: CSVParamsInterface = {}
         row.forEach((col: any, index: number) => {
