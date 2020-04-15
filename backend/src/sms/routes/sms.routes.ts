@@ -1,20 +1,17 @@
-import S3 from 'aws-sdk/clients/s3'
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { keys } from 'lodash'
 
-import { template, upsertTemplate } from '@sms/services/sms.service'
+import { extractS3Key, populateTemplate, template, testHydration, upsertTemplate } from '@sms/services/sms.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
-import { updateCampaignS3Metadata, S3Service } from '@core/services'
-import { jwtUtils } from '@core/utils/jwt'
+import { updateCampaignS3Metadata } from '@core/services'
 
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 
-
-const s3Client = new S3()
+import { isSuperSet } from '@core/utils'
 
 const router = Router({ mergeParams: true })
 
@@ -89,16 +86,6 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
   res.json({ message: 'OK' })
 }
 
-/**
- * returns true if `_superset` is superset of `subset`
- * @param _superset
- * @param subset
- */
-const isSuperSet = <T>(_superset: Array<T>, subset: Array<T>): boolean => {
-  const superset = new Set(_superset)
-  return subset.every(s => superset.has(s))
-}
-
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
@@ -165,17 +152,14 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       where: { id: campaignId },
     })
 
-
     // extract s3Key from transactionId
     const { transactionId } = req.body
-    let decoded: string
+    let s3Key: string
     try {
-      decoded = jwtUtils.verify(transactionId) as string
+      s3Key = extractS3Key(transactionId)
     } catch (err) {
-      logger.info(`${err.message}`)
-      return res.status(400).json({ message: 'Invalid transactionId provided' })
+      return res.status(400).json(err.message)
     }
-    const s3Key = decoded as string
 
     // check if template exists
     const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
@@ -192,51 +176,9 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      const s3Service = new S3Service(s3Client)
-      const downloadStream = s3Service.download(s3Key)
-      const fileContents = await s3Service.parseCsv(downloadStream)
-      // FIXME / TODO: dedupe
-      const records: Array<object> = fileContents.map(entry => {
-        return {
-          campaignId,
-          recipient: entry['recipient'],
-          params: entry,
-        }
-      })
-
-      // attempt to hydrate
-      const firstRecord = fileContents[0]
-      // if body exists, smsTemplate.params should also exist
-      if (!isSuperSet(keys(firstRecord), smsTemplate.params!)) {
-        // TODO: lodash diff to show missing keys
-        logger.error('Hydration failed: Template contains keys that are not in file.')
-      }
-
+      const records = await testHydration(+campaignId, s3Key, smsTemplate)
       // START populate template
-      // begin txn
-      let transaction
-      try {
-        transaction = await SmsMessage.sequelize?.transaction()
-        // delete message_logs entries
-        await SmsMessage.destroy({
-          where: { campaignId },
-          transaction,
-        })
-        await SmsMessage.bulkCreate(records, { transaction })
-        await Campaign.update({
-          valid: true,
-        }, {
-          where: {
-            id: campaignId,
-          },
-          transaction,
-        })
-        // TODO: end txn
-        await transaction?.commit()
-      } catch (err) {
-        await transaction?.rollback()
-        logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
-      }
+      populateTemplate(+campaignId, records)
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
     }
