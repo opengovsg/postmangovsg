@@ -55,6 +55,14 @@ const extractS3Key = (transactionId: string): string => {
   return decoded as string
 }
 
+/**
+ * 1. delete existing entries
+ * 2. bulk insert
+ * 3. mark campaign as valid
+ * steps 1- 3 are wrapped in txn. rollback if any fails
+ * @param campaignId
+ * @param records
+ */
 const populateTemplate = async (campaignId: number, records: Array<object>) => {
   let transaction
   try {
@@ -73,7 +81,6 @@ const populateTemplate = async (campaignId: number, records: Array<object>) => {
       },
       transaction,
     })
-    // TODO: end txn
     await transaction?.commit()
   } catch (err) {
     await transaction?.rollback()
@@ -99,7 +106,8 @@ const testHydration = async (campaignId: number, s3Key: string, smsTemplate: Sms
   // if body exists, smsTemplate.params should also exist
   if (!isSuperSet(keys(firstRecord), smsTemplate.params!)) {
     // TODO: lodash diff to show missing keys
-    logger.error('Hydration failed: Template contains keys that are not in file.')
+    const errorMsg = 'Hydration failed: Template contains keys that are not in file'
+    throw new Error(errorMsg)
   }
   return records
 }
