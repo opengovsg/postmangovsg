@@ -4,7 +4,7 @@ AS $$
 BEGIN
 
 WITH logged_jobs AS ( 
-	UPDATE job_queue SET status = 'LOGGED'
+	UPDATE job_queue SET status = 'LOGGED', worker_id = NULL
 	WHERE campaign_id IN ( SELECT q1.campaign_id
 	    FROM job_queue q1
 	    WHERE 

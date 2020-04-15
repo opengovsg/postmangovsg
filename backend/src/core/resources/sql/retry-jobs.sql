@@ -15,7 +15,7 @@ IF retry_disabled IS NULL THEN
 	    END
     FROM campaigns where id = selected_campaign_id;
 
-    UPDATE job_queue SET status = 'READY' WHERE campaign_id = selected_campaign_id;
+    UPDATE job_queue SET status = 'READY', worker_id = NULL WHERE campaign_id = selected_campaign_id;
 
 END IF;
 
