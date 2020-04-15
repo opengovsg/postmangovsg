@@ -64,19 +64,24 @@ const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
     twilioAccountSid: Joi
       .string()
-      .trim(),
+      .trim()
+      .required(),
     twilioApiSecret: Joi
       .string()
-      .trim(),
+      .trim()
+      .required(),
     twilioApiKey: Joi
       .string()
-      .trim(),
+      .trim()
+      .required(),
     twilioMessagingServiceSid: Joi
     .string()
-    .trim(),
+    .trim()
+    .required(),
     testNumber: Joi
     .string()
-    .trim(),
+    .trim()
+    .required(),
   }),
 }
 
