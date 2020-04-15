@@ -3,13 +3,13 @@ import { Campaign } from '@core/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
-import { dbService, secretsService, hashService } from '@core/services'
+import { credentialService, hashService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
 
 const saveCredential = async (name: string, secret: string) => {
   // Check if credential is already in the credential table
-  const isExisting = await dbService.isExistingCredential(name)
+  const isExisting = await credentialService.isExistingCredential(name)
 
   // Dont have to save if it is an old credential
   if (isExisting) {
@@ -17,9 +17,9 @@ const saveCredential = async (name: string, secret: string) => {
   }
 
   // Store credential to credential table
-  await dbService.insertCredential(name)
+  await credentialService.insertCredential(name)
   // Upload the credential to aws secret manager
-  await secretsService.storeSecret(name, secret)  
+  await credentialService.storeSecret(name, secret)  
 }
 
 const getCredential = (req: Request): TwilioCredentials => {
@@ -78,7 +78,7 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
     const secretString = JSON.stringify(credential)
     const credentialName = await getEncodedHash(secretString)
     await saveCredential(credentialName, secretString)
-    await dbService.updateCampaignWithCredential(campaignId, credentialName)
+    await credentialService.updateCampaignWithCredential(campaignId, credentialName)
   }catch(e) {
     logger.error(`Error saving credentials. error=${e}`)
     return res.sendStatus(500)

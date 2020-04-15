@@ -41,5 +41,9 @@ const storeSecret = async (name: string, secret: string) => {
 }
 
 
-export const dbService = { insertCredential, updateCampaignWithCredential, isExistingCredential }
-export const secretsService = {storeSecret}
+export const credentialService = {
+  insertCredential,
+  updateCampaignWithCredential,
+  isExistingCredential,
+  storeSecret
+}
