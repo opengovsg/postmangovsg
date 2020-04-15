@@ -26,6 +26,7 @@ const upsertSmsTemplate = async (body: string, campaignId: number): Promise<SmsT
     // else create
     const createdTemplate = await SmsTemplate.create({
       campaignId, body,
+    }, {
       transaction,
     })
 
