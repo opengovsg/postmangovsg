@@ -90,11 +90,14 @@ const getCampaignDetails = async (_req: Request, res: Response): Promise<void> =
 }
 
 /**
- * returns true if A is superset of B
- * @param a - list
- * @param b - list
+ * returns true if `_superset` is superset of `subset`
+ * @param _superset
+ * @param subset
  */
-const isSuperSet = (a: Array<string>, b: Array<string>): boolean => b.every(s => a.indexOf(s) !== -1)
+const isSuperSet = <T>(_superset: Array<T>, subset: Array<T>): boolean => {
+  const superset = new Set(_superset)
+  return subset.every(s => superset.has(s))
+}
 
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
