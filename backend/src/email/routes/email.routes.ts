@@ -122,8 +122,13 @@ const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
+    const { subject, body } = req.body
     // extract params from template, save to db (this will be done with hook)
-    const updatedTemplate = await upsertEmailTemplate(req.body.body, +campaignId)
+    const updatedTemplate = await upsertEmailTemplate({
+      subject,
+      body,
+      campaignId: +campaignId
+    })
 
     const firstRecord = await EmailMessage.findOne({
       where: { campaignId },

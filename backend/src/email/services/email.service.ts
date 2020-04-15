@@ -2,7 +2,7 @@ import { Campaign } from '@core/models'
 import logger from '@core/logger'
 import { EmailMessage, EmailTemplate } from '@email/models'
 
-const upsertEmailTemplate = async (body: string, campaignId: number): Promise<EmailTemplate> => {
+const upsertEmailTemplate = async ({subject, body, campaignId}: {subject: string, body: string, campaignId: number}): Promise<EmailTemplate> => {
   let transaction
   try {
     transaction = await EmailTemplate.sequelize?.transaction()
@@ -10,6 +10,7 @@ const upsertEmailTemplate = async (body: string, campaignId: number): Promise<Em
     if (await EmailTemplate.findByPk(campaignId, { transaction }) !== null) {
       // .update is actually a bulkUpdate
       const updatedTemplate: [number, EmailTemplate[]] = await EmailTemplate.update({
+        subject,
         body,
       }, {
         where: { campaignId },
