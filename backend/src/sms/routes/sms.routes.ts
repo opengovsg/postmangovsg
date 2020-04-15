@@ -2,8 +2,9 @@ import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
 
-import { template } from '@core/services/template.service'
-import { extractS3Key, populateTemplate, testHydration, upsertTemplate } from '@sms/services/sms.service'
+import { template, testHydration } from '@core/services/template.service'
+import { extractS3Key } from '@core/services/campaign.service'
+import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services/sms.service'
 
 import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
@@ -125,7 +126,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
   try {
     const { campaignId } = req.params
     // extract params from template, save to db (this will be done with hook)
-    const updatedTemplate = await upsertTemplate(req.body.body, +campaignId)
+    const updatedTemplate = await upsertSmsTemplate(req.body.body, +campaignId)
 
     const firstRecord = await SmsMessage.findOne({
       where: { campaignId },
@@ -159,7 +160,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     await Campaign.update({
       valid: false,
     }, {
-      where: { id: campaignId },
+      where: { id: +campaignId },
     })
 
     // extract s3Key from transactionId
@@ -185,9 +186,9 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      const records = await testHydration(+campaignId, s3Key, smsTemplate)
+      const records = await testHydration(+campaignId, s3Key, smsTemplate.params!)
       // START populate template
-      populateTemplate(+campaignId, records)
+      populateSmsTemplate(+campaignId, records)
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err

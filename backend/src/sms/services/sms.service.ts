@@ -2,7 +2,7 @@ import { Campaign } from '@core/models'
 import logger from '@core/logger'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 
-const upsertTemplate = async (body: string, campaignId: number): Promise<SmsTemplate> => {
+const upsertSmsTemplate = async (body: string, campaignId: number): Promise<SmsTemplate> => {
   let transaction
   try {
     transaction = await SmsTemplate.sequelize?.transaction()
@@ -69,4 +69,4 @@ const populateSmsTemplate = async (campaignId: number, records: Array<object>) =
   }
 }
 
-export { populateSmsTemplate, upsertTemplate }
+export { populateSmsTemplate, upsertSmsTemplate }
