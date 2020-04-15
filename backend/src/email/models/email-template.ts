@@ -38,6 +38,7 @@ export class EmailTemplate extends Model<EmailTemplate> {
   @BeforeCreate
   static generateParams(instance: EmailTemplate): void {
     if (!instance.body) return
+    if (!instance.subject) return
     const parsedTemplateVariables = parseTemplate(instance.body).variables
     const parsedSubjectVariables = parseTemplate(instance.subject).variables
     instance.params = union(parsedTemplateVariables, parsedSubjectVariables)
