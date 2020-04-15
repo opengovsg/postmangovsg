@@ -1,5 +1,5 @@
 import S3 from 'aws-sdk/clients/s3'
-import { keys } from 'lodash'
+import { difference, keys } from 'lodash'
 
 import { Campaign } from '@core/models'
 import { S3Service } from '@core/services'
@@ -7,6 +7,7 @@ import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { jwtUtils } from '@core/utils/jwt'
 import { SmsMessage, SmsTemplate } from '@sms/models'
+import { MissingTemplateKeysError } from '@sms/errors/sms.errors'
 
 const s3Client = new S3()
 
@@ -85,31 +86,36 @@ const populateTemplate = async (campaignId: number, records: Array<object>) => {
   } catch (err) {
     await transaction?.rollback()
     logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
+    throw new Error(`SmsMessage: destroy / bulkcreate failure`)
   }
 }
 
 const testHydration = async (campaignId: number, s3Key: string, smsTemplate: SmsTemplate): Promise<Array<object>> => {
-  const s3Service = new S3Service(s3Client)
-  const downloadStream = s3Service.download(s3Key)
-  const fileContents = await s3Service.parseCsv(downloadStream)
-  // FIXME / TODO: dedupe
-  const records: Array<object> = fileContents.map(entry => {
-    return {
-      campaignId,
-      recipient: entry['recipient'],
-      params: entry,
-    }
-  })
+  try {
+    const s3Service = new S3Service(s3Client)
+    const downloadStream = s3Service.download(s3Key)
+    const fileContents = await s3Service.parseCsv(downloadStream)
+    // FIXME / TODO: dedupe
+    const records: Array<object> = fileContents.map(entry => {
+      return {
+        campaignId,
+        recipient: entry['recipient'],
+        params: entry,
+      }
+    })
 
-  // attempt to hydrate
-  const firstRecord = fileContents[0]
-  // if body exists, smsTemplate.params should also exist
-  if (!isSuperSet(keys(firstRecord), smsTemplate.params!)) {
-    // TODO: lodash diff to show missing keys
-    const errorMsg = 'Hydration failed: Template contains keys that are not in file'
-    throw new Error(errorMsg)
+    // attempt to hydrate
+    const firstRecord = fileContents[0]
+    // if body exists, smsTemplate.params should also exist
+    if (!isSuperSet(keys(firstRecord), smsTemplate.params!)) {
+      // TODO: lodash diff to show missing keys
+      const missingKeys = difference(smsTemplate.params!, keys(firstRecord))
+      throw new MissingTemplateKeysError(missingKeys)
+    }
+    return records
+  } catch (err) {
+    throw err
   }
-  return records
 }
 
 export { extractS3Key, populateTemplate, testHydration, upsertTemplate }

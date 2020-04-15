@@ -14,6 +14,7 @@ import { SmsMessage, SmsTemplate } from '@sms/models'
 
 import { isSuperSet } from '@core/utils'
 import { MissingTemplateKeysError, HydrationError } from '@sms/errors/sms.errors'
+import { RecipientColumnMissing } from '@core/errors/s3.errors'
 
 const router = Router({ mergeParams: true })
 
@@ -180,7 +181,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
     // Updates metadata in project
     await updateCampaignS3Metadata({ key: s3Key, campaignId })
-    res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
 
     // carry out templating / hydration
     // - download from s3
@@ -190,8 +190,13 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       populateTemplate(+campaignId, records)
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
+      throw err
     }
+    return res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
+    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
+      return res.status(400).json({ message: err.message })
+    }
     return next(err)
   }
 }
