@@ -9,6 +9,8 @@ import logger from '@core/logger'
 import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { updateCampaignS3Metadata, S3Service } from '@core/services'
 import { jwtUtils } from '@core/utils/jwt'
+
+import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 
 
@@ -107,6 +109,13 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
 
     // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
     if (firstRecord && updatedTemplate.params) {
+      // first set project.valid to false, switch this back to true only when hydration succeeds
+      await Campaign.update({
+        valid: false,
+      }, {
+        where: { campaignId },
+      })
+
       const paramsFromS3 = keys(firstRecord.params)
       // warn if params from s3 file are not a superset of saved params
       if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
@@ -118,6 +127,12 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
       // try hydrate(...), return 4xx if unable to do so
       try {
         template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
+        // set campaign.valid to true since templating suceeded AND file has been uploaded
+        await Campaign.update({
+          valid: true,
+        }, {
+          where: { campaignId },
+        })
       } catch (err) {
         logger.error(`Hydration error: ${err.stack}`)
         return res.status(400).json({
@@ -139,6 +154,14 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   try {
     const { campaignId } = req.params
     // TODO: validate if project is in editable state
+
+    // switch campaign to invalid - this is for the case of uploading over an existing file
+    await Campaign.update({
+      valid: false,
+    }, {
+      where: { campaignId },
+    })
+
 
     // extract s3Key from transactionId
     const { transactionId } = req.body
@@ -197,6 +220,14 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
           transaction,
         })
         await SmsMessage.bulkCreate(records, { transaction })
+        await Campaign.update({
+          valid: true,
+        }, {
+          where: {
+            campaignId,
+          },
+          transaction,
+        })
         // TODO: end txn
         await transaction?.commit()
       } catch (err) {
