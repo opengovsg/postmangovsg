@@ -33,9 +33,11 @@ const router = Router({ mergeParams: true })
 const storeTemplateValidator = {
   [Segments.BODY]: Joi.object({
     subject: Joi
-      .string(),
+      .string()
+      .required(),
     body: Joi
-      .string(),
+      .string()
+      .required(),
   }),
 }
 
