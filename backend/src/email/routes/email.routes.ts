@@ -1,19 +1,29 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
-
-import { RecipientColumnMissing } from '@core/errors/s3.errors'
-import { HydrationError, MissingTemplateKeysError } from '@core/errors/template.errors'
-import logger from '@core/logger'
 import { Campaign } from '@core/models'
-import { uploadStartHandler, sendCampaign, stopCampaign, retryCampaign, canEditCampaign } from '@core/middlewares'
-import { extractS3Key, updateCampaignS3Metadata } from '@core/services/campaign.service'
-import { template, testHydration } from '@core/services/template.service'
-import { isSuperSet } from '@core/utils'
-import { storeCredentials } from '@email/middlewares'
-
 import { EmailTemplate, EmailMessage } from '@email/models'
-import { populateEmailTemplate, upsertEmailTemplate } from '@email/services/email.service'
+import { 
+  updateCampaignS3Metadata,
+  template, 
+  testHydration,
+  extractS3Key,
+} from '@core/services'
+import { populateEmailTemplate, upsertEmailTemplate } from '@email/services'
+import { 
+  uploadStartHandler, 
+  sendCampaign, 
+  stopCampaign, 
+  retryCampaign, 
+  canEditCampaign, 
+} from '@core/middlewares'
+import { 
+  MissingTemplateKeysError, 
+  HydrationError, 
+  RecipientColumnMissing, 
+} from '@core/errors'
+import { isSuperSet } from '@core/utils'
+import logger from '@core/logger'
 
 const router = Router({ mergeParams: true })
 

@@ -1,8 +1,8 @@
 import { chunk } from 'lodash'
-
 import { Campaign } from '@core/models'
-import logger from '@core/logger'
 import { EmailMessage, EmailTemplate } from '@email/models'
+import logger from '@core/logger'
+
 
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
   let transaction
