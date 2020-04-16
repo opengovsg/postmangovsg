@@ -6,25 +6,29 @@ import { ProgressDetails } from 'components/common'
 
 const SMSDetail = ({ id, sentAt, numRecipients }: { id: number; sentAt: Date; numRecipients: number }) => {
 
-  const [stats, setStats] = useState(new CampaignStats({
-  }))
+  const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats() {
     const campaignStats = await getCampaignStats(+id)
     setStats(campaignStats)
-  }
-
-  async function pollSendingStatus() {
-    await refreshCampaignStats()
-    if (stats.status !== Status.Sent) {
-      setTimeout(() => {
-        pollSendingStatus()
-      }, 1000)
-    }
+    return campaignStats
   }
 
   useEffect(() => {
-    pollSendingStatus()
+    let timeoutId: NodeJS.Timeout
+
+    async function poll() {
+      const { status } = await refreshCampaignStats()
+
+      if (status === Status.Sending) {
+        timeoutId = setTimeout(poll, 2000)
+      }
+    }
+
+    poll()
+    return () => {
+      timeoutId && clearTimeout(timeoutId)
+    }
   }, [])
 
   return (
@@ -36,7 +40,10 @@ const SMSDetail = ({ id, sentAt, numRecipients }: { id: number; sentAt: Date; nu
 
       <div className="separator"></div>
 
-      <ProgressDetails sentAt={sentAt} numRecipients={numRecipients} stats={stats} />
+      {
+        stats.status &&
+        <ProgressDetails sentAt={sentAt} numRecipients={numRecipients} stats={stats} />
+      }
     </>
   )
 }

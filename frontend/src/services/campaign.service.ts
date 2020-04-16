@@ -46,12 +46,14 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign> 
   }))
 }
 
+
 export async function getCampaignStats(campaignId: number): Promise<CampaignStats> {
   await sleep(100)
   return Promise.resolve(new CampaignStats({
+    id: campaignId,
     error: 12,
     invalid: 10,
-    unsent: 40,
+    unsent: 199,
     sent: 23,
     status: Status.Sending,
   }))

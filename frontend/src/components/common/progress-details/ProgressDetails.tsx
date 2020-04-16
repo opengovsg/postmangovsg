@@ -54,7 +54,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats }: { sentAt: Date; numRe
               )
           }
         </div>
-        <ProgressBar completed={numRecipients - unsent} total={numRecipients} />
+        <ProgressBar progress={numRecipients - unsent} total={numRecipients} />
 
         <table className={styles.stats}>
           <thead>

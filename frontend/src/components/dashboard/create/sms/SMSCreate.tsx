@@ -59,7 +59,7 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
         campaign.status !== Status.Draft
           ? (
             <div className={styles.stepContainer}>
-              {<SMSDetail id={campaign.id} sentAt={campaign.sentAt} numRecipients={campaign.numRecipients}></SMSDetail>}
+              <SMSDetail id={campaign.id} sentAt={campaign.sentAt} numRecipients={campaign.numRecipients}></SMSDetail>
             </div>
           )
           : (
