@@ -4,6 +4,12 @@ export async function saveTemplate(campaignId: number, body: string): Promise<bo
   return Promise.resolve(true)
 }
 
-export async function testCredentials(credentials: any, mobile: number): Promise<boolean> {
+export async function validateCredentials(
+  accountSid: string,
+  apiKey: string,
+  apiSecret: string,
+  messagingServiceSid: string,
+  mobile: string
+): Promise<boolean> {
   return Promise.resolve(true)
 }

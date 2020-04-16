@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 
-import { testCredentials } from 'services/sms.service'
+import { validateCredentials } from 'services/sms.service'
 import { TextInput, PrimaryButton, TextInputWithButton } from 'components/common'
 
-const SMSCredentials = ({ hasCredentials, onNext }: { hasCredentials: boolean; onNext: (changes: any, next?: boolean) => void }) => {
+const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { hasCredentials: boolean; onNext: (changes: any, next?: boolean) => void }) => {
 
+  const [hasCredentials, setHasCredentials] = useState(initialHasCredentials)
   const [accountSid, setAccountSid] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [apiSecret, setApiSecret] = useState('')
@@ -13,6 +14,11 @@ const SMSCredentials = ({ hasCredentials, onNext }: { hasCredentials: boolean; o
 
   function isDisabled() {
     return !accountSid || !apiKey || !apiSecret || !messagingServiceSid
+  }
+
+  async function handleValidateCredentials() {
+    const isValid = await validateCredentials(accountSid, apiKey, apiSecret, messagingServiceSid, mobileNumber)
+    setHasCredentials(isValid)
   }
 
   return (
@@ -65,7 +71,7 @@ const SMSCredentials = ({ hasCredentials, onNext }: { hasCredentials: boolean; o
                 type="tel"
                 value={mobileNumber}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMobileNumber(e.target.value)}
-                onClick={() => testCredentials}
+                onClick={handleValidateCredentials}
                 disabled={isDisabled()}
               >
                 Validate credential
