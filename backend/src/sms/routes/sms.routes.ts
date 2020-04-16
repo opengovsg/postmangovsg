@@ -2,15 +2,6 @@ import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
 
-import { template, testHydration } from '@core/services/template.service'
-import { extractS3Key } from '@core/services/campaign.service'
-import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services/sms.service'
-import { storeCredentials } from '@sms/middlewares'
-
-import logger from '@core/logger'
-import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
-import { updateCampaignS3Metadata } from '@core/services'
-
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { 
@@ -33,6 +24,7 @@ import {
   RecipientColumnMissing, 
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
+import { storeCredentials } from '@sms/middlewares'
 import logger from '@core/logger'
 
 const router = Router({ mergeParams: true })
@@ -377,7 +369,14 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/TwilioCredentials'
+ *            required:
+ *              - testNumber
+ *              - twilioCredentials
+ *            properties:
+ *              testNumber:
+ *                type: string
+ *              twilioCredentials:
+ *                $ref: '#/components/schemas/TwilioCredentials'
  *
  *      responses:
  *        200:
@@ -387,48 +386,6 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *                type: object
  */
 router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaign, storeCredentials)
-
-/**
- * @swagger
- * path:
- *  /campaign/{campaignId}/sms/validate:
- *    post:
- *      tags:
- *        - SMS
- *      summary: Vaidates stored credentials by sending to a specific phone number
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                twilioAccountSid:
- *                  type: string
- *                twilioApiSecret:
- *                  type: string
- *                twilioApiKey:
- *                  type: string
- *                twilioMessagingServiceSid:
- *                  type: string 
- *                testNumber:
- *                  type: string 
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- */
-router.post('/validate', celebrate(validateCredentialsValidator), canEditCampaign, validateCredentials)
-
 
 /**
  * @swagger
