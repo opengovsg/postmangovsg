@@ -8,17 +8,17 @@ import logger from '@core/logger'
 import { template } from '@core/services/template.service'
 import { EmailContent } from '@email/interfaces'
 
-const sendEmail = async (mail: MailToSend): Promise<boolean> => {
+const sendEmail = async (mail: MailToSend): Promise<string | void> => {
   try {
     return mailClient.sendMail(mail)
   } catch (e) {
     logger.error(`Error while sending test email. error=${e}`)
-    return false
+    return
   }
 } 
 
-const getEmailTemplate = async (campaignId: string) => {
-  return await EmailTemplate.findOne({ where: { campaignId }, attributes:['body', 'subject'] })
+const getEmailTemplate = (campaignId: string): Promise<EmailTemplate> => {
+  return  EmailTemplate.findOne({ where: { campaignId }, attributes:['body', 'subject'] })
 }
 
 const getEmailContent = async (campaignId: string): Promise<EmailContent | null> => {
@@ -37,7 +37,7 @@ const getParams = async (campaignId: string): Promise<{[key: string]: string} | 
   return emailMessage.params as {[key: string]: string}
 }
 
-const getHydratedMail = async (campaignId: string, recipientEmail: string): Promise<MailToSend | null> => {
+const getHydratedMail = async (campaignId: string, recipient: string): Promise<MailToSend | null> => {
   // get email content 
   const emailContent = await getEmailContent(campaignId)
 
@@ -51,7 +51,7 @@ const getHydratedMail = async (campaignId: string, recipientEmail: string): Prom
 
   const hydratedBody = template(body, params)
   return { 
-    recipients: [recipientEmail],
+    recipients: [recipient],
     body: hydratedBody,
     subject,
   }
@@ -70,19 +70,26 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
 }
 
 // Sends a test email
-const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
-  const { email: recipientEmail } = req.body
-  const { campaignId } = req.params
+const storeCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try{
+    const { campaignId } = req.params
+    const { email: recipient } = req.body
 
-  const mail = await getHydratedMail(campaignId, recipientEmail)
-  if (!mail) return res.sendStatus(400)
+    const mail = await getHydratedMail(campaignId, recipient)
+    if (!mail) return res.sendStatus(400)
+    // Send email using node mailer
+    const isEmailSent = await sendEmail(mail)
+    if (!isEmailSent) {
+      return res.sendStatus(500)
+    }
+    else{
+      await Campaign.update({ credName: 'EMAIL_DEFAULT' } , { where: { id: +campaignId } })
+      return res.json({ message: 'OK' })
+    }
+  } catch (err) {
+    return next(err)
+  }
 
-  // Send email using node mailer
-  const isEmailSent = await sendEmail(mail)
-
-  if (!isEmailSent) return res.sendStatus(500)
-
-  res.json({ message: 'OK' })
 }
 
 export { isEmailCampaignOwnedByUser, storeCredentials }
