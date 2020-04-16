@@ -46,7 +46,7 @@ const upsertSmsTemplate = async (body: string, campaignId: number): Promise<SmsT
  * @param campaignId
  * @param records
  */
-const populateSmsTemplate = async (campaignId: number, records: Array<object>) => {
+const populateSmsTemplate = async (campaignId: number, records: Array<object>): Promise<void> => {
   let transaction
   try {
     logger.info({ message: `Started populateSmsTemplate for ${campaignId}` })
@@ -72,11 +72,11 @@ const populateSmsTemplate = async (campaignId: number, records: Array<object>) =
       transaction,
     })
     await transaction?.commit()
-    logger.info({ message: `Finished populateSmsTemplate for ${campaignId}`})
+    logger.info({ message: `Finished populateSmsTemplate for ${campaignId}` })
   } catch (err) {
     await transaction?.rollback()
     logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
-    throw new Error(`SmsMessage: destroy / bulkcreate failure`)
+    throw new Error('SmsMessage: destroy / bulkcreate failure')
   }
 }
 

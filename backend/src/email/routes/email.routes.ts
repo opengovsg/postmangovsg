@@ -95,7 +95,7 @@ const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord
   }
   // try hydrate(...), return 4xx if unable to do so
   try {
-    template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
+    template(updatedTemplate.body, firstRecord.params as {[key: string]: string})
     // set campaign.valid to true since templating suceeded AND file has been uploaded
     await Campaign.update({
       valid: true,
@@ -117,7 +117,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
     const updatedTemplate = await upsertEmailTemplate({
       subject,
       body,
-      campaignId: +campaignId
+      campaignId: +campaignId,
     })
 
     const firstRecord = await EmailMessage.findOne({
@@ -178,6 +178,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const records = await testHydration(+campaignId, s3Key, emailTemplate.params!)
       // START populate template
       populateEmailTemplate(+campaignId, records)

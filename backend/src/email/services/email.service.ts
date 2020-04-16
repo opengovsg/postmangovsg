@@ -4,7 +4,7 @@ import { Campaign } from '@core/models'
 import logger from '@core/logger'
 import { EmailMessage, EmailTemplate } from '@email/models'
 
-const upsertEmailTemplate = async ({subject, body, campaignId}: {subject: string, body: string, campaignId: number}): Promise<EmailTemplate> => {
+const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
   let transaction
   try {
     transaction = await EmailTemplate.sequelize?.transaction()
@@ -28,7 +28,7 @@ const upsertEmailTemplate = async ({subject, body, campaignId}: {subject: string
     const createdTemplate = await EmailTemplate.create({
       campaignId, body, subject,
     }, {
-       transaction,
+      transaction,
     })
 
     transaction?.commit()
@@ -47,7 +47,7 @@ const upsertEmailTemplate = async ({subject, body, campaignId}: {subject: string
  * @param campaignId
  * @param records
  */
-const populateEmailTemplate = async (campaignId: number, records: Array<object>) => {
+const populateEmailTemplate = async (campaignId: number, records: Array<object>): Promise<void> => {
   logger.info({ message: `Started populateEmailTemplate for ${campaignId}` })
   let transaction
 
@@ -78,7 +78,7 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
   } catch (err) {
     await transaction?.rollback()
     logger.error(`EmailMessage: destroy / bulkcreate failure. ${err.stack}`)
-    throw new Error(`EmailMessage: destroy / bulkcreate failure`)
+    throw new Error('EmailMessage: destroy / bulkcreate failure')
   }
 }
 

@@ -108,7 +108,7 @@ const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord
   }
   // try hydrate(...), return 4xx if unable to do so
   try {
-    template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
+    template(updatedTemplate.body, firstRecord.params as {[key: string]: string})
     // set campaign.valid to true since templating suceeded AND file has been uploaded
     await Campaign.update({
       valid: true,
@@ -186,6 +186,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const records = await testHydration(+campaignId, s3Key, smsTemplate.params!)
       // START populate template
       populateSmsTemplate(+campaignId, records)

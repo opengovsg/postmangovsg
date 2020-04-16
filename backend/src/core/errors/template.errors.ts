@@ -1,6 +1,6 @@
 export class MissingTemplateKeysError extends Error {
   public readonly missingKeys: string[]
-  constructor (missingKeys: string[]) {
+  constructor(missingKeys: string[]) {
     super(`Template contains keys [${missingKeys}] that are not present in uploaded recipient list.`)
     this.missingKeys = missingKeys
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
@@ -10,7 +10,7 @@ export class MissingTemplateKeysError extends Error {
 
 export class HydrationError extends Error {
   constructor() {
-    super(`Error hydrating template`)
+    super('Error hydrating template')
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
     Error.captureStackTrace(this)
   }
