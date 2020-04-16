@@ -17,6 +17,7 @@ import {
   retryCampaign, 
   canEditCampaign, 
 } from '@core/middlewares'
+import { storeCredentials } from '@email/middlewares'
 import { 
   MissingTemplateKeysError, 
   HydrationError, 
@@ -24,6 +25,7 @@ import {
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
+
 
 const router = Router({ mergeParams: true })
 

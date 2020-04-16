@@ -5,7 +5,7 @@ import { mailClient } from '@core/services'
 import { MailToSend } from '@core/interfaces'
 import logger from '@core/logger'
 
-const sendEmail = async (recipient: string): Promise<boolean> => {
+const sendEmail = async (recipient: string): Promise<string | void> => {
   // TODO: replace with hydrated email
   const mail: MailToSend = {
     recipients: [recipient],
@@ -13,10 +13,10 @@ const sendEmail = async (recipient: string): Promise<boolean> => {
     body: 'Test message from postman.',
   }
   try {
-    return await mailClient.sendMail(mail)
+    return mailClient.sendMail(mail)
   } catch (e) {
     logger.error(`Error while sending test email. error=${e}`)
-    return false
+    return
   }
   
 
