@@ -10,6 +10,7 @@ import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
 import { extractS3Key, updateCampaignS3Metadata } from '@core/services/campaign.service'
 import { template, testHydration } from '@core/services/template.service'
 import { isSuperSet } from '@core/utils'
+import { storeCredentials } from '@email/middlewares'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { populateEmailTemplate, upsertEmailTemplate } from '@email/services/email.service'
@@ -43,21 +44,10 @@ const uploadCompleteValidator = {
 const storeCredentialsValidator = {
   // really not sure
   [Segments.BODY]: Joi.object({
-    sesUsername: Joi
-      .string()
-      .trim(),
-    sesApiKey: Joi
-      .string()
-      .trim(),
-  }),
-}
-
-const validateCredentialsValidator = {
-  [Segments.BODY]: Joi.object({
-    email: Joi
-      .string()
-      .trim()
-      .pattern(/^\+\d{8,15}$/),
+    email: Joi.string().email()
+      .options({ convert: true }) // Converts email to lowercase if it isn't
+      .lowercase()
+      .required(),
   }),
 }
 
@@ -202,16 +192,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     return next(err)
   }
-}
-
-// Read file from s3 and populate messages table
-const storeCredentials = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
-}
-
-// Send validation email to specified phone number
-const validateCredentials = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
 }
 
 // Get preview of one message
@@ -363,35 +343,6 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadComple
  *                type: object
  */
 router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentials)
-
-/**
- * @swagger
- * path:
- *  /campaign/{campaignId}/email/validate:
- *    post:
- *      tags:
- *        - Email
- *      summary: Vaidates stored credentials by sending to a specific phone number
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                emailAddress:
- *                  type: string
- *                  pattern: '^\+\d{8,15}$'
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- */
-router.post('/validate', celebrate(validateCredentialsValidator), validateCredentials)
-
 
 /**
  * @swagger
