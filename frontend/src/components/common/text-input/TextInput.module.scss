@@ -1,0 +1,18 @@
+@import 'styles/_variables';
+
+.textInput {
+  height: $button-height;
+  border: 1px solid $indigo-blue;
+  border-radius: $border-radius;
+  box-shadow: none;
+  line-height: 1rem;
+  font-size: 1rem;
+  padding-left: $border-radius;
+  border: 1px solid $indigo-blue;
+  background-color: $light-blue;
+  color: $dark-blue;
+
+  &:focus {
+    outline: none;
+  }
+}

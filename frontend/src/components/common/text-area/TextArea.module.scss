@@ -1,0 +1,44 @@
+@import 'styles/_variables';
+
+.textAreaContainer {
+  margin: 2rem 0;
+  width: 100%;
+  position: relative;
+
+  .textArea {
+    width: 100%;
+    border: 1px solid $light-grey;
+    border-radius: $border-radius;
+    padding: $border-radius;
+    color: $dark-blue;
+    font-size: 1rem;
+    line-height: 150%;
+    resize: none;
+    background: transparent;
+
+    &:focus {
+      outline: none;
+      border-color: $indigo-blue;
+    }
+  }
+
+  .highlightBackdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-color: transparent;
+    pointer-events: none;
+    z-index: -1;
+    white-space: pre;
+    p {
+      color: transparent;
+      font-size: 1rem;
+    }
+  }
+
+  .instructions {
+    color: $grey;
+    font-size: 0.8rem;
+  }
+}

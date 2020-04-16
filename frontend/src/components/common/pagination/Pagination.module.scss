@@ -1,0 +1,47 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.pagination {
+  @include flex-horizontal;
+  justify-content: center;
+  margin-top: 3.5rem;
+}
+
+.icon {
+  @include icon;
+  color: $dark-blue;
+  vertical-align: middle;
+}
+
+.navIconDisabled span {
+  color: $light-grey;
+}
+
+.break a {
+  color: $dark-blue;
+}
+
+.pageNumber {
+  width: 2rem;
+  height: 2rem;
+  margin-right: 1rem;
+  margin-left: 1rem;
+  @include flex-horizontal;
+  justify-content: center;
+
+  a {
+    color: $dark-blue;
+    font-size: 0.8rem;
+    line-height: 1rem;
+  }
+}
+
+.active {
+  background-color: $indigo-blue;
+  border-radius: 1rem;
+
+  a,
+  a:hover {
+    color: $light-blue;
+  }
+}

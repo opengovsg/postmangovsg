@@ -1,0 +1,47 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+$progress-pane-width: 18rem;
+
+.progressPane {
+  width: $progress-pane-width;
+  min-width: $progress-pane-width;
+  border-right: 1px solid $indigo-blue;
+}
+
+.progressItem {
+  @include flex-horizontal;
+  align-items: baseline;
+  font-size: 1rem;
+  opacity: 0.2;
+  padding: 1rem 0;
+  padding-left: $site-padding;
+  user-select: none;
+  cursor: default;
+
+  &.active {
+    $border-left: 0.5rem;
+    border-left: $border-left solid $indigo-blue;
+    background-color: $light-blue;
+    padding-left: calc(#{$site-padding} - #{$border-left});
+  }
+
+  &.active,
+  &.enabled {
+    opacity: 1;
+    cursor: pointer;
+  }
+
+  .number {
+    $number-size: 1.8rem;
+    height: $number-size;
+    width: $number-size;
+    background-color: $indigo-blue;
+    font-size: 0.8rem;
+    border-radius: 50%;
+    margin-right: 1rem;
+    color: $light-blue;
+    @include flex-horizontal;
+    justify-content: center;
+  }
+}
