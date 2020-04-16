@@ -1,21 +1,29 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
-
-import { template, testHydration } from '@core/services/template.service'
-import { extractS3Key } from '@core/services/campaign.service'
-import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services/sms.service'
-
-import logger from '@core/logger'
-import { uploadStartHandler } from '@core/middlewares/campaign.middleware'
-import { updateCampaignS3Metadata } from '@core/services'
-
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
-
+import { 
+  updateCampaignS3Metadata,
+  template, 
+  testHydration,
+  extractS3Key,
+} from '@core/services'
+import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services'
+import { 
+  uploadStartHandler, 
+  sendCampaign, 
+  stopCampaign, 
+  retryCampaign, 
+  canEditCampaign, 
+} from '@core/middlewares'
+import { 
+  MissingTemplateKeysError, 
+  HydrationError, 
+  RecipientColumnMissing, 
+} from '@core/errors'
 import { isSuperSet } from '@core/utils'
-import { MissingTemplateKeysError, HydrationError } from '@core/errors/template.errors'
-import { RecipientColumnMissing } from '@core/errors/s3.errors'
+import logger from '@core/logger'
 
 const router = Router({ mergeParams: true })
 
@@ -23,7 +31,8 @@ const router = Router({ mergeParams: true })
 const storeTemplateValidator = {
   [Segments.BODY]: Joi.object({
     body: Joi
-      .string(),
+      .string()
+      .required(),
   }),
 }
 
@@ -74,7 +83,7 @@ const previewMessageValidator = {
   }),
 }
 
-const sendMessagesValidator = {
+const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
     rate: Joi
       .number()
@@ -108,6 +117,7 @@ const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord
   }
   // try hydrate(...), return 4xx if unable to do so
   try {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
     // set campaign.valid to true since templating suceeded AND file has been uploaded
     await Campaign.update({
@@ -186,6 +196,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const records = await testHydration(+campaignId, s3Key, smsTemplate.params!)
       // START populate template
       populateSmsTemplate(+campaignId, records)
@@ -215,11 +226,6 @@ const validateCredentials = async (_req: Request, res: Response): Promise<void> 
 // Get preview of one message
 const previewMessage = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Message content' })
-}
-
-// Queue job for sending
-const sendMessages = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
 }
 
 // Routes
@@ -280,7 +286,7 @@ router.get('/', getCampaignDetails)
  *              schema:
  *                type: object
  */
-router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
+router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, storeTemplate)
 
 /**
  * @swagger
@@ -314,7 +320,7 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
  *                   transactionId:
  *                     type: string
  */
-router.get('/upload/start', celebrate(uploadStartValidator), uploadStartHandler)
+router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, uploadStartHandler)
 
 /**
  * @swagger
@@ -348,7 +354,7 @@ router.get('/upload/start', celebrate(uploadStartValidator), uploadStartHandler)
  *           description: Server Error
  *
  */
-router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadCompleteHandler)
+router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampaign, uploadCompleteHandler)
 
 /**
  * @swagger
@@ -378,7 +384,7 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), uploadComple
  *              schema:
  *                type: object
  */
-router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentials)
+router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaign, storeCredentials)
 
 /**
  * @swagger
@@ -412,7 +418,7 @@ router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentia
  *              schema:
  *                type: object
  */
-router.post('/validate', celebrate(validateCredentialsValidator), validateCredentials)
+router.post('/validate', celebrate(validateCredentialsValidator), canEditCampaign, validateCredentials)
 
 
 /**
@@ -461,13 +467,14 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
  *          schema:
  *            type: string
  *      requestBody:
- *        required: true
+ *        required: false
  *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              properties:
  *                rate:
+ *                  example: 10
  *                  type: integer
  *                  minimum: 1
  *
@@ -478,6 +485,43 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
  *              schema:
  *                type: object
  */
-router.post('/send', celebrate(sendMessagesValidator), sendMessages)
+router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCampaign)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/stop:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Stop sending campaign
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/stop', stopCampaign)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/retry:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Retry sending campaign
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/retry', canEditCampaign, retryCampaign)
+
 
 export default router

@@ -1,15 +1,15 @@
 import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'email_messages' , underscored: true, timestamps: true })
-export class EmailMessage extends Model<EmailMessage> {
+@Table({ tableName: 'email_ops' , underscored: true, timestamps: true })
+export class EmailOp extends Model<EmailOp> {
   @Column({
     type: DataType.BIGINT,
     autoIncrement: true,
     primaryKey: true,
   })
   id!: number
-
+  
   @ForeignKey(() => Campaign)
   @Column(DataType.INTEGER)
   campaignId!: number

@@ -61,7 +61,6 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
             // only allow alphanumeric template, prevents code execution
             const keyHasValidChars = (key.match(/[^a-zA-z0-9]/) === null)
             if (!keyHasValidChars) {
-              console.log('error: invalid chars')
               throw new Error(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
             }
 
@@ -107,31 +106,27 @@ const template = (templateBody: string, params: {[key: string]: string}): string
 }
 
 const testHydration = async (campaignId: number, s3Key: string, templateParams: Array<string>): Promise<Array<object>> => {
-  try {
-    const s3Service = new S3Service(s3Client)
-    const downloadStream = s3Service.download(s3Key)
-    const fileContents = await s3Service.parseCsv(downloadStream)
-    // FIXME / TODO: dedupe
-    const records: Array<object> = fileContents.map(entry => {
-      return {
-        campaignId,
-        recipient: entry['recipient'],
-        params: entry,
-      }
-    })
-
-    // attempt to hydrate
-    const firstRecord = fileContents[0]
-    // if body exists, smsTemplate.params should also exist
-    if (!isSuperSet(keys(firstRecord), templateParams)) {
-      // TODO: lodash diff to show missing keys
-      const missingKeys = difference(templateParams, keys(firstRecord))
-      throw new MissingTemplateKeysError(missingKeys)
+  const s3Service = new S3Service(s3Client)
+  const downloadStream = s3Service.download(s3Key)
+  const fileContents = await s3Service.parseCsv(downloadStream)
+  // FIXME / TODO: dedupe
+  const records: Array<object> = fileContents.map(entry => {
+    return {
+      campaignId,
+      recipient: entry['recipient'],
+      params: entry,
     }
-    return records
-  } catch (err) {
-    throw err
+  })
+
+  // attempt to hydrate
+  const firstRecord = fileContents[0]
+  // if body exists, smsTemplate.params should also exist
+  if (!isSuperSet(keys(firstRecord), templateParams)) {
+    // TODO: lodash diff to show missing keys
+    const missingKeys = difference(templateParams, keys(firstRecord))
+    throw new MissingTemplateKeysError(missingKeys)
   }
+  return records
 }
 
 export { template, parseTemplate, testHydration }

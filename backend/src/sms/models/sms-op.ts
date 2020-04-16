@@ -1,8 +1,8 @@
 import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'email_messages' , underscored: true, timestamps: true })
-export class EmailMessage extends Model<EmailMessage> {
+@Table({ tableName: 'sms_ops' , underscored: true, timestamps: true })
+export class SmsOp extends Model<SmsOp> {
   @Column({
     type: DataType.BIGINT,
     autoIncrement: true,
