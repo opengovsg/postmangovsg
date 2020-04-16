@@ -48,11 +48,11 @@ const enqueueMessages = (jobId: number): Promise<void> => {
   return service().enqueueMessages(jobId)
 }
   
-const getMessages = (jobId: number, rate: number): Promise<{id: number; recipient: string; params: any, body: string, subject?: string}[]>  => {
+const getMessages = (jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string}[]>  => {
   return service().getMessages(jobId, rate)
 }
 
-const sendMessage = (message: { id: number; recipient: string; params: string, body: string, subject?: string}): Promise<void>  => {
+const sendMessage = (message: { id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string}): Promise<void>  => {
   return service().sendMessage(message)
 }
   
@@ -116,6 +116,7 @@ const createAndResumeWorker = (): Promise<void> => {
     logger.info(`${workerId}: Resumed`)
   })
 }
+
   
 const init = async (index: number, isLogger = false): Promise<void> => {
   workerId = index
@@ -123,17 +124,22 @@ const init = async (index: number, isLogger = false): Promise<void> => {
   createAndResumeWorker()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
-
-  if(!isLogger){
-    for(;;){
-      await enqueueAndSend()
-      await waitForMs(2000)
+  try {
+    if(!isLogger){
+      for(;;){
+        await enqueueAndSend()
+        await waitForMs(2000)
+      }
+    } else{
+      for(;;){
+        await finalize()
+        await waitForMs(2000)
+      }
     }
-  } else{
-    for(;;){
-      await finalize()
-      await waitForMs(2000)
-    }
+  } catch(err) {
+    // TODO:  handle error!!!
+    // Otherwise this worker will be useless
+    logger.error(err)
   }
 }
   

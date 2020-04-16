@@ -1,7 +1,8 @@
-import logger from '../../logger'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
-import get from 'lodash/get'
+import map from 'lodash/get'
+import { template } from '@core/services'
+import logger from '@core/logger'
 
 class SMS {
     private workerId: number
@@ -20,23 +21,20 @@ class SMS {
     }
     
     
-    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any, body: string}[]>   {
+    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string}[]>   {
       return this.connection.query('SELECT get_messages_to_send_sms(:job_id, :rate) ;',
         { replacements: { 'job_id': jobId, rate }, type: QueryTypes.SELECT },
-      ).then((result) => {
-        return result.map(record => {
-          const tuple = get(record, ('get_messages_to_send_sms'), '()')
-          const [id, recipient, params, body] = tuple.substring(1, tuple.length - 1).split(',')
-          return { id: +id, recipient, params: params && JSON.parse(params), body }
-        })
-      })
+      ).then((result) => (map(result, 'get_messages_to_send_sms')))
     }
       
-    sendMessage({ id, recipient, params, body }: { id: number; recipient: string; params: string, body: string }): Promise<void> {
+    sendMessage({ id, recipient, params, body }: { id: number; recipient: string; params: {[key: string]: string}; body: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
+          return { hydratedBody: template(body, params) }
+        })
+        .then(({ hydratedBody }: { hydratedBody: string}) => {
         // do some sending get a response
-          return `${id}.${recipient}.${body}.${params}`
+          return `${recipient}.${hydratedBody}`
         })
         .then((messageId) => {
           return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',

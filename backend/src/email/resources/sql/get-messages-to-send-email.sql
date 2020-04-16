@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION get_messages_to_send_email(jid int, lim int) 
-RETURNS TABLE(res_id bigint, res_recipient varchar(255), res_params json, res_body text, res_subject text) 
+RETURNS TABLE (result json)
 LANGUAGE plpgsql AS $$
 BEGIN
 	RETURN QUERY
@@ -14,7 +14,7 @@ BEGIN
 			FOR UPDATE SKIP LOCKED
 		)
 		RETURNING id, recipient, params, campaign_id
-	) SELECT m.id, m.recipient, m.params, t.body, t.subject 
+	) SELECT json_build_object('id', m.id, 'recipient', m.recipient, 'params', m.params, 'body', t.body, 'subject', t.subject)
 	 FROM messages m, email_templates t
 	 WHERE m.campaign_id = t.campaign_id;
 		
@@ -28,5 +28,3 @@ BEGIN
 		UPDATE job_queue SET status = 'SENT' where id = jid AND status = 'SENDING';
 	END IF;
 END $$;
-
-
