@@ -1,6 +1,19 @@
 import { Request, Response, NextFunction } from 'express'
 import { Campaign } from '@core/models'
 import { ChannelType } from '@core/constants'
+import { mailClient } from '@core/services'
+import { MailToSend } from '@core/interfaces'
+
+const sendEmail = async (email: string): Promise<boolean> => {
+  // TODO: replace with hydrated email
+  const mail: MailToSend = {
+    recipients: [email],
+    subject: 'Test Message',
+    body: 'Test message from postman.'
+  }
+  return await mailClient.sendMail(mail)
+
+}
 
 // TODO
 const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -14,8 +27,14 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
   }
 }
 
-// Sends a test message
-const storeCredentials = async (_req: Request, res: Response): Promise<void> => {
+// Sends a test email
+const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
+  const { email } = req.body
+  // Send email using node mailer
+  const isEmailSent = await sendEmail(email)
+
+  if (!isEmailSent) return res.sendStatus(500)
+
   res.json({ message: 'OK' })
 }
 

@@ -47,12 +47,10 @@ const uploadCompleteValidator = {
 const storeCredentialsValidator = {
   // really not sure
   [Segments.BODY]: Joi.object({
-    sesUsername: Joi
-      .string()
-      .trim(),
-    sesApiKey: Joi
-      .string()
-      .trim(),
+    email: Joi.string().email()
+      .options({ convert: true }) // Converts email to lowercase if it isn't
+      .lowercase()
+      .required(),
   }),
 }
 
