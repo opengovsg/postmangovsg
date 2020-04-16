@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { createJob, stopCampaign as stop, retryCampaign as retry } from '@core/services'
 import { Campaign } from '@core/models'
-import { Op } from 'Sequelize'
+import { Op } from 'sequelize'
 const sendCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
