@@ -1,6 +1,14 @@
-CREATE OR REPLACE FUNCTION get_next_job(worker int, out selected_job_id int, out selected_campaign_id int, out selected_campaign_type text, out selected_rate int)
+CREATE OR REPLACE FUNCTION get_next_job(worker int)
+RETURNS json
 LANGUAGE plpgsql AS $$
+DECLARE  
+selected_job_id int;  
+selected_campaign_id int;
+selected_campaign_type text;
+selected_rate int;
+result json;
 BEGIN
+
 UPDATE job_queue
 SET worker_id = worker, status = 'ENQUEUED'
 WHERE 
@@ -22,7 +30,7 @@ AND id = ( SELECT q.id
     -- Assigns that job with a worker (but this doesn’t take effect until commit)
 )
 RETURNING id, campaign_id, send_rate into selected_job_id, selected_campaign_id, selected_rate;
-IF FOUND THEN
-    SELECT "type" into selected_campaign_type FROM campaigns WHERE id = selected_campaign_id;
-END IF;
+
+SELECT json_build_object('job_id', selected_job_id, 'campaign_id', selected_campaign_id, 'rate', selected_rate, 'type', "type") INTO result FROM campaigns WHERE id = selected_campaign_id;
+RETURN result;
 END $$;

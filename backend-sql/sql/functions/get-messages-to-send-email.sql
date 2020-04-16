@@ -1,9 +1,11 @@
-CREATE OR REPLACE FUNCTION get_messages_to_send_email(jid int, lim int) RETURNS TABLE(res_id bigint, res_recipient varchar(255), res_params json) 
+CREATE OR REPLACE FUNCTION get_messages_to_send_email(jid int, lim int) 
+RETURNS TABLE (result json)
 LANGUAGE plpgsql AS $$
 BEGIN
 	RETURN QUERY
 	-- Set sent_at for messages belonging to a job that is in SENDING state only (it will not pick up any other states like STOPPED or LOGGED)
-	UPDATE email_ops SET sent_at=clock_timestamp() WHERE 
+	WITH messages AS (
+		UPDATE email_ops SET sent_at=clock_timestamp() WHERE 
 		id in (
 			SELECT id FROM email_ops WHERE
 			campaign_id = (SELECT q.campaign_id FROM job_queue q WHERE q.id = jid AND status = 'SENDING')
@@ -11,8 +13,11 @@ BEGIN
 			LIMIT lim
 			FOR UPDATE SKIP LOCKED
 		)
-	RETURNING id, recipient, params;
-
+		RETURNING id, recipient, params, campaign_id
+	) SELECT json_build_object('id', m.id, 'recipient', m.recipient, 'params', m.params, 'body', t.body, 'subject', t.subject)
+	 FROM messages m, email_templates t
+	 WHERE m.campaign_id = t.campaign_id;
+		
 	-- If there are no messages found, we assume the job is done
 	-- This is only correct because enqueue and send are serialized. All messages are enqueued before sending occurs
 

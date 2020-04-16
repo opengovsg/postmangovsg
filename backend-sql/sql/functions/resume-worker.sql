@@ -15,7 +15,7 @@ BEGIN
 
             -- If we managed to update the status
             IF logged_campaign_id IS NOT NULL THEN 
-            -- Then do the loggingq
+            -- Then do the logging
                 PERFORM 
                     CASE WHEN type = 'EMAIL' THEN log_job_email(logged_campaign_id)
                     WHEN type = 'SMS' THEN log_job_sms(logged_campaign_id)
