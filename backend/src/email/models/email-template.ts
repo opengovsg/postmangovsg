@@ -19,12 +19,12 @@ export class EmailTemplate extends Model<EmailTemplate> {
   @Column({
     type: DataType.TEXT,
   })
-  body!: string
+  body?: string
 
   @Column({
     type: DataType.TEXT,
   })
-  subject!: string
+  subject?: string
 
   @Column({
     type: DataType.ARRAY(DataType.STRING),
