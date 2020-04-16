@@ -5,10 +5,10 @@ import { mailClient } from '@core/services'
 import { MailToSend } from '@core/interfaces'
 import logger from '@core/logger'
 
-const sendEmail = async (email: string): Promise<boolean> => {
+const sendEmail = async (recipient: string): Promise<boolean> => {
   // TODO: replace with hydrated email
   const mail: MailToSend = {
-    recipients: [email],
+    recipients: [recipient],
     subject: 'Test Message',
     body: 'Test message from postman.',
   }
@@ -36,9 +36,9 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
 
 // Sends a test email
 const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
-  const { email } = req.body
+  const { email: recipient } = req.body
   // Send email using node mailer
-  const isEmailSent = await sendEmail(email)
+  const isEmailSent = await sendEmail(recipient)
 
   if (!isEmailSent) return res.sendStatus(500)
 
