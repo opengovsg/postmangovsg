@@ -20,23 +20,23 @@ class SMS {
     }
     
     
-    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any}[]>   {
+    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any, body: string}[]>   {
       return this.connection.query('SELECT get_messages_to_send_sms(:job_id, :rate) ;',
         { replacements: { 'job_id': jobId, rate }, type: QueryTypes.SELECT },
       ).then((result) => {
         return result.map(record => {
           const tuple = get(record, ('get_messages_to_send_sms'), '()')
-          const [id, recipient, params] = tuple.substring(1, tuple.length - 1).split(',')
-          return { id: +id, recipient, params: params && JSON.parse(params) }
+          const [id, recipient, params, body] = tuple.substring(1, tuple.length - 1).split(',')
+          return { id: +id, recipient, params: params && JSON.parse(params), body }
         })
       })
     }
       
-    sendMessage({ id, recipient, params }: { id: number; recipient: string; params: string }): Promise<void> {
+    sendMessage({ id, recipient, params, body }: { id: number; recipient: string; params: string, body: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
         // do some sending get a response
-          return `${id}.${recipient}.${params}`
+          return `${id}.${recipient}.${body}.${params}`
         })
         .then((messageId) => {
           return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',

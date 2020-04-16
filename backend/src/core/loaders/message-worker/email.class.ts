@@ -1,9 +1,12 @@
-import logger from '../../logger'
-import config from '../../config'
+
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-import MailService from '../../services/mail.class'
+import MailService from '@core/services/mail.class'
+// import { template } from '@core/services'
+import logger from '@core/logger'
+import config from '@core/config'
+
 class Email {
     private workerId: number
     private connection: Sequelize
@@ -23,22 +26,22 @@ class Email {
     }
     
     
-    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any}[]>   {
+    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: any, body: string, subject: string}[]>   {
       return this.connection.query('SELECT get_messages_to_send_email(:job_id, :rate) ;',
         { replacements: { 'job_id': jobId, rate }, type: QueryTypes.SELECT },
       ).then((result) => {
         return result.map(record => {
           const tuple = get(record, ('get_messages_to_send_email'), '()')
-          const [id, recipient, params] = tuple.substring(1, tuple.length - 1).split(',')
-          return { id: +id, recipient, params: params && JSON.parse(params) }
+          const [id, recipient, params, body, subject] = tuple.substring(1, tuple.length - 1).split(',')
+          return { id: +id, recipient, params: params && JSON.parse(params), body, subject }
         })
       })
     }
       
-    sendMessage({ id, recipient, params }: { id: number; recipient: string; params: string }): Promise<void> {
+    sendMessage({ id, recipient, params, body, subject }: { id: number; recipient: string; params: string, body: string, subject?: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
-          return { subject: 'subject', hydratedBody: `${id}.${recipient}.${params}` }
+          return { subject: subject!, hydratedBody: `${id}.${recipient}.${body}.${params}` }
         })
         .then(({ subject, hydratedBody }: {subject: string; hydratedBody: string}) => {
           return this.mailService.sendMail({
