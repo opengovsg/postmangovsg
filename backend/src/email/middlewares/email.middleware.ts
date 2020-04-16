@@ -35,14 +35,22 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
 }
 
 // Sends a test email
-const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
-  const { email: recipient } = req.body
-  // Send email using node mailer
-  const isEmailSent = await sendEmail(recipient)
-
-  if (!isEmailSent) return res.sendStatus(500)
-
-  res.json({ message: 'OK' })
+const storeCredentials = async (req: Request, res: Response,  next: NextFunction): Promise<Response | void> => {
+  try{
+    const { campaignId } = req.params
+    const { email: recipient } = req.body
+    // Send email using node mailer
+    const isEmailSent = await sendEmail(recipient)
+    if (!isEmailSent) {
+      return res.sendStatus(500)
+    }
+    else{
+      await Campaign.update({ credName: 'EMAIL_DEFAULT' } , { where: { id: +campaignId } })
+      return res.json({ message: 'OK' })
+    }
+  } catch (err) {
+    return next(err)
+  }
 }
 
 export { isEmailCampaignOwnedByUser, storeCredentials }

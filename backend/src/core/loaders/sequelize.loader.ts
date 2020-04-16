@@ -26,6 +26,7 @@ class SequelizeLoader {
     const emailModels = [EmailMessage, EmailTemplate, EmailOp]
     const smsModels = [SmsMessage, SmsTemplate, SmsOp]
     sequelize.addModels([...coreModels, ...emailModels, ...smsModels])
+    await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
   
     try {
       this._sequelize = await sequelize.sync()
