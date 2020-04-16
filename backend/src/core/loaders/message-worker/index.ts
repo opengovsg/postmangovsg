@@ -34,12 +34,10 @@ const getNextJob = (): Promise< { jobId: number | undefined; campaignId: number 
   return connection.query('SELECT get_next_job(:worker_id);',
     { replacements: { 'worker_id': workerId }, type: QueryTypes.SELECT },
   ).then((result) => {
-    const tuple = get(result, ('[0].get_next_job'), '()')
-    const [jobId, campaignId, campaignType, rate] = tuple.substring(1, tuple.length - 1).split(',')
-    if (jobId &&  campaignId && campaignType && rate) {
-      currentCampaignType = campaignType
-      logger.info(`${workerId}: getNextJob job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType} rate=${rate}`) 
-    }
+    const nextJob = get(result, '[0].get_next_job') || {}
+    const { 'job_id': jobId, 'campaign_id': campaignId, 'type': campaignType, rate } = nextJob
+    currentCampaignType = campaignType
+    if(jobId) logger.info(`${workerId}:  get_next_job job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType}`)
     return { jobId, campaignId, campaignType, rate }
   })
 }
