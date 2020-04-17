@@ -7,21 +7,32 @@ import { get } from 'lodash'
 
 const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
 
-const insertCredential = (hash: string): Promise<Credential> => {
-  return Credential.create({
-    name: hash,
-  })
+const addCredentialToCampaign = async (campaignId: number, credentialName: string): Promise <void> => {
+  const transaction = await Credential.sequelize?.transaction()
+  try{
+    // Insert the credential name into credential table if it does not exist
+    await Credential.findCreateFind({ 
+      where: {
+        name: credentialName,
+      },
+      transaction,
+    })
+    // Update campaign with the credential name
+    await Campaign.update({
+      credName: credentialName,
+    },{
+      where: { id: campaignId },
+      returning: false,
+      transaction,
+    })
+    transaction?.commit()
+  }
+  catch(err){
+    transaction?.rollback()
+    throw err
+  }
+ 
 }
-
-const updateCampaignWithCredential = (campaignId: string, credentialName: string): Promise<[number, Campaign[]]> => {
-  return Campaign.update({
-    credName: credentialName,
-  },{
-    where: { id: campaignId },
-    returning: false,
-  })
-}
-
 const isExistingCredential = async (name: string): Promise<boolean> => {
   const result = await Credential.findOne({
     where: {
@@ -60,8 +71,7 @@ const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> =>
 }
 
 export const credentialService = {
-  insertCredential,
-  updateCampaignWithCredential,
+  addCredentialToCampaign,
   isExistingCredential,
   storeSecret,
   getTwilioCredentials,
