@@ -9,15 +9,13 @@ import config from '@core/config'
 
 const saveCredential = async (campaignId: number, credentialName: string, secret: string): Promise<void> => {
   // Check if credential is already in the credential table
-  const isExisting = await credentialService.isExistingCredential(credentialName)
+  const credentialExists = await credentialService.isExistingCredential(credentialName)
 
-  // Dont have to save if it is an old credential
-  if (isExisting) {
-    return
+  // If credential doesnt already exist
+  if (!credentialExists) {
+    // Upload the credential to aws secret manager
+    await credentialService.storeSecret(credentialName, secret)  
   }
-
-  // Upload the credential to aws secret manager
-  await credentialService.storeSecret(credentialName, secret)  
   // Store credential to credential table and update campaign
   await credentialService.addCredentialToCampaign(campaignId, credentialName)
 
@@ -34,17 +32,11 @@ const getCredential = (req: Request): TwilioCredentials => {
   return credential
 }
 
-const sendMessage = async (recipient: string, credential: TwilioCredentials): Promise<boolean> => {
+const sendMessage = (recipient: string, credential: TwilioCredentials): Promise<string | void> => {
   const msg = 'You have successfully verified your Twilio credentials with Postman.'
   logger.info('Sending sms using Twilio.')
-  try {
-    const twilioService = new TwilioService(credential)
-    const isMessageSent = await twilioService.send(recipient, msg)
-    return isMessageSent
-  } catch(e) {
-    logger.error(`Twilio client fails to send message. error=${e}`)
-    return false
-  }
+  const twilioService = new TwilioService(credential)
+  return twilioService.send(recipient, msg)
 }
 
 const getEncodedHash = async (secret: string): Promise<string> => {
@@ -66,12 +58,16 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
 
 // Sends out a test message. 
 // If it is successful, stores the twilio credential in AWS secret manager and db, as well as updating the campaign table.
-const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
+const storeCredentials = async (req: Request, res: Response,  next: NextFunction): Promise<Response | void> => {
   const credential: TwilioCredentials = getCredential(req)
   // Send test message
   const { testNumber } = req.body
-  const isMessageSent = await sendMessage(testNumber, credential)
-  if (!isMessageSent) return res.sendStatus(400)
+  try {
+    await sendMessage(testNumber, credential)
+  }
+  catch(err){
+    return res.status(400).json({ message: err })
+  }
 
   const { campaignId } = req.params
   // Save the credentials and update DB
@@ -79,12 +75,10 @@ const storeCredentials = async (req: Request, res: Response): Promise<Response |
     const secretString = JSON.stringify(credential)
     const credentialName = await getEncodedHash(secretString)
     await saveCredential(+campaignId, credentialName, secretString)
-  }catch(e) {
-    logger.error(`Error saving credentials. error=${e}`)
-    return res.sendStatus(500)
+  }catch(err) {
+    return next(err)
   }
-
-  res.json({ message: 'OK' })
+  return res.json({ message: 'OK' })
 }
 
 export { isSmsCampaignOwnedByUser, storeCredentials }

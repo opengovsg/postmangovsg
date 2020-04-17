@@ -30,15 +30,15 @@ const service = (): Email | SMS => {
   }
 }
 
-const getNextJob = (): Promise< { jobId: number | undefined; campaignId: number | undefined; campaignType: string | undefined; rate: number | undefined}>  => {
+const getNextJob = (): Promise< { jobId: number | undefined; campaignId: number | undefined; campaignType: string | undefined; rate: number | undefined; credName: string | undefined}>  => {
   return connection.query('SELECT get_next_job(:worker_id);',
     { replacements: { 'worker_id': workerId }, type: QueryTypes.SELECT },
   ).then((result) => {
     const nextJob = get(result, '[0].get_next_job') || {}
-    const { 'job_id': jobId, 'campaign_id': campaignId, 'type': campaignType, rate } = nextJob
+    const { 'job_id': jobId, 'campaign_id': campaignId, 'type': campaignType, rate, 'cred_name': credName } = nextJob
     currentCampaignType = campaignType
-    if(jobId) logger.info(`${workerId}:  get_next_job job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType}`)
-    return { jobId, campaignId, campaignType, rate }
+    if(jobId) logger.info(`${workerId}:  get_next_job job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType} cred_name=${credName}`)
+    return { jobId, campaignId, campaignType, rate, credName }
   })
 }
 
@@ -76,11 +76,11 @@ const waitForMs = (ms: number): Promise<void> => {
   if (ms > 0) return new Promise(resolve => setTimeout(() => resolve(), ms))
   return Promise.resolve()
 }
-  
-    
+      
 const enqueueAndSend = async (): Promise<void>  => {
-  const { jobId, rate } = await getNextJob()
-  if (jobId && rate) {
+  const { jobId, rate, credName } = await getNextJob()
+  if (jobId && rate && credName) {
+    await service().setSendingService(credName)
     await enqueueMessages(jobId)
     let hasNext = true
     while (hasNext) {
@@ -95,6 +95,7 @@ const enqueueAndSend = async (): Promise<void>  => {
         await waitForMs(wait)
       }
     }
+    await service().destroySendingService()
   }
 }
 

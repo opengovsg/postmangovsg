@@ -14,7 +14,7 @@ const requiredEnvVars = [
   'DB_URI',
   'REDIS_OTP_URI',
   'REDIS_SESSION_URI',
-  'SESSION_SECRET'
+  'SESSION_SECRET',
 ]
 
 const port = Number(process.env.PORT) || 4000
