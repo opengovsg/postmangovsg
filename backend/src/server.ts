@@ -8,10 +8,13 @@ import { checkRequiredEnvVars, loaders } from './core'
 
 const requiredEnvVars = [
   'AWS_REGION',
-  'DB_URI',
   'FILE_STORAGE_BUCKET_NAME',
+  'SECRET_MANAGER_SALT',
   'JWT_SECRET',
-  'SESSION_SECRET',
+  'DB_URI',
+  'REDIS_OTP_URI',
+  'REDIS_SESSION_URI',
+  'SESSION_SECRET'
 ]
 
 const port = Number(process.env.PORT) || 4000
