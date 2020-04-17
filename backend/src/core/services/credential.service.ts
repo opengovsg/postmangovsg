@@ -7,13 +7,13 @@ import { get } from 'lodash'
 
 const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
 
-const insertCredential = async (hash: string) => {
-  await Credential.create({
+const insertCredential = (hash: string): Promise<Credential> => {
+  return Credential.create({
     name: hash,
   })
 }
 
-const updateCampaignWithCredential = async (campaignId: string, credentialName: string) => {
+const updateCampaignWithCredential = (campaignId: string, credentialName: string): Promise<[number, Campaign[]]> => {
   return Campaign.update({
     credName: credentialName,
   },{
@@ -32,7 +32,11 @@ const isExistingCredential = async (name: string): Promise<boolean> => {
   return false
 }
 
-const storeSecret = async (name: string, secret: string) => {
+const storeSecret = async (name: string, secret: string): Promise<void> => {
+  if(!config.IS_PROD){
+    logger.info(`Dev env - storeSecret - skipping for name=${name}`)
+    return
+  }
   const params = {
     Name: name,
     SecretString: secret,
@@ -43,6 +47,10 @@ const storeSecret = async (name: string, secret: string) => {
 }
 
 const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> => {
+  if(!config.IS_PROD){
+    logger.info(`Dev env - getTwilioCredentials - returning default credentials for name=${name}`)
+    return config.smsOptions
+  }
   logger.info('Getting secret from AWS secrets manager.')
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   logger.info('Gotten secret from AWS secrets manager.')

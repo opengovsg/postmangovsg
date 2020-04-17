@@ -44,6 +44,12 @@ const mailPort = Number(process.env.SES_PORT)
 const mailUser: string = process.env.SES_USER as string
 const mailPass: string = process.env.SES_PASS as string
 
+// Twilio
+const twilioAccountSid: string = process.env.TWILIO_ACCOUNT_SID as string
+const twilioApiKey: string = process.env.TWILIO_API_KEY as string
+const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
+const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
+
 // Message workers
 // Ensure that number of senders and number of loggers are each always >= 1
 let numSender: number = parseEnvVarAsInt(process.env.MESSAGE_WORKER_SENDER as string) || 1
@@ -87,6 +93,12 @@ export default {
       user: mailUser,
       pass: mailPass,
     },
+  },
+  smsOptions: {
+    accountSid: twilioAccountSid,
+    apiKey: twilioApiKey,
+    apiSecret: twilioApiSecret,
+    messagingServiceSid: twilioMessagingServiceSid,
   },
   messageWorker: {
     numSender,

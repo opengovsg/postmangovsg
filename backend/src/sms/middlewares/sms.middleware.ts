@@ -7,7 +7,7 @@ import { credentialService, hashService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
 
-const saveCredential = async (name: string, secret: string) => {
+const saveCredential = async (name: string, secret: string) : Promise<void> => {
   // Check if credential is already in the credential table
   const isExisting = await credentialService.isExistingCredential(name)
 
@@ -19,7 +19,6 @@ const saveCredential = async (name: string, secret: string) => {
   // Store credential to credential table
   await credentialService.insertCredential(name)
   // Upload the credential to aws secret manager
-  if (!config.IS_PROD) return
   await credentialService.storeSecret(name, secret)  
 }
 
@@ -35,7 +34,6 @@ const getCredential = (req: Request): TwilioCredentials => {
 }
 
 const sendMessage = async (recipient: string, credential: TwilioCredentials): Promise<boolean> => {
-  if (!config.IS_PROD) return true
   const msg = 'You have successfully verified your Twilio credentials with Postman.'
   logger.info('Sending sms using Twilio.')
   try {

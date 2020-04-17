@@ -67,13 +67,13 @@ const storeCredentialsValidator = {
       .trim()
       .required(),
     twilioMessagingServiceSid: Joi
-    .string()
-    .trim()
-    .required(),
+      .string()
+      .trim()
+      .required(),
     testNumber: Joi
-    .string()
-    .trim()
-    .required(),
+      .string()
+      .trim()
+      .required(),
   }),
 }
 
