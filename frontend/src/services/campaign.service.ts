@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Campaign, CampaignStats, ChannelType, Status, SMSCampaign } from 'classes'
+import { Campaign, CampaignStats, ChannelType, Status, SMSCampaign, EmailCampaign } from 'classes'
 
 // for dev use
 async function sleep(ms: number): Promise<void> {
