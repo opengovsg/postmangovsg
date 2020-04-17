@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
-import map from 'lodash/get'
+import map from 'lodash/map'
 import { template } from '@core/services'
 import logger from '@core/logger'
 
