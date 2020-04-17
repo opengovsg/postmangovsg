@@ -57,6 +57,16 @@ class Email {
           logger.info(`${this.workerId}: sendMessage id=${id}`)
         })
     }
+
+    async setSendingService(_: string): Promise<void> {
+      // Do nothing
+      return 
+    }
+
+    destroySendingService(): void {
+      // Do nothing
+      return
+    }
 }
  
 export default Email

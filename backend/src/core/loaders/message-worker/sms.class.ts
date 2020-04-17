@@ -1,15 +1,18 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import map from 'lodash/map'
-import { template } from '@core/services'
+import { template, credentialService } from '@core/services'
 import logger from '@core/logger'
+import { TwilioService } from '@sms/services'
 
 class SMS {
     private workerId: number
     private connection: Sequelize
+    private twilioService: TwilioService | null
     constructor(workerId: number, connection: Sequelize){
       this.workerId = workerId
       this.connection = connection
+      this.twilioService = null
     }
    
     enqueueMessages(jobId: number): Promise<void>{
@@ -30,20 +33,29 @@ class SMS {
     sendMessage({ id, recipient, params, body }: { id: number; recipient: string; params: {[key: string]: string}; body: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
-          return { hydratedBody: template(body, params) }
-        })
-        .then(({ hydratedBody }: { hydratedBody: string}) => {
-        // do some sending get a response
-          return `${recipient}.${hydratedBody}`
+          return this.twilioService?.send(recipient, template(body, params))
         })
         .then((messageId) => {
           return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
             { replacements: { id, messageId }, type: QueryTypes.UPDATE })
         })
+        .catch((error: Error) => {
+          return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), error_code=:error WHERE id=:id;',
+            { replacements: { id,  error: error.message.substring(0,255) }, type: QueryTypes.UPDATE })
+        })
         .then(() => {
           logger.info(`${this.workerId}: sendMessage id=${id}`)
         })
-    } 
+    }
+
+    async setSendingService(credentialName: string): Promise<void> {
+      const credentials = await credentialService.getTwilioCredentials(credentialName)
+      this.twilioService = new TwilioService(credentials)
+    }
+
+    destroySendingService(): void {
+      this.twilioService = null
+    }
 }
 
 export default SMS

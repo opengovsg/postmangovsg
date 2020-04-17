@@ -4,7 +4,6 @@ LANGUAGE plpgsql AS $$
 DECLARE  
 selected_job_id int;  
 selected_campaign_id int;
-selected_campaign_type text;
 selected_rate int;
 result json;
 BEGIN
@@ -31,6 +30,6 @@ AND id = ( SELECT q.id
 )
 RETURNING id, campaign_id, send_rate into selected_job_id, selected_campaign_id, selected_rate;
 
-SELECT json_build_object('job_id', selected_job_id, 'campaign_id', selected_campaign_id, 'rate', selected_rate, 'type', "type") INTO result FROM campaigns WHERE id = selected_campaign_id;
+SELECT json_build_object('job_id', selected_job_id, 'campaign_id', selected_campaign_id, 'rate', selected_rate, 'type', "type", 'cred_name', "cred_name") INTO result FROM campaigns WHERE id = selected_campaign_id;
 RETURN result;
 END $$;

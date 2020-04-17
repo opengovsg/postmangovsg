@@ -1,6 +1,5 @@
 import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
-import logger from '@core/logger'
 
 export class TwilioService {
   private client: any;
@@ -12,17 +11,24 @@ export class TwilioService {
     this.messagingServiceSid = messagingServiceSid
   }
 
-  public async send(recipient: string, message: string): Promise<boolean>{
-    const result = await this.client.messages.create({
+  public send(recipient: string, message: string): Promise<string | void>{
+    return this.client.messages.create({
       to: recipient,
       body: message,
       from: this.messagingServiceSid,
+    }).then((result: {[key: string]: string}) => {
+      const { status, sid, error_code: errorCode, code } = result
+      if(sid){
+        if(errorCode || code){
+          return Promise.reject(new Error(`${sid};${errorCode};${code}`))
+        }
+        else {
+          return sid
+        }
+      }
+      else {
+        return Promise.reject(new Error(`${status};Unknown error`))
+      }
     })
-    const { status, sid, error_codes: errorCode } = result
-    if (!sid || errorCode) {
-      logger.error(`send: SMS Message error with status=${status} error_code=${errorCode} sid=${sid}`)
-      return false
-    }
-    return true
   }
 }
