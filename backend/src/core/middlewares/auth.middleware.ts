@@ -4,27 +4,14 @@ import bcrypt from 'bcrypt'
 import { User } from '@core/models'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import logger from '@core/logger'
-import { otpClient, mailClient } from '@core/services'
+import { otpClient, mailClient, hashService } from '@core/services'
 
-const SALT_ROUNDS = 10
 const RETRIES = 4 // Number of attempts to enter otp
 const EXPIRY_IN_SECONDS = 300 //expires after 5 minutes
 const WAIT_IN_SECONDS = 30 // Number of seconds to wait before resending otp
 
 const generateOtp = (): string => {
   return authenticator.generate(authenticator.generateSecret())
-}
-
-const hash = (value: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    bcrypt.hash(value, SALT_ROUNDS, (error, hash) => {
-      if (error) {
-        logger.error(`Failed to hash value: ${error}`)
-        reject(error)
-      }
-      resolve(hash as string)
-    })
-  })
 }
 
 const saveHashedOtp = (email: string, hashedOtp: HashedOtp): Promise<boolean> => {
@@ -128,7 +115,7 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
   }
   try {
     const otp = generateOtp()
-    const hashValue = await hash(otp)
+    const hashValue = await hashService.randomSalt(otp)
     const hashedOtp: HashedOtp = { hash: hashValue, retries: RETRIES, createdAt: Date.now() }
     await saveHashedOtp(email, hashedOtp)
     await sendOtp(email, otp)
