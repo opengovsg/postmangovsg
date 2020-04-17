@@ -20,7 +20,7 @@ const jwtSecret = process.env.JWT_SECRET as string
 const databaseUri: string = process.env.DB_URI as string
 const SEQUELIZE_POOL_MAX_CONNECTIONS = 150
 const SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS = 600000
-const rdsCa: false | Buffer = IS_PROD && fs.readFileSync(path.join(__dirname, '../db-ca.pem'))
+const rdsCa: false | Buffer = IS_PROD && fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 
 // Cache settings
 const redisOtpUri: string = process.env.REDIS_OTP_URI as string
