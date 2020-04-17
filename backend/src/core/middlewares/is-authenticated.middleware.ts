@@ -2,11 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { get } from 'lodash'
 import { hashService } from '@core/services'
 import { ApiKey } from '@core/models'
-
-// SWTODO: Move to env var
-const API_KEY_SALT_V1 = '$2b$10$o5JEFyRcL9WHQFqmu8W3mO'
-// SWTODO: Move this to config but not env var 
-const API_KEY_VERSION = 'v1'
+import config from '@core/config'
 
 const doesHashExist = async (hash: string) =>  {
   return await ApiKey.findByPk(hash)
@@ -20,7 +16,7 @@ export const isCookieAuthenticated = async (req: Request, res: Response, next: N
 }
 
 export const isApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  const headerKey = `ApiKey-${API_KEY_VERSION}`
+  const headerKey = `ApiKey-${config.apiKey.version}`
   const authHeader = get(req, 'headers.authorization', '')
   
   const [header, content] = authHeader.split(' ')
@@ -29,7 +25,7 @@ export const isApiKeyAuthenticated = async (req: Request, res: Response, next: N
   const [name, version, key] = content.split('_')
   if (!name || !version || !key) return res.sendStatus(401)
 
-  const hash = await hashService.specifySalt(key, API_KEY_SALT_V1)
+  const hash = await hashService.specifySalt(key, config.apiKey.salt)
   const apiKeyHash = `${name}_${version}_${hash}`
 
   const exists = await doesHashExist(apiKeyHash)
