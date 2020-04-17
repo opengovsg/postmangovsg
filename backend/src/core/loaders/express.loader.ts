@@ -14,6 +14,14 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(loggerMiddleware)
 
   app.use(bodyParser.json())
+  // ref: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
+  // Default CORS setting:
+  // {
+  //   "origin": "*",
+  //   "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+  //   "preflightContinue": false,
+  //   "optionsSuccessStatus": 204
+  // }
   app.use(cors())
 
   app.get('/', async (_req: Request, res: Response) => {
