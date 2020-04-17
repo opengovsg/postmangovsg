@@ -1,3 +1,4 @@
+import cors from 'cors'
 import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
@@ -13,6 +14,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(loggerMiddleware)
 
   app.use(bodyParser.json())
+  app.use(cors())
 
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
