@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { TextInputWithButton } from 'components/common'
-// import AuthService from 'services/auth.service'
+import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
 
 import styles from './Login.module.scss'
 
@@ -14,12 +14,22 @@ const Login = () => {
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
 
-  function sendOtp() {
-    setOtpSent(true)
+  async function sendOtp() {
+    try {
+      await getOtpWithEmail(email)
+      setOtpSent(true)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-  function login() {
-    setOtpSent(true)
+  async function login() {
+    try {
+      const resp = await loginWithOtp(email, otp)
+      console.log(resp)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   function render(mainText: string, value: string, onChange: Function, onClick: Function, buttonText: string, inputType?: string) {

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { POSTMAN_API_BASEURL } from 'config'
 
 // for dev use
 async function sleep(ms: number): Promise<void> {
@@ -8,13 +9,19 @@ async function sleep(ms: number): Promise<void> {
 }
 
 async function getOtpWithEmail(email: string): Promise<void> {
-  await sleep(1000)
-  return Promise.resolve()
+  return axios.post(`${POSTMAN_API_BASEURL}/v1/auth/otp`, {
+    email,
+  }, {
+    withCredentials: true,
+  })
 }
 
 async function loginWithOtp(email: string, otp: string): Promise<void> {
-  await sleep(1000)
-  return Promise.resolve()
+  return axios.post(`${POSTMAN_API_BASEURL}/v1/auth/login`, {
+    email, otp,
+  }, {
+    withCredentials: true,
+  })
 }
 
 async function getIsLoggedIn(): Promise<boolean> {
