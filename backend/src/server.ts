@@ -15,6 +15,8 @@ const requiredEnvVars = [
   'REDIS_OTP_URI',
   'REDIS_SESSION_URI',
   'SESSION_SECRET',
+  'FRONTEND_URL',
+  'COOKIE_DOMAIN',
 ]
 
 const port = Number(process.env.PORT) || 4000

@@ -8,6 +8,7 @@ import config from '@core/config'
 import v1Router from '@core/routes'
 import logger from '@core/logger'
 
+const FRONTEND_URL = config.frontendUrl
 const loggerMiddleware = morgan(config.MORGAN_LOG_FORMAT)
 
 const expressApp = ({ app }: { app: express.Application }): void => {
@@ -22,7 +23,10 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   //   "preflightContinue": false,
   //   "optionsSuccessStatus": 204
   // }
-  app.use(cors())
+  app.use(cors({
+    origin: FRONTEND_URL,
+    credentials: true, // required for setting cookie
+  }))
 
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
