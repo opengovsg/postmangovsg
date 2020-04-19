@@ -58,7 +58,7 @@ const Campaigns = () => {
     },
     {
       name: 'Sent At',
-      render: (campaign: Campaign) => <Moment format='LLL'>{campaign.sentAt}</Moment>,
+      render: (campaign: Campaign) => campaign.sentAt ? <Moment format='LLL'>{campaign.sentAt}</Moment> : <span></span>,
       width: 'md',
     }
     ,

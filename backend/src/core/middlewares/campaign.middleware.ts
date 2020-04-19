@@ -58,7 +58,7 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
   try{
     const { offset, limit } = req.query
     const { id : userId } = req.session?.user
-    const options: { where: any; attributes: any; order: any; offset?: number; limit? : number} = {
+    const options: { where: any; attributes: any; order: any; include: any; offset?: number; limit? : number} = {
       where: {
         userId,
       },
@@ -67,6 +67,12 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
       ],
       order: [
         ['created_at', 'DESC'],
+      ],
+      include: [
+        {
+          model: JobQueue,
+          attributes: ['status'],
+        },
       ],
     }
     if (offset) {

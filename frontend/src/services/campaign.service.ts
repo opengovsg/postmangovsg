@@ -8,27 +8,44 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
+function getStatus(jobs: Array<{status: string}>) : string {
+  let result
+  const jobSet = new Set(jobs.map((x=>x.status)))
+  if(jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')){
+    result = Status.Sending
+  }
+  else if(jobSet.has('SENT') || jobSet.has('LOGGED')){
+    result = Status.Sent
+  }
+  else{
+    result = Status.Draft
+  }
+  return result
+}
+
 export async function getCampaigns(): Promise<Array<Campaign>> {
-  const campaigns: Array<Campaign> = [
-    {
-      id: 1,
-      type: ChannelType.SMS,
-      name: 'test sms',
-      createdAt: Date.now(),
-      sentAt: Date.now(),
-      status: 'sending',
-    },
-    {
-      id: 1,
-      type: ChannelType.Email,
-      name: 'test email',
-      createdAt: Date.now(),
-      timeSent: Date.now(),
-      status: 'sent',
-    },
-  ].map((a) => new Campaign(a))
-  await sleep(1000)
-  return Promise.resolve(campaigns)
+  return axios.get(`/campaigns`).then((response) => {
+    const campaigns : Campaign[] = response.data.map((data: any)=> {
+      const { id,
+        type,
+        name,
+        has_credential: hasCredential,
+        created_at: createdAt,
+        job_queue : jobs
+      } = data
+      const details = 
+      {
+        id,
+        type,
+        name,
+        hasCredential,
+        createdAt,
+        status: getStatus(jobs)
+      }
+      return new Campaign(details)
+    })
+    return campaigns
+  })
 }
 
 export async function getCampaignStats(campaignId: number): Promise<CampaignStats> {
@@ -54,14 +71,7 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign |
       job_queue : jobs,
       email_templates: emailTemplate,
       sms_templates: smsTemplate } = campaign
-    const jobSet = new Set(jobs.map(({ status }: {status: string}) => status))
-    let status = Status.Draft
-    if(jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')){
-      status = Status.Sending
-    }
-    else if(jobSet.has('SENT') || jobSet.has('LOGGED')){
-      status = Status.Sent
-    }
+   
 
     const details = {
       id,
@@ -69,7 +79,7 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign |
       name,
       hasCredential,
       createdAt,
-      status,
+      status: getStatus(jobs),
       numRecipients,
       ...emailTemplate,
       ...smsTemplate,
