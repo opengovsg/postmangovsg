@@ -39,8 +39,13 @@ const createCampaign = async (req: Request, res: Response, next: NextFunction): 
   try{
     const { name, type }: { name: string; type: string} = req.body
     const { id: userId } = req.session?.user
-    await Campaign.create({ name, type, userId, valid: false })
-    return res.sendStatus(201)
+    const campaign: Campaign =  await Campaign.create({ name, type, userId, valid: false })
+    return res.status(201).json({
+      id: campaign.id,
+      name: campaign.name,
+      createdAt: campaign.createdAt,
+      type: campaign.type,
+    })
   }
   catch(err){
     return next(err)

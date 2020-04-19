@@ -58,3 +58,13 @@ export async function getCampaignStats(campaignId: number): Promise<CampaignStat
     status: Status.Sending,
   }))
 }
+
+export async function createCampaign(name: string, type: ChannelType): Promise<Campaign> {
+  return axios.post('/campaigns', { name, type }).then(
+    (response) => {
+      return new Campaign({
+        ...response.data,
+        status: Status.Draft,
+      })
+    })
+}
