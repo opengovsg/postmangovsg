@@ -25,8 +25,15 @@ async function getIsLoggedIn(): Promise<boolean> {
   })
 }
 
+async function logout(): Promise<void> {
+  return axios.get(`${POSTMAN_API_BASEURL}/auth/logout`, {
+    withCredentials: true,
+  })
+}
+
 export {
   getOtpWithEmail,
   loginWithOtp,
   getIsLoggedIn,
+  logout,
 }
