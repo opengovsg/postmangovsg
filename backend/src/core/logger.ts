@@ -1,4 +1,7 @@
 import winston from 'winston'
+import WinstonCloudwatch from 'winston-cloudwatch'
+
+import config from '@core/config'
 
 interface LoggerInterface {
   logger: winston.Logger;
@@ -17,8 +20,23 @@ class Logger implements LoggerInterface {
         winston.format.splat(),
         winston.format.json()
       ),
-      transports: [new winston.transports.Console()],
+      transports: [
+        new winston.transports.Console(),
+        new WinstonCloudwatch({
+          logGroupName: 'postmangovsg-beanstalk-testing',
+          logStreamName: 'dev',
+          awsRegion: config.aws.awsRegion,
+        })
+      ],
     })
+
+    this.logger.stream = {
+      // @ts-ignore
+      write: (message: string, _encoding: any) => {
+        // use the 'info' log level so the output will be picked up by both transports
+        this.logger.info(message)
+      }
+    }
   }
 }
 
