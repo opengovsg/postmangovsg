@@ -29,13 +29,19 @@ const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 // Format for logging
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
 
+// CORS settings
+const frontendUrl: string = process.env.FRONTEND_URL as string
+
 // Express session
 const sessionSecret: string = process.env.SESSION_SECRET as string
+const cookieDomain: string = process.env.COOKIE_DOMAIN as string
 const cookieSettings = {
   httpOnly: true,
   secure: IS_PROD,
   maxAge: 24 * 60 * 60 * 1000, // 24 hours,
   sameSite: true,
+  domain: cookieDomain,
+  path: '/',
 }
 
 // Node mailer
@@ -80,6 +86,7 @@ export default {
   },
   jwtSecret,
   MORGAN_LOG_FORMAT,
+  frontendUrl,
   session: {
     secret: sessionSecret,
     cookieSettings,

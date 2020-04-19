@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { getOtp, verifyOtp } from '@core/middlewares'
+import { getOtp, verifyOtp, isCookieAuthenticated, logout } from '@core/middlewares'
 
 const router = Router()
 
@@ -90,5 +90,46 @@ router.post('/otp', celebrate(getOtpValidator), getOtp)
  *                type: object
  */
 router.post('/login', celebrate(verifyOtpValidator), verifyOtp)
+
+/**
+ * @swagger
+ * path:
+ *  /auth/login:
+ *    get:
+ *      summary: check if user is logged in
+ *      tags:
+ *        - Authentication
+ *                  
+ *      responses:
+ *        "200":
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *        "401":
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.get('/login', isCookieAuthenticated, (_req, res) => (res.sendStatus(200)))
+
+/**
+ * @swagger
+ * path:
+ *  /auth/logout:
+ *    get:
+ *      summary: logs user out
+ *      tags:
+ *        - Authentication
+ *                  
+ *      responses:
+ *        "200":
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.get('/logout', logout)
 
 export default router

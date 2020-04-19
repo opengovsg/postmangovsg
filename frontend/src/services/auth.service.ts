@@ -1,29 +1,39 @@
 import axios from 'axios'
+import { POSTMAN_API_BASEURL } from 'config'
 
-// for dev use
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
+async function getOtpWithEmail(email: string): Promise<void> {
+  return axios.post(`${POSTMAN_API_BASEURL}/auth/otp`, {
+    email,
+  }, {
+    withCredentials: true,
   })
 }
 
-async function getOtpWithEmail(email: string): Promise<void> {
-  await sleep(1000)
-  return Promise.resolve()
-}
-
 async function loginWithOtp(email: string, otp: string): Promise<void> {
-  await sleep(1000)
-  return Promise.resolve()
+  return axios.post(`${POSTMAN_API_BASEURL}/auth/login`, {
+    email, otp,
+  }, {
+    withCredentials: true,
+  })
 }
 
 async function getIsLoggedIn(): Promise<boolean> {
-  await sleep(1000)
-  return Promise.resolve(true)
+  return axios.get(`${POSTMAN_API_BASEURL}/auth/login`, {
+    withCredentials: true,
+  }).then((response) => {
+    return response.status === 200
+  })
+}
+
+async function logout(): Promise<void> {
+  return axios.get(`${POSTMAN_API_BASEURL}/auth/logout`, {
+    withCredentials: true,
+  })
 }
 
 export {
   getOtpWithEmail,
   loginWithOtp,
   getIsLoggedIn,
+  logout,
 }
