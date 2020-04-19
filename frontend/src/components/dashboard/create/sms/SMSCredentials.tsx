@@ -4,15 +4,15 @@ import { validateCredentials } from 'services/sms.service'
 import { TextInput, PrimaryButton, TextInputWithButton } from 'components/common'
 import styles from '../Create.module.scss'
 
-const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { hasCredentials: boolean; onNext: (changes: any, next?: boolean) => void }) => {
+const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCredential: boolean; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [hasCredentials, setHasCredentials] = useState(initialHasCredentials)
+  const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [accountSid, setAccountSid] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [apiSecret, setApiSecret] = useState('')
   const [messagingServiceSid, setMessagingServiceSid] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
-  const [showCredentialFields, setShowCredentialFields] = useState(!hasCredentials)
+  const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
 
   function isDisabled() {
     return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\d+$/g).test(mobileNumber)
@@ -28,7 +28,7 @@ const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { has
 
   async function handleValidateCredentials() {
     const isValid = await validateCredentials(accountSid, apiKey, apiSecret, messagingServiceSid, mobileNumber)
-    setHasCredentials(isValid)
+    setHasCredential(isValid)
     setShowCredentialFields(false)
     resetFields()
   }
@@ -89,7 +89,7 @@ const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { has
     <>
       <sub>Step 3</sub>
       {
-        hasCredentials
+        hasCredential
           ? (
             <>
               <h2>Your current credentials have already been validated.</h2>
@@ -110,7 +110,7 @@ const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { has
               <div className="separator"></div>
 
               <div className="progress-button">
-                <PrimaryButton disabled={!hasCredentials} onClick={onNext}>Send Message →</PrimaryButton>
+                <PrimaryButton disabled={!hasCredential} onClick={onNext}>Send Message →</PrimaryButton>
               </div>
             </>
           )

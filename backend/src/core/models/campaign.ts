@@ -1,11 +1,23 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table, HasMany, HasOne } from 'sequelize-typescript'
 import { ChannelType } from '@core/constants'
 import { CampaignS3ObjectInterface } from '@core/interfaces'
 import { Credential } from './credential'
 import { User } from './user'
-
+import { JobQueue } from './job-queue'
+import { EmailTemplate } from '@email/models'
+import { SmsTemplate } from '@sms/models'
 @Table({ tableName: 'campaigns' , underscored: true, timestamps: true })
 export class Campaign extends Model<Campaign> {
+  @HasMany(() => JobQueue, { as: 'job_queue' })
+  @HasOne(() => EmailTemplate, { as: 'email_templates' })
+  @HasOne(() => SmsTemplate, { as: 'sms_templates' })
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  })
+  id!: number
+
   @Column({
     type: DataType.STRING,
     allowNull: false,

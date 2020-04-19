@@ -1,11 +1,14 @@
 import { Request, Response, NextFunction } from 'express'
-import { Campaign } from '@core/models'
+import { literal } from 'sequelize'
+import { Campaign, JobQueue } from '@core/models'
+import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
 import { credentialService, hashService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
+
 
 const saveCredential = async (campaignId: number, credentialName: string, secret: string): Promise<void> => {
   // Check if credential is already in the credential table
@@ -81,4 +84,33 @@ const storeCredentials = async (req: Request, res: Response,  next: NextFunction
   return res.json({ message: 'OK' })
 }
 
-export { isSmsCampaignOwnedByUser, storeCredentials }
+
+const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try{
+    const { campaignId } = req.params
+    const campaign: Campaign | null =  await Campaign.findOne({ 
+      where: { id: +campaignId }, 
+      attributes: [
+        'id', 'name', 'type', 'created_at', 'valid', [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+      ],
+      include: [
+        {
+          model: JobQueue,
+          attributes: ['status'],
+        },
+        {
+          model: SmsTemplate,
+          attributes: ['body'],
+        }],
+    })
+    const numRecipients: number = await SmsMessage.count(
+      {
+        where: { campaignId: +campaignId },
+      }
+    )
+    return res.json({ campaign, 'num_recipients': numRecipients })
+  }catch(err){
+    return next(err)
+  }
+}
+export { isSmsCampaignOwnedByUser, storeCredentials, getCampaignDetails }

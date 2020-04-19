@@ -31,22 +31,6 @@ export async function getCampaigns(): Promise<Array<Campaign>> {
   return Promise.resolve(campaigns)
 }
 
-export async function getCampaignDetails(campaignId: number): Promise<Campaign> {
-  await sleep(100)
-  return Promise.resolve(new SMSCampaign({
-    id: campaignId,
-    name: 'Project Name',
-    type: ChannelType.SMS,
-    status: Status.Sent,
-    createdAt: Date.now(),
-    hasCredentials: true,
-    body: 'something {{ hello }} ',
-    numRecipients: 524,
-    sentAt: Date.now(),
-  }))
-}
-
-
 export async function getCampaignStats(campaignId: number): Promise<CampaignStats> {
   await sleep(100)
   return Promise.resolve(new CampaignStats({
@@ -59,12 +43,44 @@ export async function getCampaignStats(campaignId: number): Promise<CampaignStat
   }))
 }
 
+export async function getCampaignDetails(campaignId: number): Promise<Campaign | SMSCampaign> {
+  return axios.get(`/campaign/${campaignId}`).then((response) => {
+    const { campaign, num_recipients : numRecipients } = response.data
+    const { id,
+      type,
+      name,
+      has_credential: hasCredential,
+      created_at: createdAt,
+      job_queue : jobs,
+      email_templates: emailTemplate,
+      sms_templates: smsTemplate } = campaign
+    const jobSet = new Set(jobs.map(({ status }: {status: string}) => status))
+    let status = Status.Draft
+    if(jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')){
+      status = Status.Sending
+    }
+    else if(jobSet.has('SENT') || jobSet.has('LOGGED')){
+      status = Status.Sent
+    }
+
+    const details = {
+      id,
+      type,
+      name,
+      hasCredential,
+      createdAt,
+      status,
+      numRecipients,
+      ...emailTemplate,
+      ...smsTemplate,
+    }
+    return type === ChannelType.SMS ? new SMSCampaign(details) : new Campaign(details)
+  })
+}
+
 export async function createCampaign(name: string, type: ChannelType): Promise<Campaign> {
   return axios.post('/campaigns', { name, type }).then(
     (response) => {
-      return new Campaign({
-        ...response.data,
-        status: Status.Draft,
-      })
+      return new Campaign(response.data)
     })
 }

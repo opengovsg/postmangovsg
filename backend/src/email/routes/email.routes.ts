@@ -17,7 +17,7 @@ import {
   retryCampaign, 
   canEditCampaign, 
 } from '@core/middlewares'
-import { storeCredentials } from '@email/middlewares'
+import { storeCredentials, getCampaignDetails } from '@email/middlewares'
 import { 
   MissingTemplateKeysError, 
   HydrationError, 
@@ -86,10 +86,6 @@ const sendCampaignValidator = {
 }
 
 // handlers
-// Get campaign details
-const getCampaignDetails = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
-}
 
 const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: EmailTemplate; firstRecord: EmailMessage}): Promise<void> => {
   if (!updatedTemplate.params) return

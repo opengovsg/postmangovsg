@@ -24,7 +24,7 @@ import {
   RecipientColumnMissing, 
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
-import { storeCredentials } from '@sms/middlewares'
+import { storeCredentials, getCampaignDetails } from '@sms/middlewares'
 import logger from '@core/logger'
 
 const router = Router({ mergeParams: true })
@@ -99,9 +99,6 @@ const sendCampaignValidator = {
 
 // handlers
 // Get campaign details
-const getCampaignDetails = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
-}
 
 const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: SmsTemplate; firstRecord: SmsMessage}): Promise<void> => {
   if (!updatedTemplate.params) return
