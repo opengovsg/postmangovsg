@@ -34,7 +34,7 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
         )
       case EmailProgress.UploadRecipients:
         return (
-          <EmailRecipients csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
+          <EmailRecipients id={campaign.id} csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
         )
       case EmailProgress.Send:
         return (

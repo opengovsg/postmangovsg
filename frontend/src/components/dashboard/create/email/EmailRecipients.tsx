@@ -1,20 +1,25 @@
 import React, { useState } from 'react'
 
+import { getPreviewMessage } from 'services/campaign.service'
 import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
 
-const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
+const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { id: number; csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
+  const [messagePreview, setMessagePreview] = useState('')
 
   function uploadFile(files: File[]) {
     const uploadedFile = files[0].name
     setIsUploading(true)
-    setTimeout(() => {
+    setTimeout(async () => {
       setNumRecipients(100)
       setUploadedCsvFilename(uploadedFile)
       setIsUploading(false)
+
+      const msgPreview = await getPreviewMessage(id)
+      setMessagePreview(msgPreview)
     }, 1000)
   }
 
@@ -38,6 +43,15 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
         </InfoBlock>
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+      <div className="separator"></div>
+      {
+        csvFilename &&
+        <>
+          <p>Message preview</p>
+          <InfoBlock>{messagePreview}</InfoBlock>
+          <div className="separator"></div>
+        </>
+      }
       <div className="progress-button">
         <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Preview →</PrimaryButton>
       </div>

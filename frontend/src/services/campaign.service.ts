@@ -106,3 +106,6 @@ export async function stopCampaign(campaignId: number): Promise<boolean>{
 export async function retryCampaign(campaignId: number): Promise<boolean>{
   return axios.post(`/campaign/${campaignId}/retry`).then((response) => response.status===200)
 }
+export async function getPreviewMessage(campaignId: number) {
+  return 'something hola'
+}
