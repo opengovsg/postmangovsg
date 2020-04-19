@@ -1,0 +1,19 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+$title-bar-height: 5rem;
+
+.titleBar {
+  @include flex-horizontal;
+  height: $title-bar-height;
+  color: $dark-blue;
+  border-bottom: 1px solid $indigo-blue;
+  padding: 0 $site-padding;
+  justify-content: space-between;
+}
+
+.titleText {
+  color: $dark-blue;
+  font-weight: 300;
+  margin-bottom: 0;
+}

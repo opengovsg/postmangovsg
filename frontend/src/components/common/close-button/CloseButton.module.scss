@@ -1,0 +1,24 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.close {
+  @include flex-center;
+  color: $grey;
+  font-size: 2.5rem;
+  line-height: 1;
+  font-weight: 100;
+  transform: rotate(45deg);
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    color: darken($grey, 20%);
+  }
+
+  &:active {
+    color: darken($grey, 30%);
+  }
+}

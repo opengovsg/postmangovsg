@@ -1,6 +1,7 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
+
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { 
@@ -23,6 +24,7 @@ import {
   RecipientColumnMissing, 
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
+import { storeCredentials } from '@sms/middlewares'
 import logger from '@core/logger'
 
 const router = Router({ mergeParams: true })
@@ -54,22 +56,24 @@ const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
     twilioAccountSid: Joi
       .string()
-      .trim(),
-    twilioSomethingId: Joi
-      .string()
-      .trim(),
-    twilioApiKey: Joi
-      .string()
-      .trim(),
-  }),
-}
-
-const validateCredentialsValidator = {
-  [Segments.BODY]: Joi.object({
-    phoneNumber: Joi
+      .trim()
+      .required(),
+    twilioApiSecret: Joi
       .string()
       .trim()
-      .pattern(/^\+\d{8,15}$/),
+      .required(),
+    twilioApiKey: Joi
+      .string()
+      .trim()
+      .required(),
+    twilioMessagingServiceSid: Joi
+      .string()
+      .trim()
+      .required(),
+    testNumber: Joi
+      .string()
+      .trim()
+      .required(),
   }),
 }
 
@@ -211,16 +215,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     return next(err)
   }
-}
-
-// Read file from s3 and populate messages table
-const storeCredentials = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
-}
-
-// Send validation sms to specified phone number
-const validateCredentials = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
 }
 
 // Get preview of one message
@@ -375,7 +369,14 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/TwilioCredentials'
+ *            required:
+ *              - testNumber
+ *              - twilioCredentials
+ *            properties:
+ *              testNumber:
+ *                type: string
+ *              twilioCredentials:
+ *                $ref: '#/components/schemas/TwilioCredentials'
  *
  *      responses:
  *        200:
@@ -385,41 +386,6 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *                type: object
  */
 router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaign, storeCredentials)
-
-/**
- * @swagger
- * path:
- *  /campaign/{campaignId}/sms/validate:
- *    post:
- *      tags:
- *        - SMS
- *      summary: Vaidates stored credentials by sending to a specific phone number
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                phoneNumber:
- *                  type: string
- *                  pattern: '^\+\d{8,15}$'
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- */
-router.post('/validate', celebrate(validateCredentialsValidator), canEditCampaign, validateCredentials)
-
 
 /**
  * @swagger

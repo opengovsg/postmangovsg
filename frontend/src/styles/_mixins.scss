@@ -1,0 +1,126 @@
+@import 'styles/_variables';
+
+$tablet: 769px;
+$desktop: 1024px;
+$widescreen: 1216px;
+
+@mixin mobile {
+  @media (max-width: $tablet - 0.1px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $tablet) and (max-width: $desktop - 0.1px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $desktop) and (max-width: $widescreen - 0.1px) {
+    @content;
+  }
+}
+
+@mixin widescreen {
+  @media (min-width: $widescreen) {
+    @content;
+  }
+}
+
+@mixin flex-horizontal {
+  display: flex;
+  align-items: center;
+}
+
+@mixin flex-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin app-name {
+  font-weight: bold;
+  font-size: 2.2rem;
+  color: $indigo-blue;
+  letter-spacing: 0.5rem;
+}
+
+@mixin icon {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+}
+
+@mixin button($background-color) {
+  background-color: $background-color;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: $button-height;
+  min-width: $button-min-width;
+  font-size: 0.8rem;
+  border: 0;
+  color: white;
+  text-align: center;
+  padding: 1px $border-radius 2px;
+  border-radius: $border-radius;
+  cursor: pointer;
+  user-select: none;
+
+  &.alignRight {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  &:hover {
+    background-color: darken($background-color, 10%);
+    outline: none;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    background-color: darken($background-color, 18%);
+  }
+
+  &:disabled {
+    background-color: $light-grey;
+  }
+
+  i {
+    @include icon;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+  }
+}
+
+@mixin block($backgroundColor, $color) {
+  padding: 1rem 2rem;
+  border-radius: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  background-color: $backgroundColor;
+  color: $color;
+  border-left: 0.5rem solid lighten($color, 10%);
+  margin: 2rem 0;
+
+  li {
+    margin-bottom: 0.5rem;
+    list-style: none;
+
+    i {
+      margin-right: 1.5rem;
+    }
+  }
+}

@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+@import '~boxicons/css/boxicons.min.css';
+
+@import 'styles/_variables';
+
+html,
+body {
+  font-size: 16px;
+  font-family: $font-stack;
+  color: $dark-blue;
+  font-weight: normal;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: $font-stack;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-top: 0;
+  font-weight: normal;
+}
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: normal;
+}
+h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  font-weight: normal;
+}
+h4 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+h5 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+a {
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+li,
+a {
+  outline: none;
+}
+
+p {
+  color: $grey;
+  margin-block-start: 0;
+  margin-block-end: 1rem;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+  font-size: 0.8rem;
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+table {
+  border-spacing: 0;
+}
+
+th {
+  text-align: left;
+}
+
+ul {
+  list-style-type: none;
+}
+
+mark {
+  background-color: rgba(255, 194, 204, 0.5);
+  border-radius: 4px;
+  padding-bottom: 2px;
+  color: inherit;
+}
+
+sub {
+  color: $light-grey;
+}
+
+.align-right {
+  text-align: right;
+}
