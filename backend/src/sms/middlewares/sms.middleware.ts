@@ -41,11 +41,11 @@ const getCredential = (req: Request): TwilioCredentials => {
   return credential
 }
 
-const sendMessage = async (campaignId: string, recipient: string, credential: TwilioCredentials): Promise<boolean> => {
+const sendMessage = async (campaignId: string, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
   const msg = await getHydratedMsg(campaignId)
-  if (!msg) return false
+  if (!msg) return
 
-  if (!config.IS_PROD) return true
+  if (!config.IS_PROD) return
 
   logger.info('Sending sms using Twilio.')
   const twilioService = new TwilioService(credential)
