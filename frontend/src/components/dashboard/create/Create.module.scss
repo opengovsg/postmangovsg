@@ -14,6 +14,14 @@
   margin: 0 auto;
 }
 
+.sendInfo {
+  p { margin-bottom: 0; }
+  h4 {
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
 .darkBlueBtn {
   @include button($dark-blue)
 }

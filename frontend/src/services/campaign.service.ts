@@ -39,7 +39,8 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign> 
     type: ChannelType.SMS,
     status: Status.Draft,
     createdAt: Date.now(),
-    hasCredentials: false,
+    hasCredentials: true,
     body: 'something {{ hello }} ',
+    numRecipients: 524,
   }))
 }
