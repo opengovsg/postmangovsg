@@ -60,7 +60,7 @@ export async function getCampaignStats(campaignId: number): Promise<CampaignStat
   }))
 }
 
-export async function getCampaignDetails(campaignId: number): Promise<Campaign | SMSCampaign> {
+export async function getCampaignDetails(campaignId: number): Promise<EmailCampaign | SMSCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
     const { campaign, num_recipients : numRecipients } = response.data
     const { id,
@@ -84,7 +84,15 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign |
       ...emailTemplate,
       ...smsTemplate,
     }
-    return type === ChannelType.SMS ? new SMSCampaign(details) : new Campaign(details)
+    
+    switch(type){
+      case ChannelType.SMS:
+        return new SMSCampaign(details)
+      case ChannelType.Email:
+        return new EmailCampaign(details)
+      default:
+        throw new Error('Invalid channel type')
+    }
   })
 }
 
