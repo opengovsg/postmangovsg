@@ -24,7 +24,6 @@ const saveCredential = async (campaignId: number, credentialName: string, secret
   // Store credential to credential table and update campaign
   await credentialService.addCredentialToCampaign(campaignId, credentialName)
 
-  if (!config.IS_PROD) return
   // Upload the credential to aws secret manager
   await credentialService.storeSecret(credentialName, secret)  
 
@@ -44,8 +43,6 @@ const getCredential = (req: Request): TwilioCredentials => {
 const sendMessage = async (campaignId: string, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
   const msg = await getHydratedMsg(campaignId)
   if (!msg) return
-
-  if (!config.IS_PROD) return
 
   logger.info('Sending sms using Twilio.')
   const twilioService = new TwilioService(credential)
