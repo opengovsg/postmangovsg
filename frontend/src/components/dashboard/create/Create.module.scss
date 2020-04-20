@@ -13,3 +13,7 @@
   padding: $content-vertical-padding $site-padding;
   margin: 0 auto;
 }
+
+.darkBlueBtn {
+  @include button($dark-blue)
+}

@@ -17,7 +17,7 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
       <h2>Create message template</h2>
       <h4>Message</h4>
       <TextArea highlight={true} value={body} onChange={setBody} />
-      <div className="align-right">
+      <div className="progress-button">
         <PrimaryButton disabled={!body} onClick={onNextClicked}>Upload Recipients →</PrimaryButton>
       </div>
     </>

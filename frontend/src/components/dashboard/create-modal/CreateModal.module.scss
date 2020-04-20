@@ -35,6 +35,10 @@
   }
 }
 
+.input {
+  background-color: $light-blue;
+}
+
 .icon {
   @include icon;
 }
@@ -52,13 +56,10 @@
   margin-bottom: 1.25rem;
 }
 
-.separator {
-  border-bottom: 1px solid $transparent-blue;
-}
-
 .subtext {
   font-size: 0.75rem;
   margin-top: 1rem;
+  margin-bottom: 0;
 
   a {
     font-size: 0.75rem;

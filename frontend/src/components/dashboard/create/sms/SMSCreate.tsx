@@ -4,6 +4,7 @@ import { SMSCampaign, SMSProgress } from 'classes'
 import { ProgressPane } from 'components/common'
 import SMSTemplate from './SMSTemplate'
 import SMSRecipients from './SMSRecipients'
+import SMSCredentials from './SMSCredentials'
 
 import styles from '../Create.module.scss'
 
@@ -15,7 +16,8 @@ const SMS_PROGRESS_STEPS = [
 ]
 
 const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => {
-  const [activeStep, setActiveStep] = useState(initialCampaign.progress)
+  const [activeStep, setActiveStep] = useState(2)
+  // const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
 
   // Modifies campaign object in state and navigates to next step
@@ -39,7 +41,7 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
         )
       case SMSProgress.InsertCredentials:
         return (
-          <>Creds</>
+          <SMSCredentials hasCredentials={campaign.hasCredentials} onNext={onNext} />
         )
       case SMSProgress.Send:
         return (
