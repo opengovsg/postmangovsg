@@ -3,6 +3,7 @@ import { Campaign } from './Campaign'
 export enum EmailProgress {
   CreateTemplate,
   UploadRecipients,
+  SendTestMessage,
   Send,
 }
 
@@ -12,6 +13,7 @@ export class EmailCampaign extends Campaign {
   csvFilename: string
   numRecipients: number
   preview: string
+  hasCredential: boolean
   progress: EmailProgress = EmailProgress.CreateTemplate
 
   constructor(input: any) {
@@ -21,6 +23,7 @@ export class EmailCampaign extends Campaign {
     this.csvFilename = input['csvFilename']
     this.numRecipients = input['numRecipients']
     this.preview = input['preview']
+    this.hasCredential = input['hasCredential']
     this.setProgress()
   }
 
@@ -29,6 +32,8 @@ export class EmailCampaign extends Campaign {
       this.progress = EmailProgress.CreateTemplate
     } else if (!this.numRecipients) {
       this.progress = EmailProgress.UploadRecipients
+    } else if (!this.hasCredential){
+      this.progress = EmailProgress.SendTestMessage
     } else {
       this.progress = EmailProgress.Send
     }

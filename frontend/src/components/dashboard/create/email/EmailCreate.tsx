@@ -6,6 +6,7 @@ import EmailTemplate from './EmailTemplate'
 import EmailRecipients from './EmailRecipients'
 import EmailSend from './EmailSend'
 import EmailDetail from './EmailDetail'
+import EmailCredentials from './EmailCredentials'
 
 import styles from '../Create.module.scss'
 import { Status } from 'classes'
@@ -13,6 +14,7 @@ import { Status } from 'classes'
 const EMAIL_PROGRESS_STEPS = [
   'Create Template',
   'Upload Recipients',
+  'Send Test Message',
   'Send',
 ]
 
@@ -38,6 +40,10 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
       case EmailProgress.UploadRecipients:
         return (
           <EmailRecipients id={campaign.id} csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
+        )
+      case EmailProgress.SendTestMessage:
+        return (
+          <EmailCredentials hasCredential={campaign.hasCredential} onNext={onNext}/>
         )
       case EmailProgress.Send:
         return (
