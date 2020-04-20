@@ -18,7 +18,7 @@ const saveCredential = async (campaignId: number, credentialName: string, secret
   // If credential doesnt already exist
   if (!credentialExists) {
     // Upload the credential to aws secret manager
-    await credentialService.storeSecret(credentialName, secret)  
+    await credentialService.storeSecret(credentialName, secret)
   }
 
   // Store credential to credential table and update campaign
@@ -30,29 +30,11 @@ const getCredential = (req: Request): TwilioCredentials => {
   const { twilioAccountSid, twilioApiKey, twilioApiSecret, twilioMessagingServiceSid } = req.body
   const credential: TwilioCredentials = {
     accountSid: twilioAccountSid,
-    apiKey: twilioApiKey, 
+    apiKey: twilioApiKey,
     apiSecret: twilioApiSecret,
     messagingServiceSid: twilioMessagingServiceSid,
   }
   return credential
-}
-
-const sendMessage = async (campaignId: string, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
-  const msg = await getHydratedMsg(campaignId)
-  if (!msg) return
-
-  logger.info('Sending sms using Twilio.')
-  const twilioService = new TwilioService(credential)
-  return twilioService.send(recipient, msg)
-}
-
-const getHydratedMsg = async (campaignId: string): Promise<string | null>  => {
-  const params = await getParams(campaignId)
-  const body = await getSmsBody(campaignId)
-  if (params === null || body === null ) return null
-
-  const hydratedMsg = template(body, params)
-  return hydratedMsg
 }
 
 const getParams = async (campaignId: string): Promise<{[key: string]: string} | null> => {
@@ -65,6 +47,24 @@ const getSmsBody = async (campaignId: string): Promise<string | null> => {
   const smsTemplate = await SmsTemplate.findOne({ where: { campaignId }, attributes: ['body'] })
   if (smsTemplate === null) return null
   return smsTemplate.body as string
+}
+
+const getHydratedMsg = async (campaignId: string): Promise<string | null>  => {
+  const params = await getParams(campaignId)
+  const body = await getSmsBody(campaignId)
+  if (params === null || body === null ) return null
+
+  const hydratedMsg = template(body, params)
+  return hydratedMsg
+}
+
+const sendMessage = async (campaignId: string, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
+  const msg = await getHydratedMsg(campaignId)
+  if (!msg) return
+
+  logger.info('Sending sms using Twilio.')
+  const twilioService = new TwilioService(credential)
+  return twilioService.send(recipient, msg)
 }
 
 const getEncodedHash = async (secret: string): Promise<string> => {
@@ -84,7 +84,7 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
   }
 }
 
-// Sends out a test message. 
+// Sends out a test message.
 // If it is successful, stores the twilio credential in AWS secret manager and db, as well as updating the campaign table.
 const storeCredentials = async (req: Request, res: Response,  next: NextFunction): Promise<Response | void> => {
   const credential: TwilioCredentials = getCredential(req)
@@ -113,8 +113,8 @@ const storeCredentials = async (req: Request, res: Response,  next: NextFunction
 const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
-    const campaign: Campaign | null =  await Campaign.findOne({ 
-      where: { id: +campaignId }, 
+    const campaign: Campaign | null =  await Campaign.findOne({
+      where: { id: +campaignId },
       attributes: [
         'id', 'name', 'type', 'created_at', 'valid', [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
       ],

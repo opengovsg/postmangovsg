@@ -27,12 +27,13 @@ class S3Service {
     const parser = CSVParse({
       delimiter: ',',
       trim: true,
+      // eslint-disable-next-line @typescript-eslint/camelcase
       skip_empty_lines: true,
     })
     readStream.pipe(parser)
     let headers: string[] = []
     let recipientIndex: number
-    const params: Map<String, CSVParamsInterface> = new Map()
+    const params: Map<string, CSVParamsInterface> = new Map()
     for await (const row of parser) {
       if (isEmpty(headers)) {
         const lowercaseHeaders = row.map((col: string) => col.toLowerCase())
