@@ -3,25 +3,26 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
 import { Campaign } from '@core/models'
 import { EmailTemplate, EmailMessage } from '@email/models'
-import { 
+import {
   updateCampaignS3Metadata,
-  template, 
+  template,
   testHydration,
   extractS3Key,
 } from '@core/services'
 import { populateEmailTemplate, upsertEmailTemplate } from '@email/services'
-import { 
-  uploadStartHandler, 
-  sendCampaign, 
-  stopCampaign, 
-  retryCampaign, 
-  canEditCampaign, 
+import {
+  uploadStartHandler,
+  sendCampaign,
+  stopCampaign,
+  retryCampaign,
+  canEditCampaign,
 } from '@core/middlewares'
 import { storeCredentials, getCampaignDetails } from '@email/middlewares'
-import { 
-  MissingTemplateKeysError, 
-  HydrationError, 
-  RecipientColumnMissing, 
+
+import {
+  MissingTemplateKeysError,
+  HydrationError,
+  RecipientColumnMissing,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
@@ -192,7 +193,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const records = await testHydration(+campaignId, s3Key, emailTemplate.params!)
       // START populate template
-      populateEmailTemplate(+campaignId, records)
+      await populateEmailTemplate(+campaignId, records)
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err
@@ -424,7 +425,7 @@ router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCamp
  *                rate:
  *                  example: 10
  *                  type: integer
- *                  minimum: 1              
+ *                  minimum: 1
  *
  *      responses:
  *        200:
