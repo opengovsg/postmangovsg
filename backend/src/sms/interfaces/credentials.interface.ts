@@ -1,7 +1,8 @@
 export interface TwilioCredentials {
-  Key1: string;
-  Key2: string;
-  Key3: string;
+  accountSid: string;
+  apiKey: string;
+  apiSecret: string;
+  messagingServiceSid: string;
 }
 /**
  * @swagger
@@ -10,10 +11,12 @@ export interface TwilioCredentials {
  *      TwilioCredentials:
  *        type: object
  *        properties:
- *          Key1:
+ *          accountSid:
  *            type: string
- *          Key2:
+ *          apiKey:
  *            type: string
- *          Key3:
+ *          apiSecret:
+ *            type: string
+ *          messagingServiceSid:
  *            type: string
  */

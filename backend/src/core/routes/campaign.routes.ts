@@ -1,25 +1,26 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 import { ChannelType } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
-
+import { createCampaign, listCampaigns } from '@core/middlewares'
 const router = Router()
 
 // validators
-const listProjectsValidator = {
-  [Segments.PARAMS]: Joi.object(),
+const listCampaignsValidator = {
   [Segments.QUERY]: Joi.object({
     limit: Joi
       .number()
-      .min(0),
+      .integer()
+      .min(1)
+      .optional(),
     offset: Joi
       .number()
-      .positive()
-      .min(1)
+      .integer()
+      .min(0)
       .optional(),
   }),
 }
 
-const createProjectValidator = {
+const createCampaignValidator = {
   [Segments.BODY]: Joi.object({
     type: Joi
       .string()
@@ -33,46 +34,31 @@ const createProjectValidator = {
   }),
 }
 
-// route handlers here
-
-// Create project
-async function createProject(_req: Request, res: Response): Promise<void> {
-  res.json({
-    // project details
-  })
-}
-
-// List projects
-async function listProjects(_req: Request, res: Response): Promise<void> {
-  res.json({ message: 'ok' })
-}
-
 // actual routes here
 
 /**
  * @swagger
  * path:
- *  /projects:
+ *  /campaigns:
  *    get:
  *      tags:
- *        - Projects
- *      summary: List all projects for user
+ *        - Campaigns
+ *      summary: List all campaigns for user
  *      parameters:
  *        - in: query
+ *          name: limit
+ *          description: max number of campaigns returned
+ *          required: false
+ *          schema:
+ *            type: integer
+ *            minimum: 1
+*        - in: query
  *          name: offset
- *          description: offset index for projects
+ *          description: offset to begin returning campaigns from
  *          required: false
  *          schema:
  *            type: integer
  *            minimum: 0
- *        - in: query
- *          name: limit
- *          description: max number of projects returned
- *          required: true
- *          schema:
- *            type: integer
- *            minimum: 1
- *                  
  *      responses:
  *        "200":
  *          content:
@@ -80,18 +66,18 @@ async function listProjects(_req: Request, res: Response): Promise<void> {
  *              schema:
  *                type: array
  *                items:
- *                  $ref: '#/components/schemas/ProjectMeta'
+ *                  $ref: '#/components/schemas/CampaignMeta'
  */
-router.get('/', celebrate(listProjectsValidator), listProjects)
+router.get('/', celebrate(listCampaignsValidator), listCampaigns)
 
 /**
  * @swagger
  * path:
- *  /projects:
+ *  /campaigns:
  *    post:
- *      summary: Create a new project
+ *      summary: Create a new campaign
  *      tags:
- *        - Projects
+ *        - Campaigns
  *      requestBody:
  *        required: true
  *        content:
@@ -101,19 +87,19 @@ router.get('/', celebrate(listProjectsValidator), listProjects)
  *              properties:
  *                name:
  *                  type: string
- *                type: 
+ *                type:
  *                   $ref: '#/components/schemas/ChannelType'
  *              required:
  *              - name
  *              - type
- *                  
+ *
  *      responses:
- *        "200":
+ *        "201":
  *          content:
  *            application/json:
  *              schema:
  *                type: object
  */
-router.post('/', celebrate(createProjectValidator), createProject)
+router.post('/', celebrate(createCampaignValidator), createCampaign)
 
 export default router

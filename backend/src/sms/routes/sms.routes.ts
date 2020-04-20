@@ -1,51 +1,79 @@
-import { Request, Response, Router } from 'express'
+import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
+import { difference, keys } from 'lodash'
 
-const router = Router()
+import { Campaign } from '@core/models'
+import { SmsMessage, SmsTemplate } from '@sms/models'
+import { 
+  updateCampaignS3Metadata,
+  template, 
+  testHydration,
+  extractS3Key,
+} from '@core/services'
+import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services'
+import { 
+  uploadStartHandler, 
+  sendCampaign, 
+  stopCampaign, 
+  retryCampaign, 
+  canEditCampaign, 
+} from '@core/middlewares'
+import { 
+  MissingTemplateKeysError, 
+  HydrationError, 
+  RecipientColumnMissing, 
+} from '@core/errors'
+import { isSuperSet } from '@core/utils'
+import { storeCredentials } from '@sms/middlewares'
+import logger from '@core/logger'
+
+const router = Router({ mergeParams: true })
 
 // validators
 const storeTemplateValidator = {
   [Segments.BODY]: Joi.object({
     body: Joi
-      .string(),
+      .string()
+      .required(),
   }),
 }
 
-const uploadstartValidator = {
-  [Segments.BODY]: Joi.object({
-    filename: Joi
+const uploadStartValidator = {
+  [Segments.QUERY]: Joi.object({
+    mimeType: Joi
       .string()
-      .trim()
-      .min(5)
-      .max(100)
-      .pattern(/^[^\\/]+\.csv$/),
+      .required(),
   }),
 }
 
 const uploadCompleteValidator = {
-  [Segments.BODY]: Joi.object(),
+  [Segments.BODY]: Joi.object({
+    transactionId: Joi.string().required(),
+  }),
 }
 
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
     twilioAccountSid: Joi
       .string()
-      .trim(),
-    twilioSomethingId: Joi
-      .string()
-      .trim(),
-    twilioApiKey: Joi
-      .string()
-      .trim(),
-  }),
-}
-
-const validateCredentialsValidator = {
-  [Segments.BODY]: Joi.object({
-    phoneNumber: Joi
+      .trim()
+      .required(),
+    twilioApiSecret: Joi
       .string()
       .trim()
-      .pattern(/^\+\d{8,15}$/),
+      .required(),
+    twilioApiKey: Joi
+      .string()
+      .trim()
+      .required(),
+    twilioMessagingServiceSid: Joi
+      .string()
+      .trim()
+      .required(),
+    testNumber: Joi
+      .string()
+      .trim()
+      .required(),
   }),
 }
 
@@ -59,7 +87,7 @@ const previewMessageValidator = {
   }),
 }
 
-const sendMessagesValidator = {
+const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
     rate: Joi
       .number()
@@ -70,81 +98,165 @@ const sendMessagesValidator = {
 }
 
 // handlers
-// Get project details
-async function getProjectDetails(_req: Request, res: Response): Promise<void> {
+// Get campaign details
+const getCampaignDetails = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'OK' })
+}
+
+const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: SmsTemplate; firstRecord: SmsMessage}): Promise<void> => {
+  if (!updatedTemplate.params) return
+
+  // first set project.valid to false, switch this back to true only when hydration succeeds
+  await Campaign.update({
+    valid: false,
+  }, {
+    where: { id: campaignId },
+  })
+
+  const paramsFromS3 = keys(firstRecord.params)
+  // warn if params from s3 file are not a superset of saved params
+  if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
+    const missingKeys = difference(updatedTemplate.params, paramsFromS3)
+    throw new MissingTemplateKeysError(missingKeys)
+  }
+  // try hydrate(...), return 4xx if unable to do so
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
+    // set campaign.valid to true since templating suceeded AND file has been uploaded
+    await Campaign.update({
+      valid: true,
+    }, {
+      where: { id: campaignId },
+    })
+  } catch (err) {
+    logger.error(`Hydration error: ${err.stack}`)
+    throw new HydrationError()
+  }
 }
 
 // Store body of message in sms template table
-async function storeTemplate(_req: Request, res: Response): Promise<void> {
-  res.json({ message: 'OK' })
-}
+const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    // extract params from template, save to db (this will be done with hook)
+    const updatedTemplate = await upsertSmsTemplate(req.body.body, +campaignId)
 
-// Returns presigned url for upload
-async function uploadStart(_req: Request, res: Response): Promise<void> {
-  res.json({ signedUrl: '' })
+    const firstRecord = await SmsMessage.findOne({
+      where: { campaignId },
+    })
+
+    // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
+    if (firstRecord && updatedTemplate.params) {
+      await checkNewTemplateParams({ campaignId: +campaignId, updatedTemplate, firstRecord })
+    }
+    return res.status(200).json({
+      message: `Template for campaign ${campaignId} updated`,
+    })
+  } catch (err) {
+    if (err instanceof HydrationError) {
+      return res.status(400).json({ message: err.message })
+    }
+    if (err instanceof MissingTemplateKeysError) {
+      return res.status(400).json({ message: err.message })
+    }
+    return next(err)
+  }
 }
 
 // Read file from s3 and populate messages table
-async function uploadComplete(_req: Request, res: Response): Promise<void> {
-  res.json({ numMessages: 100 })
-}
+const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    // TODO: validate if project is in editable state
 
-// Read file from s3 and populate messages table
-async function storeCredentials(_req: Request, res: Response): Promise<void> {
-  res.json({ message: 'OK' })
-}
+    // switch campaign to invalid - this is for the case of uploading over an existing file
+    await Campaign.update({
+      valid: false,
+    }, {
+      where: { id: +campaignId },
+    })
 
-// Send validation sms to specified phone number
-async function validateCredentials(_req: Request, res: Response): Promise<void> {
-  res.json({ message: 'OK' })
+    // extract s3Key from transactionId
+    const { transactionId } = req.body
+    let s3Key: string
+    try {
+      s3Key = extractS3Key(transactionId)
+    } catch (err) {
+      return res.status(400).json(err.message)
+    }
+
+    // check if template exists
+    const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
+    if (smsTemplate === null || smsTemplate.body === null) {
+      return res.status(400).json({
+        message: 'Template does not exist, please create a template',
+      })
+    }
+
+    // Updates metadata in project
+    await updateCampaignS3Metadata({ key: s3Key, campaignId })
+
+    // carry out templating / hydration
+    // - download from s3
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const records = await testHydration(+campaignId, s3Key, smsTemplate.params!)
+      // START populate template
+      populateSmsTemplate(+campaignId, records)
+    } catch (err) {
+      logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
+      throw err
+    }
+    return res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
+  } catch (err) {
+    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
+      return res.status(400).json({ message: err.message })
+    }
+    return next(err)
+  }
 }
 
 // Get preview of one message
-async function previewMessage(_req: Request, res: Response): Promise<void> {
+const previewMessage = async (_req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Message content' })
-}
-
-// Queue job for sending
-async function sendMessages(_req: Request, res: Response): Promise<void> {
-  res.json({ message: 'OK' })
 }
 
 // Routes
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms:
+ *  /campaign/{campaignId}/sms:
  *    get:
  *      tags:
  *        - SMS
- *      summary: Get sms project details
+ *      summary: Get sms campaign details
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
  *            type: string
- *                  
+ *
  *      responses:
  *        200:
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/SmsProject'
+ *                $ref: '#/components/schemas/SmsCampaign'
  */
-router.get('/', getProjectDetails)
+router.get('/', getCampaignDetails)
 
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/template:
+ *  /campaign/{campaignId}/sms/template:
  *    put:
  *      tags:
  *        - SMS
  *      summary: Stores body template for sms campaign
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -160,42 +272,6 @@ router.get('/', getProjectDetails)
  *                  type: string
  *                  minLength: 1
  *                  maxLength: 200
- *                  
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- */
-router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
-
-/**
- * @swagger
- * path:
- *  /project/{projectId}/sms/upload-start:
- *    post:
- *      tags:
- *        - SMS
- *      summary: Gets presigned url for upload
- *      parameters:
- *        - name: projectId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                body:
- *                  type: string
- *                  minLength: 1
- *                  maxLength: 200
- *                  pattern: '^[^\\/]+\.csv$'
  *
  *      responses:
  *        200:
@@ -203,46 +279,87 @@ router.put('/template', celebrate(storeTemplateValidator), storeTemplate)
  *            application/json:
  *              schema:
  *                type: object
- *                properties:
- *                  url:
- *                    type:string
  */
-router.post('/upload-start', celebrate(uploadstartValidator), uploadStart)
+router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, storeTemplate)
 
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/upload-complete:
- *    post:
- *      tags:
- *        - SMS
- *      summary: Populate recipient list with uploaded csv
- *      parameters:
- *        - name: projectId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *      
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
+ *   /campaign/{campaignId}/sms/upload/start:
+ *     get:
+ *       description: "Get a presigned URL for upload"
+ *       tags:
+ *         - SMS
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: mimeType
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   presignedUrl:
+ *                     type: string
+ *                   transactionId:
+ *                     type: string
  */
-router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComplete)
+router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, uploadStartHandler)
 
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/credentials:
+ *   /campaign/{campaignId}/sms/upload/complete:
+ *     post:
+ *       description: "Complete upload session"
+ *       tags:
+ *         - SMS
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - transactionId
+ *               properties:
+ *                 transactionId:
+ *                   type: string
+ *       responses:
+ *         201:
+ *           description: Created
+ *         400:
+ *           description: Invalid Request
+ *         500:
+ *           description: Server Error
+ *
+ */
+router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampaign, uploadCompleteHandler)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/credentials:
  *    post:
  *      tags:
  *        - SMS
  *      summary: Store credentials for twilio
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -252,8 +369,15 @@ router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComple
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/TwilioCredentials'
- *                  
+ *            required:
+ *              - testNumber
+ *              - twilioCredentials
+ *            properties:
+ *              testNumber:
+ *                type: string
+ *              twilioCredentials:
+ *                $ref: '#/components/schemas/TwilioCredentials'
+ *
  *      responses:
  *        200:
  *          content:
@@ -261,53 +385,18 @@ router.post('/upload-complete', celebrate(uploadCompleteValidator), uploadComple
  *              schema:
  *                type: object
  */
-router.post('/credentials', celebrate(storeCredentialsValidator), storeCredentials)
+router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaign, storeCredentials)
 
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/validate:
- *    post:
- *      tags:
- *        - SMS
- *      summary: Vaidates stored credentials by sending to a specific phone number
- *      parameters:
- *        - name: projectId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                phoneNumber: 
- *                  type: string
- *                  pattern: '^\+\d{8,15}$'
- *                  
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- */
-router.post('/validate', celebrate(validateCredentialsValidator), validateCredentials)
-
-
-/**
- * @swagger
- * path:
- *  /project/{projectId}/sms/preview:
+ *  /campaign/{campaignId}/sms/preview:
  *    get:
  *      tags:
  *        - SMS
  *      summary: Preview templated message
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
@@ -318,8 +407,8 @@ router.post('/validate', celebrate(validateCredentialsValidator), validateCreden
  *          required: false
  *          schema:
  *            type: integer
- *            minimum: 1  
- * 
+ *            minimum: 1
+ *
  *      responses:
  *        200:
  *          content:
@@ -332,28 +421,29 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
 /**
  * @swagger
  * path:
- *  /project/{projectId}/sms/send:
+ *  /campaign/{campaignId}/sms/send:
  *    post:
  *      tags:
  *        - SMS
  *      summary: Start sending campaign
  *      parameters:
- *        - name: projectId
+ *        - name: campaignId
  *          in: path
  *          required: true
  *          schema:
  *            type: string
  *      requestBody:
- *        required: true
+ *        required: false
  *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              properties:
- *                rate: 
+ *                rate:
+ *                  example: 10
  *                  type: integer
- *                  minimum: 1  
- * 
+ *                  minimum: 1
+ *
  *      responses:
  *        200:
  *          content:
@@ -361,6 +451,43 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
  *              schema:
  *                type: object
  */
-router.post('/send', celebrate(sendMessagesValidator), sendMessages)
+router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCampaign)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/stop:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Stop sending campaign
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/stop', stopCampaign)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/retry:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Retry sending campaign
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ */
+router.post('/retry', canEditCampaign, retryCampaign)
+
 
 export default router

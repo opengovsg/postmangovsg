@@ -1,23 +1,27 @@
-import React, { createContext, useState, useEffect } from 'react'
+import React, { createContext, useState, useEffect, SetStateAction, Dispatch } from 'react'
 import { getIsLoggedIn } from 'services/auth.service'
 
-const defaultValue = {
-  isAuthenticated: false,
-  setAuthenticated: {},
-  email: null,
-  setEmail: {},
+interface ContextProps {
+ isAuthenticated: boolean;
+ setAuthenticated: Dispatch<SetStateAction<boolean>>;
+ email: string;
+ setEmail: Dispatch<SetStateAction<string>>;
 }
 
-export const AuthContext = createContext(defaultValue)
+export const AuthContext = createContext({} as ContextProps)
 
 const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setAuthenticated] = useState(false)
   const [isLoaded, setLoaded] = useState(false)
-  const [email, setEmail] = useState(null)
+  const [email, setEmail] = useState('')
 
   async function initialChecks() {
-    const isLoggedIn = await getIsLoggedIn()
-    setAuthenticated(isLoggedIn)
+    try {
+      const isLoggedIn = await getIsLoggedIn()
+      setAuthenticated(isLoggedIn)
+    } catch(err){
+      // is unauthorized
+    }
     setLoaded(true)
   }
 

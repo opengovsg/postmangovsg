@@ -1,10 +1,24 @@
+import 'source-map-support/register'
+
 import express from 'express'
 require('dotenv').config()
 require('module-alias/register')
 
 import { checkRequiredEnvVars, loaders } from './core'
 
-const requiredEnvVars = ['DB_URI']
+const requiredEnvVars = [
+  'AWS_REGION',
+  'FILE_STORAGE_BUCKET_NAME',
+  'SECRET_MANAGER_SALT',
+  'JWT_SECRET',
+  'DB_URI',
+  'REDIS_OTP_URI',
+  'REDIS_SESSION_URI',
+  'SESSION_SECRET',
+  'FRONTEND_URL',
+  'COOKIE_DOMAIN',
+]
+
 const port = Number(process.env.PORT) || 4000
 const app: express.Application = express()
 
@@ -15,3 +29,6 @@ const start = async (): Promise<void> => {
 }
 
 start()
+  .catch((err) => {
+    console.error(err)
+  })

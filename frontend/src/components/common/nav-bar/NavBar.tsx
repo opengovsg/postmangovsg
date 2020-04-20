@@ -5,11 +5,12 @@ import cx from 'classnames'
 import { ModalContext } from 'contexts/modal.context'
 import { POSTMAN_GUIDE_URL } from 'config'
 import CreateModal from 'components/dashboard/create-modal'
-
+import { logout } from 'services/auth.service'
 import styles from './NavBar.module.scss'
+import { AuthContext } from 'contexts/auth.context'
 
 const NavBar = () => {
-
+  const { setAuthenticated } = useContext(AuthContext)
   const modalContext = useContext(ModalContext)
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
@@ -18,6 +19,15 @@ const NavBar = () => {
     modalContext.setModalContent(
       <CreateModal></CreateModal>
     )
+  }
+
+  async function handleLogout() {
+    try{
+      await logout()
+      setAuthenticated(false)
+    }catch(err){
+      console.error(err)
+    }
   }
 
   function isCreatePath() {
@@ -41,7 +51,7 @@ const NavBar = () => {
         <div className={styles.separator}></div>
 
         <span className={cx(styles.active, styles.link)}>postman@open.gov.sg</span>
-        <a className={cx(styles.active, styles.link)} onClick={() => alert('logout')}>Sign out</a>
+        <a className={cx(styles.active, styles.link)} onClick={handleLogout}>Sign out</a>
       </div>
     </nav >
   )

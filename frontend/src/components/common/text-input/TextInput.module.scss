@@ -2,17 +2,17 @@
 
 .textInput {
   height: $button-height;
-  border: 1px solid $indigo-blue;
+  border: 1px solid $light-grey;
   border-radius: $border-radius;
   box-shadow: none;
   line-height: 1rem;
   font-size: 1rem;
   padding-left: $border-radius;
-  border: 1px solid $indigo-blue;
-  background-color: $light-blue;
   color: $dark-blue;
+  width: 100%;
 
   &:focus {
     outline: none;
+    border-color: $indigo-blue;
   }
 }

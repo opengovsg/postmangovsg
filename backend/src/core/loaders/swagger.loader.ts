@@ -1,6 +1,7 @@
 import { Application } from 'express'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+import logger from '@core/logger'
 
 const options = {
   swaggerDefinition: {
@@ -27,7 +28,7 @@ const swaggerLoader = ({ app }: { app: Application }): void => {
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     explorer: true,
   }))
-  console.log('Swagger docs generated' /*, JSON.stringify(swaggerSpec, null, 2) */)
+  logger.info({ message: 'Swagger docs generated.' }) /*, JSON.stringify(swaggerSpec, null, 2) */
 }
 
 export default swaggerLoader

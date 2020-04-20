@@ -1,29 +1,30 @@
 import axios from 'axios'
 
-// for dev use
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
+async function getOtpWithEmail(email: string): Promise<void> {
+  return axios.post('/auth/otp', {
+    email,
   })
 }
 
-async function getOtpWithEmail(email: string): Promise<void> {
-  await sleep(1000)
-  return Promise.resolve()
-}
-
 async function loginWithOtp(email: string, otp: string): Promise<void> {
-  await sleep(1000)
-  return Promise.resolve()
+  return axios.post('/auth/login', {
+    email, otp,
+  })
 }
 
 async function getIsLoggedIn(): Promise<boolean> {
-  await sleep(1000)
-  return Promise.resolve(true)
+  return axios.get('/auth/login').then((response) => {
+    return response.status === 200
+  })
+}
+
+async function logout(): Promise<void> {
+  return axios.get('/auth/logout')
 }
 
 export {
   getOtpWithEmail,
   loginWithOtp,
   getIsLoggedIn,
+  logout,
 }

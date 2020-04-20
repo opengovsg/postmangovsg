@@ -21,3 +21,7 @@
     margin-bottom: 2rem;
   }
 }
+
+.darkBlueBtn {
+  @include button($dark-blue)
+}

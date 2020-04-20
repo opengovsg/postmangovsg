@@ -20,7 +20,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { 
-      "argsIgnorePattern": "^_" 
+      'argsIgnorePattern': '^_' 
     }],
     'comma-dangle': [
       'error',
@@ -71,6 +71,10 @@ module.exports = {
     ],
     '@typescript-eslint/no-use-before-define': ['error',
       { 'functions': false }
-    ]
+    ],
+    'func-style': [
+      'error',
+      'expression'
+    ],
   }
 }
