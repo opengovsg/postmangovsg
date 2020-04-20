@@ -17,11 +17,13 @@ const EmailSend = ({ id, body, numRecipients, onNext }: { id: number; body: stri
       <h2>Your campaign is ready to be sent!</h2>
       <div className="separator"></div>
 
-      <p>Number of recipients</p>
-      <h4>{numRecipients}</h4>
+      <div className={styles.sendInfo}>
+        <p>Number of recipients</p>
+        <h4>{numRecipients}</h4>
 
-      <p>Message</p>
-      <InfoBlock>{body}</InfoBlock>
+        <p>Message</p>
+        <InfoBlock>{body}</InfoBlock>
+      </div>
 
       <div className="separator"></div>
 
