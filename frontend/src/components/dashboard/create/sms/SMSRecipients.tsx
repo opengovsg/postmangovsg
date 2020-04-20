@@ -79,9 +79,14 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
           <li>
             <i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>
           </li>
-          <li>
-            <i className="bx bx-file"></i><span>{csvFilename}</span>
-          </li>
+          {csvFilename ? (
+            <li>
+              <i className='bx bx-file'></i>
+              <span>{csvFilename}</span>
+            </li>
+          ) : (
+            <></>
+          )}
         </InfoBlock>
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
