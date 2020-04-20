@@ -25,7 +25,7 @@ const SMSSend = ({ body, numRecipients }: { body: string; numRecipients: number 
 
       <div className="separator"></div>
 
-      <div className="align-right">
+      <div className="progress-button">
         <PrimaryButton onClick={() => modalContext.setModalContent(
           <ConfirmModal></ConfirmModal>
         )}>
