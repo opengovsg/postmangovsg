@@ -34,17 +34,22 @@ const EmailDetail = ({ id, sentAt, numRecipients }: { id: number; sentAt: Date; 
   return (
     <>
       {
-        stats.status !== Status.Sent &&
-        <>
+        stats.status === Status.Sending ?
+        (<>
           <h2>Your campaign is being sent out now!</h2>
           <p>It may take a few minutes to complete. You can leave this page in the meantime,
-        and check on the progress at home page. For SMSes which have errored, you will be
-        notified at home page and you can retry sending them.</p>
-
-          <div className="separator"></div>
+          and check on the progress by returning to this page from the Campaigns tab.</p>
         </>
-      }
-
+        ) :
+        (<>
+          <h2>Your campaign has been sent!</h2>
+          <p>Some messages may have failed to send. You can retry these by clicking on Retry. </p>
+        </>
+        )
+        }
+      
+       <div className="separator"></div>
+      
       {
         stats.status &&
         <ProgressDetails sentAt={sentAt} numRecipients={numRecipients} stats={stats} />
