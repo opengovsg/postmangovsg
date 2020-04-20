@@ -8,6 +8,14 @@ export async function saveTemplate(campaignId: number, subject: string, body: st
   })
 }
 
+export async function sendPreviewMessage({campaignId, recipient}: {campaignId: number; recipient: string}): Promise<boolean>{
+  return axios.post(`/campaign/${campaignId}/credentials`,{
+    recipient
+  }).then((response) => {
+    return response.status === 200
+  })
+}
+
 export async function getPreviewMessage(campaignId: number): Promise<string> {
   return Promise.resolve('something hola')
 }

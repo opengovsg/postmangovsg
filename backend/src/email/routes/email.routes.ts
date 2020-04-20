@@ -57,9 +57,8 @@ const uploadCompleteValidator = {
 }
 
 const storeCredentialsValidator = {
-  // really not sure
   [Segments.BODY]: Joi.object({
-    email: Joi.string().email()
+    recipient: Joi.string().email()
       .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
       .required(),
@@ -342,8 +341,16 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *    post:
  *      tags:
  *        - Email
- *      summary: Store credentials for SES
- *
+ *      summary: Sends a test message and defaults to Postman's credentials for the campaign
+ *      requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - recipient
+ *               properties:
+ *                 recipient:
+ *                   type: string
  *      responses:
  *        200:
  *          content:

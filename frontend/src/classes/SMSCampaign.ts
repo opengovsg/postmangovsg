@@ -28,13 +28,11 @@ export class SMSCampaign extends Campaign {
   setProgress() {
     if (!this.body) {
       this.progress = SMSProgress.CreateTemplate
-      return
     }
-    if (!this.numRecipients) {
+    else if (!this.numRecipients) {
       this.progress = SMSProgress.UploadRecipients
-      return
     }
-    if (!this.hasCredential) {
+    else if (!this.hasCredential) {
       this.progress = SMSProgress.InsertCredentials
     } else {
       this.progress = SMSProgress.Send

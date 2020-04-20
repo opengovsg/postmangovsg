@@ -75,7 +75,7 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
 const storeCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
-    const { email: recipient } = req.body
+    const { recipient } = req.body
 
     const mail = await getHydratedMail(campaignId, recipient)
     if (!mail) return res.sendStatus(400)
