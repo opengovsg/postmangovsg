@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
 
+import { POSTMAN_GUIDE_URL } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
@@ -128,12 +129,18 @@ const Campaigns = () => {
             )
             : (
               <div className={styles.emptyDashboard}>
-                <img src={EmptyDashboardImg} />
+                <img src={EmptyDashboardImg} alt="Empty dashboard graphic" />
                 <h2>We are excited to have you here!</h2>
                 <h5>To get you started, we have prepared a guide for your reference</h5>
-                <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
-                <h5>To get you started, we have prepared a guide for your reference</h5>
-                <PrimaryButton>Let&apos;s begin</PrimaryButton>
+                <a href={POSTMAN_GUIDE_URL}>
+                  <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
+                </a>
+                <h5>Or you can begin creating your campaign with our step-by step</h5>
+                <PrimaryButton onClick={() => modalContext.setModalContent(
+                  <CreateCampaign></CreateCampaign>
+                )}>
+                  Let&apos;s begin
+                </PrimaryButton>
               </div>
             )
         }
