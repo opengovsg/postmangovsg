@@ -58,3 +58,17 @@ table {
     }
   }
 }
+
+.emptyDashboard {
+  text-align: center;
+
+  h2 { font-weight: 500; }
+  h5 { 
+    font-weight: normal; 
+    margin-bottom: 1rem;
+  }
+
+  .darkBlueButton {
+    @include button($dark-blue);
+  }
+}

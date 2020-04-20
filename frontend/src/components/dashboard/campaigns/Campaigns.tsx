@@ -9,6 +9,7 @@ import { getCampaigns } from 'services/campaign.service'
 import { Campaign, ChannelType } from 'classes'
 import CreateCampaign from 'components/dashboard/create-modal'
 
+import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
 
 const ITEMS_PER_PAGE = 2
@@ -94,31 +95,48 @@ const Campaigns = () => {
         </PrimaryButton>
       </TitleBar>
       <div className={styles.content}>
-        <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
-        <table>
-          <thead>
-            <tr>
-              {
-                headers.map(({ name, width }) => (
-                  <th className={styles[width]} key={name}>
-                    {name}
-                  </th>
-                ))
-              }
-            </tr>
-          </thead>
-          <tbody>
-            {
-              campaignsDisplayed.map(renderRow)
-            }
-          </tbody>
-        </table>
+        {
+          campaigns.length > 0
+            ? (
+              <>
+                <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      {
+                        headers.map(({ name, width }) => (
+                          <th className={styles[width]} key={name}>
+                            {name}
+                          </th>
+                        ))
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      campaignsDisplayed.map(renderRow)
+                    }
+                  </tbody>
+                </table>
 
-        <Pagination
-          itemsCount={campaigns.length}
-          setSelectedPage={setSelectedPage}
-          itemsPerPage={ITEMS_PER_PAGE}
-        ></Pagination>
+                <Pagination
+                  itemsCount={campaigns.length}
+                  setSelectedPage={setSelectedPage}
+                  itemsPerPage={ITEMS_PER_PAGE}
+                ></Pagination>
+              </>
+            )
+            : (
+              <div className={styles.emptyDashboard}>
+                <img src={EmptyDashboardImg} />
+                <h2>We are excited to have you here!</h2>
+                <h5>To get you started, we have prepared a guide for your reference</h5>
+                <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
+                <h5>To get you started, we have prepared a guide for your reference</h5>
+                <PrimaryButton>Let&apos;s begin</PrimaryButton>
+              </div>
+            )
+        }
       </div>
     </>
   )
