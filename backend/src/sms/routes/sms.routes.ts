@@ -70,7 +70,7 @@ const storeCredentialsValidator = {
       .string()
       .trim()
       .required(),
-    testNumber: Joi
+    recipient: Joi
       .string()
       .trim()
       .required(),
@@ -367,10 +367,10 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *          application/json:
  *            schema:
  *            required:
- *              - testNumber
+ *              - recipient
  *              - twilioCredentials
  *            properties:
- *              testNumber:
+ *              recipient:
  *                type: string
  *              twilioCredentials:
  *                $ref: '#/components/schemas/TwilioCredentials'

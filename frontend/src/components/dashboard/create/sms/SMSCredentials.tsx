@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { validateCredentials } from 'services/sms.service'
 import { TextInput, PrimaryButton, TextInputWithButton } from 'components/common'
 import styles from '../Create.module.scss'
+import { useParams } from 'react-router-dom'
 
 const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCredential: boolean; onNext: (changes: any, next?: boolean) => void }) => {
 
@@ -11,11 +12,11 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   const [apiKey, setApiKey] = useState('')
   const [apiSecret, setApiSecret] = useState('')
   const [messagingServiceSid, setMessagingServiceSid] = useState('')
-  const [mobileNumber, setMobileNumber] = useState('')
+  const [recipient, setRecipient] = useState('')
   const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
-
+  const params: { id? : string } = useParams()
   function isDisabled() {
-    return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\d+$/g).test(mobileNumber)
+    return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\+?\d+$/g).test(recipient)
   }
 
   function resetFields() {
@@ -23,14 +24,26 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
     setApiKey('')
     setApiSecret('')
     setMessagingServiceSid('')
-    setMobileNumber('')
+    setRecipient('')
   }
 
   async function handleValidateCredentials() {
-    const isValid = await validateCredentials(accountSid, apiKey, apiSecret, messagingServiceSid, mobileNumber)
-    setHasCredential(isValid)
-    setShowCredentialFields(false)
-    resetFields()
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const campaignId = +params.id!
+      const isValid = await validateCredentials({
+        campaignId,
+        accountSid,
+        apiKey,
+        apiSecret,
+        messagingServiceSid,
+        recipient })
+      setHasCredential(isValid)
+      setShowCredentialFields(false)
+      resetFields()
+    } catch(err){
+      console.error(err)
+    }
   }
 
   function renderCredentialFields() {
@@ -74,8 +87,8 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
         </p>
         <TextInputWithButton
           type="tel"
-          value={mobileNumber}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMobileNumber(e.target.value)}
+          value={recipient}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
           onClick={handleValidateCredentials}
           disabled={isDisabled()}
         >

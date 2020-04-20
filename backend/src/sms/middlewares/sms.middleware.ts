@@ -49,6 +49,11 @@ const getSmsBody = async (campaignId: string): Promise<string | null> => {
   return smsTemplate.body as string
 }
 
+const getEncodedHash = async (secret: string): Promise<string> => {
+  const secretHash = await hashService.specifySalt(secret, config.aws.secretManagerSalt)
+  return Buffer.from(secretHash).toString('base64')
+}
+
 const getHydratedMsg = async (campaignId: string): Promise<string | null>  => {
   const params = await getParams(campaignId)
   const body = await getSmsBody(campaignId)
@@ -65,11 +70,6 @@ const sendMessage = async (campaignId: string, recipient: string, credential: Tw
   logger.info('Sending sms using Twilio.')
   const twilioService = new TwilioService(credential)
   return twilioService.send(recipient, msg)
-}
-
-const getEncodedHash = async (secret: string): Promise<string> => {
-  const secretHash = await hashService.specifySalt(secret, config.aws.secretManagerSalt)
-  return Buffer.from(secretHash).toString('base64')
 }
 
 // TODO
@@ -89,13 +89,13 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
 const storeCredentials = async (req: Request, res: Response,  next: NextFunction): Promise<Response | void> => {
   const credential: TwilioCredentials = getCredential(req)
   // Send test message
-  const { testNumber } = req.body
+  const { recipient } = req.body
   const { campaignId } = req.params
   try {
-    await sendMessage(campaignId, testNumber, credential)
+    await sendMessage(campaignId, recipient, credential)
   }
   catch(err){
-    return res.status(400).json({ message: err })
+    return res.status(400).json({ message: `${err}` })
   }
 
   // Save the credentials and update DB
