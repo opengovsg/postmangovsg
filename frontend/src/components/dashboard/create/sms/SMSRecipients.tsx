@@ -4,11 +4,11 @@ import { useParams } from 'react-router-dom'
 import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
 
 import { getPresignedUrl, completeFileUpload } from 'services/sms.service'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 
 const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
@@ -51,11 +51,13 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       setNumRecipients(uploadResponse.num_recipients)
 
     } catch (err) {
-      const axiosError = err.response?.data
-      if (axiosError?.statusCode === 400) {
-        setErrorMessage(axiosError?.message)
-      }
-      if (axiosError) {
+      const axiosError: AxiosResponse = err.response
+      if (axiosError !== undefined) {
+        if (axiosError.status === 400) {
+          setErrorMessage(axiosError?.data?.message)
+        } else {
+          setErrorMessage('Error uploading file.')
+        }
         console.error(axiosError)
       } else {
         console.error(err)
@@ -91,15 +93,9 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
 
-      {errorMessage
-      ?
-      <div>
-        Error here: {errorMessage}
-      </div>
-      :
-      <></>
+      {
+        errorMessage.length !== 0 ? <div>Error: {errorMessage}</div> : <></>
       }
-
 
       <div className="progress-button">
         <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Insert Credentials →</PrimaryButton>
