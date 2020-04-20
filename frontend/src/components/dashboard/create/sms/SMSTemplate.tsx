@@ -24,7 +24,17 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
       <sub>Step 1</sub>
       <h2>Create message template</h2>
       <h4>Message</h4>
-      <TextArea highlight={true} value={body} onChange={setBody} />
+      <p>
+        To personalise your message, include attributes and use double curly braces on them.
+        The attributes in your message template should match the headers in your recipients list file.
+        Note: Recipient is a required column in the csv file.
+      </p>
+      <p>
+        Example<br/>
+        Reminder: Dear {'{{ recipient }}'}, your next appointment at {'{{ clinic }}'} is on {'{{ date }}'}
+        at {'{{ time }}'}.
+      </p>
+      <TextArea placeholder="Enter message" highlight={true} value={body} onChange={setBody} />
       <div className="progress-button">
         <PrimaryButton disabled={!body} onClick={handleSaveTemplate}>Upload Recipients →</PrimaryButton>
       </div>
