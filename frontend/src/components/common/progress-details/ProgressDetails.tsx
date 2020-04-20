@@ -1,13 +1,38 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
 import { CampaignStats, Status } from 'classes/Campaign'
 import { ProgressBar, PrimaryButton } from 'components/common'
 import styles from './ProgressDetails.module.scss'
+import { useParams } from 'react-router-dom'
+import { stopCampaign, retryCampaign } from 'services/campaign.service'
 
 const ProgressDetails = ({ sentAt, numRecipients, stats }: { sentAt: Date; numRecipients: number; stats: CampaignStats }) => {
+  const params: {id?: string} = useParams()
+  const [retryDisabled, setRetryDisabled] = useState(stats.status === Status.Sending)
+  const [pauseDisabled, setPauseDisabled] = useState(stats.status === Status.Sent)
 
+  async function handleStop(): Promise<void>{
+    try {
+      setPauseDisabled(true)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await stopCampaign(+params.id!)
+    }catch(err){
+      console.error(err)
+      setPauseDisabled(false)
+    }
+  }
+  async function handleRetry(): Promise<void>{
+    try {
+      setRetryDisabled(true)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await retryCampaign(+params.id!)
+    }catch(err){
+      console.error(err)
+      setRetryDisabled(false)
+    }
+  }
   const { status, error, unsent, sent, invalid } = stats
   return (
     <>
@@ -41,13 +66,13 @@ const ProgressDetails = ({ sentAt, numRecipients, stats }: { sentAt: Date; numRe
           {
             status === Status.Sent
               ? (
-                <PrimaryButton className={styles.retry}>
+                <PrimaryButton className={styles.retry} onClick={handleRetry} disabled={retryDisabled}>
                   Retry sending errored messages
                   <i className={cx(styles.icon, 'bx bx-revision')}></i>
                 </PrimaryButton>
               )
               : (
-                <PrimaryButton className={styles.pause}>
+                <PrimaryButton className={styles.pause} onClick={handleStop} disabled={pauseDisabled}>
                   Pause sending
                   <i className={cx(styles.icon, 'bx bx-error-circle')}></i>
                 </PrimaryButton>

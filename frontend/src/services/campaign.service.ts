@@ -8,9 +8,9 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
-function getStatus(jobs: Array<{status: string}>) : string {
+function getStatus(jobs: Array<{status: string}>): string {
   let result
-  const jobSet = new Set(jobs.map((x=>x.status)))
+  const jobSet = new Set(jobs.map((x => x.status)))
   if(jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')){
     result = Status.Sending
   }
@@ -24,23 +24,23 @@ function getStatus(jobs: Array<{status: string}>) : string {
 }
 
 export async function getCampaigns(): Promise<Array<Campaign>> {
-  return axios.get(`/campaigns`).then((response) => {
-    const campaigns : Campaign[] = response.data.map((data: any)=> {
+  return axios.get('/campaigns').then((response) => {
+    const campaigns: Campaign[] = response.data.map((data: any) => {
       const { id,
         type,
         name,
         has_credential: hasCredential,
         created_at: createdAt,
-        job_queue : jobs
+        job_queue : jobs,
       } = data
-      const details = 
+      const details =
       {
         id,
         type,
         name,
         hasCredential,
         createdAt,
-        status: getStatus(jobs)
+        status: getStatus(jobs),
       }
       return new Campaign(details)
     })
@@ -71,7 +71,7 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign |
       job_queue : jobs,
       email_templates: emailTemplate,
       sms_templates: smsTemplate } = campaign
-   
+
 
     const details = {
       id,
@@ -93,4 +93,16 @@ export async function createCampaign(name: string, type: ChannelType): Promise<C
     (response) => {
       return new Campaign(response.data)
     })
+}
+
+export async function sendCampaign(campaignId: number): Promise<boolean>{
+  return axios.post(`/campaign/${campaignId}/send`).then((response) => response.status===200)
+}
+
+export async function stopCampaign(campaignId: number): Promise<boolean>{
+  return axios.post(`/campaign/${campaignId}/stop`).then((response) => response.status===200)
+}
+
+export async function retryCampaign(campaignId: number): Promise<boolean>{
+  return axios.post(`/campaign/${campaignId}/retry`).then((response) => response.status===200)
 }
