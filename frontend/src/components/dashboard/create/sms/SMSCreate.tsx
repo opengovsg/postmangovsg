@@ -42,7 +42,7 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
         )
       case SMSProgress.InsertCredentials:
         return (
-          <SMSCredentials hasCredentials={campaign.hasCredentials} onNext={onNext} />
+          <SMSCredentials hasCredential={campaign.hasCredential} onNext={onNext} />
         )
       case SMSProgress.Send:
         return (

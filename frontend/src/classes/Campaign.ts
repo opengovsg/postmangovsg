@@ -1,6 +1,6 @@
 export enum ChannelType {
-  SMS = 'sms',
-  Email = 'email',
+  SMS = 'SMS',
+  Email = 'EMAIL',
 }
 
 export enum Status {
