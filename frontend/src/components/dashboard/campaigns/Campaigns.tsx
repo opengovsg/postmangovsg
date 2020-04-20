@@ -17,6 +17,7 @@ const ITEMS_PER_PAGE = 2
 
 const Campaigns = () => {
   const modalContext = useContext(ModalContext)
+  const [isLoading, setLoading] = useState(true)
   const [campaigns, setCampaigns] = useState(new Array<Campaign>())
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(new Array<Campaign>())
   const [selectedPage, setSelectedPage] = useState(0)
@@ -25,6 +26,7 @@ const Campaigns = () => {
   async function fetchCampaigns() {
     const campaigns = await getCampaigns()
     setCampaigns(campaigns)
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -85,6 +87,57 @@ const Campaigns = () => {
     )
   }
 
+  function renderEmptyDashboard() {
+    return (
+      <div className={styles.emptyDashboard}>
+        <img className={styles.image} src={EmptyDashboardImg} alt="Empty dashboard graphic" />
+        <h2>We are excited to have you here!</h2>
+        <h5>To get you started, we have prepared a guide for your reference</h5>
+        <a href={POSTMAN_GUIDE_URL}>
+          <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
+        </a>
+        <h5>Or you can begin creating your campaign with our step-by step</h5>
+        <PrimaryButton onClick={() => modalContext.setModalContent(
+          <CreateCampaign></CreateCampaign>
+        )}>
+          Let&apos;s begin
+        </PrimaryButton>
+      </div>
+    )
+  }
+
+  function renderCampaignList() {
+    return (
+      <>
+        <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
+        <table>
+          <thead>
+            <tr>
+              {
+                headers.map(({ name, width }) => (
+                  <th className={styles[width]} key={name}>
+                    {name}
+                  </th>
+                ))
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              campaignsDisplayed.map(renderRow)
+            }
+          </tbody>
+        </table>
+
+        <Pagination
+          itemsCount={campaigns.length}
+          setSelectedPage={setSelectedPage}
+          itemsPerPage={ITEMS_PER_PAGE}
+        ></Pagination>
+      </>
+    )
+  }
+
   return (
     <>
       <TitleBar title="Welcome, Agency">
@@ -96,54 +149,12 @@ const Campaigns = () => {
         </PrimaryButton>
       </TitleBar>
       <div className={styles.content}>
-        {
+        { isLoading && <i className={cx(styles.icon, styles.spinner, 'bx bx-loader-alt bx-spin')}></i> }
+        { !isLoading && (
           campaigns.length > 0
-            ? (
-              <>
-                <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
-                <table>
-                  <thead>
-                    <tr>
-                      {
-                        headers.map(({ name, width }) => (
-                          <th className={styles[width]} key={name}>
-                            {name}
-                          </th>
-                        ))
-                      }
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      campaignsDisplayed.map(renderRow)
-                    }
-                  </tbody>
-                </table>
-
-                <Pagination
-                  itemsCount={campaigns.length}
-                  setSelectedPage={setSelectedPage}
-                  itemsPerPage={ITEMS_PER_PAGE}
-                ></Pagination>
-              </>
-            )
-            : (
-              <div className={styles.emptyDashboard}>
-                <img src={EmptyDashboardImg} alt="Empty dashboard graphic" />
-                <h2>We are excited to have you here!</h2>
-                <h5>To get you started, we have prepared a guide for your reference</h5>
-                <a href={POSTMAN_GUIDE_URL}>
-                  <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
-                </a>
-                <h5>Or you can begin creating your campaign with our step-by step</h5>
-                <PrimaryButton onClick={() => modalContext.setModalContent(
-                  <CreateCampaign></CreateCampaign>
-                )}>
-                  Let&apos;s begin
-                </PrimaryButton>
-              </div>
-            )
-        }
+            ? renderCampaignList()
+            : renderEmptyDashboard()
+        ) }
       </div>
     </>
   )

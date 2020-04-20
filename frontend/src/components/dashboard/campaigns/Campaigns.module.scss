@@ -31,10 +31,6 @@ table {
     @include flex-horizontal;
     border-bottom: 1px solid $transparent-blue;
 
-    .icon {
-      @include icon;
-    }
-
     td,
     th {
       padding: 0.75rem 0;
@@ -59,12 +55,27 @@ table {
   }
 }
 
+.icon {
+  @include icon;
+}
+
+.spinner {
+  width: 3rem;
+  font-size: 3rem;
+  align-self: center;
+  margin: 2rem;
+}
+
 .emptyDashboard {
   text-align: center;
 
+  .image {
+    width: 400px;
+  }
+
   h2 { font-weight: 500; }
-  h5 { 
-    font-weight: normal; 
+  h5 {
+    font-weight: normal;
     margin-bottom: 1rem;
   }
 
