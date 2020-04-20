@@ -27,12 +27,17 @@
 
       td.status {
         @include flex-horizontal;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      th {
+        text-transform: capitalize;
       }
 
       td,
       th {
         padding: 0.75rem 0;
-        text-transform: capitalize;
 
         &.xs {
           flex: 1.2;
@@ -53,6 +58,10 @@
       }
     }
   }
+}
+
+.campaignStatus {
+  text-transform: capitalize;
 }
 
 .stats {

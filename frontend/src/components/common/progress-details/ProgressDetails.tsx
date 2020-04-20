@@ -29,7 +29,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats }: { sentAt: Date; numRe
               <td className={styles.md}>
                 {numRecipients}
               </td>
-              <td className={styles.sm}>
+              <td className={cx(styles.campaignStatus, styles.sm)}>
                 {status}
               </td>
             </tr>
@@ -42,13 +42,13 @@ const ProgressDetails = ({ sentAt, numRecipients, stats }: { sentAt: Date; numRe
             status === Status.Sent
               ? (
                 <PrimaryButton className={styles.retry}>
-                  Retry send errored
+                  Retry sending errored messages
                   <i className={cx(styles.icon, 'bx bx-revision')}></i>
                 </PrimaryButton>
               )
               : (
                 <PrimaryButton className={styles.pause}>
-                  Pause send
+                  Pause sending
                   <i className={cx(styles.icon, 'bx bx-error-circle')}></i>
                 </PrimaryButton>
               )
@@ -78,13 +78,13 @@ const ProgressDetails = ({ sentAt, numRecipients, stats }: { sentAt: Date; numRe
                 <i className={cx(styles.icon, styles.red, 'bx bx-help-circle')}></i>
                 Invalid
               </td>
-              <td className={styles.md}>Invalid mobile number</td>
+              <td className={styles.md}>Invalid recipient</td>
               <td className={styles.sm}>{invalid}</td>
             </tr>
             <tr>
               <td className={cx(styles.status, styles.md)}>
                 <i className={cx(styles.icon, styles.blue, 'bx bx-time-five')}></i>
-                Unset
+                Unsent
               </td>
               <td className={styles.md}>In the queue</td>
               <td className={styles.sm}>{unsent}</td>

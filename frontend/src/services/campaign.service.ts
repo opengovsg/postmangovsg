@@ -37,7 +37,7 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign> 
     id: campaignId,
     name: 'Project Name',
     type: ChannelType.SMS,
-    status: Status.Sending,
+    status: Status.Sent,
     createdAt: Date.now(),
     hasCredentials: true,
     body: 'something {{ hello }} ',
