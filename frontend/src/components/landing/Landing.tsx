@@ -5,8 +5,8 @@ import Login from './login'
 import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Landing.module.scss'
-import landingImg from 'assets/img/landing.png'
-import appLogo from 'assets/img/app-logo.png'
+import landingImg from 'assets/img/landing.svg'
+import appLogo from 'assets/img/app-logo.svg'
 import ogpLogo from 'assets/img/ogp-logo.svg'
 
 const Landing = () => {
@@ -19,28 +19,28 @@ const Landing = () => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <div className={styles.topContainer}>
         <div className={styles.innerContainer}>
-          <div className={styles.landingImg}>
-            <img src={landingImg} alt="Landing page graphic"></img>
-          </div>
           <div className={styles.textContainer}>
             <img className={styles.appLogo} src={appLogo} alt="Postman logo"></img>
-            <p className={styles.title}>POSTMAN</p>
             <Login></Login>
+          </div>
+          <div className={styles.landingImg}>
+            <img src={landingImg} alt="Landing page graphic"></img>
           </div>
         </div>
       </div >
       <div className={styles.bottomContainer}>
-        <div className={styles.linkBar}>
-          <p className={styles.navTitle}>Postman Admin Panel</p>
-          <a className={styles.navLink} href="/">Guide</a>
-          <a className={styles.navLink} href="/">Contact Us</a>
+        <div className={styles.bottomContent}>
+          <img className={styles.ogpLogo} src={ogpLogo} alt="OGP"></img>
+          <div className={styles.linkBar}>
+            <a className={styles.navLink} href="/">Guide</a>
+            <a className={styles.navLink} href="/">Contact Us</a>
+          </div>
         </div>
-        <img className={styles.ogpLogo} src={ogpLogo} alt="OGP"></img>
       </div>
-    </React.Fragment>
+    </>
   )
 }
 

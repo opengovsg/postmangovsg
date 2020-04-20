@@ -28,7 +28,8 @@ export async function getCampaigns(): Promise<Array<Campaign>> {
     },
   ].map((a) => new Campaign(a))
   await sleep(1000)
-  return Promise.resolve(campaigns)
+  // return Promise.resolve(campaigns)
+  return Promise.resolve([])
 }
 
 export async function getCampaignDetails(campaignId: number): Promise<Campaign> {
