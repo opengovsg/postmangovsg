@@ -353,13 +353,22 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *                 transactionId:
  *                   type: string
  *       responses:
- *         201:
- *           description: Created
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 properties:
+ *                   template_body:
+ *                     type: string
+ *                   num_recipients:
+ *                     type: string
+ *                   hydrated_record:
+ *                     type: string
  *         400:
  *           description: Invalid Request
  *         500:
  *           description: Server Error
- *
  */
 router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampaign, uploadCompleteHandler)
 
