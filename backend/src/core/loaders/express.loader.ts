@@ -10,7 +10,13 @@ import logger from '@core/logger'
 
 const FRONTEND_URL = config.frontendUrl
 const loggerMiddleware = morgan(config.MORGAN_LOG_FORMAT)
-
+const origin = (v: string): string | RegExp  => {
+  if(v.startsWith('/') && v.endsWith('/')){
+    // Remove the leading and trailing slash
+    return new RegExp(v.substring(1, v.length-1))
+  }
+  return v
+}
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(loggerMiddleware)
 
@@ -24,7 +30,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   //   "optionsSuccessStatus": 204
   // }
   app.use(cors({
-    origin: FRONTEND_URL,
+    origin: origin(FRONTEND_URL),
     credentials: true, // required for setting cookie
   }))
 

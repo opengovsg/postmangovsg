@@ -3,19 +3,20 @@ import React, { useState } from 'react'
 import { validateCredentials } from 'services/sms.service'
 import { TextInput, PrimaryButton, TextInputWithButton } from 'components/common'
 import styles from '../Create.module.scss'
+import { useParams } from 'react-router-dom'
 
-const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { hasCredentials: boolean; onNext: (changes: any, next?: boolean) => void }) => {
+const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCredential: boolean; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [hasCredentials, setHasCredentials] = useState(initialHasCredentials)
+  const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [accountSid, setAccountSid] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [apiSecret, setApiSecret] = useState('')
   const [messagingServiceSid, setMessagingServiceSid] = useState('')
-  const [mobileNumber, setMobileNumber] = useState('')
-  const [showCredentialFields, setShowCredentialFields] = useState(!hasCredentials)
-
+  const [recipient, setRecipient] = useState('')
+  const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
+  const params: { id? : string } = useParams()
   function isDisabled() {
-    return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\d+$/g).test(mobileNumber)
+    return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\+?\d+$/g).test(recipient)
   }
 
   function resetFields() {
@@ -23,14 +24,26 @@ const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { has
     setApiKey('')
     setApiSecret('')
     setMessagingServiceSid('')
-    setMobileNumber('')
+    setRecipient('')
   }
 
   async function handleValidateCredentials() {
-    const isValid = await validateCredentials(accountSid, apiKey, apiSecret, messagingServiceSid, mobileNumber)
-    setHasCredentials(isValid)
-    setShowCredentialFields(false)
-    resetFields()
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const campaignId = +params.id!
+      const isValid = await validateCredentials({
+        campaignId,
+        accountSid,
+        apiKey,
+        apiSecret,
+        messagingServiceSid,
+        recipient })
+      setHasCredential(isValid)
+      setShowCredentialFields(false)
+      resetFields()
+    } catch(err){
+      console.error(err)
+    }
   }
 
   function renderCredentialFields() {
@@ -74,8 +87,8 @@ const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { has
         </p>
         <TextInputWithButton
           type="tel"
-          value={mobileNumber}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMobileNumber(e.target.value)}
+          value={recipient}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
           onClick={handleValidateCredentials}
           disabled={isDisabled()}
         >
@@ -89,7 +102,7 @@ const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { has
     <>
       <sub>Step 3</sub>
       {
-        hasCredentials
+        hasCredential
           ? (
             <>
               <h2>Your current credentials have already been validated.</h2>
@@ -110,7 +123,7 @@ const SMSCredentials = ({ hasCredentials: initialHasCredentials, onNext }: { has
               <div className="separator"></div>
 
               <div className="progress-button">
-                <PrimaryButton disabled={!hasCredentials} onClick={onNext}>Send Message →</PrimaryButton>
+                <PrimaryButton disabled={!hasCredential} onClick={onNext}>Send Message →</PrimaryButton>
               </div>
             </>
           )

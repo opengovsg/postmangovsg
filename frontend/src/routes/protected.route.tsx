@@ -1,13 +1,13 @@
 import React, { useContext } from 'react'
-import { Route, Redirect } from 'react-router-dom'
+import { Route, Redirect, RouteProps } from 'react-router-dom'
 
 import { AuthContext } from 'contexts/auth.context'
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const ProtectedRoute = ({ children, ...rest }: RouteProps) => {
   const { isAuthenticated } = useContext(AuthContext)
 
   return (
-    <Route render={({ location }) =>
+    <Route {...rest} render={({ location }) =>
       // else, redirect to main page
       isAuthenticated ?
         children :

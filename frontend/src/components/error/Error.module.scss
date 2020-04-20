@@ -1,0 +1,40 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.topContainer {
+  background-color: $light-blue;
+  height: 70vh;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  .innerContainer {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1000px;
+    width: 90vw;
+
+    @include mobile() {
+      justify-content: center;
+    }
+    
+    .title {
+      @include app-name();
+      margin-bottom: 1rem;
+    }
+
+    .appLogo {
+      height: 120px;
+      width: 120px;
+    }
+
+    .textContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      margin-bottom: 3rem;
+    }
+  }
+}

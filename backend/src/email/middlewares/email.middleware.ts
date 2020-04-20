@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import { Campaign } from '@core/models'
+import { literal } from 'sequelize'
+import { Campaign, JobQueue } from '@core/models'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { ChannelType } from '@core/constants'
 import { mailClient } from '@core/services'
@@ -7,6 +8,7 @@ import { MailToSend } from '@core/interfaces'
 import logger from '@core/logger'
 import { template } from '@core/services/template.service'
 import { EmailContent } from '@email/interfaces'
+
 
 const sendEmail = async (mail: MailToSend): Promise<string | void> => {
   try {
@@ -92,4 +94,33 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
 
 }
 
-export { isEmailCampaignOwnedByUser, storeCredentials }
+const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try{
+    const { campaignId } = req.params
+    const campaign: Campaign | null =  await Campaign.findOne({ 
+      where: { id: +campaignId }, 
+      attributes: [
+        'id', 'name', 'type', 'created_at', 'valid', [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+      ],
+      include: [
+        {
+          model: JobQueue,
+          attributes: ['status'],
+        },
+        {
+          model: EmailTemplate,
+          attributes: ['body', 'subject'],
+        }],
+    })
+    const numRecipients: number = await EmailMessage.count(
+      {
+        where: { campaignId: +campaignId },
+      }
+    )
+    return res.json({ campaign, 'num_recipients': numRecipients })
+  }catch(err){
+    return next(err)
+  }
+}
+
+export { isEmailCampaignOwnedByUser, storeCredentials, getCampaignDetails }

@@ -4,27 +4,27 @@ import { difference, keys } from 'lodash'
 
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
-import { 
+import {
   updateCampaignS3Metadata,
-  template, 
+  template,
   testHydration,
   extractS3Key,
 } from '@core/services'
 import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services'
-import { 
-  uploadStartHandler, 
-  sendCampaign, 
-  stopCampaign, 
-  retryCampaign, 
-  canEditCampaign, 
+import {
+  uploadStartHandler,
+  sendCampaign,
+  stopCampaign,
+  retryCampaign,
+  canEditCampaign,
 } from '@core/middlewares'
-import { 
-  MissingTemplateKeysError, 
-  HydrationError, 
-  RecipientColumnMissing, 
+import {
+  MissingTemplateKeysError,
+  HydrationError,
+  RecipientColumnMissing,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
-import { storeCredentials } from '@sms/middlewares'
+import { storeCredentials, getCampaignDetails } from '@sms/middlewares'
 import logger from '@core/logger'
 
 const router = Router({ mergeParams: true })
@@ -70,7 +70,7 @@ const storeCredentialsValidator = {
       .string()
       .trim()
       .required(),
-    testNumber: Joi
+    recipient: Joi
       .string()
       .trim()
       .required(),
@@ -99,9 +99,6 @@ const sendCampaignValidator = {
 
 // handlers
 // Get campaign details
-const getCampaignDetails = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
-}
 
 const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: SmsTemplate; firstRecord: SmsMessage}): Promise<void> => {
   if (!updatedTemplate.params) return
@@ -203,7 +200,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const records = await testHydration(+campaignId, s3Key, smsTemplate.params!)
       // START populate template
-      populateSmsTemplate(+campaignId, records)
+      await populateSmsTemplate(+campaignId, records)
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err
@@ -370,10 +367,10 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *          application/json:
  *            schema:
  *            required:
- *              - testNumber
+ *              - recipient
  *              - twilioCredentials
  *            properties:
- *              testNumber:
+ *              recipient:
  *                type: string
  *              twilioCredentials:
  *                $ref: '#/components/schemas/TwilioCredentials'

@@ -62,7 +62,7 @@ const Campaigns = () => {
     },
     {
       name: 'Sent At',
-      render: (campaign: Campaign) => <Moment format='LLL'>{campaign.sentAt}</Moment>,
+      render: (campaign: Campaign) => campaign.sentAt ? <Moment format='LLL'>{campaign.sentAt}</Moment> : <span></span>,
       width: 'md',
     }
     ,
@@ -78,7 +78,7 @@ const Campaigns = () => {
       <tr key={key} onClick={() => history.push(`/campaigns/${campaign.id}`)}>
         {
           headers.map(({ render, width, name }) => (
-            <td className={cx(styles.column, styles[width])} key={name} >
+            <td className={styles[width]} key={name} >
               {render(campaign)}
             </td>
           ))
