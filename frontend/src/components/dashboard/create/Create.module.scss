@@ -25,3 +25,6 @@
 .darkBlueBtn {
   @include button($dark-blue)
 }
+.turquoiseGreenBtn {
+  @include button($turquoise-green);
+}
