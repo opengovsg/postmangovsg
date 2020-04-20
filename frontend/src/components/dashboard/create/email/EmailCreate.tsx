@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 
+import { EmailCampaign, EmailProgress } from 'classes/EmailCampaign'
 import { ProgressPane } from 'components/common'
 import EmailTemplate from './EmailTemplate'
 import EmailRecipients from './EmailRecipients'
+import EmailSend from './EmailSend'
+import EmailDetail from './EmailDetail'
 
-import { EmailCampaign, EmailProgress } from 'classes/EmailCampaign'
 import styles from '../Create.module.scss'
+import { Status } from 'classes'
 
 const EMAIL_PROGRESS_STEPS = [
   'Create Template',
@@ -38,7 +41,7 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
         )
       case EmailProgress.Send:
         return (
-          <>Send</>
+          <EmailSend id={campaign.id} body={campaign.body} numRecipients={campaign.numRecipients} onNext={onNext} />
         )
       default:
         return (<p>Invalid step</p>)
@@ -48,10 +51,22 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
 
   return (
     <div className={styles.createContainer}>
-      <ProgressPane steps={EMAIL_PROGRESS_STEPS} activeStep={activeStep} setActiveStep={setActiveStep} progress={campaign.progress} />
-      <div className={styles.stepContainer}>
-        {renderStep()}
-      </div>
+      {
+        campaign.status !== Status.Draft
+          ? (
+            <div className={styles.stepContainer}>
+              <EmailDetail id={campaign.id} sentAt={campaign.sentAt} numRecipients={campaign.numRecipients}></EmailDetail>
+            </div>
+          )
+          : (
+            <>
+              <ProgressPane steps={EMAIL_PROGRESS_STEPS} activeStep={activeStep} setActiveStep={setActiveStep} progress={campaign.progress} />
+              <div className={styles.stepContainer}>
+                {renderStep()}
+              </div>
+            </>
+          )
+      }
     </div>
   )
 }

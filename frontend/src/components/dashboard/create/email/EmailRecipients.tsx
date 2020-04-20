@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { getPreviewMessage } from 'services/campaign.service'
+import { getPreviewMessage } from 'services/email.service'
 import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
 
 const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { id: number; csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
