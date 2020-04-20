@@ -3,7 +3,7 @@ import { difference, keys, mapKeys } from 'lodash'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 
-import { S3Service } from '@core/services'
+import { S3Service } from '@core/services/s3.service'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
 import { MissingTemplateKeysError } from '@core/errors/template.errors'
