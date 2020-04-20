@@ -3,6 +3,8 @@ import React, { useContext } from 'react'
 import { ModalContext } from 'contexts/modal.context'
 import ConfirmModal from 'components/dashboard/confirm-modal'
 import { InfoBlock, PrimaryButton } from 'components/common'
+import styles from '../Create.module.scss'
+
 const SMSSend = ({ body, numRecipients }: { body: string; numRecipients: number }) => {
 
   const modalContext = useContext(ModalContext)
@@ -13,11 +15,13 @@ const SMSSend = ({ body, numRecipients }: { body: string; numRecipients: number 
       <h2>Your campaign is ready to be sent!</h2>
       <div className="separator"></div>
 
-      <p>Number of recipients</p>
-      <h4>{numRecipients}</h4>
+      <div className={styles.sendInfo}>
+        <p>Number of recipients</p>
+        <h4>{numRecipients}</h4>
 
-      <p>Message</p>
-      <InfoBlock>{body}</InfoBlock>
+        <p>Message</p>
+        <InfoBlock>{body}</InfoBlock>
+      </div>
 
       <div className="separator"></div>
 

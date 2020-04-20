@@ -13,3 +13,11 @@
   padding: $content-vertical-padding $site-padding;
   margin: 0 auto;
 }
+
+.sendInfo {
+  p { margin-bottom: 0; }
+  h4 {
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+  }
+}
