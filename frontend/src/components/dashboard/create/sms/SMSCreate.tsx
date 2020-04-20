@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 
-import { SMSCampaign, SMSProgress } from 'classes'
+import { SMSCampaign, SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import SMSTemplate from './SMSTemplate'
 import SMSRecipients from './SMSRecipients'
 import SMSCredentials from './SMSCredentials'
 import SMSSend from './SMSSend'
+import SMSDetail from './SMSDetail'
 
 import styles from '../Create.module.scss'
 
@@ -52,13 +53,24 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
     }
   }
 
-
   return (
     <div className={styles.createContainer}>
-      <ProgressPane steps={SMS_PROGRESS_STEPS} activeStep={activeStep} setActiveStep={setActiveStep} progress={campaign.progress} />
-      <div className={styles.stepContainer}>
-        {renderStep()}
-      </div>
+      {
+        campaign.status !== Status.Draft
+          ? (
+            <div className={styles.stepContainer}>
+              <SMSDetail id={campaign.id} sentAt={campaign.sentAt} numRecipients={campaign.numRecipients}></SMSDetail>
+            </div>
+          )
+          : (
+            <>
+              <ProgressPane steps={SMS_PROGRESS_STEPS} activeStep={activeStep} setActiveStep={setActiveStep} progress={campaign.progress} />
+              <div className={styles.stepContainer}>
+                {renderStep()}
+              </div>
+            </>
+          )
+      }
     </div>
   )
 }

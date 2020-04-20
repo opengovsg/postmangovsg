@@ -14,10 +14,6 @@
 
 .icon {
   @include icon;
-
-  &.send {
-    transform: rotateZ(52deg);
-  }
 }
 
 .button {

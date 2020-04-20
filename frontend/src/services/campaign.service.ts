@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Campaign, ChannelType, Status, SMSCampaign } from 'classes'
+import { Campaign, CampaignStats, ChannelType, Status, SMSCampaign } from 'classes'
 
 // for dev use
 async function sleep(ms: number): Promise<void> {
@@ -16,7 +16,7 @@ export async function getCampaigns(): Promise<Array<Campaign>> {
       name: 'test sms',
       createdAt: Date.now(),
       sentAt: Date.now(),
-      status: 'draft',
+      status: 'sending',
     },
     {
       id: 1,
@@ -37,10 +37,24 @@ export async function getCampaignDetails(campaignId: number): Promise<Campaign> 
     id: campaignId,
     name: 'Project Name',
     type: ChannelType.SMS,
-    status: Status.Draft,
+    status: Status.Sent,
     createdAt: Date.now(),
     hasCredentials: true,
     body: 'something {{ hello }} ',
     numRecipients: 524,
+    sentAt: Date.now(),
+  }))
+}
+
+
+export async function getCampaignStats(campaignId: number): Promise<CampaignStats> {
+  await sleep(100)
+  return Promise.resolve(new CampaignStats({
+    id: campaignId,
+    error: 12,
+    invalid: 10,
+    unsent: 199,
+    sent: 23,
+    status: Status.Sending,
   }))
 }

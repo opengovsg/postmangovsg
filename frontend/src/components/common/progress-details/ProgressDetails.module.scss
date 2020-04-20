@@ -1,0 +1,96 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.progress {
+  table {
+    width: 100%;
+    margin-bottom: 3rem;
+
+    tbody tr {
+      &:hover {
+        cursor: default;
+        background-color: unset;
+      }
+
+      &:active {
+        opacity: 0.5;
+      }
+    }
+
+    tr {
+      @include flex-horizontal;
+      border-bottom: none;
+
+      .icon {
+        @include icon;
+      }
+
+      td.status {
+        @include flex-horizontal;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      th {
+        text-transform: capitalize;
+      }
+
+      td,
+      th {
+        padding: 0.75rem 0;
+
+        &.xs {
+          flex: 1.2;
+          text-align: center;
+        }
+
+        &.sm {
+          flex: 2;
+        }
+
+        &.md {
+          flex: 3;
+        }
+
+        &.lg {
+          flex: 4;
+        }
+      }
+    }
+  }
+}
+
+.campaignStatus {
+  text-transform: capitalize;
+}
+
+.stats {
+  margin-top: 3rem;
+}
+
+.icon {
+  @include icon;
+  margin-right: 0.5rem;
+
+  &.red {
+    color: $red;
+  }
+
+  &.blue {
+    color: $indigo-blue;
+  }
+}
+
+.progressTitle {
+  @include flex-horizontal;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+
+  .pause {
+    @include button($red);
+  }
+
+  .retry {
+    @include button($dark-blue)
+  }
+}
