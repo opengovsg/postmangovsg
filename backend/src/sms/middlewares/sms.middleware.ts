@@ -24,9 +24,6 @@ const saveCredential = async (campaignId: number, credentialName: string, secret
   // Store credential to credential table and update campaign
   await credentialService.addCredentialToCampaign(campaignId, credentialName)
 
-  // Upload the credential to aws secret manager
-  await credentialService.storeSecret(credentialName, secret)  
-
 }
 
 const getCredential = (req: Request): TwilioCredentials => {
