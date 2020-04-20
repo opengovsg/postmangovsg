@@ -1,16 +1,24 @@
 import React, { useState } from 'react'
 
 import { TextArea, PrimaryButton } from 'components/common'
+import { useParams } from 'react-router-dom'
+import { saveTemplate } from 'services/email.service'
 
 const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
   { subject: string; body: string; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [body, setBody] = useState(initialBody)
   const [subject, setSubject] = useState(initialSubject)
+  const params: {id?: string} = useParams()
 
-  async function onNextClicked(): Promise<void> {
-    // Save template
-    onNext({ subject, body })
+  async function handleSaveTemplate(): Promise<void> {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await saveTemplate(+params.id!, subject, body)
+      onNext({ subject, body })
+    } catch(err){
+      console.error(err)
+    }
   }
 
   return (
@@ -30,7 +38,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
       <TextArea highlight={true} placeholder="Enter email message" value={body} onChange={setBody} />
       <div className="separator"></div>
       <div className="progress-button">
-        <PrimaryButton disabled={!body || !subject} onClick={onNextClicked}>Upload Recipients →</PrimaryButton>
+        <PrimaryButton disabled={!body || !subject} onClick={handleSaveTemplate}>Upload Recipients →</PrimaryButton>
       </div>
     </>
   )
