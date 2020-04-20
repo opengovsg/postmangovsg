@@ -24,7 +24,11 @@ class S3Service {
   }
 
   async parseCsv(readStream: NodeJS.ReadableStream): Promise<Array<CSVParamsInterface>> {
-    const parser = CSVParse({ delimiter: ',' })
+    const parser = CSVParse({
+      delimiter: ',',
+      trim: true,
+      skip_empty_lines: true,
+    })
     readStream.pipe(parser)
     let headers: string[] = []
     const params: Array<CSVParamsInterface> = []
