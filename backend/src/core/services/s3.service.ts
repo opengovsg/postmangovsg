@@ -31,11 +31,13 @@ class S3Service {
     })
     readStream.pipe(parser)
     let headers: string[] = []
-    const params: Array<CSVParamsInterface> = []
+    let recipientIndex: number
+    const params: Map<String, CSVParamsInterface> = new Map()
     for await (const row of parser) {
       if (isEmpty(headers)) {
         const lowercaseHeaders = row.map((col: string) => col.toLowerCase())
-        if (lowercaseHeaders.indexOf('recipient') === -1) throw new RecipientColumnMissing()
+        recipientIndex = lowercaseHeaders.indexOf('recipient')
+        if (recipientIndex === -1) throw new RecipientColumnMissing()
         headers = lowercaseHeaders
       } else {
         const rowWithHeaders: CSVParamsInterface = {}
@@ -43,11 +45,11 @@ class S3Service {
           rowWithHeaders[headers[index]] = col
         })
         // produces {header1: value1, header2: value2, ...}
-        params.push(rowWithHeaders)
+        params.set(row[recipientIndex!], rowWithHeaders)
       }
     }
     logger.info({ message: 'Parsing complete' })
-    return params
+    return Array.from(params.values())
   }
 }
 
