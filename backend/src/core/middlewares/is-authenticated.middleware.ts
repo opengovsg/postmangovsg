@@ -8,31 +8,37 @@ const doesHashExist = async (hash: string) =>  {
   return await ApiKey.findByPk(hash)
 }
 
-export const isCookieAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  if (req.session?.user?.id) {
-    return next()
-  }
-  return res.sendStatus(401)
+const checkCookie = async (req: Request): Promise<boolean> => {
+  return req.session?.user?.id
 }
 
-export const isApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkApiKey = async (req: Request): Promise<boolean> => {
   const headerKey = `ApiKey-${config.apiKey.version}`
   const authHeader = get(req, 'headers.authorization', '')
   
   const [header, content] = authHeader.split(' ')
-  if (headerKey !== header) return res.sendStatus(401)
+  if (headerKey !== header) return false
 
   const [name, version, key] = content.split('_')
-  if (!name || !version || !key) return res.sendStatus(401)
+  if (!name || !version || !key) return false
 
   const hash = await hashService.specifySalt(key, config.apiKey.salt)
   const apiKeyHash = `${name}_${version}_${hash}`
 
   const exists = await doesHashExist(apiKeyHash)
-  if (!exists) return res.sendStatus(401)
+  if (!exists) return false
 
-  return next()
-}export const logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  return true
+}
+
+export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  if (await checkCookie(req) || await checkApiKey(req)) {
+    return next()
+  }
+  return res.sendStatus(401)
+}
+
+export const logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   return new Promise <Response | void> ((resolve, reject) => {
    req.session?.destroy((err) => {
      res.cookie('postmangovsg', '', { expires: new Date() }) // Makes cookie expire immediately
@@ -42,4 +48,18 @@ export const isApiKeyAuthenticated = async (req: Request, res: Response, next: N
      reject(err)
    })
   }).catch(err => next(err))
+}
+
+export const isCookieAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  if (await checkCookie(req)) {
+    return next()
+  }
+  return res.sendStatus(401)
+}
+
+export const isApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  if (await checkApiKey(req)) {
+    return next()
+  }
+  return res.sendStatus(401)
 }
