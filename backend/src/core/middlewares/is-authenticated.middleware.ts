@@ -36,9 +36,7 @@ const getApiKeyHash = async (apiKey: string): Promise<string | null> => {
   if (!exists) return null
 
   return apiKeyHash
-} 
-
-
+}
 
 export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   if (checkCookie(req)) {
@@ -75,13 +73,6 @@ export const logout = async (req: Request, res: Response, next: NextFunction): P
 
 export const isCookieAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   if (checkCookie(req)) {
-    return next()
-  }
-  return res.sendStatus(401)
-}
-
-export const isApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  if (await checkApiKey(req)) {
     return next()
   }
   return res.sendStatus(401)
