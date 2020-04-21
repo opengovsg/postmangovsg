@@ -8,8 +8,9 @@ const doesHashExist = async (hash: string): Promise<ApiKey | null > =>  {
   return ApiKey.findByPk(hash)
 }
 
-const checkCookie = async (req: Request): Promise<boolean> => {
-  return req.session?.user?.id
+const checkCookie = (req: Request): boolean => {
+  if (req.session?.user?.id) return true
+  return false
 }
 
 const checkApiKey = async (req: Request): Promise<boolean> => {
@@ -32,7 +33,8 @@ const checkApiKey = async (req: Request): Promise<boolean> => {
 }
 
 export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  if (await checkCookie(req) || await checkApiKey(req)) {
+  if (checkCookie(req) || await checkApiKey(req)) {
+    console.log(checkCookie(req))
     return next()
   }
   return res.sendStatus(401)
@@ -51,7 +53,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction): P
 }
 
 export const isCookieAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  if (await checkCookie(req)) {
+  if (checkCookie(req)) {
     return next()
   }
   return res.sendStatus(401)
