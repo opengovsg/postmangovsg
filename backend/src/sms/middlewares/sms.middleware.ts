@@ -101,7 +101,8 @@ const storeCredentials = async (req: Request, res: Response,  next: NextFunction
   // Save the credentials and update DB
   try {
     const secretString = JSON.stringify(credential)
-    const credentialName = await getEncodedHash(secretString)
+    const encodedHash = await getEncodedHash(secretString)
+    const credentialName = `${config.aws.credentialsVersion}_${encodedHash}`
     await saveCredential(+campaignId, credentialName, secretString)
   }catch(err) {
     return next(err)
