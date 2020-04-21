@@ -12,7 +12,7 @@ interface UploadCompleteResponse {
 }
 
 export async function saveTemplate(campaignId: number, body: string): Promise<boolean> {
-  return axios.put(`/campaign/${campaignId}/template`,{
+  return axios.put(`/campaign/${campaignId}/sms/template`,{
     body,
   }).then((response) => {
     return response.status === 200
@@ -29,7 +29,7 @@ export async function validateCredentials({
   messagingServiceSid: string;
   recipient: string;
 }): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/credentials`,{
+  return axios.post(`/campaign/${campaignId}/sms/credentials`,{
     twilioAccountSid: accountSid,
     twilioApiKey: apiKey,
     twilioApiSecret: apiSecret,
