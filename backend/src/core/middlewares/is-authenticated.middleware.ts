@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { get } from 'lodash'
 import { hashService } from '@core/services'
-import { ApiKey } from '@core/models'
+import { ApiKey, User } from '@core/models'
 import config from '@core/config'
 
 const doesHashExist = async (hash: string): Promise<ApiKey | null > =>  {
@@ -38,6 +38,24 @@ const getApiKeyHash = async (apiKey: string): Promise<string | null> => {
   return apiKeyHash
 }
 
+const getEmailFromApiKey = async (apiKeyHash: string): Promise<string | null> => {
+  const apiKey = await ApiKey.findByPk(apiKeyHash)
+  if (!apiKey) return null
+  return apiKey.email
+}
+
+const getUserId = async (apiKeyHash: string): Promise <string | null> => {
+
+  // Derive user id from api key
+  const userEmail = await getEmailFromApiKey(apiKeyHash)
+  if (userEmail === null) return null
+
+  const user = await User.findOne({ where: { email: userEmail } , attributes: ['id'] })
+  if (user === null) return null
+
+  return user.id
+}
+
 export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   if (checkCookie(req)) {
     return next()
@@ -53,8 +71,8 @@ export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response,
     return res.sendStatus(401)
   }
 
-  // Store hash in res.locals so that downstream middlewares can use it
-  res.locals.apiKeyHash = hash
+  // Store user id in res.locals so that downstream middlewares can use it
+  res.locals.userId = await getUserId(hash)
   
   return next()
 }

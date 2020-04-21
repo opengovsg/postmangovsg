@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express'
 import { literal } from 'sequelize'
 import { Campaign, JobQueue } from '@core/models'
 import { EmailTemplate, EmailMessage } from '@email/models'
-import { ApiKey, User } from '@core/models'
 import { ChannelType } from '@core/constants'
 import { mailClient } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
@@ -67,31 +66,16 @@ const getHydratedMail = async (campaignId: number, recipient: string): Promise<M
   return 
 }
 
-const getEmailFromApiKey = async (apiKeyHash: string): Promise<string | null> => {
-  const apiKey = await ApiKey.findByPk(apiKeyHash)
-  if (!apiKey) return null
-  return apiKey.email
-}
-
-const getUserId = async (req: Request, apiKeyHash: string): Promise <string | null> => {
-  // Cookie
+const getUserId = (req: Request, res: Response): string => {
+  // From Cookie
   if (req.session?.user?.id) return req.session?.user?.id
-
-  // Derive user id from api key
-  const userEmail = await getEmailFromApiKey(apiKeyHash)
-  if (userEmail === null) return null
-
-  const user = await User.findOne({ where: { email: userEmail } , attributes: ['id'] })
-  if (user === null) return null
-
-  return user.id
+  return res.locals.userId
 }
 
 // TODO
 const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const { campaignId } = req.params
-  const { apiKeyHash } = res.locals
-  const userId = await getUserId(req, apiKeyHash)
+  const userId = getUserId(req, res)
   
   try {
     const campaign = await Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.Email } })
