@@ -1,26 +1,78 @@
 import React, { useState } from 'react'
+import { useParams } from 'react-router-dom'
 
-import { getPreviewMessage } from 'services/email.service'
+import axios, { AxiosResponse } from 'axios'
+
+import {
+  completeFileUpload,
+  getPresignedUrl,
+  getPreviewMessage,
+} from 'services/email.service'
 import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
 
 const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { id: number; csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
+  const [errorMessage, setErrorMessage] = useState('')
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
   const [messagePreview, setMessagePreview] = useState('')
 
-  function uploadFile(files: File[]) {
-    const uploadedFile = files[0].name
-    setIsUploading(true)
-    setTimeout(async () => {
-      setNumRecipients(100)
-      setUploadedCsvFilename(uploadedFile)
-      setIsUploading(false)
+  const params: { id?: string } = useParams()
 
+  async function uploadFile(files: File[]) {
+    setIsUploading(true)
+    try {
+      // user did not select a file
+      if (!files[0]) {
+        return
+      }
+
+      // where do i put this
       const msgPreview = await getPreviewMessage(id)
       setMessagePreview(msgPreview)
-    }, 1000)
+
+      const uploadedFile = files[0]
+      const campaignId = +params.id!
+
+      const startUploadResponse = await getPresignedUrl({
+        campaignId,
+        mimeType: uploadedFile.type,
+      })
+      console.log('obtained s3 presigned url')
+
+      const s3AxiosInstance = axios.create({
+        withCredentials: false,
+      })
+      await s3AxiosInstance.put(startUploadResponse.presignedUrl, uploadedFile, {
+        headers: { 'Content-Type': uploadedFile.type },
+      })
+      console.log('PUT to s3 succeeded')
+
+      // POST to upload complete
+      const uploadResponse = await completeFileUpload({
+        campaignId,
+        transactionId: startUploadResponse.transactionId,
+      })
+
+      setUploadedCsvFilename(uploadedFile.name)
+      setNumRecipients(uploadResponse.num_recipients)
+
+    } catch (err) {
+      const axiosError: AxiosResponse = err.response
+      if (axiosError !== undefined) {
+        if (axiosError.status === 400) {
+          setErrorMessage(axiosError?.data?.message)
+        } else {
+          setErrorMessage('Error uploading file.')
+        }
+        console.error(axiosError)
+      } else {
+        console.error(err)
+      }
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   return (
@@ -35,14 +87,24 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       {!isUploading && numRecipients &&
         <InfoBlock>
           <li>
-            <i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>
+            a<i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>
           </li>
-          <li>
-            <i className="bx bx-file"></i><span>{csvFilename}</span>
-          </li>
+          {csvFilename ? (
+            <li>
+              b<i className='bx bx-file'></i>
+              <span>{csvFilename}</span>
+            </li>
+          ) : (
+            <></>
+          )}
         </InfoBlock>
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+
+      {
+        errorMessage.length !== 0 ? <div>Error: {errorMessage}</div> : <></>
+      }
+
       <div className="separator"></div>
       {
         csvFilename &&
