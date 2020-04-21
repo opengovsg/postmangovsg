@@ -13,30 +13,52 @@ const checkCookie = (req: Request): boolean => {
   return false
 }
 
-const checkApiKey = async (req: Request): Promise<boolean> => {
+const getApiKey = (req: Request): string | null => {
   const headerKey = `ApiKey-${config.apiKey.version}`
   const authHeader = get(req, 'headers.authorization', '')
   
-  const [header, content] = authHeader.split(' ')
-  if (headerKey !== header) return false
+  const [header, apiKey] = authHeader.split(' ')
+  if (headerKey !== header) return null
 
-  const [name, version, key] = content.split('_')
-  if (!name || !version || !key) return false
+  const [name, version, key] = apiKey.split('_')
+  if (!name || !version || !key) return null
+
+  return apiKey
+}
+
+const getApiKeyHash = async (apiKey: string): Promise<string | null> => {
+  const [name, version, key] = apiKey.split('_')
 
   const hash = await hashService.specifySalt(key, config.apiKey.salt)
   const apiKeyHash = `${name}_${version}_${hash}`
 
   const exists = await doesHashExist(apiKeyHash)
-  if (!exists) return false
+  if (!exists) return null
 
-  return true
-}
+  return apiKeyHash
+} 
+
+
 
 export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  if (checkCookie(req) || await checkApiKey(req)) {
+  if (checkCookie(req)) {
     return next()
   }
-  return res.sendStatus(401)
+
+  const apiKey = getApiKey(req)
+  if (apiKey === null) {
+    return res.sendStatus(401)
+  }
+
+  const hash = await getApiKeyHash(apiKey)
+  if (hash === null) {
+    return res.sendStatus(401)
+  }
+
+  // Store hash in res.locals so that downstream middlewares can use it
+  res.locals.apiKeyHash = hash
+  
+  return next()
 }
 
 export const logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
