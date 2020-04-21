@@ -12,7 +12,7 @@ interface UploadCompleteResponse {
 }
 
 export async function saveTemplate(campaignId: number, subject: string, body: string): Promise<boolean> {
-  return axios.put(`/campaign/${campaignId}/template`,{
+  return axios.put(`/campaign/${campaignId}/email/template`,{
     body,
     subject,
   }).then((response) => {
@@ -21,7 +21,7 @@ export async function saveTemplate(campaignId: number, subject: string, body: st
 }
 
 export async function sendPreviewMessage({campaignId, recipient}: {campaignId: number; recipient: string}): Promise<boolean>{
-  return axios.post(`/campaign/${campaignId}/credentials`,{
+  return axios.post(`/campaign/${campaignId}/email/credentials`,{
     recipient
   }).then((response) => {
     return response.status === 200
@@ -61,8 +61,4 @@ export async function completeFileUpload({
 
 export async function getPreviewMessage(campaignId: number): Promise<string> {
   return Promise.resolve('something hola')
-}
-
-export async function sendCampaign(campaignId: number): Promise<boolean> {
-  return Promise.resolve(true)
 }
