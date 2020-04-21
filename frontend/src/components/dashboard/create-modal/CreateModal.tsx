@@ -66,7 +66,7 @@ const CreateModal = () => {
 
       <div className="separator"></div>
       <div className="progress-button">
-        <PrimaryButton className={styles.bottomButton} onClick={handleCreateCampaign}>
+        <PrimaryButton className={styles.bottomButton} onClick={handleCreateCampaign} disabled={!name}>
           Create campaign
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
         </PrimaryButton>
