@@ -36,7 +36,10 @@ class S3Service {
     const params: Map<string, CSVParamsInterface> = new Map()
     for await (const row of parser) {
       if (isEmpty(headers)) {
-        const lowercaseHeaders = row.map((col: string) => col.toLowerCase())
+        // @see https://stackoverflow.com/questions/11305797/remove-zero-width-space-characters-from-a-javascript-string
+        const lowercaseHeaders = row.map((col: string) =>
+          col.toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g, '')
+        )
         recipientIndex = lowercaseHeaders.indexOf('recipient')
         if (recipientIndex === -1) throw new RecipientColumnMissing()
         headers = lowercaseHeaders
