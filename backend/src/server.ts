@@ -17,7 +17,7 @@ const requiredEnvVars = [
   'SESSION_SECRET',
   'FRONTEND_URL',
   'COOKIE_DOMAIN',
-  'API_KEY_SALT_V1'
+  'API_KEY_SALT_V1',
 ]
 
 const port = Number(process.env.PORT) || 4000

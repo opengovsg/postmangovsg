@@ -86,7 +86,7 @@ const maxRatePerJob = parseEnvVarAsInt(process.env.MAX_RATE_PER_JOB as string) |
 
 // For API Key hashing 
 const apiKeySalt: string = process.env.API_KEY_SALT_V1 as string
-const apiKeyVersion: string = 'v1'
+const apiKeyVersion = 'v1'
 
 export default {
   IS_PROD,
@@ -147,5 +147,5 @@ export default {
   apiKey: {
     salt: apiKeySalt,
     version: apiKeyVersion,
-  }
+  },
 }
