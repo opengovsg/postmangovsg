@@ -1,19 +1,35 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import cx from 'classnames'
 
-import { ChannelType } from 'classes/Campaign'
+import { ChannelType, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
-
+import { createCampaign } from 'services/campaign.service'
+import { ModalContext } from 'contexts/modal.context'
+import { useHistory } from 'react-router-dom'
 const CreateModal = () => {
+  const modalContext = useContext(ModalContext)
+  const history = useHistory()
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
+  const [name, setName] = useState('')
+  async function handleCreateCampaign(){
+    try{
+      const campaign: Campaign = await createCampaign(name, selectedChannel)
+      // close modal and go to create view
+      modalContext.setModalContent(null)
+      history.push(`/campaigns/${campaign.id}`)
+    }
+    catch(err){
+      console.error(err)
+    }
+  }
 
   return (
     <>
       <div className={styles.section}>
         <h2 className={styles.title}>Name your campaign</h2>
         <h5 className={styles.subtitle}>Give your campaign a descriptive name</h5>
-        <TextInput></TextInput>
+        <TextInput type="text" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)}></TextInput>
       </div>
       <div className={cx(styles.section, styles.separator)}>
         <h2 className={styles.title}>Choose the channel you want to send in</h2>
@@ -40,9 +56,9 @@ const CreateModal = () => {
         <p className={styles.subtext}>Get your credentials ready. <a href="#">What is this?</a></p>
       </div>
 
-
-      <div className="align-right">
-        <PrimaryButton className={styles.bottomButton}>
+      <div className="separator"></div>
+      <div className="progress-button">
+        <PrimaryButton className={styles.bottomButton}  onClick={handleCreateCampaign}>
           Create campaign
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
         </PrimaryButton>

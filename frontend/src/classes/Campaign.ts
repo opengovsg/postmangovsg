@@ -1,6 +1,6 @@
 export enum ChannelType {
-  SMS = 'sms',
-  Email = 'email',
+  SMS = 'SMS',
+  Email = 'EMAIL',
 }
 
 export enum Status {
@@ -23,6 +23,22 @@ export class Campaign {
     this.type = input['type']
     this.createdAt = input['createdAt']
     this.sentAt = input['sentAt']
+    this.status = input['status']
+  }
+}
+
+export class CampaignStats {
+  error: number
+  invalid: number
+  unsent: number
+  sent: number
+  status: Status
+
+  constructor(input: any) {
+    this.error = input['error']
+    this.invalid = input['invalid']
+    this.unsent = input['unsent']
+    this.sent = input['sent']
     this.status = input['status']
   }
 }

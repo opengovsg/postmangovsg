@@ -11,30 +11,18 @@ interface UploadCompleteResponse {
   hydrated_record: string;
 }
 
-export async function saveTemplate(campaignId: number, body: string): Promise<boolean> {
+export async function saveTemplate(campaignId: number, subject: string, body: string): Promise<boolean> {
   return axios.put(`/campaign/${campaignId}/template`,{
     body,
+    subject,
   }).then((response) => {
     return response.status === 200
   })
 }
 
-export async function validateCredentials({
-  campaignId, accountSid, apiKey, apiSecret, messagingServiceSid, recipient,
-}: {
-  campaignId: number;
-  accountSid: string;
-  apiKey: string;
-  apiSecret: string;
-  messagingServiceSid: string;
-  recipient: string;
-}): Promise<boolean> {
+export async function sendPreviewMessage({campaignId, recipient}: {campaignId: number; recipient: string}): Promise<boolean>{
   return axios.post(`/campaign/${campaignId}/credentials`,{
-    twilioAccountSid: accountSid,
-    twilioApiKey: apiKey,
-    twilioApiSecret: apiSecret,
-    twilioMessagingServiceSid: messagingServiceSid,
-    recipient,
+    recipient
   }).then((response) => {
     return response.status === 200
   })
@@ -48,7 +36,7 @@ export async function getPresignedUrl({
   mimeType: string
 }): Promise<PresignedUrlResponse> {
   return axios
-    .get(`/campaign/${campaignId}/sms/upload/start`, {
+    .get(`/campaign/${campaignId}/email/upload/start`, {
       params: {
         mimeType,
       },
@@ -64,8 +52,17 @@ export async function completeFileUpload({
   transactionId: string
 }): Promise<UploadCompleteResponse> {
   return axios
-    .post(`/campaign/${campaignId}/sms/upload/complete`, {
+    .post(`/campaign/${campaignId}/email/upload/complete`, {
       transactionId,
     })
     .then((resp) => resp.data)
+}
+
+
+export async function getPreviewMessage(campaignId: number): Promise<string> {
+  return Promise.resolve('something hola')
+}
+
+export async function sendCampaign(campaignId: number): Promise<boolean> {
+  return Promise.resolve(true)
 }

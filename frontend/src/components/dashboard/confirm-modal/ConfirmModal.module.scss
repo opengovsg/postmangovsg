@@ -14,14 +14,10 @@
 
 .icon {
   @include icon;
-
-  &.send {
-    transform: rotateZ(52deg);
-  }
 }
 
 .button {
-  @include button($light-green);
+  @include button($turquoise-green);
 }
 
 .title {

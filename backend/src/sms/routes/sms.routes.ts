@@ -4,27 +4,27 @@ import { difference, keys } from 'lodash'
 
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
-import { 
+import {
   updateCampaignS3Metadata,
-  template, 
+  template,
   testHydration,
   extractS3Key,
 } from '@core/services'
 import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services'
-import { 
-  uploadStartHandler, 
-  sendCampaign, 
-  stopCampaign, 
-  retryCampaign, 
-  canEditCampaign, 
+import {
+  uploadStartHandler,
+  sendCampaign,
+  stopCampaign,
+  retryCampaign,
+  canEditCampaign,
 } from '@core/middlewares'
-import { 
-  MissingTemplateKeysError, 
-  HydrationError, 
-  RecipientColumnMissing, 
+import {
+  MissingTemplateKeysError,
+  HydrationError,
+  RecipientColumnMissing,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
-import { storeCredentials } from '@sms/middlewares'
+import { storeCredentials, getCampaignDetails } from '@sms/middlewares'
 import logger from '@core/logger'
 
 const router = Router({ mergeParams: true })
@@ -70,7 +70,7 @@ const storeCredentialsValidator = {
       .string()
       .trim()
       .required(),
-    testNumber: Joi
+    recipient: Joi
       .string()
       .trim()
       .required(),
@@ -99,9 +99,6 @@ const sendCampaignValidator = {
 
 // handlers
 // Get campaign details
-const getCampaignDetails = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
-}
 
 const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: SmsTemplate; firstRecord: SmsMessage}): Promise<void> => {
   if (!updatedTemplate.params) return
@@ -200,15 +197,31 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const records = await testHydration(+campaignId, s3Key, smsTemplate.params!)
+      /* eslint-disable @typescript-eslint/no-non-null-assertion */
+      const hydrationResult = await testHydration({
+        campaignId: +campaignId,
+        s3Key,
+        templateBody: smsTemplate.body!,
+        templateParams: smsTemplate.params!,
+      })
+      /* eslint-enable */
+
+      const recipientCount: number = hydrationResult.records.length
       // START populate template
-      populateSmsTemplate(+campaignId, records)
+      await populateSmsTemplate(+campaignId, hydrationResult.records)
+
+      /* eslint-disable @typescript-eslint/camelcase */
+      return res.status(202).json({
+        template_body: smsTemplate.body,
+        num_recipients: recipientCount,
+        hydrated_record: hydrationResult.hydratedRecord,
+      })
+      /* eslint-enable */
+
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err
     }
-    return res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
     if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
       return res.status(400).json({ message: err.message })
@@ -340,13 +353,22 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *                 transactionId:
  *                   type: string
  *       responses:
- *         201:
- *           description: Created
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 properties:
+ *                   template_body:
+ *                     type: string
+ *                   num_recipients:
+ *                     type: string
+ *                   hydrated_record:
+ *                     type: string
  *         400:
  *           description: Invalid Request
  *         500:
  *           description: Server Error
- *
  */
 router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampaign, uploadCompleteHandler)
 
@@ -370,10 +392,10 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *          application/json:
  *            schema:
  *            required:
- *              - testNumber
+ *              - recipient
  *              - twilioCredentials
  *            properties:
- *              testNumber:
+ *              recipient:
  *                type: string
  *              twilioCredentials:
  *                $ref: '#/components/schemas/TwilioCredentials'

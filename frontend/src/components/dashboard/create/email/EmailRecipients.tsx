@@ -1,28 +1,36 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
-
-import { getPresignedUrl, completeFileUpload } from 'services/sms.service'
 import axios, { AxiosResponse } from 'axios'
 
-const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
+import {
+  completeFileUpload,
+  getPresignedUrl,
+  getPreviewMessage,
+} from 'services/email.service'
+import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
+
+const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { id: number; csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [errorMessage, setErrorMessage] = useState('')
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
+  const [messagePreview, setMessagePreview] = useState('')
 
   const params: { id?: string } = useParams()
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
-
     try {
       // user did not select a file
       if (!files[0]) {
         return
       }
+
+      // where do i put this
+      const msgPreview = await getPreviewMessage(id)
+      setMessagePreview(msgPreview)
 
       const uploadedFile = files[0]
       const campaignId = +params.id!
@@ -79,11 +87,11 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       {!isUploading && numRecipients &&
         <InfoBlock>
           <li>
-            <i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>
+            a<i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>
           </li>
           {csvFilename ? (
             <li>
-              <i className='bx bx-file'></i>
+              b<i className='bx bx-file'></i>
               <span>{csvFilename}</span>
             </li>
           ) : (
@@ -97,11 +105,20 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
         errorMessage.length !== 0 ? <div>Error: {errorMessage}</div> : <></>
       }
 
+      <div className="separator"></div>
+      {
+        csvFilename &&
+        <>
+          <p>Message preview</p>
+          <InfoBlock>{messagePreview}</InfoBlock>
+          <div className="separator"></div>
+        </>
+      }
       <div className="progress-button">
-        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Insert Credentials →</PrimaryButton>
+        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Preview →</PrimaryButton>
       </div>
     </>
   )
 }
 
-export default SMSRecipients
+export default EmailRecipients

@@ -3,25 +3,26 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
 import { Campaign } from '@core/models'
 import { EmailTemplate, EmailMessage } from '@email/models'
-import { 
+import {
   updateCampaignS3Metadata,
-  template, 
+  template,
   testHydration,
   extractS3Key,
 } from '@core/services'
 import { populateEmailTemplate, upsertEmailTemplate } from '@email/services'
-import { 
-  uploadStartHandler, 
-  sendCampaign, 
-  stopCampaign, 
-  retryCampaign, 
-  canEditCampaign, 
+import {
+  uploadStartHandler,
+  sendCampaign,
+  stopCampaign,
+  retryCampaign,
+  canEditCampaign,
 } from '@core/middlewares'
-import { storeCredentials } from '@email/middlewares'
-import { 
-  MissingTemplateKeysError, 
-  HydrationError, 
-  RecipientColumnMissing, 
+import { storeCredentials, getCampaignDetails } from '@email/middlewares'
+
+import {
+  MissingTemplateKeysError,
+  HydrationError,
+  RecipientColumnMissing,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
@@ -56,9 +57,8 @@ const uploadCompleteValidator = {
 }
 
 const storeCredentialsValidator = {
-  // really not sure
   [Segments.BODY]: Joi.object({
-    email: Joi.string().email()
+    recipient: Joi.string().email()
       .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
       .required(),
@@ -86,10 +86,6 @@ const sendCampaignValidator = {
 }
 
 // handlers
-// Get campaign details
-const getCampaignDetails = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'OK' })
-}
 
 const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: EmailTemplate; firstRecord: EmailMessage}): Promise<void> => {
   if (!updatedTemplate.params) return
@@ -193,15 +189,31 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const records = await testHydration(+campaignId, s3Key, emailTemplate.params!)
+      /* eslint-disable @typescript-eslint/no-non-null-assertion */
+      const hydrationResult = await testHydration({
+        campaignId: +campaignId,
+        s3Key,
+        templateBody: emailTemplate.body!,
+        templateParams: emailTemplate.params!,
+      })
+      /* eslint-enable */
+
+      const recipientCount: number = hydrationResult.records.length
       // START populate template
-      populateEmailTemplate(+campaignId, records)
+      await populateEmailTemplate(+campaignId, hydrationResult.records)
+
+      /* eslint-disable @typescript-eslint/camelcase */
+      return res.status(202).json({
+        template_body: emailTemplate.body,
+        num_recipients: recipientCount,
+        hydrated_record: hydrationResult.hydratedRecord,
+      })
+      /* eslint-enable */
+
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err
     }
-    return res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
     if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
       return res.status(400).json({ message: err.message })
@@ -329,8 +341,18 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *                 transactionId:
  *                   type: string
  *       responses:
- *         201:
- *           description: Created
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 properties:
+ *                   template_body:
+ *                     type: string
+ *                   num_recipients:
+ *                     type: string
+ *                   hydrated_record:
+ *                     type: string
  *         400:
  *           description: Invalid Request
  *         500:
@@ -345,8 +367,16 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *    post:
  *      tags:
  *        - Email
- *      summary: Store credentials for SES
- *
+ *      summary: Sends a test message and defaults to Postman's credentials for the campaign
+ *      requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - recipient
+ *               properties:
+ *                 recipient:
+ *                   type: string
  *      responses:
  *        200:
  *          content:
@@ -428,7 +458,7 @@ router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCamp
  *                rate:
  *                  example: 10
  *                  type: integer
- *                  minimum: 1              
+ *                  minimum: 1
  *
  *      responses:
  *        200:
