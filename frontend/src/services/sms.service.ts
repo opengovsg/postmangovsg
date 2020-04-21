@@ -1,5 +1,16 @@
 import axios from 'axios'
 
+interface PresignedUrlResponse {
+  presignedUrl: string;
+  transactionId: string;
+}
+
+interface UploadCompleteResponse {
+  template_body: string;
+  num_recipients: number;
+  hydrated_record: string;
+}
+
 export async function saveTemplate(campaignId: number, body: string): Promise<boolean> {
   return axios.put(`/campaign/${campaignId}/template`,{
     body,
@@ -27,4 +38,34 @@ export async function validateCredentials({
   }).then((response) => {
     return response.status === 200
   })
+}
+
+export async function getPresignedUrl({
+  campaignId,
+  mimeType,
+}: {
+  campaignId: number
+  mimeType: string
+}): Promise<PresignedUrlResponse> {
+  return axios
+    .get(`/campaign/${campaignId}/sms/upload/start`, {
+      params: {
+        mimeType,
+      },
+    })
+    .then((resp) => resp.data)
+}
+
+export async function completeFileUpload({
+  campaignId,
+  transactionId,
+}: {
+  campaignId: number
+  transactionId: string
+}): Promise<UploadCompleteResponse> {
+  return axios
+    .post(`/campaign/${campaignId}/sms/upload/complete`, {
+      transactionId,
+    })
+    .then((resp) => resp.data)
 }

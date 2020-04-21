@@ -189,15 +189,31 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const records = await testHydration(+campaignId, s3Key, emailTemplate.params!)
+      /* eslint-disable @typescript-eslint/no-non-null-assertion */
+      const hydrationResult = await testHydration({
+        campaignId: +campaignId,
+        s3Key,
+        templateBody: emailTemplate.body!,
+        templateParams: emailTemplate.params!,
+      })
+      /* eslint-enable */
+
+      const recipientCount: number = hydrationResult.records.length
       // START populate template
-      await populateEmailTemplate(+campaignId, records)
+      await populateEmailTemplate(+campaignId, hydrationResult.records)
+
+      /* eslint-disable @typescript-eslint/camelcase */
+      return res.status(202).json({
+        template_body: emailTemplate.body,
+        num_recipients: recipientCount,
+        hydrated_record: hydrationResult.hydratedRecord,
+      })
+      /* eslint-enable */
+
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err
     }
-    return res.status(202).json({ message: `Upload success for campaign ${campaignId}.` })
   } catch (err) {
     if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
       return res.status(400).json({ message: err.message })
@@ -325,8 +341,18 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *                 transactionId:
  *                   type: string
  *       responses:
- *         201:
- *           description: Created
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 properties:
+ *                   template_body:
+ *                     type: string
+ *                   num_recipients:
+ *                     type: string
+ *                   hydrated_record:
+ *                     type: string
  *         400:
  *           description: Invalid Request
  *         500:
