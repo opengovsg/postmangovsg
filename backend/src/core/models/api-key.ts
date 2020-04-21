@@ -1,6 +1,6 @@
 import { Column, DataType, Model, Table } from 'sequelize-typescript'
 
-@Table({ tableName: 'api_key' , underscored: true, timestamps: true })
+@Table({ tableName: 'api_keys' , underscored: true, timestamps: true })
 export class ApiKey extends Model<Credential> {
   @Column({
     type: DataType.STRING,
