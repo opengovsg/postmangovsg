@@ -1,7 +1,7 @@
 import React from 'react'
 
 import styles from './Error.module.scss'
-import appLogo from 'assets/img/app-logo.png'
+import appLogo from 'assets/img/app-logo.svg'
 const Error = () => {
 
   return (
@@ -10,7 +10,7 @@ const Error = () => {
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <a href="/"><img className={styles.appLogo} src={appLogo} alt="Postman logo"></img></a>
-            <p className={styles.title}>Page Not Found</p>
+            <h1>Page Not Found!</h1>
           </div>
         </div>
       </div >

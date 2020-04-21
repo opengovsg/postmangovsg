@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import cx from 'classnames'
 
 import { PrimaryButton } from 'components/common'
-import ModalImage from 'assets/img/modal.png'
+import ModalImage from 'assets/img/confirm-modal.svg'
 import styles from './ConfirmModal.module.scss'
 import { sendCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
