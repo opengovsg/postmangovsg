@@ -6,8 +6,10 @@ import { ModalContext } from 'contexts/modal.context'
 import { POSTMAN_GUIDE_URL } from 'config'
 import CreateModal from 'components/dashboard/create-modal'
 import { logout } from 'services/auth.service'
-import styles from './NavBar.module.scss'
 import { AuthContext } from 'contexts/auth.context'
+
+import AppLogo from 'assets/img/app-logo-reverse.svg'
+import styles from './NavBar.module.scss'
 
 const NavBar = () => {
   const { setAuthenticated } = useContext(AuthContext)
@@ -37,7 +39,9 @@ const NavBar = () => {
   return (
     <nav className={styles.navBar}>
       <div className={styles.navBrand}>
-        <NavLink className={styles.title} to="/campaigns">POSTMAN</NavLink>
+        <a href="/campaigns" className={styles.appLogo}>
+          <img src={AppLogo} alt="Postman logo" />
+        </a>
         <a className={styles.burgerButton} onClick={() => setMenuOpen(!menuOpen)}>
           <span className={cx(styles.burger, { [styles.isActive]: menuOpen })}></span>
         </a>

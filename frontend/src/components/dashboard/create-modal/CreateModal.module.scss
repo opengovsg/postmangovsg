@@ -10,6 +10,10 @@
   @include flex-horizontal;
   justify-content: space-between;
 
+  @include mobile() {
+    @include flex-vertical;
+  }
+
   .button {
     @include flex-horizontal;
     justify-content: space-between;
@@ -31,6 +35,17 @@
         background: $indigo-blue;
         color: white;
       }
+    }
+
+    @include mobile() {
+      margin-right: 0;
+      margin-bottom: 1rem;
+      padding: 1rem 1rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+  
     }
   }
 }
