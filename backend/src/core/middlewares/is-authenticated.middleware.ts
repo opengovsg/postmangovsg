@@ -4,8 +4,8 @@ import { hashService } from '@core/services'
 import { ApiKey } from '@core/models'
 import config from '@core/config'
 
-const doesHashExist = async (hash: string) =>  {
-  return await ApiKey.findByPk(hash)
+const doesHashExist = async (hash: string): Promise<ApiKey | null > =>  {
+  return ApiKey.findByPk(hash)
 }
 
 const checkCookie = async (req: Request): Promise<boolean> => {
