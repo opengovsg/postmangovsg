@@ -53,12 +53,20 @@ const CreateModal = () => {
           </PrimaryButton>
         </div>
 
-        <p className={styles.subtext}>Get your credentials ready. <a href="#">What is this?</a></p>
+        <p className={styles.subtext}>Get your credentials ready.
+          <a
+            href="https://guide.postman.gov.sg/twilio-sms.html#where-can-i-find-credentials-on-the-twilio-console"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            What is this?
+          </a>
+        </p>
       </div>
 
       <div className="separator"></div>
       <div className="progress-button">
-        <PrimaryButton className={styles.bottomButton}  onClick={handleCreateCampaign}>
+        <PrimaryButton className={styles.bottomButton} onClick={handleCreateCampaign}>
           Create campaign
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
         </PrimaryButton>
