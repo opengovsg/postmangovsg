@@ -51,11 +51,12 @@ const getHydratedMail = async (campaignId: string, recipient: string): Promise<M
   // get the body and subject 
   const { subject, body } = emailContent
 
+  const hydratedSubject = template(subject, params)
   const hydratedBody = template(body, params)
   return { 
     recipients: [recipient],
     body: hydratedBody,
-    subject,
+    subject: hydratedSubject,
   }
 }
 
