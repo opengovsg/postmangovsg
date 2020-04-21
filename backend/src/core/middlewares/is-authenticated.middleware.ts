@@ -34,7 +34,6 @@ const checkApiKey = async (req: Request): Promise<boolean> => {
 
 export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   if (checkCookie(req) || await checkApiKey(req)) {
-    console.log(checkCookie(req))
     return next()
   }
   return res.sendStatus(401)
