@@ -76,7 +76,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       <p>
         CSV file must include a <b>recipient</b> column with recipients&apos; mobile numbers
       </p>
-      {!isUploading && numRecipients &&
+      {!isUploading && numRecipients > 0 &&
         <InfoBlock>
           <li>
             <i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>

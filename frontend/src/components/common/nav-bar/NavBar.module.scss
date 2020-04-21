@@ -29,12 +29,13 @@ $navbar-mobile-height: 3.5rem;
       width: 100%;
     }
 
-    .title {
-      font-size: 1.3rem;
-      font-weight: bold;
-      letter-spacing: 2px;
+    .appLogo {
       margin-right: 2rem;
-      color: $light-blue;
+      @include flex-horizontal;
+
+      img {
+        height: 2rem;
+      }
     }
 
     .burgerButton {
