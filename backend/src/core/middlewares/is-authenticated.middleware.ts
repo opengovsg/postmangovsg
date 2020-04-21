@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
 import { get } from 'lodash'
 import { hashService } from '@core/services'
-import { ApiKey, User } from '@core/models'
+import { User } from '@core/models'
 import config from '@core/config'
 
-const doesHashExist = async (hash: string): Promise<ApiKey | null > =>  {
-  return ApiKey.findByPk(hash)
+const getUser = async (hash: string): Promise<User | null> =>  {
+  return User.findOne({ where: { apiKey: hash } , attributes: ['id'] })
 }
 
 const checkCookie = (req: Request): boolean => {
@@ -32,28 +32,11 @@ const getApiKeyHash = async (apiKey: string): Promise<string | null> => {
   const hash = await hashService.specifySalt(key, config.apiKey.salt)
   const apiKeyHash = `${name}_${version}_${hash}`
 
-  const exists = await doesHashExist(apiKeyHash)
+  // Checks if there is a user associated with the hash
+  const exists = await getUser(apiKeyHash)
   if (!exists) return null
 
   return apiKeyHash
-}
-
-const getEmailFromApiKey = async (apiKeyHash: string): Promise<string | null> => {
-  const apiKey = await ApiKey.findByPk(apiKeyHash)
-  if (!apiKey) return null
-  return apiKey.email
-}
-
-const getUserId = async (apiKeyHash: string): Promise <string | null> => {
-
-  // Derive user id from api key
-  const userEmail = await getEmailFromApiKey(apiKeyHash)
-  if (userEmail === null) return null
-
-  const user = await User.findOne({ where: { email: userEmail } , attributes: ['id'] })
-  if (user === null) return null
-
-  return user.id
 }
 
 export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -71,8 +54,13 @@ export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response,
     return res.sendStatus(401)
   }
 
+  const user = await getUser(hash)
+  if (user === null) {
+    return res.sendStatus(401)
+  } 
+
   // Store user id in res.locals so that downstream middlewares can use it
-  res.locals.userId = await getUserId(hash)
+  res.locals.userId = user.id
   
   return next()
 }

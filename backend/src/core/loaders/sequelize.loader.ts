@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 
 import config from '@core/config'
-import { Credential, JobQueue, Campaign, User, Worker, ApiKey } from '@core/models'
+import { Credential, JobQueue, Campaign, User, Worker } from '@core/models'
 import { EmailMessage, EmailTemplate, EmailOp } from '@email/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import logger from '@core/logger'
@@ -22,7 +22,7 @@ class SequelizeLoader {
       ...dialectOptions,
     })
   
-    const coreModels = [Credential, JobQueue, Campaign, User, Worker, ApiKey]
+    const coreModels = [Credential, JobQueue, Campaign, User, Worker]
     const emailModels = [EmailMessage, EmailTemplate, EmailOp]
     const smsModels = [SmsMessage, SmsTemplate, SmsOp]
     sequelize.addModels([...coreModels, ...emailModels, ...smsModels])
