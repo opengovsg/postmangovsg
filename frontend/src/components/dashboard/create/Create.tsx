@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
+import cx from 'classnames'
 
-import { Campaign, ChannelType, SMSCampaign, EmailCampaign } from 'classes'
-import { TitleBar } from 'components/common'
+import { Campaign, ChannelType, SMSCampaign, EmailCampaign, Status } from 'classes'
+import { TitleBar, PrimaryButton } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
 import SMSCreate from './sms/SMSCreate'
 import EmailCreate from './email/EmailCreate'
+import styles from './Create.module.scss'
 
 const Create = () => {
   const { id } = useParams()
+  const history = useHistory()
 
   const [campaign, setCampaign] = useState(new Campaign({}))
+  const [isLoading, setLoading] = useState(true)
 
   async function loadProject() {
     if (id) {
       const campaign = await getCampaignDetails(+id)
       setCampaign(campaign)
+      setLoading(false)
     }
   }
 
@@ -40,8 +45,18 @@ const Create = () => {
         campaign ?
           (
             <>
-              <TitleBar title={campaign.name} > </TitleBar >
-              {renderCreateChannel()}
+              <TitleBar title={campaign.name}>
+                <PrimaryButton
+                  onClick={() => history.push('/campaigns')}>
+                  {
+                    campaign.status === Status.Draft
+                      ? 'Finish this later'
+                      : 'Back to campaigns'
+                  }
+                </PrimaryButton>
+              </TitleBar>
+              { isLoading && <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i> }
+              { !isLoading && renderCreateChannel() }
             </>
           )
           :
