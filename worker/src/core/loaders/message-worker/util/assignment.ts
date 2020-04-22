@@ -58,10 +58,10 @@ const replaceDeadWorker = (connection: Sequelize, workerId: string, deadWorker: 
 }
 
 const insertNewWorker = (connection: Sequelize, workerId: string): Promise<boolean>  => {
-  logger.info(`${workerId}: Inserting new worker ${workerId}`)
+  logger.info(`${workerId}: Inserting new worker`)
   return connection.query('INSERT INTO workers (id, created_at, updated_at) VALUES (:workerId, clock_timestamp(), clock_timestamp()) ON CONFLICT (id) DO NOTHING;',
     {
-      replacements: { workerId: 1 }, type : QueryTypes.INSERT,
+      replacements: { workerId }, type : QueryTypes.INSERT,
     }).then(() => {
     logger.info(`${workerId}: Inserted new worker`)
     return true
