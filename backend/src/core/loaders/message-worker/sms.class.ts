@@ -6,10 +6,10 @@ import logger from '@core/logger'
 import { TwilioService } from '@sms/services'
 
 class SMS {
-    private workerId: number
+    private workerId: string
     private connection: Sequelize
     private twilioService: TwilioService | null
-    constructor(workerId: number, connection: Sequelize){
+    constructor(workerId: string, connection: Sequelize){
       this.workerId = workerId
       this.connection = connection
       this.twilioService = null
