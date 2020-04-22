@@ -22,6 +22,14 @@
   }
 }
 
+.spinner {
+  @include icon;
+  width: 3rem;
+  font-size: 3rem;
+  align-self: center;
+  margin: 2rem;
+}
+
 .darkBlueBtn {
   @include button($dark-blue)
 }
