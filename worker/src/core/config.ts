@@ -8,10 +8,17 @@ const parseEnvVarAsInt = (i: string): number | undefined => {
 
 const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 
+// Message workers
+const numSender: number = parseEnvVarAsInt(process.env.MESSAGE_WORKER_SENDER as string) || 0
+const numLogger: number = parseEnvVarAsInt(process.env.MESSAGE_WORKER_LOGGER as string) || 0
+if(IS_PROD && (numSender + numLogger) !== 1){
+  throw new Error(`Only 1 worker of 1 variant per task supported in production. 
+  You supplied MESSAGE_WORKER_SENDER=${numSender}, MESSAGE_WORKER_LOGGER=${numLogger}`)
+}
+
 // AWS settings
 const awsRegion: string = process.env.AWS_REGION as string
 const secretManagerSalt: string = process.env.SECRET_MANAGER_SALT as string
-
 
 // Database settings
 const databaseUri: string = process.env.DB_URI as string
@@ -31,12 +38,7 @@ const twilioApiKey: string = process.env.TWILIO_API_KEY as string
 const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
 const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
 
-// Message workers
-// Ensure that number of senders and number of loggers are each always >= 1
-let numSender: number = parseEnvVarAsInt(process.env.MESSAGE_WORKER_SENDER as string) || 1
-numSender = numSender > 0 ? numSender : 1
-let numLogger: number = parseEnvVarAsInt(process.env.MESSAGE_WORKER_LOGGER as string)  || 1
-numLogger = numLogger > 0 ? numLogger : 1
+
 
 export default {
   IS_PROD,
