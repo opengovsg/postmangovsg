@@ -49,7 +49,7 @@ const NavBar = () => {
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
         <a className={cx(styles.link, { [styles.active]: isCreatePath() })} onClick={handleCreateCampaign}>Create</a>
-        <a className={styles.link} href={POSTMAN_GUIDE_URL}>Guide</a>
+        <a className={styles.link} href={POSTMAN_GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
         <NavLink className={styles.link} activeClassName={styles.active} to="/settings">Settings</NavLink>
 
         <div className={styles.separator}></div>
