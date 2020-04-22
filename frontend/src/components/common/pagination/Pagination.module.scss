@@ -24,21 +24,24 @@
 .pageNumber {
   width: 2rem;
   height: 2rem;
-  margin-right: 1rem;
-  margin-left: 1rem;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
   @include flex-horizontal;
   justify-content: center;
+  cursor: pointer;
 
   a {
     color: $dark-blue;
     font-size: 0.8rem;
     line-height: 1rem;
+    padding: 0.5rem;
   }
 }
 
 .active {
   background-color: $indigo-blue;
   border-radius: 1rem;
+  cursor: default;
 
   a,
   a:hover {
