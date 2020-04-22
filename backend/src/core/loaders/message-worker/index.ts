@@ -10,7 +10,7 @@ import Email from './email.class'
 import SMS from './sms.class'
 
 let connection: Sequelize, 
-  workerId: number, 
+  workerId: string, 
   currentCampaignType: string,
   email: Email,
   sms: SMS
@@ -117,7 +117,7 @@ const createAndResumeWorker = (): Promise<void> => {
 }
 
   
-const init = async (index: number, isLogger = false): Promise<void> => {
+const init = async (index: string, isLogger = false): Promise<void> => {
   workerId = index
   connection = createConnection()
   createAndResumeWorker()
