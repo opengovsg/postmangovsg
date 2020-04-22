@@ -74,7 +74,8 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       <p>Only CSV format files are allowed. If you have an Excel file, please convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
       </p>
       <p>
-        CSV file must include a <b>recipient</b> column with recipients&apos; mobile numbers
+        CSV file must include a <b>recipient</b> column with recipients&apos; mobile numbers.
+        Please ensure that the required field is labelled recipient in your .csv file.
       </p>
       {!isUploading && numRecipients > 0 &&
         <InfoBlock>
