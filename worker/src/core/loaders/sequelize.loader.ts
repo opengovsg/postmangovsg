@@ -7,7 +7,9 @@ const DB_URI = config.database.databaseUri
 
 class SequelizeLoader {
   private static _sequelize: Sequelize | undefined
+  private static hasLoaded = false
   static get sequelize(): Sequelize | undefined {
+    if(!this.hasLoaded) throw new Error('SequelizeLoader has not been loaded')
     return this._sequelize
   }
   static async load(): Promise<void> {
@@ -22,6 +24,7 @@ class SequelizeLoader {
     try {
       this._sequelize = await sequelize.sync()
       logger.info({ message: 'Database loaded.' })
+      this.hasLoaded = true
     } catch (err) {
       logger.error(`Unable to connect to database: ${err}`)
       process.exit(1)

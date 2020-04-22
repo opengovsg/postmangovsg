@@ -8,10 +8,10 @@ import logger from '@core/logger'
 import config from '@core/config'
 
 class Email {
-    private workerId: number
+    private workerId: string
     private connection: Sequelize
     private mailService: MailService
-    constructor(workerId: number, connection: Sequelize){
+    constructor(workerId: string, connection: Sequelize){
       this.workerId = workerId
       this.connection = connection
       this.mailService = new MailService('Postman.gov.sg <donotreply@mail.postman.gov.sg>', config.mailOptions)

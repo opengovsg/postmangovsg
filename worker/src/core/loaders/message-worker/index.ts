@@ -8,10 +8,10 @@ import config from '@core/config'
 import logger from '@core/logger'
 import Email from './email.class'
 import SMS from './sms.class'
+import ECSUtil from './util/ecs'
 import assignment from './util/assignment'
-import { getWorkerId } from './util/ecs'
 let connection: Sequelize, 
-  workerId: number, 
+  workerId: string, 
   currentCampaignType: string,
   email: Email,
   sms: SMS
@@ -116,8 +116,9 @@ const createAndResumeWorker = (): Promise<void> => {
 }
 
   
-const init = async (index: number, isLogger = false): Promise<void> => {
-  workerId = config.IS_PROD ? getWorkerId() : index
+const init = async (index: string, isLogger = false): Promise<void> => {
+  await ECSUtil.load()
+  workerId = ECSUtil.getWorkerId(index)
   connection = createConnection()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)

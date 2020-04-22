@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION resume_worker(worker integer)
+CREATE OR REPLACE FUNCTION resume_worker(worker text)
  RETURNS void
  LANGUAGE plpgsql
 AS $$

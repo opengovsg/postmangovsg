@@ -38,13 +38,17 @@ const twilioApiKey: string = process.env.TWILIO_API_KEY as string
 const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
 const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
 
-
+//ECS
+const serviceName: string = process.env.ECS_SERVICE_NAME as string // We have to specify this
+const metadataUri: string = process.env.ECS_CONTAINER_METADATA_URI_V4 as string // This is injected by ecs agent
 
 export default {
   IS_PROD,
   aws: {
     awsRegion,
     secretManagerSalt,
+    serviceName,
+    metadataUri,
   },
   database: {
     databaseUri,

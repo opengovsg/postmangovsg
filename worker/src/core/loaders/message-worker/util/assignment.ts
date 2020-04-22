@@ -11,19 +11,19 @@ import logger from '@core/logger'
 import { Sequelize } from 'sequelize-typescript'
 import difference from 'lodash/difference'
 import config from '@core/config'
-import { getWorkersInService } from './ecs'
+import ECSLoader from './ecs'
 
-const getWorkersInDatabase = (connection: Sequelize): Promise<number[]> => {
+const getWorkersInDatabase = (connection: Sequelize): Promise<string[]> => {
   return connection.query('SELECT id FROM workers;')
     .then((results: any[]) => {
-      const workers = results[0] as Array<{id: number}>
+      const workers = results[0] as Array<{id: string}>
       return workers.map(worker => worker.id) 
     })
 }
 
 
-const getDeadWorkers = async (connection: Sequelize, workerId: number): Promise<number[]> => {
-  const serviceWorkers = await getWorkersInService()
+const getDeadWorkers = async (connection: Sequelize, workerId: string): Promise<string[]> => {
+  const serviceWorkers = await ECSLoader.getWorkersInService()
   logger.info(`${workerId}: Workers in ECS - ${serviceWorkers}`)
   const jobWorkers = await getWorkersInDatabase(connection)
   logger.info(`${workerId}: Workers in database - ${jobWorkers}`)
@@ -36,7 +36,7 @@ const getDeadWorkers = async (connection: Sequelize, workerId: number): Promise<
 /**
   *  New worker tries to update the workers and job queue table 
   */
-const replaceDeadWorker = (connection: Sequelize, workerId: number, deadWorker: number): Promise<boolean> => {
+const replaceDeadWorker = (connection: Sequelize, workerId: string, deadWorker: string): Promise<boolean> => {
   logger.info(`${workerId}: Replacing deadWorker ${deadWorker}`)
   // The update of worker's id will cascade to the job queue
   return connection.query('UPDATE workers SET id=:workerId WHERE id=:deadWorker;', {
@@ -57,11 +57,11 @@ const replaceDeadWorker = (connection: Sequelize, workerId: number, deadWorker: 
     })
 }
 
-const insertNewWorker = (connection: Sequelize, workerId: number): Promise<boolean>  => {
+const insertNewWorker = (connection: Sequelize, workerId: string): Promise<boolean>  => {
   logger.info(`${workerId}: Inserting new worker ${workerId}`)
   return connection.query('INSERT INTO workers (id, created_at, updated_at) VALUES (:workerId, clock_timestamp(), clock_timestamp()) ON CONFLICT (id) DO NOTHING;',
     {
-      replacements: { workerId }, type : QueryTypes.INSERT,
+      replacements: { workerId: 1 }, type : QueryTypes.INSERT,
     }).then(() => {
     logger.info(`${workerId}: Inserted new worker`)
     return true
@@ -73,9 +73,9 @@ const insertNewWorker = (connection: Sequelize, workerId: number): Promise<boole
 }
 
 
-const assignment = async (connection: Sequelize, workerId: number): Promise<boolean> => {
+const assignment = async (connection: Sequelize, workerId: string): Promise<boolean> => {
   try{
-    let deadWorkers: number[] = []
+    let deadWorkers: string[] = []
     if(config.IS_PROD) {
       deadWorkers = await getDeadWorkers(connection, workerId)
     } else {
