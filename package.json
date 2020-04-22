@@ -1,0 +1,37 @@
+{
+  "name": "postmangovsg",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "build": "npm run build:backend && npm run build:worker && npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:worker": "cd worker && npm run build",
+    "start": "cd backend && npm start",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"Backend,Worker,Frontend\" -c \"yellow.bold,cyan.bold,white.bold\" \"npm run dev:backend\" \"npm run dev:worker\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:worker": "cd worker && npm run dev",
+    "postinstall": "npm run postinstall:backend && npm run postinstall:worker && npm run postinstall:frontend",
+    "postinstall:frontend": "cd frontend && npm install",
+    "postinstall:backend": "cd backend && npm install",
+    "postinstall:worker": "cd worker && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datagovsg/postmangovsg.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/datagovsg/postmangovsg/issues"
+  },
+  "homepage": "https://github.com/datagovsg/postmangovsg#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^5.1.0",
+    "typescript": "^3.8.3"
+  }
+}
