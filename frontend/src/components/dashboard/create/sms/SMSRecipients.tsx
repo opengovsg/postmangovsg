@@ -41,6 +41,9 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       // Set state
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
+
+      onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
+
     } catch (err) {
       setErrorMessage(err.message)
     } finally {
@@ -72,7 +75,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       {errorMessage && <ErrorBlock>{errorMessage}</ErrorBlock>}
 
       <div className="progress-button">
-        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Insert Credentials →</PrimaryButton>
+        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={onNext}>Insert Credentials →</PrimaryButton>
       </div>
     </>
   )

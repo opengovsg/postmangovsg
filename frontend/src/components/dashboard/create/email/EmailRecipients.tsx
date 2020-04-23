@@ -41,6 +41,10 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       // Set state
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
+
+      // Store filename and numRecipients in campaign object
+      onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
+
       // where do i put this
       const msgPreview = await getPreviewMessage(id)
       setMessagePreview(msgPreview)
@@ -76,7 +80,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
 
       <div className="separator"></div>
       {
-        csvFilename &&
+        messagePreview &&
         <>
           <p>Message preview</p>
           <InfoBlock>{messagePreview}</InfoBlock>
@@ -84,7 +88,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
         </>
       }
       <div className="progress-button">
-        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Preview →</PrimaryButton>
+        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={onNext}>Preview →</PrimaryButton>
       </div>
     </>
   )
