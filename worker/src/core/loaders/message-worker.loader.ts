@@ -11,13 +11,17 @@ const createMessageWorker = async (workerId: string, isLogger = false): Promise<
 
 const messageWorkerLoader = async (): Promise<void> => {
   let i = 1
+  const workers = []
   for(; i <= config.messageWorker.numSender; i++){
-    createMessageWorker(String(i))
+    workers.push(createMessageWorker(String(i)))
   }
   for(; i <=  config.messageWorker.numSender + config.messageWorker.numLogger; i++){
-    createMessageWorker(String(i), true)
+    workers.push(createMessageWorker(String(i), true))
   }
-  logger.info('MessageWorker loaded')
+  return Promise.all(workers)
+    .then(() => {
+      logger.info('MessageWorker loaded')
+    })
 }
 
 export default messageWorkerLoader
