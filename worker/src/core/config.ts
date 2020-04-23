@@ -11,7 +11,7 @@ const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 // Message workers
 const numSender: number = parseEnvVarAsInt(process.env.MESSAGE_WORKER_SENDER as string) || 0
 const numLogger: number = parseEnvVarAsInt(process.env.MESSAGE_WORKER_LOGGER as string) || 0
-if(IS_PROD && (numSender + numLogger) !== 1){
+if (IS_PROD && (numSender + numLogger) !== 1) {
   throw new Error(`Only 1 worker of 1 variant per task supported in production. 
   You supplied MESSAGE_WORKER_SENDER=${numSender}, MESSAGE_WORKER_LOGGER=${numLogger}`)
 }
@@ -37,6 +37,8 @@ const twilioAccountSid: string = process.env.TWILIO_ACCOUNT_SID as string
 const twilioApiKey: string = process.env.TWILIO_API_KEY as string
 const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
 const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
+
+const defaultCountryCode: string = process.env.DEFAULT_COUNTRY_CODE as string
 
 //ECS
 const serviceName: string = process.env.ECS_SERVICE_NAME as string // We have to specify this
@@ -64,7 +66,7 @@ export default {
       acquire: SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
     },
   },
-  mailOptions:{
+  mailOptions: {
     host: mailHost,
     port: mailPort,
     auth: {
@@ -78,6 +80,7 @@ export default {
     apiSecret: twilioApiSecret,
     messagingServiceSid: twilioMessagingServiceSid,
   },
+  defaultCountryCode,
   messageWorker: {
     numSender,
     numLogger,
