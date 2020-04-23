@@ -104,16 +104,30 @@ $widescreen: 1216px;
   display: flex;
   flex-direction: column;
   background-color: $backgroundColor;
-  color: $color;
   border-left: 0.5rem solid lighten($color, 10%);
   margin: 2rem 0;
+  color: $color;
 
   li {
     margin-bottom: 0.5rem;
     list-style: none;
+    display: flex;
+    align-items: flex-start;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
 
     i {
-      margin-right: 1.5rem;
+      margin-top: 0.3rem;
+      margin-right: 1rem;
+      font-size: 1.1rem;
+    }
+
+    p {
+      color: $color;
+      font-size: 1rem;
+      margin-block-end: 0;
     }
   }
 }

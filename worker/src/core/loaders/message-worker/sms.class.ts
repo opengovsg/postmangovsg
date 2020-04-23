@@ -1,9 +1,10 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import map from 'lodash/map'
-import { template, credentialService } from '@core/services'
+import { template } from '@core/services/template.service'
+import { getTwilioCredentials } from '@core/services/credential.service'
 import logger from '@core/logger'
-import { TwilioService } from '@sms/services'
+import { TwilioService } from '@sms/services/twilio.service'
 
 class SMS {
     private workerId: string
@@ -49,7 +50,7 @@ class SMS {
     }
 
     async setSendingService(credentialName: string): Promise<void> {
-      const credentials = await credentialService.getTwilioCredentials(credentialName)
+      const credentials = await getTwilioCredentials(credentialName)
       this.twilioService = new TwilioService(credentials)
     }
 

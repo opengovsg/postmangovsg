@@ -1,59 +1,86 @@
 import React, { useState, useContext } from 'react'
-import { TextInputWithButton } from 'components/common'
+import { TextInputWithButton, ErrorBlock } from 'components/common'
 import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
 
 import styles from './Login.module.scss'
 import { AuthContext } from 'contexts/auth.context'
 
 const emailText = 'Sign in with your gov.sg email'
-const otpText = 'Enter the 6-digit One Time Password sent to your email'
-const emailButtonText = 'Get OTP'
-const otpButtonText = 'Sign In'
+const otpText = 'One-Time Password'
+const emailButtonText = ['Get OTP', 'Sending OTP...']
+const otpButtonText = ['Sign In', 'Verifying OTP...']
+
+const RESEND_WAIT_TIME = 30000
 
 const Login = () => {
-  const [otpSent, setOtpSent] = useState(false)
-  const [status, setStatus] = useState('')
-  const [email, setEmail] = useState('')
-  const [otp, setOtp] = useState('')
   const { setAuthenticated } = useContext(AuthContext)
 
+  const [otpSent, setOtpSent] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [otp, setOtp] = useState('')
+  const [errorMsg, setErrorMsg] = useState(null)
+  const [canResend, setCanResend] = useState(false)
+
   async function sendOtp() {
+    resetButton()
     try {
-      setStatus('Sending OTP...')
       await getOtpWithEmail(email)
       setOtpSent(true)
-      setStatus(`OTP sent to ${email}`)
+      // Show resend button after wait time
+      setTimeout(() => {
+        setCanResend(true)
+      }, RESEND_WAIT_TIME)
     } catch (err) {
-      setStatus('Error sending OTP')
-      console.error(err)
+      setErrorMsg(err.message)
     }
+    setIsLoading(false)
   }
 
   async function login() {
+    resetButton()
     try {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
     } catch (err) {
-      setStatus('Error logging in')
-      console.error(err)
+      setErrorMsg(err.message)
     }
+    setIsLoading(false)
+  }
+
+  function resetButton() {
+    setIsLoading(true)
+    setErrorMsg(null)
+    setCanResend(false)
+  }
+
+  function resend() {
+    setOtpSent(false)
+    sendOtp()
   }
 
 
-  function render(mainText: string, value: string, onChange: Function, onClick: Function, buttonText: string, inputType?: string) {
+  function render(mainText: string, value: string, onChange: Function, onClick: Function, buttonText: string[], inputType?: string) {
     return (
       <>
         <h4 className={styles.text}>
           {mainText}
+          {otpSent && canResend &&
+            <a className={styles.resend} onClick={resend}>Resend?</a>
+          }
         </h4>
         <TextInputWithButton
           value={value}
           type={inputType}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+          buttonDisabled={isLoading}
+          inputDisabled={isLoading}
           onClick={onClick}>
-          {buttonText}
+          {isLoading ? buttonText[1] : buttonText[0]}
         </TextInputWithButton>
-        <p className={styles.statusMsg}>{status}</p>
+        <ErrorBlock className={styles.errorBlock}>
+          {errorMsg}
+        </ErrorBlock>
       </>
     )
   }

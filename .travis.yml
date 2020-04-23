@@ -5,6 +5,9 @@ node_js:
 services:
   - docker
 
+# Skip the automatic npm ci step 
+install: skip
+
 # Deploy from Dockerfile
 jobs:
   include:
@@ -16,7 +19,7 @@ jobs:
         skip_cleanup: true
         access_key_id: $AWS_ACCESS_KEY_ID_FOR_DEPLOYMENT
         secret_access_key: $AWS_SECRET_ACCESS_KEY_FOR_DEPLOYMENT
-        region: "ap-northeast-1"
+        region: $AWS_DEFAULT_REGION
         app: "postmangovsg-backend"
         env: "postmangovsg-backend-staging"
         bucket_name: "postmangovsg-backend-elasticbeanstalk"
@@ -26,9 +29,23 @@ jobs:
         skip_cleanup: true
         access_key_id: $AWS_ACCESS_KEY_ID_FOR_DEPLOYMENT
         secret_access_key: $AWS_SECRET_ACCESS_KEY_FOR_DEPLOYMENT
-        region: "ap-northeast-1"
+        region: $AWS_DEFAULT_REGION
         app: "postmangovsg-backend"
         env: "postmangovsg-backend-prod"
         bucket_name: "postmangovsg-backend-elasticbeanstalk"
         on:
           branch: $PRODUCTION_BRANCH
+  - name: worker
+    before_script:
+      - cd worker
+    deploy:
+      - provider: script
+        script: ./deploy.sh postmangovsg-workers staging-sending staging-logger
+        on:
+          branch: $STAGING_BRANCH
+          condition: "$DEPLOY_WORKER = true"
+      - provider: script
+        script: ./deploy.sh postmangovsg-workers prod-sending prod-logger
+        on:
+          branch: $PRODUCTION_BRANCH
+          condition: "$DEPLOY_WORKER = true"

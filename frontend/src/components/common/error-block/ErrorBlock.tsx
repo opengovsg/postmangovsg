@@ -7,17 +7,17 @@ const ErrorBlock = (props: any) => {
 
   const { className, children, ...otherProps } = props
 
+  if (!children) {
+    return null
+  }
+
   return (
-    <div className={cx(styles.errorBlock, className)} {...otherProps}>
-      {children}
+    <div className={styles.relativeContainer}>
+      <div className={cx(styles.errorBlock, className)} {...otherProps}>
+        <li><i className='bx bx-error-circle'></i><p>{children}</p></li>
+      </div>
     </div>
   )
 }
-
-/* e.g. children
- * <li><i className="bx"></i><p>text goes here...</p>
- * <li><i className="bx"></i><p>text goes here...</p>
- * <li><i className="bx"></i><p>text goes here...</p>
- */
 
 export default ErrorBlock

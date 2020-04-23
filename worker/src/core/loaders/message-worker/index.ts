@@ -8,7 +8,8 @@ import config from '@core/config'
 import logger from '@core/logger'
 import Email from './email.class'
 import SMS from './sms.class'
-
+import ECSUtil from './util/ecs'
+import assignment from './util/assignment'
 let connection: Sequelize, 
   workerId: string, 
   currentCampaignType: string,
@@ -93,6 +94,7 @@ const enqueueAndSend = async (): Promise<void>  => {
         // Make sure at least 1 second has elapsed
         const wait = Math.max(0, 1000 - (Date.now() - start))
         await waitForMs(wait)
+        logger.info(`${workerId}: jobId=${jobId} rate=${rate} numMessages=${messages.length} wait=${wait}`)
       }
     }
     await service().destroySendingService()
@@ -104,27 +106,26 @@ const enqueueAndSend = async (): Promise<void>  => {
  * and checks if it was working on any existing jobs
  */
 const createAndResumeWorker = (): Promise<void> => {
-  return connection.query(`
-            INSERT INTO workers ("id",  "created_at", "updated_at") VALUES 
-            (:worker_id, clock_timestamp(), clock_timestamp()) ON CONFLICT (id) DO NOTHING;
-    
-            SELECT resume_worker(:worker_id);
-        `,
-  { replacements: { 'worker_id': workerId }, type: QueryTypes.INSERT },
-  ).then(() => {
-    logger.info(`${workerId}: Resumed`)
-  })
+  return assignment(connection, workerId)
+    .then(() => {
+      return connection.query('SELECT resume_worker(:worker_id);', 
+        { replacements: { 'worker_id': workerId }, type: QueryTypes.SELECT })
+    })
+    .then(() => {
+      logger.info(`${workerId}: Resumed`)
+    })
 }
 
   
 const init = async (index: string, isLogger = false): Promise<void> => {
-  workerId = index
+  await ECSUtil.load()
+  workerId = ECSUtil.getWorkerId(index)
   connection = createConnection()
-  createAndResumeWorker()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
   try {
     if(!isLogger){
+      await createAndResumeWorker()
       for(;;){
         await enqueueAndSend()
         await waitForMs(2000)
