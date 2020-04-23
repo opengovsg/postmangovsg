@@ -2,6 +2,11 @@
 @import 'styles/_mixins';
 
 .bottom {
+  @include block($light-red, $red);
+  margin: 3rem;;
+  position: fixed;
+  opacity: 1;
+  transition: all 0.7s;
   bottom: -300px;
   left: 0;
 
