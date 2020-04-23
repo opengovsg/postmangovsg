@@ -54,8 +54,8 @@ const NavBar = () => {
 
         <div className={styles.separator}></div>
 
-        <span className={cx(styles.active, styles.link)}>postman@open.gov.sg</span>
-        <a className={cx(styles.active, styles.link, styles.iconLink)} onClick={handleLogout}>
+        <span className={cx(styles.active, styles.link, styles.right)}>postman@open.gov.sg</span>
+        <a className={cx(styles.active, styles.link, styles.right, styles.iconLink)} onClick={handleLogout}>
           Sign out
           <i className={cx(styles.icon, 'bx bx-log-out-circle')}></i>
         </a>

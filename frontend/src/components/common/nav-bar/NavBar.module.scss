@@ -75,11 +75,12 @@ $navbar-mobile-height: 3.5rem;
     }
 
     .link {
-      letter-spacing: 1.3px;
       opacity: 0.5;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       color: $light-blue;
       margin-right: $navbar-link-margin;
+      font-weight: 500;
+
       &:last-child {
         margin-right: 0;
       }
@@ -104,6 +105,10 @@ $navbar-mobile-height: 3.5rem;
         font-size: 1.3rem;
         margin-left: 0.5rem;
       }
+    }
+
+    .right {
+      font-weight: normal;
     }
 
     .separator {
