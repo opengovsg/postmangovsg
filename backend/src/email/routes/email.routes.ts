@@ -286,13 +286,11 @@ const campaignStatsHandler = async (req: Request, res: Response): Promise<void> 
 
   try {
     const stats = await getEmailStats(campaignId)
-    console.log(stats)
-    res.json({ message: 'Message content' })
+    res.json(stats)
   } catch (e) {
     logger.error(`Error getting email campaign stats. error= ${e}`)
     res.status(400)
   }
-
 }
 
 // Routes

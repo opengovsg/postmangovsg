@@ -33,7 +33,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats }: { sentAt: Date; numRe
       setRetryDisabled(false)
     }
   }
-  const { status, error, unsent, sent, invalid } = stats
+  const { status, error, unsent, sent} = stats
   return (
     <>
       <div className={styles.progress}>
@@ -97,14 +97,6 @@ const ProgressDetails = ({ sentAt, numRecipients, stats }: { sentAt: Date; numRe
               </td>
               <td className={styles.md}>Could not be sent</td>
               <td className={styles.sm}>{error}</td>
-            </tr>
-            <tr>
-              <td className={cx(styles.status, styles.md)}>
-                <i className={cx(styles.icon, styles.red, 'bx bx-help-circle')}></i>
-                Invalid
-              </td>
-              <td className={styles.md}>Invalid recipient</td>
-              <td className={styles.sm}>{invalid}</td>
             </tr>
             <tr>
               <td className={cx(styles.status, styles.md)}>
