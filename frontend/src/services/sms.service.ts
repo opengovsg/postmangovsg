@@ -62,13 +62,16 @@ export async function getPresignedUrl({
 export async function completeFileUpload({
   campaignId,
   transactionId,
+  filename,
 }: {
   campaignId: number;
   transactionId: string;
+  filename: string;
 }): Promise<UploadCompleteResponse> {
   try {
     const response = await axios.post(`/campaign/${campaignId}/sms/upload/complete`, {
       transactionId,
+      filename,
     })
     return response.data
   } catch (e) {

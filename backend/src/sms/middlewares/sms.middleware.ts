@@ -37,10 +37,10 @@ const getCredential = (req: Request): TwilioCredentials => {
   return credential
 }
 
-const getParams = async (campaignId: string): Promise<{[key: string]: string} | null> => {
+const getParams = async (campaignId: string): Promise<{ [key: string]: string } | null> => {
   const smsMessage = await SmsMessage.findOne({ where: { campaignId }, attributes: ['params'] })
   if (smsMessage === null) return null
-  return smsMessage.params as {[key: string]: string}
+  return smsMessage.params as { [key: string]: string }
 }
 
 const getSmsBody = async (campaignId: string): Promise<string | null> => {
@@ -54,10 +54,10 @@ const getEncodedHash = async (secret: string): Promise<string> => {
   return Buffer.from(secretHash).toString('base64')
 }
 
-const getHydratedMsg = async (campaignId: string): Promise<string | null>  => {
+const getHydratedMsg = async (campaignId: string): Promise<string | null> => {
   const params = await getParams(campaignId)
   const body = await getSmsBody(campaignId)
-  if (params === null || body === null ) return null
+  if (params === null || body === null) return null
 
   const hydratedMsg = template(body, params)
   return hydratedMsg
@@ -74,19 +74,19 @@ const sendMessage = async (campaignId: string, recipient: string, credential: Tw
 
 // TODO
 const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
+  try {
     const { campaignId } = req.params
     const { id: userId } = req.session?.user
     const campaign = await Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.SMS } })
     return campaign ? next() : res.sendStatus(400)
-  }catch(err){
+  } catch (err) {
     return next(err)
   }
 }
 
 // Sends out a test message.
 // If it is successful, stores the twilio credential in AWS secret manager and db, as well as updating the campaign table.
-const storeCredentials = async (req: Request, res: Response,  next: NextFunction): Promise<Response | void> => {
+const storeCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const credential: TwilioCredentials = getCredential(req)
   // Send test message
   const { recipient } = req.body
@@ -94,8 +94,7 @@ const storeCredentials = async (req: Request, res: Response,  next: NextFunction
   try {
     await sendMessage(campaignId, recipient, credential)
   }
-  catch(err){
-    logger.error(err)
+  catch (err) {
     return res.status(400).json({ message: `${err}` })
   }
 
@@ -104,7 +103,7 @@ const storeCredentials = async (req: Request, res: Response,  next: NextFunction
     const secretString = JSON.stringify(credential)
     const credentialName = await getEncodedHash(secretString)
     await saveCredential(+campaignId, credentialName, secretString)
-  }catch(err) {
+  } catch (err) {
     return next(err)
   }
   return res.json({ message: 'OK' })
@@ -112,12 +111,14 @@ const storeCredentials = async (req: Request, res: Response,  next: NextFunction
 
 
 const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
+  try {
     const { campaignId } = req.params
-    const campaign: Campaign | null =  await Campaign.findOne({
+    const campaign: Campaign | null = await Campaign.findOne({
       where: { id: +campaignId },
       attributes: [
-        'id', 'name', 'type', 'created_at', 'valid', [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+        'id', 'name', 'type', 'created_at', 'valid',
+        [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+        [literal('s3_object -> \'filename\''), 'csv_filename'],
       ],
       include: [
         {
@@ -134,8 +135,9 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
         where: { campaignId: +campaignId },
       }
     )
+    // TODO: Why is numRecipients not part of campaign?
     return res.json({ campaign, 'num_recipients': numRecipients })
-  }catch(err){
+  } catch (err) {
     return next(err)
   }
 }
