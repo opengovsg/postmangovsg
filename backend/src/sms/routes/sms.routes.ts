@@ -310,35 +310,54 @@ router.get('/', getCampaignDetails)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/template:
- *    put:
- *      tags:
- *        - SMS
- *      summary: Stores body template for sms campaign
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                body:
- *                  type: string
- *                  minLength: 1
- *                  maxLength: 200
+ *   /campaign/{campaignId}/sms/template:
+ *     put:
+ *       tags:
+ *         - SMS
+ *       summary: Stores body template for sms campaign
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 body:
+ *                   type: string
+ *                   minLength: 1
+ *                   maxLength: 200
  *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 required:
+ *                   - message
+ *                   - valid
+ *                   - num_recipients
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                   extra_keys:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                   valid:
+ *                     type: boolean
+ *                   num_recipients:
+ *                     type: integer
+ *         400:
+ *           description: Bad Request
+ *         500:
+ *           description: Internal Server Error
  */
 router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, storeTemplate)
 
