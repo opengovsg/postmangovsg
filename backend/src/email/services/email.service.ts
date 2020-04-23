@@ -83,29 +83,37 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
   }
 }
 
+  const getStatsFromTable = async (model: any, campaignId: string): Promise<{error: number, unsent: number, sent: number}> => {
+    const error = await model.count({
+      where: {campaign_id: campaignId},
+      col: 'error_code'
+    })
+    const total = await model.count({
+      where: {campaign_id: campaignId},
+      col: 'id'
+    })
+    const sent = await model.count({
+      where: {campaign_id: campaignId},
+      col: 'sent_at'
+    })
+
+    const unsent = total - sent
+    return { error, sent, unsent }
+  }
+
+
 const getEmailStats = async (campaignId: string): Promise<CampaignStats> => {
-  const error = await EmailOp.count({
-    where: {campaign_id: campaignId},
-    col: 'error_code'
-  })
-  const total = await EmailOp.count({
-    where: {campaign_id: campaignId},
-    col: 'id'
-  })
-  const sent = await EmailOp.count({
-    where: {campaign_id: campaignId},
-    col: 'sent_at'
-  })
-  const unsent = total - sent
   const job = await JobQueue.findOne({ where: { campaignId } })
   if (job === null) throw new Error('Unable to find campaign in job queue table.')
-  
-  return {
-    error,
-    unsent,
-    sent,
-    status: job.status
+
+  // Gets from email ops table if status is SENDING or SENT
+  if (job.status === 'SENDING' || job.status === 'SENT') {
+    const stats = await getStatsFromTable(EmailOp, campaignId) 
+    return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
   }
+
+  const stats = await getStatsFromTable(EmailMessage, campaignId) 
+  return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
 } 
 
-export { populateEmailTemplate, upsertEmailTemplate, getEmailStats}
+export { populateEmailTemplate, upsertEmailTemplate, getEmailStats }
