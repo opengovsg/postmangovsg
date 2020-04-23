@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 interface PresignedUrlResponse {
   presignedUrl: string;
@@ -12,7 +12,7 @@ interface UploadCompleteResponse {
 }
 
 export async function saveTemplate(campaignId: number, body: string): Promise<boolean> {
-  return axios.put(`/campaign/${campaignId}/sms/template`,{
+  return axios.put(`/campaign/${campaignId}/sms/template`, {
     body,
   }).then((response) => {
     return response.status === 200
@@ -29,7 +29,7 @@ export async function validateCredentials({
   messagingServiceSid: string;
   recipient: string;
 }): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/sms/credentials`,{
+  return axios.post(`/campaign/${campaignId}/sms/credentials`, {
     twilioAccountSid: accountSid,
     twilioApiKey: apiKey,
     twilioApiSecret: apiSecret,
@@ -44,28 +44,42 @@ export async function getPresignedUrl({
   campaignId,
   mimeType,
 }: {
-  campaignId: number
-  mimeType: string
+  campaignId: number;
+  mimeType: string;
 }): Promise<PresignedUrlResponse> {
-  return axios
-    .get(`/campaign/${campaignId}/sms/upload/start`, {
+  try {
+    const response = await axios.get(`/campaign/${campaignId}/sms/upload/start`, {
       params: {
         mimeType,
       },
     })
-    .then((resp) => resp.data)
+    return response.data
+  } catch (e) {
+    errorHandler(e, 'Error completing file upload')
+  }
 }
 
 export async function completeFileUpload({
   campaignId,
   transactionId,
 }: {
-  campaignId: number
-  transactionId: string
+  campaignId: number;
+  transactionId: string;
 }): Promise<UploadCompleteResponse> {
-  return axios
-    .post(`/campaign/${campaignId}/sms/upload/complete`, {
+  try {
+    const response = await axios.post(`/campaign/${campaignId}/sms/upload/complete`, {
       transactionId,
     })
-    .then((resp) => resp.data)
+    return response.data
+  } catch (e) {
+    errorHandler(e, 'Error completing file upload')
+  }
+}
+
+function errorHandler(e: AxiosError, defaultMsg: string): never {
+  console.error(e)
+  if (e.response && e.response.data && e.response.data.message) {
+    throw new Error(e.response.data.message)
+  }
+  throw new Error(defaultMsg)
 }

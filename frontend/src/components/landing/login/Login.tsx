@@ -88,7 +88,7 @@ const Login = () => {
           onClick={onClick}>
           {isLoading ? buttonText[1] : buttonText[0]}
         </TextInputWithButton>
-        <ErrorBlock className={styles.errorBlock}>
+        <ErrorBlock absolute={true}>
           {errorMsg}
         </ErrorBlock>
       </>
