@@ -1,7 +1,8 @@
 import { chunk } from 'lodash'
-import { Campaign } from '@core/models'
-import { SmsMessage, SmsTemplate } from '@sms/models'
+import { Campaign, JobQueue } from '@core/models'
+import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import logger from '@core/logger'
+import { CampaignStats } from '@core/interfaces'
 
 
 const upsertSmsTemplate = async (body: string, campaignId: number): Promise<SmsTemplate> => {
@@ -80,4 +81,37 @@ const populateSmsTemplate = async (campaignId: number, records: Array<object>): 
   }
 }
 
-export { populateSmsTemplate, upsertSmsTemplate }
+const getStatsFromTable = async (model: any, campaignId: string): Promise<{error: number, unsent: number, sent: number}> => {
+  const error = await model.count({
+    where: {campaign_id: campaignId},
+    col: 'error_code'
+  })
+  const total = await model.count({
+    where: {campaign_id: campaignId},
+    col: 'id'
+  })
+  const sent = await model.count({
+    where: {campaign_id: campaignId},
+    col: 'sent_at'
+  })
+
+  const unsent = total - sent
+  return { error, sent, unsent }
+}
+
+
+const getSmsStats = async (campaignId: string): Promise<CampaignStats> => {
+const job = await JobQueue.findOne({ where: { campaignId } })
+if (job === null) throw new Error('Unable to find campaign in job queue table.')
+
+// Gets from email ops table if status is SENDING or SENT
+if (job.status === 'SENDING' || job.status === 'SENT') {
+  const stats = await getStatsFromTable(SmsOp, campaignId) 
+  return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
+}
+
+const stats = await getStatsFromTable(SmsMessage, campaignId) 
+return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
+} 
+
+export { populateSmsTemplate, upsertSmsTemplate, getSmsStats }
