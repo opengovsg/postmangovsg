@@ -87,39 +87,71 @@ const sendCampaignValidator = {
 
 // handlers
 
-const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: EmailTemplate; firstRecord: EmailMessage}): Promise<void> => {
-  if (!updatedTemplate.params) return
+/**
+ * side effects:
+ *  - updates campaign 'valid' column
+ *  - may delete email_message where campaignId
+ */
+const checkNewTemplateParams = async ({
+  campaignId,
+  updatedTemplate,
+  firstRecord,
+}: {
+  campaignId: number;
+  updatedTemplate: EmailTemplate;
+  firstRecord: EmailMessage;
+}): Promise<{
+  reupload: boolean;
+  extraKeys?: Array<string>;
+}> => {
+  // new template might not even have params, (not inserted yet - hydration doesn't even need to take place
+  if (!updatedTemplate.params) return { reupload: false }
 
   // first set project.valid to false, switch this back to true only when hydration succeeds
-  await Campaign.update({
-    valid: false,
-  }, {
-    where: { id: campaignId },
-  })
+  await Campaign.update({ valid: false }, { where: { id: campaignId } })
 
   const paramsFromS3 = keys(firstRecord.params)
-  // warn if params from s3 file are not a superset of saved params
-  if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
-    const missingKeys = difference(updatedTemplate.params, paramsFromS3)
-    throw new MissingTemplateKeysError(missingKeys)
-  }
-  // try hydrate(...), return 4xx if unable to do so
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
+
+  const templateContainsExtraKeys = !isSuperSet(paramsFromS3, updatedTemplate.params)
+  if (templateContainsExtraKeys) {
+    // warn if params from s3 file are not a superset of saved params, remind user to re-upload a new file
+    const extraKeysInTemplate = difference(
+      updatedTemplate.params,
+      paramsFromS3
+    )
+
+    // the entries (message_logs) from the uploaded file are no longer valid, so we delete
+    await EmailMessage.destroy({
+      where: {
+        campaignId,
+      },
+    })
+
+    return { reupload: true, extraKeys: extraKeysInTemplate }
+  } else {
+    // the keys in the template are either a subset or the same as what is present in the uploaded file
+
+    try {
+      template(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        updatedTemplate.body!,
+        firstRecord.params as { [key: string]: string }
+      )
+    } catch (err) {
+      logger.error(`Hydration error: ${err.stack}`)
+      throw new HydrationError()
+    }
     // set campaign.valid to true since templating suceeded AND file has been uploaded
-    await Campaign.update({
-      valid: true,
-    }, {
+    await Campaign.update({ valid: true }, {
       where: { id: campaignId },
     })
-  } catch (err) {
-    logger.error(`Hydration error: ${err.stack}`)
-    throw new HydrationError()
+
+    return { reupload: false }
   }
 }
 
 // Store body of message in email template table
+// Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
@@ -137,16 +169,36 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
 
     // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
     if (firstRecord && updatedTemplate.params) {
-      await checkNewTemplateParams({ campaignId: +campaignId, updatedTemplate, firstRecord })
+      const check = await checkNewTemplateParams({
+        campaignId: +campaignId,
+        updatedTemplate,
+        firstRecord,
+      })
+      if (check.reupload) {
+        /* eslint-disable @typescript-eslint/camelcase */
+        return res.status(200)
+          .json({
+            message: 'Please re-upload your recipient list as template has changed.',
+            extra_keys: check.extraKeys,
+            recipients: 0,
+            valid: false,
+          })
+        /* eslint-enable */
+      }
     }
-    return res.status(200).json({
-      message: `Template for campaign ${campaignId} updated`,
-    })
+
+    const recipientCount = await EmailMessage.count({ where: { campaignId } })
+    const campaign = await Campaign.findByPk(+campaignId)
+    /* eslint-disable @typescript-eslint/camelcase */
+    return res.status(200)
+      .json({
+        message: `Template for campaign ${campaignId} updated`,
+        valid: campaign?.valid,
+        num_recipients: recipientCount,
+      })
+    /* eslint-enable */
   } catch (err) {
     if (err instanceof HydrationError) {
-      return res.status(400).json({ message: err.message })
-    }
-    if (err instanceof MissingTemplateKeysError) {
       return res.status(400).json({ message: err.message })
     }
     return next(err)
@@ -229,7 +281,6 @@ const previewMessage = async (_req: Request, res: Response): Promise<void> => {
 
 
 // Routes
-// Routes
 /**
  * @swagger
  * path:
@@ -257,29 +308,54 @@ router.get('/', getCampaignDetails)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/template:
- *    put:
- *      tags:
- *        - Email
- *      summary: Stores body template for email campaign
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                subject:
- *                  type: string
- *                body:
- *                  type: string
+ *   /campaign/{campaignId}/email/template:
+ *     put:
+ *       tags:
+ *         - Email
+ *       summary: Stores body template for email campaign
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 body:
+ *                   type: string
+ *                   minLength: 1
+ *                   maxLength: 200
  *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 required:
+ *                   - message
+ *                   - valid
+ *                   - num_recipients
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                   extra_keys:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                   valid:
+ *                     type: boolean
+ *                   num_recipients:
+ *                     type: integer
+ *         400:
+ *           description: Bad Request
+ *         500:
+ *           description: Internal Server Error
  */
 router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, storeTemplate)
 
