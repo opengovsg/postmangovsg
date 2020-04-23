@@ -94,6 +94,7 @@ const enqueueAndSend = async (): Promise<void>  => {
         // Make sure at least 1 second has elapsed
         const wait = Math.max(0, 1000 - (Date.now() - start))
         await waitForMs(wait)
+        logger.info(`${workerId}: jobId=${jobId} rate=${rate} numMessages=${messages.length} wait=${wait}`)
       }
     }
     await service().destroySendingService()
