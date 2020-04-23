@@ -109,12 +109,12 @@ const checkNewTemplateParams = async ({
   updatedTemplate,
   firstRecord,
 }: {
-  campaignId: number
-  updatedTemplate: SmsTemplate
-  firstRecord: SmsMessage
+  campaignId: number;
+  updatedTemplate: SmsTemplate;
+  firstRecord: SmsMessage;
 }): Promise<{
-  reupload: boolean
-  extraKeys?: Array<String>
+  reupload: boolean;
+  extraKeys?: Array<string>;
 }> => {
   // new template might not even have params, (not inserted yet - hydration doesn't even need to take place
   if (!updatedTemplate.params) return { reupload: false }
@@ -124,42 +124,42 @@ const checkNewTemplateParams = async ({
 
   const paramsFromS3 = keys(firstRecord.params)
 
-    const templateContainsExtraKeys = !isSuperSet(paramsFromS3, updatedTemplate.params)
-    if (templateContainsExtraKeys) {
-      // warn if params from s3 file are not a superset of saved params, remind user to re-upload a new file
-      const extraKeysInTemplate = difference(
-        updatedTemplate.params,
-        paramsFromS3
-      )
+  const templateContainsExtraKeys = !isSuperSet(paramsFromS3, updatedTemplate.params)
+  if (templateContainsExtraKeys) {
+    // warn if params from s3 file are not a superset of saved params, remind user to re-upload a new file
+    const extraKeysInTemplate = difference(
+      updatedTemplate.params,
+      paramsFromS3
+    )
 
-      // the entries (message_logs) from the uploaded file are no longer valid, so we delete
-      await SmsMessage.destroy({
-        where: {
-          campaignId,
-        },
-      })
+    // the entries (message_logs) from the uploaded file are no longer valid, so we delete
+    await SmsMessage.destroy({
+      where: {
+        campaignId,
+      },
+    })
 
-      return { reupload: true, extraKeys: extraKeysInTemplate }
-    } else {
-      // the keys in the template are either a subset or the same as what is present in the uploaded file
+    return { reupload: true, extraKeys: extraKeysInTemplate }
+  } else {
+    // the keys in the template are either a subset or the same as what is present in the uploaded file
 
-      try {
+    try {
+      template(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        template(
           updatedTemplate.body!,
           firstRecord.params as { [key: string]: string }
-        )
-      } catch (err) {
-        logger.error(`Hydration error: ${err.stack}`)
-        throw new HydrationError()
-      }
-      // set campaign.valid to true since templating suceeded AND file has been uploaded
-      await Campaign.update({ valid: true }, {
-        where: { id: campaignId },
-      })
-
-      return { reupload: false }
+      )
+    } catch (err) {
+      logger.error(`Hydration error: ${err.stack}`)
+      throw new HydrationError()
     }
+    // set campaign.valid to true since templating suceeded AND file has been uploaded
+    await Campaign.update({ valid: true }, {
+      where: { id: campaignId },
+    })
+
+    return { reupload: false }
+  }
 }
 
 // Store body of message in sms template table
@@ -181,25 +181,28 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         firstRecord,
       })
       if (check.reupload) {
+        /* eslint-disable @typescript-eslint/camelcase */
         return res.status(200)
           .json({
-            message: `Please re-upload your recipient list as template has changed.`,
+            message: 'Please re-upload your recipient list as template has changed.',
             extra_keys: check.extraKeys,
             recipients: 0,
             valid: false,
           })
+        /* eslint-enable */
       }
     }
 
     const recipientCount = await SmsMessage.count({ where: { campaignId } })
     const campaign = await Campaign.findByPk(+campaignId)
-
+    /* eslint-disable @typescript-eslint/camelcase */
     return res.status(200)
       .json({
         message: `Template for campaign ${campaignId} updated`,
         valid: campaign?.valid,
         num_recipients: recipientCount,
       })
+    /* eslint-enable */
   } catch (err) {
     if (err instanceof HydrationError) {
       return res.status(400).json({ message: err.message })
