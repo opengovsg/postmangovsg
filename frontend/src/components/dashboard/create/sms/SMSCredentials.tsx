@@ -15,7 +15,8 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   const [recipient, setRecipient] = useState('')
   const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
   const params: { id? : string } = useParams()
-  function isDisabled() {
+
+  function isButtonDisabled() {
     return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\+?\d+$/g).test(recipient)
   }
 
@@ -90,7 +91,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           value={recipient}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
           onClick={handleValidateCredentials}
-          disabled={isDisabled()}
+          buttonDisabled={isButtonDisabled()}
         >
           Validate credential
         </TextInputWithButton>

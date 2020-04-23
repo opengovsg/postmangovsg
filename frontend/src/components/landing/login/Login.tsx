@@ -73,7 +73,8 @@ const Login = () => {
           value={value}
           type={inputType}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-          disabled={isLoading}
+          buttonDisabled={isLoading}
+          inputDisabled={isLoading}
           onClick={onClick}>
           {isLoading ? buttonText[1] : buttonText[0]}
         </TextInputWithButton>

@@ -10,8 +10,9 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [recipient, setRecipient] = useState('')
   const [testSending, setTestSending] = useState(false)
-  const params: { id? : string } = useParams()
-  function isDisabled() {
+  const params: { id?: string } = useParams()
+
+  function isButtonDisabled() {
     return testSending || !isEmail(recipient)
   }
 
@@ -30,7 +31,7 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
       })
       setHasCredential(isValid)
       resetFields()
-    } catch(err){
+    } catch (err) {
       console.error(err)
       setTestSending(false)
     }
@@ -48,9 +49,9 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
             value={recipient}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
             onClick={handleTestSend}
-            disabled={isDisabled()}
+            buttonDisabled={isButtonDisabled()}
           >
-          Test your email
+            Test your email
           </TextInputWithButton>
 
           <div className="separator"></div>
