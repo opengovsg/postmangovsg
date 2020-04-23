@@ -13,8 +13,8 @@ export class JobQueue extends Model<JobQueue> {
   campaign!: Campaign
 
   @ForeignKey(() => Worker)
-  @Column(DataType.INTEGER)
-  workerId?: number
+  @Column(DataType.STRING)
+  workerId?: string
 
   @BelongsTo(() => Worker)
   worker?: Worker

@@ -26,7 +26,7 @@ const Create = () => {
 
   useEffect(() => {
     loadProject()
-  }, [])
+  }, [id])
 
   function renderCreateChannel() {
     switch (campaign.type) {
@@ -55,8 +55,8 @@ const Create = () => {
                   }
                 </PrimaryButton>
               </TitleBar>
-              { isLoading && <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i> }
-              { !isLoading && renderCreateChannel() }
+              {isLoading && <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>}
+              {!isLoading && renderCreateChannel()}
             </>
           )
           :
