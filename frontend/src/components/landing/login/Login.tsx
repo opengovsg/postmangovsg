@@ -9,6 +9,8 @@ const emailText = 'Sign in with your gov.sg email'
 const otpText = 'Enter the 6-digit One Time Password sent to your email'
 const emailButtonText = 'Get OTP'
 const otpButtonText = 'Sign In'
+const emailPlaceholder = 'e.g. postman@agency.gov.sg'
+const otpPlaceholder = 'enter OTP sent to your email'
 
 const Login = () => {
   const [otpSent, setOtpSent] = useState(false)
@@ -40,7 +42,15 @@ const Login = () => {
   }
 
 
-  function render(mainText: string, value: string, onChange: Function, onClick: Function, buttonText: string, inputType?: string) {
+  function render(
+    mainText: string,
+    value: string,
+    onChange: Function,
+    onClick: Function,
+    buttonText: string,
+    placeholder: string,
+    inputType?: string,
+  ) {
     return (
       <>
         <h4 className={styles.text}>
@@ -49,6 +59,7 @@ const Login = () => {
         <TextInputWithButton
           value={value}
           type={inputType}
+          placeholder={placeholder}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
           onClick={onClick}>
           {buttonText}
@@ -61,9 +72,9 @@ const Login = () => {
   return (
     <div className={styles.container}>
       {!otpSent ?
-        render(emailText, email, setEmail, sendOtp, emailButtonText, 'email')
+        render(emailText, email, setEmail, sendOtp, emailButtonText, emailPlaceholder, 'email')
         :
-        render(otpText, otp, setOtp, login, otpButtonText, 'tel')
+        render(otpText, otp, setOtp, login, otpButtonText, otpPlaceholder, 'tel')
       }
     </div >
   )
