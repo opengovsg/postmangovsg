@@ -10,7 +10,7 @@
 .stepContainer {
   display: block;
   width: 750px;
-  padding: $content-vertical-padding $site-padding;
+  padding: $content-top-padding $site-padding $content-bottom-padding;
   margin: 0 auto;
 }
 
