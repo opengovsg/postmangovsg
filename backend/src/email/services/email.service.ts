@@ -1,6 +1,6 @@
 import { chunk } from 'lodash'
 import { Campaign, JobQueue } from '@core/models'
-import { EmailMessage, EmailTemplate } from '@email/models'
+import { EmailMessage, EmailTemplate, EmailOp } from '@email/models'
 import logger from '@core/logger'
 import { CampaignStats } from '@core/interfaces'
 
@@ -84,15 +84,15 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
 }
 
 const getEmailStats = async (campaignId: string): Promise<CampaignStats> => {
-  const error = await EmailMessage.count({
+  const error = await EmailOp.count({
     where: {campaign_id: campaignId},
     col: 'error_code'
   })
-  const total = await EmailMessage.count({
+  const total = await EmailOp.count({
     where: {campaign_id: campaignId},
     col: 'id'
   })
-  const sent = await EmailMessage.count({
+  const sent = await EmailOp.count({
     where: {campaign_id: campaignId},
     col: 'sent_at'
   })
