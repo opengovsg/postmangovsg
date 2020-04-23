@@ -1,0 +1,31 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.bottom {
+  bottom: -300px;
+  left: 0;
+
+  &.enter {
+    bottom: 0;
+    left: 0;
+  }
+}
+
+.top {
+  @include block($light-red, $red);
+  margin-top: 12rem;
+  margin-right: 3rem;
+  position: fixed;
+  right: -300px;
+  opacity: 1;
+  transition: all 0.7s;
+  top: 0;
+
+  &.enter {
+    right: 0;
+  }
+}
+
+.fade {
+  opacity: 0;
+}

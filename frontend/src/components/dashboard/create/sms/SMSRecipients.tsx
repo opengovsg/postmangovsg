@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { ToastContext } from 'contexts/toast.context'
 import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
 
 import { getPresignedUrl, completeFileUpload } from 'services/sms.service'
@@ -8,12 +9,12 @@ import axios, { AxiosResponse } from 'axios'
 
 const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [errorMessage, setErrorMessage] = useState('')
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
 
   const params: { id?: string } = useParams()
+  const { showTopToast } = useContext(ToastContext)
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
@@ -31,7 +32,6 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
         campaignId,
         mimeType: uploadedFile.type,
       })
-      console.log('obtained s3 presigned url')
 
       const s3AxiosInstance = axios.create({
         withCredentials: false,
@@ -39,7 +39,6 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       await s3AxiosInstance.put(startUploadResponse.presignedUrl, uploadedFile, {
         headers: { 'Content-Type': uploadedFile.type },
       })
-      console.log('PUT to s3 succeeded')
 
       // POST to upload complete
       const uploadResponse = await completeFileUpload({
@@ -54,9 +53,9 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       const axiosError: AxiosResponse = err.response
       if (axiosError !== undefined) {
         if (axiosError.status === 400) {
-          setErrorMessage(axiosError?.data?.message)
+          showTopToast(axiosError?.data?.message)
         } else {
-          setErrorMessage('Error uploading file.')
+          showTopToast('Error uploading file.')
         }
         console.error(axiosError)
       } else {
@@ -93,10 +92,6 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
         </InfoBlock>
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
-
-      {
-        errorMessage.length !== 0 ? <div>Error: {errorMessage}</div> : <></>
-      }
 
       <div className="progress-button">
         <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Insert Credentials →</PrimaryButton>

@@ -1,4 +1,6 @@
 import React, { useState, useContext } from 'react'
+
+import { ToastContext } from 'contexts/toast.context'
 import { TextInputWithButton } from 'components/common'
 import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
 
@@ -12,19 +14,17 @@ const otpButtonText = 'Sign In'
 
 const Login = () => {
   const [otpSent, setOtpSent] = useState(false)
-  const [status, setStatus] = useState('')
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
   const { setAuthenticated } = useContext(AuthContext)
+  const { showBottomToast } = useContext(ToastContext)
 
   async function sendOtp() {
     try {
-      setStatus('Sending OTP...')
       await getOtpWithEmail(email)
       setOtpSent(true)
-      setStatus(`OTP sent to ${email}`)
     } catch (err) {
-      setStatus('Error sending OTP')
+      showBottomToast('Error sending OTP')
       console.error(err)
     }
   }
@@ -34,7 +34,7 @@ const Login = () => {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
     } catch (err) {
-      setStatus('Error logging in')
+      showBottomToast('Error verifying OTP')
       console.error(err)
     }
   }
@@ -53,7 +53,6 @@ const Login = () => {
           onClick={onClick}>
           {buttonText}
         </TextInputWithButton>
-        <p className={styles.statusMsg}>{status}</p>
       </>
     )
   }
