@@ -175,16 +175,33 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
 
     // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
     if (firstRecord && updatedTemplate.params) {
-      await checkNewTemplateParams({ campaignId: +campaignId, updatedTemplate, firstRecord })
+      const check = await checkNewTemplateParams({
+        campaignId: +campaignId,
+        updatedTemplate,
+        firstRecord,
+      })
+      if (check.reupload) {
+        return res.status(200)
+          .json({
+            message: `Please re-upload your recipient list as template has changed.`,
+            extra_keys: check.extraKeys,
+            recipients: 0,
+            valid: false,
+          })
+      }
     }
-    return res.status(200).json({
-      message: `Template for campaign ${campaignId} updated`,
-    })
+
+    const recipientCount = await SmsMessage.count({ where: { campaignId } })
+    const campaign = await Campaign.findByPk(+campaignId)
+
+    return res.status(200)
+      .json({
+        message: `Template for campaign ${campaignId} updated`,
+        valid: campaign?.valid,
+        num_recipients: recipientCount,
+      })
   } catch (err) {
     if (err instanceof HydrationError) {
-      return res.status(400).json({ message: err.message })
-    }
-    if (err instanceof MissingTemplateKeysError) {
       return res.status(400).json({ message: err.message })
     }
     return next(err)
