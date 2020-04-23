@@ -10,15 +10,14 @@ const getOtpValidator = {
     email: Joi.string().email()
       .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
-      .regex(/^.*\.gov\.sg$/)
-      .required(), // TODO: Add other validation 
+      .required(), // validation for email ending in .gov.sg was removed as we want to support other manually whitelisted emails
   }),
 }
 
 const verifyOtpValidator = {
   [Segments.BODY]: Joi.object({
     email: Joi.string().email()
-      .required(), // TODO: Add other validation
+      .required(),
     otp: Joi.string().required(), //TODO: Add validation for 6 digit otp
   }),
 }
