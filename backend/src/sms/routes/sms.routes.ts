@@ -98,38 +98,68 @@ const sendCampaignValidator = {
 }
 
 // handlers
-// Get campaign details
 
-const checkNewTemplateParams = async ({ campaignId, updatedTemplate, firstRecord }: {campaignId: number; updatedTemplate: SmsTemplate; firstRecord: SmsMessage}): Promise<void> => {
-  if (!updatedTemplate.params) return
+/**
+ * side effects:
+ *  - updates campaign 'valid' column
+ *  - may delete sms_message where campaignId
+ */
+const checkNewTemplateParams = async ({
+  campaignId,
+  updatedTemplate,
+  firstRecord,
+}: {
+  campaignId: number
+  updatedTemplate: SmsTemplate
+  firstRecord: SmsMessage
+}): Promise<{
+  reupload: boolean
+  extraKeys?: Array<String>
+}> => {
+  // new template might not even have params, (not inserted yet - hydration doesn't even need to take place
+  if (!updatedTemplate.params) return { reupload: false }
 
   // first set project.valid to false, switch this back to true only when hydration succeeds
-  await Campaign.update({
-    valid: false,
-  }, {
-    where: { id: campaignId },
-  })
+  await Campaign.update({ valid: false }, { where: { id: campaignId } })
 
   const paramsFromS3 = keys(firstRecord.params)
-  // warn if params from s3 file are not a superset of saved params
-  if (!isSuperSet(paramsFromS3, updatedTemplate.params)) {
-    const missingKeys = difference(updatedTemplate.params, paramsFromS3)
-    throw new MissingTemplateKeysError(missingKeys)
-  }
-  // try hydrate(...), return 4xx if unable to do so
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    template(updatedTemplate.body!, firstRecord.params as {[key: string]: string})
-    // set campaign.valid to true since templating suceeded AND file has been uploaded
-    await Campaign.update({
-      valid: true,
-    }, {
-      where: { id: campaignId },
-    })
-  } catch (err) {
-    logger.error(`Hydration error: ${err.stack}`)
-    throw new HydrationError()
-  }
+
+    const templateContainsExtraKeys = !isSuperSet(paramsFromS3, updatedTemplate.params)
+    if (templateContainsExtraKeys) {
+      // warn if params from s3 file are not a superset of saved params, remind user to re-upload a new file
+      const extraKeysInTemplate = difference(
+        updatedTemplate.params,
+        paramsFromS3
+      )
+
+      // the entries (message_logs) from the uploaded file are no longer valid, so we delete
+      await SmsMessage.destroy({
+        where: {
+          campaignId,
+        },
+      })
+
+      return { reupload: true, extraKeys: extraKeysInTemplate }
+    } else {
+      // the keys in the template are either a subset or the same as what is present in the uploaded file
+
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        template(
+          updatedTemplate.body!,
+          firstRecord.params as { [key: string]: string }
+        )
+      } catch (err) {
+        logger.error(`Hydration error: ${err.stack}`)
+        throw new HydrationError()
+      }
+      // set campaign.valid to true since templating suceeded AND file has been uploaded
+      await Campaign.update({ valid: true }, {
+        where: { id: campaignId },
+      })
+
+      return { reupload: false }
+    }
 }
 
 // Store body of message in sms template table
