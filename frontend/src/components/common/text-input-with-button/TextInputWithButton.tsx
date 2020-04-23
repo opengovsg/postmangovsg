@@ -10,8 +10,9 @@ const TextInputWithButton = (props: {
   type: string | undefined;
   buttonDisabled?: boolean | undefined;
   inputDisabled?: boolean | undefined;
+  placeholder?: string;
 }) => {
-  const { value, onChange, onClick, children, type, buttonDisabled, inputDisabled } = props
+  const { value, onChange, onClick, children, type, buttonDisabled, inputDisabled, placeholder } = props
 
   function onFormSubmit(e: React.FormEvent) {
     onClick()
@@ -21,7 +22,7 @@ const TextInputWithButton = (props: {
 
   return (
     <form className={styles.inputWithButton} onSubmit={onFormSubmit}>
-      <TextInput className={styles.textInput} value={value} onChange={onChange} type={type} disabled={inputDisabled} />
+      <TextInput className={styles.textInput} value={value} onChange={onChange} type={type} disabled={inputDisabled} placeholder={placeholder} />
       <PrimaryButton className={styles.inputButton} disabled={buttonDisabled} type="submit">
         {children}
       </PrimaryButton>

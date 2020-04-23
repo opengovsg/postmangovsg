@@ -13,7 +13,7 @@ import CreateCampaign from 'components/dashboard/create-modal'
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
 
-const ITEMS_PER_PAGE = 2
+const ITEMS_PER_PAGE = 10
 
 const Campaigns = () => {
   const modalContext = useContext(ModalContext)

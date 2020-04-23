@@ -9,6 +9,8 @@ const emailText = 'Sign in with your gov.sg email'
 const otpText = 'One-Time Password'
 const emailButtonText = ['Get OTP', 'Sending OTP...']
 const otpButtonText = ['Sign In', 'Verifying OTP...']
+const emailPlaceholder = 'e.g. postman@agency.gov.sg'
+const otpPlaceholder = 'enter OTP sent to your email'
 
 const RESEND_WAIT_TIME = 30000
 
@@ -59,8 +61,15 @@ const Login = () => {
     sendOtp()
   }
 
-
-  function render(mainText: string, value: string, onChange: Function, onClick: Function, buttonText: string[], inputType?: string) {
+  function render(
+    mainText: string,
+    value: string,
+    onChange: Function,
+    onClick: Function,
+    buttonText: string[],
+    placeholder: string,
+    inputType?: string,
+  ) {
     return (
       <>
         <h4 className={styles.text}>
@@ -72,6 +81,7 @@ const Login = () => {
         <TextInputWithButton
           value={value}
           type={inputType}
+          placeholder={placeholder}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
           buttonDisabled={isLoading}
           inputDisabled={isLoading}
@@ -88,9 +98,9 @@ const Login = () => {
   return (
     <div className={styles.container}>
       {!otpSent ?
-        render(emailText, email, setEmail, sendOtp, emailButtonText, 'email')
+        render(emailText, email, setEmail, sendOtp, emailButtonText, emailPlaceholder, 'email')
         :
-        render(otpText, otp, setOtp, login, otpButtonText, 'tel')
+        render(otpText, otp, setOtp, login, otpButtonText, otpPlaceholder, 'tel')
       }
     </div >
   )

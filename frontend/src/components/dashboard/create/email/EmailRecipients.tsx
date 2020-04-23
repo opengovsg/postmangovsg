@@ -84,7 +84,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       <p>
         CSV file must include a <b>recipient</b> column with recipients&apos; email addresses
       </p>
-      {!isUploading && numRecipients &&
+      {!isUploading && numRecipients > 0 &&
         <InfoBlock>
           <li>
             a<i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>
