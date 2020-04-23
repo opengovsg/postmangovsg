@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION get_next_job(worker TEXT)
+CREATE OR REPLACE FUNCTION get_next_job(worker text)
 RETURNS json
 LANGUAGE plpgsql AS $$
 DECLARE  

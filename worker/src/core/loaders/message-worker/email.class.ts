@@ -2,8 +2,8 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import map from 'lodash/map'
-import MailService from '@core/services/mail.class'
-import { template } from '@core/services'
+import MailService from '@email/services/mail.service'
+import { template } from '@core/services/template.service'
 import logger from '@core/logger'
 import config from '@core/config'
 
