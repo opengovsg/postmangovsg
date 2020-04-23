@@ -21,13 +21,12 @@ class SequelizeLoader {
       pool: config.database.poolOptions,
       ...dialectOptions,
     })
-  
+
     const coreModels = [Credential, JobQueue, Campaign, User, Worker]
     const emailModels = [EmailMessage, EmailTemplate, EmailOp]
     const smsModels = [SmsMessage, SmsTemplate, SmsOp]
     sequelize.addModels([...coreModels, ...emailModels, ...smsModels])
-    await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
-  
+
     try {
       this._sequelize = await sequelize.sync()
       logger.info({ message: 'Database loaded.' })
@@ -35,6 +34,9 @@ class SequelizeLoader {
       logger.error(`Unable to connect to database: ${err}`)
       process.exit(1)
     }
+
+    await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
+
   }
 }
 

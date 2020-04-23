@@ -82,7 +82,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       <p>Only CSV format files are allowed. If you have an Excel file, please convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
       </p>
       <p>
-        CSV file must include a <b>recipient</b> column with recipients&apos; mobile numbers
+        CSV file must include a <b>recipient</b> column with recipients&apos; email addresses
       </p>
       {!isUploading && numRecipients &&
         <InfoBlock>

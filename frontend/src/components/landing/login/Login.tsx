@@ -12,14 +12,19 @@ const otpButtonText = 'Sign In'
 
 const Login = () => {
   const [otpSent, setOtpSent] = useState(false)
+  const [status, setStatus] = useState('')
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
   const { setAuthenticated } = useContext(AuthContext)
+
   async function sendOtp() {
     try {
+      setStatus('Sending OTP...')
       await getOtpWithEmail(email)
       setOtpSent(true)
+      setStatus(`OTP sent to ${email}`)
     } catch (err) {
+      setStatus('Error sending OTP')
       console.error(err)
     }
   }
@@ -29,6 +34,7 @@ const Login = () => {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
     } catch (err) {
+      setStatus('Error logging in')
       console.error(err)
     }
   }
@@ -47,6 +53,7 @@ const Login = () => {
           onClick={onClick}>
           {buttonText}
         </TextInputWithButton>
+        <p className={styles.statusMsg}>{status}</p>
       </>
     )
   }
