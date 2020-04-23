@@ -35,3 +35,28 @@ export interface CampaignDetails {
       status: string;
     };
   }
+export interface CampaignStats {
+    error: number;
+    invalid: number;
+    unsent: number;
+    sent: number;
+    status: string;
+}
+/**
+ * @swagger
+ *  components:
+ *    schemas:
+ *      CampaignStats:
+ *        type: object
+ *        properties:
+ *          error:
+ *            type: number
+ *          invalid:
+ *            type: number
+ *          unsent:
+ *            type: number
+ *          sent:
+ *            type: number
+ *          status:
+ *            type: string
+ */

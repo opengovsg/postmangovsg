@@ -1,7 +1,8 @@
 import { chunk } from 'lodash'
-import { Campaign } from '@core/models'
+import { Campaign, JobQueue } from '@core/models'
 import { EmailMessage, EmailTemplate } from '@email/models'
 import logger from '@core/logger'
+import { CampaignStats } from '@core/interfaces'
 
 
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
@@ -82,4 +83,30 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
   }
 }
 
-export { populateEmailTemplate, upsertEmailTemplate }
+const getEmailStats = async (campaignId: string): Promise<CampaignStats> => {
+  const error = await EmailMessage.count({
+    where: {campaign_id: campaignId},
+    col: 'error_code'
+  })
+  const total = await EmailMessage.count({
+    where: {campaign_id: campaignId},
+    col: 'id'
+  })
+  const sent = await EmailMessage.count({
+    where: {campaign_id: campaignId},
+    col: 'sent_at'
+  })
+  const unsent = total - sent
+  const job = await JobQueue.findOne({ where: { campaignId } })
+  if (job === null) throw new Error('Unable to find campaign in job queue table.')
+  
+  return {
+    error,
+    invalid: 0,
+    unsent,
+    sent,
+    status: job.status
+  }
+} 
+
+export { populateEmailTemplate, upsertEmailTemplate, getEmailStats}
