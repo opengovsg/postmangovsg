@@ -20,7 +20,7 @@ const TextInputWithButton = (props: {
 
   return (
     <form className={styles.inputWithButton} onSubmit={onFormSubmit}>
-      <TextInput className={styles.textInput} value={value} onChange={onChange} type={type} />
+      <TextInput className={styles.textInput} value={value} onChange={onChange} type={type} disabled={disabled} />
       <PrimaryButton className={styles.inputButton} disabled={disabled} type="submit">
         {children}
       </PrimaryButton>

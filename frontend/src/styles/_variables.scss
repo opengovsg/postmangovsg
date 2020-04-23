@@ -13,12 +13,13 @@ $light-red: rgba(219, 79, 93, 0.1);
 
 // Dimensions
 $button-min-width: 12rem;
-$button-height: 2.5rem;
+$button-height: 2.8rem;
 $border-radius: $button-height / 2;
 
 // Paddings
 $site-padding: 3vw;
-$content-vertical-padding: 4vh;
+$content-top-padding: 4vh;
+$content-bottom-padding: 15vh;
 
 // Fonts
 $font-stack: "Noto Sans JP", sans-serif;

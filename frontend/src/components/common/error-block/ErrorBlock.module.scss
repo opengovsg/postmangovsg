@@ -1,6 +1,13 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.errorBlock {
-  @include block($light-red, $red);
+.relativeContainer {
+  position: relative;
+
+  .errorBlock {
+    position: absolute;
+    left: 0;
+    right: 0;
+    @include block($light-red, $red);
+  }
 }
