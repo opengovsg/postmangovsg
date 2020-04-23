@@ -51,7 +51,8 @@ const getSmsBody = async (campaignId: string): Promise<string | null> => {
 
 const getEncodedHash = async (secret: string): Promise<string> => {
   const secretHash = await hashService.specifySalt(secret, config.aws.secretManagerSalt)
-  return Buffer.from(secretHash).toString('base64')
+  const hash = Buffer.from(secretHash).toString('base64')
+  return `${config.aws.credentialsVersion}_${hash}`
 }
 
 const getHydratedMsg = async (campaignId: string): Promise<string | null>  => {
@@ -101,8 +102,7 @@ const storeCredentials = async (req: Request, res: Response,  next: NextFunction
   // Save the credentials and update DB
   try {
     const secretString = JSON.stringify(credential)
-    const encodedHash = await getEncodedHash(secretString)
-    const credentialName = `${config.aws.credentialsVersion}_${encodedHash}`
+    const credentialName = await getEncodedHash(secretString)
     await saveCredential(+campaignId, credentialName, secretString)
   }catch(err) {
     return next(err)
