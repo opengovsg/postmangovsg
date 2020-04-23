@@ -102,7 +102,6 @@ const getEmailStats = async (campaignId: string): Promise<CampaignStats> => {
   
   return {
     error,
-    invalid: 0,
     unsent,
     sent,
     status: job.status

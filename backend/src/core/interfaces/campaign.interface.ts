@@ -37,7 +37,6 @@ export interface CampaignDetails {
   }
 export interface CampaignStats {
     error: number;
-    invalid: number;
     unsent: number;
     sent: number;
     status: string;
@@ -50,8 +49,6 @@ export interface CampaignStats {
  *        type: object
  *        properties:
  *          error:
- *            type: number
- *          invalid:
  *            type: number
  *          unsent:
  *            type: number
