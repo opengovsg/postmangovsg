@@ -87,12 +87,12 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       {!isUploading && numRecipients > 0 &&
         <InfoBlock>
           <li>
-            a<i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>
+            <i className="bx bx-user-check"></i><p>{numRecipients} recipients</p>
           </li>
           {csvFilename ? (
             <li>
-              b<i className='bx bx-file'></i>
-              <span>{csvFilename}</span>
+              <i className='bx bx-file'></i>
+              <p>{csvFilename}</p>
             </li>
           ) : (
             <></>
