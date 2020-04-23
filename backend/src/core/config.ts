@@ -11,6 +11,7 @@ const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 // AWS settings
 const awsRegion: string = process.env.AWS_REGION as string
 const uploadBucket: string = process.env.FILE_STORAGE_BUCKET_NAME as string
+// If the secret manager salt changes, the credentials version should be incremented. ie from v1 to v2
 const secretManagerSalt: string = process.env.SECRET_MANAGER_SALT as string
 const credentialsVersion = 'v1'
 
