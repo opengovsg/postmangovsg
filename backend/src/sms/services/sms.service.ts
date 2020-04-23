@@ -92,7 +92,7 @@ const getStatsFromTable = async (model: any, campaignId: string): Promise<{error
   })
   const sent = await model.count({
     where: {campaign_id: campaignId},
-    col: 'sent_at'
+    col: 'message_id'
   })
 
   const unsent = total - sent

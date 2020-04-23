@@ -94,7 +94,7 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
     })
     const sent = await model.count({
       where: {campaign_id: campaignId},
-      col: 'sent_at'
+      col: 'message_id'
     })
 
     const unsent = total - sent
