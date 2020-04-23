@@ -97,6 +97,15 @@ $navbar-mobile-height: 3.5rem;
       }
     }
 
+    .iconLink {
+      @include flex-horizontal;
+
+      .icon {
+        font-size: 1.3rem;
+        margin-left: 0.5rem;
+      }
+    }
+
     .separator {
       flex: 1;
     }
