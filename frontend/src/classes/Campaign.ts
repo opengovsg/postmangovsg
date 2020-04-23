@@ -21,9 +21,22 @@ export class Campaign {
     this.id = input['id']
     this.name = input['name']
     this.type = input['type']
-    this.createdAt = input['createdAt']
-    this.sentAt = input['sentAt']
-    this.status = input['status']
+    this.createdAt = input['created_at']
+    this.sentAt = input['sent_at']
+    this.status = this.getStatus(input['job_queue'])
+  }
+
+  getStatus(jobs: Array<{ status: string }>): Status {
+    if (jobs) {
+      const jobSet = new Set(jobs.map((x => x.status)))
+      if (jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')) {
+        return Status.Sending
+      }
+      else if (jobSet.has('SENT') || jobSet.has('LOGGED')) {
+        return Status.Sent
+      }
+    }
+    return Status.Draft
   }
 }
 

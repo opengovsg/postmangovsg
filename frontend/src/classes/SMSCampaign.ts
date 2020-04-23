@@ -17,11 +17,11 @@ export class SMSCampaign extends Campaign {
 
   constructor(input: any) {
     super(input)
-    this.body = input['body']
-    this.csvFilename = input['csvFilename']
-    this.numRecipients = input['numRecipients']
+    this.body = input['sms_templates'].body
+    this.csvFilename = input['csv_filename']
+    this.numRecipients = input['num_recipients']
     this.preview = input['preview']
-    this.hasCredential = input['hasCredential']
+    this.hasCredential = input['has_credential']
     this.setProgress()
   }
 

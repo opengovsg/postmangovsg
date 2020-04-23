@@ -13,7 +13,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
   const [isUploading, setIsUploading] = useState(false)
   const [messagePreview, setMessagePreview] = useState('')
 
-  const params: { id?: string } = useParams()
+  const { id: campaignId } = useParams()
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
@@ -21,22 +21,21 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
 
     try {
       // user did not select a file
-      if (!files[0]) {
+      if (!files[0] || !campaignId) {
         return
       }
-
       const uploadedFile = files[0]
-      const campaignId = +params.id!
       // Get presigned url from postman server
       const startUploadResponse = await getPresignedUrl({
-        campaignId,
+        campaignId: +campaignId,
         mimeType: uploadedFile.type,
       })
       // Upload to presigned url
       await uploadFileWithPresignedUrl(uploadedFile, startUploadResponse.presignedUrl)
       const uploadResponse = await completeFileUpload({
-        campaignId,
+        campaignId: +campaignId,
         transactionId: startUploadResponse.transactionId,
+        filename: uploadedFile.name,
       })
 
       // Set state
