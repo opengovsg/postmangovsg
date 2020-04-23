@@ -14,7 +14,8 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   const [messagingServiceSid, setMessagingServiceSid] = useState('')
   const [recipient, setRecipient] = useState('')
   const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
-  const params: { id? : string } = useParams()
+  const [isValidating, setIsValidating] = useState(false)
+  const params: { id?: string } = useParams()
 
   function isButtonDisabled() {
     return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\+?\d+$/g).test(recipient)
@@ -32,19 +33,24 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const campaignId = +params.id!
+      setIsValidating(true)
       const isValid = await validateCredentials({
         campaignId,
         accountSid,
         apiKey,
         apiSecret,
         messagingServiceSid,
-        recipient })
+        recipient,
+      })
       setHasCredential(isValid)
       setShowCredentialFields(false)
+      // Saves hasCredential property but do not advance to next step
+      onNext({ hasCredential: isValid }, false)
       resetFields()
-    } catch(err){
+    } catch (err) {
       console.error(err)
     }
+    setIsValidating(false)
   }
 
   function renderCredentialFields() {
@@ -91,9 +97,10 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           value={recipient}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
           onClick={handleValidateCredentials}
-          buttonDisabled={isButtonDisabled()}
+          buttonDisabled={isButtonDisabled() || isValidating}
+          inputDisabled={isValidating}
         >
-          Validate credential
+          {isValidating ? 'Validating...' : 'Validate credential'}
         </TextInputWithButton>
       </>
     )
@@ -116,7 +123,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
                   ? renderCredentialFields()
                   : (
                     <PrimaryButton className={styles.darkBlueBtn} onClick={() => setShowCredentialFields(true)}>
-                  Enter new credentials
+                      Enter new credentials
                     </PrimaryButton>
                   )
               }
@@ -131,7 +138,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           : (
             <>
               <h2>Insert your SMS credentials</h2>
-              { renderCredentialFields() }
+              {renderCredentialFields()}
             </>
           )
       }
