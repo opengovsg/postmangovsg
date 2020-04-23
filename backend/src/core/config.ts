@@ -44,6 +44,12 @@ const cookieSettings = {
   path: '/',
 }
 
+// OTP settings
+const otpRetries = 4 // Number of attempts to enter otp
+const otpExpiry = 600 // in seconds, expires after 10 minutes
+const otpResendTimeout= 30 // Number of seconds to wait before resending otp
+
+
 // Node mailer
 const mailHost: string = process.env.SES_HOST as string
 const mailPort = Number(process.env.SES_PORT)
@@ -90,6 +96,11 @@ export default {
   session: {
     secret: sessionSecret,
     cookieSettings,
+  },
+  otp: {
+    retries: otpRetries,
+    expiry: otpExpiry,
+    resendTimeout: otpResendTimeout,
   },
   redisOtpUri,
   redisSessionUri,

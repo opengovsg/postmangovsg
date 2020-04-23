@@ -15,9 +15,9 @@ const InfoBlock = (props: any) => {
 }
 
 /* e.g. children
- * <li><i className="bx"></i><p>text goes here...</p>
- * <li><i className="bx"></i><p>text goes here...</p>
- * <li><i className="bx"></i><p>text goes here...</p>
+ * <li><i className="bx"></i><span>text goes here...</span></li>
+ * <li><i className="bx"></i><span>text goes here...</span></li>
+ * <li><i className="bx"></i><span>text goes here...</span></li>
  */
 
 export default InfoBlock

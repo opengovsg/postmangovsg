@@ -3,7 +3,7 @@
 
 .content {
   @include flex-vertical;
-  padding: $content-vertical-padding 0;
+  padding: $content-top-padding 0 $content-bottom-padding;
   margin: 0 auto;
   width: 1000px;
   max-width: calc(100vw - (2 * #{$site-padding}));

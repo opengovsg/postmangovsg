@@ -6,6 +6,10 @@
   display: flex;
   flex-direction: column;
 
+  @include mobile() {
+    align-items: center;
+  }
+
   .text {
     font-weight: 500;
     margin-bottom: 1rem;
@@ -15,7 +19,13 @@
     background-color: $light-blue;
   }
 
-  .statusMsg {
-    margin-top: 0.5rem;
+  .resend {
+    text-decoration: underline;
+    margin-left: 1rem;
+    cursor: pointer;
+  }
+
+  .errorBlock {
+    position: absolute;
   }
 }
