@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { authenticator } from 'otplib'
 import bcrypt from 'bcrypt'
 import { User } from '@core/models'
@@ -71,6 +71,7 @@ const isOtpVerified = async (input: VerifyOtpInput ): Promise<boolean> => {
     const hashedOtp: HashedOtp = await getHashedOtp(input.email)
     const authorized: boolean = await bcrypt.compare(input.otp, hashedOtp.hash)
     if (authorized) {
+      await deleteHashedOtp(input.email)
       return true
     }
     hashedOtp.retries -= 1
@@ -89,10 +90,15 @@ const isOtpVerified = async (input: VerifyOtpInput ): Promise<boolean> => {
   }
 }
 
-// TODO: Remove when launch, checks if it's an existing user
-const doesUserExist = async (email: string): Promise<void> => {
+const doesUserExist = async (email: string): Promise<boolean> => {
   const user = await User.findOne({ where: { email: email } })
   if (user === null) throw new Error('No user was found with this email')
+  return true
+}
+
+const isWhitelistedEmail = async ( email: string ): Promise<boolean> => {
+  const isGovEmail = /^.*\.gov\.sg$/.test(email)
+  return isGovEmail || doesUserExist(email)
 }
 
 const sendOtp = (recipient: string, otp: string): Promise<string | void> => {
@@ -107,7 +113,8 @@ const sendOtp = (recipient: string, otp: string): Promise<string | void> => {
 const getOtp = async (req: Request, res: Response): Promise<Response> => {
   const email = req.body.email
   try {
-    await doesUserExist(email) // TODO: remove when launching
+    await doesUserExist(email) // TODO: remove when launching so that anyone with a .gov.sg email can sign up
+    await isWhitelistedEmail(email)
     await hasWaitTimeElapsed(email)
   } catch (e) {
     logger.error(`Not allowed to send OTP to email=${email}`)
@@ -127,19 +134,23 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
   return res.sendStatus(200)
 }
 
-const verifyOtp = async (req: Request, res: Response): Promise<Response> => {
+const verifyOtp = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const { email, otp } = req.body
   const authorized = await isOtpVerified({ email, otp })
   if (!authorized) {
     return res.sendStatus(401)
   }  
-
-  if(req.session){
-    const [user] = await User.findCreateFind({ where: { email: email } })
-    req.session.user = { id: user.id, createdAt: user.createdAt, updatedAt: user.updatedAt }
-    return res.sendStatus(200)
+  try{
+    if(req.session){
+      const [user] = await User.findCreateFind({ where: { email: email } })
+      req.session.user = { id: user.id, createdAt: user.createdAt, updatedAt: user.updatedAt }
+      return res.sendStatus(200)
+    }
+    return res.sendStatus(401)
+  }catch(err){
+    return next(err)
   }
-  return res.sendStatus(401)
+ 
 }
 
 export { getOtp, verifyOtp }
