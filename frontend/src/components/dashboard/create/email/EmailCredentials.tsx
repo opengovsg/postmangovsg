@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { sendPreviewMessage } from 'services/email.service'
-import { PrimaryButton, TextInputWithButton } from 'components/common'
+import { PrimaryButton, TextInputWithButton, InfoBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
 import isEmail from 'validator/lib/isEmail'
 
@@ -9,11 +9,11 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
 
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [recipient, setRecipient] = useState('')
-  const [testSending, setTestSending] = useState(false)
+  const [isValidating, setIsValidating] = useState(false)
   const params: { id?: string } = useParams()
 
   function isButtonDisabled() {
-    return testSending || !isEmail(recipient)
+    return !isEmail(recipient)
   }
 
   function resetFields() {
@@ -22,7 +22,7 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
 
   async function handleTestSend() {
     try {
-      setTestSending(true)
+      setIsValidating(true)
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const campaignId = +params.id!
       const isValid = await sendPreviewMessage({
@@ -30,11 +30,13 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
         recipient,
       })
       setHasCredential(isValid)
+      // Saves hasCredential property but do not advance to next step
+      onNext({ hasCredential: isValid }, false)
       resetFields()
     } catch (err) {
       console.error(err)
-      setTestSending(false)
     }
+    setIsValidating(false)
   }
 
   return (
@@ -49,10 +51,21 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
             value={recipient}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
             onClick={handleTestSend}
-            buttonDisabled={isButtonDisabled()}
+            inputDisabled={isValidating}
+            buttonDisabled={isButtonDisabled() || isValidating}
           >
             Test your email
           </TextInputWithButton>
+
+          {
+            hasCredential &&
+            <InfoBlock>
+              <li>
+                <i className="bx bx-check-circle"></i>
+                <span>Email credentails have been validated but you may continue to send test messages.</span>
+              </li>
+            </InfoBlock>
+          }
 
           <div className="separator"></div>
 
