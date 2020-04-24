@@ -36,3 +36,7 @@ frontend:
         font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
         default-src 'self' https://*.postman.gov.sg;
         object-src 'none'"
+    - pattern: "/static/**/*"
+      headers:
+      - key: "Cache-Control"
+        value: "public, must-revalidate, max-age=14400"
