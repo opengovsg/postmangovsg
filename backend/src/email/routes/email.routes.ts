@@ -443,35 +443,6 @@ router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCamp
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/send:
- *    post:
- *      tags:
- *        - Email
- *      summary: Start sending campaign
- *      requestBody:
- *        required: false
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                rate:
- *                  example: 10
- *                  type: integer
- *                  minimum: 1
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- */
-router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCampaign)
-
-/**
- * @swagger
- * path:
  *  /campaign/{campaignId}/email/stop:
  *    post:
  *      tags:
