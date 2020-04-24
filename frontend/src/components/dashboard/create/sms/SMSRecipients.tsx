@@ -72,7 +72,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
 
-      {errorMessage && <ErrorBlock>{errorMessage}</ErrorBlock>}
+      <ErrorBlock>{errorMessage}</ErrorBlock>
 
       <div className="progress-button">
         <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={onNext}>Insert Credentials →</PrimaryButton>

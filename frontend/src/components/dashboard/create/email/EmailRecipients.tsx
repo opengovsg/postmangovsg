@@ -49,7 +49,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       const msgPreview = await getPreviewMessage(id)
       setMessagePreview(msgPreview)
     } catch (err) {
-      throw new Error(err.message)
+      setErrorMessage(err.message)
     } finally {
       setIsUploading(false)
     }
@@ -76,7 +76,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
 
-      {errorMessage && <ErrorBlock>{errorMessage}</ErrorBlock>}
+      <ErrorBlock>{errorMessage}</ErrorBlock>
 
       <div className="separator"></div>
       {
