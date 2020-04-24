@@ -50,7 +50,9 @@ const getSmsBody = async (campaignId: string): Promise<string | null> => {
 }
 
 const getEncodedHash = async (secret: string): Promise<string> => {
-  const secretHash = await hashService.specifySalt(secret, config.aws.secretManagerSalt)
+  // Removes special characters as they affect the consistency of hash
+  const noSpecialChars = secret.replace(/[^\w]/gi, '')
+  const secretHash = await hashService.specifySalt(noSpecialChars, config.aws.secretManagerSalt)
   return Buffer.from(secretHash).toString('base64')
 }
 
