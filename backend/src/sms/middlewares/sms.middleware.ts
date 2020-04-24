@@ -95,6 +95,7 @@ const storeCredentials = async (req: Request, res: Response,  next: NextFunction
     await sendMessage(campaignId, recipient, credential)
   }
   catch(err){
+    logger.error(err)
     return res.status(400).json({ message: `${err}` })
   }
 
