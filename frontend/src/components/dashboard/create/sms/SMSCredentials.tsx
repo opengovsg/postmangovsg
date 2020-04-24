@@ -89,7 +89,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
         <h2>Validate your credentials by doing a test send</h2>
         <p>
           To ensure your credentials are working perfectly,
-          please send a test SMS to an available phone numnber
+          please send a test SMS to an available phone number
           to receive a preview of your message.
         </p>
         <TextInputWithButton

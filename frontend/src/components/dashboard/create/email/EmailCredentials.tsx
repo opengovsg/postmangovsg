@@ -62,7 +62,7 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
             <InfoBlock>
               <li>
                 <i className="bx bx-check-circle"></i>
-                <span>Email credentails have been validated but you may continue to send test messages.</span>
+                <span>Email credentials have been validated but you may continue to send test messages.</span>
               </li>
             </InfoBlock>
           }
