@@ -1,7 +1,7 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
-
+import xss from 'xss'
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import {
@@ -26,6 +26,7 @@ import {
 import { isSuperSet } from '@core/utils'
 import { storeCredentials, getCampaignDetails } from '@sms/middlewares'
 import logger from '@core/logger'
+import config from '@core/config'
 
 const router = Router({ mergeParams: true })
 
@@ -163,12 +164,17 @@ const checkNewTemplateParams = async ({
   }
 }
 
+const replaceNewLinesAndSanitize = (body: string): string => {
+  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g,'<br/>'), config.xssOptions.sms)
+}
+
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
+    const { body } = req.body
     // extract params from template, save to db (this will be done with hook)
-    const updatedTemplate = await upsertSmsTemplate(req.body.body, +campaignId)
+    const updatedTemplate = await upsertSmsTemplate(replaceNewLinesAndSanitize(body), +campaignId)
 
     const firstRecord = await SmsMessage.findOne({
       where: { campaignId },

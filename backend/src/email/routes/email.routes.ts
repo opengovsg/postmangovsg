@@ -1,6 +1,7 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
+import xss from 'xss'
 import { Campaign } from '@core/models'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import {
@@ -26,6 +27,7 @@ import {
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
+import config from '@core/config'
 
 
 const router = Router({ mergeParams: true })
@@ -151,6 +153,10 @@ const checkNewTemplateParams = async ({
   }
 }
 
+const replaceNewLinesAndSanitize = (body: string): string => {
+  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g,'<br/>'), config.xssOptions.email)
+}
+
 // Store body of message in email template table
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -159,8 +165,8 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
     const { subject, body } = req.body
     // extract params from template, save to db (this will be done with hook)
     const updatedTemplate = await upsertEmailTemplate({
-      subject,
-      body,
+      subject: replaceNewLinesAndSanitize(subject),
+      body: replaceNewLinesAndSanitize(body),
       campaignId: +campaignId,
     })
 

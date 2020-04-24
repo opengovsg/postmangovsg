@@ -9,6 +9,7 @@ import { credentialService, hashService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
 import { template } from '@core/services/template.service'
+import { CampaignDetails } from '@core/interfaces'
 
 
 const saveCredential = async (campaignId: number, credentialName: string, secret: string): Promise<void> => {
@@ -113,7 +114,7 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
 const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const campaign: Campaign | null = await Campaign.findOne({
+    const campaign: CampaignDetails =  (await Campaign.findOne({
       where: { id: +campaignId },
       attributes: [
         'id', 'name', 'type', 'created_at', 'valid',
@@ -129,7 +130,8 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
           model: SmsTemplate,
           attributes: ['body'],
         }],
-    })
+    }))?.get({ plain:true }) as CampaignDetails
+    
     const numRecipients: number = await SmsMessage.count(
       {
         where: { campaignId: +campaignId },
