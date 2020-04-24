@@ -31,10 +31,10 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
       <TextArea highlight={true} singleRow={true} placeholder="Enter subject" value={subject} onChange={setSubject} />
       <h4>Message</h4>
       <p>
-        To personalise your message, include attributes and use double curly braces on them.
-        The attributes in your message template should match the headers in your recipients list file.
+        To personalise your message, include keywords that are surrounded by double curly braces.
+        The keywords in your message template should match the headers in your recipients CSV file.
         <br/>
-        <b>Note:</b> Recipient is a required column in the csv file.
+        <b>Note:</b> Recipient is a required column in the CSV file.
       </p>
       <p>
         Example<br/>
