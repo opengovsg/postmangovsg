@@ -41,6 +41,6 @@ export class TwilioService {
   }
 
   private replaceNewLines(body: string): string {
-    return body.replace(/<br\s+\/>/g, '\n')
+    return body.replace(/<br\s*\/>/g, '\n')
   }
 }

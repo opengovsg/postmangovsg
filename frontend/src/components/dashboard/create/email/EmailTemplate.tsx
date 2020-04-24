@@ -26,7 +26,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
   }
 
   function replaceNewLines(body?: string): string {
-    return body?.replace(/<br\s+\/>/g, '\n') || ''
+    return body?.replace(/<br\s*\/>/g, '\n') || ''
   }
 
   return (
