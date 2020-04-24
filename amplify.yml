@@ -34,4 +34,5 @@ frontend:
         value: "connect-src 'self' https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ https://postmangovsg-upload.s3.ap-northeast-1.amazonaws.com; 
         style-src-elem 'self' https://*.postman.gov.sg https://fonts.googleapis.com;
         font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
-        default-src 'self' https://*.postman.gov.sg"
+        default-src 'self' https://*.postman.gov.sg;
+        object-src 'none'"
