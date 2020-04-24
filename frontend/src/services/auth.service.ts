@@ -20,17 +20,21 @@ async function loginWithOtp(email: string, otp: string): Promise<void> {
   }
 }
 
-async function getLoggedInUser(): Promise<string> {
-  return axios.get('/auth/login').then((response) => {
-    return response.data.email
-  })
+async function getUserEmail(): Promise<string | undefined> {
+  try {
+    const response = await axios.get('/auth/userinfo')
+    return response.data?.email
+  } catch (e) {
+    console.error(e)
+  }
+
 }
 
 async function logout(): Promise<void> {
   return axios.get('/auth/logout')
 }
 
-function errorHandler(e: AxiosError, customHandlers: any) {
+function errorHandler(e: AxiosError, customHandlers: any = {}) {
   if (e.response && e.response.status) {
     const code = e.response.status
     if (customHandlers[code]) {
@@ -45,6 +49,6 @@ function errorHandler(e: AxiosError, customHandlers: any) {
 export {
   getOtpWithEmail,
   loginWithOtp,
-  getLoggedInUser,
+  getUserEmail,
   logout,
 }
