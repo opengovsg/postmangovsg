@@ -20,9 +20,9 @@ async function loginWithOtp(email: string, otp: string): Promise<void> {
   }
 }
 
-async function getIsLoggedIn(): Promise<boolean> {
+async function getLoggedInUser(): Promise<string> {
   return axios.get('/auth/login').then((response) => {
-    return response.status === 200
+    return response.data.email
   })
 }
 
@@ -45,6 +45,6 @@ function errorHandler(e: AxiosError, customHandlers: any) {
 export {
   getOtpWithEmail,
   loginWithOtp,
-  getIsLoggedIn,
+  getLoggedInUser,
   logout,
 }

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { getOtp, verifyOtp, isCookieAuthenticated, logout } from '@core/middlewares'
+import { getOtp, verifyOtp, getUser, isCookieAuthenticated, logout } from '@core/middlewares'
 
 const router = Router()
 
@@ -111,7 +111,7 @@ router.post('/login', celebrate(verifyOtpValidator), verifyOtp)
  *              schema:
  *                type: object
  */
-router.get('/login', isCookieAuthenticated, (_req, res) => (res.sendStatus(200)))
+router.get('/login', isCookieAuthenticated, getUser)
 
 /**
  * @swagger
