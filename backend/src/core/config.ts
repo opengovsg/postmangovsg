@@ -57,6 +57,8 @@ const twilioApiKey: string = process.env.TWILIO_API_KEY as string
 const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
 const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
 
+const defaultCountryCode: string = process.env.DEFAULT_COUNTRY_CODE as string
+
 export default {
   IS_PROD,
   aws: {
@@ -100,6 +102,7 @@ export default {
       pass: mailPass,
     },
   },
+  defaultCountryCode,
   smsOptions: {
     accountSid: twilioAccountSid,
     apiKey: twilioApiKey,
