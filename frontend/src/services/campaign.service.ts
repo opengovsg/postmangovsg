@@ -8,10 +8,37 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
+function getStatus(jobs: Array<{status: string}>): string {
+  let result
+  const jobSet = new Set(jobs.map((x => x.status)))
+  if(jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')){
+    result = Status.Sending
+  }
+  else if(jobSet.has('SENT') || jobSet.has('LOGGED')){
+    result = Status.Sent
+  }
+  else{
+    result = Status.Draft
+  }
+  return result
+}
+
+function getSentAt(jobs: Array<{sent_at: Date}>): Date {
+  const jobsSentAt = jobs.map((x => x.sent_at)).sort()
+  // returns job with the earliest sentAt time
+  return jobsSentAt[0]
+}
+
 export async function getCampaigns(): Promise<Array<Campaign>> {
   return axios.get('/campaigns').then((response) => {
     const campaigns: Campaign[] = response.data.map((data: any) => {
-      return new Campaign(data)
+
+      const details = {
+        ...data,
+        sent_at: getSentAt(data.job_queue)
+      }
+    
+      return new Campaign(details)
     })
     return campaigns
   })
@@ -31,11 +58,14 @@ export async function getCampaignStats(campaignId: number): Promise<CampaignStat
 
 export async function getCampaignDetails(campaignId: number): Promise<EmailCampaign | SMSCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
-    const { campaign, num_recipients: numRecipients } = response.data
+    const { campaign, num_recipients } = response.data
+    const details = {
+      ...campaign,
+      num_recipients,
+      sent_at:  getSentAt(campaign.job_queue),
+    }
 
-    const details = { ...campaign, 'num_recipients': numRecipients }
-
-    switch (campaign.type) {
+    switch(campaign.type){
       case ChannelType.SMS:
         return new SMSCampaign(details)
       case ChannelType.Email:
