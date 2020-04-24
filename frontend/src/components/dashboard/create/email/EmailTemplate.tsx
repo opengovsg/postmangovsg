@@ -7,7 +7,7 @@ import { saveTemplate } from 'services/email.service'
 const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
   { subject: string; body: string; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [body, setBody] = useState(initialBody)
+  const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
   const { id: campaignId } = useParams()
@@ -23,6 +23,10 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
     } catch (err) {
       setErrorMsg(err.message)
     }
+  }
+
+  function replaceNewLines(body?: string): string {
+    return body?.replace(/<br\s+\/>/g, '\n') || ''
   }
 
   return (

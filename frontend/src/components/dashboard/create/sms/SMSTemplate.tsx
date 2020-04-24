@@ -6,7 +6,7 @@ import { saveTemplate } from 'services/sms.service'
 
 const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [body, setBody] = useState(initialBody)
+  const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
 
@@ -21,6 +21,10 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
     } catch (err) {
       setErrorMsg(err.message)
     }
+  }
+
+  function replaceNewLines(body?: string): string {
+    return body?.replace(/<br\s+\/>/g, '\n') || ''
   }
 
   return (
