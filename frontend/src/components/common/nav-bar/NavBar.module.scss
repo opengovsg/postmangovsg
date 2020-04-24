@@ -1,6 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
-@import "~sass-burger";
+@import '~sass-burger';
 
 $navbar-link-margin: calc(1rem + 1vw);
 $navbar-height: 4rem;
@@ -80,6 +80,7 @@ $navbar-mobile-height: 3.5rem;
       color: $light-blue;
       margin-right: $navbar-link-margin;
       font-weight: 500;
+      cursor: pointer;
 
       &:last-child {
         margin-right: 0;
@@ -90,11 +91,14 @@ $navbar-mobile-height: 3.5rem;
         width: 100%;
       }
 
+      &.noClick {
+        cursor: default;
+      }
+
       &:hover,
       &:active,
       &.active {
         opacity: 1;
-        cursor: pointer;
       }
     }
 

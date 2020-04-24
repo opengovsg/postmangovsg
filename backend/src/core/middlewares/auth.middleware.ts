@@ -152,4 +152,9 @@ const verifyOtp = async (req: Request, res: Response, next: NextFunction): Promi
  
 }
 
-export { getOtp, verifyOtp }
+const getUser = async (req: Request, res: Response): Promise<Response | void> => {
+  const user = await User.findOne({ where: { id: req?.session?.user?.id } })
+  return res.status(200).json({ email: user?.email })
+}
+
+export { getOtp, verifyOtp, getUser }
