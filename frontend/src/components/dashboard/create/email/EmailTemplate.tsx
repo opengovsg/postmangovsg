@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { TextArea, PrimaryButton } from 'components/common'
+import { TextArea, PrimaryButton, ErrorBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/email.service'
 
@@ -8,16 +8,20 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
   { subject: string; body: string; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [body, setBody] = useState(initialBody)
+  const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
-  const params: {id?: string} = useParams()
+  const { id: campaignId } = useParams()
 
   async function handleSaveTemplate(): Promise<void> {
+    setErrorMsg(null)
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await saveTemplate(+params.id!, subject, body)
-      onNext({ subject, body })
-    } catch(err){
-      console.error(err)
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
+      }
+      const { numRecipients } = await saveTemplate(+campaignId, subject, body)
+      onNext({ subject, body, numRecipients })
+    } catch (err) {
+      setErrorMsg(err.message)
     }
   }
 
@@ -33,11 +37,11 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
       <p>
         To personalise your message, include keywords that are surrounded by double curly braces.
         The keywords in your message template should match the headers in your recipients CSV file.
-        <br/>
+        <br />
         <b>Note:</b> Recipient is a required column in the CSV file.
       </p>
       <p>
-        Example<br/>
+        Example<br />
         Reminder: Dear {'{{ name }}'}, your next appointment at {'{{ clinic }}'} is on {'{{ date }}'}
         at {'{{ time }}'}.
       </p>
@@ -46,6 +50,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
       <div className="progress-button">
         <PrimaryButton disabled={!body || !subject} onClick={handleSaveTemplate}>Upload Recipients →</PrimaryButton>
       </div>
+      <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )
 }
