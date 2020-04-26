@@ -17,7 +17,7 @@ export class SMSCampaign extends Campaign {
 
   constructor(input: any) {
     super(input)
-    this.body = input['sms_templates'].body
+    this.body = input['sms_templates']?.body
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
     this.preview = input['preview']
