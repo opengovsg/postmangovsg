@@ -12,7 +12,7 @@ import AppLogo from 'assets/img/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
 
 const NavBar = () => {
-  const { setAuthenticated } = useContext(AuthContext)
+  const { setAuthenticated, email } = useContext(AuthContext)
   const modalContext = useContext(ModalContext)
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
@@ -24,10 +24,10 @@ const NavBar = () => {
   }
 
   async function handleLogout() {
-    try{
+    try {
       await logout()
       setAuthenticated(false)
-    }catch(err){
+    } catch (err) {
       console.error(err)
     }
   }
@@ -54,7 +54,7 @@ const NavBar = () => {
 
         <div className={styles.separator}></div>
 
-        <span className={cx(styles.active, styles.link, styles.right)}>postman@open.gov.sg</span>
+        <span className={cx(styles.active, styles.link, styles.noClick, styles.right)}>{email}</span>
         <a className={cx(styles.active, styles.link, styles.right, styles.iconLink)} onClick={handleLogout}>
           Sign out
           <i className={cx(styles.icon, 'bx bx-log-out-circle')}></i>

@@ -53,6 +53,7 @@ const uploadStartValidator = {
 const uploadCompleteValidator = {
   [Segments.BODY]: Joi.object({
     transactionId: Joi.string().required(),
+    filename: Joi.string().required(),
   }),
 }
 
@@ -219,7 +220,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     })
 
     // extract s3Key from transactionId
-    const { transactionId } = req.body
+    const { transactionId, filename } = req.body
     let s3Key: string
     try {
       s3Key = extractS3Key(transactionId)
@@ -236,7 +237,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
 
     // Updates metadata in project
-    await updateCampaignS3Metadata({ key: s3Key, campaignId })
+    await updateCampaignS3Metadata({ key: s3Key, campaignId, filename })
 
     // carry out templating / hydration
     // - download from s3
@@ -413,8 +414,11 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *             schema:
  *               required:
  *                 - transactionId
+ *                 - filename
  *               properties:
  *                 transactionId:
+ *                   type: string
+ *                 filename:
  *                   type: string
  *       responses:
  *         200:
@@ -504,35 +508,6 @@ router.get('/preview', celebrate(previewMessageValidator), previewMessage)
  *              type: object
  *              properties:
  *                rate:
- *                  type: integer
- *                  minimum: 1
- *
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- */
-router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCampaign)
-
-/**
- * @swagger
- * path:
- *  /campaign/{campaignId}/email/send:
- *    post:
- *      tags:
- *        - Email
- *      summary: Start sending campaign
- *      requestBody:
- *        required: false
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                rate:
- *                  example: 10
  *                  type: integer
  *                  minimum: 1
  *

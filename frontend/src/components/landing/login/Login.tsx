@@ -10,7 +10,7 @@ const otpText = 'One-Time Password'
 const emailButtonText = ['Get OTP', 'Sending OTP...']
 const otpButtonText = ['Sign In', 'Verifying OTP...']
 const emailPlaceholder = 'e.g. postman@agency.gov.sg'
-const otpPlaceholder = 'enter OTP sent to your email'
+const otpPlaceholder = 'Enter OTP'
 
 const RESEND_WAIT_TIME = 30000
 
@@ -88,7 +88,7 @@ const Login = () => {
           onClick={onClick}>
           {isLoading ? buttonText[1] : buttonText[0]}
         </TextInputWithButton>
-        <ErrorBlock className={styles.errorBlock}>
+        <ErrorBlock absolute={true}>
           {errorMsg}
         </ErrorBlock>
       </>

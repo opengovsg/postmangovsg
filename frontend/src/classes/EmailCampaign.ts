@@ -18,12 +18,12 @@ export class EmailCampaign extends Campaign {
 
   constructor(input: any) {
     super(input)
-    this.body = input['body']
-    this.subject = input['subject']
-    this.csvFilename = input['csvFilename']
-    this.numRecipients = input['numRecipients']
+    this.body = input['email_templates']?.body
+    this.subject = input['email_templates']?.subject
+    this.csvFilename = input['csv_filename']
+    this.numRecipients = input['num_recipients']
     this.preview = input['preview']
-    this.hasCredential = input['hasCredential']
+    this.hasCredential = input['has_credential']
     this.setProgress()
   }
 

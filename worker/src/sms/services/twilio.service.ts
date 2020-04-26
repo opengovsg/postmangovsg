@@ -1,5 +1,6 @@
 import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces/credentials.interface'
+import config from '@core/config'
 
 export class TwilioService {
   private client: any;
@@ -11,15 +12,15 @@ export class TwilioService {
     this.messagingServiceSid = messagingServiceSid
   }
 
-  public send(recipient: string, message: string): Promise<string | void>{
+  public send(recipient: string, message: string): Promise<string | void> {
     return this.client.messages.create({
-      to: recipient,
+      to: this.addDefaultCountryCode(recipient),
       body: message,
       from: this.messagingServiceSid,
-    }).then((result: {[key: string]: string}) => {
+    }).then((result: { [key: string]: string }) => {
       const { status, sid, error_code: errorCode, code } = result
-      if(sid){
-        if(errorCode || code){
+      if (sid) {
+        if (errorCode || code) {
           return Promise.reject(new Error(`${sid};${errorCode};${code}`))
         }
         else {
@@ -30,5 +31,12 @@ export class TwilioService {
         return Promise.reject(new Error(`${status};Unknown error`))
       }
     })
+  }
+
+  private addDefaultCountryCode(recipient: string): string {
+    if (!recipient.startsWith('+') && config.defaultCountryCode) {
+      return `+${config.defaultCountryCode}${recipient}`
+    }
+    return recipient
   }
 }

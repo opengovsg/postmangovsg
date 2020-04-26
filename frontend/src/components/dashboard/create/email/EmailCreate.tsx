@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { cloneDeep } from 'lodash'
 
 import { EmailCampaign, EmailProgress } from 'classes/EmailCampaign'
 import { ProgressPane } from 'components/common'
@@ -24,8 +25,9 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
 
   // Modifies campaign object in state and navigates to next step
   const onNext = (changes: any, next = true) => {
-    setCampaign(Object.assign(campaign, changes))
-    campaign.setProgress()
+    const updatedCampaign = Object.assign(cloneDeep(campaign), changes) as EmailCampaign
+    updatedCampaign.setProgress()
+    setCampaign(updatedCampaign)
     if (next) {
       setActiveStep(activeStep + 1)
     }
@@ -43,7 +45,7 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
         )
       case EmailProgress.SendTestMessage:
         return (
-          <EmailCredentials hasCredential={campaign.hasCredential} onNext={onNext}/>
+          <EmailCredentials hasCredential={campaign.hasCredential} onNext={onNext} />
         )
       case EmailProgress.Send:
         return (

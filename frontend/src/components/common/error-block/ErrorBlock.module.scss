@@ -3,11 +3,14 @@
 
 .relativeContainer {
   position: relative;
+  width: 100%;
 
   .errorBlock {
-    position: absolute;
-    left: 0;
-    right: 0;
+    &.absolute {
+      position: absolute;
+      left: 0;
+      right: 0;
+    }
     @include block($light-red, $red);
   }
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { cloneDeep } from 'lodash'
 
 import { SMSCampaign, SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
@@ -23,8 +24,9 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
 
   // Modifies campaign object in state and navigates to next step
   const onNext = (changes: any, next = true) => {
-    setCampaign(Object.assign(campaign, changes))
-    campaign.setProgress()
+    const updatedCampaign = Object.assign(cloneDeep(campaign), changes) as SMSCampaign
+    updatedCampaign.setProgress()
+    setCampaign(updatedCampaign)
     if (next) {
       setActiveStep(activeStep + 1)
     }

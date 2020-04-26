@@ -1,75 +1,55 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import axios, { AxiosResponse } from 'axios'
-
-import {
-  completeFileUpload,
-  getPresignedUrl,
-  getPreviewMessage,
-} from 'services/email.service'
-import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
+import { completeFileUpload, getPresignedUrl, getPreviewMessage } from 'services/email.service'
+import { uploadFileWithPresignedUrl } from 'services/upload.service'
+import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
 
 const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { id: number; csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
   const [messagePreview, setMessagePreview] = useState('')
 
-  const params: { id?: string } = useParams()
+  const { id: campaignId } = useParams()
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
+    setErrorMessage(null)
+
     try {
       // user did not select a file
-      if (!files[0]) {
+      if (!files[0] || !campaignId) {
         return
       }
+      const uploadedFile = files[0]
+      // Get presigned url from postman server
+      const startUploadResponse = await getPresignedUrl({
+        campaignId: +campaignId,
+        mimeType: uploadedFile.type,
+      })
+      // Upload to presigned url
+      await uploadFileWithPresignedUrl(uploadedFile, startUploadResponse.presignedUrl)
+      const uploadResponse = await completeFileUpload({
+        campaignId: +campaignId,
+        transactionId: startUploadResponse.transactionId,
+        filename: uploadedFile.name,
+      })
+
+      // Set state
+      setUploadedCsvFilename(uploadedFile.name)
+      setNumRecipients(uploadResponse.num_recipients)
+
+      // Store filename and numRecipients in campaign object
+      onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
 
       // where do i put this
       const msgPreview = await getPreviewMessage(id)
       setMessagePreview(msgPreview)
-
-      const uploadedFile = files[0]
-      const campaignId = +params.id!
-
-      const startUploadResponse = await getPresignedUrl({
-        campaignId,
-        mimeType: uploadedFile.type,
-      })
-      console.log('obtained s3 presigned url')
-
-      const s3AxiosInstance = axios.create({
-        withCredentials: false,
-      })
-      await s3AxiosInstance.put(startUploadResponse.presignedUrl, uploadedFile, {
-        headers: { 'Content-Type': uploadedFile.type },
-      })
-      console.log('PUT to s3 succeeded')
-
-      // POST to upload complete
-      const uploadResponse = await completeFileUpload({
-        campaignId,
-        transactionId: startUploadResponse.transactionId,
-      })
-
-      setUploadedCsvFilename(uploadedFile.name)
-      setNumRecipients(uploadResponse.num_recipients)
-
     } catch (err) {
-      const axiosError: AxiosResponse = err.response
-      if (axiosError !== undefined) {
-        if (axiosError.status === 400) {
-          setErrorMessage(axiosError?.data?.message)
-        } else {
-          setErrorMessage('Error uploading file.')
-        }
-        console.error(axiosError)
-      } else {
-        console.error(err)
-      }
+      setErrorMessage(err.message)
     } finally {
       setIsUploading(false)
     }
@@ -84,30 +64,23 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       <p>
         CSV file must include a <b>recipient</b> column with recipients&apos; email addresses
       </p>
-      {!isUploading && numRecipients > 0 &&
+      {numRecipients > 0 &&
         <InfoBlock>
           <li>
             <i className="bx bx-user-check"></i><p>{numRecipients} recipients</p>
           </li>
-          {csvFilename ? (
-            <li>
-              <i className='bx bx-file'></i>
-              <p>{csvFilename}</p>
-            </li>
-          ) : (
-            <></>
-          )}
+          {csvFilename &&
+            <li><i className='bx bx-file'></i><p>{csvFilename}</p></li>
+          }
         </InfoBlock>
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
 
-      {
-        errorMessage.length !== 0 ? <div>Error: {errorMessage}</div> : <></>
-      }
+      <ErrorBlock>{errorMessage}</ErrorBlock>
 
       <div className="separator"></div>
       {
-        csvFilename &&
+        messagePreview &&
         <>
           <p>Message preview</p>
           <InfoBlock>{messagePreview}</InfoBlock>
@@ -115,7 +88,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
         </>
       }
       <div className="progress-button">
-        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Preview →</PrimaryButton>
+        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={onNext}>Preview →</PrimaryButton>
       </div>
     </>
   )
