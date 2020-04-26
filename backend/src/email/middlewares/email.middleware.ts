@@ -17,10 +17,10 @@ const sendEmail = async (mail: MailToSend): Promise<string | void> => {
     logger.error(`Error while sending test email. error=${e}`)
     return
   }
-} 
+}
 
 const getEmailTemplate = (campaignId: string): Promise<EmailTemplate> => {
-  return  EmailTemplate.findOne({ where: { campaignId }, attributes:['body', 'subject'] })
+  return EmailTemplate.findOne({ where: { campaignId }, attributes: ['body', 'subject'] })
 }
 
 const getEmailContent = async (campaignId: string): Promise<EmailContent | null> => {
@@ -33,10 +33,10 @@ const getEmailContent = async (campaignId: string): Promise<EmailContent | null>
   return { subject, body }
 }
 
-const getParams = async (campaignId: string): Promise<{[key: string]: string} | null> => {
-  const emailMessage = await EmailMessage.findOne({ where: { campaignId }, attributes:['params'] })
+const getParams = async (campaignId: string): Promise<{ [key: string]: string } | null> => {
+  const emailMessage = await EmailMessage.findOne({ where: { campaignId }, attributes: ['params'] })
   if (!emailMessage) return null
-  return emailMessage.params as {[key: string]: string}
+  return emailMessage.params as { [key: string]: string }
 }
 
 const getHydratedMail = async (campaignId: string, recipient: string): Promise<MailToSend | null> => {
@@ -53,7 +53,7 @@ const getHydratedMail = async (campaignId: string, recipient: string): Promise<M
 
   const hydratedSubject = template(subject, params)
   const hydratedBody = template(body, params)
-  return { 
+  return {
     recipients: [recipient],
     body: hydratedBody,
     subject: hydratedSubject,
@@ -62,19 +62,19 @@ const getHydratedMail = async (campaignId: string, recipient: string): Promise<M
 
 // TODO
 const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
+  try {
     const { campaignId } = req.params
     const { id: userId } = req.session?.user
     const campaign = await Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.Email } })
     return campaign ? next() : res.sendStatus(400)
-  }catch(err){
+  } catch (err) {
     return next(err)
   }
 }
 
 // Sends a test email
 const storeCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
+  try {
     const { campaignId } = req.params
     const { recipient } = req.body
 
@@ -85,8 +85,8 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
     if (!isEmailSent) {
       return res.sendStatus(500)
     }
-    else{
-      await Campaign.update({ credName: 'EMAIL_DEFAULT' } , { where: { id: +campaignId } })
+    else {
+      await Campaign.update({ credName: 'EMAIL_DEFAULT' }, { where: { id: +campaignId } })
       return res.json({ message: 'OK' })
     }
   } catch (err) {
@@ -96,12 +96,14 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
 }
 
 const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
+  try {
     const { campaignId } = req.params
-    const campaign: Campaign | null =  await Campaign.findOne({ 
-      where: { id: +campaignId }, 
+    const campaign: Campaign | null = await Campaign.findOne({
+      where: { id: +campaignId },
       attributes: [
-        'id', 'name', 'type', 'created_at', 'valid', [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+        'id', 'name', 'type', 'created_at', 'valid',
+        [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+        [literal('s3_object -> \'filename\''), 'csv_filename'],
       ],
       include: [
         {
@@ -119,7 +121,7 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
       }
     )
     return res.json({ campaign, 'num_recipients': numRecipients })
-  }catch(err){
+  } catch (err) {
     return next(err)
   }
 }

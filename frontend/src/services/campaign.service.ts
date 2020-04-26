@@ -8,41 +8,10 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
-function getStatus(jobs: Array<{status: string}>): string {
-  let result
-  const jobSet = new Set(jobs.map((x => x.status)))
-  if(jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')){
-    result = Status.Sending
-  }
-  else if(jobSet.has('SENT') || jobSet.has('LOGGED')){
-    result = Status.Sent
-  }
-  else{
-    result = Status.Draft
-  }
-  return result
-}
-
 export async function getCampaigns(): Promise<Array<Campaign>> {
   return axios.get('/campaigns').then((response) => {
     const campaigns: Campaign[] = response.data.map((data: any) => {
-      const { id,
-        type,
-        name,
-        has_credential: hasCredential,
-        created_at: createdAt,
-        job_queue : jobs,
-      } = data
-      const details =
-      {
-        id,
-        type,
-        name,
-        hasCredential,
-        createdAt,
-        status: getStatus(jobs),
-      }
-      return new Campaign(details)
+      return new Campaign(data)
     })
     return campaigns
   })
@@ -62,30 +31,11 @@ export async function getCampaignStats(campaignId: number): Promise<CampaignStat
 
 export async function getCampaignDetails(campaignId: number): Promise<EmailCampaign | SMSCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
-    const { campaign, num_recipients : numRecipients } = response.data
-    const { id,
-      type,
-      name,
-      has_credential: hasCredential,
-      created_at: createdAt,
-      job_queue : jobs,
-      email_templates: emailTemplate,
-      sms_templates: smsTemplate } = campaign
+    const { campaign, num_recipients: numRecipients } = response.data
 
+    const details = { ...campaign, 'num_recipients': numRecipients }
 
-    const details = {
-      id,
-      type,
-      name,
-      hasCredential,
-      createdAt,
-      status: getStatus(jobs),
-      numRecipients,
-      ...emailTemplate,
-      ...smsTemplate,
-    }
-    
-    switch(type){
+    switch (campaign.type) {
       case ChannelType.SMS:
         return new SMSCampaign(details)
       case ChannelType.Email:
@@ -103,16 +53,16 @@ export async function createCampaign(name: string, type: ChannelType): Promise<C
     })
 }
 
-export async function sendCampaign(campaignId: number): Promise<boolean>{
-  return axios.post(`/campaign/${campaignId}/send`).then((response) => response.status===200)
+export async function sendCampaign(campaignId: number): Promise<boolean> {
+  return axios.post(`/campaign/${campaignId}/send`).then((response) => response.status === 200)
 }
 
-export async function stopCampaign(campaignId: number): Promise<boolean>{
-  return axios.post(`/campaign/${campaignId}/stop`).then((response) => response.status===200)
+export async function stopCampaign(campaignId: number): Promise<boolean> {
+  return axios.post(`/campaign/${campaignId}/stop`).then((response) => response.status === 200)
 }
 
-export async function retryCampaign(campaignId: number): Promise<boolean>{
-  return axios.post(`/campaign/${campaignId}/retry`).then((response) => response.status===200)
+export async function retryCampaign(campaignId: number): Promise<boolean> {
+  return axios.post(`/campaign/${campaignId}/retry`).then((response) => response.status === 200)
 }
 export async function getPreviewMessage(campaignId: number) {
   return 'something hola'

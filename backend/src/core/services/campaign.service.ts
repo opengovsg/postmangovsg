@@ -5,10 +5,11 @@ import logger from '@core/logger'
 
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
 
-const updateCampaignS3Metadata = ({ key, campaignId }: {key: string; campaignId: string}): Promise<[number, Campaign[]]> => {
+const updateCampaignS3Metadata = ({ key, campaignId, filename }: { key: string; campaignId: string; filename: string }): Promise<[number, Campaign[]]> => {
   const s3Object = {
     key,
     bucket: FILE_STORAGE_BUCKET_NAME,
+    filename,
   }
 
   return Campaign

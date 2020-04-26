@@ -1,67 +1,51 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { FileInput, InfoBlock, PrimaryButton } from 'components/common'
+import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
 
 import { getPresignedUrl, completeFileUpload } from 'services/sms.service'
-import axios, { AxiosResponse } from 'axios'
+import { uploadFileWithPresignedUrl } from 'services/upload.service'
 
 const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
-  const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
 
-  const params: { id?: string } = useParams()
+  const { id: campaignId } = useParams()
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
+    setErrorMessage(null)
 
     try {
       // user did not select a file
-      if (!files[0]) {
+      if (!files[0] || !campaignId) {
         return
       }
-
       const uploadedFile = files[0]
-      const campaignId = +params.id!
-
+      // Get presigned url from postman server
       const startUploadResponse = await getPresignedUrl({
-        campaignId,
+        campaignId: +campaignId,
         mimeType: uploadedFile.type,
       })
-      console.log('obtained s3 presigned url')
-
-      const s3AxiosInstance = axios.create({
-        withCredentials: false,
-      })
-      await s3AxiosInstance.put(startUploadResponse.presignedUrl, uploadedFile, {
-        headers: { 'Content-Type': uploadedFile.type },
-      })
-      console.log('PUT to s3 succeeded')
-
-      // POST to upload complete
+      // Upload to presigned url
+      await uploadFileWithPresignedUrl(uploadedFile, startUploadResponse.presignedUrl)
       const uploadResponse = await completeFileUpload({
-        campaignId,
+        campaignId: +campaignId,
         transactionId: startUploadResponse.transactionId,
+        filename: uploadedFile.name,
       })
 
+      // Set state
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
+      onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
+
     } catch (err) {
-      const axiosError: AxiosResponse = err.response
-      if (axiosError !== undefined) {
-        if (axiosError.status === 400) {
-          setErrorMessage(axiosError?.data?.message)
-        } else {
-          setErrorMessage('Error uploading file.')
-        }
-        console.error(axiosError)
-      } else {
-        console.error(err)
-      }
+      setErrorMessage(err.message)
     } finally {
       setIsUploading(false)
     }
@@ -76,29 +60,22 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       <p>
         CSV file must include a <b>recipient</b> column with recipients&apos; mobile numbers
       </p>
-      {!isUploading && numRecipients > 0 &&
+      {numRecipients > 0 &&
         <InfoBlock>
           <li>
-            <i className="bx bx-user-check"></i><span>{numRecipients} recipients</span>
+            <i className="bx bx-user-check"></i><p>{numRecipients} recipients</p>
           </li>
-          {csvFilename ? (
-            <li>
-              <i className='bx bx-file'></i>
-              <span>{csvFilename}</span>
-            </li>
-          ) : (
-            <></>
-          )}
+          {csvFilename &&
+            <li><i className='bx bx-file'></i><p>{csvFilename}</p></li>
+          }
         </InfoBlock>
       }
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
 
-      {
-        errorMessage.length !== 0 ? <div>Error: {errorMessage}</div> : <></>
-      }
+      <ErrorBlock>{errorMessage}</ErrorBlock>
 
       <div className="progress-button">
-        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={() => onNext({ csvFilename, numRecipients })}>Insert Credentials →</PrimaryButton>
+        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={onNext}>Insert Credentials →</PrimaryButton>
       </div>
     </>
   )
