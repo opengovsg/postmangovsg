@@ -101,17 +101,17 @@ const getStatsFromTable = async (model: any, campaignId: string): Promise<{error
 
 
 const getSmsStats = async (campaignId: string): Promise<CampaignStats> => {
-const job = await JobQueue.findOne({ where: { campaignId } })
-if (job === null) throw new Error('Unable to find campaign in job queue table.')
+  const job = await JobQueue.findOne({ where: { campaignId } })
+  if (job === null) throw new Error('Unable to find campaign in job queue table.')
 
-// Gets from email ops table if status is SENDING or SENT
-if (job.status === 'SENDING' || job.status === 'SENT') {
-  const stats = await getStatsFromTable(SmsOp, campaignId) 
+  // Gets from email ops table if status is SENDING, SENT, or STOPPED
+  if (job.status === 'SENDING' || job.status === 'SENT' || job.status === 'STOPPED') {
+    const stats = await getStatsFromTable(SmsOp, campaignId) 
+    return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
+  }
+
+  const stats = await getStatsFromTable(SmsMessage, campaignId) 
   return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
-}
-
-const stats = await getStatsFromTable(SmsMessage, campaignId) 
-return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
 } 
 
 export { populateSmsTemplate, upsertSmsTemplate, getSmsStats }
