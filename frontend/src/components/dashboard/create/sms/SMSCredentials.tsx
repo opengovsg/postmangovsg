@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { validateCredentials } from 'services/sms.service'
-import { TextInput, PrimaryButton, TextInputWithButton } from 'components/common'
+import { TextInput, PrimaryButton, TextInputWithButton, ErrorBlock } from 'components/common'
 import styles from '../Create.module.scss'
 import { useParams } from 'react-router-dom'
 
@@ -15,7 +15,8 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   const [recipient, setRecipient] = useState('')
   const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
   const [isValidating, setIsValidating] = useState(false)
-  const params: { id?: string } = useParams()
+  const [errorMsg, setErrorMsg] = useState(null)
+  const { id: campaignId } = useParams()
 
   function isButtonDisabled() {
     return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\+?\d+$/g).test(recipient)
@@ -30,25 +31,28 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   }
 
   async function handleValidateCredentials() {
+    setErrorMsg(null)
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const campaignId = +params.id!
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
+      }
       setIsValidating(true)
-      const isValid = await validateCredentials({
-        campaignId,
+      await validateCredentials({
+        campaignId: +campaignId,
         accountSid,
         apiKey,
         apiSecret,
         messagingServiceSid,
         recipient,
       })
-      setHasCredential(isValid)
+      setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
-      onNext({ hasCredential: isValid }, false)
+      onNext({ hasCredential: true }, false)
       resetFields()
     } catch (err) {
-      console.error(err)
+      setErrorMsg(err.message)
     }
     setIsValidating(false)
   }
@@ -139,6 +143,9 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
             <>
               <h2>Insert your SMS credentials</h2>
               {renderCredentialFields()}
+              <ErrorBlock>
+                {errorMsg}
+              </ErrorBlock>
             </>
           )
       }

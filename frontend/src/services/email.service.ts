@@ -26,12 +26,14 @@ export async function saveTemplate(campaignId: number, subject: string, body: st
   }
 }
 
-export async function sendPreviewMessage({ campaignId, recipient }: { campaignId: number; recipient: string }): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/email/credentials`, {
-    recipient,
-  }).then((response) => {
-    return response.status === 200
-  })
+export async function sendPreviewMessage({ campaignId, recipient }: { campaignId: number; recipient: string }): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/email/credentials`, {
+      recipient,
+    })
+  } catch (e) {
+    errorHandler(e, 'Send preview message failed')
+  }
 }
 
 export async function getPresignedUrl({

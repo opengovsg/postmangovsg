@@ -34,16 +34,18 @@ export async function validateCredentials({
   apiSecret: string;
   messagingServiceSid: string;
   recipient: string;
-}): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/sms/credentials`, {
-    twilioAccountSid: accountSid,
-    twilioApiKey: apiKey,
-    twilioApiSecret: apiSecret,
-    twilioMessagingServiceSid: messagingServiceSid,
-    recipient,
-  }).then((response) => {
-    return response.status === 200
-  })
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/sms/credentials`, {
+      twilioAccountSid: accountSid,
+      twilioApiKey: apiKey,
+      twilioApiSecret: apiSecret,
+      twilioMessagingServiceSid: messagingServiceSid,
+      recipient,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error validating credentials.')
+  }
 }
 
 export async function getPresignedUrl({
