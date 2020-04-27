@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 import { Status, CampaignStats } from 'classes/Campaign'
-import { getCampaignStats } from 'services/campaign.service'
+import { getCampaignStats, stopCampaign, retryCampaign } from 'services/campaign.service'
 import { ProgressDetails } from 'components/common'
 
 const SMSDetail = ({ id, sentAt, numRecipients }: { id: number; sentAt: Date; numRecipients: number }) => {
@@ -14,13 +14,31 @@ const SMSDetail = ({ id, sentAt, numRecipients }: { id: number; sentAt: Date; nu
     return campaignStats
   }
 
+  async function handlePause(){
+    try{
+      await stopCampaign(id)
+      await refreshCampaignStats()
+    } catch(err) {
+      console.error(err)
+    }
+  }
+
+  async function handleRetry(){
+    try{
+      await retryCampaign(id)
+      await refreshCampaignStats()
+    } catch(err) {
+      console.error(err)
+    }
+  }
+
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
 
     async function poll() {
       const { status } = await refreshCampaignStats()
 
-      if (status === Status.Sending) {
+      if (status !== Status.Sent) {
         timeoutId = setTimeout(poll, 2000)
       }
     }
@@ -29,7 +47,7 @@ const SMSDetail = ({ id, sentAt, numRecipients }: { id: number; sentAt: Date; nu
     return () => {
       timeoutId && clearTimeout(timeoutId)
     }
-  }, [])
+  }, [stats.status])
 
   return (
     <>
@@ -53,7 +71,13 @@ const SMSDetail = ({ id, sentAt, numRecipients }: { id: number; sentAt: Date; nu
 
       {
         stats.status &&
-        <ProgressDetails sentAt={sentAt} numRecipients={numRecipients} stats={stats} />
+        <ProgressDetails
+          sentAt={sentAt}
+          numRecipients={numRecipients}
+          stats={stats}
+          handlePause={handlePause}
+          handleRetry={handleRetry}
+        />
       }
     </>
   )
