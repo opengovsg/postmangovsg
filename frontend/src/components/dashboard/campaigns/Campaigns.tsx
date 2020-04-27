@@ -2,9 +2,11 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
+import { upperFirst } from 'lodash'
 
 import { POSTMAN_GUIDE_URL } from 'config'
 import { ModalContext } from 'contexts/modal.context'
+import { AuthContext } from 'contexts/auth.context'
 import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { Campaign, ChannelType } from 'classes'
@@ -16,12 +18,21 @@ import styles from './Campaigns.module.scss'
 const ITEMS_PER_PAGE = 10
 
 const Campaigns = () => {
+  const { email } = useContext(AuthContext)
   const modalContext = useContext(ModalContext)
   const [isLoading, setLoading] = useState(true)
   const [campaigns, setCampaigns] = useState(new Array<Campaign>())
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(new Array<Campaign>())
   const [selectedPage, setSelectedPage] = useState(0)
   const history = useHistory()
+  const name = getEmailFromName(email)
+  const title = `Welcome, ${name}`
+
+  function getEmailFromName(email: string): string {
+    const parts = email.split('@')
+    const [ nameParts ] = parts
+    return nameParts.split('_').map((n) => upperFirst(n)).join(' ')
+  }
 
   async function fetchCampaigns() {
     const campaigns = await getCampaigns()
@@ -140,7 +151,7 @@ const Campaigns = () => {
 
   return (
     <>
-      <TitleBar title="Welcome, Agency">
+      <TitleBar title={ title }>
         <PrimaryButton
           onClick={() => modalContext.setModalContent(
             <CreateCampaign></CreateCampaign>
