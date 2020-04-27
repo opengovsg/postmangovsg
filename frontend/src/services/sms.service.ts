@@ -11,12 +11,18 @@ interface UploadCompleteResponse {
   hydrated_record: string;
 }
 
-export async function saveTemplate(campaignId: number, body: string): Promise<boolean> {
-  return axios.put(`/campaign/${campaignId}/sms/template`, {
-    body,
-  }).then((response) => {
-    return response.status === 200
-  })
+export async function saveTemplate(campaignId: number, body: string): Promise<{ numRecipients: number }> {
+  try {
+    const response = await axios.put(`/campaign/${campaignId}/sms/template`, {
+      body,
+    })
+    const { num_recipients: numRecipients, message } = response.data
+    // How should we show this message?
+    console.log(message)
+    return { numRecipients }
+  } catch (e) {
+    errorHandler(e, 'Error saving template.')
+  }
 }
 
 export async function validateCredentials({
@@ -28,16 +34,18 @@ export async function validateCredentials({
   apiSecret: string;
   messagingServiceSid: string;
   recipient: string;
-}): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/sms/credentials`, {
-    twilioAccountSid: accountSid,
-    twilioApiKey: apiKey,
-    twilioApiSecret: apiSecret,
-    twilioMessagingServiceSid: messagingServiceSid,
-    recipient,
-  }).then((response) => {
-    return response.status === 200
-  })
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/sms/credentials`, {
+      twilioAccountSid: accountSid,
+      twilioApiKey: apiKey,
+      twilioApiSecret: apiSecret,
+      twilioMessagingServiceSid: messagingServiceSid,
+      recipient,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error validating credentials.')
+  }
 }
 
 export async function getPresignedUrl({

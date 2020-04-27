@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { sendPreviewMessage } from 'services/email.service'
-import { PrimaryButton, TextInputWithButton, InfoBlock } from 'components/common'
+import { PrimaryButton, TextInputWithButton, InfoBlock, ErrorBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
 import isEmail from 'validator/lib/isEmail'
 
@@ -10,7 +10,8 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [recipient, setRecipient] = useState('')
   const [isValidating, setIsValidating] = useState(false)
-  const params: { id?: string } = useParams()
+  const [errorMsg, setErrorMsg] = useState(null)
+  const { id: campaignId } = useParams()
 
   function isButtonDisabled() {
     return !isEmail(recipient)
@@ -21,20 +22,22 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
   }
 
   async function handleTestSend() {
+    setErrorMsg(null)
     try {
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
+      }
       setIsValidating(true)
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const campaignId = +params.id!
-      const isValid = await sendPreviewMessage({
-        campaignId,
+      await sendPreviewMessage({
+        campaignId: +campaignId,
         recipient,
       })
-      setHasCredential(isValid)
+      setHasCredential(true)
       // Saves hasCredential property but do not advance to next step
-      onNext({ hasCredential: isValid }, false)
+      onNext({ hasCredential: true }, false)
       resetFields()
     } catch (err) {
-      console.error(err)
+      setErrorMsg(err.message)
     }
     setIsValidating(false)
   }
@@ -56,6 +59,9 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
           >
             Test your email
           </TextInputWithButton>
+          <ErrorBlock>
+            {errorMsg}
+          </ErrorBlock>
 
           {
             hasCredential &&

@@ -11,21 +11,29 @@ interface UploadCompleteResponse {
   hydrated_record: string;
 }
 
-export async function saveTemplate(campaignId: number, subject: string, body: string): Promise<boolean> {
-  return axios.put(`/campaign/${campaignId}/email/template`, {
-    body,
-    subject,
-  }).then((response) => {
-    return response.status === 200
-  })
+export async function saveTemplate(campaignId: number, subject: string, body: string): Promise<{ numRecipients: number }> {
+  try {
+    const response = await axios.put(`/campaign/${campaignId}/email/template`, {
+      body,
+      subject,
+    })
+    const { num_recipients: numRecipients, message } = response.data
+    // How should we show this message?
+    console.log(message)
+    return { numRecipients }
+  } catch (e) {
+    errorHandler(e, 'Error saving template')
+  }
 }
 
-export async function sendPreviewMessage({ campaignId, recipient }: { campaignId: number; recipient: string }): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/email/credentials`, {
-    recipient,
-  }).then((response) => {
-    return response.status === 200
-  })
+export async function sendPreviewMessage({ campaignId, recipient }: { campaignId: number; recipient: string }): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/email/credentials`, {
+      recipient,
+    })
+  } catch (e) {
+    errorHandler(e, 'Send preview message failed')
+  }
 }
 
 export async function getPresignedUrl({
