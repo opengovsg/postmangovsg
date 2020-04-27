@@ -8,7 +8,7 @@ const cloudwatchLoader = async (): Promise<void> => {
   const instanceId = await getInstanceId()
   if (instanceId) {
     logger.add(new WinstonCloudwatch({
-      logGroupName: 'postmangovsg-beanstalk-testing',
+      logGroupName: config.aws.logGroupName,
       logStreamName: instanceId,
       awsRegion: config.aws.awsRegion,
     }))
