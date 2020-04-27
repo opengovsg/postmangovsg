@@ -1,13 +1,6 @@
 import axios from 'axios'
 import { Campaign, CampaignStats, ChannelType, Status, SMSCampaign, EmailCampaign } from 'classes'
 
-// for dev use
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
-}
-
 function getSentAt(jobs: Array<{sent_at: Date}>): Date {
   const jobsSentAt = jobs.map((x => x.sent_at)).sort()
   // returns job with the earliest sentAt time
@@ -29,16 +22,31 @@ export async function getCampaigns(): Promise<Array<Campaign>> {
   })
 }
 
+function parseStatus (status: string) : Status {
+  switch (status){
+    case 'READY':
+    case 'ENQUEUED':
+    case 'SENDING':
+      return Status.Sending
+    case 'SENT':
+    case 'LOGGED':
+      return Status.Sent
+    default: 
+      return Status.Draft
+  }
+}
+
 export async function getCampaignStats(campaignId: number): Promise<CampaignStats> {
-  await sleep(100)
-  return Promise.resolve(new CampaignStats({
-    id: campaignId,
-    error: 12,
-    invalid: 10,
-    unsent: 199,
-    sent: 23,
-    status: Status.Sending,
-  }))
+  return axios.get(`/campaign/${campaignId}/stats`).then((response) => {
+    const { error, unsent, sent, status } = response.data
+    const details = { error, unsent, sent, status}
+    return new CampaignStats({
+      error,
+      unsent,
+      sent, 
+      status: parseStatus(status)
+    })
+  })
 }
 
 export async function getCampaignDetails(campaignId: number): Promise<EmailCampaign | SMSCampaign> {

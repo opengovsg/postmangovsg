@@ -10,7 +10,7 @@ import {
   testHydration,
   extractS3Key,
 } from '@core/services'
-import { populateSmsTemplate, upsertSmsTemplate } from '@sms/services'
+import { populateSmsTemplate, upsertSmsTemplate, getSmsStats } from '@sms/services'
 import {
   uploadStartHandler,
   sendCampaign,
@@ -279,6 +279,18 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
       return res.status(400).json({ message: err.message })
     }
+    return next(err)
+  }
+}
+
+// Get the stats of a campaign
+const campaignStatsHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  const { campaignId } = req.params
+
+  try {
+    const stats = await getSmsStats(+campaignId)
+    return res.json(stats)
+  } catch (err) {
     return next(err)
   }
 }
@@ -573,6 +585,30 @@ router.post('/stop', stopCampaign)
  *                type: object
  */
 router.post('/retry', canEditCampaign, retryCampaign)
+
+/**
+ * @swagger
+ * path:
+*  /campaign/{campaignId}/sms/stats:
+ *    get:
+ *      tags:
+ *        - SMS
+ *      summary: Get sms campaign stats
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ */
+router.get('/stats', campaignStatsHandler)
 
 
 export default router
