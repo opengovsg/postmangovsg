@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { getPreviewMessage } from 'services/campaign.service'
-import { completeFileUpload, getPresignedUrl } from 'services/email.service'
+import { completeFileUpload, getPresignedUrl, getPreviewMessage } from 'services/email.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
 import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
 
-const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { id: number; csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
+const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { id: number; csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [errorMessage, setErrorMessage] = useState(null)
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
@@ -15,8 +14,22 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
   const [previewBody, setPreviewBody] = useState('')
   const [previewSubject, setPreviewSubject] = useState('')
 
-
   const { id: campaignId } = useParams()
+
+  useEffect(() => {
+    loadPreview()
+  }, [campaignId])
+
+  async function loadPreview() {
+    if (!campaignId) {
+      throw new Error('Invalid campaign id')
+    }
+    const msgPreview = await getPreviewMessage(+campaignId)
+    if (msgPreview) {
+      setPreviewBody(msgPreview.body)
+      setPreviewSubject(msgPreview.subject)
+    }
+  }
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
@@ -45,11 +58,6 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if(msgPreview){
-        setPreviewBody(msgPreview?.body)
-        setPreviewSubject(msgPreview?.subject || '')
-      }
 
       // Store filename and numRecipients in campaign object
       onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)

@@ -20,7 +20,7 @@ const s3Client = new S3()
  * @param templateBody - template body
  * @param params - dict of param variables used for interpolation
  */
-const parseTemplate = (templateBody: string, params?: {[key: string]: string}): {
+const parseTemplate = (templateBody: string, params?: { [key: string]: string }): {
   variables: Array<string>;
   tokens: Array<string>;
 } => {
@@ -100,12 +100,12 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
   }
 }
 
-const template = (templateBody: string, params: {[key: string]: string}): string => {
+const template = (templateBody: string, params: { [key: string]: string }): string => {
   const parsed = parseTemplate(templateBody, params)
   return parsed.tokens.join('')
 }
 
-const checkTemplateKeysMatch = (csvRecord: {[key: string]: string}, templateParams: Array<string>): void => {
+const checkTemplateKeysMatch = (csvRecord: { [key: string]: string }, templateParams: Array<string>): void => {
   // if body exists, smsTemplate.params should also exist
   if (!isSuperSet(keys(csvRecord), templateParams)) {
     const missingKeys = difference(templateParams, keys(csvRecord))
@@ -116,11 +116,13 @@ const checkTemplateKeysMatch = (csvRecord: {[key: string]: string}, templatePara
 const testHydration = async ({
   campaignId,
   s3Key,
+  templateSubject,
   templateBody,
   templateParams,
 }: {
   campaignId: number;
   s3Key: string;
+  templateSubject?: string;
   templateBody: string;
   templateParams: Array<string>;
 }): Promise<TestHydrationResult> => {
@@ -142,7 +144,11 @@ const testHydration = async ({
   const firstRecord = fileContents[0]
   checkTemplateKeysMatch(firstRecord, templateParams)
 
-  const hydratedRecord = template(templateBody, records[0].params)
+  const hydratedRecord = { body: template(templateBody, records[0].params) } as { body: string; subject?: string }
+
+  if (templateSubject) {
+    hydratedRecord.subject = template(templateSubject, records[0].params)
+  }
 
   return {
     records,

@@ -144,7 +144,7 @@ const checkNewTemplateParams = async ({
 }
 
 const replaceNewLinesAndSanitize = (body: string): string => {
-  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g,'<br/>'), config.xssOptions.email)
+  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g, '<br/>'), config.xssOptions.email)
 }
 
 // Store body of message in email template table
@@ -234,7 +234,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
     // check if template exists
     const emailTemplate = await EmailTemplate.findOne({ where: { campaignId } })
-    if (emailTemplate === null || emailTemplate.body === null) {
+    if (!emailTemplate?.body || !emailTemplate?.subject || !emailTemplate.params) {
       return res.status(400).json({
         message: 'Template does not exist, please create a template',
       })
@@ -246,26 +246,23 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
-      const hydrationResult = await testHydration({
+      const { records, hydratedRecord } = await testHydration({
         campaignId: +campaignId,
         s3Key,
-        templateBody: emailTemplate.body!,
-        templateParams: emailTemplate.params!,
+        templateSubject: emailTemplate.subject,
+        templateBody: emailTemplate.body,
+        templateParams: emailTemplate.params,
       })
-      /* eslint-enable */
 
-      const recipientCount: number = hydrationResult.records.length
+      const recipientCount: number = records.length
       // START populate template
-      await populateEmailTemplate(+campaignId, hydrationResult.records)
+      // TODO: is actually populate message logs
+      await populateEmailTemplate(+campaignId, records)
 
-      /* eslint-disable @typescript-eslint/camelcase */
-      return res.status(202).json({
-        template_body: emailTemplate.body,
-        num_recipients: recipientCount,
-        hydrated_record: hydrationResult.hydratedRecord,
+      return res.json({
+        'num_recipients': recipientCount,
+        preview: hydratedRecord,
       })
-      /* eslint-enable */
 
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
@@ -426,12 +423,15 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *             application/json:
  *               schema:
  *                 properties:
- *                   template_body:
- *                     type: string
  *                   num_recipients:
  *                     type: string
- *                   hydrated_record:
- *                     type: string
+ *                   preview:
+ *                     type: object
+ *                     properties:
+ *                       subject:
+ *                         type: string
+ *                       body:
+ *                         type: string
  *         400:
  *           description: Invalid Request
  *         500:
@@ -486,6 +486,14 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                  preview:
+ *                    type: object
+ *                    properties:
+ *                      body:
+ *                        type: string
+ *                      subject: 
+ *                        type: string
  */
 router.get('/preview', previewFirstMessage)
 

@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
-import { getPreviewMessage } from 'services/campaign.service'
-import { getPresignedUrl, completeFileUpload } from 'services/sms.service'
+import { getPresignedUrl, completeFileUpload, getPreviewMessage } from 'services/sms.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
 
 const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
@@ -15,6 +14,20 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
   const [previewBody, setPreviewBody] = useState('')
 
   const { id: campaignId } = useParams()
+
+  useEffect(() => {
+    loadPreview()
+  }, [campaignId])
+
+  async function loadPreview() {
+    if (!campaignId) {
+      throw new Error('Invalid campaign id')
+    }
+    const msgPreview = await getPreviewMessage(+campaignId)
+    if (msgPreview) {
+      setPreviewBody(msgPreview?.body)
+    }
+  }
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
@@ -43,10 +56,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if(msgPreview){
-        setPreviewBody(msgPreview?.body)
-      }
+      await loadPreview()
 
       onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
 
