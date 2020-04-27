@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { completeFileUpload, getPresignedUrl, getPreviewMessage } from 'services/email.service'
+import { getPreviewMessage } from 'services/campaign.service'
+import { completeFileUpload, getPresignedUrl } from 'services/email.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
 import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
 
@@ -11,7 +12,9 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
-  const [messagePreview, setMessagePreview] = useState('')
+  const [previewBody, setPreviewBody] = useState('')
+  const [previewSubject, setPreviewSubject] = useState('')
+
 
   const { id: campaignId } = useParams()
 
@@ -42,17 +45,24 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
+      const msgPreview = await getPreviewMessage(id)
+      setPreviewBody(msgPreview.body)
+      setPreviewSubject(msgPreview.subject || '')
+
       // Store filename and numRecipients in campaign object
       onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
-
-      // where do i put this
-      const msgPreview = await getPreviewMessage(id)
-      setMessagePreview(msgPreview)
     } catch (err) {
       setErrorMessage(err.message)
     } finally {
       setIsUploading(false)
     }
+  }
+
+  function constructPreviewMessage(body: string, subject: string): string {
+    return `
+      <div><b>Subject:</b><p>${subject}</p></div>
+      <div><b>Body:</b><p>${body}</p></div>
+    `
   }
 
   return (
@@ -80,10 +90,11 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
 
       <div className="separator"></div>
       {
-        messagePreview &&
+        previewBody &&
         <>
           <p>Message preview</p>
-          <InfoBlock>{messagePreview}</InfoBlock>
+          <InfoBlock dangerouslySetInnerHTML={{ __html: constructPreviewMessage(previewBody, previewSubject) }}>
+          </InfoBlock>
           <div className="separator"></div>
         </>
       }

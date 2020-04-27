@@ -24,7 +24,7 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
   }
 
   function replaceNewLines(body: string): string {
-    return body.replace(/<br\s*\/>/g, '\n') || ''
+    return (body||'').replace(/<br\s*\/>/g, '\n')
   }
 
   return (

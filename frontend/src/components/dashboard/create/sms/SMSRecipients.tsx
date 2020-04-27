@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
-
+import { getPreviewMessage } from 'services/campaign.service'
 import { getPresignedUrl, completeFileUpload } from 'services/sms.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
 
@@ -12,6 +12,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
+  const [previewBody, setPreviewBody] = useState('')
 
   const { id: campaignId } = useParams()
 
@@ -41,6 +42,9 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       // Set state
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
+
+      const msgPreview = await getPreviewMessage(+campaignId)
+      setPreviewBody(msgPreview.body)
 
       onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
 
@@ -73,6 +77,17 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
+
+      <div className="separator"></div>
+      {
+        previewBody &&
+        <>
+          <p>Message preview</p>
+          <InfoBlock dangerouslySetInnerHTML={{ __html: previewBody }}>
+          </InfoBlock>
+          <div className="separator"></div>
+        </>
+      }
 
       <div className="progress-button">
         <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={onNext}>Insert Credentials →</PrimaryButton>

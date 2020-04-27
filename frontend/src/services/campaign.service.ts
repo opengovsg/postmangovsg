@@ -64,6 +64,9 @@ export async function stopCampaign(campaignId: number): Promise<boolean> {
 export async function retryCampaign(campaignId: number): Promise<boolean> {
   return axios.post(`/campaign/${campaignId}/retry`).then((response) => response.status === 200)
 }
-export async function getPreviewMessage(campaignId: number) {
-  return 'something hola'
+
+export async function getPreviewMessage(campaignId: number): Promise<{body: string, subject?:string}> {
+  return axios.get(`/campaign/${campaignId}/preview`).then((response)=>{
+    return response.data?.preview
+  })
 }

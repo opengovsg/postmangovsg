@@ -82,7 +82,3 @@ function errorHandler(e: AxiosError, defaultMsg: string): never {
   }
   throw new Error(defaultMsg)
 }
-
-export async function getPreviewMessage(campaignId: number): Promise<string> {
-  return Promise.resolve('something hola')
-}
