@@ -15,7 +15,7 @@ export class TwilioService {
   public send(recipient: string, message: string): Promise<string | void> {
     return this.client.messages.create({
       to: this.addDefaultCountryCode(recipient),
-      body: message,
+      body: this.replaceNewLines(message),
       from: this.messagingServiceSid,
     }).then((result: { [key: string]: string }) => {
       const { status, sid, error_code: errorCode, code } = result
@@ -38,5 +38,9 @@ export class TwilioService {
       return `+${config.defaultCountryCode}${recipient}`
     }
     return recipient
+  }
+
+  private replaceNewLines(body: string): string {
+    return (body||'').replace(/<br\s*\/>/g, '\n')
   }
 }

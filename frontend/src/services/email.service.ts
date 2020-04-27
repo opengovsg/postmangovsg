@@ -11,16 +11,16 @@ interface UploadCompleteResponse {
   hydrated_record: string;
 }
 
-export async function saveTemplate(campaignId: number, subject: string, body: string): Promise<{ numRecipients: number }> {
+export async function saveTemplate(campaignId: number, subject: string, body: string): Promise<{ numRecipients: number, updatedTemplate?: {body: string; subject: string}}> {
   try {
     const response = await axios.put(`/campaign/${campaignId}/email/template`, {
       body,
       subject,
     })
-    const { num_recipients: numRecipients, message } = response.data
+    const { num_recipients: numRecipients, message, updatedTemplate } = response.data
     // How should we show this message?
     console.log(message)
-    return { numRecipients }
+    return { numRecipients, updatedTemplate}
   } catch (e) {
     errorHandler(e, 'Error saving template')
   }
@@ -81,8 +81,4 @@ function errorHandler(e: AxiosError, defaultMsg: string): never {
     throw new Error(e.response.data.message)
   }
   throw new Error(defaultMsg)
-}
-
-export async function getPreviewMessage(campaignId: number): Promise<string> {
-  return Promise.resolve('something hola')
 }

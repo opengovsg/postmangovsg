@@ -1,7 +1,7 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
-
+import xss from 'xss'
 import { Campaign } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import {
@@ -24,8 +24,9 @@ import {
   RecipientColumnMissing,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
-import { storeCredentials, getCampaignDetails } from '@sms/middlewares'
+import { storeCredentials, getCampaignDetails, previewFirstMessage } from '@sms/middlewares'
 import logger from '@core/logger'
+import config from '@core/config'
 
 const router = Router({ mergeParams: true })
 
@@ -75,16 +76,6 @@ const storeCredentialsValidator = {
       .string()
       .trim()
       .required(),
-  }),
-}
-
-const previewMessageValidator = {
-  [Segments.QUERY]: Joi.object({
-    message: Joi
-      .number()
-      .integer()
-      .positive()
-      .optional(),
   }),
 }
 
@@ -163,12 +154,17 @@ const checkNewTemplateParams = async ({
   }
 }
 
+const replaceNewLinesAndSanitize = (body: string): string => {
+  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g,'<br/>'), config.xssOptions.sms)
+}
+
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
+    const { body } = req.body
     // extract params from template, save to db (this will be done with hook)
-    const updatedTemplate = await upsertSmsTemplate(req.body.body, +campaignId)
+    const updatedTemplate = await upsertSmsTemplate(replaceNewLinesAndSanitize(body), +campaignId)
 
     const firstRecord = await SmsMessage.findOne({
       where: { campaignId },
@@ -187,8 +183,11 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
           .json({
             message: 'Please re-upload your recipient list as template has changed.',
             extra_keys: check.extraKeys,
-            recipients: 0,
+            num_recipients: 0,
             valid: false,
+            updatedTemplate: {
+              body: updatedTemplate?.body,
+            },
           })
         /* eslint-enable */
       }
@@ -202,6 +201,9 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         message: `Template for campaign ${campaignId} updated`,
         valid: campaign?.valid,
         num_recipients: recipientCount,
+        updatedTemplate: {
+          body: updatedTemplate.body,
+        },
       })
     /* eslint-enable */
   } catch (err) {
@@ -279,11 +281,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     return next(err)
   }
-}
-
-// Get preview of one message
-const previewMessage = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'Message content' })
 }
 
 // Routes
@@ -496,13 +493,6 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *          required: true
  *          schema:
  *            type: string
- *        - in: query
- *          name: message
- *          description: message number, defaults to 1
- *          required: false
- *          schema:
- *            type: integer
- *            minimum: 1
  *
  *      responses:
  *        200:
@@ -511,7 +501,7 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *              schema:
  *                type: object
  */
-router.get('/preview', celebrate(previewMessageValidator), previewMessage)
+router.get('/preview', previewFirstMessage)
 
 /**
  * @swagger

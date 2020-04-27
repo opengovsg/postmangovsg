@@ -9,6 +9,7 @@ import { credentialService, hashService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
 import { template } from '@core/services/template.service'
+import { CampaignDetails } from '@core/interfaces'
 
 
 const saveCredential = async (campaignId: number, credentialName: string, secret: string): Promise<void> => {
@@ -37,13 +38,13 @@ const getCredential = (req: Request): TwilioCredentials => {
   return credential
 }
 
-const getParams = async (campaignId: string): Promise<{ [key: string]: string } | null> => {
+const getParams = async (campaignId: number): Promise<{ [key: string]: string } | null> => {
   const smsMessage = await SmsMessage.findOne({ where: { campaignId }, attributes: ['params'] })
   if (smsMessage === null) return null
   return smsMessage.params as { [key: string]: string }
 }
 
-const getSmsBody = async (campaignId: string): Promise<string | null> => {
+const getSmsBody = async (campaignId: number): Promise<string | null> => {
   const smsTemplate = await SmsTemplate.findOne({ where: { campaignId }, attributes: ['body'] })
   if (smsTemplate === null) return null
   return smsTemplate.body as string
@@ -54,7 +55,7 @@ const getEncodedHash = async (secret: string): Promise<string> => {
   return Buffer.from(secretHash).toString('base64')
 }
 
-const getHydratedMsg = async (campaignId: string): Promise<string | null> => {
+const getHydratedMsg = async (campaignId: number): Promise<string | null> => {
   const params = await getParams(campaignId)
   const body = await getSmsBody(campaignId)
   if (params === null || body === null) return null
@@ -63,7 +64,7 @@ const getHydratedMsg = async (campaignId: string): Promise<string | null> => {
   return hydratedMsg
 }
 
-const sendMessage = async (campaignId: string, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
+const sendMessage = async (campaignId: number, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
   const msg = await getHydratedMsg(campaignId)
   if (!msg) return
 
@@ -92,7 +93,7 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
   const { recipient } = req.body
   const { campaignId } = req.params
   try {
-    await sendMessage(campaignId, recipient, credential)
+    await sendMessage(+campaignId, recipient, credential)
   }
   catch (err) {
     return res.status(400).json({ message: `${err}` })
@@ -113,7 +114,7 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
 const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const campaign: Campaign | null = await Campaign.findOne({
+    const campaign: CampaignDetails =  (await Campaign.findOne({
       where: { id: +campaignId },
       attributes: [
         'id', 'name', 'type', 'created_at', 'valid',
@@ -129,7 +130,8 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
           model: SmsTemplate,
           attributes: ['body'],
         }],
-    })
+    }))?.get({ plain:true }) as CampaignDetails
+    
     const numRecipients: number = await SmsMessage.count(
       {
         where: { campaignId: +campaignId },
@@ -141,4 +143,18 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
     return next(err)
   }
 }
-export { isSmsCampaignOwnedByUser, storeCredentials, getCampaignDetails }
+
+const previewFirstMessage = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try{
+    const { campaignId } = req.params
+    return res.json({
+      preview: {
+        body: await getHydratedMsg(+campaignId),
+      },
+    })
+  } catch(err){
+    return next(err)
+  }
+}
+
+export { isSmsCampaignOwnedByUser, storeCredentials, getCampaignDetails, previewFirstMessage }

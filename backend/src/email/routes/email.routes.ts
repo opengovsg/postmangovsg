@@ -1,6 +1,7 @@
 import { Request, Response, Router, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
+import xss from 'xss'
 import { Campaign } from '@core/models'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import {
@@ -17,7 +18,7 @@ import {
   retryCampaign,
   canEditCampaign,
 } from '@core/middlewares'
-import { storeCredentials, getCampaignDetails } from '@email/middlewares'
+import { storeCredentials, getCampaignDetails, previewFirstMessage } from '@email/middlewares'
 
 import {
   MissingTemplateKeysError,
@@ -26,6 +27,7 @@ import {
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
+import config from '@core/config'
 
 
 const router = Router({ mergeParams: true })
@@ -63,16 +65,6 @@ const storeCredentialsValidator = {
       .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
       .required(),
-  }),
-}
-
-const previewMessageValidator = {
-  [Segments.BODY]: Joi.object({
-    message: Joi
-      .number()
-      .integer()
-      .positive()
-      .optional(),
   }),
 }
 
@@ -151,6 +143,10 @@ const checkNewTemplateParams = async ({
   }
 }
 
+const replaceNewLinesAndSanitize = (body: string): string => {
+  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g,'<br/>'), config.xssOptions.email)
+}
+
 // Store body of message in email template table
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -159,8 +155,8 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
     const { subject, body } = req.body
     // extract params from template, save to db (this will be done with hook)
     const updatedTemplate = await upsertEmailTemplate({
-      subject,
-      body,
+      subject: replaceNewLinesAndSanitize(subject),
+      body: replaceNewLinesAndSanitize(body),
       campaignId: +campaignId,
     })
 
@@ -181,8 +177,12 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
           .json({
             message: 'Please re-upload your recipient list as template has changed.',
             extra_keys: check.extraKeys,
-            recipients: 0,
+            num_recipients: 0,
             valid: false,
+            updatedTemplate: {
+              body: updatedTemplate?.body,
+              subject: updatedTemplate?.subject,
+            },
           })
         /* eslint-enable */
       }
@@ -196,6 +196,10 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         message: `Template for campaign ${campaignId} updated`,
         valid: campaign?.valid,
         num_recipients: recipientCount,
+        updatedTemplate: {
+          body: updatedTemplate?.body,
+          subject: updatedTemplate?.subject,
+        },
       })
     /* eslint-enable */
   } catch (err) {
@@ -273,11 +277,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
     return next(err)
   }
-}
-
-// Get preview of one message
-const previewMessage = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'Message content' })
 }
 
 
@@ -475,13 +474,11 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *        - Email
  *      summary: Preview templated message
  *      parameters:
- *        - in: query
- *          name: message
- *          description: message number, defaults to 1
- *          required: false
+ *        - name: campaignId
+ *          in: path
+ *          required: true
  *          schema:
- *            type: integer
- *            minimum: 1
+ *            type: string
  *
  *      responses:
  *        200:
@@ -490,7 +487,7 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *              schema:
  *                type: object
  */
-router.get('/preview', celebrate(previewMessageValidator), previewMessage)
+router.get('/preview', previewFirstMessage)
 
 /**
  * @swagger
