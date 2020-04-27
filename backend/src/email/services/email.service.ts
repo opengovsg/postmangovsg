@@ -3,6 +3,8 @@ import { Campaign, JobQueue } from '@core/models'
 import { EmailMessage, EmailTemplate, EmailOp } from '@email/models'
 import logger from '@core/logger'
 import { CampaignStats } from '@core/interfaces'
+import { getStatsFromTable } from '@core/services'
+
 
 
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
@@ -82,25 +84,6 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
     throw new Error('EmailMessage: destroy / bulkcreate failure')
   }
 }
-
-  const getStatsFromTable = async (model: any, campaignId: string): Promise<{error: number, unsent: number, sent: number}> => {
-    const error = await model.count({
-      where: {campaign_id: campaignId},
-      col: 'error_code'
-    })
-    const total = await model.count({
-      where: {campaign_id: campaignId},
-      col: 'id'
-    })
-    const sent = await model.count({
-      where: {campaign_id: campaignId},
-      col: 'message_id'
-    })
-
-    const unsent = total - sent
-    return { error, sent, unsent }
-  }
-
 
 const getEmailStats = async (campaignId: string): Promise<CampaignStats> => {
   const job = await JobQueue.findOne({ where: { campaignId } })

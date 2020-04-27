@@ -3,6 +3,7 @@ import { Campaign, JobQueue } from '@core/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import logger from '@core/logger'
 import { CampaignStats } from '@core/interfaces'
+import { getStatsFromTable } from '@core/services'
 
 
 const upsertSmsTemplate = async (body: string, campaignId: number): Promise<SmsTemplate> => {
@@ -80,25 +81,6 @@ const populateSmsTemplate = async (campaignId: number, records: Array<object>): 
     throw new Error('SmsMessage: destroy / bulkcreate failure')
   }
 }
-
-const getStatsFromTable = async (model: any, campaignId: string): Promise<{error: number, unsent: number, sent: number}> => {
-  const error = await model.count({
-    where: {campaign_id: campaignId},
-    col: 'error_code'
-  })
-  const total = await model.count({
-    where: {campaign_id: campaignId},
-    col: 'id'
-  })
-  const sent = await model.count({
-    where: {campaign_id: campaignId},
-    col: 'message_id'
-  })
-
-  const unsent = total - sent
-  return { error, sent, unsent }
-}
-
 
 const getSmsStats = async (campaignId: string): Promise<CampaignStats> => {
   const job = await JobQueue.findOne({ where: { campaignId } })
