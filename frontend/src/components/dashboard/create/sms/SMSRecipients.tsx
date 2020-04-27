@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
+import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton } from 'components/common'
 import { getPresignedUrl, completeFileUpload, getPreviewMessage } from 'services/sms.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
 
@@ -11,7 +11,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
-  const [previewBody, setPreviewBody] = useState('')
+  const [preview, setPreview] = useState({} as { body: string })
 
   const { id: campaignId } = useParams()
 
@@ -20,12 +20,11 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
   }, [campaignId])
 
   async function loadPreview() {
-    if (!campaignId) {
-      throw new Error('Invalid campaign id')
-    }
-    const msgPreview = await getPreviewMessage(+campaignId)
-    if (msgPreview) {
-      setPreviewBody(msgPreview?.body)
+    if (campaignId) {
+      const msgPreview = await getPreviewMessage(+campaignId)
+      if (msgPreview) {
+        setPreview(msgPreview)
+      }
     }
   }
 
@@ -92,11 +91,10 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
 
       <div className="separator"></div>
       {
-        previewBody &&
+        preview.body &&
         <>
           <p>Message preview</p>
-          <InfoBlock dangerouslySetInnerHTML={{ __html: previewBody }}>
-          </InfoBlock>
+          <PreviewBlock body={preview.body}></PreviewBlock>
           <div className="separator"></div>
         </>
       }
