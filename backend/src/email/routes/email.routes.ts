@@ -281,15 +281,14 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
 
 // Get the stats of a campaign
-const campaignStatsHandler = async (req: Request, res: Response): Promise<void> => {
+const campaignStatsHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const { campaignId } = req.params
 
   try {
-    const stats = await getEmailStats(campaignId)
-    res.json(stats)
-  } catch (e) {
-    logger.error(`Error getting email campaign stats. error= ${e}`)
-    res.status(400)
+    const stats = await getEmailStats(+campaignId)
+    return res.json(stats)
+  } catch (err) {
+    next(err)
   }
 }
 

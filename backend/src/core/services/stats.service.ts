@@ -1,5 +1,5 @@
 import { fn, col, cast } from 'sequelize'
-export const getStatsFromTable = async (model: any, campaignId: string): Promise<{error: number; unsent: number; sent: number}> => {
+export const getStatsFromTable = async (model: any, campaignId: number): Promise<{error: number; unsent: number; sent: number}> => {
   const [data]= await model.findAll({
     raw : true, 
     /* eslint-disable-next-line @typescript-eslint/camelcase */

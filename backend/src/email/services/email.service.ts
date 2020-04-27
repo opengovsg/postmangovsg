@@ -85,7 +85,7 @@ const populateEmailTemplate = async (campaignId: number, records: Array<object>)
   }
 }
 
-const getEmailStats = async (campaignId: string): Promise<CampaignStats> => {
+const getEmailStats = async (campaignId: number): Promise<CampaignStats> => {
   const job = await JobQueue.findOne({ where: { campaignId } })
   if (job === null) throw new Error('Unable to find campaign in job queue table.')
 
