@@ -8,21 +8,6 @@ async function sleep(ms: number): Promise<void> {
   })
 }
 
-function getStatus(jobs: Array<{status: string}>): string {
-  let result
-  const jobSet = new Set(jobs.map((x => x.status)))
-  if(jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')){
-    result = Status.Sending
-  }
-  else if(jobSet.has('SENT') || jobSet.has('LOGGED')){
-    result = Status.Sent
-  }
-  else{
-    result = Status.Draft
-  }
-  return result
-}
-
 function getSentAt(jobs: Array<{sent_at: Date}>): Date {
   const jobsSentAt = jobs.map((x => x.sent_at)).sort()
   // returns job with the earliest sentAt time
