@@ -23,6 +23,7 @@
     "@types/nodemailer-direct-transport": "^1.0.31",
     "@types/redis": "^2.8.17",
     "aws-sdk": "^2.654.0",
+    "axios": "^0.19.2",
     "bcrypt": "^4.0.1",
     "celebrate": "^12.0.1",
     "connect-redis": "^4.0.4",
