@@ -5,10 +5,11 @@ import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
-import { credentialService, hashService } from '@core/services'
+import { credentialService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
 import { template } from '@core/services/template.service'
+import { specifySalt } from '@core/utils/hash'
 
 
 const saveCredential = async (campaignId: number, credentialName: string, secret: string): Promise<void> => {
@@ -50,7 +51,7 @@ const getSmsBody = async (campaignId: string): Promise<string | null> => {
 }
 
 const getEncodedHash = async (secret: string): Promise<string> => {
-  const secretHash = await hashService.specifySalt(secret, config.aws.secretManagerSalt)
+  const secretHash = await specifySalt(secret, config.aws.secretManagerSalt)
   return Buffer.from(secretHash).toString('base64')
 }
 
