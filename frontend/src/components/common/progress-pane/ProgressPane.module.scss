@@ -1,7 +1,7 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-$progress-pane-width: 18rem;
+$progress-pane-width: 25rem;
 
 .progressPane {
   width: $progress-pane-width;
@@ -14,8 +14,7 @@ $progress-pane-width: 18rem;
   align-items: baseline;
   font-size: 1rem;
   opacity: 0.2;
-  padding: 1rem 0;
-  padding-left: $site-padding;
+  padding: 2rem 4rem;
   user-select: none;
   cursor: default;
 
@@ -23,7 +22,7 @@ $progress-pane-width: 18rem;
     $border-left: 0.5rem;
     border-left: $border-left solid $indigo-blue;
     background-color: $light-blue;
-    padding-left: calc(#{$site-padding} - #{$border-left});
+    padding-left: calc(4rem - #{$border-left});
   }
 
   &.active,
