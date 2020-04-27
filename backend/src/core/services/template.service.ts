@@ -6,7 +6,7 @@ import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { S3Service } from '@core/services/s3.service'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
-import { MissingTemplateKeysError } from '@core/errors/template.errors'
+import { MissingTemplateKeysError, UnclosedTagError, BlankTemplateVariableError } from '@core/errors/template.errors'
 
 const s3Client = new S3()
 
@@ -96,6 +96,8 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
     }
   } catch (err) {
     console.error(err.message)
+    if (err.message.includes('unclosed tag')) throw new UnclosedTagError()
+    if (err.message.includes('Blank template variable')) throw new BlankTemplateVariableError()
     throw err
   }
 }
