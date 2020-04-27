@@ -70,8 +70,11 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
 
   function constructPreviewMessage(body: string, subject: string): string {
     return `
-      <div><b>Subject:</b><p>${subject}</p></div>
-      <div><b>Body:</b><p>${body}</p></div>
+      <li><b>Subject</b></li>
+      <li><p>${subject}</p></li>
+      <br>
+      <li><b>Body</b>
+      </li><li><p>${body}</p></li>
     `
   }
 
