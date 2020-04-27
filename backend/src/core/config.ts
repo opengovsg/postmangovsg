@@ -1,5 +1,10 @@
 import fs from 'fs'
 import path from 'path'
+const parseEnvVarAsInt = (i: string): number | undefined => {
+  const j = parseInt(i)
+  return isNaN(j) ? undefined : j
+}
+
 const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 
 // AWS settings
@@ -75,6 +80,8 @@ const xssOptionsSms = {
   stripIgnoreTag: true,
 }
 
+// Rate for job (any rate higher than this will be split)
+const maxRatePerJob = parseEnvVarAsInt(process.env.MAX_RATE_PER_JOB as string) || 150
 
 export default {
   IS_PROD,
@@ -130,4 +137,5 @@ export default {
     email: xssOptionsEmail,
     sms: xssOptionsSms,
   },
+  maxRatePerJob,
 }
