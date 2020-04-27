@@ -18,7 +18,7 @@ import {
   retryCampaign,
   canEditCampaign,
 } from '@core/middlewares'
-import { storeCredentials, getCampaignDetails } from '@email/middlewares'
+import { storeCredentials, getCampaignDetails, previewFirstMessage } from '@email/middlewares'
 
 import {
   MissingTemplateKeysError,
@@ -65,16 +65,6 @@ const storeCredentialsValidator = {
       .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
       .required(),
-  }),
-}
-
-const previewMessageValidator = {
-  [Segments.BODY]: Joi.object({
-    message: Joi
-      .number()
-      .integer()
-      .positive()
-      .optional(),
   }),
 }
 
@@ -285,11 +275,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   }
 }
 
-// Get preview of one message
-const previewMessage = async (_req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'Message content' })
-}
-
 
 // Routes
 /**
@@ -485,13 +470,11 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *        - Email
  *      summary: Preview templated message
  *      parameters:
- *        - in: query
- *          name: message
- *          description: message number, defaults to 1
- *          required: false
+ *        - name: campaignId
+ *          in: path
+ *          required: true
  *          schema:
- *            type: integer
- *            minimum: 1
+ *            type: string
  *
  *      responses:
  *        200:
@@ -500,7 +483,7 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *              schema:
  *                type: object
  */
-router.get('/preview', celebrate(previewMessageValidator), previewMessage)
+router.get('/preview', previewFirstMessage)
 
 /**
  * @swagger
