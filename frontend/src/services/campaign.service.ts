@@ -76,16 +76,17 @@ export async function createCampaign(name: string, type: ChannelType): Promise<C
     })
 }
 
-export async function sendCampaign(campaignId: number): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/send`).then((response) => response.status === 200)
+export async function sendCampaign(campaignId: number, sendRate: number): Promise<void> {
+  const body = sendRate ? { rate: sendRate } : null
+  await axios.post(`/campaign/${campaignId}/send`, body)
 }
 
-export async function stopCampaign(campaignId: number): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/stop`).then((response) => response.status === 200)
+export async function stopCampaign(campaignId: number): Promise<void> {
+  await axios.post(`/campaign/${campaignId}/stop`)
 }
 
-export async function retryCampaign(campaignId: number): Promise<boolean> {
-  return axios.post(`/campaign/${campaignId}/retry`).then((response) => response.status === 200)
+export async function retryCampaign(campaignId: number): Promise<void> {
+  await axios.post(`/campaign/${campaignId}/retry`)
 }
 
 
