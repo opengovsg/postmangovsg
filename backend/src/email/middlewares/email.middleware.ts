@@ -113,7 +113,7 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
       include: [
         {
           model: JobQueue,
-          attributes: ['status'],
+          attributes: ['status', ['created_at', 'sent_at']],
         },
         {
           model: EmailTemplate,
