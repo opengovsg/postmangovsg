@@ -14,12 +14,12 @@ const PreviewBlock = (props: any) => {
 
   function constructHtml() {
     let html = `<p>${body}</p>`
-    if (body.subject) {
-      html = html + `
+    if (subject) {
+      html = `
         <h5>Subject</h5>
         <p>${subject}</p>
         <h5>Body</h5>
-      `
+      ` + html
     }
     return html
   }
