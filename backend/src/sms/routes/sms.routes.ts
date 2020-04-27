@@ -138,8 +138,8 @@ const checkNewTemplateParams = async ({
     try {
       template(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          updatedTemplate.body!,
-          firstRecord.params as { [key: string]: string }
+        updatedTemplate.body!,
+        firstRecord.params as { [key: string]: string }
       )
     } catch (err) {
       logger.error(`Hydration error: ${err.stack}`)
@@ -238,7 +238,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
     // check if template exists
     const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
-    if (smsTemplate === null || smsTemplate.body === null) {
+    if (!smsTemplate?.body || !smsTemplate?.params) {
       return res.status(400).json({
         message: 'Template does not exist, please create a template',
       })
@@ -250,26 +250,22 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
-      const hydrationResult = await testHydration({
+      const { records, hydratedRecord } = await testHydration({
         campaignId: +campaignId,
         s3Key,
-        templateBody: smsTemplate.body!,
-        templateParams: smsTemplate.params!,
+        templateBody: smsTemplate.body,
+        templateParams: smsTemplate.params,
       })
-      /* eslint-enable */
 
-      const recipientCount: number = hydrationResult.records.length
+      const recipientCount: number = records.length
       // START populate template
-      await populateSmsTemplate(+campaignId, hydrationResult.records)
+      // TODO: is actually populate message logs
+      await populateSmsTemplate(+campaignId, records)
 
-      /* eslint-disable @typescript-eslint/camelcase */
-      return res.status(202).json({
-        template_body: smsTemplate.body,
-        num_recipients: recipientCount,
-        hydrated_record: hydrationResult.hydratedRecord,
+      return res.json({
+        'num_recipients': recipientCount,
+        preview: hydratedRecord,
       })
-      /* eslint-enable */
 
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
@@ -441,12 +437,14 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *             application/json:
  *               schema:
  *                 properties:
- *                   template_body:
- *                     type: string
  *                   num_recipients:
  *                     type: string
- *                   hydrated_record:
- *                     type: string
+ *                   preview:
+ *                     type: object
+ *                     properties:
+ *                       body:
+ *                         type: string
+ *
  *         400:
  *           description: Invalid Request
  *         500:
@@ -512,6 +510,13 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                  preview:
+ *                    type: object
+ *                    properties:
+ *                      body:
+ *                        type: string                    
+ *                  
  */
 router.get('/preview', previewFirstMessage)
 

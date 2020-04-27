@@ -11,7 +11,7 @@ interface UploadCompleteResponse {
   hydrated_record: string;
 }
 
-export async function saveTemplate(campaignId: number, body: string): Promise<{ numRecipients: number, updatedTemplate?: {body: string} }> {
+export async function saveTemplate(campaignId: number, body: string): Promise<{ numRecipients: number; updatedTemplate?: { body: string } }> {
   try {
     const response = await axios.put(`/campaign/${campaignId}/sms/template`, {
       body,
@@ -84,6 +84,15 @@ export async function completeFileUpload({
     return response.data
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
+  }
+}
+
+export async function getPreviewMessage(campaignId: number): Promise<{ body: string }> {
+  try {
+    const response = await axios.get(`/campaign/${campaignId}/sms/preview`)
+    return response.data?.preview
+  } catch (e) {
+    errorHandler(e, 'Unable to get preview message')
   }
 }
 

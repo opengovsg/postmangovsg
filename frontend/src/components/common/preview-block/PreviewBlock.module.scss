@@ -1,0 +1,9 @@
+.preview {
+  h5 {
+    margin-top: 2rem;
+
+    &:first-child{
+      margin-top: 0;
+    }
+  }
+}
