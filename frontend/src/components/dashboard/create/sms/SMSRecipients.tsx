@@ -44,7 +44,9 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       setNumRecipients(uploadResponse.num_recipients)
 
       const msgPreview = await getPreviewMessage(+campaignId)
-      setPreviewBody(msgPreview.body)
+      if(msgPreview){
+        setPreviewBody(msgPreview?.body)
+      }
 
       onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
 

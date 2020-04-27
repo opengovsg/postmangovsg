@@ -183,8 +183,11 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
           .json({
             message: 'Please re-upload your recipient list as template has changed.',
             extra_keys: check.extraKeys,
-            recipients: 0,
+            num_recipients: 0,
             valid: false,
+            updatedTemplate: {
+              body: updatedTemplate?.body,
+            },
           })
         /* eslint-enable */
       }

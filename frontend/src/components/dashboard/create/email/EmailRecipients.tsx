@@ -45,9 +45,11 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
-      const msgPreview = await getPreviewMessage(id)
-      setPreviewBody(msgPreview.body)
-      setPreviewSubject(msgPreview.subject || '')
+      const msgPreview = await getPreviewMessage(+campaignId)
+      if(msgPreview){
+        setPreviewBody(msgPreview?.body)
+        setPreviewSubject(msgPreview?.subject || '')
+      }
 
       // Store filename and numRecipients in campaign object
       onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
