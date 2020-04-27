@@ -31,7 +31,7 @@ const Campaigns = () => {
   function getEmailFromName(email: string): string {
     const parts = email.split('@')
     const [ nameParts ] = parts
-    return nameParts.split('_').map((n) => upperFirst(n)).join(' ')
+    return nameParts.split(/[_.-]/).map((n) => upperFirst(n)).join(' ')
   }
 
   async function fetchCampaigns() {
