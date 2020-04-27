@@ -29,7 +29,7 @@ const CreateModal = () => {
       <div className={styles.section}>
         <h2 className={styles.title}>Name your campaign</h2>
         <h5 className={styles.subtitle}>Give your campaign a descriptive name</h5>
-        <TextInput type="text" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)}></TextInput>
+        <TextInput className={styles.input} type="text" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)}></TextInput>
       </div>
       <div className={cx(styles.section, styles.separator)}>
         <h2 className={styles.title}>Choose the channel you want to send in</h2>
