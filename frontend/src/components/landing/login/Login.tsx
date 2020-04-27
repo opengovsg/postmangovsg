@@ -15,7 +15,7 @@ const otpPlaceholder = 'Enter OTP'
 const RESEND_WAIT_TIME = 30000
 
 const Login = () => {
-  const { setAuthenticated } = useContext(AuthContext)
+  const { setAuthenticated, setEmail: setAuthContextEmail } = useContext(AuthContext)
 
   const [otpSent, setOtpSent] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -44,6 +44,7 @@ const Login = () => {
     try {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
+      setAuthContextEmail(email)
     } catch (err) {
       setErrorMsg(err.message)
     }
@@ -83,7 +84,7 @@ const Login = () => {
           type={inputType}
           placeholder={placeholder}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-          buttonDisabled={isLoading}
+          buttonDisabled={!value || isLoading}
           inputDisabled={isLoading}
           onClick={onClick}>
           {isLoading ? buttonText[1] : buttonText[0]}
