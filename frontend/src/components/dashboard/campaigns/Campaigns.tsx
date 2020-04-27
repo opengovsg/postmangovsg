@@ -25,10 +25,10 @@ const Campaigns = () => {
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(new Array<Campaign>())
   const [selectedPage, setSelectedPage] = useState(0)
   const history = useHistory()
-  const name = getEmailFromName(email)
+  const name = getNameFromEmail(email)
   const title = `Welcome, ${name}`
 
-  function getEmailFromName(email: string): string {
+  function getNameFromEmail(email: string): string {
     const parts = email.split('@')
     const [ nameParts ] = parts
     return nameParts.split(/[_.-]/).map((n) => capitalize(n)).join(' ')
