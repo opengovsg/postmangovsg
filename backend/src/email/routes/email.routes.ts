@@ -144,7 +144,7 @@ const checkNewTemplateParams = async ({
 }
 
 const replaceNewLinesAndSanitize = (body: string): string => {
-  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g,'<br/>'), config.xssOptions.email)
+  return xss.filterXSS(body.replace(/(\n|\r\n)/g,'<br/>'), config.xssOptions.email)
 }
 
 // Store body of message in email template table

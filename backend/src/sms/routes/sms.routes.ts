@@ -155,7 +155,7 @@ const checkNewTemplateParams = async ({
 }
 
 const replaceNewLinesAndSanitize = (body: string): string => {
-  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g,'<br/>'), config.xssOptions.sms)
+  return xss.filterXSS(body.replace(/(\n|\r\n)/g,'<br/>'), config.xssOptions.sms)
 }
 
 // Store body of message in sms template table
