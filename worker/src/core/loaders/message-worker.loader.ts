@@ -5,7 +5,12 @@ import config from '@core/config'
 
 const createMessageWorker = async (workerId: string, isLogger = false): Promise<ModuleThread<MessageWorker>> => {
   const worker = await spawn<MessageWorker>(new Worker('./message-worker'))
-  worker.init(workerId, isLogger)
+  try{
+    await worker.init(workerId, isLogger)
+  }catch(err){
+    logger.error(`Worker died. ${err.stack}`)
+    process.exit(1)
+  }
   return worker
 }
 

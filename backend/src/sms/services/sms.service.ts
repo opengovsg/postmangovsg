@@ -1,7 +1,9 @@
 import { chunk } from 'lodash'
-import { Campaign } from '@core/models'
-import { SmsMessage, SmsTemplate } from '@sms/models'
+import { Campaign, JobQueue } from '@core/models'
+import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import logger from '@core/logger'
+import { CampaignStats } from '@core/interfaces'
+import { getStatsFromTable } from '@core/services'
 
 
 const upsertSmsTemplate = async (body: string, campaignId: number): Promise<SmsTemplate> => {
@@ -80,4 +82,18 @@ const populateSmsTemplate = async (campaignId: number, records: Array<object>): 
   }
 }
 
-export { populateSmsTemplate, upsertSmsTemplate }
+const getSmsStats = async (campaignId: number): Promise<CampaignStats> => {
+  const job = await JobQueue.findOne({ where: { campaignId } })
+  if (job === null) throw new Error('Unable to find campaign in job queue table.')
+
+  // Gets from email ops table if status is SENDING, SENT, or STOPPED
+  if (job.status === 'SENDING' || job.status === 'SENT' || job.status === 'STOPPED') {
+    const stats = await getStatsFromTable(SmsOp, campaignId) 
+    return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
+  }
+
+  const stats = await getStatsFromTable(SmsMessage, campaignId) 
+  return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
+} 
+
+export { populateSmsTemplate, upsertSmsTemplate, getSmsStats }

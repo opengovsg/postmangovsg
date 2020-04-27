@@ -102,7 +102,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
 
 const template = (templateBody: string, params: { [key: string]: string }): string => {
   const parsed = parseTemplate(templateBody, params)
-  return parsed.tokens.join('')
+  return parsed.tokens.map((t) => t.replace(/\\([\\\'])/g, "$1")).join('')
 }
 
 const checkTemplateKeysMatch = (csvRecord: { [key: string]: string }, templateParams: Array<string>): void => {

@@ -117,13 +117,13 @@ const createAndResumeWorker = (): Promise<void> => {
 }
 
   
-const init = async (index: string, isLogger = false): Promise<void> => {
+const init = async (index: string, isLogger = false): Promise<any> => {
   await ECSUtil.load()
   workerId = ECSUtil.getWorkerId(index)
   connection = createConnection()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
-  try {
+  try{
     if(!isLogger){
       await createAndResumeWorker()
       for(;;){
@@ -136,11 +136,13 @@ const init = async (index: string, isLogger = false): Promise<void> => {
         await waitForMs(2000)
       }
     }
-  } catch(err) {
-    // TODO:  handle error!!!
-    // Otherwise this worker will be useless
-    logger.error(err)
   }
+  catch(err) {
+    return Promise.reject(err)
+  }
+   
+    
+  
 }
   
 const messageWorker = {

@@ -10,7 +10,7 @@ import {
   testHydration,
   extractS3Key,
 } from '@core/services'
-import { populateEmailTemplate, upsertEmailTemplate } from '@email/services'
+import { populateEmailTemplate, upsertEmailTemplate, getEmailStats } from '@email/services'
 import {
   uploadStartHandler,
   sendCampaign,
@@ -144,7 +144,7 @@ const checkNewTemplateParams = async ({
 }
 
 const replaceNewLinesAndSanitize = (body: string): string => {
-  return xss.filterXSS(body.replace(/(\\n|\n|\r\n)/g, '<br/>'), config.xssOptions.email)
+  return xss.filterXSS(body.replace(/(\n|\r\n)/g,'<br/>'), config.xssOptions.email)
 }
 
 // Store body of message in email template table
@@ -276,6 +276,18 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   }
 }
 
+
+// Get the stats of a campaign
+const campaignStatsHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  const { campaignId } = req.params
+
+  try {
+    const stats = await getEmailStats(+campaignId)
+    return res.json(stats)
+  } catch (err) {
+    next(err)
+  }
+}
 
 // Routes
 /**
@@ -560,5 +572,29 @@ router.post('/stop', stopCampaign)
  *                type: object
  */
 router.post('/retry', canEditCampaign, retryCampaign)
+
+/**
+ * @swagger
+ * path:
+*  /campaign/{campaignId}/email/stats:
+ *    get:
+ *      tags:
+ *        - Email
+ *      summary: Get email campaign stats
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ */
+router.get('/stats', campaignStatsHandler)
 
 export default router
