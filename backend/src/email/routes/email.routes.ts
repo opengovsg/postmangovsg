@@ -202,6 +202,10 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         message: `Template for campaign ${campaignId} updated`,
         valid: campaign?.valid,
         num_recipients: recipientCount,
+        updatedTemplate: {
+          body: updatedTemplate?.body,
+          subject: updatedTemplate?.subject,
+        },
       })
     /* eslint-enable */
   } catch (err) {

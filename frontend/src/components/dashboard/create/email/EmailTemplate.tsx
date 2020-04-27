@@ -18,15 +18,15 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
-      const { numRecipients } = await saveTemplate(+campaignId, subject, body)
-      onNext({ subject, body, numRecipients })
+      const { updatedTemplate, numRecipients } = await saveTemplate(+campaignId, subject, body)
+      onNext({ subject: updatedTemplate.subject , body: updatedTemplate.body, numRecipients })
     } catch (err) {
       setErrorMsg(err.message)
     }
   }
 
-  function replaceNewLines(body?: string): string {
-    return body?.replace(/<br\s*\/>/g, '\n') || ''
+  function replaceNewLines(body: string): string {
+    return body.replace(/<br\s*\/>/g, '\n') || ''
   }
 
   return (

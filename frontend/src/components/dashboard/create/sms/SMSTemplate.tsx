@@ -16,15 +16,15 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
-      const { numRecipients } = await saveTemplate(+campaignId, body)
-      onNext({ body, numRecipients })
+      const { updatedTemplate, numRecipients } = await saveTemplate(+campaignId, body)
+      onNext({ body: updatedTemplate.body , numRecipients })
     } catch (err) {
       setErrorMsg(err.message)
     }
   }
 
-  function replaceNewLines(body?: string): string {
-    return body?.replace(/<br\s*\/>/g, '\n') || ''
+  function replaceNewLines(body: string): string {
+    return body.replace(/<br\s*\/>/g, '\n') || ''
   }
 
   return (
