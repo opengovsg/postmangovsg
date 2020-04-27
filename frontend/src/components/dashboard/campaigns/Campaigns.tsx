@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
-import { upperFirst } from 'lodash'
+import { capitalize } from 'lodash'
 
 import { POSTMAN_GUIDE_URL } from 'config'
 import { ModalContext } from 'contexts/modal.context'
@@ -31,7 +31,7 @@ const Campaigns = () => {
   function getEmailFromName(email: string): string {
     const parts = email.split('@')
     const [ nameParts ] = parts
-    return nameParts.split(/[_.-]/).map((n) => upperFirst(n)).join(' ')
+    return nameParts.split(/[_.-]/).map((n) => capitalize(n)).join(' ')
   }
 
   async function fetchCampaigns() {
