@@ -4,14 +4,14 @@ import axios from 'axios'
  * @see https://github.com/axios/axios/issues/647#issuecomment-322209906
  */
 const queryAwsMetadata  = () => {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
+  const CancelToken = axios.CancelToken
+  const source = CancelToken.source()
 
   setTimeout(() => {
     source.cancel('Getting AWS metadata timed out')
   }, 3000)
 
-  return axios.get('http://169.254.169.254/latest/meta-data/instance-id', {cancelToken: source.token})
+  return axios.get('http://169.254.169.254/latest/meta-data/instance-id', { cancelToken: source.token })
 }
 
 /**

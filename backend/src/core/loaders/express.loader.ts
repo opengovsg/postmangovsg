@@ -25,9 +25,11 @@ const morganFormat = ((tokens: morgan.TokenIndexer, req: Request, res: Response)
     tokens.res(req, res, 'content-length'), '-',
     tokens.referrer(req, res),
     `"${tokens.req(req, res, 'user-agent')}"`,
-    tokens['response-time'](req, res), 'ms'
+    tokens['response-time'](req, res), 'ms',
   ].join(' ')
 })
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 //@ts-ignore
 const loggerMiddleware = morgan(morganFormat, { stream: logger.stream })
 

@@ -8,7 +8,7 @@ const cloudwatchLoader = async (): Promise<void> => {
   const instanceId = await getInstanceId()
   try {
     if (instanceId) {
-      logger.info({ message: `Detetcted instanceId as ${instanceId}`})
+      logger.info({ message: `Detetcted instanceId as ${instanceId}` })
       logger.add(new WinstonCloudwatch({
         logGroupName: config.aws.logGroupName,
         logStreamName: instanceId,

@@ -23,11 +23,12 @@ class Logger implements LoggerInterface {
     })
 
     this.logger.stream = {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       write: (message: string, _encoding: any) => {
         // use the 'info' log level so the output will be picked up by both transports
         this.logger.info(message)
-      }
+      },
     }
   }
 }
