@@ -64,28 +64,28 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
         <TextInput
           placeholder="Enter Account SID"
           value={accountSid}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAccountSid(e.target.value)}
+          onChange={setAccountSid}
         />
 
         <h5>API Key</h5>
         <TextInput
           placeholder="Enter API Key"
           value={apiKey}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApiKey(e.target.value)}
+          onChange={setApiKey}
         />
 
         <h5>API Secret</h5>
         <TextInput
           placeholder="Enter API Secret"
           value={apiSecret}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApiSecret(e.target.value)}
+          onChange={setApiSecret}
         />
 
         <h5>Messaging Service ID</h5>
         <TextInput
           placeholder="Enter Messaging Service ID"
           value={messagingServiceSid}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMessagingServiceSid(e.target.value)}
+          onChange={setMessagingServiceSid}
         />
 
         <div className="separator"></div>
@@ -99,7 +99,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
         <TextInputWithButton
           type="tel"
           value={recipient}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
+          onChange={setRecipient}
           onClick={handleValidateCredentials}
           buttonDisabled={isButtonDisabled() || isValidating}
           inputDisabled={isValidating}

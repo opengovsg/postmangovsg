@@ -7,19 +7,19 @@ import styles from './ConfirmModal.module.scss'
 import { sendCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
-const ConfirmModal = ({ campaignId }: {campaignId: number}) => {
+const ConfirmModal = ({ campaignId, sendRate }: { campaignId: number; sendRate: number }) => {
   const modalContext = useContext(ModalContext)
   const [disabled, setDisabled] = useState(false)
-  async function handleSend(): Promise<void>{
+  async function handleSend(): Promise<void> {
     try {
       setDisabled(true)
-      await sendCampaign(campaignId)
+      await sendCampaign(campaignId, sendRate)
       // Close the modal
       modalContext.setModalContent(null)
       // Reloads the page
       window.location.href = `/campaigns/${campaignId}`
 
-    }catch(err){
+    } catch (err) {
       console.error(err)
       setDisabled(false)
     }
