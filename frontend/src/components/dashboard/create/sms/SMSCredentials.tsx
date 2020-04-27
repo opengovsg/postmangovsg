@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { validateCredentials } from 'services/sms.service'
-import { TextInput, PrimaryButton, TextInputWithButton } from 'components/common'
+import { TextInput, PrimaryButton, TextInputWithButton, ErrorBlock } from 'components/common'
 import styles from '../Create.module.scss'
 import { useParams } from 'react-router-dom'
 
@@ -14,7 +14,9 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   const [messagingServiceSid, setMessagingServiceSid] = useState('')
   const [recipient, setRecipient] = useState('')
   const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
-  const params: { id? : string } = useParams()
+  const [isValidating, setIsValidating] = useState(false)
+  const [errorMsg, setErrorMsg] = useState(null)
+  const { id: campaignId } = useParams()
 
   function isButtonDisabled() {
     return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\+?\d+$/g).test(recipient)
@@ -29,22 +31,30 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   }
 
   async function handleValidateCredentials() {
+    setErrorMsg(null)
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const campaignId = +params.id!
-      const isValid = await validateCredentials({
-        campaignId,
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
+      }
+      setIsValidating(true)
+      await validateCredentials({
+        campaignId: +campaignId,
         accountSid,
         apiKey,
         apiSecret,
         messagingServiceSid,
-        recipient })
-      setHasCredential(isValid)
+        recipient,
+      })
+      setHasCredential(true)
       setShowCredentialFields(false)
+      // Saves hasCredential property but do not advance to next step
+      onNext({ hasCredential: true }, false)
       resetFields()
-    } catch(err){
-      console.error(err)
+    } catch (err) {
+      setErrorMsg(err.message)
     }
+    setIsValidating(false)
   }
 
   function renderCredentialFields() {
@@ -83,7 +93,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
         <h2>Validate your credentials by doing a test send</h2>
         <p>
           To ensure your credentials are working perfectly,
-          please send a test SMS to an available phone numnber
+          please send a test SMS to an available phone number
           to receive a preview of your message.
         </p>
         <TextInputWithButton
@@ -91,9 +101,10 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           value={recipient}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
           onClick={handleValidateCredentials}
-          buttonDisabled={isButtonDisabled()}
+          buttonDisabled={isButtonDisabled() || isValidating}
+          inputDisabled={isValidating}
         >
-          Validate credential
+          {isValidating ? 'Validating...' : 'Validate credential'}
         </TextInputWithButton>
       </>
     )
@@ -116,7 +127,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
                   ? renderCredentialFields()
                   : (
                     <PrimaryButton className={styles.darkBlueBtn} onClick={() => setShowCredentialFields(true)}>
-                  Enter new credentials
+                      Enter new credentials
                     </PrimaryButton>
                   )
               }
@@ -131,7 +142,10 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           : (
             <>
               <h2>Insert your SMS credentials</h2>
-              { renderCredentialFields() }
+              {renderCredentialFields()}
+              <ErrorBlock>
+                {errorMsg}
+              </ErrorBlock>
             </>
           )
       }

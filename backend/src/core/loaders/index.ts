@@ -1,3 +1,4 @@
+import securityHeadersLoader from './security-headers.loader'
 import expressLoader from './express.loader'
 import swaggerLoader from './swagger.loader'
 import sessionLoader from './session.loader'
@@ -6,11 +7,11 @@ import { Application } from 'express'
 
 
 const loaders = async ({ app }: { app: Application }): Promise<void> => {
+  securityHeadersLoader({ app })
   await SequelizeLoader.load()
   await sessionLoader({ app })
   await expressLoader({ app })
   await swaggerLoader({ app })
-
 }
 
 export { loaders }

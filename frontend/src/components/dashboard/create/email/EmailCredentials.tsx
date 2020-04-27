@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { sendPreviewMessage } from 'services/email.service'
-import { PrimaryButton, TextInputWithButton } from 'components/common'
+import { PrimaryButton, TextInputWithButton, InfoBlock, ErrorBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
 import isEmail from 'validator/lib/isEmail'
 
@@ -9,11 +9,12 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
 
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [recipient, setRecipient] = useState('')
-  const [testSending, setTestSending] = useState(false)
-  const params: { id?: string } = useParams()
+  const [isValidating, setIsValidating] = useState(false)
+  const [errorMsg, setErrorMsg] = useState(null)
+  const { id: campaignId } = useParams()
 
   function isButtonDisabled() {
-    return testSending || !isEmail(recipient)
+    return !isEmail(recipient)
   }
 
   function resetFields() {
@@ -21,20 +22,24 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
   }
 
   async function handleTestSend() {
+    setErrorMsg(null)
     try {
-      setTestSending(true)
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const campaignId = +params.id!
-      const isValid = await sendPreviewMessage({
-        campaignId,
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
+      }
+      setIsValidating(true)
+      await sendPreviewMessage({
+        campaignId: +campaignId,
         recipient,
       })
-      setHasCredential(isValid)
+      setHasCredential(true)
+      // Saves hasCredential property but do not advance to next step
+      onNext({ hasCredential: true }, false)
       resetFields()
     } catch (err) {
-      console.error(err)
-      setTestSending(false)
+      setErrorMsg(err.message)
     }
+    setIsValidating(false)
   }
 
   return (
@@ -49,10 +54,24 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
             value={recipient}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
             onClick={handleTestSend}
-            buttonDisabled={isButtonDisabled()}
+            inputDisabled={isValidating}
+            buttonDisabled={isButtonDisabled() || isValidating}
           >
             Test your email
           </TextInputWithButton>
+          <ErrorBlock>
+            {errorMsg}
+          </ErrorBlock>
+
+          {
+            hasCredential &&
+            <InfoBlock>
+              <li>
+                <i className="bx bx-check-circle"></i>
+                <span>Email credentials have been validated but you may continue to send test messages.</span>
+              </li>
+            </InfoBlock>
+          }
 
           <div className="separator"></div>
 

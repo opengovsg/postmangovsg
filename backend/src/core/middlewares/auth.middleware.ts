@@ -95,7 +95,7 @@ const doesUserExist = async (email: string): Promise<boolean> => {
   return true
 }
 
-const isWhitelistedEmail = async ( email: string ): Promise<boolean> => {
+const isWhitelistedEmail = async (email: string): Promise<boolean> => {
   const isGovEmail = /^.*\.gov\.sg$/.test(email)
   return isGovEmail || doesUserExist(email)
 }
@@ -138,18 +138,28 @@ const verifyOtp = async (req: Request, res: Response, next: NextFunction): Promi
   const authorized = await isOtpVerified({ email, otp })
   if (!authorized) {
     return res.sendStatus(401)
-  }  
-  try{
-    if(req.session){
+  }
+  try {
+    if (req.session) {
       const [user] = await User.findCreateFind({ where: { email: email } })
       req.session.user = { id: user.id, createdAt: user.createdAt, updatedAt: user.updatedAt }
       return res.sendStatus(200)
     }
     return res.sendStatus(401)
-  }catch(err){
+  } catch (err) {
     return next(err)
   }
- 
+
 }
 
-export { getOtp, verifyOtp }
+const getUser = async (req: Request, res: Response): Promise<Response | void> => {
+  if (req?.session?.user?.id) {
+    const user = await User.findOne({
+      where: { id: req?.session?.user?.id },
+    })
+    return res.json({ email: user?.email })
+  }
+  return res.json({})
+}
+
+export { getOtp, verifyOtp, getUser }
