@@ -1,8 +1,18 @@
-import AWS from 'aws-sdk'
-import { promisify } from 'util'
+import axios from 'axios'
 
-const metadataService = new AWS.MetadataService()
-const metadataRequest = promisify(metadataService.request)
+/**
+ * @see https://github.com/axios/axios/issues/647#issuecomment-322209906
+ */
+const queryAwsMetadata  = () => {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
+
+  setTimeout(() => {
+    source.cancel('Getting AWS metadata timed out')
+  }, 3000)
+
+  return axios.get('http://169.254.169.254/latest/meta-data/instance-id', {cancelToken: source.token})
+}
 
 /**
  * @see https://github.com/aws/aws-sdk-js/blob/master/lib/metadata_service.js
@@ -10,16 +20,12 @@ const metadataRequest = promisify(metadataService.request)
  */
 const getInstanceId = async (): Promise<string | void> => {
   try {
-    const id = await metadataRequest('/latest/meta-data/instance-id"')
-    console.log(id)
-    return id as string
+    const resp = await queryAwsMetadata()
+    return resp.data
   } catch (err) {
-    console.log({ message: 'Unable to retrieve instanceId, is this running in an EC2 instance?' })
+    console.log(err)
+    console.log('Unable to retrieve instanceId, is this running in an EC2 instance?')
   }
 }
-
-// const getDeploymentInfo = () => {
-
-// }
 
 export { getInstanceId }
