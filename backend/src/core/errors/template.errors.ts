@@ -16,25 +16,9 @@ export class HydrationError extends Error {
   }
 }
 
-export class UnclosedTagError extends Error {
-  constructor() {
-    super('There are unclosed curly brackets in the template.')
-    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
-    Error.captureStackTrace(this)
-  }
-}
-
-export class BlankTemplateVariableError extends Error {
-  constructor() {
-    super('Keyword not found within curly brackets.')
-    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
-    Error.captureStackTrace(this)
-  }
-}
-
-export class SpecialCharacterVariableError extends Error {
-  constructor() {
-    super('Keyword not found within curly brackets.')
+export class TemplateError extends Error {
+  constructor(message: string) {
+    super(message)
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
     Error.captureStackTrace(this)
   }
