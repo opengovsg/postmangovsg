@@ -12,11 +12,10 @@ const sendCampaign = async (req: Request, res: Response, next: NextFunction): Pr
       // Split jobs if the supplied send rate is higher than the rate 1 worker can support
       // The rate is distributed evenly across workers.
       const jobs = []
-      const numJobs = Math.ceil(rate / config.maxRatePerJob)
-      const sendRate = Math.ceil(rate/numJobs)
-      for (let i = 0; i < numJobs; i++){
-        jobs.push(createJob({ campaignId: +campaignId, rate: Math.min(sendRate, rate) }))
-        rate-=sendRate
+      while (rate>0) {
+        const sendRate = Math.min(config.maxRatePerJob, rate) 
+        jobs.push(createJob({ campaignId: +campaignId, rate: sendRate }))
+        rate -= sendRate
       }
     
       const jobIds = await Promise.all(jobs)
