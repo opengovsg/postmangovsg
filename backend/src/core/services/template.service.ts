@@ -83,7 +83,8 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
           }
         } else {
           // FIXME: be more specific about templateObject, just pass the error itself?
-          throw new TemplateError(`Invalid template provided: ${JSON.stringify(templateObject)}`)
+          logger.error (`Templating error: invalid template provided. templateObject= ${JSON.stringify(templateObject)}`)
+          throw new TemplateError(`Invalid template provided`)
         }
       } else {
         // normal string (non variable portion)
@@ -103,6 +104,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
 
 const template = (templateBody: string, params: { [key: string]: string }): string => {
   const parsed = parseTemplate(templateBody, params)
+  // Remove extra '\' infront of single quotes and backslashes
   return parsed.tokens.map((t) => t.replace(/\\([\\\'])/g, "$1")).join('')
 }
 
