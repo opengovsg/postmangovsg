@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { validateCredentials } from 'services/sms.service'
 import { TextInput, PrimaryButton, TextInputWithButton, ErrorBlock } from 'components/common'
 import styles from '../Create.module.scss'
-import { useParams } from 'react-router-dom'
 
 const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCredential: boolean; onNext: (changes: any, next?: boolean) => void }) => {
 
@@ -104,7 +104,14 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           buttonDisabled={isButtonDisabled() || isValidating}
           inputDisabled={isValidating}
         >
-          {isValidating ? 'Validating...' : 'Validate credential'}
+          {isValidating
+            ? 'Sending...'
+            : (
+              <>
+                Send test message
+                <i className="bx bx-message-detail"></i>
+              </>
+            )}
         </TextInputWithButton>
       </>
     )
