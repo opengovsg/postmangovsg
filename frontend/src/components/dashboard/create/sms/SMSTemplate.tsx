@@ -40,8 +40,8 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
       </p>
       <p>
         Example<br />
-        Reminder: Dear {'{{ name }}'}, your next appointment at {'{{ clinic }}'} is on {'{{ date }}'}
-        at {'{{ time }}'}.
+        Reminder: Dear <b>{'{{ name }}'}</b>, your next appointment at <b>{'{{ clinic }}'}</b> is on <b>{'{{ date }}'} </b>
+        at <b>{'{{ time }}'}</b>.
       </p>
       <TextArea placeholder="Enter message" highlight={true} value={body} onChange={setBody} />
       <div className="progress-button">

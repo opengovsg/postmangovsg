@@ -46,8 +46,8 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
       </p>
       <p>
         Example<br />
-        Reminder: Dear {'{{ name }}'}, your next appointment at {'{{ clinic }}'} is on {'{{ date }}'}
-        at {'{{ time }}'}.
+        Reminder: Dear <b>{'{{ name }}'}</b>, your next appointment at <b>{'{{ clinic }}'}</b> is on <b>{'{{ date }}'} </b>
+        at <b>{'{{ time }}'}</b>.
       </p>
       <TextArea highlight={true} placeholder="Enter email message" value={body} onChange={setBody} />
       <div className="separator"></div>
