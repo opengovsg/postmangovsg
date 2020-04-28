@@ -31,7 +31,10 @@
   "homepage": "https://github.com/datagovsg/postmangovsg#readme",
   "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^25.2.1",
     "concurrently": "^5.1.0",
+    "jest": "^25.4.0",
+    "ts-jest": "^25.4.0",
     "typescript": "^3.8.3"
   }
 }
