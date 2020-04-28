@@ -22,6 +22,7 @@ import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
+  TemplateError
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import { storeCredentials, getCampaignDetails, previewFirstMessage } from '@sms/middlewares'
@@ -207,7 +208,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
       })
     /* eslint-enable */
   } catch (err) {
-    if (err instanceof HydrationError) {
+    if (err instanceof HydrationError || err instanceof TemplateError) {
       return res.status(400).json({ message: err.message })
     }
     return next(err)
