@@ -10,7 +10,7 @@
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
-    "test": "jest",
+    "test": "jest --forceExit",
     "test:watch": "jest --watch"
   },
   "author": "",
