@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton } from 'components/common'
 import { getPresignedUrl, completeFileUpload, getPreviewMessage } from 'services/sms.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
+import styles from '../Create.module.scss'
 
 const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
@@ -93,7 +94,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       {
         preview.body &&
         <>
-          <p>Message preview</p>
+          <p className={styles.greyText}>Message preview</p>
           <PreviewBlock body={preview.body}></PreviewBlock>
           <div className="separator"></div>
         </>

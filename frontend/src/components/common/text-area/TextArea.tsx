@@ -9,10 +9,12 @@ const HIGHLIGHT_REGEX = /{{\s*?\w+\s*?}}/g
 
 const TextArea = ({ highlight, singleRow, placeholder, value, onChange }:
   { highlight: boolean; singleRow?: boolean; placeholder: string; value: string; onChange: Function }) => {
+
   const minRows = singleRow ? 1 : 5
+
   return (
     <div className={styles.textAreaContainer}>
-      {highlight && <div className={cx(styles.textArea, styles.highlightBackdrop)}>
+      {highlight && <div className={cx(styles.textArea, styles.highlightBackdrop, { [styles.single]: singleRow })}>
         <p dangerouslySetInnerHTML={{
           __html: highlightHTML(value),
         }}></p>
@@ -22,18 +24,8 @@ const TextArea = ({ highlight, singleRow, placeholder, value, onChange }:
         value={value}
         onChange={e => onChange(e.target.value)}
         minRows={minRows}
-        className={styles.textArea}
+        className={cx(styles.textArea, { [styles.single]: singleRow })}
       />
-      {/* {highlight && (
-        <div className={styles.instructions}>
-          <h5 >How to use - Personalisation</h5>
-          <p>
-            Use double curly braces to personalise your message.
-            <br/>
-            E.g.: Hello <mark>{'{{ name }}'}</mark>, your ID number is <mark>{'{{ id }}'}</mark>
-          </p>
-        </div>
-      )} */}
     </div >
   )
 }

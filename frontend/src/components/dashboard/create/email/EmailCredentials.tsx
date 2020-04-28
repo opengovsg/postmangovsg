@@ -57,7 +57,14 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
             inputDisabled={isValidating}
             buttonDisabled={isButtonDisabled() || isValidating}
           >
-            Test your email
+            {
+              isValidating ? 'Sending...' : (
+                <>
+                  Send test email
+                  <i className="bx bx-envelope-open"></i>
+                </>
+              )
+            }
           </TextInputWithButton>
           <ErrorBlock>
             {errorMsg}
