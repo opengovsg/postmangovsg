@@ -9,7 +9,9 @@
     "lint": "eslint --ignore-path .gitignore --fix 'src/**/*.ts'",
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
-    "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build"
+    "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "author": "",
   "license": "MIT",
