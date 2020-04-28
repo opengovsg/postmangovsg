@@ -128,10 +128,10 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
         },
         {
           model: SmsTemplate,
-          attributes: ['body'],
+          attributes: ['body', 'params'],
         }],
     }))?.get({ plain:true }) as CampaignDetails
-    
+
     const numRecipients: number = await SmsMessage.count(
       {
         where: { campaignId: +campaignId },
