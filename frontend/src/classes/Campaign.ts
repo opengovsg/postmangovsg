@@ -42,14 +42,12 @@ export class Campaign {
 
 export class CampaignStats {
   error: number
-  invalid: number
   unsent: number
   sent: number
   status: Status
 
   constructor(input: any) {
     this.error = input['error']
-    this.invalid = input['invalid']
     this.unsent = input['unsent']
     this.sent = input['sent']
     this.status = input['status']

@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
-import { getPreviewMessage } from 'services/campaign.service'
-import { getPresignedUrl, completeFileUpload } from 'services/sms.service'
+import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton } from 'components/common'
+import { getPresignedUrl, completeFileUpload, getPreviewMessage } from 'services/sms.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
 
 const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
@@ -12,9 +11,22 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
-  const [previewBody, setPreviewBody] = useState('')
+  const [preview, setPreview] = useState({} as { body: string })
 
   const { id: campaignId } = useParams()
+
+  useEffect(() => {
+    loadPreview()
+  }, [campaignId])
+
+  async function loadPreview() {
+    if (campaignId) {
+      const msgPreview = await getPreviewMessage(+campaignId)
+      if (msgPreview) {
+        setPreview(msgPreview)
+      }
+    }
+  }
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
@@ -43,10 +55,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if(msgPreview){
-        setPreviewBody(msgPreview?.body)
-      }
+      await loadPreview()
 
       onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
 
@@ -82,11 +91,10 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
 
       <div className="separator"></div>
       {
-        previewBody &&
+        preview.body &&
         <>
           <p>Message preview</p>
-          <InfoBlock dangerouslySetInnerHTML={{ __html: previewBody }}>
-          </InfoBlock>
+          <PreviewBlock body={preview.body}></PreviewBlock>
           <div className="separator"></div>
         </>
       }

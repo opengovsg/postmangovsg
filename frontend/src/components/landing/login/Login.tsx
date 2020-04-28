@@ -83,7 +83,7 @@ const Login = () => {
           value={value}
           type={inputType}
           placeholder={placeholder}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+          onChange={onChange}
           buttonDisabled={!value || isLoading}
           inputDisabled={isLoading}
           onClick={onClick}>
