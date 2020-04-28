@@ -6,7 +6,7 @@ import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { S3Service } from '@core/services/s3.service'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
-import { MissingTemplateKeysError, TemplateError} from '@core/errors/template.errors'
+import { MissingTemplateKeysError, TemplateError } from '@core/errors/template.errors'
 
 const s3Client = new S3()
 
@@ -96,8 +96,9 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
       tokens,
     }
   } catch (err) {
-    console.error(err.message)
+    console.error(err.stack)
     if (err.message.includes('unclosed tag')) throw new TemplateError('There are unclosed curly brackets in the template')
+    if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
     throw err
   }
 }
