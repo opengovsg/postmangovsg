@@ -15,6 +15,7 @@
 .stepContainer {
   display: block;
   max-width: $content-max-width;
+  width: 100%;
   padding: $content-top-padding $site-padding $content-bottom-padding;
   margin: 0 auto;
 }
