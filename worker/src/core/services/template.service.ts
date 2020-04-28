@@ -14,7 +14,7 @@ import logger from '@core/logger'
  * @param templateBody - template body
  * @param params - dict of param variables used for interpolation
  */
-const parseTemplate = (templateBody: string, params?: {[key: string]: string}): {
+const parseTemplate = (templateBody: string, params?: { [key: string]: string }): {
   variables: Array<string>;
   tokens: Array<string>;
 } => {
@@ -77,7 +77,8 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
           }
         } else {
           // FIXME: be more specific about templateObject, just pass the error itself?
-          throw new Error(`Invalid template provided: ${JSON.stringify(templateObject)}`)
+          logger.error (`Templating error: invalid template provided. templateObject= ${JSON.stringify(templateObject)}`)
+          throw new Error(`Invalid template provided`)
         }
       } else {
         // normal string (non variable portion)
@@ -89,7 +90,9 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
       tokens,
     }
   } catch (err) {
-    console.error(err.message)
+    console.error(err.stack)
+    if (err.message.includes('unclosed tag')) throw new Error('There are unclosed curly brackets in the template')
+    if (err.name === 'Squirrelly Error') throw new Error(err.message)
     throw err
   }
 }
