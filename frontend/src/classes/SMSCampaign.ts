@@ -9,6 +9,7 @@ export enum SMSProgress {
 
 export class SMSCampaign extends Campaign {
   body: string
+  params: Array<string>
   csvFilename: string
   numRecipients: number
   preview: string
@@ -18,6 +19,7 @@ export class SMSCampaign extends Campaign {
   constructor(input: any) {
     super(input)
     this.body = input['sms_templates']?.body
+    this.params = input['sms_templates']?.params
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
     this.preview = input['preview']

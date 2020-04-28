@@ -52,3 +52,29 @@
     margin-right: 1rem;
   }
 }
+
+.uploadActions {
+  @include flex-horizontal;
+  justify-content: space-between;
+  width: 65%;
+
+  a {
+    cursor: pointer;
+    color: $indigo-blue;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+
+  @include mobile() {
+    @include flex-vertical;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    p {
+      margin-bottom: 2rem;
+    }
+  }
+}
