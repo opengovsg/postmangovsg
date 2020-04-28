@@ -2,27 +2,76 @@
 @import 'styles/_mixins';
 
 $progress-pane-width: 25rem;
+$progress-item-height: 5rem;
+
+// This max-width is not based on standard device width
+@mixin sm-mobile {
+  @media (max-width: 600px) {
+    @content;
+  }
+}
 
 .progressPane {
   width: $progress-pane-width;
   min-width: $progress-pane-width;
   border-right: 1px solid $indigo-blue;
+  @include mobile() {
+    display: flex;
+    width: 100%;
+    min-width: unset;
+    flex-direction: row;
+    border-right: none;
+    padding: 0 $site-padding;
+    margin-top: 2vh;
+  }
 }
 
 .progressItem {
   @include flex-horizontal;
-  align-items: baseline;
   font-size: 1rem;
   opacity: 0.2;
-  padding: 2rem 4rem;
+  padding: 0 4rem;
   user-select: none;
+  height: $progress-item-height;
   cursor: default;
+
+  @include mobile() {
+    width: 25%;
+    padding: 0 $site-padding;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @include sm-mobile() {
+    width: 20%;
+  }
 
   &.active {
     $border-left: 0.5rem;
     border-left: $border-left solid $indigo-blue;
     background-color: $light-blue;
     padding-left: calc(4rem - #{$border-left});
+
+    @include mobile() {
+      padding-left: $site-padding;
+      height: calc(#{$progress-item-height} + #{$border-left});
+      border-left: none;
+      border-bottom: $border-left solid $indigo-blue;
+      background-color: transparent;
+    }
+
+    @include sm-mobile() {
+      height: $progress-item-height;
+      flex-basis: 40%;
+      border-bottom: none;
+      background-color: transparent;
+
+      span {
+        width: auto;
+        margin-left: 3vw;
+        overflow: visible;
+      }
+    }
   }
 
   &.active,
@@ -35,12 +84,22 @@ $progress-pane-width: 25rem;
     $number-size: 1.8rem;
     height: $number-size;
     width: $number-size;
+    min-width: $number-size;
     background-color: $indigo-blue;
     font-size: 0.8rem;
     border-radius: 50%;
-    margin-right: 1rem;
     color: $light-blue;
     @include flex-horizontal;
     justify-content: center;
+  }
+
+  span {
+    margin-left: 1rem;
+
+    @include sm-mobile() {
+      overflow: hidden;
+      width: 0;
+      margin-left: 0;
+    }
   }
 }

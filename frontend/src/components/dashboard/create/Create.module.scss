@@ -5,11 +5,16 @@
   display: flex;
   flex: 1;
   position: relative;
+
+  @include mobile() {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .stepContainer {
   display: block;
-  width: 750px;
+  max-width: $content-max-width;
   padding: $content-top-padding $site-padding $content-bottom-padding;
   margin: 0 auto;
 }
