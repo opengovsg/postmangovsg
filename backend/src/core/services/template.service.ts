@@ -84,7 +84,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
         } else {
           // FIXME: be more specific about templateObject, just pass the error itself?
           logger.error (`Templating error: invalid template provided. templateObject= ${JSON.stringify(templateObject)}`)
-          throw new TemplateError(`Invalid template provided`)
+          throw new TemplateError('Invalid template provided')
         }
       } else {
         // normal string (non variable portion)
@@ -96,7 +96,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
       tokens,
     }
   } catch (err) {
-    logger.error({ message: `${err.stack}`})
+    logger.error({ message: `${err.stack}` })
     if (err.message.includes('unclosed tag')) throw new TemplateError('There are unclosed curly brackets in the template')
     if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
     throw err
@@ -106,7 +106,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
 const template = (templateBody: string, params: { [key: string]: string }): string => {
   const parsed = parseTemplate(templateBody, params)
   // Remove extra '\' infront of single quotes and backslashes
-  return parsed.tokens.map((t) => t.replace(/\\([\\\'])/g, "$1")).join('')
+  return parsed.tokens.map((t) => t.replace(/\\([\\'])/g, '$1')).join('')
 }
 
 const checkTemplateKeysMatch = (csvRecord: { [key: string]: string }, templateParams: Array<string>): void => {

@@ -22,7 +22,7 @@ import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
-  TemplateError
+  TemplateError,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import { storeCredentials, getCampaignDetails, previewFirstMessage } from '@sms/middlewares'
