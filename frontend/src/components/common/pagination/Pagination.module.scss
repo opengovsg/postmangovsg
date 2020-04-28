@@ -12,10 +12,12 @@
   @include icon;
   color: $dark-blue;
   vertical-align: middle;
+  cursor: pointer;
 }
 
 .navIconDisabled span {
   color: $light-grey;
+  cursor: default;
 }
 
 .break a {
