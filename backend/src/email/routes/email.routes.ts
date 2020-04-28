@@ -24,6 +24,7 @@ import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
+  TemplateError,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
@@ -203,7 +204,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
       })
     /* eslint-enable */
   } catch (err) {
-    if (err instanceof HydrationError) {
+    if (err instanceof HydrationError || err instanceof TemplateError) {
       return res.status(400).json({ message: err.message })
     }
     return next(err)
