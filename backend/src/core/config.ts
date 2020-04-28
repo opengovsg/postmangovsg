@@ -11,6 +11,7 @@ const IS_PROD: boolean = process.env.NODE_ENV === 'production'
 const awsRegion: string = process.env.AWS_REGION as string
 const uploadBucket: string = process.env.FILE_STORAGE_BUCKET_NAME as string
 const secretManagerSalt: string = process.env.SECRET_MANAGER_SALT as string
+const logGroupName: string = process.env.AWS_LOG_GROUP_NAME || 'postmangovsg-beanstalk-testing'
 
 // Upload csv
 const jwtSecret = process.env.JWT_SECRET as string
@@ -87,6 +88,7 @@ export default {
   IS_PROD,
   aws: {
     awsRegion,
+    logGroupName,
     uploadBucket,
     secretManagerSalt,
   },
