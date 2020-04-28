@@ -8,8 +8,37 @@ import styles from './ProgressDetails.module.scss'
 const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetry }:
   { sentAt: Date; numRecipients: number; stats: CampaignStats; handlePause: Function; handleRetry: Function }) => {
   const { status, error, unsent, sent } = stats
-  const [pauseDisabled, setPauseDisabled] = useState(stats.status === Status.Sent)
-  useEffect(() => {setPauseDisabled(stats.status === Status.Sent)},[status])
+  const [isSent, setIsSent] = useState(status === Status.Sent)
+  const [isComplete, setIsComplete] = useState(!error && !unsent)
+  useEffect(() => {
+    setIsComplete(!error && !unsent)
+    setIsSent(status === Status.Sent)
+  }, [status, error, unsent])
+
+  function renderButton() {
+    if (!isSent) {
+      return (
+        <PrimaryButton className={styles.pause} onClick={handlePause} >
+          Pause sending
+          <i className={cx(styles.icon, 'bx bx-error-circle')}></i>
+        </PrimaryButton>
+      )
+    }
+    if (!isComplete) {
+      return (
+        <PrimaryButton className={styles.retry} onClick={handleRetry} >
+          Retry / Resume sending
+          <i className={cx(styles.icon, 'bx bx-revision')}></i>
+        </PrimaryButton>
+      )
+    }
+    return (
+      <PrimaryButton className={styles.complete}>
+        Sending complete
+        <i className={cx(styles.icon, 'bx bx-check')}></i>
+      </PrimaryButton>
+    )
+  }
 
   return (
     <>
@@ -40,21 +69,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
 
         <div className={styles.progressTitle}>
           <h2>Progress</h2>
-          {
-            status === Status.Sent
-              ? (
-                <PrimaryButton className={styles.retry} onClick={handleRetry} disabled={!pauseDisabled}>
-                  Retry sending errored messages
-                  <i className={cx(styles.icon, 'bx bx-revision')}></i>
-                </PrimaryButton>
-              )
-              : (
-                <PrimaryButton className={styles.pause} onClick={handlePause} disabled={pauseDisabled}>
-                  Pause sending
-                  <i className={cx(styles.icon, 'bx bx-error-circle')}></i>
-                </PrimaryButton>
-              )
-          }
+          {renderButton()}
         </div>
         <ProgressBar progress={numRecipients - unsent} total={numRecipients} />
 
