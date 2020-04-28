@@ -1,7 +1,7 @@
 import SequelizeLoader from '@core/loaders/sequelize.loader'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-const createJob = async ({ campaignId, rate = 10 }: {campaignId: number; rate: number}): Promise<number | undefined> => {
+const createJob = async ({ campaignId, rate }: {campaignId: number; rate: number}): Promise<number | undefined> => {
   const job = await SequelizeLoader.sequelize?.query('SELECT insert_job(:campaignId, :rate);',
     {
       replacements: { campaignId, rate }, type: QueryTypes.SELECT,

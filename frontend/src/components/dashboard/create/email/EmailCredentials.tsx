@@ -52,7 +52,7 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
           <TextInputWithButton
             type="email"
             value={recipient}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRecipient(e.target.value)}
+            onChange={setRecipient}
             onClick={handleTestSend}
             inputDisabled={isValidating}
             buttonDisabled={isButtonDisabled() || isValidating}

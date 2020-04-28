@@ -37,3 +37,18 @@
 .turquoiseGreenBtn {
   @include button($turquoise-green);
 }
+
+.sendRateContainer {
+  display: flex;
+  justify-content: space-between;
+  text-align: right;
+  align-items: center;
+  a {
+    cursor: pointer;
+  }
+
+  input {
+    width: 7rem;
+    margin-right: 1rem;
+  }
+}

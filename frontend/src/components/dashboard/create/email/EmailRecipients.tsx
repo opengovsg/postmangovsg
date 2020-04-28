@@ -1,22 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { getPreviewMessage } from 'services/campaign.service'
-import { completeFileUpload, getPresignedUrl } from 'services/email.service'
+import { completeFileUpload, getPresignedUrl, getPreviewMessage } from 'services/email.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
-import { FileInput, InfoBlock, ErrorBlock, PrimaryButton } from 'components/common'
+import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton } from 'components/common'
 
-const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { id: number; csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
+const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [errorMessage, setErrorMessage] = useState(null)
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
-  const [previewBody, setPreviewBody] = useState('')
-  const [previewSubject, setPreviewSubject] = useState('')
-
+  const [preview, setPreview] = useState({} as { body: string; subject: string })
 
   const { id: campaignId } = useParams()
+
+  useEffect(() => {
+    loadPreview()
+  }, [campaignId])
+
+  async function loadPreview() {
+    if (campaignId) {
+      const msgPreview = await getPreviewMessage(+campaignId)
+      if (msgPreview) {
+        setPreview(msgPreview)
+      }
+    }
+  }
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
@@ -45,11 +55,7 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if(msgPreview){
-        setPreviewBody(msgPreview?.body)
-        setPreviewSubject(msgPreview?.subject || '')
-      }
+      await loadPreview()
 
       // Store filename and numRecipients in campaign object
       onNext({ csvFilename: uploadedFile.name, numRecipients: uploadResponse.num_recipients }, false)
@@ -58,13 +64,6 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
     } finally {
       setIsUploading(false)
     }
-  }
-
-  function constructPreviewMessage(body: string, subject: string): string {
-    return `
-      <div><b>Subject:</b><p>${subject}</p></div>
-      <div><b>Body:</b><p>${body}</p></div>
-    `
   }
 
   return (
@@ -92,11 +91,10 @@ const EmailRecipients = ({ id, csvFilename: initialCsvFilename, numRecipients: i
 
       <div className="separator"></div>
       {
-        previewBody &&
+        preview?.body &&
         <>
           <p>Message preview</p>
-          <InfoBlock dangerouslySetInnerHTML={{ __html: constructPreviewMessage(previewBody, previewSubject) }}>
-          </InfoBlock>
+          <PreviewBlock body={preview.body} subject={preview.subject} />
           <div className="separator"></div>
         </>
       }

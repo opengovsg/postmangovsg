@@ -41,7 +41,7 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
         )
       case EmailProgress.UploadRecipients:
         return (
-          <EmailRecipients id={campaign.id} csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
+          <EmailRecipients csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
         )
       case EmailProgress.SendTestMessage:
         return (
@@ -49,7 +49,7 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
         )
       case EmailProgress.Send:
         return (
-          <EmailSend id={campaign.id} body={campaign.body} numRecipients={campaign.numRecipients} onNext={onNext} />
+          <EmailSend numRecipients={campaign.numRecipients} />
         )
       default:
         return (<p>Invalid step</p>)

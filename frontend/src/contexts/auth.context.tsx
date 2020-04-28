@@ -5,6 +5,7 @@ interface ContextProps {
   isAuthenticated: boolean;
   setAuthenticated: Dispatch<SetStateAction<boolean>>;
   email: string;
+  setEmail: Dispatch<SetStateAction<string>>;
 }
 
 export const AuthContext = createContext({} as ContextProps)
@@ -34,6 +35,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       isAuthenticated,
       setAuthenticated,
       email,
+      setEmail,
     }}>
       {isLoaded && children}
     </AuthContext.Provider>

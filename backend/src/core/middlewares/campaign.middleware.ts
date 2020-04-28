@@ -71,7 +71,7 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
       include: [
         {
           model: JobQueue,
-          attributes: ['status'],
+          attributes: ['status', ['created_at', 'sent_at']],
         },
       ],
     }
