@@ -70,6 +70,12 @@ $widescreen: 1216px;
   cursor: pointer;
   user-select: none;
 
+  // unset min width on mobile, it's taking too much space
+  @include mobile() {
+    min-width: unset;
+    white-space: nowrap;
+  }
+
   &.alignRight {
     margin-left: auto;
     margin-right: 0;
