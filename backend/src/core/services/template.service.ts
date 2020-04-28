@@ -96,7 +96,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
       tokens,
     }
   } catch (err) {
-    console.error(err.stack)
+    logger.error({ message: `${err.stack}`})
     if (err.message.includes('unclosed tag')) throw new TemplateError('There are unclosed curly brackets in the template')
     if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
     throw err
