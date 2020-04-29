@@ -29,10 +29,10 @@ export class Campaign {
   getStatus(jobs: Array<{ status: string }>): Status {
     if (jobs) {
       const jobSet = new Set(jobs.map((x => x.status)))
-      if (jobSet.has('READY') || jobSet.has('ENQUEUED') || jobSet.has('SENDING')) {
+      if (['READY','ENQUEUED','SENDING','SENT','STOPPED'].some(s=>jobSet.has(s))) {
         return Status.Sending
       }
-      else if (jobSet.has('SENT') || jobSet.has('LOGGED')) {
+      else if (jobSet.has('LOGGED')) {
         return Status.Sent
       }
     }

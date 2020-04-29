@@ -24,13 +24,14 @@ export async function getCampaigns(): Promise<Array<Campaign>> {
 
 function parseStatus(status: string): Status {
   switch (status) {
+    case 'LOGGED':
+      return Status.Sent
     case 'READY':
     case 'ENQUEUED':
     case 'SENDING':
-      return Status.Sending
     case 'SENT':
-    case 'LOGGED':
-      return Status.Sent
+    case 'STOPPED':
+      return Status.Sending
     default:
       return Status.Draft
   }
