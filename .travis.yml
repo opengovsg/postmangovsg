@@ -56,4 +56,4 @@ jobs:
       - npm ci
     script:
       - npm run lint
-      - npm run build
+      - CI=false npm run build
