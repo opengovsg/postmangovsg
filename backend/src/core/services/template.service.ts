@@ -6,7 +6,7 @@ import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { S3Service } from '@core/services/s3.service'
 import { isSuperSet } from '@core/utils'
 import logger from '@core/logger'
-import { MissingTemplateKeysError } from '@core/errors/template.errors'
+import { MissingTemplateKeysError, TemplateError } from '@core/errors/template.errors'
 
 const s3Client = new S3()
 
@@ -55,13 +55,13 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
           if (key !== undefined) {
 
             if (key.length === 0) {
-              throw new Error('Blank template variable provided')
+              throw new TemplateError('Blank template variable provided')
             }
 
             // only allow alphanumeric template, prevents code execution
-            const keyHasValidChars = (key.match(/[^a-zA-z0-9]/) === null)
+            const keyHasValidChars = (key.match(/[^a-zA-Z0-9]/) === null)
             if (!keyHasValidChars) {
-              throw new Error(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
+              throw new TemplateError(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
             }
 
             // if params provided == attempt to carry out templating
@@ -70,7 +70,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
                 const templated = dict[key]
                 tokens.push(templated)
               } else {
-                throw new Error(`Param ${templateObject.c} not found`)
+                throw new TemplateError(`Param ${templateObject.c} not found`)
               }
             }
 
@@ -79,11 +79,12 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
 
           } else { // I have not found an edge case that trips this yet
             logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)
-            throw new Error('TemplateObject has no content')
+            throw new TemplateError('TemplateObject has no content')
           }
         } else {
           // FIXME: be more specific about templateObject, just pass the error itself?
-          throw new Error(`Invalid template provided: ${JSON.stringify(templateObject)}`)
+          logger.error (`Templating error: invalid template provided. templateObject= ${JSON.stringify(templateObject)}`)
+          throw new TemplateError('Invalid template provided')
         }
       } else {
         // normal string (non variable portion)
@@ -95,14 +96,17 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
       tokens,
     }
   } catch (err) {
-    console.error(err.message)
+    logger.error({ message: `${err.stack}` })
+    if (err.message.includes('unclosed tag')) throw new TemplateError('There are unclosed curly brackets in the template')
+    if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
     throw err
   }
 }
 
 const template = (templateBody: string, params: { [key: string]: string }): string => {
   const parsed = parseTemplate(templateBody, params)
-  return parsed.tokens.map((t) => t.replace(/\\([\\\'])/g, "$1")).join('')
+  // Remove extra '\' infront of single quotes and backslashes
+  return parsed.tokens.map((t) => t.replace(/\\([\\'])/g, '$1')).join('')
 }
 
 const checkTemplateKeysMatch = (csvRecord: { [key: string]: string }, templateParams: Array<string>): void => {

@@ -4,7 +4,7 @@ import { ModalContext } from 'contexts/modal.context'
 import ConfirmModal from 'components/dashboard/confirm-modal'
 import { useParams } from 'react-router-dom'
 
-import { PreviewBlock, PrimaryButton, TextInput } from 'components/common'
+import { PreviewBlock, PrimaryButton } from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
 import styles from '../Create.module.scss'
 
@@ -12,8 +12,6 @@ const EmailSend = ({ numRecipients }: { numRecipients: number }) => {
 
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string; subject: string })
-  const [useCustomRate, setUseCustomRate] = useState(false)
-  const [sendRate, setSendRate] = useState('')
   const { id: campaignId } = useParams()
 
   if (!campaignId) {
@@ -35,7 +33,7 @@ const EmailSend = ({ numRecipients }: { numRecipients: number }) => {
 
   const openModal = () => {
     modalContext.setModalContent(
-      <ConfirmModal campaignId={+campaignId} sendRate={+sendRate}></ConfirmModal>
+      <ConfirmModal campaignId={+campaignId} sendRate={0}></ConfirmModal>
     )
   }
 
@@ -55,24 +53,7 @@ const EmailSend = ({ numRecipients }: { numRecipients: number }) => {
 
       <div className="separator"></div>
 
-      <div className={styles.sendRateContainer}>
-        {useCustomRate ?
-          <span>
-            <TextInput
-              type="tel"
-              value={sendRate}
-              maxlength="4"
-              onChange={(str: string) => setSendRate(str.replace(/\D/g, ''))}
-              placeholder='send rate'></TextInput>
-            <a onClick={() => { setUseCustomRate(false); setSendRate('') }}>
-              Cancel
-            </a>
-          </span>
-          :
-          <a onClick={() => setUseCustomRate(true)}>
-            Custom send rate?
-          </a>
-        }
+      <div className="progress-button">
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>

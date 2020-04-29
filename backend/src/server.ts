@@ -25,6 +25,7 @@ const app: express.Application = express()
 const start = async (): Promise<void> => {
   checkRequiredEnvVars(requiredEnvVars)
   await loaders({ app })
+  // eslint-disable-next-line no-console
   app.listen(port, () => console.log(`Listening on port ${port}!`))
 }
 

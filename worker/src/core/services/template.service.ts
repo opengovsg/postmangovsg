@@ -14,7 +14,7 @@ import logger from '@core/logger'
  * @param templateBody - template body
  * @param params - dict of param variables used for interpolation
  */
-const parseTemplate = (templateBody: string, params?: {[key: string]: string}): {
+const parseTemplate = (templateBody: string, params?: { [key: string]: string }): {
   variables: Array<string>;
   tokens: Array<string>;
 } => {
@@ -53,7 +53,7 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
             }
 
             // only allow alphanumeric template, prevents code execution
-            const keyHasValidChars = (key.match(/[^a-zA-z0-9]/) === null)
+            const keyHasValidChars = (key.match(/[^a-zA-Z0-9]/) === null)
             if (!keyHasValidChars) {
               throw new Error(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
             }
@@ -77,7 +77,8 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
           }
         } else {
           // FIXME: be more specific about templateObject, just pass the error itself?
-          throw new Error(`Invalid template provided: ${JSON.stringify(templateObject)}`)
+          logger.error (`Templating error: invalid template provided. templateObject= ${JSON.stringify(templateObject)}`)
+          throw new Error(`Invalid template provided`)
         }
       } else {
         // normal string (non variable portion)
@@ -89,14 +90,17 @@ const parseTemplate = (templateBody: string, params?: {[key: string]: string}): 
       tokens,
     }
   } catch (err) {
-    console.error(err.message)
+    logger.error({ message: `${err.stack}` })
+    if (err.message.includes('unclosed tag')) throw new Error('There are unclosed curly brackets in the template')
+    if (err.name === 'Squirrelly Error') throw new Error(err.message)
     throw err
   }
 }
 
 const template = (templateBody: string, params: {[key: string]: string}): string => {
   const parsed = parseTemplate(templateBody, params)
-  return parsed.tokens.join('')
+  // Remove extra '\' infront of single quotes and backslashes
+  return parsed.tokens.map((t) => t.replace(/\\([\\'])/g, '$1')).join('')
 }
 
 export { template  }

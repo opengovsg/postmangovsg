@@ -21,46 +21,46 @@
   display: block;
   overflow-x: auto;
   max-width: 100%;
-}
 
-table {
-  min-width: calc(#{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding});
-  width: 100%;
+  table.campaignTable {
+    min-width: calc(#{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding});
+    width: 100%;
 
-  tbody tr {
-    &:hover {
-      cursor: pointer;
-      background-color: $transparent-blue;
+    tbody tr {
+      &:hover {
+        cursor: pointer;
+        background-color: $transparent-blue;
+      }
+
+      &:active {
+        opacity: 0.5;
+      }
     }
 
-    &:active {
-      opacity: 0.5;
-    }
-  }
+    tr {
+      @include flex-horizontal;
+      border-bottom: 1px solid $transparent-blue;
 
-  tr {
-    @include flex-horizontal;
-    border-bottom: 1px solid $transparent-blue;
+      td,
+      th {
+        padding: 0.75rem 0;
 
-    td,
-    th {
-      padding: 0.75rem 0;
+        &.xs {
+          flex: 1.2;
+          text-align: center;
+        }
 
-      &.xs {
-        flex: 1.2;
-        text-align: center;
-      }
+        &.sm {
+          flex: 2;
+        }
 
-      &.sm {
-        flex: 2;
-      }
+        &.md {
+          flex: 3;
+        }
 
-      &.md {
-        flex: 3;
-      }
-
-      &.lg {
-        flex: 4;
+        &.lg {
+          flex: 4;
+        }
       }
     }
   }

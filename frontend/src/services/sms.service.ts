@@ -16,9 +16,7 @@ export async function saveTemplate(campaignId: number, body: string): Promise<{ 
     const response = await axios.put(`/campaign/${campaignId}/sms/template`, {
       body,
     })
-    const { num_recipients: numRecipients, message, updatedTemplate } = response.data
-    // How should we show this message?
-    console.log(message)
+    const { num_recipients: numRecipients, updatedTemplate } = response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template.')

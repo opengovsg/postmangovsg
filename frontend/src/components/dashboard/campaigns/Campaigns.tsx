@@ -124,9 +124,8 @@ const Campaigns = () => {
     return (
       <>
         <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
-
         <div className={styles.tableContainer}>
-          <table>
+          <table className={styles.campaignTable}>
             <thead>
               <tr>
                 {
@@ -166,12 +165,14 @@ const Campaigns = () => {
         </PrimaryButton>
       </TitleBar>
       <div className={styles.content}>
-        {isLoading && <i className={cx(styles.icon, styles.spinner, 'bx bx-loader-alt bx-spin')}></i>}
-        {!isLoading && (
-          campaigns.length > 0
-            ? renderCampaignList()
-            : renderEmptyDashboard()
-        )}
+        {isLoading
+          ? <i className={cx(styles.icon, styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
+          : (
+            campaigns.length > 0
+              ? renderCampaignList()
+              : renderEmptyDashboard()
+          )
+        }
       </div>
     </>
   )

@@ -89,15 +89,14 @@ const isOtpVerified = async (input: VerifyOtpInput): Promise<boolean> => {
   }
 }
 
-const doesUserExist = async (email: string): Promise<boolean> => {
-  const user = await User.findOne({ where: { email: email } })
-  if (user === null) throw new Error('No user was found with this email')
-  return true
-}
-
 const isWhitelistedEmail = async (email: string): Promise<boolean> => {
   const isGovEmail = /^.*\.gov\.sg$/.test(email)
-  return isGovEmail || doesUserExist(email)
+  if(!isGovEmail){ 
+    // If the email is not a .gov.sg email, check that it was  whitelisted by us manually
+    const user = await User.findOne({ where: { email: email } })
+    if (user === null) throw new Error('No user was found with this email')
+  }
+  return true
 }
 
 const sendOtp = (recipient: string, otp: string): Promise<string | void> => {
@@ -112,7 +111,6 @@ const sendOtp = (recipient: string, otp: string): Promise<string | void> => {
 const getOtp = async (req: Request, res: Response): Promise<Response> => {
   const email = req.body.email
   try {
-    await doesUserExist(email) // TODO: remove when launching so that anyone with a .gov.sg email can sign up
     await isWhitelistedEmail(email)
     await hasWaitTimeElapsed(email)
   } catch (e) {
