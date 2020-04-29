@@ -4,6 +4,8 @@ node_js:
 
 services:
   - docker
+  - postgresql
+  - redis-server
 
 # Skip the automatic npm ci step 
 install: skip
@@ -17,6 +19,10 @@ jobs:
   - name: backend
     before_script:
       - cd backend
+      - psql -c 'create database postmangovsgtest;' -U postgres
+    script:
+      - npm install
+      - npm run test
     deploy:
       - provider: elasticbeanstalk
         skip_cleanup: true
