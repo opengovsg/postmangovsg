@@ -1,20 +1,17 @@
 import React from 'react'
+import { without, times, constant } from 'lodash'
 
 import styles from './SampleCsv.module.scss'
 
 const SampleCsv = ({ params, defaultRecipient }: { params: Array<string>; defaultRecipient: string }) => {
 
-  function onDownloadFile() {
-    const headers: Array<string> = params
-    const body: Array<string> = Array(params.length).fill('abc')
+  const RECIPIENT_HEADER = 'recipient'
 
-    if (headers.indexOf('recipient') === -1) {
-      headers.push('recipient')
-      body.push(defaultRecipient)
-    } else {
-      // if receipient is part of params, insert default recipient value
-      body[headers.indexOf('recipient')] = defaultRecipient
-    }
+  function onDownloadFile() {
+    // Add recipient column in front, remove if already in params
+    const headers = [RECIPIENT_HEADER, ...without(params, RECIPIENT_HEADER)]
+    // Set default recipient as first value and pad with placeholder
+    const body = [defaultRecipient, ...times(headers.length - 1, constant('abc'))]
 
     const content = [
       `data:text/csv;charset=utf-8,${headers.join(',')}`,
