@@ -27,17 +27,12 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
     if (!isComplete) {
       return (
         <PrimaryButton className={styles.retry} onClick={handleRetry} >
-          Retry / Resume sending
+          Retry/Resume sending
           <i className={cx(styles.icon, 'bx bx-revision')}></i>
         </PrimaryButton>
       )
     }
-    return (
-      <PrimaryButton className={styles.complete}>
-        Sending complete
-        <i className={cx(styles.icon, 'bx bx-check')}></i>
-      </PrimaryButton>
-    )
+    return null
   }
 
   return (
@@ -68,10 +63,10 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
         </table>
 
         <div className={styles.progressTitle}>
-          <h2>Progress</h2>
+          <h2>{isComplete ? 'Sending completed': 'Progress' }</h2>
           {renderButton()}
         </div>
-        <ProgressBar progress={numRecipients - unsent} total={numRecipients} />
+        <ProgressBar progress={numRecipients - unsent} total={numRecipients} isComplete={isComplete}/>
 
         <table className={styles.stats}>
           <thead>
@@ -100,7 +95,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
             </tr>
             <tr>
               <td className={cx(styles.status, styles.md)}>
-                <i className={cx(styles.icon, styles.blue, 'bx bx-check-circle')}></i>
+                <i className={cx(styles.icon, styles.green, 'bx bx-check-circle')}></i>
                 Sent
               </td>
               <td className={styles.md}>Sent to recipient</td>
