@@ -1,0 +1,11 @@
+DB_URI=postgres://localhost:5432/postmangovsgtest
+SESSION_SECRET='secret'
+REDIS_OTP_URI=redis://localhost:6379/4
+REDIS_SESSION_URI=redis://localhost:6379/5
+AWS_REGION='ap-northeast-1'
+FILE_STORAGE_BUCKET_NAME='name'
+JWT_SECRET='secret'
+SECRET_MANAGER_SALT='$2b$10$9cSPjtWbMnATxJ4PjfZX8e'
+API_KEY_SALT_V1='$2b$10$o5JEFyRcL9WHQFqmu8W3mO'
+FRONTEND_URL='http://localhost:3000'
+COOKIE_DOMAIN='localhost'
