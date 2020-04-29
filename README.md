@@ -133,9 +133,18 @@ See [sending.md](docs/architecture.md) for details
 
 ## Contributions
 
+The production branch is `master`, and the development branch is `develop`.
+
+**If you have write access to this repository**
+- Check out your feature branch from `develop`
+- Make changes, and commit those changes
+- Push these changes to Github
+- Submit a pull request against `develop`, filling in the standard template
+
+**If you do not have write access to this repository**
 - Fork this repository
 - Clone the forked repository to your machine
 - Create a branch, make changes and commit those changes.
 - Push these changes to Github
-- Submit a pull request to the *base fork* (that's us!)
+- Submit a pull request against `basefork/develop` (that's us!)
 - Describe the issue as thoroughly as possible, and with screenshots if applicable. A picture speaks a thousand words!
