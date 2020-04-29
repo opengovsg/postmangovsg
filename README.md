@@ -75,6 +75,35 @@ env:
   - DEPLOY_WORKER=true
 ```
 
+## Infrastructure customizations
+
+#### Amplify rewrite rule
+
+```
+[
+    {
+        "source": "</^[^.]+$|\\\\\\\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf)$)([^.]+$)/>",
+        "target": "/index.html",
+        "status": "200",
+        "condition": null
+    }
+]
+```
+
+#### Elastic Container Service
+
+Create a cluster with four services. These names are currently hardcoded for deployment in .travis.yml
+
+|Cluster Name: postmangovsg-workers|
+|--|
+
+|Service Name|LaunchType|Platform version|
+|--|--|--|
+|staging-sending|FARGATE|1.4.0|
+|staging-logger|FARGATE|1.4.0|
+|prod-sending|FARGATE|1.4.0|
+|prod-logger|FARGATE|1.4.0|
+
 ## Architecture
 
 ## How it sends messages
