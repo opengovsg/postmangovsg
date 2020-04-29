@@ -56,7 +56,7 @@ jobs:
     before_install:
       - cd frontend
     install:
-      - npm ci
+      - npm i
     script:
       - npm run lint
       - CI=false npm run build
