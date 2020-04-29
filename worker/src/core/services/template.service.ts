@@ -53,7 +53,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
             }
 
             // only allow alphanumeric template, prevents code execution
-            const keyHasValidChars = (key.match(/[^a-zA-z0-9]/) === null)
+            const keyHasValidChars = (key.match(/[^a-zA-Z0-9]/) === null)
             if (!keyHasValidChars) {
               throw new Error(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
             }
