@@ -49,3 +49,11 @@ jobs:
         on:
           branch: $PRODUCTION_BRANCH
           condition: "$DEPLOY_WORKER = true"
+  - name: frontend
+    before_install:
+      - cd frontend
+    install:
+      - npm ci
+    script:
+      - npm run lint
+      - npm run build

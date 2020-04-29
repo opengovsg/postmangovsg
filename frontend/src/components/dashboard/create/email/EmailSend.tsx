@@ -4,7 +4,7 @@ import { ModalContext } from 'contexts/modal.context'
 import ConfirmModal from 'components/dashboard/confirm-modal'
 import { useParams } from 'react-router-dom'
 
-import { PreviewBlock, PrimaryButton, SendRate } from 'components/common'
+import { PreviewBlock, PrimaryButton } from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
 import styles from '../Create.module.scss'
 
@@ -12,7 +12,6 @@ const EmailSend = ({ numRecipients }: { numRecipients: number }) => {
 
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string; subject: string })
-  const [sendRate, setSendRate] = useState('')
   const { id: campaignId } = useParams()
 
   if (!campaignId) {
@@ -34,7 +33,7 @@ const EmailSend = ({ numRecipients }: { numRecipients: number }) => {
 
   const openModal = () => {
     modalContext.setModalContent(
-      <ConfirmModal campaignId={+campaignId} sendRate={+sendRate}></ConfirmModal>
+      <ConfirmModal campaignId={+campaignId} sendRate={0}></ConfirmModal>
     )
   }
 
@@ -51,8 +50,6 @@ const EmailSend = ({ numRecipients }: { numRecipients: number }) => {
         <p className={styles.greyText}>Message</p>
         <PreviewBlock body={preview.body} subject={preview.subject} />
       </div>
-
-      {/* <SendRate sendRate={sendRate} setSendRate={setSendRate} /> */}
 
       <div className="separator"></div>
 

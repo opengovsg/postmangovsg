@@ -1,8 +1,8 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useState, Dispatch, SetStateAction } from 'react'
 import Modal from 'components/common/modal'
 
 const defaultValue = {
-  setModalContent: (_content: any) => { },
+  setModalContent: {} as Dispatch<SetStateAction<any>>,
 }
 
 export const ModalContext = createContext(defaultValue)
