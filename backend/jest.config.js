@@ -11,5 +11,8 @@ module.exports = {
     '@sms/(.*)': '<rootDir>/src/sms/$1',
     '@email/(.*)': '<rootDir>/src/email/$1'
   },
+  "transform": {
+    "^.+\\.(ts|tsx)$": "ts-jest"
+  },
   "testEnvironment": "node",
 } 
