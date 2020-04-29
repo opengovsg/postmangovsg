@@ -6,17 +6,6 @@
     width: 100%;
     margin-bottom: 3rem;
 
-    tbody tr {
-      &:hover {
-        cursor: default;
-        background-color: unset;
-      }
-
-      &:active {
-        opacity: 0.5;
-      }
-    }
-
     tr {
       @include flex-horizontal;
       border-bottom: none;
@@ -79,6 +68,10 @@
   &.blue {
     color: $indigo-blue;
   }
+
+  &.green {
+    color: $turquoise-green;
+  }
 }
 
 .progressTitle {
@@ -91,6 +84,11 @@
   }
 
   .retry {
-    @include button($dark-blue)
+    @include button($dark-blue);
+  }
+
+  .complete {
+    @include button ($turquoise-green);
+    pointer-events: none;
   }
 }

@@ -20,8 +20,8 @@ jobs:
     deploy:
       - provider: elasticbeanstalk
         skip_cleanup: true
-        access_key_id: $AWS_ACCESS_KEY_ID_FOR_DEPLOYMENT
-        secret_access_key: $AWS_SECRET_ACCESS_KEY_FOR_DEPLOYMENT
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
         region: $AWS_DEFAULT_REGION
         app: "postmangovsg-backend"
         env: "postmangovsg-backend-staging"
@@ -30,8 +30,8 @@ jobs:
           branch: $STAGING_BRANCH
       - provider: elasticbeanstalk
         skip_cleanup: true
-        access_key_id: $AWS_ACCESS_KEY_ID_FOR_DEPLOYMENT
-        secret_access_key: $AWS_SECRET_ACCESS_KEY_FOR_DEPLOYMENT
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
         region: $AWS_DEFAULT_REGION
         app: "postmangovsg-backend"
         env: "postmangovsg-backend-prod"

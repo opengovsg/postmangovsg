@@ -12,4 +12,7 @@
   border-radius: $border-radius;
   height: 100%;
   transition: all 1s;
+  &.complete {
+    background-color: $turquoise-green;
+  }
 }

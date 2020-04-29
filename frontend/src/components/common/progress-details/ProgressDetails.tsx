@@ -8,8 +8,32 @@ import styles from './ProgressDetails.module.scss'
 const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetry }:
   { sentAt: Date; numRecipients: number; stats: CampaignStats; handlePause: Function; handleRetry: Function }) => {
   const { status, error, unsent, sent } = stats
-  const [pauseDisabled, setPauseDisabled] = useState(stats.status === Status.Sent)
-  useEffect(() => {setPauseDisabled(stats.status === Status.Sent)},[status])
+  const [isSent, setIsSent] = useState(status === Status.Sent)
+  const [isComplete, setIsComplete] = useState(!error && !unsent)
+  useEffect(() => {
+    setIsComplete(!error && !unsent)
+    setIsSent(status === Status.Sent)
+  }, [status, error, unsent])
+
+  function renderButton() {
+    if (!isSent) {
+      return (
+        <PrimaryButton className={styles.pause} onClick={handlePause} >
+          Pause sending
+          <i className={cx(styles.icon, 'bx bx-error-circle')}></i>
+        </PrimaryButton>
+      )
+    }
+    if (!isComplete) {
+      return (
+        <PrimaryButton className={styles.retry} onClick={handleRetry} >
+          Retry/Resume sending
+          <i className={cx(styles.icon, 'bx bx-revision')}></i>
+        </PrimaryButton>
+      )
+    }
+    return null
+  }
 
   return (
     <>
@@ -39,24 +63,10 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
         </table>
 
         <div className={styles.progressTitle}>
-          <h2>Progress</h2>
-          {
-            status === Status.Sent
-              ? (
-                <PrimaryButton className={styles.retry} onClick={handleRetry} disabled={!pauseDisabled}>
-                  Retry sending errored messages
-                  <i className={cx(styles.icon, 'bx bx-revision')}></i>
-                </PrimaryButton>
-              )
-              : (
-                <PrimaryButton className={styles.pause} onClick={handlePause} disabled={pauseDisabled}>
-                  Pause sending
-                  <i className={cx(styles.icon, 'bx bx-error-circle')}></i>
-                </PrimaryButton>
-              )
-          }
+          <h2>{isComplete ? 'Sending completed': 'Progress' }</h2>
+          {renderButton()}
         </div>
-        <ProgressBar progress={numRecipients - unsent} total={numRecipients} />
+        <ProgressBar progress={numRecipients - unsent} total={numRecipients} isComplete={isComplete}/>
 
         <table className={styles.stats}>
           <thead>
@@ -85,7 +95,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
             </tr>
             <tr>
               <td className={cx(styles.status, styles.md)}>
-                <i className={cx(styles.icon, styles.blue, 'bx bx-check-circle')}></i>
+                <i className={cx(styles.icon, styles.green, 'bx bx-check-circle')}></i>
                 Sent
               </td>
               <td className={styles.md}>Sent to recipient</td>
