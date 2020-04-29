@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton } from 'components/common'
+import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton, SampleCsv } from 'components/common'
 import { getPresignedUrl, completeFileUpload, getPreviewMessage } from 'services/sms.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
 
@@ -69,22 +69,6 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
     }
   }
 
-  function onDownloadFile() {
-    const dummyRecipient = '88888888'
-    const content = [
-      `data:text/csv;charset=utf-8,${params.join(',')}, recipient`,
-      `${Array(params.length).fill('abc')},${dummyRecipient}`,
-    ].join('\n')
-    const encodedUri = encodeURI(content)
-
-    // Trigger file download
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute('download', 'postman_sample.csv')
-    document.body.appendChild(link)
-    link.click()
-  }
-
   return (
     <>
       <sub>Step 2</sub>
@@ -108,7 +92,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       <div className={styles.uploadActions}>
         <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
         <p>or</p>
-        <a onClick={onDownloadFile}>Download a sample .csv file</a>
+        <SampleCsv params={params} />
       </div>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
