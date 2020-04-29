@@ -1,8 +1,11 @@
 # Postman.gov.sg
 ## Architecture
 
-![Diagram](./postman.png)
+**Prod only (replicate for staging vpc)**
 
+![Diagram](./postman-prod.png)
+
+**DB schema**
 
 ![DB Diagram](./5ea9488f39d18f5553fe68ff.png)
 
