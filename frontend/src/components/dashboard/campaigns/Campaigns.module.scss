@@ -7,6 +7,10 @@
   margin: 0 auto;
   width: 1000px;
   max-width: calc(100vw - (2 * #{$site-padding}));
+
+  @include mobile() {
+    max-width: calc(100vw - (2 * #{$mobile-site-padding}));
+  }
 }
 
 .header {
@@ -73,7 +77,9 @@ table {
     width: 350px;
   }
 
-  h2 { font-weight: 500; }
+  h2 {
+    font-weight: 500;
+  }
   h5 {
     font-weight: normal;
     margin-bottom: 1rem;

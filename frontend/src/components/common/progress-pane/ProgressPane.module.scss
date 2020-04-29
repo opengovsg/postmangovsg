@@ -21,7 +21,7 @@ $progress-item-height: 5rem;
     min-width: unset;
     flex-direction: row;
     border-right: none;
-    padding: 0 $site-padding;
+    padding: 0 3vw;
     margin-top: 2vh;
   }
 }
@@ -37,7 +37,7 @@ $progress-item-height: 5rem;
 
   @include mobile() {
     width: 25%;
-    padding: 0 $site-padding;
+    padding: 0 3vw;
     justify-content: center;
     align-items: center;
   }
@@ -53,7 +53,7 @@ $progress-item-height: 5rem;
     padding-left: calc(4rem - #{$border-left});
 
     @include mobile() {
-      padding-left: $site-padding;
+      padding-left: 3vw;
       height: calc(#{$progress-item-height} + #{$border-left});
       border-left: none;
       border-bottom: $border-left solid $indigo-blue;
