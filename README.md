@@ -126,10 +126,10 @@ Create a cluster with four services. These names are currently hardcoded for dep
 |prod-logger|FARGATE|1.4.0|
 
 ## Architecture
-See [architecture.md](docs/architecture.md) for details
+See [architecture](docs/architecture/index.md) for details
 
 ## How messages are sent
-See [sending.md](docs/architecture.md) for details
+See [sending.md](docs/sending.md) for details
 
 ## Contributions
 

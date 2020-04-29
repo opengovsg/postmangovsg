@@ -1,2 +1,0 @@
-# Postman.gov.sg
-## Architecture
