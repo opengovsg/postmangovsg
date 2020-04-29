@@ -11,7 +11,8 @@ interface UploadCompleteResponse {
   hydrated_record: string;
 }
 
-export async function saveTemplate(campaignId: number, subject: string, body: string): Promise<{ numRecipients: number; updatedTemplate?: { body: string; subject: string } }> {
+export async function saveTemplate(campaignId: number, subject: string, body: string):
+  Promise<{ numRecipients: number; updatedTemplate?: { body: string; subject: string; params: Array<string> } }> {
   try {
     const response = await axios.put(`/campaign/${campaignId}/email/template`, {
       body,

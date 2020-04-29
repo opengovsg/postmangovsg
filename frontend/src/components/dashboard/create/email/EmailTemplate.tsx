@@ -19,7 +19,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
         throw new Error('Invalid campaign id')
       }
       const { updatedTemplate, numRecipients } = await saveTemplate(+campaignId, subject, body)
-      onNext({ subject: updatedTemplate?.subject, body: updatedTemplate?.body, numRecipients })
+      onNext({ subject: updatedTemplate?.subject, body: updatedTemplate?.body, params: updatedTemplate?.params, numRecipients })
     } catch (err) {
       setErrorMsg(err.message)
     }
