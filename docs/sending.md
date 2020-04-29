@@ -105,7 +105,7 @@ The order of jobs in the job queue table determines their priority. The older th
 ### Why don't we have an enqueue worker? 
 Given that it takes time to queue the messages from ground truth into the ops table, it would be great to have a worker doing the enqueueing while the sender worker picks up messages to send. It would speed things up. However this poses several challenges:
 
-- If the enqueue worker is slower than the sending worker, then the sending worker may incorrectly assume that there are no more messages to send. What then would be the termination condition for a logger worker to finalize the job?
+- If the enqueue worker is slower than the sending worker, then the sending worker may incorrectly assume that there are no more messages to send. What then would the termination condition be for a logger worker to finalize the job?
 - If there are enqueue worker is slower than the sending worker, it might create bias towards new jobs with credentials that are not in use. 
 
 ### Why not just use indexes to speed things up?
