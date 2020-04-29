@@ -36,7 +36,7 @@ const SendRate = ({ sendRate, setSendRate }: { sendRate: string; setSendRate: Di
           <TextInput
             type="tel"
             value={sendRate}
-            maxLength="4"
+            maxLength="3"
             className={styles.input}
             onChange={(str: string) => setSendRate(str.replace(/\D/g, ''))}
             placeholder='enter send rate'
