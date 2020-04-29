@@ -2,13 +2,23 @@ import React from 'react'
 
 import styles from './SampleCsv.module.scss'
 
-const SampleCsv = ({ params }: { params: Array<string> }) => {
+const SampleCsv = ({ params, defaultRecipient }: { params: Array<string>; defaultRecipient: string }) => {
 
   function onDownloadFile() {
-    const dummyRecipient = '88888888'
+    const headers: Array<string> = params
+    const body: Array<string> = Array(params.length).fill('abc')
+
+    if (headers.indexOf('recipient') === -1) {
+      headers.push('recipient')
+      body.push(defaultRecipient)
+    } else {
+      // if receipient is part of params, insert default recipient value
+      body[headers.indexOf('recipient')] = defaultRecipient
+    }
+
     const content = [
-      `data:text/csv;charset=utf-8,${params.join(',')}, recipient`,
-      `${Array(params.length).fill('abc')},${dummyRecipient}`,
+      `data:text/csv;charset=utf-8,${headers.join(',')}`,
+      `${body.join(',')}`,
     ].join('\n')
     const encodedUri = encodeURI(content)
 

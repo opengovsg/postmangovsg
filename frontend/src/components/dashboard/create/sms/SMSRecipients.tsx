@@ -92,7 +92,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       <div className={styles.uploadActions}>
         <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
         <p>or</p>
-        <SampleCsv params={params} />
+        <SampleCsv params={params} defaultRecipient="88888888" />
       </div>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>

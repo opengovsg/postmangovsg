@@ -92,7 +92,7 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
       <div className={styles.uploadActions}>
         <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
         <p>or</p>
-        <SampleCsv params={params} />
+        <SampleCsv params={params} defaultRecipient="user@email.com" />
       </div>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
