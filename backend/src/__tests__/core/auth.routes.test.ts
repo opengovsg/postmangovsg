@@ -12,12 +12,29 @@ beforeAll(async() => {
 })
 
 describe('POST /auth/otp', () => {
-  test('Should respond with a 200 when there is email in body', async () => {
+  test('200 when there is email in body', async () => {
     const response = await(request(app)
       .post('/v1/auth/otp')
       .send({
         email: 'test@open.gov.sg'
       }))
       expect(response.status).toBe(200)
+  })
+
+  test('400 when there is no email in body', async () => {
+    const response = await(request(app)
+      .post('/v1/auth/otp')
+      .send({
+      }))
+      expect(response.status).toBe(400)
+  })
+
+  test('401 when email is not a gov.sg', async () => {
+    const response = await(request(app)
+      .post('/v1/auth/otp')
+      .send({
+        email: 'test@test.com'
+      }))
+      expect(response.status).toBe(401)
   })
 })
