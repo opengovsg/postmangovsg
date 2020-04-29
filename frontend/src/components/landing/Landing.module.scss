@@ -21,6 +21,10 @@
 
     .landingImg {
       flex: 1;
+
+      img {
+        vertical-align: bottom;
+      }
       @include mobile() {
         display: none;
       }

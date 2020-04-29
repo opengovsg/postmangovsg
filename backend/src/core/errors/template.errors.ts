@@ -7,10 +7,18 @@ export class MissingTemplateKeysError extends Error {
     Error.captureStackTrace(this)
   }
 }
-
+ 
 export class HydrationError extends Error {
   constructor() {
     super('Error hydrating template')
+    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
+    Error.captureStackTrace(this)
+  }
+}
+
+export class TemplateError extends Error {
+  constructor(message: string) {
+    super(message)
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
     Error.captureStackTrace(this)
   }

@@ -29,7 +29,7 @@
 
     &:not(.active) {
       color: $indigo-blue;
-      background: white;
+      background: $light-blue;
 
       &:hover {
         background: $indigo-blue;

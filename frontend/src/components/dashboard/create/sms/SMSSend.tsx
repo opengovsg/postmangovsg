@@ -46,10 +46,10 @@ const SMSSend = ({ numRecipients }: { numRecipients: number }) => {
       <div className="separator"></div>
 
       <div className={styles.sendInfo}>
-        <p>Number of recipients</p>
+        <p className={styles.greyText}>Number of recipients</p>
         <h4>{numRecipients}</h4>
 
-        <p>Message</p>
+        <p className={styles.greyText}>Message</p>
         <PreviewBlock body={preview.body}></PreviewBlock>
       </div>
 

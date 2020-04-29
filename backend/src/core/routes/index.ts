@@ -1,6 +1,5 @@
-import { Router } from 'express'
+import { Router, Request, Response, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { Request, Response } from 'express'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { isCookieAuthenticated } from '@core/middlewares'
@@ -49,9 +48,24 @@ const redirectToChannelRoute = async (req: Request, res: Response): Promise<Resp
   return res.redirect(307, redirectTo)
 }
 
+/**
+ * Healthcheck endpoint that connects to the db
+ * @param _req
+ * @param res 
+ * @param next 
+ */
+const ping = async (_req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
+    await Campaign.sequelize?.query('SELECT 1+1;')
+    return res.sendStatus(200)
+  }
+  catch(err){
+    return next(err)
+  }
+}
 
 const router = Router()
-
+router.use('/ping', ping)
 router.use('/auth', authenticationRoutes)
 router.use('/campaigns', isCookieAuthenticated, campaignRoutes)
 router.use('/campaign/:campaignId/sms', isCookieAuthenticated, celebrate(campaignIdValidator), smsRoutes)
