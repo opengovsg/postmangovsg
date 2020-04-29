@@ -7,6 +7,9 @@ services:
 
 # Skip the automatic npm ci step 
 install: skip
+cache:
+  directories:
+    - frontend/node_modules
 
 # Deploy from Dockerfile
 jobs:
