@@ -12,6 +12,7 @@
     + [Set environment variables](#set-environment-variables)
     + [Install and run the app](#install-and-run-the-app)
   * [Deployment](#deployment)
+  * [Downtime procedure](#downtime-procedure)
   * [Infrastructure customizations](#infrastructure-customizations)
       - [Amplify rewrite rule](#amplify-rewrite-rule)
       - [Elastic Container Service](#elastic-container-service)
@@ -91,6 +92,9 @@ To deploy workers, trigger a custom build on Travis with the Custom Config set t
 env:
   - DEPLOY_WORKER=true
 ```
+
+## Downtime procedure
+See [downtime-procedure](docs/downtime-procedure/index.md) for steps on how to bring the app down  in the event that we need to make database changes
 
 ## Infrastructure customizations
 
