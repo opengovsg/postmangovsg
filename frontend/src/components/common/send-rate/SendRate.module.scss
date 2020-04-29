@@ -1,0 +1,27 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.title {
+  margin-bottom: 0.6rem;
+}
+
+.icon {
+  @include icon;
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}
+
+.rotateArrow {
+  transform: rotateZ(180deg);
+}
+
+.link {
+  text-decoration: underline;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.input {
+  margin-top: 1rem;
+}
