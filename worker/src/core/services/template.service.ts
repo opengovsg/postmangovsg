@@ -90,7 +90,7 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
       tokens,
     }
   } catch (err) {
-    console.error(err.stack)
+    logger.error({ message: `${err.stack}` })
     if (err.message.includes('unclosed tag')) throw new Error('There are unclosed curly brackets in the template')
     if (err.name === 'Squirrelly Error') throw new Error(err.message)
     throw err
@@ -99,7 +99,8 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
 
 const template = (templateBody: string, params: {[key: string]: string}): string => {
   const parsed = parseTemplate(templateBody, params)
-  return parsed.tokens.join('')
+  // Remove extra '\' infront of single quotes and backslashes
+  return parsed.tokens.map((t) => t.replace(/\\([\\'])/g, '$1')).join('')
 }
 
 export { template  }
