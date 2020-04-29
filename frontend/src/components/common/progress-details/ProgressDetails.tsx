@@ -73,7 +73,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
             <tr>
               <th className={styles.md}>Status</th>
               <th className={styles.md}>Description</th>
-              <th className={styles.sm}>SMS count</th>
+              <th className={styles.sm}>Message count</th>
             </tr>
           </thead>
           <tbody>
