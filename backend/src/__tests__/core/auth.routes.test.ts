@@ -1,3 +1,5 @@
+import * as path from 'path'
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env.test') }) // A hack, dotenv won't replace existing env
 import getApp from '../../app'
 import { Application } from 'express'
 import request from 'supertest'
