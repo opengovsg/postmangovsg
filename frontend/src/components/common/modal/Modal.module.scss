@@ -15,7 +15,7 @@ $content-width: 600px;
 .modal {
   width: $tablet;
   max-width: 100vw;
-  border-radius: $border-radius;
+  border-radius: 0.6rem;
   background-color: $light-blue;
   height: auto;
   max-height: calc(100vh - 4rem);

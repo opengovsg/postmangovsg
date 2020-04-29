@@ -30,6 +30,10 @@
   margin: 2rem;
 }
 
+.greyText {
+  color: $light-grey;
+}
+
 .darkBlueBtn {
   @include button($dark-blue)
 }

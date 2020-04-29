@@ -101,7 +101,7 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
       {
         preview?.body &&
         <>
-          <p>Message preview</p>
+          <p className={styles.greyText}>Message preview</p>
           <PreviewBlock body={preview.body} subject={preview.subject} />
           <div className="separator"></div>
         </>

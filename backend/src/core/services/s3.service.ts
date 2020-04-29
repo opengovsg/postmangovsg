@@ -49,6 +49,7 @@ class S3Service {
           rowWithHeaders[headers[index]] = col
         })
         // produces {header1: value1, header2: value2, ...}
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         params.set(row[recipientIndex!], rowWithHeaders)
       }
     }
