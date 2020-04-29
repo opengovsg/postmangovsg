@@ -2,13 +2,15 @@
 @import 'styles/_mixins';
 
 .title {
-  margin-bottom: 0.6rem;
+  margin: 1rem 0;
+  cursor: pointer;
 }
 
 .icon {
   @include icon;
   font-size: 0.8rem;
   margin-left: 0.5rem;
+  transition: transform 0.3s ease-out;
 }
 
 .rotateArrow {
