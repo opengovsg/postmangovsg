@@ -6,6 +6,18 @@
 > Postman.gov.sg enables public officers to send templated messages to many recipients.
 
 ## Table of Contents
+  * [Features](#features)
+  * [Development](#development)
+    + [Install and run required services](#install-and-run-required-services)
+    + [Set environment variables](#set-environment-variables)
+    + [Install and run the app](#install-and-run-the-app)
+  * [Deployment](#deployment)
+  * [Infrastructure customizations](#infrastructure-customizations)
+      - [Amplify rewrite rule](#amplify-rewrite-rule)
+      - [Elastic Container Service](#elastic-container-service)
+  * [Architecture](#architecture)
+  * [How messages are sent](#how-messages-are-sent)
+  * [Contributions](#contributions)
 
 ## Features
 - **Passwordless login**: login with your .gov.sg email
@@ -53,6 +65,11 @@ cd postmangovsg
 npm install
 npm run dev
 ```
+You should find the
+- React frontend at `localhost:3000`
+- Express backend  at `localhost:4000`
+- Swagger docs at `localhost:4000/docs`
+
 
 ## Deployment
 
@@ -105,8 +122,16 @@ Create a cluster with four services. These names are currently hardcoded for dep
 |prod-logger|FARGATE|1.4.0|
 
 ## Architecture
+See [architecture.md](docs/architecture.md) for details
 
-## How it sends messages
+## How messages are sent
+See [sending.md](docs/architecture.md) for details
 
 ## Contributions
 
+- Fork this repository
+- Clone the forked repository to your machine
+- Create a branch, make changes and commit those changes.
+- Push these changes to Github
+- Submit a pull request to the *base fork* (that's us!)
+- Describe the issue as thoroughly as possible, and with screenshots if applicable. A picture speaks a thousand words!
