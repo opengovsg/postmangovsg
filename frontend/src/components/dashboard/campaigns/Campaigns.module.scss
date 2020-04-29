@@ -7,49 +7,60 @@
   margin: 0 auto;
   width: 1000px;
   max-width: calc(100vw - (2 * #{$site-padding}));
+
+  @include mobile() {
+    max-width: calc(100vw - (2 * #{$mobile-site-padding}));
+  }
 }
 
 .header {
   margin-bottom: 2rem;
 }
 
-table.campaignTable {
-  width: 100%;
+.tableContainer {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
 
-  tbody tr {
-    &:hover {
-      cursor: pointer;
-      background-color: $transparent-blue;
+  table.campaignTable {
+    min-width: calc(#{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding});
+    width: 100%;
+
+    tbody tr {
+      &:hover {
+        cursor: pointer;
+        background-color: $transparent-blue;
+      }
+
+      &:active {
+        opacity: 0.5;
+      }
     }
 
-    &:active {
-      opacity: 0.5;
-    }
-  }
+    tr {
+      @include flex-horizontal;
+      border-bottom: 1px solid $transparent-blue;
 
-  tr {
-    @include flex-horizontal;
-    border-bottom: 1px solid $transparent-blue;
+      td,
+      th {
+        padding: 0.75rem 0;
 
-    td,
-    th {
-      padding: 0.75rem 0;
+        &.xs {
+          flex: 1.2;
+          text-align: center;
+        }
 
-      &.xs {
-        flex: 1.2;
-        text-align: center;
-      }
+        &.sm {
+          flex: 2;
+        }
 
-      &.sm {
-        flex: 2;
-      }
+        &.md {
+          flex: 3;
+        }
 
-      &.md {
-        flex: 3;
-      }
-
-      &.lg {
-        flex: 4;
+        &.lg {
+          flex: 4;
+        }
       }
     }
   }
@@ -73,7 +84,9 @@ table.campaignTable {
     width: 350px;
   }
 
-  h2 { font-weight: 500; }
+  h2 {
+    font-weight: 500;
+  }
   h5 {
     font-weight: normal;
     margin-bottom: 1rem;

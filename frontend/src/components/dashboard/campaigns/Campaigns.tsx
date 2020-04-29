@@ -31,7 +31,9 @@ const Campaigns = () => {
   function getNameFromEmail(email: string): string {
     const parts = email.split('@')
     const [nameParts] = parts
-    return nameParts.split(/[_.-]/).map((n) => capitalize(n))
+    return nameParts
+      .split(/[_.-]/)
+      .map((n) => capitalize(n))
       .join(' ')
   }
 
@@ -122,24 +124,26 @@ const Campaigns = () => {
     return (
       <>
         <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
-        <table className={styles.campaignTable}>
-          <thead>
-            <tr>
+        <div className={styles.tableContainer}>
+          <table className={styles.campaignTable}>
+            <thead>
+              <tr>
+                {
+                  headers.map(({ name, width }) => (
+                    <th className={styles[width]} key={name}>
+                      {name}
+                    </th>
+                  ))
+                }
+              </tr>
+            </thead>
+            <tbody>
               {
-                headers.map(({ name, width }) => (
-                  <th className={styles[width]} key={name}>
-                    {name}
-                  </th>
-                ))
+                campaignsDisplayed.map(renderRow)
               }
-            </tr>
-          </thead>
-          <tbody>
-            {
-              campaignsDisplayed.map(renderRow)
-            }
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
 
         <Pagination
           itemsCount={campaigns.length}

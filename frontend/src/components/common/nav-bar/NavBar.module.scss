@@ -4,7 +4,7 @@
 
 $navbar-link-margin: calc(1rem + 1vw);
 $navbar-height: 4rem;
-$navbar-mobile-height: 3.5rem;
+$navbar-mobile-height: 4rem;
 
 .navBar {
   @include flex-horizontal;
@@ -25,7 +25,7 @@ $navbar-mobile-height: 3.5rem;
 
     @include mobile() {
       justify-content: space-between;
-      padding: 0 $site-padding;
+      padding: 0 $mobile-site-padding;
       width: 100%;
     }
 
@@ -46,6 +46,7 @@ $navbar-mobile-height: 3.5rem;
         align-items: center;
         height: $navbar-mobile-height;
         width: $navbar-mobile-height;
+        cursor: pointer;
       }
 
       .burger {
@@ -70,7 +71,9 @@ $navbar-mobile-height: 3.5rem;
         align-items: flex-start;
         width: 100%;
         background-color: $dark-blue;
-        border: $site-padding solid $dark-blue;
+        border-width: $site-padding  $mobile-site-padding;
+        border-style: solid;
+        border-color: $dark-blue;
       }
     }
 
