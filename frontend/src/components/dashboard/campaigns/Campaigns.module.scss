@@ -17,7 +17,14 @@
   margin-bottom: 2rem;
 }
 
+.tableContainer {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
 table {
+  min-width: calc(#{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding});
   width: 100%;
 
   tbody tr {

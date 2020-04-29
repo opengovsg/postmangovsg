@@ -124,24 +124,27 @@ const Campaigns = () => {
     return (
       <>
         <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
-        <table>
-          <thead>
-            <tr>
+
+        <div className={styles.tableContainer}>
+          <table>
+            <thead>
+              <tr>
+                {
+                  headers.map(({ name, width }) => (
+                    <th className={styles[width]} key={name}>
+                      {name}
+                    </th>
+                  ))
+                }
+              </tr>
+            </thead>
+            <tbody>
               {
-                headers.map(({ name, width }) => (
-                  <th className={styles[width]} key={name}>
-                    {name}
-                  </th>
-                ))
+                campaignsDisplayed.map(renderRow)
               }
-            </tr>
-          </thead>
-          <tbody>
-            {
-              campaignsDisplayed.map(renderRow)
-            }
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
 
         <Pagination
           itemsCount={campaigns.length}
