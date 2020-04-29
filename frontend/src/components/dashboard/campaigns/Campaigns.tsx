@@ -30,8 +30,9 @@ const Campaigns = () => {
 
   function getNameFromEmail(email: string): string {
     const parts = email.split('@')
-    const [ nameParts ] = parts
-    return nameParts.split(/[_.-]/).map((n) => capitalize(n)).join(' ')
+    const [nameParts] = parts
+    return nameParts.split(/[_.-]/).map((n) => capitalize(n))
+      .join(' ')
   }
 
   async function fetchCampaigns() {
@@ -121,7 +122,7 @@ const Campaigns = () => {
     return (
       <>
         <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
-        <table>
+        <table className={styles.campaignTable}>
           <thead>
             <tr>
               {
@@ -151,7 +152,7 @@ const Campaigns = () => {
 
   return (
     <>
-      <TitleBar title={ title }>
+      <TitleBar title={title}>
         <PrimaryButton
           onClick={() => modalContext.setModalContent(
             <CreateCampaign></CreateCampaign>
@@ -160,12 +161,14 @@ const Campaigns = () => {
         </PrimaryButton>
       </TitleBar>
       <div className={styles.content}>
-        { isLoading && <i className={cx(styles.icon, styles.spinner, 'bx bx-loader-alt bx-spin')}></i> }
-        { !isLoading && (
-          campaigns.length > 0
-            ? renderCampaignList()
-            : renderEmptyDashboard()
-        ) }
+        {isLoading
+          ? <i className={cx(styles.icon, styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
+          : (
+            campaigns.length > 0
+              ? renderCampaignList()
+              : renderEmptyDashboard()
+          )
+        }
       </div>
     </>
   )
