@@ -7,6 +7,9 @@ services:
 
 # Skip the automatic npm ci step 
 install: skip
+cache:
+  directories:
+    - frontend/node_modules
 
 # Deploy from Dockerfile
 jobs:
@@ -49,3 +52,11 @@ jobs:
         on:
           branch: $PRODUCTION_BRANCH
           condition: "$DEPLOY_WORKER = true"
+  - name: frontend
+    before_install:
+      - cd frontend
+    install:
+      - npm i
+    script:
+      - npm run lint
+      - CI=false npm run build
