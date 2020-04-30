@@ -47,9 +47,9 @@ export class CampaignStats {
   status: Status
 
   constructor(input: any) {
-    this.error = input['error']
-    this.unsent = input['unsent']
-    this.sent = input['sent']
+    this.error = +input['error']
+    this.unsent = +input['unsent']
+    this.sent = +input['sent']
     this.status = input['status']
   }
 }

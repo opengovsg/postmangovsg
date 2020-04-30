@@ -11,14 +11,16 @@ $red: #db4f5d;
 $light-red: rgba(219, 79, 93, 0.1);
 
 // Dimensions
+$content-max-width: 750px;
 $button-min-width: 12rem;
 $button-height: 2.8rem;
 $border-radius: $button-height / 2;
 
 // Paddings
 $site-padding: 3vw;
+$mobile-site-padding: 5vw;
 $content-top-padding: 4vh;
 $content-bottom-padding: 15vh;
 
 // Fonts
-$font-stack: "Noto Sans JP", sans-serif;
+$font-stack: 'Noto Sans JP', sans-serif;

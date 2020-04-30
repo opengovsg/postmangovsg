@@ -5,17 +5,29 @@
   display: flex;
   flex: 1;
   position: relative;
+
+  @include mobile() {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .stepContainer {
   display: block;
-  width: 750px;
+  max-width: $content-max-width;
+  width: 100%;
   padding: $content-top-padding $site-padding $content-bottom-padding;
   margin: 0 auto;
+
+  @include mobile() {
+    padding: $content-top-padding $mobile-site-padding $content-bottom-padding;
+  }
 }
 
 .sendInfo {
-  p { margin-bottom: 0; }
+  p {
+    margin-bottom: 0;
+  }
   h4 {
     margin-top: 0.5rem;
     margin-bottom: 2rem;
@@ -35,7 +47,7 @@
 }
 
 .darkBlueBtn {
-  @include button($dark-blue)
+  @include button($dark-blue);
 }
 
 .turquoiseGreenBtn {

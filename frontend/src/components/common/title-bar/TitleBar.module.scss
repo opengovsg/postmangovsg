@@ -10,6 +10,10 @@ $title-bar-height: 5rem;
   border-bottom: 1px solid $indigo-blue;
   padding: 0 $site-padding;
   justify-content: space-between;
+
+  @include mobile() {
+    padding: 0 $mobile-site-padding;
+  }
 }
 
 .titleText {

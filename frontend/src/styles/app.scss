@@ -2,6 +2,7 @@
 @import '~boxicons/css/boxicons.min.css';
 
 @import 'styles/_variables';
+@import 'styles/_mixins';
 
 html,
 body {
@@ -14,6 +15,10 @@ body {
   overflow-y: auto;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+
+  @include mobile() {
+    font-size: 14px;
+  }
 }
 
 * {
@@ -52,6 +57,18 @@ h5 {
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
+}
+
+@include mobile() {
+  h1 {
+    font-size: 1.3rem;
+  }
+  h2 {
+    font-size: 1.2rem;
+  }
+  h3 {
+    font-size: 1.15rem;
+  }
 }
 
 a {

@@ -30,8 +30,11 @@ const Campaigns = () => {
 
   function getNameFromEmail(email: string): string {
     const parts = email.split('@')
-    const [ nameParts ] = parts
-    return nameParts.split(/[_.-]/).map((n) => capitalize(n)).join(' ')
+    const [nameParts] = parts
+    return nameParts
+      .split(/[_.-]/)
+      .map((n) => capitalize(n))
+      .join(' ')
   }
 
   async function fetchCampaigns() {
@@ -121,24 +124,26 @@ const Campaigns = () => {
     return (
       <>
         <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
-        <table>
-          <thead>
-            <tr>
+        <div className={styles.tableContainer}>
+          <table className={styles.campaignTable}>
+            <thead>
+              <tr>
+                {
+                  headers.map(({ name, width }) => (
+                    <th className={styles[width]} key={name}>
+                      {name}
+                    </th>
+                  ))
+                }
+              </tr>
+            </thead>
+            <tbody>
               {
-                headers.map(({ name, width }) => (
-                  <th className={styles[width]} key={name}>
-                    {name}
-                  </th>
-                ))
+                campaignsDisplayed.map(renderRow)
               }
-            </tr>
-          </thead>
-          <tbody>
-            {
-              campaignsDisplayed.map(renderRow)
-            }
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
 
         <Pagination
           itemsCount={campaigns.length}
@@ -151,7 +156,7 @@ const Campaigns = () => {
 
   return (
     <>
-      <TitleBar title={ title }>
+      <TitleBar title={title}>
         <PrimaryButton
           onClick={() => modalContext.setModalContent(
             <CreateCampaign></CreateCampaign>
@@ -160,12 +165,14 @@ const Campaigns = () => {
         </PrimaryButton>
       </TitleBar>
       <div className={styles.content}>
-        { isLoading && <i className={cx(styles.icon, styles.spinner, 'bx bx-loader-alt bx-spin')}></i> }
-        { !isLoading && (
-          campaigns.length > 0
-            ? renderCampaignList()
-            : renderEmptyDashboard()
-        ) }
+        {isLoading
+          ? <i className={cx(styles.icon, styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
+          : (
+            campaigns.length > 0
+              ? renderCampaignList()
+              : renderEmptyDashboard()
+          )
+        }
       </div>
     </>
   )
