@@ -17,6 +17,9 @@ jobs:
   - name: backend
     before_script:
       - cd backend
+    script:
+      - npm install
+      - npm run test
     deploy:
       - provider: elasticbeanstalk
         skip_cleanup: true
