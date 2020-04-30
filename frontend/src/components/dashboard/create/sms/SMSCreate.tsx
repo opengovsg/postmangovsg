@@ -40,7 +40,7 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
         )
       case SMSProgress.UploadRecipients:
         return (
-          <SMSRecipients csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
+          <SMSRecipients params={campaign.params} csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
         )
       case SMSProgress.InsertCredentials:
         return (

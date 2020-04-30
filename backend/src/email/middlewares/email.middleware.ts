@@ -117,7 +117,7 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
         },
         {
           model: EmailTemplate,
-          attributes: ['body', 'subject'],
+          attributes: ['body', 'subject', 'params'],
         }],
     }))?.get({ plain: true }) as CampaignDetails
 

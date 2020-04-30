@@ -188,6 +188,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
             valid: false,
             updatedTemplate: {
               body: updatedTemplate?.body,
+              params: updatedTemplate?.params,
             },
           })
         /* eslint-enable */
@@ -204,6 +205,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         num_recipients: recipientCount,
         updatedTemplate: {
           body: updatedTemplate.body,
+          params: updatedTemplate.params,
         },
       })
     /* eslint-enable */
