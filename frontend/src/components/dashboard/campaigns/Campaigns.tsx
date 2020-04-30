@@ -107,7 +107,7 @@ const Campaigns = () => {
         <img className={styles.image} src={EmptyDashboardImg} alt="Empty dashboard graphic" />
         <h2>We are excited to have you here!</h2>
         <h5>To get you started, we have prepared a guide for your reference</h5>
-        <a href={POSTMAN_GUIDE_URL}>
+        <a href={POSTMAN_GUIDE_URL} target="_blank" rel="noopener noreferrer">
           <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
         </a>
         <h5>Or you can begin creating your campaign with our step-by step</h5>
