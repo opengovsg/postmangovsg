@@ -1,9 +1,9 @@
 {
   "include": [
-    "./src/**/*",
+    "./src/**/**/**/*",
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
   ],
   "files": [
     "./src/server.ts",
