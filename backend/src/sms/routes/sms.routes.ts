@@ -42,7 +42,7 @@ const storeTemplateValidator = {
 
 const uploadStartValidator = {
   [Segments.QUERY]: Joi.object({
-    mimeType: Joi
+    'mime_type': Joi
       .string()
       .required(),
   }),
@@ -50,26 +50,26 @@ const uploadStartValidator = {
 
 const uploadCompleteValidator = {
   [Segments.BODY]: Joi.object({
-    transactionId: Joi.string().required(),
+    'transaction_id': Joi.string().required(),
     filename: Joi.string().required(),
   }),
 }
 
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    twilioAccountSid: Joi
+    'twilio_account_sid': Joi
       .string()
       .trim()
       .required(),
-    twilioApiSecret: Joi
+    'twilio_api_secret': Joi
       .string()
       .trim()
       .required(),
-    twilioApiKey: Joi
+    'twilio_api_key': Joi
       .string()
       .trim()
       .required(),
-    twilioMessagingServiceSid: Joi
+    'twilio_messaging_service_sid': Joi
       .string()
       .trim()
       .required(),
@@ -179,36 +179,32 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         firstRecord,
       })
       if (check.reupload) {
-        /* eslint-disable @typescript-eslint/camelcase */
         return res.status(200)
           .json({
             message: 'Please re-upload your recipient list as template has changed.',
-            extra_keys: check.extraKeys,
-            num_recipients: 0,
+            'extra_keys': check.extraKeys,
+            'num_recipients': 0,
             valid: false,
-            updatedTemplate: {
+            template: {
               body: updatedTemplate?.body,
               params: updatedTemplate?.params,
             },
           })
-        /* eslint-enable */
       }
     }
 
     const recipientCount = await SmsMessage.count({ where: { campaignId } })
     const campaign = await Campaign.findByPk(+campaignId)
-    /* eslint-disable @typescript-eslint/camelcase */
     return res.status(200)
       .json({
         message: `Template for campaign ${campaignId} updated`,
         valid: campaign?.valid,
-        num_recipients: recipientCount,
-        updatedTemplate: {
+        'num_recipients': recipientCount,
+        template: {
           body: updatedTemplate.body,
           params: updatedTemplate.params,
         },
       })
-    /* eslint-enable */
   } catch (err) {
     if (err instanceof HydrationError || err instanceof TemplateError) {
       return res.status(400).json({ message: err.message })
@@ -231,7 +227,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     })
 
     // extract s3Key from transactionId
-    const { transactionId, filename } = req.body
+    const { 'transaction_id': transactionId, filename } = req.body
     let s3Key: string
     try {
       s3Key = extractS3Key(transactionId)
@@ -355,6 +351,7 @@ router.get('/', getCampaignDetails)
  *                   - message
  *                   - valid
  *                   - num_recipients
+ *                   - template
  *                 properties:
  *                   message:
  *                     type: string
@@ -366,6 +363,15 @@ router.get('/', getCampaignDetails)
  *                     type: boolean
  *                   num_recipients:
  *                     type: integer
+ *                   template:
+ *                     type: object
+ *                     properties:
+ *                       body:
+ *                         type: string
+ *                       params:
+ *                         type: array
+ *                         items:
+ *                           type: string
  *         400:
  *           description: Bad Request
  *         500:
@@ -387,7 +393,7 @@ router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, stor
  *           required: true
  *           schema:
  *             type: string
- *         - name: mimeType
+ *         - name: mime_type
  *           in: query
  *           required: true
  *           schema:
@@ -400,9 +406,9 @@ router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, stor
  *               schema:
  *                 type: object
  *                 properties:
- *                   presignedUrl:
+ *                   presigned_url:
  *                     type: string
- *                   transactionId:
+ *                   transaction_id:
  *                     type: string
  */
 router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, uploadStartHandler)
@@ -426,10 +432,10 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *           application/json:
  *             schema:
  *               required:
- *                 - transactionId
+ *                 - transaction_id
  *                 - filename
  *               properties:
- *                 transactionId:
+ *                 transaction_id:
  *                   type: string
  *                 filename:
  *                   type: string

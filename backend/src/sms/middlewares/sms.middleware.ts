@@ -28,12 +28,17 @@ const saveCredential = async (campaignId: number, credentialName: string, secret
 }
 
 const getCredential = (req: Request): TwilioCredentials => {
-  const { twilioAccountSid, twilioApiKey, twilioApiSecret, twilioMessagingServiceSid } = req.body
+  const {
+    'twilio_account_sid': accountSid,
+    'twilio_api_key': apiKey,
+    'twilio_api_secret': apiSecret,
+    'twilio_messaging_service_sid': messagingServiceSid,
+  } = req.body
   const credential: TwilioCredentials = {
-    accountSid: twilioAccountSid,
-    apiKey: twilioApiKey,
-    apiSecret: twilioApiSecret,
-    messagingServiceSid: twilioMessagingServiceSid,
+    accountSid,
+    apiKey,
+    apiSecret,
+    messagingServiceSid,
   }
   return credential
 }
@@ -114,7 +119,7 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
 const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const campaign: CampaignDetails =  (await Campaign.findOne({
+    const campaign: CampaignDetails = (await Campaign.findOne({
       where: { id: +campaignId },
       attributes: [
         'id', 'name', 'type', 'created_at', 'valid',
@@ -130,7 +135,7 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
           model: SmsTemplate,
           attributes: ['body', 'params'],
         }],
-    }))?.get({ plain:true }) as CampaignDetails
+    }))?.get({ plain: true }) as CampaignDetails
 
     const numRecipients: number = await SmsMessage.count(
       {
@@ -145,14 +150,14 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
 }
 
 const previewFirstMessage = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
+  try {
     const { campaignId } = req.params
     return res.json({
       preview: {
         body: await getHydratedMsg(+campaignId),
       },
     })
-  } catch(err){
+  } catch (err) {
     return next(err)
   }
 }
