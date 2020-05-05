@@ -51,5 +51,11 @@ describe('template', () => {
       const body = 'Hello {{name}}'
       expect(() => {template(body, params)}).toThrow(TemplateError)
     })
+
+    test('empty params', () => {
+      const params = { nickname: '' }
+      const body = 'Hello {{nickname}}'
+      expect(() => {template(body, params)}).toThrow(TemplateError)
+    })
   })
 })
