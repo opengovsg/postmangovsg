@@ -64,18 +64,21 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
               throw new TemplateError(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
             }
 
-            // if params provided == attempt to carry out templating
-            if (params) {
-              if (dict[key]) {
-                const templated = dict[key]
-                tokens.push(templated)
-              } else {
-                throw new TemplateError(`Param ${templateObject.c} not found`)
-              }
-            }
-
             // add key regardless, note that this is also returned in lowercase
             variables.push(key)
+            
+            // if no params continue with the loop
+            if (!params) return
+
+            // if params provided == attempt to carry out templating
+            if (dict[key]) {
+              const templated = dict[key]
+              tokens.push(templated)
+              return
+            }
+
+            // recipient key must have param
+            if (key === 'recipient') throw new TemplateError(`Param ${templateObject.c} not found`)
 
           } else { // I have not found an edge case that trips this yet
             logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)
