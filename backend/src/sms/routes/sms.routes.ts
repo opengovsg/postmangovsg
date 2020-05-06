@@ -480,14 +480,12 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *        content:
  *          application/json:
  *            schema:
- *            required:
- *              - recipient
- *              - twilioCredentials
- *            properties:
- *              recipient:
- *                type: string
- *              twilioCredentials:
- *                $ref: '#/components/schemas/TwilioCredentials'
+ *              allOf: 
+ *                - $ref: '#/components/schemas/TwilioCredentials'
+ *                - type: object
+ *                  properties:
+ *                    recipient:
+ *                      type: string
  *
  *      responses:
  *        200:
