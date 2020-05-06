@@ -22,8 +22,6 @@ export enum JobStatus {
  *       - SMS
  *       - EMAIL
  *
- *     Campaign:
- *       type: object
  *
  *     CampaignMeta:
  *       type: object
