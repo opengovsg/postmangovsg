@@ -66,11 +66,17 @@ const getHydratedMail = async (campaignId: number, recipient: string): Promise<M
   return 
 }
 
+const getUserId = (req: Request, res: Response): number => {
+  return req.session?.user?.id !== undefined ? req.session.user.id 
+    : res.locals.userId
+}
+
 // TODO
 const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  const { campaignId } = req.params
+  const userId = getUserId(req, res)
+  
   try {
-    const { campaignId } = req.params
-    const { id: userId } = req.session?.user
     const campaign = await Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.Email } })
     return campaign ? next() : res.sendStatus(400)
   } catch (err) {

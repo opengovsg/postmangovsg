@@ -21,7 +21,7 @@ class SequelizeLoader {
       pool: config.database.poolOptions,
       ...dialectOptions,
     })
-
+  
     const coreModels = [Credential, JobQueue, Campaign, User, Worker]
     const emailModels = [EmailMessage, EmailTemplate, EmailOp]
     const smsModels = [SmsMessage, SmsTemplate, SmsOp]

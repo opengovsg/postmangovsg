@@ -17,6 +17,11 @@ const s3 = new S3({
   region: AWS_REGION,
 })
 
+const getUserId = (req: Request, res: Response): number => {
+  return req.session?.user?.id !== undefined ? req.session.user.id 
+    : res.locals.userId
+}
+
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
  * @param req
@@ -38,7 +43,7 @@ const canEditCampaign = async (req: Request, res: Response, next: NextFunction):
 const createCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { name, type }: { name: string; type: string } = req.body
-    const { id: userId } = req.session?.user
+    const userId = getUserId(req, res)
     const campaign: Campaign = await Campaign.create({ name, type, userId, valid: false })
     return res.status(201).json({
       id: campaign.id,
@@ -57,7 +62,7 @@ const createCampaign = async (req: Request, res: Response, next: NextFunction): 
 const listCampaigns = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { offset, limit } = req.query
-    const { id: userId } = req.session?.user
+    const userId = getUserId(req, res)
     const options: { where: any; attributes: any; order: any; include: any; offset?: number; limit?: number } = {
       where: {
         userId,
