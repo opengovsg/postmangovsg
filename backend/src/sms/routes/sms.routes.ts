@@ -597,6 +597,13 @@ router.get('/preview', previewFirstMessage)
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                 campaign_id:
+ *                  type: integer
+ *                 job_id:
+ *                  type: array
+ *                  items:
+ *                    type: number
  *        "400" :
  *           description: Bad Request
  *        "401":
@@ -623,6 +630,9 @@ router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCamp
  *            application/json:
  *              schema:
  *                type: object
+*                properties:
+ *                 campaign_id:
+ *                  type: integer
  *        "401":
  *           description: Unauthorized
  *        "500":
@@ -645,6 +655,9 @@ router.post('/stop', stopCampaign)
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                 campaign_id:
+ *                  type: integer
  *        "401":
  *           description: Unauthorized
  *        "403":
