@@ -4,13 +4,6 @@ export * from './credentials.interface'
  * @swagger
  *  components:
  *    schemas:
- *      EmailContent:
- *        type: object
- *        properties:
- *          subject:
- *            type: string
- *          body:
- *            type: string
  * 
  *      SMSCampaign:
  *       type: object

@@ -6,13 +6,6 @@ export interface EmailContent {
  * @swagger
  *  components:
  *    schemas:
- *      EmailContent:
- *        type: object
- *        properties:
- *          subject:
- *            type: string
- *          body:
- *            type: string
  * 
  *      EmailCampaign:
  *       type: object
