@@ -24,7 +24,7 @@ const getApiKeyHash = async (apiKey: string): Promise<string | null> => {
   return apiKeyHash
 }
 
-const checkApiKey = async (req: Request): Promise<User | null> => {
+const getUserForApiKey = async (req: Request): Promise<User | null> => {
   const apiKey = getApiKey(req)
   if(apiKey !== null) {
     const hash = await getApiKeyHash(apiKey)
@@ -38,16 +38,18 @@ const checkCookie = (req: Request): boolean => {
   return req.session?.user?.id !== undefined
 }
 
-export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     if (checkCookie(req)) {
       return next()
     }
   
-    const user = await checkApiKey(req)
-    if(user!==null){
-      // Store user id in res.locals so that downstream middlewares can use it
-      res.locals.userId = user.id
+    const user = await getUserForApiKey(req)
+    if(user!==null && req.session){
+      // Ideally, we store the user id in res.locals for api key, because theoretically, no session was created.
+      // Practically, we have to check multiple places for the user id when we want to retrieve the id
+      // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
+      req.session.user = user
       return next()
     }   
     
@@ -57,12 +59,10 @@ export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response,
   }
 }
 
-export const logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   return new Promise <Response | void> ((resolve, reject) => {
    req.session?.destroy((err) => {
      res.cookie('postmangovsg', '', { expires: new Date() }) // Makes cookie expire immediately
-     if(res.locals) delete res.locals.userId 
-
      if(!err) {
        resolve(res.sendStatus(200))
      }
@@ -71,3 +71,4 @@ export const logout = async (req: Request, res: Response, next: NextFunction): P
   }).catch(err => next(err))
 }
 
+export { isCookieOrApiKeyAuthenticated, logout }
