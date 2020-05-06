@@ -48,7 +48,8 @@ const createCampaign = async (req: Request, res: Response, next: NextFunction): 
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
-      createdAt: campaign.createdAt,
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      created_at: campaign.createdAt,
       type: campaign.type,
     })
   }

@@ -50,6 +50,8 @@ const verifyOtpValidator = {
  *            application/json:
  *              schema:
  *                type: object
+ *        "500":
+ *           description: Internal Server Error
  */
 router.post('/otp', celebrate(getOtpValidator), getOtp)
 
@@ -87,6 +89,8 @@ router.post('/otp', celebrate(getOtpValidator), getOtp)
  *            application/json:
  *              schema:
  *                type: object
+ *        "500":
+ *           description: Internal Server Error
  */
 router.post('/login', celebrate(verifyOtpValidator), verifyOtp)
 
@@ -127,6 +131,8 @@ router.get('/userinfo', getUser)
  *            application/json:
  *              schema:
  *                type: object
+ *        "500":
+ *           description: Internal Server Error
  */
 router.get('/logout', logout)
 

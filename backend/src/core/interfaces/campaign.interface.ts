@@ -55,5 +55,5 @@ export interface CampaignStats {
  *          sent:
  *            type: number
  *          status:
- *            type: string
+ *            $ref: '#/components/schemas/JobStatus'
  */

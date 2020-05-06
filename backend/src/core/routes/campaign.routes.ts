@@ -67,6 +67,10 @@ const createCampaignValidator = {
  *                type: array
  *                items:
  *                  $ref: '#/components/schemas/CampaignMeta'
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
  */
 router.get('/', celebrate(listCampaignsValidator), listCampaigns)
 
@@ -99,6 +103,20 @@ router.get('/', celebrate(listCampaignsValidator), listCampaigns)
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                 id:
+ *                  type: number
+ *                 name:
+ *                  type: string
+ *                 created_at:
+ *                  type: string
+ *                  format: date-time
+ *                 type:
+ *                  $ref: '#/components/schemas/ChannelType'   
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error              
  */
 router.post('/', celebrate(createCampaignValidator), createCampaign)
 
