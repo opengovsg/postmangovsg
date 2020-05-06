@@ -4,9 +4,10 @@ import bcrypt from 'bcrypt'
 import { User } from '@core/models'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import logger from '@core/logger'
-import { otpClient, mailClient, hashService } from '@core/services'
+import { otpClient, mailClient } from '@core/services'
 import config from '@core/config'
 
+const SALT_ROUNDS = 10
 const { retries: OTP_RETRIES, expiry: OTP_EXPIRY, resendTimeout: OTP_RESEND_TIMEOUT } = config.otp
 
 const generateOtp = (): string => {
@@ -119,7 +120,7 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
   }
   try {
     const otp = generateOtp()
-    const hashValue = await hashService.randomSalt(otp)
+    const hashValue = await bcrypt.hash(otp, SALT_ROUNDS)
     const hashedOtp: HashedOtp = { hash: hashValue, retries: OTP_RETRIES, createdAt: Date.now() }
     await saveHashedOtp(email, hashedOtp)
     await sendOtp(email, otp)

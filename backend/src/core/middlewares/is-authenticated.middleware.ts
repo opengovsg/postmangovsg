@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { hashService } from '@core/services'
+import bcrypt from 'bcrypt'
 import { User } from '@core/models'
 import config from '@core/config'
 
@@ -19,7 +19,7 @@ const getApiKey = (req: Request): string | null => {
 
 const getApiKeyHash = async (apiKey: string): Promise<string | null> => {
   const [name, version, key] = apiKey.split('_')
-  const hash = await hashService.specifySalt(key, config.apiKey.salt)
+  const hash = await bcrypt.hash(key, config.apiKey.salt)
   const apiKeyHash = `${name}_${version}_${hash.replace(config.apiKey.salt,'')}`
   return apiKeyHash
 }

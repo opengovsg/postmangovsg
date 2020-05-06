@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
+import bcrypt from 'bcrypt'
 import { literal } from 'sequelize'
 import { Campaign, JobQueue } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
 import logger from '@core/logger'
-import { credentialService, hashService } from '@core/services'
+import { credentialService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
 import { template } from '@core/services/template.service'
@@ -56,7 +57,7 @@ const getSmsBody = async (campaignId: number): Promise<string | null> => {
 }
 
 const getEncodedHash = async (secret: string): Promise<string> => {
-  const secretHash = await hashService.specifySalt(secret, config.aws.secretManagerSalt)
+  const secretHash = await bcrypt.hash(secret, config.aws.secretManagerSalt)
   return Buffer.from(secretHash).toString('base64')
 }
 
