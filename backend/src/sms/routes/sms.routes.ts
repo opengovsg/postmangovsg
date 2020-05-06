@@ -10,7 +10,7 @@ import {
   testHydration,
   extractS3Key,
 } from '@core/services'
-import { populateSmsTemplate, upsertSmsTemplate, getSmsStats } from '@sms/services'
+import { populateSmsTemplate, upsertSmsTemplate, getSmsStats, hasInvalidSmsRecipient } from '@sms/services'
 import {
   uploadStartHandler,
   sendCampaign,
@@ -23,6 +23,7 @@ import {
   HydrationError,
   RecipientColumnMissing,
   TemplateError,
+  InvalidRecipientError,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import { storeCredentials, getCampaignDetails, previewFirstMessage } from '@sms/middlewares'
@@ -260,6 +261,8 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         templateParams: smsTemplate.params,
       })
 
+      if (hasInvalidSmsRecipient(records)) throw new InvalidRecipientError()
+
       const recipientCount: number = records.length
       // START populate template
       // TODO: is actually populate message logs
@@ -275,7 +278,8 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       throw err
     }
   } catch (err) {
-    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
+    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError 
+      || err instanceof InvalidRecipientError) {
       return res.status(400).json({ message: err.message })
     }
     return next(err)
