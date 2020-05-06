@@ -5,7 +5,6 @@ import { Campaign, JobQueue } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
-import logger from '@core/logger'
 import { credentialService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
@@ -72,9 +71,8 @@ const getHydratedMsg = async (campaignId: number): Promise<string | null> => {
 
 const sendMessage = async (campaignId: number, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
   const msg = await getHydratedMsg(campaignId)
-  if (!msg) return
+  if (!msg) throw new Error('No message to send')
 
-  logger.info('Sending sms using Twilio.')
   const twilioService = new TwilioService(credential)
   return twilioService.send(recipient, msg)
 }
@@ -98,14 +96,9 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
   const { recipient } = req.body
   const { campaignId } = req.params
   try {
-    const messageId = await sendMessage(+campaignId, recipient, credential)
-    // No message to send
-    if(!messageId){
-      return res.status(400).json({ message: `Could not test credential as there was no message to send` }) 
-    }
+    await sendMessage(+campaignId, recipient, credential)
   }
   catch (err) {
-    // Twilio client could not send message, probably due to invalid credentials
     return res.status(400).json({ message: `${err}` })
   }
 
