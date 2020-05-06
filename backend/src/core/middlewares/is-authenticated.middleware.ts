@@ -45,9 +45,11 @@ export const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response,
     }
   
     const user = await checkApiKey(req)
-    if(user!==null){
-      // Store user id in res.locals so that downstream middlewares can use it
-      res.locals.userId = user.id
+    if(user!==null && req.session){
+      // Ideally, we store the user id in res.locals for api key, because theoretically, no session was created.
+      // Practically, we have to check multiple places for the user id when we want to retrieve the id
+      // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
+      req.session.user = user
       return next()
     }   
     
@@ -61,8 +63,6 @@ export const logout = async (req: Request, res: Response, next: NextFunction): P
   return new Promise <Response | void> ((resolve, reject) => {
    req.session?.destroy((err) => {
      res.cookie('postmangovsg', '', { expires: new Date() }) // Makes cookie expire immediately
-     if(res.locals) delete res.locals.userId 
-
      if(!err) {
        resolve(res.sendStatus(200))
      }
