@@ -4,6 +4,7 @@ $tablet: 769px;
 $desktop: 1024px;
 $widescreen: 1216px;
 
+
 @mixin mobile {
   @media (max-width: $tablet - 0.1px) {
     @content;
@@ -68,6 +69,12 @@ $widescreen: 1216px;
   border-radius: $border-radius;
   cursor: pointer;
   user-select: none;
+
+  // unset min width on mobile, it's taking too much space
+  @include mobile() {
+    min-width: unset;
+    white-space: nowrap;
+  }
 
   &.alignRight {
     margin-left: auto;

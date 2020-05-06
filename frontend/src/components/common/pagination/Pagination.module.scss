@@ -5,16 +5,19 @@
   @include flex-horizontal;
   justify-content: center;
   margin-top: 3.5rem;
+  padding-inline-start: 0;
 }
 
 .icon {
   @include icon;
   color: $dark-blue;
   vertical-align: middle;
+  cursor: pointer;
 }
 
 .navIconDisabled span {
   color: $light-grey;
+  cursor: default;
 }
 
 .break a {

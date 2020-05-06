@@ -7,6 +7,9 @@ services:
 
 # Skip the automatic npm ci step 
 install: skip
+cache:
+  directories:
+    - frontend/node_modules
 
 # Deploy from Dockerfile
 jobs:
@@ -17,8 +20,8 @@ jobs:
     deploy:
       - provider: elasticbeanstalk
         skip_cleanup: true
-        access_key_id: $AWS_ACCESS_KEY_ID_FOR_DEPLOYMENT
-        secret_access_key: $AWS_SECRET_ACCESS_KEY_FOR_DEPLOYMENT
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
         region: $AWS_DEFAULT_REGION
         app: "postmangovsg-backend"
         env: "postmangovsg-backend-staging"
@@ -27,8 +30,8 @@ jobs:
           branch: $STAGING_BRANCH
       - provider: elasticbeanstalk
         skip_cleanup: true
-        access_key_id: $AWS_ACCESS_KEY_ID_FOR_DEPLOYMENT
-        secret_access_key: $AWS_SECRET_ACCESS_KEY_FOR_DEPLOYMENT
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
         region: $AWS_DEFAULT_REGION
         app: "postmangovsg-backend"
         env: "postmangovsg-backend-prod"
@@ -49,3 +52,11 @@ jobs:
         on:
           branch: $PRODUCTION_BRANCH
           condition: "$DEPLOY_WORKER = true"
+  - name: frontend
+    before_install:
+      - cd frontend
+    install:
+      - npm i
+    script:
+      - npm run lint
+      - CI=false npm run build

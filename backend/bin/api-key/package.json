@@ -1,0 +1,17 @@
+{
+  "name": "@postmangovsg/api-key",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js --help",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "commander": "^5.1.0",
+    "dotenv": "^8.2.0"
+  }
+}

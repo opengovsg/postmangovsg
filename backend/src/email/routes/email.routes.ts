@@ -47,7 +47,7 @@ const storeTemplateValidator = {
 
 const uploadStartValidator = {
   [Segments.QUERY]: Joi.object({
-    mimeType: Joi
+    'mime_type': Joi
       .string()
       .required(),
   }),
@@ -55,7 +55,7 @@ const uploadStartValidator = {
 
 const uploadCompleteValidator = {
   [Segments.BODY]: Joi.object({
-    transactionId: Joi.string().required(),
+    'transaction_id': Joi.string().required(),
     filename: Joi.string().required(),
   }),
 }
@@ -173,36 +173,34 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         firstRecord,
       })
       if (check.reupload) {
-        /* eslint-disable @typescript-eslint/camelcase */
         return res.status(200)
           .json({
             message: 'Please re-upload your recipient list as template has changed.',
-            extra_keys: check.extraKeys,
-            num_recipients: 0,
+            'extra_keys': check.extraKeys,
+            'num_recipients': 0,
             valid: false,
-            updatedTemplate: {
+            template: {
               body: updatedTemplate?.body,
               subject: updatedTemplate?.subject,
+              params: updatedTemplate?.params,
             },
           })
-        /* eslint-enable */
       }
     }
 
     const recipientCount = await EmailMessage.count({ where: { campaignId } })
     const campaign = await Campaign.findByPk(+campaignId)
-    /* eslint-disable @typescript-eslint/camelcase */
     return res.status(200)
       .json({
         message: `Template for campaign ${campaignId} updated`,
         valid: campaign?.valid,
-        num_recipients: recipientCount,
-        updatedTemplate: {
+        'num_recipients': recipientCount,
+        template: {
           body: updatedTemplate?.body,
           subject: updatedTemplate?.subject,
+          params: updatedTemplate?.params,
         },
       })
-    /* eslint-enable */
   } catch (err) {
     if (err instanceof HydrationError || err instanceof TemplateError) {
       return res.status(400).json({ message: err.message })
@@ -225,7 +223,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     })
 
     // extract s3Key from transactionId
-    const { transactionId, filename } = req.body
+    const { 'transaction_id': transactionId, filename } = req.body
     let s3Key: string
     try {
       s3Key = extractS3Key(transactionId)
@@ -311,7 +309,18 @@ const campaignStatsHandler = async (req: Request, res: Response, next: NextFunct
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/EmailCampaign'
+ *                type: object
+ *                properties:
+ *                  campaign:
+ *                    $ref: '#/components/schemas/EmailCampaign'
+ *                  num_recipients:
+ *                    type: number
+ *        "400" :
+ *           description: Invalid campaign type or not owned by user
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
  */
 router.get('/', getCampaignDetails)
 
@@ -336,6 +345,8 @@ router.get('/', getCampaignDetails)
  *             schema:
  *               type: object
  *               properties:
+ *                 subject:
+ *                   type: string
  *                 body:
  *                   type: string
  *                   minLength: 1
@@ -362,9 +373,25 @@ router.get('/', getCampaignDetails)
  *                     type: boolean
  *                   num_recipients:
  *                     type: integer
- *         400:
+ *                   template:
+ *                     type: object
+ *                     properties:
+ *                       subject:
+ *                         type: string
+ *                       body:
+ *                         type: string
+ *                       params:
+ *                         type: array
+ *                         items:
+ *                           type: string 
+ *
+ *         "400":
  *           description: Bad Request
- *         500:
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress 
+ *         "500":
  *           description: Internal Server Error
  */
 router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, storeTemplate)
@@ -383,7 +410,7 @@ router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, stor
  *           required: true
  *           schema:
  *             type: string
- *         - name: mimeType
+ *         - name: mime_type
  *           in: query
  *           required: true
  *           schema:
@@ -396,10 +423,18 @@ router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, stor
  *               schema:
  *                 type: object
  *                 properties:
- *                   presignedUrl:
+ *                   presigned_url:
  *                     type: string
- *                   transactionId:
+ *                   transaction_id:
  *                     type: string
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress 
+ *         "500":
+ *           description: Internal Server Error
  */
 router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, uploadStartHandler)
 
@@ -422,10 +457,10 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *           application/json:
  *             schema:
  *               required:
- *                 - transactionId
+ *                 - transcation_id
  *                 - filename
  *               properties:
- *                 transactionId:
+ *                 transaction_id:
  *                   type: string
  *                 filename:
  *                   type: string
@@ -437,7 +472,7 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *               schema:
  *                 properties:
  *                   num_recipients:
- *                     type: string
+ *                     type: number
  *                   preview:
  *                     type: object
  *                     properties:
@@ -445,10 +480,14 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *                         type: string
  *                       body:
  *                         type: string
- *         400:
- *           description: Invalid Request
- *         500:
- *           description: Server Error
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress 
+ *         "500":
+ *           description: Internal Server Error
  */
 router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampaign, uploadCompleteHandler)
 
@@ -475,6 +514,14 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *            application/json:
  *              schema:
  *                type: object
+ *        "400" :
+ *           description: Bad Request
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden as there is a job in progress 
+ *        "500":
+ *           description: Internal Server Error
  */
 router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaign, storeCredentials)
 
@@ -507,6 +554,10 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *                        type: string
  *                      subject: 
  *                        type: string
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
  */
 router.get('/preview', previewFirstMessage)
 
@@ -535,6 +586,21 @@ router.get('/preview', previewFirstMessage)
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                 campaign_id:
+ *                  type: integer
+ *                 job_id:
+ *                  type: array
+ *                  items:
+ *                    type: number
+ *        "400" :
+ *           description: Bad Request
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden as there is a job in progress 
+ *        "500":
+ *           description: Internal Server Error
  */
 router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCampaign)
 
@@ -553,6 +619,13 @@ router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCamp
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                 campaign_id:
+ *                  type: integer
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
  */
 router.post('/stop', stopCampaign)
 
@@ -571,6 +644,15 @@ router.post('/stop', stopCampaign)
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                 campaign_id:
+ *                  type: integer
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden as there is a job in progress 
+ *        "500":
+ *           description: Internal Server Error
  */
 router.post('/retry', canEditCampaign, retryCampaign)
 
@@ -595,6 +677,10 @@ router.post('/retry', canEditCampaign, retryCampaign)
  *            application/json:
  *              schema:
  *                $ref: '#/components/schemas/CampaignStats'
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
  */
 router.get('/stats', campaignStatsHandler)
 

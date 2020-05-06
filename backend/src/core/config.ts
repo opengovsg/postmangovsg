@@ -84,6 +84,10 @@ const xssOptionsSms = {
 // Rate for job (any rate higher than this will be split)
 const maxRatePerJob = parseEnvVarAsInt(process.env.MAX_RATE_PER_JOB as string) || 150
 
+// For API Key hashing 
+const apiKeySalt: string = process.env.API_KEY_SALT_V1 as string
+const apiKeyVersion = 'v1'
+
 export default {
   IS_PROD,
   aws: {
@@ -140,4 +144,8 @@ export default {
     sms: xssOptionsSms,
   },
   maxRatePerJob,
+  apiKey: {
+    salt: apiKeySalt,
+    version: apiKeyVersion,
+  },
 }

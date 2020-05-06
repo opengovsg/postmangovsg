@@ -1,6 +1,7 @@
-import { Application } from 'express'
+import { Application, Request, Response, NextFunction } from 'express'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+
 import logger from '@core/logger'
 
 const options = {
@@ -23,11 +24,18 @@ const options = {
 }
 
 const swaggerSpec = swaggerJSDoc(options)
+const swaggerUiOptions = {
+  explorer: false,
+  customCss: '.swagger-ui .topbar { display: none; }',
+}
+
+const removeCspHeader = (_req: Request, res: Response, next: NextFunction): void => {
+  res.removeHeader('Content-Security-Policy')
+  next()
+}
 
 const swaggerLoader = ({ app }: { app: Application }): void => {
-  app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    explorer: true,
-  }))
+  app.use('/docs', removeCspHeader, swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions))
   logger.info({ message: 'Swagger docs generated.' }) /*, JSON.stringify(swaggerSpec, null, 2) */
 }
 

@@ -3,10 +3,12 @@ import { useParams } from 'react-router-dom'
 
 import { completeFileUpload, getPresignedUrl, getPreviewMessage } from 'services/email.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
-import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton } from 'components/common'
+import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton, SampleCsv } from 'components/common'
+
 import styles from '../Create.module.scss'
 
-const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, onNext }: { csvFilename: string; numRecipients: number; onNext: (changes: any, next?: boolean) => void }) => {
+const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initialNumRecipients, params, onNext }:
+  { csvFilename: string; numRecipients: number; params: Array<string>; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [errorMessage, setErrorMessage] = useState(null)
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
@@ -86,7 +88,12 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
           }
         </InfoBlock>
       }
-      <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+
+      <div className={styles.uploadActions}>
+        <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+        <p>or</p>
+        <SampleCsv params={params} defaultRecipient="user@email.com" />
+      </div>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
 

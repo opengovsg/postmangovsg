@@ -14,39 +14,53 @@ export enum JobStatus {
 
 /**
  * @swagger
- *  components:
- *    schemas:
- *      ChannelType:
- *        type: string
- *        enum:
- *        - SMS
- *        - EMAIL
+ * components:
+ *   schemas:
+ *     ChannelType:
+ *       type: string
+ *       enum:
+ *       - SMS
+ *       - EMAIL
  *
- *      Campaign:
- *        type: object
  *
- *      CampaignMeta:
+ *     CampaignMeta:
+ *       type: object
+ *       properties:
+ *         id:
+ *          type: number
+ *         name:
+ *           type: string
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *         has_credential:
+ *           type: boolean
+ *         valid:
+ *           type: boolean
+ *         type:
+ *           $ref: '#/components/schemas/ChannelType'
+ *         job_queue:
+ *           type: array
+ *           items:
+ *            $ref: '#/components/schemas/JobQueue'
+ * 
+ *     JobQueue:
  *        type: object
  *        properties:
- *          name:
- *            type: string
- *          createdAt:
+ *          status:
+ *            $ref: '#/components/schemas/JobStatus'
+ *          sent_at:
  *            type: string
  *            format: date-time
- *          hasCredential:
- *            type: boolean
- *          valid:
- *            type: boolean
- *          type:
- *            $ref: '#/components/schemas/ChannelType'
- *      JobStatus:
- *        type: string
- *        enum:
- *        - READY
- *        - ENQUEUED
- *        - SENDING
- *        - SENT
- *        - STOPPED
- *        - LOGGED
+ *     
+ *     JobStatus:
+ *       type: string
+ *       enum:
+ *       - READY
+ *       - ENQUEUED
+ *       - SENDING
+ *       - SENT
+ *       - STOPPED
+ *       - LOGGED
  */
 

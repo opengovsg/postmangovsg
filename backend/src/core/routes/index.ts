@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
-import { isCookieAuthenticated } from '@core/middlewares'
+import { isCookieOrApiKeyAuthenticated } from '@core/middlewares'
 
 // Core routes
 import authenticationRoutes from './auth.routes'
@@ -67,8 +67,8 @@ const ping = async (_req: Request, res: Response, next: NextFunction): Promise<R
 const router = Router()
 router.use('/ping', ping)
 router.use('/auth', authenticationRoutes)
-router.use('/campaigns', isCookieAuthenticated, campaignRoutes)
-router.use('/campaign/:campaignId/sms', isCookieAuthenticated, celebrate(campaignIdValidator), smsRoutes)
-router.use('/campaign/:campaignId/email', isCookieAuthenticated, celebrate(campaignIdValidator), emailRoutes)
-router.use('/campaign/:campaignId', isCookieAuthenticated, celebrate(campaignIdValidator), redirectToChannelRoute)
+router.use('/campaigns', isCookieOrApiKeyAuthenticated, campaignRoutes)
+router.use('/campaign/:campaignId/sms', isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), smsRoutes)
+router.use('/campaign/:campaignId/email', isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), emailRoutes)
+router.use('/campaign/:campaignId', isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), redirectToChannelRoute)
 export default router

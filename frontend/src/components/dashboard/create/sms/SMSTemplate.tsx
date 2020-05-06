@@ -17,7 +17,7 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
         throw new Error('Invalid campaign id')
       }
       const { updatedTemplate, numRecipients } = await saveTemplate(+campaignId, body)
-      onNext({ body: updatedTemplate?.body , numRecipients })
+      onNext({ body: updatedTemplate?.body, params: updatedTemplate?.params, numRecipients })
     } catch (err) {
       setErrorMsg(err.message)
     }

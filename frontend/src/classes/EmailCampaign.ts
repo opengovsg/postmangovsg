@@ -9,6 +9,7 @@ export enum EmailProgress {
 
 export class EmailCampaign extends Campaign {
   body: string
+  params: Array<string>
   subject: string
   csvFilename: string
   numRecipients: number
@@ -19,6 +20,7 @@ export class EmailCampaign extends Campaign {
   constructor(input: any) {
     super(input)
     this.body = input['email_templates']?.body
+    this.params = input['email_templates']?.params
     this.subject = input['email_templates']?.subject
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']

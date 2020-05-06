@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Campaign, CampaignStats, ChannelType, Status, SMSCampaign, EmailCampaign } from 'classes'
 
-function getSentAt(jobs: Array<{sent_at: Date}>): Date {
+function getSentAt(jobs: Array<{ sent_at: Date }>): Date {
   const jobsSentAt = jobs.map((x => x.sent_at)).sort()
   // returns job with the earliest sentAt time
   return jobsSentAt[0]
@@ -13,25 +13,26 @@ export async function getCampaigns(): Promise<Array<Campaign>> {
 
       const details = {
         ...data,
-        sent_at: getSentAt(data.job_queue)
+        'sent_at': getSentAt(data.job_queue),
       }
-    
+
       return new Campaign(details)
     })
     return campaigns
   })
 }
 
-function parseStatus (status: string) : Status {
-  switch (status){
+function parseStatus(status: string): Status {
+  switch (status) {
+    case 'LOGGED':
+      return Status.Sent
     case 'READY':
     case 'ENQUEUED':
     case 'SENDING':
-      return Status.Sending
     case 'SENT':
-    case 'LOGGED':
-      return Status.Sent
-    default: 
+    case 'STOPPED':
+      return Status.Sending
+    default:
       return Status.Draft
   }
 }
@@ -39,26 +40,25 @@ function parseStatus (status: string) : Status {
 export async function getCampaignStats(campaignId: number): Promise<CampaignStats> {
   return axios.get(`/campaign/${campaignId}/stats`).then((response) => {
     const { error, unsent, sent, status } = response.data
-    const details = { error, unsent, sent, status}
     return new CampaignStats({
       error,
       unsent,
-      sent, 
-      status: parseStatus(status)
+      sent,
+      status: parseStatus(status),
     })
   })
 }
 
 export async function getCampaignDetails(campaignId: number): Promise<EmailCampaign | SMSCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
-    const { campaign, num_recipients } = response.data
+    const { campaign, num_recipients: numRecipients } = response.data
     const details = {
       ...campaign,
-      num_recipients,
-      sent_at:  getSentAt(campaign.job_queue),
+      'num_recipients': numRecipients,
+      'sent_at': getSentAt(campaign.job_queue),
     }
 
-    switch(campaign.type){
+    switch (campaign.type) {
       case ChannelType.SMS:
         return new SMSCampaign(details)
       case ChannelType.Email:
