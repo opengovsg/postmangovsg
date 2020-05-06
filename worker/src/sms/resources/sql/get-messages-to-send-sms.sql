@@ -14,7 +14,7 @@ BEGIN
 			FOR UPDATE SKIP LOCKED
 		)
 		RETURNING id, recipient, params, campaign_id
-	) SELECT json_build_object('id', m.id, 'recipient', m.recipient, 'params', m.params, 'body', t.body)
+	) SELECT json_build_object('id', m.id, 'recipient', m.recipient, 'params', m.params, 'body', t.body, 'campaignId': m.campaign_id)
 	 FROM messages m, sms_templates t
 	 WHERE m.campaign_id = t.campaign_id;
 		

@@ -7,6 +7,7 @@ import { checkRequiredEnvVars, loaders } from './core'
 const requiredEnvVars = [
   'AWS_REGION',
   'SECRET_MANAGER_SALT',
+  'TWILIO_CALLBACK_SECRET',
   'DB_URI',
 ]
 

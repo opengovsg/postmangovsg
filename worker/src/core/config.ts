@@ -37,6 +37,9 @@ const twilioAccountSid: string = process.env.TWILIO_ACCOUNT_SID as string
 const twilioApiKey: string = process.env.TWILIO_API_KEY as string
 const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
 const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
+const twilioCallbackSecret: string = process.env.TWILIO_CALLBACK_SECRET as string
+const backendUrl: string = process.env.BACKEND_URL as string
+
 const defaultCountryCode: string = process.env.DEFAULT_COUNTRY_CODE as string
 
 //ECS
@@ -95,6 +98,8 @@ export default {
     apiKey: twilioApiKey,
     apiSecret: twilioApiSecret,
     messagingServiceSid: twilioMessagingServiceSid,
+    callbackSecret: twilioCallbackSecret,
+    callbackBackendUrl: backendUrl
   },
   defaultCountryCode,
   xssOptions: {
