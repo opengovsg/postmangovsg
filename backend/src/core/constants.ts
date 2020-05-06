@@ -28,17 +28,33 @@ export enum JobStatus {
  *     CampaignMeta:
  *       type: object
  *       properties:
+ *         id:
+ *          type: number
  *         name:
  *           type: string
- *         createdAt:
+ *         created_at:
  *           type: string
  *           format: date-time
- *         hasCredential:
+ *         has_credential:
  *           type: boolean
  *         valid:
  *           type: boolean
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
+ *         job_queue:
+ *           type: array
+ *           items:
+ *            $ref: '#/components/schemas/JobQueue'
+ * 
+ *     JobQueue:
+ *        type: object
+ *        properties:
+ *          status:
+ *            $ref: '#/components/schemas/JobStatus'
+ *          sent_at:
+ *            type: string
+ *            format: date-time
+ *     
  *     JobStatus:
  *       type: string
  *       enum:
