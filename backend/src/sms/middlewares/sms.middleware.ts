@@ -5,7 +5,6 @@ import { Campaign, JobQueue } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
-import logger from '@core/logger'
 import { credentialService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
@@ -72,9 +71,8 @@ const getHydratedMsg = async (campaignId: number): Promise<string | null> => {
 
 const sendMessage = async (campaignId: number, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
   const msg = await getHydratedMsg(campaignId)
-  if (!msg) return
+  if (!msg) throw new Error('No message to send')
 
-  logger.info('Sending sms using Twilio.')
   const twilioService = new TwilioService(credential)
   return twilioService.send(recipient, msg)
 }
