@@ -98,9 +98,14 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
   const { recipient } = req.body
   const { campaignId } = req.params
   try {
-    await sendMessage(+campaignId, recipient, credential)
+    const messageId = await sendMessage(+campaignId, recipient, credential)
+    // No message to send
+    if(!messageId){
+      return res.status(400).json({ message: `Could not test credential as there was no message to send` }) 
+    }
   }
   catch (err) {
+    // Twilio client could not send message, probably due to invalid credentials
     return res.status(400).json({ message: `${err}` })
   }
 
