@@ -23,3 +23,11 @@ export class TemplateError extends Error {
     Error.captureStackTrace(this)
   }
 }
+
+export class InvalidRecipientError extends Error {
+  constructor() {
+    super('There are invalid recipient(s) in the uploaded recipient list.')
+    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
+    Error.captureStackTrace(this)
+  }
+}
