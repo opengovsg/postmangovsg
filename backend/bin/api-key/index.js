@@ -35,7 +35,7 @@ if(!salt){
 }
 
 const generateKey = () => {
-    return crypto.randomBytes(32).toString('hex')
+    return crypto.randomBytes(32).toString('base64')
   }
   
 const generateHash = (value, salt) => {
