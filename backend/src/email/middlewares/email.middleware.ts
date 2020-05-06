@@ -66,10 +66,9 @@ const getHydratedMail = async (campaignId: number, recipient: string): Promise<M
   return 
 }
 
-const getUserId = (req: Request, res: Response): string => {
-  // From Cookie
-  if (req.session?.user?.id) return req.session?.user?.id
-  return res.locals.userId
+const getUserId = (req: Request, res: Response): number => {
+  return req.session?.user?.id !== undefined ? req.session.user.id 
+    : res.locals.userId
 }
 
 // TODO

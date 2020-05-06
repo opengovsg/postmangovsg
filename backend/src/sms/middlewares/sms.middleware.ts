@@ -78,11 +78,11 @@ const sendMessage = async (campaignId: number, recipient: string, credential: Tw
   return twilioService.send(recipient, msg)
 }
 
-const getUserId = (req: Request, res: Response): string => {
-  // From Cookie
-  if (req.session?.user?.id) return req.session?.user?.id
-  return res.locals.userId
+const getUserId = (req: Request, res: Response): number => {
+  return req.session?.user?.id !== undefined ? req.session.user.id 
+    : res.locals.userId
 }
+
 
 // TODO
 const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
