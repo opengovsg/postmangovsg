@@ -454,7 +454,7 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *               schema:
  *                 properties:
  *                   num_recipients:
- *                     type: string
+ *                     type: number
  *                   preview:
  *                     type: object
  *                     properties:
