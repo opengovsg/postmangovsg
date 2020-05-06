@@ -6,17 +6,17 @@ export interface TwilioCredentials {
 }
 /**
  * @swagger
- *  components:
- *    schemas:
- *      TwilioCredentials:
- *        type: object
- *        properties:
- *          accountSid:
- *            type: string
- *          apiKey:
- *            type: string
- *          apiSecret:
- *            type: string
- *          messagingServiceSid:
- *            type: string
+ * components:
+ *   schemas:
+ *     TwilioCredentials:
+ *       type: object
+ *       properties:
+ *         twilio_account_sid:
+ *           type: string
+ *         twilio_api_key:
+ *           type: string
+ *         twilio_api_Secret:
+ *           type: string
+ *         twilio_messaging_service_sid:
+ *           type: string
  */

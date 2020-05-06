@@ -17,7 +17,7 @@ export async function saveTemplate(campaignId: number, body: string):
     const response = await axios.put(`/campaign/${campaignId}/sms/template`, {
       body,
     })
-    const { num_recipients: numRecipients, updatedTemplate } = response.data
+    const { num_recipients: numRecipients, template: updatedTemplate } = response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template.')
@@ -36,10 +36,10 @@ export async function validateCredentials({
 }): Promise<void> {
   try {
     await axios.post(`/campaign/${campaignId}/sms/credentials`, {
-      twilioAccountSid: accountSid,
-      twilioApiKey: apiKey,
-      twilioApiSecret: apiSecret,
-      twilioMessagingServiceSid: messagingServiceSid,
+      'twilio_account_sid': accountSid,
+      'twilio_api_key': apiKey,
+      'twilio_api_secret': apiSecret,
+      'twilio_messaging_service_sid': messagingServiceSid,
       recipient,
     })
   } catch (e) {
@@ -57,10 +57,11 @@ export async function getPresignedUrl({
   try {
     const response = await axios.get(`/campaign/${campaignId}/sms/upload/start`, {
       params: {
-        mimeType,
+        'mime_type': mimeType,
       },
     })
-    return response.data
+    const { 'transaction_id': transactionId, 'presigned_url': presignedUrl } = response.data
+    return { transactionId, presignedUrl } as PresignedUrlResponse
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
   }
@@ -77,7 +78,7 @@ export async function completeFileUpload({
 }): Promise<UploadCompleteResponse> {
   try {
     const response = await axios.post(`/campaign/${campaignId}/sms/upload/complete`, {
-      transactionId,
+      'transaction_id': transactionId,
       filename,
     })
     return response.data

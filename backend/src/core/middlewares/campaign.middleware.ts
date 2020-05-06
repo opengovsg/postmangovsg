@@ -23,23 +23,23 @@ const s3 = new S3({
  * @param res
  * @param next
  */
-const canEditCampaign =  async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
+const canEditCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
     const { campaignId } = req.params
     const job = await JobQueue.findOne({ where: { campaignId, status: { [Op.not]: JobStatus.Logged } } })
     return !job ? next() : res.sendStatus(403)
   }
-  catch(err){
+  catch (err) {
     return next(err)
   }
 }
 
 // Create campaign
 const createCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
-    const { name, type }: { name: string; type: string} = req.body
+  try {
+    const { name, type }: { name: string; type: string } = req.body
     const { id: userId } = req.session?.user
-    const campaign: Campaign =  await Campaign.create({ name, type, userId, valid: false })
+    const campaign: Campaign = await Campaign.create({ name, type, userId, valid: false })
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
@@ -47,7 +47,7 @@ const createCampaign = async (req: Request, res: Response, next: NextFunction): 
       type: campaign.type,
     })
   }
-  catch(err){
+  catch (err) {
     return next(err)
   }
 
@@ -55,10 +55,10 @@ const createCampaign = async (req: Request, res: Response, next: NextFunction): 
 
 // List campaigns
 const listCampaigns = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try{
+  try {
     const { offset, limit } = req.query
-    const { id : userId } = req.session?.user
-    const options: { where: any; attributes: any; order: any; include: any; offset?: number; limit? : number} = {
+    const { id: userId } = req.session?.user
+    const options: { where: any; attributes: any; order: any; include: any; offset?: number; limit?: number } = {
       where: {
         userId,
       },
@@ -78,13 +78,13 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
     if (offset) {
       options.offset = +offset
     }
-    if(limit){
+    if (limit) {
       options.limit = +limit
     }
 
     const campaigns = await Campaign.findAll(options)
     return res.json(campaigns)
-  }catch(err){
+  } catch (err) {
     return next(err)
   }
 }
@@ -97,14 +97,17 @@ const uploadStartHandler = async (req: Request, res: Response): Promise<Response
     const params = {
       Bucket: FILE_STORAGE_BUCKET_NAME,
       Key: s3Key,
-      ContentType: req.query.mimeType,
+      ContentType: req.query['mime_type'],
       Expires: 180, // seconds
     }
 
     const signedKey = jwtUtils.sign(s3Key)
 
     const presignedUrl = await s3.getSignedUrlPromise('putObject', params)
-    return res.status(200).json({ presignedUrl, transactionId: signedKey })
+    return res.status(200).json({
+      'presigned_url': presignedUrl,
+      'transaction_id': signedKey,
+    })
 
   } catch (err) {
     logger.error(`${err.message}`)
