@@ -99,6 +99,16 @@ router.get('/', celebrate(listCampaignsValidator), listCampaigns)
  *            application/json:
  *              schema:
  *                type: object
+ *                properties:
+ *                 id:
+ *                  type: number
+ *                 name:
+ *                  type: string
+ *                 created_at:
+ *                  type: string
+ *                  format: date-time
+ *                 type:
+ *                  $ref: '#/components/schemas/ChannelType'                 
  */
 router.post('/', celebrate(createCampaignValidator), createCampaign)
 

@@ -43,7 +43,7 @@ const createCampaign = async (req: Request, res: Response, next: NextFunction): 
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
-      createdAt: campaign.createdAt,
+      created_at: campaign.createdAt,
       type: campaign.type,
     })
   }
