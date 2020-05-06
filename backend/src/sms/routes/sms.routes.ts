@@ -311,7 +311,12 @@ const campaignStatsHandler = async (req: Request, res: Response, next: NextFunct
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/SmsCampaign'
+ *                type: object
+ *                properties:
+ *                  campaign:
+ *                    $ref: '#/components/schemas/SMSCampaign'
+ *                  num_recipients:
+ *                    type: number
  */
 router.get('/', getCampaignDetails)
 
