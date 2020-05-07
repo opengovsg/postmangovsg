@@ -65,6 +65,14 @@ const listCampaigns = ({ userId, offset, limit }: {userId: number; offset: numbe
   return Campaign.findAll(options)
 }
 
+const setInvalid = (campaignId: number): Promise<[number, Campaign[]]> => {
+  return Campaign.update({
+    valid: false,
+  }, {
+    where: { id: +campaignId },
+  })
+}
+
 
 export const CampaignService = 
-{ hasJobInProgress, createCampaign, retrieveCampaign, listCampaigns, updateCampaignS3Metadata }
+{ hasJobInProgress, createCampaign, retrieveCampaign, listCampaigns, updateCampaignS3Metadata, setInvalid }

@@ -1,6 +1,23 @@
+import { EmailTemplate } from '@email/models'
+
 export interface EmailContent {
   subject: string;
   body: string;
+}
+export interface StoreTemplateInput {
+  campaignId: number;
+  subject: string;
+  body: string;
+}
+export interface StoreTemplateOutput {
+  updatedTemplate: EmailTemplate;
+  numRecipients: number;
+  check?: {
+    reupload: boolean;
+    extraKeys?: string[];
+  };
+  valid?: boolean;
+
 }
 /**
  * @swagger
