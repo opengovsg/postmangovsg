@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
-import { isCookieOrApiKeyAuthenticated } from '@core/middlewares'
+import { AuthMiddleware } from '@core/middlewares'
 
 // Core routes
 import authenticationRoutes from './auth.routes'
@@ -69,13 +69,13 @@ const router = Router()
 router.use('/ping', ping)
 router.use('/auth', authenticationRoutes)
 
-router.use('/campaigns', isCookieOrApiKeyAuthenticated, campaignRoutes)
-router.use('/campaign/:campaignId/sms', isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), smsCampaignRoutes)
-router.use('/campaign/:campaignId/email', isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), emailCampaignRoutes)
-router.use('/campaign/:campaignId', isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), redirectToChannelRoute)
+router.use('/campaigns', AuthMiddleware.isCookieOrApiKeyAuthenticated, campaignRoutes)
+router.use('/campaign/:campaignId/sms', AuthMiddleware.isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), smsCampaignRoutes)
+router.use('/campaign/:campaignId/email', AuthMiddleware.isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), emailCampaignRoutes)
+router.use('/campaign/:campaignId', AuthMiddleware.isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), redirectToChannelRoute)
 
-router.use('/settings/email', isCookieOrApiKeyAuthenticated, emailSettingsRoutes)
-router.use('/settings/sms', isCookieOrApiKeyAuthenticated, smsSettingsRoutes)
-router.use('/settings', isCookieOrApiKeyAuthenticated, settingsRoutes)
+router.use('/settings/email', AuthMiddleware.isCookieOrApiKeyAuthenticated, emailSettingsRoutes)
+router.use('/settings/sms', AuthMiddleware.isCookieOrApiKeyAuthenticated, smsSettingsRoutes)
+router.use('/settings', AuthMiddleware.isCookieOrApiKeyAuthenticated, settingsRoutes)
 
 export default router

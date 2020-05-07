@@ -14,7 +14,7 @@ const getApiKeyHash = async (apiKey: string): Promise<string> => {
   return apiKeyHash
 }
 
-export {
+export const ApiKeyService = {
   generateApiKeyFromName,
   getApiKeyHash,
 }
