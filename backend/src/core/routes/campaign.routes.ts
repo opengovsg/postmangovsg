@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { ChannelType } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { createCampaign, listCampaigns } from '@core/middlewares'
+import { CampaignMiddleware } from '@core/middlewares'
 const router = Router()
 
 // validators
@@ -72,7 +72,7 @@ const createCampaignValidator = {
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/', celebrate(listCampaignsValidator), listCampaigns)
+router.get('/', celebrate(listCampaignsValidator), CampaignMiddleware.listCampaigns)
 
 /**
  * @swagger
@@ -118,6 +118,6 @@ router.get('/', celebrate(listCampaignsValidator), listCampaigns)
  *        "500":
  *           description: Internal Server Error              
  */
-router.post('/', celebrate(createCampaignValidator), createCampaign)
+router.post('/', celebrate(createCampaignValidator), CampaignMiddleware.createCampaign)
 
 export default router

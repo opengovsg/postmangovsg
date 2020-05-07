@@ -5,10 +5,9 @@ import { Campaign, JobQueue, UserCredential } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
-import { credentialService } from '@core/services'
+import { credentialService, TemplateService } from '@core/services'
 import { TwilioService } from '@sms/services'
 import config from '@core/config'
-import { template } from '@core/services/template.service'
 import { CampaignDetails } from '@core/interfaces'
 
 // Parse credentials from request body
@@ -76,7 +75,7 @@ const getHydratedMsg = async (campaignId: number): Promise<string | null> => {
   const body = await getSmsBody(campaignId)
   if (params === null || body === null) return null
 
-  const hydratedMsg = template(body, params)
+  const hydratedMsg = TemplateService.template(body, params)
   return hydratedMsg
 }
 

@@ -6,7 +6,7 @@ import { ChannelType } from '@core/constants'
 import { mailClient } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 import logger from '@core/logger'
-import { template } from '@core/services/template.service'
+import { TemplateService } from '@core/services'
 import { EmailContent } from '@email/interfaces'
 
 
@@ -48,8 +48,8 @@ const hydrateFirstMessage = async (campaignId: number): Promise<{ body: string; 
   
   if (!emailContent || !params) return
 
-  const subject = template(emailContent.subject, params)
-  const body = template(emailContent.body, params)
+  const subject = TemplateService.template(emailContent.subject, params)
+  const body = TemplateService.template(emailContent.body, params)
   return { body, subject }
 }
 

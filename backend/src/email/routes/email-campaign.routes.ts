@@ -5,18 +5,16 @@ import xss from 'xss'
 import { Campaign } from '@core/models'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import {
-  updateCampaignS3Metadata,
-  template,
-  testHydration,
-  extractS3Key,
+  CampaignService,
+  TemplateService,
 } from '@core/services'
 import { populateEmailTemplate, upsertEmailTemplate, getEmailStats, hasInvalidEmailRecipient } from '@email/services'
 import {
-  uploadStartHandler,
+  CampaignMiddleware,
+  TemplateMiddleware,
   sendCampaign,
   stopCampaign,
   retryCampaign,
-  canEditCampaign,
 } from '@core/middlewares'
 import {
   storeCredentials,
@@ -132,7 +130,7 @@ const checkNewTemplateParams = async ({
     // the keys in the template are either a subset or the same as what is present in the uploaded file
 
     try {
-      template(
+      TemplateService.template(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         updatedTemplate.body!,
         firstRecord.params as { [key: string]: string }
@@ -232,7 +230,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     const { 'transaction_id': transactionId, filename } = req.body
     let s3Key: string
     try {
-      s3Key = extractS3Key(transactionId)
+      s3Key = TemplateService.extractS3Key(transactionId)
     } catch (err) {
       return res.status(400).json(err.message)
     }
@@ -246,12 +244,12 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
 
     // Updates metadata in project
-    await updateCampaignS3Metadata({ key: s3Key, campaignId, filename })
+    await CampaignService.updateCampaignS3Metadata({ key: s3Key, campaignId, filename })
 
     // carry out templating / hydration
     // - download from s3
     try {
-      const { records, hydratedRecord } = await testHydration({
+      const { records, hydratedRecord } = await TemplateService.testHydration({
         campaignId: +campaignId,
         s3Key,
         templateSubject: emailTemplate.subject,
@@ -407,7 +405,7 @@ router.get('/', getCampaignDetails)
  *         "500":
  *           description: Internal Server Error
  */
-router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, storeTemplate)
+router.put('/template', celebrate(storeTemplateValidator), CampaignMiddleware.canEditCampaign, storeTemplate)
 
 /**
  * @swagger
@@ -449,7 +447,7 @@ router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, stor
  *         "500":
  *           description: Internal Server Error
  */
-router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, uploadStartHandler)
+router.get('/upload/start', celebrate(uploadStartValidator), CampaignMiddleware.canEditCampaign, TemplateMiddleware.uploadStartHandler)
 
 /**
  * @swagger
@@ -502,7 +500,7 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *         "500":
  *           description: Internal Server Error
  */
-router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampaign, uploadCompleteHandler)
+router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMiddleware.canEditCampaign, uploadCompleteHandler)
 
 /**
  * @swagger
@@ -536,7 +534,7 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaign, storeCredentials)
+router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddleware.canEditCampaign, storeCredentials)
 
 /**
  * @swagger
@@ -615,7 +613,7 @@ router.get('/preview', previewFirstMessage)
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCampaign)
+router.post('/send', celebrate(sendCampaignValidator), CampaignMiddleware.canEditCampaign, sendCampaign)
 
 /**
  * @swagger
@@ -667,7 +665,7 @@ router.post('/stop', stopCampaign)
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/retry', canEditCampaign, retryCampaign)
+router.post('/retry', CampaignMiddleware.canEditCampaign, retryCampaign)
 
 /**
  * @swagger

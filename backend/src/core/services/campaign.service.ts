@@ -1,9 +1,18 @@
-import { Campaign } from '@core/models'
+import { Campaign, JobQueue } from '@core/models'
 import config from '@core/config'
-import { jwtUtils } from '@core/utils/jwt'
-import logger from '@core/logger'
+import { JobStatus } from '@core/constants'
+import { Op, literal  } from 'sequelize'
+
 
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
+
+const hasJobInProgress =  (campaignId: number): Promise<JobQueue | null> => {
+  return JobQueue.findOne({ where: { campaignId, status: { [Op.not]: JobStatus.Logged } } })
+}
+
+const createCampaign = ({ name, type, userId }: {name: string; type: string; userId: number}):  Promise<Campaign> => {
+  return Campaign.create({ name, type, userId, valid: false })
+}
 
 const updateCampaignS3Metadata = ({ key, campaignId, filename }: { key: string; campaignId: string; filename: string }): Promise<[number, Campaign[]]> => {
   const s3Object = {
@@ -28,17 +37,34 @@ const retrieveCampaign = (id: number): Promise<Campaign> => {
   return Campaign.findByPk(id)
 }
 
-// decodes JWT
-const extractS3Key = (transactionId: string): string => {
-  let decoded: string
-  try {
-    decoded = jwtUtils.verify(transactionId) as string
-  } catch (err) {
-    logger.error(`${err.stack}`)
-    throw new Error('Invalid transactionId provided')
+const listCampaigns = ({ userId, offset, limit }: {userId: number; offset: number; limit: number}): Promise<Array<Campaign>> => {
+  const options: { where: any; attributes: any; order: any; include: any; offset?: number; limit?: number } = {
+    where: {
+      userId,
+    },
+    attributes: [
+      'id', 'name', 'type', 'created_at', 'valid', [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+    ],
+    order: [
+      ['created_at', 'DESC'],
+    ],
+    include: [
+      {
+        model: JobQueue,
+        attributes: ['status', ['created_at', 'sent_at']],
+      },
+    ],
   }
-  return decoded as string
+  if (offset) {
+    options.offset = +offset
+  }
+  if (limit) {
+    options.limit = +limit
+  }
+
+  return Campaign.findAll(options)
 }
 
 
-export { extractS3Key, retrieveCampaign, updateCampaignS3Metadata }
+export const CampaignService = 
+{ hasJobInProgress, createCampaign, retrieveCampaign, listCampaigns, updateCampaignS3Metadata }

@@ -9,7 +9,7 @@ const queryAwsMetadata  = () => {
 
   setTimeout(() => {
     source.cancel('Getting AWS metadata timed out')
-  }, 3000)
+  }, 1000)
 
   return axios.get('http://169.254.169.254/latest/meta-data/instance-id', { cancelToken: source.token })
 }
