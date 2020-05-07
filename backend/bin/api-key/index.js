@@ -40,7 +40,6 @@ const generateKey = () => {
   
 const generateHash = (value, salt) => {
     return bcrypt.hash(value, salt)
-    .then(hashed => hashed)
     .catch(err=>{
         console.error(`Could not generate hash. Exiting. ${err.stack}`)
         process.exit(1)
