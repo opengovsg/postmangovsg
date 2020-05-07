@@ -8,9 +8,10 @@ const getApiKey = (req: Request): string | null => {
   const authHeader = req.get('authorization')
   if(!authHeader) return null
   
-  const [header, apiKey] = authHeader.split(' ')
+  const [header, bearerToken] = authHeader.split(' ')
   if (headerKey !== header) return null
 
+  const apiKey = bearerToken.trim()
   const [name, version, key] = apiKey.split('_')
   if (!name || !version || !key) return null
 
