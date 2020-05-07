@@ -7,7 +7,7 @@ import {
   stopCampaign,
   retryCampaign,
 } from '@core/middlewares'
-import { EmailTemplateMiddleware, EmailStatsMiddleware, isEmailCampaignOwnedByUser, storeCredentials, getCampaignDetails, previewFirstMessage } from '@email/middlewares'
+import { EmailTemplateMiddleware, EmailStatsMiddleware, EmailMiddleware } from '@email/middlewares'
 
 
 
@@ -63,7 +63,7 @@ const sendCampaignValidator = {
 // Routes
 
 // Check if campaign belongs to user for this router
-router.use(isEmailCampaignOwnedByUser)
+router.use(EmailMiddleware.isEmailCampaignOwnedByUser)
 
 /**
  * @swagger
@@ -98,7 +98,7 @@ router.use(isEmailCampaignOwnedByUser)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/', getCampaignDetails)
+router.get('/', EmailMiddleware.getCampaignDetails)
 
 /**
  * @swagger
@@ -299,7 +299,7 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMidd
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddleware.canEditCampaign, storeCredentials)
+router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddleware.canEditCampaign, EmailMiddleware.storeCredentials)
 
 /**
  * @swagger
@@ -335,7 +335,7 @@ router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddle
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/preview', previewFirstMessage)
+router.get('/preview', EmailMiddleware.previewFirstMessage)
 
 /**
  * @swagger

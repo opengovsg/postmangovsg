@@ -35,6 +35,11 @@ export interface CampaignDetails {
       status: string;
     };
   }
+
+export interface GetCampaignDetailsOutput {
+    campaign: CampaignDetails;
+    numRecipients: number;
+}
 export interface CampaignStats {
     error: number;
     unsent: number;
