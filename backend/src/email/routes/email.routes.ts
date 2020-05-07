@@ -457,7 +457,7 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *           application/json:
  *             schema:
  *               required:
- *                 - transcation_id
+ *                 - transaction_id
  *                 - filename
  *               properties:
  *                 transaction_id:
