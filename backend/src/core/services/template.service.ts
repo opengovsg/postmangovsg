@@ -5,11 +5,12 @@ import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { v4 as uuid } from 'uuid'
 
 import S3Client from '@core/services/s3-client.class'
+import logger from '@core/logger'
+import config from '@core/config'
+import { MissingTemplateKeysError, TemplateError } from '@core/errors/template.errors'
 import { isSuperSet } from '@core/utils'
 import { jwtUtils } from '@core/utils/jwt'
-import logger from '@core/logger'
-import { MissingTemplateKeysError, TemplateError } from '@core/errors/template.errors'
-import config from '@core/config'
+
 
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
 const s3 = new S3({
@@ -199,5 +200,10 @@ const extractS3Key = (transactionId: string): string => {
   return decoded as string
 }
 
-export const TemplateService = 
-  { template, parseTemplate, testHydration, getUploadParameters, extractS3Key }
+export const TemplateService = { 
+  template, 
+  parseTemplate, 
+  testHydration, 
+  getUploadParameters, 
+  extractS3Key, 
+}

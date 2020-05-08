@@ -1,17 +1,16 @@
 import { Request, Response, NextFunction } from 'express'
-import {
-  CampaignService,
-  TemplateService,
-} from '@core/services'
-import { EmailTemplateService } from '@email/services'
+import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
   TemplateError,
 } from '@core/errors'
-
-import logger from '@core/logger'
+import {
+  CampaignService,
+  TemplateService,
+} from '@core/services'
+import { EmailTemplateService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
   
 

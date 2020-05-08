@@ -1,6 +1,8 @@
 import { Request, Response  } from 'express'
+
 import logger from '@core/logger'
 import { TemplateService } from '@core/services'
+
 // Upload start
 const uploadStartHandler = async (req: Request, res: Response): Promise<Response> => {
   try {
@@ -18,4 +20,6 @@ const uploadStartHandler = async (req: Request, res: Response): Promise<Response
   }
 }
 
-export const TemplateMiddleware = { uploadStartHandler }
+export const TemplateMiddleware = { 
+  uploadStartHandler, 
+}

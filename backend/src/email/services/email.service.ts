@@ -1,12 +1,13 @@
 import { literal } from 'sequelize'
-import { Campaign, JobQueue } from '@core/models'
-import { EmailTemplate, EmailMessage } from '@email/models'
-import { TemplateService, MailService } from '@core/services'
-import { MailToSend, GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
-import { EmailContent } from '@email/interfaces'
+
 import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
+import { Campaign, JobQueue } from '@core/models'
+import { TemplateService, MailService } from '@core/services'
+import { MailToSend, GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 
+import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailContent } from '@email/interfaces'
   
 const getEmailTemplate = (campaignId: number): Promise<EmailTemplate> => {
   return EmailTemplate.findOne({ where: { campaignId }, attributes: ['body', 'subject'] })

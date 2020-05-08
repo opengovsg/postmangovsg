@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
-import { SmsService } from '@sms/services'
 
+import { SmsService } from '@sms/services'
 
 const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {

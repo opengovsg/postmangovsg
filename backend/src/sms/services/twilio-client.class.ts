@@ -1,6 +1,6 @@
 import twilio from 'twilio'
-import { TwilioCredentials } from '@sms/interfaces'
 import config from '@core/config'
+import { TwilioCredentials } from '@sms/interfaces'
 
 export default class TwilioClient {
   private client: any;

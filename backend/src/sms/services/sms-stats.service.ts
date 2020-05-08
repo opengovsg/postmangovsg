@@ -1,8 +1,9 @@
 
 import { JobQueue } from '@core/models'
-import { SmsMessage, SmsOp } from '@sms/models'
-import { CampaignStats } from '@core/interfaces'
 import { StatsService } from '@core/services'
+import { CampaignStats } from '@core/interfaces'
+
+import { SmsMessage, SmsOp } from '@sms/models'
 
 const getStats = async (campaignId: number): Promise<CampaignStats> => {
   const job = await JobQueue.findOne({ where: { campaignId } })

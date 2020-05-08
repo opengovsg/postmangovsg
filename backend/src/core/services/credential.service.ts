@@ -1,9 +1,11 @@
 import AWS from 'aws-sdk'
-import { Credential, UserCredential } from '@core/models'
+import { get } from 'lodash'
+
 import logger from '@core/logger'
 import config from '@core/config'
+import { Credential, UserCredential } from '@core/models'
+
 import { TwilioCredentials } from '@sms/interfaces'
-import { get } from 'lodash'
 
 const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
 

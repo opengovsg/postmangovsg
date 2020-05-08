@@ -1,13 +1,17 @@
 import bcrypt from 'bcrypt'
-import { SmsMessage, SmsTemplate } from '@sms/models'
+import { literal } from 'sequelize'
+
 import config from '@core/config'
-import { TemplateService } from '@core/services'
-import { TwilioCredentials } from '@sms/interfaces'
-import TwilioClient from './twilio-client.class'
+
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
+import { TemplateService } from '@core/services'
 import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
-import { literal } from 'sequelize'
+
+import { SmsMessage, SmsTemplate } from '@sms/models'
+import { TwilioCredentials } from '@sms/interfaces'
+
+import TwilioClient from  './twilio-client.class'
 
 const getParams = async (campaignId: number): Promise<{ [key: string]: string } | null> => {
   const smsMessage = await SmsMessage.findOne({ where: { campaignId }, attributes: ['params'] })
@@ -44,7 +48,7 @@ const sendCampaignMessage = async (campaignId: number, recipient: string, creden
 }
 
 const sendValidationMessage = async (recipient: string, credential: TwilioCredentials): Promise<string | void> => {
-  const twilioService = new TwilioService(credential)
+  const twilioService = new TwilioClient(credential)
   return twilioService.send(recipient, 'Your Twilio credential has been validated.')
 }
 

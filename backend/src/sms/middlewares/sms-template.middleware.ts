@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
-import { SmsTemplateService } from '@sms/services'
-import { StoreTemplateOutput } from '@sms/interfaces'
+
+import logger from '@core/logger'
 import { HydrationError, TemplateError, RecipientColumnMissing, MissingTemplateKeysError } from '@core/errors'
 import { TemplateService, CampaignService } from '@core/services'
-import logger from '@core/logger'
+
+import { SmsTemplateService } from '@sms/services'
+import { StoreTemplateOutput } from '@sms/interfaces'
+
 
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {

@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { CampaignService } from '@core/services'
 
-
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
  * @param req
@@ -57,4 +56,8 @@ const listCampaigns = async (req: Request, res: Response, next: NextFunction): P
 
 
 
-export const CampaignMiddleware = { canEditCampaign, createCampaign, listCampaigns }
+export const CampaignMiddleware = { 
+  canEditCampaign, 
+  createCampaign, 
+  listCampaigns, 
+}

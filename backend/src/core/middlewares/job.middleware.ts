@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { JobService } from '@core/services'
+
 const sendCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params

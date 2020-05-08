@@ -1,8 +1,7 @@
-import { Campaign, JobQueue } from '@core/models'
+import { Op, literal  } from 'sequelize'
 import config from '@core/config'
 import { JobStatus } from '@core/constants'
-import { Op, literal  } from 'sequelize'
-
+import { Campaign, JobQueue } from '@core/models'
 
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
 
@@ -74,5 +73,11 @@ const setInvalid = (campaignId: number): Promise<[number, Campaign[]]> => {
 }
 
 
-export const CampaignService = 
-{ hasJobInProgress, createCampaign, retrieveCampaign, listCampaigns, updateCampaignS3Metadata, setInvalid }
+export const CampaignService = { 
+  hasJobInProgress, 
+  createCampaign, 
+  retrieveCampaign, 
+  listCampaigns, 
+  updateCampaignS3Metadata, 
+  setInvalid, 
+}

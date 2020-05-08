@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-
 import logger from '@core/logger'
 import { AuthService } from '@core/services'
 
@@ -81,4 +80,10 @@ const logout = async (req: Request, res: Response, next: NextFunction): Promise<
   }).catch(err => next(err))
 }
 
-export const AuthMiddleware = { getOtp, verifyOtp, getUser, isCookieOrApiKeyAuthenticated, logout }
+export const AuthMiddleware = { 
+  getOtp, 
+  verifyOtp, 
+  getUser, 
+  isCookieOrApiKeyAuthenticated, 
+  logout, 
+}

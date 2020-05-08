@@ -1,6 +1,6 @@
-
 import { QueryTypes, Op } from 'sequelize'
 import get from 'lodash/get'
+
 import config from '@core/config'
 import { Campaign } from '@core/models'
 

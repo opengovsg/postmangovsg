@@ -1,12 +1,14 @@
 import { difference, keys, chunk } from 'lodash'
 import xss from 'xss'
-import { EmailTemplate, EmailMessage } from '@email/models'
-import logger from '@core/logger'
-import { Campaign } from '@core/models'
-import { isSuperSet } from '@core/utils'
-import { TemplateService } from '@core/services'
-import { HydrationError } from '@core/errors'
+
 import config from '@core/config'
+import logger from '@core/logger'
+import { isSuperSet } from '@core/utils'
+import { HydrationError } from '@core/errors'
+import { Campaign } from '@core/models'
+import { TemplateService } from '@core/services'
+
+import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
