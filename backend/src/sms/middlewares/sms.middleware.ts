@@ -85,7 +85,7 @@ const validateAndStoreCredentials = async (req: Request, res: Response, next: Ne
     res.locals.channelType = ChannelType.SMS
     next()
   } catch (err) {
-    return next(err)
+    return res.status(400).json({ message: `${err.message}` })
   }
 }
 
