@@ -1,11 +1,12 @@
 import { authenticator } from 'otplib'
 import bcrypt from 'bcrypt'
 import { Request } from 'express'
-import { User } from '@core/models'
-import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import config from '@core/config'
-import { otpClient, mailClient, ApiKeyService } from '.'
+import { mailClient } from '.'
 import logger from '@core/logger'
+import { User } from '@core/models'
+import { RedisService, ApiKeyService } from '@core/services'
+import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 
 const SALT_ROUNDS = 10
 const { retries: OTP_RETRIES, expiry: OTP_EXPIRY, resendTimeout: OTP_RESEND_TIMEOUT } = config.otp
@@ -16,7 +17,7 @@ const generateOtp = (): string => {
 
 const saveHashedOtp = (email: string, hashedOtp: HashedOtp): Promise<boolean> => {
   return new Promise((resolve, reject) => {
-    otpClient.set(email, JSON.stringify(hashedOtp), 'EX', OTP_EXPIRY, (error) => {
+    RedisService.otpClient.set(email, JSON.stringify(hashedOtp), 'EX', OTP_EXPIRY, (error) => {
       if (error) {
         logger.error(`Failed to save hashed otp: ${error}`)
         reject(error)
@@ -28,7 +29,7 @@ const saveHashedOtp = (email: string, hashedOtp: HashedOtp): Promise<boolean> =>
 
 const getHashedOtp = (email: string): Promise<HashedOtp> => {
   return new Promise((resolve, reject) => {
-    otpClient.get(email, (error, value) => {
+    RedisService.otpClient.get(email, (error, value) => {
       if (error) {
         logger.error(`Failed to get hashed otp: ${error}`)
         reject(new Error('Internal server error - request for otp again'))
@@ -43,7 +44,7 @@ const getHashedOtp = (email: string): Promise<HashedOtp> => {
 
 const deleteHashedOtp = async (email: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
-    otpClient.del(email, (error, response) => {
+    RedisService.otpClient.del(email, (error, response) => {
       if (error || response !== 1) {
         logger.error(`Failed to delete hashed otp: ${error}`)
         reject(error)

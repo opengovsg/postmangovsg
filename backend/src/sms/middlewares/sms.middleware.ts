@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
-import { credentialService } from '@core/services'
+import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 
 
@@ -38,12 +38,12 @@ const getCredentialsFromLabel = async (req: Request, res: Response, next: NextFu
   const userId = req.session?.user?.id
   try {
     // if label provided, fetch from aws secrets
-    const userCred = await credentialService.findUserCredential(+userId, label)
+    const userCred = await CredentialService.findUserCredential(+userId, label)
     if (!userCred) {
       res.status(400).json({ message: 'User credentials cannot be found' })
       return
     }
-    const credentials = await credentialService.getTwilioCredentials(userCred.credName)
+    const credentials = await CredentialService.getTwilioCredentials(userCred.credName)
     res.locals.credentials = credentials
     res.locals.credentialName = userCred.credName
     next()
@@ -79,7 +79,7 @@ const validateAndStoreCredentials = async (req: Request, res: Response, next: Ne
     // Store credentials in AWS secrets manager
     const stringifiedCredential = JSON.stringify(credentials)
     const credentialName = await SmsService.getEncodedHash(stringifiedCredential)
-    await credentialService.storeCredential(credentialName, stringifiedCredential)
+    await CredentialService.storeCredential(credentialName, stringifiedCredential)
     // Pass on to next middleware/handler
     res.locals.credentialName = credentialName
     res.locals.channelType = ChannelType.SMS
