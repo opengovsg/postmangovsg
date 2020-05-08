@@ -2,10 +2,9 @@ import { authenticator } from 'otplib'
 import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import config from '@core/config'
-import { mailClient } from '.'
 import logger from '@core/logger'
 import { User } from '@core/models'
-import { RedisService, ApiKeyService } from '@core/services'
+import { RedisService, ApiKeyService, MailService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 
 const SALT_ROUNDS = 10
@@ -121,7 +120,7 @@ const sendOtp = async (email: string): Promise<string | void> => {
   const hashedOtp: HashedOtp = { hash: hashValue, retries: OTP_RETRIES, createdAt: Date.now() }
   await saveHashedOtp(email, hashedOtp)
 
-  return mailClient.sendMail({
+  return MailService.mailClient.sendMail({
     recipients: [email],
     subject: 'One-Time Password (OTP) for Postman.gov.sg',
     body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(OTP_EXPIRY / 60)} minutes.

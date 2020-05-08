@@ -1,7 +1,7 @@
 import { literal } from 'sequelize'
 import { Campaign, JobQueue } from '@core/models'
 import { EmailTemplate, EmailMessage } from '@email/models'
-import { TemplateService, mailClient } from '@core/services'
+import { TemplateService, MailService } from '@core/services'
 import { MailToSend, GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 import { EmailContent } from '@email/interfaces'
 import logger from '@core/logger'
@@ -57,7 +57,7 @@ const getHydratedMail = async (campaignId: number, recipient: string): Promise<M
 
 const sendEmail = async (mail: MailToSend): Promise<string | void> => {
   try {
-    return mailClient.sendMail(mail)
+    return MailService.mailClient.sendMail(mail)
   } catch (e) {
     logger.error(`Error while sending test email. error=${e}`)
     return
