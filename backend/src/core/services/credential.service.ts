@@ -64,7 +64,8 @@ const findUserCredential = (userId: number, label: string): Promise<UserCredenti
   })
 }
 
-export const credentialService = {
+export const CredentialService = {
+  isExistingCredential,
   storeCredential,
   getTwilioCredentials,
   findUserCredential,
