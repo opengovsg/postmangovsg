@@ -2,7 +2,7 @@ import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
 import config from '@core/config'
 
-export class TwilioService {
+export default class TwilioClient {
   private client: any;
   private messagingServiceSid: string;
 

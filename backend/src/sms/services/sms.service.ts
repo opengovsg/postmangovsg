@@ -3,7 +3,7 @@ import { SmsMessage, SmsTemplate } from '@sms/models'
 import config from '@core/config'
 import { TemplateService } from '@core/services'
 import { TwilioCredentials } from '@sms/interfaces'
-import { TwilioService } from '.'
+import TwilioClient from './twilio-client.class'
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
 import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
@@ -39,7 +39,7 @@ const sendCampaignMessage = async (campaignId: number, recipient: string, creden
   const msg = await getHydratedMessage(campaignId)
   if (!msg) throw new Error('No message to send')
   
-  const twilioService = new TwilioService(credential)
+  const twilioService = new TwilioClient(credential)
   return twilioService.send(recipient, msg)
 }
 
