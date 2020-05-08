@@ -10,7 +10,7 @@ import { CampaignService } from '@core/services'
 const canEditCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    if(!CampaignService.hasJobInProgress(+campaignId)){
+    if(!(await CampaignService.hasJobInProgress(+campaignId))){
       return next() 
     } else{
       return res.sendStatus(403)
