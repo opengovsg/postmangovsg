@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
-import { validateAndStoreCredentials, getCredentialsFromBody } from '@sms/middlewares'
-import { storeUserCredential, checkUserCredentialLabel, getChannelSpecificCredentials } from '@core/middlewares'
+import { SmsMiddleware } from '@sms/middlewares'
+import { SettingsMiddleware } from '@core/middlewares'
 
 const router = Router()
 
@@ -73,7 +73,11 @@ const getCredentialsValidator = {
  *          description: Bad Request (invalid credentials, malformed request, duplicate labels)
  *                    
  */
-router.post('/credentials', celebrate(storeCredentialValidator), checkUserCredentialLabel, getCredentialsFromBody, validateAndStoreCredentials, storeUserCredential)
+router.post('/credentials', celebrate(storeCredentialValidator), 
+  SettingsMiddleware.checkUserCredentialLabel, 
+  SmsMiddleware.getCredentialsFromBody, 
+  SmsMiddleware.validateAndStoreCredentials, 
+  SettingsMiddleware.storeUserCredential)
 
 /**
  * @swagger
@@ -97,7 +101,7 @@ router.post('/credentials', celebrate(storeCredentialValidator), checkUserCreden
  *                     type: string
  *                    
  */
-router.get('/credentials', celebrate(getCredentialsValidator), getChannelSpecificCredentials)
+router.get('/credentials', celebrate(getCredentialsValidator), SettingsMiddleware.getChannelSpecificCredentials)
 
 
 export default router

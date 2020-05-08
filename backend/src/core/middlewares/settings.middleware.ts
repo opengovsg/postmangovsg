@@ -120,7 +120,7 @@ const regenerateApiKey = async (req: Request, res: Response, next: NextFunction)
   }
 }
 
-export {
+export const SettingsMiddleware = {
   getUserSettings,
   checkUserCredentialLabel,
   storeUserCredential,

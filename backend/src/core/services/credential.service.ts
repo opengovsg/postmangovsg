@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk'
-import { Credential } from '@core/models'
+import { Credential, UserCredential } from '@core/models'
 import logger from '@core/logger'
 import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
@@ -54,7 +54,18 @@ const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> =>
   return JSON.parse(secretString)
 }
 
+const findUserCredential = (userId: number, label: string): Promise<UserCredential> => {
+  return UserCredential.findOne({
+    where: {
+      userId,
+      label,
+    },
+    attributes: ['credName'],
+  })
+}
+
 export const credentialService = {
   storeCredential,
   getTwilioCredentials,
+  findUserCredential,
 }

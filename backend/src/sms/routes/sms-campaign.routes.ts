@@ -7,8 +7,7 @@ import {
   stopCampaign,
   retryCampaign,
 } from '@core/middlewares'
-import { isSmsCampaignOwnedByUser, getCredentialsFromBody, getCredentialsFromLabel, validateAndStoreCredentials, setCampaignCredential, 
-  getCampaignDetails, previewFirstMessage, SmsStatsMiddleware, SmsTemplateMiddleware } from '@sms/middlewares'
+import { SmsMiddleware, SmsStatsMiddleware, SmsTemplateMiddleware } from '@sms/middlewares'
 
 
 const router = Router({ mergeParams: true })
@@ -87,7 +86,7 @@ const sendCampaignValidator = {
 // Routes
 
 // Check if campaign belongs to user for this router
-router.use(isSmsCampaignOwnedByUser)
+router.use(SmsMiddleware.isSmsCampaignOwnedByUser)
 
 /**
  * @swagger
@@ -122,7 +121,7 @@ router.use(isSmsCampaignOwnedByUser)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/', getCampaignDetails)
+router.get('/', SmsMiddleware.getCampaignDetails)
 
 /**
  * @swagger
@@ -328,7 +327,11 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMidd
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/new-credentials', celebrate(storeCredentialsValidator), CampaignMiddleware.canEditCampaign, getCredentialsFromBody, validateAndStoreCredentials, setCampaignCredential)
+router.post('/new-credentials', celebrate(storeCredentialsValidator),
+  CampaignMiddleware.canEditCampaign, 
+  SmsMiddleware.getCredentialsFromBody, 
+  SmsMiddleware.validateAndStoreCredentials, 
+  SmsMiddleware.setCampaignCredential)
 
 /**
  * @swagger
@@ -372,7 +375,11 @@ router.post('/new-credentials', celebrate(storeCredentialsValidator), CampaignMi
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/credentials', celebrate(useCredentialsValidator), CampaignMiddleware.canEditCampaign, getCredentialsFromLabel, validateAndStoreCredentials, setCampaignCredential)
+router.post('/credentials', celebrate(useCredentialsValidator), 
+  CampaignMiddleware.canEditCampaign, 
+  SmsMiddleware.getCredentialsFromLabel, 
+  SmsMiddleware.validateAndStoreCredentials, 
+  SmsMiddleware.setCampaignCredential)
 
 /**
  * @swagger
@@ -406,7 +413,7 @@ router.post('/credentials', celebrate(useCredentialsValidator), CampaignMiddlewa
  *        "500":
  *           description: Internal Server Error                 
  */
-router.get('/preview', previewFirstMessage)
+router.get('/preview', SmsMiddleware.previewFirstMessage)
 
 /**
  * @swagger

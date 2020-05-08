@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
-import { getUserSettings, deleteUserCredential, regenerateApiKey } from '@core/middlewares'
+import { SettingsMiddleware } from '@core/middlewares'
 
 const router = Router()
 
@@ -42,7 +42,7 @@ const deleteCredentialValidator = {
  *                          $ref: '#/components/schemas/ChannelType'
  *                    
  */
-router.get('/', getUserSettings)
+router.get('/', SettingsMiddleware.getUserSettings)
 
 /**
  * @swagger
@@ -65,7 +65,7 @@ router.get('/', getUserSettings)
  *                     type: string
  *                    
  */
-router.post('/regen', regenerateApiKey)
+router.post('/regen', SettingsMiddleware.regenerateApiKey)
 
 /**
  * @swagger
@@ -92,6 +92,6 @@ router.post('/regen', regenerateApiKey)
  *          description: Bad Request
  *                    
  */
-router.delete('/credentials', celebrate(deleteCredentialValidator), deleteUserCredential)
+router.delete('/credentials', celebrate(deleteCredentialValidator), SettingsMiddleware.deleteUserCredential)
 
 export default router
