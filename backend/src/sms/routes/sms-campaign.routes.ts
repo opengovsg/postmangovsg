@@ -3,9 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
   TemplateMiddleware,
-  sendCampaign,
-  stopCampaign,
-  retryCampaign,
+  JobMiddleware,
 } from '@core/middlewares'
 import { SmsMiddleware, SmsStatsMiddleware, SmsTemplateMiddleware } from '@sms/middlewares'
 
@@ -463,7 +461,7 @@ router.get('/preview', SmsMiddleware.previewFirstMessage)
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/send', celebrate(sendCampaignValidator), CampaignMiddleware.canEditCampaign, sendCampaign)
+router.post('/send', celebrate(sendCampaignValidator), CampaignMiddleware.canEditCampaign, JobMiddleware.sendCampaign)
 
 /**
  * @swagger
@@ -490,7 +488,7 @@ router.post('/send', celebrate(sendCampaignValidator), CampaignMiddleware.canEdi
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/stop', stopCampaign)
+router.post('/stop', JobMiddleware.stopCampaign)
 
 /**
  * @swagger
@@ -517,7 +515,7 @@ router.post('/stop', stopCampaign)
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/retry', CampaignMiddleware.canEditCampaign, retryCampaign)
+router.post('/retry', CampaignMiddleware.canEditCampaign, JobMiddleware.retryCampaign)
 
 /**
  * @swagger
