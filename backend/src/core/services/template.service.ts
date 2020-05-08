@@ -4,7 +4,7 @@ import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { v4 as uuid } from 'uuid'
 
-import { S3Service } from '@core/services/s3.service'
+import S3Client from '@core/services/s3-client.class'
 import { isSuperSet } from '@core/utils'
 import { jwtUtils } from '@core/utils/jwt'
 import logger from '@core/logger'
@@ -12,7 +12,7 @@ import { MissingTemplateKeysError, TemplateError } from '@core/errors/template.e
 import config from '@core/config'
 
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
-const s3Client = new S3({
+const s3 = new S3({
   signatureVersion: 'v4',
   region: config.aws.awsRegion,
 })
@@ -140,9 +140,9 @@ const testHydration = async ({
   templateBody: string;
   templateParams: Array<string>;
 }): Promise<TestHydrationResult> => {
-  const s3Service = new S3Service(s3Client)
-  const downloadStream = s3Service.download(s3Key)
-  const fileContents = await s3Service.parseCsv(downloadStream)
+  const s3Client = new S3Client(s3)
+  const downloadStream = s3Client.download(s3Key)
+  const fileContents = await s3Client.parseCsv(downloadStream)
 
   const records: Array<MessageBulkInsertInterface> = fileContents.map(
     (entry) => {
@@ -182,7 +182,7 @@ const getUploadParameters = async (contentType: string): Promise<{presignedUrl: 
 
   const signedKey = jwtUtils.sign(s3Key)
 
-  const presignedUrl = await s3Client.getSignedUrlPromise('putObject', params)
+  const presignedUrl = await s3.getSignedUrlPromise('putObject', params)
 
   return { presignedUrl, signedKey }
 }
