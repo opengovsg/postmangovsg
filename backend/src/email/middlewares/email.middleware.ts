@@ -17,7 +17,7 @@ const storeCredentials = async (req: Request, res: Response, next: NextFunction)
   try {
     const { campaignId } = req.params
     const { recipient } = req.body
-    await EmailService.sendTestEmail(+campaignId, recipient)
+    await EmailService.sendTestMessage(+campaignId, recipient)
     await EmailService.updateCredentials(+campaignId)
     return res.json({ message: 'OK' })
   } catch (err) {
@@ -39,7 +39,7 @@ const previewFirstMessage = async (req: Request, res: Response, next: NextFuncti
   try{
     const { campaignId } = req.params
     return res.json({
-      preview: await EmailService.hydrateFirstMessage(+campaignId),
+      preview: await EmailService.getHydratedMessage(+campaignId),
     })
   } catch(err){
     return next(err)

@@ -28,7 +28,7 @@ const getParams = async (campaignId: number): Promise<{ [key: string]: string } 
   return emailMessage.params as { [key: string]: string }
 }
   
-const hydrateFirstMessage = async (campaignId: number): Promise<{ body: string; subject: string } | void> => {
+const getHydratedMessage = async (campaignId: number): Promise<{ body: string; subject: string } | void> => {
   // get email content 
   const emailContent = await getEmailContent(campaignId)
   
@@ -44,7 +44,7 @@ const hydrateFirstMessage = async (campaignId: number): Promise<{ body: string; 
   
 const getHydratedMail = async (campaignId: number, recipient: string): Promise<MailToSend | void> => {
   // get the body and subject 
-  const message = await hydrateFirstMessage(campaignId)
+  const message = await getHydratedMessage(campaignId)
   if (message){
     const mailToSend: MailToSend=  ({
       recipients: [recipient],
@@ -73,7 +73,7 @@ const findCampaign = (campaignId: number, userId: number): Promise<Campaign> => 
  * @param recipient 
  * @throws Error if it cannot send an email
  */
-const sendTestEmail = async (campaignId: number, recipient: string): Promise<void> => {
+const sendTestMessage = async (campaignId: number, recipient: string): Promise<void> => {
   const mail = await getHydratedMail(+campaignId, recipient)
   if (!mail) throw new Error('No message to send')
   // Send email using node mailer
@@ -83,7 +83,6 @@ const sendTestEmail = async (campaignId: number, recipient: string): Promise<voi
 
 const updateCredentials = (campaignId: number): Promise<[number, Campaign[]]> => {
   return Campaign.update({ credName: 'EMAIL_DEFAULT' }, { where: { id: campaignId } })
-
 }
 
 const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetailsOutput> => {
@@ -115,8 +114,8 @@ const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetail
 
 export const EmailService = {
   findCampaign,
-  sendTestEmail,
+  sendTestMessage,
   updateCredentials,
   getCampaignDetails,
-  hydrateFirstMessage,
+  getHydratedMessage,
 }
