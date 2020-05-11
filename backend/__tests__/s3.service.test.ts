@@ -93,15 +93,5 @@ describe('S3 Service', () => {
         { recipient: 'test@open.gov.sg', name: 'Ahmad', number: '' }])
     })
 
-    test('empty recipient attribute', async () => {
-      const headers = ['name', 'recipient', 'number']
-      const values = [
-        ['Ahmad', '', '91234567'],
-      ]
-      const stream = await createStream(headers, values)
-      const params = await s3Service.parseCsv(stream)
-      expect(params).toEqual([ 
-        { recipient: '', name: 'Ahmad', number: '91234567' }])
-    })
   })
 })
