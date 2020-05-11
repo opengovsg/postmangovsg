@@ -19,6 +19,7 @@
     "@types/validator": "^13.0.0",
     "aws-sdk": "^2.660.0",
     "axios": "^0.19.2",
+    "bcrypt": "^4.0.1",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
     "module-alias": "^2.2.2",

@@ -20,7 +20,8 @@ export default class TwilioClient {
       const protocolRegex = /^https?:\/\//
       const trucatedUrl = config.smsOptions.callbackBackendUrl.replace(protocolRegex,'')
       const protocol = config.smsOptions.callbackBackendUrl.match(protocolRegex)?.[0] || ''
-      const callbackUrl = `${protocol}${username}:${password}@${trucatedUrl}`
+      // encode password as the hash contains special characters
+      const callbackUrl = `${protocol}${username}:${encodeURIComponent(password)}@${trucatedUrl}`
 
       return this.client.messages.create({
         to: this.addDefaultCountryCode(recipient),
