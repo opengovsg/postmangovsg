@@ -30,8 +30,8 @@ const Landing = () => {
 
   return (
     <>
+      <Navbar></Navbar>
       <div className={styles.topContainer}>
-        <Navbar></Navbar>
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>Reach out to the citizens in minutes</h1>

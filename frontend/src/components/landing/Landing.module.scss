@@ -6,7 +6,6 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  border: 1px solid pink;
   align-items: center;
 
   .innerContainer {
@@ -59,6 +58,10 @@
 
       .numOfMessages {
         font-size: 4.5rem;
+
+        @include mobile() {
+          font-size: 2.5rem;
+        }
       }
 
       .signInRow {
@@ -95,7 +98,11 @@
   .agencyContainer {
     margin-top: 20px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100vw - ($site-padding * 2);
+
 
     .agencyHeader {
       font-size: 1rem;
@@ -106,12 +113,10 @@
     .agencies {
       margin-top: 40px;
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
 
       img {
-        @include mobile() {
-          width: 100px;
-        }
+        width: 20%;
       }
     }
   }
