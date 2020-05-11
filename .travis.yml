@@ -63,3 +63,30 @@ jobs:
     script:
       - npm run lint
       - CI=false npm run build
+  - name: lambda
+    before_deploy:
+      - cd lambda
+      - cd logTwilioCallback &&  zip -qr code.zip build package.json node_modules/
+      - cd ../authorizer && zip -qr code.zip *
+    deploy:
+      - provider: lambda
+        function_name: logTwilioCallback
+        region: ap-southeast-1
+        role: // INSERT ROLE HERE
+        runtime: nodejs12.x
+        module_name: build/index
+        handler_name: handler
+        publish: true
+        zip: "../logTwilioCallback/code.zip"
+        environment_variables:
+          - BACKEND_URL=$BACKEND_URL
+          - TWILIO_CALLBACK_SECRET=$TWILIO_CALLBACK_SECRET
+          - DB_URI=$DB_URI
+      - provider: lambda
+        function_name: fetchData
+        region: ap-southeast-1
+        role: // INSERT ROLE HERE
+        runtime: nodejs12.x
+        handler_name: handler
+        publish: true
+        zip: "../authorizer/code.zip"
