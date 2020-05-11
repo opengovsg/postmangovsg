@@ -38,6 +38,8 @@ describe('template', () => {
     )
   })
 
+  // Squirrelly adds a backslash infront of some special characters
+  // This test suite is to ensure that the backslash is removed
   describe('no backslash infront of special characters', () => {
     const table = [
       [ 'Single quote', '\'' ],
