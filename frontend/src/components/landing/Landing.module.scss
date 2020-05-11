@@ -3,46 +3,115 @@
 
 .topContainer {
   background-color: $light-blue;
-  height: 70vh;
-  min-height: 420px;
+  height: 100vh;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  border: 1px solid pink;
+  align-items: center;
 
   .innerContainer {
+    margin-top: 10vh;
     display: flex;
     justify-content: space-between;
-    max-width: 1000px;
-    width: 90vw;
+    width: 100vw - ($site-padding * 2);
 
     @include mobile() {
       justify-content: center;
     }
 
     .landingImg {
-      flex: 1;
-
-      img {
-        vertical-align: bottom;
-      }
+      width: 680px;
+      height: 430px;
+      // img {
+      //   vertical-align: bottom;
+      // }
       @include mobile() {
         display: none;
       }
-    }
-
-    .appLogo {
-      margin-bottom: 2.5rem;
     }
 
     .textContainer {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      flex: 1;
       margin-bottom: 3rem;
+      width: 40%;
 
       @include mobile() {
         align-items: center;
+        width: 100%;
+      }
+
+      .headerText {
+        color: $indigo-blue;
+        font-size: 3rem;
+        width: 90%;
+        font-weight: bold;
+
+        @include mobile() {
+          font-size: 2rem;
+        }
+      }
+
+      .sentMessages {
+        font-size: 1rem;
+      }
+
+      .numOfMessages {
+        font-size: 4.5rem;
+      }
+
+      .signInRow {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+                
+        .signInButton {
+          min-width: 9rem;
+          font-size: 0.9rem;
+          text-align: center;
+        }
+
+        .arrowRight {
+          padding-top: 3px;
+          height: 25px;
+          width: 25px;
+        }
+
+        .needHelp {
+          margin-left: 35px;
+          color: $indigo-blue;
+        }
+        
+        .contactUs {
+          margin-left: 8px;
+          color: $indigo-blue;
+          font-size: 16px;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  .agencyContainer {
+    margin-top: 20px;
+    text-align: center;
+    width: 100vw - ($site-padding * 2);
+
+    .agencyHeader {
+      font-size: 1rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .agencies {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-around;
+
+      img {
+        @include mobile() {
+          width: 100px;
+        }
       }
     }
   }
