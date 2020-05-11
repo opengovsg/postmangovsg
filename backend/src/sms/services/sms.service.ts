@@ -97,8 +97,8 @@ const getSmsStats = async (campaignId: number): Promise<CampaignStats> => {
 } 
 
 const hasInvalidSmsRecipient = (records: MessageBulkInsertInterface[]): boolean => {
-  const re = /^[0-9+]+$/
-  return records.some((record) => !record.recipient.match(re))
+  const re = /^\+?[0-9]+$/
+  return records.some((record) => !re.test(record.recipient))
 }
 
 export { populateSmsTemplate, upsertSmsTemplate, getSmsStats, hasInvalidSmsRecipient }
