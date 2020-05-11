@@ -71,17 +71,6 @@ describe('S3 Service', () => {
       ])
     })
 
-    test('throws error when there is missing attribute in value', async () => {
-      const headers = ['name', 'recipient', 'number']
-      const values = [
-        ['Ahmad', '91234567'],
-      ]
-      const stream = await createStream(headers, values)
-      await expect(s3Service.parseCsv(stream))
-        .rejects
-        .toThrow(Error)
-    })
-
     test('empty attribute', async () => {
       const headers = ['name', 'recipient', 'number']
       const values = [
