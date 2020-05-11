@@ -71,7 +71,7 @@ const isOtpVerified = async (input: VerifyOtpInput): Promise<boolean> => {
   try {
     const hashedOtp: HashedOtp = await getHashedOtp(input.email)
     const authorized: boolean = await bcrypt.compare(input.otp, hashedOtp.hash)
-    if (authorized || !config.IS_PROD) {
+    if (authorized) {
       await deleteHashedOtp(input.email)
       return true
     }

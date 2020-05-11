@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 
 import { User, UserCredential } from '@core/models'
-import { generateApiKey, getApiKeyHash } from '@core/services'
+import { ChannelType } from '@core/constants'
 
 /*
  * Retrieves API key and stored credentials of the user
@@ -71,12 +71,11 @@ const storeUserCredential = async (req: Request, res: Response, next: NextFuncti
 
 // Associate credential to user
 const getChannelSpecificCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  const { channelType } = res.locals
   const userId = req.session?.user?.id
   try {
     const creds = await UserCredential.findAll({
       where: {
-        type: channelType,
+        type: ChannelType.SMS,
         userId: userId,
       },
       attributes: ['label'],
@@ -114,10 +113,7 @@ const regenerateApiKey = async (req: Request, res: Response, next: NextFunction)
     if (!user) {
       throw new Error('User not found')
     }
-    const newApiKey = generateApiKey(user.email)
-    const hashedApiKey = await getApiKeyHash(newApiKey)
-    user.apiKey = hashedApiKey
-    user.save()
+    const newApiKey = await user.regenerateAndSaveApiKey()
     return res.json({ 'api_key': newApiKey })
   } catch (e) {
     next(e)

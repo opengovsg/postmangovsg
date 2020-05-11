@@ -27,7 +27,8 @@ import {
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
 import {
-  parseCredentials,
+  getCredentialsFromBody,
+  getCredentialsFromLabel,
   validateAndStoreCredentials,
   setCampaignCredential,
   getCampaignDetails,
@@ -71,35 +72,31 @@ const storeCredentialsValidator = {
     'twilio_account_sid': Joi
       .string()
       .trim()
-      .when('credential', {
-        is: Joi.exist(),
-        then: Joi.forbidden(),
-        otherwise: Joi.required(),
-      }),
+      .required(),
     'twilio_api_secret': Joi
       .string()
       .trim()
-      .when('credential', {
-        is: Joi.exist(),
-        then: Joi.forbidden(),
-        otherwise: Joi.required(),
-      }),
+      .required(),
     'twilio_api_key': Joi
       .string()
       .trim()
-      .when('credential', {
-        is: Joi.exist(),
-        then: Joi.forbidden(),
-        otherwise: Joi.required(),
-      }),
+      .required(),
     'twilio_messaging_service_sid': Joi
       .string()
       .trim()
-      .when('credential', {
-        is: Joi.exist(),
-        then: Joi.forbidden(),
-        otherwise: Joi.required(),
-      }),
+      .required(),
+    recipient: Joi
+      .string()
+      .trim()
+      .required(),
+  }),
+}
+
+const useCredentialsValidator = {
+  [Segments.BODY]: Joi.object({
+    label: Joi
+      .string()
+      .required(),
     recipient: Joi
       .string()
       .trim()
@@ -348,10 +345,10 @@ router.use(isSmsCampaignOwnedByUser)
  *                    $ref: '#/components/schemas/SMSCampaign'
  *                  num_recipients:
  *                    type: number
- *        "400" :
- *           description: Invalid campaign type or not owned by user
  *        "401":
  *           description: Unauthorized
+ *        "403" :
+ *           description: Forbidden, campaign not owned by user or job in progress
  *        "500":
  *           description: Internal Server Error
  */
@@ -419,7 +416,7 @@ router.get('/', getCampaignDetails)
  *         "401":
  *           description: Unauthorized
  *         "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden, campaign not owned by user or job in progress
  *         "500":
  *           description: Internal Server Error
  */
@@ -461,7 +458,7 @@ router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, stor
  *         "401":
  *           description: Unauthorized
  *         "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden, campaign not owned by user or job in progress
  *         "500":
  *           description: Internal Server Error
  */
@@ -513,7 +510,7 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *         "401":
  *           description: Unauthorized
  *         "403":
- *           description: Forbidden as there is a job in progress 
+ *          description: Forbidden, campaign not owned by user or job in progress
  *         "500":
  *           description: Internal Server Error
  */
@@ -522,11 +519,11 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/credentials:
+ *  /campaign/{campaignId}/sms/newcredentials:
  *    post:
  *      tags:
  *        - SMS
- *      summary: Store credentials for twilio
+ *      summary: Validate twilio credentials and assign to campaign
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -557,11 +554,55 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *        "401":
  *           description: Unauthorized
  *        "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden, campaign not owned by user or job in progress
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaign, parseCredentials, validateAndStoreCredentials, setCampaignCredential)
+router.post('/newcredentials', celebrate(storeCredentialsValidator), canEditCampaign, getCredentialsFromBody, validateAndStoreCredentials, setCampaignCredential)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/credentials:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Validate stored credentials and assign to campaign
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                recipient:
+ *                  type: string
+ *                label:
+ *                  type: string
+ *
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *        "400" :
+ *           description: Bad Request
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user or job in progress
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post('/credentials', celebrate(useCredentialsValidator), canEditCampaign, getCredentialsFromLabel, validateAndStoreCredentials, setCampaignCredential)
 
 /**
  * @swagger
@@ -641,7 +682,7 @@ router.get('/preview', previewFirstMessage)
  *        "401":
  *           description: Unauthorized
  *        "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden, campaign not owned by user or job in progress
  *        "500":
  *           description: Internal Server Error
  */
@@ -667,6 +708,8 @@ router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCamp
  *                  type: integer
  *        "401":
  *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
  *        "500":
  *           description: Internal Server Error
  */
@@ -693,7 +736,7 @@ router.post('/stop', stopCampaign)
  *        "401":
  *           description: Unauthorized
  *        "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden, campaign not owned by user or job in progress
  *        "500":
  *           description: Internal Server Error
  */
@@ -722,6 +765,8 @@ router.post('/retry', canEditCampaign, retryCampaign)
  *                $ref: '#/components/schemas/CampaignStats'
  *        "401":
  *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
  *        "500":
  *           description: Internal Server Error
  */

@@ -1,5 +1,6 @@
 import { Column, DataType, Model, Table, BeforeUpdate, BeforeCreate, HasMany } from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
+import { generateApiKeyFromName, getApiKeyHash } from '@core/services'
 
 @Table({ tableName: 'users', underscored: true, timestamps: true })
 export class User extends Model<User> {
@@ -31,4 +32,12 @@ export class User extends Model<User> {
     }
   }
 
+  async regenerateAndSaveApiKey(): Promise<string> {
+    const name = this.email.split('@')[0].replace(/\W/g, '')
+    const apiKeyPlainText = generateApiKeyFromName(name)
+    const apiKeyHash = await getApiKeyHash(apiKeyPlainText)
+    this.apiKey = apiKeyHash
+    this.save()
+    return apiKeyPlainText
+  }
 }

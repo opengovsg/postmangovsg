@@ -5,9 +5,6 @@ import { getUserSettings, deleteUserCredential, regenerateApiKey } from '@core/m
 
 const router = Router()
 
-const getUserSettingsValidation = {
-  [Segments.QUERY]: Joi.object({}),
-}
 const deleteCredentialValidator = {
   [Segments.BODY]: Joi.object({
     label: Joi.string()
@@ -17,10 +14,6 @@ const deleteCredentialValidator = {
       .pattern(/^[\w\d-]+$/)
       .required(),
   }),
-}
-
-const regenerateApiKeyValidator = {
-  [Segments.BODY]: Joi.object({}),
 }
 
 /**
@@ -52,7 +45,7 @@ const regenerateApiKeyValidator = {
  *                          $ref: '#/components/schemas/ChannelType'
  *                    
  */
-router.get('/', celebrate(getUserSettingsValidation), getUserSettings)
+router.get('/', getUserSettings)
 
 /**
  * @swagger
@@ -75,7 +68,7 @@ router.get('/', celebrate(getUserSettingsValidation), getUserSettings)
  *                     type: string
  *                    
  */
-router.post('/regen', celebrate(regenerateApiKeyValidator), regenerateApiKey)
+router.post('/regen', regenerateApiKey)
 
 /**
  * @swagger

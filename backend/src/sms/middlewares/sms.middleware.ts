@@ -11,30 +11,29 @@ import config from '@core/config'
 import { template } from '@core/services/template.service'
 import { CampaignDetails } from '@core/interfaces'
 
-// Parse credentials from request body if provided, else retrieve from aws secrets mgr
-const parseCredentials = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+// Parse credentials from request body
+const getCredentialsFromBody = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const {
-    'credential': label,
     'twilio_account_sid': accountSid,
     'twilio_api_key': apiKey,
     'twilio_api_secret': apiSecret,
     'twilio_messaging_service_sid': messagingServiceSid,
   } = req.body
 
-  // if credential label not provided, set credentials in res.locals
-  if (!label) {
-    res.locals.credentials = {
-      accountSid,
-      apiKey,
-      apiSecret,
-      messagingServiceSid,
-    }
-    return next()
+  res.locals.credentials = {
+    accountSid,
+    apiKey,
+    apiSecret,
+    messagingServiceSid,
   }
+  return next()
+}
 
+const getCredentialsFromLabel = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { label } = req.body
+  const userId = req.session?.user?.id
   try {
     // if label provided, fetch from aws secrets
-    const userId = req.session?.user?.id
     const userCred = await UserCredential.findOne({
       where: {
         userId,
@@ -148,7 +147,7 @@ const setCampaignCredential = async (req: Request, res: Response, next: NextFunc
   const { credentialName } = res.locals
   try {
     if (!credentialName) {
-      throw new Error('Credentail does not exist')
+      throw new Error('Credential does not exist')
     }
     await Campaign.update({
       credName: credentialName,
@@ -209,7 +208,8 @@ const previewFirstMessage = async (req: Request, res: Response, next: NextFuncti
 }
 
 export {
-  parseCredentials,
+  getCredentialsFromBody,
+  getCredentialsFromLabel,
   isSmsCampaignOwnedByUser,
   validateAndStoreCredentials,
   setCampaignCredential,

@@ -1,8 +1,7 @@
-import { Router, NextFunction, Request, Response } from 'express'
+import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
-import { ChannelType } from '@core/constants'
-import { validateAndStoreCredentials, parseCredentials } from '@sms/middlewares'
+import { validateAndStoreCredentials, getCredentialsFromBody } from '@sms/middlewares'
 import { storeUserCredential, checkUserCredentialLabel, getChannelSpecificCredentials } from '@core/middlewares'
 
 const router = Router()
@@ -11,7 +10,7 @@ const storeCredentialValidator = {
   [Segments.BODY]: Joi.object({
     label: Joi.string()
       .min(4)
-      .max(255)
+      .max(50)
       .lowercase()
       .pattern(/^[\w\d-]+$/)
       .required(),
@@ -40,11 +39,6 @@ const storeCredentialValidator = {
 
 const getCredentialsValidator = {
   [Segments.QUERY]: Joi.object({}),
-}
-
-const passChannelType = (_req: Request, res: Response, next: NextFunction): void => {
-  res.locals.channelType = ChannelType.SMS
-  next()
 }
 
 /**
@@ -77,7 +71,7 @@ const passChannelType = (_req: Request, res: Response, next: NextFunction): void
  *          description: Bad Request (invalid credentials, malformed request, duplicate labels)
  *                    
  */
-router.post('/credentials', celebrate(storeCredentialValidator), checkUserCredentialLabel, parseCredentials, validateAndStoreCredentials, storeUserCredential)
+router.post('/credentials', celebrate(storeCredentialValidator), checkUserCredentialLabel, getCredentialsFromBody, validateAndStoreCredentials, storeUserCredential)
 
 /**
  * @swagger
@@ -101,7 +95,7 @@ router.post('/credentials', celebrate(storeCredentialValidator), checkUserCreden
  *                     type: string
  *                    
  */
-router.get('/credentials', celebrate(getCredentialsValidator), passChannelType, getChannelSpecificCredentials)
+router.get('/credentials', celebrate(getCredentialsValidator), getChannelSpecificCredentials)
 
 
 export default router
