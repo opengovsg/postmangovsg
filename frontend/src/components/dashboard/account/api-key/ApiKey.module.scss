@@ -1,0 +1,14 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.blueButton {
+  @include button($dark-blue);
+}
+
+.greenButton {
+  @include button($turquoise-green);
+}
+
+.redButton {
+  @include button($red);
+}

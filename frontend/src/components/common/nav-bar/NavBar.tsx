@@ -4,7 +4,7 @@ import cx from 'classnames'
 
 import { ModalContext } from 'contexts/modal.context'
 import { POSTMAN_GUIDE_URL } from 'config'
-import CreateModal from 'components/dashboard/create-modal'
+import CreateModal from 'components/dashboard/create/create-modal'
 import { logout } from 'services/auth.service'
 import { AuthContext } from 'contexts/auth.context'
 
@@ -50,7 +50,7 @@ const NavBar = () => {
         <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
         <a className={cx(styles.link, { [styles.active]: isCreatePath() })} onClick={handleCreateCampaign}>Create</a>
         <a className={styles.link} href={POSTMAN_GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
-        <NavLink className={styles.link} activeClassName={styles.active} to="/settings">Settings</NavLink>
+        <NavLink className={styles.link} activeClassName={styles.active} to="/account">Account</NavLink>
 
         <div className={styles.separator}></div>
 

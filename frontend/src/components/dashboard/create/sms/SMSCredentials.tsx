@@ -1,93 +1,81 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { validateCredentials } from 'services/sms.service'
-import { TextInput, PrimaryButton, TextInputWithButton, ErrorBlock } from 'components/common'
+import { validateCredentials, getStoredCredentials } from 'services/sms.service'
+import { PrimaryButton, ErrorBlock, Dropdown } from 'components/common'
+import SMSValidationInput from './SMSValidationInput'
+import TwilioCredentialsInput from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
 
 const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCredential: boolean; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
-  const [accountSid, setAccountSid] = useState('')
-  const [apiKey, setApiKey] = useState('')
-  const [apiSecret, setApiSecret] = useState('')
-  const [messagingServiceSid, setMessagingServiceSid] = useState('')
-  const [recipient, setRecipient] = useState('')
+  const [storedCredentials, setStoredCredentials] = useState([] as { label: string; value: string }[])
+  const [selectedCredential, setSelectedCredential] = useState('')
+  const [creds, setCreds] = useState(null as any)
   const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
-  const [isValidating, setIsValidating] = useState(false)
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [isManual, setIsManual] = useState(false)
+  const [errorMessazge, setErrorMessage] = useState(null)
   const { id: campaignId } = useParams()
 
-  function isButtonDisabled() {
-    return !accountSid || !apiKey || !apiSecret || !messagingServiceSid || !(/^\+?\d+$/g).test(recipient)
+  useEffect(() => {
+    populateStoredCredentials()
+  }, [])
+
+  async function populateStoredCredentials() {
+    try {
+      const storedCredLabels = await getStoredCredentials()
+      setStoredCredentials(storedCredLabels.map(c => ({ label: c, value: c })))
+    } catch (e) {
+      console.error(e)
+      setErrorMessage(e.message)
+    }
   }
 
-  function resetFields() {
-    setAccountSid('')
-    setApiKey('')
-    setApiSecret('')
-    setMessagingServiceSid('')
-    setRecipient('')
+  function toggleInputMode() {
+    setIsManual(m => !m)
+    setCreds(null)
+    setSelectedCredential('')
   }
 
-  async function handleValidateCredentials() {
-    setErrorMsg(null)
+  async function handleValidateCredentials(recipient: string) {
+    setErrorMessage(null)
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
-      setIsValidating(true)
       await validateCredentials({
         campaignId: +campaignId,
-        accountSid,
-        apiKey,
-        apiSecret,
-        messagingServiceSid,
+        ...(isManual ? creds : { credential: selectedCredential }),
         recipient,
       })
       setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
       onNext({ hasCredential: true }, false)
-      resetFields()
     } catch (err) {
-      setErrorMsg(err.message)
+      setErrorMessage(err.message)
     }
-    setIsValidating(false)
   }
 
   function renderCredentialFields() {
     return (
       <>
-        <h5>Account SID</h5>
-        <TextInput
-          placeholder="Enter Account SID"
-          value={accountSid}
-          onChange={setAccountSid}
-        />
-
-        <h5>API Key</h5>
-        <TextInput
-          placeholder="Enter API Key"
-          value={apiKey}
-          onChange={setApiKey}
-        />
-
-        <h5>API Secret</h5>
-        <TextInput
-          placeholder="Enter API Secret"
-          value={apiSecret}
-          onChange={setApiSecret}
-        />
-
-        <h5>Messaging Service ID</h5>
-        <TextInput
-          placeholder="Enter Messaging Service ID"
-          value={messagingServiceSid}
-          onChange={setMessagingServiceSid}
-        />
-
+        {isManual || !storedCredentials.length
+          ?
+          <>
+            <h2>Insert your Twilio credentials</h2>
+            <TwilioCredentialsInput onFilled={setCreds}></TwilioCredentialsInput>
+            <p className="clickable" onClick={toggleInputMode}>or select from stored credentials</p>
+          </>
+          :
+          <>
+            <h2>Select your Twilio credentials</h2>
+            <Dropdown onSelect={setSelectedCredential} options={storedCredentials}></Dropdown>
+            <p className="clickable" onClick={() => setIsManual(true)}>or manually input credentials</p>
+          </>
+        }
         <div className="separator"></div>
 
         <h2>Validate your credentials by doing a test send</h2>
@@ -96,23 +84,13 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           please send a test SMS to an available phone number
           to receive a preview of your message.
         </p>
-        <TextInputWithButton
-          type="tel"
-          value={recipient}
-          onChange={setRecipient}
+        <SMSValidationInput
           onClick={handleValidateCredentials}
-          buttonDisabled={isButtonDisabled() || isValidating}
-          inputDisabled={isValidating}
-        >
-          {isValidating
-            ? 'Sending...'
-            : (
-              <>
-                Send test message
-                <i className="bx bx-message-detail"></i>
-              </>
-            )}
-        </TextInputWithButton>
+          buttonDisabled={isManual ? !creds : !selectedCredential}
+        />
+        <ErrorBlock>
+          {errorMessazge}
+        </ErrorBlock>
       </>
     )
   }
@@ -148,11 +126,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           )
           : (
             <>
-              <h2>Insert your SMS credentials</h2>
               {renderCredentialFields()}
-              <ErrorBlock>
-                {errorMsg}
-              </ErrorBlock>
             </>
           )
       }

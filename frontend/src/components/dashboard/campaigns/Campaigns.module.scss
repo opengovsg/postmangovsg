@@ -3,13 +3,13 @@
 
 .content {
   @include flex-vertical;
-  padding: $content-top-padding 0 $content-bottom-padding;
+  padding: $content-top-padding $site-padding $content-bottom-padding;
   margin: 0 auto;
   width: 1000px;
-  max-width: calc(100vw - (2 * #{$site-padding}));
+  max-width: 100%;
 
   @include mobile() {
-    max-width: calc(100vw - (2 * #{$mobile-site-padding}));
+    padding: $content-top-padding $mobile-site-padding $content-bottom-padding;
   }
 }
 
@@ -37,32 +37,6 @@
       }
     }
 
-    tr {
-      @include flex-horizontal;
-      border-bottom: 1px solid $transparent-blue;
-
-      td,
-      th {
-        padding: 0.75rem 0;
-
-        &.xs {
-          flex: 1.2;
-          text-align: center;
-        }
-
-        &.sm {
-          flex: 2;
-        }
-
-        &.md {
-          flex: 3;
-        }
-
-        &.lg {
-          flex: 4;
-        }
-      }
-    }
   }
 }
 

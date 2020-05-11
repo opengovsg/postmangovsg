@@ -1,14 +1,15 @@
 import React, { useContext, useState, useEffect } from 'react'
-
-import { ModalContext } from 'contexts/modal.context'
-import ConfirmModal from 'components/dashboard/confirm-modal'
 import { useParams } from 'react-router-dom'
 
-import { PreviewBlock, PrimaryButton } from 'components/common'
+import { Status } from 'classes'
+import { ModalContext } from 'contexts/modal.context'
+import { PreviewBlock, PrimaryButton, ConfirmModal } from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
+import { sendCampaign } from 'services/campaign.service'
+
 import styles from '../Create.module.scss'
 
-const EmailSend = ({ numRecipients }: { numRecipients: number }) => {
+const EmailSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: Function }) => {
 
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string; subject: string })
@@ -18,22 +19,32 @@ const EmailSend = ({ numRecipients }: { numRecipients: number }) => {
     throw new Error('Invalid campaign id')
   }
 
+  const loadPreview = async () => {
+    const msgPreview = await getPreviewMessage(+campaignId)
+    if (msgPreview) {
+      setPreview(msgPreview)
+    }
+  }
+
   useEffect(() => {
     loadPreview()
   }, [campaignId])
 
-  async function loadPreview() {
-    if (campaignId) {
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if (msgPreview) {
-        setPreview(msgPreview)
-      }
-    }
+
+  const onModalConfirm = async () => {
+    await sendCampaign(+campaignId, 0)
+    onNext({ status: Status.Sending }, false)
   }
 
   const openModal = () => {
     modalContext.setModalContent(
-      <ConfirmModal campaignId={+campaignId} sendRate={0}></ConfirmModal>
+      <ConfirmModal
+        title="Are you absolutely sure?"
+        subtitle="Sending out a campaign is irreversible."
+        buttonText="Confirm send now"
+        buttonIcon="bx-send"
+        onConfirm={onModalConfirm}
+      />
     )
   }
 

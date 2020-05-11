@@ -21,7 +21,7 @@ const App = () => {
       <AuthContextProvider>
         <Switch>
           <Route exact path="/" component={Landing}></Route>
-          <ProtectedRoute path="/campaigns">
+          <ProtectedRoute>
             <Dashboard></Dashboard>
           </ProtectedRoute>
           <Route component={Error} />

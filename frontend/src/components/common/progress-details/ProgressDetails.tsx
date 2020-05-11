@@ -41,21 +41,21 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
         <table>
           <thead>
             <tr>
-              <th className={styles.md}>Sent date</th>
-              <th className={styles.md}>Messages sent</th>
-              <th className={styles.sm}>Status</th>
+              <th className={'md'}>Sent date</th>
+              <th className={'md'}>Total messages</th>
+              <th className={'sm'}>Status</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td className={styles.md}>
+              <td className={'md'}>
                 <Moment format='LLL'>{sentAt}</Moment>
               </td>
 
-              <td className={styles.md}>
+              <td className={'md'}>
                 {numRecipients}
               </td>
-              <td className={cx(styles.campaignStatus, styles.sm)}>
+              <td className={cx(styles.campaignStatus, 'sm')}>
                 {status}
               </td>
             </tr>
@@ -71,35 +71,35 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
         <table className={styles.stats}>
           <thead>
             <tr>
-              <th className={styles.md}>Status</th>
-              <th className={styles.md}>Description</th>
-              <th className={styles.sm}>Message count</th>
+              <th className={'md'}>Status</th>
+              <th className={'md'}>Description</th>
+              <th className={'sm'}>Message count</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td className={cx(styles.status, styles.md)}>
+              <td className={cx(styles.status, 'md')}>
                 <i className={cx(styles.icon, styles.red, 'bx bx-error-circle')}></i>
                 Error
               </td>
-              <td className={styles.md}>Could not be sent</td>
-              <td className={styles.sm}>{error}</td>
+              <td className={'md'}>Could not be sent</td>
+              <td className={'sm'}>{error}</td>
             </tr>
             <tr>
-              <td className={cx(styles.status, styles.md)}>
+              <td className={cx(styles.status, 'md')}>
                 <i className={cx(styles.icon, styles.blue, 'bx bx-time-five')}></i>
                 Unsent
               </td>
-              <td className={styles.md}>In the queue</td>
-              <td className={styles.sm}>{unsent}</td>
+              <td className={'md'}>In the queue</td>
+              <td className={'sm'}>{unsent}</td>
             </tr>
             <tr>
-              <td className={cx(styles.status, styles.md)}>
+              <td className={cx(styles.status, 'md')}>
                 <i className={cx(styles.icon, styles.green, 'bx bx-check-circle')}></i>
                 Sent
               </td>
-              <td className={styles.md}>Sent to recipient</td>
-              <td className={styles.sm}>{sent}</td>
+              <td className={'md'}>Sent to recipient</td>
+              <td className={'sm'}>{sent}</td>
             </tr>
           </tbody>
         </table>

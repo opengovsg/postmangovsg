@@ -48,7 +48,7 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
         )
       case SMSProgress.Send:
         return (
-          <SMSSend numRecipients={campaign.numRecipients} />
+          <SMSSend numRecipients={campaign.numRecipients} onNext={onNext} />
         )
       default:
         return (<p>Invalid step</p>)

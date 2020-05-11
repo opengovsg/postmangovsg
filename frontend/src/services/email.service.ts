@@ -89,5 +89,5 @@ function errorHandler(e: AxiosError, defaultMsg: string): never {
   if (e.response && e.response.data && e.response.data.message) {
     throw new Error(e.response.data.message)
   }
-  throw new Error(defaultMsg)
+  throw new Error(defaultMsg || e.response?.statusText)
 }

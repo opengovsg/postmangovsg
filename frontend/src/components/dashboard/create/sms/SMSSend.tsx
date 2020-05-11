@@ -1,14 +1,15 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { Status } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
-import ConfirmModal from 'components/dashboard/confirm-modal'
-import { PreviewBlock, PrimaryButton, SendRate } from 'components/common'
+import { PreviewBlock, PrimaryButton, SendRate, ConfirmModal } from 'components/common'
 import { getPreviewMessage } from 'services/sms.service'
+import { sendCampaign } from 'services/campaign.service'
 
 import styles from '../Create.module.scss'
 
-const SMSSend = ({ numRecipients }: { numRecipients: number }) => {
+const SMSSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: Function }) => {
 
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
@@ -32,9 +33,20 @@ const SMSSend = ({ numRecipients }: { numRecipients: number }) => {
     }
   }
 
+  const onModalConfirm = async () => {
+    await sendCampaign(+campaignId, +sendRate)
+    onNext({ status: Status.Sending }, false)
+  }
+
   const openModal = () => {
     modalContext.setModalContent(
-      <ConfirmModal campaignId={+campaignId} sendRate={+sendRate}></ConfirmModal>
+      <ConfirmModal
+        title="Are you absolutely sure?"
+        subtitle="Sending out a campaign is irreversible."
+        buttonText="Confirm send now"
+        buttonIcon="bx-send"
+        onConfirm={onModalConfirm}
+      />
     )
   }
 

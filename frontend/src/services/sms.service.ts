@@ -25,9 +25,45 @@ export async function saveTemplate(campaignId: number, body: string):
 }
 
 export async function validateCredentials({
-  campaignId, accountSid, apiKey, apiSecret, messagingServiceSid, recipient,
+  campaignId, accountSid, apiKey, apiSecret, messagingServiceSid, recipient, credential,
 }: {
   campaignId: number;
+  recipient: string;
+  accountSid?: string;
+  apiKey?: string;
+  apiSecret?: string;
+  messagingServiceSid?: string;
+  credential?: string;
+}): Promise<void> {
+  try {
+
+    let body = {
+      recipient,
+    }
+
+    if (credential) {
+      body = { ...body, ...{ credential } }
+    } else {
+      body = {
+        ...body, ...{
+          'twilio_account_sid': accountSid,
+          'twilio_api_key': apiKey,
+          'twilio_api_secret': apiSecret,
+          'twilio_messaging_service_sid': messagingServiceSid,
+        },
+      }
+    }
+
+    await axios.post(`/campaign/${campaignId}/sms/credentials`, body)
+  } catch (e) {
+    errorHandler(e, 'Error validating credentials.')
+  }
+}
+
+export async function storeCredentials({
+  label, accountSid, apiKey, apiSecret, messagingServiceSid, recipient,
+}: {
+  label: string;
   accountSid: string;
   apiKey: string;
   apiSecret: string;
@@ -35,7 +71,8 @@ export async function validateCredentials({
   recipient: string;
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/sms/credentials`, {
+    await axios.post('/settings/sms/credentials', {
+      label,
       'twilio_account_sid': accountSid,
       'twilio_api_key': apiKey,
       'twilio_api_secret': apiSecret,
@@ -43,7 +80,16 @@ export async function validateCredentials({
       recipient,
     })
   } catch (e) {
-    errorHandler(e, 'Error validating credentials.')
+    errorHandler(e, 'Error saving credentials.')
+  }
+}
+
+export async function getStoredCredentials(): Promise<string[]> {
+  try {
+    const response = await axios.get('/settings/sms/credentials')
+    return response.data
+  } catch (e) {
+    errorHandler(e, 'Error retrieving stored credentials')
   }
 }
 
