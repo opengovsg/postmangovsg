@@ -18,7 +18,10 @@ const verifyOtpValidator = {
   [Segments.BODY]: Joi.object({
     email: Joi.string().email()
       .required(),
-    otp: Joi.string().required(), //TODO: Add validation for 6 digit otp
+    otp: Joi.string()
+      .length(6)
+      .pattern(/^\d+$/, { name: "numbers" })
+      .required(),
   }),
 }
 

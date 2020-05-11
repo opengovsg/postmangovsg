@@ -62,6 +62,17 @@ const Login = () => {
     sendOtp()
   }
 
+  function validateOtp(value: string) {
+    // Reject input that's more than 6 characters or not a number
+    if (
+      value.length > 6 ||
+      value.length > 0 && isNaN(parseInt(value))
+    ) {
+      return
+    }
+    setOtp(value)
+  }
+
   function render(
     mainText: string,
     value: string,
@@ -101,7 +112,7 @@ const Login = () => {
       {!otpSent ?
         render(emailText, email, setEmail, sendOtp, emailButtonText, emailPlaceholder, 'email')
         :
-        render(otpText, otp, setOtp, login, otpButtonText, otpPlaceholder, 'tel')
+        render(otpText, otp, validateOtp, login, otpButtonText, otpPlaceholder, 'tel')
       }
     </div >
   )
