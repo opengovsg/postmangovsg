@@ -14,6 +14,12 @@ describe('template', () => {
       const body = 'Hello {{name}}'
       expect(template(body, params)).toEqual('Hello test')
     })
+
+    test('missing params', () => {
+      const params = {}
+      const body = 'Hello {{name}}'
+      expect(() => {template(body, params)}).toThrow(TemplateError)
+    })
   })
   
   describe('parsing errors', () => {
@@ -43,13 +49,5 @@ describe('template', () => {
         expect(template(body, {})).toEqual(body)
       }
     )
-  })
-
-  describe('params', () => {
-    test('missing params', () => {
-      const params = {}
-      const body = 'Hello {{name}}'
-      expect(() => {template(body, params)}).toThrow(TemplateError)
-    })
   })
 })
