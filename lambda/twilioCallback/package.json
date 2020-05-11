@@ -4,8 +4,7 @@
   "description": "Twilio callback logger for Postman",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf build & tsc",
-    "start": "npm run build ; node --require dotenv/config build/index"
+    "build": "rimraf build & tsc"
   },
   "author": "",
   "license": "MIT",
