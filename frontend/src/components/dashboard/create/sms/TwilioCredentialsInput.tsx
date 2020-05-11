@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import { TextInput } from 'components/common'
 
-interface TwilioCredentials {
+export interface TwilioCredentials {
   accountSid: string;
   apiKey: string;
   apiSecret: string;

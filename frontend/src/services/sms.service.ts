@@ -24,41 +24,46 @@ export async function saveTemplate(campaignId: number, body: string):
   }
 }
 
-export async function validateCredentials({
-  campaignId, accountSid, apiKey, apiSecret, messagingServiceSid, recipient, credential,
+export async function validateNewCredentials({
+  campaignId, accountSid, apiKey, apiSecret, messagingServiceSid, recipient,
 }: {
   campaignId: number;
   recipient: string;
-  accountSid?: string;
-  apiKey?: string;
-  apiSecret?: string;
-  messagingServiceSid?: string;
-  credential?: string;
+  accountSid: string;
+  apiKey: string;
+  apiSecret: string;
+  messagingServiceSid: string;
 }): Promise<void> {
   try {
-
-    let body = {
+    await axios.post(`/campaign/${campaignId}/sms/newcredentials`, {
       recipient,
-    }
-
-    if (credential) {
-      body = { ...body, ...{ credential } }
-    } else {
-      body = {
-        ...body, ...{
-          'twilio_account_sid': accountSid,
-          'twilio_api_key': apiKey,
-          'twilio_api_secret': apiSecret,
-          'twilio_messaging_service_sid': messagingServiceSid,
-        },
-      }
-    }
-
-    await axios.post(`/campaign/${campaignId}/sms/credentials`, body)
+      'twilio_account_sid': accountSid,
+      'twilio_api_key': apiKey,
+      'twilio_api_secret': apiSecret,
+      'twilio_messaging_service_sid': messagingServiceSid,
+    })
   } catch (e) {
     errorHandler(e, 'Error validating credentials.')
   }
 }
+
+export async function validateStoredCredentials({
+  campaignId, recipient, label,
+}: {
+  campaignId: number;
+  recipient: string;
+  label: string;
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/sms/credentials`, {
+      recipient,
+      label,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error validating credentials.')
+  }
+}
+
 
 export async function storeCredentials({
   label, accountSid, apiKey, apiSecret, messagingServiceSid, recipient,

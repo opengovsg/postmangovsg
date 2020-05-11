@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { validateCredentials, getStoredCredentials } from 'services/sms.service'
+import { validateStoredCredentials, validateNewCredentials, getStoredCredentials } from 'services/sms.service'
 import { PrimaryButton, ErrorBlock, Dropdown } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
-import TwilioCredentialsInput from './TwilioCredentialsInput'
+import TwilioCredentialsInput, { TwilioCredentials } from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
 
 const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCredential: boolean; onNext: (changes: any, next?: boolean) => void }) => {
@@ -12,7 +12,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [storedCredentials, setStoredCredentials] = useState([] as { label: string; value: string }[])
   const [selectedCredential, setSelectedCredential] = useState('')
-  const [creds, setCreds] = useState(null as any)
+  const [creds, setCreds] = useState(null as TwilioCredentials | null)
   const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
   const [isManual, setIsManual] = useState(false)
   const [errorMessazge, setErrorMessage] = useState(null)
@@ -45,11 +45,21 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
-      await validateCredentials({
-        campaignId: +campaignId,
-        ...(isManual ? creds : { credential: selectedCredential }),
-        recipient,
-      })
+      if (isManual && creds) {
+        await validateNewCredentials({
+          campaignId: +campaignId,
+          ...creds,
+          recipient,
+        })
+      } else if (!isManual && selectedCredential) {
+        await validateStoredCredentials({
+          campaignId: +campaignId,
+          label: selectedCredential,
+          recipient,
+        })
+      } else {
+        throw new Error('Missing credentials')
+      }
       setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
