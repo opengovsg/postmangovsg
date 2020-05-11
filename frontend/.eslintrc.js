@@ -43,7 +43,7 @@ module.exports = {
     'newline-per-chained-call': [
       'error',
       {
-        'ignoreChainWithDepth': 2
+        'ignoreChainWithDepth': 3
       }
     ],
     'no-console': [
