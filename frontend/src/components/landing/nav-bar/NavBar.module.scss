@@ -10,6 +10,7 @@ $navbar-mobile-height: 4rem;
   z-index: 100;
   padding: 0 $site-padding;
   justify-content: space-between;
+  width: 100%;
 
   @include mobile() {
     height: $navbar-mobile-height;
@@ -36,69 +37,45 @@ $navbar-mobile-height: 4rem;
       }
     }
   }
-    .buttonAndLinks {
-      display: flex;
-      min-width: 360px;
-      justify-content: space-between;
+  .navbarLinks {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 21%;
+    @include mobile() {
+      justify-content: center;
+    }
+
+    .link {
+      font-size: 0.9rem;
+      color: $dark-blue;
+      margin-right: $navbar-link-margin;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:last-child {
+        margin-right: 0;
+      }
 
       @include mobile() {
-        min-width: 10px;
+        display: none;
       }
 
-      .navbarLinks {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 50%;
-    
-        @include mobile() {
-          display: none;
-          min-width: 100px;
-          &.isActive {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            width: 100%;
-            background-color: $dark-blue;
-            border-width: $site-padding  $mobile-site-padding;
-            border-style: solid;
-            border-color: $dark-blue;
-          }
-        }
-    
-        .link {
-          font-size: 0.9rem;
-          color: $dark-blue;
-          margin-right: $navbar-link-margin;
-          font-weight: 500;
-          cursor: pointer;
-    
-          &:last-child {
-            margin-right: 0;
-          }
-    
-          @include mobile() {
-            padding: 0.8rem 0;
-            width: 100%;
-            color: $light-blue;
-          }
-    
-          &.noClick {
-            cursor: default;
-          }
-        }
-    
-        .iconLink {
-          @include flex-horizontal;
-    
-          .icon {
-            font-size: 1.3rem;
-            margin-left: 0.5rem;
-          }
-        }
-      }
-      .signInButton {
-        min-width: 7rem;
+      &.noClick {
+        cursor: default;
       }
     }
+
+    .iconLink {
+      @include flex-horizontal;
+
+      .icon {
+        font-size: 1.3rem;
+        margin-left: 0.5rem;
+      }
+    }
+    .signInButton {
+      min-width: 7rem;
+    }
+  }
 }
