@@ -3,14 +3,14 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import { difference, keys } from 'lodash'
 import xss from 'xss'
 import { Campaign } from '@core/models'
-import { SmsMessage, SmsTemplate } from '@sms/models'
+import { EmailTemplate, EmailMessage } from '@email/models'
 import {
   updateCampaignS3Metadata,
   template,
   testHydration,
   extractS3Key,
 } from '@core/services'
-import { populateSmsTemplate, upsertSmsTemplate, getSmsStats } from '@sms/services'
+import { populateEmailTemplate, upsertEmailTemplate, getEmailStats } from '@email/services'
 import {
   uploadStartHandler,
   sendCampaign,
@@ -19,21 +19,31 @@ import {
   canEditCampaign,
 } from '@core/middlewares'
 import {
+  storeCredentials,
+  getCampaignDetails,
+  previewFirstMessage,
+  isEmailCampaignOwnedByUser,
+} from '@email/middlewares'
+
+import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
   TemplateError,
 } from '@core/errors'
 import { isSuperSet } from '@core/utils'
-import { storeCredentials, getCampaignDetails, previewFirstMessage } from '@sms/middlewares'
 import logger from '@core/logger'
 import config from '@core/config'
+
 
 const router = Router({ mergeParams: true })
 
 // validators
 const storeTemplateValidator = {
   [Segments.BODY]: Joi.object({
+    subject: Joi
+      .string()
+      .required(),
     body: Joi
       .string()
       .required(),
@@ -57,25 +67,9 @@ const uploadCompleteValidator = {
 
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    'twilio_account_sid': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_api_secret': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_api_key': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_messaging_service_sid': Joi
-      .string()
-      .trim()
-      .required(),
-    recipient: Joi
-      .string()
-      .trim()
+    recipient: Joi.string().email()
+      .options({ convert: true }) // Converts email to lowercase if it isn't
+      .lowercase()
       .required(),
   }),
 }
@@ -95,7 +89,7 @@ const sendCampaignValidator = {
 /**
  * side effects:
  *  - updates campaign 'valid' column
- *  - may delete sms_message where campaignId
+ *  - may delete email_message where campaignId
  */
 const checkNewTemplateParams = async ({
   campaignId,
@@ -103,8 +97,8 @@ const checkNewTemplateParams = async ({
   firstRecord,
 }: {
   campaignId: number;
-  updatedTemplate: SmsTemplate;
-  firstRecord: SmsMessage;
+  updatedTemplate: EmailTemplate;
+  firstRecord: EmailMessage;
 }): Promise<{
   reupload: boolean;
   extraKeys?: Array<string>;
@@ -126,7 +120,7 @@ const checkNewTemplateParams = async ({
     )
 
     // the entries (message_logs) from the uploaded file are no longer valid, so we delete
-    await SmsMessage.destroy({
+    await EmailMessage.destroy({
       where: {
         campaignId,
       },
@@ -156,18 +150,23 @@ const checkNewTemplateParams = async ({
 }
 
 const replaceNewLinesAndSanitize = (body: string): string => {
-  return xss.filterXSS(body.replace(/(\n|\r\n)/g,'<br/>'), config.xssOptions.sms)
+  return xss.filterXSS(body.replace(/(\n|\r\n)/g, '<br/>'), config.xssOptions.email)
 }
 
+// Store body of message in email template table
 // Store body of message in sms template table
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { body } = req.body
+    const { subject, body } = req.body
     // extract params from template, save to db (this will be done with hook)
-    const updatedTemplate = await upsertSmsTemplate(replaceNewLinesAndSanitize(body), +campaignId)
+    const updatedTemplate = await upsertEmailTemplate({
+      subject: replaceNewLinesAndSanitize(subject),
+      body: replaceNewLinesAndSanitize(body),
+      campaignId: +campaignId,
+    })
 
-    const firstRecord = await SmsMessage.findOne({
+    const firstRecord = await EmailMessage.findOne({
       where: { campaignId },
     })
 
@@ -187,13 +186,14 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
             valid: false,
             template: {
               body: updatedTemplate?.body,
+              subject: updatedTemplate?.subject,
               params: updatedTemplate?.params,
             },
           })
       }
     }
 
-    const recipientCount = await SmsMessage.count({ where: { campaignId } })
+    const recipientCount = await EmailMessage.count({ where: { campaignId } })
     const campaign = await Campaign.findByPk(+campaignId)
     return res.status(200)
       .json({
@@ -201,8 +201,9 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
         valid: campaign?.valid,
         'num_recipients': recipientCount,
         template: {
-          body: updatedTemplate.body,
-          params: updatedTemplate.params,
+          body: updatedTemplate?.body,
+          subject: updatedTemplate?.subject,
+          params: updatedTemplate?.params,
         },
       })
   } catch (err) {
@@ -236,8 +237,8 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     }
 
     // check if template exists
-    const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
-    if (!smsTemplate?.body || !smsTemplate?.params) {
+    const emailTemplate = await EmailTemplate.findOne({ where: { campaignId } })
+    if (!emailTemplate?.body || !emailTemplate?.subject || !emailTemplate.params) {
       return res.status(400).json({
         message: 'Template does not exist, please create a template',
       })
@@ -252,14 +253,15 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       const { records, hydratedRecord } = await testHydration({
         campaignId: +campaignId,
         s3Key,
-        templateBody: smsTemplate.body,
-        templateParams: smsTemplate.params,
+        templateSubject: emailTemplate.subject,
+        templateBody: emailTemplate.body,
+        templateParams: emailTemplate.params,
       })
 
       const recipientCount: number = records.length
       // START populate template
       // TODO: is actually populate message logs
-      await populateSmsTemplate(+campaignId, records)
+      await populateEmailTemplate(+campaignId, records)
 
       return res.json({
         'num_recipients': recipientCount,
@@ -278,27 +280,32 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   }
 }
 
+
 // Get the stats of a campaign
 const campaignStatsHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const { campaignId } = req.params
 
   try {
-    const stats = await getSmsStats(+campaignId)
+    const stats = await getEmailStats(+campaignId)
     return res.json(stats)
   } catch (err) {
-    return next(err)
+    next(err)
   }
 }
 
 // Routes
+
+// Check if campaign belongs to user for this router
+router.use(isEmailCampaignOwnedByUser)
+
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms:
+ *  /campaign/{campaignId}/email:
  *    get:
  *      tags:
- *        - SMS
- *      summary: Get sms campaign details
+ *        - Email
+ *      summary: Get email campaign details
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -314,7 +321,7 @@ const campaignStatsHandler = async (req: Request, res: Response, next: NextFunct
  *                type: object
  *                properties:
  *                  campaign:
- *                    $ref: '#/components/schemas/SMSCampaign'
+ *                    $ref: '#/components/schemas/EmailCampaign'
  *                  num_recipients:
  *                    type: number
  *        "400" :
@@ -329,11 +336,11 @@ router.get('/', getCampaignDetails)
 /**
  * @swagger
  * path:
- *   /campaign/{campaignId}/sms/template:
+ *   /campaign/{campaignId}/email/template:
  *     put:
  *       tags:
- *         - SMS
- *       summary: Stores body template for sms campaign
+ *         - Email
+ *       summary: Stores body template for email campaign
  *       parameters:
  *         - name: campaignId
  *           in: path
@@ -347,6 +354,8 @@ router.get('/', getCampaignDetails)
  *             schema:
  *               type: object
  *               properties:
+ *                 subject:
+ *                   type: string
  *                 body:
  *                   type: string
  *                   minLength: 1
@@ -362,7 +371,6 @@ router.get('/', getCampaignDetails)
  *                   - message
  *                   - valid
  *                   - num_recipients
- *                   - template
  *                 properties:
  *                   message:
  *                     type: string
@@ -377,12 +385,15 @@ router.get('/', getCampaignDetails)
  *                   template:
  *                     type: object
  *                     properties:
+ *                       subject:
+ *                         type: string
  *                       body:
  *                         type: string
  *                       params:
  *                         type: array
  *                         items:
- *                           type: string
+ *                           type: string 
+ *
  *         "400":
  *           description: Bad Request
  *         "401":
@@ -397,11 +408,11 @@ router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, stor
 /**
  * @swagger
  * path:
- *   /campaign/{campaignId}/sms/upload/start:
+ *   /campaign/{campaignId}/email/upload/start:
  *     get:
  *       description: "Get a presigned URL for upload"
  *       tags:
- *         - SMS
+ *         - Email
  *       parameters:
  *         - name: campaignId
  *           in: path
@@ -425,7 +436,7 @@ router.put('/template', celebrate(storeTemplateValidator), canEditCampaign, stor
  *                     type: string
  *                   transaction_id:
  *                     type: string
- *         "400":
+ *         "400" :
  *           description: Bad Request
  *         "401":
  *           description: Unauthorized
@@ -439,11 +450,11 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
 /**
  * @swagger
  * path:
- *   /campaign/{campaignId}/sms/upload/complete:
+ *   /campaign/{campaignId}/email/upload/complete:
  *     post:
  *       description: "Complete upload session"
  *       tags:
- *         - SMS
+ *         - Email
  *       parameters:
  *         - name: campaignId
  *           in: path
@@ -474,9 +485,10 @@ router.get('/upload/start', celebrate(uploadStartValidator), canEditCampaign, up
  *                   preview:
  *                     type: object
  *                     properties:
+ *                       subject:
+ *                         type: string
  *                       body:
  *                         type: string
- *
  *         "400" :
  *           description: Bad Request
  *         "401":
@@ -491,29 +503,20 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/credentials:
+ *  /campaign/{campaignId}/email/credentials:
  *    post:
  *      tags:
- *        - SMS
- *      summary: Store credentials for twilio
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
+ *        - Email
+ *      summary: Sends a test message and defaults to Postman's credentials for the campaign
  *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              allOf: 
- *                - $ref: '#/components/schemas/TwilioCredentials'
- *                - type: object
- *                  properties:
- *                    recipient:
- *                      type: string
- *
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - recipient
+ *               properties:
+ *                 recipient:
+ *                   type: string
  *      responses:
  *        200:
  *          content:
@@ -534,10 +537,10 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/preview:
+ *  /campaign/{campaignId}/email/preview:
  *    get:
  *      tags:
- *        - SMS
+ *        - Email
  *      summary: Preview templated message
  *      parameters:
  *        - name: campaignId
@@ -557,37 +560,32 @@ router.post('/credentials', celebrate(storeCredentialsValidator), canEditCampaig
  *                    type: object
  *                    properties:
  *                      body:
- *                        type: string                    
+ *                        type: string
+ *                      subject: 
+ *                        type: string
  *        "401":
  *           description: Unauthorized
  *        "500":
- *           description: Internal Server Error                 
+ *           description: Internal Server Error
  */
 router.get('/preview', previewFirstMessage)
 
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/send:
+ *  /campaign/{campaignId}/email/send:
  *    post:
  *      tags:
- *        - SMS
+ *        - Email
  *      summary: Start sending campaign
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
  *      requestBody:
- *        required: false
+ *        required: true
  *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              properties:
  *                rate:
- *                  example: 10
  *                  type: integer
  *                  minimum: 1
  *
@@ -618,10 +616,10 @@ router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCamp
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/stop:
+ *  /campaign/{campaignId}/email/stop:
  *    post:
  *      tags:
- *        - SMS
+ *        - Email
  *      summary: Stop sending campaign
  *
  *      responses:
@@ -630,7 +628,7 @@ router.post('/send', celebrate(sendCampaignValidator), canEditCampaign, sendCamp
  *            application/json:
  *              schema:
  *                type: object
-*                properties:
+ *                properties:
  *                 campaign_id:
  *                  type: integer
  *        "401":
@@ -643,10 +641,10 @@ router.post('/stop', stopCampaign)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/retry:
+ *  /campaign/{campaignId}/email/retry:
  *    post:
  *      tags:
- *        - SMS
+ *        - Email
  *      summary: Retry sending campaign
  *
  *      responses:
@@ -670,11 +668,11 @@ router.post('/retry', canEditCampaign, retryCampaign)
 /**
  * @swagger
  * path:
-*  /campaign/{campaignId}/sms/stats:
+*  /campaign/{campaignId}/email/stats:
  *    get:
  *      tags:
- *        - SMS
- *      summary: Get sms campaign stats
+ *        - Email
+ *      summary: Get email campaign stats
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -694,6 +692,5 @@ router.post('/retry', canEditCampaign, retryCampaign)
  *           description: Internal Server Error
  */
 router.get('/stats', campaignStatsHandler)
-
 
 export default router

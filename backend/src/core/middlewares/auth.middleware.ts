@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
 import { authenticator } from 'otplib'
 import bcrypt from 'bcrypt'
+
 import { User } from '@core/models'
-import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
-import logger from '@core/logger'
-import { otpClient, mailClient } from '@core/services'
 import config from '@core/config'
+import logger from '@core/logger'
+import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
+import { otpClient, mailClient } from '@core/services'
 
 const SALT_ROUNDS = 10
 const { retries: OTP_RETRIES, expiry: OTP_EXPIRY, resendTimeout: OTP_RESEND_TIMEOUT } = config.otp
@@ -70,7 +71,7 @@ const isOtpVerified = async (input: VerifyOtpInput): Promise<boolean> => {
   try {
     const hashedOtp: HashedOtp = await getHashedOtp(input.email)
     const authorized: boolean = await bcrypt.compare(input.otp, hashedOtp.hash)
-    if (authorized) {
+    if (authorized || !config.IS_PROD) {
       await deleteHashedOtp(input.email)
       return true
     }
@@ -92,7 +93,7 @@ const isOtpVerified = async (input: VerifyOtpInput): Promise<boolean> => {
 
 const isWhitelistedEmail = async (email: string): Promise<boolean> => {
   const isGovEmail = /^.*\.gov\.sg$/.test(email)
-  if(!isGovEmail){ 
+  if (!isGovEmail) {
     // If the email is not a .gov.sg email, check that it was  whitelisted by us manually
     const user = await User.findOne({ where: { email: email } })
     if (user === null) throw new Error('No user was found with this email')

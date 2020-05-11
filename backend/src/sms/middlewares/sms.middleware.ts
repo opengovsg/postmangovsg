@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
 import { literal } from 'sequelize'
-import { Campaign, JobQueue } from '@core/models'
+import { Campaign, JobQueue, UserCredential } from '@core/models'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
 import { TwilioCredentials } from '@sms/interfaces'
@@ -11,36 +11,48 @@ import config from '@core/config'
 import { template } from '@core/services/template.service'
 import { CampaignDetails } from '@core/interfaces'
 
-
-const saveCredential = async (campaignId: number, credentialName: string, secret: string): Promise<void> => {
-  // Check if credential is already in the credential table
-  const credentialExists = await credentialService.isExistingCredential(credentialName)
-
-  // If credential doesnt already exist
-  if (!credentialExists) {
-    // Upload the credential to aws secret manager
-    await credentialService.storeSecret(credentialName, secret)
-  }
-
-  // Store credential to credential table and update campaign
-  await credentialService.addCredentialToCampaign(campaignId, credentialName)
-
-}
-
-const getCredential = (req: Request): TwilioCredentials => {
+// Parse credentials from request body if provided, else retrieve from aws secrets mgr
+const parseCredentials = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const {
+    'credential': label,
     'twilio_account_sid': accountSid,
     'twilio_api_key': apiKey,
     'twilio_api_secret': apiSecret,
     'twilio_messaging_service_sid': messagingServiceSid,
   } = req.body
-  const credential: TwilioCredentials = {
-    accountSid,
-    apiKey,
-    apiSecret,
-    messagingServiceSid,
+
+  // if credential label not provided, set credentials in res.locals
+  if (!label) {
+    res.locals.credentials = {
+      accountSid,
+      apiKey,
+      apiSecret,
+      messagingServiceSid,
+    }
+    return next()
   }
-  return credential
+
+  try {
+    // if label provided, fetch from aws secrets
+    const userId = req.session?.user?.id
+    const userCred = await UserCredential.findOne({
+      where: {
+        userId,
+        label,
+      },
+      attributes: ['credName'],
+    })
+    if (!userCred) {
+      res.status(400).json({ message: 'User credentials cannot be found' })
+      return
+    }
+    const credentials = await credentialService.getTwilioCredentials(userCred.credName)
+    res.locals.credentials = credentials
+    res.locals.credentialName = userCred.credName
+    next()
+  } catch (e) {
+    next(e)
+  }
 }
 
 const getParams = async (campaignId: number): Promise<{ [key: string]: string } | null> => {
@@ -69,7 +81,7 @@ const getHydratedMsg = async (campaignId: number): Promise<string | null> => {
   return hydratedMsg
 }
 
-const sendMessage = async (campaignId: number, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
+const sendCampaignMessage = async (campaignId: number, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
   const msg = await getHydratedMsg(campaignId)
   if (!msg) throw new Error('No message to send')
 
@@ -77,42 +89,78 @@ const sendMessage = async (campaignId: number, recipient: string, credential: Tw
   return twilioService.send(recipient, msg)
 }
 
+const sendValidationMessage = async (recipient: string, credential: TwilioCredentials): Promise<string | void> => {
+  const twilioService = new TwilioService(credential)
+  return twilioService.send(recipient, 'Your Twilio credential has been validated.')
+}
+
 const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const userId = req.session?.user?.id 
+    const userId = req.session?.user?.id
     const campaign = await Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.SMS } })
-    return campaign ? next() : res.sendStatus(400)
+    return campaign ? next() : res.sendStatus(403)
   } catch (err) {
     return next(err)
   }
 }
 
 // Sends out a test message.
-// If it is successful, stores the twilio credential in AWS secret manager and db, as well as updating the campaign table.
-const storeCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  const credential: TwilioCredentials = getCredential(req)
-  // Send test message
+// If it is successful, stores the twilio credential in AWS secret manager and db
+// Set credentialName in res.locals
+const validateAndStoreCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const { recipient } = req.body
   const { campaignId } = req.params
+  const { credentials, credentialName } = res.locals
   try {
-    await sendMessage(+campaignId, recipient, credential)
+    if (campaignId) {
+      // Sends first hydrated message from campaign
+      await sendCampaignMessage(+campaignId, recipient, credentials)
+    } else {
+      // Sends generic validation message if campaignId not specified
+      await sendValidationMessage(recipient, credentials)
+    }
+    // If credentialName exists, credential has already been stored
+    if (credentialName) {
+      return next()
+    }
   }
   catch (err) {
     return res.status(400).json({ message: `${err}` })
   }
-
-  // Save the credentials and update DB
   try {
-    const secretString = JSON.stringify(credential)
-    const credentialName = await getEncodedHash(secretString)
-    await saveCredential(+campaignId, credentialName, secretString)
+    // Store credentials in AWS secrets manager
+    const stringifiedCredential = JSON.stringify(credentials)
+    const credentialName = await getEncodedHash(stringifiedCredential)
+    await credentialService.storeCredential(credentialName, stringifiedCredential)
+    // Pass on to next middleware/handler
+    res.locals.credentialName = credentialName
+    res.locals.channelType = ChannelType.SMS
+    next()
   } catch (err) {
     return next(err)
   }
-  return res.json({ message: 'OK' })
 }
 
+// Assign credential to campaign
+const setCampaignCredential = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  const { campaignId } = req.params
+  const { credentialName } = res.locals
+  try {
+    if (!credentialName) {
+      throw new Error('Credentail does not exist')
+    }
+    await Campaign.update({
+      credName: credentialName,
+    }, {
+      where: { id: campaignId },
+      returning: false,
+    })
+    return res.json({ message: 'OK' })
+  } catch (err) {
+    next(err)
+  }
+}
 
 const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
@@ -160,4 +208,11 @@ const previewFirstMessage = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
-export { isSmsCampaignOwnedByUser, storeCredentials, getCampaignDetails, previewFirstMessage }
+export {
+  parseCredentials,
+  isSmsCampaignOwnedByUser,
+  validateAndStoreCredentials,
+  setCampaignCredential,
+  getCampaignDetails,
+  previewFirstMessage,
+}

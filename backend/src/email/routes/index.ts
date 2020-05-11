@@ -1,9 +1,3 @@
-import { Router } from 'express'
-import emailRoutes from './email.routes'
-import { isEmailCampaignOwnedByUser } from '@email/middlewares'
+export { default as emailCampaignRoutes } from './email-campaign.routes'
+export { default as emailSettingsRoutes } from './email-settings.routes'
 
-const router = Router({ mergeParams: true })
-
-router.use('/', isEmailCampaignOwnedByUser, emailRoutes)
-
-export default router
