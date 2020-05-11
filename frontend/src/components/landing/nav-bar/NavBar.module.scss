@@ -1,0 +1,104 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+$navbar-link-margin: calc(1rem + 1vw);
+$navbar-height: 4rem;
+$navbar-mobile-height: 4rem;
+
+.navBar {
+  @include flex-horizontal;
+  height: $navbar-height;
+  z-index: 100;
+  padding: 0 $site-padding;
+  justify-content: space-between;
+
+  @include mobile() {
+    height: $navbar-mobile-height;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0;
+  }
+
+  .navBrand {
+    @include flex-horizontal;
+    justify-content: flex-start;
+
+    @include mobile() {
+      justify-content: space-between;
+      padding: 0 $mobile-site-padding;
+    }
+
+    .appLogo {
+      margin-right: 2rem;
+      @include flex-horizontal;
+
+      img {
+        height: 2rem;
+      }
+    }
+  }
+    .buttonAndLinks {
+      display: flex;
+      min-width: 360px;
+      justify-content: space-between;
+
+      @include mobile() {
+        min-width: 10px;
+      }
+
+      .navbarLinks {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 50%;
+    
+        @include mobile() {
+          display: none;
+          min-width: 100px;
+          &.isActive {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            background-color: $dark-blue;
+            border-width: $site-padding  $mobile-site-padding;
+            border-style: solid;
+            border-color: $dark-blue;
+          }
+        }
+    
+        .link {
+          font-size: 0.9rem;
+          color: $dark-blue;
+          margin-right: $navbar-link-margin;
+          font-weight: 500;
+          cursor: pointer;
+    
+          &:last-child {
+            margin-right: 0;
+          }
+    
+          @include mobile() {
+            padding: 0.8rem 0;
+            width: 100%;
+            color: $light-blue;
+          }
+    
+          &.noClick {
+            cursor: default;
+          }
+        }
+    
+        .iconLink {
+          @include flex-horizontal;
+    
+          .icon {
+            font-size: 1.3rem;
+            margin-left: 0.5rem;
+          }
+        }
+      }
+      .signInButton {
+        min-width: 7rem;
+      }
+    }
+}

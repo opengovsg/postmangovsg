@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom'
 
 import Login from './login'
 import { GUIDE_URL, CONTACT_US_URL } from 'config'
+import Navbar from './nav-bar'
 import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Landing.module.scss'
@@ -22,6 +23,7 @@ const Landing = () => {
   return (
     <>
       <div className={styles.topContainer}>
+        <Navbar></Navbar>
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <img className={styles.appLogo} src={appLogo} alt="Postman logo"></img>
