@@ -57,9 +57,32 @@ router.get('/', celebrate(getUserSettingsValidation), getUserSettings)
 /**
  * @swagger
  * path:
- *  /settings/sms/credentials:
+ *  /settings/regen:
  *    post:
- *      summary: Store credential for user
+ *      summary: Regenerates api key 
+ *      tags:
+ *        - Settings
+ *
+ *      responses:
+ *        200:
+ *          description: Success
+ *          content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   api_key:
+ *                     type: string
+ *                    
+ */
+router.post('/regen', celebrate(regenerateApiKeyValidator), regenerateApiKey)
+
+/**
+ * @swagger
+ * path:
+ *  /settings/credentials:
+ *    delete:
+ *      summary: Deletes stored credential for user
  *      tags:
  *        - Settings
  *      requestBody:
@@ -81,38 +104,5 @@ router.get('/', celebrate(getUserSettingsValidation), getUserSettings)
  *                    
  */
 router.delete('/credentials', celebrate(deleteCredentialValidator), deleteUserCredential)
-
-/**
- * @swagger
- * path:
- *  /settings/sms/credential:
- *    post:
- *      summary: Store credential for user
- *      tags:
- *        - Settings
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                label:
- *                  type: string
- *                  pattern: '/^[\w\d-]+$/'
- *
- *      responses:
- *        200:
- *          description: Success
- *          content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   api_key:
- *                     type: string
- *                    
- */
-router.post('/regen', celebrate(regenerateApiKeyValidator), regenerateApiKey)
 
 export default router
