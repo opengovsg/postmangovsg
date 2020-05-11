@@ -11,8 +11,7 @@ const storeCredentialValidator = {
     label: Joi.string()
       .min(4)
       .max(50)
-      .lowercase()
-      .pattern(/^[\w\d-]+$/)
+      .pattern(/^[a-z0-9-]+$/)
       .required(),
     'twilio_account_sid': Joi
       .string()
@@ -60,7 +59,10 @@ const getCredentialsValidator = {
  *                  properties:
  *                    label:
  *                      type: string
- *                      pattern: '/^[\w\d-]+$/'
+ *                      pattern: '/^[a-z0-9-]+$/'
+ *                      minLength: 4
+ *                      maxLength: 50
+ *                      description: should only consist of lowercase alphanumeric characters and dashes
  *                    recipient:
  *                      type: string
  *

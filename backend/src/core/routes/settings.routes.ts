@@ -10,8 +10,7 @@ const deleteCredentialValidator = {
     label: Joi.string()
       .min(1)
       .max(50)
-      .lowercase()
-      .pattern(/^[\w\d-]+$/)
+      .pattern(/^[a-z0-9-]+$/)
       .required(),
   }),
 }
@@ -87,7 +86,7 @@ router.post('/regen', regenerateApiKey)
  *              properties:
  *                label:
  *                  type: string
- *                  pattern: '/^[\w\d-]+$/'
+ *                  pattern: '/^[a-z0-9-]+$/'
  *
  *      responses:
  *        200:
