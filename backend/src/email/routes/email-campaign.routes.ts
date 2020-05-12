@@ -18,7 +18,12 @@ import {
   retryCampaign,
   canEditCampaign,
 } from '@core/middlewares'
-import { storeCredentials, getCampaignDetails, previewFirstMessage } from '@email/middlewares'
+import {
+  storeCredentials,
+  getCampaignDetails,
+  previewFirstMessage,
+  isEmailCampaignOwnedByUser,
+} from '@email/middlewares'
 
 import {
   MissingTemplateKeysError,
@@ -146,7 +151,7 @@ const checkNewTemplateParams = async ({
 }
 
 const replaceNewLinesAndSanitize = (body: string): string => {
-  return xss.filterXSS(body.replace(/(\n|\r\n)/g,'<br/>'), config.xssOptions.email)
+  return xss.filterXSS(body.replace(/(\n|\r\n)/g, '<br/>'), config.xssOptions.email)
 }
 
 // Store body of message in email template table
@@ -293,6 +298,10 @@ const campaignStatsHandler = async (req: Request, res: Response, next: NextFunct
 }
 
 // Routes
+
+// Check if campaign belongs to user for this router
+router.use(isEmailCampaignOwnedByUser)
+
 /**
  * @swagger
  * path:

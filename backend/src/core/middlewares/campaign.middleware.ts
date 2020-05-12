@@ -38,7 +38,7 @@ const canEditCampaign = async (req: Request, res: Response, next: NextFunction):
 const createCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { name, type }: { name: string; type: string } = req.body
-    const userId = req.session?.user?.id 
+    const userId = req.session?.user?.id
     const campaign: Campaign = await Campaign.create({ name, type, userId, valid: false })
     return res.status(201).json({
       id: campaign.id,
@@ -58,7 +58,7 @@ const createCampaign = async (req: Request, res: Response, next: NextFunction): 
 const listCampaigns = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { offset, limit } = req.query
-    const userId = req.session?.user?.id 
+    const userId = req.session?.user?.id
     const options: { where: any; attributes: any; order: any; include: any; offset?: number; limit?: number } = {
       where: {
         userId,

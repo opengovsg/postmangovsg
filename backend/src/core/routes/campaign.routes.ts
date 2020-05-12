@@ -94,8 +94,8 @@ router.get('/', celebrate(listCampaignsValidator), listCampaigns)
  *                type:
  *                   $ref: '#/components/schemas/ChannelType'
  *              required:
- *              - name
- *              - type
+ *                - name
+ *                - type
  *
  *      responses:
  *        "201":
