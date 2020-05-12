@@ -9,7 +9,7 @@ const router = Router()
 const storeCredentialValidator = {
   [Segments.BODY]: Joi.object({
     label: Joi.string()
-      .min(4)
+      .min(1)
       .max(50)
       .pattern(/^[a-z0-9-]+$/)
       .required(),
@@ -60,7 +60,7 @@ const getCredentialsValidator = {
  *                    label:
  *                      type: string
  *                      pattern: '/^[a-z0-9-]+$/'
- *                      minLength: 4
+ *                      minLength: 1
  *                      maxLength: 50
  *                      description: should only consist of lowercase alphanumeric characters and dashes
  *                    recipient:

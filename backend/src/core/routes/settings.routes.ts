@@ -7,10 +7,8 @@ const router = Router()
 
 const deleteCredentialValidator = {
   [Segments.BODY]: Joi.object({
-    label: Joi.string()
-      .min(1)
-      .max(50)
-      .pattern(/^[a-z0-9-]+$/)
+    label: Joi
+      .string()
       .required(),
   }),
 }
@@ -86,7 +84,6 @@ router.post('/regen', regenerateApiKey)
  *              properties:
  *                label:
  *                  type: string
- *                  pattern: '/^[a-z0-9-]+$/'
  *
  *      responses:
  *        200:

@@ -519,7 +519,7 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/newcredentials:
+ *  /campaign/{campaignId}/sms/new-credentials:
  *    post:
  *      tags:
  *        - SMS
@@ -558,7 +558,7 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), canEditCampa
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/newcredentials', celebrate(storeCredentialsValidator), canEditCampaign, getCredentialsFromBody, validateAndStoreCredentials, setCampaignCredential)
+router.post('/new-credentials', celebrate(storeCredentialsValidator), canEditCampaign, getCredentialsFromBody, validateAndStoreCredentials, setCampaignCredential)
 
 /**
  * @swagger
