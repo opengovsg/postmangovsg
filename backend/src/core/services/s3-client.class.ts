@@ -9,7 +9,7 @@ import { RecipientColumnMissing } from '@core/errors/s3.errors'
 type CSVParamsInterface = {[key: string]: string}
 const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
 
-class S3Service {
+export default class S3Client {
   s3: S3
   constructor(s3: S3) {
     this.s3 = s3
@@ -57,5 +57,3 @@ class S3Service {
     return Array.from(params.values())
   }
 }
-
-export { S3Service }

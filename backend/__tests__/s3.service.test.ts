@@ -1,12 +1,12 @@
 import S3 from 'aws-sdk/clients/s3'
 
-import { S3Service } from '@core/services/s3.service'
+import S3Client from '@core/services/s3-client.class'
 import { RecipientColumnMissing } from '@core/errors'
 
 import { Readable } from 'stream'
 
-const s3Client = new S3()
-const s3Service = new S3Service(s3Client)
+const s3 = new S3()
+const s3Client = new S3Client(s3)
 
 const createStream = (headers: Array<string>, values: Array<Array<string>>): Readable => {
   const head =[headers.join(',')]
@@ -22,7 +22,7 @@ describe('S3 Service', () => {
       const headers = ['recipient']
       const values = [['test@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await s3Service.parseCsv(stream)
+      const params = await s3Client.parseCsv(stream)
       expect(params).toEqual( [ { recipient: 'test@open.gov.sg' } ])
     })
 
@@ -30,7 +30,7 @@ describe('S3 Service', () => {
       const headers: Array<string> = []
       const values: Array<Array<string>> = []
       const stream = await createStream(headers, values)
-      await expect(s3Service.parseCsv(stream))
+      await expect(s3Client.parseCsv(stream))
         .rejects
         .toThrow(RecipientColumnMissing)
     })
@@ -39,7 +39,7 @@ describe('S3 Service', () => {
       const headers = ['RECIPIENT']
       const values = [['test@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await s3Service.parseCsv(stream)
+      const params = await s3Client.parseCsv(stream)
       expect(params).toEqual( [ { recipient: 'test@open.gov.sg' } ])
     })
 
@@ -47,11 +47,11 @@ describe('S3 Service', () => {
       const headers = ['recipient']
       const values = [['test@open.gov.sg'], ['test2@open.gov.sg'], ['test3@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await s3Service.parseCsv(stream)
+      const params = await s3Client.parseCsv(stream)
       expect(params).toEqual([ 
         { recipient: 'test@open.gov.sg' },
         { recipient: 'test2@open.gov.sg' },
-        { recipient: 'test3@open.gov.sg'},
+        { recipient: 'test3@open.gov.sg' },
       ])
     })
 
@@ -60,14 +60,14 @@ describe('S3 Service', () => {
       const values = [
         ['Ali', 'test@open.gov.sg', '81234567'],
         ['Ahmad', 'test2@open.gov.sg', '91234567'],
-        ['Amy', 'test3@open.gov.sg', '99912345']
+        ['Amy', 'test3@open.gov.sg', '99912345'],
       ]
       const stream = await createStream(headers, values)
-      const params = await s3Service.parseCsv(stream)
+      const params = await s3Client.parseCsv(stream)
       expect(params).toEqual([ 
-        { recipient: 'test@open.gov.sg', name: 'Ali', number: '81234567'},
-        { recipient: 'test2@open.gov.sg', name: 'Ahmad', number: '91234567'},
-        { recipient: 'test3@open.gov.sg', name: 'Amy', number: '99912345'},
+        { recipient: 'test@open.gov.sg', name: 'Ali', number: '81234567' },
+        { recipient: 'test2@open.gov.sg', name: 'Ahmad', number: '91234567' },
+        { recipient: 'test3@open.gov.sg', name: 'Amy', number: '99912345' },
       ])
     })
 
@@ -77,7 +77,7 @@ describe('S3 Service', () => {
         ['Ahmad', 'test@open.gov.sg', ''],
       ]
       const stream = await createStream(headers, values)
-      const params = await s3Service.parseCsv(stream)
+      const params = await s3Client.parseCsv(stream)
       expect(params).toEqual([ 
         { recipient: 'test@open.gov.sg', name: 'Ahmad', number: '' }])
     })

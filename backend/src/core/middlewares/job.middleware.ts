@@ -1,24 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
-import { createJob, stopCampaign as stop, retryCampaign as retry } from '@core/services'
-import { Campaign } from '@core/models'
-import { Op } from 'sequelize'
-import config from '@core/config'
+import { JobService } from '@core/services'
+
 const sendCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
-    let rate = +req.body.rate
-    const canSend = await Campaign.findOne({ where: { id: campaignId, valid: true, credName: { [Op.ne]: null } } })
-    if(canSend){
-      // Split jobs if the supplied send rate is higher than the rate 1 worker can support
-      // The rate is distributed evenly across workers.
-      const jobs = []
-      while (rate>0) {
-        const sendRate = Math.min(config.maxRatePerJob, rate) 
-        jobs.push(createJob({ campaignId: +campaignId, rate: sendRate }))
-        rate -= sendRate
-      }
-    
-      const jobIds = await Promise.all(jobs)
+    const { rate } = req.body
+    if(await JobService.canSendCampaign(+campaignId)){
+      const jobIds = await JobService.sendCampaign({ campaignId: +campaignId, rate: +rate })
       return res.status(200).json({ 'campaign_id': campaignId, 'job_id': jobIds })
     }
     return res.status(400).json({ message: 'Unable to send campaign due to invalid template, recipients or missing credentials.' })
@@ -31,7 +19,7 @@ const sendCampaign = async (req: Request, res: Response, next: NextFunction): Pr
 const stopCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
-    await stop(+campaignId)
+    await JobService.stopCampaign(+campaignId)
     return res.status(200).json({ 'campaign_id': campaignId })
   }
   catch(err){
@@ -42,7 +30,7 @@ const stopCampaign = async (req: Request, res: Response, next: NextFunction): Pr
 const retryCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try{
     const { campaignId } = req.params
-    await retry(+campaignId)
+    await JobService.retryCampaign(+campaignId)
     return res.status(200).json({ 'campaign_id': campaignId })
   }
   catch(err){
@@ -51,7 +39,7 @@ const retryCampaign = async (req: Request, res: Response, next: NextFunction): P
 }
 
 
-export {
+export const JobMiddleware = {
   sendCampaign,
   stopCampaign,
   retryCampaign,

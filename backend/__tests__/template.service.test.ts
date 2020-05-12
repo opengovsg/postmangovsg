@@ -1,4 +1,4 @@
-import { template } from '@core/services/template.service'
+import { TemplateService } from '@core/services/template.service'
 import { TemplateError } from '@core/errors'
 
 describe('template', () => {
@@ -6,19 +6,19 @@ describe('template', () => {
     test('no params', () => {
       const params = {}
       const body = 'Hello world'
-      expect(template(body, params)).toEqual('Hello world')
+      expect(TemplateService.template(body, params)).toEqual('Hello world')
     })
   
     test('has params', () => {
       const params = { 'name' : 'test' }
       const body = 'Hello {{name}}'
-      expect(template(body, params)).toEqual('Hello test')
+      expect(TemplateService.template(body, params)).toEqual('Hello test')
     })
 
     test('missing params should be replaced with empty string', () => {
       const params = {}
       const body = 'Hello {{name}}'
-      expect(template(body, params)).toEqual('Hello ')
+      expect(TemplateService.template(body, params)).toEqual('Hello ')
     })
   })
   
@@ -33,7 +33,7 @@ describe('template', () => {
 
     test.each(table)(
       '%s : %s', (_, body) => {
-        expect(() => {template(body, {})}).toThrow(TemplateError)
+        expect(() => {TemplateService.template(body, {})}).toThrow(TemplateError)
       }
     )
   })
@@ -48,7 +48,7 @@ describe('template', () => {
 
     test.each(table)(
       '%s', (_, body) => {
-        expect(template(body, {})).toEqual(body)
+        expect(TemplateService.template(body, {})).toEqual(body)
       }
     )
   })

@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-
-import { User, UserCredential } from '@core/models'
-import { ChannelType } from '@core/constants'
+import { CredentialService } from '@core/services'
 
 /*
  * Retrieves API key and stored credentials of the user
@@ -9,22 +7,11 @@ import { ChannelType } from '@core/constants'
 const getUserSettings = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.session?.user?.id
-    const user = await User.findOne({
-      where: {
-        id: userId,
-      },
-      attributes: ['apiKey'],
-      // include as 'creds'
-      include: [{
-        model: UserCredential,
-        attributes: ['label', 'type'],
-      }],
-      plain: true,
-    })
-    if (!user) {
+    const userSettings = await CredentialService.getUserSettings(userId)
+    if (!userSettings) {
       throw new Error('User not found')
     }
-    res.json({ 'has_api_key': !!user.apiKey, creds: user.creds })
+    res.json({ 'has_api_key': userSettings.hasApiKey, creds: userSettings.creds })
   } catch (err) {
     next(err)
   }
@@ -32,13 +19,10 @@ const getUserSettings = async (req: Request, res: Response, next: NextFunction):
 
 // Checks if label already used for user
 const checkUserCredentialLabel = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  const { label } = req.body
   try {
-    const result = await UserCredential.findOne({
-      where: {
-        label,
-      },
-    })
+    const userId = req.session?.user?.id
+    const { label } = req.body
+    const result = await CredentialService.getUserCredential(userId, label)
     if (result) {
       return res.status(400).json({ message: 'User credential with the same label already exists.' })
     }
@@ -57,12 +41,7 @@ const storeUserCredential = async (req: Request, res: Response, next: NextFuncti
     if (!credentialName || !channelType) {
       throw new Error('Credential or credential type does not exist')
     }
-    await UserCredential.create({
-      label,
-      type: channelType,
-      credName: credentialName,
-      userId,
-    })
+    await CredentialService.createUserCredential(label, channelType, credentialName, +userId)
     return res.json({ message: 'OK' })
   } catch (e) {
     next(e)
@@ -71,31 +50,20 @@ const storeUserCredential = async (req: Request, res: Response, next: NextFuncti
 
 // Associate credential to user
 const getChannelSpecificCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  const userId = req.session?.user?.id
   try {
-    const creds = await UserCredential.findAll({
-      where: {
-        type: ChannelType.SMS,
-        userId: userId,
-      },
-      attributes: ['label'],
-    })
-    return res.json(creds.map(c => c.label))
+    const userId = req.session?.user?.id
+    const result = await CredentialService.getSmsUserCredentialLabels(+userId)
+    return res.json(result)
   } catch (e) {
     next(e)
   }
 }
 
 const deleteUserCredential = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  const { label } = req.body
-  const userId = req.session?.user?.id
   try {
-    const count = await UserCredential.destroy({
-      where: {
-        userId,
-        label,
-      },
-    })
+    const { label } = req.body
+    const userId = req.session?.user?.id
+    const count = await CredentialService.deleteUserCredential(+userId, label)
     if (count) {
       return res.json({ message: 'OK' })
     } else {
@@ -107,20 +75,16 @@ const deleteUserCredential = async (req: Request, res: Response, next: NextFunct
 }
 
 const regenerateApiKey = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  const userId = req.session?.user?.id
   try {
-    const user = await User.findByPk(userId)
-    if (!user) {
-      throw new Error('User not found')
-    }
-    const newApiKey = await user.regenerateAndSaveApiKey()
-    return res.json({ 'api_key': newApiKey })
+    const userId = req.session?.user?.id
+    const apiKey = await CredentialService.regenerateApiKey(+userId)
+    return res.json({ 'api_key': apiKey })
   } catch (e) {
     next(e)
   }
 }
 
-export {
+export const SettingsMiddleware = {
   getUserSettings,
   checkUserCredentialLabel,
   storeUserCredential,
