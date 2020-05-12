@@ -122,6 +122,84 @@
   }
 }
 
+.howItWorks {
+  height: 90vh;
+  background-color: $dark-blue;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @include mobile() {
+    min-height: 135vh;
+  }
+
+  h1 {
+    padding-top: 10vh;
+    color: #b5c4ff;
+    font-weight: bold;
+    font-size: 3rem;
+    margin: 0;
+  }
+  
+  h2 {
+    margin-top: 10px;
+    color: $light-blue;
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  .features {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100vw - ($site-padding * 2);
+
+    @include mobile() {
+      flex-direction: column;
+    }
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    align-items: center;
+
+    @include mobile() {
+      width: 100%;
+      height: 25%;
+    }
+
+    img {
+      @include mobile() {
+        max-width: 15%;
+        margin-top: 3%;
+      }
+    }
+
+    h3 {
+      color: #b5c4ff;
+      font-weight: bold;
+    }
+    .featureText {
+      width: 60%;
+      color: $light-blue;
+      font-size: 1.2rem;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .learnMoreBtn {
+    margin-top: 5rem;
+    width: 193px;
+    border: 1px solid $light-blue;
+    background-color: $dark-blue;
+  }
+}
+
 .bottomContainer {
   background-color: $transparent-blue;
 }
