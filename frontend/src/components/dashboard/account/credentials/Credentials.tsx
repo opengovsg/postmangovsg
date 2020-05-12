@@ -61,8 +61,8 @@ const Credentials = ({ creds, refresh }: { creds: UserCredential[]; refresh: Fun
           <i className={'bx bx-plus'}></i>
         </PrimaryButton>
       </div>
-      <table className={styles.credTable}>
-        {(creds.length) ?
+      {(creds.length) ?
+        <table className={styles.credTable}>
           <tbody>
             <tr>
               <th className='xs'>Mode</th>
@@ -71,14 +71,14 @@ const Credentials = ({ creds, refresh }: { creds: UserCredential[]; refresh: Fun
             </tr>
             {renderCredentials()}
           </tbody>
-          :
-          <div className={styles.emptyCredentials}>
-            <img src={EmptyCredentialsImage} />
-            <h3>There’s nothing to show yet!</h3>
-            <p>But here’s what you can do. Start adding credentials by clicking the button above.</p>
-          </div>
-        }
-      </table>
+        </table>
+        :
+        <div className={styles.emptyCredentials}>
+          <img src={EmptyCredentialsImage} />
+          <h3>There’s nothing to show yet!</h3>
+          <p>But here’s what you can do. Start adding credentials by clicking the button above.</p>
+        </div>
+      }
     </>
   )
 }
