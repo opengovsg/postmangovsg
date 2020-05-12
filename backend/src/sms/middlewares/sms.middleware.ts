@@ -38,7 +38,7 @@ const getCredentialsFromLabel = async (req: Request, res: Response, next: NextFu
   const userId = req.session?.user?.id
   try {
     // if label provided, fetch from aws secrets
-    const userCred = await CredentialService.findUserCredential(+userId, label)
+    const userCred = await CredentialService.getUserCredential(+userId, label)
     if (!userCred) {
       res.status(400).json({ message: 'User credentials cannot be found' })
       return
