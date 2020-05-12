@@ -15,10 +15,10 @@ describe('template', () => {
       expect(template(body, params)).toEqual('Hello test')
     })
 
-    test('missing params', () => {
+    test('missing params should be replaced with empty string', () => {
       const params = {}
       const body = 'Hello {{name}}'
-      expect(() => {template(body, params)}).toThrow(TemplateError)
+      expect(template(body, params)).toEqual('Hello ')
     })
   })
   
@@ -27,8 +27,8 @@ describe('template', () => {
       [ 'unclosed curly braces', 'Hello {{'],
       [ 'empty variable', '{{}}'],
       [ 'special character', '{{^^}}'],
-      [ 'single quote', "{{'}}"],
-      ['should not allow strings in variables', "{{'hello'}}"]
+      [ 'single quote', '{{\'}}'],
+      ['should not allow strings in variables', '{{\'hello\'}}'],
     ]
 
     test.each(table)(
