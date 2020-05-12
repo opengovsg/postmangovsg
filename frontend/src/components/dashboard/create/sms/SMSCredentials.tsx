@@ -26,6 +26,9 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
     try {
       const storedCredLabels = await getStoredCredentials()
       setStoredCredentials(storedCredLabels.map(c => ({ label: c, value: c })))
+      if (!storedCredLabels.length) {
+        setIsManual(true)
+      }
     } catch (e) {
       console.error(e)
       setErrorMessage(e.message)
@@ -72,12 +75,12 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   function renderCredentialFields() {
     return (
       <>
-        {isManual || !storedCredentials.length
+        {isManual
           ?
           <>
             <h2>Insert your Twilio credentials</h2>
             <TwilioCredentialsInput onFilled={setCreds}></TwilioCredentialsInput>
-            <p className="clickable" onClick={toggleInputMode}>or select from stored credentials</p>
+            {storedCredentials.length ? <p className="clickable" onClick={toggleInputMode}>or select from stored credentials</p> : null}
           </>
           :
           <>
