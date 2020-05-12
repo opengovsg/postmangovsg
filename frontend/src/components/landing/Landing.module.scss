@@ -200,6 +200,84 @@
   }
 }
 
+.whyUsePostman {
+  height: auto;
+
+  .innerContainer {
+    margin: 0 auto;
+    height: 100%;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h1 {
+      color: $indigo-blue;
+      font-weight: bold;
+      font-size: 2.5rem;
+      padding-top: 3rem;
+    }
+
+    h3 {
+      font-size: 2rem;
+      color: $indigo-blue;
+      font-weight: bold;
+    }
+
+    p {
+      color: $dark-blue;
+      font-size: 1.2rem;
+    }
+
+    img {
+      @include mobile() {
+        display: none;
+      }
+    }
+
+    .reason {
+      display: flex;
+      margin-bottom: 3rem;
+
+      p {
+        width: 20rem;
+      }
+    }
+
+    .testimonial {
+      display: flex;
+      align-items: center;
+
+      padding-bottom: 8vh;
+
+      img {
+        width: 150px;
+        height: 150px;
+      }
+
+      .textContainer {
+        margin-left: 50px;
+
+        @include mobile() {
+          margin-left: 0;
+        }
+        
+        p {
+          width: 40rem;
+          @include mobile() {
+            width: 20rem;
+          }
+        }
+
+        span {
+          color: $indigo-blue;
+          font-size: 1rem;
+        }
+      }   
+    }
+  }
+}
+
 .bottomContainer {
   background-color: $transparent-blue;
 }
