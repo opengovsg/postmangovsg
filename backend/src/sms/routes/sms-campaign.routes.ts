@@ -67,9 +67,6 @@ const uploadCompleteValidator = {
 
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    'credential': Joi
-      .string()
-      .optional(),
     'twilio_account_sid': Joi
       .string()
       .trim()
