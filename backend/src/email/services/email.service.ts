@@ -1,11 +1,10 @@
 import { chunk } from 'lodash'
+import validator from 'validator'
 import { Campaign, JobQueue } from '@core/models'
 import { EmailMessage, EmailTemplate, EmailOp } from '@email/models'
 import logger from '@core/logger'
 import { CampaignStats } from '@core/interfaces'
 import { getStatsFromTable } from '@core/services'
-
-
 
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
   let transaction
@@ -97,6 +96,10 @@ const getEmailStats = async (campaignId: number): Promise<CampaignStats> => {
 
   const stats = await getStatsFromTable(EmailMessage, campaignId) 
   return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
-} 
+}
 
-export { populateEmailTemplate, upsertEmailTemplate, getEmailStats }
+const hasInvalidEmailRecipient = (records: MessageBulkInsertInterface[]): boolean => {
+  return records.some((record) => !validator.isEmail(record.recipient))
+}
+
+export { populateEmailTemplate, upsertEmailTemplate, getEmailStats, hasInvalidEmailRecipient }
