@@ -63,11 +63,8 @@ const Login = () => {
   }
 
   function validateOtp(value: string) {
-    // Reject input that's more than 6 characters or not a number
-    if (
-      value.length > 6 ||
-      value.length > 0 && isNaN(parseInt(value))
-    ) {
+    // Only accept input that is between 0-6 digits
+    if (!/^\d{0,6}$/.test(value)) {
       return
     }
     setOtp(value)
