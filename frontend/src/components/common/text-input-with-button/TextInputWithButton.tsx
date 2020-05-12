@@ -1,4 +1,5 @@
 import React from 'react'
+import cx from 'classnames'
 import styles from './TextInputWithButton.module.scss'
 import { PrimaryButton, TextInput } from '../'
 
@@ -7,12 +8,14 @@ const TextInputWithButton = (props: {
   onChange: Function;
   onClick: Function;
   children: React.ReactNode;
-  type: string | undefined;
-  buttonDisabled?: boolean | undefined;
-  inputDisabled?: boolean | undefined;
+  type?: string;
+  buttonDisabled?: boolean;
+  inputDisabled?: boolean;
   placeholder?: string;
+  className?: string;
+  textRef?: any;
 }) => {
-  const { value, onChange, onClick, children, type, buttonDisabled, inputDisabled, placeholder } = props
+  const { value, onChange, onClick, children, type, buttonDisabled, inputDisabled, placeholder, className, textRef } = props
 
   function onFormSubmit(e: React.FormEvent) {
     onClick()
@@ -22,8 +25,8 @@ const TextInputWithButton = (props: {
 
   return (
     <form className={styles.inputWithButton} onSubmit={onFormSubmit}>
-      <TextInput className={styles.textInput} value={value} onChange={onChange} type={type} disabled={inputDisabled} placeholder={placeholder} />
-      <PrimaryButton className={styles.inputButton} disabled={buttonDisabled} type="submit">
+      <TextInput className={styles.textInput} value={value} onChange={onChange} type={type} disabled={inputDisabled} placeholder={placeholder} ref={textRef}/>
+      <PrimaryButton className={cx(styles.inputButton, className)} disabled={buttonDisabled} type="submit">
         {children}
       </PrimaryButton>
     </form>
