@@ -15,9 +15,9 @@ const CredLabelInput = ({ value, onChange }: { value: string; onChange: (newValu
 
   return (
     <>
-      <h5>Credential Name</h5>
+      <h5>Credential Label</h5>
       <TextInput
-        placeholder="Enter a name (e.g. default-cred-1)"
+        placeholder="Enter a label (e.g. default-cred-1)"
         value={value}
         maxLength="50"
         onChange={onLabelChange}

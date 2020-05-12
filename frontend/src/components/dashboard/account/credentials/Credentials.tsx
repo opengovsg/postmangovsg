@@ -66,7 +66,7 @@ const Credentials = ({ creds, refresh }: { creds: UserCredential[]; refresh: Fun
           <tbody>
             <tr>
               <th className='xs'>Mode</th>
-              <th className='md'>Name</th>
+              <th className='md'>Label</th>
               <th className={cx('sm', styles.actionColumn)}></th>
             </tr>
             {renderCredentials()}
