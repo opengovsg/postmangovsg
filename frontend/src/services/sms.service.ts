@@ -35,7 +35,7 @@ export async function validateNewCredentials({
   messagingServiceSid: string;
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/sms/newcredentials`, {
+    await axios.post(`/campaign/${campaignId}/sms/new-credentials`, {
       recipient,
       'twilio_account_sid': accountSid,
       'twilio_api_key': apiKey,
