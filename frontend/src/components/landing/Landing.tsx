@@ -26,6 +26,8 @@ import reattemptImg from 'assets/img/landing/WhyUsePostman-2.svg'
 import trackImg from 'assets/img/landing/WhyUsePostman-3.svg'
 import faceImg from 'assets/img/landing/WhyUsePostman-face.png'
 
+import onboardingImg from 'assets/img/landing/Onboarding.svg'
+
 const Landing = () => {
   const authContext = useContext(AuthContext)
 
@@ -174,6 +176,22 @@ const Landing = () => {
           )}
         </div>
       </div>
+
+      <div className={styles.onboarding}>
+        <div className={styles.textContainer}>
+          <h2>No onboarding process nor any installation required.</h2>
+          <p>Sign in with your government email, and send your messages in minutes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
+
+          <div className={styles.buttonRow}>
+            <PrimaryButton className={styles.getStartedButton} onClick={directToSignIn}>
+                  Get started<img className={styles.arrowRight} src={arrowRight}/>
+            </PrimaryButton>
+            <a href={CONTACT_US_URL}>Have a question?</a>
+          </div>
+        </div>
+        <img className={styles.onboardingImg} src={onboardingImg} alt="Onboarding"/>
+      </div>
+
       <div className={styles.bottomContainer}>
         <div className={styles.bottomContent}>
           <img className={styles.companyLogo} src={companyLogo} alt="OGP"></img>

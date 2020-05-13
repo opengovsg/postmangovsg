@@ -322,6 +322,58 @@
   }
 }
 
+.onboarding {
+  padding: 3rem $site-padding*8;
+  background-color: $indigo-blue;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+
+  .onboardingImg {
+    width:40%;
+
+    @include mobile() {
+      display: none;
+    }
+  }
+
+  .textContainer {
+    width: 60%;
+
+    @include mobile() {
+      width: 100%;
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: bold;
+      color: $light-blue;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: $light-blue;
+    }
+
+    .buttonRow {
+      margin-top: 3rem;
+
+      .getStartedButton {
+        color: $light-blue;
+        border: 1px solid $light-blue;
+      }
+
+      a {
+        margin-left: 2rem;
+        color: $light-blue;
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
 .bottomContainer {
   background-color: $transparent-blue;
 }
