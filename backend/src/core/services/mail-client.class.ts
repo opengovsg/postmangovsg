@@ -42,6 +42,7 @@ export default class MailClient {
         from: this.email,
         to: input.recipients,
         subject: input.subject,
+        replyTo: input.replyTo,
         html: input.body,
       }, (err, info) => {
         if (err !== null){
