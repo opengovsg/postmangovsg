@@ -17,7 +17,10 @@ export async function saveTemplate(campaignId: number, subject: string, body: st
     const response = await axios.put(`/campaign/${campaignId}/email/template`, {
       body,
       subject,
-      replyTo
+      // Replace unwanted values (undefined and empty string) with null. Cases where this happens:
+      // 1. User saves the template with no replyTo email - undefined
+      // 2. User deletes the replyTo email after previously setting it - empty string
+      replyTo: replyTo || null,
     })
     const { num_recipients: numRecipients, template: updatedTemplate } = response.data
     return { numRecipients, updatedTemplate }
