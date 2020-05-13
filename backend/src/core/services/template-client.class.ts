@@ -1,20 +1,13 @@
-import S3 from 'aws-sdk/clients/s3'
 import { difference, keys, mapKeys } from 'lodash'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 
 import S3Client from '@core/services/s3-client.class'
 import logger from '@core/logger'
-import config from '@core/config'
 import { MissingTemplateKeysError, TemplateError } from '@core/errors/template.errors'
 import { isSuperSet } from '@core/utils'
 
 import xss from 'xss'
-
-const s3 = new S3({
-  signatureVersion: 'v4',
-  region: config.aws.awsRegion,
-})
 
 export default class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
@@ -150,7 +143,7 @@ export default class TemplateClient {
     templateBody: string;
     templateParams: Array<string>;
   }): Promise<TestHydrationResult> {
-    const s3Client = new S3Client(s3)
+    const s3Client = new S3Client()
     const downloadStream = s3Client.download(s3Key)
     const fileContents = await s3Client.parseCsv(downloadStream)
   
