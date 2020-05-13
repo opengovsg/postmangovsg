@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 
 import logger from '@core/logger'
-import { HydrationError, TemplateError, RecipientColumnMissing, MissingTemplateKeysError } from '@core/errors'
+import { HydrationError, TemplateError, RecipientColumnMissing, MissingTemplateKeysError, InvalidRecipientError } from '@core/errors'
 import { TemplateService, CampaignService } from '@core/services'
 
 import { SmsTemplateService } from '@sms/services'
@@ -88,7 +88,9 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         templateBody: smsTemplate.body as string,
         templateParams: smsTemplate.params as string[],
       })
-  
+
+      if (SmsTemplateService.hasInvalidSmsRecipient(records)) throw new InvalidRecipientError()
+
       const recipientCount: number = records.length
       // START populate template
       await SmsTemplateService.addToMessageLogs(+campaignId, records)
@@ -103,7 +105,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       throw err
     }
   } catch (err) {
-    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError) {
+    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError || err instanceof InvalidRecipientError) {
       return res.status(400).json({ message: err.message })
     }
     return next(err)
