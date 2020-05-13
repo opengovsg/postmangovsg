@@ -370,51 +370,99 @@
 }
 
 .bottomContainer {
-  background-color: $transparent-blue;
-}
+  background-color: $dark-blue;
+  height: auto;
+  padding: 3rem $site-padding;
+  color: $light-blue;
 
-.bottomContent {
-  max-width: 1000px;
-  width: 90vw;
-  margin: auto;
-  height: 30vh;
-  min-height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  @include mobile() {
-    padding: 2rem;
+  .lineBreak {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    border: 1px solid $light-blue;
+    margin-top: 2rem;
   }
 
-  .linkBar {
-    font-size: 0.75rem;
+  .innerContainer {
     display: flex;
-    align-items: baseline;
-    margin-bottom: -4px;
+    justify-content: space-between;
+
+    @include mobile {
+      flex-direction: column;
+    }
+    .navLinks {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+  
+      a {
+        margin-top: 2rem;
+        font-weight: bold;
+        font-size: 1rem;
+        color: $light-blue;
+      }
+    
+      .header {
+        display: flex;
+        align-items: center;
+    
+        .title {
+          font-weight: bold;
+          font-size: 24px;
+          line-height: 0.37;
+          height: 16px;
+        }
+    
+        .text {
+          margin-left: 30px;
+          font-style: italic;
+          font-size: 16px;
+          line-height: 1;
+          height: 20px;
+
+          @include mobile {
+            display: none;
+          }
+        }
+      }
+    }
+  
+    .builtBy {
+      display: flex;
+      align-items: center;
+      align-self: flex-end;
+  
+      @include mobile() {
+        align-self: flex-start;
+        margin-top: 2rem;
+  
+      }
+      span {
+        margin-right: 2rem;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  .footer {
+    display: flex;
+    margin-top: 2rem;
+    justify-content: space-between;
+
     @include mobile() {
       flex-direction: column;
     }
 
-    .navLink {
-      color: $dark-blue;
-      margin-left: 3vw;
-      font-weight: bold;
-      &:hover,
-      &:active {
-        text-decoration: underline;
-      }
+    .links {
+      display: flex;
       @include mobile() {
-        margin: 0;
-        &:not(:last-child) {
-          margin-bottom: 1rem;
-        }
+        flex-direction: column;
+        margin-bottom: 2rem;
       }
-    }
-  }
-
-  .ogpLogo {
-    @include mobile() {
-      height: 2rem;
+      a {
+        color: $light-blue;
+        margin-right: 2rem;
+      }
     }
   }
 }

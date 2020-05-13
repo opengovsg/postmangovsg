@@ -193,12 +193,29 @@ const Landing = () => {
       </div>
 
       <div className={styles.bottomContainer}>
-        <div className={styles.bottomContent}>
-          <img className={styles.companyLogo} src={companyLogo} alt="OGP"></img>
-          <div className={styles.linkBar}>
-            <a className={styles.navLink} href={GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
-            <a className={styles.navLink} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Contact Us</a>
+        <div className={styles.innerContainer}>
+          <div className={styles.navLinks}>
+            <div className={styles.header}>
+              <span className={styles.title}>Postman</span>
+              <span className={styles.text}>Reach out to the citizens in minutes</span>
+            </div>
+            <a href={POSTMAN_GUIDE_URL}>User guide</a>
+            <a href={POSTMAN_CONTRIBUTE_URL}>Contribute</a>
           </div>
+
+          <div className={styles.builtBy}>
+              <span>Built by</span>
+              <img src={ogpLogo} alt="logo"/>
+          </div>
+        </div>
+        <div className={styles.lineBreak}></div>
+        <div className={styles.footer}>
+          <div className={styles.links}>
+            <a href="">Privacy</a>
+            <a href="">Terms of use</a>
+            <a href="">Report Vulnerability</a>
+          </div>
+          <span>&copy; 2019 Open Government Products. Last Updated 28 April 2020</span>
         </div>
       </div>
     </>
