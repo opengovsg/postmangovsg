@@ -1,19 +1,19 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import map from 'lodash/map'
-import { template } from '@core/services/template.service'
-import { getTwilioCredentials } from '@core/services/credential.service'
+import { TemplateService } from '@core/services/template.service'
+import { CredentialService } from '@core/services/credential.service'
 import logger from '@core/logger'
-import { TwilioService } from '@sms/services/twilio.service'
+import TwilioClient from '@sms/services/twilio-client.class'
 
 class SMS {
     private workerId: string
     private connection: Sequelize
-    private twilioService: TwilioService | null
+    private twilioClient: TwilioClient | null
     constructor(workerId: string, connection: Sequelize){
       this.workerId = workerId
       this.connection = connection
-      this.twilioService = null
+      this.twilioClient = null
     }
    
     enqueueMessages(jobId: number): Promise<void>{
@@ -34,7 +34,7 @@ class SMS {
     sendMessage({ id, recipient, params, body }: { id: number; recipient: string; params: {[key: string]: string}; body: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
-          return this.twilioService?.send(recipient, template(body, params))
+          return this.twilioClient?.send(recipient, TemplateService.template(body, params))
         })
         .then((messageId) => {
           return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
@@ -50,12 +50,12 @@ class SMS {
     }
 
     async setSendingService(credentialName: string): Promise<void> {
-      const credentials = await getTwilioCredentials(credentialName)
-      this.twilioService = new TwilioService(credentials)
+      const credentials = await CredentialService.getTwilioCredentials(credentialName)
+      this.twilioClient = new TwilioClient(credentials)
     }
 
     destroySendingService(): void {
-      this.twilioService = null
+      this.twilioClient = null
     }
 }
 

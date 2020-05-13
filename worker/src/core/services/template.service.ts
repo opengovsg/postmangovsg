@@ -2,10 +2,9 @@ import { mapKeys } from 'lodash'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import logger from '@core/logger'
-
+import { TemplateError } from '@core/errors/template.errors'
 
 // FIXME: handle edge case of x.y
-
 /**
  * returns {
  *    variables - extracted param variables from template
@@ -49,18 +48,18 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
           if (key !== undefined) {
 
             if (key.length === 0) {
-              throw new Error('Blank template variable provided')
+              throw new TemplateError('Blank template variable provided')
             }
 
             // only allow alphanumeric template, prevents code execution
             const keyHasValidChars = (key.match(/[^a-zA-Z0-9]/) === null)
             if (!keyHasValidChars) {
-              throw new Error(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
+              throw new TemplateError(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
             }
 
             // add key regardless, note that this is also returned in lowercase
             variables.push(key)
-
+            
             // if no params continue with the loop
             if (!params) return
 
@@ -72,16 +71,16 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
             }
 
             // recipient key must have param
-            if (key === 'recipient') throw new Error(`Param ${templateObject.c} not found`)
+            if (key === 'recipient') throw new TemplateError(`Param ${templateObject.c} not found`)
 
           } else { // I have not found an edge case that trips this yet
             logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)
-            throw new Error('TemplateObject has no content')
+            throw new TemplateError('TemplateObject has no content')
           }
         } else {
           // FIXME: be more specific about templateObject, just pass the error itself?
           logger.error (`Templating error: invalid template provided. templateObject= ${JSON.stringify(templateObject)}`)
-          throw new Error(`Invalid template provided`)
+          throw new TemplateError('Invalid template provided')
         }
       } else {
         // normal string (non variable portion)
@@ -94,16 +93,16 @@ const parseTemplate = (templateBody: string, params?: { [key: string]: string })
     }
   } catch (err) {
     logger.error({ message: `${err.stack}` })
-    if (err.message.includes('unclosed tag')) throw new Error('There are unclosed curly brackets in the template')
-    if (err.name === 'Squirrelly Error') throw new Error(err.message)
+    if (err.message.includes('unclosed tag')) throw new TemplateError('There are unclosed curly brackets in the template')
+    if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
     throw err
   }
 }
 
-const template = (templateBody: string, params: {[key: string]: string}): string => {
+const template = (templateBody: string, params: { [key: string]: string }): string => {
   const parsed = parseTemplate(templateBody, params)
   // Remove extra '\' infront of single quotes and backslashes
   return parsed.tokens.map((t) => t.replace(/\\([\\'])/g, '$1')).join('')
 }
 
-export { template  }
+export const TemplateService = { template  }

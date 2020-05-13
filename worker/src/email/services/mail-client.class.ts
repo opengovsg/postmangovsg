@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer'
 import directTransport from 'nodemailer-direct-transport'
-import { MailToSend, MailCredentials } from '@email/mail.interface'
 import logger from '@core/logger'
+import { MailToSend, MailCredentials } from '@email/interfaces'
 
-export default class MailService {
+export default class MailClient {
   private email: string
   private mailer: nodemailer.Transporter
 
