@@ -22,6 +22,7 @@ const storeTemplateValidator = {
       .required(),
     replyTo: Joi
       .string()
+      .allow(null)
       .email()
       .options({ convert: true })
       .lowercase(),
