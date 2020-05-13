@@ -1,4 +1,5 @@
 import { difference, keys, chunk } from 'lodash'
+import validator from 'validator'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -191,10 +192,15 @@ const addToMessageLogs = async (campaignId: number, records: Array<object>): Pro
   }
 }
 
+const hasInvalidEmailRecipient = (records: MessageBulkInsertInterface[]): boolean => {
+  return records.some((record) => !validator.isEmail(record.recipient))
+}
+
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
+  hasInvalidEmailRecipient,
   client,
 }
   

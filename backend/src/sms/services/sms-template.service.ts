@@ -185,9 +185,16 @@ const addToMessageLogs = async (campaignId: number, records: Array<object>): Pro
     throw new Error('SmsMessage: destroy / bulkcreate failure')
   }
 }
+
+const hasInvalidSmsRecipient = (records: MessageBulkInsertInterface[]): boolean => {
+  const re = /^\+?[0-9]+$/
+  return records.some((record) => !re.test(record.recipient))
+}
+
 export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
+  hasInvalidSmsRecipient,
   client,
 }
