@@ -3,16 +3,16 @@
 
 .topContainer {
   background-color: $light-blue;
-  height: 100vh;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 5rem $site-padding;
+
 
   .innerContainer {
-    margin-top: 10vh;
     display: flex;
     justify-content: space-between;
-    width: 100vw - ($site-padding * 2);
 
     @include mobile() {
       justify-content: center;
@@ -21,9 +21,7 @@
     .landingImg {
       width: 680px;
       height: 430px;
-      // img {
-      //   vertical-align: bottom;
-      // }
+
       @include mobile() {
         display: none;
       }
@@ -101,8 +99,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100vw - ($site-padding * 2);
-
 
     .agencyHeader {
       font-size: 1rem;
@@ -111,7 +107,7 @@
     }
 
     .agencies {
-      margin-top: 40px;
+      margin-top: 3rem;
       display: flex;
       justify-content: space-between;
 
@@ -123,18 +119,15 @@
 }
 
 .howItWorks {
-  height: 90vh;
+  height: auto;
   background-color: $dark-blue;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 5rem $site-padding;
 
-  @include mobile() {
-    min-height: 135vh;
-  }
 
   h1 {
-    padding-top: 10vh;
     color: #b5c4ff;
     font-weight: bold;
     font-size: 3rem;
@@ -202,11 +195,11 @@
 
 .whyUsePostman {
   height: auto;
+  padding: 5rem $site-padding;
+
 
   .innerContainer {
-    margin: 0 auto;
     height: 100%;
-    width: 80%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -214,8 +207,7 @@
     h1 {
       color: $indigo-blue;
       font-weight: bold;
-      font-size: 2.5rem;
-      padding-top: 3rem;
+      font-size: 3rem;
     }
 
     h3 {
@@ -248,8 +240,6 @@
       display: flex;
       align-items: center;
 
-      padding-bottom: 8vh;
-
       img {
         width: 150px;
         height: 150px;
@@ -281,7 +271,7 @@
 .faq {
   height: auto;
   background-color: $light-blue;
-  padding: 5rem $site-padding*8;
+  padding: 3rem $site-padding*8;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -325,9 +315,13 @@
 .onboarding {
   padding: 3rem $site-padding*8;
   background-color: $indigo-blue;
-  height: auto;
+  height: 50vh;
   display: flex;
   flex-direction: row;
+
+  @include mobile() {
+    height: auto;
+  }
 
   .onboardingImg {
     width:40%;
@@ -361,6 +355,7 @@
       .getStartedButton {
         color: $light-blue;
         border: 1px solid $light-blue;
+        min-width: 10rem;
       }
 
       a {
