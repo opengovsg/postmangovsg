@@ -49,21 +49,21 @@ const Landing = () => {
   const trustedAgencies = [
     { img: mohAgencyImg, alt: 'MOH' },
     { img: mohAgencyImg, alt: 'MOH' },
-    { img: mohAgencyImg, alt: 'MOH' }
+    { img: mohAgencyImg, alt: 'MOH' },
   ]
 
   const features = [
     { img: chooseChannelImg, alt: 'Choose channel', title: 'Choose Channel', text: 'Select either SMS or email and name the campaign' },
     { img: createMessageImg, alt: 'Create message', title: 'Create Message', text: 'Personalise messages using attributes' },
-    { img: uploadContactsImg, alt: 'Upload contacts', title: 'Upload Contacts', text: 'Upload recipients list in CSV format'},
-    { img: sendMessageImg, alt: 'Send message', title: 'Send Message', text: 'Do a test send before mass sendout'}
+    { img: uploadContactsImg, alt: 'Upload contacts', title: 'Upload Contacts', text: 'Upload recipients list in CSV format' },
+    { img: sendMessageImg, alt: 'Send message', title: 'Send Message', text: 'Do a test send before mass sendout' },
   ]
 
   const questions = [
-    {text: 'When does Postman send my message?', answer: 'Postman currently supports send NOW.'},
-    {text: 'Where do messages go and how do I know that Postman delivered it successfully?', answer: 'Messages go to the recipients that you specified. Like Fedex, you can track your package. Postman tells you the number of failed deliveries and you can reattempt delivery.'},
-    {text: 'Is Postman free?', answer: 'Sending an email is free. SMS & WhatsApp will be charged based on WhatsApp and Twilio SMS rates.'},
-    {text: 'Is Postman secure?', answer: 'We recommend that you don’t put any sensitive information in the sms content. Some of our users generate a recipient specific unique link that opens up to a locked page. When in doubt, you should follow IM8’s guidelines on data classification.'}
+    { text: 'When does Postman send my message?', answer: 'Postman currently supports send NOW.' },
+    { text: 'Where do messages go and how do I know that Postman delivered it successfully?', answer: 'Messages go to the recipients that you specified. Like Fedex, you can track your package. Postman tells you the number of failed deliveries and you can reattempt delivery.' },
+    { text: 'Is Postman free?', answer: 'Sending an email is free. SMS & WhatsApp will be charged based on WhatsApp and Twilio SMS rates.' },
+    { text: 'Is Postman secure?', answer: 'We recommend that you don’t put any sensitive information in the sms content. Some of our users generate a recipient specific unique link that opens up to a locked page. When in doubt, you should follow IM8’s guidelines on data classification.' },
   ]
 
   return (
@@ -90,11 +90,11 @@ const Landing = () => {
           </div>
         </div>
         <div className={styles.agencyContainer}>
-            <h2 className={styles.agencyHeader}>Trusted by these agencies</h2>
-            <div className={styles.agencies}>            
-              {trustedAgencies.map(agency => <img src={agency.img} alt={agency.alt}/>)}
-            </div>
+          <h2 className={styles.agencyHeader}>Trusted by these agencies</h2>
+          <div className={styles.agencies}>
+            {trustedAgencies.map(agency => <img src={agency.img} alt={agency.alt} key={agency.img}/>)}
           </div>
+        </div>
       </div >
 
       <div className={styles.howItWorks}>
@@ -103,7 +103,7 @@ const Landing = () => {
 
         <div className={styles.features}>
           {features.map(feature =>
-            <div className={styles.feature}>
+            <div className={styles.feature} key={feature.title}>
               <img src={feature.img} alt={feature.alt}/>
               <h3>{feature.title}</h3>
               <span className={styles.featureText}>{feature.text}</span>
@@ -150,7 +150,7 @@ const Landing = () => {
               <p className={styles.longText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tellus id interdum velit laoreet id donec ultrices. Amet cursus sit amet dictum sit amet justo donec enim. Mi proin sed libero enim. Aenean et tortor at risus viverra adipiscing at in. Lectus vestibulum mattis ullamcorper velit.</p>
               <span>Lorem ipsum dolor, Agency A</span>
             </div>
-          </div>          
+          </div>
         </div>
       </div>
 
@@ -169,7 +169,7 @@ const Landing = () => {
             <li><span>No official source of information: </span>Communications come in many different forms. Lacking a consistent channel puts agencies at risks of phishing attack.</li>
           </ol>
           {questions.map(question =>
-            <div className={styles.question}>
+            <div className={styles.question} key={question.text}>
               <h3>{question.text}</h3>
               <p>{question.answer}</p>
             </div>
@@ -204,8 +204,8 @@ const Landing = () => {
           </div>
 
           <div className={styles.builtBy}>
-              <span>Built by</span>
-              <img src={ogpLogo} alt="logo"/>
+            <span>Built by</span>
+            <img src={ogpLogo} alt="logo"/>
           </div>
         </div>
         <div className={styles.lineBreak}></div>
