@@ -2,19 +2,21 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import map from 'lodash/map'
-import MailService from '@email/services/mail.service'
-import { template } from '@core/services/template.service'
+
 import logger from '@core/logger'
 import config from '@core/config'
+import MailClient from '@email/services/mail-client.class'
+import TemplateClient from '@core/services/template-client.class'
 
+const templateClient = new TemplateClient(config.xssOptions.email)
 class Email {
     private workerId: string
     private connection: Sequelize
-    private mailService: MailService
+    private mailService: MailClient
     constructor(workerId: string, connection: Sequelize){
       this.workerId = workerId
       this.connection = connection
-      this.mailService = new MailService('Postman.gov.sg <donotreply@mail.postman.gov.sg>', config.mailOptions)
+      this.mailService = new MailClient('Postman.gov.sg <donotreply@mail.postman.gov.sg>', config.mailOptions)
     }
    
     enqueueMessages(jobId: number): Promise<void>{
@@ -36,7 +38,7 @@ class Email {
       return Promise.resolve()
         .then(() => {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          return { subject: template(subject!, params), hydratedBody: template(body, params) }
+          return { subject: templateClient.template(subject!, params), hydratedBody: templateClient.template(body, params) }
         })
         .then(({ subject, hydratedBody }: {subject: string; hydratedBody: string}) => {
           return this.mailService.sendMail({

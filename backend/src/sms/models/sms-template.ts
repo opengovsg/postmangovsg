@@ -1,7 +1,7 @@
 import { BeforeCreate, BeforeUpdate, BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
 
 import { Campaign } from '@core/models/campaign'
-import { parseTemplate } from '@core/services/template.service'
+import { SmsTemplateService } from '@sms/services'
 
 @Table({ tableName: 'sms_templates' , underscored: true, timestamps: true })
 export class SmsTemplate extends Model<SmsTemplate> {
@@ -32,7 +32,7 @@ export class SmsTemplate extends Model<SmsTemplate> {
   @BeforeCreate
   static generateParams(instance: SmsTemplate): void {
     if (!instance.body) return
-    const parsedTemplate = parseTemplate(instance.body)
+    const parsedTemplate = SmsTemplateService.client.parseTemplate(instance.body)
     instance.params = parsedTemplate.variables
   }
 

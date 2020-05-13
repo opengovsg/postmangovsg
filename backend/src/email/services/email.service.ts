@@ -1,102 +1,123 @@
-import { chunk } from 'lodash'
-import { Campaign, JobQueue } from '@core/models'
-import { EmailMessage, EmailTemplate, EmailOp } from '@email/models'
+import { literal } from 'sequelize'
+
 import logger from '@core/logger'
-import { CampaignStats } from '@core/interfaces'
-import { getStatsFromTable } from '@core/services'
+import { ChannelType } from '@core/constants'
+import { Campaign, JobQueue } from '@core/models'
+import { MailService } from '@core/services'
+import { MailToSend, GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 
-
-
-const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
-  let transaction
-  try {
-    transaction = await EmailTemplate.sequelize?.transaction()
-    // update
-    if (await EmailTemplate.findByPk(campaignId, { transaction }) !== null) {
-      // .update is actually a bulkUpdate
-      const updatedTemplate: [number, EmailTemplate[]] = await EmailTemplate.update({
-        subject,
-        body,
-      }, {
-        where: { campaignId },
-        individualHooks: true, // required so that BeforeUpdate hook runs
-        returning: true,
-        transaction,
-      })
-
-      transaction?.commit()
-      return updatedTemplate[1][0]
-    }
-    // else create
-    const createdTemplate = await EmailTemplate.create({
-      campaignId, body, subject,
-    }, {
-      transaction,
+import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailTemplateService } from '@email/services'
+import { EmailContent } from '@email/interfaces'
+  
+const getEmailTemplate = (campaignId: number): Promise<EmailTemplate> => {
+  return EmailTemplate.findOne({ where: { campaignId }, attributes: ['body', 'subject'] })
+}
+  
+const getEmailContent = async (campaignId: number): Promise<EmailContent | void> => {
+  const emailTemplate = await getEmailTemplate(campaignId)
+  if (emailTemplate === null) return 
+  
+  const { body, subject } = emailTemplate
+  if (!body || !subject) return 
+  
+  return { subject, body }
+}
+  
+const getParams = async (campaignId: number): Promise<{ [key: string]: string } | void> => {
+  const emailMessage = await EmailMessage.findOne({ where: { campaignId }, attributes: ['params'] })
+  if (!emailMessage) return
+  return emailMessage.params as { [key: string]: string }
+}
+  
+const getHydratedMessage = async (campaignId: number): Promise<{ body: string; subject: string } | void> => {
+  // get email content 
+  const emailContent = await getEmailContent(campaignId)
+  
+  // Get params
+  const params = await getParams(campaignId)
+    
+  if (!emailContent || !params) return
+  
+  const subject = EmailTemplateService.client.template(emailContent.subject, params)
+  const body = EmailTemplateService.client.template(emailContent.body, params)
+  return { body, subject }
+}
+  
+const getHydratedMail = async (campaignId: number, recipient: string): Promise<MailToSend | void> => {
+  // get the body and subject 
+  const message = await getHydratedMessage(campaignId)
+  if (message){
+    const mailToSend: MailToSend=  ({
+      recipients: [recipient],
+      ...message,
     })
-
-    transaction?.commit()
-    return createdTemplate
-  } catch (err) {
-    transaction?.rollback()
-    throw err
+    return mailToSend
   }
+  return 
 }
 
+const sendEmail = async (mail: MailToSend): Promise<string | void> => {
+  try {
+    return MailService.mailClient.sendMail(mail)
+  } catch (e) {
+    logger.error(`Error while sending test email. error=${e}`)
+    return
+  }
+}
+  
+const findCampaign = (campaignId: number, userId: number): Promise<Campaign> => {
+  return Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.Email } })
+}
 /**
- * 1. delete existing entries
- * 2. bulk insert
- * 3. mark campaign as valid
- * steps 1- 3 are wrapped in txn. rollback if any fails
- * @param campaignId
- * @param records
+ * Sends a templated email to the campaign admin
+ * @param campaignId 
+ * @param recipient 
+ * @throws Error if it cannot send an email
  */
-const populateEmailTemplate = async (campaignId: number, records: Array<object>): Promise<void> => {
-  logger.info({ message: `Started populateEmailTemplate for ${campaignId}` })
-  let transaction
-
-  try {
-    transaction = await EmailMessage.sequelize?.transaction()
-    // delete message_logs entries
-    await EmailMessage.destroy({
-      where: { campaignId },
-      transaction,
-    })
-
-    const chunks = chunk(records, 5000)
-    for (let idx = 0; idx < chunks.length; idx++) {
-      const batch = chunks[idx]
-      await EmailMessage.bulkCreate(batch, { transaction })
-    }
-
-    await Campaign.update({
-      valid: true,
-    }, {
-      where: {
-        id: campaignId,
-      },
-      transaction,
-    })
-    await transaction?.commit()
-    logger.info({ message: `Finished populateEmailTemplate for ${campaignId}` })
-  } catch (err) {
-    await transaction?.rollback()
-    logger.error(`EmailMessage: destroy / bulkcreate failure. ${err.stack}`)
-    throw new Error('EmailMessage: destroy / bulkcreate failure')
-  }
+const sendCampaignMessage = async (campaignId: number, recipient: string): Promise<void> => {
+  const mail = await getHydratedMail(+campaignId, recipient)
+  if (!mail) throw new Error('No message to send')
+  // Send email using node mailer
+  const isEmailSent = await sendEmail(mail)
+  if (!isEmailSent) throw new Error(`Could not send test email to ${recipient}`)
 }
 
-const getEmailStats = async (campaignId: number): Promise<CampaignStats> => {
-  const job = await JobQueue.findOne({ where: { campaignId } })
-  if (job === null) throw new Error('Unable to find campaign in job queue table.')
+const updateCredentials = (campaignId: number): Promise<[number, Campaign[]]> => {
+  return Campaign.update({ credName: 'EMAIL_DEFAULT' }, { where: { id: campaignId } })
+}
 
-  // Gets from email ops table if status is SENDING or SENT
-  if (job.status === 'SENDING' || job.status === 'SENT') {
-    const stats = await getStatsFromTable(EmailOp, campaignId) 
-    return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
-  }
+const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetailsOutput> => {
+  const campaignDetails: CampaignDetails =  (await Campaign.findOne({ 
+    where: { id: +campaignId }, 
+    attributes: [
+      'id', 'name', 'type', 'created_at', 'valid',
+      [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+      [literal('s3_object -> \'filename\''), 'csv_filename'],
+    ],
+    include: [
+      {
+        model: JobQueue,
+        attributes: ['status', ['created_at', 'sent_at']],
+      },
+      {
+        model: EmailTemplate,
+        attributes: ['body', 'subject', 'params'],
+      }],
+  }))?.get({ plain: true }) as CampaignDetails
 
-  const stats = await getStatsFromTable(EmailMessage, campaignId) 
-  return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
-} 
+  const numRecipients: number = await EmailMessage.count(
+    {
+      where: { campaignId: +campaignId },
+    }
+  )
+  return { campaign: campaignDetails, numRecipients }
+}
 
-export { populateEmailTemplate, upsertEmailTemplate, getEmailStats }
+export const EmailService = {
+  findCampaign,
+  sendCampaignMessage,
+  updateCredentials,
+  getCampaignDetails,
+  getHydratedMessage,
+}

@@ -15,7 +15,7 @@ export interface TwilioCredentials {
  *           type: string
  *         twilio_api_key:
  *           type: string
- *         twilio_api_Secret:
+ *         twilio_api_secret:
  *           type: string
  *         twilio_messaging_service_sid:
  *           type: string

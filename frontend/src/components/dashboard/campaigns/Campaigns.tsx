@@ -9,8 +9,8 @@ import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
 import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
-import { Campaign, ChannelType } from 'classes'
-import CreateCampaign from 'components/dashboard/create-modal'
+import { Campaign, channelIcons } from 'classes'
+import CreateCampaign from 'components/dashboard/create/create-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
@@ -52,11 +52,6 @@ const Campaigns = () => {
     setCampaignsDisplayed(campaigns.slice(offset, offset + ITEMS_PER_PAGE))
   }, [campaigns, selectedPage])
 
-  const channelIcons = {
-    [ChannelType.SMS]: 'bx-message-detail',
-    [ChannelType.Email]: 'bx-envelope-open',
-  }
-
   const headers = [
     {
       name: 'Mode',
@@ -92,7 +87,7 @@ const Campaigns = () => {
       <tr key={key} onClick={() => history.push(`/campaigns/${campaign.id}`)}>
         {
           headers.map(({ render, width, name }) => (
-            <td className={styles[width]} key={name} >
+            <td className={width} key={name} >
               {render(campaign)}
             </td>
           ))
@@ -130,7 +125,7 @@ const Campaigns = () => {
               <tr>
                 {
                   headers.map(({ name, width }) => (
-                    <th className={styles[width]} key={name}>
+                    <th className={width} key={name}>
                       {name}
                     </th>
                   ))

@@ -1,129 +1,17 @@
 import { Request, Response, NextFunction } from 'express'
-import { authenticator } from 'otplib'
-import bcrypt from 'bcrypt'
-import { User } from '@core/models'
-import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import logger from '@core/logger'
-import { otpClient, mailClient } from '@core/services'
-import config from '@core/config'
-
-const SALT_ROUNDS = 10
-const { retries: OTP_RETRIES, expiry: OTP_EXPIRY, resendTimeout: OTP_RESEND_TIMEOUT } = config.otp
-
-const generateOtp = (): string => {
-  return authenticator.generate(authenticator.generateSecret())
-}
-
-const saveHashedOtp = (email: string, hashedOtp: HashedOtp): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
-    otpClient.set(email, JSON.stringify(hashedOtp), 'EX', OTP_EXPIRY, (error) => {
-      if (error) {
-        logger.error(`Failed to save hashed otp: ${error}`)
-        reject(error)
-      }
-      resolve(true)
-    })
-  })
-}
-
-const getHashedOtp = (email: string): Promise<HashedOtp> => {
-  return new Promise((resolve, reject) => {
-    otpClient.get(email, (error, value) => {
-      if (error) {
-        logger.error(`Failed to get hashed otp: ${error}`)
-        reject(new Error('Internal server error - request for otp again'))
-      }
-      if (value === null) {
-        reject(new Error('No otp found - request for otp again'))
-      }
-      resolve(JSON.parse(value))
-    })
-  })
-}
-
-const deleteHashedOtp = async (email: string): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
-    otpClient.del(email, (error, response) => {
-      if (error || response !== 1) {
-        logger.error(`Failed to delete hashed otp: ${error}`)
-        reject(error)
-      }
-      resolve(true)
-    })
-  })
-}
-
-const hasWaitTimeElapsed = async (email: string): Promise<void> => {
-  const existingHash: HashedOtp | null = await getHashedOtp(email).catch(() => {
-    // If there is no hash, just proceed
-    return null
-  })
-
-  // Check that at least WAIT_IN_SECONDS has elapsed before allowing the resend of a new otp
-  if (existingHash) {
-    const remainingTime = Math.ceil((existingHash.createdAt + (OTP_RESEND_TIMEOUT * 1000) - (new Date()).getTime()) / 1000)
-    if (remainingTime > 0) throw new Error(`Wait for ${remainingTime} seconds before requesting for a new otp`)
-  }
-}
-
-const isOtpVerified = async (input: VerifyOtpInput): Promise<boolean> => {
-  try {
-    const hashedOtp: HashedOtp = await getHashedOtp(input.email)
-    const authorized: boolean = await bcrypt.compare(input.otp, hashedOtp.hash)
-    if (authorized) {
-      await deleteHashedOtp(input.email)
-      return true
-    }
-    hashedOtp.retries -= 1
-    // if there is at least 1 retry, save the hashedOtp
-    if (hashedOtp.retries > 0) {
-      await saveHashedOtp(input.email, hashedOtp)
-    }
-    else {
-      await deleteHashedOtp(input.email)
-    }
-    return false
-  }
-  catch (e) {
-    logger.error(e)
-    return false
-  }
-}
-
-const isWhitelistedEmail = async (email: string): Promise<boolean> => {
-  const isGovEmail = /^.*\.gov\.sg$/.test(email)
-  if(!isGovEmail){ 
-    // If the email is not a .gov.sg email, check that it was  whitelisted by us manually
-    const user = await User.findOne({ where: { email: email } })
-    if (user === null) throw new Error('No user was found with this email')
-  }
-  return true
-}
-
-const sendOtp = (recipient: string, otp: string): Promise<string | void> => {
-  return mailClient.sendMail({
-    recipients: [recipient],
-    subject: 'One-Time Password (OTP) for Postman.gov.sg',
-    body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(OTP_EXPIRY / 60)} minutes.
-    Please use this to login to your Postman.gov.sg account. <p>If your OTP does not work, please request for a new OTP.</p>`,
-  })
-}
+import { AuthService } from '@core/services'
 
 const getOtp = async (req: Request, res: Response): Promise<Response> => {
   const email = req.body.email
   try {
-    await isWhitelistedEmail(email)
-    await hasWaitTimeElapsed(email)
+    await AuthService.canSendOtp(email)
   } catch (e) {
     logger.error(`Not allowed to send OTP to email=${email}`)
     return res.sendStatus(401)
   }
   try {
-    const otp = generateOtp()
-    const hashValue = await bcrypt.hash(otp, SALT_ROUNDS)
-    const hashedOtp: HashedOtp = { hash: hashValue, retries: OTP_RETRIES, createdAt: Date.now() }
-    await saveHashedOtp(email, hashedOtp)
-    await sendOtp(email, otp)
+    await AuthService.sendOtp(email)
   } catch (e) {
     logger.error(`Error sending OTP: ${e}. email=${email}`)
     return res.sendStatus(500)
@@ -134,13 +22,13 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
 
 const verifyOtp = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const { email, otp } = req.body
-  const authorized = await isOtpVerified({ email, otp })
+  const authorized = await AuthService.verifyOtp({ email, otp })
   if (!authorized) {
     return res.sendStatus(401)
   }
   try {
     if (req.session) {
-      const [user] = await User.findCreateFind({ where: { email: email } })
+      const user = await AuthService.findOrCreateUser(email)
       req.session.user = { id: user.id, createdAt: user.createdAt, updatedAt: user.updatedAt }
       return res.sendStatus(200)
     }
@@ -153,12 +41,49 @@ const verifyOtp = async (req: Request, res: Response, next: NextFunction): Promi
 
 const getUser = async (req: Request, res: Response): Promise<Response | void> => {
   if (req?.session?.user?.id) {
-    const user = await User.findOne({
-      where: { id: req?.session?.user?.id },
-    })
+    const user = await AuthService.findUser(req?.session?.user?.id)
     return res.json({ email: user?.email })
   }
   return res.json({})
 }
 
-export { getOtp, verifyOtp, getUser }
+const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  try {
+    if (AuthService.checkCookie(req)) {
+      return next()
+    }
+  
+    const user = await AuthService.getUserForApiKey(req)
+    if(user!==null && req.session){
+      // Ideally, we store the user id in res.locals for api key, because theoretically, no session was created.
+      // Practically, we have to check multiple places for the user id when we want to retrieve the id
+      // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
+      req.session.user = user
+      return next()
+    }   
+    
+    return res.sendStatus(401)
+  } catch(err) {
+    return next(err)
+  }
+}
+
+const logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  return new Promise <Response | void> ((resolve, reject) => {
+   req.session?.destroy((err) => {
+     res.cookie('postmangovsg', '', { expires: new Date() }) // Makes cookie expire immediately
+     if(!err) {
+       resolve(res.sendStatus(200))
+     }
+     reject(err)
+   })
+  }).catch(err => next(err))
+}
+
+export const AuthMiddleware = { 
+  getOtp, 
+  verifyOtp, 
+  getUser, 
+  isCookieOrApiKeyAuthenticated, 
+  logout, 
+}

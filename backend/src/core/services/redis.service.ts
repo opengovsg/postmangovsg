@@ -6,7 +6,7 @@ if (!config.redisOtpUri) {
   throw new Error('otpClient: redisOtpUri not found')
 }
 
-export const otpClient = 
+const otpClient = 
   redis.createClient({ url: config.redisOtpUri })
     .on('connect', () => {
       logger.info('otpClient: Connected')
@@ -19,7 +19,7 @@ if (!config.redisSessionUri) {
   throw new Error('sessionClient: redisSessionUri not found')
 }
 
-export const sessionClient = 
+const sessionClient = 
   redis.createClient({ url: config.redisSessionUri })
     .on('connect', () => {
       logger.info('sessionClient: Connected')
@@ -27,3 +27,8 @@ export const sessionClient =
     .on('error', (err: Error) => {
       logger.error(String(err))
     })
+
+export const RedisService = {
+  otpClient,
+  sessionClient,
+}

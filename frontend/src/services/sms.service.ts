@@ -24,10 +24,51 @@ export async function saveTemplate(campaignId: number, body: string):
   }
 }
 
-export async function validateCredentials({
+export async function validateNewCredentials({
   campaignId, accountSid, apiKey, apiSecret, messagingServiceSid, recipient,
 }: {
   campaignId: number;
+  recipient: string;
+  accountSid: string;
+  apiKey: string;
+  apiSecret: string;
+  messagingServiceSid: string;
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/sms/new-credentials`, {
+      recipient,
+      'twilio_account_sid': accountSid,
+      'twilio_api_key': apiKey,
+      'twilio_api_secret': apiSecret,
+      'twilio_messaging_service_sid': messagingServiceSid,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error validating credentials.')
+  }
+}
+
+export async function validateStoredCredentials({
+  campaignId, recipient, label,
+}: {
+  campaignId: number;
+  recipient: string;
+  label: string;
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/sms/credentials`, {
+      recipient,
+      label,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error validating credentials.')
+  }
+}
+
+
+export async function storeCredentials({
+  label, accountSid, apiKey, apiSecret, messagingServiceSid, recipient,
+}: {
+  label: string;
   accountSid: string;
   apiKey: string;
   apiSecret: string;
@@ -35,7 +76,8 @@ export async function validateCredentials({
   recipient: string;
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/sms/credentials`, {
+    await axios.post('/settings/sms/credentials', {
+      label,
       'twilio_account_sid': accountSid,
       'twilio_api_key': apiKey,
       'twilio_api_secret': apiSecret,
@@ -43,7 +85,16 @@ export async function validateCredentials({
       recipient,
     })
   } catch (e) {
-    errorHandler(e, 'Error validating credentials.')
+    errorHandler(e, 'Error saving credentials.')
+  }
+}
+
+export async function getStoredCredentials(): Promise<string[]> {
+  try {
+    const response = await axios.get('/settings/sms/credentials')
+    return response.data
+  } catch (e) {
+    errorHandler(e, 'Error retrieving stored credentials')
   }
 }
 

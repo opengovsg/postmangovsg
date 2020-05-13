@@ -6,6 +6,7 @@ import { User } from './user'
 import { JobQueue } from './job-queue'
 import { EmailTemplate } from '@email/models'
 import { SmsTemplate } from '@sms/models'
+
 @Table({ tableName: 'campaigns' , underscored: true, timestamps: true })
 export class Campaign extends Model<Campaign> {
   @HasMany(() => JobQueue, { as: 'job_queue' })

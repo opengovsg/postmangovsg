@@ -90,6 +90,16 @@ p {
   font-size: 0.9rem;
 }
 
+.clickable {
+  color: $indigo-blue;
+  cursor: pointer;
+  margin-top: 1rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 img {
   height: auto;
   max-width: 100%;
@@ -126,4 +136,34 @@ sub {
 .progress-button {
   text-align: right;
   margin-top: 3rem;
+}
+
+table {
+  width: 100%;
+  tr {
+    @include flex-horizontal;
+    border-bottom: 1px solid $transparent-blue;
+
+    td,
+    th {
+      padding: 0.75rem 0;
+
+      &.xs {
+        flex: 1.2;
+        text-align: center;
+      }
+
+      &.sm {
+        flex: 2;
+      }
+
+      &.md {
+        flex: 3;
+      }
+
+      &.lg {
+        flex: 4;
+      }
+    }
+  }
 }

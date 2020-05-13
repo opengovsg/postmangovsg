@@ -49,7 +49,7 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
         )
       case EmailProgress.Send:
         return (
-          <EmailSend numRecipients={campaign.numRecipients} />
+          <EmailSend numRecipients={campaign.numRecipients} onNext={onNext} />
         )
       default:
         return (<p>Invalid step</p>)

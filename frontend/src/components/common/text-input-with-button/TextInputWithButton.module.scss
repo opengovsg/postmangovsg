@@ -1,19 +1,23 @@
+@import 'styles/_variables';
+
 $button-width: 7rem;
 
 .inputWithButton {
-  position: relative;
   width: 100%;
   box-sizing: border-box;
-
+  display: flex;
+  margin-top: 1rem;
 
   input.textInput {
-    padding-right: $button-width + 0.5rem;
     width: 100%;
+    flex-shrink: 1;
+    margin-right: -$button-height;
+    padding-right: $button-height + 0.5rem;
   }
+}
 
-  button.inputButton {
-    position: absolute;
-    right: 0;
-    min-width: $button-width;
-  }
+.inputButton {
+  min-width: $button-width;
+  flex-grow: 1;
+  flex-shrink: 0;
 }

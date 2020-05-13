@@ -37,13 +37,29 @@ const twilioAccountSid: string = process.env.TWILIO_ACCOUNT_SID as string
 const twilioApiKey: string = process.env.TWILIO_API_KEY as string
 const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
 const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
-
 const defaultCountryCode: string = process.env.DEFAULT_COUNTRY_CODE as string
 
 //ECS
 const serviceName: string = process.env.ECS_SERVICE_NAME as string // We have to specify this
 const metadataUri: string = process.env.ECS_CONTAINER_METADATA_URI_V4 as string // This is injected by ecs agent
 
+// xss whitelist
+const xssOptionsEmail = {
+  whiteList: {
+    b: [],
+    i: [],
+    u: [],
+    br: [],
+    p: [],
+    a: ['href', 'title', 'target'],
+    img: ['src', 'alt', 'title', 'width', 'height'],
+  }, 
+  stripIgnoreTag: true, 
+}
+const xssOptionsSms = {
+  whiteList: { br: [] },
+  stripIgnoreTag: true,
+}
 export default {
   IS_PROD,
   aws: {
@@ -81,6 +97,10 @@ export default {
     messagingServiceSid: twilioMessagingServiceSid,
   },
   defaultCountryCode,
+  xssOptions: {
+    email: xssOptionsEmail,
+    sms: xssOptionsSms,
+  },
   messageWorker: {
     numSender,
     numLogger,

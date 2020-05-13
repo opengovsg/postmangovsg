@@ -23,7 +23,7 @@ BEGIN
 
 	-- An edge case exists where the status of a job is set to 'SENT', but the sending client hasn't responded to all the sent messages
 	-- In that case, finalization of the job has to be deferred, so that the response can be updated in the ops table
-	-- The check for this edge case is carried out in the log_next_job function. 
+	-- The check for this edge case is carried out in the log_job_<channel> function. 
 	IF NOT FOUND THEN
 		UPDATE job_queue SET status = 'SENT' where id = jid AND status = 'SENDING';
 	END IF;

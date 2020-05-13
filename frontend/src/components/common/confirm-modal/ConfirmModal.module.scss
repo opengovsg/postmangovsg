@@ -1,0 +1,36 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.confirm {
+  @include flex-vertical;
+  align-items: center;
+}
+
+.modalImg {
+  width: 16rem;
+  margin-bottom: 2rem;
+}
+
+.icon {
+  @include icon;
+}
+
+.greenButton {
+  @include button($turquoise-green);
+}
+
+.redButton {
+  @include button($red);
+}
+
+.title {
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 3rem;
+}

@@ -56,10 +56,21 @@ const sendMessage = (message: { id: number; recipient: string; params: {[key: st
 }
   
 const finalize = (): Promise<void> => {
-  return connection.query('SELECT log_next_job();',
-  ).then(([result]) => {
-    const campaignId = get(result, ('[0].log_next_job'), '')
-    if (campaignId) logger.info(`${workerId}: finalized campaignId=${campaignId}`)
+
+  const logEmailJob = connection.query('SELECT log_next_job_email();').then(([result]) => (get(result, ('[0].log_next_job_email'), '')))
+    .catch((err) => {
+      logger.error(err)
+    })
+
+  const logSmsJob =  connection.query('SELECT log_next_job_sms();').then(([result]) => (get(result, ('[0].log_next_job_sms'), '')))
+    .catch((err) => {
+      logger.error(err)
+    })
+
+  return Promise.all([logEmailJob, logSmsJob]).then((campaignIds) => {
+    campaignIds.filter(Boolean).forEach(campaignId => {
+      logger.info(`${workerId}: finalized campaignId=${campaignId}`)
+    })
   })
 }
 

@@ -1,0 +1,12 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.container {
+  padding: $content-top-padding $site-padding $content-bottom-padding;
+  margin: 0 auto;
+  max-width: $content-max-width;
+  width: 100%;
+  @include mobile {
+    padding: $content-top-padding $mobile-site-padding $content-bottom-padding;
+  }
+}

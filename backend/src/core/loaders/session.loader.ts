@@ -2,7 +2,7 @@ import express from 'express'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 import config from '@core/config'
-import { sessionClient } from '@core/services'
+import { RedisService } from '@core/services'
 
 const sessionLoader = ({ app }: {app: express.Application}): void => {
   const sessionStore: connectRedis.RedisStore = connectRedis(session)
@@ -16,7 +16,7 @@ const sessionLoader = ({ app }: {app: express.Application}): void => {
     saveUninitialized: false,
     cookie: config.session.cookieSettings,
     store: new sessionStore({
-      client: sessionClient,
+      client: RedisService.sessionClient,
       logErrors: true,
     }),
   }

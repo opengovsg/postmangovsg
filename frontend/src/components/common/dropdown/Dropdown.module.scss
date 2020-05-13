@@ -1,0 +1,73 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.container {
+  position: relative;
+  margin: 1rem 0;
+  max-height: $button-height;
+  overflow: visible;
+
+  .select {
+    @include flex-horizontal;
+
+    height: $button-height;
+    width: 100%;
+    border-radius: $border-radius;
+    border: 1px solid $light-grey;
+    padding: 0 $border-radius;
+    font-size: 1rem;
+    user-select: none;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $indigo-blue;
+    }
+
+    .caret {
+      position: absolute;
+      line-height: $button-height;
+      right: $border-radius;
+      font-size: 1.4rem;
+      transition: transform 100ms ease-out;
+    }
+  }
+
+  &.open {
+    .select {
+      border-color: $indigo-blue;
+
+      .caret {
+        transform: rotate(180deg);
+      }
+    }
+
+    .menu {
+      display: flex;
+    }
+  }
+
+  .menu {
+    position: relative;
+    display: none;
+    flex-direction: column;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+    box-shadow: 0.2rem 0.2rem 1rem 0 $light-grey;
+    overflow: hidden;
+
+    .item {
+      padding: 1rem $border-radius;
+      background-color: white;
+      cursor: pointer;
+      user-select: none;
+
+      &:hover {
+        background-color: $light-blue;
+      }
+
+      &:active {
+        background-color: darken($light-blue, 5%);
+      }
+    }
+  }
+}

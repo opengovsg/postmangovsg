@@ -9,6 +9,11 @@ export enum Status {
   Sent = 'sent',
 }
 
+export const channelIcons = {
+  [ChannelType.SMS]: 'bx-message-detail',
+  [ChannelType.Email]: 'bx-envelope-open',
+}
+
 export class Campaign {
   id: number
   name: string

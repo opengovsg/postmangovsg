@@ -1,99 +1,103 @@
-import { chunk } from 'lodash'
+import bcrypt from 'bcrypt'
+import { literal } from 'sequelize'
+
+import config from '@core/config'
+
+import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
-import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
-import logger from '@core/logger'
-import { CampaignStats } from '@core/interfaces'
-import { getStatsFromTable } from '@core/services'
+import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 
+import { SmsMessage, SmsTemplate } from '@sms/models'
+import { SmsTemplateService } from '@sms/services'
+import { TwilioCredentials } from '@sms/interfaces'
 
-const upsertSmsTemplate = async (body: string, campaignId: number): Promise<SmsTemplate> => {
-  let transaction
-  try {
-    transaction = await SmsTemplate.sequelize?.transaction()
-    // update
-    if (await SmsTemplate.findByPk(campaignId, { transaction }) !== null) {
-      // .update is actually a bulkUpdate
-      const updatedTemplate: [number, SmsTemplate[]] = await SmsTemplate.update({
-        body,
-      }, {
-        where: { campaignId },
-        individualHooks: true, // required so that BeforeUpdate hook runs
-        returning: true,
-        transaction,
-      })
+import TwilioClient from  './twilio-client.class'
 
-      transaction?.commit()
-      return updatedTemplate[1][0]
-    }
-    // else create
-    const createdTemplate = await SmsTemplate.create({
-      campaignId, body,
-    }, {
-      transaction,
-    })
-
-    transaction?.commit()
-    return createdTemplate
-  } catch (err) {
-    transaction?.rollback()
-    throw err
-  }
+const getParams = async (campaignId: number): Promise<{ [key: string]: string } | null> => {
+  const smsMessage = await SmsMessage.findOne({ where: { campaignId }, attributes: ['params'] })
+  if (smsMessage === null) return null
+  return smsMessage.params as { [key: string]: string }
+}
+  
+const getSmsBody = async (campaignId: number): Promise<string | null> => {
+  const smsTemplate = await SmsTemplate.findOne({ where: { campaignId }, attributes: ['body'] })
+  if (smsTemplate === null) return null
+  return smsTemplate.body as string
+}
+  
+const getEncodedHash = async (secret: string): Promise<string> => {
+  const secretHash = await bcrypt.hash(secret, config.aws.secretManagerSalt)
+  return Buffer.from(secretHash).toString('base64')
+}
+  
+const getHydratedMessage = async (campaignId: number): Promise<string | null> => {
+  const params = await getParams(campaignId)
+  const body = await getSmsBody(campaignId)
+  if (params === null || body === null) return null
+  
+  const hydratedMsg = SmsTemplateService.client.template(body, params)
+  return hydratedMsg
+}
+  
+const sendCampaignMessage = async (campaignId: number, recipient: string, credential: TwilioCredentials): Promise<string | void> => {
+  const msg = await getHydratedMessage(campaignId)
+  if (!msg) throw new Error('No message to send')
+  
+  const twilioService = new TwilioClient(credential)
+  return twilioService.send(recipient, msg)
 }
 
-/**
- * 1. delete existing entries
- * 2. bulk insert
- * 3. mark campaign as valid
- * steps 1- 3 are wrapped in txn. rollback if any fails
- * @param campaignId
- * @param records
- */
-const populateSmsTemplate = async (campaignId: number, records: Array<object>): Promise<void> => {
-  let transaction
-  try {
-    logger.info({ message: `Started populateSmsTemplate for ${campaignId}` })
-    transaction = await SmsMessage.sequelize?.transaction()
-    // delete message_logs entries
-    await SmsMessage.destroy({
-      where: { campaignId },
-      transaction,
-    })
+const sendValidationMessage = async (recipient: string, credential: TwilioCredentials): Promise<string | void> => {
+  const twilioService = new TwilioClient(credential)
+  return twilioService.send(recipient, 'Your Twilio credential has been validated.')
+}
 
-    const chunks = chunk(records, 5000)
-    for (let idx = 0; idx < chunks.length; idx++) {
-      const batch = chunks[idx]
-      await SmsMessage.bulkCreate(batch, { transaction })
-    }
+const findCampaign = (campaignId: number, userId: number): Promise<Campaign> => {
+  return Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.SMS } })
+}
 
-    await Campaign.update({
-      valid: true,
-    }, {
-      where: {
-        id: campaignId,
+const setCampaignCredential = (campaignId: number, credentialName: string): Promise<[number, Campaign[]]> => {
+  return Campaign.update({
+    credName: credentialName,
+  }, {
+    where: { id: campaignId },
+    returning: false,
+  })
+}
+
+const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetailsOutput> => {
+  const campaignDetails: CampaignDetails = (await Campaign.findOne({
+    where: { id: +campaignId },
+    attributes: [
+      'id', 'name', 'type', 'created_at', 'valid',
+      [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+      [literal('s3_object -> \'filename\''), 'csv_filename'],
+    ],
+    include: [
+      {
+        model: JobQueue,
+        attributes: ['status', ['created_at', 'sent_at']],
       },
-      transaction,
-    })
-    await transaction?.commit()
-    logger.info({ message: `Finished populateSmsTemplate for ${campaignId}` })
-  } catch (err) {
-    await transaction?.rollback()
-    logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
-    throw new Error('SmsMessage: destroy / bulkcreate failure')
-  }
+      {
+        model: SmsTemplate,
+        attributes: ['body', 'params'],
+      }],
+  }))?.get({ plain: true }) as CampaignDetails
+  
+  const numRecipients: number = await SmsMessage.count(
+    {
+      where: { campaignId: +campaignId },
+    }
+  )
+  return { campaign: campaignDetails, numRecipients }
 }
-
-const getSmsStats = async (campaignId: number): Promise<CampaignStats> => {
-  const job = await JobQueue.findOne({ where: { campaignId } })
-  if (job === null) throw new Error('Unable to find campaign in job queue table.')
-
-  // Gets from email ops table if status is SENDING, SENT, or STOPPED
-  if (job.status === 'SENDING' || job.status === 'SENT' || job.status === 'STOPPED') {
-    const stats = await getStatsFromTable(SmsOp, campaignId) 
-    return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
-  }
-
-  const stats = await getStatsFromTable(SmsMessage, campaignId) 
-  return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
-} 
-
-export { populateSmsTemplate, upsertSmsTemplate, getSmsStats }
+  
+export const SmsService = {
+  getEncodedHash,
+  findCampaign,
+  getCampaignDetails,
+  getHydratedMessage,
+  sendCampaignMessage,
+  sendValidationMessage,
+  setCampaignCredential,
+}

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { getOtp, verifyOtp, getUser, logout } from '@core/middlewares'
+import { AuthMiddleware } from '@core/middlewares'
 
 const router = Router()
 
@@ -53,7 +53,7 @@ const verifyOtpValidator = {
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/otp', celebrate(getOtpValidator), getOtp)
+router.post('/otp', celebrate(getOtpValidator), AuthMiddleware.getOtp)
 
 /**
  * @swagger
@@ -92,7 +92,7 @@ router.post('/otp', celebrate(getOtpValidator), getOtp)
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/login', celebrate(verifyOtpValidator), verifyOtp)
+router.post('/login', celebrate(verifyOtpValidator), AuthMiddleware.verifyOtp)
 
 /**
  * @swagger
@@ -114,7 +114,7 @@ router.post('/login', celebrate(verifyOtpValidator), verifyOtp)
  *                    type: string
  *        
  */
-router.get('/userinfo', getUser)
+router.get('/userinfo', AuthMiddleware.getUser)
 
 /**
  * @swagger
@@ -134,6 +134,6 @@ router.get('/userinfo', getUser)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/logout', logout)
+router.get('/logout', AuthMiddleware.logout)
 
 export default router

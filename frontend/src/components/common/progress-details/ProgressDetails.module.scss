@@ -3,7 +3,6 @@
 
 .progress {
   table {
-    width: 100%;
     margin-bottom: 3rem;
 
     tr {
@@ -22,28 +21,6 @@
 
       th {
         text-transform: capitalize;
-      }
-
-      td,
-      th {
-        padding: 0.75rem 0;
-
-        &.xs {
-          flex: 1.2;
-          text-align: center;
-        }
-
-        &.sm {
-          flex: 2;
-        }
-
-        &.md {
-          flex: 3;
-        }
-
-        &.lg {
-          flex: 4;
-        }
       }
     }
   }
