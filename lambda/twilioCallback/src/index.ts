@@ -42,7 +42,7 @@ exports.handler = async (event: any) => {
     const [username, password] = credentials.split(':')
     const plainTextPassword = username + messageId + campaignId + config.smsOptions.callbackSecret
 
-    const isValid = bcrypt.compare(plainTextPassword, password)
+    const isValid = await bcrypt.compare(plainTextPassword, password)
 
     if (!isValid) {
       console.log(`Unable to validate Twilio request for message id ${twilioMessageId}`)
