@@ -1,0 +1,50 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Postman API",
+    "version": "2020-05-13T05:32:12Z",
+    "title": "postman"
+  },
+  "host": "okpxmovlnb.execute-api.ap-northeast-1.amazonaws.com",
+  "basePath": "/staging",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/v1/campaign/{campaignId}/message/{messageId}": {
+      "post": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "postmanAuthorizer": []
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "postmanAuthorizer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "x-amazon-apigateway-authtype": "custom"
+    }
+  }
+}
