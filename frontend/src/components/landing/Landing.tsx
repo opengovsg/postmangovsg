@@ -11,9 +11,9 @@ import styles from './Landing.module.scss'
 import landingImg from 'assets/img/landing.svg'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import companyLogo from 'assets/img/brand/company-logo.svg'
-import arrowRight from 'assets/img/arrow-right.svg'
 import ogpLogo from 'assets/img/ogp-logo.svg'
-import mohAgency from 'assets/img/landing/moh.png'
+import arrowRight from 'assets/img/landing/arrow-right.svg'
+import mohAgencyImg from 'assets/img/landing/moh.png'
 
 // how it works
 import chooseChannelImg from 'assets/img/landing/choose-channel.svg'
@@ -44,6 +44,19 @@ const Landing = () => {
     window.location.href = POSTMAN_GUIDE_URL
   }
 
+  const trustedAgencies = [
+    { img: mohAgencyImg, alt: 'MOH' },
+    { img: mohAgencyImg, alt: 'MOH' },
+    { img: mohAgencyImg, alt: 'MOH' }
+  ]
+
+  const features = [
+    { img: chooseChannelImg, alt: 'Choose channel', title: 'Choose Channel', text: 'Select either SMS or email and name the campaign' },
+    { img: createMessageImg, alt: 'Create message', title: 'Create Message', text: 'Personalise messages using attributes' },
+    { img: uploadContactsImg, alt: 'Upload contacts', title: 'Upload Contacts', text: 'Upload recipients list in CSV format'},
+    { img: sendMessageImg, alt: 'Send message', title: 'Send Message', text: 'Do a test send before mass sendout'}
+  ]
+
   return (
     <>
       <Navbar></Navbar>
@@ -69,10 +82,8 @@ const Landing = () => {
         </div>
         <div className={styles.agencyContainer}>
             <h2 className={styles.agencyHeader}>Trusted by these agencies</h2>
-            <div className={styles.agencies}>
-              <img src={mohAgency} alt=""/>
-              <img src={mohAgency} alt=""/>
-              <img src={mohAgency} alt=""/>
+            <div className={styles.agencies}>            
+              {trustedAgencies.map(agency => <img src={agency.img} alt={agency.alt}/>)}
             </div>
           </div>
       </div >
@@ -82,29 +93,13 @@ const Landing = () => {
         <h2>Send mass messages to citizens with minimum setup required</h2>
 
         <div className={styles.features}>
-          <div className={styles.feature}>
-            <img src={chooseChannelImg} alt="Choose channel"/>
-            <h3>Choose Channel</h3>
-            <span className={styles.featureText}>Select either SMS or email and name the campaign</span>
-          </div>
-          
-          <div className={styles.feature}>
-            <img src={createMessageImg} alt="Create message"/>
-            <h3>Create Message</h3>
-            <span className={styles.featureText}>Personalise messages using attributes</span>
-          </div>
-
-          <div className={styles.feature}>
-            <img src={uploadContactsImg} alt="Upload contacts"/>
-            <h3>Upload Contacts</h3>
-            <span className={styles.featureText}>Upload recipients list in CSV format</span>
-          </div>
-
-          <div className={styles.feature}>
-            <img src={sendMessageImg} alt="Send message"/>
-            <h3>Send Message</h3>
-            <span className={styles.featureText}>Do a test send before mass sendout</span>
-          </div>
+          {features.map(feature =>
+            <div className={styles.feature}>
+              <img src={feature.img} alt={feature.alt}/>
+              <h3>{feature.title}</h3>
+              <span className={styles.featureText}>{feature.text}</span>
+            </div>
+          )}
         </div>
 
         <PrimaryButton className={styles.learnMoreBtn} onClick={directToGuide}>
