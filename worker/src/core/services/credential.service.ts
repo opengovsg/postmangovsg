@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk'
 import logger from '@core/logger'
 import config from '@core/config'
-import { TwilioCredentials } from '@sms/interfaces/credentials.interface'
+import { TwilioCredentials } from '@sms/interfaces'
 import { get } from 'lodash'
 
 const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
@@ -19,6 +19,6 @@ const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> =>
   return JSON.parse(secretString)
 }
 
-export {
+export const CredentialService = {
   getTwilioCredentials,
 }
