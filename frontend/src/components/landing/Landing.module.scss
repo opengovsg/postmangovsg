@@ -278,6 +278,50 @@
   }
 }
 
+.faq {
+  height: auto;
+  background-color: $light-blue;
+  padding: 5rem $site-padding*8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h1 {
+    color: $indigo-blue;
+    font-weight: bold;
+    font-size: 2.5rem;
+    padding-top: 3rem;
+    width: 100%;
+  }
+
+  .question {
+    h3 {
+      margin-top: 3.5rem;
+      color: $indigo-blue;
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+  
+    p {
+      font-size: 1.2rem;
+    }
+    
+    li {
+      font-size: 1.2rem;
+      margin: 1rem;
+
+      @include mobile() {
+        margin: 0;
+      }
+
+      span {
+        color: $dark-blue;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
 .bottomContainer {
   background-color: $transparent-blue;
 }
