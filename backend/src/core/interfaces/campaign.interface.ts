@@ -27,6 +27,7 @@ export interface CampaignDetails {
     email_templates?: {
       body: string;
       subject: string;
+      replyTo: string;
     };
     sms_templates?: {
       body: string;

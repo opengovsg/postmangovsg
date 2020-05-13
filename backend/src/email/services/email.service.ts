@@ -121,7 +121,7 @@ const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetail
       },
       {
         model: EmailTemplate,
-        attributes: ['body', 'subject', 'params'],
+        attributes: ['body', 'subject', 'params', 'replyTo'],
       }],
   }))?.get({ plain: true }) as CampaignDetails
 
