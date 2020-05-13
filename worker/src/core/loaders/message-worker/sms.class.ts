@@ -1,11 +1,13 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import map from 'lodash/map'
-import { TemplateService } from '@core/services/template.service'
-import { CredentialService } from '@core/services/credential.service'
 import logger from '@core/logger'
+import config from '@core/config'
+import { CredentialService } from '@core/services/credential.service'
+import TemplateClient from '@core/services/template-client.class'
 import TwilioClient from '@sms/services/twilio-client.class'
 
+const templateClient = new TemplateClient(config.xssOptions.sms)
 class SMS {
     private workerId: string
     private connection: Sequelize
@@ -34,7 +36,7 @@ class SMS {
     sendMessage({ id, recipient, params, body }: { id: number; recipient: string; params: {[key: string]: string}; body: string }): Promise<void> {
       return Promise.resolve()
         .then(() => {
-          return this.twilioClient?.send(recipient, TemplateService.template(body, params))
+          return this.twilioClient?.send(recipient, templateClient.template(body, params))
         })
         .then((messageId) => {
           return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
