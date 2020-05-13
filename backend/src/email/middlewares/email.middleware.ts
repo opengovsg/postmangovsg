@@ -13,11 +13,11 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
 }
 
 // Sends a test email
-const storeCredentials = async (req: Request, res: Response): Promise<Response | void> => {
+const validateAndStoreCredentials = async (req: Request, res: Response): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
     const { recipient } = req.body
-    await EmailService.sendTestMessage(+campaignId, recipient)
+    await EmailService.sendCampaignMessage(+campaignId, recipient)
     await EmailService.updateCredentials(+campaignId)
   } catch (err) {
     return res.status(400).json({ message: `${err.message}` })
@@ -48,7 +48,7 @@ const previewFirstMessage = async (req: Request, res: Response, next: NextFuncti
 
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser, 
-  storeCredentials, 
+  validateAndStoreCredentials, 
   getCampaignDetails, 
   previewFirstMessage, 
 }

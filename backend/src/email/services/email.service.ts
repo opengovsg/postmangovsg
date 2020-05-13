@@ -3,10 +3,11 @@ import { literal } from 'sequelize'
 import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
-import { TemplateService, MailService } from '@core/services'
+import { MailService } from '@core/services'
 import { MailToSend, GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailTemplateService } from '@email/services'
 import { EmailContent } from '@email/interfaces'
   
 const getEmailTemplate = (campaignId: number): Promise<EmailTemplate> => {
@@ -38,8 +39,8 @@ const getHydratedMessage = async (campaignId: number): Promise<{ body: string; s
     
   if (!emailContent || !params) return
   
-  const subject = TemplateService.template(emailContent.subject, params)
-  const body = TemplateService.template(emailContent.body, params)
+  const subject = EmailTemplateService.client.template(emailContent.subject, params)
+  const body = EmailTemplateService.client.template(emailContent.body, params)
   return { body, subject }
 }
   
@@ -74,7 +75,7 @@ const findCampaign = (campaignId: number, userId: number): Promise<Campaign> => 
  * @param recipient 
  * @throws Error if it cannot send an email
  */
-const sendTestMessage = async (campaignId: number, recipient: string): Promise<void> => {
+const sendCampaignMessage = async (campaignId: number, recipient: string): Promise<void> => {
   const mail = await getHydratedMail(+campaignId, recipient)
   if (!mail) throw new Error('No message to send')
   // Send email using node mailer
@@ -115,7 +116,7 @@ const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetail
 
 export const EmailService = {
   findCampaign,
-  sendTestMessage,
+  sendCampaignMessage,
   updateCredentials,
   getCampaignDetails,
   getHydratedMessage,

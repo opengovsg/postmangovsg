@@ -5,10 +5,10 @@ import config from '@core/config'
 
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
-import { TemplateService } from '@core/services'
 import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
+import { SmsTemplateService } from '@sms/services'
 import { TwilioCredentials } from '@sms/interfaces'
 
 import TwilioClient from  './twilio-client.class'
@@ -35,7 +35,7 @@ const getHydratedMessage = async (campaignId: number): Promise<string | null> =>
   const body = await getSmsBody(campaignId)
   if (params === null || body === null) return null
   
-  const hydratedMsg = TemplateService.template(body, params)
+  const hydratedMsg = SmsTemplateService.client.template(body, params)
   return hydratedMsg
 }
   

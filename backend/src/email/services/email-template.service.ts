@@ -1,15 +1,16 @@
 import { difference, keys, chunk } from 'lodash'
-import xss from 'xss'
 
 import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
-import { TemplateService } from '@core/services'
+import TemplateClient from '@core/services/template-client.class'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
+
+const client = new TemplateClient(config.xssOptions.email)
 
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
   let transaction
@@ -91,7 +92,7 @@ const checkNewTemplateParams = async ({
     // the keys in the template are either a subset or the same as what is present in the uploaded file
   
     try {
-      TemplateService.template(
+      client.template(
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           updatedTemplate.body!,
           firstRecord.params as { [key: string]: string }
@@ -108,17 +109,12 @@ const checkNewTemplateParams = async ({
     return { reupload: false }
   }
 }
-  
-const replaceNewLinesAndSanitize = (body: string): string => {
-  return xss.filterXSS(body.replace(/(\n|\r\n)/g,'<br/>'), config.xssOptions.email)
-}
-
 
 const storeTemplate = async ({ campaignId, subject, body }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const updatedTemplate = await upsertEmailTemplate({
-    subject: replaceNewLinesAndSanitize(subject),
-    body: replaceNewLinesAndSanitize(body),
+    subject: client.replaceNewLinesAndSanitize(subject),
+    body: client.replaceNewLinesAndSanitize(body),
     campaignId: +campaignId,
   })
   
@@ -199,5 +195,6 @@ export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
+  client,
 }
   
