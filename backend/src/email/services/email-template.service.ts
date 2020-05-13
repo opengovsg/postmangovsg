@@ -17,7 +17,7 @@ const client = new TemplateClient(config.get('xssOptions.email'))
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook, 
  * and saved to the 'params' column in email_template
  */
-const upsertEmailTemplate = async ({ subject, body, replyTo, campaignId }: {subject: string; body: string; replyTo?: string; campaignId: number}): Promise<EmailTemplate> => {
+const upsertEmailTemplate = async ({ subject, body, replyTo, campaignId }: {subject: string; body: string; replyTo: string; campaignId: number}): Promise<EmailTemplate> => {
   let transaction
   try {
     transaction = await EmailTemplate.sequelize?.transaction()

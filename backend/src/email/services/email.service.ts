@@ -23,7 +23,7 @@ const getParams = async (campaignId: number): Promise<{ [key: string]: string } 
  * Replaces template's attributes with a message's parameters to return the hydrated message
  * @param campaignId 
  */
-const getHydratedMessage = async (campaignId: number): Promise<{ body: string; subject: string; replyTo?: string } | void> => {
+const getHydratedMessage = async (campaignId: number): Promise<{ body: string; subject: string; replyTo: string } | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
 
@@ -36,7 +36,7 @@ const getHydratedMessage = async (campaignId: number): Promise<{ body: string; s
   const subject = EmailTemplateService.client.template(template?.subject!, params)
   const body = EmailTemplateService.client.template(template?.body!, params)
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
-  return { body, subject, replyTo: template.replyTo }
+  return { body, subject, replyTo: template.replyTo || "" }
 }
 
 /**
