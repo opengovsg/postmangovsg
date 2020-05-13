@@ -126,7 +126,7 @@ export default class TemplateClient {
     const parsed = this.parseTemplate(templateBody, params)
     // Remove extra '\' infront of single quotes and backslashes
     const templated = parsed.tokens.join('').replace(/\\([\\'])/g, '$1')
-    return this.replaceNewLinesAndSanitize(templated)
+    return xss.filterXSS(templated, this.xssOptions)
   }
 
   private checkTemplateKeysMatch(csvRecord: { [key: string]: string }, templateParams: Array<string>): void {
