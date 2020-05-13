@@ -4,6 +4,7 @@ export interface StoreTemplateInput {
   campaignId: number;
   subject: string;
   body: string;
+  replyTo?: string;
 }
 export interface StoreTemplateOutput {
   updatedTemplate: EmailTemplate;

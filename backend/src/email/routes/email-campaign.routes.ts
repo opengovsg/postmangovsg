@@ -20,6 +20,11 @@ const storeTemplateValidator = {
     body: Joi
       .string()
       .required(),
+    replyTo: Joi
+      .string()
+      .email()
+      .options({ convert: true })
+      .lowercase(),
   }),
 }
 
@@ -125,6 +130,8 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                   type: string
  *                   minLength: 1
  *                   maxLength: 200
+ *                 replyTo:
+ *                   type: string
  *
  *       responses:
  *         200:
