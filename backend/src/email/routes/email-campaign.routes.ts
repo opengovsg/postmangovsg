@@ -297,7 +297,7 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMidd
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddleware.canEditCampaign, EmailMiddleware.storeCredentials)
+router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddleware.canEditCampaign, EmailMiddleware.validateAndStoreCredentials)
 
 /**
  * @swagger

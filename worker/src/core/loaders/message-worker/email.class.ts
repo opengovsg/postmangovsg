@@ -2,11 +2,13 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import map from 'lodash/map'
-import MailClient from '@email/services/mail-client.class'
-import { TemplateService } from '@core/services/template.service'
+
 import logger from '@core/logger'
 import config from '@core/config'
+import MailClient from '@email/services/mail-client.class'
+import TemplateClient from '@core/services/template-client.class'
 
+const templateClient = new TemplateClient(config.xssOptions.email)
 class Email {
     private workerId: string
     private connection: Sequelize
@@ -36,7 +38,7 @@ class Email {
       return Promise.resolve()
         .then(() => {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          return { subject: TemplateService.template(subject!, params), hydratedBody: TemplateService.template(body, params) }
+          return { subject: templateClient.template(subject!, params), hydratedBody: templateClient.template(body, params) }
         })
         .then(({ subject, hydratedBody }: {subject: string; hydratedBody: string}) => {
           return this.mailService.sendMail({

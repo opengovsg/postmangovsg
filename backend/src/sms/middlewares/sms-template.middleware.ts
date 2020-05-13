@@ -82,7 +82,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      const { records, hydratedRecord } = await TemplateService.testHydration({
+      const { records, hydratedRecord } = await SmsTemplateService.client.testHydration({
         campaignId: +campaignId,
         s3Key,
         templateBody: smsTemplate.body as string,

@@ -1,13 +1,14 @@
 import { difference, keys, chunk } from 'lodash'
-import xss from 'xss'
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { Campaign } from '@core/models'
 import { isSuperSet } from '@core/utils'
-import { TemplateService } from '@core/services'
+import TemplateClient from '@core/services/template-client.class'
 import logger from '@core/logger'
 import { HydrationError } from '@core/errors'
 import config from '@core/config'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
+
+const client = new TemplateClient(config.xssOptions.sms)
 
 const upsertSmsTemplate = async ({ body, campaignId }: {body: string; campaignId: number}): Promise<SmsTemplate> => {
   let transaction
@@ -88,7 +89,7 @@ const checkNewTemplateParams = async ({
     // the keys in the template are either a subset or the same as what is present in the uploaded file
   
     try {
-      TemplateService.template(
+      client.template(
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           updatedTemplate.body!,
           firstRecord.params as { [key: string]: string }
@@ -106,13 +107,10 @@ const checkNewTemplateParams = async ({
   }
 }
   
-const replaceNewLinesAndSanitize = (body: string): string => {
-  return xss.filterXSS(body.replace(/(\n|\r\n)/g,'<br/>'), config.xssOptions.sms)
-}
-  
+
 const storeTemplate = async ({ campaignId, body }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   const updatedTemplate = await upsertSmsTemplate({ 
-    body: replaceNewLinesAndSanitize(body), 
+    body: client.replaceNewLinesAndSanitize(body), 
     campaignId: +campaignId,
   })
 
@@ -191,4 +189,5 @@ export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
+  client,
 }

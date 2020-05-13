@@ -1,12 +1,9 @@
-import S3 from 'aws-sdk/clients/s3'
-
 import S3Client from '@core/services/s3-client.class'
 import { RecipientColumnMissing } from '@core/errors'
 
 import { Readable } from 'stream'
 
-const s3 = new S3()
-const s3Client = new S3Client(s3)
+const s3Client = new S3Client()
 
 const createStream = (headers: Array<string>, values: Array<Array<string>>): Readable => {
   const head =[headers.join(',')]

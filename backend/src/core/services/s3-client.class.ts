@@ -11,8 +11,11 @@ const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
 
 export default class S3Client {
   s3: S3
-  constructor(s3: S3) {
-    this.s3 = s3
+  constructor(s3?: S3) {
+    this.s3 = s3 || new S3({
+      signatureVersion: 'v4',
+      region: config.aws.awsRegion,
+    })
   }
 
   download(key: string): NodeJS.ReadableStream {

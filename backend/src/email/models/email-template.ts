@@ -1,8 +1,7 @@
 import { BeforeCreate, BeforeUpdate, Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
-import { Campaign } from '@core/models/campaign'
-import { TemplateService } from '@core/services'
-
 import { union } from 'lodash'
+import { Campaign } from '@core/models/campaign'
+import { EmailTemplateService } from '@email/services'
 
 @Table({ tableName: 'email_templates' , underscored: true, timestamps: true })
 export class EmailTemplate extends Model<EmailTemplate> {
@@ -39,8 +38,8 @@ export class EmailTemplate extends Model<EmailTemplate> {
   static generateParams(instance: EmailTemplate): void {
     if (!instance.body) return
     if (!instance.subject) return
-    const parsedTemplateVariables = TemplateService.parseTemplate(instance.body).variables
-    const parsedSubjectVariables = TemplateService.parseTemplate(instance.subject).variables
+    const parsedTemplateVariables = EmailTemplateService.client.parseTemplate(instance.body).variables
+    const parsedSubjectVariables = EmailTemplateService.client.parseTemplate(instance.subject).variables
     instance.params = union(parsedTemplateVariables, parsedSubjectVariables)
   }
 
