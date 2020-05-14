@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
 
 import Login from './login'
-import { POSTMAN_GUIDE_URL, CONTACT_US_URL } from 'config'
+import { GUIDE_URL, CONTACT_US_URL } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Landing.module.scss'
@@ -36,7 +36,7 @@ const Landing = () => {
         <div className={styles.bottomContent}>
           <img className={styles.ogpLogo} src={ogpLogo} alt="OGP"></img>
           <div className={styles.linkBar}>
-            <a className={styles.navLink} href={POSTMAN_GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
+            <a className={styles.navLink} href={GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
             <a className={styles.navLink} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Contact Us</a>
           </div>
         </div>
