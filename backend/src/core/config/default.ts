@@ -59,6 +59,7 @@ const apiKeyVersion = 'v1'
 
 // Node mailer
 const mailPort = 465
+const mailFrom = 'Postman.gov.sg <donotreply@mail.postman.gov.sg>'
 
 // Twilio
 const defaultCountryCode = '65'
@@ -68,6 +69,7 @@ const maxRatePerJob = 150
 
 // Constant format for logging
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
+
 
 export default {
   IS_PROD,
@@ -89,6 +91,7 @@ export default {
   maxRatePerJob,
   apiKeyVersion,
   mailPort,
+  mailFrom,
   defaultCountryCode,
   MORGAN_LOG_FORMAT,
 }

@@ -57,6 +57,7 @@ const mailHost: string = process.env.SES_HOST as string
 const mailPort = parseEnvVarAsInt(process.env.SES_PORT as string) 
 const mailUser: string = process.env.SES_USER as string
 const mailPass: string = process.env.SES_PASS as string
+const mailFrom: string = process.env.SES_FROM as string
 
 // Twilio
 const twilioAccountSid: string = process.env.TWILIO_ACCOUNT_SID as string
@@ -93,6 +94,7 @@ export default {
   mailPort,
   mailUser,
   mailPass,
+  mailFrom,
   twilioAccountSid,
   twilioApiKey,
   twilioApiSecret,

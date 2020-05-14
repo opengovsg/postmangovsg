@@ -63,6 +63,7 @@ export default {
       pass: config.mailPass,
     },
   },
+  mailFrom: config.mailFrom,
   defaultCountryCode: config.defaultCountryCode,
   smsOptions: {
     accountSid: config.twilioAccountSid,
