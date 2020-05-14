@@ -16,13 +16,6 @@ exports.handler = async (event) => {
     // Retrieve headers from the Lambda function input:
     const headers = event.headers;
 
-    // Parse the input for the parameter values
-    const tmp = event.methodArn.split(':');
-    const apiGatewayArnTmp = tmp[5].split('/');
-    if (apiGatewayArnTmp[3]) {
-        resource += apiGatewayArnTmp[3];
-    }
-
     // Perform authorization to return the Allow policy for correct parameters and 
     // the 'Unauthorized' error, otherwise.
     const condition = {};
