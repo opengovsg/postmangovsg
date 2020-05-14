@@ -204,14 +204,22 @@
 
 .whyUsePostman {
   height: auto;
-  padding: 5rem $site-padding;
+  padding: 2rem $site-padding*8;
 
 
   .innerContainer {
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    @include flex-vertical;
     align-items: center;
+
+    .lineBreak {
+      width:  100%;
+      margin-left: 0;
+      margin-right: 0;
+      border: 1px solid #b5c4ff;
+      margin-top: 2rem;
+      margin-bottom: 0;
+    }
 
     h1 {
       color: $indigo-blue;
@@ -220,7 +228,7 @@
     }
 
     h3 {
-      font-size: 2rem;
+      font-size: 1.5rem;
       color: $indigo-blue;
       font-weight: bold;
     }
@@ -231,14 +239,17 @@
     }
 
     img {
+      width: 22rem;
       @include mobile() {
         display: none;
       }
     }
 
     .reason {
-      display: flex;
+      @include flex-horizontal;
+      justify-content: space-around;
       margin-bottom: 3rem;
+      width: 100%;
 
       p {
         width: 20rem;
@@ -247,32 +258,61 @@
 
     .testimonial {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      height: auto;
+      width: 100%;
+      position: relative;
+      padding-bottom: 5rem;
+      margin-top: 3rem;
 
-      img {
-        width: 150px;
-        height: 150px;
+      .inner {
+        @include flex-horizontal;
+        padding: 1rem $site-padding;
+        align-items: center;
+
+
+        img {
+          width: 10rem;
+          margin-top: 3rem;
+        }
+
+        .textContainer {
+          margin-left: 2rem;
+  
+          @include mobile() {
+            margin-left: 0;
+          }
+          
+          .longText {
+            width: 90%;
+            font-size: 1rem;
+            @include mobile() {
+              width: 20rem;
+            }
+          }
+  
+          span {
+            color: $indigo-blue;
+            font-size: 1rem;
+          }
+        } 
       }
 
-      .textContainer {
-        margin-left: 50px;
+      .comma {
+        position: absolute;
+        font-size: 12rem;
+        color: #9dadf5;
+      }
 
-        @include mobile() {
-          margin-left: 0;
-        }
-        
-        p {
-          width: 40rem;
-          @include mobile() {
-            width: 20rem;
-          }
-        }
+      .openInvertedComma {
+        line-height: 10rem;
+      }
 
-        span {
-          color: $indigo-blue;
-          font-size: 1rem;
-        }
-      }   
+      .closeInvertedComma {
+        right: 0.1rem;
+        bottom: 0;
+        line-height: 1rem;
+      }
     }
   }
 }
