@@ -33,6 +33,7 @@
     "threads": "^1.4.0",
     "tiny-worker": "^2.3.0",
     "twilio": "^3.42.1",
+    "validator": "^13.0.0",
     "winston": "^3.2.1",
     "xss": "^1.0.6"
   },

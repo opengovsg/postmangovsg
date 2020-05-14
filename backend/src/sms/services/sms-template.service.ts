@@ -8,10 +8,7 @@ import { HydrationError } from '@core/errors'
 import config from '@core/config'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const validateSmsRecipient = (recipient: string): boolean => {
-  return /^\+?[0-9]+$/.test(recipient)
-}
-
+const validateSmsRecipient = (recipient: string): boolean => (/^\+?[0-9]+$/.test(recipient))
 const client = new TemplateClient(config.xssOptions.sms, validateSmsRecipient)
 
 const upsertSmsTemplate = async ({ body, campaignId }: {body: string; campaignId: number}): Promise<SmsTemplate> => {

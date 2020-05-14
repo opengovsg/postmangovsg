@@ -3,12 +3,20 @@ import { mapKeys } from 'lodash'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import logger from '@core/logger'
-import { TemplateError } from '@core/errors/template.errors'
+import { TemplateError, InvalidRecipientError } from '@core/errors/template.errors'
 
+type ValidateRecipientFunction = (recipient: string) => boolean
 export default class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
-  constructor(xssOptions?: xss.IFilterXSSOptions){
+  validateRecipient: ValidateRecipientFunction | undefined
+  /**
+   * Constructor for TemplateClient
+   * @param validateRecipient Function to test if recipient is of a valid format
+   * @param xssOptions Whitelist of html tags that will not be stripped
+   */
+  constructor(xssOptions?: xss.IFilterXSSOptions, validateRecipient?: ValidateRecipientFunction) {
     this.xssOptions = xssOptions
+    this.validateRecipient = validateRecipient
   }
 
   replaceNewLinesAndSanitize(value: string): string {
@@ -74,16 +82,24 @@ export default class TemplateClient {
               
               // if no params continue with the loop
               if (!params) return
-  
+              
+              if (key === 'recipient') {
+                const recipient = dict[key]
+                if (!recipient) {
+                  // recipient key must have param
+                  throw new TemplateError(`Param ${templateObject.c} not found`)
+                } else if (this.validateRecipient !== undefined && !this.validateRecipient(recipient)) {
+                  throw new InvalidRecipientError()
+                }
+              }
+             
+
               // if params provided == attempt to carry out templating
               if (dict[key]) {
                 const templated = dict[key]
                 tokens.push(templated)
                 return
               }
-  
-              // recipient key must have param
-              if (key === 'recipient') throw new TemplateError(`Param ${templateObject.c} not found`)
   
             } else { // I have not found an edge case that trips this yet
               logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)
@@ -110,7 +126,6 @@ export default class TemplateClient {
       throw err
     }
   }
-
   template(templateBody: string, params: { [key: string]: string }): string {
     const parsed = this.parseTemplate(templateBody, params)
     // Remove extra '\' infront of single quotes and backslashes

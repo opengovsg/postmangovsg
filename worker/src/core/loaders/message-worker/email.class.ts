@@ -2,13 +2,17 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import map from 'lodash/map'
+import validator from 'validator'
 
 import logger from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
 import TemplateClient from '@core/services/template-client.class'
 
-const templateClient = new TemplateClient(config.xssOptions.email)
+
+const validateEmailRecipient = (recipient: string): boolean => (validator.isEmail(recipient))
+const templateClient = new TemplateClient(config.xssOptions.email, validateEmailRecipient)
+
 class Email {
     private workerId: string
     private connection: Sequelize

@@ -11,10 +11,7 @@ import TemplateClient from '@core/services/template-client.class'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
-const validateEmailRecipient = (recipient: string): boolean => {
-  return validator.isEmail(recipient)
-}
-
+const validateEmailRecipient = (recipient: string): boolean => (validator.isEmail(recipient))
 const client = new TemplateClient(config.xssOptions.email, validateEmailRecipient)
 
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
