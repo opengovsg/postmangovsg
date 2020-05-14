@@ -24,7 +24,7 @@ const Account = () => {
 
   return (
     <>
-      <TitleBar title={'Account'}> </TitleBar>
+      <TitleBar title="Settings"> </TitleBar>
       <div className={styles.container}>
         <ApiKey hasApiKey={hasApiKey} />
         <div className="separator"></div>
