@@ -83,8 +83,10 @@ const Landing = () => {
               <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
                 Sign in <img className={styles.arrowRight} src={arrowRight}/>
               </PrimaryButton>
-              <span className={styles.needHelp}>Need help?</span>
-              <a className={styles.contactUs} href={CONTACT_US_URL}>Talk to us</a>
+              <div>
+                <span className={styles.needHelp}>Need help?</span>
+                <a className={styles.contactUs} href={CONTACT_US_URL}>Talk to us</a>
+              </div>
             </div>
           </div>
           <div className={styles.landingImg}>
