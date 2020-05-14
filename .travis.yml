@@ -63,46 +63,45 @@ jobs:
     script:
       - npm run lint
       - CI=false npm run build
-  - name: lambda
+  - name: serverless
     before_deploy:
-      - cd lambda
-      - cd log-twilio-callback &&  zip -qr code.zip build package.json node_modules/
+      - cd serverless/log-twilio-callback
+      - npm install && npm run build
+      - zip -qr code.zip build package.json node_modules/
       - cd ../postman-api-gateway-authorizer && zip -qr code.zip *
     deploy:
       - provider: lambda
         function_name: log-twilio-callback-staging
-        region: ap-southeast-1
-        role: // INSERT ROLE HERE
+        region: $AWS_DEFAULT_REGION
+        role: $TWILIO_CALLBACK_STAGING_ROLE
         runtime: nodejs12.x
         module_name: build/index
         handler_name: handler
         publish: true
         zip: "../log-twilio-callback/code.zip"
         environment_variables:
-          - BACKEND_URL=$BACKEND_URL
           - TWILIO_CALLBACK_SECRET=$TWILIO_CALLBACK_SECRET
           - DB_URI=$DB_URI
         on:
           branch: $STAGING_BRANCH
       - provider: lambda
         function_name: log-twilio-callback-production
-        region: ap-southeast-1
-        role: // INSERT ROLE HERE
+        region: $AWS_DEFAULT_REGION
+        role: $TWILIO_CALLBACK_PRODUCTION_ROLE
         runtime: nodejs12.x
         module_name: build/index
         handler_name: handler
         publish: true
         zip: "../log-twilio-callback/code.zip"
         environment_variables:
-          - BACKEND_URL=$BACKEND_URL
           - TWILIO_CALLBACK_SECRET=$TWILIO_CALLBACK_SECRET
           - DB_URI=$DB_URI
         on:
           branch: $PRODUCTION_BRANCH
       - provider: lambda
         function_name: postman-api-gateway-authorizer
-        region: ap-southeast-1
-        role: // INSERT ROLE HERE
+        region: $AWS_DEFAULT_REGION
+        role: $POSTMAN_AUTHORIZER_ROLE
         runtime: nodejs12.x
         handler_name: handler
         publish: true

@@ -99,7 +99,7 @@ export default {
     apiSecret: twilioApiSecret,
     messagingServiceSid: twilioMessagingServiceSid,
     callbackSecret: twilioCallbackSecret,
-    callbackBackendUrl: backendUrl
+    callbackBackendUrl: backendUrl,
   },
   defaultCountryCode,
   xssOptions: {
