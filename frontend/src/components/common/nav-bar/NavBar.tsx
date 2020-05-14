@@ -8,7 +8,7 @@ import CreateModal from 'components/dashboard/create/create-modal'
 import { logout } from 'services/auth.service'
 import { AuthContext } from 'contexts/auth.context'
 
-import AppLogo from 'assets/img/app-logo-reverse.svg'
+import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
 
 const NavBar = () => {
