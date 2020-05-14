@@ -6,6 +6,9 @@ const parseEnvVarAsInt = (i: string): number | undefined => {
   return isNaN(j) ? undefined : j
 }
 
+// App name
+const APP_NAME = process.env.APP_NAME
+
 // Environment
 const IS_PROD = process.env.NODE_ENV !== undefined ? process.env.NODE_ENV === 'production' : undefined
 
@@ -74,6 +77,7 @@ const maxRatePerJob = parseEnvVarAsInt(process.env.MAX_RATE_PER_JOB as string)
 const domains = process.env.DOMAIN_WHITELIST as string 
 
 export default {
+  APP_NAME,
   IS_PROD,
   databaseUri,
   SEQUELIZE_POOL_MAX_CONNECTIONS,

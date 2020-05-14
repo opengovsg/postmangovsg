@@ -162,9 +162,9 @@ const sendOtp = async (email: string): Promise<string | void> => {
 
   return MailService.mailClient.sendMail({
     recipients: [email],
-    subject: 'One-Time Password (OTP) for Postman.gov.sg',
+    subject: `One-Time Password (OTP) for ${config.APP_NAME}`,
     body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(OTP_EXPIRY / 60)} minutes.
-    Please use this to login to your Postman.gov.sg account. <p>If your OTP does not work, please request for a new OTP.</p>`,
+    Please use this to login to your ${config.APP_NAME} account. <p>If your OTP does not work, please request for a new OTP.</p>`,
   })
 }
 

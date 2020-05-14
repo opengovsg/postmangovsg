@@ -2,6 +2,8 @@
 /**
  * @file Non sensitive configuration that can be hard coded for a development environment
  */
+// App name
+const APP_NAME = 'Postman.gov.sg'
 
 // Environment
 const IS_PROD = false
@@ -59,7 +61,7 @@ const apiKeyVersion = 'v1'
 
 // Node mailer
 const mailPort = 465
-const mailFrom = 'Postman.gov.sg <donotreply@mail.postman.gov.sg>'
+const mailFrom = `${APP_NAME} <donotreply@mail.postman.gov.sg>`
 
 // Twilio
 const defaultCountryCode = '65'
@@ -74,6 +76,7 @@ const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-
 const domains = '.gov.sg'
 
 export default {
+  APP_NAME,
   IS_PROD,
   SEQUELIZE_POOL_MAX_CONNECTIONS,
   SEQUELIZE_POOL_MIN_CONNECTIONS,

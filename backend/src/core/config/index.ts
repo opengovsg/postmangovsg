@@ -21,6 +21,7 @@ default:
 }
 
 export default {
+  APP_NAME: config.APP_NAME,
   IS_PROD: config.IS_PROD,
   aws: {
     awsRegion: config.awsRegion,
