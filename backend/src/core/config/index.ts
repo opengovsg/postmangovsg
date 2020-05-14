@@ -6,7 +6,7 @@ import envConfig from './env'
 import getDomainValidator from './utils/get-domain-validator'
 
 let config
-const ENVIRONMENT = (process.env.ENVIRONMENT as string || 'development').toLowerCase()
+const ENVIRONMENT = (process.env.ENVIRONMENT as string || 'production').toLowerCase()
 // The left-to-right order of merging is important
 // as right will override left
 switch (ENVIRONMENT) {
