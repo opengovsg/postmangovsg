@@ -3,6 +3,7 @@ import defaultConfig from './default'
 import stagingConfig from './staging'
 import productionConfig from './production'
 import envConfig from './env'
+import getDomainValidator from './utils/get-domain-validator'
 
 let config
 const ENVIRONMENT = (process.env.ENVIRONMENT as string || 'development').toLowerCase()
@@ -80,4 +81,5 @@ export default {
     salt: config.apiKeySalt,
     version: config.apiKeyVersion,
   },
+  validateDomain: getDomainValidator(config.domains),
 }

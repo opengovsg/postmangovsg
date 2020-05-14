@@ -68,6 +68,11 @@ const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_S
 // Rate for job (any rate higher than this will be split)
 const maxRatePerJob = parseEnvVarAsInt(process.env.MAX_RATE_PER_JOB as string)
 
+// Domain whitelist
+// list of domains split by semicolon
+// .gov.sg;@moe.edu.sg will allow any emails @<agency>.gov.sg and @moe.edu.sg
+const domains = process.env.DOMAIN_WHITELIST as string 
+
 export default {
   IS_PROD,
   databaseUri,
@@ -100,4 +105,5 @@ export default {
   twilioApiSecret,
   twilioMessagingServiceSid,
   maxRatePerJob,
+  domains,
 }

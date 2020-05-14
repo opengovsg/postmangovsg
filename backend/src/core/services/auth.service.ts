@@ -91,9 +91,9 @@ const hasWaitTimeElapsed = async (email: string): Promise<void> => {
  * @param email 
  */
 const isWhitelistedEmail = async (email: string): Promise<boolean> => {
-  const isGovEmail = /^.*\.gov\.sg$/.test(email)
-  if(!isGovEmail){ 
-    // If the email is not a .gov.sg email, check that it was  whitelisted by us manually
+  const endsInWhitelistedDomain = config.validateDomain(email)
+  if (!endsInWhitelistedDomain){ 
+    // If the email does not end in a whitelisted domain, check that it was  whitelisted by us manually
     const user = await User.findOne({ where: { email: email } })
     if (user === null) throw new Error('No user was found with this email')
   }
@@ -107,7 +107,7 @@ const isWhitelistedEmail = async (email: string): Promise<boolean> => {
 const getApiKey = (req: Request): string | null => {
   const headerKey = 'Bearer'
   const authHeader = req.get('authorization')
-  if(!authHeader) return null
+  if (!authHeader) return null
     
   const [header, apiKey] = authHeader.split(' ')
   if (headerKey !== header) return null
@@ -124,7 +124,7 @@ const getApiKey = (req: Request): string | null => {
  */
 const getUserForApiKey = async (req: Request): Promise<User | null> => {
   const apiKey = getApiKey(req)
-  if(apiKey !== null) {
+  if (apiKey !== null) {
     const hash = await ApiKeyService.getApiKeyHash(apiKey)
     const user = await User.findOne({ where: { apiKey: hash } , attributes: ['id'] })
     return user

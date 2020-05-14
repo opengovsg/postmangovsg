@@ -70,6 +70,8 @@ const maxRatePerJob = 150
 // Constant format for logging
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
 
+// Domain whitelist
+const domains = '.gov.sg'
 
 export default {
   IS_PROD,
@@ -94,4 +96,5 @@ export default {
   mailFrom,
   defaultCountryCode,
   MORGAN_LOG_FORMAT,
+  domains,
 }
