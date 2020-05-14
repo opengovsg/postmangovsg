@@ -21,6 +21,7 @@ const CredLabelInput = ({ value, onChange }: { value: string; onChange: (newValu
         value={value}
         maxLength="50"
         onChange={onLabelChange}
+        transparent
       />
     </>
   )
