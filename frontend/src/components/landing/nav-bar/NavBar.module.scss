@@ -7,7 +7,6 @@ $navbar-mobile-height: 4rem;
 .navBar {
   @include flex-horizontal;
   height: $navbar-height;
-  z-index: 100;
   padding: 0 $site-padding;
   justify-content: space-between;
   width: 100%;
@@ -33,7 +32,7 @@ $navbar-mobile-height: 4rem;
       @include flex-horizontal;
 
       img {
-        height: 2rem;
+        height: 3rem;
       }
     }
   }

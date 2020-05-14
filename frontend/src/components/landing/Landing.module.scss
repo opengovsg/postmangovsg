@@ -7,20 +7,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 5rem $site-padding;
+  padding: 2rem 0 $site-padding;
+  background-image: url('../../assets/img/landing/Background.png');
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-size: 50%;
 
+  @include mobile() {
+    background-image: none;
+  }
 
   .innerContainer {
     display: flex;
     justify-content: space-between;
+    padding: 4rem $site-padding;
 
     @include mobile() {
       justify-content: center;
     }
 
     .landingImg {
-      width: 680px;
+      max-width: 680px;
       height: 430px;
+      object-fit: contain;
 
       @include mobile() {
         display: none;
