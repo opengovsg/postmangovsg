@@ -24,6 +24,7 @@ const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 
 // Express session
 const sessionSecret: string = process.env.SESSION_SECRET as string
+const cookieName: string = process.env.COOKIE_NAME as string
 const cookieDomain: string = process.env.COOKIE_DOMAIN as string
 const cookieSettings = {
   httpOnly: process.env.COOKIE_HTTP_ONLY,
@@ -86,6 +87,7 @@ export default {
   redisOtpUri,
   redisSessionUri,
   sessionSecret,
+  cookieName,
   cookieDomain,
   cookieSettings,
   frontendUrl,

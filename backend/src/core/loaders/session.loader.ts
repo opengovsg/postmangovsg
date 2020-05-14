@@ -14,7 +14,7 @@ const sessionLoader = ({ app }: {app: express.Application}): void => {
     throw new Error('config.session.secret required but missing')
   }
   const sessionOptions: session.SessionOptions = {
-    name: 'postmangovsg',
+    name: config.session.cookieName,
     secret: config.session.secret,
     resave: true,
     saveUninitialized: false,

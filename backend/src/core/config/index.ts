@@ -47,6 +47,7 @@ export default {
   MORGAN_LOG_FORMAT: config.MORGAN_LOG_FORMAT,
   frontendUrl: config.frontendUrl,
   session: {
+    cookieName: config.cookieName,
     secret: config.sessionSecret,
     cookieSettings: config.cookieSettings,
   },

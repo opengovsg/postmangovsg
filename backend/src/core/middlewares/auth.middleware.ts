@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import config from '@core/config'
 import logger from '@core/logger'
 import { AuthService } from '@core/services'
 
@@ -77,7 +78,7 @@ const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: 
     }
   
     const user = await AuthService.getUserForApiKey(req)
-    if(user!==null && req.session){
+    if (user!==null && req.session){
       // Ideally, we store the user id in res.locals for api key, because theoretically, no session was created.
       // Practically, we have to check multiple places for the user id when we want to retrieve the id
       // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
@@ -86,7 +87,7 @@ const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: 
     }   
     
     return res.sendStatus(401)
-  } catch(err) {
+  } catch (err) {
     return next(err)
   }
 }
@@ -100,8 +101,8 @@ const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: 
 const logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   return new Promise <Response | void> ((resolve, reject) => {
    req.session?.destroy((err) => {
-     res.cookie('postmangovsg', '', { expires: new Date() }) // Makes cookie expire immediately
-     if(!err) {
+     res.cookie(config.session.cookieName, '', { expires: new Date() }) // Makes cookie expire immediately
+     if (!err) {
        resolve(res.sendStatus(200))
      }
      reject(err)

@@ -15,6 +15,7 @@ const SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS = 600000
 const rdsCa = false
 
 // Express session
+const cookieName = 'postmangovsg'
 const cookieDomain = 'localhost'
 const cookieSettings = {
   httpOnly: true,
@@ -82,6 +83,7 @@ export default {
   SEQUELIZE_POOL_MIN_CONNECTIONS,
   SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS,
   rdsCa,
+  cookieName,
   cookieDomain,
   cookieSettings,
   frontendUrl,
