@@ -34,6 +34,8 @@ $content-width: 600px;
     padding: 3rem 3rem;
     margin: auto;
   }
+
+  @include scrollbar($light-blue, $grey)
 }
 
 .close {

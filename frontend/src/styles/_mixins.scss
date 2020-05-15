@@ -143,3 +143,19 @@ $widescreen: 1216px;
     font-size: 1rem;
   }
 }
+
+@mixin scrollbar($backgroundColor, $scrollbarColor) {
+  // Custom styling of the scrollbar, also ensures that the scrollbar is always visible regardless
+  // of input device. This only works for webkit-based browsers (e.g. Chrome, Safari).
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $scrollbarColor;
+    border-radius: 20px;
+    border: 3px solid $backgroundColor;
+  }
+}
