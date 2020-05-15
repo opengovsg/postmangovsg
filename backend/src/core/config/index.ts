@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import merge from 'lodash/merge' // Recursively merges from left to right, skipping undefined values
 import defaultConfig from './default'
 import stagingConfig from './staging'
@@ -18,6 +19,7 @@ case 'production':
   break
 default:
   config = merge(defaultConfig, envConfig)
+  break 
 }
 
 export default {

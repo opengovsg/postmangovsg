@@ -1,16 +1,30 @@
 /**
  *  @file Use env vars to override any of the config variables
  */
+
+/**
+  * If value is not a valid number, return undefined
+  * @param i string
+  */
 const parseEnvVarAsInt = (i: string): number | undefined => {
   const j = parseInt(i)
   return isNaN(j) ? undefined : j
 }
 
+/**
+ *  If value is not defined, return undefined, otherwise, return the evaluated value
+ * @param value 
+ * @param valueIfDefined 
+ */
+const parseIfDefined = (value: string | undefined, valueIfDefined: string | boolean ): string | boolean | undefined => {
+  return value === undefined ? undefined : valueIfDefined
+} 
+
 // App name
-const APP_NAME = process.env.APP_NAME
+const APP_NAME = process.env.APP_NAME as string
 
 // Environment
-const IS_PROD = process.env.NODE_ENV !== undefined ? process.env.NODE_ENV === 'production' : undefined
+const IS_PROD = parseIfDefined(process.env.NODE_ENV, process.env.NODE_ENV === 'production')
 
 // Database settings
 const databaseUri: string = process.env.DB_URI as string
@@ -28,9 +42,9 @@ const cookieName: string = process.env.COOKIE_NAME as string
 const cookieDomain: string = process.env.COOKIE_DOMAIN as string
 const cookieSettings = {
   httpOnly: process.env.COOKIE_HTTP_ONLY,
-  secure: process.env.COOKIE_SECURE === 'true',
+  secure: parseIfDefined(process.env.COOKIE_SECURE,  process.env.COOKIE_SECURE === 'true'),
   maxAge: parseEnvVarAsInt(process.env.COOKIE_MAX_AGE as string),
-  sameSite: process.env.COOKIE_SAME_SITE === 'true',
+  sameSite: parseIfDefined(process.env.COOKIE_SAME_SITE, process.env.COOKIE_SAME_SITE === 'true'),
   domain: cookieDomain,
   path:  process.env.COOKIE_PATH,
 }
