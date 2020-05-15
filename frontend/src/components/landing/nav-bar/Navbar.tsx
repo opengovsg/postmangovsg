@@ -13,11 +13,9 @@ const NavBar = () => {
 
   return (
     <nav className={styles.navBar}>
-      <div className={styles.navBrand}>
-        <a className={styles.appLogo}>
-          <img src={AppLogo} alt="Postman logo" />
-        </a>
-      </div>
+      <a className={styles.appLogo}>
+        <img src={AppLogo} alt="Postman logo" />
+      </a>
       <div className={styles.navbarLinks}>
         <div className={styles.links}>
           <a className={styles.link} href={POSTMAN_CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>

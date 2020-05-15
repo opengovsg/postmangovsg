@@ -15,27 +15,17 @@ $navbar-mobile-height: 4rem;
     height: $navbar-mobile-height;
     flex-direction: row;
     justify-content: space-around;
-    padding: 0;
+    padding: 0 $mobile-site-padding;
   }
 
-  .navBrand {
+  .appLogo {
     @include flex-horizontal;
-    justify-content: flex-start;
-
-    @include mobile() {
-      justify-content: space-between;
-      padding: 0 $mobile-site-padding;
-    }
-
-    .appLogo {
-      margin-right: 2rem;
-      @include flex-horizontal;
-
-      img {
-        height: 3rem;
-      }
+    img {
+      border: 1px solid blue;
+      height: 3rem;
     }
   }
+  
   .navbarLinks {
     display: flex;
     align-items: center;
