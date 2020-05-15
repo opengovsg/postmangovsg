@@ -7,6 +7,6 @@
 
 **DB schema**
 
-![DB Diagram](./5ea9488f39d18f5553fe68ff.png)
+![DB Diagram](./5ebe329c39d18f5553ff3cde.png)
 
-Generated at [https://dbdiagram.io/d/5ea9488f39d18f5553fe68ff](https://dbdiagram.io/d/5ea9488f39d18f5553fe68ff)
+Generated at [https://dbdiagram.io/d/5ebe329c39d18f5553ff3cde](https://dbdiagram.io/d/5ebe329c39d18f5553ff3cde)
