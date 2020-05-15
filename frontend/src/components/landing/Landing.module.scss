@@ -1,6 +1,8 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+$section-vertical-padding: 4rem;
+
 .topContainer {
   background-color: $light-blue;
   height: auto;
@@ -44,7 +46,6 @@
       }
 
       .headerText {
-        border: 1px solid red;
         color: $indigo-blue;
         font-size: 3rem;
         width: 90%;
@@ -152,10 +153,9 @@
 .howItWorks {
   height: auto;
   background-color: $dark-blue;
-  display: flex;
-  flex-direction: column;
+  @include flex-vertical;
   align-items: center;
-  padding: 5rem $site-padding;
+  padding: $section-vertical-padding $site-padding;
 
 
   h1 {
@@ -207,7 +207,7 @@
       font-weight: bold;
     }
     .featureText {
-      width: 60%;
+      width: 70%;
       color: $light-blue;
       font-size: 1.2rem;
       text-align: center;
@@ -217,7 +217,7 @@
   }
 
   .learnMoreBtn {
-    margin-top: 5rem;
+    margin-top: 4rem;
     width: 193px;
     border: 1px solid $light-blue;
     background-color: $dark-blue;
@@ -226,7 +226,7 @@
 
 .whyUsePostman {
   height: auto;
-  padding: 2rem $site-padding*8;
+  padding: $section-vertical-padding $site-padding*8;
 
   @include mobile() {
     padding: 2rem $site-padding;
@@ -360,7 +360,7 @@
 .faq {
   height: auto;
   background-color: $light-blue;
-  padding: 3rem $site-padding*8;
+  padding: $section-vertical-padding $site-padding*8;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -369,7 +369,6 @@
     color: $indigo-blue;
     font-weight: bold;
     font-size: 2.5rem;
-    padding-top: 3rem;
     width: 100%;
   }
 
@@ -402,11 +401,10 @@
 }
 
 .onboarding {
-  padding: 3rem $site-padding*8;
+  padding: $section-vertical-padding $site-padding*8;
   background-color: $indigo-blue;
-  height: 50vh;
-  display: flex;
-  flex-direction: row;
+  height: auto;
+  @include flex-horizontal;
 
   @include mobile() {
     height: auto;
