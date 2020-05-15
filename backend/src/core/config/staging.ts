@@ -23,7 +23,8 @@ const cookieSettings = {
 }
 
 // CORS settings
-const frontendUrl = 'https://staging.postman.gov.sg'
+// Regex to allow requests from all postman subdomains
+const frontendUrl = '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/'
 
 // AWS Settings
 const awsRegion = 'ap-northeast-1'
