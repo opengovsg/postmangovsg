@@ -35,8 +35,6 @@
 
     .textContainer {
       @include flex-vertical;
-      align-items: flex-start;
-      margin-bottom: 3rem;
       width: 40%;
 
       @include mobile() {
@@ -46,10 +44,12 @@
       }
 
       .headerText {
+        border: 1px solid red;
         color: $indigo-blue;
         font-size: 3rem;
         width: 90%;
         font-weight: bold;
+        line-height: 3.5rem;
 
         @include mobile() {
           font-size: 2rem;
@@ -59,18 +59,22 @@
 
       .sentMessages {
         font-size: 1rem;
+        line-height: 3rem;
 
         @include mobile() {
           @include flex-vertical;
           align-items: center;
         }
-      }
 
-      .numOfMessages {
-        font-size: 4.5rem;
+        .numOfMessages {
+          font-size: 4.0rem;
+          font-weight: 400;
+          margin-right: 0.5rem;
+        }
       }
 
       .signInRow {
+        margin-top: 3rem;
         @include flex-horizontal;
         align-items: center;
 
@@ -130,6 +134,7 @@
       font-size: 1rem;
       font-weight: 500;
       text-transform: uppercase;
+      letter-spacing: 0.64px;
     }
 
     .agencies {

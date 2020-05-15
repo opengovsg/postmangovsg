@@ -76,8 +76,8 @@ const Landing = () => {
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>Reach out to the citizens in minutes</h1>
             <h2 className={styles.sentMessages}>
-              <span className={styles.numOfMessages}>275000 </span>
-              sent messages
+              <span className={styles.numOfMessages}>275,000</span>
+              <span>sent messages</span>
             </h2>
             <div className={styles.signInRow}>
               <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
@@ -85,7 +85,7 @@ const Landing = () => {
               </PrimaryButton>
               <div>
                 <span className={styles.needHelp}>Need help?</span>
-                <a className={styles.contactUs} href={CONTACT_US_URL}>Talk to us</a>
+                <a className={styles.contactUs} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Talk to us</a>
               </div>
             </div>
           </div>
