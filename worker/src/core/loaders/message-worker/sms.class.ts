@@ -36,7 +36,7 @@ class SMS {
     sendMessage({ id, recipient, params, body, campaignId }: { id: number; recipient: string; params: {[key: string]: string}; body: string; campaignId?: number }): Promise<void> {
       return Promise.resolve()
         .then(() => {
-          return this.twilioService?.send(id, campaignId, recipient, template(body, params))
+          return this.twilioClient?.send(id, recipient, templateClient.template(body, params), campaignId)
         })
         .then((messageId) => {
           return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), message_id=:messageId WHERE id=:id;',
