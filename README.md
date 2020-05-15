@@ -131,6 +131,10 @@ See [architecture](docs/architecture/index.md) for details
 ## How messages are sent
 See [sending.md](docs/sending.md) for details
 
+## Forking and configuring this product
+### Backend
+See [configure/backend](docs/configure/backend.md) for details
+
 ## Contributions
 
 The production branch is `master`, and the development branch is `develop`.
