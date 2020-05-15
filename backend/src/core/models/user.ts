@@ -33,7 +33,7 @@ export class User extends Model<User> {
   }
 
   async regenerateAndSaveApiKey(): Promise<string> {
-    const name = this.email.split('@')[0].replace(/\W/g, '')
+    const name = this.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
     const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
     const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
     this.apiKey = apiKeyHash
