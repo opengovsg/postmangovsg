@@ -152,11 +152,15 @@ const Landing = () => {
           <div className={styles.testimonial}>
             <span className={cx(styles.openInvertedComma, styles.comma)}>&#8220;</span>
             <div className={styles.inner}>
-              <img src={userImg} alt="User"/>
+              <img className={styles.desktopImg} src={userImg} alt="User"/>
               <div className={styles.textContainer}>
                 <h3>Lorem ipsum dolor sit amet</h3>
                 <p className={styles.longText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tellus id interdum velit laoreet id donec ultrices. Amet cursus sit amet dictum sit amet justo donec enim. Mi proin sed libero enim. Aenean et tortor at risus viverra adipiscing at in. Lectus vestibulum mattis ullamcorper velit.</p>
-                <span>Lorem ipsum dolor, Agency A</span>
+                <div className={styles.agencyRow}>
+                  <img src={userImg} alt="User"/>
+                  <span>Lorem ipsum dolor, Agency A</span>
+                </div>
+                
               </div>
             </div>
             <span className={cx(styles.closeInvertedComma, styles.comma)}>&#8221;</span>

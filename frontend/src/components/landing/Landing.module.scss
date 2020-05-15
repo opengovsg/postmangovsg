@@ -298,8 +298,7 @@ $thinner-section-horizontal-padding: $site-padding * 6;
     }
 
     .testimonial {
-      display: flex;
-      flex-direction: column;
+      @include flex-vertical;
       height: auto;
       width: 100%;
       position: relative;
@@ -311,10 +310,18 @@ $thinner-section-horizontal-padding: $site-padding * 6;
         padding: 1rem 0;
         align-items: center;
 
+        @include mobile() {
+          justify-content: center;
+        }
 
-        img {
+
+        .desktopImg {
           width: 10rem;
           margin-top: 3rem;
+          
+          @include mobile() {
+            display: none;
+          }
         }
 
         .textContainer {
@@ -336,6 +343,17 @@ $thinner-section-horizontal-padding: $site-padding * 6;
             color: $indigo-blue;
             font-size: 1rem;
           }
+
+          .agencyRow {
+            @include flex-horizontal;
+            img {
+              display: none;
+              @include mobile() {
+                display: flex;
+                width: 4rem;
+              }
+            }
+          }
         } 
       }
 
@@ -343,16 +361,24 @@ $thinner-section-horizontal-padding: $site-padding * 6;
         position: absolute;
         font-size: 12rem;
         color: #9dadf5;
+
+        @include mobile() {
+          font-size: 8rem;
+        }
       }
 
       .openInvertedComma {
         line-height: 10rem;
+
+        @include mobile() {
+          line-height: 5rem;
+        }
       }
 
       .closeInvertedComma {
         right: 0.1rem;
         bottom: 0;
-        line-height: 1rem;
+        line-height: 3rem;
       }
     }
   }
