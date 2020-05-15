@@ -1,5 +1,4 @@
 import React from 'react'
-import cx from 'classnames'
 
 import { POSTMAN_GUIDE_URL, POSTMAN_CONTRIBUTE_URL } from 'config'
 import PrimaryButton from 'components/common/primary-button'

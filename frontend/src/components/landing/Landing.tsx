@@ -131,7 +131,7 @@ const Landing = () => {
             </div>
           </div>
 
-          <div className={cx(styles.reason)} id={styles.mobileReverse}>
+          <div className={styles.reason} id={styles.mobileReverse}>
             <div className={styles.textContainer}>
               <h3>Reattempt delivery</h3>
               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore</p>
