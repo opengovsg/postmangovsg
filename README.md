@@ -1,4 +1,4 @@
-<a href="https://postman.gov.sg"><img src="frontend/src/assets/img/app-logo.svg" title="Postman" alt="Postman.gov.sg"></a>
+<a href="https://postman.gov.sg"><img src="frontend/src/assets/img/brand/app-logo.svg" title="Postman" alt="Postman.gov.sg"></a>
 
 
 # Postman.gov.sg
