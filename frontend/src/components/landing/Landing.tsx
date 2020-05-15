@@ -160,7 +160,6 @@ const Landing = () => {
                   <img src={userImg} alt="User"/>
                   <span>Lorem ipsum dolor, Agency A</span>
                 </div>
-                
               </div>
             </div>
             <span className={cx(styles.closeInvertedComma, styles.comma)}>&#8221;</span>

@@ -81,6 +81,7 @@ $thinner-section-horizontal-padding: $site-padding * 6;
         align-items: center;
 
         @include mobile() {
+          margin-top: 0;
           @include flex-vertical;
         }
                 
