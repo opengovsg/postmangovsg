@@ -19,9 +19,11 @@ const NavBar = () => {
           <img src={AppLogo} alt="Postman logo" />
         </a>
       </div>
-      <div className={cx(styles.navbarLinks)}>
-        <a className={styles.link} href={POSTMAN_CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
-        <a className={styles.link} href={POSTMAN_GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
+      <div className={styles.navbarLinks}>
+        <div className={styles.links}>
+          <a className={styles.link} href={POSTMAN_CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
+          <a className={styles.link} href={POSTMAN_GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
+        </div>
         <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>Sign in</PrimaryButton>
       </div>
     </nav >

@@ -39,10 +39,16 @@ $navbar-mobile-height: 4rem;
   .navbarLinks {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    min-width: 21%;
+    min-width: 23%;
     @include mobile() {
       justify-content: center;
+    }
+
+    .links {
+      @include flex-horizontal;
+      justify-content: space-around;
+      width: 50%;
+      margin-right: calc(2rem + 1vw);
     }
 
     .link {
