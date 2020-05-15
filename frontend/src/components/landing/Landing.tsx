@@ -209,8 +209,8 @@ const Landing = () => {
               <span className={styles.title}>Postman</span>
               <span className={styles.text}>Reach out to the citizens in minutes</span>
             </div>
-            <a href={POSTMAN_GUIDE_URL}>User guide</a>
-            <a href={POSTMAN_CONTRIBUTE_URL}>Contribute</a>
+            <a href={POSTMAN_GUIDE_URL} target="_blank" rel="noopener noreferrer">User guide</a>
+            <a href={POSTMAN_CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
           </div>
 
           <div className={styles.builtBy}>
@@ -221,9 +221,9 @@ const Landing = () => {
         <div className={styles.lineBreak}></div>
         <div className={styles.footer}>
           <div className={styles.links}>
-            <a href="">Privacy</a>
-            <a href="">Terms of use</a>
-            <a href="">Report Vulnerability</a>
+            <a href="" target="_blank" rel="noopener noreferrer">Privacy</a>
+            <a href="" target="_blank" rel="noopener noreferrer">Terms of use</a>
+            <a href="" target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
           </div>
           <span>&copy; 2019 Open Government Products. Last Updated 28 April 2020</span>
         </div>

@@ -368,13 +368,13 @@ $thinner-section-horizontal-padding: $site-padding * 6;
   h1 {
     color: $indigo-blue;
     font-weight: bold;
-    font-size: 2.5rem;
+    font-size: 3rem;
     width: 100%;
   }
 
   .question {
     h3 {
-      margin-top: 3.5rem;
+      margin-top: 2rem;
       color: $indigo-blue;
       font-weight: bold;
       font-size: 1.5rem;
@@ -411,7 +411,8 @@ $thinner-section-horizontal-padding: $site-padding * 6;
   }
 
   .onboardingImg {
-    width:40%;
+    margin-left: 6rem;
+    height: 40%;
 
     @include mobile() {
       display: none;
@@ -535,6 +536,7 @@ $thinner-section-horizontal-padding: $site-padding * 6;
     display: flex;
     margin-top: 2rem;
     justify-content: space-between;
+    font-size: 1rem;
 
     @include mobile() {
       flex-direction: column;
@@ -549,6 +551,7 @@ $thinner-section-horizontal-padding: $site-padding * 6;
       a {
         color: $light-blue;
         margin-right: 2rem;
+        font-size: 1rem;
       }
     }
   }
