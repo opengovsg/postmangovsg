@@ -16,22 +16,10 @@ const origin = (v: string): string | RegExp  => {
   }
   return v
 }
-const morganFormat = ((tokens: morgan.TokenIndexer, req: Request, res: Response): string => {
-  return [
-    'HTTP/', req.httpVersion,
-    tokens.method(req, res),
-    tokens.url(req, res),
-    tokens.status(req, res),
-    tokens.res(req, res, 'content-length'), '-',
-    tokens.referrer(req, res),
-    `"${tokens.req(req, res, 'user-agent')}"`,
-    tokens['response-time'](req, res), 'ms',
-  ].join(' ')
-})
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-//@ts-ignore
-const loggerMiddleware = morgan(morganFormat, { stream: logger.stream })
+// @ts-ignore
+const loggerMiddleware = morgan(config.MORGAN_LOG_FORMAT, { stream: logger.stream })
 
 
 const expressApp = ({ app }: { app: express.Application }): void => {
