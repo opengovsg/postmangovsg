@@ -82,6 +82,7 @@ const twilioAccountSid: string = process.env.TWILIO_ACCOUNT_SID as string
 const twilioApiKey: string = process.env.TWILIO_API_KEY as string
 const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
 const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
+const defaultCountryCode: string = process.env.DEFAULT_COUNTRY_CODE as string
 
 // Rate for job (any rate higher than this will be split)
 const maxRatePerJob = parseEnvVarAsInt(process.env.MAX_RATE_PER_JOB as string)
@@ -124,6 +125,7 @@ export default {
   twilioApiKey,
   twilioApiSecret,
   twilioMessagingServiceSid,
+  defaultCountryCode,
   maxRatePerJob,
   domains,
 }
