@@ -2,6 +2,7 @@
 import axios, { AxiosResponse } from 'axios'
 
 /**
+ * Gets metadata for ec2 instance
  * @see https://github.com/axios/axios/issues/647#issuecomment-322209906
  */
 const queryAwsMetadata = (): Promise<AxiosResponse> => {
@@ -16,6 +17,7 @@ const queryAwsMetadata = (): Promise<AxiosResponse> => {
 }
 
 /**
+ * Gets instance id from the ec2 metadata (in this case, used for cloudwatch logging)
  * @see https://github.com/aws/aws-sdk-js/blob/master/lib/metadata_service.js
  * @see https://forums.aws.amazon.com/thread.jspa?threadID=251263
  */

@@ -4,6 +4,10 @@ import connectRedis from 'connect-redis'
 import config from '@core/config'
 import { RedisService } from '@core/services'
 
+/**
+ * Initializes a session manager for logins
+ * 
+ */
 const sessionLoader = ({ app }: {app: express.Application}): void => {
   const sessionStore: connectRedis.RedisStore = connectRedis(session)
   if (!config.session.secret) {

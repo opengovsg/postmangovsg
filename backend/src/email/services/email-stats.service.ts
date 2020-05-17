@@ -4,7 +4,10 @@ import { StatsService } from '@core/services'
 import { CampaignStats } from '@core/interfaces'
 
 import { EmailMessage, EmailOp } from '@email/models'
-
+/**
+ * Gets stats from the ops table if job is still being worked on by a sender, otherwise, get the stats from the message logs table
+ * @param campaignId 
+ */
 const getStats = async (campaignId: number): Promise<CampaignStats> => {
   const job = await JobQueue.findOne({ where: { campaignId } })
   if (job === null) throw new Error('Unable to find campaign in job queue table.')

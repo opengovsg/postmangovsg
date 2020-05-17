@@ -1,9 +1,5 @@
 import { EmailTemplate } from '@email/models'
 
-export interface EmailContent {
-  subject: string;
-  body: string;
-}
 export interface StoreTemplateInput {
   campaignId: number;
   subject: string;

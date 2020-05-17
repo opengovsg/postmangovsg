@@ -14,6 +14,10 @@ import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 const validateEmailRecipient = (recipient: string): boolean => (validator.isEmail(recipient))
 const client = new TemplateClient(config.xssOptions.email, validateEmailRecipient)
 
+/**
+ * Create or replace a template. The mustached attributes are extracted in a sequelize hook, 
+ * and saved to the 'params' column in email_template
+ */
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
   let transaction
   try {
@@ -50,6 +54,8 @@ const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: stri
 }
   
 /**
+ * If a new template is uploaded over an existing valid template and csv, 
+ * we have to check that this new template still matches the columns of the existing csv.
  * side effects:
  *  - updates campaign 'valid' column
  *  - may delete email_message where campaignId
@@ -112,6 +118,10 @@ const checkNewTemplateParams = async ({
   }
 }
 
+/**
+ * Given a template, sanitize it and save it to the db
+ * If a csv file already existed before for this campaign, check that this new template still matches the columns of the existing csv. 
+ */
 const storeTemplate = async ({ campaignId, subject, body }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const updatedTemplate = await upsertEmailTemplate({
@@ -142,6 +152,10 @@ const storeTemplate = async ({ campaignId, subject, body }: StoreTemplateInput):
   return { updatedTemplate, numRecipients, valid: campaign?.valid }
 }
 
+/**
+ *  Finds a template that has all its columns set
+ * @param campaignId 
+ */
 const getFilledTemplate = async (campaignId: number): Promise<EmailTemplate | null> => {
   const emailTemplate = await EmailTemplate.findOne({ where: { campaignId } })
   if (!emailTemplate?.body || !emailTemplate?.subject || !emailTemplate.params) {

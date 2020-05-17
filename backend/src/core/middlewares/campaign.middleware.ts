@@ -10,9 +10,9 @@ import { CampaignService } from '@core/services'
 const canEditCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    if(!(await CampaignService.hasJobInProgress(+campaignId))){
+    if (!(await CampaignService.hasJobInProgress(+campaignId))){
       return next() 
-    } else{
+    } else {
       return res.sendStatus(403)
     }
   }
@@ -21,7 +21,12 @@ const canEditCampaign = async (req: Request, res: Response, next: NextFunction):
   }
 }
 
-// Create campaign
+/**
+ *  Create a campaign
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const createCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { name, type }: { name: string; type: string } = req.body
@@ -41,7 +46,12 @@ const createCampaign = async (req: Request, res: Response, next: NextFunction): 
 
 }
 
-// List campaigns
+/**
+ * List campaigns for user
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const listCampaigns = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { offset, limit } = req.query

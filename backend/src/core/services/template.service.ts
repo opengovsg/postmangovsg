@@ -10,6 +10,10 @@ const s3 = new S3({
   region: config.aws.awsRegion,
 })
 
+/**
+ * Returns a presigned url for uploading file to s3 bucket
+ * @param contentType 
+ */
 const getUploadParameters = async (contentType: string): Promise<{presignedUrl: string; signedKey: string}> => {
   const s3Key = uuid()
   
@@ -27,7 +31,10 @@ const getUploadParameters = async (contentType: string): Promise<{presignedUrl: 
   return { presignedUrl, signedKey }
 }
   
-// decodes JWT
+/**
+ * Decodes jwt
+ * @param transactionId 
+ */
 const extractS3Key = (transactionId: string): string => {
   let decoded: string
   try {
