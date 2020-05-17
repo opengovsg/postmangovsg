@@ -20,7 +20,7 @@ class Email {
     constructor(workerId: string, connection: Sequelize){
       this.workerId = workerId
       this.connection = connection
-      this.mailService = new MailClient('Postman.gov.sg <donotreply@mail.postman.gov.sg>', config.mailOptions)
+      this.mailService = new MailClient(config.mailFrom, config.mailOptions)
     }
    
     enqueueMessages(jobId: number): Promise<void>{
