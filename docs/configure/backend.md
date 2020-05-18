@@ -14,9 +14,9 @@
 
 ## Backend
 Depending on the environment, a set of sane defaults for non-sensitive configuration can be found in
--  [backend/src/core/config/production.ts](../../backend/src/core/config/production.ts) when `ENVIRONMENT=production`
--  [backend/src/core/config/staging.ts](../../backend/src/core/config/staging.ts) when `ENVIRONMENT=staging`
--  [backend/src/core/config/default.ts](../../backend/src/core/config/default.ts) for any other environment
+-  [backend/src/core/config/index.ts](../../backend/src/core/config/index.ts).
+
+Setting `NODE_ENV=production` or `NODE_ENV=staging` will override some defaults.
 
 These defaults can be modified as you wish or overridden with environment variables.
 
@@ -25,7 +25,6 @@ Sensitive configuration has to be set with environment variables.
 ### Minimal set of environment variables
 |Name|Description|
 |--|--|
-|`ENVIRONMENT`|Used for setting default, non-sensitive configuration. Can be `staging`, `production`, or any other value for the development environment|
 |`DB_URI`| URI to the postgres database |
 |`REDIS_OTP_URI`| URI to the redis cache for storing one time passwords|
 |`REDIS_SESSION_URI`| URI to the redis cache for storing login sessions |
@@ -39,7 +38,7 @@ Sensitive configuration has to be set with environment variables.
 #### General
 |Name|Description|
 |--|--|
-|`NODE_ENV`|Set to `production` for deployment|
+|`NODE_ENV`|Set to `production` or `staging` for deployment|
 |`APP_NAME`|Name of the app|
 |`DOMAIN_WHITELIST`|Semi-colon separated list of domains that can sign in to the app. Example: `.gov.sg;@xyz.abc.sg` will allow any emails ending in `@<agency>.gov.sg` and `@xyz.abc.sg` to sign in|
 |`FRONTEND_URL`|CORS: accept requests from this origin. Can be a string, or regex |
@@ -118,5 +117,6 @@ If not set, smses cannot be sent.
 |`TWILIO_API_KEY`|API Key to access Twilio|
 |`TWILIO_API_SECRET`|Corresponding API Secret to access Twilio|
 |`TWILIO_MESSAGING_SERVICE_SID`|ID of the messaging service|
+|`DEFAULT_COUNTRY_CODE`|Country code to prepend to phone numbers|
 
 Further reference: [Twilio API Key documentation](https://www.twilio.com/docs/iam/keys/api-key-resource?code-sample=code-authenticate-with-api-key-and-api-secret)
