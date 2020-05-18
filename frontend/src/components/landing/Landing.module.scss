@@ -144,9 +144,10 @@ $thinner-section-horizontal-padding: $site-padding * 6;
       margin-top: 3rem;
       display: flex;
       justify-content: space-between;
+      width: 35rem;
 
       img {
-        width: 20%;
+        height: 5rem;
       }
     }
   }

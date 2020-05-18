@@ -16,6 +16,8 @@ import companyLogo from 'assets/img/brand/company-logo.svg'
 import ogpLogo from 'assets/img/ogp-logo.svg'
 import arrowRight from 'assets/img/landing/arrow-right.svg'
 import mohAgencyImg from 'assets/img/landing/moh.png'
+import moeAgencyImg from 'assets/img/landing/moe.png'
+import momAgencyImg from 'assets/img/landing/mom.png'
 
 // how it works
 import chooseChannelImg from 'assets/img/landing/choose-channel.svg'
@@ -50,8 +52,8 @@ const Landing = () => {
 
   const trustedAgencies = [
     { img: mohAgencyImg, alt: 'MOH' },
-    { img: mohAgencyImg, alt: 'MOH' },
-    { img: mohAgencyImg, alt: 'MOH' },
+    { img: momAgencyImg, alt: 'MOM' },
+    { img: moeAgencyImg, alt: 'MOE' },
   ]
 
   const features = [
