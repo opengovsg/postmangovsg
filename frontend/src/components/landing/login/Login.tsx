@@ -11,6 +11,7 @@ const emailButtonText = ['Get OTP', 'Sending OTP...']
 const otpButtonText = ['Sign In', 'Verifying OTP...']
 const emailPlaceholder = 'e.g. postman@agency.gov.sg'
 const otpPlaceholder = 'Enter OTP'
+const invalidOtpFormat = 'Invalid OTP format, enter 6 digits'
 
 const RESEND_WAIT_TIME = 30000
 
@@ -42,6 +43,10 @@ const Login = () => {
   async function login() {
     resetButton()
     try {
+      if (!validateOtp(otp)) {
+        throw new Error(invalidOtpFormat)
+      }
+
       await loginWithOtp(email, otp)
       setAuthenticated(true)
       setAuthContextEmail(email)
@@ -60,6 +65,18 @@ const Login = () => {
   function resend() {
     setOtpSent(false)
     sendOtp()
+  }
+
+  function validateOtpInput(value: string) {
+    // Only accept input that is between 0-6 digits
+    if (!/^\d{0,6}$/.test(value)) {
+      return
+    }
+    setOtp(value)
+  }
+
+  function validateOtp(value: string) {
+    return /^\d{6}$/.test(value)
   }
 
   function render(
@@ -84,7 +101,7 @@ const Login = () => {
           type={inputType}
           placeholder={placeholder}
           onChange={onChange}
-          buttonDisabled={!value || isLoading}
+          buttonDisabled={!value || (otp && !validateOtp(otp)) || isLoading}
           inputDisabled={isLoading}
           onClick={onClick}>
           {isLoading ? buttonText[1] : buttonText[0]}
@@ -101,7 +118,7 @@ const Login = () => {
       {!otpSent ?
         render(emailText, email, setEmail, sendOtp, emailButtonText, emailPlaceholder, 'email')
         :
-        render(otpText, otp, setOtp, login, otpButtonText, otpPlaceholder, 'tel')
+        render(otpText, otp, validateOtpInput, login, otpButtonText, otpPlaceholder, 'tel')
       }
     </div >
   )

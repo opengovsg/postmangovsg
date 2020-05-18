@@ -20,7 +20,10 @@ const verifyOtpValidator = {
       .options({ convert: true }) // Converts email to lowercase if it isn't  
       .lowercase()
       .required(),
-    otp: Joi.string().required(), //TODO: Add validation for 6 digit otp
+    otp: Joi.string()
+      .length(6)
+      .pattern(/^\d+$/, { name: "numbers" })
+      .required(),
   }),
 }
 
