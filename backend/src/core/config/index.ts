@@ -1,9 +1,12 @@
+/**
+ * @file Configuration 
+ * All defaults can be changed
+ */
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
 import getDomainValidator from './utils/get-domain-validator'
 
-const rdsCa = fs.readFileSync(path.join(__dirname, '../../assets/db-ca.pem')) 
 /**
  * To require an env var without setting a default,
  * use
@@ -26,7 +29,6 @@ convict.addFormats({
     },
   },
 })
-
 
 
 const config = convict({
@@ -316,18 +318,25 @@ const config = convict({
   },
 })
 
-config.set('mailFrom', config.get('mailFrom') || `${config.get('APP_NAME')} <donotreply@mail.postman.gov.sg>`)
+// Both production and staging environments are considered as prod environments on AWS
+config.set('IS_PROD', ['production', 'staging'].includes(config.get('env')))
 
+// If mailFrom was not set in an env var, set it using the app_name
+const defaultMailFrom =  `${config.get('APP_NAME')} <donotreply@mail.postman.gov.sg>`
+config.set('mailFrom', config.get('mailFrom') ||  defaultMailFrom)
+
+// Derive the DomainValidatorFunction from the list of domains supplied
 config.set('validateDomain', getDomainValidator(config.get('domains')))
 
-config.set('IS_PROD', config.get('env') === 'production' ||  config.get('env') === 'staging')
-
+// If the environment is a prod environment, we must connect to the database with an ssl cert
+const rdsCa = fs.readFileSync(path.join(__dirname, '../../assets/db-ca.pem')) 
 config.set('database.dialectOptions.ssl.ca', config.get('IS_PROD') ? [rdsCa] : false)
 
+// Override some defaults
 switch (config.get('env')){
 case 'production':
   config.load({
-    'frontendUrl': 'https://postman.gov.sg', // prod only
+    frontendUrl: 'https://postman.gov.sg', // prod only
     aws: {
       uploadBucket:  'postmangovsg-prod-upload',
       logGroupName: 'postmangovsg-beanstalk-prod',
@@ -346,7 +355,7 @@ case 'production':
   break
 case 'staging':
   config.load({
-    'frontendUrl': '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
+    frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
     aws: {
       uploadBucket:  'postmangovsg-dev-upload',
       logGroupName: 'postmangovsg-beanstalk-staging',
@@ -364,5 +373,8 @@ case 'staging':
   })
   break
 }
+
+// Validate to make sure all the required env vars have been set
 config.validate()
+
 export default config
