@@ -15,4 +15,8 @@ const clientIp = (req: Request, _res: Response): string => {
   return cfConnectingIp || req.ip
 }
 
-export { clientIp }
+const userId = (req: Request, _res: Response): string | undefined => {
+  return req?.session?.user?.id
+}
+
+export { clientIp, userId }
