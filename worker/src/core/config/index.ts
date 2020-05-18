@@ -1,69 +1,244 @@
-import merge from 'lodash/merge' // Recursively merges from left to right, skipping undefined values
-import defaultConfig from './default'
-import stagingConfig from './staging'
-import productionConfig from './production'
-import envConfig from './env'
+/**
+ * @file Configuration 
+ * All defaults can be changed
+ */
+import convict from 'convict'
+import fs from 'fs'
+import path from 'path'
 
-let config
-const ENVIRONMENT = (process.env.ENVIRONMENT as string || 'production').toLowerCase()
-// The left-to-right order of merging is important
-// as right will override left
-switch (ENVIRONMENT) {
-case 'staging':
-  config = merge(defaultConfig, stagingConfig, envConfig)
-  break
-case 'production':
-  config = merge(defaultConfig, productionConfig, envConfig)
-  break
-default:
-  config = merge(defaultConfig, envConfig)
-  break 
-}
+convict.addFormats({
+  'required-string': {
+    validate:  (val: any): void => {
+      if (val === '') {
+        throw new Error('Required value cannot be empty')
+      }
+    },
+    coerce: (val: any): any => { 
+      if (val === null){
+        return undefined 
+      }
+      return val
+    },
+  },
+})
 
-export default {
-  IS_PROD: config.IS_PROD,
+
+const config = convict({
+  env: {
+    doc: 'The application environment.',
+    format: ['production', 'staging', 'development'],
+    default: 'development',
+    env: 'NODE_ENV',
+  },
+  IS_PROD: {
+    default: false,
+  },
   aws: {
-    awsRegion: config.awsRegion,
-    secretManagerSalt: config.secretManagerSalt,
-    serviceName: config.serviceName,
-    metadataUri: config.metadataUri,
+    awsRegion: {
+      doc: 'Region for the S3 bucket that is used to store file uploads',
+      default:  'ap-northeast-1',
+      env: 'AWS_REGION',
+    },
+    secretManagerSalt: {
+      doc: 'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
+      default: '',
+      env: 'SECRET_MANAGER_SALT',
+      format: 'required-string',
+      sensitive: true,
+    },
+    serviceName: {
+      doc: 'ECS service name used for finding the existing running tasks',
+      default: '',
+      env: 'ECS_SERVICE_NAME',
+      format: 'required-string',
+    },
+    metadataUri: {
+      doc: 'URI injected by ECS Agent, do not set manually',
+      default: '',
+      env: 'ECS_CONTAINER_METADATA_URI_V4',
+    },
   },
   database: {
-    databaseUri: config.databaseUri,
+    databaseUri: {
+      doc: 'URI to the postgres database',
+      default: '',
+      env: 'DB_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
     dialectOptions: {
       ssl: {
         rejectUnauthorized: true,
-        ca: [config.rdsCa],
+        ca: {
+          doc: 'SSL cert to connect to database',
+          default: false,
+          format: '*',
+          sensitive: true,
+        },
       },
     },
     poolOptions: {
-      max: config.SEQUELIZE_POOL_MAX_CONNECTIONS,
-      min: config.SEQUELIZE_POOL_MIN_CONNECTIONS,
-      acquire: config.SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
+      max: {
+        doc: 'Maximum number of connection in pool',
+        default: 150,
+        env: 'SEQUELIZE_POOL_MAX_CONNECTIONS',
+        format: 'int',
+      },
+      min: {
+        doc: 'Minimum number of connection in pool',
+        default: 0,
+        env: 'SEQUELIZE_POOL_MIN_CONNECTIONS',
+        format: 'int',
+      },
+      acquire: {
+        doc: 'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
+        default: 600000,
+        env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
+        format: 'int',
+      }, 
     },
   },
   mailOptions: {
-    host: config.mailHost,
-    port: config.mailPort,
+    host: {
+      doc: 'Amazon SES SMTP endpoint.',
+      default: '',
+      env: 'SES_HOST',
+    },
+    port: {
+      doc: 'Amazon SES SMTP port, defaults to 465',
+      default: 465,
+      env: 'SES_PORT',
+      format: 'int',
+    },
     auth: {
-      user: config.mailUser,
-      pass: config.mailPass,
+      user: {
+        doc: 'SMTP username',
+        default: '',
+        env: 'SES_USER',
+        sensitive: true,
+      },
+      pass: {
+        doc: 'SMTP password',
+        default: '',
+        env: 'SES_PASS',
+        sensitive: true,
+      },
     },
   },
-  mailFrom: config.mailFrom,
-  smsOptions: {
-    accountSid: config.twilioAccountSid,
-    apiKey: config.twilioApiKey,
-    apiSecret: config.twilioApiSecret,
-    messagingServiceSid: config.twilioMessagingServiceSid,
+  mailFrom: {
+    doc: 'The email address that appears in the From field of an email',
+    default: '',
+    env: 'SES_FROM',
   },
-  defaultCountryCode: config.defaultCountryCode,
+  defaultCountryCode: {
+    doc: 'Country code to prepend to phone numbers',
+    default: '65',
+    env: 'DEFAULT_COUNTRY_CODE',
+  },
+  smsOptions: {
+    accountSid: {
+      doc: 'Id of the Twilio account',
+      default: '',
+      env: 'TWILIO_ACCOUNT_SID',
+      sensitive: true,
+    },
+    apiKey: {
+      doc: 'API Key to access Twilio',
+      default: '',
+      env: 'TWILIO_API_KEY',
+      sensitive: true,
+    },
+    apiSecret: {
+      doc: 'Corresponding API Secret to access Twilio',
+      default: '',
+      env: 'TWILIO_API_SECRET',
+      sensitive: true,
+    },
+    messagingServiceSid: {
+      doc: 'ID of the messaging service ',
+      default: '',
+      env: 'TWILIO_MESSAGING_SERVICE_SID',
+      sensitive: true,
+    },
+  },
   xssOptions: {
-    email: config.xssOptionsEmail,
-    sms: config.xssOptionsSms,
+    doc: 'List of html tags allowed',
+    default: {
+      email: {
+        whiteList: {
+          b: [],
+          i: [],
+          u: [],
+          br: [],
+          p: [],
+          a: ['href', 'title', 'target'],
+          img: ['src', 'alt', 'title', 'width', 'height'],
+        }, 
+        stripIgnoreTag: true, 
+      },
+      sms:
+      { 
+        whiteList: { br: [] },
+        stripIgnoreTag: true,
+      },
+    },
   },
   messageWorker: {
-    numSender: config.numSender,
-    numLogger: config.numLogger,
+    numSender: {
+      doc: 'Number of sender workers',
+      default: 1,
+      env: 'MESSAGE_WORKER_SENDER',
+      format: 'int',
+    },
+    numLogger: {
+      doc: 'Number of logger workers',
+      default: 1,
+      env: 'MESSAGE_WORKER_LOGGER',
+      format: 'int',
+    },
   },
+},
+)
+
+// Both production and staging environments are considered as prod environments on AWS
+config.set('IS_PROD', ['production', 'staging'].includes(config.get('env')))
+
+// If mailFrom was not set in an env var, set it using the app_name
+const defaultMailFrom =  'Postman.gov.sg <donotreply@mail.postman.gov.sg>'
+config.set('mailFrom', config.get('mailFrom') ||  defaultMailFrom)
+
+// If the environment is a prod environment, we must connect to the database with an ssl cert
+const rdsCa = fs.readFileSync(path.join(__dirname, '../../assets/db-ca.pem')) 
+if (config.get('IS_PROD')){
+  config.set('database.dialectOptions.ssl.ca',  [rdsCa] )
+  
+  if ((config.get('messageWorker.numSender') + config.get('messageWorker.numLogger')) !== 1){
+    throw new Error(`Only 1 worker of 1 variant per task supported in production. 
+    You supplied MESSAGE_WORKER_SENDER=${config.get('messageWorker.numSender')}, 
+    MESSAGE_WORKER_LOGGER=${config.get('messageWorker.numLogger')}`)
+  }
 }
+
+// If a message worker is set, ensure that the credentials needed are also set
+if (config.get('messageWorker.numSender') > 0){
+  if ( 
+    !config.get('smsOptions.accountSid') || 
+    !config.get('smsOptions.apiKey') || 
+    !config.get('smsOptions.apiSecret') ||
+    !config.get('smsOptions.messagingServiceSid')
+  ) {
+    throw new Error('SMS credentials must be set since a sender worker is required')
+  }
+  
+  if ( 
+    !config.get('mailOptions.host') || 
+    !config.get('mailOptions.port') || 
+    !config.get('mailOptions.auth.user') ||
+    !config.get('mailOptions.auth.pass')
+  ) {
+    throw new Error('Email credentials must be set since a sender worker is required')
+  }
+  
+}
+
+export default config
