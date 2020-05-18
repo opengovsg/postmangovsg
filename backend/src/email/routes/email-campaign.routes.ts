@@ -20,7 +20,7 @@ const storeTemplateValidator = {
     body: Joi
       .string()
       .required(),
-    replyTo: Joi
+    reply_to: Joi
       .string()
       .allow(null)
       .email()
@@ -132,8 +132,9 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                   type: string
  *                   minLength: 1
  *                   maxLength: 200
- *                 replyTo:
+ *                 reply_to:
  *                   type: string
+ *                   nullable: true
  *
  *       responses:
  *         200:
@@ -163,6 +164,9 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                         type: string
  *                       body:
  *                         type: string
+ *                       reply_to:
+ *                         type: string
+ *                         nullable: true
  *                       params:
  *                         type: array
  *                         items:
@@ -337,6 +341,9 @@ router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddle
  *                        type: string
  *                      subject: 
  *                        type: string
+ *                      reply_to:
+ *                        type: string
+ *                        nullable: true
  *        "401":
  *           description: Unauthorized
  *        "500":

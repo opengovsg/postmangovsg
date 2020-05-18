@@ -26,7 +26,7 @@ import { StoreTemplateOutput } from '@email/interfaces'
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { subject, body, replyTo } = req.body
+    const { subject, body, reply_to: replyTo } = req.body
     const { check, numRecipients, valid, updatedTemplate }: StoreTemplateOutput = 
         await EmailTemplateService.storeTemplate({ campaignId: +campaignId, subject, body, replyTo })
     if (check?.reupload) {
@@ -40,7 +40,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
             body: updatedTemplate?.body,
             subject: updatedTemplate?.subject,
             params: updatedTemplate?.params,
-            replyTo: updatedTemplate?.replyTo,
+            reply_to: updatedTemplate?.replyTo,
           },
         })
     } else {
@@ -53,7 +53,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
             body: updatedTemplate?.body,
             subject: updatedTemplate?.subject,
             params: updatedTemplate?.params,
-            replyTo: updatedTemplate?.replyTo,
+            reply_to: updatedTemplate?.replyTo,
           },
         })
     }
