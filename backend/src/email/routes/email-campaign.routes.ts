@@ -52,7 +52,8 @@ const sendCampaignValidator = {
     rate: Joi
       .number()
       .integer()
-      .positive(),
+      .positive()
+      .default(10),
   }),
 }
 
