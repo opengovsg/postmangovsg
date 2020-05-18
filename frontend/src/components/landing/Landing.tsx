@@ -22,7 +22,7 @@ import momAgencyImg from 'assets/img/landing/mom.png'
 import reliableImg from 'assets/img/landing/WhyUsePostman-1.svg'
 import reattemptImg from 'assets/img/landing/WhyUsePostman-2.svg'
 import trackImg from 'assets/img/landing/WhyUsePostman-3.svg'
-import userImg from 'assets/img/landing/WhyUsePostman-face.png'
+import userImg from 'assets/img/landing/moe-circle.png'
 
 import onboardingImg from 'assets/img/landing/Onboarding.svg'
 
