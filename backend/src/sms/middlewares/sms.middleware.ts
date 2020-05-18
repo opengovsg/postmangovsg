@@ -157,9 +157,7 @@ const previewFirstMessage = async (req: Request, res: Response, next: NextFuncti
   try {
     const { campaignId } = req.params
     return res.json({
-      preview: {
-        body: await SmsService.getHydratedMessage(+campaignId),
-      },
+      preview: await SmsService.getHydratedMessage(+campaignId),
     })
   } catch (err) {
     return next(err)
