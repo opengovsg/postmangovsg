@@ -7,7 +7,7 @@ import { saveTemplate } from 'services/email.service'
 import styles from './EmailTemplate.module.scss'
 
 const EmailTemplate = ({ subject: initialSubject, body: initialBody, replyTo: initialReplyTo, onNext }:
-  { subject: string; body: string; replyTo: string; onNext: (changes: any, next?: boolean) => void }) => {
+  { subject: string; body: string; replyTo: string | null; onNext: (changes: any, next?: boolean) => void }) => {
 
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
@@ -22,7 +22,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, replyTo: in
         throw new Error('Invalid campaign id')
       }
       const { updatedTemplate, numRecipients } = await saveTemplate(+campaignId, subject, body, replyTo)
-      onNext({ subject: updatedTemplate?.subject, body: updatedTemplate?.body, replyTo: updatedTemplate?.replyTo, params: updatedTemplate?.params, numRecipients })
+      onNext({ subject: updatedTemplate?.subject, body: updatedTemplate?.body, replyTo: updatedTemplate?.reply_to, params: updatedTemplate?.params, numRecipients })
     } catch (err) {
       setErrorMsg(err.message)
     }
@@ -55,7 +55,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, replyTo: in
       <TextArea highlight={true} placeholder="Enter email message" value={body} onChange={setBody} />
       <h4 className={styles.replyToHeader}>Replies <em>optional</em></h4>
       <p>All replies will be directed to the email address indicated below</p>
-      <TextArea highlight={true} singleRow={true} placeholder="Enter reply-to email address" value={replyTo} onChange={setReplyTo} />
+      <TextArea highlight={true} singleRow={true} placeholder="Enter reply-to email address" value={replyTo || ""} onChange={setReplyTo} />
       <div className="separator"></div>
       <div className="progress-button">
         <PrimaryButton disabled={!body || !subject} onClick={handleSaveTemplate}>Upload Recipients →</PrimaryButton>

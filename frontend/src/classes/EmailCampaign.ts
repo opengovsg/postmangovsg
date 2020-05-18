@@ -11,7 +11,7 @@ export class EmailCampaign extends Campaign {
   body: string
   params: Array<string>
   subject: string
-  replyTo: string
+  replyTo: string | null
   csvFilename: string
   numRecipients: number
   preview: string
@@ -23,7 +23,7 @@ export class EmailCampaign extends Campaign {
     this.body = input['email_templates']?.body
     this.params = input['email_templates']?.params
     this.subject = input['email_templates']?.subject
-    this.replyTo = input['email_templates']?.replyTo
+    this.replyTo = input['email_templates']?.reply_to
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
     this.preview = input['preview']
