@@ -222,15 +222,6 @@ if (config.get('IS_PROD')){
 // If a message worker is set, ensure that the credentials needed are also set
 if (config.get('messageWorker.numSender') > 0){
   if ( 
-    !config.get('smsOptions.accountSid') || 
-    !config.get('smsOptions.apiKey') || 
-    !config.get('smsOptions.apiSecret') ||
-    !config.get('smsOptions.messagingServiceSid')
-  ) {
-    throw new Error('SMS credentials must be set since a sender worker is required')
-  }
-  
-  if ( 
     !config.get('mailOptions.host') || 
     !config.get('mailOptions.port') || 
     !config.get('mailOptions.auth.user') ||
