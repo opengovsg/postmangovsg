@@ -61,13 +61,13 @@ const Landing = () => {
             <h1 className={styles.headerText}>Reach out to the citizens in minutes</h1>
             <h2 className={styles.sentMessages}>
               <span className={styles.numOfMessages}>275,000</span>
-              <span>sent messages</span>
+              <span className={styles.text}>sent messages</span>
             </h2>
             <div className={styles.signInRow}>
               <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
                 Sign in <img className={styles.arrowRight} src={arrowRight}/>
               </PrimaryButton>
-              <div>
+              <div className={styles.signInText}>
                 <span className={styles.needHelp}>Need help?</span>
                 <a className={styles.contactUs} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Talk to us</a>
               </div>
