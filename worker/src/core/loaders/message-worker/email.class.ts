@@ -26,13 +26,13 @@ class Email {
     }
     
     
-    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; subject: string; replyTo: string}[]> {
+    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; subject: string; replyTo: string | null}[]> {
       return this.connection.query('SELECT get_messages_to_send_email(:job_id, :rate) ;',
         { replacements: { 'job_id': jobId, rate }, type: QueryTypes.SELECT },
       ).then((result) => (map(result, 'get_messages_to_send_email')))
     }
       
-    sendMessage({ id, recipient, params, body, subject, replyTo }: { id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string }): Promise<void> {
+    sendMessage({ id, recipient, params, body, subject, replyTo }: { id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null }): Promise<void> {
       return Promise.resolve()
         .then(() => {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -43,7 +43,7 @@ class Email {
             recipients: [recipient],
             subject,
             body: hydratedBody,
-            replyTo,
+            ...(replyTo ? { replyTo } : {})
           })
         })
         .then((messageId) => {
