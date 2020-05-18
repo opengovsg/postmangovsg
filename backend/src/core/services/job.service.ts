@@ -13,9 +13,9 @@ const createJob = async ({ campaignId, rate }: {campaignId: number; rate: number
   return jobId ? Number(jobId) : undefined
 }
 
-const canSendCampaign = async (campaignId: number): Promise<boolean> => {
+const getCampaignToSend = async (campaignId: number): Promise<Campaign | null> => {
   const campaign = await Campaign.findOne({ where: { id: campaignId, valid: true, credName: { [Op.ne]: null } } })
-  return campaign !== null
+  return campaign
 }
 
 const sendCampaign = ({ campaignId, rate }: {campaignId: number; rate: number}): Promise<(number | undefined)[]> => {
@@ -51,7 +51,7 @@ const retryCampaign = (campaignId: number): Promise<any> | undefined  => {
     })
 }
 export const JobService = {
-  canSendCampaign,
+  getCampaignToSend,
   sendCampaign,
   stopCampaign,
   retryCampaign,
