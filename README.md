@@ -1,4 +1,4 @@
-<a href="https://postman.gov.sg"><img src="frontend/src/assets/img/app-logo.svg" title="Postman" alt="Postman.gov.sg"></a>
+<a href="https://postman.gov.sg"><img src="frontend/src/assets/img/brand/app-logo.svg" title="Postman" alt="Postman.gov.sg"></a>
 
 
 # Postman.gov.sg
@@ -18,6 +18,9 @@
       - [Elastic Container Service](#elastic-container-service)
   * [Architecture](#architecture)
   * [How messages are sent](#how-messages-are-sent)
+  * [Forking and configuring this product](#forking-and-configuring-this-product)
+    + [Backend](#backend)
+    + [Frontend](#frontend)
   * [Contributions](#contributions)
 
 ## Features
@@ -131,6 +134,12 @@ See [architecture](docs/architecture/index.md) for details
 ## How messages are sent
 See [sending.md](docs/sending.md) for details
 
+## Forking and configuring this product
+### Backend
+See [configure/backend](docs/configure/backend.md) for details
+### Frontend
+See [configure/frontend](docs/configure/frontend.md) for details
+
 ## Contributions
 
 The production branch is `master`, and the development branch is `develop`.
@@ -148,3 +157,5 @@ The production branch is `master`, and the development branch is `develop`.
 - Push these changes to Github
 - Submit a pull request against `basefork/develop` (that's us!)
 - Describe the issue as thoroughly as possible, and with screenshots if applicable. A picture speaks a thousand words!
+
+For more information, see [CONTRIBUTING.md](docs/CONTRIBUTING.md)

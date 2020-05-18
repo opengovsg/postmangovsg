@@ -15,8 +15,14 @@ import { EmailTemplateService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
   
 
-// Store body of message in email template table
-// Store body of message in sms template table
+/**
+ * Store template subject and body in email template table.
+ * If an existing csv has been uploaded for this campaign but whose columns do not match the attributes provided in the new template,
+ * delete the old csv, and prompt user to upload a new csv.
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
@@ -58,7 +64,14 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
   }
 }
   
-// Read file from s3 and populate messages table
+/**
+ * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
+ * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
+ * If the template and csv do not match, prompt the user to upload a new file. 
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
@@ -77,7 +90,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   
     // check if template exists
     const emailTemplate = await EmailTemplateService.getFilledTemplate(+campaignId)
-    if(emailTemplate === null){
+    if (emailTemplate === null){
       return res.status(400).json({
         message: 'Template does not exist, please create a template',
       })
@@ -96,9 +109,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         templateBody: emailTemplate.body as string,
         templateParams: emailTemplate.params as string[],
       })
-  
-      if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
-      
+        
       const recipientCount: number = records.length
        
       // START populate template

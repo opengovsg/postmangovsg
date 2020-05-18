@@ -26,10 +26,13 @@ const SMSSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: Fun
 
   async function loadPreview() {
     if (campaignId) {
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if (msgPreview) {
-        setPreview(msgPreview)
-      }
+      try {
+        const msgPreview = await getPreviewMessage(+campaignId)
+        if (msgPreview) {
+          setPreview(msgPreview)
+        }
+      // eslint-disable-next-line no-empty
+      } catch (err){}
     }
   }
 

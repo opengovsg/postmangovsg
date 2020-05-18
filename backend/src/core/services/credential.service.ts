@@ -9,8 +9,12 @@ import { Credential, UserCredential, User } from '@core/models'
 import { TwilioCredentials } from '@sms/interfaces'
 import { UserSettings } from '@core/interfaces'
 
-const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
+const secretsManager = new AWS.SecretsManager({ region: config.get('aws.awsRegion') })
 
+/**
+ * Checks if the credential has been saved
+ * @param name 
+ */
 const isExistingCredential = async (name: string): Promise<boolean> => {
   const result = await Credential.findOne({
     where: {
@@ -20,8 +24,13 @@ const isExistingCredential = async (name: string): Promise<boolean> => {
   return !!result
 }
 
+/**
+ * Save a credential into secrets manager
+ * @param name 
+ * @param secret 
+ */
 const storeCredential = async (name: string, secret: string): Promise<void> => {
-  if (!config.IS_PROD) {
+  if (!config.get('IS_PROD')) {
     logger.info(`Dev env - storeSecret - skipping for name=${name}`)
     return
   }
@@ -45,10 +54,14 @@ const storeCredential = async (name: string, secret: string): Promise<void> => {
   logger.info('Successfully stored credential in DB')
 }
 
+/**
+ * Retrieve a credential from secrets amanger
+ * @param name 
+ */
 const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> => {
-  if (!config.IS_PROD) {
+  if (!config.get('IS_PROD')) {
     logger.info(`Dev env - getTwilioCredentials - returning default credentials for name=${name}`)
-    return config.smsOptions
+    return config.get('smsOptions')
   }
   logger.info('Getting secret from AWS secrets manager.')
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
@@ -59,13 +72,24 @@ const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> =>
 }
 
 
-
+/**
+ * Creates a label for the credential, associated with a user
+ * @param label 
+ * @param type 
+ * @param credName 
+ * @param userId 
+ */
 const createUserCredential = (label: string, type: ChannelType, credName: string, userId: number): Promise<UserCredential> => {
   return UserCredential.create({
     label, type, credName, userId,
   })
 }
 
+/**
+ * Deletes the credential label for a user
+ * @param userId 
+ * @param label 
+ */
 const deleteUserCredential = (userId: number, label: string): Promise<number> => {
   return UserCredential.destroy({
     where: {
@@ -75,6 +99,11 @@ const deleteUserCredential = (userId: number, label: string): Promise<number> =>
   })
 }
 
+/**
+ * Checks if a user already has this credential label associated with them
+ * @param userId 
+ * @param label 
+ */
 const getUserCredential = (userId: number, label: string): Promise<UserCredential> => {
   return UserCredential.findOne({
     where: {
@@ -85,6 +114,10 @@ const getUserCredential = (userId: number, label: string): Promise<UserCredentia
   })
 }
 
+/**
+ * Gets only the sms credential labels for that user
+ * @param userId 
+ */
 const getSmsUserCredentialLabels = async (userId: number): Promise<string[]> => {
   const creds = await UserCredential.findAll({
     where: {
@@ -96,6 +129,10 @@ const getSmsUserCredentialLabels = async (userId: number): Promise<string[]> => 
   return creds.map(c => c.label)
 }
 
+/**
+ * Gets api keys and credential labels for that user
+ * @param userId 
+ */
 const getUserSettings = async (userId: number): Promise<UserSettings | null> => {
   const user = await User.findOne({
     where: {
@@ -109,9 +146,9 @@ const getUserSettings = async (userId: number): Promise<UserSettings | null> => 
     }],
     plain: true,
   })
-  if(user){
+  if (user){
     return { hasApiKey: !!user.apiKey, creds: user.creds }
-  } else{
+  } else {
     return null
   }
 }

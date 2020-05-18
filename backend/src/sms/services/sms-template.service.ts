@@ -1,15 +1,22 @@
 import { difference, keys, chunk } from 'lodash'
-import { SmsTemplate, SmsMessage } from '@sms/models'
-import { Campaign } from '@core/models'
-import { isSuperSet } from '@core/utils'
-import TemplateClient from '@core/services/template-client.class'
-import logger from '@core/logger'
-import { HydrationError } from '@core/errors'
+
 import config from '@core/config'
+import logger from '@core/logger'
+import { isSuperSet } from '@core/utils'
+import { HydrationError } from '@core/errors'
+import { Campaign } from '@core/models'
+import TemplateClient from '@core/services/template-client.class'
+
+import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(config.xssOptions.sms)
+const validateSmsRecipient = (recipient: string): boolean => (/^\+?[0-9]+$/.test(recipient))
+const client = new TemplateClient(config.get('xssOptions.sms'), validateSmsRecipient)
 
+/**
+ * Create or replace a template. The mustached attributes are extracted in a sequelize hook, 
+ * and saved to the 'params' column in sms_template
+ */
 const upsertSmsTemplate = async ({ body, campaignId }: {body: string; campaignId: number}): Promise<SmsTemplate> => {
   let transaction
   try {
@@ -45,6 +52,8 @@ const upsertSmsTemplate = async ({ body, campaignId }: {body: string; campaignId
 }
   
 /**
+ * If a new template is uploaded over an existing valid template and csv, 
+ * we have to check that this new template still matches the columns of the existing csv.
  * side effects:
  *  - updates campaign 'valid' column
  *  - may delete sms_message where campaignId
@@ -107,7 +116,10 @@ const checkNewTemplateParams = async ({
   }
 }
   
-
+/**
+ * Given a template, sanitize it and save it to the db
+ * If a csv file already existed before for this campaign, check that this new template still matches the columns of the existing csv. 
+ */
 const storeTemplate = async ({ campaignId, body }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   const updatedTemplate = await upsertSmsTemplate({ 
     body: client.replaceNewLinesAndSanitize(body), 
@@ -136,6 +148,10 @@ const storeTemplate = async ({ campaignId, body }: StoreTemplateInput): Promise<
   return { updatedTemplate, numRecipients, valid: campaign?.valid }
 }
 
+/**
+ *  Finds a template that has all its columns set
+ * @param campaignId 
+ */
 const getFilledTemplate = async (campaignId: number): Promise<SmsTemplate | null> => {
   const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
   if (!smsTemplate?.body || !smsTemplate.params) {
@@ -186,15 +202,9 @@ const addToMessageLogs = async (campaignId: number, records: Array<object>): Pro
   }
 }
 
-const hasInvalidSmsRecipient = (records: MessageBulkInsertInterface[]): boolean => {
-  const re = /^\+?[0-9]+$/
-  return records.some((record) => !re.test(record.recipient))
-}
-
 export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
-  hasInvalidSmsRecipient,
   client,
 }

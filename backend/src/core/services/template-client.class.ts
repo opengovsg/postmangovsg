@@ -1,20 +1,34 @@
 import { difference, keys, mapKeys } from 'lodash'
+import xss from 'xss'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 
 import S3Client from '@core/services/s3-client.class'
 import logger from '@core/logger'
-import { MissingTemplateKeysError, TemplateError } from '@core/errors/template.errors'
+import { MissingTemplateKeysError, TemplateError, InvalidRecipientError } from '@core/errors/template.errors'
 import { isSuperSet } from '@core/utils'
 
-import xss from 'xss'
 
+
+type ValidateRecipientFunction = (recipient: string) => boolean
 export default class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
-  constructor(xssOptions?: xss.IFilterXSSOptions){
+  validateRecipient: ValidateRecipientFunction | undefined
+  /**
+   * Constructor for TemplateClient
+   * @param validateRecipient Function to test if recipient is of a valid format
+   * @param xssOptions Whitelist of html tags that will not be stripped
+   */
+  constructor(xssOptions?: xss.IFilterXSSOptions, validateRecipient?: ValidateRecipientFunction) {
     this.xssOptions = xssOptions
+    this.validateRecipient = validateRecipient
   }
 
+  /**
+   * Removes non-whitelisted html tags
+   * Replaces new lines with html <br> so that the new lines can be displayed on the front-end
+   * @param value 
+   */
   replaceNewLinesAndSanitize(value: string): string {
     return xss.filterXSS(value.replace(/(\n|\r\n)/g,'<br/>'), this.xssOptions)
   }
@@ -78,16 +92,24 @@ export default class TemplateClient {
               
               // if no params continue with the loop
               if (!params) return
-  
+              
+              if (key === 'recipient') {
+                const recipient = dict[key]
+                if (!recipient) {
+                  // recipient key must have param
+                  throw new TemplateError(`Param ${templateObject.c} not found`)
+                } else if (this.validateRecipient !== undefined && !this.validateRecipient(recipient)) {
+                  throw new InvalidRecipientError()
+                }
+              }
+             
+
               // if params provided == attempt to carry out templating
               if (dict[key]) {
                 const templated = dict[key]
                 tokens.push(templated)
                 return
               }
-  
-              // recipient key must have param
-              if (key === 'recipient') throw new TemplateError(`Param ${templateObject.c} not found`)
   
             } else { // I have not found an edge case that trips this yet
               logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)
@@ -115,13 +137,23 @@ export default class TemplateClient {
     }
   }
 
+  /**
+   * Replaces attributes in the template with the parameters specified in the csv
+   * @param templateBody 
+   * @param params 
+   */
   template(templateBody: string, params: { [key: string]: string }): string {
     const parsed = this.parseTemplate(templateBody, params)
-    // Remove extra '\' infront of single quotes and backslashes
+    // Remove extra '\' infront of single quotes and backslashes, added by Squirrelly when it escaped the csv
     const templated = parsed.tokens.join('').replace(/\\([\\'])/g, '$1')
     return xss.filterXSS(templated, this.xssOptions)
   }
 
+  /**
+   * Ensures that the csv contains all the columns necessary to replace the attributes in the template
+   * @param csvRecord 
+   * @param templateParams 
+   */
   private checkTemplateKeysMatch(csvRecord: { [key: string]: string }, templateParams: Array<string>): void {
     // if body exists, smsTemplate.params should also exist
     if (!isSuperSet(keys(csvRecord), templateParams)) {
@@ -130,6 +162,11 @@ export default class TemplateClient {
     }
   }
 
+  /**
+   * Ensures that the csv contains all the columns necessary to replace the attributes in the template.
+   * Returns a message formed from the template and parameters specified in the csv.
+   * @param param0 
+   */
   async testHydration({
     campaignId,
     s3Key,

@@ -7,31 +7,27 @@ import morgan from 'morgan'
 import config from '@core/config'
 import v1Router from '@core/routes'
 import logger from '@core/logger'
+import { clientIp, userId } from '@core/utils/morgan'
 
-const FRONTEND_URL = config.frontendUrl
+const FRONTEND_URL = config.get('frontendUrl')
+
+/**
+ * Returns a regex or a string used by cors to determine if requests comes from allowed origin
+ * @param v 
+ */
 const origin = (v: string): string | RegExp  => {
-  if(v.startsWith('/') && v.endsWith('/')){
+  if (v.startsWith('/') && v.endsWith('/')){
     // Remove the leading and trailing slash
     return new RegExp(v.substring(1, v.length-1))
   }
   return v
 }
-const morganFormat = ((tokens: morgan.TokenIndexer, req: Request, res: Response): string => {
-  return [
-    'HTTP/', req.httpVersion,
-    tokens.method(req, res),
-    tokens.url(req, res),
-    tokens.status(req, res),
-    tokens.res(req, res, 'content-length'), '-',
-    tokens.referrer(req, res),
-    `"${tokens.req(req, res, 'user-agent')}"`,
-    tokens['response-time'](req, res), 'ms',
-  ].join(' ')
-})
 
+morgan.token('client-ip', clientIp)
+morgan.token('user-id', userId)
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-//@ts-ignore
-const loggerMiddleware = morgan(morganFormat, { stream: logger.stream })
+// @ts-ignore
+const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), { stream: logger.stream })
 
 
 const expressApp = ({ app }: { app: express.Application }): void => {

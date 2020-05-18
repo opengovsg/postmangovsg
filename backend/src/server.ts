@@ -1,30 +1,18 @@
-import 'source-map-support/register'
-
-import express from 'express'
 require('dotenv').config()
 require('module-alias/register')
 
-import { checkRequiredEnvVars, loaders } from './core'
+import config from '@core/config'
+// Validate to make sure all the required env vars have been set
+config.validate()
 
-const requiredEnvVars = [
-  'AWS_REGION',
-  'FILE_STORAGE_BUCKET_NAME',
-  'SECRET_MANAGER_SALT',
-  'JWT_SECRET',
-  'DB_URI',
-  'REDIS_OTP_URI',
-  'REDIS_SESSION_URI',
-  'SESSION_SECRET',
-  'FRONTEND_URL',
-  'COOKIE_DOMAIN',
-  'API_KEY_SALT_V1',
-]
-
+/** Load the app after all env vars are set */
+import 'source-map-support/register'
+import express from 'express'
+import { loaders } from '@core/loaders'
 const port = Number(process.env.PORT) || 4000
 const app: express.Application = express()
 
 const start = async (): Promise<void> => {
-  checkRequiredEnvVars(requiredEnvVars)
   await loaders({ app })
   // eslint-disable-next-line no-console
   app.listen(port, () => console.log(`Listening on port ${port}!`))

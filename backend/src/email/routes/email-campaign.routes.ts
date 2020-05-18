@@ -53,7 +53,7 @@ const sendCampaignValidator = {
       .number()
       .integer()
       .positive()
-      .default(10),
+      .default(35),
   }),
 }
 

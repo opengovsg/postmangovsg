@@ -8,43 +8,43 @@ import { MailToSend, GetCampaignDetailsOutput, CampaignDetails } from '@core/int
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
-import { EmailContent } from '@email/interfaces'
-  
-const getEmailTemplate = (campaignId: number): Promise<EmailTemplate> => {
-  return EmailTemplate.findOne({ where: { campaignId }, attributes: ['body', 'subject'] })
-}
-  
-const getEmailContent = async (campaignId: number): Promise<EmailContent | void> => {
-  const emailTemplate = await getEmailTemplate(campaignId)
-  if (emailTemplate === null) return 
-  
-  const { body, subject } = emailTemplate
-  if (!body || !subject) return 
-  
-  return { subject, body }
-}
-  
+
+/**
+ * Gets a message's parameters
+ * @param campaignId 
+ */
 const getParams = async (campaignId: number): Promise<{ [key: string]: string } | void> => {
   const emailMessage = await EmailMessage.findOne({ where: { campaignId }, attributes: ['params'] })
   if (!emailMessage) return
   return emailMessage.params as { [key: string]: string }
 }
-  
+
+/**
+ * Replaces template's attributes with a message's parameters to return the hydrated message
+ * @param campaignId 
+ */
 const getHydratedMessage = async (campaignId: number): Promise<{ body: string; subject: string } | void> => {
-  // get email content 
-  const emailContent = await getEmailContent(campaignId)
-  
+  // get email template
+  const template = await EmailTemplateService.getFilledTemplate(campaignId)
+
   // Get params
   const params = await getParams(campaignId)
     
-  if (!emailContent || !params) return
+  if (!template || !params) return
   
-  const subject = EmailTemplateService.client.template(emailContent.subject, params)
-  const body = EmailTemplateService.client.template(emailContent.body, params)
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
+  const subject = EmailTemplateService.client.template(template?.subject!, params)
+  const body = EmailTemplateService.client.template(template?.body!, params)
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
   return { body, subject }
 }
-  
-const getHydratedMail = async (campaignId: number, recipient: string): Promise<MailToSend | void> => {
+
+/**
+ * Formats mail into format that node mailer accepts
+ * @param campaignId 
+ * @param recipient 
+ */
+const getCampaignMessage = async (campaignId: number, recipient: string): Promise<MailToSend | void> => {
   // get the body and subject 
   const message = await getHydratedMessage(campaignId)
   if (message){
@@ -57,6 +57,10 @@ const getHydratedMail = async (campaignId: number, recipient: string): Promise<M
   return 
 }
 
+/**
+ * Sends message
+ * @param mail 
+ */
 const sendEmail = async (mail: MailToSend): Promise<string | void> => {
   try {
     return MailService.mailClient.sendMail(mail)
@@ -66,9 +70,15 @@ const sendEmail = async (mail: MailToSend): Promise<string | void> => {
   }
 }
   
+/**
+ * Helper method to find an email campaign owned by that user
+ * @param campaignId 
+ * @param userId 
+ */
 const findCampaign = (campaignId: number, userId: number): Promise<Campaign> => {
   return Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.Email } })
 }
+
 /**
  * Sends a templated email to the campaign admin
  * @param campaignId 
@@ -76,17 +86,26 @@ const findCampaign = (campaignId: number, userId: number): Promise<Campaign> => 
  * @throws Error if it cannot send an email
  */
 const sendCampaignMessage = async (campaignId: number, recipient: string): Promise<void> => {
-  const mail = await getHydratedMail(+campaignId, recipient)
+  const mail = await getCampaignMessage(+campaignId, recipient)
   if (!mail) throw new Error('No message to send')
   // Send email using node mailer
   const isEmailSent = await sendEmail(mail)
   if (!isEmailSent) throw new Error(`Could not send test email to ${recipient}`)
 }
 
-const updateCredentials = (campaignId: number): Promise<[number, Campaign[]]> => {
+/**
+ * As email credentials are shared globally amongst campaigns, 
+ * update the credential column for the campaign with the default credential
+ * @param campaignId 
+ */
+const setCampaignCredential = (campaignId: number): Promise<[number, Campaign[]]> => {
   return Campaign.update({ credName: 'EMAIL_DEFAULT' }, { where: { id: campaignId } })
 }
 
+/**
+ * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
+ * @param campaignId 
+ */
 const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetailsOutput> => {
   const campaignDetails: CampaignDetails =  (await Campaign.findOne({ 
     where: { id: +campaignId }, 
@@ -117,7 +136,7 @@ const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetail
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
-  updateCredentials,
+  setCampaignCredential,
   getCampaignDetails,
   getHydratedMessage,
 }
