@@ -34,8 +34,8 @@ export default class TwilioClient {
   }
 
   private addDefaultCountryCode(recipient: string): string {
-    if (!recipient.startsWith('+') && config.defaultCountryCode) {
-      return `+${config.defaultCountryCode}${recipient}`
+    if (!recipient.startsWith('+') && config.get('defaultCountryCode')) {
+      return `+${config.get('defaultCountryCode')}${recipient}`
     }
     return recipient
   }

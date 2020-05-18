@@ -11,7 +11,7 @@ import TemplateClient from '@core/services/template-client.class'
 
 
 const validateEmailRecipient = (recipient: string): boolean => (validator.isEmail(recipient))
-const templateClient = new TemplateClient(config.xssOptions.email, validateEmailRecipient)
+const templateClient = new TemplateClient(config.get('xssOptions.email'), validateEmailRecipient)
 
 class Email {
     private workerId: string
@@ -20,7 +20,7 @@ class Email {
     constructor(workerId: string, connection: Sequelize){
       this.workerId = workerId
       this.connection = connection
-      this.mailService = new MailClient(config.mailFrom, config.mailOptions)
+      this.mailService = new MailClient(config.get('mailFrom'), config.get('mailOptions'))
     }
    
     enqueueMessages(jobId: number): Promise<void>{
@@ -49,7 +49,7 @@ class Email {
             recipients: [recipient],
             subject,
             body: hydratedBody,
-            ...(replyTo ? { replyTo } : {})
+            ...(replyTo ? { replyTo } : {}),
           })
         })
         .then((messageId) => {
