@@ -26,6 +26,11 @@ export default class S3Client {
     return this.s3.getObject(params).createReadStream()
   }
 
+  /**
+   * Ensures that the recipient column exists and converts headers to lowercase
+   * Deduplicates the csv by overriding the same recipient with newer records
+   * @param readStream 
+   */
   async parseCsv(readStream: NodeJS.ReadableStream): Promise<Array<CSVParamsInterface>> {
     const parser = CSVParse({
       delimiter: ',',
@@ -53,7 +58,7 @@ export default class S3Client {
         })
         // produces {header1: value1, header2: value2, ...}
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        params.set(row[recipientIndex!], rowWithHeaders)
+        params.set(row[recipientIndex!], rowWithHeaders) // Deduplication
       }
     }
     logger.info({ message: 'Parsing complete' })

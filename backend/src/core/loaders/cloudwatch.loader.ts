@@ -4,6 +4,9 @@ import config from '@core/config'
 import logger from '@core/logger'
 import { getInstanceId } from '@core/utils/ec2'
 
+/**
+ * Writes logs directly to cloudwatch instead of relying on Elastic beanstalk's Cloudwatch agent
+ */
 const cloudwatchLoader = async (): Promise<void> => {
   const instanceId = await getInstanceId()
   try {

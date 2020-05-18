@@ -9,8 +9,13 @@ import v1Router from '@core/routes'
 import logger from '@core/logger'
 
 const FRONTEND_URL = config.frontendUrl
+
+/**
+ * Returns a regex or a string used by cors to determine if requests comes from allowed origin
+ * @param v 
+ */
 const origin = (v: string): string | RegExp  => {
-  if(v.startsWith('/') && v.endsWith('/')){
+  if (v.startsWith('/') && v.endsWith('/')){
     // Remove the leading and trailing slash
     return new RegExp(v.substring(1, v.length-1))
   }

@@ -6,6 +6,9 @@ if (!config.redisOtpUri) {
   throw new Error('otpClient: redisOtpUri not found')
 }
 
+/**
+ * Client to redis cache for storing otps
+ */
 const otpClient = 
   redis.createClient({ url: config.redisOtpUri })
     .on('connect', () => {
@@ -19,6 +22,9 @@ if (!config.redisSessionUri) {
   throw new Error('sessionClient: redisSessionUri not found')
 }
 
+/**
+ * Client to redis cache for storing sessions
+ */
 const sessionClient = 
   redis.createClient({ url: config.redisSessionUri })
     .on('connect', () => {

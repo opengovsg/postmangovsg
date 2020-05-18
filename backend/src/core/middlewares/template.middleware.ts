@@ -3,7 +3,11 @@ import { Request, Response  } from 'express'
 import logger from '@core/logger'
 import { TemplateService } from '@core/services'
 
-// Upload start
+/**
+ * Start an upload by returning a presigned url to the user to upload file to s3 bucket
+ * @param req 
+ * @param res 
+ */
 const uploadStartHandler = async (req: Request, res: Response): Promise<Response> => {
   try {
     const contentType = req.query['mime_type']

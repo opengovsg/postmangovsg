@@ -1,9 +1,14 @@
 import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
-
 import { SmsService } from '@sms/services'
 
+/**
+ * Checks if the campaign id supplied is indeed a campaign of the 'SMS' type, and belongs to the user
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
@@ -15,7 +20,12 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
   }
 }
 
-// Parse credentials from request body
+/**
+ * Parse twilio credentials from request body, setting it to res.locals.credentials to be passed downstream
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const getCredentialsFromBody = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const {
     'twilio_account_sid': accountSid,
@@ -33,6 +43,13 @@ const getCredentialsFromBody = async (req: Request, res: Response, next: NextFun
   return next()
 }
 
+/**
+ * Parse label from request body. Retrieve credentials associated with this label, 
+ * and set the credentials to res.locals.credentials, credName to res.locals.credentialName, to be passed downstream
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const getCredentialsFromLabel = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { label } = req.body
   const userId = req.session?.user?.id
@@ -46,15 +63,19 @@ const getCredentialsFromLabel = async (req: Request, res: Response, next: NextFu
     const credentials = await CredentialService.getTwilioCredentials(userCred.credName)
     res.locals.credentials = credentials
     res.locals.credentialName = userCred.credName
-    next()
-  } catch (e) {
-    next(e)
+    return next()
+  } catch (err) {
+    return next(err)
   }
 }
 
-// Sends out a test message.
-// If it is successful, stores the twilio credential in AWS secret manager and db
-// Set credentialName in res.locals
+/**
+ * Sends a test message. If the test message succeeds, 
+ * store the credentials in AWS secrets manager and db.
+ * Set the credentialName and channelType in res.locals to be passed downstream
+ * @param req 
+ * @param res 
+ */
 const validateAndStoreCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const { recipient } = req.body
   const { campaignId } = req.params
@@ -89,7 +110,12 @@ const validateAndStoreCredentials = async (req: Request, res: Response, next: Ne
   }
 }
 
-// Assign credential to campaign
+/**
+ * Associate campaign with a credential
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const setCampaignCredential = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
@@ -104,6 +130,12 @@ const setCampaignCredential = async (req: Request, res: Response, next: NextFunc
   }
 }
 
+/**
+ * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
@@ -115,6 +147,12 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
   }
 }
 
+/**
+ * Retrieves a message for this campaign
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const previewFirstMessage = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params

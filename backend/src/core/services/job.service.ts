@@ -4,6 +4,10 @@ import get from 'lodash/get'
 import config from '@core/config'
 import { Campaign } from '@core/models'
 
+/**
+ * Inserts a job into the job_queue table. 
+ * @see ../worker/src/core/resources/sql/insert-job.sql
+ */
 const createJob = async ({ campaignId, rate }: {campaignId: number; rate: number}): Promise<number | undefined> => {
   const job = await Campaign.sequelize?.query('SELECT insert_job(:campaignId, :rate);',
     {
@@ -13,11 +17,18 @@ const createJob = async ({ campaignId, rate }: {campaignId: number; rate: number
   return jobId ? Number(jobId) : undefined
 }
 
+/**
+ * Checks if a campaign has an associated credential, a template and valid csv uploaded
+ * @param campaignId 
+ */
 const canSendCampaign = async (campaignId: number): Promise<boolean> => {
   const campaign = await Campaign.findOne({ where: { id: campaignId, valid: true, credName: { [Op.ne]: null } } })
   return campaign !== null
 }
 
+/**
+ * Calculates the number of jobs needed to support the send rate specified and inserts those jobs
+ */
 const sendCampaign = ({ campaignId, rate }: {campaignId: number; rate: number}): Promise<(number | undefined)[]> => {
   // Split jobs if the supplied send rate is higher than the rate 1 worker can support
   // The rate is distributed evenly across workers.
@@ -38,12 +49,21 @@ const sendCampaign = ({ campaignId, rate }: {campaignId: number; rate: number}):
   return Promise.all(jobs)
 }
 
+/**
+ * @see ../worker/src/core/resources/sql/stop-jobs.sql
+ * @param campaignId 
+ */
 const stopCampaign = (campaignId: number): Promise<any> | undefined => {
   return Campaign.sequelize?.query('SELECT stop_jobs(:campaignId);',
     {
       replacements: { campaignId }, type: QueryTypes.SELECT,
     })
 }
+
+/**
+ * @see ../worker/src/core/resources/sql/retry-jobs.sql
+ * @param campaignId 
+ */
 const retryCampaign = (campaignId: number): Promise<any> | undefined  => {
   return Campaign.sequelize?.query('SELECT retry_jobs(:campaignId);',
     {

@@ -33,6 +33,10 @@ export default class TwilioClient {
     })
   }
 
+  /**
+   * Add a default country code if the recipient does not contain one
+   * @param recipient 
+   */
   private addDefaultCountryCode(recipient: string): string {
     if (!recipient.startsWith('+') && config.defaultCountryCode) {
       return `+${config.defaultCountryCode}${recipient}`
@@ -40,6 +44,11 @@ export default class TwilioClient {
     return recipient
   }
 
+  /**
+   * Replace html new lines in the message with escaped new lines so that they render correctly
+   * on the mobile phone
+   * @param body 
+   */
   private replaceNewLines(body: string): string {
     return (body||'').replace(/<br\s*\/?>/g, '\n')
   }
