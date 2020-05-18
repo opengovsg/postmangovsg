@@ -1,11 +1,11 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
 
-import Login from './login'
+import LoginInput from './login-input'
 import { POSTMAN_GUIDE_URL, CONTACT_US_URL } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 
-import styles from './SignIn.module.scss'
+import styles from './Login.module.scss'
 import landingImg from 'assets/img/landing.svg'
 import appLogo from 'assets/img/app-logo.svg'
 import ogpLogo from 'assets/img/ogp-logo.svg'
@@ -25,7 +25,7 @@ const Landing = () => {
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <img className={styles.appLogo} src={appLogo} alt="Postman logo"></img>
-            <Login></Login>
+            <LoginInput></LoginInput>
           </div>
           <div className={styles.landingImg}>
             <img src={landingImg} alt="Landing page graphic"></img>

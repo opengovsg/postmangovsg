@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
 
-import styles from './Login.module.scss'
+import styles from './LoginInput.module.scss'
 import { AuthContext } from 'contexts/auth.context'
 
 const emailText = 'Sign in with your gov.sg email'

@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import Landing from 'components/landing'
 import Dashboard from 'components/dashboard'
 import Error from 'components/error'
-import SignIn from 'components/sign-in'
+import Login from 'components/login'
 
 // Routes HOC
 import ProtectedRoute from 'routes/protected.route'
@@ -22,7 +22,7 @@ const App = () => {
       <AuthContextProvider>
         <Switch>
           <Route exact path="/" component={Landing}></Route>
-          <Route exact path="/signin" component={SignIn}></Route>
+          <Route exact path="/signin" component={Login}></Route>
           <ProtectedRoute>
             <Dashboard></Dashboard>
           </ProtectedRoute>
