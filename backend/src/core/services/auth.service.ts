@@ -4,6 +4,7 @@ import { Request } from 'express'
 import config from '@core/config'
 import logger from '@core/logger'
 import { User } from '@core/models'
+import { validateDomain } from '@core/utils/validate-domain'
 import { RedisService, ApiKeyService, MailService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 
@@ -91,7 +92,7 @@ const hasWaitTimeElapsed = async (email: string): Promise<void> => {
  * @param email 
  */
 const isWhitelistedEmail = async (email: string): Promise<boolean> => {
-  const endsInWhitelistedDomain = config.get('validateDomain')(email)
+  const endsInWhitelistedDomain = validateDomain(email)
   if (!endsInWhitelistedDomain){ 
     // If the email does not end in a whitelisted domain, check that it was  whitelisted by us manually
     const user = await User.findOne({ where: { email: email } })

@@ -5,8 +5,7 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
-import getDomainValidator from './utils/get-domain-validator'
-
+const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem')) 
 /**
  * To require an env var without setting a default,
  * use
@@ -35,11 +34,11 @@ const config = convict({
   env: {
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
-    default: 'development',
+    default: 'production',
     env: 'NODE_ENV',
   },
   IS_PROD: {
-    default: false,
+    default: true,
   },
   APP_NAME: {
     doc: 'Name of the app',
@@ -54,12 +53,12 @@ const config = convict({
     },
     logGroupName: {
       doc: '	Name of Cloudwatch log group to write application logs to',
-      default: 'postmangovsg-beanstalk-testing',
+      default: 'postmangovsg-beanstalk-prod',
       env: 'AWS_LOG_GROUP_NAME',
     },
     uploadBucket: {
       doc: 'Name of the S3 bucket that is used to store file uploads',
-      default:  'postmangovsg-dev-upload',
+      default:  'postmangovsg-prod-upload',
       env: 'FILE_STORAGE_BUCKET_NAME',
     },
     secretManagerSalt: {
@@ -80,10 +79,15 @@ const config = convict({
     },
     dialectOptions: {
       ssl: {
+        require: {
+          doc: 'Require SSL connection to database',
+          default: true,
+          env: 'DB_REQUIRE_SSL',
+        },
         rejectUnauthorized: true,
         ca: {
           doc: 'SSL cert to connect to database',
-          default: false,
+          default: [rdsCa],
           format: '*',
           sensitive: true,
         },
@@ -124,7 +128,7 @@ const config = convict({
   },
   frontendUrl: {
     doc: 'CORS: accept requests from this origin. Can be a string, or regex',
-    default: 'http://localhost:3000',
+    default: 'https//postman.gov.sg', // prod only
     env: 'FRONTEND_URL',
   },
   session: {
@@ -143,12 +147,12 @@ const config = convict({
     cookieSettings:{
       httpOnly:{
         doc: 'Specifies the boolean value for the HttpOnly Set-Cookie attribute.',
-        default: false,
+        default: true,
         env: 'COOKIE_HTTP_ONLY',
       },
       secure:{
         doc: 'true will set a secure cookie that is sent only over HTTPS.',
-        default: false,
+        default: true,
         env: 'COOKIE_SECURE',
       },
       maxAge:{
@@ -164,7 +168,7 @@ const config = convict({
       },
       domain:{
         doc: 'Specifies the value for the Domain Set-Cookie attribute',
-        default: 'localhost',
+        default: 'postman.gov.sg', // only root domain
         env: 'COOKIE_DOMAIN',
       },
       path:{
@@ -318,41 +322,13 @@ const config = convict({
   },
 })
 
-// Both production and staging environments are considered as prod environments on AWS
-config.set('IS_PROD', ['production', 'staging'].includes(config.get('env')))
 
 // If mailFrom was not set in an env var, set it using the app_name
 const defaultMailFrom =  `${config.get('APP_NAME')} <donotreply@mail.postman.gov.sg>`
 config.set('mailFrom', config.get('mailFrom') ||  defaultMailFrom)
 
-// Derive the DomainValidatorFunction from the list of domains supplied
-config.set('validateDomain', getDomainValidator(config.get('domains')))
-
-// If the environment is a prod environment, we must connect to the database with an ssl cert
-const rdsCa = fs.readFileSync(path.join(__dirname, '../../assets/db-ca.pem')) 
-config.set('database.dialectOptions.ssl.ca', config.get('IS_PROD') ? [rdsCa] : false)
-
 // Override some defaults
 switch (config.get('env')){
-case 'production':
-  config.load({
-    frontendUrl: 'https://postman.gov.sg', // prod only
-    aws: {
-      uploadBucket:  'postmangovsg-prod-upload',
-      logGroupName: 'postmangovsg-beanstalk-prod',
-    },
-    session: {
-      cookieSettings: {
-        httpOnly: true,
-        secure: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: true,
-        domain:  'postman.gov.sg', //root domain only
-        path: '/',
-      },
-    },
-  })
-  break
 case 'staging':
   config.load({
     frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
@@ -363,13 +339,42 @@ case 'staging':
     session: {
       cookieSettings: {
         httpOnly: true,
-        secure: true,
+        secure: true, // Can only be sent via https
         maxAge: 24 * 60 * 60 * 1000,
         sameSite: true,
         domain: '.postman.gov.sg', // all subdomains
         path: '/',
       },
     },
+  })
+  break
+case 'development':  
+  config.set('IS_PROD', false)
+  config.load({
+    frontendUrl: 'http://localhost:3000',
+    aws: {
+      uploadBucket:  'postmangovsg-dev-upload',
+      logGroupName: 'postmangovsg-beanstalk-testing',
+    },
+    database: {
+      dialectOptions: {
+        ssl: {
+          require: false, // No ssl connection needed
+          rejectUnauthorized: true,
+          ca: false, 
+        },
+      },
+    },
+    session: {
+      cookieSettings: {
+        httpOnly: true,
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: true,
+        domain:  'localhost',
+        path: '/',
+      },
+    }, 
   })
   break
 }

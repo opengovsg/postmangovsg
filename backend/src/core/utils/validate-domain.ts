@@ -1,8 +1,8 @@
 import validator from 'validator'
 import logger from '@core/logger'
-
-type DomainValidatorFunction = (email: string) => boolean 
-const getDomainValidator = (domains: string): DomainValidatorFunction => {
+import config from '@core/config'
+type ValidateDomainFunction = (email: string) => boolean 
+const getValidateDomain = (domains: string): ValidateDomainFunction => {
   const domainsToWhitelist: string[] = domains
     .split(';')
     .map(domain => {
@@ -34,4 +34,6 @@ const getDomainValidator = (domains: string): DomainValidatorFunction => {
   })
 }
 
-export default getDomainValidator
+const validateDomain = getValidateDomain(config.get('domains'))
+
+export { validateDomain }
