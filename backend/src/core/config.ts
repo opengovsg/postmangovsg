@@ -1,3 +1,5 @@
+import { Request, Response } from 'express'
+import morgan from 'morgan'
 import fs from 'fs'
 import path from 'path'
 const parseEnvVarAsInt = (i: string): number | undefined => {
@@ -27,7 +29,9 @@ const redisOtpUri: string = process.env.REDIS_OTP_URI as string
 const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 
 // Format for logging
-const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] :remote-addr ":referrer" ":user-agent" :response-time ms; :date[iso]'
+const clientIp = (req: Request, _res: Response) => {return req.ip}
+morgan.token('client-ip', clientIp)
+const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] :client-ip ":referrer" ":user-agent" :response-time ms; :date[iso]'
 
 // CORS settings
 const frontendUrl: string = process.env.FRONTEND_URL as string
