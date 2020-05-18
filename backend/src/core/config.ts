@@ -30,7 +30,12 @@ const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 
 // Format for logging
 const clientIp = (req: Request, _res: Response) => {
-  console.log(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
+  /**
+   * @see: https://support.cloudflare.com/hc/en-us/articles/200170786
+   * @see: https://stackoverflow.com/a/52026771
+   */
+  console.log(`cf-connecting-ip: ${req.headers['cf-connecting-ip']}; x-forwarded-for: ${req.headers['x-forwarded-for']}; conn.remoteAddress: ${req.connection.remoteAddress}`)
+  console.log(`req.ips: ${req.ips}`)
   return req.ip
 }
 morgan.token('client-ip', clientIp)
