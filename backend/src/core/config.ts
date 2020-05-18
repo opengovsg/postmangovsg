@@ -100,6 +100,7 @@ export default {
     databaseUri,
     dialectOptions: {
       ssl: {
+        require: IS_PROD,
         rejectUnauthorized: true,
         ca: [rdsCa],
       },
