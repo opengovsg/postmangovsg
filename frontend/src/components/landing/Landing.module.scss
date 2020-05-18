@@ -225,6 +225,15 @@ $thinner-section-horizontal-padding: $site-padding * 6;
         align-items: center;
       }
 
+      video {
+        width: 25rem;
+        margin-right: 2rem;
+
+        @include mobile() {
+          margin-right: 0;
+        }
+      }
+
       .textContainer {
         width: 50%;
       }

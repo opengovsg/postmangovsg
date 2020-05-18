@@ -26,6 +26,8 @@ import userImg from 'assets/img/landing/moe-circle.png'
 
 import onboardingImg from 'assets/img/landing/Onboarding.svg'
 
+import testVideo from 'assets/mp4/test.mp4'
+
 const Landing = () => {
   const authContext = useContext(AuthContext)
 
@@ -89,7 +91,9 @@ const Landing = () => {
         <div className={styles.innerContainer}>
           <h1>Why use Postman</h1>
           <div className={styles.reason}>
-            <img src={reliableImg} alt="Reliable"/>
+            <video autoPlay loop muted>
+              <source src={testVideo} type="video/mp4" />
+            </video>
             <div className={styles.textContainer}>
               <h3>Multichannel</h3>
               <p>No more toggling between your Outlook and SMS portal. You can reach your recipient via SMS and email in the same product!</p>
