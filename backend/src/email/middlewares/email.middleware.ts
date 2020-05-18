@@ -60,8 +60,16 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
 const previewFirstMessage = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
+    const message = await EmailService.getHydratedMessage(+campaignId)
+    if (!message) throw new Error('Failed to get message')
+    
+    const { body, subject, replyTo: reply_to } = message
     return res.json({
-      preview: await EmailService.getHydratedMessage(+campaignId),
+      preview: {
+        body,
+        subject,
+        reply_to
+      }
     })
   } catch (err){
     return next(err)
