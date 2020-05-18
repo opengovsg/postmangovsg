@@ -21,7 +21,6 @@ $navbar-mobile-height: 4rem;
   .appLogo {
     @include flex-horizontal;
     img {
-      border: 1px solid blue;
       height: 3rem;
     }
   }
