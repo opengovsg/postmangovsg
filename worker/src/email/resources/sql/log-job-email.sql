@@ -17,4 +17,6 @@ BEGIN
 	AND m.recipient = p.recipient;
 
 	DELETE FROM email_ops p WHERE  p.campaign_id = selected_campaign_id;
+
+  PERFORM update_stats_email(selected_campaign_id);
 END $$
