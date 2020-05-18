@@ -32,7 +32,7 @@ const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 // Format for logging
 morgan.token('client-ip', clientIp)
 
-const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] :client-ip ":referrer" ":user-agent" :response-time ms; :date[iso]'
+const MORGAN_LOG_FORMAT = ':client-ip - :remote-user [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :response-time ms'
 
 // CORS settings
 const frontendUrl: string = process.env.FRONTEND_URL as string
