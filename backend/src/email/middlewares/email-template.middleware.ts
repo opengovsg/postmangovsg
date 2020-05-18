@@ -109,7 +109,9 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         templateBody: emailTemplate.body as string,
         templateParams: emailTemplate.params as string[],
       })
-        
+  
+      if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
+      
       const recipientCount: number = records.length
        
       // START populate template
