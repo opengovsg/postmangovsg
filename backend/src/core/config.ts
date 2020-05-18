@@ -41,15 +41,7 @@ const clientIp = (req: Request, _res: Response): string => {
     ? req.headers['cf-connecting-ip'].join(',')
     : req.headers['cf-connecting-ip']
 
-  const xFowardedForHeaders: string | undefined = isArray(
-    req.headers['x-forwarded-for']
-  )
-    ? req.headers['x-forwarded-for'].join(',')
-    : req.headers['x-forwarded-for']
-
-  const remoteAddress: string | undefined = req.connection.remoteAddress
-
-  return cfConnectingIp || xFowardedForHeaders || remoteAddress || req.ip
+  return cfConnectingIp || req.ip
 }
 
 morgan.token('client-ip', clientIp)
