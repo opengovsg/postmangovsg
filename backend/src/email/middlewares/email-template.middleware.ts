@@ -123,7 +123,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         'num_recipients': recipientCount,
         preview: {
           ...hydratedRecord,
-          reply_to: emailTemplate.replyTo
+          reply_to: emailTemplate.replyTo || null
         },
       })
   
