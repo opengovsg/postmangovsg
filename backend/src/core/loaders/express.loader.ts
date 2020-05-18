@@ -8,7 +8,7 @@ import config from '@core/config'
 import v1Router from '@core/routes'
 import logger from '@core/logger'
 
-const FRONTEND_URL = config.frontendUrl
+const FRONTEND_URL = config.get('frontendUrl')
 
 /**
  * Returns a regex or a string used by cors to determine if requests comes from allowed origin

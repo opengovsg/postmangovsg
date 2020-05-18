@@ -28,7 +28,7 @@ export class User extends Model<User> {
   @BeforeUpdate
   @BeforeCreate
   static validateEmail(instance: User): void {
-    if (!config.validateDomain(instance.email)) {
+    if (!config.get('validateDomain')(instance.email)) {
       throw new Error(`User email ${instance.email} does not end in a whitelisted domain`)
     }
   }

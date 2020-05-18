@@ -101,7 +101,7 @@ const isCookieOrApiKeyAuthenticated = async (req: Request, res: Response, next: 
 const logout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   return new Promise <Response | void> ((resolve, reject) => {
    req.session?.destroy((err) => {
-     res.cookie(config.session.cookieName, '', { expires: new Date() }) // Makes cookie expire immediately
+     res.cookie(config.get('session.cookieName'), '', { expires: new Date() }) // Makes cookie expire immediately
      if (!err) {
        resolve(res.sendStatus(200))
      }

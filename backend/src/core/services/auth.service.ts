@@ -8,7 +8,7 @@ import { RedisService, ApiKeyService, MailService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 
 const SALT_ROUNDS = 10 // bcrypt default
-const { retries: OTP_RETRIES, expiry: OTP_EXPIRY, resendTimeout: OTP_RESEND_TIMEOUT } = config.otp
+const { retries: OTP_RETRIES, expiry: OTP_EXPIRY, resendTimeout: OTP_RESEND_TIMEOUT } = config.get('otp')
 
 /**
  * Generate a six digit otp
@@ -91,7 +91,7 @@ const hasWaitTimeElapsed = async (email: string): Promise<void> => {
  * @param email 
  */
 const isWhitelistedEmail = async (email: string): Promise<boolean> => {
-  const endsInWhitelistedDomain = config.validateDomain(email)
+  const endsInWhitelistedDomain = config.get('validateDomain')(email)
   if (!endsInWhitelistedDomain){ 
     // If the email does not end in a whitelisted domain, check that it was  whitelisted by us manually
     const user = await User.findOne({ where: { email: email } })
@@ -162,9 +162,9 @@ const sendOtp = async (email: string): Promise<string | void> => {
 
   return MailService.mailClient.sendMail({
     recipients: [email],
-    subject: `One-Time Password (OTP) for ${config.APP_NAME}`,
+    subject: `One-Time Password (OTP) for ${config.get('APP_NAME')}`,
     body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(OTP_EXPIRY / 60)} minutes.
-    Please use this to login to your ${config.APP_NAME} account. <p>If your OTP does not work, please request for a new OTP.</p>`,
+    Please use this to login to your ${config.get('APP_NAME')} account. <p>If your OTP does not work, please request for a new OTP.</p>`,
   })
 }
 

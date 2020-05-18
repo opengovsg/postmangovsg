@@ -4,10 +4,10 @@ import config from '@core/config'
 import logger from '@core/logger'
 import { jwtUtils } from '@core/utils/jwt'
 
-const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
+const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 const s3 = new S3({
   signatureVersion: 'v4',
-  region: config.aws.awsRegion,
+  region: config.get('aws.awsRegion'),
 })
 
 /**

@@ -11,7 +11,7 @@ import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
 const validateSmsRecipient = (recipient: string): boolean => (/^\+?[0-9]+$/.test(recipient))
-const client = new TemplateClient(config.xssOptions.sms, validateSmsRecipient)
+const client = new TemplateClient(config.get('xssOptions.sms'), validateSmsRecipient)
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook, 

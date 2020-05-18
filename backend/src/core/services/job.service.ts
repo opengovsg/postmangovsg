@@ -33,7 +33,7 @@ const sendCampaign = ({ campaignId, rate }: {campaignId: number; rate: number}):
   // Split jobs if the supplied send rate is higher than the rate 1 worker can support
   // The rate is distributed evenly across workers.
   const jobs = []
-  const workersNeeded = Math.ceil(rate / config.maxRatePerJob)
+  const workersNeeded = Math.ceil(rate / config.get('maxRatePerJob'))
   const averageWorkerRate = Math.ceil(rate / workersNeeded)
   const lastWorkerRate = rate - (averageWorkerRate * (workersNeeded - 1))
 

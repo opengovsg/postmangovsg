@@ -9,7 +9,7 @@ import { Credential, UserCredential, User } from '@core/models'
 import { TwilioCredentials } from '@sms/interfaces'
 import { UserSettings } from '@core/interfaces'
 
-const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
+const secretsManager = new AWS.SecretsManager({ region: config.get('aws.awsRegion') })
 
 /**
  * Checks if the credential has been saved
@@ -30,7 +30,7 @@ const isExistingCredential = async (name: string): Promise<boolean> => {
  * @param secret 
  */
 const storeCredential = async (name: string, secret: string): Promise<void> => {
-  if (!config.IS_PROD) {
+  if (!config.get('IS_PROD')) {
     logger.info(`Dev env - storeSecret - skipping for name=${name}`)
     return
   }
@@ -59,9 +59,9 @@ const storeCredential = async (name: string, secret: string): Promise<void> => {
  * @param name 
  */
 const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> => {
-  if (!config.IS_PROD) {
+  if (!config.get('IS_PROD')) {
     logger.info(`Dev env - getTwilioCredentials - returning default credentials for name=${name}`)
-    return config.smsOptions
+    return config.get('smsOptions')
   }
   logger.info('Getting secret from AWS secrets manager.')
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
