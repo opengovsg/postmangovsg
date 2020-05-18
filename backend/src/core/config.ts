@@ -1,5 +1,8 @@
 import fs from 'fs'
 import path from 'path'
+import morgan from 'morgan'
+import { clientIp, userId } from '@core/utils/morgan'
+
 const parseEnvVarAsInt = (i: string): number | undefined => {
   const j = parseInt(i)
   return isNaN(j) ? undefined : j
@@ -27,7 +30,9 @@ const redisOtpUri: string = process.env.REDIS_OTP_URI as string
 const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 
 // Format for logging
-const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
+morgan.token('client-ip', clientIp)
+morgan.token('user-id', userId)
+const MORGAN_LOG_FORMAT = ':client-ip - :user-id [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :response-time ms'
 
 // CORS settings
 const frontendUrl: string = process.env.FRONTEND_URL as string
@@ -73,8 +78,8 @@ const xssOptionsEmail = {
     p: [],
     a: ['href', 'title', 'target'],
     img: ['src', 'alt', 'title', 'width', 'height'],
-  }, 
-  stripIgnoreTag: true, 
+  },
+  stripIgnoreTag: true,
 }
 const xssOptionsSms = {
   whiteList: { br: [] },
@@ -84,7 +89,7 @@ const xssOptionsSms = {
 // Rate for job (any rate higher than this will be split)
 const maxRatePerJob = parseEnvVarAsInt(process.env.MAX_RATE_PER_JOB as string) || 150
 
-// For API Key hashing 
+// For API Key hashing
 const apiKeySalt: string = process.env.API_KEY_SALT_V1 as string
 const apiKeyVersion = 'v1'
 
