@@ -1,18 +1,27 @@
 import { difference, keys, mapKeys } from 'lodash'
+import xss from 'xss'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 
 import S3Client from '@core/services/s3-client.class'
 import logger from '@core/logger'
-import { MissingTemplateKeysError, TemplateError } from '@core/errors/template.errors'
+import { MissingTemplateKeysError, TemplateError, InvalidRecipientError } from '@core/errors/template.errors'
 import { isSuperSet } from '@core/utils'
 
-import xss from 'xss'
 
+
+type ValidateRecipientFunction = (recipient: string) => boolean
 export default class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
-  constructor(xssOptions?: xss.IFilterXSSOptions){
+  validateRecipient: ValidateRecipientFunction | undefined
+  /**
+   * Constructor for TemplateClient
+   * @param validateRecipient Function to test if recipient is of a valid format
+   * @param xssOptions Whitelist of html tags that will not be stripped
+   */
+  constructor(xssOptions?: xss.IFilterXSSOptions, validateRecipient?: ValidateRecipientFunction) {
     this.xssOptions = xssOptions
+    this.validateRecipient = validateRecipient
   }
 
   replaceNewLinesAndSanitize(value: string): string {
@@ -78,16 +87,24 @@ export default class TemplateClient {
               
               // if no params continue with the loop
               if (!params) return
-  
+              
+              if (key === 'recipient') {
+                const recipient = dict[key]
+                if (!recipient) {
+                  // recipient key must have param
+                  throw new TemplateError(`Param ${templateObject.c} not found`)
+                } else if (this.validateRecipient !== undefined && !this.validateRecipient(recipient)) {
+                  throw new InvalidRecipientError()
+                }
+              }
+             
+
               // if params provided == attempt to carry out templating
               if (dict[key]) {
                 const templated = dict[key]
                 tokens.push(templated)
                 return
               }
-  
-              // recipient key must have param
-              if (key === 'recipient') throw new TemplateError(`Param ${templateObject.c} not found`)
   
             } else { // I have not found an edge case that trips this yet
               logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)

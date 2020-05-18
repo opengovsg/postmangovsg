@@ -24,9 +24,13 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
 
   async function loadPreview() {
     if (campaignId) {
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if (msgPreview) {
-        setPreview(msgPreview)
+      try {
+        const msgPreview = await getPreviewMessage(+campaignId)
+        if (msgPreview) {
+          setPreview(msgPreview)
+        }
+      } catch (err){
+        setErrorMessage(err.message)
       }
     }
   }

@@ -89,8 +89,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         templateParams: smsTemplate.params as string[],
       })
 
-      if (SmsTemplateService.hasInvalidSmsRecipient(records)) throw new InvalidRecipientError()
-
       const recipientCount: number = records.length
       // START populate template
       await SmsTemplateService.addToMessageLogs(+campaignId, records)

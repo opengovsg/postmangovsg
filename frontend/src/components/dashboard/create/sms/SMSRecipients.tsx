@@ -24,10 +24,15 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
 
   async function loadPreview() {
     if (campaignId) {
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if (msgPreview) {
-        setPreview(msgPreview)
+      try {
+        const msgPreview = await getPreviewMessage(+campaignId)
+        if (msgPreview) {
+          setPreview(msgPreview)
+        }
+      } catch (err) {
+        setErrorMessage(err.message)
       }
+
     }
   }
 

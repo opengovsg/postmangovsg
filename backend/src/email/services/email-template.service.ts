@@ -11,7 +11,8 @@ import TemplateClient from '@core/services/template-client.class'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
-const client = new TemplateClient(config.xssOptions.email)
+const validateEmailRecipient = (recipient: string): boolean => (validator.isEmail(recipient))
+const client = new TemplateClient(config.xssOptions.email, validateEmailRecipient)
 
 const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
   let transaction
@@ -192,15 +193,10 @@ const addToMessageLogs = async (campaignId: number, records: Array<object>): Pro
   }
 }
 
-const hasInvalidEmailRecipient = (records: MessageBulkInsertInterface[]): boolean => {
-  return records.some((record) => !validator.isEmail(record.recipient))
-}
-
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
-  hasInvalidEmailRecipient,
   client,
 }
   
