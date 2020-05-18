@@ -6,7 +6,7 @@ import { Campaign } from '@core/models'
 
 /**
  * Inserts a job into the job_queue table. 
- * See ../worker/src/core/resources/sql/insert-job.sql
+ * @see ../worker/src/core/resources/sql/insert-job.sql
  */
 const createJob = async ({ campaignId, rate }: {campaignId: number; rate: number}): Promise<number | undefined> => {
   const job = await Campaign.sequelize?.query('SELECT insert_job(:campaignId, :rate);',
@@ -50,7 +50,7 @@ const sendCampaign = ({ campaignId, rate }: {campaignId: number; rate: number}):
 }
 
 /**
- * See ../worker/src/core/resources/sql/stop-jobs.sql
+ * @see ../worker/src/core/resources/sql/stop-jobs.sql
  * @param campaignId 
  */
 const stopCampaign = (campaignId: number): Promise<any> | undefined => {
@@ -61,7 +61,7 @@ const stopCampaign = (campaignId: number): Promise<any> | undefined => {
 }
 
 /**
- * See ../worker/src/core/resources/sql/retry-jobs.sql
+ * @see ../worker/src/core/resources/sql/retry-jobs.sql
  * @param campaignId 
  */
 const retryCampaign = (campaignId: number): Promise<any> | undefined  => {
