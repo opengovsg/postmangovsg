@@ -6,6 +6,8 @@ import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
 
+const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem')) 
+
 convict.addFormats({
   'required-string': {
     validate:  (val: any): void => {
@@ -27,11 +29,11 @@ const config = convict({
   env: {
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
-    default: 'development',
+    default: 'production',
     env: 'NODE_ENV',
   },
   IS_PROD: {
-    default: false,
+    default: true,
   },
   aws: {
     awsRegion: {
@@ -68,10 +70,15 @@ const config = convict({
     },
     dialectOptions: {
       ssl: {
+        require: {
+          doc: 'Require SSL connection to database',
+          default: true,
+          env: 'DB_REQUIRE_SSL',
+        },
         rejectUnauthorized: true,
         ca: {
           doc: 'SSL cert to connect to database',
-          default: false,
+          default: [rdsCa],
           format: '*',
           sensitive: true,
         },
@@ -200,23 +207,34 @@ const config = convict({
 },
 )
 
-// Both production and staging environments are considered as prod environments on AWS
-config.set('IS_PROD', ['production', 'staging'].includes(config.get('env')))
+
 
 // If mailFrom was not set in an env var, set it using the app_name
 const defaultMailFrom =  'Postman.gov.sg <donotreply@mail.postman.gov.sg>'
 config.set('mailFrom', config.get('mailFrom') ||  defaultMailFrom)
 
-// If the environment is a prod environment, we must connect to the database with an ssl cert
-const rdsCa = fs.readFileSync(path.join(__dirname, '../../assets/db-ca.pem')) 
-if (config.get('IS_PROD')){
-  config.set('database.dialectOptions.ssl.ca',  [rdsCa] )
-  
-  if ((config.get('messageWorker.numSender') + config.get('messageWorker.numLogger')) !== 1){
-    throw new Error(`Only 1 worker of 1 variant per task supported in production. 
+// Only development is a non-production environment
+// Override with local config
+if (config.get('env') === 'development'){
+  config.load({
+    'IS_PROD': false,
+    database: {
+      dialectOptions: {
+        ssl: {
+          require: false, // No ssl connection needed
+          rejectUnauthorized: true,
+          ca: false, 
+        },
+      },
+    },
+  })
+}
+
+// If the environment is a prod environment, we ensure that there is only 1 worker per ecs task
+if (config.get('IS_PROD')&& (config.get('messageWorker.numSender') + config.get('messageWorker.numLogger')) !== 1){
+  throw new Error(`Only 1 worker of 1 variant per task supported in production. 
     You supplied MESSAGE_WORKER_SENDER=${config.get('messageWorker.numSender')}, 
     MESSAGE_WORKER_LOGGER=${config.get('messageWorker.numLogger')}`)
-  }
 }
 
 // If a message worker is set, ensure that the credentials needed are also set
