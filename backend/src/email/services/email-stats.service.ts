@@ -3,7 +3,8 @@ import { JobQueue } from '@core/models'
 import { StatsService } from '@core/services'
 import { CampaignStats } from '@core/interfaces'
 
-import { EmailMessage, EmailOp } from '@email/models'
+import { EmailOp } from '@email/models'
+
 /**
  * Gets stats from the ops table if job is still being worked on by a sender, otherwise, get the stats from the message logs table
  * @param campaignId 
@@ -18,7 +19,7 @@ const getStats = async (campaignId: number): Promise<CampaignStats> => {
     return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
   }
   
-  const stats = await StatsService.getStatsFromTable(EmailMessage, campaignId) 
+  const stats = await StatsService.getStatsFromArchive(campaignId) 
   return { error: stats.error, unsent: stats.unsent, sent: stats.sent, status: job.status }
 } 
   
