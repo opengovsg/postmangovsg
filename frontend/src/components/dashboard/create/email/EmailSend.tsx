@@ -32,7 +32,7 @@ const EmailSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: F
 
 
   const onModalConfirm = async () => {
-    await sendCampaign(+campaignId, 0)
+    await sendCampaign(+campaignId, 35)
     onNext({ status: Status.Sending }, false)
   }
 
