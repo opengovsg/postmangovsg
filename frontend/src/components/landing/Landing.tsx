@@ -19,12 +19,6 @@ import mohAgencyImg from 'assets/img/landing/moh.png'
 import moeAgencyImg from 'assets/img/landing/moe.png'
 import momAgencyImg from 'assets/img/landing/mom.png'
 
-// how it works
-import chooseChannelImg from 'assets/img/landing/choose-channel.svg'
-import createMessageImg from 'assets/img/landing/create-message.svg'
-import uploadContactsImg from 'assets/img/landing/upload-contacts.svg'
-import sendMessageImg from 'assets/img/landing/send-message.svg'
-
 import reliableImg from 'assets/img/landing/WhyUsePostman-1.svg'
 import reattemptImg from 'assets/img/landing/WhyUsePostman-2.svg'
 import trackImg from 'assets/img/landing/WhyUsePostman-3.svg'
@@ -45,22 +39,10 @@ const Landing = () => {
     window.location.href = '/signin'
   }
 
-  // how it works
-  function directToGuide() {
-    window.location.href = POSTMAN_GUIDE_URL
-  }
-
   const trustedAgencies = [
     { img: mohAgencyImg, alt: 'MOH' },
     { img: momAgencyImg, alt: 'MOM' },
     { img: moeAgencyImg, alt: 'MOE' },
-  ]
-
-  const features = [
-    { img: chooseChannelImg, alt: 'Choose channel', title: 'Choose Channel', text: 'Select either SMS or email and name the campaign' },
-    { img: createMessageImg, alt: 'Create message', title: 'Create Message', text: 'Personalise messages using attributes' },
-    { img: uploadContactsImg, alt: 'Upload contacts', title: 'Upload Contacts', text: 'Upload recipients list in CSV format' },
-    { img: sendMessageImg, alt: 'Send message', title: 'Send Message', text: 'Do a test send before mass sendout' },
   ]
 
   const questions = [
@@ -102,25 +84,6 @@ const Landing = () => {
           </div>
         </div>
       </div >
-
-      <div className={styles.howItWorks}>
-        <h1>How it works</h1>
-        <h2>Send mass messages to citizens with minimum setup required</h2>
-
-        <div className={styles.features}>
-          {features.map(feature =>
-            <div className={styles.feature} key={feature.title}>
-              <img src={feature.img} alt={feature.alt}/>
-              <h3>{feature.title}</h3>
-              <span className={styles.featureText}>{feature.text}</span>
-            </div>
-          )}
-        </div>
-
-        <PrimaryButton className={styles.learnMoreBtn} onClick={directToGuide}>
-          Learn more <img className={styles.arrowRight} src={arrowRight} alt="Right arrow"/>
-        </PrimaryButton>
-      </div>
 
       <div className={styles.whyUsePostman}>
         <div className={styles.innerContainer}>
