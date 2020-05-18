@@ -374,7 +374,4 @@ case 'staging':
   break
 }
 
-// Validate to make sure all the required env vars have been set
-config.validate()
-
 export default config
