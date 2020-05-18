@@ -186,13 +186,13 @@ const config = convict({
   messageWorker: {
     numSender: {
       doc: 'Number of sender workers',
-      default: 1,
+      default: 0,
       env: 'MESSAGE_WORKER_SENDER',
       format: 'int',
     },
     numLogger: {
       doc: 'Number of logger workers',
-      default: 1,
+      default: 0,
       env: 'MESSAGE_WORKER_LOGGER',
       format: 'int',
     },
