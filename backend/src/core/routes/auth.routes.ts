@@ -22,7 +22,7 @@ const verifyOtpValidator = {
       .required(),
     otp: Joi.string()
       .length(6)
-      .pattern(/^\d+$/, { name: "numbers" })
+      .pattern(/^\d+$/, { name: 'numbers' })
       .required(),
   }),
 }

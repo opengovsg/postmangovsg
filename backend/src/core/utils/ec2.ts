@@ -1,9 +1,10 @@
-import axios from 'axios'
+/* eslint-disable no-console */
+import axios, { AxiosResponse } from 'axios'
 
 /**
  * @see https://github.com/axios/axios/issues/647#issuecomment-322209906
  */
-const queryAwsMetadata  = () => {
+const queryAwsMetadata = (): Promise<AxiosResponse> => {
   const CancelToken = axios.CancelToken
   const source = CancelToken.source()
 
