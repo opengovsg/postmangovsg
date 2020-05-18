@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from 'react'
 import cx from 'classnames'
-
+import { GUIDE_POWER_USER_URL } from 'config'
 import { TextInput } from 'components/common'
 import styles from './SendRate.module.scss'
 
@@ -21,7 +21,7 @@ const SendRate = ({ sendRate, setSendRate }: { sendRate: string; setSendRate: Di
           <p>You can send messages at a rapid rate, as long as the requests do not max out Twilio&apos;s
           REST API concurrency limit.&nbsp;
           <a
-            href="https://guide.postman.gov.sg/poweruser.html"
+            href={GUIDE_POWER_USER_URL}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}>

@@ -4,12 +4,12 @@ import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
 import { get } from 'lodash'
 
-const secretsManager = new AWS.SecretsManager({ region: config.aws.awsRegion })
+const secretsManager = new AWS.SecretsManager({ region: config.get('aws.awsRegion') })
 
 const getTwilioCredentials = async (name: string): Promise<TwilioCredentials> => {
-  if(!config.IS_PROD){
+  if (!config.get('IS_PROD')){
     logger.info(`Dev env - getTwilioCredentials - returning default credentials for name=${name}`)
-    return config.smsOptions
+    return config.get('smsOptions')
   }
   logger.info('Getting secret from AWS secrets manager.')
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()

@@ -1,8 +1,21 @@
 version: 0.1
+env:
+  variables:
+      BACKEND_URL_PRODUCTION: "https://api.postman.gov.sg/v1"
+      BACKEND_URL_STAGING: "https://api-staging.postman.gov.sg/v1"
+      REACT_APP_TITLE: "Postman.gov.sg"
+      REACT_APP_DESCRIPTION: "Postman.gov.sg enables public officers to send templated messages to many recipients"
+      REACT_APP_GUIDE_URL: "https://guide.postman.gov.sg"
+      REACT_APP_GUIDE_CREDENTIALS_URL: "https://guide.postman.gov.sg/twilio-sms.html#where-can-i-find-credentials-on-the-twilio-console"
+      REACT_APP_GUIDE_POWER_USER_URL: "https://guide.postman.gov.sg/poweruser.html"
+      REACT_APP_CONTACT_US_URL: "https://form.gov.sg/#!/5e8db1736d789b0011743202"
+      REACT_APP_LOGIN_EMAIL_TEXT: "Sign in with your .gov.sg email"
+      REACT_APP_LOGIN_EMAIL_PLACEHOLDER: "e.g. postman@agency.gov.sg"
 frontend:
   phases:
     preBuild:
       commands:
+        - if [ "${AWS_BRANCH}" = "master" ]; then export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION}; else export REACT_APP_BACKEND_URL=${BACKEND_URL_STAGING}; fi
         - cd frontend
         - npm ci
     build:

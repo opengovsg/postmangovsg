@@ -75,11 +75,11 @@ const finalize = (): Promise<void> => {
 }
 
 const createConnection = (): Sequelize => {
-  const dialectOptions = config.IS_PROD ? config.database.dialectOptions : {}
-  return new Sequelize(config.database.databaseUri, {
+  const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+  return new Sequelize(config.get('database.databaseUri'), {
     dialect: 'postgres',
     logging: false,
-    pool: config.database.poolOptions,
+    pool: config.get('database.poolOptions'),
     dialectOptions,
   })
 }

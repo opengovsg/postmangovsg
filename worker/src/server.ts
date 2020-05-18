@@ -1,17 +1,12 @@
-import 'source-map-support/register'
 require('dotenv').config()
 require('module-alias/register')
+import config from '@core/config'
+config.validate()
 
-import { checkRequiredEnvVars, loaders } from './core'
-
-const requiredEnvVars = [
-  'AWS_REGION',
-  'SECRET_MANAGER_SALT',
-  'DB_URI',
-]
-
+/*Load the app after we make sure that the sensitive env vars exist */
+import 'source-map-support/register'
+import { loaders } from '@core/loaders'
 const start = async (): Promise<void> => {
-  checkRequiredEnvVars(requiredEnvVars)
   await loaders()
 }
 

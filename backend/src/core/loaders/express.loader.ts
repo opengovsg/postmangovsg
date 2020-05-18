@@ -7,8 +7,9 @@ import morgan from 'morgan'
 import config from '@core/config'
 import v1Router from '@core/routes'
 import logger from '@core/logger'
+import { clientIp, userId } from '@core/utils/morgan'
 
-const FRONTEND_URL = config.frontendUrl
+const FRONTEND_URL = config.get('frontendUrl')
 
 /**
  * Returns a regex or a string used by cors to determine if requests comes from allowed origin
@@ -22,9 +23,11 @@ const origin = (v: string): string | RegExp  => {
   return v
 }
 
+morgan.token('client-ip', clientIp)
+morgan.token('user-id', userId)
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
-const loggerMiddleware = morgan(config.MORGAN_LOG_FORMAT, { stream: logger.stream })
+const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), { stream: logger.stream })
 
 
 const expressApp = ({ app }: { app: express.Application }): void => {

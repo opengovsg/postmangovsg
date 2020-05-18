@@ -125,7 +125,7 @@ const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetail
  * @param secret 
  */
 const getEncodedHash = async (secret: string): Promise<string> => {
-  const secretHash = await bcrypt.hash(secret, config.aws.secretManagerSalt)
+  const secretHash = await bcrypt.hash(secret, config.get('aws.secretManagerSalt'))
   return Buffer.from(secretHash).toString('base64')
 }
   

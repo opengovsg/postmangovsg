@@ -3,7 +3,7 @@ import config from '@core/config'
 import { JobStatus } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
 
-const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
+const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress

@@ -10,7 +10,7 @@ const getOtpValidator = {
     email: Joi.string().email()
       .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
-      .required(), // validation for email ending in .gov.sg was removed as we want to support other manually whitelisted emails
+      .required(), // validation for email ending in whitelisted domains was removed as we want to support other manually whitelisted emails
   }),
 }
 

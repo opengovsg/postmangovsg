@@ -12,7 +12,7 @@ import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
 const validateEmailRecipient = (recipient: string): boolean => (validator.isEmail(recipient))
-const client = new TemplateClient(config.xssOptions.email, validateEmailRecipient)
+const client = new TemplateClient(config.get('xssOptions.email'), validateEmailRecipient)
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook, 

@@ -60,7 +60,7 @@ describe('template', () => {
 
   describe('xss', () => {
     describe('email', () => {
-      const client: TemplateClient = new TemplateClient(config.xssOptions.email)
+      const client: TemplateClient = new TemplateClient(config.get('xssOptions.email'))
 
       describe('email template should allow b, i, u, br, a, img tags', () => {
         const body =
@@ -88,7 +88,7 @@ describe('template', () => {
       })
     })
     describe('sms', () => {
-      const client: TemplateClient = new TemplateClient(config.xssOptions.sms)
+      const client: TemplateClient = new TemplateClient(config.get('xssOptions.sms'))
 
       describe('sms template should not allow any html tags except br', () => {
         const body = 'XSS Test<b>bold</b><u>underline</u><i>italic</i>'+

@@ -13,9 +13,9 @@ const cloudwatchLoader = async (): Promise<void> => {
     if (instanceId) {
       logger.info({ message: `Detected instanceId as ${instanceId}` })
       logger.add(new WinstonCloudwatch({
-        logGroupName: config.aws.logGroupName,
+        logGroupName: config.get('aws.logGroupName'),
         logStreamName: instanceId,
-        awsRegion: config.aws.awsRegion,
+        awsRegion: config.get('aws.awsRegion'),
       }))
     }
   } catch (err) {

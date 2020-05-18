@@ -2,14 +2,15 @@ import React, { useState, useContext } from 'react'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
 
+import { LOGIN_EMAIL_TEXT, LOGIN_EMAIL_PLACEHOLDER } from 'config'
 import styles from './Login.module.scss'
 import { AuthContext } from 'contexts/auth.context'
 
-const emailText = 'Sign in with your gov.sg email'
+const emailText = LOGIN_EMAIL_TEXT
 const otpText = 'One-Time Password'
 const emailButtonText = ['Get OTP', 'Sending OTP...']
 const otpButtonText = ['Sign In', 'Verifying OTP...']
-const emailPlaceholder = 'e.g. postman@agency.gov.sg'
+const emailPlaceholder = LOGIN_EMAIL_PLACEHOLDER
 const otpPlaceholder = 'Enter OTP'
 const invalidOtpFormat = 'Invalid OTP format, enter 6 digits'
 
