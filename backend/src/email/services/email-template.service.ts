@@ -11,8 +11,7 @@ import TemplateClient from '@core/services/template-client.class'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
-const validateEmailRecipient = (recipient: string): boolean => (validator.isEmail(recipient))
-const client = new TemplateClient(config.get('xssOptions.email'), validateEmailRecipient)
+const client = new TemplateClient(config.get('xssOptions.email'))
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook, 
@@ -207,10 +206,15 @@ const addToMessageLogs = async (campaignId: number, records: Array<object>): Pro
   }
 }
 
+const hasInvalidEmailRecipient = (records: MessageBulkInsertInterface[]): boolean => {
+  return records.some((record) => !validator.isEmail(record.recipient))
+}
+
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
+  hasInvalidEmailRecipient,
   client,
 }
   

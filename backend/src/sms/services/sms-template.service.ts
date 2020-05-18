@@ -10,8 +10,7 @@ import TemplateClient from '@core/services/template-client.class'
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const validateSmsRecipient = (recipient: string): boolean => (/^\+?[0-9]+$/.test(recipient))
-const client = new TemplateClient(config.get('xssOptions.sms'), validateSmsRecipient)
+const client = new TemplateClient(config.get('xssOptions.sms'))
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook, 
@@ -202,9 +201,15 @@ const addToMessageLogs = async (campaignId: number, records: Array<object>): Pro
   }
 }
 
+const hasInvalidSmsRecipient = (records: MessageBulkInsertInterface[]): boolean => {
+  const re = /^\+?[0-9]+$/
+  return records.some((record) => !re.test(record.recipient))
+}
+
 export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
+  hasInvalidSmsRecipient,
   client,
 }
