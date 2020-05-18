@@ -21,7 +21,7 @@ let connection: Sequelize,
  *  Helper method to decide which queries to use, depending on channel type
  */
 const service = (): Email | SMS => {
-  switch(currentCampaignType){
+  switch (currentCampaignType){
   case 'EMAIL':
     return email
   case 'SMS':
@@ -38,7 +38,7 @@ const getNextJob = (): Promise< { jobId: number | undefined; campaignId: number 
     const nextJob = get(result, '[0].get_next_job') || {}
     const { 'job_id': jobId, 'campaign_id': campaignId, 'type': campaignType, rate, 'cred_name': credName } = nextJob
     currentCampaignType = campaignType
-    if(jobId) logger.info(`${workerId}:  get_next_job job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType} cred_name=${credName}`)
+    if (jobId) logger.info(`${workerId}:  get_next_job job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType} cred_name=${credName}`)
     return { jobId, campaignId, campaignType, rate, credName }
   })
 }
@@ -75,12 +75,12 @@ const finalize = (): Promise<void> => {
 }
 
 const createConnection = (): Sequelize => {
-  const dialectOptions = config.IS_PROD ? { ...config.database.dialectOptions } : {}
+  const dialectOptions = config.IS_PROD ? config.database.dialectOptions : {}
   return new Sequelize(config.database.databaseUri, {
     dialect: 'postgres',
     logging: false,
     pool: config.database.poolOptions,
-    ...dialectOptions,
+    dialectOptions,
   })
 }
   
@@ -134,21 +134,21 @@ const init = async (index: string, isLogger = false): Promise<any> => {
   connection = createConnection()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
-  try{
-    if(!isLogger){
+  try {
+    if (!isLogger){
       await createAndResumeWorker()
-      for(;;){
+      for (;;){
         await enqueueAndSend()
         await waitForMs(2000)
       }
-    } else{
-      for(;;){
+    } else {
+      for (;;){
         await finalize()
         await waitForMs(2000)
       }
     }
   }
-  catch(err) {
+  catch (err) {
     return Promise.reject(err)
   }
    

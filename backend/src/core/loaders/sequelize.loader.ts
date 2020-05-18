@@ -9,12 +9,12 @@ import logger from '@core/logger'
 const DB_URI = config.database.databaseUri
 
 const sequelizeLoader = async (): Promise<void> => {
-  const dialectOptions = config.IS_PROD ? { ...config.database.dialectOptions } : {}
+  const dialectOptions = config.IS_PROD ? config.database.dialectOptions : {}
   const sequelize = new Sequelize(DB_URI, {
     dialect: 'postgres',
     logging: false,
     pool: config.database.poolOptions,
-    ...dialectOptions,
+    dialectOptions,
   })
 
   const coreModels = [Credential, JobQueue, Campaign, User, Worker, UserCredential]

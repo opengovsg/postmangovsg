@@ -7,12 +7,12 @@ import { sqlFilePaths as emailSqlFilePaths } from '@email/resources/sql'
 import { sqlFilePaths as smsSqlFilePaths } from '@sms/resources/sql'
 
 const scriptLoader = async (): Promise<void> => {
-  const dialectOptions = config.IS_PROD ? { ...config.database.dialectOptions } : {}
+  const dialectOptions = config.IS_PROD ? config.database.dialectOptions : {}
   const sequelize = new Sequelize(config.database.databaseUri, {
     dialect: 'postgres',
     logging: false,
     pool: config.database.poolOptions,
-    ...dialectOptions,
+    dialectOptions,
   })
   await sequelize.sync()
   
