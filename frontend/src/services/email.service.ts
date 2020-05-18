@@ -20,6 +20,7 @@ export async function saveTemplate(campaignId: number, subject: string, body: st
       // Replace unwanted values (undefined and empty string) with null. Cases where this happens:
       // 1. User saves the template with no replyTo email - undefined
       // 2. User deletes the replyTo email after previously setting it - empty string
+      // eslint-disable-next-line @typescript-eslint/camelcase
       reply_to: replyTo || null,
     })
     const { num_recipients: numRecipients, template: updatedTemplate } = response.data
@@ -79,7 +80,7 @@ export async function completeFileUpload({
   }
 }
 
-export async function getPreviewMessage(campaignId: number): Promise<{ body: string; subject: string }> {
+export async function getPreviewMessage(campaignId: number): Promise<{ body: string; subject: string; reply_to: string | null }> {
   try {
     const response = await axios.get(`/campaign/${campaignId}/email/preview`)
     return response.data?.preview
