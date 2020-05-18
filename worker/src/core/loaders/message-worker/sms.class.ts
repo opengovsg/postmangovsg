@@ -7,9 +7,7 @@ import { CredentialService } from '@core/services/credential.service'
 import TemplateClient from '@core/services/template-client.class'
 import TwilioClient from '@sms/services/twilio-client.class'
 
-const validateSmsRecipient = (recipient: string): boolean => (/^\+?[0-9]+$/.test(recipient))
-const templateClient = new TemplateClient(config.get('xssOptions.sms'), validateSmsRecipient)
-
+const templateClient = new TemplateClient(config.get('xssOptions.sms'))
 class SMS {
     private workerId: string
     private connection: Sequelize
