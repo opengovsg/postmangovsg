@@ -19,16 +19,17 @@ export default class TwilioClient {
     return this.generateUsernamePassword(messageId, campaignId)
       .then(({ username, password }) => {
         let callbackUrl= new URL(config.smsOptions.callbackBackendUrl)
-        // encode password as the hash contains special characters
         callbackUrl.username = username
+        // encode password as the hash contains special characters
         callbackUrl.password = encodeURIComponent(password)
-        logger.info(`Status callback url for ${messageId}: ${callbackUrl}/campaign/${campaignId}/message/${messageId}`)
+        callbackUrl.pathname = `${callbackUrl.pathname}/campaign/${campaignId}/message/${messageId}`
+        logger.info(`Status callback url for ${messageId}: ${callbackUrl}`)
 
         return this.client.messages.create({
           to: this.addDefaultCountryCode(recipient),
           body: this.replaceNewLines(message),
           from: this.messagingServiceSid,
-          statusCallback: `${callbackUrl}/campaign/${campaignId}/message/${messageId}`,
+          statusCallback: callbackUrl,
         })
       })
       .then((result: { [key: string]: string }) => {
