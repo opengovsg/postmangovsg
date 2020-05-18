@@ -148,3 +148,5 @@ The production branch is `master`, and the development branch is `develop`.
 - Push these changes to Github
 - Submit a pull request against `basefork/develop` (that's us!)
 - Describe the issue as thoroughly as possible, and with screenshots if applicable. A picture speaks a thousand words!
+
+For more information, see [CONTRIBUTING.md](docs/CONTRIBUTING.md)

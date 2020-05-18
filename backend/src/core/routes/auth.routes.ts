@@ -17,6 +17,8 @@ const getOtpValidator = {
 const verifyOtpValidator = {
   [Segments.BODY]: Joi.object({
     email: Joi.string().email()
+      .options({ convert: true }) // Converts email to lowercase if it isn't  
+      .lowercase()
       .required(),
     otp: Joi.string().required(), //TODO: Add validation for 6 digit otp
   }),
