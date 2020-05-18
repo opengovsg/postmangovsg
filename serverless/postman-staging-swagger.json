@@ -2,11 +2,9 @@
   "swagger": "2.0",
   "info": {
     "description": "Postman API",
-    "version": "2020-05-13T05:32:12Z",
+    "version": "2020-05-14T03:59:08Z",
     "title": "postman"
   },
-  "host": "okpxmovlnb.execute-api.ap-northeast-1.amazonaws.com",
-  "basePath": "/staging",
   "schemes": [
     "https"
   ],
@@ -33,14 +31,14 @@
         "responses": {},
         "security": [
           {
-            "postmanAuthorizer": []
+            "postman-authorizer": []
           }
         ]
       }
     }
   },
   "securityDefinitions": {
-    "postmanAuthorizer": {
+    "postman-authorizer": {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header",
