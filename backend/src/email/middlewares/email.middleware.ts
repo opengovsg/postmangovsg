@@ -61,7 +61,8 @@ const previewFirstMessage = async (req: Request, res: Response, next: NextFuncti
   try {
     const { campaignId } = req.params
     const message = await EmailService.getHydratedMessage(+campaignId)
-    if (!message) throw new Error('Failed to get message')
+    
+    if (!message) return res.json({})
     
     const { body, subject, replyTo: reply_to } = message
     return res.json({
