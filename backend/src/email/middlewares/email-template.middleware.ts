@@ -121,7 +121,10 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   
       return res.json({
         'num_recipients': recipientCount,
-        preview: hydratedRecord,
+        preview: {
+          ...hydratedRecord,
+          reply_to: emailTemplate.replyTo
+        },
       })
   
     } catch (err) {

@@ -267,6 +267,9 @@ router.get('/upload/start', celebrate(uploadStartValidator), CampaignMiddleware.
  *                         type: string
  *                       body:
  *                         type: string
+ *                       reply_to:
+ *                         type: string
+ *                         nullable: true
  *         "400" :
  *           description: Bad Request
  *         "401":
