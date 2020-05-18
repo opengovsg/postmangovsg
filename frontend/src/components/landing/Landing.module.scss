@@ -326,6 +326,10 @@ $thinner-section-horizontal-padding: $site-padding * 6;
   @include flex-vertical;
   align-items: center;
 
+  @include mobile() {
+    display: none;
+  }
+
   h1 {
     color: $indigo-blue;
     font-weight: bold;
