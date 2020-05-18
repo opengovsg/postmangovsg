@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import morgan from 'morgan'
+import { isArray } from 'lodash'
 import fs from 'fs'
 import path from 'path'
 const parseEnvVarAsInt = (i: string): number | undefined => {
@@ -29,15 +30,28 @@ const redisOtpUri: string = process.env.REDIS_OTP_URI as string
 const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 
 // Format for logging
-const clientIp = (req: Request, _res: Response) => {
+const clientIp = (req: Request, _res: Response): string => {
   /**
    * @see: https://support.cloudflare.com/hc/en-us/articles/200170786
    * @see: https://stackoverflow.com/a/52026771
    */
-  console.log(`cf-connecting-ip: ${req.headers['cf-connecting-ip']}; x-forwarded-for: ${req.headers['x-forwarded-for']}; conn.remoteAddress: ${req.connection.remoteAddress}`)
-  console.log(`req.ips: ${req.ips}`)
-  return req.ip
+  const cfConnectingIp: string | undefined = isArray(
+    req.headers['cf-connecting-ip']
+  )
+    ? req.headers['cf-connecting-ip'].join(',')
+    : req.headers['cf-connecting-ip']
+
+  const xFowardedForHeaders: string | undefined = isArray(
+    req.headers['x-forwarded-for']
+  )
+    ? req.headers['x-forwarded-for'].join(',')
+    : req.headers['x-forwarded-for']
+
+  const remoteAddress: string | undefined = req.connection.remoteAddress
+
+  return cfConnectingIp || xFowardedForHeaders || remoteAddress || req.ip
 }
+
 morgan.token('client-ip', clientIp)
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] :client-ip ":referrer" ":user-agent" :response-time ms; :date[iso]'
 
