@@ -1,8 +1,8 @@
-import { Request, Response } from 'express'
-import morgan from 'morgan'
-import { isArray } from 'lodash'
 import fs from 'fs'
 import path from 'path'
+import morgan from 'morgan'
+import { clientIp } from '@core/utils/morgan'
+
 const parseEnvVarAsInt = (i: string): number | undefined => {
   const j = parseInt(i)
   return isNaN(j) ? undefined : j
@@ -30,21 +30,8 @@ const redisOtpUri: string = process.env.REDIS_OTP_URI as string
 const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
 
 // Format for logging
-const clientIp = (req: Request, _res: Response): string => {
-  /**
-   * @see: https://support.cloudflare.com/hc/en-us/articles/200170786
-   * @see: https://stackoverflow.com/a/52026771
-   */
-  const cfConnectingIp: string | undefined = isArray(
-    req.headers['cf-connecting-ip']
-  )
-    ? req.headers['cf-connecting-ip'].join(',')
-    : req.headers['cf-connecting-ip']
-
-  return cfConnectingIp || req.ip
-}
-
 morgan.token('client-ip', clientIp)
+
 const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] :client-ip ":referrer" ":user-agent" :response-time ms; :date[iso]'
 
 // CORS settings
