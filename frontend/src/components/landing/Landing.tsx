@@ -83,7 +83,7 @@ const Landing = () => {
             {trustedAgencies.map(agency => <img src={agency.img} alt={agency.alt} key={agency.img}/>)}
           </div>
         </div>
-      </div >
+      </div>
 
       <div className={styles.whyUsePostman}>
         <div className={styles.innerContainer}>
@@ -91,15 +91,19 @@ const Landing = () => {
           <div className={styles.reason}>
             <img src={reliableImg} alt="Reliable"/>
             <div className={styles.textContainer}>
-              <h3>Reliable</h3>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore</p>
+              <h3>Multichannel</h3>
+              <p>No more toggling between your Outlook and SMS portal. You can reach your recipient via SMS and email in the same product!</p>
+              <h3>Personalized Message</h3>
+              <p>Add in details that are useful for and specific to your recipient.</p>
             </div>
           </div>
 
           <div className={styles.reason} id={styles.mobileReverse}>
             <div className={styles.textContainer}>
-              <h3>Reattempt delivery</h3>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore</p>
+              <h3>Send in bulk.</h3>
+              <p>You don't have to BCC everyone and wait for Outlook to slowly send a batch of 1000 email. Sit back and let Postman do the work.</p>
+              <h3>No more +65.</h3>
+              <p>We took care of the country code so you don't have to enter +65 in your excel file. </p>
             </div>
             <img src={reattemptImg} alt="Reattempt delivery"/>
           </div>
@@ -107,8 +111,10 @@ const Landing = () => {
           <div className={styles.reason}>
             <img src={trackImg} alt="Track engagement"/>
             <div className={styles.textContainer}>
-              <h3>Track engagement</h3>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore</p>
+              <h3>Forgot something?</h3>
+              <p>We all have those days where we miss out on an important point for official messages. With Postman, it's never too late to pause the campaign if you are sending > 1000 messages.</p>
+              <h3>See past campaigns easily</h3>
+              <p>Not sure what was sent out previously? Check Postman's campaign landing page for stats. Understand how you are communicating with your recipients.</p>
             </div>
           </div>
 

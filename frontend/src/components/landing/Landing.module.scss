@@ -172,7 +172,6 @@ $thinner-section-horizontal-padding: $site-padding * 6;
       margin-left: 0;
       margin-right: 0;
       border: 1px solid #b5c4ff;
-      margin-top: 2rem;
       margin-bottom: 0;
     }
 
@@ -194,11 +193,11 @@ $thinner-section-horizontal-padding: $site-padding * 6;
 
     p {
       color: $dark-blue;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
 
     img {
-      width: 20rem;
+      width: 50%;
     }
 
     #mobileReverse {
@@ -220,8 +219,16 @@ $thinner-section-horizontal-padding: $site-padding * 6;
         align-items: center;
       }
 
+      .textContainer {
+        width: 50%;
+      }
+
       p {
-        width: 20rem;
+        width: 80%;
+        margin-bottom: 3rem;
+        @include mobile() {
+          width: 100%;
+        }
       }
     }
 
