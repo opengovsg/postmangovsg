@@ -4,6 +4,12 @@
 $section-vertical-padding: 4rem;
 $thinner-section-horizontal-padding: $site-padding * 6;
 
+.fixWidth {
+  width: 960px;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
 .topContainer {
   background-color: $light-blue;
   height: auto;
@@ -161,8 +167,10 @@ $thinner-section-horizontal-padding: $site-padding * 6;
 
 .whyUsePostman {
   height: auto;
-  padding: $section-vertical-padding $thinner-section-horizontal-padding;
-
+  width: 960px;
+  max-width: 90vw;
+  padding: $section-vertical-padding 0;
+  margin: 0 auto;
   @include mobile() {
     padding: 2rem $site-padding;
   }
@@ -337,9 +345,7 @@ $thinner-section-horizontal-padding: $site-padding * 6;
 .faq {
   height: auto;
   background-color: $light-blue;
-  padding: $section-vertical-padding $thinner-section-horizontal-padding;
-  @include flex-vertical;
-  align-items: center;
+  padding: $section-vertical-padding 0;
 
   @include mobile() {
     display: none;
@@ -381,10 +387,13 @@ $thinner-section-horizontal-padding: $site-padding * 6;
 }
 
 .onboarding {
-  padding: $section-vertical-padding $thinner-section-horizontal-padding;
+  padding: $section-vertical-padding 0;
   background-color: $indigo-blue;
   height: auto;
-  @include flex-horizontal;
+
+  .innerContainer {
+    @include flex-horizontal;
+  }
 
   @include mobile() {
     height: auto;

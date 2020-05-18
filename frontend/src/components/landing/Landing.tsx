@@ -143,41 +143,45 @@ const Landing = () => {
       </div>
 
       <div className={styles.faq}>
-        <h1>Frequently asked questions</h1>
-        <div className={styles.question}>
-          <h3>What can Postman do?</h3>
-          <p>Postman lets government officials mass send messages to citizens through SMS and email with minimal setup required through a user interface.</p>
-        </div>
+        <div className={styles.fixWidth}>
+          <h1>Frequently asked questions</h1>
+          <div className={styles.question}>
+            <h3>What can Postman do?</h3>
+            <p>Postman lets government officials mass send messages to citizens through SMS and email with minimal setup required through a user interface.</p>
+          </div>
 
-        <div className={styles.question}>
-          <h3>What problem is Postman solving?</h3>
-          <ol>
-            <li><span>Communication is manual: </span>Agency users are still calling and sending individual to citizens</li>
-            <li><span>Existing tool is not meeting the needs of users: </span>Outlook does not support mass sending and it is often capped at 1000 emails.</li>
-            <li><span>No official source of information: </span>Communications come in many different forms. Lacking a consistent channel puts agencies at risks of phishing attack.</li>
-          </ol>
-          {questions.map(question =>
-            <div className={styles.question} key={question.text}>
-              <h3>{question.text}</h3>
-              <p>{question.answer}</p>
-            </div>
-          )}
+          <div className={styles.question}>
+            <h3>What problem is Postman solving?</h3>
+            <ol>
+              <li><span>Communication is manual: </span>Agency users are still calling and sending individual to citizens</li>
+              <li><span>Existing tool is not meeting the needs of users: </span>Outlook does not support mass sending and it is often capped at 1000 emails.</li>
+              <li><span>No official source of information: </span>Communications come in many different forms. Lacking a consistent channel puts agencies at risks of phishing attack.</li>
+            </ol>
+            {questions.map(question =>
+              <div className={styles.question} key={question.text}>
+                <h3>{question.text}</h3>
+                <p>{question.answer}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       <div className={styles.onboarding}>
-        <div className={styles.textContainer}>
-          <h2>No onboarding process nor any installation required.</h2>
-          <p>Sign in with your government email, and send your messages in minutes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
+        <div className={cx(styles.fixWidth, styles.innerContainer)}>
+          <div className={styles.textContainer}>
+            <h2>No onboarding process nor any installation required.</h2>
+            <p>Sign in with your government email, and send your messages in minutes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
 
-          <div className={styles.buttonRow}>
-            <PrimaryButton className={styles.getStartedButton} onClick={directToSignIn}>
-                  Get started<img className={styles.arrowRight} src={arrowRight}/>
-            </PrimaryButton>
-            <a href={CONTACT_US_URL}>Have a question?</a>
+            <div className={styles.buttonRow}>
+              <PrimaryButton className={styles.getStartedButton} onClick={directToSignIn}>
+                    Get started<img className={styles.arrowRight} src={arrowRight}/>
+              </PrimaryButton>
+              <a href={CONTACT_US_URL}>Have a question?</a>
+            </div>
           </div>
+          <img className={styles.onboardingImg} src={onboardingImg} alt="Onboarding"/>
         </div>
-        <img className={styles.onboardingImg} src={onboardingImg} alt="Onboarding"/>
       </div>
 
       <div className={styles.bottomContainer}>
