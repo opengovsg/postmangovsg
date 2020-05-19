@@ -167,7 +167,7 @@ const config = convict({
       env: 'TWILIO_MESSAGING_SERVICE_SID',
       sensitive: true,
     },
-    twilioCallbackSecret: {
+    callbackSecret: {
       doc: 'Secret key used to generate Twilio callback url',
       default: '',
       env: 'TWILIO_CALLBACK_SECRET',
