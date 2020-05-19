@@ -25,28 +25,30 @@ const isExistingCredential = async (name: string): Promise<boolean> => {
 }
 
 /**
- * Save a credential into secrets manager
+ * Save a credential into secrets manager and the credential table
  * @param name 
  * @param secret 
  */
 const storeCredential = async (name: string, secret: string): Promise<void> => {
-  if (!config.get('IS_PROD')) {
-    logger.info(`Dev env - storeSecret - skipping for name=${name}`)
-    return
-  }
-
-  // If credentials exists, skip
+  // If credential exists, no need to store it again
   if (await isExistingCredential(name)) {
     return
   }
 
-  const params = {
-    Name: name,
-    SecretString: secret,
+  // If credential doesn't exist, upload credential to secret manager, unless in development
+  if (!config.get('IS_PROD')){
+    logger.info(`Dev env - skip storing credential in AWS secrets manager for name=${name}`) 
   }
-  logger.info('Storing credential in AWS secrets manager')
-  await secretsManager.createSecret(params).promise()
-  logger.info('Successfully stored credential in AWS secrets manager')
+  else {
+    const params = {
+      Name: name,
+      SecretString: secret,
+    }
+    logger.info('Storing credential in AWS secrets manager')
+    await secretsManager.createSecret(params).promise()
+    logger.info('Successfully stored credential in AWS secrets manager')
+  }
+
   logger.info('Storing credential in DB')
   await Credential.findCreateFind({
     where: { name },
