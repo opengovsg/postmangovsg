@@ -7,7 +7,7 @@ const sequelizeLoader = async () => {
     dialect: 'postgres',
     logging: false,
     pool: config.database.poolOptions,
-    ...dialectOptions,
+    dialectOptions,
   } as SequelizeOptions)
 
   try {

@@ -77,6 +77,7 @@ jobs:
         runtime: nodejs12.x
         module_name: build/index
         handler_name: handler
+        timeout: 30
         publish: true
         zip: "../log-twilio-callback/code.zip"
         environment_variables:
@@ -91,6 +92,7 @@ jobs:
         runtime: nodejs12.x
         module_name: build/index
         handler_name: handler
+        timeout: 30
         publish: true
         zip: "../log-twilio-callback/code.zip"
         environment_variables:

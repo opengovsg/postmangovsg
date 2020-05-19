@@ -167,12 +167,12 @@ const config = convict({
       env: 'TWILIO_MESSAGING_SERVICE_SID',
       sensitive: true,
     },
-    callbackSecret: {
-      doc: 'Secret key used to generate Twilio callback url',
-      default: '',
-      env: 'TWILIO_CALLBACK_SECRET',
-      sensitive: true,
-    },
+  },
+  twilioCallbackSecret: {
+    doc: 'Secret key used to generate Twilio callback url',
+    default: '',
+    env: 'TWILIO_CALLBACK_SECRET',
+    sensitive: true,
   },
   backendUrl: {
     doc: 'URL where backend is hosted',
