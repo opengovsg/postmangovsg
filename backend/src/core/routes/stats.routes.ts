@@ -25,5 +25,4 @@ const router = Router()
  */
 router.get('/', StatsMiddleware.getGlobalStats)
 
-
 export default router

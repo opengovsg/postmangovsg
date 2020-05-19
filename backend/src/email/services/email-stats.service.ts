@@ -5,7 +5,7 @@ import { CampaignStats } from '@core/interfaces'
 import { EmailOp } from '@email/models'
 
 /**
- * Gets stats from the ops table if job is still being worked on by a sender, otherwise, get the stats from the message logs table
+ * Gets stats for email project
  * @param campaignId 
  */
 const getStats = async (campaignId: number): Promise<CampaignStats> => {

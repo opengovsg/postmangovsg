@@ -62,7 +62,7 @@ const getCurrentStats = async (campaignId: number, opsTable: any): Promise<Campa
   // If job is sending, sent or stopped, i.e. not logged back to message table,
   // Retrieve current stats from ops table
   if (['SENDING', 'SENT', 'STOPPED'].includes(job.status)) {
-    const opsStats = await getStatsFromTable(opsTable, campaignId)
+    const opsStats = await getStatsFromTable(campaignId, opsTable)
 
     // Sent count must be added to archived sent count since sent messages are 
     // not enqueued to ops table if a project is stopped and resumed
@@ -77,7 +77,9 @@ const getCurrentStats = async (campaignId: number, opsTable: any): Promise<Campa
   return { ...archivedStats, status: job.status }
 }
 
-
+/*
+ * Get total sent messages across all channels
+ */
 const getTotalSentCount = async (): Promise<number> => {
   return Statistic.sum('sent')
 }

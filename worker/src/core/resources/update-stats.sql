@@ -3,6 +3,7 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
 
+-- NOTE: THIS CALLS SPECIFIC FUNCTIONS FOR CHANNEL TYPES
 PERFORM 
   CASE
     WHEN type = 'EMAIL' THEN update_stats_email(selected_campaign_id)
@@ -11,4 +12,3 @@ PERFORM
 FROM campaigns where id = selected_campaign_id;
 
 END $$
-

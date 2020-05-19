@@ -3,9 +3,10 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
 
+-- Archive number of unsent, errored and sent email messages in statistics table
 WITH stats AS (
   SELECT
-    COUNT(*) FILTER (WHERE sent_at IS NULL) AS unsent,
+    COUNT(*) FILTER (WHERE delivered_at IS NULL) AS unsent,
     COUNT(*) FILTER (WHERE error_code IS NOT NULL) AS errored,
     COUNT(*) FILTER (WHERE message_id IS NOT NULL) AS sent
   FROM email_messages
