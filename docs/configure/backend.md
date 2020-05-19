@@ -14,9 +14,10 @@
 
 ## Backend
 Depending on the environment, a set of sane defaults for non-sensitive configuration can be found in
--  [backend/src/core/config/index.ts](../../backend/src/core/config/index.ts).
+-  [backend/src/core/config.ts](../../backend/src/core/config.ts).
 
-Setting `NODE_ENV=production` or `NODE_ENV=staging` will override some defaults.
+Setting `NODE_ENV=development` or `NODE_ENV=staging` will override some defaults. If `NODE_ENV` is unset,
+default `production` configuration is used.
 
 These defaults can be modified as you wish or overridden with environment variables.
 
@@ -108,7 +109,7 @@ If not set, `nodemailer-direct-transport` will be used (for testing locally)
 Further reference: [AWS SES documentation](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/smtp-credentials.html)
 
 #### Sending smses
-This set of twilio credentials is used for testing locally only (ie, `NODE_ENV != production`). When in production, users will have to upload their credentials, which will be stored and retrieved from Secrets Manager. 
+This set of twilio credentials is used for testing locally only (ie, `NODE_ENV=development`). When in production, users will have to upload their credentials, which will be stored and retrieved from Secrets Manager. 
 If not set, smses cannot be sent. 
 
 |Name|Description|
