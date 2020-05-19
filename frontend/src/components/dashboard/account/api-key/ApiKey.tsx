@@ -7,59 +7,112 @@ import { regenerateApiKey } from 'services/account.service'
 
 import styles from './ApiKey.module.scss'
 
-const ApiKey = ({ hasApiKey }: { hasApiKey: boolean }) => {
+interface ApiKeyProps {
+  hasApiKey: boolean;
+}
 
-  const [isApiKeyRevealed, setIsApiKeyRevealed] = useState(false)
-  const [isRegeneratingApi, setIsRegeneratingApi] = useState(false)
+enum ApiKeyState {
+  GENERATE = 'GENERATE',
+  COPY = 'COPY',
+  COPIED = 'COPIED',
+  REGENERATE = 'REGENERATE'
+}
+
+const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
   const [apiKey, setApiKey] = useState('')
+  const [isGeneratingApiKey, setIsRegeneratingApiKey] = useState(false)
+  const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(
+    ApiKeyState.GENERATE
+  )
+
   const modalContext = useContext(ModalContext)
-  const apiKeyRef = useRef(null as any)
+  const apiKeyRef = useRef<HTMLInputElement>()
 
   useEffect(() => {
-    setApiKey(hasApiKey ? Array(30).fill('*').join('') : '')
+    setApiKey(hasApiKey ? '*'.repeat(30) : '')
+    setApiKeyState(hasApiKey ? ApiKeyState.REGENERATE : ApiKeyState.GENERATE)
   }, [hasApiKey])
 
-  async function onRegenButtonClicked() {
-    if (isApiKeyRevealed) {
-      apiKeyRef.current.select()
-      document.execCommand('copy')
-    } else {
-      if (apiKey) {
-        modalContext.setModalContent(
-          <ConfirmModal
-            title='Generate new API key?'
-            subtitle='This will invalidate the current API key.'
-            buttonText='Confirm'
-            onConfirm={onRegenConfirm}
-          />)
-      } else {
-        onRegenConfirm()
-      }
+  async function onButtonClick() {
+    switch (apiKeyState) {
+      case ApiKeyState.GENERATE:
+      case ApiKeyState.REGENERATE:
+        if (apiKey) {
+          modalContext.setModalContent(
+            <ConfirmModal
+              title='Generate new API key?'
+              subtitle='This will invalidate the current API key.'
+              buttonText='Confirm'
+              onConfirm={onGenerateConfirm}
+            />
+          )
+        } else {
+          onGenerateConfirm()
+        }
+        break
+      case ApiKeyState.COPY:
+        if (!apiKeyRef.current) return
+        apiKeyRef.current.select()
+        document.execCommand('copy')
+        setApiKeyState(ApiKeyState.COPIED)
+        break
+      default:
+        break
     }
   }
 
-  async function onRegenConfirm() {
-    setIsRegeneratingApi(true)
+  async function onGenerateConfirm() {
+    setIsRegeneratingApiKey(true)
     const newApiKey = await regenerateApiKey()
-    setIsRegeneratingApi(false)
+    setIsRegeneratingApiKey(false)
+
     setApiKey(newApiKey)
-    setIsApiKeyRevealed(true)
+    setApiKeyState(ApiKeyState.COPY)
   }
 
   return (
     <>
       <h2>API Key</h2>
-      <p>After generating your API key, please make a copy of it immediately as it will only be shown once. Upon leaving or refreshing this page, the key will be hidden.</p>
+      <p>
+        After generating your API key, please make a copy of it immediately as
+        it will only be shown once. Upon leaving or refreshing this page, the
+        key will be hidden.
+      </p>
       <TextInputWithButton
         value={apiKey}
-        onChange={() => { return }}
-        onClick={onRegenButtonClicked}
-        className={isApiKeyRevealed ? styles.greenButton : styles.blueButton}
+        onChange={() => {
+          return
+        }}
+        onClick={onButtonClick}
+        className={
+          apiKeyState === ApiKeyState.GENERATE ||
+          apiKeyState === ApiKeyState.REGENERATE
+            ? styles.greenButton
+            : styles.blueButton
+        }
         textRef={apiKeyRef}
-        buttonDisabled={isRegeneratingApi}
+        buttonDisabled={isGeneratingApiKey}
       >
-        {apiKey.length ? (isApiKeyRevealed ? 'Copy' : 'Regenerate') : 'Generate'} API key
-        <i className={cx('bx', isApiKeyRevealed ? 'bx-copy' : 'bx-key')}></i>
+        {apiKeyState === ApiKeyState.GENERATE
+          ? 'Generate'
+          : apiKeyState === ApiKeyState.REGENERATE
+            ? 'Regenerate'
+            : apiKeyState === ApiKeyState.COPY
+              ? 'Copy'
+              : 'Copied'}{' '}
+        API key
+        <i
+          className={cx(
+            'bx',
+            apiKeyState === ApiKeyState.GENERATE
+              ? 'bx-key'
+              : apiKeyState === ApiKeyState.REGENERATE
+                ? 'bx-refresh'
+                : apiKeyState === ApiKeyState.COPY
+                  ? 'bx-copy'
+                  : 'bx-check'
+          )}
+        />
       </TextInputWithButton>
     </>
   )
