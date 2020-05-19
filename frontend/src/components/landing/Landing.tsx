@@ -196,7 +196,7 @@ const Landing = () => {
       </div>
 
       <div className={styles.bottomContainer}>
-        <div className={styles.innerContainer}>
+        <div className={cx(styles.innerContainer, styles.fixWidth)}>
           <div className={styles.navLinks}>
             <div className={styles.header}>
               <span className={styles.title}>Postman</span>
@@ -212,7 +212,7 @@ const Landing = () => {
           </div>
         </div>
         <div className={styles.lineBreak}></div>
-        <div className={styles.footer}>
+        <div className={cx(styles.footer, styles.fixWidth)}>
           <div className={styles.links}>
             <a href="" target="_blank" rel="noopener noreferrer">Privacy</a>
             <a href="" target="_blank" rel="noopener noreferrer">Terms of use</a>

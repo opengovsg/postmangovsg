@@ -2,10 +2,9 @@
 @import 'styles/_mixins';
 
 $section-vertical-padding: 4rem;
-$thinner-section-horizontal-padding: $site-padding * 6;
 
 .fixWidth {
-  width: 960px;
+  width: $landing-width;
   max-width: 90vw;
   margin: 0 auto;
 }
@@ -17,7 +16,7 @@ $thinner-section-horizontal-padding: $site-padding * 6;
   flex-direction: column;
   align-items: center;
   padding: 2rem 0 $site-padding;
-  background-image: url('../../assets/img/landing/Background.png');
+  background-image: url('../../assets/img/landing/background.png');
   background-repeat: no-repeat;
   background-position: right top;
   background-size: 50%;
@@ -30,6 +29,10 @@ $thinner-section-horizontal-padding: $site-padding * 6;
     @include flex-horizontal;
     justify-content: space-between;
     padding: 2rem $site-padding;
+
+    width: 1400px;
+    max-width: 90vw;
+    margin: 0 auto;
 
     @include mobile() {
       flex-direction: column-reverse;
@@ -54,8 +57,8 @@ $thinner-section-horizontal-padding: $site-padding * 6;
 
       .headerText {
         color: $indigo-blue;
-        font-size: 3rem;
-        width: 90%;
+        font-size: 3.0rem;
+        width: 100%;
         font-weight: bold;
         line-height: 3.5rem;
 
@@ -167,7 +170,7 @@ $thinner-section-horizontal-padding: $site-padding * 6;
 
 .whyUsePostman {
   height: auto;
-  width: 960px;
+  width: $landing-width;
   max-width: 90vw;
   padding: $section-vertical-padding 0;
   margin: 0 auto;
@@ -195,7 +198,7 @@ $thinner-section-horizontal-padding: $site-padding * 6;
       font-size: 3rem;
 
       @include mobile() {
-        font-size: 2.5rem;
+        font-size: 2.4em;
       }
     }
 
@@ -234,11 +237,13 @@ $thinner-section-horizontal-padding: $site-padding * 6;
       }
 
       video {
-        width: 25rem;
+        width: 50%;
         margin-right: 2rem;
 
         @include mobile() {
           margin-right: 0;
+          width: 100%;
+          padding: 0 $site-padding;
         }
       }
 
@@ -462,19 +467,19 @@ $thinner-section-horizontal-padding: $site-padding * 6;
   color: $light-blue;
 
   .lineBreak {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+    width: $landing-width;
+    max-width: 90vw;
+    margin: 0 auto;
     border: 1px solid $light-blue;
     margin-top: 2rem;
   }
 
   .innerContainer {
-    display: flex;
+    @include flex-horizontal;
     justify-content: space-between;
 
     @include mobile {
-      flex-direction: column;
+      @include flex-vertical;
     }
     .navLinks {
       display: flex;
@@ -532,7 +537,6 @@ $thinner-section-horizontal-padding: $site-padding * 6;
 
   .footer {
     display: flex;
-    margin-top: 2rem;
     justify-content: space-between;
     font-size: 1rem;
 

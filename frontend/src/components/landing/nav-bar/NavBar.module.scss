@@ -9,7 +9,8 @@ $navbar-mobile-height: 4rem;
   height: $navbar-height;
   padding: 0 $site-padding;
   justify-content: space-between;
-  width: 100%;
+  width: 1400px;
+  max-width: 90vw;
 
   @include mobile() {
     height: $navbar-mobile-height;
