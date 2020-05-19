@@ -18,7 +18,7 @@ import momAgencyImg from 'assets/img/landing/mom.png'
 
 import userImg from 'assets/img/landing/moe-circle.png'
 
-import onboardingImg from 'assets/img/landing/onboarding.svg'
+import onboardingImg from 'assets/img/landing/onboard.svg'
 
 import whyUse1 from 'assets/mp4/why-use-1.mp4'
 import whyUse2 from 'assets/mp4/why-use-2.mp4'
