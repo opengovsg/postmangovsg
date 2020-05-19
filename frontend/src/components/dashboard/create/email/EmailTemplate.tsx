@@ -52,7 +52,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, onNext }:
       <TextArea highlight={true} placeholder="Enter email message" value={body} onChange={setBody} />
       <div className="separator"></div>
       <div className="progress-button">
-        <PrimaryButton disabled={!body || !subject} onClick={handleSaveTemplate}>Upload Recipients →</PrimaryButton>
+        <PrimaryButton disabled={!body || !subject} onClick={handleSaveTemplate}>Upload recipients →</PrimaryButton>
       </div>
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>

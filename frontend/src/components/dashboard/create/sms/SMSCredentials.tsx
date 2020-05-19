@@ -133,7 +133,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
               <div className="separator"></div>
 
               <div className="progress-button">
-                <PrimaryButton disabled={!hasCredential} onClick={onNext}>Send Messages →</PrimaryButton>
+                <PrimaryButton disabled={!hasCredential} onClick={onNext}>Send messages →</PrimaryButton>
               </div>
             </>
           )
