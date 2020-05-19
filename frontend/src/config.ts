@@ -14,6 +14,7 @@ const missingEnvVars = [
   'REACT_APP_CONTACT_US_URL',
   'REACT_APP_LOGIN_EMAIL_TEXT',
   'REACT_APP_LOGIN_EMAIL_PLACEHOLDER',
+  'REACT_APP_CONTRIBUTE_URL',
 ].reduce(function (acc: string[], name: string){
   if (process.env[name] === undefined) acc.push(name)
   return acc
@@ -33,3 +34,4 @@ export const GUIDE_POWER_USER_URL = process.env.REACT_APP_GUIDE_POWER_USER_URL a
 export const CONTACT_US_URL = process.env.REACT_APP_CONTACT_US_URL as string
 export const LOGIN_EMAIL_TEXT = process.env.REACT_APP_LOGIN_EMAIL_TEXT as string
 export const LOGIN_EMAIL_PLACEHOLDER = process.env.REACT_APP_LOGIN_EMAIL_PLACEHOLDER as string
+export const CONTRIBUTE_URL = process.env.REACT_APP_CONTRIBUTE_URL as string

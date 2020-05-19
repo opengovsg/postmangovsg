@@ -3,18 +3,15 @@ import { Redirect } from 'react-router-dom'
 import cx from 'classnames'
 import Lottie from 'react-lottie'
 
-
-import Login from './login'
-import { GUIDE_URL, CONTACT_US_URL } from 'config'
+import { GUIDE_URL, CONTACT_US_URL, CONTRIBUTE_URL } from 'config'
 import PrimaryButton from 'components/common/primary-button'
 import Navbar from './nav-bar'
 import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Landing.module.scss'
-import landingImg from 'assets/img/landing.svg'
-import appLogo from 'assets/img/brand/app-logo.svg'
 import companyLogo from 'assets/img/brand/company-logo.svg'
-import ogpLogo from 'assets/img/ogp-logo.svg'
+import landingImg from 'assets/img/landing/LandingHero.png'
+
 import arrowRight from 'assets/img/landing/arrow-right.svg'
 import mohAgencyImg from 'assets/img/landing/moh.png'
 import moeAgencyImg from 'assets/img/landing/moe.png'
@@ -204,13 +201,13 @@ const Landing = () => {
               <span className={styles.title}>Postman</span>
               <span className={styles.text}>Reach out to the citizens in minutes</span>
             </div>
-            <a href={POSTMAN_GUIDE_URL} target="_blank" rel="noopener noreferrer">User guide</a>
-            <a href={POSTMAN_CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
+            <a href={GUIDE_URL} target="_blank" rel="noopener noreferrer">User guide</a>
+            <a href={CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
           </div>
 
           <div className={styles.builtBy}>
             <span>Built by</span>
-            <img src={ogpLogo} alt="logo"/>
+            <img src={companyLogo} alt="logo"/>
           </div>
         </div>
         <div className={styles.lineBreak}></div>
