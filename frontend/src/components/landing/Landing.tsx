@@ -20,8 +20,6 @@ import mohAgencyImg from 'assets/img/landing/moh.png'
 import moeAgencyImg from 'assets/img/landing/moe.png'
 import momAgencyImg from 'assets/img/landing/mom.png'
 
-import reliableImg from 'assets/img/landing/WhyUsePostman-1.svg'
-import reattemptImg from 'assets/img/landing/WhyUsePostman-2.svg'
 import trackImg from 'assets/img/landing/WhyUsePostman-3.svg'
 import userImg from 'assets/img/landing/moe-circle.png'
 
@@ -59,11 +57,11 @@ const Landing = () => {
   function createLottieOption(animationData: any) {
     return {
       loop: true,
-      autoplay: true, 
+      autoplay: true,
       animationData: animationData,
       rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice'
-      }
+        preserveAspectRatio: 'xMidYMid slice',
+      },
     }
   }
 
@@ -118,9 +116,9 @@ const Landing = () => {
           <div className={styles.reason} id={styles.mobileReverse}>
             <div className={styles.textContainer}>
               <h3>Send in bulk.</h3>
-              <p>You don't have to BCC everyone and wait for Outlook to slowly send a batch of 1000 email. Sit back and let Postman do the work.</p>
+              <p>You don&apos;t have to BCC everyone and wait for Outlook to slowly send a batch of 1000 email. Sit back and let Postman do the work.</p>
               <h3>No more +65.</h3>
-              <p>We took care of the country code so you don't have to enter +65 in your excel file. </p>
+              <p>We took care of the country code so you don&apos;t have to enter +65 in your excel file. </p>
             </div>
             <div className={styles.lottie}>
               <Lottie options={createLottieOption(animationData)}></Lottie>
@@ -131,9 +129,9 @@ const Landing = () => {
             <img src={trackImg} alt="Track engagement"/>
             <div className={styles.textContainer}>
               <h3>Forgot something?</h3>
-              <p>We all have those days where we miss out on an important point for official messages. With Postman, it's never too late to pause the campaign if you are sending > 1000 messages.</p>
+              <p>We all have those days where we miss out on an important point for official messages. With Postman, it&apos;s never too late to pause the campaign if you are sending &gt; 1000 messages.</p>
               <h3>See past campaigns easily</h3>
-              <p>Not sure what was sent out previously? Check Postman's campaign landing page for stats. Understand how you are communicating with your recipients.</p>
+              <p>Not sure what was sent out previously? Check Postman&apos;s campaign landing page for stats. Understand how you are communicating with your recipients.</p>
             </div>
           </div>
 
