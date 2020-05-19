@@ -12,9 +12,9 @@ import companyLogo from 'assets/img/brand/company-logo.svg'
 import landingImg from 'assets/img/landing/landing-hero.png'
 
 import arrowRight from 'assets/img/landing/arrow-right.svg'
-import mohAgencyImg from 'assets/img/landing/moh.png'
-import moeAgencyImg from 'assets/img/landing/moe.png'
-import momAgencyImg from 'assets/img/landing/mom.png'
+import mohAgencyImg from 'assets/img/landing/moh-gray.png'
+import moeAgencyImg from 'assets/img/landing/moe-gray.png'
+import momAgencyImg from 'assets/img/landing/mom-gray.png'
 
 import userImg from 'assets/img/landing/moe-circle.png'
 
