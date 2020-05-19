@@ -1,7 +1,6 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
 import cx from 'classnames'
-import Lottie from 'react-lottie'
 
 import { GUIDE_URL, CONTACT_US_URL, CONTRIBUTE_URL } from 'config'
 import PrimaryButton from 'components/common/primary-button'
