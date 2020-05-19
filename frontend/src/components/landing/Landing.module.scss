@@ -243,7 +243,6 @@ $section-vertical-padding: 4rem;
         @include mobile() {
           margin-right: 0;
           width: 100%;
-          padding: 0 $site-padding;
         }
       }
 

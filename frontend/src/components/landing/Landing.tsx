@@ -21,8 +21,9 @@ import userImg from 'assets/img/landing/moe-circle.png'
 
 import onboardingImg from 'assets/img/landing/onboarding.svg'
 
-import testVideo from 'assets/mp4/test.mp4'
-import animationData from 'assets/lottie/test.json'
+import whyUse1 from 'assets/mp4/why-use-1.mp4'
+import whyUse2 from 'assets/mp4/why-use-2.mp4'
+import whyUse3 from 'assets/mp4/why-use-3.mp4'
 
 const Landing = () => {
   const authContext = useContext(AuthContext)
@@ -49,17 +50,6 @@ const Landing = () => {
     { text: 'Is Postman free?', answer: 'Sending an email is free. SMS & WhatsApp will be charged based on WhatsApp and Twilio SMS rates.' },
     { text: 'Is Postman secure?', answer: 'We recommend that you don’t put any sensitive information in the sms content. Some of our users generate a recipient specific unique link that opens up to a locked page. When in doubt, you should follow IM8’s guidelines on data classification.' },
   ]
-
-  function createLottieOption(animationData: any) {
-    return {
-      loop: true,
-      autoplay: true,
-      animationData: animationData,
-      rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice',
-      },
-    }
-  }
 
   return (
     <>
@@ -99,7 +89,7 @@ const Landing = () => {
           <h1>Why use Postman</h1>
           <div className={styles.reason}>
             <video autoPlay loop muted>
-              <source src={testVideo} type="video/mp4" />
+              <source src={whyUse1} type="video/mp4" />
             </video>
             <div className={styles.textContainer}>
               <h3>Multichannel</h3>
@@ -116,14 +106,14 @@ const Landing = () => {
               <h3>No more +65.</h3>
               <p>We took care of the country code so you don&apos;t have to enter +65 in your excel file. </p>
             </div>
-            <div className={styles.lottie}>
-              <Lottie options={createLottieOption(animationData)}></Lottie>
-            </div>
+            <video autoPlay loop muted>
+              <source src={whyUse2} type="video/mp4" />
+            </video>
           </div>
 
           <div className={styles.reason}>
             <video autoPlay loop muted>
-              <source src={testVideo} type="video/mp4" />
+              <source src={whyUse3} type="video/mp4" />
             </video>
             <div className={styles.textContainer}>
               <h3>Forgot something?</h3>
