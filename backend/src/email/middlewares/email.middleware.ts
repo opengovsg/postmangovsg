@@ -64,13 +64,15 @@ const previewFirstMessage = async (req: Request, res: Response, next: NextFuncti
     
     if (!message) return res.json({})
     
+    // eslint-disable-next-line @typescript-eslint/camelcase
     const { body, subject, replyTo: reply_to } = message
     return res.json({
       preview: {
         body,
         subject,
-        reply_to
-      }
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        reply_to,
+      },
     })
   } catch (err){
     return next(err)

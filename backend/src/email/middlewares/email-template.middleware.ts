@@ -40,6 +40,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
             body: updatedTemplate?.body,
             subject: updatedTemplate?.subject,
             params: updatedTemplate?.params,
+            // eslint-disable-next-line @typescript-eslint/camelcase
             reply_to: updatedTemplate?.replyTo,
           },
         })
@@ -53,6 +54,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
             body: updatedTemplate?.body,
             subject: updatedTemplate?.subject,
             params: updatedTemplate?.params,
+            // eslint-disable-next-line @typescript-eslint/camelcase
             reply_to: updatedTemplate?.replyTo,
           },
         })
@@ -123,7 +125,8 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         'num_recipients': recipientCount,
         preview: {
           ...hydratedRecord,
-          reply_to: emailTemplate.replyTo || null
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          reply_to: emailTemplate.replyTo || null,
         },
       })
   

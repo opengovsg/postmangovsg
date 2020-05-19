@@ -20,6 +20,7 @@ const storeTemplateValidator = {
     body: Joi
       .string()
       .required(),
+    // eslint-disable-next-line @typescript-eslint/camelcase
     reply_to: Joi
       .string()
       .allow(null)
