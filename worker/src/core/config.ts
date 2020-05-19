@@ -242,24 +242,28 @@ if (config.get('env') === 'development'){
   })
 }
 
-// If the environment is a prod environment, we ensure that there is only 1 worker per ecs task
-if (config.get('IS_PROD')&& (config.get('messageWorker.numSender') + config.get('messageWorker.numLogger')) !== 1){
-  throw new Error(`Only 1 worker of 1 variant per task supported in production. 
+// If the environment is a prod environment, 
+// we ensure that there is only 1 worker per ecs task,
+// and required credentials are set
+if (config.get('IS_PROD')){
+
+  if ((config.get('messageWorker.numSender') + config.get('messageWorker.numLogger')) !== 1){
+    throw new Error(`Only 1 worker of 1 variant per task supported in production. 
     You supplied MESSAGE_WORKER_SENDER=${config.get('messageWorker.numSender')}, 
     MESSAGE_WORKER_LOGGER=${config.get('messageWorker.numLogger')}`)
-}
-
-// If a message worker is set, ensure that the credentials needed are also set
-if (config.get('messageWorker.numSender') > 0){
-  if ( 
-    !config.get('mailOptions.host') || 
-    !config.get('mailOptions.port') || 
-    !config.get('mailOptions.auth.user') ||
-    !config.get('mailOptions.auth.pass')
-  ) {
-    throw new Error('Email credentials must be set since a sender worker is required')
   }
-  
+
+  // If a message worker is set, ensure that the credentials needed are also set
+  if (config.get('messageWorker.numSender') > 0){
+    if ( 
+      !config.get('mailOptions.host') || 
+      !config.get('mailOptions.port') || 
+      !config.get('mailOptions.auth.user') ||
+      !config.get('mailOptions.auth.pass')
+    ) {
+      throw new Error('Email credentials must be set since a sender worker is required')
+    }
+  }
 }
 
 export default config
