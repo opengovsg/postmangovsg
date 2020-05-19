@@ -10,17 +10,16 @@ import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Landing.module.scss'
 import companyLogo from 'assets/img/brand/company-logo.svg'
-import landingImg from 'assets/img/landing/LandingHero.png'
+import landingImg from 'assets/img/landing/landing-hero.png'
 
 import arrowRight from 'assets/img/landing/arrow-right.svg'
 import mohAgencyImg from 'assets/img/landing/moh.png'
 import moeAgencyImg from 'assets/img/landing/moe.png'
 import momAgencyImg from 'assets/img/landing/mom.png'
 
-import trackImg from 'assets/img/landing/WhyUsePostman-3.svg'
 import userImg from 'assets/img/landing/moe-circle.png'
 
-import onboardingImg from 'assets/img/landing/Onboarding.svg'
+import onboardingImg from 'assets/img/landing/onboarding.svg'
 
 import testVideo from 'assets/mp4/test.mp4'
 import animationData from 'assets/lottie/test.json'
@@ -123,7 +122,9 @@ const Landing = () => {
           </div>
 
           <div className={styles.reason}>
-            <img src={trackImg} alt="Track engagement"/>
+            <video autoPlay loop muted>
+              <source src={testVideo} type="video/mp4" />
+            </video>
             <div className={styles.textContainer}>
               <h3>Forgot something?</h3>
               <p>We all have those days where we miss out on an important point for official messages. With Postman, it&apos;s never too late to pause the campaign if you are sending &gt; 1000 messages.</p>
