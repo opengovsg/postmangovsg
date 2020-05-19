@@ -135,6 +135,9 @@ See [architecture](docs/architecture/index.md) for details
 See [sending.md](docs/sending.md) for details
 
 ## Forking and configuring this product
+
+**Disclaimer of Liability.** This product is pending Vulnerability Assessment and Penetration Testing (VAPT).  You should conduct your own security assessment prior to using code provided in this repository. Open Government Products (OGP) makes no representations or warranties of any kind, expressed or implied about the completeness, accuracy, reliability, suitability or availability of this codebase. Any usage is at your own risk. 
+
 ### Backend
 See [configure/backend](docs/configure/backend.md) for details
 ### Frontend
