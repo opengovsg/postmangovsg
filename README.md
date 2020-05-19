@@ -21,6 +21,7 @@
   * [Forking and configuring this product](#forking-and-configuring-this-product)
     + [Backend](#backend)
     + [Frontend](#frontend)
+    + [Worker](#worker)
   * [Contributions](#contributions)
 
 ## Features
@@ -56,9 +57,9 @@ redis-cli ping
 
 ### Set environment variables
 Example environment variables can be found in
-- `backend/.env-example`
-- `frontend/.env-example`
-- `worker/.env-example`
+- [backend/.env-example](backend/.env-example)
+- [frontend/.env-example](frontend/.env-example)
+- [worker/.env-example](worker/.env-example)
 
 Set the environment variables in a file named `.env` in each folder
 
@@ -70,9 +71,9 @@ npm install
 npm run dev
 ```
 You should find the
-- React frontend at `localhost:3000`
-- Express backend  at `localhost:4000`
-- Swagger docs at `localhost:4000/docs`
+- React frontend at [localhost:3000](http://localhost:3000)
+- Express backend at [localhost:4000](http://localhost:4000)
+- Swagger docs at  [localhost:4000/docs](http://localhost:4000/docs)
 
 
 ## Deployment
@@ -142,6 +143,8 @@ See [sending.md](docs/sending.md) for details
 See [configure/backend](docs/configure/backend.md) for details
 ### Frontend
 See [configure/frontend](docs/configure/frontend.md) for details
+### Worker
+See [configure/worker](docs/configure/worker.md) for details
 
 ## Contributions
 
