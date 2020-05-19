@@ -80,19 +80,19 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
           <>
             <h2>Insert your Twilio credentials</h2>
             <TwilioCredentialsInput onFilled={setCreds}></TwilioCredentialsInput>
-            {storedCredentials.length ? <p className="clickable" onClick={toggleInputMode}>or select from stored credentials</p> : null}
+            {storedCredentials.length ? <p className="clickable" onClick={toggleInputMode}>Select from stored credentials</p> : null}
           </>
           :
           <>
             <h2>Select your Twilio credentials</h2>
             <Dropdown onSelect={setSelectedCredential} options={storedCredentials}></Dropdown>
-            <p className="clickable" onClick={() => setIsManual(true)}>or manually input credentials</p>
+            <p className="clickable" onClick={() => setIsManual(true)}>Input credentials manually</p>
           </>
         }
         <div className="separator"></div>
 
         <h2>Validate your credentials by doing a test send</h2>
-        <p>
+        <p className={styles.validateSMSCredentialsInfo}>
           To ensure your credentials are working perfectly,
           please send a test SMS to an available phone number
           to receive a preview of your message.
