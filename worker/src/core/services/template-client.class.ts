@@ -47,7 +47,7 @@ export default class TemplateClient {
           // templateObject.t means TagType, default is r
           // templateObject.raw means ???
           // templateObject.f refers to filter (eg. {{ var | humanize }}), we want to make sure this is empty
-          if (templateObject.t === 'r' && !templateObject.raw && templateObject.f?.length === 0) {
+          if (!templateObject.raw && templateObject.f?.length === 0) {
             /**
              * - templateObject.c has type string | undefined
              * - templateObject.c contains the param key, c stands for content
