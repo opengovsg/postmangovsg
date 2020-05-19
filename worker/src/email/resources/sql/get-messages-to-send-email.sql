@@ -13,7 +13,7 @@ BEGIN
 			FOR UPDATE SKIP LOCKED
     ),
     messages AS (
-      UPDATE email_ops SET sent_at=clock_timestamp() WHERE 
+      UPDATE email_ops SET sent_at=clock_timestamp(), updated_at = clock_timestamp() WHERE 
       id in (SELECT * from selected_ids)
       RETURNING id, recipient, params, campaign_id
     )
@@ -28,6 +28,6 @@ BEGIN
 	-- In that case, finalization of the job has to be deferred, so that the response can be updated in the ops table
 	-- The check for this edge case is carried out in the log_next_job function. 
 	IF NOT FOUND THEN
-		UPDATE job_queue SET status = 'SENT' where id = jid AND status = 'SENDING';
+		UPDATE job_queue SET status = 'SENT', updated_at = clock_timestamp() where id = jid AND status = 'SENDING';
 	END IF;
 END $$;

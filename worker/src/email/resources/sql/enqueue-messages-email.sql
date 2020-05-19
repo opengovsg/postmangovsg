@@ -3,7 +3,7 @@ DECLARE
     selected_campaign_id int;
 BEGIN
 	-- only one worker will be able to set this job's status
-	UPDATE job_queue SET status = 'SENDING' WHERE id = jid AND status = 'ENQUEUED'
+	UPDATE job_queue SET status = 'SENDING', updated_at = clock_timestamp() WHERE id = jid AND status = 'ENQUEUED'
 	RETURNING campaign_id INTO selected_campaign_id;
 
 	WITH messages AS 
