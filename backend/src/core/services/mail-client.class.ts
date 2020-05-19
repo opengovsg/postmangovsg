@@ -6,7 +6,11 @@ import { MailToSend, MailCredentials } from '@core/interfaces'
 export default class MailClient {
   private email: string
   private mailer: nodemailer.Transporter
-
+  /**
+   * Constructs a node mailer instance if SES credentials are provided; otherwise uses local transport
+   * @param email email address that will be set in the From: field
+   * @param credentials 
+   */
   constructor(email: string, credentials: MailCredentials) {
     const { host, port, auth } = credentials
 
@@ -40,10 +44,10 @@ export default class MailClient {
         subject: input.subject,
         html: input.body,
       }, (err, info) => {
-        if(err !== null){
+        if (err !== null){
           reject(new Error(`${err}`))
         }
-        else{
+        else {
           resolve(info.messageId)
         }
       })

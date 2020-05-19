@@ -17,7 +17,12 @@ const getUserSettings = async (req: Request, res: Response, next: NextFunction):
   }
 }
 
-// Checks if label already used for user
+/**
+ * Checks if label already used for that user
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const checkUserCredentialLabel = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const userId = req.session?.user?.id
@@ -32,7 +37,12 @@ const checkUserCredentialLabel = async (req: Request, res: Response, next: NextF
   }
 }
 
-// Associate credential to user
+/**
+ * Associate credential to user
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const storeUserCredential = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   const { label } = req.body
   const userId = req.session?.user?.id
@@ -48,7 +58,12 @@ const storeUserCredential = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
-// Associate credential to user
+/**
+ * Get only labels for SMS credentials for that user
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const getChannelSpecificCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const userId = req.session?.user?.id
@@ -59,6 +74,12 @@ const getChannelSpecificCredentials = async (req: Request, res: Response, next: 
   }
 }
 
+/**
+ * Delete a credential label for that user
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const deleteUserCredential = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { label } = req.body
@@ -74,6 +95,12 @@ const deleteUserCredential = async (req: Request, res: Response, next: NextFunct
   }
 }
 
+/**
+ * Generate and associate an api key with that user
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const regenerateApiKey = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const userId = req.session?.user?.id

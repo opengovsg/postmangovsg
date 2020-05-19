@@ -76,7 +76,7 @@ const insertNewWorker = (connection: Sequelize, workerId: string): Promise<boole
 const assignment = async (connection: Sequelize, workerId: string): Promise<boolean> => {
   try{
     let deadWorkers: string[] = []
-    if(config.IS_PROD) {
+    if(config.get('IS_PROD')) {
       deadWorkers = await getDeadWorkers(connection, workerId)
     } else {
       logger.info(`${workerId}: Dev env - assignment - assumed no dead workers`)

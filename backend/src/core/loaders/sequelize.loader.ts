@@ -6,14 +6,14 @@ import { EmailMessage, EmailTemplate, EmailOp } from '@email/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import logger from '@core/logger'
 
-const DB_URI = config.database.databaseUri
+const DB_URI = config.get('database.databaseUri')
 
 const sequelizeLoader = async (): Promise<void> => {
-  const dialectOptions = config.IS_PROD ? config.database.dialectOptions : {}
+  const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
   const sequelize = new Sequelize(DB_URI, {
     dialect: 'postgres',
     logging: false,
-    pool: config.database.poolOptions,
+    pool: config.get('database.poolOptions'),
     dialectOptions,
   })
 

@@ -1,152 +1,382 @@
+/**
+ * @file Configuration 
+ * All defaults can be changed
+ */
+import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
-const parseEnvVarAsInt = (i: string): number | undefined => {
-  const j = parseInt(i)
-  return isNaN(j) ? undefined : j
-}
-
-const IS_PROD: boolean = process.env.NODE_ENV === 'production'
-
-// AWS settings
-const awsRegion: string = process.env.AWS_REGION as string
-const uploadBucket: string = process.env.FILE_STORAGE_BUCKET_NAME as string
-const secretManagerSalt: string = process.env.SECRET_MANAGER_SALT as string
-const logGroupName: string = process.env.AWS_LOG_GROUP_NAME || 'postmangovsg-beanstalk-testing'
-
-// Upload csv
-const jwtSecret = process.env.JWT_SECRET as string
-
-// Database settings
-const databaseUri: string = process.env.DB_URI as string
-const SEQUELIZE_POOL_MAX_CONNECTIONS = 150
-const SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS = 600000
-const rdsCa: false | Buffer = IS_PROD && fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
-
-// Cache settings
-const redisOtpUri: string = process.env.REDIS_OTP_URI as string
-const redisSessionUri: string = process.env.REDIS_SESSION_URI as string
-
-// Format for logging
-const MORGAN_LOG_FORMAT = 'HTTP/:http-version :method :url :status :res[content-length] ":referrer" ":user-agent" :response-time ms; :date[iso]'
-
-// CORS settings
-const frontendUrl: string = process.env.FRONTEND_URL as string
-
-// Express session
-const sessionSecret: string = process.env.SESSION_SECRET as string
-const cookieDomain: string = process.env.COOKIE_DOMAIN as string
-const cookieSettings = {
-  httpOnly: true,
-  secure: IS_PROD,
-  maxAge: 24 * 60 * 60 * 1000, // 24 hours,
-  sameSite: true,
-  domain: cookieDomain,
-  path: '/',
-}
-
-// OTP settings
-const otpRetries = 4 // Number of attempts to enter otp
-const otpExpiry = 600 // in seconds, expires after 10 minutes
-const otpResendTimeout= 30 // Number of seconds to wait before resending otp
+const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem')) 
+/**
+ * To require an env var without setting a default,
+ * use
+ *    default: '',
+ *    format: 'required-string',
+ *    sensitive: true,
+ */
+convict.addFormats({
+  'required-string': {
+    validate:  (val: any): void => {
+      if (val === '') {
+        throw new Error('Required value cannot be empty')
+      }
+    },
+    coerce: (val: any): any => { 
+      if (val === null){
+        return undefined 
+      }
+      return val
+    },
+  },
+})
 
 
-// Node mailer
-const mailHost: string = process.env.SES_HOST as string
-const mailPort = Number(process.env.SES_PORT)
-const mailUser: string = process.env.SES_USER as string
-const mailPass: string = process.env.SES_PASS as string
-
-// Twilio
-const twilioAccountSid: string = process.env.TWILIO_ACCOUNT_SID as string
-const twilioApiKey: string = process.env.TWILIO_API_KEY as string
-const twilioApiSecret: string = process.env.TWILIO_API_SECRET as string
-const twilioMessagingServiceSid: string = process.env.TWILIO_MESSAGING_SERVICE_SID as string
-const defaultCountryCode: string = process.env.DEFAULT_COUNTRY_CODE as string
-
-// xss whitelist
-const xssOptionsEmail = {
-  whiteList: {
-    b: [],
-    i: [],
-    u: [],
-    br: [],
-    p: [],
-    a: ['href', 'title', 'target'],
-    img: ['src', 'alt', 'title', 'width', 'height'],
-  }, 
-  stripIgnoreTag: true, 
-}
-const xssOptionsSms = {
-  whiteList: { br: [] },
-  stripIgnoreTag: true,
-}
-
-// Rate for job (any rate higher than this will be split)
-const maxRatePerJob = parseEnvVarAsInt(process.env.MAX_RATE_PER_JOB as string) || 150
-
-// For API Key hashing 
-const apiKeySalt: string = process.env.API_KEY_SALT_V1 as string
-const apiKeyVersion = 'v1'
-
-export default {
-  IS_PROD,
+const config = convict({
+  env: {
+    doc: 'The application environment.',
+    format: ['production', 'staging', 'development'],
+    default: 'production',
+    env: 'NODE_ENV',
+  },
+  IS_PROD: {
+    default: true,
+  },
+  APP_NAME: {
+    doc: 'Name of the app',
+    default: 'Postman.gov.sg',
+    env: 'APP_NAME',
+  },
   aws: {
-    awsRegion,
-    logGroupName,
-    uploadBucket,
-    secretManagerSalt,
+    awsRegion: {
+      doc: 'Region for the S3 bucket that is used to store file uploads',
+      default:  'ap-northeast-1',
+      env: 'AWS_REGION',
+    },
+    logGroupName: {
+      doc: '	Name of Cloudwatch log group to write application logs to',
+      default: 'postmangovsg-beanstalk-prod',
+      env: 'AWS_LOG_GROUP_NAME',
+    },
+    uploadBucket: {
+      doc: 'Name of the S3 bucket that is used to store file uploads',
+      default:  'postmangovsg-prod-upload',
+      env: 'FILE_STORAGE_BUCKET_NAME',
+    },
+    secretManagerSalt: {
+      doc: 'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
+      default: '',
+      env: 'SECRET_MANAGER_SALT',
+      format: 'required-string',
+      sensitive: true,
+    },
   },
   database: {
-    databaseUri,
+    databaseUri: {
+      doc: 'URI to the postgres database',
+      default: '',
+      env: 'DB_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
     dialectOptions: {
       ssl: {
-        require: IS_PROD,
+        require: {
+          doc: 'Require SSL connection to database',
+          default: true,
+          env: 'DB_REQUIRE_SSL',
+        },
         rejectUnauthorized: true,
-        ca: [rdsCa],
+        ca: {
+          doc: 'SSL cert to connect to database',
+          default: [rdsCa],
+          format: '*',
+          sensitive: true,
+        },
       },
     },
     poolOptions: {
-      max: SEQUELIZE_POOL_MAX_CONNECTIONS,
-      min: 0,
-      acquire: SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
+      max: {
+        doc: 'Maximum number of connection in pool',
+        default: 150,
+        env: 'SEQUELIZE_POOL_MAX_CONNECTIONS',
+        format: 'int',
+      },
+      min: {
+        doc: 'Minimum number of connection in pool',
+        default: 0,
+        env: 'SEQUELIZE_POOL_MIN_CONNECTIONS',
+        format: 'int',
+      },
+      acquire: {
+        doc: 'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
+        default: 600000,
+        env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
+        format: 'int',
+      }, 
     },
   },
-  jwtSecret,
-  MORGAN_LOG_FORMAT,
-  frontendUrl,
+  jwtSecret: {
+    doc: 'Secret used to sign pre-signed urls for uploading CSV files to AWS S3',
+    default: '',
+    env: 'JWT_SECRET',
+    format: 'required-string',
+    sensitive: true,
+  },
+  MORGAN_LOG_FORMAT: {
+    doc: 'Format for logging requests to server',
+    default: ':client-ip - :user-id [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :response-time ms',
+    env: 'MORGAN_LOG_FORMAT',
+  },
+  frontendUrl: {
+    doc: 'CORS: accept requests from this origin. Can be a string, or regex',
+    default: 'https//postman.gov.sg', // prod only
+    env: 'FRONTEND_URL',
+  },
   session: {
-    secret: sessionSecret,
-    cookieSettings,
+    cookieName: {
+      doc: 'Identifier for the cookie',
+      default: 'postmangovsg',
+      env: 'COOKIE_NAME',
+    },
+    secret: {
+      doc: 'Secret used to sign the session ID cookie',
+      default: '',
+      env: 'SESSION_SECRET',
+      format: 'required-string',
+      sensitive: true,
+    },
+    cookieSettings:{
+      httpOnly:{
+        doc: 'Specifies the boolean value for the HttpOnly Set-Cookie attribute.',
+        default: true,
+        env: 'COOKIE_HTTP_ONLY',
+      },
+      secure:{
+        doc: 'true will set a secure cookie that is sent only over HTTPS.',
+        default: true,
+        env: 'COOKIE_SECURE',
+      },
+      maxAge:{
+        doc: 'Specifies the number (in milliseconds) to use when calculating the Expires Set-Cookie attribute',
+        default: 24 * 60 * 60 * 1000,
+        env: 'COOKIE_MAX_AGE',
+        format: 'int',
+      },
+      sameSite:{
+        doc: 'true will set the SameSite attribute to Strict for strict same site enforcement.',
+        default: true,
+        env: 'COOKIE_SAME_SITE',
+      },
+      domain:{
+        doc: 'Specifies the value for the Domain Set-Cookie attribute',
+        default: 'postman.gov.sg', // only root domain
+        env: 'COOKIE_DOMAIN',
+      },
+      path:{
+        doc: 'Specifies the value for the Path Set-Cookie.',
+        default: '/',
+        env: 'COOKIE_PATH',
+      },
+    },
+      
   },
   otp: {
-    retries: otpRetries,
-    expiry: otpExpiry,
-    resendTimeout: otpResendTimeout,
-  },
-  redisOtpUri,
-  redisSessionUri,
-  mailOptions:{
-    host: mailHost,
-    port: mailPort,
-    auth: {
-      user: mailUser,
-      pass: mailPass,
+    retries: {
+      doc: 'Number of attempts a user can enter otp before a new otp is required',
+      default: 4,
+      env: 'OTP_RETRIES',
+    },
+    expiry: {
+      doc: 'Number of seconds before a new otp is required',
+      default: 600,
+      env: 'OTP_EXPIRY_SECONDS',
+    },
+    resendTimeout: {
+      doc: 'Number of seconds to wait before resending otp',
+      default: 30, 
+      env: 'OTP_RESEND_SECONDS',
     },
   },
-  defaultCountryCode,
+  redisOtpUri: {
+    doc: 'URI to the redis cache for storing one time passwords',
+    default: '',
+    env: 'REDIS_OTP_URI',
+    format: 'required-string',
+    sensitive: true,
+  },
+  redisSessionUri: {
+    doc: 'URI to the redis cache for storing login sessions',
+    default: '',
+    env: 'REDIS_SESSION_URI',
+    format: 'required-string',
+    sensitive: true,
+  },
+  mailOptions: {
+    host: {
+      doc: 'Amazon SES SMTP endpoint.',
+      default: '',
+      env: 'SES_HOST',
+    },
+    port: {
+      doc: 'Amazon SES SMTP port, defaults to 465',
+      default: 465,
+      env: 'SES_PORT',
+      format: 'int',
+    },
+    auth: {
+      user: {
+        doc: 'SMTP username',
+        default: '',
+        env: 'SES_USER',
+        sensitive: true,
+      },
+      pass: {
+        doc: 'SMTP password',
+        default: '',
+        env: 'SES_PASS',
+        sensitive: true,
+      },
+    },
+  },
+  mailFrom: {
+    doc: 'The email address that appears in the From field of an email',
+    default: '',
+    env: 'SES_FROM',
+  },
+  defaultCountryCode: {
+    doc: 'Country code to prepend to phone numbers',
+    default: '65',
+    env: 'DEFAULT_COUNTRY_CODE',
+  },
   smsOptions: {
-    accountSid: twilioAccountSid,
-    apiKey: twilioApiKey,
-    apiSecret: twilioApiSecret,
-    messagingServiceSid: twilioMessagingServiceSid,
+    accountSid: {
+      doc: 'Id of the Twilio account',
+      default: '',
+      env: 'TWILIO_ACCOUNT_SID',
+      sensitive: true,
+    },
+    apiKey: {
+      doc: 'API Key to access Twilio',
+      default: '',
+      env: 'TWILIO_API_KEY',
+      sensitive: true,
+    },
+    apiSecret: {
+      doc: 'Corresponding API Secret to access Twilio',
+      default: '',
+      env: 'TWILIO_API_SECRET',
+      sensitive: true,
+    },
+    messagingServiceSid: {
+      doc: 'ID of the messaging service ',
+      default: '',
+      env: 'TWILIO_MESSAGING_SERVICE_SID',
+      sensitive: true,
+    },
+  },
+  maxRatePerJob: {
+    doc: 'Number of messages that one worker can send at a time',
+    default: 150,
+    env: 'MAX_RATE_PER_JOB',
+    format: 'int',
+  },
+  apiKey: {
+    salt: {
+      doc: 'Secret used to hash API Keys before storing them in the database',
+      default: '',
+      env: 'API_KEY_SALT_V1',
+      format: 'required-string',
+      sensitive: true,
+    },
+    version: {
+      doc: 'Version of salt, defaults to v1',
+      default: 'v1',
+      env: 'API_KEY_SALT_VERSION',
+    },
+  },
+  domains: {
+    doc: 'Semi-colon separated list of domains that can sign in to the app.',
+    default: '.gov.sg',
+    env: 'DOMAIN_WHITELIST',
   },
   xssOptions: {
-    email: xssOptionsEmail,
-    sms: xssOptionsSms,
+    doc: 'List of html tags allowed',
+    default: {
+      email: {
+        whiteList: {
+          b: [],
+          i: [],
+          u: [],
+          br: [],
+          p: [],
+          a: ['href', 'title', 'target'],
+          img: ['src', 'alt', 'title', 'width', 'height'],
+        }, 
+        stripIgnoreTag: true, 
+      },
+      sms:
+    { 
+      whiteList: { br: [] },
+      stripIgnoreTag: true,
+    },
+    },
   },
-  maxRatePerJob,
-  apiKey: {
-    salt: apiKeySalt,
-    version: apiKeyVersion,
-  },
+})
+
+
+// If mailFrom was not set in an env var, set it using the app_name
+const defaultMailFrom =  `${config.get('APP_NAME')} <donotreply@mail.postman.gov.sg>`
+config.set('mailFrom', config.get('mailFrom') ||  defaultMailFrom)
+
+// Override some defaults
+switch (config.get('env')){
+case 'staging':
+  config.load({
+    frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
+    aws: {
+      uploadBucket:  'postmangovsg-dev-upload',
+      logGroupName: 'postmangovsg-beanstalk-staging',
+    },
+    session: {
+      cookieSettings: {
+        httpOnly: true,
+        secure: true, // Can only be sent via https
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: true,
+        domain: '.postman.gov.sg', // all subdomains
+        path: '/',
+      },
+    },
+  })
+  break
+case 'development':  
+  config.set('IS_PROD', false)
+  config.load({
+    frontendUrl: 'http://localhost:3000',
+    aws: {
+      uploadBucket:  'postmangovsg-dev-upload',
+      logGroupName: 'postmangovsg-beanstalk-testing',
+    },
+    database: {
+      dialectOptions: {
+        ssl: {
+          require: false, // No ssl connection needed
+          rejectUnauthorized: true,
+          ca: false, 
+        },
+      },
+    },
+    session: {
+      cookieSettings: {
+        httpOnly: true,
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: true,
+        domain:  'localhost',
+        path: '/',
+      },
+    }, 
+  })
+  break
 }
+
+export default config

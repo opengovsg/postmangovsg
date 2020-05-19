@@ -8,17 +8,19 @@ const SALT_ROUNDS = 10
 export default class TwilioClient {
   private client: any;
   private messagingServiceSid: string;
+  private callbackSecret: string;
 
   constructor(credential: TwilioCredentials) {
-    const { accountSid, apiKey, apiSecret, messagingServiceSid } = credential
+    const { accountSid, apiKey, apiSecret, messagingServiceSid, callbackSecret } = credential
     this.client = twilio(apiKey, apiSecret, { accountSid })
     this.messagingServiceSid = messagingServiceSid
+    this.callbackSecret = callbackSecret
   }
 
   public send(messageId: number, recipient: string, message: string, campaignId?: number): Promise<string | void> {
     return this.generateUsernamePassword(messageId, campaignId)
       .then(({ username, password }) => {
-        let callbackUrl= new URL(config.smsOptions.callbackBackendUrl)
+        let callbackUrl= new URL(config.get('backendUrl'))
         callbackUrl.username = username
         // encode password as the hash contains special characters
         callbackUrl.password = encodeURIComponent(password)
@@ -54,7 +56,7 @@ export default class TwilioClient {
   private generateUsernamePassword(messageId: number, campaignId?: number): Promise<{username: string; password: string}> {
     const username = Math.random().toString(36)
       .substring(2, 15) // random string
-    const password = username + messageId + campaignId + config.smsOptions.callbackSecret
+    const password = username + messageId + campaignId + this.callbackSecret
     return this.generateHash(password)
       .then((hashedPwd: string) => {
         return { username, password: hashedPwd }
@@ -76,8 +78,8 @@ export default class TwilioClient {
   }
 
   private addDefaultCountryCode(recipient: string): string {
-    if (!recipient.startsWith('+') && config.defaultCountryCode) {
-      return `+${config.defaultCountryCode}${recipient}`
+    if (!recipient.startsWith('+') && config.get('defaultCountryCode')) {
+      return `+${config.get('defaultCountryCode')}${recipient}`
     }
     return recipient
   }

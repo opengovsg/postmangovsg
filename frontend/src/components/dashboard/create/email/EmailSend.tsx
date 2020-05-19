@@ -20,9 +20,14 @@ const EmailSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: F
   }
 
   const loadPreview = async () => {
-    const msgPreview = await getPreviewMessage(+campaignId)
-    if (msgPreview) {
-      setPreview(msgPreview)
+    if (campaignId) {
+      try {
+        const msgPreview = await getPreviewMessage(+campaignId)
+        if (msgPreview) {
+          setPreview(msgPreview)
+        }
+      // eslint-disable-next-line no-empty
+      } catch (err){}
     }
   }
 

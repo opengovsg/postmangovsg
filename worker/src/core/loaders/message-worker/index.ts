@@ -47,11 +47,11 @@ const enqueueMessages = (jobId: number): Promise<void> => {
   return service().enqueueMessages(jobId)
 }
   
-const getMessages = (jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; campaignId?: number}[]>  => {
+const getMessages = (jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null; campaignId?: number}[]>  => {
   return service().getMessages(jobId, rate)
 }
 
-const sendMessage = (message: { id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; campaignId?: number}): Promise<void>  => {
+const sendMessage = (message: { id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null; campaignId?: number }): Promise<void>  => {
   return service().sendMessage(message)
 }
   
@@ -75,11 +75,11 @@ const finalize = (): Promise<void> => {
 }
 
 const createConnection = (): Sequelize => {
-  const dialectOptions = config.IS_PROD ? config.database.dialectOptions : {}
-  return new Sequelize(config.database.databaseUri, {
+  const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+  return new Sequelize(config.get('database.databaseUri'), {
     dialect: 'postgres',
     logging: false,
-    pool: config.database.poolOptions,
+    pool: config.get('database.poolOptions'),
     dialectOptions,
   })
 }

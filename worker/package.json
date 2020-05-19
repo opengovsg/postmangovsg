@@ -1,6 +1,6 @@
 {
   "name": "worker",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Workers for Postman",
   "main": "build/server.js",
   "scripts": {
@@ -14,13 +14,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@types/bcrypt": "^3.0.0",
     "@types/nodemailer": "^6.4.0",
     "@types/nodemailer-direct-transport": "^1.0.31",
     "@types/validator": "^13.0.0",
     "aws-sdk": "^2.660.0",
     "axios": "^0.19.2",
-    "bcrypt": "^4.0.1",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
     "module-alias": "^2.2.2",

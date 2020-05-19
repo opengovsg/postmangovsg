@@ -1,7 +1,7 @@
 import React from 'react'
 
 import styles from './Error.module.scss'
-import appLogo from 'assets/img/app-logo.svg'
+import appLogo from 'assets/img/brand/app-logo.svg'
 const Error = () => {
 
   return (

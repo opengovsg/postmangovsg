@@ -4,12 +4,16 @@ import config from '@core/config'
 import logger from '@core/logger'
 import { jwtUtils } from '@core/utils/jwt'
 
-const FILE_STORAGE_BUCKET_NAME = config.aws.uploadBucket
+const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 const s3 = new S3({
   signatureVersion: 'v4',
-  region: config.aws.awsRegion,
+  region: config.get('aws.awsRegion'),
 })
 
+/**
+ * Returns a presigned url for uploading file to s3 bucket
+ * @param contentType 
+ */
 const getUploadParameters = async (contentType: string): Promise<{presignedUrl: string; signedKey: string}> => {
   const s3Key = uuid()
   
@@ -27,7 +31,10 @@ const getUploadParameters = async (contentType: string): Promise<{presignedUrl: 
   return { presignedUrl, signedKey }
 }
   
-// decodes JWT
+/**
+ * Decodes jwt
+ * @param transactionId 
+ */
 const extractS3Key = (transactionId: string): string => {
   let decoded: string
   try {

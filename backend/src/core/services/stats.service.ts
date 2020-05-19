@@ -1,5 +1,9 @@
 import { fn, col, cast } from 'sequelize'
-
+/**
+ * Helper method to get the number of errored messages, sent messages, and messages that remain unsent. 
+ * @param model 
+ * @param campaignId 
+ */
 const getStatsFromTable = async (model: any, campaignId: number): Promise<{error: number; unsent: number; sent: number}> => {
   const [data]= await model.findAll({
     raw : true, 

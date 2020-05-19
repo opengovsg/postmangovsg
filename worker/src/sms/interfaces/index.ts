@@ -3,4 +3,5 @@ export interface TwilioCredentials {
   apiKey: string;
   apiSecret: string;
   messagingServiceSid: string;
+  callbackSecret: string;
 }

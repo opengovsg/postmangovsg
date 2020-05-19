@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react'
 import cx from 'classnames'
 
+import { GUIDE_CREDENTIALS_URL } from 'config'
 import { ChannelType, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
@@ -13,13 +14,13 @@ const CreateModal = () => {
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
   const [name, setName] = useState('')
   async function handleCreateCampaign(){
-    try{
+    try {
       const campaign: Campaign = await createCampaign(name, selectedChannel)
       // close modal and go to create view
       modalContext.setModalContent(null)
       history.push(`/campaigns/${campaign.id}`)
     }
-    catch(err){
+    catch (err){
       console.error(err)
     }
   }
@@ -55,7 +56,7 @@ const CreateModal = () => {
 
         <p className={styles.subtext}>Get your credentials ready.
           <a
-            href="https://guide.postman.gov.sg/twilio-sms.html#where-can-i-find-credentials-on-the-twilio-console"
+            href={GUIDE_CREDENTIALS_URL}
             target="_blank"
             rel="noopener noreferrer"
           >
