@@ -10,7 +10,7 @@ BEGIN
 		sent_at = p.sent_at,
 		delivered_at = p.delivered_at,
 		received_at = p.received_at,
-		updated_at = p.updated_at
+		updated_at = clock_timestamp() 
 	FROM email_ops p WHERE 
 	p.campaign_id = selected_campaign_id 
 	AND m.campaign_id = p.campaign_id

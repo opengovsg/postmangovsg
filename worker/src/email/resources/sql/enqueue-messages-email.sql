@@ -7,7 +7,7 @@ BEGIN
 	RETURNING campaign_id INTO selected_campaign_id;
 
 	WITH messages AS 
-	(UPDATE email_messages m SET dequeued_at = clock_timestamp() 
+	(UPDATE email_messages m SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp() 
 	WHERE m.campaign_id = selected_campaign_id
 	-- enqueue only those that have not been enqueued - this means that when we retry, we will have to set dequeued_at to null
 	AND m.dequeued_at IS NULL
