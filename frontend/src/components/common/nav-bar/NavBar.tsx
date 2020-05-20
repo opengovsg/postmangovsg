@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import ReactGA from 'react-ga'
 import cx from 'classnames'
 
 import { ModalContext } from 'contexts/modal.context'
@@ -49,7 +50,14 @@ const NavBar = () => {
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
         <a className={cx(styles.link, { [styles.active]: isCreatePath() })} onClick={handleCreateCampaign}>Create</a>
-        <a className={styles.link} href={GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
+        <a 
+          className={styles.link} 
+          href={GUIDE_URL} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          onClick={()=> {ReactGA.outboundLink({ label: GUIDE_URL }, () => {})}}>
+          Guide
+        </a>
         <NavLink className={styles.link} activeClassName={styles.active} to="/account">Account</NavLink>
 
         <div className={styles.separator}></div>

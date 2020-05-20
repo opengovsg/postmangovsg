@@ -29,7 +29,9 @@
     "url": "https://github.com/datagovsg/postmangovsg/issues"
   },
   "homepage": "https://github.com/datagovsg/postmangovsg#readme",
-  "dependencies": {},
+  "dependencies": {
+    "react-ga": "^2.7.0"
+  },
   "devDependencies": {
     "concurrently": "^5.1.0",
     "typescript": "^3.8.3"

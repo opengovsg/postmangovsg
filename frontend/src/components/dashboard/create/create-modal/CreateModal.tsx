@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react'
+import ReactGA from 'react-ga'
 import cx from 'classnames'
 
 import { GUIDE_CREDENTIALS_URL } from 'config'
@@ -59,6 +60,7 @@ const CreateModal = () => {
             href={GUIDE_CREDENTIALS_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={()=> {ReactGA.outboundLink({ label: GUIDE_CREDENTIALS_URL }, () => {})}}
           >
             What is this?
           </a>

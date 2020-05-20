@@ -23,10 +23,10 @@ async function loginWithOtp(email: string, otp: string): Promise<void> {
   }
 }
 
-async function getUserEmail(): Promise<string | undefined> {
+async function getUser(): Promise<{ email: string; id: number } | undefined> {
   try {
     const response = await axios.get('/auth/userinfo')
-    return response.data?.email
+    return response.data
   } catch (e) {
     console.error(e)
   }
@@ -52,6 +52,6 @@ function errorHandler(e: AxiosError, customHandlers: any = {}) {
 export {
   getOtpWithEmail,
   loginWithOtp,
-  getUserEmail,
+  getUser,
   logout,
 }

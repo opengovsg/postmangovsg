@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
+import ReactGA from 'react-ga'
 
 import Login from './login'
 import { GUIDE_URL, CONTACT_US_URL } from 'config'
@@ -36,8 +37,22 @@ const Landing = () => {
         <div className={styles.bottomContent}>
           <img className={styles.companyLogo} src={companyLogo} alt="OGP"></img>
           <div className={styles.linkBar}>
-            <a className={styles.navLink} href={GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
-            <a className={styles.navLink} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Contact Us</a>
+            <a 
+              className={styles.navLink} 
+              href={GUIDE_URL} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={()=> {ReactGA.outboundLink({ label: GUIDE_URL }, () => {})}}>
+                Guide
+            </a>
+            <a 
+              className={styles.navLink} 
+              href={CONTACT_US_URL} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={()=> {ReactGA.outboundLink({ label: CONTACT_US_URL }, () => {})}}>
+                Contact Us
+            </a>
           </div>
         </div>
       </div>
