@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { FileInput, InfoBlock, ErrorBlock, PreviewBlock, PrimaryButton, SampleCsv } from 'components/common'
 import { getPresignedUrl, completeFileUpload, getPreviewMessage } from 'services/sms.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
+import { sendTiming, sendException } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
@@ -39,6 +40,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
   async function uploadFile(files: File[]) {
     setIsUploading(true)
     setErrorMessage(null)
+    const uploadTimeStart = performance.now()
 
     try {
       // user did not select a file
@@ -60,6 +62,8 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       })
 
       // Set state
+      const uploadTimeEnd = performance.now()
+      sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
@@ -69,6 +73,11 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
 
     } catch (err) {
       setErrorMessage(err.message)
+      const exceptionMsg =
+        err.message.includes('not present in uploaded recipient list')
+        ? 'Attributes found in template not present in uploaded recipient list.'
+        : err.message
+      sendException(exceptionMsg)
     } finally {
       setIsUploading(false)
     }
