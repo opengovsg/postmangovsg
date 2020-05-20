@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { TextArea, PrimaryButton, ErrorBlock } from 'components/common'
+import { TextArea, PrimaryButton, ErrorBlock, TextInput } from 'components/common'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/email.service'
 
@@ -55,7 +55,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, replyTo: in
       <TextArea highlight={true} placeholder="Enter email message" value={body} onChange={setBody} />
       <h4 className={styles.replyToHeader}>Replies <em>optional</em></h4>
       <p>All replies will be directed to the email address indicated below</p>
-      <TextArea highlight={true} singleRow={true} placeholder="Enter reply-to email address" value={replyTo || ''} onChange={setReplyTo} />
+      <TextInput placeholder="Enter reply-to email address" value={replyTo || ''} onChange={setReplyTo} />
       <div className="separator"></div>
       <div className="progress-button">
         <PrimaryButton disabled={!body || !subject} onClick={handleSaveTemplate}>Upload Recipients →</PrimaryButton>
