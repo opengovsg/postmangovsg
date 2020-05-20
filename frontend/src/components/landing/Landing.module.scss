@@ -66,7 +66,6 @@ $section-vertical-padding: 4rem;
         margin-bottom: 0;
 
         @include mobile() {
-          font-size: 2rem;
           text-align: center;
         }
       }
@@ -79,6 +78,10 @@ $section-vertical-padding: 4rem;
 
         .text {
           line-height: 3.8rem;
+
+          @include mobile() {
+            line-height: 0.5rem;
+          }
         }
 
         @include mobile() {
@@ -90,6 +93,10 @@ $section-vertical-padding: 4rem;
           font-size: 4.5rem;
           font-weight: 200;
           margin-right: 0.5rem;
+
+          @include mobile() {
+            margin-right: 0;
+          }
         }
       }
 
@@ -110,7 +117,7 @@ $section-vertical-padding: 4rem;
           margin-right: 2rem;
 
           @include mobile() {
-            margin: 2rem 0;
+            margin: 1rem 0;
           }
         }
 
@@ -264,17 +271,13 @@ $section-vertical-padding: 4rem;
         }
       }
 
-      .lottie {
-        width: 25rem;
-        margin-right: 2rem;
-
-        @include mobile() {
-          margin-right: 0;
-        }
-      }
-
       .textContainer {
         width: 50%;
+        
+        @include mobile() {
+          margin-top: 1rem;
+          width: 100%;
+        }
       }
 
       p {
@@ -428,6 +431,7 @@ $section-vertical-padding: 4rem;
   }
 
   @include mobile() {
+    text-align: center;
     height: auto;
   }
 
@@ -461,17 +465,28 @@ $section-vertical-padding: 4rem;
     .buttonRow {
       margin-top: 3rem;
 
+      @include mobile() {
+        @include flex-vertical;
+        align-items: center;
+      }
+
       .getStartedButton {
         color: $light-blue;
         border: 1px solid $light-blue;
         min-width: 10rem;
+
+        @include mobile() {
+          width: 10rem;
+          margin-bottom: 1rem;
+        }
       }
 
       a {
         margin-left: 2rem;
         color: $light-blue;
+
         @include mobile() {
-          display: none;
+          margin-left: 0;
         }
       }
     }
@@ -513,8 +528,12 @@ $section-vertical-padding: 4rem;
       }
     
       .header {
-        display: flex;
+        @include flex-horizontal;
         align-items: center;
+
+        @include mobile() {
+          @include flex-vertical;
+        }
     
         .title {
           font-weight: bold;
@@ -530,8 +549,9 @@ $section-vertical-padding: 4rem;
           line-height: 1;
           height: 1.4rem;
 
-          @include mobile {
-            display: none;
+          @include mobile() {
+            margin-left: 0;
+            margin-top: 1rem;
           }
         }
       }
@@ -543,9 +563,7 @@ $section-vertical-padding: 4rem;
       align-self: flex-end;
   
       @include mobile() {
-        align-self: flex-start;
-        margin-top: 2rem;
-  
+        display: none;
       }
       span {
         margin-right: 2rem;
@@ -573,6 +591,19 @@ $section-vertical-padding: 4rem;
         color: $light-blue;
         margin-right: 2rem;
         font-size: 0.75rem;
+      }
+    }
+
+    .builtByMobile {
+      display: none;
+
+      @include mobile() {
+        @include flex-horizontal;
+        margin-top: 2rem;
+      }
+
+      span {
+        margin-right: 1rem;
       }
     }
   }

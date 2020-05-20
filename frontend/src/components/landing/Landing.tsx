@@ -212,6 +212,10 @@ const Landing = () => {
             <a href="" target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
           </div>
           <span>&copy; 2019 Open Government Products. Last Updated 28 April 2020</span>
+          <div className={styles.builtByMobile}>
+            <span>Built by</span>
+            <img src={companyLogo} alt="logo"/>
+          </div>
         </div>
       </div>
     </>
