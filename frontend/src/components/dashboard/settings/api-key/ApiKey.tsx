@@ -70,6 +70,29 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
     setApiKeyState(ApiKeyState.COPY)
   }
 
+  let buttonLabel = ''
+  let buttonIcon = ''
+  switch (apiKeyState) {
+    case ApiKeyState.GENERATE:
+      buttonLabel = 'Generate'
+      buttonIcon = 'bx-key'
+      break
+    case ApiKeyState.COPY:
+      buttonLabel = 'Copy'
+      buttonIcon = 'bx-copy'
+      break
+    case ApiKeyState.COPIED:
+      buttonLabel = 'Copied'
+      buttonIcon = 'bx-check'
+      break
+    case ApiKeyState.REGENERATE:
+      buttonLabel = 'Regenerate'
+      buttonIcon = 'bx-refresh'
+      break
+    default:
+      break
+  }
+
   return (
     <>
       <h2>API Key</h2>
@@ -96,26 +119,8 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
         textRef={apiKeyRef}
         buttonDisabled={isGeneratingApiKey}
       >
-        {apiKeyState === ApiKeyState.GENERATE
-          ? 'Generate'
-          : apiKeyState === ApiKeyState.REGENERATE
-            ? 'Regenerate'
-            : apiKeyState === ApiKeyState.COPY
-              ? 'Copy'
-              : 'Copied'}{' '}
-        API key
-        <i
-          className={cx(
-            'bx',
-            apiKeyState === ApiKeyState.GENERATE
-              ? 'bx-key'
-              : apiKeyState === ApiKeyState.REGENERATE
-                ? 'bx-refresh'
-                : apiKeyState === ApiKeyState.COPY
-                  ? 'bx-copy'
-                  : 'bx-check'
-          )}
-        />
+        {buttonLabel} API key
+        <i className={cx('bx', buttonIcon)} />
       </TextInputWithButton>
     </>
   )
