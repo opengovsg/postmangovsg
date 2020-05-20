@@ -23,10 +23,11 @@ const storeTemplateValidator = {
     // eslint-disable-next-line @typescript-eslint/camelcase
     reply_to: Joi
       .string()
-      .allow(null)
+      .trim()
       .email()
       .options({ convert: true })
       .lowercase()
+      .allow(null)
       .required(),
   }),
 }
