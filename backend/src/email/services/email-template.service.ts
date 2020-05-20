@@ -17,7 +17,7 @@ const client = new TemplateClient(config.get('xssOptions.email'))
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook, 
  * and saved to the 'params' column in email_template
  */
-const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: string; body: string; campaignId: number}): Promise<EmailTemplate> => {
+const upsertEmailTemplate = async ({ subject, body, replyTo, campaignId }: {subject: string; body: string; replyTo: string | null; campaignId: number}): Promise<EmailTemplate> => {
   let transaction
   try {
     transaction = await EmailTemplate.sequelize?.transaction()
@@ -27,6 +27,7 @@ const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: stri
       const updatedTemplate: [number, EmailTemplate[]] = await EmailTemplate.update({
         subject,
         body,
+        replyTo,
       }, {
         where: { campaignId },
         individualHooks: true, // required so that BeforeUpdate hook runs
@@ -39,7 +40,7 @@ const upsertEmailTemplate = async ({ subject, body, campaignId }: {subject: stri
     }
     // else create
     const createdTemplate = await EmailTemplate.create({
-      campaignId, body, subject,
+      campaignId, body, subject, replyTo,
     }, {
       transaction,
     })
@@ -121,11 +122,12 @@ const checkNewTemplateParams = async ({
  * Given a template, sanitize it and save it to the db
  * If a csv file already existed before for this campaign, check that this new template still matches the columns of the existing csv. 
  */
-const storeTemplate = async ({ campaignId, subject, body }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
+const storeTemplate = async ({ campaignId, subject, body, replyTo }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const updatedTemplate = await upsertEmailTemplate({
     subject: client.replaceNewLinesAndSanitize(subject),
     body: client.replaceNewLinesAndSanitize(body),
+    replyTo,
     campaignId: +campaignId,
   })
   

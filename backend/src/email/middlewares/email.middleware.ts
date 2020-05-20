@@ -60,8 +60,19 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
 const previewFirstMessage = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
+    const message = await EmailService.getHydratedMessage(+campaignId)
+    
+    if (!message) return res.json({})
+    
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    const { body, subject, replyTo: reply_to } = message
     return res.json({
-      preview: await EmailService.getHydratedMessage(+campaignId),
+      preview: {
+        body,
+        subject,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        reply_to,
+      },
     })
   } catch (err){
     return next(err)

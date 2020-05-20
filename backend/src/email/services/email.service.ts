@@ -23,7 +23,7 @@ const getParams = async (campaignId: number): Promise<{ [key: string]: string } 
  * Replaces template's attributes with a message's parameters to return the hydrated message
  * @param campaignId 
  */
-const getHydratedMessage = async (campaignId: number): Promise<{ body: string; subject: string } | void> => {
+const getHydratedMessage = async (campaignId: number): Promise<{ body: string; subject: string; replyTo: string | null } | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
 
@@ -36,7 +36,7 @@ const getHydratedMessage = async (campaignId: number): Promise<{ body: string; s
   const subject = EmailTemplateService.client.template(template?.subject!, params)
   const body = EmailTemplateService.client.template(template?.body!, params)
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
-  return { body, subject }
+  return { body, subject, replyTo: template.replyTo || null }
 }
 
 /**
@@ -48,9 +48,12 @@ const getCampaignMessage = async (campaignId: number, recipient: string): Promis
   // get the body and subject 
   const message = await getHydratedMessage(campaignId)
   if (message){
+    const { body, subject, replyTo } = message
     const mailToSend: MailToSend=  ({
       recipients: [recipient],
-      ...message,
+      body,
+      subject,
+      ...(replyTo ? { replyTo } : {}),
     })
     return mailToSend
   }
@@ -121,7 +124,7 @@ const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetail
       },
       {
         model: EmailTemplate,
-        attributes: ['body', 'subject', 'params'],
+        attributes: ['body', 'subject', 'params', 'reply_to'],
       }],
   }))?.get({ plain: true }) as CampaignDetails
 

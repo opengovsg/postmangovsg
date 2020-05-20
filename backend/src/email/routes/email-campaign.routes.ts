@@ -20,6 +20,14 @@ const storeTemplateValidator = {
     body: Joi
       .string()
       .required(),
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    reply_to: Joi
+      .string()
+      .allow(null)
+      .email()
+      .options({ convert: true })
+      .lowercase()
+      .required(),
   }),
 }
 
@@ -125,6 +133,9 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                   type: string
  *                   minLength: 1
  *                   maxLength: 200
+ *                 reply_to:
+ *                   type: string
+ *                   nullable: true
  *
  *       responses:
  *         200:
@@ -154,6 +165,9 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                         type: string
  *                       body:
  *                         type: string
+ *                       reply_to:
+ *                         type: string
+ *                         nullable: true
  *                       params:
  *                         type: array
  *                         items:
@@ -254,6 +268,9 @@ router.get('/upload/start', celebrate(uploadStartValidator), CampaignMiddleware.
  *                         type: string
  *                       body:
  *                         type: string
+ *                       reply_to:
+ *                         type: string
+ *                         nullable: true
  *         "400" :
  *           description: Bad Request
  *         "401":
@@ -328,6 +345,9 @@ router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddle
  *                        type: string
  *                      subject: 
  *                        type: string
+ *                      reply_to:
+ *                        type: string
+ *                        nullable: true
  *        "401":
  *           description: Unauthorized
  *        "500":
