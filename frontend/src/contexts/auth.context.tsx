@@ -1,9 +1,6 @@
 import React, { createContext, useState, useEffect, SetStateAction, Dispatch } from 'react'
 import { getUser } from 'services/auth.service'
-
-import ReactGA from 'react-ga'
-import { GA_TRACKING_ID } from 'config'
-
+import { setGAUserId } from 'services/ga.service'
 
 interface ContextProps {
   isAuthenticated: boolean;
@@ -26,9 +23,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       setEmail(user?.email || '')
 
       // set user id to track logged in user
-      if (user?.id) {
-        ReactGA.set({ userId: user.id })
-      }
+      setGAUserId(user?.id || null)
     } catch (err) {
       // is unauthorized
     }

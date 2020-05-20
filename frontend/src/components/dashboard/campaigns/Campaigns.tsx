@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
-import ReactGA from 'react-ga'
 import cx from 'classnames'
 import Moment from 'react-moment'
 import { capitalize } from 'lodash'
@@ -12,6 +11,7 @@ import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
+import { sendOutboundLinkEvent } from 'services/ga.service'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
@@ -107,7 +107,7 @@ const Campaigns = () => {
           href={GUIDE_URL} 
           target="_blank" 
           rel="noopener noreferrer"
-          onClick={()=> {ReactGA.outboundLink({ label: GUIDE_URL }, () => {})}}>
+          onClick={sendOutboundLinkEvent(GUIDE_URL)}>
           <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
         </a>
         <h5>Or you can begin creating your campaign with our step-by step</h5>

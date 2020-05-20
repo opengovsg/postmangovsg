@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import ReactGA from 'react-ga'
+import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
 import { GUIDE_CREDENTIALS_URL } from 'config'
@@ -8,7 +8,9 @@ import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
-import { useHistory } from 'react-router-dom'
+import { sendOutboundLinkEvent } from 'services/ga.service'
+
+
 const CreateModal = () => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()
@@ -60,7 +62,7 @@ const CreateModal = () => {
             href={GUIDE_CREDENTIALS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={()=> {ReactGA.outboundLink({ label: GUIDE_CREDENTIALS_URL }, () => {})}}
+            onClick={sendOutboundLinkEvent(GUIDE_CREDENTIALS_URL)}
           >
             What is this?
           </a>

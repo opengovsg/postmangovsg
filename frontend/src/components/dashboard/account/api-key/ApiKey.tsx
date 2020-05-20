@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { TextInputWithButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { regenerateApiKey } from 'services/account.service'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import styles from './ApiKey.module.scss'
 
@@ -44,6 +45,7 @@ const ApiKey = ({ hasApiKey }: { hasApiKey: boolean }) => {
     setIsRegeneratingApi(false)
     setApiKey(newApiKey)
     setIsApiKeyRevealed(true)
+    sendUserEvent(GA_USER_EVENTS.GENERATE_NEW_API_KEY)
   }
 
   return (

@@ -5,6 +5,7 @@ import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
 import { LOGIN_EMAIL_TEXT, LOGIN_EMAIL_PLACEHOLDER } from 'config'
 import styles from './Login.module.scss'
 import { AuthContext } from 'contexts/auth.context'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const emailText = LOGIN_EMAIL_TEXT
 const otpText = 'One-Time Password'
@@ -66,6 +67,7 @@ const Login = () => {
   function resend() {
     setOtpSent(false)
     sendOtp()
+    sendUserEvent(GA_USER_EVENTS.RESEND_OTP)
   }
 
   function validateOtpInput(value: string) {

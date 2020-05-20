@@ -1,8 +1,8 @@
 import React, { Dispatch, SetStateAction, useState } from 'react'
-import ReactGA from 'react-ga'
 import cx from 'classnames'
 import { GUIDE_POWER_USER_URL } from 'config'
 import { TextInput } from 'components/common'
+import { sendOutboundLinkEvent } from 'services/ga.service'
 import styles from './SendRate.module.scss'
 
 const SendRate = ({ sendRate, setSendRate }: { sendRate: string; setSendRate: Dispatch<SetStateAction<string>> }) => {
@@ -26,7 +26,7 @@ const SendRate = ({ sendRate, setSendRate }: { sendRate: string; setSendRate: Di
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}
-            onClick={()=> {ReactGA.outboundLink({ label: GUIDE_POWER_USER_URL }, () => {})}}>
+            onClick={sendOutboundLinkEvent(GUIDE_POWER_USER_URL)}>
               Learn more about send rate limits
           </a>
           </p>

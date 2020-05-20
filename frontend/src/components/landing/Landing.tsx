@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
-import ReactGA from 'react-ga'
 
 import Login from './login'
 import { GUIDE_URL, CONTACT_US_URL } from 'config'
 import { AuthContext } from 'contexts/auth.context'
+import { sendOutboundLinkEvent } from 'services/ga.service'
 
 import styles from './Landing.module.scss'
 import landingImg from 'assets/img/landing.svg'
@@ -42,7 +42,7 @@ const Landing = () => {
               href={GUIDE_URL} 
               target="_blank" 
               rel="noopener noreferrer"
-              onClick={()=> {ReactGA.outboundLink({ label: GUIDE_URL }, () => {})}}>
+              onClick={sendOutboundLinkEvent(GUIDE_URL)}>
                 Guide
             </a>
             <a 
@@ -50,7 +50,7 @@ const Landing = () => {
               href={CONTACT_US_URL} 
               target="_blank" 
               rel="noopener noreferrer"
-              onClick={()=> {ReactGA.outboundLink({ label: CONTACT_US_URL }, () => {})}}>
+              onClick={sendOutboundLinkEvent(CONTACT_US_URL)}>
                 Contact Us
             </a>
           </div>

@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import ReactGA from 'react-ga'
 import cx from 'classnames'
 
 import { ModalContext } from 'contexts/modal.context'
@@ -8,6 +7,7 @@ import { GUIDE_URL } from 'config'
 import CreateModal from 'components/dashboard/create/create-modal'
 import { logout } from 'services/auth.service'
 import { AuthContext } from 'contexts/auth.context'
+import { sendOutboundLinkEvent, setGAUserId } from 'services/ga.service'
 
 import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
@@ -28,6 +28,7 @@ const NavBar = () => {
     try {
       await logout()
       setAuthenticated(false)
+      setGAUserId(null)
     } catch (err) {
       console.error(err)
     }
@@ -55,7 +56,7 @@ const NavBar = () => {
           href={GUIDE_URL} 
           target="_blank" 
           rel="noopener noreferrer"
-          onClick={()=> {ReactGA.outboundLink({ label: GUIDE_URL }, () => {})}}>
+          onClick={sendOutboundLinkEvent(GUIDE_URL)}>
           Guide
         </a>
         <NavLink className={styles.link} activeClassName={styles.active} to="/account">Account</NavLink>

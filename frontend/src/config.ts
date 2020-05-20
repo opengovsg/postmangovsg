@@ -34,4 +34,7 @@ export const GUIDE_POWER_USER_URL = process.env.REACT_APP_GUIDE_POWER_USER_URL a
 export const CONTACT_US_URL = process.env.REACT_APP_CONTACT_US_URL as string
 export const LOGIN_EMAIL_TEXT = process.env.REACT_APP_LOGIN_EMAIL_TEXT as string
 export const LOGIN_EMAIL_PLACEHOLDER = process.env.REACT_APP_LOGIN_EMAIL_PLACEHOLDER as string
+
+// Google Analytics
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string
+

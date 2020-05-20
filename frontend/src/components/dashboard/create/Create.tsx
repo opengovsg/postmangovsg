@@ -5,6 +5,7 @@ import cx from 'classnames'
 import { Campaign, ChannelType, SMSCampaign, EmailCampaign, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import SMSCreate from './sms/SMSCreate'
 import EmailCreate from './email/EmailCreate'
 import styles from './Create.module.scss'
@@ -47,7 +48,12 @@ const Create = () => {
             <>
               <TitleBar title={campaign.name}>
                 <PrimaryButton
-                  onClick={() => history.push('/campaigns')}>
+                  onClick={() => {
+                    if (campaign.status === Status.Draft) {
+                      sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
+                    }
+                    history.push('/campaigns')
+                  }}>
                   {
                     campaign.status === Status.Draft
                       ? 'Finish this later'

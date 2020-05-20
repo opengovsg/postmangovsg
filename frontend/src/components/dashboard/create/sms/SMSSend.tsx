@@ -1,11 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Status } from 'classes'
+import { Status, ChannelType } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import { PreviewBlock, PrimaryButton, SendRate, ConfirmModal } from 'components/common'
 import { getPreviewMessage } from 'services/sms.service'
 import { sendCampaign } from 'services/campaign.service'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
@@ -38,6 +39,9 @@ const SMSSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: Fun
 
   const onModalConfirm = async () => {
     await sendCampaign(+campaignId, +sendRate)
+    if (sendRate) {
+      sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, ChannelType.SMS)
+    }
     onNext({ status: Status.Sending }, false)
   }
 

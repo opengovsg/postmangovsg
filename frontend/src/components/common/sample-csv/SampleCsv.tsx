@@ -1,6 +1,7 @@
 import React from 'react'
 import { without, times, constant } from 'lodash'
 
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import styles from './SampleCsv.module.scss'
 
 const SampleCsv = ({ params, defaultRecipient }: { params: Array<string>; defaultRecipient: string }) => {
@@ -25,6 +26,8 @@ const SampleCsv = ({ params, defaultRecipient }: { params: Array<string>; defaul
     link.setAttribute('download', 'postman_sample.csv')
     document.body.appendChild(link)
     link.click()
+
+    sendUserEvent(GA_USER_EVENTS.DOWNLOAD_SAMPLE_FILE)
   }
 
   return (
