@@ -10,13 +10,3 @@
 
   # Default build command.
   command = "npm run build && echo '/* /index.html  200' | cat >build/_redirects"
-
-[[redirects]]
-  from = "/test"
-  to = "/reach"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
