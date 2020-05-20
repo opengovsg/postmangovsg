@@ -14,7 +14,7 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
   const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
   const [isUploading, setIsUploading] = useState(false)
-  const [preview, setPreview] = useState({} as { body: string; subject: string })
+  const [preview, setPreview] = useState({} as { body: string; subject: string; reply_to: string | null })
 
   const { id: campaignId } = useParams()
 
@@ -106,7 +106,7 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
         preview?.body &&
         <>
           <p className={styles.greyText}>Message preview</p>
-          <PreviewBlock body={preview.body} subject={preview.subject} />
+          <PreviewBlock body={preview.body} subject={preview.subject} replyTo={preview.reply_to} />
           <div className="separator"></div>
         </>
       }

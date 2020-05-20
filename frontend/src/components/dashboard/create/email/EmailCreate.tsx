@@ -37,7 +37,7 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
     switch (activeStep) {
       case EmailProgress.CreateTemplate:
         return (
-          <EmailTemplate subject={campaign.subject} body={campaign.body} onNext={onNext} />
+          <EmailTemplate subject={campaign.subject} body={campaign.body} replyTo={campaign.replyTo} onNext={onNext} />
         )
       case EmailProgress.UploadRecipients:
         return (
