@@ -30,7 +30,6 @@ const TwilioCredentialsInput = ({ onFilled }: { onFilled: (input: TwilioCredenti
         placeholder="Enter Account SID"
         value={accountSid}
         onChange={setAccountSid}
-        transparent
       />
 
       <h5>API Key</h5>
@@ -38,7 +37,6 @@ const TwilioCredentialsInput = ({ onFilled }: { onFilled: (input: TwilioCredenti
         placeholder="Enter API Key"
         value={apiKey}
         onChange={setApiKey}
-        transparent
       />
 
       <h5>API Secret</h5>
@@ -46,7 +44,6 @@ const TwilioCredentialsInput = ({ onFilled }: { onFilled: (input: TwilioCredenti
         placeholder="Enter API Secret"
         value={apiSecret}
         onChange={setApiSecret}
-        transparent
       />
 
       <h5>Messaging Service ID</h5>
@@ -54,7 +51,6 @@ const TwilioCredentialsInput = ({ onFilled }: { onFilled: (input: TwilioCredenti
         placeholder="Enter Messaging Service ID"
         value={messagingServiceSid}
         onChange={setMessagingServiceSid}
-        transparent
       />
     </>
   )
