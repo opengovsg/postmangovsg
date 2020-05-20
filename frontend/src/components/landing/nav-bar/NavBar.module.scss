@@ -4,12 +4,14 @@ $navbar-link-margin: calc(1rem + 1vw);
 $navbar-height: 4rem;
 $navbar-mobile-height: 4rem;
 
+$navbar-max-width: 1400px;
+
 .navBar {
   @include flex-horizontal;
   height: $navbar-height;
   padding: 0 $site-padding;
   justify-content: space-between;
-  width: 1400px;
+  width: $navbar-max-width;
   max-width: 90vw;
 
   @include mobile() {
@@ -36,21 +38,21 @@ $navbar-mobile-height: 4rem;
 
     .links {
       @include flex-horizontal;
-      justify-content: space-around;
-      width: 50%;
+      justify-content: space-between;
+      min-width: 9rem;
       margin-right: calc(2rem + 1vw);
     }
 
     .link {
       font-size: 0.9rem;
       color: $dark-blue;
-      margin-right: $navbar-link-margin;
+      // margin-right: $navbar-link-margin;
       font-weight: 500;
       cursor: pointer;
 
-      &:last-child {
-        margin-right: 0;
-      }
+      // &:last-child {
+      //   margin-right: 0;
+      // }
 
       @include mobile() {
         display: none;
@@ -58,6 +60,10 @@ $navbar-mobile-height: 4rem;
 
       &.noClick {
         cursor: default;
+      }
+
+      &:hover {
+        font-weight: 700;
       }
     }
 
@@ -71,6 +77,14 @@ $navbar-mobile-height: 4rem;
     }
     .signInButton {
       min-width: 7rem;
+      background-color: transparent;
+      border: 1px solid $indigo-blue;
+      color: $indigo-blue;
+
+      &:hover {
+        background-color: $indigo-blue;
+        color: $light-blue;
+      }
     }
   }
 }

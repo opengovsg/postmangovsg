@@ -28,7 +28,7 @@ $section-vertical-padding: 4rem;
   .innerContainer {
     @include flex-horizontal;
     justify-content: space-between;
-    padding: 2rem $site-padding;
+    padding-left: $site-padding;
 
     width: 1400px;
     max-width: 90vw;
@@ -49,6 +49,7 @@ $section-vertical-padding: 4rem;
       @include flex-vertical;
       width: 40%;
 
+
       @include mobile() {
         margin-top: 2rem;
         align-items: center;
@@ -61,6 +62,8 @@ $section-vertical-padding: 4rem;
         width: 100%;
         font-weight: bold;
         line-height: 3.5rem;
+        margin-top: 1rem;
+        margin-bottom: 0;
 
         @include mobile() {
           font-size: 2rem;
@@ -84,14 +87,13 @@ $section-vertical-padding: 4rem;
         }
 
         .numOfMessages {
-          font-size: 4.0rem;
-          font-weight: 400;
+          font-size: 4.5rem;
+          font-weight: 200;
           margin-right: 0.5rem;
         }
       }
 
       .signInRow {
-        margin-top: 3rem;
         @include flex-horizontal;
         flex-wrap: wrap;
         align-items: center;
