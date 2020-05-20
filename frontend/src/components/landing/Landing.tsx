@@ -5,6 +5,7 @@ import cx from 'classnames'
 import { GUIDE_URL, CONTACT_US_URL, CONTRIBUTE_URL } from 'config'
 import PrimaryButton from 'components/common/primary-button'
 import Navbar from './nav-bar'
+import Banner from './banner'
 import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Landing.module.scss'
@@ -52,6 +53,7 @@ const Landing = () => {
 
   return (
     <>
+      <Banner></Banner>
       <div className={styles.topContainer}>
         <Navbar></Navbar>
         <div className={styles.innerContainer}>

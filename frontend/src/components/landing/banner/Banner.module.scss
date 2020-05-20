@@ -1,0 +1,49 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+@font-face {
+  font-family: 'sgds-icons';
+  src: url('../../../assets/fonts/sgds-icons.ttf') format('truetype'),
+    url('../../../assets/fonts/sgds-icons.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.container {
+  background-color: #f0f0f0;
+  height: auto;
+  padding: 4px 8%;
+  color: #484848;
+
+  a {
+    @include flex-horizontal;
+    align-items: center;
+    color: #484848;
+  }
+
+  a:hover {
+    color: #000;
+    text-decoration: none;
+  }
+}
+
+.sgdsIcon {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'sgds-icons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+}
+
+.sgCrestIcon::before {
+  content: '\e948';
+  color: #db0000;
+  font-size: 20px;
+}
+
+.bannerText {
+  margin-left: 3px;
+}
+
