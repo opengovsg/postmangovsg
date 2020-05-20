@@ -39,14 +39,14 @@ const getDeadWorkers = async (connection: Sequelize, workerId: string): Promise<
 const replaceDeadWorker = (connection: Sequelize, workerId: string, deadWorker: string): Promise<boolean> => {
   logger.info(`${workerId}: Replacing deadWorker ${deadWorker}`)
   // The update of worker's id will cascade to the job queue
-  return connection.query('UPDATE workers SET id=:workerId WHERE id=:deadWorker;', {
+  return connection.query('UPDATE workers SET id=:workerId, updated_at=clock_timestamp() WHERE id=:deadWorker;', {
     replacements: { workerId, deadWorker }, type : QueryTypes.UPDATE,
   }).then(([_results, rowCount]: [any, number]) => {
     const success = rowCount === 1 // Managed to replace a worker
-    if(success) {
+    if (success) {
       logger.info(`${workerId}: Replaced deadWorker ${deadWorker}`)
     }
-    else{
+    else {
       logger.info(`${workerId}: Failed to replace deadWorker ${deadWorker}`)
     }
     return success
@@ -74,23 +74,23 @@ const insertNewWorker = (connection: Sequelize, workerId: string): Promise<boole
 
 
 const assignment = async (connection: Sequelize, workerId: string): Promise<boolean> => {
-  try{
+  try {
     let deadWorkers: string[] = []
-    if(config.get('IS_PROD')) {
+    if (config.get('IS_PROD')) {
       deadWorkers = await getDeadWorkers(connection, workerId)
     } else {
       logger.info(`${workerId}: Dev env - assignment - assumed no dead workers`)
     }
-    if(deadWorkers.length === 0){
+    if (deadWorkers.length === 0){
       return insertNewWorker(connection, workerId)
-    }else {
+    } else {
       const replaced: boolean = await replaceDeadWorker(connection, workerId, deadWorkers[0])
       return replaced || 
                 // Try to assign again, after waiting for some time. Some other task probably replaced that dead worker already
                 new Promise((resolve) => setTimeout(resolve, Math.random() * 2000))
                   .then(() => (assignment(connection,workerId)))
     }
-  } catch(err){
+  } catch (err){
     return false
   }
 }
