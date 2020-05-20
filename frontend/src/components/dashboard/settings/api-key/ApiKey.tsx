@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { TextInputWithButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
-import { regenerateApiKey } from 'services/account.service'
+import { regenerateApiKey } from 'services/settings.service'
 
 import styles from './ApiKey.module.scss'
 
