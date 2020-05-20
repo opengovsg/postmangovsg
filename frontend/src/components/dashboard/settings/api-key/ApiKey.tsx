@@ -7,6 +7,8 @@ import { regenerateApiKey } from 'services/settings.service'
 
 import styles from './ApiKey.module.scss'
 
+const RESET_COPY_TIMEOUT = 1000
+
 interface ApiKeyProps {
   hasApiKey: boolean;
 }
@@ -32,6 +34,17 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
     setApiKey(hasApiKey ? '*'.repeat(30) : '')
     setApiKeyState(hasApiKey ? ApiKeyState.REGENERATE : ApiKeyState.GENERATE)
   }, [hasApiKey])
+
+  useEffect(() => {
+    if (apiKeyState !== ApiKeyState.COPIED) return
+
+    setTimeout(() => {
+      setApiKeyState(ApiKeyState.COPY)
+
+      if (!apiKeyRef.current) return
+      apiKeyRef.current.blur()
+    }, RESET_COPY_TIMEOUT)
+  }, [apiKeyState])
 
   async function onButtonClick() {
     switch (apiKeyState) {
