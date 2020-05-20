@@ -155,16 +155,31 @@ $section-vertical-padding: 4rem;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.64px;
+
+      @include mobile() {
+        margin-bottom: 2rem;
+      }
     }
 
     .agencies {
       margin-top: 3rem;
-      display: flex;
+      @include flex-horizontal;
       justify-content: space-between;
-      width: 35rem;
+      width: 45rem;
+      max-width: 90vw;
+
+      @include mobile() {
+        @include flex-vertical;
+        align-items: center;
+        margin-top: 0;
+      }
 
       img {
-        height: 5rem;
+        width: 9rem;
+
+        @include mobile() {
+          padding-bottom: 2rem;
+        }
       }
     }
   }
