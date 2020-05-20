@@ -200,6 +200,7 @@ $section-vertical-padding: 4rem;
     height: 100%;
     @include flex-vertical;
     align-items: center;
+    line-height: 1.6;
 
     .lineBreak {
       width:  100%;
@@ -254,8 +255,8 @@ $section-vertical-padding: 4rem;
       }
 
       video {
-        width: 50%;
-        margin-right: 2rem;
+        width: 55%;
+        margin-right: 4rem;
 
         @include mobile() {
           margin-right: 0;
@@ -304,7 +305,7 @@ $section-vertical-padding: 4rem;
 
 
         .desktopImg {
-          width: 10rem;
+          width: 8rem;
           margin-top: 3rem;
           
           @include mobile() {
@@ -386,6 +387,7 @@ $section-vertical-padding: 4rem;
     font-weight: bold;
     font-size: 3rem;
     width: 100%;
+    margin-bottom: 3.5rem;
   }
 
   .question {
@@ -488,6 +490,7 @@ $section-vertical-padding: 4rem;
     margin: 0 auto;
     border: 1px solid $light-blue;
     margin-top: 2rem;
+    margin-bottom: 1rem;
   }
 
   .innerContainer {
@@ -554,7 +557,7 @@ $section-vertical-padding: 4rem;
   .footer {
     display: flex;
     justify-content: space-between;
-    font-size: 1rem;
+    font-size: 0.75rem;
 
     @include mobile() {
       flex-direction: column;
@@ -569,7 +572,7 @@ $section-vertical-padding: 4rem;
       a {
         color: $light-blue;
         margin-right: 2rem;
-        font-size: 1rem;
+        font-size: 0.75rem;
       }
     }
   }

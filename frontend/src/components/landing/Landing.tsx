@@ -94,18 +94,18 @@ const Landing = () => {
             </video>
             <div className={styles.textContainer}>
               <h3>Multichannel</h3>
-              <p>No more toggling between your Outlook and SMS portal. You can reach your recipient via SMS and email in the same product!</p>
-              <h3>Personalized Message</h3>
-              <p>Add in details that are useful for and specific to your recipient.</p>
+              <p>No more toggling between your Outlook and SMS portal. You can reach your recipients via SMS and email in the same platform.</p>
+              <h3>Personalized messages</h3>
+              <p>Add in useful and specific details for your recipients.</p>
             </div>
           </div>
 
           <div className={styles.reason} id={styles.mobileReverse}>
             <div className={styles.textContainer}>
-              <h3>Send in bulk.</h3>
-              <p>You don&apos;t have to BCC everyone and wait for Outlook to slowly send a batch of 1000 email. Sit back and let Postman do the work.</p>
-              <h3>No more +65.</h3>
+              <h3>No more typing +65</h3>
               <p>We took care of the country code so you don&apos;t have to enter +65 in your excel file. </p>
+              <h3>Send in bulk</h3>
+              <p>You don&apos;t have to BCC everyone and wait for Outlook to slowly send a batch of 1000 emails. Sit back and let Postman do the work for you.</p>
             </div>
             <video autoPlay loop muted>
               <source src={whyUse2} type="video/mp4" />
@@ -117,7 +117,7 @@ const Landing = () => {
               <source src={whyUse3} type="video/mp4" />
             </video>
             <div className={styles.textContainer}>
-              <h3>Forgot something?</h3>
+              <h3>Forgot something? Pause campaign</h3>
               <p>We all have those days where we miss out on an important point for official messages. With Postman, it&apos;s never too late to pause the campaign if you are sending &gt; 1000 messages.</p>
               <h3>See past campaigns easily</h3>
               <p>Not sure what was sent out previously? Check Postman&apos;s campaign landing page for stats. Understand how you are communicating with your recipients.</p>
@@ -182,7 +182,9 @@ const Landing = () => {
               <a href={CONTACT_US_URL}>Have a question?</a>
             </div>
           </div>
-          <img className={styles.onboardingImg} src={onboardingImg} alt="Onboarding"/>
+          <div className={styles.imageContainer}>
+            <img className={styles.onboardingImg} src={onboardingImg} alt="Onboarding"/>
+          </div>
         </div>
       </div>
 
