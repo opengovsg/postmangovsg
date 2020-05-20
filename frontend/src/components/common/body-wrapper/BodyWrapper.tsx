@@ -14,6 +14,8 @@ interface BodyWrapperProps {
 const BodyWrapper: React.FunctionComponent<BodyWrapperProps> = ({
   wrap,
   children,
-}) => <div className={cx({ [styles.bodyWrapper]: wrap })}>{children}</div>
+}) => (
+  <div className={cx(styles.base, { [styles.wrap]: wrap })}>{children}</div>
+)
 
 export default BodyWrapper
