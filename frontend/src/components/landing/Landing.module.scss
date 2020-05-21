@@ -245,14 +245,14 @@ $section-vertical-padding: 4rem;
       font-size: 1.1rem;
     }
 
-    img {
-      width: 50%;
-    }
-
-    #mobileReverse {
-      @include mobile() {
+    .reasons {
+      & > :nth-child(even) {
         display: flex;
-        flex-direction: column-reverse;
+        flex-direction: row-reverse;
+
+        @include mobile {
+          flex-direction: column;
+        }
       }
     }
 
@@ -280,16 +280,15 @@ $section-vertical-padding: 4rem;
 
       .textContainer {
         width: 50%;
-        
+        @include flex-vertical;
+
         @include mobile() {
-          margin-top: 1rem;
           width: 100%;
         }
       }
 
       p {
         width: 80%;
-        margin-bottom: 3rem;
         @include mobile() {
           width: 100%;
         }

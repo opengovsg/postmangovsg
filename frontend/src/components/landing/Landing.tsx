@@ -44,6 +44,30 @@ const Landing = () => {
     { img: moeAgencyImg, alt: 'MOE' },
   ]
 
+  const reasons = [
+    {
+      video: whyUse1,
+      firstHeader: 'Multichannel',
+      firstText: 'No more toggling between your Outlook and SMS portal. You can reach your recipients via SMS and email in the same platform.',
+      secondHeader: 'Personalised messages',
+      secondText: 'Add in useful and specific details for your recipients.',
+    },
+    {
+      video: whyUse2,
+      firstHeader: 'No more typing +65',
+      firstText: 'We took care of the country code so you don\'t have to enter +65 in your excel file.',
+      secondHeader: 'Send in bulk',
+      secondText: 'You don\'t have to BCC everyone and wait for Outlook to slowly send a batch of 1000 emails. Sit back and let Postman do the work for you.',
+    },
+    {
+      video: whyUse3,
+      firstHeader: 'Forgot something? Pause campaign',
+      firstText: 'We all have those days where we miss out on an important point for official messages. With Postman, it\'s never too late to pause the campaign if you are sending > 1000 messages.',
+      secondHeader: 'See past campaigns easily',
+      secondText: 'Not sure what was sent out previously? Check Postman\'s campaign landing page for stats. Understand how you are communicating with your recipients.',
+    },
+  ]
+
   const questions = [
     { text: 'When does Postman send my message?', answer: 'Postman currently supports send NOW.' },
     { text: 'Where do messages go and how do I know that Postman delivered it successfully?', answer: 'Messages go to the recipients that you specified. Like Fedex, you can track your package. Postman tells you the number of failed deliveries and you can reattempt delivery.' },
@@ -88,40 +112,20 @@ const Landing = () => {
       <div className={styles.whyUsePostman}>
         <div className={styles.innerContainer}>
           <h1>Why use Postman</h1>
-          <div className={styles.reason}>
-            <video autoPlay loop muted playsInline>
-              <source src={whyUse1} type="video/mp4" />
-            </video>
-            <div className={styles.textContainer}>
-              <h3>Multichannel</h3>
-              <p>No more toggling between your Outlook and SMS portal. You can reach your recipients via SMS and email in the same platform.</p>
-              <h3>Personalised messages</h3>
-              <p>Add in useful and specific details for your recipients.</p>
-            </div>
-          </div>
-
-          <div className={styles.reason} id={styles.mobileReverse}>
-            <div className={styles.textContainer}>
-              <h3>No more typing +65</h3>
-              <p>We took care of the country code so you don&apos;t have to enter +65 in your excel file. </p>
-              <h3>Send in bulk</h3>
-              <p>You don&apos;t have to BCC everyone and wait for Outlook to slowly send a batch of 1000 emails. Sit back and let Postman do the work for you.</p>
-            </div>
-            <video autoPlay loop muted playsInline>
-              <source src={whyUse2} type="video/mp4" />
-            </video>
-          </div>
-
-          <div className={styles.reason}>
-            <video autoPlay loop muted playsInline>
-              <source src={whyUse3} type="video/mp4" />
-            </video>
-            <div className={styles.textContainer}>
-              <h3>Forgot something? Pause campaign</h3>
-              <p>We all have those days where we miss out on an important point for official messages. With Postman, it&apos;s never too late to pause the campaign if you are sending &gt; 1000 messages.</p>
-              <h3>See past campaigns easily</h3>
-              <p>Not sure what was sent out previously? Check Postman&apos;s campaign landing page for stats. Understand how you are communicating with your recipients.</p>
-            </div>
+          <div className={styles.reasons}>
+            {reasons.map(reason =>
+              <div className={styles.reason} key={styles.video}>
+                <video autoPlay loop muted playsInline>
+                  <source src={reason.video} type="video/mp4" />
+                </video>
+                <div className={styles.textContainer}>
+                  <h3>{reason.firstHeader}</h3>
+                  <p>{reason.firstText}</p>
+                  <h3>{reason.secondHeader}</h3>
+                  <p>{reason.secondText}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className={styles.lineBreak}></div>
