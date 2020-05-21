@@ -119,6 +119,10 @@ $section-vertical-padding: 4rem;
           @include mobile() {
             margin: 1rem 0;
           }
+
+          &:hover {
+            background-color: #2121A5;
+          }
         }
 
         .arrowRight {
@@ -142,7 +146,10 @@ $section-vertical-padding: 4rem;
             margin-left: 0.5rem;
             color: $indigo-blue;
             font-size: 1rem;
-            text-decoration: underline;
+            
+            &:hover {
+              font-weight: 500;
+            }
           }
       }
     }
@@ -308,8 +315,9 @@ $section-vertical-padding: 4rem;
 
 
         .desktopImg {
-          width: 8rem;
+          width: 6rem;
           margin-top: 3rem;
+          
           
           @include mobile() {
             display: none;
@@ -522,9 +530,13 @@ $section-vertical-padding: 4rem;
   
       a {
         margin-top: 2rem;
-        font-weight: bold;
+        font-weight: 500;
         font-size: 1rem;
         color: $light-blue;
+
+        &:hover {
+          font-weight: 700;
+        }
       }
     
       .header {

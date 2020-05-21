@@ -95,7 +95,7 @@ const Landing = () => {
             <div className={styles.textContainer}>
               <h3>Multichannel</h3>
               <p>No more toggling between your Outlook and SMS portal. You can reach your recipients via SMS and email in the same platform.</p>
-              <h3>Personalized messages</h3>
+              <h3>Personalised messages</h3>
               <p>Add in useful and specific details for your recipients.</p>
             </div>
           </div>
