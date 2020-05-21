@@ -39,7 +39,7 @@ const SendRate = ({ sendRate, setSendRate }: { sendRate: string; setSendRate: Di
             maxLength="3"
             className={styles.input}
             onChange={(str: string) => setSendRate(str.replace(/\D/g, ''))}
-            placeholder='enter send rate'
+            placeholder='Enter send rate'
           />
         </>
       }

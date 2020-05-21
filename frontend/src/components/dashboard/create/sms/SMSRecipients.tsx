@@ -113,7 +113,7 @@ const SMSRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initial
       }
 
       <div className="progress-button">
-        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={onNext}>Insert Credentials →</PrimaryButton>
+        <PrimaryButton disabled={!numRecipients || !csvFilename} onClick={onNext}>Insert credentials →</PrimaryButton>
       </div>
     </>
   )

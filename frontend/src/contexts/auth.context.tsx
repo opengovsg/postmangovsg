@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, SetStateAction, Dispatch } from 'react'
-import { getUserEmail } from 'services/auth.service'
+import axios from 'axios'
+import { getUserEmail, logout } from 'services/auth.service'
 
 interface ContextProps {
   isAuthenticated: boolean;
@@ -24,6 +25,18 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       // is unauthorized
     }
     setLoaded(true)
+
+    // Set up axios interceptor to redirect to login if any axios requests are unauthorized
+    axios.interceptors.response.use(
+      function (response){ return response } ,
+      async function (error) {
+        if (error.response && error.response.status === 401){
+          await logout()
+          setAuthenticated(false)
+        }
+        return Promise.reject(error)
+      }
+    )
   }
 
   useEffect(() => {

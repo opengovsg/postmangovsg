@@ -26,9 +26,9 @@ import { StoreTemplateOutput } from '@email/interfaces'
 const storeTemplate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { subject, body } = req.body
+    const { subject, body, reply_to: replyTo } = req.body
     const { check, numRecipients, valid, updatedTemplate }: StoreTemplateOutput = 
-        await EmailTemplateService.storeTemplate({ campaignId: +campaignId, subject, body })
+        await EmailTemplateService.storeTemplate({ campaignId: +campaignId, subject, body, replyTo })
     if (check?.reupload) {
       return res.status(200)
         .json({
@@ -40,6 +40,8 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
             body: updatedTemplate?.body,
             subject: updatedTemplate?.subject,
             params: updatedTemplate?.params,
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            reply_to: updatedTemplate?.replyTo,
           },
         })
     } else {
@@ -52,6 +54,8 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
             body: updatedTemplate?.body,
             subject: updatedTemplate?.subject,
             params: updatedTemplate?.params,
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            reply_to: updatedTemplate?.replyTo,
           },
         })
     }
@@ -119,7 +123,11 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   
       return res.json({
         'num_recipients': recipientCount,
-        preview: hydratedRecord,
+        preview: {
+          ...hydratedRecord,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          reply_to: emailTemplate.replyTo || null,
+        },
       })
   
     } catch (err) {

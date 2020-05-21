@@ -9,7 +9,7 @@ BEGIN
     IF selected_campaign_id IS NOT NULL THEN
 
             -- Attempt to log that campaign
-            UPDATE job_queue q SET status = 'LOGGED', worker_id = NULL WHERE campaign_id = selected_campaign_id 
+            UPDATE job_queue q SET status = 'LOGGED', worker_id = NULL, updated_at = clock_timestamp() WHERE campaign_id = selected_campaign_id 
             -- Should we check for existing jobs that are running for this campaign?
             RETURNING q.campaign_id INTO logged_campaign_id;
 

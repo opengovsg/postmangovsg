@@ -9,7 +9,7 @@ result json;
 BEGIN
 
 UPDATE job_queue
-SET worker_id = worker, status = 'ENQUEUED'
+SET worker_id = worker, status = 'ENQUEUED', updated_at = clock_timestamp()
 WHERE 
 -- worker is not already operating on a job 
 NOT EXISTS (SELECT 1 FROM job_queue q WHERE q.worker_id = worker LIMIT 1)

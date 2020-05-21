@@ -1,0 +1,10 @@
+.base {
+  display: inherit;
+  flex-direction: inherit;
+  min-height: inherit;
+}
+
+.wrap {
+  height: 100vh;
+  overflow: hidden;
+}

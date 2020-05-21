@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION log_next_job_email(out selected_campaign_id int)
 AS $$
 BEGIN
 WITH logged_jobs AS ( 
-	UPDATE job_queue SET status = 'LOGGED', worker_id = NULL
+	UPDATE job_queue SET status = 'LOGGED', worker_id = NULL, updated_at = clock_timestamp()
 	WHERE campaign_id = ( SELECT q1.campaign_id
 	    FROM job_queue q1, campaigns c1
 	    WHERE

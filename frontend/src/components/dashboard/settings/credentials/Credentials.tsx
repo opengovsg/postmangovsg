@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { PrimaryButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
-import { UserCredential, deleteCredential } from 'services/account.service'
+import { UserCredential, deleteCredential } from 'services/settings.service'
 import { channelIcons } from 'classes'
 
 import AddCredentialModal from '../add-credential-modal'

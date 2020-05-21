@@ -45,7 +45,7 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
       </p>
       <TextArea placeholder="Enter message" highlight={true} value={body} onChange={setBody} />
       <div className="progress-button">
-        <PrimaryButton disabled={!body} onClick={handleSaveTemplate}>Upload Recipients →</PrimaryButton>
+        <PrimaryButton disabled={!body} onClick={handleSaveTemplate}>Upload recipients →</PrimaryButton>
       </div>
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>

@@ -4,10 +4,20 @@ import cx from 'classnames'
 import InfoBlock from '../info-block'
 import styles from './PreviewBlock.module.scss'
 
-const PreviewBlock = (props: any) => {
+interface PreviewBlockProps {
+  body: string;
+  subject?: string;
+  replyTo?: string | null;
+  className?: string;
+}
 
-  const { className, subject, body, ...otherProps } = props
-
+const PreviewBlock: React.FunctionComponent<PreviewBlockProps> = ({
+  body,
+  subject,
+  replyTo,
+  className,
+  ...otherProps
+}) => {
   if (!body && !subject) {
     return null
   }
@@ -20,6 +30,12 @@ const PreviewBlock = (props: any) => {
         <p>${subject}</p>
         <h5>Body</h5>
       ` + html
+    }
+    if (replyTo) {
+      html = html + `
+        <h5>Replies</h5>
+        <p>${replyTo}</p>
+      `
     }
     return html
   }
