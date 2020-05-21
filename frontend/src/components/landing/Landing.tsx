@@ -89,7 +89,7 @@ const Landing = () => {
         <div className={styles.innerContainer}>
           <h1>Why use Postman</h1>
           <div className={styles.reason}>
-            <video autoPlay loop muted>
+            <video autoPlay loop muted playsInline>
               <source src={whyUse1} type="video/mp4" />
             </video>
             <div className={styles.textContainer}>
@@ -107,13 +107,13 @@ const Landing = () => {
               <h3>Send in bulk</h3>
               <p>You don&apos;t have to BCC everyone and wait for Outlook to slowly send a batch of 1000 emails. Sit back and let Postman do the work for you.</p>
             </div>
-            <video autoPlay loop muted>
+            <video autoPlay loop muted playsInline>
               <source src={whyUse2} type="video/mp4" />
             </video>
           </div>
 
           <div className={styles.reason}>
-            <video autoPlay loop muted>
+            <video autoPlay loop muted playsInline>
               <source src={whyUse3} type="video/mp4" />
             </video>
             <div className={styles.textContainer}>
