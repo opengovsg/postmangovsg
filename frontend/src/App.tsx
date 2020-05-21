@@ -18,11 +18,11 @@ import { initializeGA, sendPageView } from 'services/ga.service'
 import './styles/app.scss'
 
 const GA = () => {
-  let location = useLocation();
+  const location = useLocation()
 
   useEffect(() => {
     sendPageView(location.pathname)
-  }, [location]);
+  }, [location])
 
   useEffect(() => {
     initializeGA()

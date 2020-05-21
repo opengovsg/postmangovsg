@@ -51,10 +51,10 @@ const NavBar = () => {
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
         <a className={cx(styles.link, { [styles.active]: isCreatePath() })} onClick={handleCreateCampaign}>Create</a>
-        <a 
-          className={styles.link} 
-          href={GUIDE_URL} 
-          target="_blank" 
+        <a
+          className={styles.link}
+          href={GUIDE_URL}
+          target="_blank"
           rel="noopener noreferrer"
           onClick={sendOutboundLinkEvent(GUIDE_URL)}>
           Guide

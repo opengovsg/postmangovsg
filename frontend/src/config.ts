@@ -14,7 +14,7 @@ const missingEnvVars = [
   'REACT_APP_CONTACT_US_URL',
   'REACT_APP_LOGIN_EMAIL_TEXT',
   'REACT_APP_LOGIN_EMAIL_PLACEHOLDER',
-  'REACT_APP_GA_TRACKING_ID'
+  'REACT_APP_GA_TRACKING_ID',
 ].reduce(function (acc: string[], name: string){
   if (process.env[name] === undefined) acc.push(name)
   return acc

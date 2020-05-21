@@ -9,11 +9,11 @@ export const GA_USER_EVENTS = {
   USE_SEND_RATE: 'Use send rate',
   FINISH_CAMPAIGN_LATER: 'Finish campaign later',
   PAUSE_SENDING: 'Pause sending',
-  RETRY_RESUME_SENDING:'Retry/Resume sending'
+  RETRY_RESUME_SENDING:'Retry/Resume sending',
 }
 
 export function initializeGA() {
-  ReactGA.initialize(GA_TRACKING_ID, { debug: true });
+  ReactGA.initialize(GA_TRACKING_ID, { debug: true })
 }
 
 export function setGAUserId(id: number | null) {
@@ -25,23 +25,23 @@ export function sendPageView(path: string) {
 }
 
 export function sendOutboundLinkEvent(label: string) {
-  return () => {ReactGA.outboundLink({ label }, () => {})}
+  return () => {ReactGA.outboundLink({ label }, () => null)}
 }
 
 export function sendUserEvent(action: string, label?: string) {
   ReactGA.event({
     category: 'User',
     action,
-    label
+    label,
   })
 }
 
-export function sendTiming(category:string, variable:string, value: number) {
+export function sendTiming(category: string, variable: string, value: number) {
   ReactGA.timing({
     category,
     variable,
-    value // in milliseconds
-  });
+    value, // in milliseconds
+  })
 }
 
 export function sendException(description: string) {

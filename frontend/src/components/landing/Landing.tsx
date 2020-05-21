@@ -37,18 +37,18 @@ const Landing = () => {
         <div className={styles.bottomContent}>
           <img className={styles.companyLogo} src={companyLogo} alt="OGP"></img>
           <div className={styles.linkBar}>
-            <a 
-              className={styles.navLink} 
-              href={GUIDE_URL} 
-              target="_blank" 
+            <a
+              className={styles.navLink}
+              href={GUIDE_URL}
+              target="_blank"
               rel="noopener noreferrer"
               onClick={sendOutboundLinkEvent(GUIDE_URL)}>
                 Guide
             </a>
-            <a 
-              className={styles.navLink} 
-              href={CONTACT_US_URL} 
-              target="_blank" 
+            <a
+              className={styles.navLink}
+              href={CONTACT_US_URL}
+              target="_blank"
               rel="noopener noreferrer"
               onClick={sendOutboundLinkEvent(CONTACT_US_URL)}>
                 Contact Us
