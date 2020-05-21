@@ -8,6 +8,7 @@ import { AuthMiddleware } from '@core/middlewares'
 import authenticationRoutes from './auth.routes'
 import campaignRoutes from './campaign.routes'
 import settingsRoutes from './settings.routes'
+import statsRoutes from './stats.routes'
 
 // Import channel-specific routes
 import { smsCampaignRoutes, smsSettingsRoutes } from '@sms/routes'
@@ -68,6 +69,7 @@ const ping = async (_req: Request, res: Response, next: NextFunction): Promise<R
 const router = Router()
 router.use('/ping', ping)
 router.use('/auth', authenticationRoutes)
+router.use('/stats', statsRoutes)
 
 router.use('/campaigns', AuthMiddleware.isCookieOrApiKeyAuthenticated, campaignRoutes)
 router.use('/campaign/:campaignId/sms', AuthMiddleware.isCookieOrApiKeyAuthenticated, celebrate(campaignIdValidator), smsCampaignRoutes)
