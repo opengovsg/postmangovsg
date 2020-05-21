@@ -9,7 +9,7 @@ import { AuthContext } from 'contexts/auth.context'
 const emailText = LOGIN_EMAIL_TEXT
 const otpText = 'One-Time Password'
 const emailButtonText = ['Get OTP', 'Sending OTP...']
-const otpButtonText = ['Sign In', 'Verifying OTP...']
+const otpButtonText = ['Sign in', 'Verifying OTP...']
 const emailPlaceholder = LOGIN_EMAIL_PLACEHOLDER
 const otpPlaceholder = 'Enter OTP'
 const invalidOtpFormat = 'Invalid OTP format, enter 6 digits'

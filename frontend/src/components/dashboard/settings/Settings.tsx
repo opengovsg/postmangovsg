@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 
 import { TitleBar } from 'components/common'
-import { UserCredential, getUserSettings } from 'services/account.service'
+import { UserCredential, getUserSettings } from 'services/settings.service'
 
 import Credentials from './credentials'
 import ApiKey from './api-key'
 
-import styles from './Account.module.scss'
+import styles from './Settings.module.scss'
 
-const Account = () => {
+const Settings = () => {
   const [hasApiKey, setHasApiKey] = useState(false)
   const [creds, setCreds] = useState([] as UserCredential[])
 
@@ -24,7 +24,7 @@ const Account = () => {
 
   return (
     <>
-      <TitleBar title={'Account'}> </TitleBar>
+      <TitleBar title="Settings"> </TitleBar>
       <div className={styles.container}>
         <ApiKey hasApiKey={hasApiKey} />
         <div className="separator"></div>
@@ -34,4 +34,4 @@ const Account = () => {
   )
 }
 
-export default Account
+export default Settings

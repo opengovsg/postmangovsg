@@ -58,7 +58,7 @@ const EmailTemplate = ({ subject: initialSubject, body: initialBody, replyTo: in
       <TextInput placeholder="Enter reply-to email address" value={replyTo || ''} onChange={setReplyTo} />
       <div className="separator"></div>
       <div className="progress-button">
-        <PrimaryButton disabled={!body || !subject} onClick={handleSaveTemplate}>Upload Recipients →</PrimaryButton>
+        <PrimaryButton disabled={!body || !subject} onClick={handleSaveTemplate}>Upload recipients →</PrimaryButton>
       </div>
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>

@@ -26,6 +26,7 @@ const EmailValidationInput = ({ onClick, buttonDisabled }: { onClick: (recipient
       onClick={onClickHandler}
       inputDisabled={isValidating}
       buttonDisabled={isInvalidRecipient() || isValidating || buttonDisabled}
+      placeholder="Enter test mobile number"
     >
       {
         isValidating ? 'Sending...' : (
