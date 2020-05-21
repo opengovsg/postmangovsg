@@ -115,6 +115,7 @@ export default class TemplateClient {
     } catch (err) {
       logger.error({ message: `${err.stack}` })
       if (err.message.includes('unclosed tag')) throw new TemplateError('There are unclosed curly brackets in the template')
+      if (err.message.includes('unclosed string')) throw new TemplateError(`Invalid character found in keyword. Only alphanumeric characters allowed.`)
       if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
       throw err
     }
