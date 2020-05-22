@@ -2,7 +2,7 @@ version: 0.1
 env:
   variables:
       BACKEND_URL_PRODUCTION: "https://api.postman.gov.sg/v1"
-      BACKEND_URL_STAGING: "https://api-staging.postman.gov.sg/v1"
+      BACKEND_URL_STAGING: "https://api-uat.postman.gov.sg/v1"
       REACT_APP_TITLE: "Postman.gov.sg"
       REACT_APP_DESCRIPTION: "Postman.gov.sg enables public officers to send templated messages to many recipients"
       REACT_APP_GUIDE_URL: "https://guide.postman.gov.sg"
@@ -30,7 +30,7 @@ frontend:
     - pattern: "**/*"
       headers:
       - key: "Strict-Transport-Security"
-        value: "max-age=5184000; includeSubDomains" 
+        value: "max-age=5184000; includeSubDomains"
       - key: "X-Frame-Options"
         value: "DENY"
       - key: "X-XSS-Protection"
