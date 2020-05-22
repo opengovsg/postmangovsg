@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
@@ -37,11 +37,7 @@ const SMSRecipients = ({
 
   const { id: campaignId } = useParams()
 
-  useEffect(() => {
-    loadPreview()
-  }, [campaignId, loadPreview])
-
-  async function loadPreview() {
+  const loadPreview = useCallback(async () => {
     if (campaignId) {
       try {
         const msgPreview = await getPreviewMessage(+campaignId)
@@ -52,7 +48,11 @@ const SMSRecipients = ({
         setErrorMessage(err.message)
       }
     }
-  }
+  }, [campaignId])
+
+  useEffect(() => {
+    loadPreview()
+  }, [loadPreview])
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)

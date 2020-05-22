@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { Status } from 'classes'
@@ -26,7 +26,7 @@ const EmailSend = ({
     throw new Error('Invalid campaign id')
   }
 
-  const loadPreview = async () => {
+  const loadPreview = useCallback(async () => {
     if (campaignId) {
       try {
         const msgPreview = await getPreviewMessage(+campaignId)
@@ -36,11 +36,11 @@ const EmailSend = ({
         // eslint-disable-next-line no-empty
       } catch (err) {}
     }
-  }
+  }, [campaignId])
 
   useEffect(() => {
     loadPreview()
-  }, [campaignId, loadPreview])
+  }, [loadPreview])
 
   const onModalConfirm = async () => {
     await sendCampaign(+campaignId, 0)

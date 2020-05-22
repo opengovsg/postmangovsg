@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -22,17 +22,17 @@ const Create = () => {
   const [campaign, setCampaign] = useState(new Campaign({}))
   const [isLoading, setLoading] = useState(true)
 
-  async function loadProject() {
+  const loadProject = useCallback(async () => {
     if (id) {
       const campaign = await getCampaignDetails(+id)
       setCampaign(campaign)
       setLoading(false)
     }
-  }
+  }, [id])
 
   useEffect(() => {
     loadProject()
-  }, [id, loadProject])
+  }, [loadProject])
 
   function renderCreateChannel() {
     switch (campaign.type) {

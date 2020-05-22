@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import { Status, CampaignStats } from 'classes/Campaign'
 import {
@@ -19,11 +19,11 @@ const SMSDetail = ({
 }) => {
   const [stats, setStats] = useState(new CampaignStats({}))
 
-  async function refreshCampaignStats() {
+  const refreshCampaignStats = useCallback(async () => {
     const campaignStats = await getCampaignStats(+id)
     setStats(campaignStats)
     return campaignStats
-  }
+  }, [id])
 
   async function handlePause() {
     try {

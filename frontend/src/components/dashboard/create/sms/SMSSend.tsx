@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { Status } from 'classes'
@@ -30,11 +30,7 @@ const SMSSend = ({
     throw new Error('Invalid campaign id')
   }
 
-  useEffect(() => {
-    loadPreview()
-  }, [campaignId, loadPreview])
-
-  async function loadPreview() {
+  const loadPreview = useCallback(async () => {
     if (campaignId) {
       try {
         const msgPreview = await getPreviewMessage(+campaignId)
@@ -44,7 +40,11 @@ const SMSSend = ({
         // eslint-disable-next-line no-empty
       } catch (err) {}
     }
-  }
+  }, [campaignId])
+
+  useEffect(() => {
+    loadPreview()
+  }, [loadPreview])
 
   const onModalConfirm = async () => {
     await sendCampaign(+campaignId, +sendRate)
