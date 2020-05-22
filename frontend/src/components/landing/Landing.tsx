@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
 import cx from 'classnames'
+import Lottie from 'react-lottie'
 
 import {
   GUIDE_URL,
@@ -17,7 +18,6 @@ import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Landing.module.scss'
 import companyLogo from 'assets/img/brand/company-logo.svg'
-import landingImg from 'assets/img/landing/landing-hero.png'
 
 import arrowRight from 'assets/img/landing/arrow-right.svg'
 import mohAgencyImg from 'assets/img/landing/moh-gray.png'
@@ -31,6 +31,8 @@ import onboardingImg from 'assets/img/landing/onboard.svg'
 import whyUse1 from 'assets/mp4/why-use-1.mp4'
 import whyUse2 from 'assets/mp4/why-use-2.mp4'
 import whyUse3 from 'assets/mp4/why-use-3.mp4'
+
+import landingAnimation from 'assets/lottie/landing.json'
 
 const Landing = () => {
   const authContext = useContext(AuthContext)
@@ -106,8 +108,17 @@ const Landing = () => {
               </div>
             </div>
           </div>
-          <div className={styles.landingImg}>
-            <img src={landingImg} alt="Landing page graphic"></img>
+          <div className={styles.landingAnimation}>
+            <Lottie options={
+              {
+                loop: false,
+                autoplay: true, 
+                animationData: landingAnimation,
+                rendererSettings: {
+                  preserveAspectRatio: 'xMidYMid slice'
+                }
+              }
+            }/>
           </div>
         </div>
         <div className={styles.agencyContainer}>
