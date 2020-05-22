@@ -64,10 +64,6 @@ $section-vertical-padding: 4rem;
         line-height: 3.5rem;
         margin-top: 1rem;
         margin-bottom: 0;
-
-        @include mobile() {
-          text-align: center;
-        }
       }
 
       .sentMessages {
@@ -80,13 +76,15 @@ $section-vertical-padding: 4rem;
           line-height: 3.8rem;
 
           @include mobile() {
-            line-height: 0.5rem;
+            margin-left: 1rem;
+            line-height: 3.3rem;
           }
         }
 
         @include mobile() {
-          @include flex-vertical;
-          align-items: center;
+          width: 100%;
+          @include flex-horizontal;
+          align-items: flex-end;
         }
 
         .numOfMessages {
@@ -95,6 +93,7 @@ $section-vertical-padding: 4rem;
           margin-right: 0.5rem;
 
           @include mobile() {
+            font-size: 3.5rem;
             margin-right: 0;
           }
         }
@@ -107,7 +106,7 @@ $section-vertical-padding: 4rem;
 
         @include mobile() {
           margin-top: 0;
-          @include flex-vertical;
+          width: 100%;
         }
                 
         .signInButton {
@@ -118,6 +117,7 @@ $section-vertical-padding: 4rem;
 
           @include mobile() {
             margin: 1rem 0;
+            min-width: 7rem;
           }
 
           &:hover {
@@ -138,7 +138,7 @@ $section-vertical-padding: 4rem;
         .needHelp {
             color: $indigo-blue;
             @include mobile() {
-              margin-left: 0;
+              margin-left: 1rem;
             }
           }
           
@@ -171,6 +171,7 @@ $section-vertical-padding: 4rem;
       letter-spacing: 0.64px;
 
       @include mobile() {
+        margin-top: 3.5rem;
         margin-bottom: 2rem;
       }
     }
@@ -222,20 +223,22 @@ $section-vertical-padding: 4rem;
       font-size: 3rem;
 
       @include mobile() {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
         align-self: flex-start;
-        font-size: 2.4em;
+        font-size: 2.4rem;
       }
     }
 
     h3 {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       color: $indigo-blue;
       font-weight: bold;
     }
 
     p {
       color: $dark-blue;
-      font-size: 1.1rem;
+      font-size: 1.3rem;
     }
 
     .reasons {
@@ -265,6 +268,7 @@ $section-vertical-padding: 4rem;
         margin-right: 4rem;
 
         @include mobile() {
+          margin-top: 2rem;
           margin-right: 0;
           width: 100%;
         }
@@ -456,19 +460,24 @@ $section-vertical-padding: 4rem;
       font-size: 2rem;
       font-weight: bold;
       color: $light-blue;
+
+      @include mobile() {
+        font-size: 2.4rem;
+      }
     }
 
     p {
       font-size: 1.1rem;
       color: $light-blue;
+
+      @include mobile() {
+        margin-top: 2rem;
+        font-size: 1.3rem;
+      }
     }
 
     .buttonRow {
       margin-top: 3rem;
-
-      @include mobile() {
-        @include flex-vertical;
-      }
 
       .getStartedButton {
         color: $light-blue;
@@ -486,7 +495,7 @@ $section-vertical-padding: 4rem;
         color: $light-blue;
 
         @include mobile() {
-          margin-left: 0.5rem;
+          margin-left: 1rem;
         }
       }
     }
@@ -506,6 +515,10 @@ $section-vertical-padding: 4rem;
     border: 1px solid $light-blue;
     margin-top: 2rem;
     margin-bottom: 1rem;
+
+    @include mobile() {
+      margin-bottom: 0;
+    }
   }
 
   .innerContainer {
@@ -528,6 +541,10 @@ $section-vertical-padding: 4rem;
 
         &:hover {
           font-weight: 700;
+        }
+
+        @include mobile() {
+          margin-top: 3rem;
         }
       }
     
@@ -594,6 +611,7 @@ $section-vertical-padding: 4rem;
       a {
         color: $light-blue;
         margin-right: 2rem;
+        margin-top: 3rem;
         font-size: 0.75rem;
       }
     }
