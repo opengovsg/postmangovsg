@@ -107,7 +107,8 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      const { records, hydratedRecord } = await EmailTemplateService.client.testHydration({
+      // eslint-disable-next-line prefer-const
+      let { records, hydratedRecord } = await EmailTemplateService.client.testHydration({
         campaignId: +campaignId,
         s3Key,
         templateSubject: emailTemplate.subject,
@@ -118,12 +119,14 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       // VAPT:
       const user = await AuthService.findUser(req?.session?.user?.id)
       const sandboxEmail = 'success@simulator.amazonses.com'
+      const MAX_RECORDS = 20
+      const numberOfRecords = Math.min(records.length, MAX_RECORDS)
+      if (numberOfRecords < records.length) logger.info(`[${campaignId}] VAPT: TRUNCATED NUMBER OF RECORDS FROM ${records.length} TO ${numberOfRecords}`)
+      records = records.slice(0, numberOfRecords)
       logger.info(`[${campaignId}] VAPT: REPLACING 1/${records.length} RECORD WITH USER'S EMAIL: ${user.email}`)
       records[0].recipient = user.email
       logger.info(`[${campaignId}] VAPT: REPLACING ${records.length-1}/${records.length} RECORD WITH SANDBOX EMAIL: ${sandboxEmail}`)
       for (let i = 1; i < records.length; i++) records[i].recipient = sandboxEmail
-      // if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
-      
       const recipientCount: number = records.length
        
       // START populate template
