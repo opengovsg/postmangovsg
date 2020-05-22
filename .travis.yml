@@ -65,6 +65,11 @@ jobs:
         on:
           branch: $PRODUCTION_BRANCH
           condition: "$DEPLOY_WORKER = true"
+      - provider: script
+        script: ./deploy.sh postmangovsg-workers uat-sending uat-logger
+        on:
+          branch: $UAT_BRANCH
+          condition: "$DEPLOY_WORKER = true"
   - name: frontend
     before_install:
       - cd frontend
