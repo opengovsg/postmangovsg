@@ -51,8 +51,6 @@ const Landing = () => {
     { img: moeAgencyImg, alt: 'MOE' },
   ]
 
-  console.log(REPORT_BUG_URL)
-
   const reasons = [
     {
       video: whyUse1,
@@ -70,17 +68,15 @@ const Landing = () => {
     },
     {
       video: whyUse3,
-      firstHeader: 'Forgot something? Pause campaign',
-      firstText: 'We all have those days where we miss out on an important point for official messages. With Postman, it\'s never too late to pause the campaign if you are sending > 1000 messages.',
-      secondHeader: 'See past campaigns easily',
-      secondText: 'Not sure what was sent out previously? Check Postman\'s campaign landing page for stats. Understand how you are communicating with your recipients.',
+      firstHeader: 'Stop your campaign',
+      firstText: 'You can stop your campaign easily with a click of a button even if you already started sending.',
+      secondHeader: 'See past campaigns stats easily',
+      secondText: 'You can see summary stats from Postman’s campaign landing page for past campaigns.',
     },
   ]
 
   const questions = [
-    { text: 'When does Postman send my message?', answer: 'Postman currently supports send NOW.' },
-    { text: 'Where do messages go and how do I know that Postman delivered it successfully?', answer: 'Messages go to the recipients that you specified. Like Fedex, you can track your package. Postman tells you the number of failed deliveries and you can reattempt delivery.' },
-    { text: 'Is Postman free?', answer: 'Sending an email is free. SMS & WhatsApp will be charged based on WhatsApp and Twilio SMS rates.' },
+    { text: 'Is Postman free?', answer: 'Sending an email is free. SMS will be charged based on Twilio’s SMS rates.' },
     { text: 'Is Postman secure?', answer: 'We recommend that you don’t put any sensitive information in the sms content. Some of our users generate a recipient specific unique link that opens up to a locked page. When in doubt, you should follow IM8’s guidelines on data classification.' },
   ]
 
@@ -188,8 +184,8 @@ const Landing = () => {
       <div className={styles.onboarding}>
         <div className={cx(styles.fixWidth, styles.innerContainer)}>
           <div className={styles.textContainer}>
-            <h2>No onboarding process nor any installation required.</h2>
-            <p>Sign in with your government email, and send your messages in minutes. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
+            <h2>Start using Postman today</h2>
+            <p>It is easy to get started with your gov.sg email account. For non gov.sg email users, please fill out the following form. We will review your request within 3 business days.</p>
 
             <div className={styles.buttonRow}>
               <PrimaryButton className={styles.getStartedButton} onClick={directToSignIn}>
