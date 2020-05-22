@@ -114,7 +114,7 @@ const Landing = () => {
           <h1>Why use Postman</h1>
           <div className={styles.reasons}>
             {reasons.map(reason =>
-              <div className={styles.reason} key={styles.video}>
+              <div className={styles.reason} key={reason.video}>
                 <video autoPlay loop muted playsInline>
                   <source src={reason.video} type="video/mp4" />
                 </video>
@@ -138,7 +138,6 @@ const Landing = () => {
                 <h3>Lorem ipsum dolor sit amet</h3>
                 <p className={styles.longText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tellus id interdum velit laoreet id donec ultrices. Amet cursus sit amet dictum sit amet justo donec enim. Mi proin sed libero enim. Aenean et tortor at risus viverra adipiscing at in. Lectus vestibulum mattis ullamcorper velit.</p>
                 <div className={styles.agencyRow}>
-                  <img src={userImg} alt="User"/>
                   <span>Lorem ipsum dolor, Agency A</span>
                 </div>
               </div>
