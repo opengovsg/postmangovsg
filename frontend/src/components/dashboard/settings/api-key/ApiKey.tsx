@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext, useEffect } from 'react'
 import cx from 'classnames'
 
-import { TextInputWithButton, ConfirmModal } from 'components/common'
+import { TextInputWithButton, ConfirmModal, ErrorBlock } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { regenerateApiKey } from 'services/settings.service'
 
@@ -23,6 +23,7 @@ enum ApiKeyState {
 const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
   const [apiKey, setApiKey] = useState('')
   const [isGeneratingApiKey, setIsRegeneratingApiKey] = useState(false)
+  const [errorMsg, setErrorMsg] = useState(null)
   const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(
     ApiKeyState.GENERATE
   )
@@ -75,32 +76,41 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
   }
 
   async function onGenerateConfirm() {
+    setErrorMsg(null)
     setIsRegeneratingApiKey(true)
-    const newApiKey = await regenerateApiKey()
+    try {
+      const newApiKey = await regenerateApiKey()
+      setApiKey(newApiKey)
+      setApiKeyState(ApiKeyState.COPY)
+    } catch (e) {
+      setErrorMsg(e.message)
+    }
     setIsRegeneratingApiKey(false)
-
-    setApiKey(newApiKey)
-    setApiKeyState(ApiKeyState.COPY)
   }
 
   let buttonLabel = ''
   let buttonIcon = ''
+  let buttonClass = ''
   switch (apiKeyState) {
     case ApiKeyState.GENERATE:
       buttonLabel = 'Generate'
       buttonIcon = 'bx-key'
-      break
-    case ApiKeyState.COPY:
-      buttonLabel = 'Copy'
-      buttonIcon = 'bx-copy'
-      break
-    case ApiKeyState.COPIED:
-      buttonLabel = 'Copied'
-      buttonIcon = 'bx-check'
+      buttonClass = styles.greenButton
       break
     case ApiKeyState.REGENERATE:
       buttonLabel = 'Regenerate'
       buttonIcon = 'bx-refresh'
+      buttonClass = styles.greenButton
+      break
+    case ApiKeyState.COPY:
+      buttonLabel = 'Copy'
+      buttonIcon = 'bx-copy'
+      buttonClass = styles.blueButton
+      break
+    case ApiKeyState.COPIED:
+      buttonLabel = 'Copied'
+      buttonIcon = 'bx-check'
+      buttonClass = styles.blueButton
       break
     default:
       break
@@ -112,9 +122,9 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
       {(apiKeyState === ApiKeyState.COPY ||
         apiKeyState === ApiKeyState.COPIED) && (
         <p>
-          After generating your API key, please make a copy of it immediately as
-          it will only be shown once. Upon leaving or refreshing this page, the
-          key will be hidden.
+            After generating your API key, please make a copy of it immediately as
+            it will only be shown once. Upon leaving or refreshing this page, the
+            key will be hidden.
         </p>
       )}
       <TextInputWithButton
@@ -123,18 +133,14 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
           return
         }}
         onClick={onButtonClick}
-        className={
-          apiKeyState === ApiKeyState.GENERATE ||
-          apiKeyState === ApiKeyState.REGENERATE
-            ? styles.greenButton
-            : styles.blueButton
-        }
+        className={buttonClass}
         textRef={apiKeyRef}
         buttonDisabled={isGeneratingApiKey}
       >
         {buttonLabel} API key
         <i className={cx('bx', buttonIcon)} />
       </TextInputWithButton>
+      <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )
 }
