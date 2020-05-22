@@ -144,10 +144,9 @@ const Landing = () => {
             <div className={styles.inner}>
               <img className={styles.desktopImg} src={userImg} alt="User"/>
               <div className={styles.textContainer}>
-                <h3>Lorem ipsum dolor sit amet</h3>
-                <p className={styles.longText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tellus id interdum velit laoreet id donec ultrices. Amet cursus sit amet dictum sit amet justo donec enim. Mi proin sed libero enim. Aenean et tortor at risus viverra adipiscing at in. Lectus vestibulum mattis ullamcorper velit.</p>
+                <p className={styles.longText}>The email version is quite straightforward. Thumbs up!</p>
                 <div className={styles.agencyRow}>
-                  <span>Lorem ipsum dolor, Agency A</span>
+                  <span>User from MOE</span>
                 </div>
               </div>
             </div>
