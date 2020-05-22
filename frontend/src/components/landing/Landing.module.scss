@@ -230,6 +230,7 @@ $section-vertical-padding: 4rem;
       font-size: 3rem;
 
       @include mobile() {
+        align-self: flex-start;
         font-size: 2.4em;
       }
     }

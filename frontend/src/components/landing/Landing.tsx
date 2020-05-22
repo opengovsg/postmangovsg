@@ -75,6 +75,10 @@ const Landing = () => {
     { text: 'Is Postman secure?', answer: 'We recommend that you don’t put any sensitive information in the sms content. Some of our users generate a recipient specific unique link that opens up to a locked page. When in doubt, you should follow IM8’s guidelines on data classification.' },
   ]
 
+  function getYear() {
+    return new Date().getFullYear()
+  }
+
   return (
     <>
       <Banner></Banner>
@@ -214,7 +218,7 @@ const Landing = () => {
             <a href="" target="_blank" rel="noopener noreferrer">Terms of use</a>
             <a href="" target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
           </div>
-          <span>&copy; 2019 Open Government Products. Last Updated 28 April 2020</span>
+          <span>&copy; {getYear()} Open Government Products</span>
           <div className={styles.builtByMobile}>
             <span>Built by</span>
             <img src={companyLogo} alt="logo"/>
