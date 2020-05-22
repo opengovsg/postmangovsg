@@ -2,11 +2,14 @@ import axios, { AxiosError } from 'axios'
 import { ChannelType } from 'classes'
 
 export interface UserCredential {
-  label: string;
-  type: ChannelType;
+  label: string
+  type: ChannelType
 }
 
-async function getUserSettings(): Promise<{ hasApiKey: boolean; creds: UserCredential[] }> {
+async function getUserSettings(): Promise<{
+  hasApiKey: boolean
+  creds: UserCredential[]
+}> {
   try {
     const response = await axios.get('/settings')
     const { has_api_key: hasApiKey, creds } = response.data
@@ -47,8 +50,4 @@ function errorHandler(e: AxiosError, defaultMsg: string): never {
   throw new Error(defaultMsg)
 }
 
-export {
-  regenerateApiKey,
-  getUserSettings,
-  deleteCredential,
-}
+export { regenerateApiKey, getUserSettings, deleteCredential }

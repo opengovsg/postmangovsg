@@ -9,10 +9,17 @@ import { sendCampaign } from 'services/campaign.service'
 
 import styles from '../Create.module.scss'
 
-const EmailSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: Function }) => {
-
+const EmailSend = ({
+  numRecipients,
+  onNext,
+}: {
+  numRecipients: number
+  onNext: Function
+}) => {
   const modalContext = useContext(ModalContext)
-  const [preview, setPreview] = useState({} as { body: string; subject: string; reply_to: string | null })
+  const [preview, setPreview] = useState(
+    {} as { body: string; subject: string; reply_to: string | null }
+  )
   const { id: campaignId } = useParams()
 
   if (!campaignId) {
@@ -26,15 +33,14 @@ const EmailSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: F
         if (msgPreview) {
           setPreview(msgPreview)
         }
-      // eslint-disable-next-line no-empty
-      } catch (err){}
+        // eslint-disable-next-line no-empty
+      } catch (err) {}
     }
   }
 
   useEffect(() => {
     loadPreview()
-  }, [campaignId])
-
+  }, [campaignId, loadPreview])
 
   const onModalConfirm = async () => {
     await sendCampaign(+campaignId, 0)
@@ -64,7 +70,11 @@ const EmailSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: F
         <h4>{numRecipients}</h4>
 
         <p className={styles.greyText}>Message</p>
-        <PreviewBlock body={preview.body} subject={preview.subject} replyTo={preview.reply_to} />
+        <PreviewBlock
+          body={preview.body}
+          subject={preview.subject}
+          replyTo={preview.reply_to}
+        />
       </div>
 
       <div className="separator"></div>

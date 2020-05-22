@@ -18,11 +18,16 @@ enum AddCredentialStep {
   Input,
   Validate,
   Success,
-  Failure
+  Failure,
 }
 
-const AddCredentialModal = ({ labels, onSuccess }: { labels: string[]; onSuccess: Function }) => {
-
+const AddCredentialModal = ({
+  labels,
+  onSuccess,
+}: {
+  labels: string[]
+  onSuccess: Function
+}) => {
   // Using channel type as proxy for credential type for now
   // Hardcode to add new twilio cred
   const [label, setLabel] = useState('')
@@ -41,10 +46,11 @@ const AddCredentialModal = ({ labels, onSuccess }: { labels: string[]; onSuccess
     let credInput = (
       <>
         <CredLabelInput value={label} onChange={setLabel}></CredLabelInput>
-        {
-          label && !isValidLabel() &&
-          <ErrorBlock>Label already exists. Please use a different one.</ErrorBlock>
-        }
+        {label && !isValidLabel() && (
+          <ErrorBlock>
+            Label already exists. Please use a different one.
+          </ErrorBlock>
+        )}
       </>
     )
     switch (credType) {
@@ -53,7 +59,9 @@ const AddCredentialModal = ({ labels, onSuccess }: { labels: string[]; onSuccess
           <>
             <h2>Add new Twilio credentials</h2>
             {credInput}
-            <TwilioCredentialsInput onFilled={setCredentials}></TwilioCredentialsInput>
+            <TwilioCredentialsInput
+              onFilled={setCredentials}
+            ></TwilioCredentialsInput>
           </>
         )
         break
@@ -66,7 +74,12 @@ const AddCredentialModal = ({ labels, onSuccess }: { labels: string[]; onSuccess
         {credInput}
         <div className="separator"></div>
         <div className="progress-button">
-          <PrimaryButton disabled={!isValidLabel() || !credentials} onClick={() => setCredStep(AddCredentialStep.Validate)}>Next →</PrimaryButton>
+          <PrimaryButton
+            disabled={!isValidLabel() || !credentials}
+            onClick={() => setCredStep(AddCredentialStep.Validate)}
+          >
+            Next →
+          </PrimaryButton>
         </div>
       </>
     )
@@ -97,17 +110,26 @@ const AddCredentialModal = ({ labels, onSuccess }: { labels: string[]; onSuccess
     let validateInput
     switch (credType) {
       case ChannelType.SMS:
-        validateInput = <SMSValidationInput onClick={validateCredential}></SMSValidationInput>
+        validateInput = (
+          <SMSValidationInput onClick={validateCredential}></SMSValidationInput>
+        )
         break
       case ChannelType.Email:
-        validateInput = <EmailValidationInput onClick={validateCredential}></EmailValidationInput>
+        validateInput = (
+          <EmailValidationInput
+            onClick={validateCredential}
+          ></EmailValidationInput>
+        )
         break
     }
     return (
       <>
         <img src={ConfirmImage}></img>
         <h2>Almost there, validate credentials to finish</h2>
-        <p>To ensure your credentials are working perfectly, please enter an available mobile number to receive a validation message.</p>
+        <p>
+          To ensure your credentials are working perfectly, please enter an
+          available mobile number to receive a validation message.
+        </p>
         {validateInput}
       </>
     )
@@ -135,7 +157,12 @@ const AddCredentialModal = ({ labels, onSuccess }: { labels: string[]; onSuccess
           <div className={styles.centerAlign}>
             <img src={SuccessImage} />
             <h3>Your credentials are working well.</h3>
-            <PrimaryButton className={styles.padTop} onClick={() => modalContext.setModalContent(null)}>Done</PrimaryButton>
+            <PrimaryButton
+              className={styles.padTop}
+              onClick={() => modalContext.setModalContent(null)}
+            >
+              Done
+            </PrimaryButton>
           </div>
         )
       // Credentials failed to store
@@ -147,18 +174,14 @@ const AddCredentialModal = ({ labels, onSuccess }: { labels: string[]; onSuccess
             <ErrorBlock>{errorMessage}</ErrorBlock>
             <PrimaryButton onClick={() => setCredStep(AddCredentialStep.Input)}>
               Edit credentials
-              <i className='bx bx-edit'></i>
+              <i className="bx bx-edit"></i>
             </PrimaryButton>
           </div>
         )
     }
   }
 
-  return (
-    <div className={styles.container}>
-      {renderAddCredStep()}
-    </div>
-  )
+  return <div className={styles.container}>{renderAddCredStep()}</div>
 }
 
 export default AddCredentialModal

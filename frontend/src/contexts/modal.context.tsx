@@ -14,9 +14,7 @@ const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <ModalContext.Provider value={{ setModalContent }}>
       <Modal onClose={() => setModalContent(null)}>{modalContent}</Modal>
-      <BodyWrapper wrap={!!modalContent}>
-        {children}
-      </BodyWrapper>
+      <BodyWrapper wrap={!!modalContent}>{children}</BodyWrapper>
     </ModalContext.Provider>
   )
 }

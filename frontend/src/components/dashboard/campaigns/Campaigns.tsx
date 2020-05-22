@@ -22,7 +22,9 @@ const Campaigns = () => {
   const modalContext = useContext(ModalContext)
   const [isLoading, setLoading] = useState(true)
   const [campaigns, setCampaigns] = useState(new Array<Campaign>())
-  const [campaignsDisplayed, setCampaignsDisplayed] = useState(new Array<Campaign>())
+  const [campaignsDisplayed, setCampaignsDisplayed] = useState(
+    new Array<Campaign>()
+  )
   const [selectedPage, setSelectedPage] = useState(0)
   const history = useHistory()
   const name = getNameFromEmail(email)
@@ -52,11 +54,13 @@ const Campaigns = () => {
     setCampaignsDisplayed(campaigns.slice(offset, offset + ITEMS_PER_PAGE))
   }, [campaigns, selectedPage])
 
+  /* eslint-disable react/display-name */
   const headers = [
     {
       name: 'Mode',
-      render: (campaign: Campaign) => <i className={cx('bx', styles.icon, channelIcons[campaign.type])}></i>
-      ,
+      render: (campaign: Campaign) => (
+        <i className={cx('bx', styles.icon, channelIcons[campaign.type])}></i>
+      ),
       width: 'xs',
     },
     {
@@ -66,32 +70,37 @@ const Campaigns = () => {
     },
     {
       name: 'Created At',
-      render: (campaign: Campaign) => <Moment format='LLL'>{campaign.createdAt}</Moment>,
+      render: (campaign: Campaign) => (
+        <Moment format="LLL">{campaign.createdAt}</Moment>
+      ),
       width: 'md',
     },
     {
       name: 'Sent At',
-      render: (campaign: Campaign) => campaign.sentAt ? <Moment format='LLL'>{campaign.sentAt}</Moment> : <span></span>,
+      render: (campaign: Campaign) =>
+        campaign.sentAt ? (
+          <Moment format="LLL">{campaign.sentAt}</Moment>
+        ) : (
+          <span></span>
+        ),
       width: 'md',
-    }
-    ,
+    },
     {
       name: 'Status',
       render: (campaign: Campaign) => campaign.status,
       width: 'sm',
     },
   ]
+  /* eslint-enable react/display-name */
 
   function renderRow(campaign: Campaign, key: number) {
     return (
       <tr key={key} onClick={() => history.push(`/campaigns/${campaign.id}`)}>
-        {
-          headers.map(({ render, width, name }) => (
-            <td className={width} key={name} >
-              {render(campaign)}
-            </td>
-          ))
-        }
+        {headers.map(({ render, width, name }) => (
+          <td className={width} key={name}>
+            {render(campaign)}
+          </td>
+        ))}
       </tr>
     )
   }
@@ -99,16 +108,24 @@ const Campaigns = () => {
   function renderEmptyDashboard() {
     return (
       <div className={styles.emptyDashboard}>
-        <img className={styles.image} src={EmptyDashboardImg} alt="Empty dashboard graphic" />
+        <img
+          className={styles.image}
+          src={EmptyDashboardImg}
+          alt="Empty dashboard graphic"
+        />
         <h2>We are excited to have you here!</h2>
         <h5>To get you started, we have prepared a guide for your reference</h5>
         <a href={GUIDE_URL} target="_blank" rel="noopener noreferrer">
-          <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
+          <PrimaryButton className={styles.darkBlueButton}>
+            Learn how to set up →
+          </PrimaryButton>
         </a>
         <h5>Or you can begin creating your campaign with our step-by step</h5>
-        <PrimaryButton onClick={() => modalContext.setModalContent(
-          <CreateCampaign></CreateCampaign>
-        )}>
+        <PrimaryButton
+          onClick={() =>
+            modalContext.setModalContent(<CreateCampaign></CreateCampaign>)
+          }
+        >
           Let&apos;s begin
         </PrimaryButton>
       </div>
@@ -123,20 +140,14 @@ const Campaigns = () => {
           <table className={styles.campaignTable}>
             <thead>
               <tr>
-                {
-                  headers.map(({ name, width }) => (
-                    <th className={width} key={name}>
-                      {name}
-                    </th>
-                  ))
-                }
+                {headers.map(({ name, width }) => (
+                  <th className={width} key={name}>
+                    {name}
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody>
-              {
-                campaignsDisplayed.map(renderRow)
-              }
-            </tbody>
+            <tbody>{campaignsDisplayed.map(renderRow)}</tbody>
           </table>
         </div>
 
@@ -153,21 +164,27 @@ const Campaigns = () => {
     <>
       <TitleBar title={title}>
         <PrimaryButton
-          onClick={() => modalContext.setModalContent(
-            <CreateCampaign></CreateCampaign>
-          )}>
+          onClick={() =>
+            modalContext.setModalContent(<CreateCampaign></CreateCampaign>)
+          }
+        >
           Create new campaign
         </PrimaryButton>
       </TitleBar>
       <div className={styles.content}>
-        {isLoading
-          ? <i className={cx(styles.icon, styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
-          : (
-            campaigns.length > 0
-              ? renderCampaignList()
-              : renderEmptyDashboard()
-          )
-        }
+        {isLoading ? (
+          <i
+            className={cx(
+              styles.icon,
+              styles.spinner,
+              'bx bx-loader-alt bx-spin'
+            )}
+          ></i>
+        ) : campaigns.length > 0 ? (
+          renderCampaignList()
+        ) : (
+          renderEmptyDashboard()
+        )}
       </div>
     </>
   )

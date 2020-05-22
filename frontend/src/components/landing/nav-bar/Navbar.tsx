@@ -18,16 +18,36 @@ const NavBar = () => {
     <nav className={styles.navBar}>
       <a className={styles.appLogo} href="/">
         <img src={AppLogo} alt="Postman logo" className={styles.desktop} />
-        <img src={AppBrandmark} alt="Postman brandmark" className={styles.mobile}/>
+        <img
+          src={AppBrandmark}
+          alt="Postman brandmark"
+          className={styles.mobile}
+        />
       </a>
       <div className={styles.navbarLinks}>
         <div className={styles.links}>
-          <a className={styles.link} href={CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
-          <a className={styles.link} href={GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
+          <a
+            className={styles.link}
+            href={CONTRIBUTE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Contribute
+          </a>
+          <a
+            className={styles.link}
+            href={GUIDE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Guide
+          </a>
         </div>
-        <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>Sign in</PrimaryButton>
+        <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
+          Sign in
+        </PrimaryButton>
       </div>
-    </nav >
+    </nav>
   )
 }
 

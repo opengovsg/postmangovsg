@@ -2,8 +2,13 @@ import React from 'react'
 
 import styles from './FileInput.module.scss'
 
-const FileInput = ({ isProcessing, onFileSelected }: { isProcessing: boolean; onFileSelected: Function }) => {
-
+const FileInput = ({
+  isProcessing,
+  onFileSelected,
+}: {
+  isProcessing: boolean
+  onFileSelected: Function
+}) => {
   return (
     <div className={styles.container}>
       <input
@@ -16,12 +21,17 @@ const FileInput = ({ isProcessing, onFileSelected }: { isProcessing: boolean; on
         onChange={(e) => onFileSelected(e.target.files)}
       />
       <label htmlFor="recipient-upload-input">
-        {isProcessing
-          ? <>Uploading< i className='bx bx-loader-alt bx-spin' ></i></>
-          : <>Upload File <i className="bx bx-upload"></i></>
-        }
+        {isProcessing ? (
+          <>
+            Uploading<i className="bx bx-loader-alt bx-spin"></i>
+          </>
+        ) : (
+          <>
+            Upload File <i className="bx bx-upload"></i>
+          </>
+        )}
       </label>
-    </div >
+    </div>
   )
 }
 

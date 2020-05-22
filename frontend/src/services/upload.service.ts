@@ -1,6 +1,9 @@
 import axios, { AxiosError } from 'axios'
 
-export async function uploadFileWithPresignedUrl(uploadedFile: File, presignedUrl: string): Promise<void> {
+export async function uploadFileWithPresignedUrl(
+  uploadedFile: File,
+  presignedUrl: string
+): Promise<void> {
   try {
     const s3AxiosInstance = axios.create({
       withCredentials: false,

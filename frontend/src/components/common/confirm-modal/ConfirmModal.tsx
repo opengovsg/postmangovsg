@@ -7,8 +7,21 @@ import { ModalContext } from 'contexts/modal.context'
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import styles from './ConfirmModal.module.scss'
 
-const ConfirmModal = ({ title, subtitle, buttonText, buttonIcon, destructive, onConfirm }:
-  { title: string; subtitle: string; buttonText: string; buttonIcon?: string; destructive?: boolean; onConfirm: () => Promise<any> }) => {
+const ConfirmModal = ({
+  title,
+  subtitle,
+  buttonText,
+  buttonIcon,
+  destructive,
+  onConfirm,
+}: {
+  title: string
+  subtitle: string
+  buttonText: string
+  buttonIcon?: string
+  destructive?: boolean
+  onConfirm: () => Promise<any>
+}) => {
   const modalContext = useContext(ModalContext)
   const [disabled, setDisabled] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -31,13 +44,15 @@ const ConfirmModal = ({ title, subtitle, buttonText, buttonIcon, destructive, on
       </div>
       <h2 className={styles.title}>{title}</h2>
       <h4 className={styles.subtitle}>{subtitle}</h4>
-      <PrimaryButton className={destructive ? styles.redButton : styles.greenButton} onClick={onConfirmedClicked} disabled={disabled}>
+      <PrimaryButton
+        className={destructive ? styles.redButton : styles.greenButton}
+        onClick={onConfirmedClicked}
+        disabled={disabled}
+      >
         {buttonText}
         {buttonIcon && <i className={cx('bx', styles.icon, buttonIcon)}></i>}
       </PrimaryButton>
-      <ErrorBlock>
-        {errorMessage}
-      </ErrorBlock>
+      <ErrorBlock>{errorMessage}</ErrorBlock>
     </div>
   )
 }
