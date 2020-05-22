@@ -10,6 +10,7 @@ import {
 import {
   CampaignService,
   TemplateService,
+  AuthService,
 } from '@core/services'
 import { EmailTemplateService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
@@ -113,8 +114,15 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
         templateBody: emailTemplate.body as string,
         templateParams: emailTemplate.params as string[],
       })
-  
-      if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
+      
+      // VAPT:
+      const user = await AuthService.findUser(req?.session?.user?.id)
+      const sandboxEmail = 'success@simulator.amazonses.com'
+      logger.info(`[${campaignId}] VAPT: REPLACING 1/${records.length} RECORD WITH USER'S EMAIL: ${user.email}`)
+      records[0].recipient = user.email
+      logger.info(`[${campaignId}] VAPT: REPLACING ${records.length-1}/${records.length} RECORD WITH SANDBOX EMAIL: ${sandboxEmail}`)
+      for (let i = 1; i < records.length; i++) records[i].recipient = sandboxEmail
+      // if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
       
       const recipientCount: number = records.length
        
