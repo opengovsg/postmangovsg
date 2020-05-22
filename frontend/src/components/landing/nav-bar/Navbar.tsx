@@ -3,6 +3,7 @@ import React from 'react'
 import { GUIDE_URL, CONTRIBUTE_URL } from 'config'
 import PrimaryButton from 'components/common/primary-button'
 import AppLogo from 'assets/img/brand/app-logo.svg'
+import AppBrandmark from 'assets/img/brand/app-brandmark.svg'
 import styles from './NavBar.module.scss'
 
 const NavBar = () => {
@@ -14,7 +15,8 @@ const NavBar = () => {
   return (
     <nav className={styles.navBar}>
       <a className={styles.appLogo} href="/">
-        <img src={AppLogo} alt="Postman logo" />
+        <img src={AppLogo} alt="Postman logo" className={styles.desktop} />
+        <img src={AppBrandmark} alt="Postman brandmark" className={styles.mobile}/>
       </a>
       <div className={styles.navbarLinks}>
         <div className={styles.links}>

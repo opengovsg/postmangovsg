@@ -17,13 +17,25 @@ $navbar-max-width: 1400px;
   @include mobile() {
     height: $navbar-mobile-height;
     justify-content: space-between;
-    max-width: 100vw;
   }
 
   .appLogo {
     @include flex-horizontal;
     img {
       height: 3rem;
+    }
+    .mobile {
+      display: none;
+    }
+
+    @include mobile() {
+      .desktop {
+        display: none;
+      }
+
+      .mobile {
+        display: flex;
+      }
     }
   }
   
@@ -39,7 +51,8 @@ $navbar-max-width: 1400px;
       margin-right: calc(2rem + 1vw);
       
       @include mobile() {
-        display: none;
+        min-width: 10rem;
+        margin-right: 0;
       }
     }
 
@@ -67,10 +80,14 @@ $navbar-max-width: 1400px;
       }
     }
     .signInButton {
-      min-width: 7rem;
+      min-width: 7.5rem;
       background-color: transparent;
       border: 1px solid $indigo-blue;
       color: $indigo-blue;
+
+      @include mobile() {
+        display: none;
+      }
 
       &:hover {
         background-color: $indigo-blue;
