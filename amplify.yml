@@ -14,6 +14,8 @@ env:
       REACT_APP_CONTRIBUTE_URL: "https://github.com/opengovsg/postmangovsg"
       REACT_APP_TC_URL: "https://guide.postman.gov.sg/t-c.html"
       REACT_APP_REPORT_BUG_URL: "https://form.gov.sg/#!/5e8db1736d789b0011743202"
+      REACT_APP_REQUEST_URL: "https://form.gov.sg/#!/5ec2064a85d58100112184a4"
+      REACT_APP_PRIVACY_URL: "https://guide.postman.gov.sg/privacy.html"
 frontend:
   phases:
     preBuild:
