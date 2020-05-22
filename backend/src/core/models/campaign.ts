@@ -4,10 +4,11 @@ import { CampaignS3ObjectInterface } from '@core/interfaces'
 import { Credential } from './credential'
 import { User } from './user'
 import { JobQueue } from './job-queue'
+import { Statistic } from './statistic'
 import { EmailTemplate } from '@email/models'
 import { SmsTemplate } from '@sms/models'
 
-@Table({ tableName: 'campaigns' , underscored: true, timestamps: true })
+@Table({ tableName: 'campaigns', underscored: true, timestamps: true })
 export class Campaign extends Model<Campaign> {
   @HasMany(() => JobQueue, { as: 'job_queue' })
   @HasOne(() => EmailTemplate, { as: 'email_templates' })
@@ -53,4 +54,7 @@ export class Campaign extends Model<Campaign> {
     allowNull: false,
   })
   valid!: boolean
+
+  @HasOne(() => Statistic)
+  statistic?: Statistic
 }
