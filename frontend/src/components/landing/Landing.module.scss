@@ -610,8 +610,11 @@ $section-vertical-padding: 4rem;
       a {
         color: $light-blue;
         margin-right: 2rem;
-        margin-top: 3rem;
         font-size: 0.75rem;
+
+        @include mobile() {
+          margin-top: 3rem;
+        }
       }
     }
 
