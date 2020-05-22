@@ -18,7 +18,7 @@ const missingEnvVars = [
   'REACT_APP_REQUEST_URL',
   'REACT_APP_PRIVACY_URL',
   'REACT_APP_TC_URL',
-  'REACT_APP_REPORT_BUG_URL'
+  'REACT_APP_REPORT_BUG_URL',
 ].reduce(function (acc: string[], name: string){
   if (process.env[name] === undefined) acc.push(name)
   return acc
@@ -42,4 +42,4 @@ export const CONTRIBUTE_URL = process.env.REACT_APP_CONTRIBUTE_URL as string
 export const REQUEST_URL = process.env.REACT_APP_REQUEST_URL as string
 export const PRIVACY_URL = process.env.REACT_APP_PRIVACY_URL as string
 export const TC_URL = process.env.REACT_APP_TC_URL as string
-export const REPORT_BUG_URL = process.env.REACT_BUG_REPORT_URL as string
+export const REPORT_BUG_URL = process.env.REACT_APP_REPORT_BUG_URL as string

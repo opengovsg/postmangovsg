@@ -2,7 +2,14 @@ import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_URL, CONTACT_US_URL, CONTRIBUTE_URL } from 'config'
+import {
+  GUIDE_URL,
+  CONTACT_US_URL,
+  CONTRIBUTE_URL,
+  PRIVACY_URL,
+  TC_URL,
+  REPORT_BUG_URL,
+} from 'config'
 import PrimaryButton from 'components/common/primary-button'
 import Navbar from './nav-bar'
 import Banner from './banner'
@@ -43,6 +50,8 @@ const Landing = () => {
     { img: momAgencyImg, alt: 'MOM' },
     { img: moeAgencyImg, alt: 'MOE' },
   ]
+
+  console.log(REPORT_BUG_URL)
 
   const reasons = [
     {
@@ -93,7 +102,7 @@ const Landing = () => {
             </h2>
             <div className={styles.signInRow}>
               <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
-                Sign in <img className={styles.arrowRight} src={arrowRight}/>
+                Sign in <img className={styles.arrowRight} src={arrowRight} alt="Right arrow"/>
               </PrimaryButton>
               <div className={styles.signInText}>
                 <span className={styles.needHelp}>Need help?</span>
@@ -184,7 +193,7 @@ const Landing = () => {
 
             <div className={styles.buttonRow}>
               <PrimaryButton className={styles.getStartedButton} onClick={directToSignIn}>
-                    Get started<img className={styles.arrowRight} src={arrowRight}/>
+                    Get started<img className={styles.arrowRight} src={arrowRight} alt="Right arrow"/>
               </PrimaryButton>
               <a href={CONTACT_US_URL}>Have a question?</a>
             </div>
@@ -214,9 +223,9 @@ const Landing = () => {
         <div className={styles.lineBreak}></div>
         <div className={cx(styles.footer, styles.fixWidth)}>
           <div className={styles.links}>
-            <a href="" target="_blank" rel="noopener noreferrer">Privacy</a>
-            <a href="" target="_blank" rel="noopener noreferrer">Terms of use</a>
-            <a href="" target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
+            <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer">Privacy</a>
+            <a href={TC_URL} target="_blank" rel="noopener noreferrer">Terms of use</a>
+            <a href={REPORT_BUG_URL} target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
           </div>
           <span>&copy; {getYear()} Open Government Products</span>
           <div className={styles.builtByMobile}>

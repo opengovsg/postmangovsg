@@ -13,7 +13,7 @@ const NavBar = () => {
 
   return (
     <nav className={styles.navBar}>
-      <a className={styles.appLogo}>
+      <a className={styles.appLogo} href="/">
         <img src={AppLogo} alt="Postman logo" />
       </a>
       <div className={styles.navbarLinks}>
