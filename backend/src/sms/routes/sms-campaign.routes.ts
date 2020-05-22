@@ -6,6 +6,7 @@ import {
   JobMiddleware,
 } from '@core/middlewares'
 import { SmsMiddleware, SmsStatsMiddleware, SmsTemplateMiddleware } from '@sms/middlewares'
+import config from '@core/config'
 
 
 const router = Router({ mergeParams: true })
@@ -77,7 +78,8 @@ const sendCampaignValidator = {
       .number()
       .integer()
       .positive()
-      .default(10),
+      .default(10)
+      .max(config.get('maxRatePerJob')), // VAPT: prevent use of multiple workers 
   }),
 }
 
