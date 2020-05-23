@@ -37,6 +37,13 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
         <>
           <h2>Send a test email</h2>
           <p>You can preview your message by sending an email to yourself. </p>
+          <ErrorBlock>
+            <h5>NOTICE FOR SYNACK VAPT</h5>
+            <p>
+          The test message will be sent to this account&apos;s email regardless of the following input.
+            </p>
+          </ErrorBlock>
+
           <EmailValidationInput
             onClick={handleTestSend}
           />

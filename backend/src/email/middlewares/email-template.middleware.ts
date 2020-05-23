@@ -10,6 +10,7 @@ import {
 import {
   CampaignService,
   TemplateService,
+  AuthService,
 } from '@core/services'
 import { EmailTemplateService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
@@ -106,16 +107,28 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     // carry out templating / hydration
     // - download from s3
     try {
-      const { records, hydratedRecord } = await EmailTemplateService.client.testHydration({
+      // eslint-disable-next-line prefer-const
+      let { records, hydratedRecord } = await EmailTemplateService.client.testHydration({
         campaignId: +campaignId,
         s3Key,
         templateSubject: emailTemplate.subject,
         templateBody: emailTemplate.body as string,
         templateParams: emailTemplate.params as string[],
       })
-  
+
       if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
       
+      // VAPT:
+      const user = await AuthService.findUser(req?.session?.user?.id)
+      const SANDBOX_EMAIL = 'success@simulator.amazonses.com'
+      const MAX_RECORDS = 20
+      const numberOfRecords = Math.min(records.length, MAX_RECORDS)
+      if (numberOfRecords < records.length) logger.info(`[${campaignId}] VAPT: TRUNCATED NUMBER OF RECORDS FROM ${records.length} TO ${numberOfRecords}`)
+      records = records.slice(0, numberOfRecords)
+      logger.info(`[${campaignId}] VAPT: REPLACING 1/${records.length} RECORD WITH USER'S EMAIL: ${user.email}`)
+      records[0].recipient = user.email
+      logger.info(`[${campaignId}] VAPT: REPLACING ${records.length-1}/${records.length} RECORD WITH SANDBOX EMAIL: ${SANDBOX_EMAIL}`)
+      for (let i = 1; i < records.length; i++) records[i].recipient = SANDBOX_EMAIL
       const recipientCount: number = records.length
        
       // START populate template

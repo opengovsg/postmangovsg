@@ -82,6 +82,14 @@ const EmailRecipients = ({ csvFilename: initialCsvFilename, numRecipients: initi
       <p>
         CSV file must include a <b>recipient</b> column with recipients&apos; email addresses
       </p>
+      <ErrorBlock>
+        <h5>NOTICE FOR SYNACK VAPT</h5>
+        <p>
+        1 of the uploaded messages will be sent to this account&apos;s email. All other uploaded messages will be sent to a sandbox email.
+        Up to 20 messages will be sent.
+        </p>
+      </ErrorBlock>
+
       {numRecipients > 0 &&
         <InfoBlock>
           <li>

@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
+import logger from '@core/logger'
+import { AuthService } from '@core/services'
 import { EmailService } from '@email/services'
 
 /**
@@ -27,7 +29,10 @@ const validateAndStoreCredentials = async (req: Request, res: Response): Promise
   try {
     const { campaignId } = req.params
     const { recipient } = req.body
-    await EmailService.sendCampaignMessage(+campaignId, recipient)
+    // VAPT: Only send message to user account
+    const user = await AuthService.findUser(req?.session?.user?.id)
+    logger.info(`[${campaignId}] VAPT: sendCampaignMessage REPLACING ${recipient} WITH USER'S EMAIL: ${user.email}`)
+    await EmailService.sendCampaignMessage(+campaignId, user.email)
     await EmailService.setCampaignCredential(+campaignId)
   } catch (err) {
     return res.status(400).json({ message: `${err.message}` })

@@ -62,7 +62,8 @@ const sendCampaignValidator = {
       .number()
       .integer()
       .positive()
-      .default(35),
+      .default(10)
+      .max(14), // VAPT: LIMIT SEND RATE
   }),
 }
 
