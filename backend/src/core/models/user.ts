@@ -1,4 +1,4 @@
-import { Column, DataType, Model, Table, BeforeUpdate, BeforeCreate, HasMany } from 'sequelize-typescript'
+import { Column, DataType, Model, Table, BeforeCreate, HasMany } from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
@@ -25,7 +25,7 @@ export class User extends Model<User> {
   // During programmatic creation of users (users signing up by themselves), emails must end in a whitelisted domain
   // If we manually insert the user into the database, then this hook is bypassed.
   // This enables us to whitelist specific emails that do not end in a whitelisted domain, which can sign in, but not sign up.
-  @BeforeUpdate
+  // Since updating of email is never done programtically, we are not adding this as a BeforeUpdate hook
   @BeforeCreate
   static validateEmail(instance: User): void {
     if (!validateDomain(instance.email)) {
@@ -38,7 +38,7 @@ export class User extends Model<User> {
     const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
     const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
     this.apiKey = apiKeyHash
-    this.save()
+    await this.save()
     return apiKeyPlainText
   }
 }
