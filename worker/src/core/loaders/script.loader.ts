@@ -7,7 +7,9 @@ import { sqlFilePaths as emailSqlFilePaths } from '@email/resources/sql'
 import { sqlFilePaths as smsSqlFilePaths } from '@sms/resources/sql'
 
 const scriptLoader = async (): Promise<void> => {
-  const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+  const dialectOptions = config.get('IS_PROD')
+    ? config.get('database.dialectOptions')
+    : {}
   const sequelize = new Sequelize(config.get('database.databaseUri'), {
     dialect: 'postgres',
     logging: false,
@@ -15,7 +17,7 @@ const scriptLoader = async (): Promise<void> => {
     dialectOptions,
   })
   await sequelize.sync()
-  
+
   const scriptsFilePaths = [
     ...sqlFilePaths,
     ...emailSqlFilePaths,
@@ -35,8 +37,10 @@ const scriptLoader = async (): Promise<void> => {
     .then(() => {
       logger.info('Sql scripts loaded')
     })
-    .catch(err => {
-      logger.error(`Could not load sql scripts from ${scriptsFilePaths} \t ${err}`)
+    .catch((err) => {
+      logger.error(
+        `Could not load sql scripts from ${scriptsFilePaths} \t ${err}`
+      )
       process.exit(1)
     })
 }
