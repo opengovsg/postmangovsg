@@ -17,7 +17,11 @@
     "postinstall": "npm run postinstall:backend && npm run postinstall:worker && npm run postinstall:frontend",
     "postinstall:frontend": "cd frontend && npm install",
     "postinstall:backend": "cd backend && npm install",
-    "postinstall:worker": "cd worker && npm install"
+    "postinstall:worker": "cd worker && npm install",
+    "precommit": "npm run precommit:frontend && npm run precommit:backend && npm run precommit:worker",
+    "precommit:frontend": "cd frontend && npm run precommit",
+    "precommit:backend": "cd backend && npm run precommit",
+    "precommit:worker": "cd worker && npm run precommit"
   },
   "repository": {
     "type": "git",
@@ -32,6 +36,12 @@
   "dependencies": {},
   "devDependencies": {
     "concurrently": "^5.1.0",
+    "husky": "^4.2.5",
     "typescript": "^3.8.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit"
+    }
   }
 }
