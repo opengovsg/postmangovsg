@@ -1,13 +1,22 @@
-import { BeforeCreate, BeforeUpdate, BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
+import {
+  BeforeCreate,
+  BeforeUpdate,
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript'
 
 import { Campaign } from '@core/models/campaign'
 import { SmsTemplateService } from '@sms/services'
 
-@Table({ tableName: 'sms_templates' , underscored: true, timestamps: true })
+@Table({ tableName: 'sms_templates', underscored: true, timestamps: true })
 export class SmsTemplate extends Model<SmsTemplate> {
   @ForeignKey(() => Campaign)
   @Column({
-    type:DataType.INTEGER,
+    type: DataType.INTEGER,
     primaryKey: true,
   })
   campaignId!: number
@@ -32,8 +41,9 @@ export class SmsTemplate extends Model<SmsTemplate> {
   @BeforeCreate
   static generateParams(instance: SmsTemplate): void {
     if (!instance.body) return
-    const parsedTemplate = SmsTemplateService.client.parseTemplate(instance.body)
+    const parsedTemplate = SmsTemplateService.client.parseTemplate(
+      instance.body
+    )
     instance.params = parsedTemplate.variables
   }
-
 }

@@ -6,12 +6,12 @@ import { RedisService } from '@core/services'
 
 /**
  * Initializes a session manager for logins
- * 
+ *
  */
-const sessionLoader = ({ app }: {app: express.Application}): void => {
+const sessionLoader = ({ app }: { app: express.Application }): void => {
   const sessionStore: connectRedis.RedisStore = connectRedis(session)
-  if (!config.get('session.secret')){
-    throw new Error('\'session.secret\' required but missing\'')
+  if (!config.get('session.secret')) {
+    throw new Error("'session.secret' required but missing'")
   }
   const sessionOptions: session.SessionOptions = {
     name: config.get('session.cookieName'),

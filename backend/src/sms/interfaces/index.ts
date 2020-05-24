@@ -4,7 +4,7 @@ export * from './sms.interface'
  * @swagger
  *  components:
  *    schemas:
- * 
+ *
  *      SMSCampaign:
  *       type: object
  *       properties:
@@ -20,7 +20,7 @@ export * from './sms.interface'
  *         valid:
  *           type: boolean
  *         csv_filename:
- *           type: string 
+ *           type: string
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
  *           default: 'SMS'

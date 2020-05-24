@@ -16,9 +16,7 @@ const options = {
         url: 'https://choosealicense.com/licenses/mit/',
       },
     },
-    servers: [
-      { url: '/v1' },
-    ],
+    servers: [{ url: '/v1' }],
   },
   apis: ['build/**/*.js'],
 }
@@ -29,14 +27,25 @@ const swaggerUiOptions = {
   customCss: '.swagger-ui .topbar { display: none; }',
 }
 
-const removeCspHeader = (_req: Request, res: Response, next: NextFunction): void => {
+const removeCspHeader = (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   res.removeHeader('Content-Security-Policy')
   next()
 }
 
 const swaggerLoader = ({ app }: { app: Application }): void => {
-  app.use('/docs', removeCspHeader, swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions))
-  logger.info({ message: 'Swagger docs generated.' }) /*, JSON.stringify(swaggerSpec, null, 2) */
+  app.use(
+    '/docs',
+    removeCspHeader,
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, swaggerUiOptions)
+  )
+  logger.info({
+    message: 'Swagger docs generated.',
+  }) /*, JSON.stringify(swaggerSpec, null, 2) */
 }
 
 export default swaggerLoader

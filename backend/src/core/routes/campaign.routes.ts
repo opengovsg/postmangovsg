@@ -7,30 +7,17 @@ const router = Router()
 // validators
 const listCampaignsValidator = {
   [Segments.QUERY]: Joi.object({
-    limit: Joi
-      .number()
-      .integer()
-      .min(1)
-      .optional(),
-    offset: Joi
-      .number()
-      .integer()
-      .min(0)
-      .optional(),
+    limit: Joi.number().integer().min(1).optional(),
+    offset: Joi.number().integer().min(0).optional(),
   }),
 }
 
 const createCampaignValidator = {
   [Segments.BODY]: Joi.object({
-    type: Joi
-      .string()
+    type: Joi.string()
       .valid(...Object.values(ChannelType))
       .required(),
-    name: Joi.
-      string()
-      .max(255)
-      .trim()
-      .required(),
+    name: Joi.string().max(255).trim().required(),
   }),
 }
 
@@ -52,7 +39,7 @@ const createCampaignValidator = {
  *          schema:
  *            type: integer
  *            minimum: 1
-*        - in: query
+ *        - in: query
  *          name: offset
  *          description: offset to begin returning campaigns from
  *          required: false
@@ -72,7 +59,11 @@ const createCampaignValidator = {
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/', celebrate(listCampaignsValidator), CampaignMiddleware.listCampaigns)
+router.get(
+  '/',
+  celebrate(listCampaignsValidator),
+  CampaignMiddleware.listCampaigns
+)
 
 /**
  * @swagger
@@ -112,12 +103,16 @@ router.get('/', celebrate(listCampaignsValidator), CampaignMiddleware.listCampai
  *                  type: string
  *                  format: date-time
  *                 type:
- *                  $ref: '#/components/schemas/ChannelType'   
+ *                  $ref: '#/components/schemas/ChannelType'
  *        "401":
  *           description: Unauthorized
  *        "500":
- *           description: Internal Server Error              
+ *           description: Internal Server Error
  */
-router.post('/', celebrate(createCampaignValidator), CampaignMiddleware.createCampaign)
+router.post(
+  '/',
+  celebrate(createCampaignValidator),
+  CampaignMiddleware.createCampaign
+)
 
 export default router
