@@ -5,13 +5,12 @@ node_js:
 services:
   - docker
 
-# Skip the automatic npm ci step
-install: skip
 cache:
   directories:
     - backend/node_modules
     - worker/node_modules
     - frontend/node_modules
+    - ./node_modules
 
 # Deploy from Dockerfile
 jobs:
@@ -22,7 +21,7 @@ jobs:
       install:
         - npm install
       script:
-        - npm run lint
+        - npm run lint-no-fix
         - npm run test
       deploy:
         - provider: elasticbeanstalk
@@ -51,7 +50,7 @@ jobs:
       install:
         - npm install
       script:
-        - npm run lint
+        - npm run lint-no-fix
       deploy:
         - provider: script
           script: ./deploy.sh postmangovsg-workers staging-sending staging-logger
@@ -69,7 +68,7 @@ jobs:
       install:
         - npm install
       script:
-        - npm run lint
+        - npm run lint-no-fix
         - CI=false npm run build
     - name: serverless
       before_deploy:
@@ -118,3 +117,8 @@ jobs:
           zip: "../postman-api-gateway-authorizer/code.zip"
           on:
             branch: $PRODUCTION_BRANCH
+    - name: root
+      install:
+        - npm install --ignore-scripts
+      script:
+        - npm run lint-no-fix

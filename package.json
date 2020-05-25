@@ -23,7 +23,8 @@
     "precommit:backend": "cd backend && npm run precommit",
     "precommit:worker": "cd worker && npm run precommit",
     "precommit:root": "lint-staged",
-    "lint": "prettier --write '**/*.{yml,md}' --loglevel silent"
+    "lint-no-fix": "prettier --check '**/*.{yml,md}'",
+    "lint": "prettier --write '**/*.{yml,md}' --loglevel warn"
   },
   "repository": {
     "type": "git",

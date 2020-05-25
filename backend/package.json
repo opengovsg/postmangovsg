@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rimraf build && tsc",
     "dev": "npm run postbuild && tsc-watch --onSuccess \"node ./build/server.js\"",
-    "lint": "tsc --noEmit && eslint --ext .js,.ts --cache --fix .",
+    "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
+    "lint": "npm run lint-no-fix -- --fix",
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
