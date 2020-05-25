@@ -65,7 +65,7 @@
   }
 
   .complete {
-    @include button ($turquoise-green);
+    @include button($turquoise-green);
     pointer-events: none;
   }
 }

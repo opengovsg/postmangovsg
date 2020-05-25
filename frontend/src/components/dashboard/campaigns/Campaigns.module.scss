@@ -23,7 +23,9 @@
   max-width: 100%;
 
   table.campaignTable {
-    min-width: calc(#{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding});
+    min-width: calc(
+      #{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding}
+    );
     width: 100%;
 
     tbody tr {
@@ -36,7 +38,6 @@
         opacity: 0.5;
       }
     }
-
   }
 }
 
