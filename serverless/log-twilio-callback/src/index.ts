@@ -13,7 +13,7 @@ exports.handler = async (event: any) => {
 
     const { messageId, campaignId } = event.pathParameters
     const { MessageSid: twilioMessageId, MessageStatus: twilioMessageStatus, ErrorCode: twilioErrorCode } = querystring.parse(event.body)
-    console.log(JSON.stringify(event))
+
     // Do not process message if it's not of a finalized delivery status
     if (FINALIZED_STATUS.indexOf(twilioMessageStatus as string) === -1) {
       return {
