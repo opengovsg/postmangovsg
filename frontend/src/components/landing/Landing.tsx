@@ -201,7 +201,7 @@ const Landing = () => {
               <PrimaryButton className={styles.getStartedButton} onClick={directToSignIn}>
                     Get started<img className={styles.arrowRight} src={arrowRight} alt="Right arrow"/>
               </PrimaryButton>
-              <a href={CONTACT_US_URL}>Have a question?</a>
+              <a href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Have a question?</a>
             </div>
           </div>
           <div className={styles.imageContainer}>
