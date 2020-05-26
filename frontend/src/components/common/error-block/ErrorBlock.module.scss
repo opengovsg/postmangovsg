@@ -11,6 +11,7 @@
       left: 0;
       right: 0;
     }
+    white-space: pre-wrap;
     @include block($light-red, $red);
   }
 }
