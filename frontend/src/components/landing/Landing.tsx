@@ -112,11 +112,11 @@ const Landing = () => {
             <Lottie options={
               {
                 loop: false,
-                autoplay: true, 
+                autoplay: true,
                 animationData: landingAnimation,
                 rendererSettings: {
-                  preserveAspectRatio: 'xMidYMid slice'
-                }
+                  preserveAspectRatio: 'xMidYMid slice',
+                },
               }
             }/>
           </div>
