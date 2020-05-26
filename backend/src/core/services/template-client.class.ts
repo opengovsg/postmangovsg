@@ -86,7 +86,7 @@ export default class TemplateClient {
           // only allow alphanumeric template, prevents code execution
           const keyHasValidChars = (key.match(/[^a-zA-Z0-9]/) === null)
           if (!keyHasValidChars) {
-            throw new TemplateError(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.\nKeywords like {{ Person_Name }} are not allowed, but {{ PersonName }} is allowed."`)
+            throw new TemplateError(`Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters and numbers.\nKeywords like {{ Person_Name }} are not allowed, but {{ PersonName }} is allowed.`)
           }
 
           // add key regardless, note that this is also returned in lowercase
@@ -117,7 +117,7 @@ export default class TemplateClient {
     } catch (err) {
       logger.error({ message: `${err.stack}` })
       if (err.message.includes('unclosed tag')) throw new TemplateError('Check that all the keywords have double curly brackets around them.\nA correct example is {{ keyword }}, and incorrect ones are {{ keyword } or {{ keyword . ')
-      if (err.message.includes('unclosed string')) throw new TemplateError("Check that the keywords only contain letters and numbers.\nKeywords like {{ Person's Name }} are not allowed, but {{ PersonsName }} is allowed.")
+      if (err.message.includes('unclosed string')) throw new TemplateError('Check that the keywords only contain letters and numbers.\nKeywords like {{ Person\'s Name }} are not allowed, but {{ PersonsName }} is allowed.')
       if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
       throw err
     }
