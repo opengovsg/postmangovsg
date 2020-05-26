@@ -14,7 +14,7 @@ export default class TwilioClient {
     const { accountSid, apiKey, apiSecret, messagingServiceSid } = credential
     this.client = twilio(apiKey, apiSecret, { accountSid })
     this.messagingServiceSid = messagingServiceSid
-    this.hasCallback = config.get('twilioCallbackSecret') !== '' && config.get('backendUrl') !== ''
+    this.hasCallback = config.get('callbackSecret') !== '' && config.get('backendUrl') !== ''
     if (!this.hasCallback){
       logger.info('Missing callback parameters. No status callback will be provided')
     }
@@ -54,7 +54,7 @@ export default class TwilioClient {
 
     const username = Math.random().toString(36)
       .substring(2, 15) // random string
-    const password: string = username + messageId + campaignId + config.get('twilioCallbackSecret')
+    const password: string = username + messageId + campaignId + config.get('callbackSecret')
     const hashedPwd = await bcrypt.hash(password, SALT_ROUNDS)
 
     const callbackUrl= new URL(config.get('backendUrl'))
