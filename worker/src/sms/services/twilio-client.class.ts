@@ -8,28 +8,26 @@ const SALT_ROUNDS = 10
 export default class TwilioClient {
   private client: any;
   private messagingServiceSid: string;
+  private hasCallback: boolean;
 
   constructor(credential: TwilioCredentials) {
     const { accountSid, apiKey, apiSecret, messagingServiceSid } = credential
     this.client = twilio(apiKey, apiSecret, { accountSid })
     this.messagingServiceSid = messagingServiceSid
+    this.hasCallback = config.get('twilioCallbackSecret') !== '' && config.get('backendUrl') !== ''
+    if (!this.hasCallback){
+      logger.info('Missing callback parameters. No status callback will be provided')
+    }
   }
 
   public send(messageId: number, recipient: string, message: string, campaignId?: number): Promise<string | void> {
-    return this.generateUsernamePassword(messageId, campaignId)
-      .then(({ username, password }) => {
-        const callbackUrl= new URL(config.get('backendUrl'))
-        callbackUrl.username = username
-        // encode password as the hash contains special characters
-        callbackUrl.password = encodeURIComponent(password)
-        callbackUrl.pathname = `${callbackUrl.pathname}/campaign/${campaignId}/message/${messageId}`
-        logger.info(`Status callback url for ${messageId}: ${callbackUrl}`)
-
+    return this.generateStatusCallbackUrl(messageId, campaignId)
+      .then((callbackUrl) => {
         return this.client.messages.create({
           to: this.addDefaultCountryCode(recipient),
           body: this.replaceNewLines(message),
           from: this.messagingServiceSid,
-          statusCallback: callbackUrl.toString(),
+          ...(callbackUrl ? { statusCallback: callbackUrl } : {}),
         })
       })
       .then((result: { [key: string]: string }) => {
@@ -51,28 +49,22 @@ export default class TwilioClient {
       })
   }
 
-  private generateUsernamePassword(messageId: number, campaignId?: number): Promise<{username: string; password: string}> {
+  private async generateStatusCallbackUrl(messageId: number, campaignId?: number): Promise<string | undefined> {
+    if (!this.hasCallback) return undefined
+
     const username = Math.random().toString(36)
       .substring(2, 15) // random string
-    const password = username + messageId + campaignId + config.get('callbackSecret')
-    return this.generateHash(password)
-      .then((hashedPwd: string) => {
-        return { username, password: hashedPwd }
-      })
-      .catch(error => {
-        throw error
-      })
-  }
+    const password: string = username + messageId + campaignId + config.get('twilioCallbackSecret')
+    const hashedPwd = await bcrypt.hash(password, SALT_ROUNDS)
 
-  private generateHash(value: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      bcrypt.hash(value, SALT_ROUNDS, (error: Error, hash: string) => {
-        if (error) {
-          reject(new Error(`Failed to hash value: ${error}`))
-        }
-        resolve(hash)
-      })
-    })
+    const callbackUrl= new URL(config.get('backendUrl'))
+    callbackUrl.username = username
+    // encode password as the hash contains special characters
+    callbackUrl.password = encodeURIComponent(hashedPwd)
+    callbackUrl.pathname = `${callbackUrl.pathname}/campaign/${campaignId}/message/${messageId}`
+    logger.info(`Status callback url for ${messageId}: ${callbackUrl}`)
+    return callbackUrl.toString()
+
   }
 
   private addDefaultCountryCode(recipient: string): string {

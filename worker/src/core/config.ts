@@ -175,7 +175,7 @@ const config = convict({
     sensitive: true,
   },
   backendUrl: {
-    doc: 'URL where backend is hosted',
+    doc: 'URL where the callback backend is hosted',
     default: '',
     env: 'BACKEND_URL',
     sensitive: true,
