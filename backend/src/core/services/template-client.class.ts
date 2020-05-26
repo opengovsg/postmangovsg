@@ -51,61 +51,63 @@ export default class TemplateClient {
       const parseTree = (Sqrl.parse(templateBody, Sqrl.defaultConfig))
       parseTree.forEach((astObject: AstObject) => {
         // AstObject = TemplateObject | string
-        if (typeof astObject !== 'string') { // ie. it is a TemplateObject
-          const templateObject = astObject as TemplateObject
-          // templateObject.t means TagType, default is r
-          // templateObject.raw means ???
-          // templateObject.f refers to filter (eg. {{ var | humanize }}), we want to make sure this is empty
-          if (templateObject.t === 'r' && !templateObject.raw && templateObject.f?.length === 0) {
-            /**
-             * - templateObject.c has type string | undefined
-             * - templateObject.c contains the param key, c stands for content
-             * - this is the extracted variable name from the template AST
-             * - this extracted key is already trimmed (ie. no leading nor trailing spaces)
-             * - coerce to lowercase for comparison
-            */
-            const key = templateObject.c?.toLowerCase()
-  
-            if (key !== undefined) {
-  
-              if (key.length === 0) {
-                throw new TemplateError('Blank template variable provided')
-              }
-  
-              // only allow alphanumeric template, prevents code execution
-              const keyHasValidChars = (key.match(/[^a-zA-Z0-9]/) === null)
-              if (!keyHasValidChars) {
-                throw new TemplateError(`Invalid characters in param named {{${key}}}. Only alphanumeric characters allowed.`)
-              }
-  
-              // add key regardless, note that this is also returned in lowercase
-              variables.push(key)
-              
-              // if no params continue with the loop
-              if (!params) return
-  
-              // if params provided == attempt to carry out templating
-              if (dict[key]) {
-                const templated = dict[key]
-                tokens.push(templated)
-                return
-              }
-  
-              // recipient key must have param
-              if (key === 'recipient') throw new TemplateError(`Param ${templateObject.c} not found`)
-  
-            } else { // I have not found an edge case that trips this yet
-              logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)
-              throw new TemplateError('TemplateObject has no content')
-            }
-          } else {
-            // FIXME: be more specific about templateObject, just pass the error itself?
-            logger.error (`Templating error: invalid template provided. templateObject= ${JSON.stringify(templateObject)}`)
-            throw new TemplateError('Invalid template provided')
-          }
-        } else {
-          // normal string (non variable portion)
+
+        // normal string (non variable portion)
+        if (typeof astObject === 'string') {
           tokens.push(astObject)
+          return
+        }
+
+        // ie. it is a TemplateObject
+        const templateObject = astObject as TemplateObject
+        // templateObject.t means TagType, default is r
+        // templateObject.raw means ???
+        // templateObject.f refers to filter (eg. {{ var | humanize }}), we want to make sure this is empty
+        if (templateObject.t === 'r' && !templateObject.raw && templateObject.f?.length === 0) {
+          /**
+           * - templateObject.c has type string | undefined
+           * - templateObject.c contains the param key, c stands for content
+           * - this is the extracted variable name from the template AST
+           * - this extracted key is already trimmed (ie. no leading nor trailing spaces)
+           * - coerce to lowercase for comparison
+          */
+          const key = templateObject.c?.toLowerCase()
+
+          // Have not found a case that triggers this
+          if (key === undefined) {
+            logger.error(`Templating error: templateObject.c of ${templateObject} is undefined.`)
+            throw new TemplateError('TemplateObject has no content')
+          }
+
+          if (key.length === 0) {
+            throw new TemplateError('Blank template variable provided.\nA correct example is {{person}}, an incorrect example is {{}}.')
+          }
+
+          // only allow alphanumeric template, prevents code execution
+          const keyHasValidChars = (key.match(/[^a-zA-Z0-9]/) === null)
+          if (!keyHasValidChars) {
+            throw new TemplateError(`Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters and numbers.\nKeywords like {{ Person_Name }} are not allowed, but {{ PersonName }} is allowed.`)
+          }
+
+          // add key regardless, note that this is also returned in lowercase
+          variables.push(key)
+          
+          // if no params continue with the loop
+          if (!params) return
+
+          // if params provided == attempt to carry out templating
+          if (dict[key]) {
+            const templated = dict[key]
+            tokens.push(templated)
+            return
+          }
+
+          // recipient key must have param
+          if (key === 'recipient') throw new TemplateError(`Param ${templateObject.c} not found`)
+        } else {
+          // FIXME: be more specific about templateObject, just pass the error itself?
+          logger.error (`Templating error: invalid template provided. templateObject= ${JSON.stringify(templateObject)}`)
+          throw new TemplateError('Invalid template provided')
         }
       })
       return {
@@ -114,7 +116,8 @@ export default class TemplateClient {
       }
     } catch (err) {
       logger.error({ message: `${err.stack}` })
-      if (err.message.includes('unclosed tag')) throw new TemplateError('There are unclosed curly brackets in the template')
+      if (err.message.includes('unclosed tag')) throw new TemplateError('Check that all the keywords have double curly brackets around them.\nA correct example is {{ keyword }}, and incorrect ones are {{ keyword } or {{ keyword . ')
+      if (err.message.includes('unclosed string')) throw new TemplateError('Check that the keywords only contain letters and numbers.\nKeywords like {{ Person\'s Name }} are not allowed, but {{ PersonsName }} is allowed.')
       if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
       throw err
     }

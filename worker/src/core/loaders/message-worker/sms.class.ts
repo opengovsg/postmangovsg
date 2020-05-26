@@ -27,16 +27,16 @@ class SMS {
     }
     
     
-    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string}[]>   {
+    getMessages(jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; campaignId: number}[]>   {
       return this.connection.query('SELECT get_messages_to_send_sms(:job_id, :rate) ;',
         { replacements: { 'job_id': jobId, rate }, type: QueryTypes.SELECT },
       ).then((result) => (map(result, 'get_messages_to_send_sms')))
     }
       
-    sendMessage({ id, recipient, params, body }: { id: number; recipient: string; params: {[key: string]: string}; body: string }): Promise<void> {
+    sendMessage({ id, recipient, params, body, campaignId }: { id: number; recipient: string; params: {[key: string]: string}; body: string; campaignId?: number }): Promise<void> {
       return Promise.resolve()
         .then(() => {
-          return this.twilioClient?.send(recipient, templateClient.template(body, params))
+          return this.twilioClient?.send(id, recipient, templateClient.template(body, params), campaignId)
         })
         .then((messageId) => {
           return this.connection.query('UPDATE sms_ops SET delivered_at=clock_timestamp(), message_id=:messageId, updated_at=clock_timestamp() WHERE id=:id;',

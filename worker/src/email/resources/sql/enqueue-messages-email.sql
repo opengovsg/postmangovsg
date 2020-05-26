@@ -14,6 +14,7 @@ BEGIN
 	-- check for message_id is null because we dont want to enqueue messages that have already been sent
 	AND m.message_id is NULL
 	RETURNING 
+	id,
 	campaign_id, 
 	recipient, 
 	params, 
@@ -22,7 +23,8 @@ BEGIN
 	updated_at )
 
 	INSERT INTO email_ops 
-	(campaign_id, 
+	(id,
+	campaign_id, 
 	recipient, 
 	params, 
 	dequeued_at,

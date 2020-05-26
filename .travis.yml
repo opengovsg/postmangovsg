@@ -63,3 +63,48 @@ jobs:
     script:
       - npm run lint
       - CI=false npm run build
+  - name: serverless
+    before_deploy:
+      - cd serverless/log-twilio-callback
+      - npm install && npm run build
+      - zip -qr code.zip build package.json node_modules/
+      - cd ../postman-api-gateway-authorizer && zip -qr code.zip *
+    deploy:
+      - provider: lambda
+        function_name: log-twilio-callback-staging
+        region: $AWS_DEFAULT_REGION
+        role: $STAGING_TWILIO_CALLBACK_ROLE
+        runtime: nodejs12.x
+        module_name: build/index
+        handler_name: handler
+        timeout: 30
+        publish: true
+        zip: "../log-twilio-callback/code.zip"
+        environment_variables:
+          - TWILIO_CALLBACK_SECRET=$STAGING_TWILIO_CALLBACK_SECRET
+          - DB_URI=$STAGING_DB_URI
+        on:
+          branch: $STAGING_BRANCH
+      - provider: lambda
+        function_name: log-twilio-callback-production
+        region: $AWS_DEFAULT_REGION
+        role: $PRODUCTION_TWILIO_CALLBACK_ROLE
+        runtime: nodejs12.x
+        module_name: build/index
+        handler_name: handler
+        timeout: 30
+        publish: true
+        zip: "../log-twilio-callback/code.zip"
+        environment_variables:
+          - TWILIO_CALLBACK_SECRET=$PRODUCTION_TWILIO_CALLBACK_SECRET
+          - DB_URI=$PRODUCTION_DB_URI
+        on:
+          branch: $PRODUCTION_BRANCH
+      - provider: lambda
+        function_name: postman-api-gateway-authorizer
+        region: $AWS_DEFAULT_REGION
+        role: $POSTMAN_AUTHORIZER_ROLE
+        runtime: nodejs12.x
+        handler_name: handler
+        publish: true
+        zip: "../postman-api-gateway-authorizer/code.zip"
