@@ -1,15 +1,14 @@
-import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
+import { Sequelize } from 'sequelize-typescript'
 import config from './config'
 
 const sequelizeLoader = async () => {
-  const dialectOptions = config.IS_PROD ? { ...config.database.dialectOptions } : {}
-  const sequelize = new Sequelize(config.database.databaseUri, {
+  const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+  const sequelize = new Sequelize(config.get('database.databaseUri'), {
     dialect: 'postgres',
     logging: false,
-    pool: config.database.poolOptions,
+    pool: config.get('database.poolOptions'),
     dialectOptions,
-  } as SequelizeOptions)
-
+  })
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');

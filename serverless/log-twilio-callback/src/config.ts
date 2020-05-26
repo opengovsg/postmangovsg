@@ -1,36 +1,116 @@
+import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
+const rdsCa = fs.readFileSync(path.join(__dirname, './assets/db-ca.pem')) 
+/**
+ * To require an env var without setting a default,
+ * use
+ *    default: '',
+ *    format: 'required-string',
+ *    sensitive: true,
+ */
+convict.addFormats({
+  'required-string': {
+    validate:  (val: any): void => {
+      if (val === '') {
+        throw new Error('Required value cannot be empty')
+      }
+    },
+    coerce: (val: any): any => { 
+      if (val === null){
+        return undefined 
+      }
+      return val
+    },
+  },
+})
 
-const IS_PROD: boolean = process.env.NODE_ENV === 'production'
-
-// Database settings
-const databaseUri: string = process.env.DB_URI as string
-const SEQUELIZE_POOL_MAX_CONNECTIONS = 150
-const SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS = 600000
-const SEQUELIZE_POOL_CONNECTION_TIMEOUT = 30000
-const rdsCa: false | Buffer = IS_PROD && fs.readFileSync(path.join(__dirname, './assets/db-ca.pem'))
-
-// Twilio
-const twilioCallbackSecret: string = process.env.TWILIO_CALLBACK_SECRET as string
-
-export default {
-  IS_PROD,
+const config = convict({
+  env: {
+    doc: 'The application environment.',
+    format: ['production', 'staging', 'development'],
+    default: 'production',
+    env: 'NODE_ENV',
+  },
+  IS_PROD: {
+    default: true,
+  },
   database: {
-    databaseUri,
+    databaseUri: {
+      doc: 'URI to the postgres database',
+      default: '',
+      env: 'DB_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
     dialectOptions: {
       ssl: {
+        require: {
+          doc: 'Require SSL connection to database',
+          default: true,
+          env: 'DB_REQUIRE_SSL',
+        },
         rejectUnauthorized: true,
-        ca: [rdsCa],
+        ca: {
+          doc: 'SSL cert to connect to database',
+          default: [rdsCa],
+          format: '*',
+          sensitive: true,
+        },
       },
     },
     poolOptions: {
-      max: SEQUELIZE_POOL_MAX_CONNECTIONS,
-      min: 0,
-      acquire: SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS, // 10 min
-      connectionTimeoutMillis: SEQUELIZE_POOL_CONNECTION_TIMEOUT,
+      max: {
+        doc: 'Maximum number of connection in pool',
+        default: 150,
+        env: 'SEQUELIZE_POOL_MAX_CONNECTIONS',
+        format: 'int',
+      },
+      min: {
+        doc: 'Minimum number of connection in pool',
+        default: 0,
+        env: 'SEQUELIZE_POOL_MIN_CONNECTIONS',
+        format: 'int',
+      },
+      acquire: {
+        doc: 'Number of milliseconds to try getting a connection from the pool before throwing error',
+        default: 600000,
+        env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
+        format: 'int',
+      }, 
+      connectionTimeoutMillis: {
+        doc: 'Number of milliseconds to wait before timing out when connecting a new client',
+        default: 30000,
+        env: 'SEQUELIZE_POOL_CONNECTION_TIMEOUT',
+        format: 'int',
+      }
     },
   },
-  smsOptions: {
-    callbackSecret: twilioCallbackSecret
-  },
+  callbackSecret: {
+    doc: 'Secret used to generate the basic auth credentials for twilio callback',
+    default: '',
+    env: 'TWILIO_CALLBACK_SECRET',
+    format: 'required-string',
+    sensitive: true,
+  }
+})
+
+// Only development is a non-production environment
+// Override with local config
+if (config.get('env') === 'development'){
+  config.load({
+    'IS_PROD': false,
+    database: {
+      dialectOptions: {
+        ssl: {
+          require: false, // No ssl connection needed
+          rejectUnauthorized: true,
+          ca: false, 
+        },
+      },
+    },
+  })
 }
+
+
+export default config

@@ -18,7 +18,7 @@ export default class TwilioClient {
   public send(messageId: number, recipient: string, message: string, campaignId?: number): Promise<string | void> {
     return this.generateUsernamePassword(messageId, campaignId)
       .then(({ username, password }) => {
-        let callbackUrl= new URL(config.get('backendUrl'))
+        const callbackUrl= new URL(config.get('backendUrl'))
         callbackUrl.username = username
         // encode password as the hash contains special characters
         callbackUrl.password = encodeURIComponent(password)
@@ -54,7 +54,7 @@ export default class TwilioClient {
   private generateUsernamePassword(messageId: number, campaignId?: number): Promise<{username: string; password: string}> {
     const username = Math.random().toString(36)
       .substring(2, 15) // random string
-    const password = username + messageId + campaignId + config.get('twilioCallbackSecret')
+    const password = username + messageId + campaignId + config.get('callbackSecret')
     return this.generateHash(password)
       .then((hashedPwd: string) => {
         return { username, password: hashedPwd }
