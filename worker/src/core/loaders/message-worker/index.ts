@@ -47,11 +47,11 @@ const enqueueMessages = (jobId: number): Promise<void> => {
   return service().enqueueMessages(jobId)
 }
   
-const getMessages = (jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null}[]>  => {
+const getMessages = (jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null; campaignId?: number}[]>  => {
   return service().getMessages(jobId, rate)
 }
 
-const sendMessage = (message: { id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null }): Promise<void>  => {
+const sendMessage = (message: { id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null; campaignId?: number }): Promise<void>  => {
   return service().sendMessage(message)
 }
   

@@ -162,11 +162,23 @@ const config = convict({
       sensitive: true,
     },
     messagingServiceSid: {
-      doc: 'ID of the messaging service ',
+      doc: 'ID of the messaging service',
       default: '',
       env: 'TWILIO_MESSAGING_SERVICE_SID',
       sensitive: true,
     },
+  },
+  callbackSecret: {
+    doc: 'Secret key used to generate Twilio callback url',
+    default: '',
+    env: 'TWILIO_CALLBACK_SECRET',
+    sensitive: true,
+  },
+  backendUrl: {
+    doc: 'URL where the callback backend is hosted',
+    default: '',
+    env: 'BACKEND_URL',
+    sensitive: true,
   },
   xssOptions: {
     doc: 'List of html tags allowed',
