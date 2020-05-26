@@ -9,14 +9,23 @@
   font-style: normal;
 }
 
+$banner-max-width: 1400px;
+
 .container {
   background-color: #f0f0f0;
   height: auto;
-  padding: 4px 8%;
+  padding: 4px $site-padding;
   color: #484848;
+
+  @include mobile() {
+    padding: 4px $mobile-site-padding;
+  }
 
   a {
     @include flex-horizontal;
+    width: 100%;
+    max-width: $banner-max-width;
+    margin: 0 auto;
     align-items: center;
     color: #484848;
   }
@@ -46,4 +55,3 @@
 .bannerText {
   margin-left: 3px;
 }
-

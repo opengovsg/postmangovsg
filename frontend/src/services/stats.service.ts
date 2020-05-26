@@ -10,5 +10,5 @@ async function getLandingStats(): Promise<number | undefined> {
 }
 
 export {
-  getLandingStats
+  getLandingStats,
 }

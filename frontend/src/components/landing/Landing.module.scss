@@ -3,10 +3,37 @@
 
 $section-vertical-padding: 4rem;
 
-.fixWidth {
-  width: $landing-width;
-  max-width: 90vw;
+@mixin fixWidth($max-width: $landing-max-width) {
+  width: $max-width;
+  max-width: calc(100vw - (2 * #{$site-padding}));
   margin: 0 auto;
+
+  @include mobile() {
+    max-width: calc(100vw - (2 * #{$mobile-site-padding}));
+  }
+}
+
+.landing {
+  h1 {
+    font-size: 3.3rem !important;
+    line-height: 4rem;
+    font-weight: bold;
+  }
+
+  @include mobile() {
+    h1 {
+      font-size: 2.8rem !important;
+      line-height: 1.3;
+    }
+  }
+
+  h3 {
+    font-size: 1.5rem !important;
+  }
+
+  p {
+    font-size: 1.1rem !important;
+  }
 }
 
 .topContainer {
@@ -15,99 +42,94 @@ $section-vertical-padding: 4rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 0 $site-padding;
+  padding: 2rem $site-padding $section-vertical-padding;
   background-image: url('../../assets/img/landing/background-landing.png');
   background-repeat: no-repeat;
-  background-position: right top;
-  background-size: 50%;
+  background-position: right -5px;
+  background-size: auto 80%;
+  min-height: calc(100vh - 28px);
 
   @include mobile() {
     background-image: none;
+    padding: 1rem $mobile-site-padding $section-vertical-padding;
   }
 
   .innerContainer {
     @include flex-horizontal;
     justify-content: space-between;
-    padding-left: $site-padding;
 
-    width: 1400px;
-    max-width: 90vw;
-    margin: 0 auto;
+    min-height: 500px;
+    @include fixWidth($header-max-width);
 
     @include mobile() {
       flex-direction: column-reverse;
       justify-content: center;
-      padding: 2rem 1.5rem $site-padding;
     }
 
     .landingAnimation {
-       max-width: 680px;
+      max-width: 680px;
+      @include mobile {
+        max-width: 400px;
+      }
     }
 
     .textContainer {
       @include flex-vertical;
       width: 40%;
 
-
       @include mobile() {
         margin-top: 2rem;
-        align-items: center;
         width: 100%;
+      }
+
+      @mixin overflowHeaderText {
+        min-width: 450px;
+        max-width: 90vw;
+        @include mobile() {
+          min-width: unset;
+          max-width: unset;
+        }
       }
 
       .headerText {
         color: $indigo-blue;
-        font-size: 3.0rem;
-        width: 100%;
-        font-weight: bold;
-        line-height: 3.5rem;
-        margin-top: 1rem;
         margin-bottom: 0;
+        @include overflowHeaderText();
       }
 
       .sentMessages {
-        font-size: 1rem;
         @include flex-horizontal;
         flex-wrap: wrap;
-        align-items: flex-end;
+        align-items: baseline;
+        opacity: 0;
+        transition: opacity 1s ease-out;
+        @include overflowHeaderText();
 
-        .text {
-          line-height: 3.8rem;
-
-          @include mobile() {
-            margin-left: 1rem;
-            line-height: 3.3rem;
-          }
-        }
-
-        @include mobile() {
-          width: 100%;
-          @include flex-horizontal;
-          align-items: flex-end;
+        &.ready {
+          opacity: 1;
         }
 
         .numOfMessages {
-          font-size: 4.5rem;
+          font-size: 4rem;
           font-weight: 200;
-          margin-right: 0.5rem;
+          margin-top: 1.5rem;
+          margin-bottom: 2rem;
+          margin-right: 1rem;
 
           @include mobile() {
-            font-size: 3.5rem;
-            margin-right: 0;
+            font-size: 3rem;
+            margin-top: 2vh;
+            margin-bottom: 2vh;
+            margin-right: 1rem;
           }
         }
       }
 
       .signInRow {
         @include flex-horizontal;
-        flex-wrap: wrap;
-        align-items: center;
+        @include overflowHeaderText();
+        align-items: baseline;
 
-        @include mobile() {
-          margin-top: 0;
-          width: 100%;
-        }
-                
         .signInButton {
           min-width: 9rem;
           font-size: 0.9rem;
@@ -116,11 +138,10 @@ $section-vertical-padding: 4rem;
 
           @include mobile() {
             margin: 1rem 0;
-            min-width: 7rem;
           }
 
           &:hover {
-            background-color: #2121A5;
+            background-color: #2121a5;
           }
         }
 
@@ -134,22 +155,15 @@ $section-vertical-padding: 4rem;
           }
         }
 
-        .needHelp {
-            color: $indigo-blue;
-            @include mobile() {
-              margin-left: 1rem;
-            }
+        .contactUs {
+          margin-left: 0.5rem;
+          color: $indigo-blue;
+          font-size: 1rem;
+
+          &:hover {
+            color: $dark-blue;
           }
-          
-          .contactUs {
-            margin-left: 0.5rem;
-            color: $indigo-blue;
-            font-size: 1rem;
-            
-            &:hover {
-              font-weight: 500;
-            }
-          }
+        }
       }
     }
   }
@@ -158,10 +172,6 @@ $section-vertical-padding: 4rem;
     margin-top: 1rem;
     text-align: center;
     align-items: center;
-
-    @include mobile() {
-      margin-top: 0;
-    }
 
     .agencyHeader {
       font-size: 1rem;
@@ -176,11 +186,11 @@ $section-vertical-padding: 4rem;
     }
 
     .agencies {
-      margin-top: 3rem;
+      margin-top: 2rem;
       @include flex-horizontal;
       justify-content: space-between;
       width: 45rem;
-      max-width: 90vw;
+      max-width: 100%;
 
       @include mobile() {
         @include flex-vertical;
@@ -190,9 +200,9 @@ $section-vertical-padding: 4rem;
 
       img {
         width: 9rem;
-
         @include mobile() {
-          padding-bottom: 2rem;
+          width: 7rem;
+          margin-bottom: 3rem;
         }
       }
     }
@@ -200,21 +210,15 @@ $section-vertical-padding: 4rem;
 }
 
 .whyUsePostman {
-  height: auto;
-  width: $landing-width;
-  max-width: 90vw;
-  padding: $section-vertical-padding 0;
-  margin: 0 auto;
+  padding: $section-vertical-padding $site-padding;
   @include mobile() {
-    padding: 2rem $site-padding;
+    padding: $section-vertical-padding $mobile-site-padding;
   }
 
-
   .innerContainer {
-    height: 100%;
+    @include fixWidth();
     @include flex-vertical;
     align-items: center;
-    line-height: 1.6;
 
     h1 {
       color: $indigo-blue;
@@ -237,7 +241,8 @@ $section-vertical-padding: 4rem;
 
     p {
       color: $dark-blue;
-      font-size: 1.3rem;
+      font-size: 1.1rem;
+      line-height: 1.8rem;
     }
 
     .reasons {
@@ -263,12 +268,14 @@ $section-vertical-padding: 4rem;
       }
 
       video {
-        width: 55%;
+        width: 40%;
+        max-width: 550px;
         margin-right: 4rem;
 
         @include mobile() {
-          margin-top: 2rem;
+          margin-top: 3rem;
           margin-right: 0;
+          margin-bottom: 2rem;
           width: 100%;
         }
       }
@@ -289,10 +296,10 @@ $section-vertical-padding: 4rem;
         }
       }
     }
-    
+
     .lineBreak {
       display: none;
-      width:  100%;
+      width: 100%;
       margin-left: 0;
       margin-right: 0;
       border: 1px solid #b5c4ff;
@@ -316,12 +323,10 @@ $section-vertical-padding: 4rem;
           justify-content: center;
         }
 
-
         .desktopImg {
           width: 6rem;
           margin-top: 3rem;
-          
-          
+
           @include mobile() {
             display: none;
           }
@@ -330,11 +335,11 @@ $section-vertical-padding: 4rem;
         .textContainer {
           margin-left: 2rem;
           width: 100%;
-  
+
           @include mobile() {
             margin-left: 1rem;
           }
-          
+
           .longText {
             width: 90%;
             font-size: 1rem;
@@ -342,7 +347,7 @@ $section-vertical-padding: 4rem;
               width: 20rem;
             }
           }
-  
+
           span {
             color: $indigo-blue;
             font-size: 1rem;
@@ -351,7 +356,7 @@ $section-vertical-padding: 4rem;
           .agencyRow {
             @include flex-horizontal;
           }
-        } 
+        }
       }
 
       .comma {
@@ -382,9 +387,15 @@ $section-vertical-padding: 4rem;
 }
 
 .faq {
-  height: auto;
   background-color: $light-blue;
-  padding: $section-vertical-padding 0;
+  padding: $section-vertical-padding $site-padding;
+  @include mobile() {
+    padding: $section-vertical-padding $mobile-site-padding;
+  }
+
+  .innerContainer {
+    @include fixWidth();
+  }
 
   @include mobile() {
     display: none;
@@ -405,22 +416,17 @@ $section-vertical-padding: 4rem;
       font-weight: bold;
       font-size: 1.5rem;
     }
-  
+
     p {
       font-size: 1.2rem;
     }
-    
+
     li {
       font-size: 1.2rem;
       margin: 1rem;
 
       @include mobile() {
         margin: 0;
-      }
-
-      span {
-        color: $dark-blue;
-        font-weight: bold;
       }
     }
   }
@@ -429,9 +435,9 @@ $section-vertical-padding: 4rem;
 .onboarding {
   padding: $section-vertical-padding 0;
   background-color: $indigo-blue;
-  height: auto;
 
   .innerContainer {
+    @include fixWidth();
     @include flex-horizontal;
   }
 
@@ -439,12 +445,14 @@ $section-vertical-padding: 4rem;
     height: auto;
   }
 
-  .onboardingImg {
-    margin-left: 6rem;
-    height: 40%;
-
-    @include mobile() {
-      display: none;
+  .imageContainer {
+    margin-left: 3vw;
+    height: 270px;
+    .onboardingImg {
+      height: 100%;
+      @include mobile() {
+        display: none;
+      }
     }
   }
 
@@ -507,11 +515,14 @@ $section-vertical-padding: 4rem;
   padding: 3rem $site-padding;
   color: $light-blue;
 
+  .innerContainer {
+    @include fixWidth($header-max-width);
+  }
+
   .lineBreak {
-    width: $landing-width;
-    max-width: 90vw;
+    width: 100%;
     margin: 0 auto;
-    border: 1px solid #F5F6FC;
+    border: 1px solid #f5f6fc;
     margin-top: 2rem;
     margin-bottom: 1rem;
 
@@ -520,7 +531,7 @@ $section-vertical-padding: 4rem;
     }
   }
 
-  .innerContainer {
+  .linksContainer {
     @include flex-horizontal;
     justify-content: space-between;
 
@@ -531,7 +542,7 @@ $section-vertical-padding: 4rem;
       display: flex;
       flex-direction: column;
       justify-content: space-around;
-  
+
       a {
         margin-top: 2rem;
         font-weight: 500;
@@ -543,10 +554,11 @@ $section-vertical-padding: 4rem;
         }
 
         @include mobile() {
-          margin-top: 3rem;
+          margin-top: 2rem;
+          margin-bottom: 1rem;
         }
       }
-    
+
       .header {
         @include flex-horizontal;
         align-items: center;
@@ -554,14 +566,14 @@ $section-vertical-padding: 4rem;
         @include mobile() {
           @include flex-vertical;
         }
-    
+
         .title {
           font-weight: bold;
           font-size: 1.3rem;
           line-height: 0.37;
           height: 0.8rem;
         }
-    
+
         .text {
           margin-left: 2rem;
           font-style: italic;
@@ -571,17 +583,17 @@ $section-vertical-padding: 4rem;
 
           @include mobile() {
             margin-left: 0;
-            margin-top: 1rem;
+            margin-top: 2rem;
           }
         }
       }
     }
-  
+
     .builtBy {
       display: flex;
       align-items: center;
       align-self: flex-end;
-  
+
       @include mobile() {
         display: none;
       }
@@ -595,7 +607,6 @@ $section-vertical-padding: 4rem;
   .footer {
     display: flex;
     justify-content: space-between;
-    font-size: 0.75rem;
 
     @include mobile() {
       flex-direction: column;
@@ -610,10 +621,10 @@ $section-vertical-padding: 4rem;
       a {
         color: $light-blue;
         margin-right: 2rem;
-        font-size: 0.75rem;
 
         @include mobile() {
-          margin-top: 3rem;
+          margin-top: 2rem;
+          font-size: 0.8rem;
         }
       }
     }

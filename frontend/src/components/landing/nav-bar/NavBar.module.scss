@@ -1,18 +1,15 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
-$navbar-link-margin: calc(1rem + 1vw);
+$navbar-link-margin: calc(1rem + 2vw);
 $navbar-height: 4rem;
 $navbar-mobile-height: 4rem;
-
-$navbar-max-width: 1400px;
 
 .navBar {
   @include flex-horizontal;
   height: $navbar-height;
-  padding: 0 $site-padding;
+  width: 100%;
+  max-width: $header-max-width;
   justify-content: space-between;
-  width: $navbar-max-width;
-  max-width: 90vw;
 
   @include mobile() {
     height: $navbar-mobile-height;
@@ -38,22 +35,14 @@ $navbar-max-width: 1400px;
       }
     }
   }
-  
+
   .navbarLinks {
     display: flex;
     align-items: center;
-    min-width: 23%;
 
     .links {
       @include flex-horizontal;
       justify-content: space-between;
-      min-width: 9rem;
-      margin-right: calc(2rem + 1vw);
-      
-      @include mobile() {
-        min-width: 10rem;
-        margin-right: 0;
-      }
     }
 
     .link {
@@ -61,13 +50,10 @@ $navbar-max-width: 1400px;
       color: $dark-blue;
       font-weight: 500;
       cursor: pointer;
-
-      &.noClick {
-        cursor: default;
-      }
+      margin-right: $navbar-link-margin;
 
       &:hover {
-        font-weight: 700;
+        color: $indigo-blue;
       }
     }
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Redirect } from 'react-router-dom'
 import cx from 'classnames'
 import Lottie from 'react-lottie'
@@ -37,7 +37,11 @@ import landingAnimation from 'assets/lottie/landing.json'
 
 const Landing = () => {
   const authContext = useContext(AuthContext)
-  const [sentMessages, setSentMessages] = useState('275,000')
+  const [sentMessages, setSentMessages] = useState('0')
+
+  useEffect(() => {
+    getSentMessages()
+  }, [])
 
   if (authContext.isAuthenticated) {
     return (
@@ -80,43 +84,41 @@ const Landing = () => {
   ]
 
   const questions = [
-    { text: 'Is Postman free?', answer: 'Sending an email is free. SMS will be charged based on Twilio’s SMS rates.' },
-    { text: 'Is Postman secure?', answer: 'We recommend that you don’t put any sensitive information in the sms content. Some of our users generate a recipient specific unique link that opens up to a locked page. When in doubt, you should follow IM8’s guidelines on data classification.' },
+    { text: 'What can Postman do?', answer: <p>Postman lets government officials mass send messages to citizens through SMS and email with minimal setup required through a user interface.</p> },
+    { text: 'What problem is Postman solving?', answer: (<ol>
+      <li><b>Communication is manual: </b>Agency users are still calling and sending individual to citizens</li>
+      <li><b>Existing tool is not meeting the needs of users: </b>Outlook does not support mass sending and it is often capped at 1000 emails.</li>
+      <li><b>No official source of information: </b>Communications come in many different forms. Lacking a consistent channel puts agencies at risks of phishing attack.</li>
+    </ol>) },
+    { text: 'Is Postman free?', answer: <p>Sending an email is free. SMS will be charged based on Twilio’s SMS rates.</p> },
+    { text: 'Is Postman secure?', answer: <p>We recommend that you don’t put any sensitive information in the sms content. Some of our users generate a recipient specific unique link that opens up to a locked page. When in doubt, you should follow IM8’s guidelines on data classification.</p> },
   ]
-
-  function getYear() {
-    return new Date().getFullYear()
-  }
 
   async function getSentMessages(){
     const stats = await getLandingStats()
-    if (stats !== undefined) {
+    if (stats) {
       setSentMessages(stats.toLocaleString())
     }
   }
-  
-  getSentMessages()
+
 
   return (
-    <>
+    <div className={styles.landing}>
       <Banner></Banner>
       <div className={styles.topContainer}>
         <Navbar></Navbar>
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>Reach out to the citizens in minutes</h1>
-            <h2 className={styles.sentMessages}>
+            <div className={cx(styles.sentMessages, { [styles.ready]: sentMessages !== '0' })}>
               <span className={styles.numOfMessages}>{sentMessages}</span>
-              <span className={styles.text}>sent messages</span>
-            </h2>
+              <span className={styles.text}>messages sent</span>
+            </div>
             <div className={styles.signInRow}>
               <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
                 Sign in <img className={styles.arrowRight} src={arrowRight} alt="Right arrow"/>
               </PrimaryButton>
-              <div className={styles.signInText}>
-                <span className={styles.needHelp}>Need help?</span>
-                <a className={styles.contactUs} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Talk to us</a>
-              </div>
+              <a className={styles.contactUs} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Need help?&nbsp;&nbsp;Talk to us</a>
             </div>
           </div>
           <div className={styles.landingAnimation}>
@@ -178,32 +180,19 @@ const Landing = () => {
       </div>
 
       <div className={styles.faq}>
-        <div className={styles.fixWidth}>
+        <div className={styles.innerContainer}>
           <h1>Frequently asked questions</h1>
-          <div className={styles.question}>
-            <h3>What can Postman do?</h3>
-            <p>Postman lets government officials mass send messages to citizens through SMS and email with minimal setup required through a user interface.</p>
-          </div>
-
-          <div className={styles.question}>
-            <h3>What problem is Postman solving?</h3>
-            <ol>
-              <li><span>Communication is manual: </span>Agency users are still calling and sending individual to citizens</li>
-              <li><span>Existing tool is not meeting the needs of users: </span>Outlook does not support mass sending and it is often capped at 1000 emails.</li>
-              <li><span>No official source of information: </span>Communications come in many different forms. Lacking a consistent channel puts agencies at risks of phishing attack.</li>
-            </ol>
-            {questions.map(question =>
-              <div className={styles.question} key={question.text}>
-                <h3>{question.text}</h3>
-                <p>{question.answer}</p>
-              </div>
-            )}
-          </div>
+          {questions.map(question =>
+            <div className={styles.question} key={question.text}>
+              <h3>{question.text}</h3>
+              {question.answer}
+            </div>
+          )}
         </div>
       </div>
 
       <div className={styles.onboarding}>
-        <div className={cx(styles.fixWidth, styles.innerContainer)}>
+        <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <h2>Start using Postman today</h2>
             <p>It is easy to get started with your gov.sg email account. For non gov.sg email users, please fill out the following form. We will review your request within 3 business days.</p>
@@ -222,36 +211,38 @@ const Landing = () => {
       </div>
 
       <div className={styles.bottomContainer}>
-        <div className={cx(styles.innerContainer, styles.fixWidth)}>
-          <div className={styles.navLinks}>
-            <div className={styles.header}>
-              <span className={styles.title}>Postman</span>
-              <span className={styles.text}>Reach out to the citizens in minutes</span>
+        <div className={styles.innerContainer}>
+          <div className={styles.linksContainer}>
+            <div className={styles.navLinks}>
+              <div className={styles.header}>
+                <span className={styles.title}>Postman</span>
+                <span className={styles.text}>Reach out to the citizens in minutes</span>
+              </div>
+              <a href={GUIDE_URL} target="_blank" rel="noopener noreferrer">User guide</a>
+              <a href={CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
             </div>
-            <a href={GUIDE_URL} target="_blank" rel="noopener noreferrer">User guide</a>
-            <a href={CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
-          </div>
 
-          <div className={styles.builtBy}>
-            <span>Built by</span>
-            <img src={companyLogo} alt="logo"/>
+            <div className={styles.builtBy}>
+              <span>Built by</span>
+              <img src={companyLogo} alt="logo"/>
+            </div>
           </div>
-        </div>
-        <div className={styles.lineBreak}></div>
-        <div className={cx(styles.footer, styles.fixWidth)}>
-          <div className={styles.links}>
-            <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer">Privacy</a>
-            <a href={TC_URL} target="_blank" rel="noopener noreferrer">Terms of use</a>
-            <a href={REPORT_BUG_URL} target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
-          </div>
-          <span>&copy; {getYear()} Open Government Products</span>
-          <div className={styles.builtByMobile}>
-            <span>Built by</span>
-            <img src={companyLogo} alt="logo"/>
+          <div className={styles.lineBreak}></div>
+          <div className={styles.footer}>
+            <div className={styles.links}>
+              <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer">Privacy</a>
+              <a href={TC_URL} target="_blank" rel="noopener noreferrer">Terms of use</a>
+              <a href={REPORT_BUG_URL} target="_blank" rel="noopener noreferrer">Report Vulnerability</a>
+            </div>
+            <span>&copy; {new Date().getFullYear()} Open Government Products</span>
+            <div className={styles.builtByMobile}>
+              <span>Built by</span>
+              <img src={companyLogo} alt="logo"/>
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
