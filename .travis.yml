@@ -73,7 +73,7 @@ jobs:
       - provider: lambda
         function_name: log-twilio-callback-staging
         region: $AWS_DEFAULT_REGION
-        role: $TWILIO_CALLBACK_STAGING_ROLE
+        role: $STAGING_TWILIO_CALLBACK_ROLE
         runtime: nodejs12.x
         module_name: build/index
         handler_name: handler
@@ -81,14 +81,14 @@ jobs:
         publish: true
         zip: "../log-twilio-callback/code.zip"
         environment_variables:
-          - TWILIO_CALLBACK_SECRET=$TWILIO_CALLBACK_SECRET
-          - DB_URI=$DB_URI
+          - TWILIO_CALLBACK_SECRET=$STAGING_TWILIO_CALLBACK_SECRET
+          - DB_URI=$STAGING_DB_URI
         on:
           branch: $STAGING_BRANCH
       - provider: lambda
         function_name: log-twilio-callback-production
         region: $AWS_DEFAULT_REGION
-        role: $TWILIO_CALLBACK_PRODUCTION_ROLE
+        role: $PRODUCTION_TWILIO_CALLBACK_ROLE
         runtime: nodejs12.x
         module_name: build/index
         handler_name: handler
@@ -96,8 +96,8 @@ jobs:
         publish: true
         zip: "../log-twilio-callback/code.zip"
         environment_variables:
-          - TWILIO_CALLBACK_SECRET=$TWILIO_CALLBACK_SECRET
-          - DB_URI=$DB_URI
+          - TWILIO_CALLBACK_SECRET=$PRODUCTION_TWILIO_CALLBACK_SECRET
+          - DB_URI=$PRODUCTION_DB_URI
         on:
           branch: $PRODUCTION_BRANCH
       - provider: lambda
