@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { Redirect } from 'react-router-dom'
 import cx from 'classnames'
 import Lottie from 'react-lottie'
@@ -15,6 +15,7 @@ import PrimaryButton from 'components/common/primary-button'
 import Navbar from './nav-bar'
 import Banner from './banner'
 import { AuthContext } from 'contexts/auth.context'
+import { getLandingStats } from 'services/stats.service'
 
 import styles from './Landing.module.scss'
 import companyLogo from 'assets/img/brand/company-logo.svg'
@@ -36,6 +37,7 @@ import landingAnimation from 'assets/lottie/landing.json'
 
 const Landing = () => {
   const authContext = useContext(AuthContext)
+  const [sentMessages, setSentMessages] = useState('275,000')
 
   if (authContext.isAuthenticated) {
     return (
@@ -86,6 +88,15 @@ const Landing = () => {
     return new Date().getFullYear()
   }
 
+  async function getSentMessages(){
+    const stats = await getLandingStats()
+    if (stats !== undefined) {
+      setSentMessages(stats.toLocaleString())
+    }
+  }
+  
+  getSentMessages()
+
   return (
     <>
       <Banner></Banner>
@@ -95,7 +106,7 @@ const Landing = () => {
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>Reach out to the citizens in minutes</h1>
             <h2 className={styles.sentMessages}>
-              <span className={styles.numOfMessages}>275,000</span>
+              <span className={styles.numOfMessages}>{sentMessages}</span>
               <span className={styles.text}>sent messages</span>
             </h2>
             <div className={styles.signInRow}>
