@@ -5,3 +5,11 @@ export class RecipientColumnMissing extends Error {
     Error.captureStackTrace(this)
   }
 }
+
+export class UnexpectedDoubleQuoteError extends Error {
+  constructor() {
+    super('Double quote should not be used in unquoted field.')
+    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
+    Error.captureStackTrace(this)
+  }
+}
