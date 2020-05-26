@@ -5,11 +5,11 @@ AS $$
 BEGIN
 	UPDATE sms_messages m 
 	SET dequeued_at = p.dequeued_at,
-		error_code = p.error_code,
+		error_code = COALESCE(p.error_code, m.error_code),
 		message_id = p.message_id,
 		sent_at = p.sent_at,
 		delivered_at = p.delivered_at,
-		received_at = p.received_at,
+		received_at = COALESCE(p.received_at, m.received_at),
 		updated_at = clock_timestamp() 
 	FROM sms_ops p WHERE 
 	p.campaign_id = selected_campaign_id 
