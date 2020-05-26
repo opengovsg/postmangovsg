@@ -22,7 +22,7 @@ const App = () => {
       <AuthContextProvider>
         <Switch>
           <Route exact path="/" component={Landing}></Route>
-          <Route exact path="/signin" component={Login}></Route>
+          <Route exact path="/login" component={Login}></Route>
           <ProtectedRoute>
             <Dashboard></Dashboard>
           </ProtectedRoute>
