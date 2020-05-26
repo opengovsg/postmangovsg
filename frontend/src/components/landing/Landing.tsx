@@ -34,7 +34,7 @@ const Landing = () => {
       </div >
       <div className={styles.bottomContainer}>
         <div className={styles.bottomContent}>
-          <img className={styles.companyLogo} src={companyLogo} alt="OGP"></img>
+          <img className={styles.companyLogo} src={companyLogo} alt="company"></img>
           <div className={styles.linkBar}>
             <a className={styles.navLink} href={GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
             <a className={styles.navLink} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Contact Us</a>
