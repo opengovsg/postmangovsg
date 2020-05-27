@@ -69,7 +69,7 @@ $section-vertical-padding: 4rem;
     .landingAnimation {
       max-width: 680px;
       @include mobile {
-        max-width: 400px;
+        max-width: 100%;
       }
     }
 
@@ -138,6 +138,10 @@ $section-vertical-padding: 4rem;
 
           @include mobile() {
             margin: 1rem 0;
+            font-size: 16px;
+            width: 11rem;
+            height: 4rem;
+            border-radius: 3rem;
           }
 
           &:hover {
@@ -492,8 +496,14 @@ $section-vertical-padding: 4rem;
         min-width: 10rem;
 
         @include mobile() {
-          width: 10rem;
+          width: 11rem;
+          height: 4rem;
           margin-bottom: 1rem;
+          font-size: 16px;
+
+          img {
+            display: none;
+          }
         }
       }
 
