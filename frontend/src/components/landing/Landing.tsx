@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Lottie from 'react-lottie'
 
@@ -38,6 +38,7 @@ import landingAnimation from 'assets/lottie/landing.json'
 const Landing = () => {
   const authContext = useContext(AuthContext)
   const [sentMessages, setSentMessages] = useState('0')
+  const history = useHistory()
 
   useEffect(() => {
     getSentMessages()
@@ -50,7 +51,7 @@ const Landing = () => {
   }
 
   function directToSignIn() {
-    window.location.href = '/signin'
+    history.push('/login')
   }
 
   const trustedAgencies = [
