@@ -11,19 +11,19 @@ WITH logged_jobs AS (
 		AND
 		c1.type = 'EMAIL'
 		AND
+		q1.status IN ('SENT','STOPPED')
 		-- if status is sent or stopped, we check that  
 			-- all messages with sent_at have delivered_at
-		-- else for any status - X time has passed since the most recent sent_at (in the case that the worker died and did not write back to some records)
+			-- OR X time has passed since the most recent sent_at (in the case that the worker died and did not write back to some records)
+		AND
 		(
 			(
-				q1.status IN ('SENT','STOPPED')
-				AND         
-					NOT EXISTS 
-						( SELECT 1 FROM email_ops p WHERE p.campaign_id = q1.campaign_id AND sent_at IS NOT NULL AND delivered_at IS NULL LIMIT  1)
+				NOT EXISTS 
+					( SELECT 1 FROM email_ops p WHERE p.campaign_id = q1.campaign_id AND sent_at IS NOT NULL AND delivered_at IS NULL LIMIT 1 )
 			)
 			OR
 			(
-				-- 20 seconds has passed since the most recent sent_at (the ops table has been stuck for a while)
+				-- 20 seconds has passed since the most recent sent_at (the campaign has been stuck for a while in ops table)
 				(SELECT EXTRACT(EPOCH FROM (clock_timestamp()-MAX(p.sent_at))) FROM email_ops p WHERE p.campaign_id = q1.campaign_id) > 20 
 			)
 		)
