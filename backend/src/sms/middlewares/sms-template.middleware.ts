@@ -162,6 +162,9 @@ const updateCampaignAndMessages = async (
     await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
     logger.info(`after sms.addToMessageLogs; campaignId=${campaignId}`)
 
+    // Set campaign to valid
+    await CampaignService.setValid(+campaignId, transaction)
+    
     transaction?.commit()    
   } catch (err) {
     transaction?.rollback()

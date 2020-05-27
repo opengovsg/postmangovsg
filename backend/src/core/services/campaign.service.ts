@@ -95,6 +95,19 @@ const setInvalid = (campaignId: number): Promise<[number, Campaign[]]> => {
   })
 }
 
+/**
+ * Helper method to set a campaign to valid 
+ * @param campaignId 
+ */
+const setValid = (campaignId: number, transaction?: Transaction): Promise<[number, Campaign[]]> => {
+  return Campaign.update({
+    valid: true,
+  }, {
+    where: { id: +campaignId },
+    transaction,
+  })
+}
+
 
 export const CampaignService = { 
   hasJobInProgress, 
@@ -102,5 +115,6 @@ export const CampaignService = {
   retrieveCampaign, 
   listCampaigns, 
   updateCampaignS3Metadata, 
-  setInvalid, 
+  setInvalid,
+  setValid,
 }

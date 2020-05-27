@@ -169,6 +169,10 @@ const updateCampaignAndMessages = async (
 
     // START populate template
     await EmailTemplateService.addToMessageLogs(+campaignId, records, transaction)
+
+    // Set campaign to valid
+    await CampaignService.setValid(+campaignId, transaction)
+    
     transaction?.commit()    
   } catch (err) {
     transaction?.rollback()

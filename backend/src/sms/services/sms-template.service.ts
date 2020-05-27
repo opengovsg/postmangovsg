@@ -163,10 +163,9 @@ const getFilledTemplate = async (campaignId: number): Promise<SmsTemplate | null
 /**
  * 1. delete existing entries
  * 2. bulk insert
- * 3. mark campaign as valid
- * steps 1- 3 are wrapped in txn. rollback if any fails
  * @param campaignId
  * @param records
+ * @param transaction
  */
 const addToMessageLogs = async (
   campaignId: number,
@@ -185,15 +184,6 @@ const addToMessageLogs = async (
       const batch = chunks[idx]
       await SmsMessage.bulkCreate(batch, { transaction })
     }
-  
-    await Campaign.update({
-      valid: true,
-    }, {
-      where: {
-        id: campaignId,
-      },
-      transaction,
-    })
     logger.info({ message: `Finished populateSmsTemplate for ${campaignId}` })
   } catch (err) {
     logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
