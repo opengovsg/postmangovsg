@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from 'express'
 import config from '@core/config'
 import logger from '@core/logger'
 import {
+  MissingTemplateKeysError,
   HydrationError,
+  RecipientColumnMissing,
   TemplateError,
   InvalidRecipientError,
 } from '@core/errors'
@@ -12,6 +14,8 @@ import {
 } from '@core/services'
 import { EmailTemplateService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
+import { Campaign } from '@core/models'
+  
 
 /**
  * Store template subject and body in email template table.
@@ -74,7 +78,7 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
  * @param res
  * @param next
  */
-const uploadCompleteHandler = async (req: Request, res: Response): Promise<Response | void> => {
+const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
 
   res.setTimeout(config.get('express.uploadCompleteTimeout'),  () => {
     if (!res.headersSent) {
@@ -99,49 +103,79 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     if (emailTemplate === null){
       throw new Error('Template does not exist, please create a template')
     }
-
-    // Updates metadata in project
-    await CampaignService.updateCampaignS3Metadata({ key: s3Key, campaignId, filename })
-
+  
     // carry out templating / hydration
     // - download from s3
-
-    const { records, hydratedRecord } = await EmailTemplateService.client.testHydration({
-      campaignId: +campaignId,
-      s3Key,
-      templateSubject: emailTemplate.subject,
-      templateBody: emailTemplate.body as string,
-      templateParams: emailTemplate.params as string[],
-    })
-
-    if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
-
-    const recipientCount: number = records.length
-
-    // START populate template
-    logger.info(`before email.addToMessageLogs; campaignId=${campaignId}`)
-    await EmailTemplateService.addToMessageLogs(+campaignId, records)
-    logger.info(`after email.addToMessageLogs; campaignId=${campaignId}`)
-
-    if (!res.headersSent){
-      return res.json({
-        'num_recipients': recipientCount,
-        preview: {
-          ...hydratedRecord,
-          // eslint-disable-next-line @typescript-eslint/camelcase
-          reply_to: emailTemplate.replyTo || null,
-        },
+    try {
+      const { records, hydratedRecord } = await EmailTemplateService.client.testHydration({
+        campaignId: +campaignId,
+        s3Key,
+        templateSubject: emailTemplate.subject,
+        templateBody: emailTemplate.body as string,
+        templateParams: emailTemplate.params as string[],
       })
-    }
+  
+      if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
+      
+      const recipientCount: number = records.length
 
+      await updateCampaignAndMessages(s3Key, campaignId, filename, records)
+
+      if (!res.headersSent) {
+        return res.json({
+          'num_recipients': recipientCount,
+          preview: {
+            ...hydratedRecord,
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            reply_to: emailTemplate.replyTo || null,
+          },
+        })
+      } 
+    } catch(err) {
+      logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
+      throw err
+    }
   } catch (err) {
     if (!res.headersSent){
-      return res.status(400).json({ message: err.message })
+      if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError || err instanceof InvalidRecipientError) {
+        return res.status(400).json({ message: err.message })
+      }
+      return next(err)
     }
   }
 
 }
 
+/**
+ * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
+ * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
+ * For email_messages table, existing records are deleted and new ones are bulk inserted.
+ * @param key 
+ * @param campaignId
+ * @param filename 
+ * @param records
+ */
+const updateCampaignAndMessages = async (
+  key: string,
+  campaignId: string,
+  filename: string,
+  records: MessageBulkInsertInterface[]) => {
+  let transaction
+
+  try {
+    transaction = await Campaign.sequelize?.transaction()
+    // Updates metadata in project
+    await CampaignService.updateCampaignS3Metadata({ key, campaignId, filename }, transaction)
+
+    // START populate template
+    await EmailTemplateService.addToMessageLogs(+campaignId, records, transaction)
+    transaction?.commit()    
+  } catch (err) {
+    transaction?.rollback()
+    throw(err)
+  }
+}
+  
 export const EmailTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,

@@ -14,6 +14,7 @@ import {
 } from '@core/services'
 import { SmsTemplateService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
+import { Campaign } from '@core/models'
 
 const uploadTimeout = Number(config.get('express.uploadCompleteTimeout'))
 
@@ -97,10 +98,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     if (smsTemplate === null){
       throw new Error('Template does not exist, please create a template')
     }
-
-    // Updates metadata in project
-    await CampaignService.updateCampaignS3Metadata({ key: s3Key, campaignId, filename })
-
+  
     // carry out templating / hydration
     // - download from s3
     try {
@@ -114,18 +112,16 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       if (SmsTemplateService.hasInvalidSmsRecipient(records)) throw new InvalidRecipientError()
 
       const recipientCount: number = records.length
-      // START populate template
-      logger.info(`before sms.addToMessageLogs; campaignId=${campaignId}`)
-      await SmsTemplateService.addToMessageLogs(+campaignId, records)
-      logger.info(`after sms.addToMessageLogs; campaignId=${campaignId}`)
+
+      await updateCampaignAndMessages(s3Key, campaignId, filename, records)
 
       if (!res.headersSent) {
         return res.json({
           'num_recipients': recipientCount,
           preview: hydratedRecord,
         })
-      }
-
+      }  
+  
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err
@@ -137,6 +133,39 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       }
       return next(err)
     }
+  }
+}
+
+/**
+ * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
+ * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
+ * For email_messages table, existing records are deleted and new ones are bulk inserted.
+ * @param key 
+ * @param campaignId
+ * @param filename 
+ * @param records
+ */
+const updateCampaignAndMessages = async (
+  key: string,
+  campaignId: string,
+  filename: string,
+  records: MessageBulkInsertInterface[]) => {
+  let transaction
+
+  try {
+    transaction = await Campaign.sequelize?.transaction()
+    // Updates metadata in project
+    await CampaignService.updateCampaignS3Metadata({ key, campaignId, filename }, transaction)
+
+    // START populate template
+    logger.info(`before sms.addToMessageLogs; campaignId=${campaignId}`)
+    await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
+    logger.info(`after sms.addToMessageLogs; campaignId=${campaignId}`)
+
+    transaction?.commit()    
+  } catch (err) {
+    transaction?.rollback()
+    throw(err)
   }
 }
 
