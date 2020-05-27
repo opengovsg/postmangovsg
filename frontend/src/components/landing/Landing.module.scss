@@ -164,6 +164,10 @@ $section-vertical-padding: 4rem;
           color: $indigo-blue;
           font-size: 1rem;
 
+          @include mobile() {
+            margin-left: 1.5rem;
+          }
+
           &:hover {
             color: $dark-blue;
           }
@@ -500,6 +504,7 @@ $section-vertical-padding: 4rem;
           height: 4rem;
           margin-bottom: 1rem;
           font-size: 16px;
+          border-radius: 2rem;
 
           img {
             display: none;
