@@ -24,7 +24,11 @@ const createCampaign = ({ name, type, userId }: {name: string; type: string; use
  * On file upload, save the transaction id and file name against the campaign so that we can download the file from s3 later
  * @param param0 
  */
-const updateCampaignS3Metadata = ({ key, campaignId, filename }: { key: string; campaignId: string; filename: string }, transaction?: Transaction): Promise<[number, Campaign[]]> => {
+const updateCampaignS3Metadata = (
+  key: string,
+  campaignId: string,
+  filename: string,
+  transaction: Transaction | undefined): Promise<[number, Campaign[]]> => {
   const s3Object = {
     key,
     bucket: FILE_STORAGE_BUCKET_NAME,

@@ -86,7 +86,7 @@ const updateCampaignAndMessages = async (
   try {
     transaction = await Campaign.sequelize?.transaction()
     // Updates metadata in project
-    await CampaignService.updateCampaignS3Metadata({ key, campaignId, filename }, transaction)
+    await CampaignService.updateCampaignS3Metadata( key, campaignId, filename, transaction)
 
     // START populate template
     await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
