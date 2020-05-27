@@ -6,9 +6,9 @@ import { GUIDE_URL, CONTACT_US_URL } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 
 import styles from './Login.module.scss'
-import landingImg from 'assets/img/landing.svg'
+import loginImg from 'assets/img/landing/login.svg'
 import appLogo from 'assets/img/brand/app-logo.svg'
-import companyLogo from 'assets/img/brand/company-logo.svg'
+import companyLogo from 'assets/img/brand/company-logo-dark.svg'
 
 const Landing = () => {
   const authContext = useContext(AuthContext)
@@ -28,7 +28,7 @@ const Landing = () => {
             <LoginInput></LoginInput>
           </div>
           <div className={styles.landingImg}>
-            <img src={landingImg} alt="Landing page graphic"></img>
+            <img src={loginImg} alt="Landing page graphic"></img>
           </div>
         </div>
       </div >

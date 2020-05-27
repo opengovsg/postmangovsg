@@ -17,10 +17,14 @@ $button-height: 2.8rem;
 $border-radius: $button-height / 2;
 
 // Paddings
-$site-padding: 3vw;
+$site-padding: 4vw;
 $mobile-site-padding: 5vw;
 $content-top-padding: 4vh;
 $content-bottom-padding: 15vh;
 
 // Fonts
 $font-stack: 'Noto Sans JP', sans-serif;
+
+// Landing
+$landing-max-width: 1000px;
+$header-max-width: 1400px;
