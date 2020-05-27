@@ -39,7 +39,7 @@ const updateCampaignS3Metadata = ({ key, campaignId, filename }: { key: string; 
           id: campaignId,
         },
         returning: true,
-        transaction
+        transaction,
       }
     )
 }

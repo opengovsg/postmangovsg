@@ -68,6 +68,40 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
 }
 
 /**
+ * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
+ * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
+ * For email_messages table, existing records are deleted and new ones are bulk inserted.
+ * @param key 
+ * @param campaignId
+ * @param filename 
+ * @param records
+ */
+const updateCampaignAndMessages = async (
+  key: string,
+  campaignId: string,
+  filename: string,
+  records: MessageBulkInsertInterface[]): Promise<void> => {
+  let transaction
+
+  try {
+    transaction = await Campaign.sequelize?.transaction()
+    // Updates metadata in project
+    await CampaignService.updateCampaignS3Metadata({ key, campaignId, filename }, transaction)
+
+    // START populate template
+    await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
+
+    // Set campaign to valid
+    await CampaignService.setValid(+campaignId, transaction)
+    
+    transaction?.commit()    
+  } catch (err) {
+    transaction?.rollback()
+    throw(err)
+  }
+}
+  
+/**
  * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
  * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
  * If the template and csv do not match, prompt the user to upload a new file.
@@ -133,42 +167,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       }
       return next(err)
     }
-  }
-}
-
-/**
- * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
- * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
- * For email_messages table, existing records are deleted and new ones are bulk inserted.
- * @param key 
- * @param campaignId
- * @param filename 
- * @param records
- */
-const updateCampaignAndMessages = async (
-  key: string,
-  campaignId: string,
-  filename: string,
-  records: MessageBulkInsertInterface[]) => {
-  let transaction
-
-  try {
-    transaction = await Campaign.sequelize?.transaction()
-    // Updates metadata in project
-    await CampaignService.updateCampaignS3Metadata({ key, campaignId, filename }, transaction)
-
-    // START populate template
-    logger.info(`before sms.addToMessageLogs; campaignId=${campaignId}`)
-    await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
-    logger.info(`after sms.addToMessageLogs; campaignId=${campaignId}`)
-
-    // Set campaign to valid
-    await CampaignService.setValid(+campaignId, transaction)
-    
-    transaction?.commit()    
-  } catch (err) {
-    transaction?.rollback()
-    throw(err)
   }
 }
 
