@@ -124,7 +124,9 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       const recipientCount: number = records.length
 
       // START populate template
+      logger.info(`before email.addToMessageLogs; campaignId=${campaignId}`)
       await EmailTemplateService.addToMessageLogs(+campaignId, records)
+      logger.info(`after email.addToMessageLogs; campaignId=${campaignId}`)
 
       return res.json({
         'num_recipients': recipientCount,

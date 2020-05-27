@@ -119,7 +119,9 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
       const recipientCount: number = records.length
       // START populate template
+      logger.info(`before sms.addToMessageLogs; campaignId=${campaignId}`)
       await SmsTemplateService.addToMessageLogs(+campaignId, records)
+      logger.info(`after sms.addToMessageLogs; campaignId=${campaignId}`)
 
       return res.json({
         'num_recipients': recipientCount,
