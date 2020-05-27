@@ -11,23 +11,20 @@ WITH logged_jobs AS (
 		AND
 		c1.type = 'SMS'
 		AND
+		q1.status IN ('SENT','STOPPED')
+		-- if status is sent or stopped, we check that  
+			-- all messages with sent_at have delivered_at
+			-- OR X time has passed since the most recent sent_at (in the case that the worker died and did not write back to some records)
+		AND
 		(
 			(
-				-- if status is sent, then we need to check all messages have delivered_at (meaning the sending client had responded)
-				q1.status = 'SENT' 
-				AND
-				NOT EXISTS 	
-					( SELECT 1 FROM sms_ops p WHERE p.campaign_id = q1.campaign_id AND  delivered_at IS NULL LIMIT 1) 
-			
+					NOT EXISTS 
+						( SELECT 1 FROM sms_ops p WHERE p.campaign_id = q1.campaign_id AND sent_at IS NOT NULL AND delivered_at IS NULL LIMIT 1 )
 			)
 			OR
-			(  
-				-- if status is stopped, then we need to check that all messages with sent_at, also have delivered_at.
-				q1.status = 'STOPPED'
-				AND
-				NOT EXISTS 
-					( SELECT 1 FROM sms_ops p WHERE p.campaign_id = q1.campaign_id AND sent_at IS NOT NULL AND delivered_at IS NULL LIMIT  1)
-
+			(
+				-- 20 seconds has passed since the most recent sent_at (the campaign has been stuck for a while in ops table)
+				(SELECT EXTRACT(EPOCH FROM (clock_timestamp()-MAX(p.sent_at))) FROM sms_ops p WHERE p.campaign_id = q1.campaign_id) > 20 
 			)
 		)
 	    FOR UPDATE SKIP LOCKED
