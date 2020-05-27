@@ -51,6 +51,11 @@ const config = convict({
       default:  'ap-northeast-1',
       env: 'AWS_REGION',
     },
+    awsEndpoint: {
+      doc: 'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      default: null,
+      env: 'AWS_ENDPOINT',
+    },
     logGroupName: {
       doc: '	Name of Cloudwatch log group to write application logs to',
       default: 'postmangovsg-beanstalk-prod',

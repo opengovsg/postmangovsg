@@ -1,4 +1,5 @@
 import React from 'react'
+import { useHistory } from 'react-router-dom'
 
 import { GUIDE_URL, CONTRIBUTE_URL } from 'config'
 import PrimaryButton from 'components/common/primary-button'
@@ -7,9 +8,10 @@ import AppBrandmark from 'assets/img/brand/app-brandmark.svg'
 import styles from './NavBar.module.scss'
 
 const NavBar = () => {
+  const history = useHistory()
 
   function directToSignIn() {
-    window.location.href = '/signin'
+    history.push('/login')
   }
 
   return (
