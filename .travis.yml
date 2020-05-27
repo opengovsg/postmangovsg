@@ -65,10 +65,10 @@ jobs:
       - CI=false npm run build
   - name: serverless
     before_deploy:
-      - cd serverless/log-twilio-callback
+      - cd $TRAVIS_BUILD_DIR/serverless/log-twilio-callback
       - npm install && npm run build
       - zip -qr code.zip build package.json node_modules/
-      - cd ../postman-api-gateway-authorizer && zip -qr code.zip *
+      - cd $TRAVIS_BUILD_DIR/serverless/postman-api-gateway-authorizer && zip -qr code.zip *
     deploy:
       - provider: lambda
         function_name: log-twilio-callback-staging
@@ -108,3 +108,5 @@ jobs:
         handler_name: handler
         publish: true
         zip: "../postman-api-gateway-authorizer/code.zip"
+        on:
+          branch: $PRODUCTION_BRANCH
