@@ -330,8 +330,9 @@ const config = convict({
       doc: 'Custom timeout period for upload/complete handler',
       default: 240 * 1000,
       env: 'UPLOAD_COMPLETE_TIMEOUT_IN_MS',
-    }
-  }
+      format: 'int',
+    },
+  },
 })
 
 

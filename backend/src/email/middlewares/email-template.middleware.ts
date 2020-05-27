@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import config from '@core/config'
 import logger from '@core/logger'
 import {
-  MissingTemplateKeysError,
   HydrationError,
-  RecipientColumnMissing,
   TemplateError,
   InvalidRecipientError,
 } from '@core/errors'
@@ -14,8 +12,6 @@ import {
 } from '@core/services'
 import { EmailTemplateService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
-
-const uploadTimeout = Number(config.get('express.uploadCompleteTimeout'))
 
 /**
  * Store template subject and body in email template table.
@@ -78,10 +74,15 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
  * @param res
  * @param next
  */
-const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  res.setTimeout(uploadTimeout, async () => {
-    res.status(408).json('Request timed out')
+const uploadCompleteHandler = async (req: Request, res: Response): Promise<Response | void> => {
+
+  res.setTimeout(config.get('express.uploadCompleteTimeout'),  () => {
+    if (!res.headersSent) {
+      return res.sendStatus(408)
+    }
+    return
   })
+  
   try {
     const { campaignId } = req.params
 
@@ -90,19 +91,13 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
     // extract s3Key from transactionId
     const { 'transaction_id': transactionId, filename } = req.body
-    let s3Key: string
-    try {
-      s3Key = TemplateService.extractS3Key(transactionId)
-    } catch (err) {
-      return res.status(400).json(err.message)
-    }
+    const s3Key = TemplateService.extractS3Key(transactionId)
+  
 
     // check if template exists
     const emailTemplate = await EmailTemplateService.getFilledTemplate(+campaignId)
     if (emailTemplate === null){
-      return res.status(400).json({
-        message: 'Template does not exist, please create a template',
-      })
+      throw new Error('Template does not exist, please create a template')
     }
 
     // Updates metadata in project
@@ -110,24 +105,25 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
     // carry out templating / hydration
     // - download from s3
-    try {
-      const { records, hydratedRecord } = await EmailTemplateService.client.testHydration({
-        campaignId: +campaignId,
-        s3Key,
-        templateSubject: emailTemplate.subject,
-        templateBody: emailTemplate.body as string,
-        templateParams: emailTemplate.params as string[],
-      })
 
-      if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
+    const { records, hydratedRecord } = await EmailTemplateService.client.testHydration({
+      campaignId: +campaignId,
+      s3Key,
+      templateSubject: emailTemplate.subject,
+      templateBody: emailTemplate.body as string,
+      templateParams: emailTemplate.params as string[],
+    })
 
-      const recipientCount: number = records.length
+    if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
 
-      // START populate template
-      logger.info(`before email.addToMessageLogs; campaignId=${campaignId}`)
-      await EmailTemplateService.addToMessageLogs(+campaignId, records)
-      logger.info(`after email.addToMessageLogs; campaignId=${campaignId}`)
+    const recipientCount: number = records.length
 
+    // START populate template
+    logger.info(`before email.addToMessageLogs; campaignId=${campaignId}`)
+    await EmailTemplateService.addToMessageLogs(+campaignId, records)
+    logger.info(`after email.addToMessageLogs; campaignId=${campaignId}`)
+
+    if (!res.headersSent){
       return res.json({
         'num_recipients': recipientCount,
         preview: {
@@ -136,17 +132,14 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
           reply_to: emailTemplate.replyTo || null,
         },
       })
-
-    } catch (err) {
-      logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
-      throw err
     }
+    
   } catch (err) {
-    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError || err instanceof InvalidRecipientError){
+    if (!res.headersSent){ 
       return res.status(400).json({ message: err.message })
     }
-    return next(err)
   }
+  
 }
 
 export const EmailTemplateMiddleware = {
