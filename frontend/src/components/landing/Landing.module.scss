@@ -13,6 +13,17 @@ $section-vertical-padding: 4rem;
   }
 }
 
+@mixin mobileButton() {
+  @include mobile() {
+    font-size: 1rem;
+    min-width: 10rem;
+    height: 3.5rem;
+    border-radius: 2rem;
+    margin-top: 1rem;
+    padding: 0 2rem;
+  }
+}
+
 .landing {
   h1 {
     font-size: 3.3rem !important;
@@ -58,7 +69,7 @@ $section-vertical-padding: 4rem;
     @include flex-horizontal;
     justify-content: space-between;
 
-    min-height: 500px;
+    min-height: 480px;
     @include fixWidth($header-max-width);
 
     @include mobile() {
@@ -132,17 +143,11 @@ $section-vertical-padding: 4rem;
 
         .signInButton {
           min-width: 9rem;
-          font-size: 0.9rem;
+          font-size: 1rem;
           text-align: center;
           margin-right: 2rem;
 
-          @include mobile() {
-            margin: 1rem 0;
-            font-size: 16px;
-            width: 11rem;
-            height: 4rem;
-            border-radius: 3rem;
-          }
+          @include mobileButton();
 
           &:hover {
             background-color: #2121a5;
@@ -160,12 +165,14 @@ $section-vertical-padding: 4rem;
         }
 
         .contactUs {
-          margin-left: 0.5rem;
           color: $indigo-blue;
           font-size: 1rem;
 
-          @include mobile() {
-            margin-left: 1.5rem;
+          span {
+            margin-left: 0.5rem;
+            @include mobile() {
+              display: none;
+            }
           }
 
           &:hover {
@@ -499,17 +506,7 @@ $section-vertical-padding: 4rem;
         border: 1px solid $light-blue;
         min-width: 10rem;
 
-        @include mobile() {
-          width: 11rem;
-          height: 4rem;
-          margin-bottom: 1rem;
-          font-size: 16px;
-          border-radius: 2rem;
-
-          img {
-            display: none;
-          }
-        }
+        @include mobileButton();
       }
 
       a {
@@ -517,6 +514,7 @@ $section-vertical-padding: 4rem;
         color: $light-blue;
 
         @include mobile() {
+          font-size: 1rem;
           margin-left: 1rem;
         }
       }
@@ -562,10 +560,10 @@ $section-vertical-padding: 4rem;
         margin-top: 2rem;
         font-weight: 500;
         font-size: 1rem;
-        color: $light-blue;
+        color: $light-grey;
 
         &:hover {
-          font-weight: 700;
+          color: white;
         }
 
         @include mobile() {
@@ -622,9 +620,11 @@ $section-vertical-padding: 4rem;
   .footer {
     display: flex;
     justify-content: space-between;
+    font-size: 0.8rem;
 
     @include mobile() {
       flex-direction: column;
+      font-size: 1rem;
     }
 
     .links {
@@ -634,12 +634,16 @@ $section-vertical-padding: 4rem;
         margin-bottom: 2rem;
       }
       a {
-        color: $light-blue;
+        color: $light-grey;
         margin-right: 2rem;
+
+        &:hover {
+          color: white;
+        }
 
         @include mobile() {
           margin-top: 2rem;
-          font-size: 0.8rem;
+          font-size: 1rem;
         }
       }
     }

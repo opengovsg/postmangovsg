@@ -118,7 +118,7 @@ const Landing = () => {
               <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
                 Sign in <img className={styles.arrowRight} src={arrowRight} alt="Right arrow"/>
               </PrimaryButton>
-              <a className={styles.contactUs} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Need help?&nbsp;&nbsp;Talk to us</a>
+              <a className={styles.contactUs} href={CONTACT_US_URL} target="_blank" rel="noopener noreferrer">Need help?<span>Talk to us</span></a>
             </div>
           </div>
           <div className={styles.landingAnimation}>
