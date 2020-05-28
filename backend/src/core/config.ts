@@ -328,7 +328,7 @@ const config = convict({
   express: {
     uploadCompleteTimeout: {
       doc: 'Custom timeout period for upload/complete handler',
-      default: 240 * 1000,
+      default: 100 * 1000,
       env: 'UPLOAD_COMPLETE_TIMEOUT_IN_MS',
       format: 'int',
     },
