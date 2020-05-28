@@ -76,7 +76,10 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
  */
 const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   res.setTimeout(uploadTimeout, async () => {
-    res.status(408).json('Request timed out')
+    if (!res.headersSent) {
+      return res.status(408).json('Request timed out')
+    }
+    return
   })
   try {
     const { campaignId } = req.params
@@ -87,19 +90,12 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
     // extract s3Key from transactionId
     const { 'transaction_id': transactionId, filename } = req.body
-    let s3Key: string
-    try {
-      s3Key = TemplateService.extractS3Key(transactionId)
-    } catch (err) {
-      return res.status(400).json(err.message)
-    }
+    const s3Key: string = TemplateService.extractS3Key(transactionId)
 
     // check if template exists
     const smsTemplate = await SmsTemplateService.getFilledTemplate(+campaignId)
     if (smsTemplate === null){
-      return res.status(400).json({
-        message: 'Template does not exist, please create a template',
-      })
+      throw new Error('Template does not exist, please create a template')
     }
 
     // Updates metadata in project
@@ -123,20 +119,24 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
       await SmsTemplateService.addToMessageLogs(+campaignId, records)
       logger.info(`after sms.addToMessageLogs; campaignId=${campaignId}`)
 
-      return res.json({
-        'num_recipients': recipientCount,
-        preview: hydratedRecord,
-      })
+      if (!res.headersSent) {
+        return res.json({
+          'num_recipients': recipientCount,
+          preview: hydratedRecord,
+        })
+      }
 
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err
     }
   } catch (err) {
-    if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError || err instanceof InvalidRecipientError) {
-      return res.status(400).json({ message: err.message })
+    if (!res.headersSent) {
+      if (err instanceof RecipientColumnMissing || err instanceof MissingTemplateKeysError || err instanceof InvalidRecipientError) {
+        return res.status(400).json({ message: err.message })
+      }
+      return next(err)
     }
-    return next(err)
   }
 }
 

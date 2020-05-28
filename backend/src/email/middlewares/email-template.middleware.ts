@@ -82,7 +82,7 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     }
     return
   })
-  
+
   try {
     const { campaignId } = req.params
 
@@ -92,7 +92,7 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
     // extract s3Key from transactionId
     const { 'transaction_id': transactionId, filename } = req.body
     const s3Key = TemplateService.extractS3Key(transactionId)
-  
+
 
     // check if template exists
     const emailTemplate = await EmailTemplateService.getFilledTemplate(+campaignId)
@@ -133,13 +133,13 @@ const uploadCompleteHandler = async (req: Request, res: Response): Promise<Respo
         },
       })
     }
-    
+
   } catch (err) {
-    if (!res.headersSent){ 
+    if (!res.headersSent){
       return res.status(400).json({ message: err.message })
     }
   }
-  
+
 }
 
 export const EmailTemplateMiddleware = {
