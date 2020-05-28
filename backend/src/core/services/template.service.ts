@@ -2,12 +2,13 @@ import { v4 as uuid } from 'uuid'
 import S3 from 'aws-sdk/clients/s3'
 import config from '@core/config'
 import logger from '@core/logger'
+import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 const s3 = new S3({
   signatureVersion: 'v4',
-  region: config.get('aws.awsRegion'),
+  ...configureEndpoint(config),
 })
 
 /**

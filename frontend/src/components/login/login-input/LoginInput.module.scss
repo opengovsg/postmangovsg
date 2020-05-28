@@ -1,0 +1,27 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.container {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+
+  @include mobile() {
+    align-items: center;
+  }
+
+  .text {
+    font-weight: 500;
+  }
+
+  input {
+    background-color: $light-blue;
+  }
+
+  .resend {
+    text-decoration: underline;
+    margin-left: 1rem;
+    cursor: pointer;
+  }
+
+}

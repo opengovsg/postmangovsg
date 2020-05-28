@@ -5,11 +5,12 @@ import logger from '@core/logger'
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
 import { Credential, UserCredential, User } from '@core/models'
+import { configureEndpoint } from '@core/utils/aws-endpoint'
 
 import { TwilioCredentials } from '@sms/interfaces'
 import { UserSettings } from '@core/interfaces'
 
-const secretsManager = new AWS.SecretsManager({ region: config.get('aws.awsRegion') })
+const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 
 /**
  * Checks if the credential has been saved
