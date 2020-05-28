@@ -1,6 +1,6 @@
-import { fn, cast, Transaction } from 'sequelize'
+import { fn, cast, Transaction, Op } from 'sequelize'
 import { Statistic, JobQueue } from '@core/models'
-import { CampaignStats, CampaignStatsCount } from '@core/interfaces'
+import { CampaignStats, CampaignStatsCount, CampaignInvalidRecipient } from '@core/interfaces'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -134,9 +134,27 @@ const getTotalSentCount = async (): Promise<number> => {
   return Statistic.sum('sent')
 }
 
+/**
+ * Helper method to get error_code, recipients for failes messages from logs table
+ * @param campaignId
+ * @param logsTable
+ */
+const getInvalidRecipients = async (campaignId: number, logsTable: any): Promise<Array<CampaignInvalidRecipient>> => {
+  // Retrieve message logs with error codes from logs table
+  const data = await logsTable.findAll({
+    where: {
+      campaignId,
+      error_code: { [Op.ne]: null }
+     },
+    attributes: ['recipient', 'sentAt', 'updatedAt', 'messageId', 'errorCode'],
+  })
+  return data
+}
+
 export const StatsService = {
   getCurrentStats,
   getTotalSentCount,
   getNumRecipients,
   setNumRecipients,
+  getInvalidRecipients
 }

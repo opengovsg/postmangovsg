@@ -57,6 +57,15 @@ export interface CampaignStatsCount {
   sent: number
   invalid: number
 }
+
+export interface CampaignInvalidRecipient {
+    recipient: string,
+    messageId: string
+    errorCode: string,
+    sentAt: Date,
+    updatedAt: Date
+}
+
 /**
  * @swagger
  *  components:

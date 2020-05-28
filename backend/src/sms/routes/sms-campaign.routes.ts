@@ -615,4 +615,37 @@ router.post(
  */
 router.get('/stats', SmsStatsMiddleware.getStats)
 
+/**
+ * @swagger
+ * path:
+*  /campaign/{campaignId}/sms/invalid-recipients:
+ *    get:
+ *      tags:
+ *        - SMS
+ *      summary: Get invalid recipients in campaign
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: array
+ *                items:
+ *                  $ref: '#/components/schemas/CampaignInvalidRecipient'
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.get('/invalid-recipients', SmsStatsMiddleware.getInvalidRecipients)
+
+
 export default router
