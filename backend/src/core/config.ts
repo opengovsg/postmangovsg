@@ -1,11 +1,11 @@
 /**
- * @file Configuration 
+ * @file Configuration
  * All defaults can be changed
  */
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
-const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem')) 
+const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 /**
  * To require an env var without setting a default,
  * use
@@ -20,9 +20,9 @@ convict.addFormats({
         throw new Error('Required value cannot be empty')
       }
     },
-    coerce: (val: any): any => { 
+    coerce: (val: any): any => {
       if (val === null){
-        return undefined 
+        return undefined
       }
       return val
     },
@@ -116,7 +116,7 @@ const config = convict({
         default: 600000,
         env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
         format: 'int',
-      }, 
+      },
     },
   },
   jwtSecret: {
@@ -182,7 +182,7 @@ const config = convict({
         env: 'COOKIE_PATH',
       },
     },
-      
+
   },
   otp: {
     retries: {
@@ -197,7 +197,7 @@ const config = convict({
     },
     resendTimeout: {
       doc: 'Number of seconds to wait before resending otp',
-      default: 30, 
+      default: 30,
       env: 'OTP_RESEND_SECONDS',
     },
   },
@@ -315,14 +315,22 @@ const config = convict({
           p: [],
           a: ['href', 'title', 'target'],
           img: ['src', 'alt', 'title', 'width', 'height'],
-        }, 
-        stripIgnoreTag: true, 
+        },
+        stripIgnoreTag: true,
       },
       sms:
-    { 
+    {
       whiteList: { br: [] },
       stripIgnoreTag: true,
     },
+    },
+  },
+  express: {
+    uploadCompleteTimeout: {
+      doc: 'Custom timeout period for upload/complete handler',
+      default: 100 * 1000,
+      env: 'UPLOAD_COMPLETE_TIMEOUT_IN_MS',
+      format: 'int',
     },
   },
 })
@@ -353,7 +361,7 @@ case 'staging':
     },
   })
   break
-case 'development':  
+case 'development':
   config.set('IS_PROD', false)
   config.load({
     frontendUrl: 'http://localhost:3000',
@@ -366,7 +374,7 @@ case 'development':
         ssl: {
           require: false, // No ssl connection needed
           rejectUnauthorized: true,
-          ca: false, 
+          ca: false,
         },
       },
     },
@@ -379,7 +387,7 @@ case 'development':
         domain:  'localhost',
         path: '/',
       },
-    }, 
+    },
   })
   break
 }
