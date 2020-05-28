@@ -73,6 +73,7 @@
   @include flex-horizontal;
   justify-content: space-between;
   width: 65%;
+  margin: 3rem 0;
 
   p {
     margin-bottom: 0;
@@ -84,6 +85,7 @@
     justify-content: center;
     width: 100%;
 
+    div,
     p {
       margin-bottom: 2rem;
     }
@@ -92,4 +94,8 @@
 
 .validateSMSCredentialsInfo {
   margin-bottom: 2rem;
+}
+
+.newCredentialsButton {
+  margin-top: 2rem;
 }
