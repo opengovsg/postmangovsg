@@ -26,7 +26,7 @@ export class TemplateError extends Error {
 
 export class InvalidRecipientError extends Error {
   constructor() {
-    super('There are invalid recipient(s) in the uploaded recipient list.')
+    super('There are invalid recipient(s) in the uploaded recipient list.\nPlease check the recipient column in your csv file.')
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
     Error.captureStackTrace(this)
   }
