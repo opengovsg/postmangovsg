@@ -84,6 +84,7 @@ const CreateSMS = ({
         <div className={styles.stepContainer}>
           <SMSDetail
             id={campaign.id}
+	    name={campaign.name}
             sentAt={campaign.sentAt}
             numRecipients={campaign.numRecipients}
           ></SMSDetail>

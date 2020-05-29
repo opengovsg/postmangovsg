@@ -22,6 +22,7 @@ export class Campaign {
   sentAt: Date
   status: Status
   isCsvProcessing: boolean
+  statusUpdatedAt: Date
 
   constructor(input: any) {
     this.id = input['id']
@@ -31,6 +32,7 @@ export class Campaign {
     this.sentAt = input['sent_at']
     this.status = this.getStatus(input['job_queue'])
     this.isCsvProcessing = input['is_csv_processing']
+    this.statusUpdatedAt = input['statusUpdatedAt']
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {
@@ -56,6 +58,7 @@ export class CampaignStats {
   sent: number
   invalid: number
   status: Status
+  updatedAt: Date
 
   constructor(input: any) {
     this.error = +input['error']
@@ -63,5 +66,22 @@ export class CampaignStats {
     this.sent = +input['sent']
     this.invalid = input['invalid']
     this.status = input['status']
+    this.updatedAt = input['updatedAt']
+  }
+}
+
+export class CampaignInvalidRecipients {
+  recipient: string
+  messageId: string
+  errorCode: string
+  sentAt: Date
+  updatedAt: Date
+
+  constructor(input: any) {
+    this.recipient = input['recipient']
+    this.messageId = input['message_id']
+    this.errorCode = input['error_code']
+    this.sentAt = input['sentAt']
+    this.updatedAt = input['updatedAt']
   }
 }

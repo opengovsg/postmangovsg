@@ -3,24 +3,29 @@ import Moment from 'react-moment'
 import cx from 'classnames'
 
 import { CampaignStats, Status } from 'classes/Campaign'
-import { ProgressBar, PrimaryButton } from 'components/common'
+import { ProgressBar, PrimaryButton, InvalidRecipientsCsv } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 const ProgressDetails = ({
+campaignId,
+campaignName,
   sentAt,
   numRecipients,
   stats,
   handlePause,
   handleRetry,
 }: {
+campaignId: number; 
+campaignName: string;
   sentAt: Date
   numRecipients: number
   stats: CampaignStats
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
 }) => {
-  const { status, error, unsent, sent, invalid } = stats
+  const { status, error, unsent, sent, invalid, updatedAt } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
+
   useEffect(() => {
     setIsComplete(!error && !unsent)
     setIsSent(status === Status.Sent)
@@ -96,7 +101,10 @@ const ProgressDetails = ({
                 Error
               </td>
               <td className={'md'}>Could not be sent</td>
-              <td className={'sm'}>{error}</td>
+              <td className={cx('sm', styles.error)}>
+                {error}
+                <InvalidRecipientsCsv campaignId={campaignId} campaignName={campaignName} status={status} error={error} sentAt={sentAt} updatedAt={updatedAt} />
+              </td>
             </tr>
             <tr>
               <td className={cx(styles.status, 'md')}>

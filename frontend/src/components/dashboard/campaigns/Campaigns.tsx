@@ -8,7 +8,7 @@ import { capitalize } from 'lodash'
 import { GUIDE_URL } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
-import { Pagination, TitleBar, PrimaryButton } from 'components/common'
+import { Pagination, TitleBar, PrimaryButton, InvalidRecipientsCsv } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
@@ -89,6 +89,11 @@ const Campaigns = () => {
     {
       name: 'Status',
       render: (campaign: Campaign) => campaign.status,
+      width: 'xs',
+    },
+    {
+      name: '',
+      render: (campaign: Campaign) => <InvalidRecipientsCsv campaignId={campaign.id} campaignName={campaign.name} status={campaign.status} sentAt={campaign.sentAt} updatedAt={campaign.statusUpdatedAt} />,
       width: 'sm',
     },
   ]

@@ -21,5 +21,5 @@ const getInvalidRecipients = async (campaignId: number): Promise<Array<CampaignI
 
 export const SmsStatsService = {
   getStats,
-  getInvalidRecipients
+  getInvalidRecipients,
 }

@@ -38,5 +38,5 @@ const getInvalidRecipients = async (req: Request, res: Response, next: NextFunct
 
 export const SmsStatsMiddleware = {
   getStats,
-  getInvalidRecipients
+  getInvalidRecipients,
 }

@@ -9,15 +9,8 @@ import {
 import { ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
-const EmailDetail = ({
-  id,
-  sentAt,
-  numRecipients,
-}: {
-  id: number
-  sentAt: Date
-  numRecipients: number
-}) => {
+const EmailDetail = ({ id, name, sentAt, numRecipients }: { id: number; name: string; sentAt: Date; numRecipients: number }) => {
+
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number) {
@@ -88,6 +81,8 @@ const EmailDetail = ({
 
       {stats.status && (
         <ProgressDetails
+          campaignId={id}
+          campaignName={name}
           sentAt={sentAt}
           numRecipients={numRecipients}
           stats={stats}
