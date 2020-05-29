@@ -71,6 +71,7 @@ export default class S3Client {
     }
     catch (err) {
       if (err.message.includes('Invalid Opening Quote')) throw new UnexpectedDoubleQuoteError()
+      if (err.message.includes('Invalid Closing Quote')) throw new UnexpectedDoubleQuoteError()
       throw err
     }
   }
