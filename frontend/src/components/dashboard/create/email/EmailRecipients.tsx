@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
@@ -39,22 +39,21 @@ const EmailRecipients = ({
 
   const { id: campaignId } = useParams()
 
-  const loadPreview = useCallback(async () => {
-    if (campaignId) {
-      try {
-        const msgPreview = await getPreviewMessage(+campaignId)
-        if (msgPreview) {
-          setPreview(msgPreview)
-        }
-      } catch (err) {
-        setErrorMessage(err.message)
+  async function loadPreview(campaignId: string) {
+    try {
+      const msgPreview = await getPreviewMessage(+campaignId)
+      if (msgPreview) {
+        setPreview(msgPreview)
       }
+    } catch (err) {
+      setErrorMessage(err.message)
     }
-  }, [campaignId])
+  }
 
   useEffect(() => {
-    loadPreview()
-  }, [loadPreview])
+    if (!campaignId) return
+    loadPreview(campaignId)
+  }, [campaignId])
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
@@ -86,7 +85,7 @@ const EmailRecipients = ({
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
-      await loadPreview()
+      await loadPreview(campaignId)
 
       // Store filename and numRecipients in campaign object
       onNext(

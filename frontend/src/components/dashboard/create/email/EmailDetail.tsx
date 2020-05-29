@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { Status, CampaignStats } from 'classes/Campaign'
 import {
@@ -19,16 +19,16 @@ const EmailDetail = ({
 }) => {
   const [stats, setStats] = useState(new CampaignStats({}))
 
-  const refreshCampaignStats = useCallback(async () => {
-    const campaignStats = await getCampaignStats(+id)
+  async function refreshCampaignStats(id: number) {
+    const campaignStats = await getCampaignStats(id)
     setStats(campaignStats)
     return campaignStats
-  }, [id])
+  }
 
   async function handlePause() {
     try {
       await stopCampaign(id)
-      await refreshCampaignStats()
+      await refreshCampaignStats(id)
     } catch (err) {
       console.error(err)
     }
@@ -37,7 +37,7 @@ const EmailDetail = ({
   async function handleRetry() {
     try {
       await retryCampaign(id)
-      await refreshCampaignStats()
+      await refreshCampaignStats(id)
     } catch (err) {
       console.error(err)
     }
@@ -47,7 +47,7 @@ const EmailDetail = ({
     let timeoutId: NodeJS.Timeout
 
     async function poll() {
-      const { status } = await refreshCampaignStats()
+      const { status } = await refreshCampaignStats(id)
 
       if (status !== Status.Sent) {
         timeoutId = setTimeout(poll, 2000)
@@ -58,7 +58,7 @@ const EmailDetail = ({
     return () => {
       timeoutId && clearTimeout(timeoutId)
     }
-  }, [refreshCampaignStats, stats.status])
+  }, [id, stats.status])
 
   return (
     <>
