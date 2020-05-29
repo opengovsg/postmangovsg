@@ -58,24 +58,23 @@ const EmailDetail = ({ id, name, sentAt, numRecipients }: { id: number; name: st
 
   return (
     <>
-      {stats.status === Status.Sending ? (
-        <>
-          <h2>Your campaign is being sent out now!</h2>
-          <p>
-            It may take a few minutes to complete. You can leave this page in
-            the meantime, and check on the progress by returning to this page
-            from the Campaigns tab.
-          </p>
-        </>
-      ) : (
-        <>
-          <h2>Your campaign has been sent!</h2>
-          <p>
-            Some messages may have failed to send. You can retry these by
-            clicking on Retry.{' '}
-          </p>
-        </>
-      )}
+      {
+        stats.status === Status.Sending ?
+          (<>
+            <h2>Your campaign is being sent out now!</h2>
+            <p>It may take a few minutes to complete. You can leave this page in the meantime,
+          and check on the progress by returning to this page from the Campaigns tab.</p>
+          </>
+          ) :
+          (<>
+            <h2>Your campaign has been sent!</h2>
+            <p>Some messages may have failed to send. You can retry these by clicking on Retry.
+            You can also download a list of failed recipients.
+            The link will be available after the campaign has finished sending. It may take up to 5 minutes.
+            </p>
+          </>
+          )
+      }
 
       <div className="separator"></div>
 
