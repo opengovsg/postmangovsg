@@ -83,6 +83,13 @@ const config = convict({
       format: 'required-string',
       sensitive: true,
     },
+    databaseReadReplicaUri: {
+      doc: 'URI to the postgres read replica database',
+      default: '',
+      env: 'DB_READ_REPLICA_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
     dialectOptions: {
       ssl: {
         require: {

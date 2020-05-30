@@ -1,4 +1,5 @@
-import { fn, cast, Transaction, Op } from 'sequelize'
+import { fn, cast, Transaction, Op, QueryTypes } from 'sequelize'
+import sequelizeLoader from '../loaders/sequelize.loader'
 import { Statistic, JobQueue } from '@core/models'
 import { CampaignStats, CampaignStatsCount, CampaignInvalidRecipient } from '@core/interfaces'
 
@@ -136,20 +137,20 @@ const getTotalSentCount = async (): Promise<number> => {
 }
 
 /**
- * Helper method to get error_code, recipients for failes messages from logs table
+ * Helper method to get error_code, recipients for failed messages from logs table
  * @param campaignId
  * @param logsTable
  */
-const getInvalidRecipients = async (campaignId: number, logsTable: any): Promise<Array<CampaignInvalidRecipient>> => {
+const getInvalidRecipients = async (campaignId: number, logsTable: string): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+  // Get read replica instance
+  const sequelize = sequelizeLoader.getSequelizeReadReplicaInstance()
   // Retrieve message logs with error codes from logs table
-  const data = await logsTable.findAll({
-    where: {
-      campaignId,
-      error_code: { [Op.ne]: null }
-     },
-    attributes: ['recipient', 'sentAt', 'updatedAt', 'messageId', 'errorCode'],
+  return await sequelize?.query(
+    `SELECT recipient, sent_at, updated_at, message_id, error_code FROM ${logsTable} \
+    WHERE campaign_id = :campaignId and error_code is not NULL`,
+  {
+    replacements: { campaignId }, type: QueryTypes.SELECT,
   })
-  return data
 }
 
 export const StatsService = {

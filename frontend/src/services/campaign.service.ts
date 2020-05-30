@@ -121,16 +121,6 @@ export async function retryCampaign(campaignId: number): Promise<void> {
 
 export async function getCampaignInvalidRecipients(campaignId: number): Promise<Array<CampaignInvalidRecipients>> {
   return axios.get(`/campaign/${campaignId}/invalid-recipients`).then((response) => {
-    const invalidRecipients: CampaignInvalidRecipients[] = response.data.map((data: any) => {
-      const { sentAt, statusUpdatedAt } = getJobTimestamps(data.job_queue)
-      const details = {
-        ...data,
-        sentAt,
-        statusUpdatedAt,
-      }
-
-      return new CampaignInvalidRecipients(details)
-    })
-    return invalidRecipients
+    return response.data
   })
 }

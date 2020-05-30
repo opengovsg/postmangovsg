@@ -20,17 +20,31 @@ import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import logger from '@core/logger'
 
 const DB_URI = config.get('database.databaseUri')
+const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
 
-const sequelizeLoader = async (): Promise<void> => {
-  const dialectOptions = config.get('IS_PROD')
-    ? config.get('database.dialectOptions')
-    : {}
-  const sequelize = new Sequelize(DB_URI, {
-    dialect: 'postgres',
-    logging: false,
-    pool: config.get('database.poolOptions'),
-    dialectOptions,
-  })
+class SequelizeLoader {
+  private sequelizeReadReplica: Sequelize | null
+
+  constructor() {
+    this.sequelizeReadReplica = null
+  }
+
+  public async init(): Promise<void> {
+    await this.loadMasterDB()
+    this.sequelizeReadReplica = await this.loadReadReplicaDB()
+  }
+  public getSequelizeReadReplicaInstance(): Sequelize | null {
+    return this.sequelizeReadReplica
+  }
+
+  private loadMasterDB = async (): Promise<void> => {
+    const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+    const sequelize = new Sequelize(DB_URI, {
+      dialect: 'postgres',
+      logging: false,
+      pool: config.get('database.poolOptions'),
+      dialectOptions,
+    })
 
   const coreModels = [
     Credential,
@@ -45,15 +59,36 @@ const sequelizeLoader = async (): Promise<void> => {
   const smsModels = [SmsMessage, SmsTemplate, SmsOp]
   sequelize.addModels([...coreModels, ...emailModels, ...smsModels])
 
-  try {
-    await sequelize.sync()
-    logger.info({ message: 'Database loaded.' })
-  } catch (err) {
-    logger.error(`Unable to connect to database: ${err}`)
-    process.exit(1)
+    try {
+      await sequelize.sync()
+      logger.info({ message: 'Master database loaded.' })
+    } catch (err) {
+      logger.error(`Unable to connect to master database: ${err}`)
+      process.exit(1)
+    }
+
+    await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
   }
 
-  await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
+  private loadReadReplicaDB = async (): Promise<Sequelize> => {
+    const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+    const sequelizeReadReplica = new Sequelize(DB_READ_REPLICA_URI, {
+      dialect: 'postgres',
+      logging: false,
+      pool: config.get('database.poolOptions'),
+      dialectOptions,
+    })
+
+    try {
+      await sequelizeReadReplica.sync()
+      logger.info({ message: 'Read replica database loaded.' })
+    } catch (err) {
+      logger.error(`Unable to connect to read replica database database: ${err}`)
+      process.exit(1)
+    }
+
+    return sequelizeReadReplica
+  }
 }
 
-export default sequelizeLoader
+export default new SequelizeLoader()

@@ -68,9 +68,10 @@ const EmailDetail = ({ id, name, sentAt, numRecipients }: { id: number; name: st
           ) :
           (<>
             <h2>Your campaign has been sent!</h2>
-            <p>Some messages may have failed to send. You can retry these by clicking on Retry.
-            You can also download a list of failed recipients.
-            The link will be available after the campaign has finished sending. It may take up to 5 minutes.
+            <p>A retry button will appear if some messages had an error while sending.
+              You can click on retry to try sending the message(s) again.
+              An invalid recipients download link will appear for you to download a list
+               of failed deliveries with the recipient’s email or mobile number.
             </p>
           </>
           )

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 
 import { Status } from 'classes/Campaign'
@@ -6,25 +6,27 @@ import { getCampaignInvalidRecipients, getCampaignStats } from 'services/campaig
 import styles from './InvalidRecipientsCsv.module.scss'
 
 const LINK_DISPLAY_WAIT_TIME = 5 * 60 * 1000
+
 const InvalidRecipientsCsv = ({ campaignId, campaignName, status, sentAt, updatedAt, error }:
   { campaignId: number; campaignName: string; status: Status; sentAt: Date; updatedAt: Date; error?: number }) => {
   const updatedAtTimestamp = +new Date(updatedAt)
   const campaignAge = Date.now() - updatedAtTimestamp
+  const [errorCount, setErrorCount] = useState(error)
 
   async function getErrorCount() {
     const { error } = await getCampaignStats(campaignId)
-    return error
+    setErrorCount(error)
   }
 
   async function onDownloadInvalidRecipientsList(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     event.stopPropagation()
     const list = await getCampaignInvalidRecipients(campaignId)
-    const headers = Object.keys(list)
+    const headers = Object.keys(list[0])
     const sentAtTime = new Date(sentAt)
 
     const content = [
       `data:text/csv;charset=utf-8,${headers.join(',')}`,
-      `${list.join(',')}`,
+      `${list.map(row => Object.values(row).join(','))}`,
     ].join('\n')
     const encodedUri = encodeURI(content)
 
@@ -37,13 +39,12 @@ const InvalidRecipientsCsv = ({ campaignId, campaignName, status, sentAt, update
   }
 
   if (status === Status.Sent && campaignAge > LINK_DISPLAY_WAIT_TIME) {
-    const errorCount = error || 0
-    // call stats endpoint to retrieve error count when error stats not found i.e. in campaigns list
     if (!error) {
       getErrorCount()
     }
+    // call stats endpoint to retrieve error count when error stats not found i.e. in campaigns list
 
-    return errorCount > 0
+    return errorCount
       ? (
         <div className={styles.invalidRecipients} onClick={e => onDownloadInvalidRecipientsList(e)}>
           <i className={cx(styles.icon, 'bx bx-download')}></i>
