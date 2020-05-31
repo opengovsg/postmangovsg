@@ -92,12 +92,8 @@ router.use(EmailMiddleware.isEmailCampaignOwnedByUser)
  *          content:
  *            application/json:
  *              schema:
- *                type: object
- *                properties:
- *                  campaign:
- *                    $ref: '#/components/schemas/EmailCampaign'
- *                  num_recipients:
- *                    type: number
+ *                $ref: '#/components/schemas/EmailCampaign'
+ * 
  *        "400" :
  *           description: Invalid campaign type or not owned by user
  *        "401":

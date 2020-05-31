@@ -140,8 +140,7 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
   try {
     const { campaignId } = req.params
     const result = await SmsService.getCampaignDetails(+campaignId)
-    // TODO: Why is numRecipients not part of campaign?
-    return res.json({ campaign: (await result).campaign, 'num_recipients': result.numRecipients })
+    return res.json(result)
   } catch (err) {
     return next(err)
   }

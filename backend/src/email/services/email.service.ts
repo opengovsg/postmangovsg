@@ -4,7 +4,7 @@ import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
 import { MailService } from '@core/services'
-import { MailToSend, GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
+import { MailToSend, GetCampaignDetailsOutput } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
@@ -110,30 +110,34 @@ const setCampaignCredential = (campaignId: number): Promise<[number, Campaign[]]
  * @param campaignId 
  */
 const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetailsOutput> => {
-  const campaignDetails: CampaignDetails =  (await Campaign.findOne({ 
-    where: { id: +campaignId }, 
-    attributes: [
-      'id', 'name', 'type', 'created_at', 'valid',
-      [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
-      [literal('s3_object -> \'filename\''), 'csv_filename'],
-    ],
-    include: [
-      {
-        model: JobQueue,
-        attributes: ['status', ['created_at', 'sent_at']],
-      },
-      {
-        model: EmailTemplate,
-        attributes: ['body', 'subject', 'params', 'reply_to'],
-      }],
-  }))?.get({ plain: true }) as CampaignDetails
-
-  const numRecipients: number = await EmailMessage.count(
-    {
-      where: { campaignId: +campaignId },
-    }
+  const [campaignDetails, numRecipients] =  await Promise.all(
+    [
+      Campaign.findOne({ 
+        where: { id: +campaignId }, 
+        attributes: [
+          'id', 'name', 'type', 'created_at', 'valid',
+          [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+          [literal('s3_object -> \'filename\''), 'csv_filename'],
+        ],
+        include: [
+          {
+            model: JobQueue,
+            attributes: ['status', ['created_at', 'sent_at']],
+          },
+          {
+            model: EmailTemplate,
+            attributes: ['body', 'subject', 'params', 'reply_to'],
+          }],
+      }),
+      EmailMessage.count(
+        {
+          where: { campaignId: +campaignId },
+        }
+      ),
+    ]
   )
-  return { campaign: campaignDetails, numRecipients }
+
+  return { ...campaignDetails?.get({ plain: true }), 'num_recipients': numRecipients } as GetCampaignDetailsOutput
 }
 
 export const EmailService = {

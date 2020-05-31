@@ -20,7 +20,6 @@ export interface StoreTemplateOutput {
  * @swagger
  *  components:
  *    schemas:
- * 
  *      EmailCampaign:
  *       type: object
  *       properties:
@@ -44,6 +43,8 @@ export interface StoreTemplateOutput {
  *           type: array
  *           items:
  *            $ref: '#/components/schemas/JobQueue'
+ *         num_recipients:
+ *           type: number
  *         email_templates:
  *           type: object
  *           properties:

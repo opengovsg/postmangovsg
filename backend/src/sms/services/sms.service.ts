@@ -5,7 +5,7 @@ import config from '@core/config'
 
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
-import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
+import { GetCampaignDetailsOutput } from '@core/interfaces'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
@@ -94,30 +94,35 @@ const setCampaignCredential = (campaignId: number, credentialName: string): Prom
  * @param campaignId 
  */
 const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetailsOutput> => {
-  const campaignDetails: CampaignDetails = (await Campaign.findOne({
-    where: { id: +campaignId },
-    attributes: [
-      'id', 'name', 'type', 'created_at', 'valid',
-      [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
-      [literal('s3_object -> \'filename\''), 'csv_filename'],
-    ],
-    include: [
-      {
-        model: JobQueue,
-        attributes: ['status', ['created_at', 'sent_at']],
-      },
-      {
-        model: SmsTemplate,
-        attributes: ['body', 'params'],
-      }],
-  }))?.get({ plain: true }) as CampaignDetails
-  
-  const numRecipients: number = await SmsMessage.count(
-    {
-      where: { campaignId: +campaignId },
-    }
+  const [campaignDetails, numRecipients] =  await Promise.all(
+    [
+      Campaign.findOne({ 
+        where: { id: +campaignId },
+        attributes: [
+          'id', 'name', 'type', 'created_at', 'valid',
+          [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
+          [literal('s3_object -> \'filename\''), 'csv_filename'],
+        ],
+        include: [
+          {
+            model: JobQueue,
+            attributes: ['status', ['created_at', 'sent_at']],
+          },
+          {
+            model: SmsTemplate,
+            attributes: ['body', 'params'],
+          },
+        ],
+      }),
+      SmsMessage.count(
+        {
+          where: { campaignId: +campaignId },
+        }
+      ),
+    ]
   )
-  return { campaign: campaignDetails, numRecipients }
+  
+  return { ...campaignDetails?.get({ plain: true }), 'num_recipients': numRecipients } as GetCampaignDetailsOutput
 }
 
 /**

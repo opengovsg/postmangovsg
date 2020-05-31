@@ -51,10 +51,9 @@ export async function getCampaignStats(campaignId: number): Promise<CampaignStat
 
 export async function getCampaignDetails(campaignId: number): Promise<EmailCampaign | SMSCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
-    const { campaign, num_recipients: numRecipients } = response.data
+    const campaign = response.data
     const details = {
       ...campaign,
-      'num_recipients': numRecipients,
       'sent_at': getSentAt(campaign.job_queue),
     }
 
