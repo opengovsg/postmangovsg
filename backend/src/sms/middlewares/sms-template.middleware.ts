@@ -120,9 +120,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     const { campaignId } = req.params
     // TODO: validate if project is in editable state
 
-    // switch campaign to invalid - this is for the case of uploading over an existing file
-    await CampaignService.setInvalid(+campaignId)
-
     // extract s3Key from transactionId
     const { 'transaction_id': transactionId, filename } = req.body
     const s3Key: string = TemplateService.extractS3Key(transactionId)
