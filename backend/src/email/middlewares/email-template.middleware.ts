@@ -146,7 +146,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
   
       if (EmailTemplateService.hasInvalidEmailRecipient(records)) throw new InvalidRecipientError()
       
-      const recipientCount: number = records.length
+      const recipientCount = records.length
 
       await updateCampaignAndMessages(s3Key, campaignId, filename, records)
 
