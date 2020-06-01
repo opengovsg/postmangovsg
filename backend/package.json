@@ -6,12 +6,14 @@
   "scripts": {
     "build": "rimraf build && tsc",
     "dev": "npm run postbuild && tsc-watch --onSuccess \"node ./build/server.js\"",
-    "lint": "eslint --ignore-path .gitignore --fix 'src/**/*.ts'",
+    "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
+    "lint": "npm run lint-no-fix -- --fix",
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "precommit": "lint-staged"
   },
   "author": "",
   "license": "MIT",
@@ -78,7 +80,11 @@
     "@typescript-eslint/parser": "^2.25.0",
     "copyfiles": "^2.2.0",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
     "jest": "^25.5.2",
+    "lint-staged": "^10.2.6",
+    "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "ts-jest": "^25.4.0",
     "tsc-watch": "^4.2.3",
@@ -95,5 +101,8 @@
   },
   "bugs": {
     "url": "https://github.com/datagovsg/postmangovsg/issues"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --cache --fix"
   }
 }

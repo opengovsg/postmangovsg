@@ -13,7 +13,8 @@ async function getOtpWithEmail(email: string): Promise<void> {
 async function loginWithOtp(email: string, otp: string): Promise<void> {
   try {
     await axios.post('/auth/login', {
-      email, otp,
+      email,
+      otp,
     })
   } catch (e) {
     errorHandler(e, {
@@ -30,7 +31,6 @@ async function getUserEmail(): Promise<string | undefined> {
   } catch (e) {
     console.error(e)
   }
-
 }
 
 async function logout(): Promise<void> {
@@ -49,9 +49,4 @@ function errorHandler(e: AxiosError, customHandlers: any = {}) {
   throw new Error(`${e}`)
 }
 
-export {
-  getOtpWithEmail,
-  loginWithOtp,
-  getUserEmail,
-  logout,
-}
+export { getOtpWithEmail, loginWithOtp, getUserEmail, logout }

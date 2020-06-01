@@ -9,21 +9,25 @@ export default class MailClient {
   /**
    * Constructs a node mailer instance if SES credentials are provided; otherwise uses local transport
    * @param email email address that will be set in the From: field
-   * @param credentials 
+   * @param credentials
    */
   constructor(email: string, credentials: MailCredentials) {
     const { host, port, auth } = credentials
 
-    if (!email) throw new Error('Missing email from credentials while constructing MailService.')
+    if (!email)
+      throw new Error(
+        'Missing email from credentials while constructing MailService.'
+      )
     this.email = email
 
     if (!host) {
       logger.info('Mailer: Using direct transport')
-      this.mailer = nodemailer.createTransport(directTransport({ debug:true }))
+      this.mailer = nodemailer.createTransport(directTransport({ debug: true }))
       return
     }
 
-    if (!port || !auth.user || !auth.pass) throw new Error('Missing credentials while constructing MailService')
+    if (!port || !auth.user || !auth.pass)
+      throw new Error('Missing credentials while constructing MailService')
 
     logger.info('Mailer: Using SMTP transport')
     this.mailer = nodemailer.createTransport({
@@ -37,21 +41,23 @@ export default class MailClient {
   }
 
   public sendMail(input: MailToSend): Promise<string | void> {
-    return new Promise<string | void>((resolve,reject) => {
-      this.mailer.sendMail({
-        from: this.email,
-        to: input.recipients,
-        subject: input.subject,
-        replyTo: input.replyTo,
-        html: input.body,
-      }, (err, info) => {
-        if (err !== null){
-          reject(new Error(`${err}`))
+    return new Promise<string | void>((resolve, reject) => {
+      this.mailer.sendMail(
+        {
+          from: this.email,
+          to: input.recipients,
+          subject: input.subject,
+          replyTo: input.replyTo,
+          html: input.body,
+        },
+        (err, info) => {
+          if (err !== null) {
+            reject(new Error(`${err}`))
+          } else {
+            resolve(info.messageId)
+          }
         }
-        else {
-          resolve(info.messageId)
-        }
-      })
+      )
     })
   }
 }

@@ -1,10 +1,15 @@
-import { Column, DataType, Model, Table, ForeignKey } from 'sequelize-typescript'
+import {
+  Column,
+  DataType,
+  Model,
+  Table,
+  ForeignKey,
+} from 'sequelize-typescript'
 import { Campaign } from './campaign'
 import { QueryTypes } from 'sequelize'
 
 @Table({ tableName: 'statistics', underscored: true, timestamps: true })
 export class Statistic extends Model<Statistic> {
-
   @ForeignKey(() => Campaign)
   @Column({
     type: DataType.INTEGER,
@@ -30,5 +35,4 @@ export class Statistic extends Model<Statistic> {
     })
     return
   }
-
 }

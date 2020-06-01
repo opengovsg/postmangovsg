@@ -17,7 +17,14 @@
     "postinstall": "npm run postinstall:backend && npm run postinstall:worker && npm run postinstall:frontend",
     "postinstall:frontend": "cd frontend && npm install",
     "postinstall:backend": "cd backend && npm install",
-    "postinstall:worker": "cd worker && npm install"
+    "postinstall:worker": "cd worker && npm install",
+    "precommit": "npm run precommit:frontend && npm run precommit:backend && npm run precommit:worker && npm run precommit:root",
+    "precommit:frontend": "cd frontend && npm run precommit",
+    "precommit:backend": "cd backend && npm run precommit",
+    "precommit:worker": "cd worker && npm run precommit",
+    "precommit:root": "lint-staged",
+    "lint-no-fix": "prettier --check '**/*.{yml,md}'",
+    "lint": "prettier --write '**/*.{yml,md}' --loglevel warn"
   },
   "repository": {
     "type": "git",
@@ -32,6 +39,17 @@
   "dependencies": {},
   "devDependencies": {
     "concurrently": "^5.1.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.6",
+    "prettier": "^2.0.5",
     "typescript": "^3.8.3"
+  },
+  "lint-staged": {
+    "*.{yml,md}": "prettier --write"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit"
+    }
   }
 }

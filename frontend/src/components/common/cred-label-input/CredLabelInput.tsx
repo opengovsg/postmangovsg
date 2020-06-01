@@ -2,11 +2,19 @@ import React from 'react'
 
 import TextInput from '../text-input'
 
-const CredLabelInput = ({ value, onChange }: { value: string; onChange: (newValue: string) => any }) => {
-
+const CredLabelInput = ({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (newValue: string) => any
+}) => {
   function onLabelChange(value: string) {
     if (value) {
-      const converted = value.toLowerCase().replace(/[\s-]+/g, '-').replace(/[^a-z0-9-]+/g, '')
+      const converted = value
+        .toLowerCase()
+        .replace(/[\s-]+/g, '-')
+        .replace(/[^a-z0-9-]+/g, '')
       onChange(converted)
     } else {
       onChange('')

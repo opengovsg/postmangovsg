@@ -3,15 +3,23 @@ import cx from 'classnames'
 
 import styles from './Dropdown.module.scss'
 
-const Dropdown = ({ options, onSelect }: { options: { label: string; value: string }[]; onSelect: (value: string) => any }) => {
-
+const Dropdown = ({
+  options,
+  onSelect,
+}: {
+  options: { label: string; value: string }[]
+  onSelect: (value: string) => any
+}) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [selectedLabel, setSelectedLabel] = useState('')
 
   useEffect(() => {
     function handleClickOutside(event: { target: any }) {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
         setIsOpen(false)
       }
     }
@@ -31,15 +39,24 @@ const Dropdown = ({ options, onSelect }: { options: { label: string; value: stri
   }
 
   return (
-    <div className={cx(styles.container, { [styles.open]: isOpen })} ref={containerRef}>
+    <div
+      className={cx(styles.container, { [styles.open]: isOpen })}
+      ref={containerRef}
+    >
       <div className={styles.select} onClick={() => setIsOpen(!isOpen)}>
         {selectedLabel || 'Select an option'}
         <i className={cx(styles.caret, 'bx bx-caret-down')}></i>
       </div>
       <div className={styles.menu}>
-        {options.map(o =>
-          <div className={styles.item} key={o.value} onClick={() => onItemSelected(o)}>{o.label}</div>
-        )}
+        {options.map((o) => (
+          <div
+            className={styles.item}
+            key={o.value}
+            onClick={() => onItemSelected(o)}
+          >
+            {o.label}
+          </div>
+        ))}
       </div>
     </div>
   )

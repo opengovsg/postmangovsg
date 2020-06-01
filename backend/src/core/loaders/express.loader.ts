@@ -13,12 +13,12 @@ const FRONTEND_URL = config.get('frontendUrl')
 
 /**
  * Returns a regex or a string used by cors to determine if requests comes from allowed origin
- * @param v 
+ * @param v
  */
-const origin = (v: string): string | RegExp  => {
-  if (v.startsWith('/') && v.endsWith('/')){
+const origin = (v: string): string | RegExp => {
+  if (v.startsWith('/') && v.endsWith('/')) {
     // Remove the leading and trailing slash
-    return new RegExp(v.substring(1, v.length-1))
+    return new RegExp(v.substring(1, v.length - 1))
   }
   return v
 }
@@ -27,8 +27,9 @@ morgan.token('client-ip', clientIp)
 morgan.token('user-id', userId)
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
-const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), { stream: logger.stream })
-
+const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
+  stream: logger.stream,
+})
 
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(loggerMiddleware)
@@ -42,10 +43,12 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   //   "preflightContinue": false,
   //   "optionsSuccessStatus": 204
   // }
-  app.use(cors({
-    origin: origin(FRONTEND_URL),
-    credentials: true, // required for setting cookie
-  }))
+  app.use(
+    cors({
+      origin: origin(FRONTEND_URL),
+      credentials: true, // required for setting cookie
+    })
+  )
 
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
@@ -54,10 +57,17 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use('/v1', v1Router)
   app.use(celebrateErrorMiddleware())
 
-  app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    logger.error(`${JSON.stringify(err.stack, null, 4)}`)
-    return res.sendStatus(500)
-  })
+  app.use(
+    (
+      err: Error,
+      _req: express.Request,
+      res: express.Response,
+      _next: express.NextFunction
+    ) => {
+      logger.error(`${JSON.stringify(err.stack, null, 4)}`)
+      return res.sendStatus(500)
+    }
+  )
 
   logger.info({ message: 'Express routes loaded' })
 }

@@ -13,28 +13,30 @@ const s3 = new S3({
 
 /**
  * Returns a presigned url for uploading file to s3 bucket
- * @param contentType 
+ * @param contentType
  */
-const getUploadParameters = async (contentType: string): Promise<{presignedUrl: string; signedKey: string}> => {
+const getUploadParameters = async (
+  contentType: string
+): Promise<{ presignedUrl: string; signedKey: string }> => {
   const s3Key = uuid()
-  
+
   const params = {
     Bucket: FILE_STORAGE_BUCKET_NAME,
     Key: s3Key,
     ContentType: contentType,
     Expires: 180, // seconds
   }
-  
+
   const signedKey = jwtUtils.sign(s3Key)
-  
+
   const presignedUrl = await s3.getSignedUrlPromise('putObject', params)
-  
+
   return { presignedUrl, signedKey }
 }
-  
+
 /**
  * Decodes jwt
- * @param transactionId 
+ * @param transactionId
  */
 const extractS3Key = (transactionId: string): string => {
   let decoded: string

@@ -13,11 +13,13 @@ const cloudwatchLoader = async (): Promise<void> => {
   try {
     if (instanceId) {
       logger.info({ message: `Detected instanceId as ${instanceId}` })
-      logger.add(new WinstonCloudwatch({
-        logGroupName: config.get('aws.logGroupName'),
-        logStreamName: instanceId,
-        awsOptions: configureEndpoint(config),
-      }))
+      logger.add(
+        new WinstonCloudwatch({
+          logGroupName: config.get('aws.logGroupName'),
+          logStreamName: instanceId,
+          awsOptions: configureEndpoint(config),
+        })
+      )
     }
   } catch (err) {
     console.error(err)

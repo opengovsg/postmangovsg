@@ -7,67 +7,81 @@ import { CampaignService } from '@core/services'
  * @param res
  * @param next
  */
-const canEditCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const canEditCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    if (!(await CampaignService.hasJobInProgress(+campaignId))){
-      return next() 
+    if (!(await CampaignService.hasJobInProgress(+campaignId))) {
+      return next()
     } else {
       return res.sendStatus(403)
     }
-  }
-  catch (err) {
+  } catch (err) {
     return next(err)
   }
 }
 
 /**
  *  Create a campaign
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const createCampaign = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const createCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { name, type }: { name: string; type: string } = req.body
-    const userId = req.session?.user?.id 
-    const campaign = await CampaignService.createCampaign({ name, type, userId })
+    const userId = req.session?.user?.id
+    const campaign = await CampaignService.createCampaign({
+      name,
+      type,
+      userId,
+    })
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
-      // eslint-disable-next-line @typescript-eslint/camelcase
       created_at: campaign.createdAt,
       type: campaign.type,
     })
-  }
-  catch (err) {
+  } catch (err) {
     return next(err)
   }
-
 }
 
 /**
  * List campaigns for user
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const listCampaigns = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const listCampaigns = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { offset, limit } = req.query
-    const userId = req.session?.user?.id 
-    const campaigns = await CampaignService.listCampaigns({ offset, limit, userId })
-    
+    const userId = req.session?.user?.id
+    const campaigns = await CampaignService.listCampaigns({
+      offset,
+      limit,
+      userId,
+    })
+
     return res.json(campaigns)
   } catch (err) {
     return next(err)
   }
 }
 
-
-
-export const CampaignMiddleware = { 
-  canEditCampaign, 
-  createCampaign, 
-  listCampaigns, 
+export const CampaignMiddleware = {
+  canEditCampaign,
+  createCampaign,
+  listCampaigns,
 }

@@ -4,7 +4,6 @@ $tablet: 769px;
 $desktop: 1024px;
 $widescreen: 1216px;
 
-
 @mixin mobile {
   @media (max-width: $tablet - 0.1px) {
     @content;

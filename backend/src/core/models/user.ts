@@ -1,11 +1,17 @@
-import { Column, DataType, Model, Table, BeforeCreate, HasMany } from 'sequelize-typescript'
+import {
+  Column,
+  DataType,
+  Model,
+  Table,
+  BeforeCreate,
+  HasMany,
+} from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 
 @Table({ tableName: 'users', underscored: true, timestamps: true })
 export class User extends Model<User> {
-
   @Column({
     type: DataType.TEXT,
     allowNull: false,
@@ -29,7 +35,9 @@ export class User extends Model<User> {
   @BeforeCreate
   static validateEmail(instance: User): void {
     if (!validateDomain(instance.email)) {
-      throw new Error(`User email ${instance.email} does not end in a whitelisted domain`)
+      throw new Error(
+        `User email ${instance.email} does not end in a whitelisted domain`
+      )
     }
   }
 

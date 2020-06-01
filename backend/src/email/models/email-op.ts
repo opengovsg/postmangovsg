@@ -1,7 +1,14 @@
-import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+  BelongsTo,
+} from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'email_ops' , underscored: true, timestamps: true })
+@Table({ tableName: 'email_ops', underscored: true, timestamps: true })
 export class EmailOp extends Model<EmailOp> {
   @Column({
     type: DataType.BIGINT,
@@ -9,7 +16,7 @@ export class EmailOp extends Model<EmailOp> {
     primaryKey: true,
   })
   id!: number
-  
+
   @ForeignKey(() => Campaign)
   @Column(DataType.INTEGER)
   campaignId!: number
@@ -31,14 +38,13 @@ export class EmailOp extends Model<EmailOp> {
 
   @Column(DataType.DATE)
   dequeuedAt?: Date
-  
+
   @Column(DataType.DATE)
   sentAt?: Date
-  
+
   @Column(DataType.DATE)
   deliveredAt?: Date
 
   @Column(DataType.DATE)
   receivedAt?: Date
-
 }

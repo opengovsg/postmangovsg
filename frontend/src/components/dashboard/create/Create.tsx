@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { Campaign, ChannelType, SMSCampaign, EmailCampaign, Status } from 'classes'
+import {
+  Campaign,
+  ChannelType,
+  SMSCampaign,
+  EmailCampaign,
+  Status,
+} from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
 import SMSCreate from './sms/SMSCreate'
@@ -16,16 +22,15 @@ const Create = () => {
   const [campaign, setCampaign] = useState(new Campaign({}))
   const [isLoading, setLoading] = useState(true)
 
-  async function loadProject() {
-    if (id) {
-      const campaign = await getCampaignDetails(+id)
-      setCampaign(campaign)
-      setLoading(false)
-    }
+  async function loadProject(id: string) {
+    const campaign = await getCampaignDetails(+id)
+    setCampaign(campaign)
+    setLoading(false)
   }
 
   useEffect(() => {
-    loadProject()
+    if (!id) return
+    loadProject(id)
   }, [id])
 
   function renderCreateChannel() {
@@ -41,27 +46,23 @@ const Create = () => {
 
   return (
     <>
-      {
-        campaign ?
-          (
-            <>
-              <TitleBar title={campaign.name}>
-                <PrimaryButton
-                  onClick={() => history.push('/campaigns')}>
-                  {
-                    campaign.status === Status.Draft
-                      ? 'Finish this later'
-                      : 'Back to campaigns'
-                  }
-                </PrimaryButton>
-              </TitleBar>
-              {isLoading && <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>}
-              {!isLoading && renderCreateChannel()}
-            </>
-          )
-          :
-          (<p>loading..</p>)
-      }
+      {campaign ? (
+        <>
+          <TitleBar title={campaign.name}>
+            <PrimaryButton onClick={() => history.push('/campaigns')}>
+              {campaign.status === Status.Draft
+                ? 'Finish this later'
+                : 'Back to campaigns'}
+            </PrimaryButton>
+          </TitleBar>
+          {isLoading && (
+            <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
+          )}
+          {!isLoading && renderCreateChannel()}
+        </>
+      ) : (
+        <p>loading..</p>
+      )}
     </>
   )
 }

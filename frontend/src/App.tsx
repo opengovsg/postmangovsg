@@ -15,7 +15,6 @@ import AuthContextProvider from 'contexts/auth.context'
 
 import './styles/app.scss'
 
-
 const App = () => {
   return (
     <Router>

@@ -1,6 +1,6 @@
 export enum ChannelType {
   SMS = 'SMS',
-  Email = 'EMAIL'
+  Email = 'EMAIL',
 }
 
 export enum JobStatus {
@@ -9,7 +9,7 @@ export enum JobStatus {
   Sending = 'SENDING',
   Sent = 'SENT',
   Stopped = 'STOPPED',
-  Logged = 'LOGGED'
+  Logged = 'LOGGED',
 }
 
 /**
@@ -43,7 +43,7 @@ export enum JobStatus {
  *           type: array
  *           items:
  *            $ref: '#/components/schemas/JobQueue'
- * 
+ *
  *     JobQueue:
  *        type: object
  *        properties:
@@ -52,7 +52,7 @@ export enum JobStatus {
  *          sent_at:
  *            type: string
  *            format: date-time
- *     
+ *
  *     JobStatus:
  *       type: string
  *       enum:
@@ -63,4 +63,3 @@ export enum JobStatus {
  *       - STOPPED
  *       - LOGGED
  */
-
