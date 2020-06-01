@@ -7,7 +7,7 @@ BEGIN
 WITH stats AS (
   SELECT
     COUNT(*) FILTER (WHERE delivered_at IS NULL) AS unsent,
-    COUNT(*) FILTER (WHERE error_code IS NOT NULL) AS errored,
+    COUNT(*) FILTER (WHERE error_code IS NOT NULL AND message_id IS NULL) AS errored,
     COUNT(*) FILTER (WHERE message_id IS NOT NULL) AS sent
   FROM sms_messages
   WHERE campaign_id = selected_campaign_id
