@@ -1,4 +1,5 @@
 import { difference, keys, chunk } from 'lodash'
+import { Transaction } from 'sequelize'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -162,16 +163,16 @@ const getFilledTemplate = async (campaignId: number): Promise<SmsTemplate | null
 /**
  * 1. delete existing entries
  * 2. bulk insert
- * 3. mark campaign as valid
- * steps 1- 3 are wrapped in txn. rollback if any fails
  * @param campaignId
  * @param records
+ * @param transaction
  */
-const addToMessageLogs = async (campaignId: number, records: Array<object>): Promise<void> => {
-  let transaction
+const addToMessageLogs = async (
+  campaignId: number,
+  records: Array<object>,
+  transaction: Transaction | undefined): Promise<void> => {
   try {
     logger.info({ message: `Started populateSmsTemplate for ${campaignId}` })
-    transaction = await SmsMessage.sequelize?.transaction()
     // delete message_logs entries
     await SmsMessage.destroy({
       where: { campaignId },
@@ -183,19 +184,8 @@ const addToMessageLogs = async (campaignId: number, records: Array<object>): Pro
       const batch = chunks[idx]
       await SmsMessage.bulkCreate(batch, { transaction })
     }
-  
-    await Campaign.update({
-      valid: true,
-    }, {
-      where: {
-        id: campaignId,
-      },
-      transaction,
-    })
-    await transaction?.commit()
     logger.info({ message: `Finished populateSmsTemplate for ${campaignId}` })
   } catch (err) {
-    await transaction?.rollback()
     logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
     throw new Error('SmsMessage: destroy / bulkcreate failure')
   }

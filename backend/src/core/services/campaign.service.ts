@@ -1,4 +1,4 @@
-import { Op, literal  } from 'sequelize'
+import { Op, literal, Transaction  } from 'sequelize'
 import config from '@core/config'
 import { JobStatus } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
@@ -24,7 +24,11 @@ const createCampaign = ({ name, type, userId }: {name: string; type: string; use
  * On file upload, save the transaction id and file name against the campaign so that we can download the file from s3 later
  * @param param0 
  */
-const updateCampaignS3Metadata = ({ key, campaignId, filename }: { key: string; campaignId: string; filename: string }): Promise<[number, Campaign[]]> => {
+const updateCampaignS3Metadata = (
+  key: string,
+  campaignId: string,
+  filename: string,
+  transaction: Transaction | undefined): Promise<[number, Campaign[]]> => {
   const s3Object = {
     key,
     bucket: FILE_STORAGE_BUCKET_NAME,
@@ -39,6 +43,7 @@ const updateCampaignS3Metadata = ({ key, campaignId, filename }: { key: string; 
           id: campaignId,
         },
         returning: true,
+        transaction,
       }
     )
 }
@@ -94,6 +99,19 @@ const setInvalid = (campaignId: number): Promise<[number, Campaign[]]> => {
   })
 }
 
+/**
+ * Helper method to set a campaign to valid 
+ * @param campaignId 
+ */
+const setValid = (campaignId: number, transaction?: Transaction): Promise<[number, Campaign[]]> => {
+  return Campaign.update({
+    valid: true,
+  }, {
+    where: { id: +campaignId },
+    transaction,
+  })
+}
+
 
 export const CampaignService = { 
   hasJobInProgress, 
@@ -101,5 +119,6 @@ export const CampaignService = {
   retrieveCampaign, 
   listCampaigns, 
   updateCampaignS3Metadata, 
-  setInvalid, 
+  setInvalid,
+  setValid,
 }

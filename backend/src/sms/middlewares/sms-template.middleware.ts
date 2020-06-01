@@ -14,6 +14,7 @@ import {
 } from '@core/services'
 import { SmsTemplateService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
+import { Campaign } from '@core/models'
 
 const uploadTimeout = Number(config.get('express.uploadCompleteTimeout'))
 
@@ -67,6 +68,40 @@ const storeTemplate = async (req: Request, res: Response, next: NextFunction): P
 }
 
 /**
+ * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
+ * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
+ * For email_messages table, existing records are deleted and new ones are bulk inserted.
+ * @param key 
+ * @param campaignId
+ * @param filename 
+ * @param records
+ */
+const updateCampaignAndMessages = async (
+  key: string,
+  campaignId: string,
+  filename: string,
+  records: MessageBulkInsertInterface[]): Promise<void> => {
+  let transaction
+
+  try {
+    transaction = await Campaign.sequelize?.transaction()
+    // Updates metadata in project
+    await CampaignService.updateCampaignS3Metadata( key, campaignId, filename, transaction)
+
+    // START populate template
+    await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
+
+    // Set campaign to valid
+    await CampaignService.setValid(+campaignId, transaction)
+    
+    transaction?.commit()    
+  } catch (err) {
+    transaction?.rollback()
+    throw(err)
+  }
+}
+  
+/**
  * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
  * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
  * If the template and csv do not match, prompt the user to upload a new file.
@@ -85,9 +120,6 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     const { campaignId } = req.params
     // TODO: validate if project is in editable state
 
-    // switch campaign to invalid - this is for the case of uploading over an existing file
-    await CampaignService.setInvalid(+campaignId)
-
     // extract s3Key from transactionId
     const { 'transaction_id': transactionId, filename } = req.body
     const s3Key: string = TemplateService.extractS3Key(transactionId)
@@ -97,10 +129,7 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
     if (smsTemplate === null){
       throw new Error('Template does not exist, please create a template')
     }
-
-    // Updates metadata in project
-    await CampaignService.updateCampaignS3Metadata({ key: s3Key, campaignId, filename })
-
+  
     // carry out templating / hydration
     // - download from s3
     try {
@@ -113,19 +142,17 @@ const uploadCompleteHandler = async (req: Request, res: Response, next: NextFunc
 
       if (SmsTemplateService.hasInvalidSmsRecipient(records)) throw new InvalidRecipientError()
 
-      const recipientCount: number = records.length
-      // START populate template
-      logger.info(`before sms.addToMessageLogs; campaignId=${campaignId}`)
-      await SmsTemplateService.addToMessageLogs(+campaignId, records)
-      logger.info(`after sms.addToMessageLogs; campaignId=${campaignId}`)
+      const recipientCount = records.length
+
+      await updateCampaignAndMessages(s3Key, campaignId, filename, records)
 
       if (!res.headersSent) {
         return res.json({
           'num_recipients': recipientCount,
           preview: hydratedRecord,
         })
-      }
-
+      }  
+  
     } catch (err) {
       logger.error(`Error parsing file for campaign ${campaignId}. ${err.stack}`)
       throw err
