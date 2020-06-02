@@ -12,6 +12,14 @@ import {
 } from '@core/models'
 import { EmailMessage, EmailTemplate, EmailOp } from '@email/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
+import {
+  BotSubscriber,
+  TelegramMessage,
+  TelegramOp,
+  TelegramSubscriber,
+  TelegramTemplate,
+} from '@telegram/models'
+
 import logger from '@core/logger'
 
 const DB_URI = config.get('database.databaseUri')
@@ -38,7 +46,19 @@ const sequelizeLoader = async (): Promise<void> => {
   ]
   const emailModels = [EmailMessage, EmailTemplate, EmailOp]
   const smsModels = [SmsMessage, SmsTemplate, SmsOp]
-  sequelize.addModels([...coreModels, ...emailModels, ...smsModels])
+  const telegramModels = [
+    BotSubscriber,
+    TelegramOp,
+    TelegramMessage,
+    TelegramTemplate,
+    TelegramSubscriber,
+  ]
+  sequelize.addModels([
+    ...coreModels,
+    ...emailModels,
+    ...smsModels,
+    ...telegramModels,
+  ])
 
   try {
     await sequelize.sync()

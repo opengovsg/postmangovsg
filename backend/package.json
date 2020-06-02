@@ -93,7 +93,8 @@
   "_moduleAliases": {
     "@core": "build/core",
     "@sms": "build/sms",
-    "@email": "build/email"
+    "@email": "build/email",
+    "@telegram": "build/telegram"
   },
   "repository": {
     "type": "git",
