@@ -81,6 +81,24 @@ const getTwilioCredentials = async (
 }
 
 /**
+ * Retrieve Telegram credentials from secrets manager
+ * @param name
+ */
+const getTelegramCredential = async (name: string): Promise<string> => {
+  if (!config.get('IS_PROD')) {
+    logger.info(
+      `Dev env - getTelegramCredential - returning default credentials set in env var`
+    )
+    return config.get('telegramBotToken')
+  }
+  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
+  const secretString = get(data, 'SecretString', '')
+  if (!secretString)
+    throw new Error('Missing secret string from AWS secrets manager.')
+  return secretString
+}
+
+/**
  * Creates a label for the credential, associated with a user
  * @param label
  * @param type
@@ -199,6 +217,7 @@ export const CredentialService = {
   isExistingCredential,
   storeCredential,
   getTwilioCredentials,
+  getTelegramCredential,
   // User credentials (user - label - cred_name)
   createUserCredential,
   deleteUserCredential,
