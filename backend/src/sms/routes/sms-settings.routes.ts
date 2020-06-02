@@ -127,8 +127,6 @@ router.get(
  *          description: OK
  *        400:
  *          description: Bad Request (invalid credentials, malformed request)
- *        404:
- *          description: Not Found
  *
  */
 router.post(
