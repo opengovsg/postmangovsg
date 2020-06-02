@@ -25,6 +25,13 @@ const getCredentialsValidator = {
   [Segments.QUERY]: Joi.object({}),
 }
 
+const verifyCredentialValidator = {
+  [Segments.BODY]: Joi.object({
+    recipient: Joi.string().trim().required(),
+    label: Joi.string().required(),
+  }),
+}
+
 /**
  * @swagger
  * path:
@@ -93,6 +100,41 @@ router.get(
   '/credentials',
   celebrate(getCredentialsValidator),
   SettingsMiddleware.getChannelSpecificCredentials
+)
+
+/**
+ * @swagger
+ * path:
+ *  /settings/sms/credentials/verify:
+ *    post:
+ *      summary: Verify stored credential for user
+ *      tags:
+ *        - Settings
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                recipient:
+ *                  type: string
+ *                label:
+ *                  type: string
+ *
+ *      responses:
+ *        200:
+ *          description: OK
+ *        400:
+ *          description: Bad Request (invalid credentials, malformed request)
+ *        404:
+ *          description: Not Found
+ *
+ */
+router.post(
+  '/credentials/verify',
+  celebrate(verifyCredentialValidator),
+  SmsMiddleware.verifyUserCredential
 )
 
 export default router
