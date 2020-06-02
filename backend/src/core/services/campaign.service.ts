@@ -31,23 +31,22 @@ const createCampaign = ({
 }
 
 /**
- * On file upload, save the transaction id and file name against the campaign so that we can download the file from s3 later
- * @param param0
+ * On file upload complete, save the transaction id and file name against the campaign so that we can download the file from s3 later
  */
-const updateCampaignS3Metadata = (
+const replaceCampaignS3Metadata = (
+  campaignId: number,
   key: string,
-  campaignId: string,
   filename: string,
   transaction: Transaction | undefined
 ): Promise<[number, Campaign[]]> => {
-  const s3Object = {
-    key,
-    bucket: FILE_STORAGE_BUCKET_NAME,
-    filename,
-  }
-
   return Campaign.update(
-    { s3Object },
+    {
+      s3Object: {
+        key,
+        filename,
+        bucket: FILE_STORAGE_BUCKET_NAME,
+      },
+    },
     {
       where: {
         id: campaignId,
@@ -58,12 +57,24 @@ const updateCampaignS3Metadata = (
   )
 }
 
-/**
- * Helper method to find a campaign by id
- * @param id
+/*
+ * On file upload processing start, store temp filename in s3 object
  */
-const retrieveCampaign = (id: number): Promise<Campaign> => {
-  return Campaign.findByPk(id)
+const storeS3TempFilename = async (
+  campaignId: number,
+  tempFilename: string
+): Promise<void> => {
+  return Campaign.updateS3ObjectKey(campaignId, 'tempFilename', tempFilename)
+}
+
+/*
+ * On file upload processing failed, store error string in s3 object
+ */
+const storeS3Error = async (
+  campaignId: number,
+  error: string
+): Promise<void> => {
+  return Campaign.updateS3ObjectKey(campaignId, 'error', error)
 }
 
 /**
@@ -155,9 +166,10 @@ const setValid = (
 export const CampaignService = {
   hasJobInProgress,
   createCampaign,
-  retrieveCampaign,
   listCampaigns,
-  updateCampaignS3Metadata,
+  replaceCampaignS3Metadata,
+  storeS3TempFilename,
+  storeS3Error,
   setInvalid,
   setValid,
 }

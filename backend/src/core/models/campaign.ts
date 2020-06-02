@@ -66,4 +66,23 @@ export class Campaign extends Model<Campaign> {
 
   @HasOne(() => Statistic)
   statistic?: Statistic
+
+  // Sets key in s3Object json
+  static async updateS3ObjectKey(
+    id: number,
+    key: string,
+    value: any
+  ): Promise<void> {
+    await Campaign.sequelize?.transaction(async (transaction) => {
+      const campaign = await Campaign.findByPk(id, {
+        transaction,
+      })
+      if (!campaign) {
+        throw new Error('Invalid campaign')
+      }
+      // Set will ensure that the other keys in the JSON/JSONB are left unchanged
+      await campaign.set({ [`s3_object.${key}`]: value }).save({ transaction })
+    })
+    return
+  }
 }

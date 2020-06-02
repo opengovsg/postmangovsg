@@ -272,6 +272,8 @@ router.get(
  *                       reply_to:
  *                         type: string
  *                         nullable: true
+ *         "202" :
+ *           description: Accepted. The uploaded file is being processed.
  *         "400" :
  *           description: Bad Request
  *         "401":

@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import config from '@core/config'
 import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
@@ -40,7 +39,7 @@ const storeTemplate = async (
       replyTo,
     })
     if (check?.reupload) {
-      return res.status(200).json({
+      return res.json({
         message:
           'Please re-upload your recipient list as template has changed.',
         extra_keys: check.extraKeys,
@@ -54,7 +53,7 @@ const storeTemplate = async (
         },
       })
     } else {
-      return res.status(200).json({
+      return res.json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
         num_recipients: numRecipients,
@@ -84,8 +83,8 @@ const storeTemplate = async (
  * @param records
  */
 const updateCampaignAndMessages = async (
+  campaignId: number,
   key: string,
-  campaignId: string,
   filename: string,
   records: MessageBulkInsertInterface[]
 ): Promise<void> => {
@@ -94,22 +93,22 @@ const updateCampaignAndMessages = async (
   try {
     transaction = await Campaign.sequelize?.transaction()
     // Updates metadata in project
-    await CampaignService.updateCampaignS3Metadata(
-      key,
+    await CampaignService.replaceCampaignS3Metadata(
       campaignId,
+      key,
       filename,
       transaction
     )
 
     // START populate template
     await EmailTemplateService.addToMessageLogs(
-      +campaignId,
+      campaignId,
       records,
       transaction
     )
 
     // Set campaign to valid
-    await CampaignService.setValid(+campaignId, transaction)
+    await CampaignService.setValid(campaignId, transaction)
 
     transaction?.commit()
   } catch (err) {
@@ -131,13 +130,6 @@ const uploadCompleteHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  res.setTimeout(config.get('express.uploadCompleteTimeout'), () => {
-    if (!res.headersSent) {
-      return res.sendStatus(408)
-    }
-    return
-  })
-
   try {
     const { campaignId } = req.params
 
@@ -155,52 +147,44 @@ const uploadCompleteHandler = async (
 
     // carry out templating / hydration
     // - download from s3
+    const { records } = await EmailTemplateService.client.testHydration({
+      campaignId: +campaignId,
+      s3Key,
+      templateSubject: emailTemplate.subject,
+      templateBody: emailTemplate.body as string,
+      templateParams: emailTemplate.params as string[],
+    })
+
+    if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
+      throw new InvalidRecipientError()
+    }
+
+    // Store temp filename
+    await CampaignService.storeS3TempFilename(+campaignId, filename)
+
     try {
-      const {
-        records,
-        hydratedRecord,
-      } = await EmailTemplateService.client.testHydration({
-        campaignId: +campaignId,
-        s3Key,
-        templateSubject: emailTemplate.subject,
-        templateBody: emailTemplate.body as string,
-        templateParams: emailTemplate.params as string[],
-      })
+      // Return early because bulk insert is slow
+      res.sendStatus(202)
 
-      if (EmailTemplateService.hasInvalidEmailRecipient(records))
-        throw new InvalidRecipientError()
-
-      const recipientCount = records.length
-
-      await updateCampaignAndMessages(s3Key, campaignId, filename, records)
-
-      if (!res.headersSent) {
-        return res.json({
-          num_recipients: recipientCount,
-          preview: {
-            ...hydratedRecord,
-            // eslint-disable-next-line @typescript-eslint/camelcase
-            reply_to: emailTemplate.replyTo || null,
-          },
-        })
-      }
+      // Slow bulk insert
+      await updateCampaignAndMessages(+campaignId, s3Key, filename, records)
     } catch (err) {
+      // Do not return any response since it has already been sent
       logger.error(
-        `Error parsing file for campaign ${campaignId}. ${err.stack}`
+        `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
-      throw err
+      // Store error to return on poll
+      CampaignService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
-    if (!res.headersSent) {
-      if (
-        err instanceof RecipientColumnMissing ||
-        err instanceof MissingTemplateKeysError ||
-        err instanceof InvalidRecipientError
-      ) {
-        return res.status(400).json({ message: err.message })
-      }
-      return next(err)
+    if (
+      err instanceof RecipientColumnMissing ||
+      err instanceof MissingTemplateKeysError ||
+      err instanceof InvalidRecipientError
+    ) {
+      return res.status(400).json({ message: err.message })
     }
+    return next(err)
   }
 }
 

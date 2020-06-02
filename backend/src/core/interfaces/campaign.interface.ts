@@ -1,9 +1,11 @@
 import { ChannelType } from '@core/constants'
 
 export interface CampaignS3ObjectInterface {
-  key: string
-  bucket: string
-  filename: string
+  key?: string
+  bucket?: string
+  filename?: string
+  tempFilename?: string
+  error?: string
 }
 
 export interface CampaignInterface {
