@@ -9,13 +9,17 @@ const { path: PATH, port: PORT } = config.get('devServer')
 const app = express()
 app.use(express.json())
 
-app.post(PATH, async (req, res) => {
-  req.body = JSON.stringify(req.body) // simulate Lambda's stringified body
-  await handler(req) // execute handler
+app.post(`${PATH}:botId`, async (req, res) => {
+  const event = {
+    body: JSON.stringify(req.body), // simulate Lambda's stringified body
+    pathParameters: req.params,
+  }
+  await handler(event) // execute handler
+
   res.sendStatus(200)
 })
 
 // ngrok http 8000
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT} at ${PATH}`)
+  console.log(`Listening on port ${PORT} at ${PATH}{botId}`)
 })
