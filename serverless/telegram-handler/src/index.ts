@@ -1,4 +1,4 @@
-const handler = async (event: any): Promise<void> => {
+const handler = async (event: any): Promise<{ statusCode: number }> => {
   try {
     const { botId } = event.pathParameters
     const body = JSON.parse(event.body)
@@ -11,7 +11,9 @@ const handler = async (event: any): Promise<void> => {
     console.error(err)
   }
 
-  return
+  return {
+    statusCode: 200,
+  }
 }
 
 export { handler }
