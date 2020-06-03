@@ -6,7 +6,7 @@
   "scripts": {
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
-    "build": "rm -rf build && tsc",
+    "build": "rm -rf build && tsc && cp -r src/assets build/assets",
     "dev": "npm run build && node build/server.js"
   },
   "repository": {
@@ -32,5 +32,14 @@
     "express": "^4.17.1",
     "prettier": "^2.0.5",
     "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "@types/bluebird": "^3.5.32",
+    "@types/node": "^14.0.9",
+    "@types/validator": "^13.0.0",
+    "pg": "^8.2.1",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^5.21.11",
+    "sequelize-typescript": "^1.1.0"
   }
 }
