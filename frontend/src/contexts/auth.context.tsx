@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, SetStateAction, Dispatch } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getUser } from 'services/auth.service'
-import { setGAUserId, initializeGA, sendPageView  } from 'services/ga.service'
+import { setGAUserId, initializeGA, sendPageView } from 'services/ga.service'
 
 interface ContextProps {
   isAuthenticated: boolean;

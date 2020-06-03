@@ -24,10 +24,6 @@ export function sendPageView(path: string) {
   ReactGA.pageview(path)
 }
 
-export function sendOutboundLinkEvent(label: string) {
-  return () => {ReactGA.outboundLink({ label }, () => null)}
-}
-
 export function sendUserEvent(action: string, label?: string) {
   ReactGA.event({
     category: 'User',

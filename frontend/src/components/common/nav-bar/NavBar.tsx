@@ -1,13 +1,14 @@
 import React, { useState, useContext } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import cx from 'classnames'
+import { OutboundLink } from 'react-ga'
 
 import { ModalContext } from 'contexts/modal.context'
 import { GUIDE_URL } from 'config'
 import CreateModal from 'components/dashboard/create/create-modal'
 import { logout } from 'services/auth.service'
 import { AuthContext } from 'contexts/auth.context'
-import { sendOutboundLinkEvent, setGAUserId } from 'services/ga.service'
+import { setGAUserId } from 'services/ga.service'
 
 import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
@@ -51,14 +52,14 @@ const NavBar = () => {
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
         <a className={cx(styles.link, { [styles.active]: isCreatePath() })} onClick={handleCreateCampaign}>Create</a>
-        <a
+        <OutboundLink
           className={styles.link}
-          href={GUIDE_URL}
+          eventLabel={GUIDE_URL}
+          to={GUIDE_URL}
           target="_blank"
-          rel="noopener noreferrer"
-          onClick={sendOutboundLinkEvent(GUIDE_URL)}>
+        >
           Guide
-        </a>
+        </OutboundLink>
         <NavLink className={styles.link} activeClassName={styles.active} to="/account">Account</NavLink>
 
         <div className={styles.separator}></div>

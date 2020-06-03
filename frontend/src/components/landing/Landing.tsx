@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
+import { OutboundLink } from 'react-ga'
 
 import Login from './login'
 import { GUIDE_URL, CONTACT_US_URL } from 'config'
 import { AuthContext } from 'contexts/auth.context'
-import { sendOutboundLinkEvent } from 'services/ga.service'
 
 import styles from './Landing.module.scss'
 import landingImg from 'assets/img/landing.svg'
@@ -37,22 +37,22 @@ const Landing = () => {
         <div className={styles.bottomContent}>
           <img className={styles.companyLogo} src={companyLogo} alt="OGP"></img>
           <div className={styles.linkBar}>
-            <a
+            <OutboundLink
               className={styles.navLink}
-              href={GUIDE_URL}
+              eventLabel={GUIDE_URL}
+              to={GUIDE_URL}
               target="_blank"
-              rel="noopener noreferrer"
-              onClick={sendOutboundLinkEvent(GUIDE_URL)}>
-                Guide
-            </a>
-            <a
+            >
+              Guide
+            </OutboundLink>
+            <OutboundLink
               className={styles.navLink}
-              href={CONTACT_US_URL}
+              eventLabel={CONTACT_US_URL}
+              to={CONTACT_US_URL}
               target="_blank"
-              rel="noopener noreferrer"
-              onClick={sendOutboundLinkEvent(CONTACT_US_URL)}>
-                Contact Us
-            </a>
+            >
+              Contact Us
+            </OutboundLink>
           </div>
         </div>
       </div>

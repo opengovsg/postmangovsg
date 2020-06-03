@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
+import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -11,7 +12,6 @@ import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
-import { sendOutboundLinkEvent } from 'services/ga.service'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
@@ -103,13 +103,13 @@ const Campaigns = () => {
         <img className={styles.image} src={EmptyDashboardImg} alt="Empty dashboard graphic" />
         <h2>We are excited to have you here!</h2>
         <h5>To get you started, we have prepared a guide for your reference</h5>
-        <a
-          href={GUIDE_URL}
+        <OutboundLink
+          eventLabel={GUIDE_URL}
+          to={GUIDE_URL}
           target="_blank"
-          rel="noopener noreferrer"
-          onClick={sendOutboundLinkEvent(GUIDE_URL)}>
+        >
           <PrimaryButton className={styles.darkBlueButton}>Learn how to set up →</PrimaryButton>
-        </a>
+        </OutboundLink>
         <h5>Or you can begin creating your campaign with our step-by step</h5>
         <PrimaryButton onClick={() => modalContext.setModalContent(
           <CreateCampaign></CreateCampaign>
