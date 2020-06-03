@@ -5,7 +5,10 @@ import { isEmpty } from 'lodash'
 import config from '@core/config'
 import logger from '@core/logger'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
-import { RecipientColumnMissing, UnexpectedDoubleQuoteError } from '@core/errors/s3.errors'
+import {
+  RecipientColumnMissing,
+  UnexpectedDoubleQuoteError,
+} from '@core/errors/s3.errors'
 
 type CSVParamsInterface = { [key: string]: string }
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
@@ -67,11 +70,12 @@ export default class S3Client {
         }
       }
       logger.info({ message: 'Parsing complete' })
-      return Array.from(params.values()) 
-    }
-    catch (err) {
-      if (err.message.includes('Invalid Opening Quote')) throw new UnexpectedDoubleQuoteError()
-      if (err.message.includes('Invalid Closing Quote')) throw new UnexpectedDoubleQuoteError()
+      return Array.from(params.values())
+    } catch (err) {
+      if (err.message.includes('Invalid Opening Quote'))
+        throw new UnexpectedDoubleQuoteError()
+      if (err.message.includes('Invalid Closing Quote'))
+        throw new UnexpectedDoubleQuoteError()
       throw err
     }
   }

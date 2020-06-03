@@ -186,7 +186,8 @@ const uploadCompleteHandler = async (
         RecipientColumnMissing,
         MissingTemplateKeysError,
         InvalidRecipientError,
-        UnexpectedDoubleQuoteError]
+        UnexpectedDoubleQuoteError,
+      ]
 
       if (userErrors.some((errType) => err instanceof errType)) {
         return res.status(400).json({ message: err.message })
