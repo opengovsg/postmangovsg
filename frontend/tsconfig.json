@@ -19,6 +19,9 @@
     "noEmit": true,
     "jsx": "react",
     "baseUrl": "src",
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/"
   },
   "include": [
     "src"
