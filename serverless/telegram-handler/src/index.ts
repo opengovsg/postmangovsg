@@ -12,13 +12,23 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
     // Get database connection
     const sequelize = await sequelizeLoader()
 
-    // TODO: Attempt to find a match in stored credentials
-    const result = await sequelize.query(`SELECT 1`)
-    console.log(result)
+    // Verify that this is a registered bot
+    const { exists: botIdExists } = await sequelize.query(
+      `SELECT EXISTS (SELECT * FROM credentials WHERE name = :botId);`,
+      {
+        replacements: {
+          botId,
+        },
+        plain: true,
+      }
+    )
+    if (!botIdExists) {
+      throw new Error(`botId ${botId} not recognized.`)
+    }
 
     // TODO: Instantiate Telegraf bot and attach handlers
   } catch (err) {
-    console.error(`An error occurred: ${err}`)
+    console.error(`Error: ${err.message}`)
   }
 
   return {
