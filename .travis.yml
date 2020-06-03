@@ -79,6 +79,9 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/serverless/log-email-sns
         - npm install && npm run build
         - zip -qr code.zip build package.json node_modules/
+        - cd $TRAVIS_BUILD_DIR/serverless/telegram-handler
+        - npm install && npm run build
+        - zip -qr code.zip build package.json node_modules/
       deploy:
         - provider: lambda
           edge: true
@@ -153,6 +156,21 @@ jobs:
             branch: $PRODUCTION_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_EMAIL_DB_URI
+        - provider: lambda
+          edge: true
+          function_name: telegram-handler-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../telegram-handler/code.zip"
+          on:
+            branch: $STAGING_TELEGRAM_HANDLER_BRANCH
+          environment_variables:
+            - DB_URI=$STAGING_TELEGRAM_HANDLER_DB_URI
     - name: root
       install:
         - npm install --ignore-scripts
