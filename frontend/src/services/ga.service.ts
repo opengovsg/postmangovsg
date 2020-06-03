@@ -16,8 +16,8 @@ export function initializeGA() {
   ReactGA.initialize(GA_TRACKING_ID, { debug: true })
 }
 
-export function setGAUserId(id: number | null) {
-  ReactGA.set({ id })
+export function setGAUserId(userId: number | null) {
+  ReactGA.set({ userId })
 }
 
 export function sendPageView(path: string) {

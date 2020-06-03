@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
-import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
+import { getOtpWithEmail, loginWithOtp, getUser } from 'services/auth.service'
 
 import { LOGIN_EMAIL_TEXT, LOGIN_EMAIL_PLACEHOLDER } from 'config'
 import styles from './Login.module.scss'
 import { AuthContext } from 'contexts/auth.context'
-import { GA_USER_EVENTS, sendUserEvent, sendException } from 'services/ga.service'
+import { GA_USER_EVENTS, setGAUserId, sendUserEvent, sendException } from 'services/ga.service'
 
 const emailText = LOGIN_EMAIL_TEXT
 const otpText = 'One-Time Password'
@@ -53,6 +53,8 @@ const Login = () => {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
       setAuthContextEmail(email)
+      const user = await getUser()
+      setGAUserId(user?.id || null)
     } catch (err) {
       setErrorMsg(err.message)
       sendException(err.message)
