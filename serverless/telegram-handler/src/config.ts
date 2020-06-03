@@ -13,19 +13,11 @@ convict.addFormat({
 })
 
 const config = convict({
-  devServer: {
-    path: {
-      doc: 'Path for development server to listen on',
-      default: '/bot',
-      format: 'required',
-      env: 'DEV_SERVER_PATH',
-    },
-    port: {
-      doc: 'Port for development server to listen on',
-      default: 8000,
-      format: 'required',
-      env: 'DEV_SERVER_PORT',
-    },
+  devServerPort: {
+    doc: 'Port for development server to listen on',
+    default: 8000,
+    format: 'required',
+    env: 'DEV_SERVER_PORT',
   },
 })
 
