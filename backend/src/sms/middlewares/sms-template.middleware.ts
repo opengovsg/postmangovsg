@@ -94,7 +94,7 @@ const updateCampaignAndMessages = async (
   try {
     transaction = await Campaign.sequelize?.transaction()
     // Updates metadata in project
-    await CampaignService.replaceCampaignS3Metadata(
+    await TemplateService.replaceCampaignS3Metadata(
       +campaignId,
       key,
       filename,

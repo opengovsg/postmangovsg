@@ -8,6 +8,13 @@ export interface CampaignS3ObjectInterface {
   error?: string
 }
 
+export interface CsvStatusInterface {
+  isProcessing: boolean
+  filename?: string
+  tempFilename?: string
+  error?: string
+}
+
 export interface CampaignInterface {
   name: string
   userId: number

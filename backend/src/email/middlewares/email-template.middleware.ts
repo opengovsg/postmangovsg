@@ -93,7 +93,7 @@ const updateCampaignAndMessages = async (
   try {
     transaction = await Campaign.sequelize?.transaction()
     // Updates metadata in project
-    await CampaignService.replaceCampaignS3Metadata(
+    await TemplateService.replaceCampaignS3Metadata(
       campaignId,
       key,
       filename,
@@ -160,7 +160,7 @@ const uploadCompleteHandler = async (
     }
 
     // Store temp filename
-    await CampaignService.storeS3TempFilename(+campaignId, filename)
+    await TemplateService.storeS3TempFilename(+campaignId, filename)
 
     try {
       // Return early because bulk insert is slow
@@ -174,7 +174,7 @@ const uploadCompleteHandler = async (
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
       // Store error to return on poll
-      CampaignService.storeS3Error(+campaignId, err.message)
+      TemplateService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     if (
@@ -188,7 +188,38 @@ const uploadCompleteHandler = async (
   }
 }
 
+/*
+ * Returns status of csv processing
+ * If tempFilename exists in S3Object without errors, processing is still ongoing
+ * If error exists in S3Object, processing has failed
+ * If neither exists, processing is complete
+ */
+const pollCsvStatusHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const {
+      isProcessing,
+      filename,
+      tempFilename,
+      error,
+    } = await TemplateService.getCsvStatus(+campaignId)
+    res.json({
+      is_processing: isProcessing,
+      csv_filename: filename,
+      temp_csv_filename: tempFilename,
+      csv_error: error,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const EmailTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
+  pollCsvStatusHandler,
 }

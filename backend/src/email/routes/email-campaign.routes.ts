@@ -254,24 +254,6 @@ router.get(
  *                 filename:
  *                   type: string
  *       responses:
- *         200:
- *           description: Success
- *           content:
- *             application/json:
- *               schema:
- *                 properties:
- *                   num_recipients:
- *                     type: number
- *                   preview:
- *                     type: object
- *                     properties:
- *                       subject:
- *                         type: string
- *                       body:
- *                         type: string
- *                       reply_to:
- *                         type: string
- *                         nullable: true
  *         "202" :
  *           description: Accepted. The uploaded file is being processed.
  *         "400" :
@@ -288,6 +270,62 @@ router.post(
   celebrate(uploadCompleteValidator),
   CampaignMiddleware.canEditCampaign,
   EmailTemplateMiddleware.uploadCompleteHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/upload/status:
+ *     get:
+ *       description: "Get csv processing status"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 properties:
+ *                   num_recipients:
+ *                     type: number
+ *                   is_processing:
+ *                     type: boolean
+ *                   csv_filename:
+ *                     type: string
+ *                   temp_csv_filename:
+ *                     type: string
+ *                   csv_error:
+ *                     type: string
+ *                   preview:
+ *                     type: object
+ *                     properties:
+ *                       subject:
+ *                         type: string
+ *                       body:
+ *                         type: string
+ *                       reply_to:
+ *                         type: string
+ *                         nullable: true
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/upload/status',
+  celebrate(uploadCompleteValidator),
+  EmailTemplateMiddleware.pollCsvStatusHandler
 )
 
 /**
