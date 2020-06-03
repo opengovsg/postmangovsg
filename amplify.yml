@@ -20,6 +20,7 @@ frontend:
     preBuild:
       commands:
         - if [ "${AWS_BRANCH}" = "master" ]; then export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION}; else export REACT_APP_BACKEND_URL=${BACKEND_URL_STAGING}; fi
+        - if [ "${AWS_BRANCH}" = "master" ]; then export REACT_APP_SENTRY_DSN=${SENTRY_DSN_PRODUCTION}; else export REACT_APP_SENTRY_DSN=${SENTRY_DSN_STAGING}; fi
         - cd frontend
         - npm ci
     build:

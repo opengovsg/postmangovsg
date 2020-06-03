@@ -7,6 +7,7 @@ import React, {
 } from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
+import * as Sentry from '@sentry/browser'
 import { getUser, logout } from 'services/auth.service'
 import { setGAUserId, initializeGA, sendPageView } from 'services/ga.service'
 
@@ -40,6 +41,11 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       initializeGA()
       // set user id to track logged in user
       setGAUserId(user?.id || null)
+
+      Sentry.configureScope((scope) => {
+        const scopeUser = email ? { email } : null
+        scope.setUser(scopeUser)
+      })
     } catch (err) {
       // is unauthorized
     }

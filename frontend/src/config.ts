@@ -45,4 +45,5 @@ export const PRIVACY_URL = process.env.REACT_APP_PRIVACY_URL as string
 export const TC_URL = process.env.REACT_APP_TC_URL as string
 export const REPORT_BUG_URL = process.env.REACT_APP_REPORT_BUG_URL as string
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string
+export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN as string
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
