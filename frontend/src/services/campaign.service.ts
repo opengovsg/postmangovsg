@@ -14,9 +14,15 @@ function getSentAt(jobs: Array<{ sent_at: Date }>): Date {
   return jobsSentAt[0]
 }
 
-export async function getCampaigns(): Promise<Array<Campaign>> {
-  return axios.get('/campaigns').then((response) => {
-    const campaigns: Campaign[] = response.data.map((data: any) => {
+export async function getCampaigns(params: {
+  offset: number
+  limit: number
+}): Promise<{
+  campaigns: Array<Campaign>
+  totalCount: number
+}> {
+  return axios.get('/campaigns', { params }).then((response) => {
+    const campaigns: Campaign[] = response.data.campaigns.map((data: any) => {
       const details = {
         ...data,
         sent_at: getSentAt(data.job_queue),
@@ -24,7 +30,11 @@ export async function getCampaigns(): Promise<Array<Campaign>> {
 
       return new Campaign(details)
     })
-    return campaigns
+
+    return {
+      campaigns,
+      totalCount: response.data.total_count,
+    }
   })
 }
 
