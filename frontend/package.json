@@ -12,6 +12,7 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
+    "@types/papaparse": "^5.0.3",
     "@types/react-lottie": "^1.2.5",
     "@types/validator": "^13.0.0",
     "axios": "^0.19.2",
@@ -20,6 +21,7 @@
     "escape-html": "^1.0.3",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "papaparse": "^5.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-lottie": "^1.2.3",

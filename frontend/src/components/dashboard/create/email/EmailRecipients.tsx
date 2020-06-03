@@ -68,7 +68,7 @@ const EmailRecipients = ({
       // Get presigned url from postman server
       const startUploadResponse = await getPresignedUrl({
         campaignId: +campaignId,
-        mimeType: uploadedFile.type,
+        uploadedFile,
       })
       // Upload to presigned url
       await uploadFileWithPresignedUrl(
