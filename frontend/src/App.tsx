@@ -12,30 +12,11 @@ import ProtectedRoute from 'routes/protected.route'
 // Contexts
 import AuthContextProvider from 'contexts/auth.context'
 
-// Service
-import { initializeGA, sendPageView } from 'services/ga.service'
-
 import './styles/app.scss'
-
-const GA = () => {
-  const location = useLocation()
-
-  useEffect(() => {
-    sendPageView(location.pathname)
-  }, [location])
-
-  useEffect(() => {
-    initializeGA()
-  })
-
-  return <></>
-}
-
 
 const App = () => {
   return (
     <Router>
-      <GA></GA>
       <AuthContextProvider>
         <Switch>
           <Route exact path="/" component={Landing}></Route>
