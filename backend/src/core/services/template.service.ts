@@ -82,12 +82,16 @@ const replaceCampaignS3Metadata = (
 
 /*
  * On file upload processing start, store temp filename in s3 object
+ * and delete error string if present
  */
 const storeS3TempFilename = async (
   campaignId: number,
   tempFilename: string
 ): Promise<void> => {
-  return Campaign.updateS3ObjectKey(campaignId, { tempFilename })
+  return Campaign.updateS3ObjectKey(campaignId, {
+    temp_filename: tempFilename,
+    error: undefined,
+  })
 }
 
 /*
@@ -105,7 +109,7 @@ const storeS3Error = async (
  */
 const deleteS3TempKeys = async (campaignId: number): Promise<void> => {
   return Campaign.updateS3ObjectKey(campaignId, {
-    tempFilename: undefined,
+    temp_filename: undefined,
     error: undefined,
   })
 }
@@ -123,9 +127,10 @@ const getCsvStatus = async (
   if (!campaign) {
     throw new Error('Campaign does not exist')
   }
-  const { filename, tempFilename, error } = campaign.s3Object || {}
+  const { filename, temp_filename: tempFilename, error } =
+    campaign.s3Object || {}
   return {
-    isProcessing: !!tempFilename && !error,
+    isCsvProcessing: !!tempFilename && !error,
     filename,
     tempFilename,
     error,

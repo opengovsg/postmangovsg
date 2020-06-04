@@ -8,9 +8,10 @@ import {
   InvalidRecipientError,
 } from '@core/errors'
 import { CampaignService, TemplateService } from '@core/services'
-import { EmailTemplateService } from '@email/services'
+import { EmailTemplateService, EmailService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
+import { EmailMessage } from '@email/models'
 /**
  * Store template subject and body in email template table.
  * If an existing csv has been uploaded for this campaign but whose columns do not match the attributes provided in the new template,
@@ -167,7 +168,11 @@ const uploadCompleteHandler = async (
       res.sendStatus(202)
 
       // Slow bulk insert
+      // setTimeout(async () => {
       await updateCampaignAndMessages(+campaignId, s3Key, filename, records)
+      // }, 5000)
+      // console.log(updateCampaignAndMessages)
+      // throw new Error('sum ting wong')
     } catch (err) {
       // Do not return any response since it has already been sent
       logger.error(
@@ -188,6 +193,10 @@ const uploadCompleteHandler = async (
   }
 }
 
+// const timeout = (ms: number): Promise<any> => {
+//   return new Promise((resolve) => setTimeout(resolve, ms))
+// }
+
 /*
  * Returns status of csv processing
  * If tempFilename exists in S3Object without errors, processing is still ongoing
@@ -202,16 +211,28 @@ const pollCsvStatusHandler = async (
   try {
     const { campaignId } = req.params
     const {
-      isProcessing,
+      isCsvProcessing,
       filename,
       tempFilename,
       error,
     } = await TemplateService.getCsvStatus(+campaignId)
+    let numRecipients, preview
+    if (!isCsvProcessing) {
+      ;[numRecipients, preview] = await Promise.all([
+        EmailMessage.count({
+          where: { campaignId: +campaignId },
+        }),
+        EmailService.getHydratedMessage(+campaignId),
+      ])
+    }
+    // await timeout(1000)
     res.json({
-      is_processing: isProcessing,
+      is_csv_processing: isCsvProcessing,
       csv_filename: filename,
       temp_csv_filename: tempFilename,
       csv_error: error,
+      numRecipients,
+      preview,
     })
   } catch (err) {
     next(err)

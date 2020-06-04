@@ -293,9 +293,7 @@ router.post(
  *             application/json:
  *               schema:
  *                 properties:
- *                   num_recipients:
- *                     type: number
- *                   is_processing:
+ *                   is_csv_processing:
  *                     type: boolean
  *                   csv_filename:
  *                     type: string
@@ -303,6 +301,8 @@ router.post(
  *                     type: string
  *                   csv_error:
  *                     type: string
+ *                   num_recipients:
+ *                     type: number
  *                   preview:
  *                     type: object
  *                     properties:
@@ -322,11 +322,7 @@ router.post(
  *         "500":
  *           description: Internal Server Error
  */
-router.post(
-  '/upload/status',
-  celebrate(uploadCompleteValidator),
-  EmailTemplateMiddleware.pollCsvStatusHandler
-)
+router.get('/upload/status', EmailTemplateMiddleware.pollCsvStatusHandler)
 
 /**
  * @swagger
