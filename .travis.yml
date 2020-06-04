@@ -134,7 +134,7 @@ jobs:
           on:
             branch: $STAGING_BRANCH
           environment_variables:
-            - DB_URI=$STAGING_DB_URI
+            - DB_URI=$SERVERLESS_EMAIL_DB_STAGING_URL
     - name: root
       install:
         - npm install --ignore-scripts
