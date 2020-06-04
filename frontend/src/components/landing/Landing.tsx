@@ -64,15 +64,15 @@ const Landing = () => {
       video: whyUse1,
       firstHeader: 'Multichannel',
       firstText:
-        'No more toggling between your Outlook and SMS portal. You can reach your recipients via SMS and email in the same platform.',
+        'No more switching between your Outlook and SMS portal. You can reach your recipients via SMS and email in the same platform.',
       secondHeader: 'Personalised messages',
-      secondText: 'Add in useful and specific details for your recipients.',
+      secondText: 'Add useful, custom details for your recipients.',
     },
     {
       video: whyUse2,
       firstHeader: 'No more typing +65',
       firstText:
-        "We took care of the country code so you don't have to enter +65 in your excel file.",
+        "We took care of the country code so you don't have to enter +65 in your Excel file.",
       secondHeader: 'Send in bulk',
       secondText:
         "You don't have to BCC everyone and wait for Outlook to slowly send a batch of 1000 emails. Sit back and let Postman do the work for you.",
@@ -81,10 +81,10 @@ const Landing = () => {
       video: whyUse3,
       firstHeader: 'Stop your campaign',
       firstText:
-        'You can stop your campaign easily with a click of a button even if you already started sending.',
-      secondHeader: 'See past campaigns stats easily',
+        'You can stop your campaign with a click of a button even when sending is in progress.',
+      secondHeader: "See past campaigns' stats easily",
       secondText:
-        'You can see summary stats from Postman’s campaign landing page for past campaigns.',
+        "You can see summary stats from Postman's campaign landing page for past campaigns.",
     },
   ]
 
@@ -93,28 +93,27 @@ const Landing = () => {
       text: 'What can Postman do?',
       answer: (
         <p>
-          Postman lets government officials mass send messages to citizens
-          through SMS and email with minimal setup required through a user
-          interface.
+          Postman lets public officers mass send messages to citizens through
+          SMS and email via a user interface, with minimal setup required.
         </p>
       ),
     },
     {
-      text: 'What problem is Postman solving?',
+      text: 'What problems are Postman solving?',
       answer: (
         <ol>
           <li>
-            <b>Communication is manual: </b>Agency users are still calling and
-            sending individual to citizens
+            <b>Communication is manual: </b>Public officers are still calling
+            and sending individual messages to citizens.
           </li>
           <li>
-            <b>Existing tool is not meeting the needs of users: </b>Outlook does
-            not support mass sending and it is often capped at 1000 emails.
+            <b>Existing tools do not meet users&apos; needs: </b>Outlook does
+            not support mass sending, as it is capped at 1000 emails at a time.
           </li>
           <li>
-            <b>No official source of information: </b>Communications come in
-            many different forms. Lacking a consistent channel puts agencies at
-            risks of phishing attack.
+            <b>No official source of information: </b>Citizens currently receive
+            messages from the government via many channels, and consequently are
+            at risk of being phished.
           </li>
         </ol>
       ),
@@ -123,8 +122,8 @@ const Landing = () => {
       text: 'Is Postman free?',
       answer: (
         <p>
-          Sending an email is free. SMS will be charged based on Twilio’s SMS
-          rates.
+          Sending an email is free. SMS will be charged based on Twilio&apos;s
+          SMS rates.
         </p>
       ),
     },
@@ -132,8 +131,8 @@ const Landing = () => {
       text: 'Is Postman secure?',
       answer: (
         <p>
-          We recommend that you don’t put any sensitive information in the sms
-          content. Some of our users generate a recipient specific unique link
+          We recommend that you do not add any sensitive information to the
+          messages. Some of our users generate a recipient specific unique link
           that opens up to a locked page. When in doubt, you should follow IM8’s
           guidelines on data classification.
         </p>
@@ -156,7 +155,7 @@ const Landing = () => {
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>
-              Reach out to the citizens in minutes
+              Reach out to citizens in minutes
             </h1>
             <div
               className={cx(styles.sentMessages, {
@@ -171,7 +170,7 @@ const Landing = () => {
                 className={styles.signInButton}
                 onClick={directToSignIn}
               >
-                Sign in{' '}
+                Sign in
                 <img
                   className={styles.arrowRight}
                   src={arrowRight}
@@ -213,7 +212,7 @@ const Landing = () => {
 
       <div className={styles.whyUsePostman}>
         <div className={styles.innerContainer}>
-          <h1>Why use Postman</h1>
+          <h1>Why use Postman?</h1>
           <div className={styles.reasons}>
             {reasons.map((reason) => (
               <div className={styles.reason} key={reason.video}>
@@ -272,8 +271,8 @@ const Landing = () => {
             <h2>Start using Postman today</h2>
             <p>
               It is easy to get started with your gov.sg email account. For non
-              gov.sg email users, please fill out the following form. We will
-              review your request within 3 business days.
+              gov.sg email users, please contact us. We will review your request
+              within 3 business days.
             </p>
 
             <div className={styles.buttonRow}>
@@ -293,7 +292,7 @@ const Landing = () => {
                 to={CONTACT_US_URL}
                 target="_blank"
               >
-                Have a question?
+                Contact us
               </OutboundLink>
             </div>
           </div>
@@ -314,7 +313,7 @@ const Landing = () => {
               <div className={styles.header}>
                 <span className={styles.title}>Postman</span>
                 <span className={styles.text}>
-                  Reach out to the citizens in minutes
+                  Reach out to citizens in minutes
                 </span>
               </div>
               <OutboundLink
@@ -350,7 +349,7 @@ const Landing = () => {
                 Privacy
               </OutboundLink>
               <OutboundLink eventLabel={TC_URL} to={TC_URL} target="_blank">
-                Terms of use
+                Terms of Use
               </OutboundLink>
               <OutboundLink
                 eventLabel={REPORT_BUG_URL}
