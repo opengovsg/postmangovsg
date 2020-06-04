@@ -24,6 +24,7 @@
     "papaparse": "^5.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-ga": "^2.7.0",
     "react-lottie": "^1.2.3",
     "react-moment": "^0.9.7",
     "react-paginate": "^6.3.2",

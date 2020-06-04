@@ -15,6 +15,7 @@ import {
   PrimaryButton,
   SampleCsv,
 } from 'components/common'
+import { sendTiming, sendException } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
@@ -58,6 +59,7 @@ const EmailRecipients = ({
   async function uploadFile(files: File[]) {
     setIsUploading(true)
     setErrorMessage(null)
+    const uploadTimeStart = performance.now()
 
     try {
       // user did not select a file
@@ -82,6 +84,8 @@ const EmailRecipients = ({
       })
 
       // Set state
+      const uploadTimeEnd = performance.now()
+      sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
@@ -97,6 +101,12 @@ const EmailRecipients = ({
       )
     } catch (err) {
       setErrorMessage(err.message)
+      const exceptionMsg = err.message.includes(
+        'not present in uploaded recipient list'
+      )
+        ? 'Attributes found in template not present in uploaded recipient list.'
+        : err.message
+      sendException(exceptionMsg)
     } finally {
       setIsUploading(false)
     }

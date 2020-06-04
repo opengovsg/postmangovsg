@@ -15,6 +15,7 @@ import {
   getPreviewMessage,
 } from 'services/sms.service'
 import { uploadFileWithPresignedUrl } from 'services/upload.service'
+import { sendTiming, sendException } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
@@ -56,6 +57,7 @@ const SMSRecipients = ({
   async function uploadFile(files: File[]) {
     setIsUploading(true)
     setErrorMessage(null)
+    const uploadTimeStart = performance.now()
 
     try {
       // user did not select a file
@@ -80,6 +82,8 @@ const SMSRecipients = ({
       })
 
       // Set state
+      const uploadTimeEnd = performance.now()
+      sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
       setUploadedCsvFilename(uploadedFile.name)
       setNumRecipients(uploadResponse.num_recipients)
 
@@ -94,6 +98,12 @@ const SMSRecipients = ({
       )
     } catch (err) {
       setErrorMessage(err.message)
+      const exceptionMsg = err.message.includes(
+        'not present in uploaded recipient list'
+      )
+        ? 'Attributes found in template not present in uploaded recipient list.'
+        : err.message
+      sendException(exceptionMsg)
     } finally {
       setIsUploading(false)
     }

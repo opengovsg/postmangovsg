@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Redirect, useHistory } from 'react-router-dom'
+import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 import Lottie from 'react-lottie'
 
@@ -177,14 +178,14 @@ const Landing = () => {
                   alt="Right arrow"
                 />
               </PrimaryButton>
-              <a
+              <OutboundLink
                 className={styles.contactUs}
-                href={CONTACT_US_URL}
+                eventLabel={CONTACT_US_URL}
+                to={CONTACT_US_URL}
                 target="_blank"
-                rel="noopener noreferrer"
               >
                 Need help?<span>Talk to us</span>
-              </a>
+              </OutboundLink>
             </div>
           </div>
           <div className={styles.landingAnimation}>
@@ -287,13 +288,13 @@ const Landing = () => {
                   alt="Right arrow"
                 />
               </PrimaryButton>
-              <a
-                href={CONTACT_US_URL}
+              <OutboundLink
+                eventLabel={CONTACT_US_URL}
+                to={CONTACT_US_URL}
                 target="_blank"
-                rel="noopener noreferrer"
               >
                 Have a question?
-              </a>
+              </OutboundLink>
             </div>
           </div>
           <div className={styles.imageContainer}>
@@ -316,16 +317,20 @@ const Landing = () => {
                   Reach out to the citizens in minutes
                 </span>
               </div>
-              <a href={GUIDE_URL} target="_blank" rel="noopener noreferrer">
-                User guide
-              </a>
-              <a
-                href={CONTRIBUTE_URL}
+              <OutboundLink
+                eventLabel={GUIDE_URL}
+                to={GUIDE_URL}
                 target="_blank"
-                rel="noopener noreferrer"
+              >
+                Guide
+              </OutboundLink>
+              <OutboundLink
+                eventLabel={CONTRIBUTE_URL}
+                to={CONTRIBUTE_URL}
+                target="_blank"
               >
                 Contribute
-              </a>
+              </OutboundLink>
             </div>
 
             <div className={styles.builtBy}>
@@ -336,19 +341,24 @@ const Landing = () => {
           <div className={styles.lineBreak}></div>
           <div className={styles.footer}>
             <div className={styles.links}>
-              <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer">
-                Privacy
-              </a>
-              <a href={TC_URL} target="_blank" rel="noopener noreferrer">
-                Terms of use
-              </a>
-              <a
-                href={REPORT_BUG_URL}
+              <OutboundLink
+                className={styles.navLink}
+                eventLabel={PRIVACY_URL}
+                to={PRIVACY_URL}
                 target="_blank"
-                rel="noopener noreferrer"
+              >
+                Privacy
+              </OutboundLink>
+              <OutboundLink eventLabel={TC_URL} to={TC_URL} target="_blank">
+                Terms of use
+              </OutboundLink>
+              <OutboundLink
+                eventLabel={REPORT_BUG_URL}
+                to={REPORT_BUG_URL}
+                target="_blank"
               >
                 Report Vulnerability
-              </a>
+              </OutboundLink>
             </div>
             <span>
               &copy; {new Date().getFullYear()} Open Government Products

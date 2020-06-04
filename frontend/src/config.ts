@@ -44,3 +44,4 @@ export const CONTRIBUTE_URL = process.env.REACT_APP_CONTRIBUTE_URL as string
 export const PRIVACY_URL = process.env.REACT_APP_PRIVACY_URL as string
 export const TC_URL = process.env.REACT_APP_TC_URL as string
 export const REPORT_BUG_URL = process.env.REACT_APP_REPORT_BUG_URL as string
+export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string

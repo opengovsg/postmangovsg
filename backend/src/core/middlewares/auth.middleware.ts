@@ -70,7 +70,7 @@ const getUser = async (
 ): Promise<Response | void> => {
   if (req?.session?.user?.id) {
     const user = await AuthService.findUser(req?.session?.user?.id)
-    return res.json({ email: user?.email })
+    return res.json({ email: user?.email, id: user?.id })
   }
   return res.json({})
 }

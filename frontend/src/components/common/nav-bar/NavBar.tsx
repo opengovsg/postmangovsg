@@ -1,12 +1,14 @@
 import React, { useState, useContext } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import cx from 'classnames'
+import { OutboundLink } from 'react-ga'
 
 import { ModalContext } from 'contexts/modal.context'
 import { GUIDE_URL } from 'config'
 import CreateModal from 'components/dashboard/create/create-modal'
 import { logout } from 'services/auth.service'
 import { AuthContext } from 'contexts/auth.context'
+import { setGAUserId } from 'services/ga.service'
 
 import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
@@ -25,6 +27,7 @@ const NavBar = () => {
     try {
       await logout()
       setAuthenticated(false)
+      setGAUserId(null)
     } catch (err) {
       console.error(err)
     }
@@ -64,14 +67,14 @@ const NavBar = () => {
         >
           Create
         </a>
-        <a
+        <OutboundLink
           className={styles.link}
-          href={GUIDE_URL}
+          eventLabel={GUIDE_URL}
+          to={GUIDE_URL}
           target="_blank"
-          rel="noopener noreferrer"
         >
           Guide
-        </a>
+        </OutboundLink>
         <NavLink
           className={styles.link}
           activeClassName={styles.active}

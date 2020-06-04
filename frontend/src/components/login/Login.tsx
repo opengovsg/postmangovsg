@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
+import { OutboundLink } from 'react-ga'
 
 import LoginInput from './login-input'
 import { GUIDE_URL, CONTACT_US_URL } from 'config'
@@ -42,22 +43,22 @@ const Landing = () => {
             alt="company logo"
           ></img>
           <div className={styles.linkBar}>
-            <a
+            <OutboundLink
               className={styles.navLink}
-              href={GUIDE_URL}
+              eventLabel={GUIDE_URL}
+              to={GUIDE_URL}
               target="_blank"
-              rel="noopener noreferrer"
             >
               Guide
-            </a>
-            <a
+            </OutboundLink>
+            <OutboundLink
               className={styles.navLink}
-              href={CONTACT_US_URL}
+              eventLabel={CONTACT_US_URL}
+              to={CONTACT_US_URL}
               target="_blank"
-              rel="noopener noreferrer"
             >
               Contact Us
-            </a>
+            </OutboundLink>
           </div>
         </div>
       </div>
