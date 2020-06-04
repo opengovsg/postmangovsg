@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 import config from './config'
 
-const sequelizeLoader = async () => {
+const sequelizeLoader = async (): Promise<Sequelize> => {
   try {
     const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
     const sequelize = new Sequelize(config.get('database.databaseUri'), {

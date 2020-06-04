@@ -1,5 +1,6 @@
 import sequelizeLoader from './sequelize-loader'
 import { QueryTypes } from 'sequelize'
+import { Sequelize } from 'sequelize-typescript'
 
 exports.handler = async (event: any) => {
   try {
@@ -7,17 +8,26 @@ exports.handler = async (event: any) => {
 
     const message = JSON.parse(event.Records[0].Sns.Message)
 
+    const notificationType = message?.notificationType
+
     const messageId = message?.mail?.commonHeaders?.messageId
-    console.log(messageId)
 
-    const timeStamp = message?.delivery?.timestamp
-    console.log(timeStamp)
+    console.log(`Updating messageId ${messageId} in email_messages, notificationType = ${notificationType}`)
 
-    await sequelize.query(
-      `UPDATE email_messages SET received_at=timeStamp, updated_at = clock_timestamp() WHERE id=messageId`,
-      {
-        replacements: { timeStamp, messageId }, type: QueryTypes.UPDATE,
-      })
+    switch (notificationType) {
+      case "Delivery": 
+        await updateSuccessfulDelivery(message, sequelize)
+        break
+      case "Bounce":
+        await updateBouncedStatus(message, sequelize)
+        break
+      case "Reject":
+        await updateRejectedStatus(message, sequelize)
+        break
+      default:
+        throw new Error(`Can't handle messages with this notification type. notificationType = ${notificationType}`)
+    }    
+    
     return {
       statusCode: 200,
       body: 'Ok'
@@ -32,3 +42,47 @@ exports.handler = async (event: any) => {
     }
   }
 }
+
+const updateSuccessfulDelivery = async (message: any, dbConnection: Sequelize ) => {
+  const messageId = message?.mail?.commonHeaders?.messageId
+  const timeStamp = message?.delivery?.timestamp
+  
+  await dbConnection.query(
+    `UPDATE email_messages SET received_at=:timeStamp, updated_at = clock_timestamp() WHERE message_id=:messageId`,
+    {
+      replacements: { timeStamp, messageId }, type: QueryTypes.UPDATE 
+    })
+}
+
+const updateBouncedStatus = async (message: any, dbConnection: Sequelize) => {
+  const bounceType = message?.bounce?.bounceType
+  const messageId = message?.mail?.commonHeaders?.messageId
+
+  let errorCode
+ 
+  if (bounceType === 'Permanent') {
+    errorCode = "Hard bounce, the recipient's mail server permanently rejected the email."
+  }
+  else {
+    errorCode = "Soft bounce, Amazon SES fails to deliver the email after retrying for a period of time."
+  }
+  
+  await dbConnection.query(
+    `UPDATE email_messages SET error_code=:errorCode, updated_at = clock_timestamp() WHERE message_id=:messageId`,
+    {
+      replacements: { errorCode, messageId }, type: QueryTypes.UPDATE 
+    })
+}
+
+const updateRejectedStatus = async (message: any, dbConnection: Sequelize) => {
+  const messageId = message?.mail?.commonHeaders?.messageId
+
+  const errorCode = "SES accepted the email, determined that it contained a virus, and rejected it.\
+    SES didn't attempt to deliver the email to the recipient's mail server."
+  
+  await dbConnection.query(
+    `UPDATE email_messages SET error_code=:errorCode, updated_at = clock_timestamp() WHERE message_id=:messageId`,
+    {
+      replacements: { errorCode, messageId }, type: QueryTypes.UPDATE 
+    })
+} 
