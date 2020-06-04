@@ -121,6 +121,7 @@ jobs:
           on:
             branch: $PRODUCTION_BRANCH
         - provider: lambda
+          edge: true
           function_name: ses-status-success-staging
           region: $AWS_DEFAULT_REGION
           role: $STAGING_TWILIO_CALLBACK_ROLE
