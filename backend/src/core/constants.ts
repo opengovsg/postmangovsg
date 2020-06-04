@@ -1,6 +1,7 @@
 export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
+  Telegram = 'TELEGRAM',
 }
 
 export enum JobStatus {
@@ -21,6 +22,7 @@ export enum JobStatus {
  *       enum:
  *       - SMS
  *       - EMAIL
+ *       - TELEGRAM
  *
  *
  *     CampaignMeta:
