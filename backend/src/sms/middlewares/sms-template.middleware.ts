@@ -7,6 +7,7 @@ import {
   RecipientColumnMissing,
   TemplateError,
   InvalidRecipientError,
+  UnexpectedDoubleQuoteError,
 } from '@core/errors'
 import { CampaignService, TemplateService } from '@core/services'
 import { SmsTemplateService } from '@sms/services'
@@ -181,11 +182,14 @@ const uploadCompleteHandler = async (
     }
   } catch (err) {
     if (!res.headersSent) {
-      if (
-        err instanceof RecipientColumnMissing ||
-        err instanceof MissingTemplateKeysError ||
-        err instanceof InvalidRecipientError
-      ) {
+      const userErrors = [
+        RecipientColumnMissing,
+        MissingTemplateKeysError,
+        InvalidRecipientError,
+        UnexpectedDoubleQuoteError,
+      ]
+
+      if (userErrors.some((errType) => err instanceof errType)) {
         return res.status(400).json({ message: err.message })
       }
       return next(err)

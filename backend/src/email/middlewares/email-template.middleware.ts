@@ -7,6 +7,7 @@ import {
   RecipientColumnMissing,
   TemplateError,
   InvalidRecipientError,
+  UnexpectedDoubleQuoteError,
 } from '@core/errors'
 import { CampaignService, TemplateService } from '@core/services'
 import { EmailTemplateService } from '@email/services'
@@ -128,8 +129,7 @@ const updateCampaignAndMessages = async (
  */
 const uploadCompleteHandler = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
   res.setTimeout(config.get('express.uploadCompleteTimeout'), () => {
     if (!res.headersSent) {
@@ -192,14 +192,16 @@ const uploadCompleteHandler = async (
     }
   } catch (err) {
     if (!res.headersSent) {
-      if (
-        err instanceof RecipientColumnMissing ||
-        err instanceof MissingTemplateKeysError ||
-        err instanceof InvalidRecipientError
-      ) {
+      const userErrors = [
+        RecipientColumnMissing,
+        MissingTemplateKeysError,
+        InvalidRecipientError,
+        UnexpectedDoubleQuoteError,
+      ]
+
+      if (userErrors.some((errType) => err instanceof errType)) {
         return res.status(400).json({ message: err.message })
       }
-      return next(err)
     }
   }
 }

@@ -1,5 +1,8 @@
 import S3Client from '@core/services/s3-client.class'
-import { RecipientColumnMissing } from '@core/errors'
+import {
+  RecipientColumnMissing,
+  UnexpectedDoubleQuoteError,
+} from '@core/errors'
 
 import { Readable } from 'stream'
 
@@ -84,6 +87,27 @@ describe('S3 Service', () => {
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg', name: 'Ahmad', number: '' },
       ])
+    })
+
+    test('Double quotes allows escaping of special characters', async () => {
+      const headers = ['message', 'recipient']
+      const values = [[`"hello, this is a test"`, 'test@open.gov.sg']]
+      const stream = await createStream(headers, values)
+      const params = await s3Client.parseCsv(stream)
+      expect(params).toEqual([
+        { recipient: 'test@open.gov.sg', message: 'hello, this is a test' },
+      ])
+    })
+
+    test('throws error when double quote is used in unquoted field', async () => {
+      const headers = ['message', 'recipient']
+      const values = [
+        [`New York City,40°42'46"N,74°00'21"W`, 'test@open.gov.sg'],
+      ]
+      const stream = await createStream(headers, values)
+      await expect(s3Client.parseCsv(stream)).rejects.toThrow(
+        UnexpectedDoubleQuoteError
+      )
     })
   })
 })
