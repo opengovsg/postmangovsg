@@ -1,6 +1,8 @@
 import Telegraf from 'telegraf'
 import { Update } from 'telegraf/typings/telegram-types'
 
+import { startCommandHandler } from './handlers/start'
+
 /**
  * Instantiates a Telegraf instance to handle the incoming Telegram update.
  * @param update Incoming Telegram update
@@ -13,8 +15,8 @@ export const handleUpdate = async (
   // Instantiate bot
   const bot = new Telegraf(botToken)
 
-  // TODO: Attach handlers
-  bot.on('message', (ctx) => ctx.reply('ok'))
+  // Attach handlers
+  bot.command('start', startCommandHandler)
 
   // Handle update
   await bot.handleUpdate(update)
