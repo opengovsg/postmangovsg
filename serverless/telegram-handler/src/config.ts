@@ -17,11 +17,19 @@ convict.addFormat({
 })
 
 const config = convict({
-  devServerPort: {
-    doc: 'Port for development server to listen on',
-    default: 8000,
-    format: 'int',
-    env: 'DEV_SERVER_PORT',
+  devServer: {
+    port: {
+      doc: 'Port for development server to listen on',
+      default: 8000,
+      format: 'int',
+      env: 'DEV_SERVER_PORT',
+    },
+    botToken: {
+      doc: 'Token of Telegram bot to use in development',
+      default: '',
+      format: String,
+      env: 'DEV_SERVER_BOT_TOKEN',
+    },
   },
   env: {
     doc: 'The application environment',
@@ -80,6 +88,13 @@ const config = convict({
         env: 'SEQUELIZE_POOL_CONNECTION_TIMEOUT',
         format: 'int',
       },
+    },
+  },
+  aws: {
+    awsRegion: {
+      doc: 'Region for the S3 bucket that is used to store file uploads',
+      default: 'ap-northeast-1',
+      env: 'AWS_REGION',
     },
   },
 })

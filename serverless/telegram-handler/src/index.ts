@@ -1,4 +1,5 @@
 import sequelizeLoader from './sequelize-loader'
+import { getBotTokenFromId } from './credential'
 
 const handler = async (event: any): Promise<{ statusCode: number }> => {
   try {
@@ -26,6 +27,8 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
       throw new Error(`botId ${botId} not recognized.`)
     }
 
+    const botToken = await getBotTokenFromId(botId)
+    console.log(botToken)
     // TODO: Instantiate Telegraf bot and attach handlers
   } catch (err) {
     console.error(`Error: ${err.message}`)

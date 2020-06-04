@@ -4,7 +4,12 @@ import express from 'express'
 import config from './config'
 import { handler } from '.'
 
-const PORT = config.get('devServerPort')
+const { port: PORT, botToken: TOKEN } = config.get('devServer')
+
+if (!TOKEN) {
+  console.error('Error: Bot token is required.')
+  process.exit(1)
+}
 
 const app = express()
 app.use(express.json())
