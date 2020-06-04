@@ -131,14 +131,19 @@ export async function getPresignedUrl({
       Papa.parse(uploadedFile, {
         header: true,
         delimiter: ',',
-        step: function (results, parser: Papa.Parser) {
+        step: function (_, parser: Papa.Parser) {
           // Checks first row only
           parser.pause()
           parser.abort()
         },
         complete: function (results) {
           // results.data will contain 1 row of results because we aborted on the first step
-          resolve(results.meta.delimiter === ',')
+          const { delimiter, fields } = results.meta
+          resolve(
+            delimiter === ',' &&
+              // papaparse parses everything, including images, pdfs... This checks that at least one of the columns is sane
+              fields.some((field) => /^[a-zA-Z0-9\s-_'"/]+$/.test(field))
+          )
         },
         error: function () {
           resolve(false)
@@ -153,6 +158,7 @@ export async function getPresignedUrl({
       )
     }
   }
+
   try {
     const response = await axios.get(
       `/campaign/${campaignId}/sms/upload/start`,
