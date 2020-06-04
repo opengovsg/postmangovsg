@@ -7,9 +7,7 @@ const router = Router()
 
 const deleteCredentialValidator = {
   [Segments.BODY]: Joi.object({
-    label: Joi
-      .string()
-      .required(),
+    label: Joi.string().required(),
   }),
 }
 
@@ -40,7 +38,7 @@ const deleteCredentialValidator = {
  *                          type: string
  *                        type:
  *                          $ref: '#/components/schemas/ChannelType'
- *                    
+ *
  */
 router.get('/', SettingsMiddleware.getUserSettings)
 
@@ -49,7 +47,7 @@ router.get('/', SettingsMiddleware.getUserSettings)
  * path:
  *  /settings/regen:
  *    post:
- *      summary: Regenerates api key 
+ *      summary: Regenerates api key
  *      tags:
  *        - Settings
  *
@@ -63,7 +61,7 @@ router.get('/', SettingsMiddleware.getUserSettings)
  *                 properties:
  *                   api_key:
  *                     type: string
- *                    
+ *
  */
 router.post('/regen', SettingsMiddleware.regenerateApiKey)
 
@@ -90,8 +88,12 @@ router.post('/regen', SettingsMiddleware.regenerateApiKey)
  *          description: OK
  *        400:
  *          description: Bad Request
- *                    
+ *
  */
-router.delete('/credentials', celebrate(deleteCredentialValidator), SettingsMiddleware.deleteUserCredential)
+router.delete(
+  '/credentials',
+  celebrate(deleteCredentialValidator),
+  SettingsMiddleware.deleteUserCredential
+)
 
 export default router

@@ -3,8 +3,13 @@ import isEmail from 'validator/lib/isEmail'
 
 import { TextInputWithButton } from 'components/common'
 
-const EmailValidationInput = ({ onClick, buttonDisabled }: { onClick: (recipient: string) => any; buttonDisabled?: boolean }) => {
-
+const EmailValidationInput = ({
+  onClick,
+  buttonDisabled,
+}: {
+  onClick: (recipient: string) => any
+  buttonDisabled?: boolean
+}) => {
   const [recipient, setRecipient] = useState('')
   const [isValidating, setIsValidating] = useState(false)
 
@@ -28,14 +33,14 @@ const EmailValidationInput = ({ onClick, buttonDisabled }: { onClick: (recipient
       inputDisabled={isValidating}
       buttonDisabled={isInvalidRecipient() || isValidating || buttonDisabled}
     >
-      {
-        isValidating ? 'Sending...' : (
-          <>
-            Send test email
-            <i className="bx bx-envelope-open"></i>
-          </>
-        )
-      }
+      {isValidating ? (
+        'Sending...'
+      ) : (
+        <>
+          Send test email
+          <i className="bx bx-envelope-open"></i>
+        </>
+      )}
     </TextInputWithButton>
   )
 }

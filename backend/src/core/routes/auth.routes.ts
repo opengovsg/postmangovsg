@@ -7,7 +7,8 @@ const router = Router()
 // validators
 const getOtpValidator = {
   [Segments.BODY]: Joi.object({
-    email: Joi.string().email()
+    email: Joi.string()
+      .email()
       .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
       .required(), // validation for email ending in whitelisted domains was removed as we want to support other manually whitelisted emails
@@ -16,8 +17,9 @@ const getOtpValidator = {
 
 const verifyOtpValidator = {
   [Segments.BODY]: Joi.object({
-    email: Joi.string().email()
-      .options({ convert: true }) // Converts email to lowercase if it isn't  
+    email: Joi.string()
+      .email()
+      .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
       .required(),
     otp: Joi.string()
@@ -48,7 +50,7 @@ const verifyOtpValidator = {
  *                  type: string
  *              required:
  *              - email
- *                  
+ *
  *      responses:
  *        "200":
  *          content:
@@ -77,12 +79,12 @@ router.post('/otp', celebrate(getOtpValidator), AuthMiddleware.getOtp)
  *              properties:
  *                email:
  *                  type: string
- *                otp: 
+ *                otp:
  *                   type: string
  *              required:
  *              - email
  *              - otp
- *                  
+ *
  *      responses:
  *        "200":
  *          content:
@@ -107,7 +109,7 @@ router.post('/login', celebrate(verifyOtpValidator), AuthMiddleware.verifyOtp)
  *      summary: get logged in user info
  *      tags:
  *        - Authentication
- *                  
+ *
  *      responses:
  *        "200":
  *          content:
@@ -117,7 +119,7 @@ router.post('/login', celebrate(verifyOtpValidator), AuthMiddleware.verifyOtp)
  *                properties:
  *                  email:
  *                    type: string
- *        
+ *
  */
 router.get('/userinfo', AuthMiddleware.getUser)
 
@@ -129,7 +131,7 @@ router.get('/userinfo', AuthMiddleware.getUser)
  *      summary: logs user out
  *      tags:
  *        - Authentication
- *                  
+ *
  *      responses:
  *        "200":
  *          content:

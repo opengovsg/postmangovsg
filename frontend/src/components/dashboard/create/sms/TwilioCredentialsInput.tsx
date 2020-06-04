@@ -3,13 +3,17 @@ import React, { useState, useEffect } from 'react'
 import { TextInput } from 'components/common'
 
 export interface TwilioCredentials {
-  accountSid: string;
-  apiKey: string;
-  apiSecret: string;
-  messagingServiceSid: string;
+  accountSid: string
+  apiKey: string
+  apiSecret: string
+  messagingServiceSid: string
 }
 
-const TwilioCredentialsInput = ({ onFilled }: { onFilled: (input: TwilioCredentials | null) => any }) => {
+const TwilioCredentialsInput = ({
+  onFilled,
+}: {
+  onFilled: (input: TwilioCredentials | null) => any
+}) => {
   const [accountSid, setAccountSid] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [apiSecret, setApiSecret] = useState('')
@@ -21,7 +25,7 @@ const TwilioCredentialsInput = ({ onFilled }: { onFilled: (input: TwilioCredenti
     } else {
       onFilled(null)
     }
-  }, [accountSid, apiKey, apiSecret, messagingServiceSid])
+  }, [accountSid, apiKey, apiSecret, messagingServiceSid, onFilled])
 
   return (
     <>

@@ -1,11 +1,16 @@
-import { Column, DataType, Model, Table, ForeignKey } from 'sequelize-typescript'
+import {
+  Column,
+  DataType,
+  Model,
+  Table,
+  ForeignKey,
+} from 'sequelize-typescript'
 import { User } from './user'
 import { Credential } from './credential'
 import { ChannelType } from '@core/constants'
 
 @Table({ tableName: 'user_credentials', underscored: true, timestamps: true })
 export class UserCredential extends Model<UserCredential> {
-
   @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,
@@ -35,5 +40,4 @@ export class UserCredential extends Model<UserCredential> {
     allowNull: false,
   })
   type!: ChannelType
-
 }

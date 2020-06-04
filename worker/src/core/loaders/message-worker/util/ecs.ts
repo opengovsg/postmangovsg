@@ -7,7 +7,8 @@ import logger from '@core/logger'
 const ECSClient = new ECS({ region: config.get('aws.awsRegion') })
 const taskKeyword = ':task/'
 const clusterKeyword = ':cluster/'
-const getLabel = (v: string, keyword: string): string => (v.substring(v.indexOf(keyword) + keyword.length))
+const getLabel = (v: string, keyword: string): string =>
+  v.substring(v.indexOf(keyword) + keyword.length)
 class ECSUtil {
   static clusterName: string
   static taskARN: string
@@ -20,30 +21,39 @@ class ECSUtil {
   static getWorkersInService(): Promise<string[]> {
     if (!this.hasLoaded) throw new Error('ECSUtil has not been loaded')
     return new Promise((resolve, reject) => {
-      ECSClient.listTasks({
-        serviceName: config.get('aws.serviceName'),
-        cluster: this.clusterName,
-        desiredStatus: 'RUNNING',
-      }, (err: AWSError, data: ECS.ListTasksResponse) => {
-        if (err) reject(err)
-        resolve(data.taskArns?.map((taskArn) => getLabel(taskArn, taskKeyword)))
-      })
+      ECSClient.listTasks(
+        {
+          serviceName: config.get('aws.serviceName'),
+          cluster: this.clusterName,
+          desiredStatus: 'RUNNING',
+        },
+        (err: AWSError, data: ECS.ListTasksResponse) => {
+          if (err) reject(err)
+          resolve(
+            data.taskArns?.map((taskArn) => getLabel(taskArn, taskKeyword))
+          )
+        }
+      )
     })
   }
   static load(): Promise<void> {
+    logger.info({
+      prod: config.get('IS_PROD'),
+      metadataUri: config.get('aws.metadataUri'),
+    })
+    if (config.get('IS_PROD') && config.get('aws.metadataUri')) {
+      return axios
+        .get(`${config.get('aws.metadataUri')}/task`)
+        .then((response) => {
+          logger.info(response.data)
+          const data: { Cluster: string; TaskARN: string } = response.data
+          // "Cluster": "arn:aws:ecs:us-west-2:&ExampsleAWSAccountNo1;:cluster/clusterName",
+          // "TaskARN": "arn:aws:ecs:us-west-2:&ExampleAWSAccountNo1;:task/taskARN",
 
-    logger.info({ prod : config.get('IS_PROD'), metadataUri: config.get('aws.metadataUri') })
-    if (config.get('IS_PROD') && config.get('aws.metadataUri')){
-      return axios.get(`${config.get('aws.metadataUri')}/task`).then((response) => {
-        logger.info(response.data)
-        const data: {'Cluster': string; 'TaskARN': string } = response.data
-        // "Cluster": "arn:aws:ecs:us-west-2:&ExampsleAWSAccountNo1;:cluster/clusterName",
-        // "TaskARN": "arn:aws:ecs:us-west-2:&ExampleAWSAccountNo1;:task/taskARN",
-
-        this.clusterName = getLabel(data['Cluster'], clusterKeyword)
-        this.taskARN = getLabel(data['TaskARN'], taskKeyword)
-        logger.info({ clusterName: this.clusterName, taskARN: this.taskARN }) 
-      })
+          this.clusterName = getLabel(data['Cluster'], clusterKeyword)
+          this.taskARN = getLabel(data['TaskARN'], taskKeyword)
+          logger.info({ clusterName: this.clusterName, taskARN: this.taskARN })
+        })
         .then(() => {
           this.hasLoaded = true
           logger.info('ECSUtil loaded for prod')
@@ -57,5 +67,3 @@ class ECSUtil {
 }
 
 export default ECSUtil
-
-

@@ -18,13 +18,20 @@ const SMS_PROGRESS_STEPS = [
   'Send',
 ]
 
-const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => {
+const CreateSMS = ({
+  campaign: initialCampaign,
+}: {
+  campaign: SMSCampaign
+}) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
 
   // Modifies campaign object in state and navigates to next step
   const onNext = (changes: any, next = true) => {
-    const updatedCampaign = Object.assign(cloneDeep(campaign), changes) as SMSCampaign
+    const updatedCampaign = Object.assign(
+      cloneDeep(campaign),
+      changes
+    ) as SMSCampaign
     updatedCampaign.setProgress()
     setCampaign(updatedCampaign)
     if (next) {
@@ -35,44 +42,53 @@ const CreateSMS = ({ campaign: initialCampaign }: { campaign: SMSCampaign }) => 
   function renderStep() {
     switch (activeStep) {
       case SMSProgress.CreateTemplate:
-        return (
-          <SMSTemplate body={campaign.body} onNext={onNext} />
-        )
+        return <SMSTemplate body={campaign.body} onNext={onNext} />
       case SMSProgress.UploadRecipients:
         return (
-          <SMSRecipients params={campaign.params} csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
+          <SMSRecipients
+            params={campaign.params}
+            csvFilename={campaign.csvFilename}
+            numRecipients={campaign.numRecipients}
+            onNext={onNext}
+          />
         )
       case SMSProgress.InsertCredentials:
         return (
-          <SMSCredentials hasCredential={campaign.hasCredential} onNext={onNext} />
+          <SMSCredentials
+            hasCredential={campaign.hasCredential}
+            onNext={onNext}
+          />
         )
       case SMSProgress.Send:
         return (
           <SMSSend numRecipients={campaign.numRecipients} onNext={onNext} />
         )
       default:
-        return (<p>Invalid step</p>)
+        return <p>Invalid step</p>
     }
   }
 
   return (
     <div className={styles.createContainer}>
-      {
-        campaign.status !== Status.Draft
-          ? (
-            <div className={styles.stepContainer}>
-              <SMSDetail id={campaign.id} sentAt={campaign.sentAt} numRecipients={campaign.numRecipients}></SMSDetail>
-            </div>
-          )
-          : (
-            <>
-              <ProgressPane steps={SMS_PROGRESS_STEPS} activeStep={activeStep} setActiveStep={setActiveStep} progress={campaign.progress} />
-              <div className={styles.stepContainer}>
-                {renderStep()}
-              </div>
-            </>
-          )
-      }
+      {campaign.status !== Status.Draft ? (
+        <div className={styles.stepContainer}>
+          <SMSDetail
+            id={campaign.id}
+            sentAt={campaign.sentAt}
+            numRecipients={campaign.numRecipients}
+          ></SMSDetail>
+        </div>
+      ) : (
+        <>
+          <ProgressPane
+            steps={SMS_PROGRESS_STEPS}
+            activeStep={activeStep}
+            setActiveStep={setActiveStep}
+            progress={campaign.progress}
+          />
+          <div className={styles.stepContainer}>{renderStep()}</div>
+        </>
+      )}
     </div>
   )
 }

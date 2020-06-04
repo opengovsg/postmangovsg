@@ -4,14 +4,15 @@ import cx from 'classnames'
 import styles from './Banner.module.scss'
 
 const Banner = () => {
-
   return (
     <div className={styles.container}>
       <a href="https://www.gov.sg" target="_blank" rel="noopener noreferrer">
         <span className={cx(styles.sgdsIcon, styles.sgCrestIcon)}></span>
-        <span className={styles.bannerText}>A Singapore Government Agency Website</span>
+        <span className={styles.bannerText}>
+          A Singapore Government Agency Website
+        </span>
       </a>
-    </div >
+    </div>
   )
 }
 

@@ -13,13 +13,13 @@ const Pagination = (props: any) => {
 
   const previousButton = (
     <span className={styles.icon}>
-      <i className='bx bx-chevron-left'></i>
+      <i className="bx bx-chevron-left"></i>
     </span>
   )
 
   const nextButton = (
     <span className={styles.icon}>
-      <i className='bx bx-chevron-right'></i>
+      <i className="bx bx-chevron-right"></i>
     </span>
   )
 
@@ -41,7 +41,7 @@ const Pagination = (props: any) => {
       pageClassName={styles.pageNumber}
       breakClassName={styles.break}
       activeClassName={styles.active}
-      activeLinkClassName	={styles.activeLink}
+      activeLinkClassName={styles.activeLink}
       previousClassName={styles.navIcon}
       nextClassName={styles.navIcon}
       disabledClassName={styles.navIconDisabled}

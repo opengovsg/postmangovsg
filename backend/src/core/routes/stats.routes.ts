@@ -21,7 +21,7 @@ const router = Router()
  *                properties:
  *                  sent:
  *                    type: number
- *                    
+ *
  */
 router.get('/', StatsMiddleware.getGlobalStats)
 

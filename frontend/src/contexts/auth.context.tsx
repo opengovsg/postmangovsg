@@ -1,12 +1,20 @@
-import React, { createContext, useState, useEffect, SetStateAction, Dispatch } from 'react'
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  SetStateAction,
+  Dispatch,
+} from 'react'
+import { useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { getUserEmail, logout } from 'services/auth.service'
+import { getUser, logout } from 'services/auth.service'
+import { setGAUserId, initializeGA, sendPageView } from 'services/ga.service'
 
 interface ContextProps {
-  isAuthenticated: boolean;
-  setAuthenticated: Dispatch<SetStateAction<boolean>>;
-  email: string;
-  setEmail: Dispatch<SetStateAction<string>>;
+  isAuthenticated: boolean
+  setAuthenticated: Dispatch<SetStateAction<boolean>>
+  email: string
+  setEmail: Dispatch<SetStateAction<string>>
 }
 
 export const AuthContext = createContext({} as ContextProps)
@@ -16,11 +24,22 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')
 
+  const location = useLocation()
+
+  useEffect(() => {
+    // ensure that GA is loaded before sending event
+    isLoaded && sendPageView(location.pathname)
+  }, [location, isLoaded])
+
   async function initialChecks() {
     try {
-      const email = await getUserEmail()
-      setAuthenticated(!!email)
-      setEmail(email || '')
+      const user = await getUser()
+      setAuthenticated(!!user?.email)
+      setEmail(user?.email || '')
+
+      initializeGA()
+      // set user id to track logged in user
+      setGAUserId(user?.id || null)
     } catch (err) {
       // is unauthorized
     }
@@ -28,11 +47,14 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Set up axios interceptor to redirect to login if any axios requests are unauthorized
     axios.interceptors.response.use(
-      function (response){ return response } ,
+      function (response) {
+        return response
+      },
       async function (error) {
-        if (error.response && error.response.status === 401){
+        if (error.response && error.response.status === 401) {
           await logout()
           setAuthenticated(false)
+          setGAUserId(null)
         }
         return Promise.reject(error)
       }
@@ -44,12 +66,14 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   return (
-    <AuthContext.Provider value={{
-      isAuthenticated,
-      setAuthenticated,
-      email,
-      setEmail,
-    }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        setAuthenticated,
+        email,
+        setEmail,
+      }}
+    >
       {isLoaded && children}
     </AuthContext.Provider>
   )

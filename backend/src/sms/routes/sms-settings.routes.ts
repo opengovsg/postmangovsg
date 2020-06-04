@@ -13,26 +13,11 @@ const storeCredentialValidator = {
       .max(50)
       .pattern(/^[a-z0-9-]+$/)
       .required(),
-    'twilio_account_sid': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_api_secret': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_api_key': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_messaging_service_sid': Joi
-      .string()
-      .trim()
-      .required(),
-    recipient: Joi
-      .string()
-      .trim()
-      .required(),
+    twilio_account_sid: Joi.string().trim().required(),
+    twilio_api_secret: Joi.string().trim().required(),
+    twilio_api_key: Joi.string().trim().required(),
+    twilio_messaging_service_sid: Joi.string().trim().required(),
+    recipient: Joi.string().trim().required(),
   }),
 }
 
@@ -53,7 +38,7 @@ const getCredentialsValidator = {
  *        content:
  *          application/json:
  *            schema:
- *              allOf: 
+ *              allOf:
  *                - $ref: '#/components/schemas/TwilioCredentials'
  *                - type: object
  *                  properties:
@@ -71,13 +56,16 @@ const getCredentialsValidator = {
  *          description: OK
  *        400:
  *          description: Bad Request (invalid credentials, malformed request, duplicate labels)
- *                    
+ *
  */
-router.post('/credentials', celebrate(storeCredentialValidator), 
-  SettingsMiddleware.checkUserCredentialLabel, 
-  SmsMiddleware.getCredentialsFromBody, 
-  SmsMiddleware.validateAndStoreCredentials, 
-  SettingsMiddleware.storeUserCredential)
+router.post(
+  '/credentials',
+  celebrate(storeCredentialValidator),
+  SettingsMiddleware.checkUserCredentialLabel,
+  SmsMiddleware.getCredentialsFromBody,
+  SmsMiddleware.validateAndStoreCredentials,
+  SettingsMiddleware.storeUserCredential
+)
 
 /**
  * @swagger
@@ -99,9 +87,12 @@ router.post('/credentials', celebrate(storeCredentialValidator),
  *                  properties:
  *                    label:
  *                     type: string
- *                    
+ *
  */
-router.get('/credentials', celebrate(getCredentialsValidator), SettingsMiddleware.getChannelSpecificCredentials)
-
+router.get(
+  '/credentials',
+  celebrate(getCredentialsValidator),
+  SettingsMiddleware.getChannelSpecificCredentials
+)
 
 export default router

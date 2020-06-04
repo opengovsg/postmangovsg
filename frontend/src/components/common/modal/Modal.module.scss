@@ -35,7 +35,7 @@ $content-width: 600px;
     margin: auto;
   }
 
-  @include scrollbar($light-blue, $grey)
+  @include scrollbar($light-blue, $grey);
 }
 
 .close {

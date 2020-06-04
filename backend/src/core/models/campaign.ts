@@ -1,4 +1,13 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table, HasMany, HasOne } from 'sequelize-typescript'
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+  HasMany,
+  HasOne,
+} from 'sequelize-typescript'
 import { ChannelType } from '@core/constants'
 import { CampaignS3ObjectInterface } from '@core/interfaces'
 import { Credential } from './credential'

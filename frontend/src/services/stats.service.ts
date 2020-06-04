@@ -9,6 +9,4 @@ async function getLandingStats(): Promise<number | undefined> {
   }
 }
 
-export {
-  getLandingStats,
-}
+export { getLandingStats }

@@ -29,7 +29,7 @@ const Settings = () => {
         <ApiKey hasApiKey={hasApiKey} />
         <div className="separator"></div>
         <Credentials creds={creds} refresh={fetchUserSettings} />
-      </div >
+      </div>
     </>
   )
 }

@@ -1,80 +1,28 @@
 module.exports = {
   root: false,
   parser: '@typescript-eslint/parser',
-  plugins: [
-    '@typescript-eslint',
-  ],
+  plugins: ['@typescript-eslint'],
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
+    'eslint:recommended', // Recommended ESLint rules
+    'plugin:@typescript-eslint/eslint-recommended', // Disables rules from `eslint:recommended` that are already covered by the TypeScript typechecker
+    'plugin:@typescript-eslint/recommended', // Recommended TypeScript rules
+    'prettier/@typescript-eslint', // Disables rules from `@typescript-eslint/recommended` that are covered by Prettier
+    'plugin:prettier/recommended', // Recommended Prettier rules
   ],
   parserOptions: {
-    sourceType: 'module'
+    sourceType: 'module',
   },
-  ignorePatterns: [
-    '**/build',
-    '**/dist',
-    '**/node_modules'
-  ],
+  ignorePatterns: ['build', 'dist', 'node_modules'],
   rules: {
+    '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', { 
-      'argsIgnorePattern': '^_' 
-    }],
-    'comma-dangle': [
-      'error',
-      'always-multiline'
-    ],
-    'indent': [
-      'error',
-      2
-    ],
-    'newline-per-chained-call': [
-      'error',
-      {
-        'ignoreChainWithDepth': 2
-      }
-    ],
+    '@typescript-eslint/no-unused-vars': [2, { argsIgnorePattern: '^_' }],
+
     'no-console': [
       'warn',
       {
-        'allow': [
-          'warn',
-          'error'
-        ]
-      }
+        allow: ['warn', 'error'],
+      },
     ],
-    'quotes': [
-      'error',
-      'single'
-    ],
-    'space-before-function-paren': [
-      'error',
-      {
-        'anonymous': 'always',
-        'named': 'never',
-        'asyncArrow': 'always'
-      }
-    ],
-    'arrow-spacing': [
-      'error',
-      { 'before': true, 'after': true },
-    ],
-    'semi': [
-      'error',
-      'never'
-    ],
-    'object-curly-spacing': [
-      'error',
-      'always'
-    ],
-    '@typescript-eslint/no-use-before-define': ['error',
-      { 'functions': false }
-    ],
-    'func-style': [
-      'error',
-      'expression'
-    ],
-  }
+  },
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
+import { OutboundLink } from 'react-ga'
 
 import { GUIDE_URL, CONTRIBUTE_URL } from 'config'
 import PrimaryButton from 'components/common/primary-button'
@@ -18,16 +19,36 @@ const NavBar = () => {
     <nav className={styles.navBar}>
       <a className={styles.appLogo} href="/">
         <img src={AppLogo} alt="Postman logo" className={styles.desktop} />
-        <img src={AppBrandmark} alt="Postman brandmark" className={styles.mobile}/>
+        <img
+          src={AppBrandmark}
+          alt="Postman brandmark"
+          className={styles.mobile}
+        />
       </a>
       <div className={styles.navbarLinks}>
         <div className={styles.links}>
-          <a className={styles.link} href={CONTRIBUTE_URL} target="_blank" rel="noopener noreferrer">Contribute</a>
-          <a className={styles.link} href={GUIDE_URL} target="_blank" rel="noopener noreferrer">Guide</a>
+          <OutboundLink
+            className={styles.link}
+            eventLabel={CONTRIBUTE_URL}
+            to={CONTRIBUTE_URL}
+            target="_blank"
+          >
+            Contribute
+          </OutboundLink>
+          <OutboundLink
+            className={styles.link}
+            eventLabel={GUIDE_URL}
+            to={GUIDE_URL}
+            target="_blank"
+          >
+            Guide
+          </OutboundLink>
         </div>
-        <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>Sign in</PrimaryButton>
+        <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
+          Sign in
+        </PrimaryButton>
       </div>
-    </nav >
+    </nav>
   )
 }
 

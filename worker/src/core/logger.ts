@@ -1,7 +1,7 @@
 import winston from 'winston'
 
 interface LoggerInterface {
-  logger: winston.Logger;
+  logger: winston.Logger
 }
 
 class Logger implements LoggerInterface {

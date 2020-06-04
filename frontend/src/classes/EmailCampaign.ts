@@ -36,11 +36,10 @@ export class EmailCampaign extends Campaign {
       this.progress = EmailProgress.CreateTemplate
     } else if (!this.numRecipients) {
       this.progress = EmailProgress.UploadRecipients
-    } else if (!this.hasCredential){
+    } else if (!this.hasCredential) {
       this.progress = EmailProgress.SendTestMessage
     } else {
       this.progress = EmailProgress.Send
     }
   }
 }
-

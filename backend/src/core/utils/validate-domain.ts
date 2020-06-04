@@ -1,18 +1,17 @@
 import validator from 'validator'
 import logger from '@core/logger'
 import config from '@core/config'
-type ValidateDomainFunction = (email: string) => boolean 
+type ValidateDomainFunction = (email: string) => boolean
 const getValidateDomain = (domains: string): ValidateDomainFunction => {
   const domainsToWhitelist: string[] = domains
     .split(';')
-    .map(domain => {
-      if (domain.startsWith('.') && validator.isEmail(`user@agency${domain}`)){
+    .map((domain) => {
+      if (domain.startsWith('.') && validator.isEmail(`user@agency${domain}`)) {
         // wildcard domain
         // example: .gov.sg
         // allow any emails that have domains ending in .gov.sg to sign in
         return domain
-      } 
-      else if (domain.startsWith('@') && validator.isEmail(`user${domain}`)){
+      } else if (domain.startsWith('@') && validator.isEmail(`user${domain}`)) {
         // specific domain
         // example: @moe.edu.sg
         // allow any emails that are @moe.edu.sg to sign in
@@ -21,17 +20,20 @@ const getValidateDomain = (domains: string): ValidateDomainFunction => {
       return ''
     })
     .filter(Boolean)
-  
-  if (domainsToWhitelist.length === 0 ){
-    throw new Error(`No domains were whitelisted - the supplied DOMAIN_WHITELIST is ${domains}`)
-  }
-  else {
+
+  if (domainsToWhitelist.length === 0) {
+    throw new Error(
+      `No domains were whitelisted - the supplied DOMAIN_WHITELIST is ${domains}`
+    )
+  } else {
     logger.info(`Domains whitelisted: ${domainsToWhitelist}`)
   }
-  return ((email): boolean => {
-    return validator.isEmail(email) && domainsToWhitelist
-      .some(domain => email.endsWith(domain))
-  })
+  return (email): boolean => {
+    return (
+      validator.isEmail(email) &&
+      domainsToWhitelist.some((domain) => email.endsWith(domain))
+    )
+  }
 }
 
 const validateDomain = getValidateDomain(config.get('domains'))

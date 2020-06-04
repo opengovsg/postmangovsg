@@ -18,7 +18,6 @@ const start = async (): Promise<void> => {
   app.listen(port, () => console.log(`Listening on port ${port}!`))
 }
 
-start()
-  .catch((err) => {
-    console.error(err)
-  })
+start().catch((err) => {
+  console.error(err)
+})
