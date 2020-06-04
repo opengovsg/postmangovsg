@@ -155,7 +155,7 @@ const Landing = () => {
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>
-              Reach out to the citizens in minutes
+              Reach out to citizens in minutes
             </h1>
             <div
               className={cx(styles.sentMessages, {
@@ -170,7 +170,7 @@ const Landing = () => {
                 className={styles.signInButton}
                 onClick={directToSignIn}
               >
-                Sign in{' '}
+                Sign in
                 <img
                   className={styles.arrowRight}
                   src={arrowRight}
@@ -292,7 +292,7 @@ const Landing = () => {
                 to={CONTACT_US_URL}
                 target="_blank"
               >
-                Have a question?
+                Contact us
               </OutboundLink>
             </div>
           </div>
@@ -313,7 +313,7 @@ const Landing = () => {
               <div className={styles.header}>
                 <span className={styles.title}>Postman</span>
                 <span className={styles.text}>
-                  Reach out to the citizens in minutes
+                  Reach out to citizens in minutes
                 </span>
               </div>
               <OutboundLink
