@@ -1,14 +1,11 @@
+import { parseEvent } from './parser'
 import sequelizeLoader from './sequelize-loader'
 import { getBotTokenFromId } from './credential'
 
 const handler = async (event: any): Promise<{ statusCode: number }> => {
   try {
     // Parse botId and Telegram update
-    const { botId } = event.pathParameters
-    const update = JSON.parse(event.body)
-    if (!(botId && update)) {
-      throw new Error('botId and Telegram update must be specified.')
-    }
+    const { botId, update } = parseEvent(event)
 
     // Get database connection
     const sequelize = await sequelizeLoader()
