@@ -7,6 +7,8 @@ BEGIN
 WITH stats AS (
   SELECT
     COUNT(*) FILTER (WHERE delivered_at IS NULL) AS unsent,
+    -- a row could have both error_code and message_id if a message is processed by the
+    -- messaging service but a status callback indicates an error downstream
     COUNT(*) FILTER (WHERE error_code IS NOT NULL AND message_id IS NULL) AS errored,
     COUNT(*) FILTER (WHERE message_id IS NOT NULL) AS sent
   FROM sms_messages
