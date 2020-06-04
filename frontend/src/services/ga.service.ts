@@ -13,7 +13,9 @@ export const GA_USER_EVENTS = {
 }
 
 export function initializeGA() {
-  ReactGA.initialize(GA_TRACKING_ID, { debug: true })
+  ReactGA.initialize(GA_TRACKING_ID, {
+    debug: false, // Set to true only on development
+  })
 }
 
 export function setGAUserId(userId: number | null) {
@@ -36,7 +38,7 @@ export function sendTiming(category: string, variable: string, value: number) {
   ReactGA.timing({
     category,
     variable,
-    value, // in milliseconds
+    value: Math.ceil(value), // in integer milliseconds
   })
 }
 
