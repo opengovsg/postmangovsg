@@ -116,11 +116,7 @@ const Campaigns = () => {
         />
         <h2>We are excited to have you here!</h2>
         <h5>To get you started, we have prepared a guide for your reference</h5>
-	<OutboundLink
-          eventLabel={GUIDE_URL}
-          to={GUIDE_URL}
-          target="_blank"
-        >
+        <OutboundLink eventLabel={GUIDE_URL} to={GUIDE_URL} target="_blank">
           <PrimaryButton className={styles.darkBlueButton}>
             Learn how to set up →
           </PrimaryButton>

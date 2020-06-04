@@ -50,12 +50,17 @@ const Create = () => {
       {campaign ? (
         <>
           <TitleBar title={campaign.name}>
-            <PrimaryButton onClick={() => {
-              if (campaign.status === Status.Draft) {
-                sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
-              }
-              history.push('/campaigns')
-            }}>
+            <PrimaryButton
+              onClick={() => {
+                if (campaign.status === Status.Draft) {
+                  sendUserEvent(
+                    GA_USER_EVENTS.FINISH_CAMPAIGN_LATER,
+                    campaign.type
+                  )
+                }
+                history.push('/campaigns')
+              }}
+            >
               {campaign.status === Status.Draft
                 ? 'Finish this later'
                 : 'Back to campaigns'}

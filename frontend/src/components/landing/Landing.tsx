@@ -349,11 +349,7 @@ const Landing = () => {
               >
                 Privacy
               </OutboundLink>
-              <OutboundLink
-                eventLabel={GUIDE_URL}
-                to={GUIDE_URL}
-                target="_blank"
-              >
+              <OutboundLink eventLabel={TC_URL} to={TC_URL} target="_blank">
                 Terms of use
               </OutboundLink>
               <OutboundLink

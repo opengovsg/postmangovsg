@@ -98,10 +98,11 @@ const SMSRecipients = ({
       )
     } catch (err) {
       setErrorMessage(err.message)
-      const exceptionMsg =
-        err.message.includes('not present in uploaded recipient list')
-          ? 'Attributes found in template not present in uploaded recipient list.'
-          : err.message
+      const exceptionMsg = err.message.includes(
+        'not present in uploaded recipient list'
+      )
+        ? 'Attributes found in template not present in uploaded recipient list.'
+        : err.message
       sendException(exceptionMsg)
     } finally {
       setIsUploading(false)

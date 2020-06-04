@@ -26,8 +26,8 @@ const SMSDetail = ({
     return campaignStats
   }
 
-  async function handlePause(){
-    try{
+  async function handlePause() {
+    try {
       sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.SMS)
       await stopCampaign(id)
       await refreshCampaignStats(id)
@@ -36,8 +36,8 @@ const SMSDetail = ({
     }
   }
 
-  async function handleRetry(){
-    try{
+  async function handleRetry() {
+    try {
       sendUserEvent(GA_USER_EVENTS.RETRY_RESUME_SENDING, ChannelType.SMS)
       await retryCampaign(id)
       await refreshCampaignStats(id)

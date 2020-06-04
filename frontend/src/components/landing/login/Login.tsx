@@ -5,7 +5,12 @@ import { getOtpWithEmail, loginWithOtp, getUser } from 'services/auth.service'
 import { LOGIN_EMAIL_TEXT, LOGIN_EMAIL_PLACEHOLDER } from 'config'
 import styles from './Login.module.scss'
 import { AuthContext } from 'contexts/auth.context'
-import { GA_USER_EVENTS, setGAUserId, sendUserEvent, sendException } from 'services/ga.service'
+import {
+  GA_USER_EVENTS,
+  setGAUserId,
+  sendUserEvent,
+  sendException,
+} from 'services/ga.service'
 
 const emailText = LOGIN_EMAIL_TEXT
 const otpText = 'One-Time Password'

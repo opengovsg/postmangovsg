@@ -9,7 +9,7 @@ import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
-import { useHistory } from 'react-router-dom'
+
 const CreateModal = () => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()

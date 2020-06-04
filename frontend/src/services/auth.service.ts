@@ -49,9 +49,4 @@ function errorHandler(e: AxiosError, customHandlers: any = {}) {
   throw new Error(`${e}`)
 }
 
-export {
-  getOtpWithEmail,
-  loginWithOtp,
-  getUser,
-  logout,
-}
+export { getOtpWithEmail, loginWithOtp, getUser, logout }

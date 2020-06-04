@@ -1,5 +1,6 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
+import { OutboundLink } from 'react-ga'
 
 import { GUIDE_URL, CONTRIBUTE_URL } from 'config'
 import PrimaryButton from 'components/common/primary-button'
@@ -26,22 +27,22 @@ const NavBar = () => {
       </a>
       <div className={styles.navbarLinks}>
         <div className={styles.links}>
-          <a
+          <OutboundLink
             className={styles.link}
-            href={CONTRIBUTE_URL}
+            eventLabel={CONTRIBUTE_URL}
+            to={CONTRIBUTE_URL}
             target="_blank"
-            rel="noopener noreferrer"
           >
             Contribute
-          </a>
-          <a
+          </OutboundLink>
+          <OutboundLink
             className={styles.link}
-            href={GUIDE_URL}
+            eventLabel={GUIDE_URL}
+            to={GUIDE_URL}
             target="_blank"
-            rel="noopener noreferrer"
           >
             Guide
-          </a>
+          </OutboundLink>
         </div>
         <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
           Sign in

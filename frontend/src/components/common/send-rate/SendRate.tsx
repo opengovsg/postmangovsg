@@ -36,13 +36,13 @@ const SendRate = ({
             You can send messages at a rapid rate, as long as the requests do
             not max out Twilio&apos;s REST API concurrency limit.&nbsp;
             <OutboundLink
-            className={styles.link}
-            eventLabel={GUIDE_POWER_USER_URL}
-            to={GUIDE_POWER_USER_URL}
-            target="_blank"
-          >
-            Learn more about send rate limits
-          </OutboundLink>
+              className={styles.link}
+              eventLabel={GUIDE_POWER_USER_URL}
+              to={GUIDE_POWER_USER_URL}
+              target="_blank"
+            >
+              Learn more about send rate limits
+            </OutboundLink>
           </p>
 
           <p>

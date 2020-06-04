@@ -5,8 +5,9 @@ import React, {
   SetStateAction,
   Dispatch,
 } from 'react'
+import { useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { getUserEmail, logout } from 'services/auth.service'
+import { getUser, logout } from 'services/auth.service'
 import { setGAUserId, initializeGA, sendPageView } from 'services/ga.service'
 
 interface ContextProps {
@@ -53,6 +54,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
         if (error.response && error.response.status === 401) {
           await logout()
           setAuthenticated(false)
+          setGAUserId(null)
         }
         return Promise.reject(error)
       }
