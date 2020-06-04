@@ -3,6 +3,8 @@ env:
   variables:
     BACKEND_URL_PRODUCTION: "https://api.postman.gov.sg/v1"
     BACKEND_URL_STAGING: "https://api-staging.postman.gov.sg/v1"
+    SENTRY_DSN_PRODUCTION: "https://8f422b6a207f42b5b6ebdec018723df5@o399364.ingest.sentry.io/5262343"
+    SENTRY_DSN_STAGING: "https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024"
     REACT_APP_TITLE: "Postman.gov.sg"
     REACT_APP_DESCRIPTION: "Postman.gov.sg enables public officers to send templated messages to many recipients"
     REACT_APP_LOGIN_EMAIL_TEXT: "Sign in with your .gov.sg email"
@@ -49,8 +51,11 @@ frontend:
         - key: "Referrer-Policy"
           value: "same-origin"
         - key: "Content-Security-Policy"
-          value:
-            "connect-src 'self' https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com https://www.google-analytics.com;
+          value: "connect-src 'self' \
+            https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ \
+            https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com \
+            https://o399364.ingest.sentry.io/;
+            report-uri https://o399364.ingest.sentry.io/api/5261024/security/?sentry_key=b7b979b458ee470a86efff9ef1653b50;
             style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com;
             font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
             default-src 'self' https://*.postman.gov.sg;
