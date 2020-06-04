@@ -1,6 +1,7 @@
 import { parseEvent } from './parser'
 import sequelizeLoader from './sequelize-loader'
 import { getBotTokenFromId } from './credential'
+import { handleUpdate } from './bot'
 
 const handler = async (event: any): Promise<{ statusCode: number }> => {
   try {
@@ -25,8 +26,9 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
     }
 
     const botToken = await getBotTokenFromId(botId)
-    console.log(botToken)
-    // TODO: Instantiate Telegraf bot and attach handlers
+
+    // Handle update
+    await handleUpdate(update, botToken)
   } catch (err) {
     console.error(`Error: ${err.message}`)
   }
