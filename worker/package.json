@@ -1,25 +1,29 @@
 {
   "name": "worker",
-  "version": "1.2.4",
+  "version": "1.4.1",
   "description": "Workers for Postman",
   "main": "build/server.js",
   "scripts": {
     "build": "rimraf build && tsc",
     "dev": "npm run postbuild && tsc-watch --onSuccess \"node ./build/server.js\"",
-    "lint": "eslint --ignore-path .gitignore --fix 'src/**/*.ts'",
+    "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
+    "lint": "npm run lint-no-fix -- --fix",
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
-    "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build"
+    "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
+    "precommit": "lint-staged"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/bcrypt": "^3.0.0",
     "@types/convict": "^5.2.1",
     "@types/nodemailer": "^6.4.0",
     "@types/nodemailer-direct-transport": "^1.0.31",
     "@types/validator": "^13.0.0",
     "aws-sdk": "^2.660.0",
     "axios": "^0.19.2",
+    "bcrypt": "^4.0.1",
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
@@ -46,6 +50,10 @@
     "@typescript-eslint/parser": "^2.25.0",
     "copyfiles": "^2.2.0",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "lint-staged": "^10.2.6",
+    "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "tsc-watch": "^4.2.3",
     "typescript": "^3.8.3"
@@ -61,5 +69,8 @@
   },
   "bugs": {
     "url": "https://github.com/datagovsg/postmangovsg/issues"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --cache --fix"
   }
 }

@@ -1,7 +1,15 @@
 import { Sequelize } from 'sequelize-typescript'
 
 import config from '@core/config'
-import { Credential, JobQueue, Campaign, User, Worker, UserCredential } from '@core/models'
+import {
+  Credential,
+  JobQueue,
+  Campaign,
+  User,
+  Worker,
+  UserCredential,
+  Statistic,
+} from '@core/models'
 import { EmailMessage, EmailTemplate, EmailOp } from '@email/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import logger from '@core/logger'
@@ -9,7 +17,9 @@ import logger from '@core/logger'
 const DB_URI = config.get('database.databaseUri')
 
 const sequelizeLoader = async (): Promise<void> => {
-  const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+  const dialectOptions = config.get('IS_PROD')
+    ? config.get('database.dialectOptions')
+    : {}
   const sequelize = new Sequelize(DB_URI, {
     dialect: 'postgres',
     logging: false,
@@ -17,7 +27,15 @@ const sequelizeLoader = async (): Promise<void> => {
     dialectOptions,
   })
 
-  const coreModels = [Credential, JobQueue, Campaign, User, Worker, UserCredential]
+  const coreModels = [
+    Credential,
+    JobQueue,
+    Campaign,
+    User,
+    Worker,
+    UserCredential,
+    Statistic,
+  ]
   const emailModels = [EmailMessage, EmailTemplate, EmailOp]
   const smsModels = [SmsMessage, SmsTemplate, SmsOp]
   sequelize.addModels([...coreModels, ...emailModels, ...smsModels])

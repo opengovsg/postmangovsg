@@ -1,18 +1,30 @@
 import axios, { AxiosError } from 'axios'
 
 interface PresignedUrlResponse {
-  presignedUrl: string;
-  transactionId: string;
+  presignedUrl: string
+  transactionId: string
 }
 
 interface UploadCompleteResponse {
-  template_body: string;
-  num_recipients: number;
-  hydrated_record: string;
+  template_body: string
+  num_recipients: number
+  hydrated_record: string
 }
 
-export async function saveTemplate(campaignId: number, subject: string, body: string, replyTo: string | null):
-  Promise<{ numRecipients: number; updatedTemplate?: { body: string; subject: string; reply_to: string | null; params: Array<string> } }> {
+export async function saveTemplate(
+  campaignId: number,
+  subject: string,
+  body: string,
+  replyTo: string | null
+): Promise<{
+  numRecipients: number
+  updatedTemplate?: {
+    body: string
+    subject: string
+    reply_to: string | null
+    params: Array<string>
+  }
+}> {
   try {
     const response = await axios.put(`/campaign/${campaignId}/email/template`, {
       body,
@@ -20,17 +32,25 @@ export async function saveTemplate(campaignId: number, subject: string, body: st
       // Replace unwanted values (undefined and empty string) with null. Cases where this happens:
       // 1. User saves the template with no replyTo email - undefined
       // 2. User deletes the replyTo email after previously setting it - empty string
-      // eslint-disable-next-line @typescript-eslint/camelcase
       reply_to: replyTo || null,
     })
-    const { num_recipients: numRecipients, template: updatedTemplate } = response.data
+    const {
+      num_recipients: numRecipients,
+      template: updatedTemplate,
+    } = response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template')
   }
 }
 
-export async function sendPreviewMessage({ campaignId, recipient }: { campaignId: number; recipient: string }): Promise<void> {
+export async function sendPreviewMessage({
+  campaignId,
+  recipient,
+}: {
+  campaignId: number
+  recipient: string
+}): Promise<void> {
   try {
     await axios.post(`/campaign/${campaignId}/email/credentials`, {
       recipient,
@@ -44,16 +64,22 @@ export async function getPresignedUrl({
   campaignId,
   mimeType,
 }: {
-  campaignId: number;
-  mimeType: string;
+  campaignId: number
+  mimeType: string
 }): Promise<PresignedUrlResponse> {
   try {
-    const response = await axios.get(`/campaign/${campaignId}/email/upload/start`, {
-      params: {
-        'mime_type': mimeType,
-      },
-    })
-    const { 'transaction_id': transactionId, 'presigned_url': presignedUrl } = response.data
+    const response = await axios.get(
+      `/campaign/${campaignId}/email/upload/start`,
+      {
+        params: {
+          mime_type: mimeType,
+        },
+      }
+    )
+    const {
+      transaction_id: transactionId,
+      presigned_url: presignedUrl,
+    } = response.data
     return { transactionId, presignedUrl } as PresignedUrlResponse
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
@@ -65,22 +91,27 @@ export async function completeFileUpload({
   transactionId,
   filename,
 }: {
-  campaignId: number;
-  transactionId: string;
-  filename: string;
+  campaignId: number
+  transactionId: string
+  filename: string
 }): Promise<UploadCompleteResponse> {
   try {
-    const response = await axios.post(`/campaign/${campaignId}/email/upload/complete`, {
-      'transaction_id': transactionId,
-      filename,
-    })
+    const response = await axios.post(
+      `/campaign/${campaignId}/email/upload/complete`,
+      {
+        transaction_id: transactionId,
+        filename,
+      }
+    )
     return response.data
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
   }
 }
 
-export async function getPreviewMessage(campaignId: number): Promise<{ body: string; subject: string; reply_to: string | null }> {
+export async function getPreviewMessage(
+  campaignId: number
+): Promise<{ body: string; subject: string; reply_to: string | null }> {
   try {
     const response = await axios.get(`/campaign/${campaignId}/email/preview`)
     return response.data?.preview

@@ -1,0 +1,84 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+$navbar-link-margin: calc(1rem + 2vw);
+$navbar-height: 4rem;
+$navbar-mobile-height: 4rem;
+
+.navBar {
+  @include flex-horizontal;
+  height: $navbar-height;
+  width: 100%;
+  max-width: $header-max-width;
+  justify-content: space-between;
+
+  @include mobile() {
+    height: $navbar-mobile-height;
+    justify-content: space-between;
+  }
+
+  .appLogo {
+    @include flex-horizontal;
+    img {
+      height: 3rem;
+    }
+    .mobile {
+      display: none;
+    }
+
+    @include mobile() {
+      .desktop {
+        display: none;
+      }
+
+      .mobile {
+        display: flex;
+      }
+    }
+  }
+
+  .navbarLinks {
+    display: flex;
+    align-items: center;
+
+    .links {
+      @include flex-horizontal;
+      justify-content: space-between;
+    }
+
+    .link {
+      font-size: 0.9rem;
+      color: $dark-blue;
+      font-weight: 500;
+      cursor: pointer;
+      margin-right: $navbar-link-margin;
+
+      &:hover {
+        color: $indigo-blue;
+      }
+    }
+
+    .iconLink {
+      @include flex-horizontal;
+
+      .icon {
+        font-size: 1.3rem;
+        margin-left: 0.5rem;
+      }
+    }
+    .signInButton {
+      min-width: 7.5rem;
+      background-color: transparent;
+      border: 1px solid $indigo-blue;
+      color: $indigo-blue;
+
+      @include mobile() {
+        display: none;
+      }
+
+      &:hover {
+        background-color: $indigo-blue;
+        color: $light-blue;
+      }
+    }
+  }
+}

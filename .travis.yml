@@ -5,61 +5,120 @@ node_js:
 services:
   - docker
 
-# Skip the automatic npm ci step 
-install: skip
 cache:
   directories:
+    - backend/node_modules
+    - worker/node_modules
     - frontend/node_modules
+    - ./node_modules
 
 # Deploy from Dockerfile
 jobs:
   include:
-  - name: backend
-    before_script:
-      - cd backend
-    script:
-      - npm install
-      - npm run test
-    deploy:
-      - provider: elasticbeanstalk
-        skip_cleanup: true
-        access_key_id: $AWS_ACCESS_KEY_ID
-        secret_access_key: $AWS_SECRET_ACCESS_KEY
-        region: $AWS_DEFAULT_REGION
-        app: "postmangovsg-backend"
-        env: "postmangovsg-backend-staging"
-        bucket_name: "postmangovsg-backend-elasticbeanstalk"
-        on:
-          branch: $STAGING_BRANCH
-      - provider: elasticbeanstalk
-        skip_cleanup: true
-        access_key_id: $AWS_ACCESS_KEY_ID
-        secret_access_key: $AWS_SECRET_ACCESS_KEY
-        region: $AWS_DEFAULT_REGION
-        app: "postmangovsg-backend"
-        env: "postmangovsg-backend-prod"
-        bucket_name: "postmangovsg-backend-elasticbeanstalk"
-        on:
-          branch: $PRODUCTION_BRANCH
-  - name: worker
-    before_script:
-      - cd worker
-    deploy:
-      - provider: script
-        script: ./deploy.sh postmangovsg-workers staging-sending staging-logger
-        on:
-          branch: $STAGING_BRANCH
-          condition: "$DEPLOY_WORKER = true"
-      - provider: script
-        script: ./deploy.sh postmangovsg-workers prod-sending prod-logger
-        on:
-          branch: $PRODUCTION_BRANCH
-          condition: "$DEPLOY_WORKER = true"
-  - name: frontend
-    before_install:
-      - cd frontend
-    install:
-      - npm i
-    script:
-      - npm run lint
-      - CI=false npm run build
+    - name: backend
+      before_install:
+        - cd backend
+      install:
+        - npm install
+      script:
+        - npm run lint-no-fix
+        - npm run test
+      deploy:
+        - provider: elasticbeanstalk
+          skip_cleanup: true
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_DEFAULT_REGION
+          app: "postmangovsg-backend"
+          env: "postmangovsg-backend-staging"
+          bucket_name: "postmangovsg-backend-elasticbeanstalk"
+          on:
+            branch: $STAGING_BRANCH
+        - provider: elasticbeanstalk
+          skip_cleanup: true
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_DEFAULT_REGION
+          app: "postmangovsg-backend"
+          env: "postmangovsg-backend-prod"
+          bucket_name: "postmangovsg-backend-elasticbeanstalk"
+          on:
+            branch: $PRODUCTION_BRANCH
+    - name: worker
+      before_install:
+        - cd worker
+      install:
+        - npm install
+      script:
+        - npm run lint-no-fix
+      deploy:
+        - provider: script
+          script: ./deploy.sh postmangovsg-workers staging-sending staging-logger
+          on:
+            branch: $STAGING_BRANCH
+            condition: "$DEPLOY_WORKER = true"
+        - provider: script
+          script: ./deploy.sh postmangovsg-workers prod-sending prod-logger
+          on:
+            branch: $PRODUCTION_BRANCH
+            condition: "$DEPLOY_WORKER = true"
+    - name: frontend
+      before_install:
+        - cd frontend
+      install:
+        - npm install
+      script:
+        - npm run lint-no-fix
+        - CI=false npm run build
+    - name: serverless
+      before_deploy:
+        - cd $TRAVIS_BUILD_DIR/serverless/log-twilio-callback
+        - npm install && npm run build
+        - zip -qr code.zip build package.json node_modules/
+        - cd $TRAVIS_BUILD_DIR/serverless/postman-api-gateway-authorizer && zip -qr code.zip *
+      deploy:
+        - provider: lambda
+          function_name: log-twilio-callback-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_TWILIO_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../log-twilio-callback/code.zip"
+          environment_variables:
+            - TWILIO_CALLBACK_SECRET=$STAGING_TWILIO_CALLBACK_SECRET
+            - DB_URI=$STAGING_DB_URI
+          on:
+            branch: $STAGING_BRANCH
+        - provider: lambda
+          function_name: log-twilio-callback-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_TWILIO_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../log-twilio-callback/code.zip"
+          environment_variables:
+            - TWILIO_CALLBACK_SECRET=$PRODUCTION_TWILIO_CALLBACK_SECRET
+            - DB_URI=$PRODUCTION_DB_URI
+          on:
+            branch: $PRODUCTION_BRANCH
+        - provider: lambda
+          function_name: postman-api-gateway-authorizer
+          region: $AWS_DEFAULT_REGION
+          role: $POSTMAN_AUTHORIZER_ROLE
+          runtime: nodejs12.x
+          handler_name: handler
+          publish: true
+          zip: "../postman-api-gateway-authorizer/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+    - name: root
+      install:
+        - npm install --ignore-scripts
+      script:
+        - npm run lint-no-fix

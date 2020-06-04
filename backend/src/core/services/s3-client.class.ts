@@ -5,17 +5,20 @@ import { isEmpty } from 'lodash'
 import config from '@core/config'
 import logger from '@core/logger'
 import { RecipientColumnMissing } from '@core/errors/s3.errors'
+import { configureEndpoint } from '@core/utils/aws-endpoint'
 
-type CSVParamsInterface = {[key: string]: string}
+type CSVParamsInterface = { [key: string]: string }
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
 export default class S3Client {
   s3: S3
   constructor(s3?: S3) {
-    this.s3 = s3 || new S3({
-      signatureVersion: 'v4',
-      region: config.get('aws.awsRegion'),
-    })
+    this.s3 =
+      s3 ||
+      new S3({
+        signatureVersion: 'v4',
+        ...configureEndpoint(config),
+      })
   }
 
   download(key: string): NodeJS.ReadableStream {
@@ -29,13 +32,14 @@ export default class S3Client {
   /**
    * Ensures that the recipient column exists and converts headers to lowercase
    * Deduplicates the csv by overriding the same recipient with newer records
-   * @param readStream 
+   * @param readStream
    */
-  async parseCsv(readStream: NodeJS.ReadableStream): Promise<Array<CSVParamsInterface>> {
+  async parseCsv(
+    readStream: NodeJS.ReadableStream
+  ): Promise<Array<CSVParamsInterface>> {
     const parser = CSVParse({
       delimiter: ',',
       trim: true,
-      // eslint-disable-next-line @typescript-eslint/camelcase
       skip_empty_lines: true,
     })
     readStream.pipe(parser)

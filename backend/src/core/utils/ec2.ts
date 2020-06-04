@@ -13,7 +13,9 @@ const queryAwsMetadata = (): Promise<AxiosResponse> => {
     source.cancel('Getting AWS metadata timed out')
   }, 1000)
 
-  return axios.get('http://169.254.169.254/latest/meta-data/instance-id', { cancelToken: source.token })
+  return axios.get('http://169.254.169.254/latest/meta-data/instance-id', {
+    cancelToken: source.token,
+  })
 }
 
 /**
@@ -27,7 +29,9 @@ const getInstanceId = async (): Promise<string | void> => {
     return resp.data
   } catch (err) {
     console.log(err)
-    console.log('Unable to retrieve instanceId, is this running in an EC2 instance?')
+    console.log(
+      'Unable to retrieve instanceId, is this running in an EC2 instance?'
+    )
   }
 }
 

@@ -4,7 +4,6 @@ import cx from 'classnames'
 import styles from './InfoBlock.module.scss'
 
 const InfoBlock = (props: any) => {
-
   const { className, children, ...otherProps } = props
 
   return (

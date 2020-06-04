@@ -1,4 +1,3 @@
-
 import { expose } from 'threads/worker'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
@@ -10,8 +9,8 @@ import Email from './email.class'
 import SMS from './sms.class'
 import ECSUtil from './util/ecs'
 import assignment from './util/assignment'
-let connection: Sequelize, 
-  workerId: string, 
+let connection: Sequelize,
+  workerId: string,
   currentCampaignType: string,
   email: Email,
   sms: SMS
@@ -21,61 +20,105 @@ let connection: Sequelize,
  *  Helper method to decide which queries to use, depending on channel type
  */
 const service = (): Email | SMS => {
-  switch (currentCampaignType){
-  case 'EMAIL':
-    return email
-  case 'SMS':
-    return sms
-  default:
-    throw new Error(`${currentCampaignType} not supported`)
+  switch (currentCampaignType) {
+    case 'EMAIL':
+      return email
+    case 'SMS':
+      return sms
+    default:
+      throw new Error(`${currentCampaignType} not supported`)
   }
 }
 
-const getNextJob = (): Promise< { jobId: number | undefined; campaignId: number | undefined; campaignType: string | undefined; rate: number | undefined; credName: string | undefined}>  => {
-  return connection.query('SELECT get_next_job(:worker_id);',
-    { replacements: { 'worker_id': workerId }, type: QueryTypes.SELECT },
-  ).then((result) => {
-    const nextJob = get(result, '[0].get_next_job') || {}
-    const { 'job_id': jobId, 'campaign_id': campaignId, 'type': campaignType, rate, 'cred_name': credName } = nextJob
-    currentCampaignType = campaignType
-    if (jobId) logger.info(`${workerId}:  get_next_job job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType} cred_name=${credName}`)
-    return { jobId, campaignId, campaignType, rate, credName }
-  })
+const getNextJob = (): Promise<{
+  jobId: number | undefined
+  campaignId: number | undefined
+  campaignType: string | undefined
+  rate: number | undefined
+  credName: string | undefined
+}> => {
+  return connection
+    .query('SELECT get_next_job(:worker_id);', {
+      replacements: { worker_id: workerId },
+      type: QueryTypes.SELECT,
+    })
+    .then((result) => {
+      const nextJob = get(result, '[0].get_next_job') || {}
+      const {
+        job_id: jobId,
+        campaign_id: campaignId,
+        type: campaignType,
+        rate,
+        cred_name: credName,
+      } = nextJob
+      currentCampaignType = campaignType
+      if (jobId)
+        logger.info(
+          `${workerId}:  get_next_job job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType} cred_name=${credName}`
+        )
+      return { jobId, campaignId, campaignType, rate, credName }
+    })
 }
 
 const enqueueMessages = (jobId: number): Promise<void> => {
   return service().enqueueMessages(jobId)
 }
-  
-const getMessages = (jobId: number, rate: number): Promise<{id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null}[]>  => {
+
+const getMessages = (
+  jobId: number,
+  rate: number
+): Promise<
+  {
+    id: number
+    recipient: string
+    params: { [key: string]: string }
+    body: string
+    subject?: string
+    replyTo?: string | null
+    campaignId?: number
+  }[]
+> => {
   return service().getMessages(jobId, rate)
 }
 
-const sendMessage = (message: { id: number; recipient: string; params: {[key: string]: string}; body: string; subject?: string; replyTo?: string | null }): Promise<void>  => {
+const sendMessage = (message: {
+  id: number
+  recipient: string
+  params: { [key: string]: string }
+  body: string
+  subject?: string
+  replyTo?: string | null
+  campaignId?: number
+}): Promise<void> => {
   return service().sendMessage(message)
 }
-  
-const finalize = (): Promise<void> => {
 
-  const logEmailJob = connection.query('SELECT log_next_job_email();').then(([result]) => (get(result, ('[0].log_next_job_email'), '')))
+const finalize = (): Promise<void> => {
+  const logEmailJob = connection
+    .query('SELECT log_next_job_email();')
+    .then(([result]) => get(result, '[0].log_next_job_email', ''))
     .catch((err) => {
       logger.error(err)
     })
 
-  const logSmsJob =  connection.query('SELECT log_next_job_sms();').then(([result]) => (get(result, ('[0].log_next_job_sms'), '')))
+  const logSmsJob = connection
+    .query('SELECT log_next_job_sms();')
+    .then(([result]) => get(result, '[0].log_next_job_sms', ''))
     .catch((err) => {
       logger.error(err)
     })
 
   return Promise.all([logEmailJob, logSmsJob]).then((campaignIds) => {
-    campaignIds.filter(Boolean).forEach(campaignId => {
+    campaignIds.filter(Boolean).forEach((campaignId) => {
       logger.info(`${workerId}: finalized campaignId=${campaignId}`)
     })
   })
 }
 
 const createConnection = (): Sequelize => {
-  const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+  const dialectOptions = config.get('IS_PROD')
+    ? config.get('database.dialectOptions')
+    : {}
   return new Sequelize(config.get('database.databaseUri'), {
     dialect: 'postgres',
     logging: false,
@@ -83,13 +126,13 @@ const createConnection = (): Sequelize => {
     dialectOptions,
   })
 }
-  
+
 const waitForMs = (ms: number): Promise<void> => {
-  if (ms > 0) return new Promise(resolve => setTimeout(() => resolve(), ms))
+  if (ms > 0) return new Promise((resolve) => setTimeout(() => resolve(), ms))
   return Promise.resolve()
 }
-      
-const enqueueAndSend = async (): Promise<void>  => {
+
+const enqueueAndSend = async (): Promise<void> => {
   const { jobId, rate, credName } = await getNextJob()
   if (jobId && rate && credName) {
     await service().setSendingService(credName)
@@ -101,11 +144,13 @@ const enqueueAndSend = async (): Promise<void>  => {
         hasNext = false
       } else {
         const start = Date.now()
-        await Promise.all(messages.map(m => sendMessage(m)))
+        await Promise.all(messages.map((m) => sendMessage(m)))
         // Make sure at least 1 second has elapsed
         const wait = Math.max(0, 1000 - (Date.now() - start))
         await waitForMs(wait)
-        logger.info(`${workerId}: jobId=${jobId} rate=${rate} numMessages=${messages.length} wait=${wait}`)
+        logger.info(
+          `${workerId}: jobId=${jobId} rate=${rate} numMessages=${messages.length} wait=${wait}`
+        )
       }
     }
     await service().destroySendingService()
@@ -113,21 +158,22 @@ const enqueueAndSend = async (): Promise<void>  => {
 }
 
 /**
- * When a worker is spawned, it adds itself to the database, 
+ * When a worker is spawned, it adds itself to the database,
  * and checks if it was working on any existing jobs
  */
 const createAndResumeWorker = (): Promise<void> => {
   return assignment(connection, workerId)
     .then(() => {
-      return connection.query('SELECT resume_worker(:worker_id);', 
-        { replacements: { 'worker_id': workerId }, type: QueryTypes.SELECT })
+      return connection.query('SELECT resume_worker(:worker_id);', {
+        replacements: { worker_id: workerId },
+        type: QueryTypes.SELECT,
+      })
     })
     .then(() => {
       logger.info(`${workerId}: Resumed`)
     })
 }
 
-  
 const init = async (index: string, isLogger = false): Promise<any> => {
   await ECSUtil.load()
   workerId = ECSUtil.getWorkerId(index)
@@ -135,27 +181,23 @@ const init = async (index: string, isLogger = false): Promise<any> => {
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
   try {
-    if (!isLogger){
+    if (!isLogger) {
       await createAndResumeWorker()
-      for (;;){
+      for (;;) {
         await enqueueAndSend()
         await waitForMs(2000)
       }
     } else {
-      for (;;){
+      for (;;) {
         await finalize()
         await waitForMs(2000)
       }
     }
-  }
-  catch (err) {
+  } catch (err) {
     return Promise.reject(err)
   }
-   
-    
-  
 }
-  
+
 const messageWorker = {
   init,
 }

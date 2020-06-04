@@ -1,4 +1,5 @@
 # Postman.gov.sg
+
 ## Architecture
 
 **Prod only (replicate for staging vpc)**
@@ -7,6 +8,6 @@
 
 **DB schema**
 
-![DB Diagram](./5ebe329c39d18f5553ff3cde.png)
+![DB Diagram](./5ec230b839d18f5553ff5a97.png)
 
-Generated at [https://dbdiagram.io/d/5ebe329c39d18f5553ff3cde](https://dbdiagram.io/d/5ebe329c39d18f5553ff3cde)
+Generated at [https://dbdiagram.io/d/5ec230b839d18f5553ff5a97](https://dbdiagram.io/d/5ec230b839d18f5553ff5a97)

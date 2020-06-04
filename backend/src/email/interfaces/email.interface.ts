@@ -1,26 +1,25 @@
 import { EmailTemplate } from '@email/models'
 
 export interface StoreTemplateInput {
-  campaignId: number;
-  subject: string;
-  body: string;
-  replyTo: string | null;
+  campaignId: number
+  subject: string
+  body: string
+  replyTo: string | null
 }
 export interface StoreTemplateOutput {
-  updatedTemplate: EmailTemplate;
-  numRecipients: number;
+  updatedTemplate: EmailTemplate
+  numRecipients: number
   check?: {
-    reupload: boolean;
-    extraKeys?: string[];
-  };
-  valid?: boolean;
-
+    reupload: boolean
+    extraKeys?: string[]
+  }
+  valid?: boolean
 }
 /**
  * @swagger
  *  components:
  *    schemas:
- * 
+ *
  *      EmailCampaign:
  *       type: object
  *       properties:
@@ -36,7 +35,7 @@ export interface StoreTemplateOutput {
  *         valid:
  *           type: boolean
  *         csv_filename:
- *           type: string 
+ *           type: string
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
  *           default: 'EMAIL'

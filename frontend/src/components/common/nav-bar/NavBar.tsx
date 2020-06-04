@@ -20,9 +20,7 @@ const NavBar = () => {
   const location = useLocation()
 
   function handleCreateCampaign() {
-    modalContext.setModalContent(
-      <CreateModal></CreateModal>
-    )
+    modalContext.setModalContent(<CreateModal></CreateModal>)
   }
 
   async function handleLogout() {
@@ -45,13 +43,30 @@ const NavBar = () => {
         <a href="/campaigns" className={styles.appLogo}>
           <img src={AppLogo} alt="Postman logo" />
         </a>
-        <a className={styles.burgerButton} onClick={() => setMenuOpen(!menuOpen)}>
-          <span className={cx(styles.burger, { [styles.isActive]: menuOpen })}></span>
+        <a
+          className={styles.burgerButton}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span
+            className={cx(styles.burger, { [styles.isActive]: menuOpen })}
+          ></span>
         </a>
       </div>
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
-        <NavLink className={styles.link} activeClassName={styles.active} exact to="/campaigns">Campaigns</NavLink>
-        <a className={cx(styles.link, { [styles.active]: isCreatePath() })} onClick={handleCreateCampaign}>Create</a>
+        <NavLink
+          className={styles.link}
+          activeClassName={styles.active}
+          exact
+          to="/campaigns"
+        >
+          Campaigns
+        </NavLink>
+        <a
+          className={cx(styles.link, { [styles.active]: isCreatePath() })}
+          onClick={handleCreateCampaign}
+        >
+          Create
+        </a>
         <OutboundLink
           className={styles.link}
           eventLabel={GUIDE_URL}
@@ -60,17 +75,40 @@ const NavBar = () => {
         >
           Guide
         </OutboundLink>
-        <NavLink className={styles.link} activeClassName={styles.active} to="/account">Account</NavLink>
+        <NavLink
+          className={styles.link}
+          activeClassName={styles.active}
+          to="/settings"
+        >
+          Settings
+        </NavLink>
 
         <div className={styles.separator}></div>
 
-        <span className={cx(styles.active, styles.link, styles.noClick, styles.right)}>{email}</span>
-        <a className={cx(styles.active, styles.link, styles.right, styles.iconLink)} onClick={handleLogout}>
+        <span
+          className={cx(
+            styles.active,
+            styles.link,
+            styles.noClick,
+            styles.right
+          )}
+        >
+          {email}
+        </span>
+        <a
+          className={cx(
+            styles.active,
+            styles.link,
+            styles.right,
+            styles.iconLink
+          )}
+          onClick={handleLogout}
+        >
           Sign out
           <i className={cx(styles.icon, 'bx bx-log-out-circle')}></i>
         </a>
       </div>
-    </nav >
+    </nav>
   )
 }
 

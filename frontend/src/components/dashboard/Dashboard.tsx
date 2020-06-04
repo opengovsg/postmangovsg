@@ -5,8 +5,7 @@ import ModalContextProvider from 'contexts/modal.context'
 import { NavBar } from 'components/common'
 import Campaigns from './campaigns'
 import Create from './create'
-import Settings from './account'
-
+import Settings from './settings'
 
 const Dashboard = () => {
   return (
@@ -15,9 +14,9 @@ const Dashboard = () => {
       <Switch>
         <Route exact path="/campaigns" component={Campaigns}></Route>
         <Route path="/campaigns/:id" component={Create}></Route>
-        <Route path="/account" component={Settings}></Route>
+        <Route path="/settings" component={Settings}></Route>
       </Switch>
-    </ ModalContextProvider>
+    </ModalContextProvider>
   )
 }
 

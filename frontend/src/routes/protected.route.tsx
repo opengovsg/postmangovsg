@@ -7,17 +7,21 @@ const ProtectedRoute = ({ children, ...rest }: RouteProps) => {
   const { isAuthenticated } = useContext(AuthContext)
 
   return (
-    <Route {...rest} render={({ location }) =>
-      // else, redirect to main page
-      isAuthenticated ?
-        children :
-        <Redirect
-          to={{
-            pathname: '/',
-            state: { from: location },
-          }}
-        />
-    }
+    <Route
+      {...rest}
+      render={({ location }) =>
+        // else, redirect to main page
+        isAuthenticated ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: '/',
+              state: { from: location },
+            }}
+          />
+        )
+      }
     />
   )
 }

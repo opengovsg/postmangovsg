@@ -4,7 +4,6 @@ import cx from 'classnames'
 import styles from './CloseButton.module.scss'
 
 const CloseButton = (props: any) => {
-
   const { className, ...otherProps } = props
 
   return (

@@ -5,23 +5,37 @@ import { GUIDE_POWER_USER_URL } from 'config'
 import { TextInput } from 'components/common'
 import styles from './SendRate.module.scss'
 
-const SendRate = ({ sendRate, setSendRate }: { sendRate: string; setSendRate: Dispatch<SetStateAction<string>> }) => {
-
+const SendRate = ({
+  sendRate,
+  setSendRate,
+}: {
+  sendRate: string
+  setSendRate: Dispatch<SetStateAction<string>>
+}) => {
   const [useCustomRate, setUseCustomRate] = useState(false)
 
   return (
     <>
-      <div className={styles.title} onClick={() => setUseCustomRate(!useCustomRate)}>
-        <span><b>Send rate</b> <i>optional</i></span>
-        <i className={cx(styles.icon, 'bx bxs-down-arrow', { [styles.rotateArrow]: useCustomRate })} />
+      <div
+        className={styles.title}
+        onClick={() => setUseCustomRate(!useCustomRate)}
+      >
+        <span>
+          <b>Send rate</b> <i>optional</i>
+        </span>
+        <i
+          className={cx(styles.icon, 'bx bxs-down-arrow', {
+            [styles.rotateArrow]: useCustomRate,
+          })}
+        />
       </div>
 
-      {
-        useCustomRate &&
+      {useCustomRate && (
         <>
-          <p>You can send messages at a rapid rate, as long as the requests do not max out Twilio&apos;s
-          REST API concurrency limit.&nbsp;
-          <OutboundLink
+          <p>
+            You can send messages at a rapid rate, as long as the requests do
+            not max out Twilio&apos;s REST API concurrency limit.&nbsp;
+            <OutboundLink
             className={styles.link}
             eventLabel={GUIDE_POWER_USER_URL}
             to={GUIDE_POWER_USER_URL}
@@ -31,9 +45,12 @@ const SendRate = ({ sendRate, setSendRate }: { sendRate: string; setSendRate: Di
           </OutboundLink>
           </p>
 
-          <p>Default rate is 10 messages/ second. If you have raised your send rate with Twilio previously,
-          please enter your new send rate here. We will optimise our sending to match what Twilio has
-            configured for your account.</p>
+          <p>
+            Default rate is 10 messages/ second. If you have raised your send
+            rate with Twilio previously, please enter your new send rate here.
+            We will optimise our sending to match what Twilio has configured for
+            your account.
+          </p>
 
           <TextInput
             type="tel"
@@ -41,10 +58,10 @@ const SendRate = ({ sendRate, setSendRate }: { sendRate: string; setSendRate: Di
             maxLength="3"
             className={styles.input}
             onChange={(str: string) => setSendRate(str.replace(/\D/g, ''))}
-            placeholder='enter send rate'
+            placeholder="Enter send rate"
           />
         </>
-      }
+      )}
     </>
   )
 }

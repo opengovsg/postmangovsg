@@ -1,7 +1,7 @@
 import winston from 'winston'
 
 interface LoggerInterface {
-  logger: winston.Logger;
+  logger: winston.Logger
 }
 
 class Logger implements LoggerInterface {
@@ -17,9 +17,7 @@ class Logger implements LoggerInterface {
         winston.format.splat(),
         winston.format.json()
       ),
-      transports: [
-        new winston.transports.Console(),
-      ],
+      transports: [new winston.transports.Console()],
     })
 
     this.logger.stream = {

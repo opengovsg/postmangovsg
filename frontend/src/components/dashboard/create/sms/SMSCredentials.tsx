@@ -1,19 +1,34 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { validateStoredCredentials, validateNewCredentials, getStoredCredentials } from 'services/sms.service'
+import {
+  validateStoredCredentials,
+  validateNewCredentials,
+  getStoredCredentials,
+} from 'services/sms.service'
 import { PrimaryButton, ErrorBlock, Dropdown } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
-import TwilioCredentialsInput, { TwilioCredentials } from './TwilioCredentialsInput'
+import TwilioCredentialsInput, {
+  TwilioCredentials,
+} from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
 
-const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCredential: boolean; onNext: (changes: any, next?: boolean) => void }) => {
-
+const SMSCredentials = ({
+  hasCredential: initialHasCredential,
+  onNext,
+}: {
+  hasCredential: boolean
+  onNext: (changes: any, next?: boolean) => void
+}) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
-  const [storedCredentials, setStoredCredentials] = useState([] as { label: string; value: string }[])
+  const [storedCredentials, setStoredCredentials] = useState(
+    [] as { label: string; value: string }[]
+  )
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as TwilioCredentials | null)
-  const [showCredentialFields, setShowCredentialFields] = useState(!hasCredential)
+  const [showCredentialFields, setShowCredentialFields] = useState(
+    !hasCredential
+  )
   const [isManual, setIsManual] = useState(false)
   const [errorMessazge, setErrorMessage] = useState(null)
   const { id: campaignId } = useParams()
@@ -25,7 +40,9 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   async function populateStoredCredentials() {
     try {
       const storedCredLabels = await getStoredCredentials()
-      setStoredCredentials(storedCredLabels.map(c => ({ label: c, value: c })))
+      setStoredCredentials(
+        storedCredLabels.map((c) => ({ label: c, value: c }))
+      )
       if (!storedCredLabels.length) {
         setIsManual(true)
       }
@@ -36,7 +53,7 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   }
 
   function toggleInputMode() {
-    setIsManual(m => !m)
+    setIsManual((m) => !m)
     setCreds(null)
     setSelectedCredential('')
   }
@@ -44,7 +61,6 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   async function handleValidateCredentials(recipient: string) {
     setErrorMessage(null)
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
@@ -75,35 +91,42 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   function renderCredentialFields() {
     return (
       <>
-        {isManual
-          ?
+        {isManual ? (
           <>
             <h2>Insert your Twilio credentials</h2>
-            <TwilioCredentialsInput onFilled={setCreds}></TwilioCredentialsInput>
-            {storedCredentials.length ? <p className="clickable" onClick={toggleInputMode}>or select from stored credentials</p> : null}
+            <TwilioCredentialsInput
+              onFilled={setCreds}
+            ></TwilioCredentialsInput>
+            {storedCredentials.length ? (
+              <p className="clickable" onClick={toggleInputMode}>
+                Select from stored credentials
+              </p>
+            ) : null}
           </>
-          :
+        ) : (
           <>
             <h2>Select your Twilio credentials</h2>
-            <Dropdown onSelect={setSelectedCredential} options={storedCredentials}></Dropdown>
-            <p className="clickable" onClick={() => setIsManual(true)}>or manually input credentials</p>
+            <Dropdown
+              onSelect={setSelectedCredential}
+              options={storedCredentials}
+            ></Dropdown>
+            <p className="clickable" onClick={() => setIsManual(true)}>
+              Input credentials manually
+            </p>
           </>
-        }
+        )}
         <div className="separator"></div>
 
         <h2>Validate your credentials by doing a test send</h2>
-        <p>
-          To ensure your credentials are working perfectly,
-          please send a test SMS to an available phone number
-          to receive a preview of your message.
+        <p className={styles.validateSMSCredentialsInfo}>
+          To ensure your credentials are working perfectly, please send a test
+          SMS to an available phone number to receive a preview of your message.
         </p>
         <SMSValidationInput
           onClick={handleValidateCredentials}
           buttonDisabled={isManual ? !creds : !selectedCredential}
         />
-        <ErrorBlock>
-          {errorMessazge}
-        </ErrorBlock>
+        <ErrorBlock>{errorMessazge}</ErrorBlock>
       </>
     )
   }
@@ -111,38 +134,35 @@ const SMSCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCr
   return (
     <>
       <sub>Step 3</sub>
-      {
-        hasCredential
-          ? (
-            <>
-              <h2>Your current credentials have already been validated.</h2>
-              <p>
-                Entering new credentials will overwrite the previous validated one.
-                This action is irreversible. Please proceed with caution.
-              </p>
-              {
-                showCredentialFields
-                  ? renderCredentialFields()
-                  : (
-                    <PrimaryButton className={styles.darkBlueBtn} onClick={() => setShowCredentialFields(true)}>
-                      Enter new credentials
-                    </PrimaryButton>
-                  )
-              }
+      {hasCredential ? (
+        <>
+          <h2>Your current credentials have already been validated.</h2>
+          <p>
+            Entering new credentials will overwrite the previous validated one.
+            This action is irreversible. Please proceed with caution.
+          </p>
+          {showCredentialFields ? (
+            renderCredentialFields()
+          ) : (
+            <PrimaryButton
+              className={styles.darkBlueBtn}
+              onClick={() => setShowCredentialFields(true)}
+            >
+              Enter new credentials
+            </PrimaryButton>
+          )}
 
-              <div className="separator"></div>
+          <div className="separator"></div>
 
-              <div className="progress-button">
-                <PrimaryButton disabled={!hasCredential} onClick={onNext}>Send Messages →</PrimaryButton>
-              </div>
-            </>
-          )
-          : (
-            <>
-              {renderCredentialFields()}
-            </>
-          )
-      }
+          <div className="progress-button">
+            <PrimaryButton disabled={!hasCredential} onClick={onNext}>
+              Send messages →
+            </PrimaryButton>
+          </div>
+        </>
+      ) : (
+        <>{renderCredentialFields()}</>
+      )}
     </>
   )
 }

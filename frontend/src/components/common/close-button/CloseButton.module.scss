@@ -14,11 +14,8 @@
   cursor: pointer;
   user-select: none;
 
-  &:hover {
-    color: darken($grey, 20%);
-  }
-
+  &:hover,
   &:active {
-    color: darken($grey, 30%);
+    color: $indigo-blue;
   }
 }

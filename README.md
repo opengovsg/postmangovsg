@@ -1,30 +1,31 @@
 <a href="https://postman.gov.sg"><img src="frontend/src/assets/img/brand/app-logo.svg" title="Postman" alt="Postman.gov.sg"></a>
 
-
 # Postman.gov.sg
 
 > Postman.gov.sg enables public officers to send templated messages to many recipients.
 
 ## Table of Contents
-  * [Features](#features)
-  * [Development](#development)
-    + [Install and run required services](#install-and-run-required-services)
-    + [Set environment variables](#set-environment-variables)
-    + [Install and run the app](#install-and-run-the-app)
-  * [Deployment](#deployment)
-  * [Downtime procedure](#downtime-procedure)
-  * [Infrastructure customizations](#infrastructure-customizations)
-      - [Amplify rewrite rule](#amplify-rewrite-rule)
-      - [Elastic Container Service](#elastic-container-service)
-  * [Architecture](#architecture)
-  * [How messages are sent](#how-messages-are-sent)
-  * [Forking and configuring this product](#forking-and-configuring-this-product)
-    + [Backend](#backend)
-    + [Frontend](#frontend)
-    + [Worker](#worker)
-  * [Contributions](#contributions)
+
+- [Features](#features)
+- [Development](#development)
+  - [Install and run required services](#install-and-run-required-services)
+  - [Set environment variables](#set-environment-variables)
+  - [Install and run the app](#install-and-run-the-app)
+- [Deployment](#deployment)
+- [Downtime procedure](#downtime-procedure)
+- [Infrastructure customizations](#infrastructure-customizations)
+  - [Amplify rewrite rule](#amplify-rewrite-rule)
+  - [Elastic Container Service](#elastic-container-service)
+- [Architecture](#architecture)
+- [How messages are sent](#how-messages-are-sent)
+- [Forking and configuring this product](#forking-and-configuring-this-product)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Worker](#worker)
+- [Contributions](#contributions)
 
 ## Features
+
 - **Passwordless login**: login with your .gov.sg email
 - **Easily customize messages to reach a wide audience**: create a message template, upload a file containing customization parameters and we will handle the customization for you
 - **Send emails**: Just click send and Postman will send those messages out to your intended audience via email
@@ -34,6 +35,7 @@
 ## Development
 
 ### Install and run required services
+
 Set up a **postgresql@11** database and **redis** cache
 
 ```bash
@@ -56,7 +58,9 @@ redis-cli ping
 ```
 
 ### Set environment variables
+
 Example environment variables can be found in
+
 - [backend/.env-example](backend/.env-example)
 - [frontend/.env-example](frontend/.env-example)
 - [worker/.env-example](worker/.env-example)
@@ -70,20 +74,23 @@ cd postmangovsg
 npm install
 npm run dev
 ```
+
 You should find the
+
 - React frontend at [localhost:3000](http://localhost:3000)
 - Express backend at [localhost:4000](http://localhost:4000)
-- Swagger docs at  [localhost:4000/docs](http://localhost:4000/docs)
-
+- Swagger docs at [localhost:4000/docs](http://localhost:4000/docs)
 
 ## Deployment
 
-We use TravisCI to simplify our deployment process: 
+We use TravisCI to simplify our deployment process:
+
 - `backend` is deployed on Elastic Beanstalk
 - `frontend` is deployed on AWS Amplify
 - `worker` is deployed on Elastic Container Service
 
 The environment variables on Travis are:
+
 - `AWS_ACCESS_KEY_ID` : access key for the travis IAM user
 - `AWS_SECRET_ACCESS_KEY` : access key for the travis IAM user
 - `AWS_DEFAULT_REGION` : region where your infrastructure is deployed (`ap-northeast-1` for us)
@@ -92,13 +99,15 @@ The environment variables on Travis are:
 - `STAGING_BRANCH`: branch that is deployed to staging. Change this variable to test different branches.
 
 To deploy workers, trigger a custom build on Travis with the Custom Config set to
+
 ```
 env:
   - DEPLOY_WORKER=true
 ```
 
 ## Downtime procedure
-See [downtime-procedure](docs/downtime-procedure/index.md) for steps on how to bring the app down  in the event that we need to make database changes
+
+See [downtime-procedure](docs/downtime-procedure/index.md) for steps on how to bring the app down in the event that we need to make database changes
 
 ## Infrastructure customizations
 
@@ -119,31 +128,39 @@ See [downtime-procedure](docs/downtime-procedure/index.md) for steps on how to b
 
 Create a cluster with four services. These names are currently hardcoded for deployment in .travis.yml
 
-|Cluster Name: postmangovsg-workers|
-|--|
+| Cluster Name: postmangovsg-workers |
+| ---------------------------------- |
 
-|Service Name|LaunchType|Platform version|
-|--|--|--|
-|staging-sending|FARGATE|1.4.0|
-|staging-logger|FARGATE|1.4.0|
-|prod-sending|FARGATE|1.4.0|
-|prod-logger|FARGATE|1.4.0|
+
+| Service Name    | LaunchType | Platform version |
+| --------------- | ---------- | ---------------- |
+| staging-sending | FARGATE    | 1.4.0            |
+| staging-logger  | FARGATE    | 1.4.0            |
+| prod-sending    | FARGATE    | 1.4.0            |
+| prod-logger     | FARGATE    | 1.4.0            |
 
 ## Architecture
+
 See [architecture](docs/architecture/index.md) for details
 
 ## How messages are sent
+
 See [sending.md](docs/sending.md) for details
 
 ## Forking and configuring this product
 
-**Disclaimer of Liability.** This product is pending Vulnerability Assessment and Penetration Testing (VAPT).  You should conduct your own security assessment prior to using code provided in this repository. Open Government Products (OGP) makes no representations or warranties of any kind, expressed or implied about the completeness, accuracy, reliability, suitability or availability of this codebase. Any usage is at your own risk. 
+**Disclaimer of Liability.** This product is pending Vulnerability Assessment and Penetration Testing (VAPT). You should conduct your own security assessment prior to using code provided in this repository. Open Government Products (OGP) makes no representations or warranties of any kind, expressed or implied about the completeness, accuracy, reliability, suitability or availability of this codebase. Any usage is at your own risk.
 
 ### Backend
+
 See [configure/backend](docs/configure/backend.md) for details
+
 ### Frontend
+
 See [configure/frontend](docs/configure/frontend.md) for details
+
 ### Worker
+
 See [configure/worker](docs/configure/worker.md) for details
 
 ## Contributions
@@ -151,12 +168,14 @@ See [configure/worker](docs/configure/worker.md) for details
 The production branch is `master`, and the development branch is `develop`.
 
 **If you have write access to this repository**
+
 - Check out your feature branch from `develop`
 - Make changes, and commit those changes
 - Push these changes to Github
 - Submit a pull request against `develop`, filling in the standard template
 
 **If you do not have write access to this repository**
+
 - Fork this repository
 - Clone the forked repository to your machine
 - Create a branch, make changes and commit those changes.
