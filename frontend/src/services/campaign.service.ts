@@ -22,7 +22,8 @@ export async function getCampaigns(params: {
   totalCount: number
 }> {
   return axios.get('/campaigns', { params }).then((response) => {
-    const campaigns: Campaign[] = response.data.campaigns.map((data: any) => {
+    const { campaigns, total_count } = response.data
+    const campaignList: Campaign[] = campaigns.map((data: any) => {
       const details = {
         ...data,
         sent_at: getSentAt(data.job_queue),
@@ -32,8 +33,8 @@ export async function getCampaigns(params: {
     })
 
     return {
-      campaigns,
-      totalCount: response.data.total_count,
+      campaigns: campaignList,
+      totalCount: total_count,
     }
   })
 }
