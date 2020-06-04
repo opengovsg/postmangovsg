@@ -1,10 +1,12 @@
 import React from 'react'
 import cx from 'classnames'
 
+import { CloseButton } from 'components/common'
+
 import styles from './ErrorBlock.module.scss'
 
 const ErrorBlock = (props: any) => {
-  const { className, children, absolute, ...otherProps } = props
+  const { className, children, absolute, onClose, ...otherProps } = props
 
   if (!children) {
     return null
@@ -15,7 +17,7 @@ const ErrorBlock = (props: any) => {
       <div
         className={cx(
           styles.errorBlock,
-          { [styles.absolute]: absolute },
+          { [styles.absolute]: absolute, [styles.withClose]: onClose },
           className
         )}
         {...otherProps}
@@ -24,6 +26,7 @@ const ErrorBlock = (props: any) => {
           <i className="bx bx-error-circle"></i>
           <p>{children}</p>
         </li>
+        {onClose && <CloseButton onClick={onClose} className={styles.close} />}
       </div>
     </div>
   )

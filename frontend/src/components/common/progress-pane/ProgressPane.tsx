@@ -34,11 +34,13 @@ const ProgressPane = ({
   activeStep,
   setActiveStep,
   progress,
+  disabled,
 }: {
   steps: string[]
   activeStep: number
   setActiveStep: Function
   progress: number
+  disabled?: boolean
 }) => {
   return (
     <div className={styles.progressPane}>
@@ -48,7 +50,7 @@ const ProgressPane = ({
           key={index}
           number={index + 1}
           isActive={activeStep === index}
-          isEnabled={index <= progress}
+          isEnabled={!disabled && index <= progress}
           onClick={() => setActiveStep(index)}
         ></ProgressItem>
       ))}

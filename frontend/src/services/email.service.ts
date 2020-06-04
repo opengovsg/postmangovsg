@@ -5,10 +5,19 @@ interface PresignedUrlResponse {
   transactionId: string
 }
 
-interface UploadCompleteResponse {
-  template_body: string
-  num_recipients: number
-  hydrated_record: string
+interface CsvStatusResponse {
+  isCsvProcessing: boolean
+  csvFilename?: string
+  tempCsvFilename?: string
+  csvError?: string
+  numRecipients?: number
+  preview?: PreviewMessage
+}
+
+interface PreviewMessage {
+  body: string
+  subject: string
+  replyTo: string | null
 }
 
 export async function saveTemplate(
@@ -94,27 +103,57 @@ export async function completeFileUpload({
   campaignId: number
   transactionId: string
   filename: string
-}): Promise<UploadCompleteResponse> {
+}): Promise<void> {
   try {
-    const response = await axios.post(
-      `/campaign/${campaignId}/email/upload/complete`,
-      {
-        transaction_id: transactionId,
-        filename,
-      }
-    )
-    return response.data
+    await axios.post(`/campaign/${campaignId}/email/upload/complete`, {
+      transaction_id: transactionId,
+      filename,
+    })
+    return
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
   }
 }
 
+export async function getCsvStatus(
+  campaignId: number
+): Promise<CsvStatusResponse> {
+  try {
+    const response = await axios.get(
+      `/campaign/${campaignId}/email/upload/status`
+    )
+    const {
+      is_csv_processing: isCsvProcessing,
+      csv_filename: csvFilename,
+      temp_csv_filename: tempCsvFilename,
+      csv_error: csvError,
+      num_recipients: numRecipients,
+      preview,
+    } = response.data
+    const result = {
+      isCsvProcessing,
+      csvFilename,
+      tempCsvFilename,
+      csvError,
+      numRecipients,
+    } as CsvStatusResponse
+    if (preview) {
+      const { subject, body, reply_to: replyTo } = preview
+      result.preview = { subject, body, replyTo }
+    }
+    return result
+  } catch (e) {
+    errorHandler(e, 'Error getting csv status')
+  }
+}
+
 export async function getPreviewMessage(
   campaignId: number
-): Promise<{ body: string; subject: string; reply_to: string | null }> {
+): Promise<PreviewMessage> {
   try {
     const response = await axios.get(`/campaign/${campaignId}/email/preview`)
-    return response.data?.preview
+    const { body, subject, reply_to: replyTo } = response.data?.preview
+    return { body, subject, replyTo }
   } catch (e) {
     errorHandler(e, 'Unable to get preview message')
   }
