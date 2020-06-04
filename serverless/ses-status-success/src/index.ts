@@ -1,7 +1,11 @@
 import sequelizeLoader from './sequelize-loader'
 import { QueryTypes } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
-
+/**
+ *  Lambda to update the email delivery status.
+ *  SNS triggers it whenever it receives a new notification from SES.
+ *  @param event
+ */
 exports.handler = async (event: any) => {
   try {
     const sequelize = await sequelizeLoader()
@@ -43,6 +47,12 @@ exports.handler = async (event: any) => {
   }
 }
 
+/**
+ *  Updates the email_messages table for successful delivery of an email.
+ *  Delivery: Amazon SES successfully delivered the email to the recipient's mail server.
+ *  @param message JSON object that contains the notification details
+ *  @param dbConnection Sequelize connection
+ */
 const updateSuccessfulDelivery = async (message: any, dbConnection: Sequelize ) => {
   const messageId = message?.mail?.commonHeaders?.messageId
   const timeStamp = message?.delivery?.timestamp
@@ -54,6 +64,13 @@ const updateSuccessfulDelivery = async (message: any, dbConnection: Sequelize ) 
     })
 }
 
+/**
+ *  Updates the error_code in the email_messages table for bounced delivery.
+ *  Hard bounce: The recipient's mail server permanently rejected the email.
+ *  Soft bounce: SES fails to deliver the email after retrying for a period of time.
+ *  @param message JSON object that contains the notification details
+ *  @param dbConnection Sequelize connection
+ */
 const updateBouncedStatus = async (message: any, dbConnection: Sequelize) => {
   const bounceType = message?.bounce?.bounceType
   const messageId = message?.mail?.commonHeaders?.messageId
@@ -74,6 +91,12 @@ const updateBouncedStatus = async (message: any, dbConnection: Sequelize) => {
     })
 }
 
+/**
+ *  Updates the error_code in the email_messages table for rejected emails.
+ *  Reject: SES accepted the email, determined that it contained a virus, and rejected it.
+ *  @param message JSON object that contains the notification details
+ *  @param dbConnection Sequelize connection
+ */
 const updateRejectedStatus = async (message: any, dbConnection: Sequelize) => {
   const messageId = message?.mail?.commonHeaders?.messageId
 
