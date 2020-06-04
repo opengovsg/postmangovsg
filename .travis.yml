@@ -132,6 +132,8 @@ jobs:
           zip: "../ses-status-success/code.zip"
           on:
             branch: $STAGING_BRANCH
+          environment_variables:
+            - DB_URI=$STAGING_DB_URI
     - name: root
       install:
         - npm install --ignore-scripts
