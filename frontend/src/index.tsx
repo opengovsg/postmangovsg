@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as Sentry from '@sentry/browser'
-import { SENTRY_DSN } from 'config'
+import { SENTRY_DSN, SENTRY_RELEASE } from 'config'
 import App from './App'
 
-Sentry.init({ dsn: SENTRY_DSN })
+Sentry.init({ dsn: SENTRY_DSN, release: SENTRY_RELEASE })
 
 ReactDOM.render(
   <React.StrictMode>

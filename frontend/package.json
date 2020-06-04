@@ -10,6 +10,7 @@
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx --cache . && prettier --check '**/*.{md,scss}'",
     "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx --cache --fix . && prettier --write '**/*.{md,scss}' --loglevel warn",
     "precommit": "lint-staged",
+    "get-sentry-release": "sentry-cli releases propose-version",
     "upload-source-map": "node sentry.js"
   },
   "dependencies": {
