@@ -46,6 +46,10 @@ export default class S3Client {
       skip_empty_lines: true,
     })
     try {
+      readStream.on('error', (err) => {
+        // Pass error from s3 to csv parser
+        parser.emit('error', err)
+      })
       readStream.pipe(parser)
       let headers: string[] = []
       let recipientIndex: number
