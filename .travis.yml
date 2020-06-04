@@ -76,7 +76,7 @@ jobs:
         - npm install && npm run build
         - zip -qr code.zip build package.json node_modules/
         - cd $TRAVIS_BUILD_DIR/serverless/postman-api-gateway-authorizer && zip -qr code.zip *
-        - cd $TRAVIS_BUILD_DIR/serverless/ses-status-success
+        - cd $TRAVIS_BUILD_DIR/serverless/log-email-sns
         - npm install && npm run build
         - zip -qr code.zip build package.json node_modules/
       deploy:
@@ -122,7 +122,7 @@ jobs:
             branch: $PRODUCTION_BRANCH
         - provider: lambda
           edge: true
-          function_name: ses-status-success-staging
+          function_name: log-email-sns
           region: $AWS_DEFAULT_REGION
           role: $STAGING_TWILIO_CALLBACK_ROLE
           runtime: nodejs12.x
@@ -130,7 +130,7 @@ jobs:
           handler_name: handler
           timeout: 30
           publish: true
-          zip: "../ses-status-success/code.zip"
+          zip: "../log-email-sns/code.zip"
           on:
             branch: $STAGING_BRANCH
           environment_variables:

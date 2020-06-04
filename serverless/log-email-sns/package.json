@@ -1,5 +1,5 @@
 {
-  "name": "ses-status-success",
+  "name": "log-email-sns",
   "version": "1.0.0",
   "description": "Logs successful delivery of emails for Postman",
   "main": "index.js",
