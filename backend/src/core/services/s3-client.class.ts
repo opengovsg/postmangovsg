@@ -38,6 +38,10 @@ export default class S3Client {
       // eslint-disable-next-line @typescript-eslint/camelcase
       skip_empty_lines: true,
     })
+    readStream.on('error', (err) => {
+      // Pass error from s3 to csv parser
+      parser.emit('error', err)
+    })
     readStream.pipe(parser)
     let headers: string[] = []
     let recipientIndex: number
