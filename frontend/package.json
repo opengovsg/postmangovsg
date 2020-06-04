@@ -9,7 +9,8 @@
     "eject": "react-scripts eject",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx --cache . && prettier --check '**/*.{md,scss}'",
     "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx --cache --fix . && prettier --write '**/*.{md,scss}' --loglevel warn",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "upload-source-map": "node sentry.js"
   },
   "dependencies": {
     "@sentry/browser": "^5.15.5",
@@ -37,6 +38,7 @@
     "validator": "^13.0.0"
   },
   "devDependencies": {
+    "@sentry/cli": "^1.54.0",
     "@types/classnames": "^2.2.10",
     "@types/escape-html": "0.0.20",
     "@types/lodash": "^4.14.150",
