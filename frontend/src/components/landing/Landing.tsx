@@ -52,6 +52,7 @@ const Landing = () => {
   }
 
   function directToSignIn() {
+    throw Error
     history.push('/login')
   }
 
