@@ -563,7 +563,7 @@ router.get('/stats', EmailStatsMiddleware.getStats)
 /**
  * @swagger
  * path:
-*  /campaign/{campaignId}/email/invalid-recipients:
+ *  /campaign/{campaignId}/email/invalid-recipients:
  *    get:
  *      tags:
  *        - Email

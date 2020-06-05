@@ -9,9 +9,11 @@ import {
 CampaignInvalidRecipients
 } from 'classes'
 
-function getJobTimestamps(jobs: Array<{ sent_at: Date; status_updated_at: Date }>): { sentAt: Date; statusUpdatedAt: Date } {
-  const jobsSentAt = jobs.map((x => x.sent_at)).sort()
-  const jobsUpdatedAt = jobs.map((x => x.status_updated_at)).sort()
+function getJobTimestamps(
+  jobs: Array<{ sent_at: Date; status_updated_at: Date }>
+): { sentAt: Date; statusUpdatedAt: Date } {
+  const jobsSentAt = jobs.map((x) => x.sent_at).sort()
+  const jobsUpdatedAt = jobs.map((x) => x.status_updated_at).sort()
   // returns job with the earliest sentAt time
   return { sentAt: jobsSentAt[0], statusUpdatedAt: jobsUpdatedAt[0] }
 }
@@ -79,8 +81,8 @@ export async function getCampaignDetails(
 const { sentAt } = getJobTimestamps(campaign.job_queue)
     const details = {
       ...campaign,
-      sent_at: getSentAt(campaign.job_queue),
-sentAt,
+      num_recipients: numRecipients,
+      sentAt,
     }
 
     switch (campaign.type) {
@@ -119,8 +121,12 @@ export async function retryCampaign(campaignId: number): Promise<void> {
   await axios.post(`/campaign/${campaignId}/retry`)
 }
 
-export async function getCampaignInvalidRecipients(campaignId: number): Promise<Array<CampaignInvalidRecipients>> {
-  return axios.get(`/campaign/${campaignId}/invalid-recipients`).then((response) => {
-    return response.data
-  })
+export async function getCampaignInvalidRecipients(
+  campaignId: number
+): Promise<Array<CampaignInvalidRecipients>> {
+  return axios
+    .get(`/campaign/${campaignId}/invalid-recipients`)
+    .then((response) => {
+      return response.data
+    })
 }

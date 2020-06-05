@@ -122,11 +122,11 @@ const getCurrentStats = async (
       // this is needed when invalid might appear in ops table, e.g. telegram immediate bounce errors
       invalid: opsStats.invalid + archivedStats.invalid,
       status: job.status,
-      'updated_at': job.updatedAt,
+      updated_at: job.updatedAt,
     }
   }
   // else, return archived stats
-  return { ...archivedStats, status: job.status, 'updated_at': job.updatedAt }
+  return { ...archivedStats, status: job.status, updated_at: job.updatedAt }
 }
 
 /*
@@ -141,16 +141,21 @@ const getTotalSentCount = async (): Promise<number> => {
  * @param campaignId
  * @param logsTable
  */
-const getInvalidRecipients = async (campaignId: number, logsTable: string): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+const getInvalidRecipients = async (
+  campaignId: number,
+  logsTable: string
+): Promise<Array<CampaignInvalidRecipient> | undefined> => {
   // Get read replica instance
   const sequelize = sequelizeLoader.getSequelizeReadReplicaInstance()
   // Retrieve message logs with error codes from logs table
   return await sequelize?.query(
     `SELECT recipient, sent_at, updated_at, message_id, error_code FROM ${logsTable} \
     WHERE campaign_id = :campaignId and error_code is not NULL`,
-  {
-    replacements: { campaignId }, type: QueryTypes.SELECT,
-  })
+    {
+      replacements: { campaignId },
+      type: QueryTypes.SELECT,
+    }
+  )
 }
 
 export const StatsService = {

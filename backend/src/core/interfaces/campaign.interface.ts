@@ -61,11 +61,11 @@ export interface CampaignStatsCount {
 }
 
 export interface CampaignInvalidRecipient {
-    recipient: string,
-    messageId: string
-    errorCode: string,
-    sentAt: Date,
-    updatedAt: Date
+  recipient: string
+  messageId: string
+  errorCode: string
+  sentAt: Date
+  updatedAt: Date
 }
 
 /**

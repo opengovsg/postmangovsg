@@ -9,8 +9,17 @@ import {
 import { ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
-const EmailDetail = ({ id, name, sentAt, numRecipients }: { id: number; name: string; sentAt: Date; numRecipients: number }) => {
-
+const EmailDetail = ({
+  id,
+  name,
+  sentAt,
+  numRecipients,
+}: {
+  id: number
+  name: string
+  sentAt: Date
+  numRecipients: number
+}) => {
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number) {
@@ -58,24 +67,27 @@ const EmailDetail = ({ id, name, sentAt, numRecipients }: { id: number; name: st
 
   return (
     <>
-      {
-        stats.status === Status.Sending ?
-          (<>
-            <h2>Your campaign is being sent out now!</h2>
-            <p>It may take a few minutes to complete. You can leave this page in the meantime,
-          and check on the progress by returning to this page from the Campaigns tab.</p>
-          </>
-          ) :
-          (<>
-            <h2>Your campaign has been sent!</h2>
-            <p>A retry button will appear if some messages had an error while sending.
-              You can click on retry to try sending the message(s) again.
-              An invalid recipients download link will appear for you to download a list
-               of failed deliveries with the recipient’s email or mobile number.
-            </p>
-          </>
-          )
-      }
+      {stats.status === Status.Sending ? (
+        <>
+          <h2>Your campaign is being sent out now!</h2>
+          <p>
+            It may take a few minutes to complete. You can leave this page in
+            the meantime, and check on the progress by returning to this page
+            from the Campaigns tab.
+          </p>
+        </>
+      ) : (
+        <>
+          <h2>Your campaign has been sent!</h2>
+          <p>
+            A retry button will appear if some messages had an error while
+            sending. You can click on retry to try sending the message(s) again.
+            An invalid recipients download link will appear for you to download
+            a list of failed deliveries with the recipient’s email or mobile
+            number.
+          </p>
+        </>
+      )}
 
       <div className="separator"></div>
 

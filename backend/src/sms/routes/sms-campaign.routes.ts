@@ -618,7 +618,7 @@ router.get('/stats', SmsStatsMiddleware.getStats)
 /**
  * @swagger
  * path:
-*  /campaign/{campaignId}/sms/invalid-recipients:
+ *  /campaign/{campaignId}/sms/invalid-recipients:
  *    get:
  *      tags:
  *        - SMS
@@ -646,6 +646,5 @@ router.get('/stats', SmsStatsMiddleware.getStats)
  *           description: Internal Server Error
  */
 router.get('/invalid-recipients', SmsStatsMiddleware.getInvalidRecipients)
-
 
 export default router
