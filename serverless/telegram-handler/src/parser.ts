@@ -2,7 +2,6 @@ import { Update } from 'telegraf/typings/telegram-types'
 
 /**
  * Extracts botId and Telegram update from the Lambda event
- * @param event Lambda event
  */
 export const parseEvent = (event: any): { botId: string; update: Update } => {
   const { botId } = event.pathParameters

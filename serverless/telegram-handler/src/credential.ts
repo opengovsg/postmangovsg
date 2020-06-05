@@ -6,6 +6,12 @@ const secretsManager = new AWS.SecretsManager({
   region: config.get('aws.awsRegion'),
 })
 
+/**
+ * Fetches a bot token for the given bot id.
+ *
+ * In development, this returns the configured `DEV_SERVER_BOT_TOKEN` env var.
+ * Otherwise, the bot token is fetched from AWS Secrets Manager.
+ */
 export const getBotTokenFromId = async (botId: string): Promise<string> => {
   if (config.get('env') === 'development') {
     console.log('Dev env - returning DEV_SERVER_BOT_TOKEN')

@@ -3,7 +3,6 @@ import { Message } from 'telegraf/typings/telegram-types'
 
 /**
  * Handles updates for the /updatenumber command.
- * @param ctx Telegraf context
  */
 export const updatenumberCommandHandler = async (
   ctx: TelegrafContext

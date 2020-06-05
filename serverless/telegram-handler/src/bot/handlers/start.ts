@@ -3,7 +3,6 @@ import { Message } from 'telegraf/typings/telegram-types'
 
 /**
  * Handles updates for the /start command.
- * @param ctx Telegraf context
  */
 export const startCommandHandler = async (
   ctx: TelegrafContext

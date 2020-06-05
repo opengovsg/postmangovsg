@@ -68,6 +68,9 @@ const addBotSubscriber = async (
   return affectedRows > 0
 }
 
+/**
+ * Handles updates with contacts.
+ */
 export const contactMessageHandler = (
   botId: string,
   sequelize: Sequelize
@@ -80,7 +83,7 @@ export const contactMessageHandler = (
 
   const { phone_number: phoneNumber, user_id: telegramId } = contact
   if (!(phoneNumber && telegramId)) {
-    await ctx.reply('Error: Invalid contact information')
+    await ctx.reply('Error: Invalid contact information.')
     throw new Error('Invalid contact information')
   }
 
