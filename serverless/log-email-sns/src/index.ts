@@ -25,9 +25,6 @@ exports.handler = async (event: any) => {
       case "Bounce":
         await updateBouncedStatus(message, sequelize)
         break
-      case "Reject":
-        await updateRejectedStatus(message, sequelize)
-        break
       default:
         throw new Error(`Can't handle messages with this notification type. notificationType = ${notificationType}`)
     }    
@@ -90,22 +87,3 @@ const updateBouncedStatus = async (message: any, dbConnection: Sequelize) => {
       replacements: { errorCode, messageId }, type: QueryTypes.UPDATE 
     })
 }
-
-/**
- *  Updates the error_code in the email_messages table for rejected emails.
- *  Reject: SES accepted the email, determined that it contained a virus, and rejected it.
- *  @param message JSON object that contains the notification details
- *  @param dbConnection Sequelize connection
- */
-const updateRejectedStatus = async (message: any, dbConnection: Sequelize) => {
-  const messageId = message?.mail?.commonHeaders?.messageId
-
-  const errorCode = "SES accepted the email, determined that it contained a virus, and rejected it.\
-    SES didn't attempt to deliver the email to the recipient's mail server."
-  
-  await dbConnection.query(
-    `UPDATE email_messages SET error_code=:errorCode, updated_at = clock_timestamp() WHERE message_id=:messageId`,
-    {
-      replacements: { errorCode, messageId }, type: QueryTypes.UPDATE 
-    })
-} 

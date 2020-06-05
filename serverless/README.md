@@ -20,4 +20,3 @@ Once the lambda is deployed, ensure that the lambda is in the same VPC with the 
 Currently, the lambda handles:
 - Successful deliveries
 - Bounces
-- Rejects
