@@ -29,23 +29,30 @@ const isExistingCredential = async (name: string): Promise<boolean> => {
  * Upserts credential into AWS SecretsManager
  * @param name
  * @param secret
- * @returns created - returns true if the secrets was created.
+ * @returns updated - returns true if the secret was updated.
  */
 const upsertCredential = async (
   name: string,
   secret: string
 ): Promise<boolean> => {
-  let created
-  if (await isExistingCredential(name)) {
+  const exists = await isExistingCredential(name)
+  if (!config.get('IS_PROD')) {
+    logger.info(
+      `Dev env - skip storing credential in AWS secrets manager for name=${name}`
+    )
+    return exists
+  }
+
+  if (exists) {
     const params = {
       SecretId: name,
       SecretString: secret,
     }
-    logger.info('Updating credential in AWS secrets manager')
+    logger.info(`Updating credential in AWS secrets manager for name=${name}`)
     await secretsManager.putSecretValue(params).promise()
-    logger.info('Successfully updated credential in AWS secrets manager')
-
-    created = false
+    logger.info(
+      `Successfully updated credential in AWS secrets manager for name=${name}`
+    )
   } else {
     const params = {
       Name: name,
@@ -54,11 +61,9 @@ const upsertCredential = async (
     logger.info('Storing credential in AWS secrets manager')
     await secretsManager.createSecret(params).promise()
     logger.info('Successfully stored credential in AWS secrets manager')
-
-    created = true
   }
 
-  return created
+  return exists
 }
 
 /**
@@ -67,16 +72,8 @@ const upsertCredential = async (
  * @param secret
  */
 const storeCredential = async (name: string, secret: string): Promise<void> => {
-  // If credential doesn't exist, upload credential to secret manager, unless in development
-  if (!config.get('IS_PROD')) {
-    logger.info(
-      `Dev env - skip storing credential in AWS secrets manager for name=${name}`
-    )
-    return
-  }
-
-  const created = await upsertCredential(name, secret)
-  if (created) {
+  const updated = await upsertCredential(name, secret)
+  if (!updated) {
     logger.info('Storing credential in DB')
     await Credential.findCreateFind({
       where: { name },
