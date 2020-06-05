@@ -26,21 +26,26 @@ const isExistingCredential = async (name: string): Promise<boolean> => {
 }
 
 /**
- * Save a credential into secrets manager and the credential table
+ * Upserts credential into AWS SecretsManager
  * @param name
  * @param secret
+ * @returns created - returns true if the secrets was created.
  */
-const storeCredential = async (name: string, secret: string): Promise<void> => {
-  // If credential exists, no need to store it again
+const upsertCredential = async (
+  name: string,
+  secret: string
+): Promise<boolean> => {
+  let created
   if (await isExistingCredential(name)) {
-    return
-  }
+    const params = {
+      SecretId: name,
+      SecretString: secret,
+    }
+    logger.info('Updating credential in AWS secrets manager')
+    await secretsManager.putSecretValue(params).promise()
+    logger.info('Successfully updated credential in AWS secrets manager')
 
-  // If credential doesn't exist, upload credential to secret manager, unless in development
-  if (!config.get('IS_PROD')) {
-    logger.info(
-      `Dev env - skip storing credential in AWS secrets manager for name=${name}`
-    )
+    created = false
   } else {
     const params = {
       Name: name,
@@ -49,13 +54,35 @@ const storeCredential = async (name: string, secret: string): Promise<void> => {
     logger.info('Storing credential in AWS secrets manager')
     await secretsManager.createSecret(params).promise()
     logger.info('Successfully stored credential in AWS secrets manager')
+
+    created = true
   }
 
-  logger.info('Storing credential in DB')
-  await Credential.findCreateFind({
-    where: { name },
-  })
-  logger.info('Successfully stored credential in DB')
+  return created
+}
+
+/**
+ * Save a credential into secrets manager and the credential table
+ * @param name
+ * @param secret
+ */
+const storeCredential = async (name: string, secret: string): Promise<void> => {
+  // If credential doesn't exist, upload credential to secret manager, unless in development
+  if (!config.get('IS_PROD')) {
+    logger.info(
+      `Dev env - skip storing credential in AWS secrets manager for name=${name}`
+    )
+    return
+  }
+
+  const created = await upsertCredential(name, secret)
+  if (created) {
+    logger.info('Storing credential in DB')
+    await Credential.findCreateFind({
+      where: { name },
+    })
+    logger.info('Successfully stored credential in DB')
+  }
 }
 
 /**
@@ -89,7 +116,7 @@ const getTelegramCredential = async (name: string): Promise<string> => {
     logger.info(
       `Dev env - getTelegramCredential - returning default credentials set in env var`
     )
-    return config.get('telegramBotToken')
+    return config.get('telegramOptions.telegramBotToken')
   }
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   const secretString = get(data, 'SecretString', '')
