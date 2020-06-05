@@ -1,6 +1,6 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Sequelize } from 'sequelize-typescript'
-import { Message } from 'telegraf/typings/telegram-types'
+import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 
 /**
  * Upserts a Telegram subscriber.
@@ -103,14 +103,21 @@ export const contactMessageHandler = (
   )
 
   // Respond
+  const replyOptions: ExtraReplyMessage = {
+    reply_markup: {
+      remove_keyboard: true,
+    },
+  }
+
   if (!didUpsertTelegramSubscriber && !didAddBotSubscriber) {
     return ctx.reply(
-      'Error: Failed to save your subscription. Are you already subscribed?'
+      'Error: Failed to save your subscription. Are you already subscribed?',
+      replyOptions
     )
   }
   if (didUpsertTelegramSubscriber && !didAddBotSubscriber) {
-    return ctx.reply('Success: Your number has been updated.')
+    return ctx.reply('Success: Your number has been updated.', replyOptions)
   }
 
-  return ctx.reply('Success: You are now subscribed.')
+  return ctx.reply('Success: You are now subscribed.', replyOptions)
 }
