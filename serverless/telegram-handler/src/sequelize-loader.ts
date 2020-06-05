@@ -1,6 +1,9 @@
 import { Sequelize } from 'sequelize-typescript'
 
 import config from './config'
+import { Logger } from './utils/logger'
+
+const logger = new Logger('db')
 
 const sequelizeLoader = async (): Promise<Sequelize> => {
   const dialectOptions =
@@ -13,14 +16,10 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
     pool: config.get('database.poolOptions'),
     dialectOptions,
   })
-  try {
-    await sequelize.authenticate()
-    console.log('Connection has been established successfully.')
-    return sequelize
-  } catch (error) {
-    console.error('Unable to connect to the database: ', error)
-    process.exit(1)
-  }
+
+  await sequelize.authenticate()
+  logger.log('Connection established successfully')
+  return sequelize
 }
 
 export default sequelizeLoader

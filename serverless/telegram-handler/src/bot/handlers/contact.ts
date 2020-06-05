@@ -2,6 +2,10 @@ import { TelegrafContext } from 'telegraf/typings/context'
 import { Sequelize } from 'sequelize-typescript'
 import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 
+import { Logger } from '../../utils/logger'
+
+const logger = new Logger('contact')
+
 /**
  * Upserts a Telegram subscriber.
  *
@@ -13,7 +17,7 @@ const upsertTelegramSubscriber = async (
   telegramId: number,
   sequelize: Sequelize
 ): Promise<boolean> => {
-  console.log(`Upserting Telegram subscriber: ${phoneNumber} -> ${telegramId}`)
+  logger.log(`Upserting Telegram subscriber: ${phoneNumber} -> ${telegramId}`)
   const affectedRows = (
     await sequelize.query(
       `
@@ -31,7 +35,7 @@ const upsertTelegramSubscriber = async (
       }
     )
   )[1] as number
-  console.log(`Upserted ${affectedRows} Telegram subscriber`)
+  logger.log(`Upserted ${affectedRows} Telegram subscriber`)
 
   return affectedRows > 0
 }
@@ -47,7 +51,7 @@ const addBotSubscriber = async (
   telegramId: number,
   sequelize: Sequelize
 ): Promise<boolean> => {
-  console.log(`Upserting bot subscriber: ${telegramId} -> bot ${botId}`)
+  logger.log(`Upserting bot subscriber: ${telegramId} -> bot ${botId}`)
   const affectedRows = (
     await sequelize.query(
       `
@@ -63,7 +67,7 @@ const addBotSubscriber = async (
       }
     )
   )[1] as number
-  console.log(`Upserted ${affectedRows} bot subscription`)
+  logger.log(`Upserted ${affectedRows} bot subscription`)
 
   return affectedRows > 0
 }
@@ -75,6 +79,8 @@ export const contactMessageHandler = (
   botId: string,
   sequelize: Sequelize
 ) => async (ctx: TelegrafContext): Promise<Message> => {
+  logger.log(ctx.from?.id.toString())
+
   // Parse contact data
   const contact = ctx.message?.contact
   if (!contact) {
