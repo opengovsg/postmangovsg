@@ -23,7 +23,6 @@ export const getBotTokenFromId = async (botId: string): Promise<string> => {
     return botToken
   }
 
-  // TODO: Figure out how to test on AWS
   logger.log('Getting bot token from Secrets Manager')
   const data = await secretsManager
     .getSecretValue({
