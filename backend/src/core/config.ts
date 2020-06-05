@@ -285,11 +285,18 @@ const config = convict({
       sensitive: true,
     },
   },
-  telegramBotToken: {
-    doc: 'API Key required to make use of Telegram APIs',
-    default: '',
-    env: 'TELEGRAM_BOT_TOKEN',
-    sensitive: true,
+  telegramOptions: {
+    webhookUrl: {
+      doc: 'Webhook URL to configure for all Telegram bots',
+      default: '',
+      env: 'TELEGRAM_WEBHOOK_URL',
+    },
+    telegramBotToken: {
+      doc: 'API Key required to make use of Telegram APIs',
+      default: '',
+      env: 'TELEGRAM_BOT_TOKEN',
+      sensitive: true,
+    },
   },
   maxRatePerJob: {
     doc: 'Number of messages that one worker can send at a time',
