@@ -22,12 +22,30 @@ export default class TelegramClient {
    * Register a callback url for the bot.
    * @param callbackUrl
    */
-  public registerCallbackUrl(callbackUrl: string): Promise<boolean> {
-    return this.client.setWebhook(callbackUrl)
+  public registerCallbackUrl(callbackUrl: string): Promise<void> {
+    return this.client.setWebhook(callbackUrl).then((success: boolean) => {
+      if (!success) throw new Error('Failed to register callback')
+    })
+  }
+
+  /**
+   * Add a command on the bot.
+   * @param commands
+   */
+  public setCommands(
+    commands: Array<{
+      command: string
+      description: string
+    }>
+  ): Promise<void> {
+    return this.client.setMyCommands(commands).then((success: boolean) => {
+      if (!success) throw new Error('Failed to register commands')
+    })
   }
 
   /**
    * Get info about bot
+   * @throws Will throw an error if the botToken is invalid.
    */
   public getBotInfo(): Promise<string | number> {
     return this.client.getMe().then((user) => {

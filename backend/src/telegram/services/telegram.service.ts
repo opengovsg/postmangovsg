@@ -1,10 +1,54 @@
 import { literal } from 'sequelize'
 
+import config from '@core/config'
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
 import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
+
+import TelegramClient from './telegram-client.class'
+
+/**
+ * Validate and configure Telegram bot
+ * @param telegramBotToken
+ * @throws Error when either the token is invalid or the configuration
+ *   for the bot failed.
+ */
+const validateAndConfigureBot = async (
+  telegramBotToken: string
+): Promise<void> => {
+  const telegramService = new TelegramClient(telegramBotToken)
+  try {
+    await telegramService.getBotInfo()
+  } catch (err) {
+    throw new Error(`Invalid token. ${err.message}`)
+  }
+
+  const callbackUrl = config.get('telegramOptions.webhookUrl')
+  await telegramService.registerCallbackUrl(callbackUrl)
+
+  const commands = [
+    { command: 'updatenumber', description: 'Update linked phone number' },
+  ]
+  await telegramService.setCommands(commands)
+}
+
+/**
+ *  Sends a stock sms to the campaign admin using the associated credentials
+ * @param recipient
+ * @param credential
+ */
+const sendValidationMessage = async (
+  recipient: string,
+  telegramBotToken: string
+): Promise<number> => {
+  const telegramService = new TelegramClient(telegramBotToken)
+  return telegramService.send(
+    recipient,
+    'Your Twilio credential has been validated.'
+  )
+}
 
 /**
  *  Helper method to find a telegram campaign owned by that user
@@ -83,4 +127,6 @@ export const TelegramService = {
   findCampaign,
   getCampaignDetails,
   setCampaignCredential,
+  sendValidationMessage,
+  validateAndConfigureBot,
 }
