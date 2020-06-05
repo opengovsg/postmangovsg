@@ -14,7 +14,7 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
     const { campaignId } = req.params
     const userId = req.session?.user?.id 
     const campaign = await SmsService.findCampaign(+campaignId, +userId)
-    return campaign ? next() : res.sendStatus(400)
+    return campaign ? next() : res.sendStatus(403)
   } catch (err) {
     return next(err)
   }

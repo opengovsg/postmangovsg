@@ -13,7 +13,7 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
   const { campaignId } = req.params
   const userId = req.session?.user?.id
   try {
-    const campaign = EmailService.findCampaign(+campaignId, +userId) 
+    const campaign = await EmailService.findCampaign(+campaignId, +userId)
     return campaign ? next() : res.sendStatus(403)
   } catch (err) {
     return next(err)
