@@ -43,7 +43,9 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       setGAUserId(user?.id || null)
 
       Sentry.configureScope((scope) => {
-        const scopeUser = email ? { email } : null
+        const scopeUser = user?.email
+          ? { email: user?.email, id: `${user?.id}` }
+          : null
         scope.setUser(scopeUser)
       })
     } catch (err) {
@@ -61,6 +63,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
           await logout()
           setAuthenticated(false)
           setGAUserId(null)
+          Sentry.setUser(null)
         }
         return Promise.reject(error)
       }

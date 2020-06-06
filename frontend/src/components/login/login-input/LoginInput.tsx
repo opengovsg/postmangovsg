@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react'
+import * as Sentry from '@sentry/browser'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import { getOtpWithEmail, loginWithOtp, getUser } from 'services/auth.service'
 
@@ -56,6 +57,7 @@ const Login = () => {
       setAuthContextEmail(email)
       const user = await getUser()
       setGAUserId(user?.id || null)
+      Sentry.setUser({ email: user?.email, id: `${user?.id}` })
     } catch (err) {
       setErrorMsg(err.message)
       sendException(err.message)
