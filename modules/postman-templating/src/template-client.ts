@@ -2,7 +2,7 @@ import { mapKeys } from 'lodash'
 import xss from 'xss'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
-import { TemplateError } from 'errors'
+import { TemplateError } from './errors'
 
 export default class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
