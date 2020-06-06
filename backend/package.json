@@ -18,6 +18,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^5.16.1",
     "@types/bcrypt": "^3.0.0",
     "@types/connect-redis": "0.0.13",
     "@types/convict": "^5.2.1",

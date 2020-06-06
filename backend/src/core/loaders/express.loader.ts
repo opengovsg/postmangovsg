@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express'
 import bodyParser from 'body-parser'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
 import morgan from 'morgan'
+import * as Sentry from '@sentry/node'
 
 import config from '@core/config'
 import v1Router from '@core/routes'
@@ -31,7 +32,10 @@ const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
   stream: logger.stream,
 })
 
+Sentry.init({ dsn: config.get('sentryDsn') })
+
 const expressApp = ({ app }: { app: express.Application }): void => {
+  app.use(Sentry.Handlers.requestHandler())
   app.use(loggerMiddleware)
 
   app.use(bodyParser.json())
@@ -54,7 +58,12 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     return res.sendStatus(200)
   })
 
+  app.get('/debug-sentry', function mainHandler() {
+    throw new Error('My first Sentry error!')
+  })
+
   app.use('/v1', v1Router)
+  app.use(Sentry.Handlers.errorHandler())
   app.use(celebrateErrorMiddleware())
 
   app.use(
