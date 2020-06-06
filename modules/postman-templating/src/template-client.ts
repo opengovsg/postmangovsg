@@ -11,6 +11,15 @@ export default class TemplateClient {
   }
 
   /**
+   * Removes non-whitelisted html tags
+   * Replaces new lines with html <br> so that the new lines can be displayed on the front-end
+   * @param value
+   */
+  replaceNewLinesAndSanitize(value: string): string {
+    return xss.filterXSS(value.replace(/(\n|\r\n)/g, '<br/>'), this.xssOptions)
+  }
+
+  /**
    * returns {
    *    variables - extracted param variables from template
    *    tokens - tokenised strings that can be joined to produce a template
