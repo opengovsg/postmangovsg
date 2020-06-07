@@ -83,8 +83,8 @@ const storeTemplate = async (
  * @param records
  */
 const updateCampaignAndMessages = async (
+  campaignId: number,
   key: string,
-  campaignId: string,
   filename: string,
   records: MessageBulkInsertInterface[]
 ): Promise<void> => {
@@ -94,17 +94,17 @@ const updateCampaignAndMessages = async (
     transaction = await Campaign.sequelize?.transaction()
     // Updates metadata in project
     await TemplateService.replaceCampaignS3Metadata(
-      +campaignId,
+      campaignId,
       key,
       filename,
       transaction
     )
 
     // START populate template
-    await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
+    await SmsTemplateService.addToMessageLogs(campaignId, records, transaction)
 
     // Set campaign to valid
-    await CampaignService.setValid(+campaignId, transaction)
+    await CampaignService.setValid(campaignId, transaction)
 
     transaction?.commit()
   } catch (err) {
@@ -152,12 +152,15 @@ const uploadCompleteHandler = async (
       throw new InvalidRecipientError()
     }
 
+    // Store temp filename
+    await TemplateService.storeS3TempFilename(+campaignId, filename)
+
     try {
       // Return early because bulk insert is slow
       res.sendStatus(202)
 
       // Slow bulk insert
-      await updateCampaignAndMessages(s3Key, campaignId, filename, records)
+      await updateCampaignAndMessages(+campaignId, s3Key, filename, records)
     } catch (err) {
       // Do not return any response since it has already been sent
       logger.error(
