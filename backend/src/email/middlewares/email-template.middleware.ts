@@ -230,7 +230,7 @@ const pollCsvStatusHandler = async (
       csv_filename: filename,
       temp_csv_filename: tempFilename,
       csv_error: error,
-      numRecipients,
+      num_recipients: numRecipients,
       preview,
     })
   } catch (err) {
