@@ -9,9 +9,10 @@ import {
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
 import { CampaignService, TemplateService } from '@core/services'
-import { SmsTemplateService } from '@sms/services'
+import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { Campaign } from '@core/models'
+import { SmsMessage } from '@sms/models'
 
 /**
  * Store template subject and body in sms template table.
@@ -73,9 +74,9 @@ const storeTemplate = async (
 }
 
 /**
- * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
+ * Updates the campaign and sms_messages table in a transaction, rolling back when either fails.
  * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
- * For email_messages table, existing records are deleted and new ones are bulk inserted.
+ * For sms_messages table, existing records are deleted and new ones are bulk inserted.
  * @param key
  * @param campaignId
  * @param filename
@@ -127,11 +128,10 @@ const uploadCompleteHandler = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    // TODO: validate if project is in editable state
 
     // extract s3Key from transactionId
     const { transaction_id: transactionId, filename } = req.body
-    const s3Key: string = TemplateService.extractS3Key(transactionId)
+    const s3Key = TemplateService.extractS3Key(transactionId)
 
     // check if template exists
     const smsTemplate = await SmsTemplateService.getFilledTemplate(+campaignId)
@@ -141,54 +141,107 @@ const uploadCompleteHandler = async (
 
     // carry out templating / hydration
     // - download from s3
+    const { records } = await SmsTemplateService.client.testHydration({
+      campaignId: +campaignId,
+      s3Key,
+      templateBody: smsTemplate.body as string,
+      templateParams: smsTemplate.params as string[],
+    })
+
+    if (SmsTemplateService.hasInvalidSmsRecipient(records)) {
+      throw new InvalidRecipientError()
+    }
+
     try {
-      const {
-        records,
-        hydratedRecord,
-      } = await SmsTemplateService.client.testHydration({
-        campaignId: +campaignId,
-        s3Key,
-        templateBody: smsTemplate.body as string,
-        templateParams: smsTemplate.params as string[],
-      })
+      // Return early because bulk insert is slow
+      res.sendStatus(202)
 
-      if (SmsTemplateService.hasInvalidSmsRecipient(records))
-        throw new InvalidRecipientError()
-
-      const recipientCount = records.length
-
+      // Slow bulk insert
       await updateCampaignAndMessages(s3Key, campaignId, filename, records)
-
-      if (!res.headersSent) {
-        return res.json({
-          num_recipients: recipientCount,
-          preview: hydratedRecord,
-        })
-      }
     } catch (err) {
+      // Do not return any response since it has already been sent
       logger.error(
-        `Error parsing file for campaign ${campaignId}. ${err.stack}`
+        `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
-      throw err
+      // Store error to return on poll
+      TemplateService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
-    if (!res.headersSent) {
-      const userErrors = [
-        RecipientColumnMissing,
-        MissingTemplateKeysError,
-        InvalidRecipientError,
-        UnexpectedDoubleQuoteError,
-      ]
+    const userErrors = [
+      RecipientColumnMissing,
+      MissingTemplateKeysError,
+      InvalidRecipientError,
+      UnexpectedDoubleQuoteError,
+    ]
 
-      if (userErrors.some((errType) => err instanceof errType)) {
-        return res.status(400).json({ message: err.message })
-      }
-      return next(err)
+    if (userErrors.some((errType) => err instanceof errType)) {
+      return res.status(400).json({ message: err.message })
     }
+    return next(err)
+  }
+}
+
+/*
+ * Returns status of csv processing
+ */
+const pollCsvStatusHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const {
+      isCsvProcessing,
+      filename,
+      tempFilename,
+      error,
+    } = await TemplateService.getCsvStatus(+campaignId)
+
+    // If done processing, returns num recipients and preview msg
+    let numRecipients, preview
+    if (!isCsvProcessing) {
+      ;[numRecipients, preview] = await Promise.all([
+        SmsMessage.count({
+          where: { campaignId: +campaignId },
+        }),
+        SmsService.getHydratedMessage(+campaignId),
+      ])
+    }
+
+    res.json({
+      is_csv_processing: isCsvProcessing,
+      csv_filename: filename,
+      temp_csv_filename: tempFilename,
+      csv_error: error,
+      num_recipients: numRecipients,
+      preview,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+/*
+ * Deletes csv error and temp csv name from db
+ */
+const deleteCsvErrorHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    await TemplateService.deleteS3TempKeys(+campaignId)
+    res.sendStatus(200)
+  } catch (e) {
+    next(e)
   }
 }
 
 export const SmsTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
+  pollCsvStatusHandler,
+  deleteCsvErrorHandler,
 }

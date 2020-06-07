@@ -169,11 +169,7 @@ const uploadCompleteHandler = async (
       res.sendStatus(202)
 
       // Slow bulk insert
-      // setTimeout(async () => {
       await updateCampaignAndMessages(+campaignId, s3Key, filename, records)
-      // }, 5000)
-      // console.log(updateCampaignAndMessages)
-      // throw new Error('sum ting wong')
     } catch (err) {
       // Do not return any response since it has already been sent
       logger.error(
@@ -224,7 +220,7 @@ const pollCsvStatusHandler = async (
         EmailService.getHydratedMessage(+campaignId),
       ])
     }
-    // await timeout(1000)
+
     res.json({
       is_csv_processing: isCsvProcessing,
       csv_filename: filename,
