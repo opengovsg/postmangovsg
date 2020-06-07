@@ -7,12 +7,16 @@ export enum SMSProgress {
   Send,
 }
 
+export interface SMSPreview {
+  body: string
+  subject: string
+}
+
 export class SMSCampaign extends Campaign {
   body: string
   params: Array<string>
   csvFilename: string
   numRecipients: number
-  preview: string
   hasCredential: boolean
   progress: SMSProgress = SMSProgress.CreateTemplate
 
@@ -22,7 +26,6 @@ export class SMSCampaign extends Campaign {
     this.params = input['sms_templates']?.params
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
-    this.preview = input['preview']
     this.hasCredential = input['has_credential']
     this.setProgress()
   }

@@ -2,27 +2,22 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
-  completeFileUpload,
-  getPresignedUrl,
-  getCsvStatus,
-} from 'services/email.service'
-import {
-  uploadFileWithPresignedUrl,
+  uploadFileToS3,
   deleteCsvStatus,
+  getCsvStatus,
+  CsvStatusResponse,
 } from 'services/upload.service'
 import {
   FileInput,
-  InfoBlock,
+  CsvUpload,
   ErrorBlock,
   PreviewBlock,
   PrimaryButton,
   SampleCsv,
 } from 'components/common'
+import { EmailCampaign, EmailPreview } from 'classes'
 
 import styles from '../Create.module.scss'
-import { EmailCampaign } from 'classes'
-
-type NullableString = string | null | undefined
 
 const EmailRecipients = ({
   csvFilename: initialCsvFilename,
@@ -38,17 +33,17 @@ const EmailRecipients = ({
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
 }) => {
   const [errorMessage, setErrorMessage] = useState(null)
-  const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
-  const [isUploading, setIsUploading] = useState(false)
-  const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
-  const [tempCsvFilename, setTempCsvFilename] = useState<NullableString>(null)
-  const [csvError, setCsvError] = useState<NullableString>('')
-  const [preview, setPreview] = useState(
-    {} as { body: string; subject: string; replyTo: string | null }
-  )
-
+  const [isUploading, setIsUploading] = useState(false)
+  const [csvInfo, setCsvInfo] = useState<
+    Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
+  >({
+    numRecipients: initialNumRecipients,
+    csvFilename: initialCsvFilename,
+  })
+  const [preview, setPreview] = useState({} as EmailPreview)
   const { id: campaignId } = useParams()
+  const { csvFilename, numRecipients = 0 } = csvInfo
 
   // Handle file upload
   async function uploadFile(files: File[]) {
@@ -60,24 +55,10 @@ const EmailRecipients = ({
       if (!files[0] || !campaignId) {
         return
       }
-      const uploadedFile = files[0]
-      // Get presigned url from postman server
-      const startUploadResponse = await getPresignedUrl({
-        campaignId: +campaignId,
-        mimeType: uploadedFile.type,
-      })
-      // Upload to presigned url
-      await uploadFileWithPresignedUrl(
-        uploadedFile,
-        startUploadResponse.presignedUrl
-      )
-      await completeFileUpload({
-        campaignId: +campaignId,
-        transactionId: startUploadResponse.transactionId,
-        filename: uploadedFile.name,
-      })
+      clearCsvStatus()
+      const tempCsvFilename = await uploadFileToS3(+campaignId, files[0])
       setIsCsvProcessing(true)
-      setTempCsvFilename(uploadedFile.name)
+      setCsvInfo((info) => ({ ...info, tempCsvFilename }))
     } catch (err) {
       setErrorMessage(err.message)
     } finally {
@@ -85,10 +66,11 @@ const EmailRecipients = ({
     }
   }
 
+  // Hide csv error from previous upload and delete from db
   function clearCsvStatus() {
     if (campaignId) {
+      setCsvInfo((info) => ({ ...info, csvError: undefined }))
       deleteCsvStatus(+campaignId)
-      setCsvError(null)
     }
   }
 
@@ -99,20 +81,12 @@ const EmailRecipients = ({
     let timeoutId: NodeJS.Timeout
     const pollStatus = async () => {
       try {
-        const {
-          isCsvProcessing,
-          csvFilename,
-          tempCsvFilename,
-          csvError,
-          numRecipients,
-          preview,
-        } = await getCsvStatus(+campaignId)
+        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
+          +campaignId
+        )
         setIsCsvProcessing(isCsvProcessing)
-        setTempCsvFilename(tempCsvFilename)
-        setCsvError(csvError)
-        csvFilename && setUploadedCsvFilename(csvFilename)
-        numRecipients && setNumRecipients(numRecipients)
-        preview && setPreview(preview)
+        setCsvInfo(newCsvInfo)
+        preview && setPreview(preview as EmailPreview)
         if (isCsvProcessing) {
           timeoutId = setTimeout(pollStatus, 2000)
         }
@@ -120,6 +94,9 @@ const EmailRecipients = ({
         setErrorMessage(e.message)
       }
     }
+
+    // Retrieve status regardless of isCsvProcessing to retrieve csvError if any
+    // If completed, it will only poll once
     pollStatus()
 
     return () => clearTimeout(timeoutId)
@@ -127,83 +104,7 @@ const EmailRecipients = ({
 
   useEffect(() => {
     onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
-  }, [csvFilename, isCsvProcessing, numRecipients, onNext])
-
-  function renderInfoBlock() {
-    if (!isCsvProcessing) {
-      return (
-        <>
-          {numRecipients > 0 && (
-            <InfoBlock>
-              <li>
-                <i className="bx bx-user-check"></i>
-                <p>{numRecipients} recipients</p>
-              </li>
-              {csvFilename && (
-                <li>
-                  <i className="bx bx-file"></i>
-                  <p>{csvFilename}</p>
-                </li>
-              )}
-            </InfoBlock>
-          )}
-          <div className={styles.uploadActions}>
-            <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
-            <p>or</p>
-            <SampleCsv params={params} defaultRecipient="user@email.com" />
-          </div>
-        </>
-      )
-    }
-    if (isCsvProcessing) {
-      return (
-        <InfoBlock>
-          <li>
-            <i className="bx bx-loader-alt bx-spin"></i>
-            <p>
-              <b>{tempCsvFilename || 'Your file'}</b> is being processed. You
-              may leave this page and check back later.
-            </p>
-          </li>
-        </InfoBlock>
-      )
-    }
-  }
-
-  function renderErrorBlock() {
-    if (isCsvProcessing) {
-      return <ErrorBlock>{errorMessage}</ErrorBlock>
-    } else {
-      return <ErrorBlock onClose={clearCsvStatus}>{csvError}</ErrorBlock>
-    }
-  }
-
-  function renderPreview() {
-    if (!isCsvProcessing && numRecipients > 0) {
-      if (preview.body) {
-        return (
-          <>
-            <p className={styles.greyText}>Message preview</p>
-            <PreviewBlock
-              body={preview.body}
-              subject={preview.subject}
-              replyTo={preview.replyTo}
-            />
-            <div className="separator"></div>
-          </>
-        )
-      } else {
-        return (
-          <InfoBlock>
-            <li>
-              <i className="bx bx-loader-alt bx-spin"></i>
-              <p>Loading preview...</p>
-            </li>
-          </InfoBlock>
-        )
-      }
-    }
-  }
+  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
 
   return (
     <>
@@ -218,13 +119,31 @@ const EmailRecipients = ({
         email addresses
       </p>
 
-      {renderInfoBlock()}
+      <CsvUpload
+        isCsvProcessing={isCsvProcessing}
+        csvInfo={csvInfo}
+        onErrorClose={clearCsvStatus}
+      >
+        <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+        <p>or</p>
+        <SampleCsv params={params} defaultRecipient="user@email.com" />
+      </CsvUpload>
 
-      {renderErrorBlock()}
+      <ErrorBlock>{errorMessage}</ErrorBlock>
 
       <div className="separator"></div>
 
-      {renderPreview()}
+      {!isCsvProcessing && numRecipients > 0 && (
+        <>
+          <p className={styles.greyText}>Message preview</p>
+          <PreviewBlock
+            body={preview?.body}
+            subject={preview?.subject}
+            replyTo={preview?.replyTo}
+          />
+          <div className="separator"></div>
+        </>
+      )}
 
       <div className="progress-button">
         <PrimaryButton
