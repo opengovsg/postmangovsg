@@ -64,7 +64,15 @@ const CsvUpload = ({
   return (
     <>
       {renderFileUploadInput()}
-      <ErrorBlock onClose={onErrorClose}>{csvError}</ErrorBlock>
+      <ErrorBlock onClose={onErrorClose}>
+        {csvError && (
+          <>
+            <b>{tempCsvFilename}</b>
+            <br />
+            {csvError}
+          </>
+        )}
+      </ErrorBlock>
     </>
   )
 }

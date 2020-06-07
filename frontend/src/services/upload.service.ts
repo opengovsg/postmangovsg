@@ -41,14 +41,11 @@ export async function getPresignedUrl({
 }): Promise<PresignedUrlResponse> {
   try {
     const mimeType = await getMimeType(uploadedFile)
-    const response = await axios.get(
-      `/campaign/${campaignId}/email/upload/start`,
-      {
-        params: {
-          mime_type: mimeType,
-        },
-      }
-    )
+    const response = await axios.get(`/campaign/${campaignId}/upload/start`, {
+      params: {
+        mime_type: mimeType,
+      },
+    })
     const {
       transaction_id: transactionId,
       presigned_url: presignedUrl,
@@ -69,7 +66,7 @@ export async function completeFileUpload({
   filename: string
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/email/upload/complete`, {
+    await axios.post(`/campaign/${campaignId}/upload/complete`, {
       transaction_id: transactionId,
       filename,
     })
@@ -83,9 +80,7 @@ export async function getCsvStatus(
   campaignId: number
 ): Promise<CsvStatusResponse> {
   try {
-    const response = await axios.get(
-      `/campaign/${campaignId}/email/upload/status`
-    )
+    const response = await axios.get(`/campaign/${campaignId}/upload/status`)
     const {
       is_csv_processing: isCsvProcessing,
       csv_filename: csvFilename,

@@ -42,6 +42,7 @@ const CreateEmail = ({
     }
   }, [])
 
+  // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
     if (campaign.isCsvProcessing) {
       setActiveStep(EmailProgress.UploadRecipients)

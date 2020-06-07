@@ -44,7 +44,41 @@ const EmailRecipients = ({
   })
   const [preview, setPreview] = useState({} as EmailPreview)
   const { id: campaignId } = useParams()
+
   const { csvFilename, numRecipients = 0 } = csvInfo
+
+  // Poll csv status
+  useEffect(() => {
+    if (!campaignId) return
+
+    let timeoutId: NodeJS.Timeout
+    const pollStatus = async () => {
+      try {
+        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
+          +campaignId
+        )
+        setIsCsvProcessing(isCsvProcessing)
+        setCsvInfo(newCsvInfo)
+        preview && setPreview(preview as EmailPreview)
+        if (isCsvProcessing) {
+          timeoutId = setTimeout(pollStatus, 2000)
+        }
+      } catch (e) {
+        setErrorMessage(e.message)
+      }
+    }
+
+    // Retrieve status regardless of isCsvProcessing to retrieve csvError if any
+    // If completed, it will only poll once
+    pollStatus()
+
+    return () => clearTimeout(timeoutId)
+  }, [campaignId, isCsvProcessing])
+
+  // If campaign properties change, bubble up to root campaign object
+  useEffect(() => {
+    onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
+  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
 
   // Handle file upload
   async function uploadFile(files: File[]) {
@@ -79,38 +113,6 @@ const EmailRecipients = ({
       deleteCsvStatus(+campaignId)
     }
   }
-
-  // Poll csv status
-  useEffect(() => {
-    if (!campaignId) return
-
-    let timeoutId: NodeJS.Timeout
-    const pollStatus = async () => {
-      try {
-        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
-          +campaignId
-        )
-        setIsCsvProcessing(isCsvProcessing)
-        setCsvInfo(newCsvInfo)
-        preview && setPreview(preview as EmailPreview)
-        if (isCsvProcessing) {
-          timeoutId = setTimeout(pollStatus, 2000)
-        }
-      } catch (e) {
-        setErrorMessage(e.message)
-      }
-    }
-
-    // Retrieve status regardless of isCsvProcessing to retrieve csvError if any
-    // If completed, it will only poll once
-    pollStatus()
-
-    return () => clearTimeout(timeoutId)
-  }, [campaignId, isCsvProcessing])
-
-  useEffect(() => {
-    onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
-  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
 
   return (
     <>

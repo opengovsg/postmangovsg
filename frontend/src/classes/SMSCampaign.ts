@@ -9,7 +9,6 @@ export enum SMSProgress {
 
 export interface SMSPreview {
   body: string
-  subject: string
 }
 
 export class SMSCampaign extends Campaign {

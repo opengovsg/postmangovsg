@@ -145,7 +145,7 @@ const getCsvStatus = async (
     Date.now() - campaign.updatedAt > MAX_PROCESSING_TIME
   ) {
     isCsvProcessing = false
-    error = 'Csv processing timedout'
+    error = 'Csv processing timeout. Please contact us if this persists.'
     await storeS3Error(campaignId, error)
   }
   return {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { cloneDeep } from 'lodash'
 
 import { SMSCampaign, SMSProgress, Status } from 'classes'
@@ -27,17 +27,26 @@ const CreateSMS = ({
   const [campaign, setCampaign] = useState(initialCampaign)
 
   // Modifies campaign object in state and navigates to next step
-  const onNext = (changes: any, next = true) => {
-    const updatedCampaign = Object.assign(
-      cloneDeep(campaign),
-      changes
-    ) as SMSCampaign
-    updatedCampaign.setProgress()
-    setCampaign(updatedCampaign)
+  const onNext = useCallback((changes: any, next = true) => {
+    setCampaign((c) => {
+      const updatedCampaign = Object.assign(
+        cloneDeep(c),
+        changes
+      ) as SMSCampaign
+      updatedCampaign.setProgress()
+      return updatedCampaign
+    })
     if (next) {
-      setActiveStep(activeStep + 1)
+      setActiveStep((s) => s + 1)
     }
-  }
+  }, [])
+
+  // If isCsvProcessing, user can only access UploadRecipients tab
+  useEffect(() => {
+    if (campaign.isCsvProcessing) {
+      setActiveStep(SMSProgress.UploadRecipients)
+    }
+  }, [campaign.isCsvProcessing])
 
   function renderStep() {
     switch (activeStep) {
@@ -49,6 +58,7 @@ const CreateSMS = ({
             params={campaign.params}
             csvFilename={campaign.csvFilename}
             numRecipients={campaign.numRecipients}
+            isProcessing={campaign.isCsvProcessing}
             onNext={onNext}
           />
         )
@@ -85,6 +95,7 @@ const CreateSMS = ({
             activeStep={activeStep}
             setActiveStep={setActiveStep}
             progress={campaign.progress}
+            disabled={campaign.isCsvProcessing}
           />
           <div className={styles.stepContainer}>{renderStep()}</div>
         </>
