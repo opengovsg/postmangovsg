@@ -9,6 +9,7 @@ import { jwtUtils } from '@core/utils/jwt'
 import { Campaign } from '@core/models'
 import { CsvStatusInterface } from '@core/interfaces'
 
+const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 const s3 = new S3({
   signatureVersion: 'v4',
@@ -101,7 +102,11 @@ const storeS3Error = async (
   campaignId: number,
   error: string
 ): Promise<void> => {
-  return Campaign.updateS3ObjectKey(campaignId, { error })
+  try {
+    await Campaign.updateS3ObjectKey(campaignId, { error })
+  } catch (e) {
+    logger.error(`Error storing csv processing error in s3object: ${e}`)
+  }
 }
 
 /*
@@ -119,6 +124,7 @@ const deleteS3TempKeys = async (campaignId: number): Promise<void> => {
  * If tempFilename exists in S3Object without errors, processing is still ongoing
  * If error exists in S3Object, processing has failed
  * If neither exists, processing is complete
+ * If lastUpdated timestamp on campaign has exceeded csvProcessingTimeout, consider processing timedout
  */
 const getCsvStatus = async (
   campaignId: number
@@ -127,10 +133,23 @@ const getCsvStatus = async (
   if (!campaign) {
     throw new Error('Campaign does not exist')
   }
-  const { filename, temp_filename: tempFilename, error } =
-    campaign.s3Object || {}
+  // s3Object is nullable
+  const { filename, temp_filename: tempFilename } = campaign.s3Object || {}
+  let { error } = campaign.s3Object || {}
+
+  let isCsvProcessing = !!tempFilename && !error
+
+  // Check if still stuck in processing but past timeout threshold
+  if (
+    isCsvProcessing &&
+    Date.now() - campaign.updatedAt > MAX_PROCESSING_TIME
+  ) {
+    isCsvProcessing = false
+    error = 'Csv processing timedout'
+    await storeS3Error(campaignId, error)
+  }
   return {
-    isCsvProcessing: !!tempFilename && !error,
+    isCsvProcessing,
     filename,
     tempFilename,
     error,

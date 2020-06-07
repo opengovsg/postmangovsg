@@ -331,13 +331,12 @@ const config = convict({
       },
     },
   },
-  express: {
-    uploadCompleteTimeout: {
-      doc: 'Custom timeout period for upload/complete handler',
-      default: 100 * 1000,
-      env: 'UPLOAD_COMPLETE_TIMEOUT_IN_MS',
-      format: 'int',
-    },
+  csvProcessingTimeout: {
+    doc:
+      'Max duration for csv processing before timeout. Prevent campaigns from being stuck in isCsvProcessing state if server dies.',
+    default: 10 * 60 * 1000, // 10 minutes
+    env: 'CSV_PROCESSING_TIMEOUT_IN_MS',
+    format: 'int',
   },
 })
 

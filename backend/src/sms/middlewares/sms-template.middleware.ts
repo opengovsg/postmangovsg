@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import config from '@core/config'
 import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
@@ -12,8 +11,6 @@ import { CampaignService, TemplateService } from '@core/services'
 import { SmsTemplateService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { Campaign } from '@core/models'
-
-const uploadTimeout = Number(config.get('express.uploadCompleteTimeout'))
 
 /**
  * Store template subject and body in sms template table.
@@ -127,12 +124,6 @@ const uploadCompleteHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  res.setTimeout(uploadTimeout, async () => {
-    if (!res.headersSent) {
-      return res.status(408).json('Request timed out')
-    }
-    return
-  })
   try {
     const { campaignId } = req.params
     // TODO: validate if project is in editable state

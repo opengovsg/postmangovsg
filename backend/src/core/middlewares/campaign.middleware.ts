@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { CampaignService } from '@core/services'
+import { CampaignService, TemplateService } from '@core/services'
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -14,7 +14,11 @@ const canEditCampaign = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    if (!(await CampaignService.hasJobInProgress(+campaignId))) {
+    const [hasJob, csvStatus] = await Promise.all([
+      CampaignService.hasJobInProgress(+campaignId),
+      TemplateService.getCsvStatus(+campaignId),
+    ])
+    if (!hasJob && !csvStatus?.isCsvProcessing) {
       return next()
     } else {
       return res.sendStatus(403)

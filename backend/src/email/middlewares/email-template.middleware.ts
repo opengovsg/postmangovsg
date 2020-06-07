@@ -199,9 +199,6 @@ const uploadCompleteHandler = async (
 
 /*
  * Returns status of csv processing
- * If tempFilename exists in S3Object without errors, processing is still ongoing
- * If error exists in S3Object, processing has failed
- * If neither exists, processing is complete
  */
 const pollCsvStatusHandler = async (
   req: Request,
@@ -216,6 +213,8 @@ const pollCsvStatusHandler = async (
       tempFilename,
       error,
     } = await TemplateService.getCsvStatus(+campaignId)
+
+    // If done processing, returns num recipients and preview msg
     let numRecipients, preview
     if (!isCsvProcessing) {
       ;[numRecipients, preview] = await Promise.all([
@@ -239,8 +238,26 @@ const pollCsvStatusHandler = async (
   }
 }
 
+/*
+ * Deletes csv error and temp csv name from db
+ */
+const deleteCsvErrorHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    await TemplateService.deleteS3TempKeys(+campaignId)
+    res.sendStatus(200)
+  } catch (e) {
+    next(e)
+  }
+}
+
 export const EmailTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
   pollCsvStatusHandler,
+  deleteCsvErrorHandler,
 }
