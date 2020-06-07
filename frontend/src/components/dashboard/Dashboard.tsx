@@ -7,7 +7,6 @@ import Campaigns from './campaigns'
 import Create from './create'
 import Settings from './settings'
 
-
 const Dashboard = () => {
   return (
     <ModalContextProvider>
@@ -17,7 +16,7 @@ const Dashboard = () => {
         <Route path="/campaigns/:id" component={Create}></Route>
         <Route path="/settings" component={Settings}></Route>
       </Switch>
-    </ ModalContextProvider>
+    </ModalContextProvider>
   )
 }
 

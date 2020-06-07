@@ -1,9 +1,16 @@
-import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript'
+import {
+  Column,
+  DataType,
+  Model,
+  Table,
+  ForeignKey,
+  BelongsTo,
+} from 'sequelize-typescript'
 import { JobStatus } from '@core/constants'
 import { Campaign } from './campaign'
 import { Worker } from './worker'
 
-@Table({ tableName: 'job_queue' , underscored: true, timestamps: true })
+@Table({ tableName: 'job_queue', underscored: true, timestamps: true })
 export class JobQueue extends Model<JobQueue> {
   @ForeignKey(() => Campaign)
   @Column(DataType.INTEGER)
@@ -27,5 +34,4 @@ export class JobQueue extends Model<JobQueue> {
     allowNull: false,
   })
   status!: JobStatus
-
 }

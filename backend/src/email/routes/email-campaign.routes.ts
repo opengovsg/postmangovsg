@@ -5,24 +5,20 @@ import {
   TemplateMiddleware,
   JobMiddleware,
 } from '@core/middlewares'
-import { EmailTemplateMiddleware, EmailStatsMiddleware, EmailMiddleware } from '@email/middlewares'
-
-
+import {
+  EmailTemplateMiddleware,
+  EmailStatsMiddleware,
+  EmailMiddleware,
+} from '@email/middlewares'
 
 const router = Router({ mergeParams: true })
 
 // validators
 const storeTemplateValidator = {
   [Segments.BODY]: Joi.object({
-    subject: Joi
-      .string()
-      .required(),
-    body: Joi
-      .string()
-      .required(),
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    reply_to: Joi
-      .string()
+    subject: Joi.string().required(),
+    body: Joi.string().required(),
+    reply_to: Joi.string()
       .trim()
       .email()
       .options({ convert: true })
@@ -34,22 +30,21 @@ const storeTemplateValidator = {
 
 const uploadStartValidator = {
   [Segments.QUERY]: Joi.object({
-    'mime_type': Joi
-      .string()
-      .required(),
+    mime_type: Joi.string().required(),
   }),
 }
 
 const uploadCompleteValidator = {
   [Segments.BODY]: Joi.object({
-    'transaction_id': Joi.string().required(),
+    transaction_id: Joi.string().required(),
     filename: Joi.string().required(),
   }),
 }
 
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    recipient: Joi.string().email()
+    recipient: Joi.string()
+      .email()
       .options({ convert: true }) // Converts email to lowercase if it isn't
       .lowercase()
       .required(),
@@ -58,14 +53,9 @@ const storeCredentialsValidator = {
 
 const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
-    rate: Joi
-      .number()
-      .integer()
-      .positive()
-      .default(35),
+    rate: Joi.number().integer().positive().default(35),
   }),
 }
-
 
 // Routes
 
@@ -93,7 +83,7 @@ router.use(EmailMiddleware.isEmailCampaignOwnedByUser)
  *            application/json:
  *              schema:
  *                $ref: '#/components/schemas/EmailCampaign'
- * 
+ *
  *        "400" :
  *           description: Invalid campaign type or not owned by user
  *        "401":
@@ -168,18 +158,23 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                       params:
  *                         type: array
  *                         items:
- *                           type: string 
+ *                           type: string
  *
  *         "400":
  *           description: Bad Request
  *         "401":
  *           description: Unauthorized
  *         "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden as there is a job in progress
  *         "500":
  *           description: Internal Server Error
  */
-router.put('/template', celebrate(storeTemplateValidator), CampaignMiddleware.canEditCampaign, EmailTemplateMiddleware.storeTemplate)
+router.put(
+  '/template',
+  celebrate(storeTemplateValidator),
+  CampaignMiddleware.canEditCampaign,
+  EmailTemplateMiddleware.storeTemplate
+)
 
 /**
  * @swagger
@@ -217,11 +212,16 @@ router.put('/template', celebrate(storeTemplateValidator), CampaignMiddleware.ca
  *         "401":
  *           description: Unauthorized
  *         "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden as there is a job in progress
  *         "500":
  *           description: Internal Server Error
  */
-router.get('/upload/start', celebrate(uploadStartValidator), CampaignMiddleware.canEditCampaign, TemplateMiddleware.uploadStartHandler)
+router.get(
+  '/upload/start',
+  celebrate(uploadStartValidator),
+  CampaignMiddleware.canEditCampaign,
+  TemplateMiddleware.uploadStartHandler
+)
 
 /**
  * @swagger
@@ -273,11 +273,16 @@ router.get('/upload/start', celebrate(uploadStartValidator), CampaignMiddleware.
  *         "401":
  *           description: Unauthorized
  *         "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden as there is a job in progress
  *         "500":
  *           description: Internal Server Error
  */
-router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMiddleware.canEditCampaign, EmailTemplateMiddleware.uploadCompleteHandler)
+router.post(
+  '/upload/complete',
+  celebrate(uploadCompleteValidator),
+  CampaignMiddleware.canEditCampaign,
+  EmailTemplateMiddleware.uploadCompleteHandler
+)
 
 /**
  * @swagger
@@ -307,11 +312,16 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMidd
  *        "401":
  *           description: Unauthorized
  *        "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden as there is a job in progress
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddleware.canEditCampaign, EmailMiddleware.validateAndStoreCredentials)
+router.post(
+  '/credentials',
+  celebrate(storeCredentialsValidator),
+  CampaignMiddleware.canEditCampaign,
+  EmailMiddleware.validateAndStoreCredentials
+)
 
 /**
  * @swagger
@@ -340,7 +350,7 @@ router.post('/credentials', celebrate(storeCredentialsValidator), CampaignMiddle
  *                    properties:
  *                      body:
  *                        type: string
- *                      subject: 
+ *                      subject:
  *                        type: string
  *                      reply_to:
  *                        type: string
@@ -389,11 +399,16 @@ router.get('/preview', EmailMiddleware.previewFirstMessage)
  *        "401":
  *           description: Unauthorized
  *        "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden as there is a job in progress
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/send', celebrate(sendCampaignValidator), CampaignMiddleware.canEditCampaign, JobMiddleware.sendCampaign)
+router.post(
+  '/send',
+  celebrate(sendCampaignValidator),
+  CampaignMiddleware.canEditCampaign,
+  JobMiddleware.sendCampaign
+)
 
 /**
  * @swagger
@@ -441,16 +456,20 @@ router.post('/stop', JobMiddleware.stopCampaign)
  *        "401":
  *           description: Unauthorized
  *        "403":
- *           description: Forbidden as there is a job in progress 
+ *           description: Forbidden as there is a job in progress
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/retry', CampaignMiddleware.canEditCampaign, JobMiddleware.retryCampaign)
+router.post(
+  '/retry',
+  CampaignMiddleware.canEditCampaign,
+  JobMiddleware.retryCampaign
+)
 
 /**
  * @swagger
  * path:
-*  /campaign/{campaignId}/email/stats:
+ *  /campaign/{campaignId}/email/stats:
  *    get:
  *      tags:
  *        - Email

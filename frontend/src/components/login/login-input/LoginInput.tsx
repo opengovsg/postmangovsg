@@ -1,9 +1,15 @@
 import React, { useState, useContext } from 'react'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
-import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
+import { getOtpWithEmail, loginWithOtp, getUser } from 'services/auth.service'
 
 import styles from './LoginInput.module.scss'
 import { AuthContext } from 'contexts/auth.context'
+import {
+  GA_USER_EVENTS,
+  setGAUserId,
+  sendUserEvent,
+  sendException,
+} from 'services/ga.service'
 
 const emailText = 'Sign in with your gov.sg email'
 const otpText = 'One-Time Password'
@@ -15,7 +21,9 @@ const otpPlaceholder = 'Enter OTP'
 const RESEND_WAIT_TIME = 30000
 
 const Login = () => {
-  const { setAuthenticated, setEmail: setAuthContextEmail } = useContext(AuthContext)
+  const { setAuthenticated, setEmail: setAuthContextEmail } = useContext(
+    AuthContext
+  )
 
   const [otpSent, setOtpSent] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -35,6 +43,7 @@ const Login = () => {
       }, RESEND_WAIT_TIME)
     } catch (err) {
       setErrorMsg(err.message)
+      sendException(err.message)
     }
     setIsLoading(false)
   }
@@ -45,8 +54,11 @@ const Login = () => {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
       setAuthContextEmail(email)
+      const user = await getUser()
+      setGAUserId(user?.id || null)
     } catch (err) {
       setErrorMsg(err.message)
+      sendException(err.message)
     }
     setIsLoading(false)
   }
@@ -60,6 +72,7 @@ const Login = () => {
   function resend() {
     setOtpSent(false)
     sendOtp()
+    sendUserEvent(GA_USER_EVENTS.RESEND_OTP)
   }
 
   function render(
@@ -69,15 +82,17 @@ const Login = () => {
     onClick: Function,
     buttonText: string[],
     placeholder: string,
-    inputType?: string,
+    inputType?: string
   ) {
     return (
       <>
         <h4 className={styles.text}>
           {mainText}
-          {otpSent && canResend &&
-            <a className={styles.resend} onClick={resend}>Resend?</a>
-          }
+          {otpSent && canResend && (
+            <a className={styles.resend} onClick={resend}>
+              Resend?
+            </a>
+          )}
         </h4>
         <TextInputWithButton
           value={value}
@@ -86,24 +101,37 @@ const Login = () => {
           onChange={onChange}
           buttonDisabled={!value || isLoading}
           inputDisabled={isLoading}
-          onClick={onClick}>
+          onClick={onClick}
+        >
           {isLoading ? buttonText[1] : buttonText[0]}
         </TextInputWithButton>
-        <ErrorBlock absolute={true}>
-          {errorMsg}
-        </ErrorBlock>
+        <ErrorBlock absolute={true}>{errorMsg}</ErrorBlock>
       </>
     )
   }
 
   return (
     <div className={styles.container}>
-      {!otpSent ?
-        render(emailText, email, setEmail, sendOtp, emailButtonText, emailPlaceholder, 'email')
-        :
-        render(otpText, otp, setOtp, login, otpButtonText, otpPlaceholder, 'tel')
-      }
-    </div >
+      {!otpSent
+        ? render(
+            emailText,
+            email,
+            setEmail,
+            sendOtp,
+            emailButtonText,
+            emailPlaceholder,
+            'email'
+          )
+        : render(
+            otpText,
+            otp,
+            setOtp,
+            login,
+            otpButtonText,
+            otpPlaceholder,
+            'tel'
+          )}
+    </div>
   )
 }
 

@@ -1,20 +1,20 @@
 version: 0.1
 env:
   variables:
-      BACKEND_URL_PRODUCTION: "https://api.postman.gov.sg/v1"
-      BACKEND_URL_STAGING: "https://api-staging.postman.gov.sg/v1"
-      REACT_APP_TITLE: "Postman.gov.sg"
-      REACT_APP_DESCRIPTION: "Postman.gov.sg enables public officers to send templated messages to many recipients"
-      REACT_APP_LOGIN_EMAIL_TEXT: "Sign in with your .gov.sg email"
-      REACT_APP_LOGIN_EMAIL_PLACEHOLDER: "e.g. postman@agency.gov.sg"
-      REACT_APP_GUIDE_URL: "https://guide.postman.gov.sg"
-      REACT_APP_GUIDE_CREDENTIALS_URL: "https://guide.postman.gov.sg/twilio-sms.html#where-can-i-find-credentials-on-the-twilio-console"
-      REACT_APP_GUIDE_POWER_USER_URL: "https://guide.postman.gov.sg/poweruser.html"
-      REACT_APP_CONTACT_US_URL: "https://go.gov.sg/postman-contact-us"
-      REACT_APP_CONTRIBUTE_URL: "https://github.com/opengovsg/postmangovsg"
-      REACT_APP_TC_URL: "https://guide.postman.gov.sg/t-c.html"
-      REACT_APP_PRIVACY_URL: "https://guide.postman.gov.sg/privacy.html"
-      REACT_APP_REPORT_BUG_URL: "https://guide.postman.gov.sg/report-bug.html"
+    BACKEND_URL_PRODUCTION: "https://api.postman.gov.sg/v1"
+    BACKEND_URL_STAGING: "https://api-staging.postman.gov.sg/v1"
+    REACT_APP_TITLE: "Postman.gov.sg"
+    REACT_APP_DESCRIPTION: "Postman.gov.sg enables public officers to send templated messages to many recipients"
+    REACT_APP_LOGIN_EMAIL_TEXT: "Sign in with your .gov.sg email"
+    REACT_APP_LOGIN_EMAIL_PLACEHOLDER: "e.g. postman@agency.gov.sg"
+    REACT_APP_GUIDE_URL: "https://guide.postman.gov.sg"
+    REACT_APP_GUIDE_CREDENTIALS_URL: "https://guide.postman.gov.sg/twilio-sms.html#where-can-i-find-credentials-on-the-twilio-console"
+    REACT_APP_GUIDE_POWER_USER_URL: "https://guide.postman.gov.sg/poweruser.html"
+    REACT_APP_CONTACT_US_URL: "https://go.gov.sg/postman-contact-us"
+    REACT_APP_CONTRIBUTE_URL: "https://github.com/opengovsg/postmangovsg"
+    REACT_APP_TC_URL: "https://guide.postman.gov.sg/t-c.html"
+    REACT_APP_PRIVACY_URL: "https://guide.postman.gov.sg/privacy.html"
+    REACT_APP_REPORT_BUG_URL: "https://guide.postman.gov.sg/report-bug.html"
 frontend:
   phases:
     preBuild:
@@ -33,27 +33,30 @@ frontend:
   customHeaders:
     - pattern: "**/*"
       headers:
-      - key: "Strict-Transport-Security"
-        value: "max-age=5184000; includeSubDomains" 
-      - key: "X-Frame-Options"
-        value: "DENY"
-      - key: "X-XSS-Protection"
-        value: "1; mode=block"
-      - key: "X-Content-Type-Options"
-        value: "nosniff"
-      - key: "X-DNS-Prefetch-Control"
-        value: "off"
-      - key: "X-Download-Options"
-        value: "noopen"
-      - key: "Referrer-Policy"
-        value: "same-origin"
-      - key: "Content-Security-Policy"
-        value: "connect-src 'self' https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com; 
-        style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com;
-        font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
-        default-src 'self' https://*.postman.gov.sg;
-        object-src 'none'"
+        - key: "Strict-Transport-Security"
+          value: "max-age=5184000; includeSubDomains"
+        - key: "X-Frame-Options"
+          value: "DENY"
+        - key: "X-XSS-Protection"
+          value: "1; mode=block"
+        - key: "X-Content-Type-Options"
+          value: "nosniff"
+        - key: "X-DNS-Prefetch-Control"
+          value: "off"
+        - key: "X-Download-Options"
+          value: "noopen"
+        - key: "Referrer-Policy"
+          value: "same-origin"
+        - key: "Content-Security-Policy"
+          value:
+            "connect-src 'self' https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com https://www.google-analytics.com;
+            style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com;
+            font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
+            default-src 'self' https://*.postman.gov.sg;
+            object-src 'none';
+            script-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
+            img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com"
     - pattern: "/static/**/*"
       headers:
-      - key: "Cache-Control"
-        value: "public, must-revalidate, max-age=14400"
+        - key: "Cache-Control"
+          value: "public, must-revalidate, max-age=14400"

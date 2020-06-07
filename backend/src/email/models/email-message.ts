@@ -1,7 +1,14 @@
-import { Column, DataType, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript'
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+  BelongsTo,
+} from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'email_messages' , underscored: true, timestamps: true })
+@Table({ tableName: 'email_messages', underscored: true, timestamps: true })
 export class EmailMessage extends Model<EmailMessage> {
   @Column({
     type: DataType.BIGINT,
@@ -31,14 +38,13 @@ export class EmailMessage extends Model<EmailMessage> {
 
   @Column(DataType.DATE)
   dequeuedAt?: Date
-  
+
   @Column(DataType.DATE)
   sentAt?: Date
-  
+
   @Column(DataType.DATE)
   deliveredAt?: Date
 
   @Column(DataType.DATE)
   receivedAt?: Date
-
 }

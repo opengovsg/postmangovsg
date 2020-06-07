@@ -1,5 +1,5 @@
 import config from '@core/config'
-import TemplateClient  from '@core/services/template-client.class'
+import TemplateClient from '@core/services/template-client.class'
 import { TemplateError } from '@core/errors'
 
 describe('template', () => {
@@ -13,9 +13,9 @@ describe('template', () => {
       const body = 'Hello world'
       expect(templateClient.template(body, params)).toEqual('Hello world')
     })
-  
+
     test('has params', () => {
-      const params = { 'name' : 'test' }
+      const params = { name: 'test' }
       const body = 'Hello {{name}}'
       expect(templateClient.template(body, params)).toEqual('Hello test')
     })
@@ -26,87 +26,90 @@ describe('template', () => {
       expect(templateClient.template(body, params)).toEqual('Hello ')
     })
   })
-  
+
   describe('parsing errors', () => {
     const table = [
-      [ 'unclosed curly braces', 'Hello {{'],
-      [ 'empty variable', '{{}}'],
-      [ 'special character', '{{^^}}'],
-      [ 'single quote', '{{\'}}'],
-      ['should not allow strings in variables', '{{\'hello\'}}'],
+      ['unclosed curly braces', 'Hello {{'],
+      ['empty variable', '{{}}'],
+      ['special character', '{{^^}}'],
+      ['single quote', "{{'}}"],
+      ['should not allow strings in variables', "{{'hello'}}"],
     ]
 
-    test.each(table)(
-      '%s : %s', (_, body) => {
-        expect(() => {templateClient.template(body, {})}).toThrow(TemplateError)
-      }
-    )
+    test.each(table)('%s : %s', (_, body) => {
+      expect(() => {
+        templateClient.template(body, {})
+      }).toThrow(TemplateError)
+    })
   })
 
   // Squirrelly adds a backslash infront of some special characters
   // This test suite is to ensure that the backslash is removed
   describe('no backslash infront of special characters', () => {
     const table = [
-      [ 'Single quote', '\'' ],
-      [ 'Backslash', '\\' ],
+      ['Single quote', "'"],
+      ['Backslash', '\\'],
     ]
 
-    test.each(table)(
-      '%s', (_, body) => {
-        expect(templateClient.template(body, {})).toEqual(body)
-      }
-    )
+    test.each(table)('%s', (_, body) => {
+      expect(templateClient.template(body, {})).toEqual(body)
+    })
   })
 
   describe('xss', () => {
     describe('email', () => {
-      const client: TemplateClient = new TemplateClient(config.get('xssOptions.email'))
+      const client: TemplateClient = new TemplateClient(
+        config.get('xssOptions.email')
+      )
 
       describe('email template should allow b, i, u, br, a, img tags', () => {
         const body =
-        'XSS Test<b>bold</b><u>underline</u><i>italic</i>'+
-        '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>'+
-        '<a href="https://open.gov.sg">Open.gov.sg</a>'
-        
+          'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
+          '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>' +
+          '<a href="https://open.gov.sg">Open.gov.sg</a>'
+
         expect(client.template(body, {})).toEqual(body)
       })
       describe('email template should not allow any other html tags', () => {
-        const script = '<script>alert(\'xss!\')</script>'
+        const script = "<script>alert('xss!')</script>"
         const body =
-        'XSS Test<b>bold</b><u>underline</u><i>italic</i>'+
-        '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>'+
-        '<a href="https://open.gov.sg">Open.gov.sg</a>'
-        const strippedScript = 'alert(\'xss!\')' 
+          'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
+          '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>' +
+          '<a href="https://open.gov.sg">Open.gov.sg</a>'
+        const strippedScript = "alert('xss!')"
 
-        expect(client.template(script+body, {})).toEqual(strippedScript+body)
+        expect(client.template(script + body, {})).toEqual(
+          strippedScript + body
+        )
       })
       describe('email template should also strip params of tags', () => {
-        const params = { xss : '<script>alert(\'xss!\')</script>', text: 'hello' }
+        const params = { xss: "<script>alert('xss!')</script>", text: 'hello' }
         const body = 'test {{xss}} {{text}}'
-        const output = 'test alert(\'xss!\') hello'
+        const output = "test alert('xss!') hello"
         expect(client.template(body, params)).toEqual(output)
       })
     })
     describe('sms', () => {
-      const client: TemplateClient = new TemplateClient(config.get('xssOptions.sms'))
+      const client: TemplateClient = new TemplateClient(
+        config.get('xssOptions.sms')
+      )
 
       describe('sms template should not allow any html tags except br', () => {
-        const body = 'XSS Test<b>bold</b><u>underline</u><i>italic</i>'+
-      '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>'+
-      '<a href="https://open.gov.sg">Open.gov.sg</a>'
-        const output = 'XSS Testboldunderlineitalic'+
-      'Open.gov.sg'
+        const body =
+          'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
+          '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>' +
+          '<a href="https://open.gov.sg">Open.gov.sg</a>'
+        const output = 'XSS Testboldunderlineitalic' + 'Open.gov.sg'
 
         expect(client.template(body, {})).toEqual(output)
       })
       describe('sms template should also strip params of tags', () => {
-        const params = { xss : '<script>alert(\'xss!\')</script>', text: 'hello' }
+        const params = { xss: "<script>alert('xss!')</script>", text: 'hello' }
         const body = 'test {{xss}} {{text}}'
-        const output = 'test alert(\'xss!\') hello'
+        const output = "test alert('xss!') hello"
 
         expect(client.template(body, params)).toEqual(output)
       })
     })
-
   })
 })

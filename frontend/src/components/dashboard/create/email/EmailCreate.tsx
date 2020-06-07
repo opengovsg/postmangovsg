@@ -19,13 +19,20 @@ const EMAIL_PROGRESS_STEPS = [
   'Send',
 ]
 
-const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign }) => {
+const CreateEmail = ({
+  campaign: initialCampaign,
+}: {
+  campaign: EmailCampaign
+}) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
 
   // Modifies campaign object in state and navigates to next step
   const onNext = (changes: any, next = true) => {
-    const updatedCampaign = Object.assign(cloneDeep(campaign), changes) as EmailCampaign
+    const updatedCampaign = Object.assign(
+      cloneDeep(campaign),
+      changes
+    ) as EmailCampaign
     updatedCampaign.setProgress()
     setCampaign(updatedCampaign)
     if (next) {
@@ -37,44 +44,59 @@ const CreateEmail = ({ campaign: initialCampaign }: { campaign: EmailCampaign })
     switch (activeStep) {
       case EmailProgress.CreateTemplate:
         return (
-          <EmailTemplate subject={campaign.subject} body={campaign.body} replyTo={campaign.replyTo} onNext={onNext} />
+          <EmailTemplate
+            subject={campaign.subject}
+            body={campaign.body}
+            replyTo={campaign.replyTo}
+            onNext={onNext}
+          />
         )
       case EmailProgress.UploadRecipients:
         return (
-          <EmailRecipients params={campaign.params} csvFilename={campaign.csvFilename} numRecipients={campaign.numRecipients} onNext={onNext} />
+          <EmailRecipients
+            params={campaign.params}
+            csvFilename={campaign.csvFilename}
+            numRecipients={campaign.numRecipients}
+            onNext={onNext}
+          />
         )
       case EmailProgress.SendTestMessage:
         return (
-          <EmailCredentials hasCredential={campaign.hasCredential} onNext={onNext} />
+          <EmailCredentials
+            hasCredential={campaign.hasCredential}
+            onNext={onNext}
+          />
         )
       case EmailProgress.Send:
         return (
           <EmailSend numRecipients={campaign.numRecipients} onNext={onNext} />
         )
       default:
-        return (<p>Invalid step</p>)
+        return <p>Invalid step</p>
     }
   }
 
-
   return (
     <div className={styles.createContainer}>
-      {
-        campaign.status !== Status.Draft
-          ? (
-            <div className={styles.stepContainer}>
-              <EmailDetail id={campaign.id} sentAt={campaign.sentAt} numRecipients={campaign.numRecipients}></EmailDetail>
-            </div>
-          )
-          : (
-            <>
-              <ProgressPane steps={EMAIL_PROGRESS_STEPS} activeStep={activeStep} setActiveStep={setActiveStep} progress={campaign.progress} />
-              <div className={styles.stepContainer}>
-                {renderStep()}
-              </div>
-            </>
-          )
-      }
+      {campaign.status !== Status.Draft ? (
+        <div className={styles.stepContainer}>
+          <EmailDetail
+            id={campaign.id}
+            sentAt={campaign.sentAt}
+            numRecipients={campaign.numRecipients}
+          ></EmailDetail>
+        </div>
+      ) : (
+        <>
+          <ProgressPane
+            steps={EMAIL_PROGRESS_STEPS}
+            activeStep={activeStep}
+            setActiveStep={setActiveStep}
+            progress={campaign.progress}
+          />
+          <div className={styles.stepContainer}>{renderStep()}</div>
+        </>
+      )}
     </div>
   )
 }

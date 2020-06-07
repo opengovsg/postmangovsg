@@ -1,10 +1,10 @@
 export interface HashedOtp {
-  hash: string;
-  retries: number;
-  createdAt: number; // Date.getTime() milliseconds
+  hash: string
+  retries: number
+  createdAt: number // Date.getTime() milliseconds
 }
 
 export interface VerifyOtpInput {
-  email: string;
-  otp: string;
+  email: string
+  otp: string
 }

@@ -1,24 +1,24 @@
 import { SmsTemplate } from '@sms/models'
 
 export interface StoreTemplateInput {
-    campaignId: number;
-    body: string;
-  }
+  campaignId: number
+  body: string
+}
 export interface StoreTemplateOutput {
-    updatedTemplate: SmsTemplate;
-    numRecipients: number;
-    check?: {
-      reupload: boolean;
-      extraKeys?: string[];
-    };
-    valid?: boolean;
+  updatedTemplate: SmsTemplate
+  numRecipients: number
+  check?: {
+    reupload: boolean
+    extraKeys?: string[]
+  }
+  valid?: boolean
 }
 
 /**
  * @swagger
  *  components:
  *    schemas:
- * 
+ *
  *      SMSCampaign:
  *       type: object
  *       properties:
@@ -34,7 +34,9 @@ export interface StoreTemplateOutput {
  *         valid:
  *           type: boolean
  *         csv_filename:
- *           type: string 
+ *           type: string
+ *         num_recipients:
+ *           type: number
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
  *           default: 'SMS'

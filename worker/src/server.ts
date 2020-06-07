@@ -10,7 +10,6 @@ const start = async (): Promise<void> => {
   await loaders()
 }
 
-start()
-  .catch((err) => {
-    console.error(err)
-  })
+start().catch((err) => {
+  console.error(err)
+})

@@ -3,15 +3,19 @@ import { EmailService } from '@email/services'
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const isEmailCampaignOwnedByUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   const { campaignId } = req.params
   const userId = req.session?.user?.id
   try {
-    const campaign = EmailService.findCampaign(+campaignId, +userId) 
+    const campaign = await EmailService.findCampaign(+campaignId, +userId)
     return campaign ? next() : res.sendStatus(403)
   } catch (err) {
     return next(err)
@@ -19,11 +23,14 @@ const isEmailCampaignOwnedByUser = async (req: Request, res: Response, next: Nex
 }
 
 /**
- * Sends a test message. If the test message succeeds, store the credentials 
- * @param req 
- * @param res 
+ * Sends a test message. If the test message succeeds, store the credentials
+ * @param req
+ * @param res
  */
-const validateAndStoreCredentials = async (req: Request, res: Response): Promise<Response | void> => {
+const validateAndStoreCredentials = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
     const { recipient } = req.body
@@ -37,11 +44,15 @@ const validateAndStoreCredentials = async (req: Request, res: Response): Promise
 
 /**
  * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const getCampaignDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
     const result = await EmailService.getCampaignDetails(+campaignId)
@@ -53,35 +64,37 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
 
 /**
  * Retrieves a message for this campaign
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const previewFirstMessage = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const previewFirstMessage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
     const message = await EmailService.getHydratedMessage(+campaignId)
-    
+
     if (!message) return res.json({})
-    
-    // eslint-disable-next-line @typescript-eslint/camelcase
+
     const { body, subject, replyTo: reply_to } = message
     return res.json({
       preview: {
         body,
         subject,
-        // eslint-disable-next-line @typescript-eslint/camelcase
         reply_to,
       },
     })
-  } catch (err){
+  } catch (err) {
     return next(err)
   }
 }
 
 export const EmailMiddleware = {
-  isEmailCampaignOwnedByUser, 
-  validateAndStoreCredentials, 
-  getCampaignDetails, 
-  previewFirstMessage, 
+  isEmailCampaignOwnedByUser,
+  validateAndStoreCredentials,
+  getCampaignDetails,
+  previewFirstMessage,
 }

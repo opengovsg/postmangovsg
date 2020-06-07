@@ -4,36 +4,50 @@ import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
 import { MailService } from '@core/services'
-import { MailToSend, GetCampaignDetailsOutput } from '@core/interfaces'
+import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
 
 /**
  * Gets a message's parameters
- * @param campaignId 
+ * @param campaignId
  */
-const getParams = async (campaignId: number): Promise<{ [key: string]: string } | void> => {
-  const emailMessage = await EmailMessage.findOne({ where: { campaignId }, attributes: ['params'] })
+const getParams = async (
+  campaignId: number
+): Promise<{ [key: string]: string } | void> => {
+  const emailMessage = await EmailMessage.findOne({
+    where: { campaignId },
+    attributes: ['params'],
+  })
   if (!emailMessage) return
   return emailMessage.params as { [key: string]: string }
 }
 
 /**
  * Replaces template's attributes with a message's parameters to return the hydrated message
- * @param campaignId 
+ * @param campaignId
  */
-const getHydratedMessage = async (campaignId: number): Promise<{ body: string; subject: string; replyTo: string | null } | void> => {
+const getHydratedMessage = async (
+  campaignId: number
+): Promise<{
+  body: string
+  subject: string
+  replyTo: string | null
+} | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
 
   // Get params
   const params = await getParams(campaignId)
-    
+
   if (!template || !params) return
-  
+
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
-  const subject = EmailTemplateService.client.template(template?.subject!, params)
+  const subject = EmailTemplateService.client.template(
+    template?.subject!,
+    params
+  )
   const body = EmailTemplateService.client.template(template?.body!, params)
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
   return { body, subject, replyTo: template.replyTo || null }
@@ -41,28 +55,31 @@ const getHydratedMessage = async (campaignId: number): Promise<{ body: string; s
 
 /**
  * Formats mail into format that node mailer accepts
- * @param campaignId 
- * @param recipient 
+ * @param campaignId
+ * @param recipient
  */
-const getCampaignMessage = async (campaignId: number, recipient: string): Promise<MailToSend | void> => {
-  // get the body and subject 
+const getCampaignMessage = async (
+  campaignId: number,
+  recipient: string
+): Promise<MailToSend | void> => {
+  // get the body and subject
   const message = await getHydratedMessage(campaignId)
-  if (message){
+  if (message) {
     const { body, subject, replyTo } = message
-    const mailToSend: MailToSend=  ({
+    const mailToSend: MailToSend = {
       recipients: [recipient],
       body,
       subject,
       ...(replyTo ? { replyTo } : {}),
-    })
+    }
     return mailToSend
   }
-  return 
+  return
 }
 
 /**
  * Sends message
- * @param mail 
+ * @param mail
  */
 const sendEmail = async (mail: MailToSend): Promise<string | void> => {
   try {
@@ -72,23 +89,31 @@ const sendEmail = async (mail: MailToSend): Promise<string | void> => {
     return
   }
 }
-  
+
 /**
  * Helper method to find an email campaign owned by that user
- * @param campaignId 
- * @param userId 
+ * @param campaignId
+ * @param userId
  */
-const findCampaign = (campaignId: number, userId: number): Promise<Campaign> => {
-  return Campaign.findOne({ where: { id: +campaignId, userId, type: ChannelType.Email } })
+const findCampaign = (
+  campaignId: number,
+  userId: number
+): Promise<Campaign> => {
+  return Campaign.findOne({
+    where: { id: +campaignId, userId, type: ChannelType.Email },
+  })
 }
 
 /**
  * Sends a templated email to the campaign admin
- * @param campaignId 
- * @param recipient 
+ * @param campaignId
+ * @param recipient
  * @throws Error if it cannot send an email
  */
-const sendCampaignMessage = async (campaignId: number, recipient: string): Promise<void> => {
+const sendCampaignMessage = async (
+  campaignId: number,
+  recipient: string
+): Promise<void> => {
   const mail = await getCampaignMessage(+campaignId, recipient)
   if (!mail) throw new Error('No message to send')
   // Send email using node mailer
@@ -97,47 +122,61 @@ const sendCampaignMessage = async (campaignId: number, recipient: string): Promi
 }
 
 /**
- * As email credentials are shared globally amongst campaigns, 
+ * As email credentials are shared globally amongst campaigns,
  * update the credential column for the campaign with the default credential
- * @param campaignId 
+ * @param campaignId
  */
-const setCampaignCredential = (campaignId: number): Promise<[number, Campaign[]]> => {
-  return Campaign.update({ credName: 'EMAIL_DEFAULT' }, { where: { id: campaignId } })
+const setCampaignCredential = (
+  campaignId: number
+): Promise<[number, Campaign[]]> => {
+  return Campaign.update(
+    { credName: 'EMAIL_DEFAULT' },
+    { where: { id: campaignId } }
+  )
 }
 
 /**
  * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
- * @param campaignId 
+ * @param campaignId
  */
-const getCampaignDetails = async (campaignId: number): Promise<GetCampaignDetailsOutput> => {
-  const [campaignDetails, numRecipients] =  await Promise.all(
-    [
-      Campaign.findOne({ 
-        where: { id: +campaignId }, 
-        attributes: [
-          'id', 'name', 'type', 'created_at', 'valid',
-          [literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'), 'has_credential'],
-          [literal('s3_object -> \'filename\''), 'csv_filename'],
+const getCampaignDetails = async (
+  campaignId: number
+): Promise<CampaignDetails> => {
+  const [campaignDetails, numRecipients] = await Promise.all([
+    Campaign.findOne({
+      where: { id: +campaignId },
+      attributes: [
+        'id',
+        'name',
+        'type',
+        'created_at',
+        'valid',
+        [
+          literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
+          'has_credential',
         ],
-        include: [
-          {
-            model: JobQueue,
-            attributes: ['status', ['created_at', 'sent_at']],
-          },
-          {
-            model: EmailTemplate,
-            attributes: ['body', 'subject', 'params', 'reply_to'],
-          }],
-      }),
-      EmailMessage.count(
+        [literal("s3_object -> 'filename'"), 'csv_filename'],
+      ],
+      include: [
         {
-          where: { campaignId: +campaignId },
-        }
-      ),
-    ]
-  )
+          model: JobQueue,
+          attributes: ['status', ['created_at', 'sent_at']],
+        },
+        {
+          model: EmailTemplate,
+          attributes: ['body', 'subject', 'params', 'reply_to'],
+        },
+      ],
+    }),
+    EmailMessage.count({
+      where: { campaignId: +campaignId },
+    }),
+  ])
 
-  return { ...campaignDetails?.get({ plain: true }), 'num_recipients': numRecipients } as GetCampaignDetailsOutput
+  return {
+    ...campaignDetails?.get({ plain: true }),
+    num_recipients: numRecipients,
+  } as CampaignDetails
 }
 
 export const EmailService = {

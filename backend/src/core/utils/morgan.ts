@@ -16,7 +16,9 @@ const clientIp = (req: Request, _res: Response): string => {
 }
 
 const userId = (req: Request, _res: Response): string | undefined => {
-  return req?.session?.user?.id
+  const apiKey = req?.session?.apiKey
+  const userId = req?.session?.user?.id
+  return userId ? `${userId}${apiKey ? '-api' : ''}` : undefined
 }
 
 export { clientIp, userId }

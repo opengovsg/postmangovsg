@@ -5,16 +5,20 @@ import { SmsService } from '@sms/services'
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'SMS' type, and belongs to the user
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const isSmsCampaignOwnedByUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const userId = req.session?.user?.id 
+    const userId = req.session?.user?.id
     const campaign = await SmsService.findCampaign(+campaignId, +userId)
-    return campaign ? next() : res.sendStatus(400)
+    return campaign ? next() : res.sendStatus(403)
   } catch (err) {
     return next(err)
   }
@@ -22,16 +26,20 @@ const isSmsCampaignOwnedByUser = async (req: Request, res: Response, next: NextF
 
 /**
  * Parse twilio credentials from request body, setting it to res.locals.credentials to be passed downstream
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const getCredentialsFromBody = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const getCredentialsFromBody = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const {
-    'twilio_account_sid': accountSid,
-    'twilio_api_key': apiKey,
-    'twilio_api_secret': apiSecret,
-    'twilio_messaging_service_sid': messagingServiceSid,
+    twilio_account_sid: accountSid,
+    twilio_api_key: apiKey,
+    twilio_api_secret: apiSecret,
+    twilio_messaging_service_sid: messagingServiceSid,
   } = req.body
 
   res.locals.credentials = {
@@ -44,13 +52,17 @@ const getCredentialsFromBody = async (req: Request, res: Response, next: NextFun
 }
 
 /**
- * Parse label from request body. Retrieve credentials associated with this label, 
+ * Parse label from request body. Retrieve credentials associated with this label,
  * and set the credentials to res.locals.credentials, credName to res.locals.credentialName, to be passed downstream
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const getCredentialsFromLabel = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const getCredentialsFromLabel = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const { label } = req.body
   const userId = req.session?.user?.id
   try {
@@ -60,7 +72,9 @@ const getCredentialsFromLabel = async (req: Request, res: Response, next: NextFu
       res.status(400).json({ message: 'User credentials cannot be found' })
       return
     }
-    const credentials = await CredentialService.getTwilioCredentials(userCred.credName)
+    const credentials = await CredentialService.getTwilioCredentials(
+      userCred.credName
+    )
     res.locals.credentials = credentials
     res.locals.credentialName = userCred.credName
     return next()
@@ -70,13 +84,17 @@ const getCredentialsFromLabel = async (req: Request, res: Response, next: NextFu
 }
 
 /**
- * Sends a test message. If the test message succeeds, 
+ * Sends a test message. If the test message succeeds,
  * store the credentials in AWS secrets manager and db.
  * Set the credentialName and channelType in res.locals to be passed downstream
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
-const validateAndStoreCredentials = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const validateAndStoreCredentials = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   const { recipient } = req.body
   const { campaignId } = req.params
   const { credentials, credentialName } = res.locals
@@ -92,15 +110,19 @@ const validateAndStoreCredentials = async (req: Request, res: Response, next: Ne
     if (credentialName) {
       return next()
     }
-  }
-  catch (err) {
+  } catch (err) {
     return res.status(400).json({ message: `${err}` })
   }
   try {
     // Store credentials in AWS secrets manager
     const stringifiedCredential = JSON.stringify(credentials)
-    const credentialName = await SmsService.getEncodedHash(stringifiedCredential)
-    await CredentialService.storeCredential(credentialName, stringifiedCredential)
+    const credentialName = await SmsService.getEncodedHash(
+      stringifiedCredential
+    )
+    await CredentialService.storeCredential(
+      credentialName,
+      stringifiedCredential
+    )
     // Pass on to next middleware/handler
     res.locals.credentialName = credentialName
     res.locals.channelType = ChannelType.SMS
@@ -112,11 +134,15 @@ const validateAndStoreCredentials = async (req: Request, res: Response, next: Ne
 
 /**
  * Associate campaign with a credential
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const setCampaignCredential = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const setCampaignCredential = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
     const { credentialName } = res.locals
@@ -132,11 +158,15 @@ const setCampaignCredential = async (req: Request, res: Response, next: NextFunc
 
 /**
  * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const getCampaignDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const getCampaignDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
     const result = await SmsService.getCampaignDetails(+campaignId)
@@ -148,11 +178,15 @@ const getCampaignDetails = async (req: Request, res: Response, next: NextFunctio
 
 /**
  * Retrieves a message for this campaign
- * @param req 
- * @param res 
- * @param next 
+ * @param req
+ * @param res
+ * @param next
  */
-const previewFirstMessage = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const previewFirstMessage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
     return res.json({
@@ -163,12 +197,12 @@ const previewFirstMessage = async (req: Request, res: Response, next: NextFuncti
   }
 }
 
-export const SmsMiddleware = { 
+export const SmsMiddleware = {
   getCredentialsFromBody,
   getCredentialsFromLabel,
   isSmsCampaignOwnedByUser,
   validateAndStoreCredentials,
-  setCampaignCredential, 
+  setCampaignCredential,
   getCampaignDetails,
-  previewFirstMessage, 
+  previewFirstMessage,
 }

@@ -6,8 +6,13 @@ import { useParams } from 'react-router-dom'
 
 import EmailValidationInput from './EmailValidationInput'
 
-const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { hasCredential: boolean; onNext: (changes: any, next?: boolean) => void }) => {
-
+const EmailCredentials = ({
+  hasCredential: initialHasCredential,
+  onNext,
+}: {
+  hasCredential: boolean
+  onNext: (changes: any, next?: boolean) => void
+}) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
@@ -37,27 +42,27 @@ const EmailCredentials = ({ hasCredential: initialHasCredential, onNext }: { has
         <>
           <h2>Send a test email</h2>
           <p>You can preview your message by sending an email to yourself. </p>
-          <EmailValidationInput
-            onClick={handleTestSend}
-          />
-          <ErrorBlock>
-            {errorMsg}
-          </ErrorBlock>
+          <EmailValidationInput onClick={handleTestSend} />
+          <ErrorBlock>{errorMsg}</ErrorBlock>
 
-          {
-            hasCredential &&
+          {hasCredential && (
             <InfoBlock>
               <li>
                 <i className="bx bx-check-circle"></i>
-                <span>Email credentials have been validated but you may continue to send test messages.</span>
+                <span>
+                  Email credentials have been validated but you may continue to
+                  send test messages.
+                </span>
               </li>
             </InfoBlock>
-          }
+          )}
 
           <div className="separator"></div>
 
           <div className="progress-button">
-            <PrimaryButton disabled={!hasCredential} onClick={onNext}>Send messages →</PrimaryButton>
+            <PrimaryButton disabled={!hasCredential} onClick={onNext}>
+              Send messages →
+            </PrimaryButton>
           </div>
         </>
       }

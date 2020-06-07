@@ -5,8 +5,19 @@ import cx from 'classnames'
 import { CampaignStats, Status } from 'classes/Campaign'
 import { ProgressBar, PrimaryButton } from 'components/common'
 import styles from './ProgressDetails.module.scss'
-const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetry }:
-  { sentAt: Date; numRecipients: number; stats: CampaignStats; handlePause: Function; handleRetry: Function }) => {
+const ProgressDetails = ({
+  sentAt,
+  numRecipients,
+  stats,
+  handlePause,
+  handleRetry,
+}: {
+  sentAt: Date
+  numRecipients: number
+  stats: CampaignStats
+  handlePause: Function
+  handleRetry: Function
+}) => {
   const { status, error, unsent, sent } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
@@ -18,7 +29,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
   function renderButton() {
     if (!isSent) {
       return (
-        <PrimaryButton className={styles.pause} onClick={handlePause} >
+        <PrimaryButton className={styles.pause} onClick={handlePause}>
           Pause sending
           <i className={cx(styles.icon, 'bx bx-error-circle')}></i>
         </PrimaryButton>
@@ -26,7 +37,7 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
     }
     if (!isComplete) {
       return (
-        <PrimaryButton className={styles.retry} onClick={handleRetry} >
+        <PrimaryButton className={styles.retry} onClick={handleRetry}>
           Retry/Resume sending
           <i className={cx(styles.icon, 'bx bx-revision')}></i>
         </PrimaryButton>
@@ -49,24 +60,24 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
           <tbody>
             <tr>
               <td className={'md'}>
-                <Moment format='LLL'>{sentAt}</Moment>
+                <Moment format="LLL">{sentAt}</Moment>
               </td>
 
-              <td className={'md'}>
-                {numRecipients}
-              </td>
-              <td className={cx(styles.campaignStatus, 'sm')}>
-                {status}
-              </td>
+              <td className={'md'}>{numRecipients}</td>
+              <td className={cx(styles.campaignStatus, 'sm')}>{status}</td>
             </tr>
           </tbody>
         </table>
 
         <div className={styles.progressTitle}>
-          <h2>{isComplete ? 'Sending completed': 'Progress' }</h2>
+          <h2>{isComplete ? 'Sending completed' : 'Progress'}</h2>
           {renderButton()}
         </div>
-        <ProgressBar progress={numRecipients - unsent} total={numRecipients} isComplete={isComplete}/>
+        <ProgressBar
+          progress={numRecipients - unsent}
+          total={numRecipients}
+          isComplete={isComplete}
+        />
 
         <table className={styles.stats}>
           <thead>
@@ -79,7 +90,9 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
           <tbody>
             <tr>
               <td className={cx(styles.status, 'md')}>
-                <i className={cx(styles.icon, styles.red, 'bx bx-error-circle')}></i>
+                <i
+                  className={cx(styles.icon, styles.red, 'bx bx-error-circle')}
+                ></i>
                 Error
               </td>
               <td className={'md'}>Could not be sent</td>
@@ -87,7 +100,9 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
             </tr>
             <tr>
               <td className={cx(styles.status, 'md')}>
-                <i className={cx(styles.icon, styles.blue, 'bx bx-time-five')}></i>
+                <i
+                  className={cx(styles.icon, styles.blue, 'bx bx-time-five')}
+                ></i>
                 Unsent
               </td>
               <td className={'md'}>In the queue</td>
@@ -95,7 +110,13 @@ const ProgressDetails = ({ sentAt, numRecipients, stats, handlePause, handleRetr
             </tr>
             <tr>
               <td className={cx(styles.status, 'md')}>
-                <i className={cx(styles.icon, styles.green, 'bx bx-check-circle')}></i>
+                <i
+                  className={cx(
+                    styles.icon,
+                    styles.green,
+                    'bx bx-check-circle'
+                  )}
+                ></i>
                 Sent
               </td>
               <td className={'md'}>Sent to recipient</td>

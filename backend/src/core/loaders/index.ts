@@ -6,7 +6,6 @@ import sessionLoader from './session.loader'
 import sequelizeLoader from './sequelize.loader'
 import cloudwatchLoader from './cloudwatch.loader'
 
-
 const loaders = async ({ app }: { app: Application }): Promise<void> => {
   securityHeadersLoader({ app })
   await cloudwatchLoader()

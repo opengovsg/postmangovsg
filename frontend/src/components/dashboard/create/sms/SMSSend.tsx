@@ -1,16 +1,27 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Status } from 'classes'
+import { Status, ChannelType } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
-import { PreviewBlock, PrimaryButton, SendRate, ConfirmModal } from 'components/common'
+import {
+  PreviewBlock,
+  PrimaryButton,
+  SendRate,
+  ConfirmModal,
+} from 'components/common'
 import { getPreviewMessage } from 'services/sms.service'
 import { sendCampaign } from 'services/campaign.service'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
-const SMSSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: Function }) => {
-
+const SMSSend = ({
+  numRecipients,
+  onNext,
+}: {
+  numRecipients: number
+  onNext: Function
+}) => {
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')
@@ -20,24 +31,26 @@ const SMSSend = ({ numRecipients, onNext }: { numRecipients: number; onNext: Fun
     throw new Error('Invalid campaign id')
   }
 
-  useEffect(() => {
-    loadPreview()
-  }, [campaignId])
-
-  async function loadPreview() {
-    if (campaignId) {
-      try {
-        const msgPreview = await getPreviewMessage(+campaignId)
-        if (msgPreview) {
-          setPreview(msgPreview)
-        }
+  async function loadPreview(campaignId: string) {
+    try {
+      const msgPreview = await getPreviewMessage(+campaignId)
+      if (msgPreview) {
+        setPreview(msgPreview)
+      }
       // eslint-disable-next-line no-empty
-      } catch (err){}
-    }
+    } catch (err) {}
   }
+
+  useEffect(() => {
+    if (!campaignId) return
+    loadPreview(campaignId)
+  }, [campaignId])
 
   const onModalConfirm = async () => {
     await sendCampaign(+campaignId, +sendRate)
+    if (sendRate) {
+      sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, ChannelType.SMS)
+    }
     onNext({ status: Status.Sending }, false)
   }
 

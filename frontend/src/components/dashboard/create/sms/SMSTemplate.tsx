@@ -4,8 +4,13 @@ import { TextArea, PrimaryButton, ErrorBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/sms.service'
 
-const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (changes: any, next?: boolean) => void }) => {
-
+const SMSTemplate = ({
+  body: initialBody,
+  onNext,
+}: {
+  body: string
+  onNext: (changes: any, next?: boolean) => void
+}) => {
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
@@ -16,15 +21,22 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
-      const { updatedTemplate, numRecipients } = await saveTemplate(+campaignId, body)
-      onNext({ body: updatedTemplate?.body, params: updatedTemplate?.params, numRecipients })
+      const { updatedTemplate, numRecipients } = await saveTemplate(
+        +campaignId,
+        body
+      )
+      onNext({
+        body: updatedTemplate?.body,
+        params: updatedTemplate?.params,
+        numRecipients,
+      })
     } catch (err) {
       setErrorMsg(err.message)
     }
   }
 
   function replaceNewLines(body: string): string {
-    return (body||'').replace(/<br\s*\/?>/g, '\n')
+    return (body || '').replace(/<br\s*\/?>/g, '\n')
   }
 
   return (
@@ -33,19 +45,29 @@ const SMSTemplate = ({ body: initialBody, onNext }: { body: string; onNext: (cha
       <h2>Create message template</h2>
       <h4>Message</h4>
       <p>
-        To personalise your message, include keywords that are surrounded by double curly braces.
-        The keywords in your message template should match the headers in your recipients CSV file.
+        To personalise your message, include keywords that are surrounded by
+        double curly braces. The keywords in your message template should match
+        the headers in your recipients CSV file.
         <br />
         <b>Note:</b> Recipient is a required column in the CSV file.
       </p>
       <p>
-        Example<br />
-        Reminder: Dear <b>{'{{ name }}'}</b>, your next appointment at <b>{'{{ clinic }}'}</b> is on <b>{'{{ date }}'} </b>
+        Example
+        <br />
+        Reminder: Dear <b>{'{{ name }}'}</b>, your next appointment at{' '}
+        <b>{'{{ clinic }}'}</b> is on <b>{'{{ date }}'} </b>
         at <b>{'{{ time }}'}</b>.
       </p>
-      <TextArea placeholder="Enter message" highlight={true} value={body} onChange={setBody} />
+      <TextArea
+        placeholder="Enter message"
+        highlight={true}
+        value={body}
+        onChange={setBody}
+      />
       <div className="progress-button">
-        <PrimaryButton disabled={!body} onClick={handleSaveTemplate}>Upload recipients →</PrimaryButton>
+        <PrimaryButton disabled={!body} onClick={handleSaveTemplate}>
+          Upload recipients →
+        </PrimaryButton>
       </div>
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>

@@ -5,79 +5,54 @@ import {
   TemplateMiddleware,
   JobMiddleware,
 } from '@core/middlewares'
-import { SmsMiddleware, SmsStatsMiddleware, SmsTemplateMiddleware } from '@sms/middlewares'
-
+import {
+  SmsMiddleware,
+  SmsStatsMiddleware,
+  SmsTemplateMiddleware,
+} from '@sms/middlewares'
 
 const router = Router({ mergeParams: true })
 
 // validators
 const storeTemplateValidator = {
   [Segments.BODY]: Joi.object({
-    body: Joi
-      .string()
-      .required(),
+    body: Joi.string().required(),
   }),
 }
 
 const uploadStartValidator = {
   [Segments.QUERY]: Joi.object({
-    'mime_type': Joi
-      .string()
-      .required(),
+    mime_type: Joi.string().required(),
   }),
 }
 
 const uploadCompleteValidator = {
   [Segments.BODY]: Joi.object({
-    'transaction_id': Joi.string().required(),
+    transaction_id: Joi.string().required(),
     filename: Joi.string().required(),
   }),
 }
 
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    'twilio_account_sid': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_api_secret': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_api_key': Joi
-      .string()
-      .trim()
-      .required(),
-    'twilio_messaging_service_sid': Joi
-      .string()
-      .trim()
-      .required(),
-    recipient: Joi
-      .string()
-      .trim()
-      .required(),
+    twilio_account_sid: Joi.string().trim().required(),
+    twilio_api_secret: Joi.string().trim().required(),
+    twilio_api_key: Joi.string().trim().required(),
+    twilio_messaging_service_sid: Joi.string().trim().required(),
+    recipient: Joi.string().trim().required(),
   }),
 }
 
 const useCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    label: Joi
-      .string()
-      .required(),
-    recipient: Joi
-      .string()
-      .trim()
-      .required(),
+    label: Joi.string().required(),
+    recipient: Joi.string().trim().required(),
   }),
 }
 
 const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
-    rate: Joi
-      .number()
-      .integer()
-      .positive()
-      .default(10),
+    rate: Joi.number().integer().positive().default(10),
   }),
 }
 
@@ -107,7 +82,7 @@ router.use(SmsMiddleware.isSmsCampaignOwnedByUser)
  *            application/json:
  *              schema:
  *                $ref: '#/components/schemas/SMSCampaign'
- * 
+ *
  *        "401":
  *           description: Unauthorized
  *        "403" :
@@ -183,7 +158,12 @@ router.get('/', SmsMiddleware.getCampaignDetails)
  *         "500":
  *           description: Internal Server Error
  */
-router.put('/template', celebrate(storeTemplateValidator), CampaignMiddleware.canEditCampaign, SmsTemplateMiddleware.storeTemplate)
+router.put(
+  '/template',
+  celebrate(storeTemplateValidator),
+  CampaignMiddleware.canEditCampaign,
+  SmsTemplateMiddleware.storeTemplate
+)
 
 /**
  * @swagger
@@ -225,7 +205,12 @@ router.put('/template', celebrate(storeTemplateValidator), CampaignMiddleware.ca
  *         "500":
  *           description: Internal Server Error
  */
-router.get('/upload/start', celebrate(uploadStartValidator), CampaignMiddleware.canEditCampaign, TemplateMiddleware.uploadStartHandler)
+router.get(
+  '/upload/start',
+  celebrate(uploadStartValidator),
+  CampaignMiddleware.canEditCampaign,
+  TemplateMiddleware.uploadStartHandler
+)
 
 /**
  * @swagger
@@ -277,7 +262,12 @@ router.get('/upload/start', celebrate(uploadStartValidator), CampaignMiddleware.
  *         "500":
  *           description: Internal Server Error
  */
-router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMiddleware.canEditCampaign, SmsTemplateMiddleware.uploadCompleteHandler)
+router.post(
+  '/upload/complete',
+  celebrate(uploadCompleteValidator),
+  CampaignMiddleware.canEditCampaign,
+  SmsTemplateMiddleware.uploadCompleteHandler
+)
 
 /**
  * @swagger
@@ -298,7 +288,7 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMidd
  *        content:
  *          application/json:
  *            schema:
- *              allOf: 
+ *              allOf:
  *                - $ref: '#/components/schemas/TwilioCredentials'
  *                - type: object
  *                  properties:
@@ -321,11 +311,14 @@ router.post('/upload/complete', celebrate(uploadCompleteValidator), CampaignMidd
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/new-credentials', celebrate(storeCredentialsValidator),
-  CampaignMiddleware.canEditCampaign, 
-  SmsMiddleware.getCredentialsFromBody, 
-  SmsMiddleware.validateAndStoreCredentials, 
-  SmsMiddleware.setCampaignCredential)
+router.post(
+  '/new-credentials',
+  celebrate(storeCredentialsValidator),
+  CampaignMiddleware.canEditCampaign,
+  SmsMiddleware.getCredentialsFromBody,
+  SmsMiddleware.validateAndStoreCredentials,
+  SmsMiddleware.setCampaignCredential
+)
 
 /**
  * @swagger
@@ -369,11 +362,14 @@ router.post('/new-credentials', celebrate(storeCredentialsValidator),
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/credentials', celebrate(useCredentialsValidator), 
-  CampaignMiddleware.canEditCampaign, 
-  SmsMiddleware.getCredentialsFromLabel, 
-  SmsMiddleware.validateAndStoreCredentials, 
-  SmsMiddleware.setCampaignCredential)
+router.post(
+  '/credentials',
+  celebrate(useCredentialsValidator),
+  CampaignMiddleware.canEditCampaign,
+  SmsMiddleware.getCredentialsFromLabel,
+  SmsMiddleware.validateAndStoreCredentials,
+  SmsMiddleware.setCampaignCredential
+)
 
 /**
  * @swagger
@@ -401,11 +397,11 @@ router.post('/credentials', celebrate(useCredentialsValidator),
  *                    type: object
  *                    properties:
  *                      body:
- *                        type: string                    
+ *                        type: string
  *        "401":
  *           description: Unauthorized
  *        "500":
- *           description: Internal Server Error                 
+ *           description: Internal Server Error
  */
 router.get('/preview', SmsMiddleware.previewFirstMessage)
 
@@ -457,7 +453,12 @@ router.get('/preview', SmsMiddleware.previewFirstMessage)
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/send', celebrate(sendCampaignValidator), CampaignMiddleware.canEditCampaign, JobMiddleware.sendCampaign)
+router.post(
+  '/send',
+  celebrate(sendCampaignValidator),
+  CampaignMiddleware.canEditCampaign,
+  JobMiddleware.sendCampaign
+)
 
 /**
  * @swagger
@@ -474,7 +475,7 @@ router.post('/send', celebrate(sendCampaignValidator), CampaignMiddleware.canEdi
  *            application/json:
  *              schema:
  *                type: object
-*                properties:
+ *                properties:
  *                 campaign_id:
  *                  type: integer
  *        "401":
@@ -511,12 +512,16 @@ router.post('/stop', JobMiddleware.stopCampaign)
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/retry', CampaignMiddleware.canEditCampaign, JobMiddleware.retryCampaign)
+router.post(
+  '/retry',
+  CampaignMiddleware.canEditCampaign,
+  JobMiddleware.retryCampaign
+)
 
 /**
  * @swagger
  * path:
-*  /campaign/{campaignId}/sms/stats:
+ *  /campaign/{campaignId}/sms/stats:
  *    get:
  *      tags:
  *        - SMS
@@ -542,6 +547,5 @@ router.post('/retry', CampaignMiddleware.canEditCampaign, JobMiddleware.retryCam
  *           description: Internal Server Error
  */
 router.get('/stats', SmsStatsMiddleware.getStats)
-
 
 export default router
