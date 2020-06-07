@@ -5,9 +5,18 @@ import { CloseButton } from 'components/common'
 
 import styles from './ErrorBlock.module.scss'
 
-const ErrorBlock = (props: any) => {
-  const { className, children, absolute, onClose, ...otherProps } = props
-
+const ErrorBlock = ({
+  className,
+  children,
+  absolute,
+  onClose,
+  ...otherProps
+}: {
+  className?: string
+  children?: React.ReactNode
+  absolute?: boolean
+  onClose?: Function
+}) => {
   if (!children) {
     return null
   }

@@ -5,12 +5,10 @@ export async function uploadFileWithPresignedUrl(
   presignedUrl: string
 ): Promise<void> {
   try {
-    const s3AxiosInstance = axios.create({
+    await axios.put(presignedUrl, uploadedFile, {
+      headers: { 'Content-Type': uploadedFile.type },
       withCredentials: false,
       timeout: 0,
-    })
-    await s3AxiosInstance.put(presignedUrl, uploadedFile, {
-      headers: { 'Content-Type': uploadedFile.type },
     })
     return
   } catch (e) {
@@ -18,10 +16,19 @@ export async function uploadFileWithPresignedUrl(
   }
 }
 
-function errorHandler(e: AxiosError) {
-  console.error(e)
-  if (e.response && e.response.statusText) {
-    throw new Error(e.response.statusText)
+export async function deleteCsvStatus(campaignId: number): Promise<void> {
+  try {
+    await axios.delete(`/campaign/${campaignId}/upload/status`)
+  } catch (e) {
+    // No need to throw an error
+    console.error('Error deleting csv error status', e)
   }
-  throw new Error(`${e}`)
+}
+
+function errorHandler(e: AxiosError, defaultMsg?: string): never {
+  console.error(e)
+  if (e.response && e.response.data && e.response.data.message) {
+    throw new Error(e.response.data.message)
+  }
+  throw new Error(defaultMsg || e.response?.statusText)
 }

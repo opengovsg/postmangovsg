@@ -6,7 +6,10 @@ import {
   getPresignedUrl,
   getCsvStatus,
 } from 'services/email.service'
-import { uploadFileWithPresignedUrl } from 'services/upload.service'
+import {
+  uploadFileWithPresignedUrl,
+  deleteCsvStatus,
+} from 'services/upload.service'
 import {
   FileInput,
   InfoBlock,
@@ -82,35 +85,44 @@ const EmailRecipients = ({
     }
   }
 
+  function clearCsvStatus() {
+    if (campaignId) {
+      deleteCsvStatus(+campaignId)
+      setCsvError(null)
+    }
+  }
+
   // Poll csv status
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-
     if (!campaignId) return
 
+    let timeoutId: NodeJS.Timeout
     const pollStatus = async () => {
-      const {
-        isCsvProcessing,
-        csvFilename,
-        tempCsvFilename,
-        csvError,
-        numRecipients,
-        preview,
-      } = await getCsvStatus(+campaignId)
-      setIsCsvProcessing(isCsvProcessing)
-      setTempCsvFilename(tempCsvFilename)
-      setCsvError(csvError)
-      csvFilename && setUploadedCsvFilename(csvFilename)
-      numRecipients && setNumRecipients(numRecipients)
-      preview && setPreview(preview)
-      if (isCsvProcessing) {
-        timeoutId = setTimeout(pollStatus, 2000)
+      try {
+        const {
+          isCsvProcessing,
+          csvFilename,
+          tempCsvFilename,
+          csvError,
+          numRecipients,
+          preview,
+        } = await getCsvStatus(+campaignId)
+        setIsCsvProcessing(isCsvProcessing)
+        setTempCsvFilename(tempCsvFilename)
+        setCsvError(csvError)
+        csvFilename && setUploadedCsvFilename(csvFilename)
+        numRecipients && setNumRecipients(numRecipients)
+        preview && setPreview(preview)
+        if (isCsvProcessing) {
+          timeoutId = setTimeout(pollStatus, 2000)
+        }
+      } catch (e) {
+        setErrorMessage(e.message)
       }
     }
     pollStatus()
-    return () => {
-      timeoutId && clearTimeout(timeoutId)
-    }
+
+    return () => clearTimeout(timeoutId)
   }, [campaignId, isCsvProcessing])
 
   useEffect(() => {
@@ -148,14 +160,10 @@ const EmailRecipients = ({
         <InfoBlock>
           <li>
             <i className="bx bx-loader-alt bx-spin"></i>
-            {tempCsvFilename ? (
-              <p>
-                <b>{tempCsvFilename}</b> is being processed. You may leave this
-                page and check back later.
-              </p>
-            ) : (
-              <p>Getting status...</p>
-            )}
+            <p>
+              <b>{tempCsvFilename || 'Your file'}</b> is being processed. You
+              may leave this page and check back later.
+            </p>
           </li>
         </InfoBlock>
       )
@@ -163,11 +171,10 @@ const EmailRecipients = ({
   }
 
   function renderErrorBlock() {
-    if (isCsvProcessing && errorMessage) {
+    if (isCsvProcessing) {
       return <ErrorBlock>{errorMessage}</ErrorBlock>
-    }
-    if (!isCsvProcessing && csvError) {
-      return <ErrorBlock>{csvError}</ErrorBlock>
+    } else {
+      return <ErrorBlock onClose={clearCsvStatus}>{csvError}</ErrorBlock>
     }
   }
 
