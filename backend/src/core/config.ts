@@ -333,7 +333,7 @@ const config = convict({
   },
   csvProcessingTimeout: {
     doc:
-      'Max duration for csv processing before timeout. Prevent campaigns from being stuck in isCsvProcessing state if server dies.',
+      'Max duration for csv processing before timeout. Prevent campaigns from being stuck in csv processing state if server dies.',
     default: 10 * 60 * 1000, // 10 minutes
     env: 'CSV_PROCESSING_TIMEOUT_IN_MS',
     format: 'int',
