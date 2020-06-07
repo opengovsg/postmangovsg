@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 
-import { Status, CampaignStats } from 'classes/Campaign'
+import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
 import {
   getCampaignStats,
   stopCampaign,
   retryCampaign,
 } from 'services/campaign.service'
 import { ProgressDetails } from 'components/common'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const SMSDetail = ({
   id,
@@ -27,6 +28,7 @@ const SMSDetail = ({
 
   async function handlePause() {
     try {
+      sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.SMS)
       await stopCampaign(id)
       await refreshCampaignStats(id)
     } catch (err) {
@@ -36,6 +38,7 @@ const SMSDetail = ({
 
   async function handleRetry() {
     try {
+      sendUserEvent(GA_USER_EVENTS.RETRY_RESUME_SENDING, ChannelType.SMS)
       await retryCampaign(id)
       await refreshCampaignStats(id)
     } catch (err) {

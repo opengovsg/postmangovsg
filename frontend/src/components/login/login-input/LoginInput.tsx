@@ -1,9 +1,15 @@
 import React, { useState, useContext } from 'react'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
-import { getOtpWithEmail, loginWithOtp } from 'services/auth.service'
+import { getOtpWithEmail, loginWithOtp, getUser } from 'services/auth.service'
 
 import styles from './LoginInput.module.scss'
 import { AuthContext } from 'contexts/auth.context'
+import {
+  GA_USER_EVENTS,
+  setGAUserId,
+  sendUserEvent,
+  sendException,
+} from 'services/ga.service'
 
 const emailText = 'Sign in with your gov.sg email'
 const otpText = 'One-Time Password'
@@ -37,6 +43,7 @@ const Login = () => {
       }, RESEND_WAIT_TIME)
     } catch (err) {
       setErrorMsg(err.message)
+      sendException(err.message)
     }
     setIsLoading(false)
   }
@@ -47,8 +54,11 @@ const Login = () => {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
       setAuthContextEmail(email)
+      const user = await getUser()
+      setGAUserId(user?.id || null)
     } catch (err) {
       setErrorMsg(err.message)
+      sendException(err.message)
     }
     setIsLoading(false)
   }
@@ -62,6 +72,7 @@ const Login = () => {
   function resend() {
     setOtpSent(false)
     sendOtp()
+    sendUserEvent(GA_USER_EVENTS.RESEND_OTP)
   }
 
   function render(

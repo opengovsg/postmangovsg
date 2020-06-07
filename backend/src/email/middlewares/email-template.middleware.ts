@@ -6,6 +6,7 @@ import {
   RecipientColumnMissing,
   TemplateError,
   InvalidRecipientError,
+  UnexpectedDoubleQuoteError,
 } from '@core/errors'
 import { CampaignService, TemplateService } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
@@ -182,20 +183,19 @@ const uploadCompleteHandler = async (
       TemplateService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
-    if (
-      err instanceof RecipientColumnMissing ||
-      err instanceof MissingTemplateKeysError ||
-      err instanceof InvalidRecipientError
-    ) {
+    const userErrors = [
+      RecipientColumnMissing,
+      MissingTemplateKeysError,
+      InvalidRecipientError,
+      UnexpectedDoubleQuoteError,
+    ]
+
+    if (userErrors.some((errType) => err instanceof errType)) {
       return res.status(400).json({ message: err.message })
     }
     return next(err)
   }
 }
-
-// const timeout = (ms: number): Promise<any> => {
-//   return new Promise((resolve) => setTimeout(resolve, ms))
-// }
 
 /*
  * Returns status of csv processing

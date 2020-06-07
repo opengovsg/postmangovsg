@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios'
+import Papa from 'papaparse'
 import { EmailPreview, SMSPreview } from 'classes'
 
 interface PresignedUrlResponse {
@@ -33,12 +34,13 @@ export async function uploadFileWithPresignedUrl(
 
 export async function getPresignedUrl({
   campaignId,
-  mimeType,
+  uploadedFile,
 }: {
   campaignId: number
-  mimeType: string
+  uploadedFile: File
 }): Promise<PresignedUrlResponse> {
   try {
+    const mimeType = await getMimeType(uploadedFile)
     const response = await axios.get(
       `/campaign/${campaignId}/email/upload/start`,
       {
@@ -110,16 +112,55 @@ export async function getCsvStatus(
 }
 
 /*
+ * Checks uploaded file has mime type csv
+ */
+export async function getMimeType(uploadedFile: File): Promise<string> {
+  let mimeType = uploadedFile.type
+  if (mimeType === '') {
+    const isValidCsv = await new Promise((resolve) => {
+      Papa.parse(uploadedFile, {
+        header: true,
+        delimiter: ',',
+        step: function (_, parser: Papa.Parser) {
+          // Checks first row only
+          parser.pause()
+          parser.abort()
+        },
+        complete: function (results) {
+          // results.data will contain 1 row of results because we aborted on the first step
+          const { delimiter, fields } = results.meta
+          resolve(
+            delimiter === ',' &&
+              // papaparse parses everything, including images, pdfs... This checks that at least one of the columns is sane
+              fields.some((field) => /^[a-zA-Z0-9\s-_'"/]+$/.test(field))
+          )
+        },
+        error: function () {
+          resolve(false)
+        },
+      })
+    })
+    if (isValidCsv) {
+      mimeType = 'text/csv'
+    } else {
+      throw new Error(
+        'Please make sure you are uploading a file in CSV format.'
+      )
+    }
+  }
+  return mimeType
+}
+
+/*
  * Wrapper around multiple api calls to upload to s3
  */
 export async function uploadFileToS3(
   campaignId: number,
   file: File
 ): Promise<string> {
-  throw new Error('error')
   const startUploadResponse = await getPresignedUrl({
     campaignId: campaignId,
-    mimeType: file.type,
+    uploadedFile: file,
   })
   // Upload to presigned url
   await uploadFileWithPresignedUrl(file, startUploadResponse.presignedUrl)

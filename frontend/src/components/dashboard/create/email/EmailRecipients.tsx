@@ -16,6 +16,7 @@ import {
   SampleCsv,
 } from 'components/common'
 import { EmailCampaign, EmailPreview } from 'classes'
+import { sendTiming, sendException } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
@@ -49,6 +50,7 @@ const EmailRecipients = ({
   async function uploadFile(files: File[]) {
     setIsUploading(true)
     setErrorMessage(null)
+    const uploadTimeStart = performance.now()
 
     try {
       // user did not select a file
@@ -57,6 +59,10 @@ const EmailRecipients = ({
       }
       clearCsvStatus()
       const tempCsvFilename = await uploadFileToS3(+campaignId, files[0])
+
+      const uploadTimeEnd = performance.now()
+      sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
+
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename }))
     } catch (err) {
