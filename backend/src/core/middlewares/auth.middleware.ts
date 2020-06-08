@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import * as Sentry from '@sentry/node'
 import config from '@core/config'
 import logger from '@core/logger'
 import { AuthService } from '@core/services'
@@ -51,6 +52,7 @@ const verifyOtp = async (
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
+      Sentry.setUser({ id: user.id })
       return res.sendStatus(200)
     }
     return res.sendStatus(401)
@@ -98,6 +100,7 @@ const isCookieOrApiKeyAuthenticated = async (
       // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
       req.session.user = user
       req.session.apiKey = true
+      Sentry.setUser({ id: user.id })
       return next()
     }
 
@@ -121,6 +124,7 @@ const logout = async (
   return new Promise<Response | void>((resolve, reject) => {
     req.session?.destroy((err) => {
       res.cookie(config.get('session.cookieName'), '', { expires: new Date() }) // Makes cookie expire immediately
+      Sentry.setUser(null)
       if (!err) {
         resolve(res.sendStatus(200))
       }
