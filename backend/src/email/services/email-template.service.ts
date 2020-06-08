@@ -244,6 +244,11 @@ const addToMessageLogs = async (
   }
 }
 
+/**
+ * Checks for invalid email recipients from an array of records
+ *
+ * @param records
+ */
 const hasInvalidEmailRecipient = (
   records: MessageBulkInsertInterface[]
 ): boolean => {
