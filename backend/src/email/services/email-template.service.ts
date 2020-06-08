@@ -12,6 +12,9 @@ import TemplateClient from '@core/services/template-client.class'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
+import S3Client from '@core/services/s3-client.class'
+import { MissingTemplateKeysError } from '@core/errors/template.errors'
+
 const client = new TemplateClient(config.get('xssOptions.email'))
 
 /**
@@ -255,10 +258,77 @@ const hasInvalidEmailRecipient = (
   return records.some((record) => !validator.isEmail(record.recipient))
 }
 
+/**
+ * Download CSV file from S3 and process it into message.
+ * The messages are formed from the template and parameters specified in the csv.
+ *
+ * @param campaignId
+ * @param s3Key
+ */
+const getCsvFileFromS3 = async (
+  s3Key: string
+): Promise<Array<{ [key: string]: string }>> => {
+  const s3Client = new S3Client()
+  const downloadStream = s3Client.download(s3Key)
+  const fileContents = await s3Client.parseCsv(downloadStream)
+  return fileContents
+}
+
+/**
+ * Ensures that the csv contains all the columns necessary to replace the attributes in the template
+ * @param csvContent
+ * @param templateParams
+ */
+const checkTemplateKeysMatch = (
+  csvContent: Array<{ [key: string]: string }>,
+  templateParams: Array<string>
+): void => {
+  const csvRecord = csvContent[0]
+
+  if (!isSuperSet(keys(csvRecord), templateParams)) {
+    const missingKeys = difference(templateParams, keys(csvRecord))
+    throw new MissingTemplateKeysError(missingKeys)
+  }
+}
+
+const getRecordsFromCsv = (
+  campaignId: number,
+  fileContent: Array<{ [key: string]: string }>
+): Array<MessageBulkInsertInterface> => {
+  const records: Array<MessageBulkInsertInterface> = fileContent.map(
+    (entry) => {
+      return {
+        campaignId,
+        recipient: entry['recipient'],
+        params: entry,
+      }
+    }
+  )
+  return records
+}
+
+const testHydration = (
+  records: Array<MessageBulkInsertInterface>,
+  templateBody: string,
+  templateSubject?: string
+): void => {
+  const hydratedRecord = {
+    body: client.template(templateBody, records[0].params),
+  } as { body: string; subject?: string }
+
+  if (templateSubject) {
+    hydratedRecord.subject = client.template(templateSubject, records[0].params)
+  }
+}
+
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
   hasInvalidEmailRecipient,
+  getCsvFileFromS3,
+  checkTemplateKeysMatch,
+  getRecordsFromCsv,
+  testHydration,
   client,
 }

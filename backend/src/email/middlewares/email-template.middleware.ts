@@ -154,13 +154,23 @@ const uploadCompleteHandler = async (
 
     // carry out templating / hydration
     // - download from s3
-    const { records } = await EmailTemplateService.client.testHydration({
-      campaignId: +campaignId,
-      s3Key,
-      templateSubject: emailTemplate.subject,
-      templateBody: emailTemplate.body as string,
-      templateParams: emailTemplate.params as string[],
-    })
+    try {
+      const fileContent = await EmailTemplateService.getCsvFileFromS3(s3Key)
+      EmailTemplateService.checkTemplateKeysMatch(
+        fileContent,
+        emailTemplate.params as string[]
+      )
+
+      const records = EmailTemplateService.getRecordsFromCsv(
+        +campaignId,
+        fileContent
+      )
+
+      EmailTemplateService.testHydration(
+        records,
+        emailTemplate.body as string,
+        emailTemplate.subject
+      )
 
     if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
       throw new InvalidRecipientError()
