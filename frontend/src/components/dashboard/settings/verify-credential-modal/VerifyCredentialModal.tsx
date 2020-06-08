@@ -70,7 +70,7 @@ const VerifyCredentialModal = ({
         <h2>Verify {label} credentials</h2>
         <p>
           To verify that your credentials are still working perfectly, please
-          enter an available mobile number to receive a validation message.
+          enter an available recipient to receive a validation message.
         </p>
         {validateInput}
       </>
