@@ -126,7 +126,7 @@ const getCampaignDetails = async (
 ): Promise<CampaignDetails> => {
   const [campaignDetails, numRecipients] = await Promise.all([
     Campaign.findOne({
-      where: { id: +campaignId },
+      where: { id: campaignId },
       attributes: [
         'id',
         'name',
@@ -151,7 +151,7 @@ const getCampaignDetails = async (
       ],
     }),
     SmsMessage.count({
-      where: { campaignId: +campaignId },
+      where: { campaignId },
     }),
   ])
 
