@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
@@ -132,7 +133,9 @@ router.get(
 router.post(
   '/credentials/verify',
   celebrate(verifyCredentialValidator),
-  SmsMiddleware.verifyUserCredential
+  SmsMiddleware.getCredentialsFromLabel,
+  SmsMiddleware.validateAndStoreCredentials,
+  (_req: Request, res: Response) => res.sendStatus(200)
 )
 
 export default router

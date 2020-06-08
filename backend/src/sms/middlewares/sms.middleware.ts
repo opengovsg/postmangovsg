@@ -201,34 +201,6 @@ const previewFirstMessage = async (
   }
 }
 
-/**
- * Verify user sms credentials with specific label
- * @param req
- * @param res
- */
-const verifyUserCredential = async (
-  req: Request,
-  res: Response
-): Promise<Response | void> => {
-  try {
-    const { recipient, label } = req.body
-    const userId = req.session?.user?.id
-    const credential = await CredentialService.getUserCredential(userId, label)
-    if (!credential) {
-      throw new Error('Invalid credentials.')
-    }
-
-    const twilioCred = await CredentialService.getTwilioCredentials(
-      credential.credName
-    )
-    await SmsService.sendValidationMessage(recipient, twilioCred)
-
-    return res.json({ message: 'OK' })
-  } catch (err) {
-    return res.status(400).json({ message: `${err}` })
-  }
-}
-
 export const SmsMiddleware = {
   getCredentialsFromBody,
   getCredentialsFromLabel,
@@ -237,5 +209,4 @@ export const SmsMiddleware = {
   setCampaignCredential,
   getCampaignDetails,
   previewFirstMessage,
-  verifyUserCredential,
 }
