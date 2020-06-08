@@ -44,8 +44,6 @@ export interface StoreTemplateOutput {
  *           type: array
  *           items:
  *            $ref: '#/components/schemas/JobQueue'
- *         num_recipients:
- *           type: number
  *         sms_templates:
  *           type: object
  *           properties:
