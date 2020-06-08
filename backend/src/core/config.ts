@@ -342,6 +342,21 @@ const config = convict({
         whiteList: { br: [] },
         stripIgnoreTag: true,
       },
+      telegram: {
+        whiteList: {
+          b: [],
+          i: [],
+          u: [],
+          s: [],
+          strike: [],
+          del: [],
+          p: [],
+          code: ['class'],
+          pre: [],
+          a: ['href', 'title', 'target'],
+        },
+        stripIgnoreTag: true,
+      },
     },
   },
   express: {
