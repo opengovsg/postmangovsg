@@ -1,4 +1,6 @@
 import {
+  BeforeCreate,
+  BeforeUpdate,
   BelongsTo,
   Column,
   DataType,
@@ -8,6 +10,7 @@ import {
 } from 'sequelize-typescript'
 
 import { Campaign } from '@core/models/campaign'
+import { TelegramTemplateService } from '@telegram/services'
 
 @Table({ tableName: 'telegram_templates', underscored: true, timestamps: true })
 export class TelegramTemplate extends Model<TelegramTemplate> {
@@ -31,4 +34,14 @@ export class TelegramTemplate extends Model<TelegramTemplate> {
     allowNull: true,
   })
   params?: Array<string>
+
+  @BeforeUpdate
+  @BeforeCreate
+  static generateParams(instance: TelegramTemplate): void {
+    if (!instance.body) return
+    const parsedTemplate = TelegramTemplateService.client.parseTemplate(
+      instance.body
+    )
+    instance.params = parsedTemplate.variables
+  }
 }
