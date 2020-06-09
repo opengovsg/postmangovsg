@@ -9,6 +9,7 @@
     "prepare": "npm run build",
     "test": "jest"
   },
+  "types": "build/index",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/datagovsg/postmangovsg.git"

@@ -1,6 +1,6 @@
 import { difference, keys, chunk } from 'lodash'
 import { Transaction } from 'sequelize'
-import TemplateClient from 'postman-templating'
+import { TemplateClient } from 'postman-templating'
 
 import config from '@core/config'
 import logger from '@core/logger'

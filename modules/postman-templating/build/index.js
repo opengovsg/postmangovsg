@@ -10,8 +10,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !exports.hasOwnProperty(p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./template-client"), exports);
-__exportStar(require("./errors"), exports);
-__exportStar(require("./parse-csv"), exports);
-__exportStar(require("./types"), exports);
+exports.TemplateClient = void 0;
+const template_client_1 = __importDefault(require("./template-client"));
+exports.TemplateClient = template_client_1.default;
 //# sourceMappingURL=index.js.map
