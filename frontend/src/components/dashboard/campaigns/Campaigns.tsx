@@ -121,7 +121,7 @@ const Campaigns = () => {
             Learn how to set up →
           </PrimaryButton>
         </OutboundLink>
-        <h5>Or you can begin creating your campaign with our step-by step</h5>
+        <h5>Or you can begin creating your campaign here</h5>
         <PrimaryButton
           onClick={() =>
             modalContext.setModalContent(<CreateCampaign></CreateCampaign>)
