@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
@@ -15,9 +15,19 @@ const CreateModal = () => {
   const history = useHistory()
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
   const [name, setName] = useState('')
+  const [locked, setLocked] = useState(false)
+
+  useEffect(() => {
+    setLocked(false)
+  }, [selectedChannel])
+
   async function handleCreateCampaign() {
     try {
-      const campaign: Campaign = await createCampaign(name, selectedChannel)
+      const campaign: Campaign = await createCampaign(
+        name,
+        selectedChannel,
+        locked
+      )
       // close modal and go to create view
       modalContext.setModalContent(null)
       history.push(`/campaigns/${campaign.id}`)
@@ -68,16 +78,42 @@ const CreateModal = () => {
           </PrimaryButton>
         </div>
 
-        <p className={styles.subtext}>
-          Get your credentials ready.
-          <OutboundLink
-            eventLabel={GUIDE_CREDENTIALS_URL}
-            to={GUIDE_CREDENTIALS_URL}
-            target="_blank"
-          >
-            What is this?
-          </OutboundLink>
-        </p>
+        {selectedChannel === ChannelType.Email && (
+          <div className={styles.protectedOption}>
+            <i
+              className={cx(
+                'bx',
+                styles.icon,
+                { 'bx-checkbox': !locked },
+                { 'bxs-checkbox-checked': locked }
+              )}
+              onClick={() => setLocked(!locked)}
+            ></i>
+            <p className={styles.subtext}>
+              Password protected.
+              <OutboundLink
+                eventLabel={GUIDE_CREDENTIALS_URL}
+                to={GUIDE_CREDENTIALS_URL}
+                target="_blank"
+              >
+                Learn more
+              </OutboundLink>
+            </p>
+          </div>
+        )}
+
+        {selectedChannel === ChannelType.SMS && (
+          <p className={styles.subtext}>
+            Get your credentials ready.
+            <OutboundLink
+              eventLabel={GUIDE_CREDENTIALS_URL}
+              to={GUIDE_CREDENTIALS_URL}
+              target="_blank"
+            >
+              What is this?
+            </OutboundLink>
+          </p>
+        )}
       </div>
 
       <div className="separator"></div>

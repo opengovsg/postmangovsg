@@ -49,6 +49,30 @@
   }
 }
 
+.protectedOption {
+  height: 1.5rem;
+  width: 50%;
+  align-self: flex-end;
+  @include flex-horizontal;
+  margin-top: 1rem;
+  padding-left: 1rem;
+
+  @include mobile() {
+    width: 100%;
+    padding-left: 0px;
+    align-self: stretch;
+  }
+
+  .icon {
+    cursor: pointer;
+    margin-right: 0.2rem;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
 .input {
   background-color: $light-blue;
 }
@@ -71,6 +95,7 @@
 }
 
 .subtext {
+  height: 1.5rem;
   font-size: 0.75rem;
   margin-top: 1rem;
   margin-bottom: 0;
@@ -79,6 +104,7 @@
     font-size: 0.75rem;
     font-style: italic;
     color: $dark-blue;
+    line-height: 1.5rem;
     text-decoration: underline;
   }
 }
