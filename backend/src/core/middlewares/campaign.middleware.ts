@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import { ChannelType } from '@core/constants'
 import { CampaignService, TemplateService } from '@core/services'
 
 /**
@@ -23,6 +24,28 @@ const canEditCampaign = async (
     } else {
       return res.sendStatus(403)
     }
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/**
+ *  If a campaign's channel is not a supported locked channel, then it cannot be created with locked set to true
+ * @param req
+ * @param res
+ * @param next
+ */
+const canCreateLockedCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { type, locked }: { type: string; locked?: boolean } = req.body
+    if (locked && type !== ChannelType.Email) {
+      return res.sendStatus(403)
+    }
+    return next()
   } catch (err) {
     return next(err)
   }
@@ -95,6 +118,7 @@ const listCampaigns = async (
 
 export const CampaignMiddleware = {
   canEditCampaign,
+  canCreateLockedCampaign,
   createCampaign,
   listCampaigns,
 }
