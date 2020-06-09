@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid'
+import { difference, keys } from 'lodash'
 import S3 from 'aws-sdk/clients/s3'
 import { Transaction } from 'sequelize/types'
 
@@ -8,6 +9,8 @@ import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
 import { Campaign } from '@core/models'
 import { CsvStatusInterface } from '@core/interfaces'
+import { MissingTemplateKeysError } from '@core/errors/template.errors'
+import { isSuperSet } from '@core/utils'
 
 const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
@@ -157,6 +160,43 @@ const getCsvStatus = async (
     error,
   }
 }
+/*
+ * Ensures that the csv contains all the columns necessary to replace the attributes in the template
+ * @param csvContent
+ * @param templateParams
+ */
+const checkTemplateKeysMatch = (
+  csvContent: Array<{ [key: string]: string }>,
+  templateParams: Array<string>
+): void => {
+  const csvRecord = csvContent[0]
+
+  if (!isSuperSet(keys(csvRecord), templateParams)) {
+    const missingKeys = difference(templateParams, keys(csvRecord))
+    throw new MissingTemplateKeysError(missingKeys)
+  }
+}
+
+/**
+ * Transform the array of CSV rows into message interface
+ * @param campaignId
+ * @param fileContent
+ */
+const getRecordsFromCsv = (
+  campaignId: number,
+  fileContent: Array<{ [key: string]: string }>
+): Array<MessageBulkInsertInterface> => {
+  const records: Array<MessageBulkInsertInterface> = fileContent.map(
+    (entry) => {
+      return {
+        campaignId,
+        recipient: entry['recipient'],
+        params: entry,
+      }
+    }
+  )
+  return records
+}
 
 export const TemplateService = {
   getUploadParameters,
@@ -166,4 +206,6 @@ export const TemplateService = {
   storeS3Error,
   deleteS3TempKeys,
   getCsvStatus,
+  checkTemplateKeysMatch,
+  getRecordsFromCsv,
 }

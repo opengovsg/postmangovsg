@@ -12,8 +12,6 @@ import TemplateClient from '@core/services/template-client.class'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
-import { MissingTemplateKeysError } from '@core/errors/template.errors'
-
 const client = new TemplateClient(config.get('xssOptions.email'))
 
 /**
@@ -257,39 +255,6 @@ const hasInvalidEmailRecipient = (
   return records.some((record) => !validator.isEmail(record.recipient))
 }
 
-/**
- * Ensures that the csv contains all the columns necessary to replace the attributes in the template
- * @param csvContent
- * @param templateParams
- */
-const checkTemplateKeysMatch = (
-  csvContent: Array<{ [key: string]: string }>,
-  templateParams: Array<string>
-): void => {
-  const csvRecord = csvContent[0]
-
-  if (!isSuperSet(keys(csvRecord), templateParams)) {
-    const missingKeys = difference(templateParams, keys(csvRecord))
-    throw new MissingTemplateKeysError(missingKeys)
-  }
-}
-
-const getRecordsFromCsv = (
-  campaignId: number,
-  fileContent: Array<{ [key: string]: string }>
-): Array<MessageBulkInsertInterface> => {
-  const records: Array<MessageBulkInsertInterface> = fileContent.map(
-    (entry) => {
-      return {
-        campaignId,
-        recipient: entry['recipient'],
-        params: entry,
-      }
-    }
-  )
-  return records
-}
-
 const testHydration = (
   records: Array<MessageBulkInsertInterface>,
   templateBody: string,
@@ -309,8 +274,6 @@ export const EmailTemplateService = {
   getFilledTemplate,
   addToMessageLogs,
   hasInvalidEmailRecipient,
-  checkTemplateKeysMatch,
-  getRecordsFromCsv,
   testHydration,
   client,
 }

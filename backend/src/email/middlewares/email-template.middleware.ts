@@ -159,12 +159,12 @@ const uploadCompleteHandler = async (
       const s3Client = new S3Client()
       const fileContent = await s3Client.getCsvFile(s3Key)
 
-      EmailTemplateService.checkTemplateKeysMatch(
+      TemplateService.checkTemplateKeysMatch(
         fileContent,
         emailTemplate.params as string[]
       )
 
-      const records = EmailTemplateService.getRecordsFromCsv(
+      const records = TemplateService.getRecordsFromCsv(
         +campaignId,
         fileContent
       )
