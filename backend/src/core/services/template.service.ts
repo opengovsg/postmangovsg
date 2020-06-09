@@ -179,14 +179,18 @@ const checkTemplateKeysMatch = (
 }
 
 /**
+ * Checks the csv for all the necessary columns.
  * Transform the array of CSV rows into message interface
  * @param campaignId
  * @param fileContent
  */
 const getRecordsFromCsv = (
   campaignId: number,
-  fileContent: Array<CSVParams>
+  fileContent: Array<CSVParams>,
+  templateParams: Array<string>
 ): Array<MessageBulkInsertInterface> => {
+  checkTemplateKeysMatch(fileContent, templateParams)
+
   return fileContent.map((entry) => {
     return {
       campaignId,
