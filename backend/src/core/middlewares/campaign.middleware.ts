@@ -40,18 +40,24 @@ const createCampaign = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { name, type }: { name: string; type: string } = req.body
+    const {
+      name,
+      type,
+      locked,
+    }: { name: string; type: string; locked?: boolean } = req.body
     const userId = req.session?.user?.id
     const campaign = await CampaignService.createCampaign({
       name,
       type,
       userId,
+      locked,
     })
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
       created_at: campaign.createdAt,
       type: campaign.type,
+      locked: campaign.locked,
     })
   } catch (err) {
     return next(err)

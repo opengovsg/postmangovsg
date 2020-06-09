@@ -18,6 +18,7 @@ const createCampaignValidator = {
       .valid(...Object.values(ChannelType))
       .required(),
     name: Joi.string().max(255).trim().required(),
+    locked: Joi.boolean(),
   }),
 }
 

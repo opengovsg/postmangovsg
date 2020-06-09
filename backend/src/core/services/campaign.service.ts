@@ -19,12 +19,14 @@ const createCampaign = ({
   name,
   type,
   userId,
+  locked,
 }: {
   name: string
   type: string
   userId: number
+  locked?: boolean
 }): Promise<Campaign> => {
-  return Campaign.create({ name, type, userId, valid: false })
+  return Campaign.create({ name, type, userId, valid: false, locked })
 }
 
 /**
