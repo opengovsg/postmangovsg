@@ -7,7 +7,7 @@ const PAGE_RANGE_DISPLAYED = 5 // range of pages displayed
 const MARGIN_PAGES_DISPLAYED = 2 // number of pages displayed after ellipsis
 
 const Pagination = (props: any) => {
-  const { itemsCount, setSelectedPage, itemsPerPage } = props
+  const { itemsCount, selectedPage, setSelectedPage, itemsPerPage } = props
 
   const pageCount = itemsCount / itemsPerPage
 
@@ -34,6 +34,7 @@ const Pagination = (props: any) => {
       nextLabel={nextButton}
       breakLabel={'...'}
       pageCount={pageCount}
+      forcePage={selectedPage}
       marginPagesDisplayed={MARGIN_PAGES_DISPLAYED}
       pageRangeDisplayed={PAGE_RANGE_DISPLAYED}
       onPageChange={handlePageClick}
