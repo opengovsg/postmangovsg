@@ -266,12 +266,11 @@ const testHydration = (
   templateBody: string,
   templateSubject?: string
 ): void => {
-  const hydratedRecord = {
-    body: client.template(templateBody, records[0].params),
-  } as { body: string; subject?: string }
+  const [firstRecord] = records
+  client.template(templateBody, firstRecord.params)
 
   if (templateSubject) {
-    hydratedRecord.subject = client.template(templateSubject, records[0].params)
+    client.template(templateSubject, firstRecord.params)
   }
 }
 
