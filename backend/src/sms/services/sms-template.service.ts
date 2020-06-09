@@ -1,12 +1,12 @@
 import { difference, keys, chunk } from 'lodash'
 import { Transaction } from 'sequelize'
+import TemplateClient from 'postman-templating'
 
 import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import TemplateClient from '@core/services/template-client.class'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
