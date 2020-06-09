@@ -221,6 +221,7 @@ const addToMessageLogs = async (
   }
 }
 
+// SWTODO: Add documentation for this function
 const hasInvalidSmsRecipient = (
   records: MessageBulkInsertInterface[]
 ): boolean => {
@@ -228,10 +229,24 @@ const hasInvalidSmsRecipient = (
   return records.some((record) => !re.test(record.recipient))
 }
 
+/**
+ * Attempts to hydrate the first record.
+ * @param records
+ * @param templateBody
+ */
+const testHydration = (
+  records: Array<MessageBulkInsertInterface>,
+  templateBody: string
+): void => {
+  const [firstRecord] = records
+  client.template(templateBody, firstRecord.params)
+}
+
 export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
   hasInvalidSmsRecipient,
+  testHydration,
   client,
 }
