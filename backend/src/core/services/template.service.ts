@@ -5,6 +5,7 @@ import { Transaction } from 'sequelize/types'
 
 import config from '@core/config'
 import logger from '@core/logger'
+import { CSVParams } from '@core/types'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
 import { Campaign } from '@core/models'
@@ -166,7 +167,7 @@ const getCsvStatus = async (
  * @param templateParams
  */
 const checkTemplateKeysMatch = (
-  csvContent: Array<{ [key: string]: string }>,
+  csvContent: Array<CSVParams>,
   templateParams: Array<string>
 ): void => {
   const csvRecord = csvContent[0]
@@ -184,18 +185,15 @@ const checkTemplateKeysMatch = (
  */
 const getRecordsFromCsv = (
   campaignId: number,
-  fileContent: Array<{ [key: string]: string }>
+  fileContent: Array<CSVParams>
 ): Array<MessageBulkInsertInterface> => {
-  const records: Array<MessageBulkInsertInterface> = fileContent.map(
-    (entry) => {
-      return {
-        campaignId,
-        recipient: entry['recipient'],
-        params: entry,
-      }
+  return fileContent.map((entry) => {
+    return {
+      campaignId,
+      recipient: entry['recipient'],
+      params: entry,
     }
-  )
-  return records
+  })
 }
 
 export const TemplateService = {
