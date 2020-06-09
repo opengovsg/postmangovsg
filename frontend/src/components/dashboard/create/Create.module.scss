@@ -15,12 +15,12 @@
 .stepContainer {
   display: block;
   max-width: $content-max-width;
-  width: 100%;
-  padding: $content-top-padding $site-padding $content-bottom-padding;
+  width: calc(100% - #{$progress-pane-width} - 2 * #{$site-padding});
+  padding: $content-top-padding 0 $content-bottom-padding;
   margin: 0 auto;
 
   @include mobile() {
-    padding: $content-top-padding $mobile-site-padding $content-bottom-padding;
+    width: calc(100% - 2 * #{$mobile-site-padding});
   }
 }
 
