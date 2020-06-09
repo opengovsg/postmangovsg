@@ -4,7 +4,7 @@ import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { TemplateError } from './errors'
 
-export default class TemplateClient {
+export class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
   constructor(xssOptions?: xss.IFilterXSSOptions) {
     this.xssOptions = xssOptions
