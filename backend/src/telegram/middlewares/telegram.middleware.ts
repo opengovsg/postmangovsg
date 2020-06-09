@@ -106,9 +106,31 @@ const getCampaignDetails = async (
   }
 }
 
+/**
+ * Retrieves a message for this campaign
+ * @param req
+ * @param res
+ * @param next
+ */
+const previewFirstMessage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    return res.json({
+      preview: await TelegramService.getHydratedMessage(+campaignId),
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const TelegramMiddleware = {
   getCredentialsFromBody,
   isTelegramCampaignOwnedByUser,
   getCampaignDetails,
+  previewFirstMessage,
   validateAndStoreCredentials,
 }

@@ -6,6 +6,7 @@ import { Campaign, JobQueue } from '@core/models'
 import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
+import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
 
@@ -123,10 +124,46 @@ const getCampaignDetails = async (
   return { campaign: campaignDetails, numRecipients }
 }
 
+/**
+ * Gets a message's parameters
+ * @param campaignId
+ */
+const getParams = async (
+  campaignId: number
+): Promise<{ [key: string]: string } | null> => {
+  const telegramMessage = await TelegramMessage.findOne({
+    where: { campaignId },
+    attributes: ['params'],
+  })
+  if (telegramMessage === null) return null
+  return telegramMessage.params as { [key: string]: string }
+}
+
+/**
+ * Replaces template's attributes with a message's parameters to return the hydrated message
+ * @param campaignId
+ */
+const getHydratedMessage = async (
+  campaignId: number
+): Promise<{ body: string } | null> => {
+  // get sms template
+  const template = await TelegramTemplateService.getFilledTemplate(campaignId)
+
+  // Get params
+  const params = await getParams(campaignId)
+  if (params === null || template === null) return null
+
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
+  const body = TelegramTemplateService.client.template(template?.body!, params)
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
+  return { body }
+}
+
 export const TelegramService = {
   findCampaign,
   getCampaignDetails,
   setCampaignCredential,
   sendValidationMessage,
+  getHydratedMessage,
   validateAndConfigureBot,
 }

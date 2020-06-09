@@ -1,5 +1,7 @@
-import { difference, keys } from 'lodash'
+import { chunk, difference, keys } from 'lodash'
+import { Transaction } from 'sequelize'
 
+import { InvalidRecipientError } from '@core/errors'
 import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
@@ -149,7 +151,79 @@ const storeTemplate = async ({
   return { updatedTemplate, numRecipients, valid: campaign?.valid }
 }
 
+/**
+ *  Finds a template that has all its columns set
+ * @param campaignId
+ */
+const getFilledTemplate = async (
+  campaignId: number
+): Promise<TelegramTemplate | null> => {
+  const smsTemplate = await TelegramTemplate.findOne({ where: { campaignId } })
+  if (!smsTemplate?.body || !smsTemplate.params) {
+    return null
+  }
+  return smsTemplate
+}
+
+/**
+ * 1. delete existing entries
+ * 2. bulk insert
+ * @param campaignId
+ * @param records
+ * @param transaction
+ */
+const addToMessageLogs = async (
+  campaignId: number,
+  records: Array<object>,
+  transaction: Transaction | undefined
+): Promise<void> => {
+  try {
+    logger.info({
+      message: `Started populateTelegramTemplate for ${campaignId}`,
+    })
+    // delete message_logs entries
+    await TelegramMessage.destroy({
+      where: { campaignId },
+      transaction,
+    })
+
+    const chunks = chunk(records, 5000)
+    for (let idx = 0; idx < chunks.length; idx++) {
+      const batch = chunks[idx]
+      await TelegramMessage.bulkCreate(batch, { transaction })
+    }
+    logger.info({
+      message: `Finished populateTelegramTemplate for ${campaignId}`,
+    })
+  } catch (err) {
+    logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
+    throw new Error('SmsMessage: destroy / bulkcreate failure')
+  }
+}
+
+const validateAndFormatNumber = (
+  records: MessageBulkInsertInterface[]
+): MessageBulkInsertInterface[] => {
+  const re = /^\+?[0-9]+$/
+
+  return records.map((record) => {
+    const { recipient } = record
+    if (!re.test(recipient)) {
+      throw new InvalidRecipientError()
+    }
+
+    // Append default country code if does not exists.
+    if (!recipient.startsWith('+') && config.get('defaultCountryCode')) {
+      record.recipient = `+${config.get('defaultCountryCode')}${recipient}`
+    }
+    return record
+  })
+}
+
 export const TelegramTemplateService = {
   storeTemplate,
+  getFilledTemplate,
+  addToMessageLogs,
+  validateAndFormatNumber,
   client,
 }
