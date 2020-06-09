@@ -255,6 +255,12 @@ const hasInvalidEmailRecipient = (
   return records.some((record) => !validator.isEmail(record.recipient))
 }
 
+/**
+ * Attempts to hydrate the first record.
+ * @param records
+ * @param templateBody
+ * @param templateSubject - optional
+ */
 const testHydration = (
   records: Array<MessageBulkInsertInterface>,
   templateBody: string,
