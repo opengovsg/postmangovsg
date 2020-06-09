@@ -5,6 +5,8 @@
   "main": "build/index.js",
   "scripts": {
     "start": "tsc && node build/index.js",
+    "build": "rimraf build && tsc",
+    "prepare": "npm run build",
     "test": "jest"
   },
   "repository": {
