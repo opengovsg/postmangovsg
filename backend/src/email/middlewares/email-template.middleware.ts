@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from 'express'
-import { TemplateError } from 'postman-templating'
+import {
+  TemplateError,
+  RecipientColumnMissing,
+  UnexpectedDoubleQuoteError,
+} from 'postman-templating'
 import config from '@core/config'
 import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
   HydrationError,
-  RecipientColumnMissing,
   InvalidRecipientError,
-  UnexpectedDoubleQuoteError,
 } from '@core/errors'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
