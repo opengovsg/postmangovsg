@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { ChannelType } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
 
 import { SettingsMiddleware } from '@core/middlewares'
@@ -8,6 +9,15 @@ const router = Router()
 const deleteCredentialValidator = {
   [Segments.BODY]: Joi.object({
     label: Joi.string().required(),
+  }),
+}
+
+const getCredentialsValidator = {
+  [Segments.PARAMS]: Joi.object({
+    channelType: Joi.string()
+      .uppercase()
+      .valid(ChannelType.SMS, ChannelType.Telegram)
+      .required(),
   }),
 }
 
@@ -94,6 +104,41 @@ router.delete(
   '/credentials',
   celebrate(deleteCredentialValidator),
   SettingsMiddleware.deleteUserCredential
+)
+
+/**
+ * @swagger
+ * path:
+ *  /settings/{channelType}/credentials:
+ *    get:
+ *      summary: Retrieve channel specific credentials for user
+ *      tags:
+ *        - Settings
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *            enum: [SMS, TELEGRAM]
+ *
+ *      responses:
+ *        "200":
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    label:
+ *                     type: string
+ *
+ */
+router.get(
+  '/:channelType/credentials',
+  celebrate(getCredentialsValidator),
+  SettingsMiddleware.getChannelSpecificCredentials
 )
 
 export default router

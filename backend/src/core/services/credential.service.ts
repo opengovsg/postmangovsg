@@ -196,6 +196,23 @@ const getSmsUserCredentialLabels = async (
 }
 
 /**
+ * Gets only the telegram credential labels for that user
+ * @param userId
+ */
+const getTelegramUserCredentialLabels = async (
+  userId: number
+): Promise<string[]> => {
+  const creds = await UserCredential.findAll({
+    where: {
+      type: ChannelType.Telegram,
+      userId: userId,
+    },
+    attributes: ['label'],
+  })
+  return creds.map((c) => c.label)
+}
+
+/**
  * Gets api keys and credential labels for that user
  * @param userId
  */
@@ -247,6 +264,7 @@ export const CredentialService = {
   deleteUserCredential,
   getUserCredential,
   getSmsUserCredentialLabels,
+  getTelegramUserCredentialLabels,
   getUserSettings,
   // Api Key
   regenerateApiKey,

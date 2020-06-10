@@ -21,10 +21,6 @@ const storeCredentialValidator = {
   }),
 }
 
-const getCredentialsValidator = {
-  [Segments.QUERY]: Joi.object({}),
-}
-
 /**
  * @swagger
  * path:
@@ -65,34 +61,6 @@ router.post(
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
   SettingsMiddleware.storeUserCredential
-)
-
-/**
- * @swagger
- * path:
- *  /settings/sms/credentials:
- *    get:
- *      summary: Retrieve stored sms credentials for user
- *      tags:
- *        - Settings
- *
- *      responses:
- *        "200":
- *          content:
- *            application/json:
- *              schema:
- *                type: array
- *                items:
- *                  type: object
- *                  properties:
- *                    label:
- *                     type: string
- *
- */
-router.get(
-  '/credentials',
-  celebrate(getCredentialsValidator),
-  SettingsMiddleware.getChannelSpecificCredentials
 )
 
 export default router

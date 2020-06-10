@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 
 /*
@@ -85,15 +86,28 @@ const storeUserCredential = async (
  */
 const getChannelSpecificCredentials = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
   try {
+    const { channelType } = req.params
     const userId = req.session?.user?.id
-    const result = await CredentialService.getSmsUserCredentialLabels(+userId)
+
+    let result
+    switch (channelType) {
+      case ChannelType.SMS:
+        result = await CredentialService.getSmsUserCredentialLabels(+userId)
+        break
+      case ChannelType.Telegram:
+        result = await CredentialService.getTelegramUserCredentialLabels(
+          +userId
+        )
+        break
+      default:
+        throw new Error('Unsupported channel type')
+    }
     return res.json(result)
   } catch (e) {
-    next(e)
+    return res.status(400).json({ message: `${e.message}` })
   }
 }
 
