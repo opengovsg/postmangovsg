@@ -221,7 +221,11 @@ const addToMessageLogs = async (
   }
 }
 
-// SWTODO: Add documentation for this function
+/**
+ * Checks for invalid sms recipients from an array of records
+ *
+ * @param records
+ */
 const hasInvalidSmsRecipient = (
   records: MessageBulkInsertInterface[]
 ): boolean => {
