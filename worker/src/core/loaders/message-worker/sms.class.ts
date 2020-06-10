@@ -4,7 +4,7 @@ import map from 'lodash/map'
 import logger from '@core/logger'
 import config from '@core/config'
 import { CredentialService } from '@core/services/credential.service'
-import TemplateClient from '@core/services/template-client.class'
+import { TemplateClient } from 'postman-templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 
 const templateClient = new TemplateClient(config.get('xssOptions.sms'))
