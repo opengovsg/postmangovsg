@@ -72,13 +72,16 @@ const listCampaigns = async (
   try {
     const { offset, limit } = req.query
     const userId = req.session?.user?.id
-    const campaigns = await CampaignService.listCampaigns({
+    const { rows, count } = await CampaignService.listCampaigns({
       offset,
       limit,
       userId,
     })
 
-    return res.json(campaigns)
+    return res.json({
+      campaigns: rows,
+      total_count: count,
+    })
   } catch (err) {
     return next(err)
   }

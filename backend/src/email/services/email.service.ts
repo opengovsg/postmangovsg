@@ -4,11 +4,7 @@ import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
 import { MailService } from '@core/services'
-import {
-  MailToSend,
-  GetCampaignDetailsOutput,
-  CampaignDetails,
-} from '@core/interfaces'
+import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
@@ -145,10 +141,10 @@ const setCampaignCredential = (
  */
 const getCampaignDetails = async (
   campaignId: number
-): Promise<GetCampaignDetailsOutput> => {
-  const campaignDetails: CampaignDetails = (
-    await Campaign.findOne({
-      where: { id: +campaignId },
+): Promise<CampaignDetails> => {
+  const [campaignDetails, numRecipients] = await Promise.all([
+    Campaign.findOne({
+      where: { id: campaignId },
       attributes: [
         'id',
         'name',
@@ -174,13 +170,16 @@ const getCampaignDetails = async (
           attributes: ['body', 'subject', 'params', 'reply_to'],
         },
       ],
-    })
-  )?.get({ plain: true }) as CampaignDetails
+    }),
+    EmailMessage.count({
+      where: { campaignId },
+    }),
+  ])
 
-  const numRecipients: number = await EmailMessage.count({
-    where: { campaignId: +campaignId },
-  })
-  return { campaign: campaignDetails, numRecipients }
+  return {
+    ...campaignDetails?.get({ plain: true }),
+    num_recipients: numRecipients,
+  } as CampaignDetails
 }
 
 export const EmailService = {

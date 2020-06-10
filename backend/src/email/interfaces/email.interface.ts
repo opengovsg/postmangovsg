@@ -38,6 +38,8 @@ export interface StoreTemplateOutput {
  *           type: string
  *         is_csv_processing:
  *           type: boolean
+ *         num_recipients:
+ *           type: number
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
  *           default: 'EMAIL'

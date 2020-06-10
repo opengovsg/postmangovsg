@@ -69,6 +69,23 @@ export async function validateStoredCredentials({
   }
 }
 
+export async function verifyUserCredentials({
+  recipient,
+  label,
+}: {
+  label: string
+  recipient: string
+}): Promise<void> {
+  try {
+    await axios.post(`/settings/sms/credentials/verify`, {
+      recipient,
+      label,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error verifying credentials.')
+  }
+}
+
 export async function storeCredentials({
   label,
   accountSid,

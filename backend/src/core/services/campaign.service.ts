@@ -38,7 +38,7 @@ const listCampaigns = ({
   userId: number
   offset: number
   limit: number
-}): Promise<Array<Campaign>> => {
+}): Promise<{ rows: Array<Campaign>; count: number }> => {
   const options: {
     where: any
     attributes: any
@@ -76,7 +76,7 @@ const listCampaigns = ({
     options.limit = +limit
   }
 
-  return Campaign.findAll(options)
+  return Campaign.findAndCountAll(options)
 }
 
 /**

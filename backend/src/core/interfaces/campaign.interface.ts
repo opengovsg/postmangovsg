@@ -33,6 +33,7 @@ export interface CampaignDetails {
   has_credential: boolean
   csv_filename: string
   is_csv_processing: boolean
+  num_recipients: number
   email_templates?: {
     body: string
     subject: string
@@ -46,10 +47,6 @@ export interface CampaignDetails {
   }
 }
 
-export interface GetCampaignDetailsOutput {
-  campaign: CampaignDetails
-  numRecipients: number
-}
 export interface CampaignStats {
   error: number
   unsent: number
