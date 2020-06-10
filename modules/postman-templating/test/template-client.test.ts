@@ -1,4 +1,4 @@
-import TemplateClient from '../src/template-client'
+import { TemplateClient } from '../src/template-client'
 import { TemplateError } from '../src/errors'
 
 describe('template', () => {
