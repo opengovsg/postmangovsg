@@ -7,24 +7,28 @@ import config from '@core/config'
 import logger from '@core/logger'
 import Email from './email.class'
 import SMS from './sms.class'
+import Telegram from './telegram.class'
 import ECSUtil from './util/ecs'
 import assignment from './util/assignment'
 let connection: Sequelize,
   workerId: string,
   currentCampaignType: string,
   email: Email,
-  sms: SMS
+  sms: SMS,
+  telegram: Telegram
 
 /**
  *  Different channel types operate on their own channel type tables.
  *  Helper method to decide which queries to use, depending on channel type
  */
-const service = (): Email | SMS => {
+const service = (): Email | SMS | Telegram => {
   switch (currentCampaignType) {
     case 'EMAIL':
       return email
     case 'SMS':
       return sms
+    case 'TELEGRAM':
+      return telegram
     default:
       throw new Error(`${currentCampaignType} not supported`)
   }
@@ -180,6 +184,7 @@ const init = async (index: string, isLogger = false): Promise<any> => {
   connection = createConnection()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
+  telegram = new Telegram(workerId, connection)
   try {
     if (!isLogger) {
       await createAndResumeWorker()
