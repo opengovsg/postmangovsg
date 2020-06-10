@@ -27,6 +27,23 @@ const uploadCompleteValidator = {
     filename: Joi.string().required(),
   }),
 }
+const storeCredentialsValidator = {
+  [Segments.BODY]: Joi.object({
+    telegram_bot_token: Joi.string().trim().required(),
+  }),
+}
+
+const useCredentialsValidator = {
+  [Segments.BODY]: Joi.object({
+    label: Joi.string().required(),
+  }),
+}
+
+const verifyCredentialsValidator = {
+  [Segments.BODY]: Joi.object({
+    recipient: Joi.string().trim().required(),
+  }),
+}
 
 // Routes
 
@@ -278,5 +295,151 @@ router.post(
  *           description: Internal Server Error
  */
 router.get('/preview', TelegramMiddleware.previewFirstMessage)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/new-credentials:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Validate Telegram bot token and assign to campaign
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                telegram_bot_token:
+ *                  type: string
+ *
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *        "400" :
+ *           description: Bad Request
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user or job in progress
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/new-credentials',
+  celebrate(storeCredentialsValidator),
+  CampaignMiddleware.canEditCampaign,
+  TelegramMiddleware.getCredentialsFromBody,
+  TelegramMiddleware.validateAndStoreCredentials,
+  TelegramMiddleware.setCampaignCredential
+)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/credentials:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Validate stored credentials and assign to campaign
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                label:
+ *                  type: string
+ *
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *        "400" :
+ *           description: Bad Request
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user or job in progress
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/credentials',
+  celebrate(useCredentialsValidator),
+  CampaignMiddleware.canEditCampaign,
+  TelegramMiddleware.getCredentialsFromLabel,
+  TelegramMiddleware.validateAndStoreCredentials,
+  TelegramMiddleware.setCampaignCredential
+)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/credentials/verify:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Send a validation message using the campaign credentials.
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                recipient:
+ *                  type: string
+ *
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *        "400" :
+ *           description: Bad Request
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user or job in progress
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/credentials/verify',
+  celebrate(verifyCredentialsValidator),
+  CampaignMiddleware.canEditCampaign,
+  TelegramMiddleware.getCampaignCredential,
+  TelegramMiddleware.sendValidationMessage
+)
 
 export default router

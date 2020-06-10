@@ -5,10 +5,50 @@ import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
 import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
 
-import { TelegramMessage, TelegramTemplate } from '@telegram/models'
+import {
+  TelegramMessage,
+  TelegramTemplate,
+  BotSubscriber,
+  TelegramSubscriber,
+} from '@telegram/models'
 import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
+
+/**
+ * Send a stock Telegram message to recpient
+ * @param recpient
+ * @param telegramBotToken
+ */
+const sendValidationMessage = async (
+  recipient: string,
+  telegramBotToken: string
+): Promise<number> => {
+  // Append default country code if does not exists.
+  if (!recipient.startsWith('+') && config.get('defaultCountryCode')) {
+    recipient = `+${config.get('defaultCountryCode')}${recipient}`
+  }
+
+  const [botId] = telegramBotToken.split(':')
+  const subscriber = await TelegramSubscriber.findOne({
+    where: { phoneNumber: recipient },
+    include: [
+      {
+        model: BotSubscriber,
+        where: { botId },
+      },
+    ],
+  })
+  if (!subscriber) {
+    throw new Error('Recipient is not subscribed to the bot.')
+  }
+
+  const telegramService = new TelegramClient(telegramBotToken)
+  return telegramService.send(
+    subscriber.telegramId,
+    'Your Telegram credential has been validated.'
+  )
+}
 
 /**
  * Validate and configure Telegram bot
@@ -33,22 +73,6 @@ const validateAndConfigureBot = async (
     { command: 'updatenumber', description: 'Update linked phone number' },
   ]
   await telegramService.setCommands(commands)
-}
-
-/**
- *  Sends a stock sms to the campaign admin using the associated credentials
- * @param recipient
- * @param credential
- */
-const sendValidationMessage = async (
-  recipient: string,
-  telegramBotToken: string
-): Promise<number> => {
-  const telegramService = new TelegramClient(telegramBotToken)
-  return telegramService.send(
-    recipient,
-    'Your Twilio credential has been validated.'
-  )
 }
 
 /**
