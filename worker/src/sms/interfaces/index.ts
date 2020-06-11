@@ -4,3 +4,5 @@ export interface TwilioCredentials {
   apiSecret: string
   messagingServiceSid: string
 }
+
+export type TelegramCredentials = string

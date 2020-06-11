@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import TemplateClient from '@core/services/template-client.class'
 import logger from '@core/logger'
 import TelegramClient from '@telegram/services/telegram-client.class'
+import { CredentialService } from '@core/services/credential.service'
 
 const templateClient = new TemplateClient()
 
@@ -26,12 +27,11 @@ class Telegram {
   /**
    * Fetches bot token and instantiates a Telegram client.
    */
-  async setSendingService(_credentialName: string): Promise<void> {
-    // TODO: Fetch credentials from CredentialsService
-
-    // TODO: Instantiate Telegram client
-    // this.telegramClient = ..
-    return
+  async setSendingService(credentialName: string): Promise<void> {
+    const botToken = await CredentialService.getTelegramCredentials(
+      credentialName
+    )
+    this.telegramClient = new TelegramClient(botToken)
   }
 
   /**

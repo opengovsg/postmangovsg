@@ -2,8 +2,8 @@ import { Telegram } from 'telegraf'
 
 export default class TelegramClient {
   private client: Telegram
-  constructor() {
-    this.client = new Telegram('token')
+  constructor(botToken: string) {
+    this.client = new Telegram(botToken)
   }
 
   public send(
