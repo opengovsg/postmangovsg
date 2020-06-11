@@ -26,6 +26,7 @@
     "moment": "^2.24.0",
     "papaparse": "^5.2.0",
     "react": "^16.13.1",
+    "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.13.1",
     "react-ga": "^2.7.0",
     "react-lottie": "^1.2.3",
@@ -71,7 +72,8 @@
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 safari version",
+      "IE 11"
     ]
   },
   "lint-staged": {
