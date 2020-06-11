@@ -1,4 +1,6 @@
 import axios, { AxiosError } from 'axios'
+import { setGAUserId } from './ga.service'
+import * as Sentry from '@sentry/browser'
 
 async function getOtpWithEmail(email: string): Promise<void> {
   try {
@@ -34,7 +36,21 @@ async function getUser(): Promise<{ email: string; id: number } | undefined> {
 }
 
 async function logout(): Promise<void> {
-  return axios.get('/auth/logout')
+  return axios.get('/auth/logout').then(() => {
+    setUserAnalytics(null)
+  })
+}
+
+function setUserAnalytics(user?: { email: string; id: number } | null) {
+  // set user id to track logged in user
+  setGAUserId(user?.id || null)
+
+  Sentry.configureScope((scope) => {
+    const scopeUser = user?.email
+      ? { email: user?.email, id: `${user?.id}` }
+      : null
+    scope.setUser(scopeUser)
+  })
 }
 
 function errorHandler(e: AxiosError, customHandlers: any = {}) {
@@ -49,4 +65,4 @@ function errorHandler(e: AxiosError, customHandlers: any = {}) {
   throw new Error(`${e}`)
 }
 
-export { getOtpWithEmail, loginWithOtp, getUser, logout }
+export { getOtpWithEmail, loginWithOtp, getUser, logout, setUserAnalytics }
