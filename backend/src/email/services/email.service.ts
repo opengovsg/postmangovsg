@@ -1,9 +1,7 @@
-import { literal } from 'sequelize'
-
 import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
-import { Campaign, JobQueue, Statistic } from '@core/models'
-import { MailService } from '@core/services'
+import { Campaign } from '@core/models'
+import { MailService, CampaignService } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
@@ -136,56 +134,18 @@ const setCampaignCredential = (
 }
 
 /**
- * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
+ * Gets details of a campaign
  * @param campaignId
  */
 const getCampaignDetails = async (
   campaignId: number
 ): Promise<CampaignDetails> => {
-  const campaignDetails = await Campaign.findOne({
-    where: { id: campaignId },
-    attributes: [
-      'id',
-      'name',
-      'type',
-      'created_at',
-      'valid',
-      [literal('cred_name IS NOT NULL'), 'has_credential'],
-      [literal("s3_object -> 'filename'"), 'csv_filename'],
-      [
-        literal(
-          "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
-        ),
-        'is_csv_processing',
-      ],
-      [
-        literal(
-          "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
-        ),
-        'is_csv_processing',
-      ],
-      [
-        literal('Statistic.unsent + Statistic.sent + Statistic.errored'),
-        'num_recipients',
-      ],
-    ],
-    include: [
-      {
-        model: JobQueue,
-        attributes: ['status', ['created_at', 'sent_at']],
-      },
-      {
-        model: EmailTemplate,
-        attributes: ['body', 'subject', 'params', 'reply_to'],
-      },
-      {
-        model: Statistic,
-        attributes: [],
-      },
-    ],
-  })
-
-  return campaignDetails?.get({ plain: true }) as CampaignDetails
+  return await CampaignService.getCampaignDetails(campaignId, [
+    {
+      model: EmailTemplate,
+      attributes: ['body', 'subject', 'params', 'reply_to'],
+    },
+  ])
 }
 
 export const EmailService = {

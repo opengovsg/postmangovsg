@@ -1,4 +1,4 @@
-import { fn, col, cast, Transaction } from 'sequelize'
+import { fn, cast, Transaction } from 'sequelize'
 import { Statistic, JobQueue } from '@core/models'
 import { CampaignStats, CampaignStatsCount } from '@core/interfaces'
 
@@ -27,7 +27,7 @@ const getStatsFromArchive = async (
 }
 
 /**
- * Return sum of all stats from stats
+ * Return total count from statistic table
  * @param campaignId
  */
 const getNumRecipients = async (campaignId: number): Promise<number> => {

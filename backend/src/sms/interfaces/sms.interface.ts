@@ -6,7 +6,6 @@ export interface StoreTemplateInput {
 }
 export interface StoreTemplateOutput {
   updatedTemplate: SmsTemplate
-  numRecipients: number
   check?: {
     reupload: boolean
     extraKeys?: string[]
