@@ -1,5 +1,5 @@
 import cors from 'cors'
-import express, { Request, Response } from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import bodyParser from 'body-parser'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
 import morgan from 'morgan'
@@ -32,6 +32,20 @@ const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
   stream: logger.stream,
 })
 
+const sentrySessionMiddleware = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void => {
+  if (req.session?.user) {
+    Sentry.setUser({ id: req.session?.user?.id })
+  }
+  if (req.session?.apiKey) {
+    Sentry.setTag('usesApiKey', 'true')
+  }
+  next()
+}
+
 Sentry.init({ dsn: config.get('sentryDsn') })
 
 const expressApp = ({ app }: { app: express.Application }): void => {
@@ -61,6 +75,8 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.get('/debug-sentry', function mainHandler() {
     throw new Error('My first Sentry error!')
   })
+
+  app.use(sentrySessionMiddleware)
 
   app.use('/v1', v1Router)
   app.use(Sentry.Handlers.errorHandler())
