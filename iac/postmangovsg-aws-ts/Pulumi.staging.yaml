@@ -1,0 +1,40 @@
+config:
+  aws:profile: postman-pulumi
+  aws:region: ap-southeast-1
+  postmangovsg-aws-ts:environment: staging
+  postmangovsg-aws-ts:ebCertificateARN: arn:aws:acm:ap-southeast-1:306667300165:certificate/9203a817-9997-451a-b98f-7099cad9604a
+  postmangovsg-aws-ts:ebDomainSettings:
+    domainName: postman.gov.sg
+    subjectAlternativeNames:
+    - '*.postman.gov.sg'
+    validationMethod: EMAIL
+  postmangovsg-aws-ts:ebSettings:
+    appName: postmangovsg
+    autoScalingMax: 1
+    autoScalingMin: 1
+    deploymentPolicy: AllAtOnce
+    description: Postman App Description
+    instanceType: t2.medium
+    keyPairName: postmangovsg-staging-jumphost-kp
+    solutionStackName: 64bit Amazon Linux 2018.03 v2.15.1 running Docker 19.03.6-ce
+  postmangovsg-aws-ts:jumphostKeyPairName: postmangovsg-staging-jumphost-kp
+  postmangovsg-aws-ts:rdsMasterPassword:
+    secure: AAABAB2JEGIVRgd1rNc+5DJw9r1cAd10ONWv3O5KhGQbrm02NgFBYBfvLsSS9qvZL+ADVTZ7IS31xFxAX/ZE9Q==
+  postmangovsg-aws-ts:rdsMasterUsername:
+    secure: AAABADAhQaoM0QycnLJR7qQp3dZB66nkg49ZuVvzi5ugyIHq/+BL0A==
+  postmangovsg-aws-ts:rdsSettings:
+    dbName: postman
+    deletionProtection: false
+    engineVersion: "11.5"
+    instanceClass: db.t3.small
+    multiAz: false
+    optionGroupName: default:postgres-11
+  postmangovsg-aws-ts:redisSettings:
+    clusterName: staging
+    engineVersion: 5.0.6
+    nodeType: cache.t2.micro
+    parameterGroupName: default.redis5.0
+  postmangovsg-aws-ts:uploadBucketName: upload-staging.postman.gov.sg
+  postmangovsg-aws-ts:vpcSettings:
+    cidrBlock: 10.102.0.0/16
+  pulumi:template: aws-typescript
