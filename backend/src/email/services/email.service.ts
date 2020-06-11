@@ -1,8 +1,8 @@
-import { literal } from 'sequelize'
+import { literal, fn, col } from 'sequelize'
 
 import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
-import { Campaign, JobQueue } from '@core/models'
+import { Campaign, JobQueue, Statistic } from '@core/models'
 import { MailService } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
@@ -142,44 +142,45 @@ const setCampaignCredential = (
 const getCampaignDetails = async (
   campaignId: number
 ): Promise<CampaignDetails> => {
-  const [campaignDetails, numRecipients] = await Promise.all([
-    Campaign.findOne({
-      where: { id: campaignId },
-      attributes: [
-        'id',
-        'name',
-        'type',
-        'created_at',
-        'valid',
-        [literal('cred_name IS NOT NULL'), 'has_credential'],
-        [literal("s3_object -> 'filename'"), 'csv_filename'],
-        [
-          literal(
-            "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
-          ),
-          'is_csv_processing',
+  const campaignDetails = await Campaign.findOne({
+    where: { id: campaignId },
+    attributes: [
+      'id',
+      'name',
+      'type',
+      'created_at',
+      'valid',
+      [literal('cred_name IS NOT NULL'), 'has_credential'],
+      [literal("s3_object -> 'filename'"), 'csv_filename'],
+      [
+        literal(
+          "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
+        ),
+        'is_csv_processing',
+      ],
+    ],
+    include: [
+      {
+        model: JobQueue,
+        attributes: ['status', ['created_at', 'sent_at']],
+      },
+      {
+        model: EmailTemplate,
+        attributes: ['body', 'subject', 'params', 'reply_to'],
+      },
+      {
+        model: Statistic,
+        attributes: [
+          [
+            fn('sum', col('unsent'), col('sent'), col('errored')),
+            'num_recipients',
+          ],
         ],
-      ],
-      include: [
-        {
-          model: JobQueue,
-          attributes: ['status', ['created_at', 'sent_at']],
-        },
-        {
-          model: EmailTemplate,
-          attributes: ['body', 'subject', 'params', 'reply_to'],
-        },
-      ],
-    }),
-    EmailMessage.count({
-      where: { campaignId },
-    }),
-  ])
+      },
+    ],
+  })
 
-  return {
-    ...campaignDetails?.get({ plain: true }),
-    num_recipients: numRecipients,
-  } as CampaignDetails
+  return campaignDetails?.get({ plain: true }) as CampaignDetails
 }
 
 export const EmailService = {

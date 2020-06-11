@@ -159,7 +159,7 @@ const storeTemplate = async ({
     subject: client.replaceNewLinesAndSanitize(subject),
     body: client.replaceNewLinesAndSanitize(body),
     replyTo,
-    campaignId: +campaignId,
+    campaignId,
   })
 
   const firstRecord = await EmailMessage.findOne({
@@ -169,18 +169,17 @@ const storeTemplate = async ({
   // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
   if (firstRecord && updatedTemplate.params) {
     const check = await checkNewTemplateParams({
-      campaignId: +campaignId,
+      campaignId,
       updatedTemplate,
       firstRecord,
     })
     if (check.reupload) {
-      return { updatedTemplate, numRecipients: 0, check }
+      return { updatedTemplate, check }
     }
   }
 
-  const numRecipients = await EmailMessage.count({ where: { campaignId } })
-  const campaign = await Campaign.findByPk(+campaignId)
-  return { updatedTemplate, numRecipients, valid: campaign?.valid }
+  const campaign = await Campaign.findByPk(campaignId)
+  return { updatedTemplate, valid: campaign?.valid }
 }
 
 /**

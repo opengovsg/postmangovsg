@@ -31,7 +31,6 @@ const storeTemplate = async (
     const { subject, body, reply_to: replyTo } = req.body
     const {
       check,
-      numRecipients,
       valid,
       updatedTemplate,
     }: StoreTemplateOutput = await EmailTemplateService.storeTemplate({
@@ -40,12 +39,14 @@ const storeTemplate = async (
       body,
       replyTo,
     })
+
     if (check?.reupload) {
+      await StatsService.clearStatsFromArchive(+campaignId)
       return res.json({
         message:
           'Please re-upload your recipient list as template has changed.',
         extra_keys: check.extraKeys,
-        num_recipients: numRecipients,
+        num_recipients: 0,
         valid: false,
         template: {
           body: updatedTemplate?.body,
@@ -55,6 +56,7 @@ const storeTemplate = async (
         },
       })
     } else {
+      const numRecipients = await StatsService.getNumRecipients(+campaignId)
       return res.json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,

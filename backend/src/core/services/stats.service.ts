@@ -52,6 +52,33 @@ const setNumRecipients = async (
 }
 
 /**
+ * Return sum of all stats from stats
+ * @param campaignId
+ */
+const getNumRecipients = async (campaignId: number): Promise<number> => {
+  const { error, unsent, sent, invalid } = await getStatsFromArchive(campaignId)
+  return error + unsent + sent + invalid
+}
+
+/**
+ * Reset all stats for campaign to 0
+ * @param campaignId
+ */
+const clearStatsFromArchive = async (campaignId: number): Promise<void> => {
+  await Statistic.update(
+    {
+      unsent: 0,
+      errored: 0,
+      sent: 0,
+      invalid: 0,
+    },
+    {
+      where: { campaignId },
+    }
+  )
+}
+
+/**
  * Helper method to get the count of errored messages, sent messages, and messages that remain unsent from ops table.
  * @param campaignId
  * @param model
@@ -129,4 +156,6 @@ export const StatsService = {
   getCurrentStats,
   getTotalSentCount,
   setNumRecipients,
+  clearStatsFromArchive,
+  getNumRecipients,
 }
