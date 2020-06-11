@@ -16,22 +16,56 @@ import { TelegramTemplateService } from '@telegram/services'
 import TelegramClient from './telegram-client.class'
 
 /**
- * Send a stock Telegram message to recpient
- * @param recpient
- * @param telegramBotToken
+ * Gets a message's parameters
+ * @param campaignId
  */
-const sendValidationMessage = async (
-  recipient: string,
-  telegramBotToken: string
+const getParams = async (
+  campaignId: number
+): Promise<{ [key: string]: string } | null> => {
+  const telegramMessage = await TelegramMessage.findOne({
+    where: { campaignId },
+    attributes: ['params'],
+  })
+  if (telegramMessage === null) return null
+  return telegramMessage.params as { [key: string]: string }
+}
+
+/**
+ * Replaces template's attributes with a message's parameters to return the hydrated message
+ * @param campaignId
+ */
+const getHydratedMessage = async (
+  campaignId: number
+): Promise<{ body: string } | null> => {
+  // get sms template
+  const template = await TelegramTemplateService.getFilledTemplate(campaignId)
+
+  // Get params
+  const params = await getParams(campaignId)
+  if (params === null || template === null) return null
+
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
+  const body = TelegramTemplateService.client.template(template?.body!, params)
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
+  return { body }
+}
+
+/**
+ * Retrieve telegramId for given phone number and bot id
+ * @param phoneNumber
+ * @param botId
+ */
+const getSubscriberTelegramId = async (
+  phoneNumber: string,
+  botId: string
 ): Promise<number> => {
   // Append default country code if does not exists.
-  if (!recipient.startsWith('+') && config.get('defaultCountryCode')) {
-    recipient = `+${config.get('defaultCountryCode')}${recipient}`
+  if (!phoneNumber.startsWith('+') && config.get('defaultCountryCode')) {
+    phoneNumber = `+${config.get('defaultCountryCode')}${phoneNumber}`
   }
 
-  const [botId] = telegramBotToken.split(':')
   const subscriber = await TelegramSubscriber.findOne({
-    where: { phoneNumber: recipient },
+    where: { phoneNumber },
     include: [
       {
         model: BotSubscriber,
@@ -43,11 +77,49 @@ const sendValidationMessage = async (
     throw new Error('Recipient is not subscribed to the bot.')
   }
 
+  return subscriber.telegramId
+}
+
+/**
+ * Send a stock Telegram message to recpient
+ * @param recpient
+ * @param telegramBotToken
+ */
+const sendValidationMessage = async (
+  recipient: string,
+  telegramBotToken: string
+): Promise<number | void> => {
+  const [botId] = telegramBotToken.split(':')
+  const telegramId = await getSubscriberTelegramId(recipient, botId)
+
   const telegramService = new TelegramClient(telegramBotToken)
   return telegramService.send(
-    subscriber.telegramId,
+    telegramId,
     'Your Telegram credential has been validated.'
   )
+}
+
+/**
+ *  Sends a templated Telegram message to the campaign admin using the
+ *  associated credentials
+ * @param campaignId
+ * @param recipient
+ * @param telegramBotToken
+ * @throws Error if it cannot send a Telegram message
+ */
+const sendCampaignMessage = async (
+  campaignId: number,
+  recipient: string,
+  telegramBotToken: string
+): Promise<number | void> => {
+  const msg = await getHydratedMessage(campaignId)
+  if (!msg) throw new Error('No message to send')
+
+  const [botId] = telegramBotToken.split(':')
+  const telegramId = await getSubscriberTelegramId(recipient, botId)
+
+  const telegramService = new TelegramClient(telegramBotToken)
+  return telegramService.send(telegramId, msg?.body)
 }
 
 /**
@@ -148,46 +220,12 @@ const getCampaignDetails = async (
   return { campaign: campaignDetails, numRecipients }
 }
 
-/**
- * Gets a message's parameters
- * @param campaignId
- */
-const getParams = async (
-  campaignId: number
-): Promise<{ [key: string]: string } | null> => {
-  const telegramMessage = await TelegramMessage.findOne({
-    where: { campaignId },
-    attributes: ['params'],
-  })
-  if (telegramMessage === null) return null
-  return telegramMessage.params as { [key: string]: string }
-}
-
-/**
- * Replaces template's attributes with a message's parameters to return the hydrated message
- * @param campaignId
- */
-const getHydratedMessage = async (
-  campaignId: number
-): Promise<{ body: string } | null> => {
-  // get sms template
-  const template = await TelegramTemplateService.getFilledTemplate(campaignId)
-
-  // Get params
-  const params = await getParams(campaignId)
-  if (params === null || template === null) return null
-
-  /* eslint-disable @typescript-eslint/no-non-null-assertion */
-  const body = TelegramTemplateService.client.template(template?.body!, params)
-  /* eslint-enable @typescript-eslint/no-non-null-assertion */
-  return { body }
-}
-
 export const TelegramService = {
   findCampaign,
   getCampaignDetails,
   setCampaignCredential,
   sendValidationMessage,
+  sendCampaignMessage,
   getHydratedMessage,
   validateAndConfigureBot,
 }

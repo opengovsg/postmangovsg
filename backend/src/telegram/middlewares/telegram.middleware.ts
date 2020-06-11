@@ -136,12 +136,21 @@ const sendValidationMessage = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  const { campaignId } = req.params
   const { recipient } = req.body
   const { credentials } = res.locals
   const { telegramBotToken } = credentials
 
   try {
-    await TelegramService.sendValidationMessage(recipient, telegramBotToken)
+    if (!campaignId) {
+      await TelegramService.sendValidationMessage(recipient, telegramBotToken)
+    } else {
+      await TelegramService.sendCampaignMessage(
+        +campaignId,
+        recipient,
+        telegramBotToken
+      )
+    }
     return res.json({ message: 'OK' })
   } catch (err) {
     return res.status(400).json({ message: `${err.message}` })
