@@ -1,4 +1,4 @@
-import { fn, cast, Transaction } from 'sequelize'
+import { fn, col, cast, Transaction } from 'sequelize'
 import { Statistic, JobQueue } from '@core/models'
 import { CampaignStats, CampaignStatsCount } from '@core/interfaces'
 
@@ -27,6 +27,15 @@ const getStatsFromArchive = async (
 }
 
 /**
+ * Return sum of all stats from stats
+ * @param campaignId
+ */
+const getNumRecipients = async (campaignId: number): Promise<number> => {
+  const { error, unsent, sent, invalid } = await getStatsFromArchive(campaignId)
+  return error + unsent + sent + invalid
+}
+
+/**
  * Upsert unsent count to statistic table
  * @param campaignId
  * @param unsent
@@ -47,33 +56,6 @@ const setNumRecipients = async (
     },
     {
       transaction,
-    }
-  )
-}
-
-/**
- * Return sum of all stats from stats
- * @param campaignId
- */
-const getNumRecipients = async (campaignId: number): Promise<number> => {
-  const { error, unsent, sent, invalid } = await getStatsFromArchive(campaignId)
-  return error + unsent + sent + invalid
-}
-
-/**
- * Reset all stats for campaign to 0
- * @param campaignId
- */
-const clearStatsFromArchive = async (campaignId: number): Promise<void> => {
-  await Statistic.update(
-    {
-      unsent: 0,
-      errored: 0,
-      sent: 0,
-      invalid: 0,
-    },
-    {
-      where: { campaignId },
     }
   )
 }
@@ -155,7 +137,6 @@ const getTotalSentCount = async (): Promise<number> => {
 export const StatsService = {
   getCurrentStats,
   getTotalSentCount,
-  setNumRecipients,
-  clearStatsFromArchive,
   getNumRecipients,
+  setNumRecipients,
 }

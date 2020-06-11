@@ -1,4 +1,4 @@
-import { literal, fn, col } from 'sequelize'
+import { literal } from 'sequelize'
 
 import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
@@ -158,6 +158,16 @@ const getCampaignDetails = async (
         ),
         'is_csv_processing',
       ],
+      [
+        literal(
+          "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
+        ),
+        'is_csv_processing',
+      ],
+      [
+        literal('Statistic.unsent + Statistic.sent + Statistic.errored'),
+        'num_recipients',
+      ],
     ],
     include: [
       {
@@ -170,12 +180,7 @@ const getCampaignDetails = async (
       },
       {
         model: Statistic,
-        attributes: [
-          [
-            fn('sum', col('unsent'), col('sent'), col('errored')),
-            'num_recipients',
-          ],
-        ],
+        attributes: [],
       },
     ],
   })
