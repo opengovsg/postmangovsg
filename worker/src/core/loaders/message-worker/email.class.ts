@@ -94,13 +94,13 @@ class Email {
       )
       .then((messageId) => {
         return this.connection.query(
-          'UPDATE email_ops SET delivered_at=clock_timestamp(), message_id=:messageId, updated_at=clock_timestamp() WHERE id=:id;',
+          `UPDATE email_ops SET status='SENDING', delivered_at=clock_timestamp(), message_id=:messageId, updated_at=clock_timestamp() WHERE id=:id;`,
           { replacements: { id, messageId }, type: QueryTypes.UPDATE }
         )
       })
       .catch((error: Error) => {
         return this.connection.query(
-          'UPDATE email_ops SET delivered_at=clock_timestamp(), error_code=:error, updated_at=clock_timestamp() WHERE id=:id;',
+          `UPDATE email_ops SET status='ERROR', delivered_at=clock_timestamp(), error_code=:error, updated_at=clock_timestamp() WHERE id=:id;`,
           {
             replacements: { id, error: error.message.substring(0, 255) },
             type: QueryTypes.UPDATE,
