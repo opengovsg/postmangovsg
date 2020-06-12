@@ -15,10 +15,10 @@ const CreateModal = () => {
   const history = useHistory()
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
   const [name, setName] = useState('')
-  const [locked, setLocked] = useState(false)
+  const [protect, setProtected] = useState(false)
 
   useEffect(() => {
-    setLocked(false)
+    setProtected(false)
   }, [selectedChannel])
 
   async function handleCreateCampaign() {
@@ -26,7 +26,7 @@ const CreateModal = () => {
       const campaign: Campaign = await createCampaign(
         name,
         selectedChannel,
-        locked
+        protect
       )
       // close modal and go to create view
       modalContext.setModalContent(null)
@@ -84,10 +84,10 @@ const CreateModal = () => {
               className={cx(
                 'bx',
                 styles.icon,
-                { 'bx-checkbox': !locked },
-                { 'bxs-checkbox-checked': locked }
+                { 'bx-checkbox': !protect },
+                { 'bxs-checkbox-checked': protect }
               )}
-              onClick={() => setLocked(!locked)}
+              onClick={() => setProtected(!protect)}
             ></i>
             <p className={styles.subtext}>
               Password protected.

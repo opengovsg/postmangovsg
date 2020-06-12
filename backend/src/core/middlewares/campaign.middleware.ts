@@ -30,19 +30,19 @@ const canEditCampaign = async (
 }
 
 /**
- *  If a campaign's channel is not a supported locked channel, then it cannot be created with locked set to true
+ *  If a campaign's channel is not a supported password protected channel, then it cannot be created with protect set to true
  * @param req
  * @param res
  * @param next
  */
-const canCreateLockedCampaign = async (
+const canCreateProtectedCampaign = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { type, locked }: { type: string; locked?: boolean } = req.body
-    if (locked && type !== ChannelType.Email) {
+    const { type, protect }: { type: string; protect?: boolean } = req.body
+    if (protect && type !== ChannelType.Email) {
       return res.sendStatus(403)
     }
     return next()
@@ -66,21 +66,21 @@ const createCampaign = async (
     const {
       name,
       type,
-      locked,
-    }: { name: string; type: string; locked?: boolean } = req.body
+      protect,
+    }: { name: string; type: string; protect?: boolean } = req.body
     const userId = req.session?.user?.id
     const campaign = await CampaignService.createCampaign({
       name,
       type,
       userId,
-      locked,
+      protect,
     })
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
       created_at: campaign.createdAt,
       type: campaign.type,
-      locked: campaign.locked,
+      protect: campaign.protect,
     })
   } catch (err) {
     return next(err)
@@ -118,7 +118,7 @@ const listCampaigns = async (
 
 export const CampaignMiddleware = {
   canEditCampaign,
-  canCreateLockedCampaign,
+  canCreateProtectedCampaign,
   createCampaign,
   listCampaigns,
 }

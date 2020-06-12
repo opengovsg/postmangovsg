@@ -18,7 +18,7 @@ const createCampaignValidator = {
       .valid(...Object.values(ChannelType))
       .required(),
     name: Joi.string().max(255).trim().required(),
-    locked: Joi.boolean(),
+    protect: Joi.boolean(),
   }),
 }
 
@@ -122,7 +122,7 @@ router.get(
 router.post(
   '/',
   celebrate(createCampaignValidator),
-  CampaignMiddleware.canCreateLockedCampaign,
+  CampaignMiddleware.canCreateProtectedCampaign,
   CampaignMiddleware.createCampaign
 )
 

@@ -69,7 +69,7 @@ export class Campaign extends Model<Campaign> {
     type: DataType.BOOLEAN,
     defaultValue: false,
   })
-  locked!: boolean
+  protect!: boolean
 
   @HasOne(() => Statistic)
   statistic?: Statistic
