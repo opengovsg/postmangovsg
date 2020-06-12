@@ -38,7 +38,8 @@ export class EmailOp extends Model<EmailOp> {
   errorCode?: string
 
   @Column({
-    type: DataType.ENUM(...Object.values(MessageStatus)),
+    // Explicitly typed since sequelize creates a new enum with a different name (https://github.com/sequelize/sequelize/issues/2577)
+    type: 'enum_email_messages_status',
     allowNull: true,
   })
   status?: MessageStatus
