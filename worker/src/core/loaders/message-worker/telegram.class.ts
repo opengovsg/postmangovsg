@@ -45,10 +45,12 @@ class Telegram {
    * Enqueues messages into `telegram_ops`.
    */
   async enqueueMessages(jobId: number): Promise<void> {
-    // TODO: Write and call db function to enqueue messages into ops table
-    // For those with no phone number -> chat id mapping, set error code
+    await this.connection.query('SELECT enqueue_messages_telegram(:jobId)', {
+      replacements: {
+        jobId,
+      },
+    })
     logger.info(`${this.workerId}: s_enqueueMessagesTelegram job_id=${jobId}`)
-    return
   }
 
   /**
