@@ -72,10 +72,6 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     return res.sendStatus(200)
   })
 
-  app.get('/debug-sentry', function mainHandler() {
-    throw new Error('My first Sentry error!')
-  })
-
   app.use(sentrySessionMiddleware)
 
   app.use('/v1', v1Router)
