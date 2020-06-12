@@ -1,6 +1,10 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { CampaignMiddleware, TemplateMiddleware } from '@core/middlewares'
+import {
+  CampaignMiddleware,
+  TemplateMiddleware,
+  JobMiddleware,
+} from '@core/middlewares'
 import {
   TelegramMiddleware,
   TelegramTemplateMiddleware,
@@ -42,6 +46,12 @@ const useCredentialsValidator = {
 const verifyCredentialsValidator = {
   [Segments.BODY]: Joi.object({
     recipient: Joi.string().trim().required(),
+  }),
+}
+
+const sendCampaignValidator = {
+  [Segments.BODY]: Joi.object({
+    rate: Joi.number().integer().positive().max(30).default(30),
   }),
 }
 
@@ -440,6 +450,120 @@ router.post(
   CampaignMiddleware.canEditCampaign,
   TelegramMiddleware.getCampaignCredential,
   TelegramMiddleware.sendValidationMessage
+)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/send:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Start sending campaign
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: false
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                rate:
+ *                  type: integer
+ *                  default: 30
+ *                  minimum: 1
+ *                  maximum: 30
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 campaign_id:
+ *                  type: integer
+ *                 job_id:
+ *                  type: array
+ *                  items:
+ *                    type: number
+ *        "400" :
+ *           description: Bad Request
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user or job in progress
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/send',
+  celebrate(sendCampaignValidator),
+  CampaignMiddleware.canEditCampaign,
+  JobMiddleware.sendCampaign
+)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/stop:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Stop sending campaign
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 campaign_id:
+ *                  type: integer
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post('/stop', JobMiddleware.stopCampaign)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/retry:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Retry sending campaign
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 campaign_id:
+ *                  type: integer
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user or job in progress
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/retry',
+  CampaignMiddleware.canEditCampaign,
+  JobMiddleware.retryCampaign
 )
 
 export default router
