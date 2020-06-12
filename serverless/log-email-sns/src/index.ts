@@ -72,11 +72,19 @@ const updateBouncedStatus = async (message: any, dbConnection: Sequelize) => {
   const bounceType = message?.bounce?.bounceType
   const messageId = message?.mail?.commonHeaders?.messageId
   const timeStamp = message?.delivery?.timestamp
+  const recipientEmail = message?.mail?.commonHeaders?.to[0]
 
   let errorCode
  
   if (bounceType === 'Permanent') {
     errorCode = "Hard bounce, the recipient's mail server permanently rejected the email."
+
+    // Add to black list
+    await dbConnection.query(
+      `UPDATE email_blacklist SET recipient=:recipientEmail, updated_at=clock_timestamp() WHERE message_id=:messageId`,
+      {
+        replacements: { recipientEmail, messageId }, type: QueryTypes.UPDATE 
+      })
   }
   else {
     errorCode = "Soft bounce, Amazon SES fails to deliver the email after retrying for a period of time."
