@@ -40,12 +40,12 @@ exports.handler = async (event: any) => {
 
     console.log(`Updating messageId ${messageId} in sms_messages`)
     if (twilioErrorCode) {
-      await sequelize.query(`UPDATE sms_messages SET errorCode=:twilioErrorCode, updated_at = clock_timestamp() WHERE id=:messageId AND campaign_id=:campaignId`, 
+      await sequelize.query(`UPDATE sms_messages SET errorCode=:twilioErrorCode, updated_at = clock_timestamp(), status = 'ERROR' WHERE id=:messageId AND campaign_id=:campaignId`, 
         {
           replacements: { twilioErrorCode, messageId, campaignId }, type: QueryTypes.UPDATE,
         })
     } else {
-      await sequelize.query(`UPDATE sms_messages SET received_at = clock_timestamp(), updated_at = clock_timestamp() WHERE id=:messageId AND campaign_id=:campaignId`,  
+      await sequelize.query(`UPDATE sms_messages SET received_at = clock_timestamp(), updated_at = clock_timestamp(), status = 'SUCCESS' WHERE id=:messageId AND campaign_id=:campaignId`,  
       { 
         replacements: { messageId, campaignId }, type: QueryTypes.UPDATE 
       })
