@@ -71,6 +71,7 @@ const updateSuccessfulDelivery = async (message: any, dbConnection: Sequelize ) 
 const updateBouncedStatus = async (message: any, dbConnection: Sequelize) => {
   const bounceType = message?.bounce?.bounceType
   const messageId = message?.mail?.commonHeaders?.messageId
+  const timeStamp = message?.delivery?.timestamp
 
   let errorCode
  
@@ -82,8 +83,8 @@ const updateBouncedStatus = async (message: any, dbConnection: Sequelize) => {
   }
   
   await dbConnection.query(
-    `UPDATE email_messages SET error_code=:errorCode, updated_at = clock_timestamp() WHERE message_id=:messageId`,
+    `UPDATE email_messages SET error_code=:errorCode, received_at=:timeStamp, updated_at = clock_timestamp() WHERE message_id=:messageId`,
     {
-      replacements: { errorCode, messageId }, type: QueryTypes.UPDATE 
+      replacements: { errorCode, timeStamp, messageId }, type: QueryTypes.UPDATE 
     })
 }
