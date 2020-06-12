@@ -1,9 +1,11 @@
+import 'webcrypto-shim/webcrypto-shim'
+
 const ENCRYPTION_METHOD = 'AES-GCM'
 
 async function importKey(password: string) {
   const pwUtf8 = new TextEncoder().encode(password)
-  const pwHash = await crypto.subtle.digest('SHA-256', pwUtf8)
-  const key = await crypto.subtle.importKey(
+  const pwHash = await window.crypto.subtle.digest('SHA-256', pwUtf8)
+  const key = await window.crypto.subtle.importKey(
     'raw',
     pwHash,
     ENCRYPTION_METHOD,
@@ -32,7 +34,9 @@ function encodeCipherToString(buffer: ArrayBuffer, iv: Uint8Array) {
 
 export async function encryptData(payload: string, password: string) {
   try {
-    const initializationVector = crypto.getRandomValues(new Uint8Array(12))
+    const initializationVector = window.crypto.getRandomValues(
+      new Uint8Array(12)
+    )
     const algorithm = {
       name: ENCRYPTION_METHOD,
       iv: initializationVector,
@@ -40,7 +44,7 @@ export async function encryptData(payload: string, password: string) {
     const key = await importKey(password)
 
     const encodedPayload = new TextEncoder().encode(payload)
-    const cipherBuffer = await crypto.subtle.encrypt(
+    const cipherBuffer = await window.crypto.subtle.encrypt(
       algorithm,
       key,
       encodedPayload
@@ -74,7 +78,11 @@ export async function decryptData(ciphertext: string, password: string) {
 
     const key = await importKey(password)
 
-    const plainBuffer = await crypto.subtle.decrypt(algorithm, key, cipher)
+    const plainBuffer = await window.crypto.subtle.decrypt(
+      algorithm,
+      key,
+      cipher
+    )
     const plaintext = new TextDecoder().decode(plainBuffer) // decode password from UTF-8
 
     return plaintext
