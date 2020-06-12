@@ -8,6 +8,8 @@ WORKDIR /usr/home/postmangovsg/backend
 
 COPY modules /usr/home/postmangovsg/modules
 
+RUN cd /usr/home/postmangovsg/modules/postman-templating && npm install && npm run build
+
 COPY backend/package* ./
 RUN npm install
 

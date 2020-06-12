@@ -19,7 +19,7 @@ jobs:
       before_deploy:
         - cd ../
         - echo $PWD
-        - export TAG=backend-travis-$TRAVIS_BRANCH-$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
+        - export TAG=travis-$TRAVIS_BRANCH-$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
         - ECR_REPO=$REPO-backend
         - export PATH=$PATH:$HOME/.local/bin
           # Install tools for deployment
