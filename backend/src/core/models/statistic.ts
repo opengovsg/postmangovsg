@@ -26,6 +26,9 @@ export class Statistic extends Model<Statistic> {
   @Column(DataType.INTEGER)
   sent!: number
 
+  @Column(DataType.INTEGER)
+  invalid!: number
+
   static async updateStats(campaignId: number): Promise<void> {
     await this.sequelize?.query('SELECT update_stats(:campaignId);', {
       replacements: {
