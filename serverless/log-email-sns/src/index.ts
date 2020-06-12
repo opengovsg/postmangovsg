@@ -16,7 +16,7 @@ exports.handler = async (event: any) => {
 
     const messageId = message?.mail?.commonHeaders?.messageId
 
-    console.log(`Updating messageId ${messageId} in email_messages, notificationType = ${notificationType}`)
+    console.log(`Updating messageId ${messageId} in respective tables, notificationType = ${notificationType}`)
 
     switch (notificationType) {
       case "Delivery": 
@@ -53,9 +53,9 @@ exports.handler = async (event: any) => {
 const updateSuccessfulDelivery = async (message: any, dbConnection: Sequelize ) => {
   const messageId = message?.mail?.commonHeaders?.messageId
   const timeStamp = message?.delivery?.timestamp
-  
+
   await dbConnection.query(
-    `UPDATE email_messages SET received_at=:timeStamp, updated_at = clock_timestamp() WHERE message_id=:messageId`,
+    `UPDATE email_messages SET received_at=:timeStamp, updated_at = clock_timestamp(), status='SUCCESS' WHERE message_id=:messageId`,
     {
       replacements: { timeStamp, messageId }, type: QueryTypes.UPDATE 
     })
@@ -83,7 +83,7 @@ const updateBouncedStatus = async (message: any, dbConnection: Sequelize) => {
   }
   
   await dbConnection.query(
-    `UPDATE email_messages SET error_code=:errorCode, received_at=:timeStamp, updated_at = clock_timestamp() WHERE message_id=:messageId`,
+    `UPDATE email_messages SET error_code=:errorCode, received_at=:timeStamp, status='INVALID_RECIPIENT', updated_at = clock_timestamp() WHERE message_id=:messageId`,
     {
       replacements: { errorCode, timeStamp, messageId }, type: QueryTypes.UPDATE 
     })
