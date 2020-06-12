@@ -20,15 +20,8 @@ jobs:
         - cd backend
       install:
         - npm install
-        - cd node_modules/postman-templating
-        - echo $PWD
-        - npm install
-        - npm run test
       script:
-        - cd ../../
-        - echo $PWD
         - npm run lint-no-fix
-        - npm run build
         - npm run test
       before_deploy:
         - cd ../
@@ -78,10 +71,7 @@ jobs:
         - cd worker
       install:
         - npm install
-        - cd node_modules/postman-templating
-        - npm install
       script:
-        - cd ../../
         - npm run lint-no-fix
       deploy:
         - provider: script
