@@ -33,7 +33,7 @@ jobs:
       before_deploy:
         - cd ../
         - echo $PWD
-        - TAG=$REPO:travis-$TRAVIS_BRANCH-$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
+        - export TAG=backend-travis-$TRAVIS_BRANCH-$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
         - ECR_REPO=$REPO-backend
         - export PATH=$PATH:$HOME/.local/bin
           # Install tools for deployment
@@ -46,8 +46,8 @@ jobs:
         - docker tag $TAG $ECR_REPO:$TRAVIS_BRANCH
         - docker push $ECR_REPO
           # Edit Dockerrun from Travis environment variables
-        - sed -i -e "s|@REPO|$ECR_REPO|g" Dockerrun.aws.json
-        - sed -i -e "s|@TAG|$TAG|g" Dockerrun.aws.json
+        - sed -i -e "s|@REPO|$ECR_REPO|g" ./backend/Dockerrun.aws.json
+        - sed -i -e "s|@TAG|$TAG|g" ./backend/Dockerrun.aws.json
         - echo $PWD
         - zip -r "$TAG.zip" ./backend/Dockerrun.aws.json
         - export ELASTIC_BEANSTALK_LABEL="$TAG-$(env TZ=Asia/Singapore date "+%Y%m%d%H%M%S")"
