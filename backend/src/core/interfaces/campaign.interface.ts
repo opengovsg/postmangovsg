@@ -60,6 +60,8 @@ export interface CampaignStatsCount {
  *            type: number
  *          sent:
  *            type: number
+ *          invalid:
+ *            type: number
  *          status:
  *            $ref: '#/components/schemas/JobStatus'
  */
