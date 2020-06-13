@@ -3,7 +3,9 @@ import config from './config'
 
 const sequelizeLoader = async (): Promise<Sequelize> => {
   try {
-    const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+    const dialectOptions = config.get('IS_PROD')
+      ? config.get('database.dialectOptions')
+      : {}
     const sequelize = new Sequelize(config.get('database.databaseUri'), {
       dialect: 'postgres',
       logging: false,
