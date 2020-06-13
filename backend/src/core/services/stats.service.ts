@@ -1,6 +1,6 @@
-import { fn, col, cast } from 'sequelize'
+import { fn, cast } from 'sequelize'
 import { Statistic, JobQueue } from '@core/models'
-import { CampaignStats } from '@core/interfaces'
+import { CampaignStats, CampaignStatsCount } from '@core/interfaces'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -8,19 +8,21 @@ import { CampaignStats } from '@core/interfaces'
  */
 const getStatsFromArchive = async (
   campaignId: number
-): Promise<{ error: number; unsent: number; sent: number }> => {
+): Promise<CampaignStatsCount> => {
   const stats = await Statistic.findByPk(campaignId)
   if (!stats) {
     return {
       error: 0,
       sent: 0,
       unsent: 0,
+      invalid: 0,
     }
   }
   return {
     error: stats?.errored,
     sent: stats?.sent,
     unsent: stats?.unsent,
+    invalid: stats?.invalid,
   }
 }
 
@@ -32,21 +34,24 @@ const getStatsFromArchive = async (
 const getStatsFromTable = async (
   campaignId: number,
   model: any
-): Promise<{ error: number; unsent: number; sent: number }> => {
+): Promise<CampaignStatsCount> => {
   // Retrieve stats from ops table
   const [data] = await model.findAll({
     raw: true,
     where: { campaignId },
     attributes: [
-      [fn('count', col('error_code')), 'error'],
-      [fn('count', col('message_id')), 'sent'],
-      [fn('sum', cast({ delivered_at: null }, 'int')), 'unsent'],
+      [fn('sum', cast({ status: 'ERROR' }, 'int')), 'error'],
+      [fn('sum', cast({ status: 'SENDING' }, 'int')), 'sent'],
+      [fn('sum', cast({ status: null }, 'int')), 'unsent'],
+      [fn('sum', cast({ status: 'INVALID_RECIPIENT' }, 'int')), 'invalid'],
     ],
   })
+
   return {
     error: +data.error,
     sent: +data.sent,
     unsent: +data.unsent,
+    invalid: +data.invalid,
   }
 }
 
@@ -74,10 +79,12 @@ const getCurrentStats = async (
 
     // Sent count must be added to archived sent count since sent messages are
     // not enqueued to ops table if a project is stopped and resumed
+    // Since sent and invalid are not retried, they have to be added to archived stats
     return {
       error: opsStats.error,
       unsent: opsStats.unsent,
       sent: opsStats.sent + archivedStats.sent,
+      invalid: opsStats.invalid + archivedStats.invalid,
       status: job.status,
     }
   }

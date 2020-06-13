@@ -37,11 +37,15 @@ export interface CampaignDetails {
   }
 }
 
-export interface CampaignStats {
+export interface CampaignStats extends CampaignStatsCount {
+  status: string
+}
+
+export interface CampaignStatsCount {
   error: number
   unsent: number
   sent: number
-  status: string
+  invalid: number
 }
 /**
  * @swagger
