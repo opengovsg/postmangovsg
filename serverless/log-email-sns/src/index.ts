@@ -168,7 +168,7 @@ exports.handler = async (event: any) => {
     if (sequelize === null) {
       sequelize = await sequelizeLoader()
     }
-    console.log(`Event: ${JSON.stringify(event)}`)
+    
     await Promise.all(event.Records.map(handleMessage))
 
     return {
