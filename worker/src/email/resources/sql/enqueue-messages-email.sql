@@ -9,9 +9,9 @@ BEGIN
 	WITH messages AS 
   (
     UPDATE email_messages e
-    SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp(), delivered_at = NULL, sent_at = NULL, received_at = NULL, status = NULL, 
-      error_code = (
-        CASE WHEN invalid_recipient IS NULL THEN NULL ELSE 'INVALID_RECIPIENT' END
+    SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp(), delivered_at = NULL, sent_at = NULL, received_at = NULL, error_code = NULL, 
+      status = (
+        CASE WHEN invalid_recipient IS NULL THEN NULL ELSE 'INVALID_RECIPIENT'::enum_email_messages_status END
       )
     FROM (
       SELECT m.*, b.recipient AS invalid_recipient FROM email_messages m LEFT OUTER JOIN email_blacklist b ON m.recipient = b.recipient
@@ -30,7 +30,7 @@ BEGIN
     e.dequeued_at,
     e.created_at,
     e.updated_at,
-    e.error_code
+    e.status
   )
 
 	INSERT INTO email_ops 
@@ -53,6 +53,6 @@ BEGIN
     updated_at 
 	 FROM messages 
     -- enqueue only the recipients that are not in the blacklist table
-   WHERE error_code IS NULL );
+   WHERE status IS NULL );
 END $$;
 

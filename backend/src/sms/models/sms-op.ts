@@ -38,7 +38,8 @@ export class SmsOp extends Model<SmsOp> {
   errorCode?: string
 
   @Column({
-    type: DataType.ENUM(...Object.values(MessageStatus)),
+    // type: DataType.ENUM(...Object.values(MessageStatus)),
+    type: 'enum_sms_messages_status',
     allowNull: true,
   })
   status?: MessageStatus
