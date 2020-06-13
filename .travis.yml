@@ -150,7 +150,7 @@ jobs:
           publish: true
           zip: "../log-email-sns/code.zip"
           on:
-            branch: $STAGING_BRANCH
+            branch: $PRODUCTION_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_EMAIL_DB_URI
     - name: root
