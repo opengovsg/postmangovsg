@@ -52,12 +52,14 @@ export class CampaignStats {
   error: number
   unsent: number
   sent: number
+  invalid: number
   status: Status
 
   constructor(input: any) {
     this.error = +input['error']
     this.unsent = +input['unsent']
     this.sent = +input['sent']
+    this.invalid = input['invalid']
     this.status = input['status']
   }
 }
