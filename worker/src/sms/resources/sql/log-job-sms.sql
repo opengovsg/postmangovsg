@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION log_job_sms(selected_campaign_id int) RETURNS VOID
 AS $$
 BEGIN
 	UPDATE sms_messages m 
-	SET dequeued_at = p.dequeued_at,
+  -- setting dequeued_at to null so it can be retried if needed
+	SET dequeued_at = NULL,
     -- coalesced fields should prioritise message table over ops table 
     -- because callbacks might arrive before logging
 		error_code = COALESCE(m.error_code, p.error_code),
