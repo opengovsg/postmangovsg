@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 import directTransport from 'nodemailer-direct-transport'
 import logger from '@core/logger'
 import { MailToSend, MailCredentials } from '@core/interfaces'
-
+const REFERENCE_ID_HEADER = 'X-Postman-ID' // Case sensitive
 export default class MailClient {
   private email: string
   private mailer: nodemailer.Transporter
@@ -42,22 +42,24 @@ export default class MailClient {
 
   public sendMail(input: MailToSend): Promise<string | void> {
     return new Promise<string | void>((resolve, reject) => {
-      this.mailer.sendMail(
-        {
-          from: this.email,
-          to: input.recipients,
-          subject: input.subject,
-          replyTo: input.replyTo,
-          html: input.body,
-        },
-        (err, info) => {
-          if (err !== null) {
-            reject(new Error(`${err}`))
-          } else {
-            resolve(info.messageId)
-          }
+      const options = {
+        from: this.email,
+        to: input.recipients,
+        subject: input.subject,
+        replyTo: input.replyTo,
+        html: input.body,
+        headers: {},
+      }
+      if (input.referenceId !== undefined) {
+        options.headers = { [REFERENCE_ID_HEADER]: input.referenceId }
+      }
+      this.mailer.sendMail(options, (err, info) => {
+        if (err !== null) {
+          reject(new Error(`${err}`))
+        } else {
+          resolve(info.messageId)
         }
-      )
+      })
     })
   }
 }
