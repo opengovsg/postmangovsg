@@ -78,6 +78,7 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/serverless/postman-api-gateway-authorizer && zip -qr code.zip *
       deploy:
         - provider: lambda
+          edge: true
           function_name: log-twilio-callback-staging
           region: $AWS_DEFAULT_REGION
           role: $STAGING_TWILIO_CALLBACK_ROLE
@@ -93,6 +94,7 @@ jobs:
           on:
             branch: $STAGING_BRANCH
         - provider: lambda
+          edge: true
           function_name: log-twilio-callback-production
           region: $AWS_DEFAULT_REGION
           role: $PRODUCTION_TWILIO_CALLBACK_ROLE
@@ -108,6 +110,7 @@ jobs:
           on:
             branch: $PRODUCTION_BRANCH
         - provider: lambda
+          edge: true
           function_name: postman-api-gateway-authorizer
           region: $AWS_DEFAULT_REGION
           role: $POSTMAN_AUTHORIZER_ROLE
