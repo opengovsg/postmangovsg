@@ -1,7 +1,25 @@
 import sequelizeLoader from './sequelize-loader'
 import { QueryTypes } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
+import {
+  UpdateMessageWithErrorCode,
+  Metadata,
+  BounceMetadata,
+  ComplaintMetadata,
+} from './interfaces'
+const REFERENCE_ID_HEADER = 'X-Postman-ID' // Case sensitive
 let sequelize: Sequelize | null = null // Define the sequelize connection outside so that a warm lambda can reuse the connection
+
+/**
+ * Parses the message to find the matching email_message id
+ * @param message
+ */
+const getReferenceId = (message: any): string | undefined => {
+  const headers: Array<{ name: string; value: string }> = message?.mail?.headers
+  const referenceId = headers.find(({ name }) => name === REFERENCE_ID_HEADER)
+    ?.value
+  return referenceId
+}
 
 /**
  * Adds email to blacklist table if it does not exist
@@ -23,22 +41,16 @@ const addToBlacklist = (recipientEmail: string) => {
  * Updates email_messages with an error and error code
  *
  */
-const updateMessageWithError = ({
-  errorCode,
-  timestamp,
-  messageId,
-}: {
-  errorCode: string
-  timestamp: string
-  messageId: string
-}) => {
-  console.log('Updating email_messages table.')
+const updateMessageWithError = (opts: UpdateMessageWithErrorCode) => {
+  const { errorCode, timestamp, id } = opts
+
+  console.log(`Updating email_messages table. ${JSON.stringify(opts)}`)
   return sequelize?.query(
     `UPDATE email_messages SET error_code=:errorCode, received_at=:timestamp, status='INVALID_RECIPIENT', updated_at = clock_timestamp()
-    WHERE message_id=:messageId 
+    WHERE id=:id 
     AND (received_at IS NULL OR received_at < :timestamp);`,
     {
-      replacements: { errorCode, timestamp, messageId },
+      replacements: { errorCode, timestamp, id },
       type: QueryTypes.UPDATE,
     }
   )
@@ -50,17 +62,15 @@ const updateMessageWithError = ({
  *  @param message JSON object that contains the notification details
  *  @param timestamp ISO string from notification timestamp
  */
-const updateSuccessfulDelivery = async (message: any, timestamp: string) => {
-  const messageId = message?.mail?.commonHeaders?.messageId
-
-  console.log('Updating email_messages table.')
+const updateSuccessfulDelivery = async (metadata: Metadata) => {
+  console.log(`Updating email_messages table ${JSON.stringify(metadata)}`)
   // Since notifications for the same messageId can be interleaved, we only update that message if this notification is newer than the previous.
   await sequelize?.query(
     `UPDATE email_messages SET received_at=:timestamp, updated_at = clock_timestamp(), status='SUCCESS' 
-    WHERE message_id=:messageId 
+    WHERE id=:id 
     AND (received_at IS NULL OR received_at < :timestamp);`,
     {
-      replacements: { timestamp, messageId },
+      replacements: { timestamp: metadata.timestamp, id: metadata.id },
       type: QueryTypes.UPDATE,
     }
   )
@@ -73,22 +83,26 @@ const updateSuccessfulDelivery = async (message: any, timestamp: string) => {
  *  @param message JSON object that contains the notification details
  *  @param timestamp ISO string from notification timestamp
  */
-const updateBouncedStatus = async (message: any, timestamp: string) => {
-  const bounceType = message?.bounce?.bounceType
-  const messageId = message?.mail?.commonHeaders?.messageId
+const updateBouncedStatus = async (metadata: BounceMetadata) => {
+  const bounceType = metadata.message?.bounce?.bounceType
+  const recipients = metadata?.message?.mail?.commonHeaders?.to
   let errorCode
 
   if (bounceType === 'Permanent') {
     errorCode =
       "Hard bounce, the recipient's mail server permanently rejected the email."
     // Add to black list
-    await Promise.all(message?.mail?.commonHeaders?.to.map(addToBlacklist))
+    if (recipients) await Promise.all(recipients.map(addToBlacklist))
   } else {
     errorCode =
       'Soft bounce, Amazon SES fails to deliver the email after retrying for a period of time.'
   }
 
-  await updateMessageWithError({ errorCode, timestamp, messageId })
+  await updateMessageWithError({
+    errorCode,
+    timestamp: metadata.timestamp,
+    id: metadata.id,
+  })
 }
 
 /**
@@ -96,38 +110,45 @@ const updateBouncedStatus = async (message: any, timestamp: string) => {
  *  @param message JSON object that contains the notification details
  *  @param timestamp ISO string from notification timestamp
  */
-const updateComplaintStatus = async (message: any, timestamp: string) => {
-  const messageId = message?.mail?.commonHeaders?.messageId
-  const errorCode = message?.complaint?.complaintFeedbackType
-  await Promise.all(message?.mail?.commonHeaders?.to.map(addToBlacklist))
-  await updateMessageWithError({ errorCode, timestamp, messageId })
+const updateComplaintStatus = async (metadata: ComplaintMetadata) => {
+  const errorCode = metadata.message?.complaint?.complaintFeedbackType
+  const recipients = metadata?.message?.mail?.commonHeaders?.to
+
+  if (errorCode && recipients) {
+    await Promise.all(recipients.map(addToBlacklist))
+    await updateMessageWithError({
+      errorCode,
+      timestamp: metadata.timestamp,
+      id: metadata.id,
+    })
+  }
 }
 
 const handleMessage = async (record: any) => {
   const message = JSON.parse(record.Sns.Message)
-  const notificationType = message?.notificationType
-
-  const timestamp = record.Sns.Timestamp
+  const id = getReferenceId(message)
   const messageId = message?.mail?.commonHeaders?.messageId
-
-  if (messageId === undefined) {
-    console.error(`No messageId found for: ${JSON.stringify(message)}`)
+  if (id === undefined) {
+    console.log(
+      `No ${REFERENCE_ID_HEADER} header found for messageId ${messageId}.`
+    )
     return
   }
 
-  console.log(
-    `Updating messageId ${messageId} in respective tables, notificationType = ${notificationType}`
-  )
+  const notificationType = message?.notificationType
+  const timestamp = record.Sns.Timestamp
 
+  console.log(`Update for notificationType = ${notificationType}`)
+  const metadata = { id, timestamp, messageId }
   switch (notificationType) {
     case 'Delivery':
-      await updateSuccessfulDelivery(message, timestamp)
+      await updateSuccessfulDelivery(metadata)
       break
     case 'Bounce':
-      await updateBouncedStatus(message, timestamp)
+      await updateBouncedStatus({...metadata, message})
       break
     case 'Complaint':
-      await updateComplaintStatus(message, timestamp)
+      await updateComplaintStatus({...metadata, message})
       break
     default:
       console.error(
@@ -147,7 +168,7 @@ exports.handler = async (event: any) => {
     if (sequelize === null) {
       sequelize = await sequelizeLoader()
     }
-
+    
     await Promise.all(event.Records.map(handleMessage))
 
     return {

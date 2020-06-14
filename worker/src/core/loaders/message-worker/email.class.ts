@@ -101,6 +101,7 @@ class Email {
             recipients: [recipient],
             subject,
             body: hydratedBody,
+            referenceId: String(id),
             ...(replyTo ? { replyTo } : {}),
           })
         }
