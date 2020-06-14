@@ -1,7 +1,7 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
-const rdsCa = fs.readFileSync(path.join(__dirname, './assets/db-ca.pem')) 
+const rdsCa = fs.readFileSync(path.join(__dirname, './assets/db-ca.pem'))
 /**
  * To require an env var without setting a default,
  * use
@@ -11,14 +11,14 @@ const rdsCa = fs.readFileSync(path.join(__dirname, './assets/db-ca.pem'))
  */
 convict.addFormats({
   'required-string': {
-    validate:  (val: any): void => {
+    validate: (val: any): void => {
       if (val === '') {
         throw new Error('Required value cannot be empty')
       }
     },
-    coerce: (val: any): any => { 
-      if (val === null){
-        return undefined 
+    coerce: (val: any): any => {
+      if (val === null) {
+        return undefined
       }
       return val
     },
@@ -73,44 +73,46 @@ const config = convict({
         format: 'int',
       },
       acquire: {
-        doc: 'Number of milliseconds to try getting a connection from the pool before throwing error',
+        doc:
+          'Number of milliseconds to try getting a connection from the pool before throwing error',
         default: 600000,
         env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
         format: 'int',
-      }, 
+      },
       connectionTimeoutMillis: {
-        doc: 'Number of milliseconds to wait before timing out when connecting a new client',
+        doc:
+          'Number of milliseconds to wait before timing out when connecting a new client',
         default: 30000,
         env: 'SEQUELIZE_POOL_CONNECTION_TIMEOUT',
         format: 'int',
-      }
+      },
     },
   },
   callbackSecret: {
-    doc: 'Secret used to generate the basic auth credentials for twilio callback',
+    doc:
+      'Secret used to generate the basic auth credentials for twilio callback',
     default: '',
     env: 'TWILIO_CALLBACK_SECRET',
     format: 'required-string',
     sensitive: true,
-  }
+  },
 })
 
 // Only development is a non-production environment
 // Override with local config
-if (config.get('env') === 'development'){
+if (config.get('env') === 'development') {
   config.load({
-    'IS_PROD': false,
+    IS_PROD: false,
     database: {
       dialectOptions: {
         ssl: {
           require: false, // No ssl connection needed
           rejectUnauthorized: true,
-          ca: false, 
+          ca: false,
         },
       },
     },
   })
 }
-
 
 export default config
