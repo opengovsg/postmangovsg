@@ -60,8 +60,8 @@ const getNextJob = (): Promise<{
     })
 }
 
-const enqueueMessages = (jobId: number): Promise<void> => {
-  return service().enqueueMessages(jobId)
+const enqueueMessages = (jobId: number, campaignId: number): Promise<void> => {
+  return service().enqueueMessages(jobId, campaignId)
 }
 
 const getMessages = (
@@ -133,10 +133,10 @@ const waitForMs = (ms: number): Promise<void> => {
 }
 
 const enqueueAndSend = async (): Promise<void> => {
-  const { jobId, rate, credName } = await getNextJob()
-  if (jobId && rate && credName) {
+  const { jobId, rate, credName, campaignId } = await getNextJob()
+  if (jobId && rate && credName && campaignId) {
     await service().setSendingService(credName)
-    await enqueueMessages(jobId)
+    await enqueueMessages(jobId, campaignId)
     let hasNext = true
     while (hasNext) {
       const messages = await getMessages(jobId, rate)
