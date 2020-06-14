@@ -139,16 +139,16 @@ const handleMessage = async (record: any) => {
   const timestamp = record.Sns.Timestamp
 
   console.log(`Update for notificationType = ${notificationType}`)
-
+  const metadata = { id, timestamp, messageId }
   switch (notificationType) {
     case 'Delivery':
-      await updateSuccessfulDelivery({ id, timestamp, messageId })
+      await updateSuccessfulDelivery(metadata)
       break
     case 'Bounce':
-      await updateBouncedStatus({ id, timestamp, messageId, message })
+      await updateBouncedStatus({...metadata, message})
       break
     case 'Complaint':
-      await updateComplaintStatus({ id, timestamp, messageId, message })
+      await updateComplaintStatus({...metadata, message})
       break
     default:
       console.error(
