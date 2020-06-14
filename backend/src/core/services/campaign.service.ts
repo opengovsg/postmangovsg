@@ -36,7 +36,7 @@ const createCampaign = ({
  */
 const updateCampaignS3Metadata = (
   key: string,
-  campaignId: string,
+  campaignId: number,
   filename: string,
   transaction: Transaction | undefined
 ): Promise<[number, Campaign[]]> => {
