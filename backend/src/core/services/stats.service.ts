@@ -1,4 +1,4 @@
-import { fn, cast } from 'sequelize'
+import { fn, cast, Transaction } from 'sequelize'
 import { Statistic, JobQueue } from '@core/models'
 import { CampaignStats, CampaignStatsCount } from '@core/interfaces'
 
@@ -24,6 +24,31 @@ const getStatsFromArchive = async (
     unsent: stats?.unsent,
     invalid: stats?.invalid,
   }
+}
+
+/**
+ * Upsert unsent count to statistic table
+ * @param campaignId
+ * @param unsent
+ * @param transaction optional
+ */
+const setNumRecipients = async (
+  campaignId: number,
+  unsent: number,
+  transaction?: Transaction
+): Promise<void> => {
+  await Statistic.upsert(
+    {
+      campaignId,
+      unsent,
+      errored: 0,
+      sent: 0,
+      invalid: 0,
+    },
+    {
+      transaction,
+    }
+  )
 }
 
 /**
@@ -103,4 +128,5 @@ const getTotalSentCount = async (): Promise<number> => {
 export const StatsService = {
   getCurrentStats,
   getTotalSentCount,
+  setNumRecipients,
 }
