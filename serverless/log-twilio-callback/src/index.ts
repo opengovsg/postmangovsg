@@ -1,15 +1,18 @@
 import querystring from 'querystring'
 import bcrypt from 'bcryptjs'
 import { QueryTypes } from 'sequelize'
+import { Sequelize } from 'sequelize-typescript'
 
 import sequelizeLoader from './sequelize-loader'
 import config from './config'
-
 const FINALIZED_STATUS = ['sent', 'delivered', 'undelivered', 'failed']
+let sequelize: Sequelize | null = null // Define the sequelize connection outside so that a warm lambda can reuse the connection
 
 exports.handler = async (event: any) => {
   try {
-    const sequelize = await sequelizeLoader()
+    if (sequelize === null) {
+      sequelize = await sequelizeLoader()
+    }
 
     const { messageId, campaignId } = event.pathParameters
     const { MessageSid: twilioMessageId, MessageStatus: twilioMessageStatus, ErrorCode: twilioErrorCode } = querystring.parse(event.body)
