@@ -11,13 +11,15 @@ BEGIN
     UPDATE email_messages e
     SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp(), delivered_at = NULL, sent_at = NULL, received_at = NULL, error_code = NULL, 
       status = (
+        -- marks blacklisted messages by setting their status to INVALID_RECIPIENT, 
+        -- and resets messages with status=ERROR to status=NULL
         CASE WHEN invalid_recipient IS NULL THEN NULL ELSE 'INVALID_RECIPIENT'::enum_email_messages_status END
       )
     FROM (
       SELECT m.*, b.recipient AS invalid_recipient FROM email_messages m LEFT OUTER JOIN email_blacklist b ON m.recipient = b.recipient
       WHERE 
       m.campaign_id = selected_campaign_id
-      -- enqueue only those that have not been enqueued - this means that when we retry, we will have to set dequeued_at to null
+      -- enqueue only those that have not been enqueued - when logger writes the ops back to messages, it will set dequeued_at to null so that messages can be retried.
       AND m.dequeued_at IS NULL
       -- enqueue only unsent or errored messages
       AND (m.status = 'ERROR' OR m.status IS NULL)
