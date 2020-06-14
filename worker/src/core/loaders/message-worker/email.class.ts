@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize-typescript'
-import { QueryTypes } from 'sequelize'
+import { QueryTypes, Transaction } from 'sequelize'
 import map from 'lodash/map'
 
 import logger from '@core/logger'
@@ -21,11 +21,24 @@ class Email {
     )
   }
 
-  enqueueMessages(jobId: number): Promise<void> {
+  enqueueMessages(jobId: number, campaignId: number): Promise<void> {
     return this.connection
-      .query('SELECT enqueue_messages_email(:job_id); ', {
-        replacements: { job_id: jobId },
-        type: QueryTypes.SELECT,
+      .transaction(async (transaction: Transaction) => {
+        await this.connection.query('SELECT enqueue_messages_email(:job_id);', {
+          replacements: { job_id: jobId },
+          type: QueryTypes.SELECT,
+          transaction,
+        })
+        // This is to ensure that stats count tally with total count during sending
+        // as enqueue step may set messages as invalid
+        await this.connection.query(
+          'SELECT update_stats_email(:campaign_id);',
+          {
+            replacements: { campaign_id: campaignId },
+            type: QueryTypes.SELECT,
+            transaction,
+          }
+        )
       })
       .then(() => {
         logger.info(`${this.workerId}: s_enqueueMessagesEmail job_id=${jobId}`)
@@ -46,7 +59,7 @@ class Email {
     }[]
   > {
     return this.connection
-      .query('SELECT get_messages_to_send_email(:job_id, :rate) ;', {
+      .query('SELECT get_messages_to_send_email(:job_id, :rate);', {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
       })
@@ -88,19 +101,20 @@ class Email {
             recipients: [recipient],
             subject,
             body: hydratedBody,
+            referenceId: String(id),
             ...(replyTo ? { replyTo } : {}),
           })
         }
       )
       .then((messageId) => {
         return this.connection.query(
-          'UPDATE email_ops SET delivered_at=clock_timestamp(), message_id=:messageId, updated_at=clock_timestamp() WHERE id=:id;',
+          `UPDATE email_ops SET status='SENDING', delivered_at=clock_timestamp(), message_id=:messageId, updated_at=clock_timestamp() WHERE id=:id;`,
           { replacements: { id, messageId }, type: QueryTypes.UPDATE }
         )
       })
       .catch((error: Error) => {
         return this.connection.query(
-          'UPDATE email_ops SET delivered_at=clock_timestamp(), error_code=:error, updated_at=clock_timestamp() WHERE id=:id;',
+          `UPDATE email_ops SET status='ERROR', delivered_at=clock_timestamp(), error_code=:error, updated_at=clock_timestamp() WHERE id=:id;`,
           {
             replacements: { id, error: error.message.substring(0, 255) },
             type: QueryTypes.UPDATE,

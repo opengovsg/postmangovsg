@@ -12,6 +12,13 @@ export enum JobStatus {
   Logged = 'LOGGED',
 }
 
+export enum MessageStatus {
+  Sending = 'SENDING',
+  Error = 'ERROR',
+  Success = 'SUCCESS',
+  InvalidRecipient = 'INVALID_RECIPIENT',
+}
+
 /**
  * @swagger
  * components:

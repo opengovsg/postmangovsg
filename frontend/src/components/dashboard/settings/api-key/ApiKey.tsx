@@ -58,8 +58,8 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
         if (apiKey) {
           modalContext.setModalContent(
             <ConfirmModal
-              title="Generate new API key?"
-              subtitle="This will invalidate the current API key."
+              title="Are you sure?"
+              subtitle="Generating a new API key will revoke your current one."
               buttonText="Confirm"
               onConfirm={onGenerateConfirm}
             />

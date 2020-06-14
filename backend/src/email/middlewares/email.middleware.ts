@@ -56,10 +56,7 @@ const getCampaignDetails = async (
   try {
     const { campaignId } = req.params
     const result = await EmailService.getCampaignDetails(+campaignId)
-    return res.json({
-      campaign: result.campaign,
-      num_recipients: result.numRecipients,
-    })
+    return res.json(result)
   } catch (err) {
     return next(err)
   }
