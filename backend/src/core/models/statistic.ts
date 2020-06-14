@@ -6,7 +6,6 @@ import {
   ForeignKey,
 } from 'sequelize-typescript'
 import { Campaign } from './campaign'
-import { QueryTypes } from 'sequelize'
 
 @Table({ tableName: 'statistics', underscored: true, timestamps: true })
 export class Statistic extends Model<Statistic> {
@@ -28,14 +27,4 @@ export class Statistic extends Model<Statistic> {
 
   @Column(DataType.INTEGER)
   invalid!: number
-
-  static async updateStats(campaignId: number): Promise<void> {
-    await this.sequelize?.query('SELECT update_stats(:campaignId);', {
-      replacements: {
-        campaignId,
-      },
-      type: QueryTypes.SELECT,
-    })
-    return
-  }
 }
