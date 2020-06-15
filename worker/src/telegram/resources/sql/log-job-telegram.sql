@@ -14,5 +14,5 @@ BEGIN
 	DELETE FROM telegram_ops o
   WHERE o.campaign_id = selected_campaign_id;
 
-  -- TODO: update stats
+  PERFORM update_stats_telegram(selected_campaign_id);
 END $$
