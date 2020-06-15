@@ -15,6 +15,7 @@ BEGIN
     FROM telegram_messages
       LEFT JOIN telegram_subscribers ON telegram_messages.recipient = telegram_subscribers.phone_number
     WHERE telegram_messages.campaign_id = selected_campaign_id
+      AND telegram_messages.dequeued_at IS NULL
   ),
 
   no_telegram_id AS (
