@@ -99,20 +99,42 @@ class Telegram {
     body: string
   }): Promise<void> {
     try {
-      // TODO: remove
-      logger.info(
-        `${
-          this.workerId
-        }: s_sendMessageTelegram id=${id} recipient=${recipient} message=${templateClient.template(
-          body,
-          params
-        )}`
-      )
+      const message = templateClient.template(body, params)
+      const messageId = await this.telegramClient?.send(recipient, message)
 
-      // TODO: Use Telegram client to send message
+      // Update `telegram_ops` with Telegram message id
+      await this.connection.query(
+        `
+          UPDATE telegram_ops
+          SET message_id = :messageId, delivered_at = clock_timestamp(), updated_at = clock_timestamp()
+          WHERE id = :id
+        `,
+        {
+          replacements: {
+            messageId,
+            id,
+          },
+        }
+      )
     } catch (err) {
-      // Set error code
+      // Sending failure, update `telegram_ops` with error code
+      const error = `${err.code}: ${err.description}`
+      await this.connection.query(
+        `
+          UPDATE telegram_ops
+          SET error_code = :error, delivered_at = clock_timestamp(), updated_at = clock_timestamp()
+          WHERE id = :id
+        `,
+        {
+          replacements: {
+            error,
+            id,
+          },
+        }
+      )
     }
+
+    logger.info(`${this.workerId}: sendMessageTelegram id=${id}`)
   }
 }
 
