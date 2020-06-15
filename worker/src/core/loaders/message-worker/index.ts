@@ -112,11 +112,20 @@ const finalize = (): Promise<void> => {
       logger.error(err)
     })
 
-  return Promise.all([logEmailJob, logSmsJob]).then((campaignIds) => {
-    campaignIds.filter(Boolean).forEach((campaignId) => {
-      logger.info(`${workerId}: finalized campaignId=${campaignId}`)
+  const logTelegramJob = connection
+    .query('SELECT log_next_job_telegram();')
+    .then(([result]) => get(result, '[0].log_next_job_telegram', ''))
+    .catch((err) => {
+      logger.error(err)
     })
-  })
+
+  return Promise.all([logEmailJob, logSmsJob, logTelegramJob]).then(
+    (campaignIds) => {
+      campaignIds.filter(Boolean).forEach((campaignId) => {
+        logger.info(`${workerId}: finalized campaignId=${campaignId}`)
+      })
+    }
+  )
 }
 
 const createConnection = (): Sequelize => {
