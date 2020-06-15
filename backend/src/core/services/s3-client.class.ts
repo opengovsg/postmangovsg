@@ -83,4 +83,17 @@ export default class S3Client {
       throw err
     }
   }
+
+  /**
+   * Download CSV file from S3 and process it into message.
+   * The messages are formed from the template and parameters specified in the csv.
+   *
+   * @param campaignId
+   * @param s3Key
+   */
+  async getCsvFile(s3Key: string): Promise<Array<CSVParamsInterface>> {
+    const downloadStream = this.download(s3Key)
+    const fileContents = await this.parseCsv(downloadStream)
+    return fileContents
+  }
 }
