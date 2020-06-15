@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import cx from 'classnames'
 
+import { ChannelType } from 'classes'
 import { PrimaryButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { UserCredential, deleteCredential } from 'services/settings.service'
@@ -12,16 +13,21 @@ import styles from './Credentials.module.scss'
 
 const Credentials = ({
   creds,
+  credType,
   refresh,
+  title,
 }: {
   creds: UserCredential[]
+  credType: ChannelType
   refresh: Function
+  title: string
 }) => {
   const modalContext = useContext(ModalContext)
 
   function onAddCredentialClicked() {
     modalContext.setModalContent(
       <AddCredentialModal
+        credType={credType}
         labels={creds.map((c) => c.label)}
         onSuccess={refresh}
       ></AddCredentialModal>
@@ -75,7 +81,7 @@ const Credentials = ({
   return (
     <>
       <div className={styles.credHeader}>
-        <h2>Credentials</h2>
+        <h2>{title}</h2>
         <PrimaryButton
           className={styles.blueButton}
           onClick={onAddCredentialClicked}
