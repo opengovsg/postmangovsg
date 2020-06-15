@@ -1,8 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-$content-width: 600px;
-
 .modalBg {
   @include flex-center();
   background: $transparent-dark-blue;
@@ -29,9 +27,8 @@ $content-width: 600px;
   }
 
   .content {
-    width: $content-width;
     max-width: 100vw;
-    padding: 3rem 3rem;
+    padding: 3rem 4.5rem;
     margin: auto;
   }
 
