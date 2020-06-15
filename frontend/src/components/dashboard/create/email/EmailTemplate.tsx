@@ -94,7 +94,9 @@ const EmailTemplate = ({
       <h4 className={styles.replyToHeader}>
         Replies <em>optional</em>
       </h4>
-      <p>All replies will be directed to the email address indicated below</p>
+      <p className={styles.replyToInfo}>
+        All replies will be directed to the email address indicated below
+      </p>
       <TextInput
         placeholder="Enter reply-to email address"
         value={replyTo || ''}

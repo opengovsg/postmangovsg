@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import cx from 'classnames'
 
+import { ChannelType } from 'classes'
 import { PrimaryButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { UserCredential, deleteCredential } from 'services/settings.service'
@@ -8,6 +9,7 @@ import { channelIcons } from 'classes'
 
 import AddCredentialModal from '../add-credential-modal'
 import EmptyCredentialsImage from 'assets/img/credentials.svg'
+import VerifyCredentialModal from '../verify-credential-modal'
 import styles from './Credentials.module.scss'
 
 const Credentials = ({
@@ -46,6 +48,15 @@ const Credentials = ({
     refresh()
   }
 
+  async function onVerifyCredClicked(label: string, type: ChannelType) {
+    modalContext.setModalContent(
+      <VerifyCredentialModal
+        label={label}
+        credType={type}
+      ></VerifyCredentialModal>
+    )
+  }
+
   function renderCredentials() {
     return (
       <>
@@ -56,6 +67,15 @@ const Credentials = ({
             </td>
             <td className="md">{label}</td>
             <td className={cx('sm', styles.actionColumn)}>
+              <i
+                className={cx(
+                  'bx',
+                  'bx-message-check',
+                  styles.icon,
+                  styles.verifyButton
+                )}
+                onClick={() => onVerifyCredClicked(label, type)}
+              ></i>
               <i
                 className={cx(
                   'bx',

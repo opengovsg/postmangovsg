@@ -18,7 +18,7 @@ const isSmsCampaignOwnedByUser = async (
     const { campaignId } = req.params
     const userId = req.session?.user?.id
     const campaign = await SmsService.findCampaign(+campaignId, +userId)
-    return campaign ? next() : res.sendStatus(400)
+    return campaign ? next() : res.sendStatus(403)
   } catch (err) {
     return next(err)
   }
@@ -170,11 +170,7 @@ const getCampaignDetails = async (
   try {
     const { campaignId } = req.params
     const result = await SmsService.getCampaignDetails(+campaignId)
-    // TODO: Why is numRecipients not part of campaign?
-    return res.json({
-      campaign: (await result).campaign,
-      num_recipients: result.numRecipients,
-    })
+    return res.json(result)
   } catch (err) {
     return next(err)
   }

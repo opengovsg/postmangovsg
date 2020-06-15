@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
+import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -21,11 +22,11 @@ const Campaigns = () => {
   const { email } = useContext(AuthContext)
   const modalContext = useContext(ModalContext)
   const [isLoading, setLoading] = useState(true)
-  const [campaigns, setCampaigns] = useState(new Array<Campaign>())
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(
     new Array<Campaign>()
   )
   const [selectedPage, setSelectedPage] = useState(0)
+  const [campaignCount, setCampaignCount] = useState(0)
   const history = useHistory()
   const name = getNameFromEmail(email)
   const title = `Welcome, ${name}`
@@ -39,20 +40,20 @@ const Campaigns = () => {
       .join(' ')
   }
 
-  async function fetchCampaigns() {
-    const campaigns = await getCampaigns()
-    setCampaigns(campaigns)
+  async function fetchCampaigns(selectedPage: number) {
+    setLoading(true)
+    const { campaigns, totalCount } = await getCampaigns({
+      offset: selectedPage * ITEMS_PER_PAGE,
+      limit: ITEMS_PER_PAGE,
+    })
+    setCampaignCount(totalCount)
+    setCampaignsDisplayed(campaigns)
     setLoading(false)
   }
 
   useEffect(() => {
-    fetchCampaigns()
-  }, [])
-
-  useEffect(() => {
-    const offset = selectedPage * ITEMS_PER_PAGE
-    setCampaignsDisplayed(campaigns.slice(offset, offset + ITEMS_PER_PAGE))
-  }, [campaigns, selectedPage])
+    fetchCampaigns(selectedPage)
+  }, [selectedPage])
 
   /* eslint-disable react/display-name */
   const headers = [
@@ -115,12 +116,12 @@ const Campaigns = () => {
         />
         <h2>We are excited to have you here!</h2>
         <h5>To get you started, we have prepared a guide for your reference</h5>
-        <a href={GUIDE_URL} target="_blank" rel="noopener noreferrer">
+        <OutboundLink eventLabel={GUIDE_URL} to={GUIDE_URL} target="_blank">
           <PrimaryButton className={styles.darkBlueButton}>
             Learn how to set up →
           </PrimaryButton>
-        </a>
-        <h5>Or you can begin creating your campaign with our step-by step</h5>
+        </OutboundLink>
+        <h5>Or you can begin creating your campaign here</h5>
         <PrimaryButton
           onClick={() =>
             modalContext.setModalContent(<CreateCampaign></CreateCampaign>)
@@ -135,7 +136,7 @@ const Campaigns = () => {
   function renderCampaignList() {
     return (
       <>
-        <h2 className={styles.header}>{campaigns.length} past campaigns</h2>
+        <h2 className={styles.header}>{campaignCount} past campaigns</h2>
         <div className={styles.tableContainer}>
           <table className={styles.campaignTable}>
             <thead>
@@ -152,7 +153,8 @@ const Campaigns = () => {
         </div>
 
         <Pagination
-          itemsCount={campaigns.length}
+          itemsCount={campaignCount}
+          selectedPage={selectedPage}
           setSelectedPage={setSelectedPage}
           itemsPerPage={ITEMS_PER_PAGE}
         ></Pagination>
@@ -180,7 +182,7 @@ const Campaigns = () => {
               'bx bx-loader-alt bx-spin'
             )}
           ></i>
-        ) : campaigns.length > 0 ? (
+        ) : campaignCount > 0 ? (
           renderCampaignList()
         ) : (
           renderEmptyDashboard()

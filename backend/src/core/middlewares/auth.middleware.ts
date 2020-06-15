@@ -70,7 +70,7 @@ const getUser = async (
 ): Promise<Response | void> => {
   if (req?.session?.user?.id) {
     const user = await AuthService.findUser(req?.session?.user?.id)
-    return res.json({ email: user?.email })
+    return res.json({ email: user?.email, id: user?.id })
   }
   return res.json({})
 }
@@ -97,6 +97,7 @@ const isCookieOrApiKeyAuthenticated = async (
       // Practically, we have to check multiple places for the user id when we want to retrieve the id
       // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
       req.session.user = user
+      req.session.apiKey = true
       return next()
     }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import cx from 'classnames'
 
 import {
   validateStoredCredentials,
@@ -145,7 +146,7 @@ const SMSCredentials = ({
             renderCredentialFields()
           ) : (
             <PrimaryButton
-              className={styles.darkBlueBtn}
+              className={cx(styles.darkBlueBtn, styles.newCredentialsButton)}
               onClick={() => setShowCredentialFields(true)}
             >
               Enter new credentials

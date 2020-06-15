@@ -49,11 +49,13 @@ frontend:
           value: "same-origin"
         - key: "Content-Security-Policy"
           value:
-            "connect-src 'self' https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com;
+            "connect-src 'self' https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com https://www.google-analytics.com;
             style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com;
             font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
             default-src 'self' https://*.postman.gov.sg;
-            object-src 'none'"
+            object-src 'none';
+            script-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
+            img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com"
     - pattern: "/static/**/*"
       headers:
         - key: "Cache-Control"

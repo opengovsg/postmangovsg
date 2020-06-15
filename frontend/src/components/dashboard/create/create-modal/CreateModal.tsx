@@ -1,4 +1,6 @@
 import React, { useState, useContext } from 'react'
+import { OutboundLink } from 'react-ga'
+import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
 import { GUIDE_CREDENTIALS_URL } from 'config'
@@ -7,7 +9,7 @@ import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
-import { useHistory } from 'react-router-dom'
+
 const CreateModal = () => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()
@@ -68,13 +70,13 @@ const CreateModal = () => {
 
         <p className={styles.subtext}>
           Get your credentials ready.
-          <a
-            href={GUIDE_CREDENTIALS_URL}
+          <OutboundLink
+            eventLabel={GUIDE_CREDENTIALS_URL}
+            to={GUIDE_CREDENTIALS_URL}
             target="_blank"
-            rel="noopener noreferrer"
           >
             What is this?
-          </a>
+          </OutboundLink>
         </p>
       </div>
 
