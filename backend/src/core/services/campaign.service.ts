@@ -1,9 +1,6 @@
 import { Op, literal, Transaction } from 'sequelize'
-import config from '@core/config'
 import { JobStatus } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
-
-const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress
@@ -28,42 +25,6 @@ const createCampaign = ({
   userId: number
 }): Promise<Campaign> => {
   return Campaign.create({ name, type, userId, valid: false })
-}
-
-/**
- * On file upload, save the transaction id and file name against the campaign so that we can download the file from s3 later
- * @param param0
- */
-const updateCampaignS3Metadata = (
-  key: string,
-  campaignId: number,
-  filename: string,
-  transaction: Transaction | undefined
-): Promise<[number, Campaign[]]> => {
-  const s3Object = {
-    key,
-    bucket: FILE_STORAGE_BUCKET_NAME,
-    filename,
-  }
-
-  return Campaign.update(
-    { s3Object },
-    {
-      where: {
-        id: campaignId,
-      },
-      returning: true,
-      transaction,
-    }
-  )
-}
-
-/**
- * Helper method to find a campaign by id
- * @param id
- */
-const retrieveCampaign = (id: number): Promise<Campaign> => {
-  return Campaign.findByPk(id)
 }
 
 /**
@@ -155,9 +116,7 @@ const setValid = (
 export const CampaignService = {
   hasJobInProgress,
   createCampaign,
-  retrieveCampaign,
   listCampaigns,
-  updateCampaignS3Metadata,
   setInvalid,
   setValid,
 }

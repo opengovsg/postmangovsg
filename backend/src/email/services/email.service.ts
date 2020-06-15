@@ -151,11 +151,14 @@ const getCampaignDetails = async (
         'type',
         'created_at',
         'valid',
-        [
-          literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
-          'has_credential',
-        ],
+        [literal('cred_name IS NOT NULL'), 'has_credential'],
         [literal("s3_object -> 'filename'"), 'csv_filename'],
+        [
+          literal(
+            "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
+          ),
+          'is_csv_processing',
+        ],
       ],
       include: [
         {

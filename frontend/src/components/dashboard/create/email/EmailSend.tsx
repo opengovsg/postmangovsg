@@ -18,7 +18,7 @@ const EmailSend = ({
 }) => {
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState(
-    {} as { body: string; subject: string; reply_to: string | null }
+    {} as { body: string; subject: string; replyTo: string | null }
   )
   const { id: campaignId } = useParams()
 
@@ -72,7 +72,7 @@ const EmailSend = ({
         <PreviewBlock
           body={preview.body}
           subject={preview.subject}
-          replyTo={preview.reply_to}
+          replyTo={preview.replyTo}
         />
       </div>
 

@@ -250,12 +250,53 @@ router.get(
  *                 filename:
  *                   type: string
  *       responses:
+ *         "202" :
+ *           description: Accepted. The uploaded file is being processed.
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/upload/complete',
+  celebrate(uploadCompleteValidator),
+  CampaignMiddleware.canEditCampaign,
+  EmailTemplateMiddleware.uploadCompleteHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/upload/status:
+ *     get:
+ *       description: "Get csv processing status"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
  *         200:
  *           description: Success
  *           content:
  *             application/json:
  *               schema:
  *                 properties:
+ *                   is_csv_processing:
+ *                     type: boolean
+ *                   csv_filename:
+ *                     type: string
+ *                   temp_csv_filename:
+ *                     type: string
+ *                   csv_error:
+ *                     type: string
  *                   num_recipients:
  *                     type: number
  *                   preview:
@@ -277,11 +318,36 @@ router.get(
  *         "500":
  *           description: Internal Server Error
  */
-router.post(
-  '/upload/complete',
-  celebrate(uploadCompleteValidator),
+router.get('/upload/status', EmailTemplateMiddleware.pollCsvStatusHandler)
+
+/**
+ * @swagger
+ * post:
+ *   /campaign/{campaignId}/email/upload/status:
+ *     delete:
+ *       description: "Deletes error status from previous failed upload"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.delete(
+  '/upload/status',
   CampaignMiddleware.canEditCampaign,
-  EmailTemplateMiddleware.uploadCompleteHandler
+  EmailTemplateMiddleware.deleteCsvErrorHandler
 )
 
 /**
