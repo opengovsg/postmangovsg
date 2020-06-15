@@ -122,7 +122,7 @@ class Telegram {
       await this.connection.query(
         `
           UPDATE telegram_ops
-          SET error_code = :error, delivered_at = clock_timestamp(), updated_at = clock_timestamp()
+          SET error_code = :error, updated_at = clock_timestamp()
           WHERE id = :id
         `,
         {
