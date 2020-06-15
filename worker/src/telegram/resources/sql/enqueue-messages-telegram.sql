@@ -53,6 +53,7 @@ BEGIN
       UNION ALL
       SELECT * FROM no_subscription
     )
+      AND messages.id = telegram_messages.id
     RETURNING messages.*
   )
 
