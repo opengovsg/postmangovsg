@@ -88,14 +88,6 @@ const config = convict({
       },
     },
   },
-  callbackSecret: {
-    doc:
-      'Secret used to generate the basic auth credentials for twilio callback',
-    default: '',
-    env: 'TWILIO_CALLBACK_SECRET',
-    format: 'required-string',
-    sensitive: true,
-  },
 })
 
 // Only development is a non-production environment

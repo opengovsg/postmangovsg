@@ -8,7 +8,7 @@ import {
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
-import { CampaignService, TemplateService } from '@core/services'
+import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { Campaign } from '@core/models'
@@ -102,6 +102,9 @@ const updateCampaignAndMessages = async (
 
     // START populate template
     await SmsTemplateService.addToMessageLogs(campaignId, records, transaction)
+
+    // Update statistic table
+    await StatsService.setNumRecipients(campaignId, records.length, transaction)
 
     // Set campaign to valid
     await CampaignService.setValid(campaignId, transaction)

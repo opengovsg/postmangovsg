@@ -58,11 +58,9 @@ export async function getCampaignStats(
   campaignId: number
 ): Promise<CampaignStats> {
   return axios.get(`/campaign/${campaignId}/stats`).then((response) => {
-    const { error, unsent, sent, status } = response.data
+    const { status, ...counts } = response.data
     return new CampaignStats({
-      error,
-      unsent,
-      sent,
+      ...counts,
       status: parseStatus(status),
     })
   })

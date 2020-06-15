@@ -12,6 +12,7 @@
   - [Set environment variables](#set-environment-variables)
   - [Install and run the app](#install-and-run-the-app)
 - [Deployment](#deployment)
+- [Serverless](#serverless)
 - [Downtime procedure](#downtime-procedure)
 - [Infrastructure customizations](#infrastructure-customizations)
   - [Amplify rewrite rule](#amplify-rewrite-rule)
@@ -88,6 +89,7 @@ We use TravisCI to simplify our deployment process:
 - `backend` is deployed on Elastic Beanstalk
 - `frontend` is deployed on AWS Amplify
 - `worker` is deployed on Elastic Container Service
+- `serverless` is deployed on AWS Lambda
 
 The environment variables on Travis are:
 
@@ -104,6 +106,12 @@ To deploy workers, trigger a custom build on Travis with the Custom Config set t
 env:
   - DEPLOY_WORKER=true
 ```
+
+## Serverless
+
+We make use of AWS lambda to handle the callbacks from Twilio, as well as updating email delivery status.
+
+See [serverless-docs](serverless/README.md) for details
 
 ## Downtime procedure
 

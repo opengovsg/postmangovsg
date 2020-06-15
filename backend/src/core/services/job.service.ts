@@ -2,7 +2,7 @@ import { QueryTypes, Op } from 'sequelize'
 import get from 'lodash/get'
 
 import config from '@core/config'
-import { Campaign, Statistic } from '@core/models'
+import { Campaign } from '@core/models'
 
 /**
  * Inserts a job into the job_queue table.
@@ -47,9 +47,6 @@ const sendCampaign = async ({
   campaignId: number
   rate: number
 }): Promise<(number | undefined)[]> => {
-  // Store statistics first
-  await Statistic.updateStats(campaignId)
-
   // Split jobs if the supplied send rate is higher than the rate 1 worker can support
   // The rate is distributed evenly across workers.
   const jobs = []
