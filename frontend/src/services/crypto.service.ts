@@ -59,12 +59,14 @@ export async function encryptData(payload: string, password: string) {
 function decodeCipherText(
   ciphertext: string
 ): { cipher: Uint8Array; iv: Uint8Array } {
-  const [cipher, iv] = ciphertext.split('.')
+  const [iv, cipher] = ciphertext.split('.')
   const ivBytes = iv.match(/.{2}/g)
   if (!ivBytes) throw Error('Error decoding initialization vector')
   const decodedIv = new Uint8Array(ivBytes.map((byte) => parseInt(byte, 16)))
+  const cipherBytes = atob(cipher).match(/[\s\S]/g)
+  if (!cipherBytes) throw Error('Error decoding cipher text')
   const decodedCipher = new Uint8Array(
-    Array.from(atob(cipher)).map((ch) => ch.charCodeAt(0))
+    cipherBytes.map((ch) => ch.charCodeAt(0))
   )
 
   return { cipher: decodedCipher, iv: decodedIv }
