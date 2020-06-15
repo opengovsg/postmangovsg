@@ -17,13 +17,6 @@ class Telegram {
   constructor(workerId: string, connection: Sequelize) {
     this.workerId = workerId
     this.connection = connection
-
-    // TODO: remove
-    logger.info(
-      `telegram worker ${workerId}: connection=${this.connection.getDialect()} telegramClient=${
-        this.telegramClient
-      }`
-    )
   }
 
   /**
