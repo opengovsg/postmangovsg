@@ -105,7 +105,9 @@ const storeS3Error = async (
   try {
     await Campaign.updateS3ObjectKey(campaignId, { error })
   } catch (e) {
-    logger.error(`Error storing csv processing error in s3object: ${e}`)
+    logger.error(
+      `Error storing error string in s3object for campaign ${campaignId}: ${e}`
+    )
   }
 }
 

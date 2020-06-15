@@ -16,7 +16,7 @@ import {
   SampleCsv,
 } from 'components/common'
 import { EmailCampaign, EmailPreview } from 'classes'
-import { sendTiming, sendException } from 'services/ga.service'
+import { sendTiming } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
@@ -59,7 +59,9 @@ const EmailRecipients = ({
         )
         setIsCsvProcessing(isCsvProcessing)
         setCsvInfo(newCsvInfo)
-        preview && setPreview(preview as EmailPreview)
+        if (preview) {
+          setPreview(preview as EmailPreview)
+        }
         if (isCsvProcessing) {
           timeoutId = setTimeout(pollStatus, 2000)
         }
