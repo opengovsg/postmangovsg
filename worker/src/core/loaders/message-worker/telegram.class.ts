@@ -1,4 +1,6 @@
 import { Sequelize } from 'sequelize-typescript'
+import { QueryTypes } from 'sequelize'
+import { map } from 'lodash'
 
 import TemplateClient from '@core/services/template-client.class'
 import logger from '@core/logger'
@@ -68,14 +70,18 @@ class Telegram {
       campaignId: number
     }>
   > {
-    // TODO: remove
-    logger.info(
-      `${this.workerId}: s_getMessagesTelegram job_id=${jobId} rate=${rate}`
+    const result = await this.connection.query(
+      'SELECT get_messages_to_send_telegram(:jobId, :rate)',
+      {
+        replacements: {
+          jobId,
+          rate,
+        },
+        type: QueryTypes.SELECT,
+      }
     )
-
-    // TODO: Write and call db function to extract messages from ops table
-    // Return messages
-    return []
+    const messages = map(result, 'get_messages_to_send_telegram')
+    return messages
   }
 
   /**
