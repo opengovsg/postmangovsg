@@ -12,7 +12,6 @@ import {
   InvalidRecipientError,
 } from '@core/errors'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
-import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
