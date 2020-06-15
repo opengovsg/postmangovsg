@@ -2,9 +2,11 @@ import * as pulumi from '@pulumi/pulumi'
 import * as awsx from '@pulumi/awsx'
 import * as aws from '@pulumi/aws'
 import * as fs from 'fs'
-import { VPCSettings, EBDomainSettings, EBSettings, RedisSettings, RdsSettings, WorkerEnvVars, BackendEnvVars } from './interfaces'
-import * as customParameterGroup from './custom-parameter-group'
-import * as customIam from './custom-iam'
+import { VPCSettings, EBDomainSettings, EBSettings, RedisSettings, RdsSettings, WorkerEnvVars, EBEnvVars } from './config/interfaces'
+import * as customParameterGroup from './config/parameter-group'
+import * as customIam from './config/iam'
+import { Region } from '@pulumi/aws'
+
 const pConfig = new pulumi.Config()
 const config = {
 	region: aws.config.requireRegion(),
@@ -19,10 +21,14 @@ const config = {
 	rdsSettings: pConfig.requireObject<RdsSettings>('rdsSettings'),
 	rdsMasterUsername: pConfig.requireSecret('rdsMasterUsername'),
 	rdsMasterPassword: pConfig.requireSecret('rdsMasterPassword'),
+	apiGatewayArn: pConfig.require('apiGatewayArn'), // Currently you have to set this up yourself, I havent figured this out
+	apiGatewayAuthorizerId: pConfig.require('apiGatewayAuthorizerId'),
 	ecsClusterId: pConfig.get('ecsClusterId'), // Not required,
-	// backendEnvVars: pConfig.requireObject<BackendEnvVars>('backendEnvVars'),
-	// workerEnvVars: pConfig.requireObject<WorkerEnvVars>('workerEnvVars'),
+	ebEnvVars: pConfig.requireSecretObject<EBEnvVars>('ebEnvironmentVariables'),
+	workerEnvVars: pConfig.requireSecretObject<WorkerEnvVars>('workerEnvironmentVariables'),
+	sesRegion: pConfig.require('sesRegion') as Region
 }
+
 const APP_NAME = `${config.ebSettings.appName}-${config.environment}`
 
 //#region VPC
@@ -234,8 +240,24 @@ const ebEnv = new aws.elasticbeanstalk.Environment(APP_NAME, {
 		// Command
 		{ namespace: 'aws:elasticbeanstalk:command', name: 'Timeout', value: '900', },
 		{ namespace: 'aws:elasticbeanstalk:command', name: 'IgnoreHealthCheck', value: 'false', }, 
-		{ namespace: 'aws:elasticbeanstalk:command', name: 'DeploymentPolicy', value: config.ebSettings.deploymentPolicy, }
-            
+		{ namespace: 'aws:elasticbeanstalk:command', name: 'DeploymentPolicy', value: config.ebSettings.deploymentPolicy, },
+		//Environment variables
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'API_KEY_SALT_V1', value: config.ebEnvVars.API_KEY_SALT_V1 },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'AWS_LOG_GROUP_NAME', value: config.ebEnvVars.AWS_LOG_GROUP_NAME },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'COOKIE_NAME', value: config.ebEnvVars.COOKIE_NAME },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'DB_URI', value: config.ebEnvVars.DB_URI },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'DOMAIN_WHITELIST', value: config.ebEnvVars.DOMAIN_WHITELIST },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'JWT_SECRET', value: config.ebEnvVars.JWT_SECRET },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'NODE_ENV', value: config.ebEnvVars.NODE_ENV },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'REDIS_OTP_URI', value: config.ebEnvVars.REDIS_OTP_URI },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'REDIS_SESSION_URI', value: config.ebEnvVars.REDIS_SESSION_URI },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SECRET_MANAGER_SALT', value: config.ebEnvVars.SECRET_MANAGER_SALT },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SENTRY_DSN', value: config.ebEnvVars.SENTRY_DSN },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_HOST', value: config.ebEnvVars.SES_HOST },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_PASS', value: config.ebEnvVars.SES_PASS },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_PORT', value: config.ebEnvVars.SES_PORT },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_USER', value: config.ebEnvVars.SES_USER },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SESSION_SECRET', value: config.ebEnvVars.SESSION_SECRET },    
 	],
 }, {
 	dependsOn: [vpc],
@@ -329,6 +351,13 @@ const ecsSendingService = new awsx.ecs.FargateService(`${APP_NAME}-sending`,{
 		containers: {
 			sending: {
 				image: ecsImage,
+				environment: [
+					{ name: 'NODE_ENV', value: config.workerEnvVars.NODE_ENV },
+					{ name: 'ECS_SERVICE_NAME', value: config.workerEnvVars.ECS_SERVICE_NAME },
+					{ name: 'DB_URI', value: config.workerEnvVars.DB_URI },
+					{ name: 'SECRET_MANAGER_SALT', value: config.workerEnvVars.SECRET_MANAGER_SALT },
+					{ name: 'MESSAGE_WORKER_LOGGER', value: config.workerEnvVars.MESSAGE_WORKER_LOGGER },
+				]
 			},
 		},
 	},
@@ -346,6 +375,13 @@ const ecsLoggingService = new awsx.ecs.FargateService(`${APP_NAME}-logging`,{
 		containers: {
 			logging: {
 				image: ecsImage,
+				environment: [
+					{ name: 'NODE_ENV', value: config.workerEnvVars.NODE_ENV },
+					{ name: 'ECS_SERVICE_NAME', value: config.workerEnvVars.ECS_SERVICE_NAME },
+					{ name: 'DB_URI', value: config.workerEnvVars.DB_URI },
+					{ name: 'SECRET_MANAGER_SALT', value: config.workerEnvVars.SECRET_MANAGER_SALT },
+					{ name: 'MESSAGE_WORKER_LOGGER', value: config.workerEnvVars.MESSAGE_WORKER_LOGGER },
+				]
 			},
 		},
 	},
@@ -483,26 +519,121 @@ const rdsInstance = new aws.rds.Instance(`${APP_NAME}-rds`, {
 })
 //#endregion
 
-//#region Update Workers env var
-// ecsSendingService.taskDefinition.containers[0].environment = [
-// 	{ name: 'NODE_ENV', value: config.environment, },
-// 	{ name: 'ECS_SERVICE_NAME', value: ecsSendingService.service.name, },
-// 	{ name: 'DB_URI', value: `postgres://${config.rdsMasterUsername}:${config.rdsMasterPassword}@${rdsInstance.endpoint}/${config.rdsSettings.dbName}`, },
-// 	{ name: 'SECRET_MANAGER_SALT', value: config.workerEnvVars.secretManagerSalt, },
-// 	{ name: 'MESSAGE_WORKER_SENDER', value: '1', }
-// ]
-// ecsLoggingService.taskDefinition.containers[0].environment = [
-// 	{ name: 'NODE_ENV', value: config.environment, },
-// 	{ name: 'ECS_SERVICE_NAME', value: ecsSendingService.service.name, },
-// 	{ name: 'DB_URI', value: `postgres://${config.rdsMasterUsername}:${config.rdsMasterPassword}@${rdsInstance.endpoint}/${config.rdsSettings.dbName}`, },
-// 	{ name: 'SECRET_MANAGER_SALT', value: config.workerEnvVars.secretManagerSalt, },
-// 	{ name: 'MESSAGE_WORKER_LOGGER', value: '1', }
-// ]
+//region LAMBDA
+
+const serverlessRole = new aws.iam.Role('serverless-role', {
+	assumeRolePolicy: customIam.lambdaTrustPolicy
+})
+const serverlessRoleAttachment1 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-serverless-AWSLambdaBasicExecutionRole`, {
+	role: serverlessRole,
+	policyArn: aws.iam.ManagedPolicies.AWSLambdaBasicExecutionRole,
+})
+const serverlessRoleAttachment2 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-serverless-AWSLambdaVPCAccessExecutionRole`, {
+	role: serverlessRole,
+	policyArn: aws.iam.ManagedPolicies.AWSLambdaVPCAccessExecutionRole,
+})
+
+
+const authorizerName = `authorizer-${config.environment}`
+const authorizer =  new aws.lambda.Function(authorizerName,
+{
+	name: authorizerName,
+	handler: 'exports.handler',
+	role: serverlessRole.arn,
+	runtime: 'nodejs12.x',
+	code: new pulumi.asset.FileArchive('authorizer.zip')
+}, {
+	deleteBeforeReplace: true,
+})
+const authorizerApiGatewayPermission = new aws.lambda.Permission('authorizer-permission', {
+    action: "lambda:InvokeFunction",
+    function: authorizer.name,
+    principal: "apigateway.amazonaws.com",
+    sourceArn: pulumi.interpolate`${config.apiGatewayArn}/authorizers/${config.apiGatewayAuthorizerId}`,
+},{
+	deleteBeforeReplace: true
+})
+
+
+const twilioCallbackName = `log-twilio-callback-${config.environment}`
+const twilioCallback = new aws.lambda.Function(twilioCallbackName,
+{
+	name:  twilioCallbackName,
+	vpcConfig: {
+		subnetIds: vpc.privateSubnetIds,
+		securityGroupIds: [serverlessSecurityGroup.id]
+	},
+	handler: 'exports.handler',
+	role: serverlessRole.arn,
+	runtime: 'nodejs12.x',
+	code: new pulumi.asset.FileArchive('twilio-callback.zip')
+}, {
+	deleteBeforeReplace: true
+})
+const twilioCallbackApiGatewayPermission = new aws.lambda.Permission('twilio-callback-permission', {
+    action: "lambda:InvokeFunction",
+    function: twilioCallback.name,
+    principal: "apigateway.amazonaws.com",
+    sourceArn: pulumi.interpolate`${config.apiGatewayArn}/*/POST/v1/campaign/*/message/`,
+})
+
+const emailCallbackName = `log-email-callback-${config.environment}`
+const emailCallback = new aws.lambda.Function(emailCallbackName,
+{
+	name: emailCallbackName,
+	vpcConfig: {
+		subnetIds: vpc.privateSubnetIds,
+		securityGroupIds: [serverlessSecurityGroup.id]
+	},
+	handler: 'exports.handler',
+	role: serverlessRole.arn,
+	runtime: 'nodejs12.x',
+	code: new pulumi.asset.FileArchive('email-callback.zip')
+},{
+	deleteBeforeReplace: true
+})
 //#endregion
 
+//region SES/SNS
+/*console.log('region', config.sesRegion)
+const sesProvider = new aws.Provider('sesProvider', {region: config.sesRegion, skipCredentialsValidation: true, skipRequestingAccountId: true})
+const sesTopic = new aws.sns.Topic(`postmangovsg-ses`, {}, {provider: sesProvider})
+const sesDomainIdentity = new aws.ses.DomainIdentity(`${APP_NAME}-ses-domain`, {
+    domain: config.ebDomainSettings.domainName,
+});
+
+const subscription = new aws.sns.TopicSubscription(`postmangovsg-ses-callback`, {
+	topic: sesTopic,
+	protocol: 'lambda',
+	endpoint: emailCallback.arn,
+	endpointAutoConfirms: true
+}, {provider: sesProvider})
+const notificationTypes = ['Bounce','Complaint','Delivery']
+notificationTypes.forEach(notificationType=> new aws.ses.IdentityNotificationTopic(notificationType, {
+	identity: sesDomainIdentity.domain,
+	includeOriginalHeaders: true,
+	notificationType,
+	topicArn: sesTopic.arn,
+}))
+*/
+//endregion
+
+
+export const appName = APP_NAME
 export const rdsEndpoint = rdsInstance.endpoint
 export const ecrRepositoryUrl = ecr.repositoryUrl
 export const ecsClusterId = ecsCluster.id
 export const ecsClusterName = ecsCluster.cluster.name
 export const ecsSendingServiceName = ecsSendingService.service.name
 export const ecsLoggingServiceName = ecsLoggingService.service.name
+export const ebEnvId = ebEnv.id
+
+console.log(
+	`Have you:
+	- Added the correct environment variables? The default for all the env vars is "Not set"
+	- SES: Set up domain verification
+	- SES: Moved out of sandbox
+	- SES: Connected notifications for that domain with the sns topic? Toggle 'Original Headers' on too.
+	- Deployed the app versions to elastic beanstalk and each lambda?
+	`
+)

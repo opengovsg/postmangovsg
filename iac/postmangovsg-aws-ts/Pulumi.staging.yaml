@@ -1,13 +1,47 @@
 config:
   aws:profile: postman-pulumi
   aws:region: ap-southeast-1
-  postmangovsg-aws-ts:environment: staging
+  postmangovsg-aws-ts:apiGatewayArn: arn:aws:execute-api:ap-southeast-1:306667300165:3f6ahfi1j8
+  postmangovsg-aws-ts:apiGatewayAuthorizerId: "*"
   postmangovsg-aws-ts:ebCertificateARN: arn:aws:acm:ap-southeast-1:306667300165:certificate/9203a817-9997-451a-b98f-7099cad9604a
   postmangovsg-aws-ts:ebDomainSettings:
     domainName: postman.gov.sg
     subjectAlternativeNames:
     - '*.postman.gov.sg'
     validationMethod: EMAIL
+  postmangovsg-aws-ts:ebEnvironmentVariables:
+    API_KEY_SALT_V1:
+      secure: AAABAMbwD1We9yx4bjX0AgeAUJ5YaSDDZjqQC4Z8u4I4TGFqLW97
+    AWS_LOG_GROUP_NAME:
+      secure: AAABALE/ED2/HXb5/KBKUfoOFbL7cl1eG7fmz39vidTKZhfpgieL
+    COOKIE_NAME:
+      secure: AAABAGqyYlbhPbksTmOV4gCIU06XdPoICtpIec25B3eNuF/6SqL8
+    DB_URI:
+      secure: AAABAAtKSGu5CP+kpBGx7jAxPnqZWB6q+cO/YHdsnXCQ/vvCeUgg
+    DOMAIN_WHITELIST:
+      secure: AAABACQ1xOpp9HrxDFW7N+0KgPEsmGDangcg4Ry2ENNODwVfZipb
+    JWT_SECRET:
+      secure: AAABAF/W9su8F0hofqzmpm7LVz2AX//lMapt9I5qxxLV4dCFVt43
+    NODE_ENV:
+      secure: AAABAETREmEcCnjrCWc8Zy0XokXH2AhLrsZBzLNZ83Xl50Wg3OzN
+    REDIS_OTP_URI:
+      secure: AAABAGiYcl8rQVIIn9Cb1fGYY4KTHeIqtzeMHT+cX+23WJ+nlx4N
+    REDIS_SESSION_URI:
+      secure: AAABAHbULyx6VOlDabN8bdz6wP+9JuWOGGN42ixzjPeBkYPslfbC
+    SECRET_MANAGER_SALT:
+      secure: AAABAECthKU6hr0pbQqLp79HNXW7JCYnhrDREE+q4hxlwr53xet+
+    SENTRY_DSN:
+      secure: AAABAEL4Qbcg5ZfD6chEC3KIzESNdWL5A6CAMT1W+0bvxmmOMWUT
+    SES_HOST:
+      secure: AAABANl01jGRQ/GpSUaTNeNTRQJzNxmeQMraTetbrE+dfdT1IZpt
+    SES_PASS:
+      secure: AAABAJF25XCA6gHZe25WVeP6RoPPzwMw/2h2reQI/yrEYY3hclll
+    SES_PORT:
+      secure: AAABAP4JdvWHtX8fvhRbN6fopRTI+BQIiutOyqyJGEXNB746e2PD
+    SES_USER:
+      secure: AAABAKK0LUZg725X0CBXyYbrRRxOxj2zuphElU4soLyZx/3G2S5i
+    SESSION_SECRET:
+      secure: AAABAP2bhQzSfGGqinpVRFKxB6ktfZTaVQRRofE8Hkx9ehyGbOtf
   postmangovsg-aws-ts:ebSettings:
     appName: postmangovsg
     autoScalingMax: 1
@@ -17,6 +51,7 @@ config:
     instanceType: t2.medium
     keyPairName: postmangovsg-staging-jumphost-kp
     solutionStackName: 64bit Amazon Linux 2018.03 v2.15.1 running Docker 19.03.6-ce
+  postmangovsg-aws-ts:environment: staging
   postmangovsg-aws-ts:jumphostKeyPairName: postmangovsg-staging-jumphost-kp
   postmangovsg-aws-ts:rdsMasterPassword:
     secure: AAABAB2JEGIVRgd1rNc+5DJw9r1cAd10ONWv3O5KhGQbrm02NgFBYBfvLsSS9qvZL+ADVTZ7IS31xFxAX/ZE9Q==
@@ -34,7 +69,21 @@ config:
     engineVersion: 5.0.6
     nodeType: cache.t2.micro
     parameterGroupName: default.redis5.0
+  postmangovsg-aws-ts:sesRegion: us-east-1
   postmangovsg-aws-ts:uploadBucketName: upload-staging.postman.gov.sg
   postmangovsg-aws-ts:vpcSettings:
     cidrBlock: 10.102.0.0/16
+  postmangovsg-aws-ts:workerEnvironmentVariables:
+    DB_URI:
+      secure: AAABAKxXYMms55a21ks1VP8pAwZSp3YWrJIhMzIycxr1KtSqgFYC
+    ECS_SERVICE_NAME:
+      secure: AAABAKMOXeR6K9B7hjP+aBI19+gDXADmVQZ7wLNsVPNgt/k3jLIC
+    MESSAGE_WORKER_LOGGER:
+      secure: AAABAG/Vzlx8Qp8H5tWOfKNo53TgkOPgta9bKlPq8JH7V2I6K4ZJ
+    MESSAGE_WORKER_SENDER:
+      secure: AAABANcfvFLLBeJIFhDWu+WUAGEcvCNEbouKlx5csR87GJaHee/Q
+    NODE_ENV:
+      secure: AAABABr8quG6PDBgKVpU4SL9QBcOrxgU2ztW3Orb3gK7trDeaSqh
+    SECRET_MANAGER_SALT:
+      secure: AAABAHAHVfDr9g4graA/H5C7yjQmz5S0Fp9MD/+uu3U7IHFXa9BN
   pulumi:template: aws-typescript

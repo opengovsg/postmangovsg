@@ -44,6 +44,19 @@ export const ecsTrustPolicy : aws.iam.PolicyDocument = {
 	],
 }
 
+export const lambdaTrustPolicy : aws.iam.PolicyDocument = {
+	"Version": "2012-10-17",
+	"Statement": [
+	  {
+		"Effect": "Allow",
+		"Principal": {
+		  "Service": "lambda.amazonaws.com"
+		},
+		"Action": "sts:AssumeRole"
+	  }
+	]
+  }
+
 export const S3BucketManagementPolicyDocument : aws.iam.PolicyDocument = {
 	'Version': '2012-10-17',
 	'Statement': [
@@ -141,3 +154,4 @@ export const SecretsManagerReadPolicyDocument : aws.iam.PolicyDocument =  {
 		}
 	],
 }
+

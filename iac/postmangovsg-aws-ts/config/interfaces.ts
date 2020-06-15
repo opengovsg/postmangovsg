@@ -35,13 +35,30 @@ export interface RdsSettings {
     deletionProtection: boolean;
 }
 
-export interface BackendEnvVars {
-    sessionSecret: string;
-    jwtSecret: string;
-    secretManagerSalt: string;
-    apiKeySalt: string;
+export interface EBEnvVars {
+    NODE_ENV: string;
+    DOMAIN_WHITELIST: string;
+    DB_URI: string;
+    REDIS_SESSION_URI: string;
+    REDIS_OTP_URI: string;
+    SES_USER: string;
+    SES_PASS: string;
+    SES_HOST: string;
+    SES_PORT: string;
+    SECRET_MANAGER_SALT: string;
+    API_KEY_SALT_V1: string;
+    JWT_SECRET: string;
+    AWS_LOG_GROUP_NAME: string;
+    SENTRY_DSN: string;
+    COOKIE_NAME: string;
+    SESSION_SECRET: string;
 }
 
 export interface WorkerEnvVars {
-    secretManagerSalt: string;
+    NODE_ENV: string;
+    ECS_SERVICE_NAME: string;
+    DB_URI: string;
+    SECRET_MANAGER_SALT: string;
+    MESSAGE_WORKER_SENDER: string;
+    MESSAGE_WORKER_LOGGER:  string
 }
