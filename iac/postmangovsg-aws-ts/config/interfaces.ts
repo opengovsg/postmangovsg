@@ -52,13 +52,24 @@ export interface EBEnvVars {
     SENTRY_DSN: string;
     COOKIE_NAME: string;
     SESSION_SECRET: string;
+    FRONTEND_URL:string;
 }
 
 export interface WorkerEnvVars {
     NODE_ENV: string;
-    ECS_SERVICE_NAME: string;
+    ECS_SERVICE_NAME_SENDER: string;
+    ECS_SERVICE_NAME_LOGGER: string;
     DB_URI: string;
     SECRET_MANAGER_SALT: string;
     MESSAGE_WORKER_SENDER: string;
     MESSAGE_WORKER_LOGGER:  string
+}
+
+export interface TwilioCallbackEnvVars {
+    DB_URI: string;
+    TWILIO_CALLBACK_SECRET: string;
+}
+
+export interface EmailCallbackEnvVars {
+    DB_URI: string;
 }

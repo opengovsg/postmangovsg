@@ -1,5 +1,5 @@
 {
-    "name": "postmangovsg-aws-ts",
+    "name": "postmangovsg-infra",
     "scripts": {
         "build": "./scripts/prepare.sh",
         "clean": "./scripts/clean.sh"

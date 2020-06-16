@@ -155,3 +155,17 @@ export const SecretsManagerReadPolicyDocument : aws.iam.PolicyDocument =  {
 	],
 }
 
+export const CloudWatchAndLogsFullAccess: aws.iam.PolicyDocument = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "EC2WinstonCloudwatch",
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:*",
+                "logs:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

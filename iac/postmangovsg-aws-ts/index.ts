@@ -2,7 +2,7 @@ import * as pulumi from '@pulumi/pulumi'
 import * as awsx from '@pulumi/awsx'
 import * as aws from '@pulumi/aws'
 import * as fs from 'fs'
-import { VPCSettings, EBDomainSettings, EBSettings, RedisSettings, RdsSettings, WorkerEnvVars, EBEnvVars } from './config/interfaces'
+import { VPCSettings, EBDomainSettings, EBSettings, RedisSettings, RdsSettings, WorkerEnvVars, EBEnvVars, EmailCallbackEnvVars, TwilioCallbackEnvVars } from './config/interfaces'
 import * as customParameterGroup from './config/parameter-group'
 import * as customIam from './config/iam'
 import { Region } from '@pulumi/aws'
@@ -11,7 +11,7 @@ const pConfig = new pulumi.Config()
 const config = {
 	region: aws.config.requireRegion(),
 	environment: pConfig.require('environment'),
-	jumphostKeyPairName: pConfig.require('jumphostKeyPairName'),
+	jumphostKeyPairName: pConfig.require('jumphostKeyPairName'), // You have to create this
 	vpcSettings: pConfig.requireObject<VPCSettings>('vpcSettings'),
 	uploadBucketName: pConfig.require('uploadBucketName'),
 	ebCertificateARN: pConfig.get('ebCertificateARN'), // Not required
@@ -22,10 +22,11 @@ const config = {
 	rdsMasterUsername: pConfig.requireSecret('rdsMasterUsername'),
 	rdsMasterPassword: pConfig.requireSecret('rdsMasterPassword'),
 	apiGatewayArn: pConfig.require('apiGatewayArn'), // Currently you have to set this up yourself, I havent figured this out
-	apiGatewayAuthorizerId: pConfig.require('apiGatewayAuthorizerId'),
 	ecsClusterId: pConfig.get('ecsClusterId'), // Not required,
 	ebEnvVars: pConfig.requireSecretObject<EBEnvVars>('ebEnvironmentVariables'),
 	workerEnvVars: pConfig.requireSecretObject<WorkerEnvVars>('workerEnvironmentVariables'),
+	twilioCallbackEnvVars: pConfig.requireSecretObject<TwilioCallbackEnvVars>('twilioCallbackEnvironmentVariables'),
+	emailCallbackEnvVars: pConfig.requireSecretObject<EmailCallbackEnvVars>('emailCallbackEnvironmentVariables'),
 	sesRegion: pConfig.require('sesRegion') as Region
 }
 
@@ -58,6 +59,7 @@ const vpc = new awsx.ec2.Vpc(APP_NAME, {
 // Add CORS policy to bucket
 const uploadBucket = new aws.s3.Bucket(config.uploadBucketName,
 	{
+		bucket: config.uploadBucketName,
 		acl: 'private',
 		versioning: {
 			enabled: true,
@@ -73,6 +75,8 @@ const uploadBucket = new aws.s3.Bucket(config.uploadBucketName,
 			exposeHeaders: ['ETag'],
 			maxAgeSeconds: 3000,
 		}],
+	}, {
+		deleteBeforeReplace: true
 	})
 //#endregion
 
@@ -125,6 +129,9 @@ const S3BucketManagementPolicy = new aws.iam.Policy(`${config.ebSettings.appName
 const SecretsManagerRW = new aws.iam.Policy(`${config.ebSettings.appName}-SecretsManagerRW`, { 
 	policy: customIam.SecretsManagerRWPolicyDocument,
 })
+const CloudWatchAndLogsFullAccess  = new aws.iam.Policy(`${config.ebSettings.appName}-CloudWatchAndLogsFullAccess`, {
+	policy: customIam.CloudWatchAndLogsFullAccess
+})
 const instanceRole =  new aws.iam.Role(`${APP_NAME}-eb-inst-role`,{ assumeRolePolicy: customIam.ebInstanceTrustPolicy, })
 const instanceRoleAttachment1 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-eb-inst-AWSElasticBeanstalkWebTier`, {
 	role: instanceRole,
@@ -142,7 +149,10 @@ const instanceRoleAttachment4 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-eb
 	role: instanceRole,
 	policyArn: SecretsManagerRW.arn,
 })
-
+const instanceRoleAttachment5 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-eb-inst-CloudWatchAndLogsFullAccess`, {
+	role: instanceRole,
+	policyArn: CloudWatchAndLogsFullAccess.arn,
+})
 // Create instance profile 
 const instanceProfile = new aws.iam.InstanceProfile(`${APP_NAME}-eb-inst-profile`, { role: instanceRole, })
 
@@ -247,6 +257,8 @@ const ebEnv = new aws.elasticbeanstalk.Environment(APP_NAME, {
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'COOKIE_NAME', value: config.ebEnvVars.COOKIE_NAME },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'DB_URI', value: config.ebEnvVars.DB_URI },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'DOMAIN_WHITELIST', value: config.ebEnvVars.DOMAIN_WHITELIST },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'FILE_STORAGE_BUCKET_NAME', value: config.uploadBucketName },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'FRONTEND_URL', value: config.ebEnvVars.FRONTEND_URL },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'JWT_SECRET', value: config.ebEnvVars.JWT_SECRET },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'NODE_ENV', value: config.ebEnvVars.NODE_ENV },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'REDIS_OTP_URI', value: config.ebEnvVars.REDIS_OTP_URI },
@@ -257,12 +269,19 @@ const ebEnv = new aws.elasticbeanstalk.Environment(APP_NAME, {
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_PASS', value: config.ebEnvVars.SES_PASS },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_PORT', value: config.ebEnvVars.SES_PORT },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_USER', value: config.ebEnvVars.SES_USER },
-		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SESSION_SECRET', value: config.ebEnvVars.SESSION_SECRET },    
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SESSION_SECRET', value: config.ebEnvVars.SESSION_SECRET },
+
 	],
 }, {
 	dependsOn: [vpc],
 })
 //#endregion ELASTIC BEANSTALK
+
+//#region CLOUDWATCH
+const ebLogGroup = new aws.cloudwatch.LogGroup(`${APP_NAME}-eb-log-group`, {
+	name: config.ebEnvVars.AWS_LOG_GROUP_NAME
+}, {deleteBeforeReplace:true})
+//#endregion
 
 //#region AMPLIFY
 // Amplify -- Not available on pulumi
@@ -329,7 +348,7 @@ const ecsSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-ecs-workers`, {
 })
 
 // Create cluster
-const clusterName = `${config.ebSettings.appName}-ecs`
+const clusterName = `${APP_NAME}-ecs`
 const ecsCluster = new awsx.ecs.Cluster(clusterName, {
 	vpc: vpc,
 	...(config.ecsClusterId ? { cluster: aws.ecs.Cluster.get(clusterName, config.ecsClusterId), } : {}),
@@ -338,7 +357,9 @@ const ecsImage = awsx.ecs.Image.fromDockerBuild(ecr,{
 	context: '../../worker',
 	dockerfile: '../../worker/Dockerfile',
 })
-const ecsSendingService = new awsx.ecs.FargateService(`${APP_NAME}-sending`,{
+const ecsSendingServiceName = `${APP_NAME}-sending`
+const ecsSendingService = new awsx.ecs.FargateService(ecsSendingServiceName,{
+	name: ecsSendingServiceName,
 	cluster: ecsCluster,
 	desiredCount: 0,
 	assignPublicIp: false,
@@ -353,16 +374,19 @@ const ecsSendingService = new awsx.ecs.FargateService(`${APP_NAME}-sending`,{
 				image: ecsImage,
 				environment: [
 					{ name: 'NODE_ENV', value: config.workerEnvVars.NODE_ENV },
-					{ name: 'ECS_SERVICE_NAME', value: config.workerEnvVars.ECS_SERVICE_NAME },
+					{ name: 'ECS_SERVICE_NAME', value: config.workerEnvVars.ECS_SERVICE_NAME_SENDER },
 					{ name: 'DB_URI', value: config.workerEnvVars.DB_URI },
 					{ name: 'SECRET_MANAGER_SALT', value: config.workerEnvVars.SECRET_MANAGER_SALT },
 					{ name: 'MESSAGE_WORKER_LOGGER', value: config.workerEnvVars.MESSAGE_WORKER_LOGGER },
+					{ name: 'TWILIO_CALLBACK_SECRET', value: config.twilioCallbackEnvVars.TWILIO_CALLBACK_SECRET },
 				]
 			},
 		},
 	},
 })
-const ecsLoggingService = new awsx.ecs.FargateService(`${APP_NAME}-logging`,{
+const ecsLoggingServiceName = `${APP_NAME}-logging`
+const ecsLoggingService = new awsx.ecs.FargateService(ecsLoggingServiceName,{
+	name: ecsLoggingServiceName,
 	cluster: ecsCluster,
 	desiredCount: 0,
 	assignPublicIp: false,
@@ -377,7 +401,7 @@ const ecsLoggingService = new awsx.ecs.FargateService(`${APP_NAME}-logging`,{
 				image: ecsImage,
 				environment: [
 					{ name: 'NODE_ENV', value: config.workerEnvVars.NODE_ENV },
-					{ name: 'ECS_SERVICE_NAME', value: config.workerEnvVars.ECS_SERVICE_NAME },
+					{ name: 'ECS_SERVICE_NAME', value: config.workerEnvVars.ECS_SERVICE_NAME_LOGGER },
 					{ name: 'DB_URI', value: config.workerEnvVars.DB_URI },
 					{ name: 'SECRET_MANAGER_SALT', value: config.workerEnvVars.SECRET_MANAGER_SALT },
 					{ name: 'MESSAGE_WORKER_LOGGER', value: config.workerEnvVars.MESSAGE_WORKER_LOGGER },
@@ -490,7 +514,7 @@ const redisCache = new aws.elasticache.Cluster(config.redisSettings.clusterName,
     ALTER DATABASE <db> set pgaudit.log=‘All’;
     */
 
-const rdsAuditParameterGroup = new aws.rds.ParameterGroup('postgres11-with-audit', {
+const rdsAuditParameterGroup = new aws.rds.ParameterGroup(`${APP_NAME}-postgres11-with-audit`, {
 	family: 'postgres11',
 	parameters: customParameterGroup.postgres11WithAudit,
 })
@@ -520,7 +544,6 @@ const rdsInstance = new aws.rds.Instance(`${APP_NAME}-rds`, {
 //#endregion
 
 //region LAMBDA
-
 const serverlessRole = new aws.iam.Role('serverless-role', {
 	assumeRolePolicy: customIam.lambdaTrustPolicy
 })
@@ -549,7 +572,7 @@ const authorizerApiGatewayPermission = new aws.lambda.Permission('authorizer-per
     action: "lambda:InvokeFunction",
     function: authorizer.name,
     principal: "apigateway.amazonaws.com",
-    sourceArn: pulumi.interpolate`${config.apiGatewayArn}/authorizers/${config.apiGatewayAuthorizerId}`,
+    sourceArn: pulumi.interpolate`${config.apiGatewayArn}/authorizers/*`,
 },{
 	deleteBeforeReplace: true
 })
@@ -566,7 +589,13 @@ const twilioCallback = new aws.lambda.Function(twilioCallbackName,
 	handler: 'exports.handler',
 	role: serverlessRole.arn,
 	runtime: 'nodejs12.x',
-	code: new pulumi.asset.FileArchive('twilio-callback.zip')
+	code: new pulumi.asset.FileArchive('twilio-callback.zip'),
+	environment: {
+		variables: {
+			DB_URI: config.twilioCallbackEnvVars.DB_URI,
+			TWILIO_CALLBACK_SECRET: config.twilioCallbackEnvVars.TWILIO_CALLBACK_SECRET
+		}
+	}
 }, {
 	deleteBeforeReplace: true
 })
@@ -588,7 +617,12 @@ const emailCallback = new aws.lambda.Function(emailCallbackName,
 	handler: 'exports.handler',
 	role: serverlessRole.arn,
 	runtime: 'nodejs12.x',
-	code: new pulumi.asset.FileArchive('email-callback.zip')
+	code: new pulumi.asset.FileArchive('email-callback.zip'),
+	environment: {
+		variables: {
+			DB_URI: config.emailCallbackEnvVars.DB_URI
+		}
+	}
 },{
 	deleteBeforeReplace: true
 })
@@ -624,8 +658,6 @@ export const rdsEndpoint = rdsInstance.endpoint
 export const ecrRepositoryUrl = ecr.repositoryUrl
 export const ecsClusterId = ecsCluster.id
 export const ecsClusterName = ecsCluster.cluster.name
-export const ecsSendingServiceName = ecsSendingService.service.name
-export const ecsLoggingServiceName = ecsLoggingService.service.name
 export const ebEnvId = ebEnv.id
 
 console.log(
