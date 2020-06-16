@@ -128,14 +128,11 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
   return (
     <>
       <h2>API Key</h2>
-      {(apiKeyState === ApiKeyState.COPY ||
-        apiKeyState === ApiKeyState.COPIED) && (
-        <p>
-          After generating your API key, please make a copy of it immediately as
-          it will only be shown once. Upon leaving or refreshing this page, the
-          key will be hidden.
-        </p>
-      )}
+      <p className={styles.helpText}>
+        After generating your API key, please make a copy of it immediately as
+        it will only be shown once. Upon leaving or refreshing this page, the
+        key will be hidden.
+      </p>
       <TextInputWithButton
         value={apiKey}
         onChange={() => {
