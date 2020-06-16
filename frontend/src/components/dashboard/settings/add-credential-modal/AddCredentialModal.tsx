@@ -47,6 +47,7 @@ const AddCredentialModal = ({
     credType ? AddCredentialStep.Input : AddCredentialStep.SelectType
   )
   const [credentials, setCredentials] = useState(null as any)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(
     null as null | {
       message: string
@@ -101,7 +102,11 @@ const AddCredentialModal = ({
           </>
         )
 
-        nextFunc = () => validateTelegramBotToken()
+        nextFunc = async () => {
+          setLoading(true)
+          await validateTelegramBotToken()
+          setLoading(false)
+        }
         break
     }
     return (
@@ -110,10 +115,10 @@ const AddCredentialModal = ({
         <div className="separator"></div>
         <div className="progress-button">
           <PrimaryButton
-            disabled={!isValidLabel() || !credentials}
+            disabled={!isValidLabel() || !credentials || loading}
             onClick={nextFunc}
           >
-            Next →
+            {loading ? 'Loading...' : 'Next →'}
           </PrimaryButton>
         </div>
       </>
