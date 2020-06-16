@@ -7,6 +7,7 @@ import {
   BelongsTo,
 } from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
+import { MessageStatus } from '@core/constants'
 
 @Table({ tableName: 'telegram_ops', underscored: true, timestamps: true })
 export class TelegramOp extends Model<TelegramOp> {
@@ -41,6 +42,12 @@ export class TelegramOp extends Model<TelegramOp> {
 
   @Column(DataType.STRING)
   errorCode?: string
+
+  @Column({
+    type: DataType.ENUM(...Object.values(MessageStatus)),
+    allowNull: true,
+  })
+  status?: MessageStatus
 
   @Column(DataType.DATE)
   dequeuedAt?: Date
