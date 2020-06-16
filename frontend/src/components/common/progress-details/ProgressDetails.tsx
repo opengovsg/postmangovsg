@@ -10,16 +10,16 @@ import {
 } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 const ProgressDetails = ({
-campaignId,
-campaignName,
+  campaignId,
+  campaignName,
   sentAt,
   numRecipients,
   stats,
   handlePause,
   handleRetry,
 }: {
-campaignId: number
-campaignName: string
+  campaignId: number
+  campaignName: string
   sentAt: Date
   numRecipients: number
   stats: CampaignStats

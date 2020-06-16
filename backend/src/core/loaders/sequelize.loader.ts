@@ -38,7 +38,9 @@ class SequelizeLoader {
   }
 
   private loadMasterDB = async (): Promise<void> => {
-    const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+    const dialectOptions = config.get('IS_PROD')
+      ? config.get('database.dialectOptions')
+      : {}
     const sequelize = new Sequelize(DB_URI, {
       dialect: 'postgres',
       logging: false,
@@ -46,18 +48,18 @@ class SequelizeLoader {
       dialectOptions,
     })
 
-  const coreModels = [
-    Credential,
-    JobQueue,
-    Campaign,
-    User,
-    Worker,
-    UserCredential,
-    Statistic,
-  ]
-  const emailModels = [EmailMessage, EmailTemplate, EmailOp, EmailBlacklist]
-  const smsModels = [SmsMessage, SmsTemplate, SmsOp]
-  sequelize.addModels([...coreModels, ...emailModels, ...smsModels])
+    const coreModels = [
+      Credential,
+      JobQueue,
+      Campaign,
+      User,
+      Worker,
+      UserCredential,
+      Statistic,
+    ]
+    const emailModels = [EmailMessage, EmailTemplate, EmailOp, EmailBlacklist]
+    const smsModels = [SmsMessage, SmsTemplate, SmsOp]
+    sequelize.addModels([...coreModels, ...emailModels, ...smsModels])
 
     try {
       await sequelize.sync()
@@ -71,7 +73,9 @@ class SequelizeLoader {
   }
 
   private loadReadReplicaDB = async (): Promise<Sequelize> => {
-    const dialectOptions = config.get('IS_PROD') ? config.get('database.dialectOptions') : {}
+    const dialectOptions = config.get('IS_PROD')
+      ? config.get('database.dialectOptions')
+      : {}
     const sequelizeReadReplica = new Sequelize(DB_READ_REPLICA_URI, {
       dialect: 'postgres',
       logging: false,
@@ -83,7 +87,9 @@ class SequelizeLoader {
       await sequelizeReadReplica.sync()
       logger.info({ message: 'Read replica database loaded.' })
     } catch (err) {
-      logger.error(`Unable to connect to read replica database database: ${err}`)
+      logger.error(
+        `Unable to connect to read replica database database: ${err}`
+      )
       process.exit(1)
     }
 

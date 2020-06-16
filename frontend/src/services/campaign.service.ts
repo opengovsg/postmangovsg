@@ -6,7 +6,7 @@ import {
   Status,
   SMSCampaign,
   EmailCampaign,
-CampaignInvalidRecipients
+  CampaignInvalidRecipients,
 } from 'classes'
 
 function getJobTimestamps(
@@ -28,7 +28,7 @@ export async function getCampaigns(params: {
   return axios.get('/campaigns', { params }).then((response) => {
     const { campaigns, total_count } = response.data
     const campaignList: Campaign[] = campaigns.map((data: any) => {
-const { sentAt, statusUpdatedAt } = getJobTimestamps(data.job_queue)
+      const { sentAt, statusUpdatedAt } = getJobTimestamps(data.job_queue)
       const details = {
         ...data,
         sentAt,
@@ -78,10 +78,9 @@ export async function getCampaignDetails(
 ): Promise<EmailCampaign | SMSCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
     const campaign = response.data
-const { sentAt } = getJobTimestamps(campaign.job_queue)
+    const { sentAt } = getJobTimestamps(campaign.job_queue)
     const details = {
       ...campaign,
-      num_recipients: numRecipients,
       sentAt,
     }
 
