@@ -1,4 +1,5 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript'
+import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript'
+import { BotSubscriber } from '.'
 
 @Table({
   tableName: 'telegram_subscribers',
@@ -6,6 +7,7 @@ import { Column, Model, Table, DataType } from 'sequelize-typescript'
   timestamps: true,
 })
 export class TelegramSubscriber extends Model<TelegramSubscriber> {
+  @HasMany(() => BotSubscriber, { as: 'bot_subscriber' })
   @Column({
     type: DataType.STRING,
     primaryKey: true,
