@@ -11,13 +11,12 @@ export class TelegramSubscriber extends Model<TelegramSubscriber> {
   @Column({
     type: DataType.STRING,
     primaryKey: true,
-    unique: true,
   })
   phoneNumber!: string
 
   @Column({
     type: DataType.BIGINT,
-    primaryKey: true,
+    allowNull: false,
     unique: true,
   })
   telegramId!: number
