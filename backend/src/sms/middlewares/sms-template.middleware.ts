@@ -152,10 +152,7 @@ const uploadCompleteHandler = async (
       smsTemplate.params as string[]
     )
 
-    await SmsTemplateService.testHydration(
-      records,
-      smsTemplate.body as string
-    )
+    await SmsTemplateService.testHydration(records, smsTemplate.body as string)
 
     if (SmsTemplateService.hasInvalidSmsRecipient(records)) {
       throw new InvalidRecipientError()
