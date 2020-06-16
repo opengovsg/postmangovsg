@@ -7,7 +7,10 @@ import { BotSubscriber } from '.'
   timestamps: true,
 })
 export class TelegramSubscriber extends Model<TelegramSubscriber> {
-  @HasMany(() => BotSubscriber, { as: 'bot_subscriber' })
+  @HasMany(() => BotSubscriber, {
+    as: 'bot_subscriber',
+    sourceKey: 'telegramId',
+  })
   @Column({
     type: DataType.STRING,
     primaryKey: true,
