@@ -15,8 +15,13 @@ const CreateModal = () => {
   const history = useHistory()
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
   const [name, setName] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
+
   async function handleCreateCampaign() {
     try {
+      if (isCreating) return
+      setIsCreating(true)
+
       const campaign: Campaign = await createCampaign(name, selectedChannel)
       // close modal and go to create view
       modalContext.setModalContent(null)
@@ -85,7 +90,7 @@ const CreateModal = () => {
         <PrimaryButton
           className={styles.bottomButton}
           onClick={handleCreateCampaign}
-          disabled={!name}
+          disabled={!name || isCreating}
         >
           Create campaign
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
