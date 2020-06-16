@@ -590,6 +590,6 @@ router.get('/stats', EmailStatsMiddleware.getStats)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/invalid-recipients', EmailStatsMiddleware.getInvalidRecipients)
+router.get('/export', EmailStatsMiddleware.getFailedRecipients)
 
 export default router

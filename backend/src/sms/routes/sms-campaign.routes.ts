@@ -645,6 +645,6 @@ router.get('/stats', SmsStatsMiddleware.getStats)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/invalid-recipients', SmsStatsMiddleware.getInvalidRecipients)
+router.get('/export', SmsStatsMiddleware.getFailedRecipients)
 
 export default router

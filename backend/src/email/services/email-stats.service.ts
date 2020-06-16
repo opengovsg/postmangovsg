@@ -12,16 +12,16 @@ const getStats = async (campaignId: number): Promise<CampaignStats> => {
 }
 
 /**
- * Gets invalid recipients for email project
+ * Gets failed recipients for email project
  * @param campaignId
  */
-const getInvalidRecipients = async (
+const getFailedRecipients = async (
   campaignId: number
 ): Promise<Array<CampaignInvalidRecipient> | undefined> => {
-  return StatsService.getInvalidRecipients(campaignId, EmailMessage)
+  return StatsService.getFailedRecipients(campaignId, EmailMessage)
 }
 
 export const EmailStatsService = {
   getStats,
-  getInvalidRecipients,
+  getFailedRecipients,
 }

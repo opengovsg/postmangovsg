@@ -142,11 +142,11 @@ const getTotalSentCount = async (): Promise<number> => {
 }
 
 /**
- * Helper method to get error_code, recipients for failed messages from logs table
+ * Helper method to get error_code, message_id, status and recipients for failed messages from logs table
  * @param campaignId
  * @param logsTable
  */
-const getInvalidRecipients = async (
+const getFailedRecipients = async (
   campaignId: number,
   logsTable: any
 ): Promise<Array<CampaignInvalidRecipient> | undefined> => {
@@ -169,5 +169,5 @@ export const StatsService = {
   getTotalSentCount,
   getNumRecipients,
   setNumRecipients,
-  getInvalidRecipients,
+  getFailedRecipients,
 }

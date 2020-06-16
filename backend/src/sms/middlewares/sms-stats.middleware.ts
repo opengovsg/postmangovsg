@@ -26,14 +26,14 @@ const getStats = async (
  * @param res
  * @param next
  */
-const getInvalidRecipients = async (
+const getFailedRecipients = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   const { campaignId } = req.params
   try {
-    const recipients = await SmsStatsService.getInvalidRecipients(+campaignId)
+    const recipients = await SmsStatsService.getFailedRecipients(+campaignId)
     return res.json(recipients)
   } catch (err) {
     next(err)
@@ -42,5 +42,5 @@ const getInvalidRecipients = async (
 
 export const SmsStatsMiddleware = {
   getStats,
-  getInvalidRecipients,
+  getFailedRecipients,
 }
