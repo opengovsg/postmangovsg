@@ -10,6 +10,7 @@ import { ChannelType, channelIcons } from 'classes'
 import ApiKey from './api-key'
 import Credentials from './credentials'
 import AddCredentialModal from './add-credential-modal'
+import AddApiKeyModal from './add-api-key-modal'
 import CredentialsImage from 'assets/img/credentials.svg'
 import styles from './Settings.module.scss'
 
@@ -50,6 +51,12 @@ const Settings = () => {
     )
   }
 
+  function onAddApiKeyClicked() {
+    modalContext.setModalContent(
+      <AddApiKeyModal onSuccess={fetchUserSettings} />
+    )
+  }
+
   async function fetchUserSettings() {
     const { hasApiKey, creds } = await getUserSettings()
     setCreds(creds)
@@ -75,7 +82,7 @@ const Settings = () => {
               Add credentials
               <i className={cx('bx', 'bx-spreadsheet')}></i>
             </button>
-            <button>
+            <button onClick={onAddApiKeyClicked}>
               Generate API key
               <i className={cx('bx', 'bx-key')}></i>
             </button>
