@@ -3,7 +3,7 @@ import cx from 'classnames'
 
 import { Status } from 'classes/Campaign'
 import {
-  getCampaignInvalidRecipients,
+  exportCampaignStats,
   getCampaignStats,
 } from 'services/campaign.service'
 import styles from './InvalidRecipientsCsv.module.scss'
@@ -16,29 +16,29 @@ const InvalidRecipientsCsv = ({
   status,
   sentAt,
   updatedAt,
-  error,
+  failedCount: initialFailedCount,
 }: {
   campaignId: number
   campaignName: string
   status: Status
   sentAt: Date
   updatedAt: Date
-  error?: number
+  failedCount?: number
 }) => {
   const updatedAtTimestamp = +new Date(updatedAt)
   const campaignAge = Date.now() - updatedAtTimestamp
-  const [errorCount, setErrorCount] = useState(error)
+  const [failedCount, setFailedCount] = useState(initialFailedCount)
 
-  async function getErrorCount() {
-    const { error } = await getCampaignStats(campaignId)
-    setErrorCount(error)
+  async function getFailedCount() {
+    const { error, invalid } = await getCampaignStats(campaignId)
+    setFailedCount(error + invalid)
   }
 
   async function onDownloadInvalidRecipientsList(
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) {
     event.stopPropagation()
-    const list = await getCampaignInvalidRecipients(campaignId)
+    const list = await exportCampaignStats(campaignId)
     const headers = Object.keys(list[0])
     const sentAtTime = new Date(sentAt)
 
@@ -60,12 +60,12 @@ const InvalidRecipientsCsv = ({
   }
 
   if (status === Status.Sent && campaignAge > LINK_DISPLAY_WAIT_TIME) {
-    if (!error) {
-      getErrorCount()
+    if (!failedCount) {
+      // call stats endpoint to retrieve failed messages count when stats not found i.e. in campaigns list
+      getFailedCount()
     }
-    // call stats endpoint to retrieve error count when error stats not found i.e. in campaigns list
 
-    return errorCount ? (
+    return failedCount ? (
       <div
         className={styles.invalidRecipients}
         onClick={(e) => onDownloadInvalidRecipientsList(e)}

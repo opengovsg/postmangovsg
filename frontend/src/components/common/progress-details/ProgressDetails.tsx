@@ -111,7 +111,7 @@ const ProgressDetails = ({
                   campaignId={campaignId}
                   campaignName={campaignName}
                   status={status}
-                  error={error}
+                  failedCount={error + invalid}
                   sentAt={sentAt}
                   updatedAt={updatedAt}
                 />

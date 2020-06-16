@@ -120,12 +120,10 @@ export async function retryCampaign(campaignId: number): Promise<void> {
   await axios.post(`/campaign/${campaignId}/retry`)
 }
 
-export async function getCampaignInvalidRecipients(
+export async function exportCampaignStats(
   campaignId: number
 ): Promise<Array<CampaignInvalidRecipients>> {
-  return axios
-    .get(`/campaign/${campaignId}/invalid-recipients`)
-    .then((response) => {
-      return response.data
-    })
+  return axios.get(`/campaign/${campaignId}/export`).then((response) => {
+    return response.data
+  })
 }
