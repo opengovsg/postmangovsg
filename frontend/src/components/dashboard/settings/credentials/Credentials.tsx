@@ -23,6 +23,7 @@ const Credentials = ({
   title: string
 }) => {
   const modalContext = useContext(ModalContext)
+  creds = creds.filter((cred: UserCredential) => cred.type === credType)
 
   function onAddCredentialClicked() {
     modalContext.setModalContent(
@@ -57,9 +58,6 @@ const Credentials = ({
       <>
         {creds.map(({ label, type }) => (
           <tr key={label}>
-            <td className="xs">
-              <i className={cx('bx', styles.icon, channelIcons[type])}></i>
-            </td>
             <td className="md">{label}</td>
             <td className={cx('sm', styles.actionColumn)}>
               <i
@@ -94,7 +92,6 @@ const Credentials = ({
         <table className={styles.credTable}>
           <tbody>
             <tr>
-              <th className="xs">Mode</th>
               <th className="md">Label</th>
               <th className={cx('sm', styles.actionColumn)}></th>
             </tr>
