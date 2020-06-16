@@ -5,7 +5,6 @@ import { ChannelType } from 'classes'
 import { PrimaryButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { UserCredential, deleteCredential } from 'services/settings.service'
-import { channelIcons } from 'classes'
 
 import AddCredentialModal from '../add-credential-modal'
 import EmptyCredentialsImage from 'assets/img/credentials.svg'
@@ -56,7 +55,7 @@ const Credentials = ({
   function renderCredentials() {
     return (
       <>
-        {creds.map(({ label, type }) => (
+        {creds.map(({ label }) => (
           <tr key={label}>
             <td className="md">{label}</td>
             <td className={cx('sm', styles.actionColumn)}>
