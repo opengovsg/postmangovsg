@@ -15,6 +15,7 @@ const RESET_COPY_TIMEOUT = 1000
 
 interface ApiKeyProps {
   hasApiKey: boolean
+  onGenerate?: Function
 }
 
 enum ApiKeyState {
@@ -24,7 +25,10 @@ enum ApiKeyState {
   REGENERATE = 'REGENERATE',
 }
 
-const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
+const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
+  hasApiKey,
+  onGenerate,
+}) => {
   const [apiKey, setApiKey] = useState('')
   const [isGeneratingApiKey, setIsRegeneratingApiKey] = useState(false)
   const [errorMsg, setErrorMsg] = useState(null)
@@ -90,6 +94,7 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
       setErrorMsg(e.message)
     }
     setIsRegeneratingApiKey(false)
+    if (onGenerate) onGenerate()
   }
 
   let buttonLabel = ''
