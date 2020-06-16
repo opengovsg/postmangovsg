@@ -9,4 +9,4 @@
   publish = "build"
 
   # Default build command.
-  command = "npm run build && echo '/* /index.html  200' | cat >build/_redirects"
+  command = "CI=false npm run build && echo '/* /index.html  200' | cat > build/_redirects"
