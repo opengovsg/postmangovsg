@@ -19,13 +19,19 @@ export class TelegramMessage extends Model<TelegramMessage> {
   id!: number
 
   @ForeignKey(() => Campaign)
-  @Column(DataType.INTEGER)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
   campaignId!: number
 
   @BelongsTo(() => Campaign)
   campaign!: Campaign
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   recipient!: string
 
   @Column(DataType.JSON)

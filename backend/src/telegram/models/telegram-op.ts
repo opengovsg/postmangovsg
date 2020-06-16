@@ -18,14 +18,20 @@ export class TelegramOp extends Model<TelegramOp> {
   id!: number
 
   @ForeignKey(() => Campaign)
-  @Column(DataType.INTEGER)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
   campaignId!: number
 
   @BelongsTo(() => Campaign)
   campaign!: Campaign
 
-  @Column(DataType.STRING)
-  recipient!: string
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: false,
+  })
+  recipient!: number
 
   @Column(DataType.JSON)
   params!: object

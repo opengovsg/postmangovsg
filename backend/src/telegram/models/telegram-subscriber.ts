@@ -8,9 +8,15 @@ import { Column, Model, Table, DataType } from 'sequelize-typescript'
 export class TelegramSubscriber extends Model<TelegramSubscriber> {
   @Column({
     type: DataType.STRING,
+    primaryKey: true,
+    unique: true,
   })
   phoneNumber!: string
 
-  @Column({ type: DataType.BIGINT })
+  @Column({
+    type: DataType.BIGINT,
+    primaryKey: true,
+    unique: true,
+  })
   telegramId!: number
 }
