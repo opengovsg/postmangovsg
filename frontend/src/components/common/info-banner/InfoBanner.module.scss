@@ -5,14 +5,17 @@
   height: auto;
   padding: 4px $site-padding;
   color: white;
+  text-align: center;
+  @include flex-horizontal;
+  justify-content: center;
+
+  .infoText {
+    max-width: $header-max-width;
+    font-size: 0.8rem;
+  }
 
   @include mobile() {
     padding: 4px $mobile-site-padding;
-  }
-
-  .infoText {
-    @include flex-horizontal;
-    justify-content: center;
-    font-size: 0.8rem;
+    text-align: justify;
   }
 }
