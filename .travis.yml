@@ -64,14 +64,15 @@ jobs:
         - npm install
       script:
         - npm run lint-no-fix
+        - cd ../
       deploy:
         - provider: script
-          script: ./deploy.sh postmangovsg-workers staging-sending staging-logger
+          script: ./worker/deploy.sh postmangovsg-workers staging-sending staging-logger
           on:
             branch: $STAGING_BRANCH
             condition: "$DEPLOY_WORKER = true"
         - provider: script
-          script: ./deploy.sh postmangovsg-workers prod-sending prod-logger
+          script: ./worker/deploy.sh postmangovsg-workers prod-sending prod-logger
           on:
             branch: $PRODUCTION_BRANCH
             condition: "$DEPLOY_WORKER = true"
