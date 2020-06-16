@@ -12,6 +12,7 @@ import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
+
 /**
  * Store template subject and body in email template table.
  * If an existing csv has been uploaded for this campaign but whose columns do not match the attributes provided in the new template,

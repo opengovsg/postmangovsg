@@ -106,7 +106,9 @@ const getCampaignDetails = async (
         'is_csv_processing',
       ],
       [
-        literal('Statistic.unsent + Statistic.sent + Statistic.errored'),
+        literal(
+          'Statistic.unsent + Statistic.sent + Statistic.errored + Statistic.invalid'
+        ),
         'num_recipients',
       ],
     ],
