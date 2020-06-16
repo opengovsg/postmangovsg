@@ -45,6 +45,7 @@ const redirectToChannelRoute = async (
   const campaign = await Campaign.findOne({
     where: { id: +campaignId },
     attributes: ['type'],
+    useMaster: true,
   })
   if (!campaign) {
     // This campaign doesn't exist

@@ -18,7 +18,7 @@ const getStats = async (campaignId: number): Promise<CampaignStats> => {
 const getInvalidRecipients = async (
   campaignId: number
 ): Promise<Array<CampaignInvalidRecipient> | undefined> => {
-  return StatsService.getInvalidRecipients(campaignId, SmsMessage.tableName)
+  return StatsService.getInvalidRecipients(campaignId, SmsMessage)
 }
 
 export const SmsStatsService = {

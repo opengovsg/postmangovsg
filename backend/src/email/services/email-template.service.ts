@@ -33,7 +33,12 @@ const upsertEmailTemplate = async ({
   try {
     transaction = await EmailTemplate.sequelize?.transaction()
     // update
-    if ((await EmailTemplate.findByPk(campaignId, { transaction })) !== null) {
+    if (
+      (await EmailTemplate.findByPk(campaignId, {
+        transaction,
+        useMaster: true,
+      })) !== null
+    ) {
       // .update is actually a bulkUpdate
       const updatedTemplate: [
         number,
@@ -174,6 +179,7 @@ const storeTemplate = async ({
   // TODO: this is slow when table is large
   const firstRecord = await EmailMessage.findOne({
     where: { campaignId },
+    useMaster: true,
   })
 
   // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
@@ -199,7 +205,10 @@ const storeTemplate = async ({
 const getFilledTemplate = async (
   campaignId: number
 ): Promise<EmailTemplate | null> => {
-  const emailTemplate = await EmailTemplate.findOne({ where: { campaignId } })
+  const emailTemplate = await EmailTemplate.findOne({
+    where: { campaignId },
+    useMaster: true,
+  })
   if (
     !emailTemplate?.body ||
     !emailTemplate?.subject ||

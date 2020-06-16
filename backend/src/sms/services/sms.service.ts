@@ -23,6 +23,7 @@ const getParams = async (
   const smsMessage = await SmsMessage.findOne({
     where: { campaignId },
     attributes: ['params'],
+    useMaster: true,
   })
   if (smsMessage === null) return null
   return smsMessage.params as { [key: string]: string }
@@ -94,6 +95,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.SMS },
+    useMaster: true,
   })
 }
 

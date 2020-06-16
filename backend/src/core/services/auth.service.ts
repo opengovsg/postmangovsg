@@ -116,7 +116,10 @@ const isWhitelistedEmail = async (email: string): Promise<boolean> => {
   const endsInWhitelistedDomain = validateDomain(email)
   if (!endsInWhitelistedDomain) {
     // If the email does not end in a whitelisted domain, check that it was  whitelisted by us manually
-    const user = await User.findOne({ where: { email: email } })
+    const user = await User.findOne({
+      where: { email: email },
+      useMaster: true,
+    })
     if (user === null) throw new Error('No user was found with this email')
   }
   return true
@@ -151,6 +154,7 @@ const getUserForApiKey = async (req: Request): Promise<User | null> => {
     const user = await User.findOne({
       where: { apiKey: hash },
       attributes: ['id'],
+      useMaster: true,
     })
     return user
   }
@@ -243,6 +247,7 @@ const findOrCreateUser = async (email: string): Promise<User> => {
 const findUser = (id: number): Promise<User> => {
   return User.findOne({
     where: { id },
+    useMaster: true,
   })
 }
 

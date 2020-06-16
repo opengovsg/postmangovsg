@@ -28,7 +28,12 @@ const upsertSmsTemplate = async ({
   try {
     transaction = await SmsTemplate.sequelize?.transaction()
     // update
-    if ((await SmsTemplate.findByPk(campaignId, { transaction })) !== null) {
+    if (
+      (await SmsTemplate.findByPk(campaignId, {
+        transaction,
+        useMaster: true,
+      })) !== null
+    ) {
       // .update is actually a bulkUpdate
       const updatedTemplate: [number, SmsTemplate[]] = await SmsTemplate.update(
         {
@@ -156,6 +161,7 @@ const storeTemplate = async ({
 
   const firstRecord = await SmsMessage.findOne({
     where: { campaignId },
+    useMaster: true,
   })
 
   // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
@@ -181,7 +187,10 @@ const storeTemplate = async ({
 const getFilledTemplate = async (
   campaignId: number
 ): Promise<SmsTemplate | null> => {
-  const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
+  const smsTemplate = await SmsTemplate.findOne({
+    where: { campaignId },
+    useMaster: true,
+  })
   if (!smsTemplate?.body || !smsTemplate.params) {
     return null
   }

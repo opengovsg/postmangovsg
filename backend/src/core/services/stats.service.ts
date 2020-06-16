@@ -1,11 +1,11 @@
-import { fn, cast, Transaction, QueryTypes } from 'sequelize'
-import sequelizeLoader from '../loaders/sequelize.loader'
+import { fn, cast, Transaction, Op } from 'sequelize'
 import { Statistic, JobQueue } from '@core/models'
 import {
   CampaignStats,
   CampaignStatsCount,
   CampaignInvalidRecipient,
 } from '@core/interfaces'
+import { MessageStatus } from '@core/constants'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -14,7 +14,7 @@ import {
 const getStatsFromArchive = async (
   campaignId: number
 ): Promise<CampaignStatsCount> => {
-  const stats = await Statistic.findByPk(campaignId)
+  const stats = await Statistic.findByPk(campaignId, { useMaster: true })
   if (!stats) {
     return {
       error: 0,
@@ -84,6 +84,7 @@ const getStatsFromTable = async (
       [fn('sum', cast({ status: null }, 'int')), 'unsent'],
       [fn('sum', cast({ status: 'INVALID_RECIPIENT' }, 'int')), 'invalid'],
     ],
+    useMaster: true,
   })
 
   return {
@@ -104,7 +105,7 @@ const getCurrentStats = async (
   opsTable: any
 ): Promise<CampaignStats> => {
   // Get job from job_queue table
-  const job = await JobQueue.findOne({ where: { campaignId } })
+  const job = await JobQueue.findOne({ where: { campaignId }, useMaster: true })
   if (job == null)
     throw new Error('Unable to find campaign in job queue table.')
 
@@ -147,19 +148,20 @@ const getTotalSentCount = async (): Promise<number> => {
  */
 const getInvalidRecipients = async (
   campaignId: number,
-  logsTable: string
+  logsTable: any
 ): Promise<Array<CampaignInvalidRecipient> | undefined> => {
-  // Get read replica instance
-  const sequelize = sequelizeLoader.getSequelizeReadReplicaInstance()
-  // Retrieve message logs with error codes from logs table
-  return await sequelize?.query(
-    `SELECT recipient, sent_at, updated_at, message_id, error_code FROM ${logsTable} \
-    WHERE campaign_id = :campaignId and error_code is not NULL`,
-    {
-      replacements: { campaignId },
-      type: QueryTypes.SELECT,
-    }
-  )
+  const data = await logsTable.findAll({
+    raw: true,
+    where: {
+      campaignId,
+      status: {
+        [Op.or]: [MessageStatus.Error, MessageStatus.InvalidRecipient],
+      },
+    },
+    attributes: ['recipient', 'status', 'error_code', 'message_id'],
+  })
+
+  return data
 }
 
 export const StatsService = {

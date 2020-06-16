@@ -21,6 +21,7 @@ const isExistingCredential = async (name: string): Promise<boolean> => {
     where: {
       name: name,
     },
+    useMaster: true,
   })
   return !!result
 }
@@ -133,6 +134,7 @@ const getUserCredential = (
       label,
     },
     attributes: ['credName'],
+    useMaster: true,
   })
 }
 
@@ -149,6 +151,7 @@ const getSmsUserCredentialLabels = async (
       userId: userId,
     },
     attributes: ['label'],
+    useMaster: true,
   })
   return creds.map((c) => c.label)
 }
@@ -173,6 +176,7 @@ const getUserSettings = async (
       },
     ],
     plain: true,
+    useMaster: true,
   })
   if (user) {
     return { hasApiKey: !!user.apiKey, creds: user.creds }
@@ -187,7 +191,7 @@ const getUserSettings = async (
  * @throws Error if user is not found
  */
 const regenerateApiKey = async (userId: number): Promise<string> => {
-  const user = await User.findByPk(userId)
+  const user = await User.findByPk(userId, { useMaster: true })
   if (!user) {
     throw new Error('User not found')
   }

@@ -17,6 +17,7 @@ const getParams = async (
   const emailMessage = await EmailMessage.findOne({
     where: { campaignId },
     attributes: ['params'],
+    useMaster: true,
   })
   if (!emailMessage) return
   return emailMessage.params as { [key: string]: string }
@@ -99,6 +100,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.Email },
+    useMaster: true,
   })
 }
 
