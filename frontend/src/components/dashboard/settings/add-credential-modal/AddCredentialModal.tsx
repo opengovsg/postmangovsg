@@ -197,7 +197,6 @@ const AddCredentialModal = ({
     } catch (e) {
       console.error(e)
       error.message = e.message
-      console.log(error)
       setError(error)
       setCredStep(AddCredentialStep.Failure)
     }
