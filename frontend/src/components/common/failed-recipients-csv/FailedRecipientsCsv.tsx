@@ -7,7 +7,6 @@ import {
   getCampaignStats,
 } from 'services/campaign.service'
 import styles from './FailedRecipientsCsv.module.scss'
-import { stat } from 'fs'
 
 const LINK_DISPLAY_WAIT_TIME = 5 * 60 * 1000
 
@@ -42,7 +41,6 @@ const FailedRecipientsCsv = ({
   ) {
     event.stopPropagation()
     const list = await exportCampaignStats(campaignId)
-    console.log(list)
     const headers = Object.keys(list[0])
     const sentAtTime = new Date(sentAt)
 

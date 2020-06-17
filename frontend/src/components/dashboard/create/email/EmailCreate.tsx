@@ -92,7 +92,7 @@ const CreateEmail = ({
         <div className={styles.stepContainer}>
           <EmailDetail
             id={campaign.id}
-	    name={campaign.name}
+            name={campaign.name}
             sentAt={campaign.sentAt}
             numRecipients={campaign.numRecipients}
           ></EmailDetail>
