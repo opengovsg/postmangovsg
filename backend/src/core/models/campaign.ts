@@ -68,6 +68,7 @@ export class Campaign extends Model<Campaign> {
   @Column({
     type: DataType.BOOLEAN,
     defaultValue: false,
+    allowNull: false,
   })
   protect!: boolean
 

@@ -133,6 +133,7 @@ const getCampaignDetails = async (
         'type',
         'created_at',
         'valid',
+        'protect',
         [literal('"cred_name" IS NOT NULL'), 'has_credential'],
         [literal("s3_object -> 'filename'"), 'csv_filename'],
         [

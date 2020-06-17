@@ -24,7 +24,7 @@ const createCampaign = ({
   name: string
   type: string
   userId: number
-  protect?: boolean
+  protect: boolean
 }): Promise<Campaign> => {
   return Campaign.create({ name, type, userId, valid: false, protect })
 }

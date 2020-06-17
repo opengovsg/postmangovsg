@@ -34,6 +34,8 @@ export interface StoreTemplateOutput {
  *           type: boolean
  *         valid:
  *           type: boolean
+ *         protect:
+ *           type: boolean
  *         csv_filename:
  *           type: string
  *         is_csv_processing:

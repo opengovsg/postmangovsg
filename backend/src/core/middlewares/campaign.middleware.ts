@@ -41,7 +41,7 @@ const canCreateProtectedCampaign = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { type, protect }: { type: string; protect?: boolean } = req.body
+    const { type, protect }: { type: string; protect: boolean } = req.body
     if (protect && type !== ChannelType.Email) {
       return res.sendStatus(403)
     }
@@ -67,7 +67,7 @@ const createCampaign = async (
       name,
       type,
       protect,
-    }: { name: string; type: string; protect?: boolean } = req.body
+    }: { name: string; type: string; protect: boolean } = req.body
     const userId = req.session?.user?.id
     const campaign = await CampaignService.createCampaign({
       name,
