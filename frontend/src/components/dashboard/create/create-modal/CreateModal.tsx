@@ -3,7 +3,7 @@ import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_CREDENTIALS_URL } from 'config'
+import { GUIDE_URL, GUIDE_CREDENTIALS_URL } from 'config'
 import { ChannelType, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
@@ -79,7 +79,10 @@ const CreateModal = () => {
         </div>
 
         {selectedChannel === ChannelType.Email && (
-          <div className={styles.protectedOption}>
+          <div
+            className={styles.protectedOption}
+            onClick={() => setProtected(!protect)}
+          >
             <i
               className={cx(
                 'bx',
@@ -87,13 +90,13 @@ const CreateModal = () => {
                 { 'bx-checkbox': !protect },
                 { 'bxs-checkbox-checked': protect }
               )}
-              onClick={() => setProtected(!protect)}
             ></i>
             <p className={styles.subtext}>
               Password protected.
+              {/* TODO: change url to passsword protected section in guide */}
               <OutboundLink
-                eventLabel={GUIDE_CREDENTIALS_URL}
-                to={GUIDE_CREDENTIALS_URL}
+                eventLabel={GUIDE_URL}
+                to={GUIDE_URL}
                 target="_blank"
               >
                 Learn more
