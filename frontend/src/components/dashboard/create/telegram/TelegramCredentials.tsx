@@ -8,7 +8,12 @@ import {
   verifyCampaignCredentials,
   getStoredCredentials,
 } from 'services/telegram.service'
-import { PrimaryButton, ErrorBlock, Dropdown } from 'components/common'
+import {
+  PrimaryButton,
+  InfoBlock,
+  ErrorBlock,
+  Dropdown,
+} from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
@@ -31,6 +36,7 @@ const TelegramCredentials = ({
   )
   const [isManual, setIsManual] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
+  const [sendSuccess, setSendSuccess] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
   const { id: campaignId } = useParams()
 
@@ -57,6 +63,12 @@ const TelegramCredentials = ({
     setIsManual((m) => !m)
     setCreds(null)
     setSelectedCredential('')
+  }
+
+  function toggleReplaceCredentials() {
+    setErrorMessage(null)
+    setSendSuccess(false)
+    setShowCredentialFields(true)
   }
 
   async function handleSelectStoredCredentials() {
@@ -111,6 +123,7 @@ const TelegramCredentials = ({
 
   async function handleSendValidationMessage(recipient: string) {
     setErrorMessage(null)
+    setSendSuccess(false)
     try {
       if (!campaignId) {
         throw new Error('Invalid campaign id')
@@ -120,6 +133,7 @@ const TelegramCredentials = ({
         campaignId: +campaignId,
         recipient,
       })
+      setSendSuccess(true)
     } catch (e) {
       setErrorMessage(e.message)
     }
@@ -214,10 +228,7 @@ const TelegramCredentials = ({
             <>
               <PrimaryButton
                 className={cx(styles.darkBlueBtn, styles.newCredentialsButton)}
-                onClick={() => {
-                  setErrorMessage(null)
-                  setShowCredentialFields(true)
-                }}
+                onClick={toggleReplaceCredentials}
               >
                 Enter new credentials
               </PrimaryButton>
@@ -231,6 +242,14 @@ const TelegramCredentials = ({
                 <b>subscribed to the bot</b>.
               </p>
               <TelegramValidationInput onClick={handleSendValidationMessage} />
+              {sendSuccess && (
+                <InfoBlock>
+                  <li>
+                    <i className="bx bx-check-circle"></i>
+                    <span>Message sent successfully.</span>
+                  </li>
+                </InfoBlock>
+              )}
               <ErrorBlock>{errorMessage}</ErrorBlock>
               <div className="separator"></div>
 
