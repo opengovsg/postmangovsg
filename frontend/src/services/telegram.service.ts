@@ -70,6 +70,22 @@ export async function verifyUserCredentials({
   }
 }
 
+export async function verifyCampaignCredentials({
+  campaignId,
+  recipient,
+}: {
+  campaignId: number
+  recipient: string
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/telegram/credentials/verify`, {
+      recipient,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error verifying credentials.')
+  }
+}
+
 export async function completeFileUpload({
   campaignId,
   transactionId,
@@ -161,6 +177,47 @@ export async function getPresignedUrl({
     return { transactionId, presignedUrl } as PresignedUrlResponse
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
+  }
+}
+
+export async function validateStoredCredentials({
+  campaignId,
+  label,
+}: {
+  campaignId: number
+  label: string
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/telegram/credentials`, {
+      label,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error validating credentials.')
+  }
+}
+
+export async function validateNewCredentials({
+  campaignId,
+  telegramBotToken,
+}: {
+  campaignId: number
+  telegramBotToken: string
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/telegram/new-credentials`, {
+      telegram_bot_token: telegramBotToken,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error validating credentials.')
+  }
+}
+
+export async function getStoredCredentials(): Promise<string[]> {
+  try {
+    const response = await axios.get('/settings/telegram/credentials')
+    return response.data
+  } catch (e) {
+    errorHandler(e, 'Error retrieving stored credentials')
   }
 }
 
