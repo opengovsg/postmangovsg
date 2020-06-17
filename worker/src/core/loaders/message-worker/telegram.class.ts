@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize-typescript'
-import { QueryTypes } from 'sequelize'
+import { QueryTypes, Transaction } from 'sequelize'
 import { map } from 'lodash'
 
 import TemplateClient from '@core/services/template-client.class'
@@ -37,15 +37,28 @@ class Telegram {
   }
 
   /**
-   * Enqueues messages into `telegram_ops`.
+   * Enqueues messages into `telegram_ops` and updates stats.
    */
-  async enqueueMessages(jobId: number): Promise<void> {
-    await this.connection.query('SELECT enqueue_messages_telegram(:jobId)', {
-      replacements: {
-        jobId,
-      },
+  async enqueueMessages(jobId: number, campaignId: number): Promise<void> {
+    await this.connection.transaction(async (transaction: Transaction) => {
+      await this.connection.query('SELECT enqueue_messages_telegram(:jobId)', {
+        replacements: {
+          jobId,
+        },
+        transaction,
+      })
+
+      await this.connection.query(
+        'SELECT update_stats_telegram(:campaignId);',
+        {
+          replacements: { campaignId },
+          type: QueryTypes.SELECT,
+          transaction,
+        }
+      )
+
+      logger.info(`${this.workerId}: s_enqueueMessagesTelegram job_id=${jobId}`)
     })
-    logger.info(`${this.workerId}: s_enqueueMessagesTelegram job_id=${jobId}`)
   }
 
   /**
@@ -99,7 +112,7 @@ class Telegram {
       await this.connection.query(
         `
           UPDATE telegram_ops
-          SET message_id = :messageId, delivered_at = clock_timestamp(), updated_at = clock_timestamp()
+          SET message_id = :messageId, status = 'SUCCESS', delivered_at = clock_timestamp(), updated_at = clock_timestamp()
           WHERE id = :id
         `,
         {
@@ -115,7 +128,7 @@ class Telegram {
       await this.connection.query(
         `
           UPDATE telegram_ops
-          SET error_code = :error, updated_at = clock_timestamp()
+          SET error_code = :error, status = 'ERROR', updated_at = clock_timestamp()
           WHERE id = :id
         `,
         {

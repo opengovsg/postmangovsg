@@ -2,7 +2,10 @@ CREATE OR REPLACE FUNCTION log_job_telegram(selected_campaign_id int)
 RETURNS VOID LANGUAGE plpgsql AS $$
 BEGIN
   UPDATE telegram_messages m
-  SET error_code = COALESCE(o.error_code, m.error_code),
+  -- reset dequeued_at so that errored messages can be retried
+  SET dequeued_at = NULL,
+    status = o.status::text::enum_telegram_messages_status,
+    error_code = o.error_code,
     message_id = o.message_id,
     sent_at = o.sent_at,
     delivered_at = o.delivered_at,

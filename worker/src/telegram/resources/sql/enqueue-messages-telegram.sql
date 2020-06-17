@@ -16,12 +16,14 @@ BEGIN
       LEFT JOIN telegram_subscribers ON telegram_messages.recipient = telegram_subscribers.phone_number
     WHERE telegram_messages.campaign_id = selected_campaign_id
       AND telegram_messages.dequeued_at IS NULL
+      AND (telegram_messages.status IS NULL OR telegram_messages.status = 'ERROR')
   ),
 
   no_telegram_id AS (
     --- set error code 1 for messages with no telegram id mapping
     UPDATE telegram_messages
-    SET error_code = 1, updated_at = clock_timestamp()
+    SET error_code = '1: Telegram ID not found', status = 'ERROR',
+      updated_at = clock_timestamp()
     FROM messages
     WHERE messages.telegram_id IS NULL -- telegram id is null
       AND messages.id = telegram_messages.id
@@ -31,7 +33,8 @@ BEGIN
   no_subscription AS (
     -- set error code 2 for messages with no subscription
     UPDATE telegram_messages
-    SET error_code = 2, updated_at = clock_timestamp()
+    SET error_code = '2: Bot subscription not found', status = 'ERROR',
+      updated_at = clock_timestamp()
     FROM messages
       -- map messages to campaigns
       JOIN campaigns ON messages.campaign_id = campaigns.id
@@ -46,7 +49,8 @@ BEGIN
   valid_messages AS (
     -- dequeue messages that have both a subscription and telegram id
     UPDATE telegram_messages
-    SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp()
+    SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp(),
+      status = NULL, error_code = NULL, sent_at = NULL, delivered_at = NULL
     FROM messages
     WHERE messages.id NOT IN (
       SELECT * FROM no_telegram_id

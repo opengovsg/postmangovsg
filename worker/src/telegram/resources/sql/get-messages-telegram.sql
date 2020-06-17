@@ -19,10 +19,10 @@ BEGIN
     SKIP LOCKED
   ),
 
-  -- set sent_at for selected messages
+  -- set status and sent_at for selected messages
   messages AS (
     UPDATE telegram_ops
-    SET sent_at = clock_timestamp(), updated_at = clock_timestamp()
+    SET status = 'SENDING', sent_at = clock_timestamp(), updated_at = clock_timestamp()
     WHERE id IN (
       SELECT *
       FROM selected_ids
