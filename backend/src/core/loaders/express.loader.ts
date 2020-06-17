@@ -46,7 +46,10 @@ const sentrySessionMiddleware = (
   next()
 }
 
-Sentry.init({ dsn: config.get('sentryDsn') })
+Sentry.init({
+  dsn: config.get('sentryDsn'),
+  environment: config.get('env'),
+})
 
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
