@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import * as Sentry from '@sentry/browser'
 import cx from 'classnames'
 import { OutboundLink } from 'react-ga'
 
@@ -27,7 +28,6 @@ const NavBar = () => {
     try {
       await logout()
       setAuthenticated(false)
-      setGAUserId(null)
     } catch (err) {
       console.error(err)
     }
