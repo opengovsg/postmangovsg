@@ -72,7 +72,7 @@ const Credentials = ({
               <i
                 className={cx(
                   'bx',
-                  'bx-message-check',
+                  'bx-list-check',
                   styles.icon,
                   styles.verifyButton
                 )}
