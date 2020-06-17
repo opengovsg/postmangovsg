@@ -1,7 +1,8 @@
 import AWS from 'aws-sdk'
 import logger from '@core/logger'
 import config from '@core/config'
-import { TwilioCredentials, TelegramCredentials } from '@sms/interfaces'
+import { TwilioCredentials } from '@sms/interfaces'
+import { TelegramCredentials } from '@telegram/interfaces'
 import { get } from 'lodash'
 
 const secretsManager = new AWS.SecretsManager({
