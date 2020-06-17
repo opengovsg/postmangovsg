@@ -4,7 +4,6 @@ import {
   RecipientColumnMissing,
   UnexpectedDoubleQuoteError,
 } from 'postman-templating'
-import config from '@core/config'
 import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
@@ -12,6 +11,7 @@ import {
   InvalidRecipientError,
 } from '@core/errors'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
+import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
@@ -157,21 +157,20 @@ const uploadCompleteHandler = async (
 
     // carry out templating / hydration
     // - download from s3
-    try {
-      const s3Client = new S3Client()
-      const fileContent = await s3Client.getCsvFile(s3Key)
+    const s3Client = new S3Client()
+    const fileContent = await s3Client.getCsvFile(s3Key)
 
-      const records = TemplateService.getRecordsFromCsv(
-        +campaignId,
-        fileContent,
-        emailTemplate.params as string[]
-      )
+    const records = TemplateService.getRecordsFromCsv(
+      +campaignId,
+      fileContent,
+      emailTemplate.params as string[]
+    )
 
-      EmailTemplateService.testHydration(
-        records,
-        emailTemplate.body as string,
-        emailTemplate.subject
-      )
+    EmailTemplateService.testHydration(
+      records,
+      emailTemplate.body as string,
+      emailTemplate.subject
+    )
 
     if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
       throw new InvalidRecipientError()
