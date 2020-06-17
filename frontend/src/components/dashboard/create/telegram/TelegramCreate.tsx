@@ -5,6 +5,7 @@ import { TelegramCampaign, TelegramProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import TelegramTemplate from './TelegramTemplate'
 import TelegramRecipients from './TelegramRecipients'
+import TelegramCredentials from './TelegramCredentials'
 
 import styles from '../Create.module.scss'
 
@@ -46,6 +47,13 @@ const CreateTelegram = ({
             params={campaign.params}
             csvFilename={campaign.csvFilename}
             numRecipients={campaign.numRecipients}
+            onNext={onNext}
+          />
+        )
+      case TelegramProgress.InsertCredentials:
+        return (
+          <TelegramCredentials
+            hasCredential={campaign.hasCredential}
             onNext={onNext}
           />
         )
