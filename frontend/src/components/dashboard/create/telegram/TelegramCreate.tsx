@@ -6,6 +6,7 @@ import { ProgressPane } from 'components/common'
 import TelegramTemplate from './TelegramTemplate'
 import TelegramRecipients from './TelegramRecipients'
 import TelegramCredentials from './TelegramCredentials'
+import TelegramSend from './TelegramSend'
 
 import styles from '../Create.module.scss'
 
@@ -54,6 +55,13 @@ const CreateTelegram = ({
         return (
           <TelegramCredentials
             hasCredential={campaign.hasCredential}
+            onNext={onNext}
+          />
+        )
+      case TelegramProgress.Send:
+        return (
+          <TelegramSend
+            numRecipients={campaign.numRecipients}
             onNext={onNext}
           />
         )
