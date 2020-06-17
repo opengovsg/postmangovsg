@@ -13,9 +13,11 @@ export default class TelegramClient {
    * @param message
    */
   public send(telegramId: string | number, message: string): Promise<number> {
-    return this.client.sendMessage(telegramId, message).then((result) => {
-      return result.message_id
-    })
+    return this.client
+      .sendMessage(telegramId, message, { parse_mode: 'HTML' })
+      .then((result) => {
+        return result.message_id
+      })
   }
 
   /**

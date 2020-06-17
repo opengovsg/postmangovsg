@@ -12,7 +12,7 @@ import TemplateClient from '@core/services/template-client.class'
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(config.get('xssOptions.telegram'))
+const client = new TemplateClient(config.get('xssOptions.telegram'), '\n')
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,
@@ -126,7 +126,10 @@ const storeTemplate = async ({
   campaignId,
   body,
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
-  const updatedTemplate = await upsertTelegramTemplate({ campaignId, body })
+  const updatedTemplate = await upsertTelegramTemplate({
+    campaignId,
+    body: client.replaceNewLinesAndSanitize(body),
+  })
 
   const firstRecord = await TelegramMessage.findOne({
     where: { campaignId },
@@ -158,11 +161,13 @@ const storeTemplate = async ({
 const getFilledTemplate = async (
   campaignId: number
 ): Promise<TelegramTemplate | null> => {
-  const smsTemplate = await TelegramTemplate.findOne({ where: { campaignId } })
-  if (!smsTemplate?.body || !smsTemplate.params) {
+  const telegramTemplate = await TelegramTemplate.findOne({
+    where: { campaignId },
+  })
+  if (!telegramTemplate?.body || !telegramTemplate.params) {
     return null
   }
-  return smsTemplate
+  return telegramTemplate
 }
 
 /**

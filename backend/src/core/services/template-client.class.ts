@@ -14,8 +14,11 @@ import xss from 'xss'
 
 export default class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
-  constructor(xssOptions?: xss.IFilterXSSOptions) {
+  lineBreak: string
+
+  constructor(xssOptions?: xss.IFilterXSSOptions, lineBreak = '<br />') {
     this.xssOptions = xssOptions
+    this.lineBreak = lineBreak
   }
 
   /**
@@ -24,7 +27,10 @@ export default class TemplateClient {
    * @param value
    */
   replaceNewLinesAndSanitize(value: string): string {
-    return xss.filterXSS(value.replace(/(\n|\r\n)/g, '<br/>'), this.xssOptions)
+    return xss.filterXSS(
+      value.replace(/(\n|\r\n)/g, this.lineBreak),
+      this.xssOptions
+    )
   }
 
   // FIXME: handle edge case of x.y
@@ -157,8 +163,12 @@ export default class TemplateClient {
    */
   template(templateBody: string, params: { [key: string]: string }): string {
     const parsed = this.parseTemplate(templateBody, params)
-    // Remove extra '\' infront of single quotes and backslashes, added by Squirrelly when it escaped the csv
-    const templated = parsed.tokens.join('').replace(/\\([\\'])/g, '$1')
+    // Remove extra '\' infront of single quotes and backslashes, added by Squirrelly when it escaped the csv.
+    // Remove extra '\' infront of \n added by Squirrelly when it escaped the message body.
+    const templated = parsed.tokens
+      .join('')
+      .replace(/\\([\\'])/g, '$1')
+      .replace(/\\n/g, '\n')
     return xss.filterXSS(templated, this.xssOptions)
   }
 
