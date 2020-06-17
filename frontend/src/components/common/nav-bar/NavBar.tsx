@@ -28,8 +28,6 @@ const NavBar = () => {
     try {
       await logout()
       setAuthenticated(false)
-      setGAUserId(null)
-      Sentry.setUser(null)
     } catch (err) {
       console.error(err)
     }
