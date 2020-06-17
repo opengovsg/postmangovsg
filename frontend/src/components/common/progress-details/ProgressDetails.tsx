@@ -6,7 +6,7 @@ import { CampaignStats, Status } from 'classes/Campaign'
 import {
   ProgressBar,
   PrimaryButton,
-  InvalidRecipientsCsv,
+  FailedRecipientsCsv,
 } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 const ProgressDetails = ({
@@ -107,7 +107,7 @@ const ProgressDetails = ({
               <td className={'md'}>Could not be sent</td>
               <td className={cx('sm', styles.error)}>
                 {error}
-                <InvalidRecipientsCsv
+                <FailedRecipientsCsv
                   campaignId={campaignId}
                   campaignName={campaignName}
                   status={status}

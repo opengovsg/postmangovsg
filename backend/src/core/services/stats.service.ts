@@ -127,11 +127,11 @@ const getCurrentStats = async (
       // this is needed when invalid might appear in ops table, e.g. telegram immediate bounce errors
       invalid: opsStats.invalid + archivedStats.invalid,
       status: job.status,
-      updated_at: job.updatedAt,
+      updatedAt: job.updatedAt,
     }
   }
   // else, return archived stats
-  return { ...archivedStats, status: job.status, updated_at: job.updatedAt }
+  return { ...archivedStats, status: job.status, updatedAt: job.updatedAt }
 }
 
 /*

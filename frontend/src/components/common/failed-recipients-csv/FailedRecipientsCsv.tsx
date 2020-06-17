@@ -6,11 +6,12 @@ import {
   exportCampaignStats,
   getCampaignStats,
 } from 'services/campaign.service'
-import styles from './InvalidRecipientsCsv.module.scss'
+import styles from './FailedRecipientsCsv.module.scss'
+import { stat } from 'fs'
 
 const LINK_DISPLAY_WAIT_TIME = 5 * 60 * 1000
 
-const InvalidRecipientsCsv = ({
+const FailedRecipientsCsv = ({
   campaignId,
   campaignName,
   status,
@@ -39,6 +40,7 @@ const InvalidRecipientsCsv = ({
   ) {
     event.stopPropagation()
     const list = await exportCampaignStats(campaignId)
+    console.log(list)
     const headers = Object.keys(list[0])
     const sentAtTime = new Date(sentAt)
 
@@ -79,4 +81,4 @@ const InvalidRecipientsCsv = ({
   return null
 }
 
-export default InvalidRecipientsCsv
+export default FailedRecipientsCsv

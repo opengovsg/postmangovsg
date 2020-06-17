@@ -131,7 +131,7 @@ const deleteS3TempKeys = async (campaignId: number): Promise<void> => {
 const getCsvStatus = async (
   campaignId: number
 ): Promise<CsvStatusInterface> => {
-  const campaign = await Campaign.findByPk(campaignId)
+  const campaign = await Campaign.findByPk(campaignId, { useMaster: true })
   if (!campaign) {
     throw new Error('Campaign does not exist')
   }

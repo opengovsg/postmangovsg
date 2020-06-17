@@ -12,7 +12,7 @@ import {
   Pagination,
   TitleBar,
   PrimaryButton,
-  InvalidRecipientsCsv,
+  FailedRecipientsCsv,
 } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'
@@ -99,7 +99,7 @@ const Campaigns = () => {
     {
       name: '',
       render: (campaign: Campaign) => (
-        <InvalidRecipientsCsv
+        <FailedRecipientsCsv
           campaignId={campaign.id}
           campaignName={campaign.name}
           status={campaign.status}

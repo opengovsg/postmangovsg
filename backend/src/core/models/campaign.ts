@@ -76,6 +76,7 @@ export class Campaign extends Model<Campaign> {
     await Campaign.sequelize?.transaction(async (transaction) => {
       const campaign = await Campaign.findByPk(id, {
         transaction,
+        useMaster: true,
       })
       if (!campaign) {
         throw new Error('Invalid campaign')
