@@ -19,14 +19,6 @@
         font-weight: 500;
       }
 
-      td.error {
-        @include flex-horizontal;
-
-        div {
-          margin-left: 1rem;
-        }
-      }
-
       th {
         text-transform: capitalize;
       }

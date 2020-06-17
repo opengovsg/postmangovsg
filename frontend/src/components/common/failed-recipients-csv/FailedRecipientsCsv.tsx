@@ -18,6 +18,7 @@ const FailedRecipientsCsv = ({
   sentAt,
   updatedAt,
   failedCount: initialFailedCount,
+  shortLabel = false,
 }: {
   campaignId: number
   campaignName: string
@@ -25,6 +26,7 @@ const FailedRecipientsCsv = ({
   sentAt: Date
   updatedAt: Date
   failedCount?: number
+  shortLabel?: boolean
 }) => {
   const updatedAtTimestamp = +new Date(updatedAt)
   const campaignAge = Date.now() - updatedAtTimestamp
@@ -73,7 +75,7 @@ const FailedRecipientsCsv = ({
         onClick={(e) => onDownloadInvalidRecipientsList(e)}
       >
         <i className={cx(styles.icon, 'bx bx-download')}></i>
-        Recipients
+        {shortLabel ? 'Export' : 'Export error and invalid recipients list'}
       </div>
     ) : null
   }

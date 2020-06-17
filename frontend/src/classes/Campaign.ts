@@ -29,7 +29,7 @@ export class Campaign {
     this.name = input['name']
     this.type = input['type']
     this.createdAt = input['created_at']
-    this.sentAt = input['sent_at']
+    this.sentAt = input['sentAt']
     this.status = this.getStatus(input['job_queue'])
     this.isCsvProcessing = input['is_csv_processing']
     this.statusUpdatedAt = input['statusUpdatedAt']

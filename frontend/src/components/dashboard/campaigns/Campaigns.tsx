@@ -100,6 +100,7 @@ const Campaigns = () => {
       name: '',
       render: (campaign: Campaign) => (
         <FailedRecipientsCsv
+          shortLabel
           campaignId={campaign.id}
           campaignName={campaign.name}
           status={campaign.status}
