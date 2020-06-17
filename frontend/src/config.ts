@@ -49,4 +49,6 @@ export const REPORT_BUG_URL = process.env.REACT_APP_REPORT_BUG_URL as string
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN as string
 export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
+export const SENTRY_ENVIRONMENT =
+  (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
