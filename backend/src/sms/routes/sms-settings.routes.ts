@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
@@ -18,6 +19,13 @@ const storeCredentialValidator = {
     twilio_api_key: Joi.string().trim().required(),
     twilio_messaging_service_sid: Joi.string().trim().required(),
     recipient: Joi.string().trim().required(),
+  }),
+}
+
+const verifyCredentialValidator = {
+  [Segments.BODY]: Joi.object({
+    recipient: Joi.string().trim().required(),
+    label: Joi.string().required(),
   }),
 }
 
@@ -61,6 +69,41 @@ router.post(
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
   SettingsMiddleware.storeUserCredential
+)
+
+/**
+ * @swagger
+ * path:
+ *  /settings/sms/credentials/verify:
+ *    post:
+ *      summary: Verify stored credential for user
+ *      tags:
+ *        - Settings
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                recipient:
+ *                  type: string
+ *                label:
+ *                  type: string
+ *
+ *      responses:
+ *        200:
+ *          description: OK
+ *        400:
+ *          description: Bad Request (invalid credentials, malformed request)
+ *
+ */
+router.post(
+  '/credentials/verify',
+  celebrate(verifyCredentialValidator),
+  SmsMiddleware.getCredentialsFromLabel,
+  SmsMiddleware.validateAndStoreCredentials,
+  (_req: Request, res: Response) => res.sendStatus(200)
 )
 
 export default router

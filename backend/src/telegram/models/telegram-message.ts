@@ -8,6 +8,7 @@ import {
 } from 'sequelize-typescript'
 
 import { Campaign } from '@core/models'
+import { MessageStatus } from '@core/constants'
 
 @Table({ tableName: 'telegram_messages', underscored: true, timestamps: true })
 export class TelegramMessage extends Model<TelegramMessage> {
@@ -19,13 +20,19 @@ export class TelegramMessage extends Model<TelegramMessage> {
   id!: number
 
   @ForeignKey(() => Campaign)
-  @Column(DataType.INTEGER)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
   campaignId!: number
 
   @BelongsTo(() => Campaign)
   campaign!: Campaign
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   recipient!: string
 
   @Column(DataType.JSON)
@@ -36,6 +43,12 @@ export class TelegramMessage extends Model<TelegramMessage> {
 
   @Column(DataType.STRING)
   errorCode?: string
+
+  @Column({
+    type: DataType.ENUM(...Object.values(MessageStatus)),
+    allowNull: true,
+  })
+  status?: MessageStatus
 
   @Column(DataType.DATE)
   dequeuedAt?: Date

@@ -76,11 +76,15 @@ jobs:
         - npm install && npm run build
         - zip -qr code.zip build package.json node_modules/
         - cd $TRAVIS_BUILD_DIR/serverless/postman-api-gateway-authorizer && zip -qr code.zip *
+        - cd $TRAVIS_BUILD_DIR/serverless/log-email-sns
+        - npm install && npm run build
+        - zip -qr code.zip build package.json node_modules/
       deploy:
         - provider: lambda
+          edge: true
           function_name: log-twilio-callback-staging
           region: $AWS_DEFAULT_REGION
-          role: $STAGING_TWILIO_CALLBACK_ROLE
+          role: $STAGING_CALLBACK_ROLE
           runtime: nodejs12.x
           module_name: build/index
           handler_name: handler
@@ -89,13 +93,14 @@ jobs:
           zip: "../log-twilio-callback/code.zip"
           environment_variables:
             - TWILIO_CALLBACK_SECRET=$STAGING_TWILIO_CALLBACK_SECRET
-            - DB_URI=$STAGING_DB_URI
+            - DB_URI=$STAGING_TWILIO_DB_URI
           on:
             branch: $STAGING_BRANCH
         - provider: lambda
+          edge: true
           function_name: log-twilio-callback-production
           region: $AWS_DEFAULT_REGION
-          role: $PRODUCTION_TWILIO_CALLBACK_ROLE
+          role: $PRODUCTION_CALLBACK_ROLE
           runtime: nodejs12.x
           module_name: build/index
           handler_name: handler
@@ -104,10 +109,11 @@ jobs:
           zip: "../log-twilio-callback/code.zip"
           environment_variables:
             - TWILIO_CALLBACK_SECRET=$PRODUCTION_TWILIO_CALLBACK_SECRET
-            - DB_URI=$PRODUCTION_DB_URI
+            - DB_URI=$PRODUCTION_TWILIO_DB_URI
           on:
             branch: $PRODUCTION_BRANCH
         - provider: lambda
+          edge: true
           function_name: postman-api-gateway-authorizer
           region: $AWS_DEFAULT_REGION
           role: $POSTMAN_AUTHORIZER_ROLE
@@ -117,6 +123,36 @@ jobs:
           zip: "../postman-api-gateway-authorizer/code.zip"
           on:
             branch: $PRODUCTION_BRANCH
+        - provider: lambda
+          edge: true
+          function_name: log-email-callback-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../log-email-sns/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - DB_URI=$STAGING_EMAIL_DB_URI
+        - provider: lambda
+          edge: true
+          function_name: log-email-callback-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../log-email-sns/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_EMAIL_DB_URI
     - name: root
       install:
         - npm install --ignore-scripts

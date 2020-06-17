@@ -8,6 +8,7 @@ import { UserCredential, deleteCredential } from 'services/settings.service'
 
 import AddCredentialModal from '../add-credential-modal'
 import EmptyCredentialsImage from 'assets/img/credentials.svg'
+import VerifyCredentialModal from '../verify-credential-modal'
 import styles from './Credentials.module.scss'
 
 const Credentials = ({
@@ -52,6 +53,15 @@ const Credentials = ({
     refresh()
   }
 
+  async function onVerifyCredClicked(label: string, type: ChannelType) {
+    modalContext.setModalContent(
+      <VerifyCredentialModal
+        label={label}
+        credType={type}
+      ></VerifyCredentialModal>
+    )
+  }
+
   function renderCredentials() {
     return (
       <>
@@ -59,6 +69,15 @@ const Credentials = ({
           <tr key={label}>
             <td className="md">{label}</td>
             <td className={cx('sm', styles.actionColumn)}>
+              <i
+                className={cx(
+                  'bx',
+                  'bx-message-check',
+                  styles.icon,
+                  styles.verifyButton
+                )}
+                onClick={() => onVerifyCredClicked(label, credType)}
+              ></i>
               <i
                 className={cx(
                   'bx',

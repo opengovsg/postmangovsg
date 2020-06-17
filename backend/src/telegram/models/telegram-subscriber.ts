@@ -1,5 +1,5 @@
 import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript'
-import { BotSubscriber } from './bot-subscriber'
+import { BotSubscriber } from '.'
 
 @Table({
   tableName: 'telegram_subscribers',
@@ -7,15 +7,20 @@ import { BotSubscriber } from './bot-subscriber'
   timestamps: true,
 })
 export class TelegramSubscriber extends Model<TelegramSubscriber> {
-  @HasMany(() => BotSubscriber, { as: 'bot_subscriber' })
-  @Column({
-    type: DataType.BIGINT,
-    primaryKey: true,
+  @HasMany(() => BotSubscriber, {
+    as: 'bot_subscriber',
+    sourceKey: 'telegramId',
   })
-  telegramId!: number
-
   @Column({
     type: DataType.STRING,
+    primaryKey: true,
   })
   phoneNumber!: string
+
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: false,
+    unique: true,
+  })
+  telegramId!: number
 }

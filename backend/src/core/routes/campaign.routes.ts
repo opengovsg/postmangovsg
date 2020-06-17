@@ -7,8 +7,8 @@ const router = Router()
 // validators
 const listCampaignsValidator = {
   [Segments.QUERY]: Joi.object({
-    limit: Joi.number().integer().min(1).optional(),
-    offset: Joi.number().integer().min(0).optional(),
+    limit: Joi.number().integer().min(1).max(100).default(10),
+    offset: Joi.number().integer().min(0).default(0),
   }),
 }
 
@@ -39,6 +39,8 @@ const createCampaignValidator = {
  *          schema:
  *            type: integer
  *            minimum: 1
+ *            maximum: 100
+ *            default: 10
  *        - in: query
  *          name: offset
  *          description: offset to begin returning campaigns from
@@ -46,14 +48,21 @@ const createCampaignValidator = {
  *          schema:
  *            type: integer
  *            minimum: 0
+ *            default: 0
  *      responses:
  *        "200":
  *          content:
  *            application/json:
  *              schema:
- *                type: array
- *                items:
- *                  $ref: '#/components/schemas/CampaignMeta'
+ *                type: object
+ *                properties:
+ *                  campaigns:
+ *                    type: array
+ *                    items:
+ *                      $ref: '#/components/schemas/CampaignMeta'
+ *                  total_count:
+ *                    type: integer
+ *
  *        "401":
  *           description: Unauthorized
  *        "500":

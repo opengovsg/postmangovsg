@@ -98,7 +98,7 @@ const updateCampaignAndMessages = async (
     // Updates metadata in project
     await CampaignService.updateCampaignS3Metadata(
       key,
-      campaignId,
+      +campaignId,
       filename,
       transaction
     )

@@ -5,7 +5,7 @@ import config from '@core/config'
 
 import { ChannelType } from '@core/constants'
 import { Campaign, JobQueue } from '@core/models'
-import { GetCampaignDetailsOutput, CampaignDetails } from '@core/interfaces'
+import { CampaignDetails } from '@core/interfaces'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
@@ -123,10 +123,10 @@ const setCampaignCredential = (
  */
 const getCampaignDetails = async (
   campaignId: number
-): Promise<GetCampaignDetailsOutput> => {
-  const campaignDetails: CampaignDetails = (
-    await Campaign.findOne({
-      where: { id: +campaignId },
+): Promise<CampaignDetails> => {
+  const [campaignDetails, numRecipients] = await Promise.all([
+    Campaign.findOne({
+      where: { id: campaignId },
       attributes: [
         'id',
         'name',
@@ -149,13 +149,16 @@ const getCampaignDetails = async (
           attributes: ['body', 'params'],
         },
       ],
-    })
-  )?.get({ plain: true }) as CampaignDetails
+    }),
+    SmsMessage.count({
+      where: { campaignId },
+    }),
+  ])
 
-  const numRecipients: number = await SmsMessage.count({
-    where: { campaignId: +campaignId },
-  })
-  return { campaign: campaignDetails, numRecipients }
+  return {
+    ...campaignDetails?.get({ plain: true }),
+    num_recipients: numRecipients,
+  } as CampaignDetails
 }
 
 /**

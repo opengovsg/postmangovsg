@@ -7,8 +7,9 @@ import {
   RecipientColumnMissing,
   TemplateError,
   InvalidRecipientError,
+  UnexpectedDoubleQuoteError,
 } from '@core/errors'
-import { CampaignService, TemplateService } from '@core/services'
+import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { SmsTemplateService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { Campaign } from '@core/models'
@@ -85,7 +86,7 @@ const storeTemplate = async (
  */
 const updateCampaignAndMessages = async (
   key: string,
-  campaignId: string,
+  campaignId: number,
   filename: string,
   records: MessageBulkInsertInterface[]
 ): Promise<void> => {
@@ -102,10 +103,13 @@ const updateCampaignAndMessages = async (
     )
 
     // START populate template
-    await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
+    await SmsTemplateService.addToMessageLogs(campaignId, records, transaction)
+
+    // Update statistic table
+    await StatsService.setNumRecipients(campaignId, records.length, transaction)
 
     // Set campaign to valid
-    await CampaignService.setValid(+campaignId, transaction)
+    await CampaignService.setValid(campaignId, transaction)
 
     transaction?.commit()
   } catch (err) {
@@ -165,7 +169,7 @@ const uploadCompleteHandler = async (
 
       const recipientCount = records.length
 
-      await updateCampaignAndMessages(s3Key, campaignId, filename, records)
+      await updateCampaignAndMessages(s3Key, +campaignId, filename, records)
 
       if (!res.headersSent) {
         return res.json({
@@ -181,11 +185,14 @@ const uploadCompleteHandler = async (
     }
   } catch (err) {
     if (!res.headersSent) {
-      if (
-        err instanceof RecipientColumnMissing ||
-        err instanceof MissingTemplateKeysError ||
-        err instanceof InvalidRecipientError
-      ) {
+      const userErrors = [
+        RecipientColumnMissing,
+        MissingTemplateKeysError,
+        InvalidRecipientError,
+        UnexpectedDoubleQuoteError,
+      ]
+
+      if (userErrors.some((errType) => err instanceof errType)) {
         return res.status(400).json({ message: err.message })
       }
       return next(err)

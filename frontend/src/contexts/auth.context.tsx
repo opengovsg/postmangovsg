@@ -5,8 +5,10 @@ import React, {
   SetStateAction,
   Dispatch,
 } from 'react'
+import { useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { getUserEmail, logout } from 'services/auth.service'
+import { getUser, logout } from 'services/auth.service'
+import { setGAUserId, initializeGA, sendPageView } from 'services/ga.service'
 
 interface ContextProps {
   isAuthenticated: boolean
@@ -22,11 +24,22 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')
 
+  const location = useLocation()
+
+  useEffect(() => {
+    // ensure that GA is loaded before sending event
+    isLoaded && sendPageView(location.pathname)
+  }, [location, isLoaded])
+
   async function initialChecks() {
     try {
-      const email = await getUserEmail()
-      setAuthenticated(!!email)
-      setEmail(email || '')
+      const user = await getUser()
+      setAuthenticated(!!user?.email)
+      setEmail(user?.email || '')
+
+      initializeGA()
+      // set user id to track logged in user
+      setGAUserId(user?.id || null)
     } catch (err) {
       // is unauthorized
     }
@@ -41,6 +54,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
         if (error.response && error.response.status === 401) {
           await logout()
           setAuthenticated(false)
+          setGAUserId(null)
         }
         return Promise.reject(error)
       }

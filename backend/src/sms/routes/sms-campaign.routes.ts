@@ -81,12 +81,8 @@ router.use(SmsMiddleware.isSmsCampaignOwnedByUser)
  *          content:
  *            application/json:
  *              schema:
- *                type: object
- *                properties:
- *                  campaign:
- *                    $ref: '#/components/schemas/SMSCampaign'
- *                  num_recipients:
- *                    type: number
+ *                $ref: '#/components/schemas/SMSCampaign'
+ *
  *        "401":
  *           description: Unauthorized
  *        "403" :

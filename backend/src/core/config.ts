@@ -367,6 +367,11 @@ const config = convict({
       format: 'int',
     },
   },
+  sentryDsn: {
+    doc: 'Sentry DSN for backend',
+    default: '',
+    env: 'SENTRY_DSN',
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
