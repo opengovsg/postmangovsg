@@ -47,7 +47,7 @@ const AddCredentialModal = ({
     credType ? AddCredentialStep.Input : AddCredentialStep.SelectType
   )
   const [credentials, setCredentials] = useState(null as any)
-  const [loading, setLoading] = useState(false)
+  const [isValidating, setIsValidating] = useState(false)
   const [error, setError] = useState(
     null as null | {
       message: string
@@ -103,9 +103,9 @@ const AddCredentialModal = ({
         )
 
         nextFunc = async () => {
-          setLoading(true)
+          setIsValidating(true)
           await validateTelegramBotToken()
-          setLoading(false)
+          setIsValidating(false)
         }
         break
     }
@@ -115,10 +115,16 @@ const AddCredentialModal = ({
         <div className="separator"></div>
         <div className="progress-button">
           <PrimaryButton
-            disabled={!isValidLabel() || !credentials || loading}
+            disabled={!isValidLabel() || !credentials || isValidating}
             onClick={nextFunc}
           >
-            {loading ? 'Loading...' : 'Next →'}
+            {isValidating ? (
+              <>
+                Validating<i className="bx bx-loader-alt bx-spin"></i>
+              </>
+            ) : (
+              'Next →'
+            )}
           </PrimaryButton>
         </div>
       </>
@@ -191,7 +197,7 @@ const AddCredentialModal = ({
           break
         case ChannelType.Telegram:
           error.editStep = AddCredentialStep.Validate
-          error.editLabel = 'Edit Number'
+          error.editLabel = 'Try again'
           await verifyUserTelegramCredentials({ label, recipient })
           break
         case ChannelType.Email:
