@@ -119,6 +119,7 @@ env:
 6. Open a new pull request and consolidate changelist from the commits made since the previous release.
 7. Merge pull request into master to trigger Travis build and deploy.
    - Manually trigger a custom build on Travis if there were changes made to the worker.
+8. Create a new pull request to merge release branch back into `develop` branch.
 
 **Example:**
 
