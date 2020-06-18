@@ -12,6 +12,7 @@
   - [Set environment variables](#set-environment-variables)
   - [Install and run the app](#install-and-run-the-app)
 - [Deployment](#deployment)
+- [Releasing](#releasing)
 - [Serverless](#serverless)
 - [Downtime procedure](#downtime-procedure)
 - [Infrastructure customizations](#infrastructure-customizations)
@@ -105,6 +106,49 @@ To deploy workers, trigger a custom build on Travis with the Custom Config set t
 ```
 env:
   - DEPLOY_WORKER=true
+```
+
+## Releasing
+
+1. Checkout a new release branch from `develop`.
+2. Bump the version of each of the subpackages (frontend, backend, worker).
+3. Stage changes for subpackage `package.json` and `package-lock.json`.
+4. Bump the version of the main package.
+   - You will need to use `--force` as the working directory is not clean.
+5. Push both the version commit and tag to GitHub.
+6. Open a new pull request and consolidate changelist from the commits made since the previous release.
+7. Merge pull request into master to trigger Travis build and deploy.
+   - Manually trigger a custom build on Travis if there were changes made to the worker.
+
+**Example:**
+
+```bash
+# Create a new release branch for a new minor version (e.g. v1.6.0 -> v1.7.0)
+$ git checkout develop
+$ git checkout -b release-v1.7.0
+
+# Bump frontend version
+$ cd frontend/
+$ npm version minor
+
+# Bump backend version
+$ cd ../ && cd backend/
+$ npm version minor
+
+# Bump worker version
+$ cd ../ && cd worker/
+$ npm version minor
+
+# Stage changes for subpackage package.json and package-lock.json
+$ cd ../
+$ git add -A
+
+# Create a version commit for main package
+$ npm version minor --force
+
+# Push version commit and tag to GitHub
+$ git push -u origin release-v1.7.0
+$ git push origin v1.7.0
 ```
 
 ## Serverless
