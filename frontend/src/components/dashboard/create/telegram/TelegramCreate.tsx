@@ -7,6 +7,7 @@ import TelegramTemplate from './TelegramTemplate'
 import TelegramRecipients from './TelegramRecipients'
 import TelegramCredentials from './TelegramCredentials'
 import TelegramSend from './TelegramSend'
+import TelegramDetail from './TelegramDetail'
 
 import styles from '../Create.module.scss'
 
@@ -73,7 +74,13 @@ const CreateTelegram = ({
   return (
     <div className={styles.createContainer}>
       {campaign.status !== Status.Draft ? (
-        <div className={styles.stepContainer}></div>
+        <div className={styles.stepContainer}>
+          <TelegramDetail
+            id={campaign.id}
+            sentAt={campaign.sentAt}
+            numRecipients={campaign.numRecipients}
+          ></TelegramDetail>
+        </div>
       ) : (
         <>
           <ProgressPane
