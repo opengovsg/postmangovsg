@@ -7,6 +7,7 @@ import {
 } from '@core/middlewares'
 import {
   TelegramMiddleware,
+  TelegramStatsMiddleware,
   TelegramTemplateMiddleware,
 } from '@telegram/middlewares'
 
@@ -565,5 +566,35 @@ router.post(
   CampaignMiddleware.canEditCampaign,
   JobMiddleware.retryCampaign
 )
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/stats:
+ *    get:
+ *      tags:
+ *        - Telegram
+ *      summary: Get telegram campaign stats
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.get('/stats', TelegramStatsMiddleware.getStats)
 
 export default router
