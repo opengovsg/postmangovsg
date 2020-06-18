@@ -78,8 +78,8 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(sentrySessionMiddleware)
 
   app.use('/v1', v1Router)
-  app.use(Sentry.Handlers.errorHandler())
   app.use(celebrateErrorMiddleware())
+  app.use(Sentry.Handlers.errorHandler())
 
   app.use(
     (
