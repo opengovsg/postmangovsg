@@ -9,7 +9,7 @@ import {
   TemplateError,
   InvalidRecipientError,
 } from '@core/errors'
-import { CampaignService, TemplateService } from '@core/services'
+import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { TelegramTemplateService } from '@telegram/services'
 import { Campaign } from '@core/models'
 
@@ -86,7 +86,7 @@ const storeTemplate = async (
  */
 const updateCampaignAndMessages = async (
   key: string,
-  campaignId: string,
+  campaignId: number,
   filename: string,
   records: MessageBulkInsertInterface[]
 ): Promise<void> => {
@@ -105,13 +105,16 @@ const updateCampaignAndMessages = async (
 
     // START populate template
     await TelegramTemplateService.addToMessageLogs(
-      +campaignId,
+      campaignId,
       records,
       transaction
     )
 
+    // Update statistic table
+    await StatsService.setNumRecipients(campaignId, records.length, transaction)
+
     // Set campaign to valid
-    await CampaignService.setValid(+campaignId, transaction)
+    await CampaignService.setValid(campaignId, transaction)
 
     transaction?.commit()
   } catch (err) {
@@ -177,7 +180,7 @@ const uploadCompleteHandler = async (
 
       await updateCampaignAndMessages(
         s3Key,
-        campaignId,
+        +campaignId,
         filename,
         formattedRecords
       )
