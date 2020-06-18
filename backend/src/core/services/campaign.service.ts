@@ -1,6 +1,7 @@
-import { Op, literal, Transaction } from 'sequelize'
+import { Op, literal, Transaction, Includeable } from 'sequelize'
 import { JobStatus } from '@core/constants'
-import { Campaign, JobQueue } from '@core/models'
+import { Campaign, JobQueue, Statistic } from '@core/models'
+import { CampaignDetails } from '@core/interfaces'
 
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress
@@ -80,6 +81,54 @@ const listCampaigns = ({
 }
 
 /**
+ * Get campaign details
+ * @param campaignId
+ * @param includes
+ */
+const getCampaignDetails = async (
+  campaignId: number,
+  includes: Includeable[]
+): Promise<CampaignDetails> => {
+  const campaignDetails = await Campaign.findOne({
+    where: { id: campaignId },
+    attributes: [
+      'id',
+      'name',
+      'type',
+      'created_at',
+      'valid',
+      [literal('cred_name IS NOT NULL'), 'has_credential'],
+      [literal("s3_object -> 'filename'"), 'csv_filename'],
+      [
+        literal(
+          "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
+        ),
+        'is_csv_processing',
+      ],
+      [
+        literal(
+          'Statistic.unsent + Statistic.sent + Statistic.errored + Statistic.invalid'
+        ),
+        'num_recipients',
+      ],
+    ],
+    include: [
+      {
+        model: JobQueue,
+        attributes: ['status', ['created_at', 'sent_at']],
+      },
+      {
+        model: Statistic,
+        attributes: [],
+      },
+      ...includes,
+    ],
+  })
+
+  return campaignDetails?.get({ plain: true }) as CampaignDetails
+}
+
+/**
  * Helper method to set a campaign to invalid (when the template and uploaded csv's columns don't match)
  * @param campaignId
  */
@@ -117,6 +166,7 @@ export const CampaignService = {
   hasJobInProgress,
   createCampaign,
   listCampaigns,
+  getCampaignDetails,
   setInvalid,
   setValid,
 }

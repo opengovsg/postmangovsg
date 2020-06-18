@@ -5,7 +5,7 @@ import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
-import { Campaign } from '@core/models'
+import { Campaign, Statistic } from '@core/models'
 import TemplateClient from '@core/services/template-client.class'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
@@ -99,11 +99,20 @@ const checkNewTemplateParams = async ({
     // warn if params from s3 file are not a superset of saved params, remind user to re-upload a new file
     const extraKeysInTemplate = difference(updatedTemplate.params, paramsFromS3)
 
-    // the entries (message_logs) from the uploaded file are no longer valid, so we delete
-    await SmsMessage.destroy({
-      where: {
-        campaignId,
-      },
+    // delete entries (message_logs) from the uploaded file and stored count since they are no longer valid,
+    await SmsMessage.sequelize?.transaction(async (transaction) => {
+      await SmsMessage.destroy({
+        where: {
+          campaignId,
+        },
+        transaction,
+      })
+      await Statistic.destroy({
+        where: {
+          campaignId,
+        },
+        transaction,
+      })
     })
 
     return { reupload: true, extraKeys: extraKeysInTemplate }
@@ -142,7 +151,7 @@ const storeTemplate = async ({
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   const updatedTemplate = await upsertSmsTemplate({
     body: client.replaceNewLinesAndSanitize(body),
-    campaignId: +campaignId,
+    campaignId,
   })
 
   const firstRecord = await SmsMessage.findOne({
@@ -152,18 +161,17 @@ const storeTemplate = async ({
   // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
   if (firstRecord && updatedTemplate.params) {
     const check = await checkNewTemplateParams({
-      campaignId: +campaignId,
+      campaignId,
       updatedTemplate,
       firstRecord,
     })
     if (check.reupload) {
-      return { updatedTemplate, numRecipients: 0, check }
+      return { updatedTemplate, check }
     }
   }
 
-  const numRecipients = await SmsMessage.count({ where: { campaignId } })
   const campaign = await Campaign.findByPk(+campaignId)
-  return { updatedTemplate, numRecipients, valid: campaign?.valid }
+  return { updatedTemplate, valid: campaign?.valid }
 }
 
 /**
@@ -205,6 +213,7 @@ const addToMessageLogs = async (
       const batch = chunks[idx]
       await SmsMessage.bulkCreate(batch, { transaction })
     }
+
     logger.info({ message: `Finished populateSmsTemplate for ${campaignId}` })
   } catch (err) {
     logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)

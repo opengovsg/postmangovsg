@@ -12,7 +12,7 @@ import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
-import { EmailMessage } from '@email/models'
+
 /**
  * Store template subject and body in email template table.
  * If an existing csv has been uploaded for this campaign but whose columns do not match the attributes provided in the new template,
@@ -31,7 +31,6 @@ const storeTemplate = async (
     const { subject, body, reply_to: replyTo } = req.body
     const {
       check,
-      numRecipients,
       valid,
       updatedTemplate,
     }: StoreTemplateOutput = await EmailTemplateService.storeTemplate({
@@ -40,12 +39,13 @@ const storeTemplate = async (
       body,
       replyTo,
     })
+
     if (check?.reupload) {
       return res.json({
         message:
           'Please re-upload your recipient list as template has changed.',
         extra_keys: check.extraKeys,
-        num_recipients: numRecipients,
+        num_recipients: 0,
         valid: false,
         template: {
           body: updatedTemplate?.body,
@@ -55,6 +55,7 @@ const storeTemplate = async (
         },
       })
     } else {
+      const numRecipients = await StatsService.getNumRecipients(+campaignId)
       return res.json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
@@ -79,6 +80,7 @@ const storeTemplate = async (
  * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
  * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
  * For email_messages table, existing records are deleted and new ones are bulk inserted.
+ * Then update statistics with new unsent count
  * @param key
  * @param campaignId
  * @param filename
@@ -217,9 +219,7 @@ const pollCsvStatusHandler = async (
     let numRecipients, preview
     if (!isCsvProcessing) {
       ;[numRecipients, preview] = await Promise.all([
-        EmailMessage.count({
-          where: { campaignId: +campaignId },
-        }),
+        StatsService.getNumRecipients(+campaignId),
         EmailService.getHydratedMessage(+campaignId),
       ])
     }

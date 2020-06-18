@@ -27,6 +27,15 @@ const getStatsFromArchive = async (
 }
 
 /**
+ * Return total count from statistic table
+ * @param campaignId
+ */
+const getNumRecipients = async (campaignId: number): Promise<number> => {
+  const { error, unsent, sent, invalid } = await getStatsFromArchive(campaignId)
+  return error + unsent + sent + invalid
+}
+
+/**
  * Upsert unsent count to statistic table
  * @param campaignId
  * @param unsent
@@ -128,5 +137,6 @@ const getTotalSentCount = async (): Promise<number> => {
 export const StatsService = {
   getCurrentStats,
   getTotalSentCount,
+  getNumRecipients,
   setNumRecipients,
 }
