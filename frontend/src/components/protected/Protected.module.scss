@@ -1,0 +1,21 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.protected {
+  @include flex-center();
+  background-color: $light-blue;
+  width: 100vw;
+  height: 100vh;
+}
+
+.modal {
+  @include flex-center();
+  flex-direction: column;
+  width: $tablet;
+  height: auto;
+  max-width: 100vw;
+  max-height: 100vh;
+  background-color: white;
+  padding: 4rem;
+  border-radius: 0.6rem;
+}

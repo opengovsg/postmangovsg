@@ -6,6 +6,7 @@ import Landing from 'components/landing'
 import Dashboard from 'components/dashboard'
 import Error from 'components/error'
 import Login from 'components/login'
+import ProtectedPage from 'components/protected'
 
 // Routes HOC
 import ProtectedRoute from 'routes/protected.route'
@@ -22,6 +23,7 @@ const App = () => {
         <Switch>
           <Route exact path="/" component={Landing}></Route>
           <Route exact path="/login" component={Login}></Route>
+          <Route exact path="/protected/:id" component={ProtectedPage}></Route>
           <ProtectedRoute>
             <Dashboard></Dashboard>
           </ProtectedRoute>
