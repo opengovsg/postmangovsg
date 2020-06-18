@@ -1,9 +1,7 @@
-import { literal } from 'sequelize'
-
 import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
-import { Campaign, JobQueue } from '@core/models'
-import { MailService } from '@core/services'
+import { Campaign } from '@core/models'
+import { MailService, CampaignService } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
@@ -136,47 +134,18 @@ const setCampaignCredential = (
 }
 
 /**
- * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
+ * Gets details of a campaign
  * @param campaignId
  */
 const getCampaignDetails = async (
   campaignId: number
 ): Promise<CampaignDetails> => {
-  const [campaignDetails, numRecipients] = await Promise.all([
-    Campaign.findOne({
-      where: { id: campaignId },
-      attributes: [
-        'id',
-        'name',
-        'type',
-        'created_at',
-        'valid',
-        [
-          literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
-          'has_credential',
-        ],
-        [literal("s3_object -> 'filename'"), 'csv_filename'],
-      ],
-      include: [
-        {
-          model: JobQueue,
-          attributes: ['status', ['created_at', 'sent_at']],
-        },
-        {
-          model: EmailTemplate,
-          attributes: ['body', 'subject', 'params', 'reply_to'],
-        },
-      ],
-    }),
-    EmailMessage.count({
-      where: { campaignId },
-    }),
+  return await CampaignService.getCampaignDetails(campaignId, [
+    {
+      model: EmailTemplate,
+      attributes: ['body', 'subject', 'params', 'reply_to'],
+    },
   ])
-
-  return {
-    ...campaignDetails?.get({ plain: true }),
-    num_recipients: numRecipients,
-  } as CampaignDetails
 }
 
 export const EmailService = {

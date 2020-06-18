@@ -9,8 +9,6 @@
   font-style: normal;
 }
 
-$banner-max-width: 1400px;
-
 .container {
   background-color: #f0f0f0;
   height: auto;
@@ -24,7 +22,7 @@ $banner-max-width: 1400px;
   a {
     @include flex-horizontal;
     width: 100%;
-    max-width: $banner-max-width;
+    max-width: $header-max-width;
     margin: 0 auto;
     align-items: center;
     color: #484848;

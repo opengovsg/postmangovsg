@@ -239,20 +239,8 @@ router.get(
  *                 filename:
  *                   type: string
  *       responses:
- *         200:
- *           description: Success
- *           content:
- *             application/json:
- *               schema:
- *                 properties:
- *                   num_recipients:
- *                     type: number
- *                   preview:
- *                     type: object
- *                     properties:
- *                       body:
- *                         type: string
- *
+ *         "202" :
+ *           description: Accepted. The uploaded file is being processed.
  *         "400" :
  *           description: Bad Request
  *         "401":
@@ -267,6 +255,85 @@ router.post(
   celebrate(uploadCompleteValidator),
   CampaignMiddleware.canEditCampaign,
   SmsTemplateMiddleware.uploadCompleteHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/sms/upload/status:
+ *     get:
+ *       description: "Get csv processing status"
+ *       tags:
+ *         - SMS
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 properties:
+ *                   is_csv_processing:
+ *                     type: boolean
+ *                   csv_filename:
+ *                     type: string
+ *                   temp_csv_filename:
+ *                     type: string
+ *                   csv_error:
+ *                     type: string
+ *                   num_recipients:
+ *                     type: number
+ *                   preview:
+ *                     type: object
+ *                     properties:
+ *                       subject:
+ *                         type: string
+ *                       body:
+ *                         type: string
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.get('/upload/status', SmsTemplateMiddleware.pollCsvStatusHandler)
+
+/**
+ * @swagger
+ * post:
+ *   /campaign/{campaignId}/sms/upload/status:
+ *     delete:
+ *       description: "Deletes error status from previous failed upload"
+ *       tags:
+ *         - SMS
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.delete(
+  '/upload/status',
+  CampaignMiddleware.canEditCampaign,
+  SmsTemplateMiddleware.deleteCsvErrorHandler
 )
 
 /**

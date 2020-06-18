@@ -19,7 +19,14 @@ const PreviewBlock: React.FunctionComponent<PreviewBlockProps> = ({
   ...otherProps
 }) => {
   if (!body && !subject) {
-    return null
+    return (
+      <InfoBlock>
+        <li>
+          <i className="bx bx-loader-alt bx-spin"></i>
+          <p>Loading preview...</p>
+        </li>
+      </InfoBlock>
+    )
   }
 
   function constructHtml() {

@@ -8,7 +8,6 @@ export interface StoreTemplateInput {
 }
 export interface StoreTemplateOutput {
   updatedTemplate: EmailTemplate
-  numRecipients: number
   check?: {
     reupload: boolean
     extraKeys?: string[]
@@ -36,6 +35,8 @@ export interface StoreTemplateOutput {
  *           type: boolean
  *         csv_filename:
  *           type: string
+ *         is_csv_processing:
+ *           type: boolean
  *         num_recipients:
  *           type: number
  *         type:

@@ -1,6 +1,6 @@
 {
   "name": "postmangovsg",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -30,8 +30,8 @@
     "type": "git",
     "url": "git+https://github.com/datagovsg/postmangovsg.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Open Government Products, GovTech Singapore (https://open.gov.sg)",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/datagovsg/postmangovsg/issues"
   },

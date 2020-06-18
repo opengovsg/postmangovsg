@@ -7,6 +7,12 @@ export enum EmailProgress {
   Send,
 }
 
+export interface EmailPreview {
+  body: string
+  subject: string
+  replyTo: string | null
+}
+
 export class EmailCampaign extends Campaign {
   body: string
   params: Array<string>
@@ -14,7 +20,6 @@ export class EmailCampaign extends Campaign {
   replyTo: string | null
   csvFilename: string
   numRecipients: number
-  preview: string
   hasCredential: boolean
   progress: EmailProgress = EmailProgress.CreateTemplate
 
@@ -26,7 +31,6 @@ export class EmailCampaign extends Campaign {
     this.replyTo = input['email_templates']?.reply_to
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
-    this.preview = input['preview']
     this.hasCredential = input['has_credential']
     this.setProgress()
   }
