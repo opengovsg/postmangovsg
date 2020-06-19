@@ -17,7 +17,7 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
   children,
   ...otherProps
 }) => {
-  const [asyncDisabled, setAsyncDisabled] = useState(false)
+  const [asyncLoading, setAsyncLoading] = useState(false)
   const isMounted = useRef(true)
 
   useEffect(() => {
@@ -28,11 +28,11 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
 
   const asyncOnClick = onClick
     ? async () => {
-        setAsyncDisabled(true)
+        setAsyncLoading(true)
         await Promise.resolve(onClick())
         // Only enable if button is still mounted
         if (isMounted.current) {
-          setAsyncDisabled(false)
+          setAsyncLoading(false)
         }
       }
     : undefined
@@ -44,7 +44,7 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
         { [styles.alignRight]: alignRight },
         className
       )}
-      disabled={disabled || asyncDisabled}
+      disabled={disabled || asyncLoading}
       onClick={asyncOnClick}
       {...otherProps}
     >
