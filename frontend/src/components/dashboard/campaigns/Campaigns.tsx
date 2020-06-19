@@ -16,7 +16,7 @@ import {
   ActionButtton,
 } from 'components/common'
 import { getCampaigns, hasFailedRecipients } from 'services/campaign.service'
-import { Campaign, channelIcons, Status } from 'classes'
+import { Campaign, channelIcons } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'

@@ -39,20 +39,20 @@ const ProgressDetails = ({
     setIsSent(status === Status.Sent)
   }, [status, error, unsent])
 
-  async function checkHasExportButton() {
-    const failedCount = error + invalid
-    const displayExportButton = await hasFailedRecipients(
-      campaignId,
-      status,
-      updatedAt,
-      failedCount
-    )
-    setDisplayExportButton(displayExportButton)
-  }
-
   useEffect(() => {
+    async function checkHasExportButton() {
+      const failedCount = error + invalid
+      const displayExportButton = await hasFailedRecipients(
+        campaignId,
+        status,
+        updatedAt,
+        failedCount
+      )
+      setDisplayExportButton(displayExportButton)
+    }
+
     checkHasExportButton()
-  }, [status, updatedAt, error, invalid, checkHasExportButton])
+  }, [status, updatedAt, error, invalid, campaignId])
 
   function renderButton() {
     if (!isSent) {

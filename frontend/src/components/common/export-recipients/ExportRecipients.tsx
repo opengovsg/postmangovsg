@@ -23,10 +23,9 @@ const ExportRecipients = ({
     const headers = Object.keys(list[0])
     const sentAtTime = new Date(sentAt)
 
-    const content = [
-      `data:text/csv;charset=utf-8,${headers.join(',')}`,
-      `${list.map((row) => Object.values(row).join(','))}`,
-    ].join('\n')
+    const content = [`data:text/csv;charset=utf-8,${headers.join(',')}`]
+      .concat(list.map((row) => Object.values(row).join(',')))
+      .join('\n')
     const encodedUri = encodeURI(content)
 
     // Trigger file download

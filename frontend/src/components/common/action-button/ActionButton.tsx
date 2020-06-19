@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 
 import styles from './ActionButton.module.scss'
@@ -33,7 +33,7 @@ const ActionButton = (props: any) => {
       {toggleDropdown && (
         <div
           className={styles.dropdownMenu}
-          onMouseLeave={(e) => setToggleDropdown(false)}
+          onMouseLeave={() => setToggleDropdown(false)}
         >
           {children.slice(1, children.length)}
         </div>

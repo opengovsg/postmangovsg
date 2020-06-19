@@ -36,7 +36,6 @@ const upsertEmailTemplate = async ({
     if (
       (await EmailTemplate.findByPk(campaignId, {
         transaction,
-        useMaster: true,
       })) !== null
     ) {
       // .update is actually a bulkUpdate
@@ -179,7 +178,6 @@ const storeTemplate = async ({
   // TODO: this is slow when table is large
   const firstRecord = await EmailMessage.findOne({
     where: { campaignId },
-    useMaster: true,
   })
 
   // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
@@ -207,7 +205,6 @@ const getFilledTemplate = async (
 ): Promise<EmailTemplate | null> => {
   const emailTemplate = await EmailTemplate.findOne({
     where: { campaignId },
-    useMaster: true,
   })
   if (
     !emailTemplate?.body ||

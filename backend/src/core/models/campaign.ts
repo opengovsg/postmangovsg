@@ -74,10 +74,7 @@ export class Campaign extends Model<Campaign> {
     objectToMerge: CampaignS3ObjectInterface
   ): Promise<void> {
     await Campaign.sequelize?.transaction(async (transaction) => {
-      const campaign = await Campaign.findByPk(id, {
-        transaction,
-        useMaster: true,
-      })
+      const campaign = await Campaign.findByPk(id, { transaction })
       if (!campaign) {
         throw new Error('Invalid campaign')
       }
