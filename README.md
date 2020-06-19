@@ -142,7 +142,7 @@ $ npm version minor
 
 # Stage changes for subpackage package.json and package-lock.json
 $ cd ../
-$ git add -A
+$ git add */package.json */package-lock.json
 
 # Create a version commit for main package
 $ npm version minor --force
