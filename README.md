@@ -117,7 +117,7 @@ env:
    - You will need to use `--force` as the working directory is not clean.
 5. Push both the version commit and tag to GitHub.
 6. Open a new pull request and consolidate changelist from the commits made since the previous release.
-7. Merge pull request into master to trigger Travis build and deploy.
+7. Merge pull request into master to trigger Travis build and deploy. Note that we do not squash commits when merging into master.
    - Manually trigger a custom build on Travis if there were changes made to the worker.
 8. Create a new pull request to merge release branch back into `develop` branch.
 
