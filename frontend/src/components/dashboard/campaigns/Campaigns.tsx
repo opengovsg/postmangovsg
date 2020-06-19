@@ -12,10 +12,11 @@ import {
   Pagination,
   TitleBar,
   PrimaryButton,
-  FailedRecipientsCsv,
+  ExportRecipients,
+  ActionButtton,
 } from 'components/common'
-import { getCampaigns } from 'services/campaign.service'
-import { Campaign, channelIcons } from 'classes'
+import { getCampaigns, hasFailedRecipients } from 'services/campaign.service'
+import { Campaign, channelIcons, Status } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
@@ -30,6 +31,9 @@ const Campaigns = () => {
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(
     new Array<Campaign>()
   )
+  const [displayExportButton, setDisplayExportButton] = useState<{
+    [key: number]: boolean
+  }>({})
   const [selectedPage, setSelectedPage] = useState(0)
   const [campaignCount, setCampaignCount] = useState(0)
   const history = useHistory()
@@ -53,6 +57,16 @@ const Campaigns = () => {
     })
     setCampaignCount(totalCount)
     setCampaignsDisplayed(campaigns)
+    const hasExportButton: { [key: number]: boolean } = {}
+    for (const campaign of campaigns) {
+      const { id, status, statusUpdatedAt } = campaign
+      hasExportButton[id] = await hasFailedRecipients(
+        id,
+        status,
+        statusUpdatedAt
+      )
+    }
+    setDisplayExportButton(hasExportButton)
     setLoading(false)
   }
 
@@ -98,17 +112,18 @@ const Campaigns = () => {
     },
     {
       name: '',
-      render: (campaign: Campaign) => (
-        <FailedRecipientsCsv
-          shortLabel
-          campaignId={campaign.id}
-          campaignName={campaign.name}
-          status={campaign.status}
-          sentAt={campaign.sentAt}
-          updatedAt={campaign.statusUpdatedAt}
-        />
-      ),
-      width: 'sm',
+      render: (campaign: Campaign) =>
+        displayExportButton[campaign.id] && (
+          <ActionButtton>
+            <ExportRecipients
+              campaignId={campaign.id}
+              campaignName={campaign.name}
+              status={campaign.status}
+              sentAt={campaign.sentAt}
+            />
+          </ActionButtton>
+        ),
+      width: 'md',
     },
   ]
   /* eslint-enable react/display-name */

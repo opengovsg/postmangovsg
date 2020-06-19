@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
+import { hasFailedRecipients } from 'services/campaign.service'
 import { CampaignStats, Status } from 'classes/Campaign'
 import {
   ProgressBar,
   PrimaryButton,
-  FailedRecipientsCsv,
+  ExportRecipients,
+  ActionButtton,
 } from 'components/common'
 import styles from './ProgressDetails.module.scss'
+
 const ProgressDetails = ({
   campaignId,
   campaignName,
@@ -29,11 +32,27 @@ const ProgressDetails = ({
   const { status, error, unsent, sent, invalid, updatedAt } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
+  const [displayExportButton, setDisplayExportButton] = useState(false)
 
   useEffect(() => {
     setIsComplete(!error && !unsent)
     setIsSent(status === Status.Sent)
   }, [status, error, unsent])
+
+  async function checkHasExportButton() {
+    const failedCount = error + invalid
+    const displayExportButton = await hasFailedRecipients(
+      campaignId,
+      status,
+      updatedAt,
+      failedCount
+    )
+    setDisplayExportButton(displayExportButton)
+  }
+
+  useEffect(() => {
+    checkHasExportButton()
+  }, [status, updatedAt, error, invalid, checkHasExportButton])
 
   function renderButton() {
     if (!isSent) {
@@ -87,6 +106,19 @@ const ProgressDetails = ({
         isComplete={isComplete}
       />
 
+      {displayExportButton && (
+        <div className={styles.actionButton}>
+          <ActionButtton>
+            <ExportRecipients
+              campaignId={campaignId}
+              campaignName={campaignName}
+              status={status}
+              sentAt={sentAt}
+            />
+          </ActionButtton>
+        </div>
+      )}
+
       <table className={styles.stats}>
         <thead>
           <tr>
@@ -138,15 +170,6 @@ const ProgressDetails = ({
           </tr>
         </tbody>
       </table>
-
-      <FailedRecipientsCsv
-        campaignId={campaignId}
-        campaignName={campaignName}
-        status={status}
-        failedCount={error + invalid}
-        sentAt={sentAt}
-        updatedAt={updatedAt}
-      />
     </div>
   )
 }

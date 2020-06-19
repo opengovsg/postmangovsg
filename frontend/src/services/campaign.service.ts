@@ -9,6 +9,8 @@ import {
   CampaignInvalidRecipients,
 } from 'classes'
 
+const EXPORT_LINK_DISPLAY_WAIT_TIME = 5 * 60 * 1000
+
 function getJobTimestamps(
   jobs: Array<{ sent_at: Date; status_updated_at: Date }>
 ): { sentAt: Date; statusUpdatedAt: Date } {
@@ -16,6 +18,30 @@ function getJobTimestamps(
   const jobsUpdatedAt = jobs.map((x) => x.status_updated_at).sort()
   // returns job with the earliest sentAt time
   return { sentAt: jobsSentAt[0], statusUpdatedAt: jobsUpdatedAt[0] }
+}
+
+export async function hasFailedRecipients(
+  campaignId: number,
+  status: Status,
+  updatedAt: Date,
+  count?: number
+) {
+  if (status !== Status.Sent) {
+    return false
+  }
+
+  const updatedAtTimestamp = +new Date(updatedAt)
+  const campaignAge = Date.now() - updatedAtTimestamp
+  if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {
+    return false
+  }
+
+  let failedCount = count
+  if (!failedCount) {
+    const { error, invalid } = await getCampaignStats(campaignId)
+    failedCount = error + invalid
+  }
+  return failedCount > 0
 }
 
 export async function getCampaigns(params: {
