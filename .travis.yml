@@ -10,6 +10,7 @@ jobs:
   include:
     - name: backend
       before_install:
+        - echo $(ls ./modules/postman-templating)
         - cd backend
       install:
         - npm install
@@ -18,6 +19,7 @@ jobs:
         - npm run test
       before_deploy:
         - cd ../
+        - echo $(ls ./modules/postman-templating)
         - export TAG=travis-$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
         - export ECR_REPO=$REPO-backend
         - export PATH=$PATH:$HOME/.local/bin
