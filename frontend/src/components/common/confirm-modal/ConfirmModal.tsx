@@ -23,18 +23,15 @@ const ConfirmModal = ({
   onConfirm: () => Promise<any>
 }) => {
   const modalContext = useContext(ModalContext)
-  const [disabled, setDisabled] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
   async function onConfirmedClicked(): Promise<void> {
     try {
-      setDisabled(true)
       await onConfirm()
       // Closes the modal
       modalContext.setModalContent(null)
     } catch (err) {
       setErrorMessage(err.message)
-      setDisabled(false)
     }
   }
   return (
@@ -47,7 +44,6 @@ const ConfirmModal = ({
       <PrimaryButton
         className={destructive ? styles.redButton : styles.greenButton}
         onClick={onConfirmedClicked}
-        disabled={disabled}
       >
         {buttonText}
         {buttonIcon && <i className={cx('bx', styles.icon, buttonIcon)}></i>}
