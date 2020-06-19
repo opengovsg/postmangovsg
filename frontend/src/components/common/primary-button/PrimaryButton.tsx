@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import cx from 'classnames'
 
 import styles from './PrimaryButton.module.scss'
@@ -26,16 +26,20 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
     }
   }, [])
 
-  const asyncOnClick = onClick
-    ? async () => {
-        setAsyncLoading(true)
-        await Promise.resolve(onClick())
-        // Only enable if button is still mounted
-        if (isMounted.current) {
-          setAsyncLoading(false)
-        }
-      }
-    : undefined
+  const asyncOnClick = useMemo(
+    () =>
+      onClick
+        ? async () => {
+            setAsyncLoading(true)
+            await Promise.resolve(onClick())
+            // Only enable if button is still mounted
+            if (isMounted.current) {
+              setAsyncLoading(false)
+            }
+          }
+        : undefined,
+    [onClick]
+  )
 
   return (
     <button
