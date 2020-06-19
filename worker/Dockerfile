@@ -8,11 +8,11 @@ WORKDIR /usr/home/postmangovsg/worker
 
 # COPY modules /usr/home/postmangovsg/modules
 
-# RUN cd /usr/home/postmangovsg/modules/postman-templating && npm install && npm run build
+# RUN cd /usr/home/postmangovsg/modules/postman-templating && npm ci
 
 COPY worker/package* ./
 
-RUN npm install
+RUN npm ci
 
 COPY worker/src ./src
 COPY worker/tsconfig.json ./
