@@ -3,6 +3,7 @@ import {
   addToBlacklist,
   updateMessageWithError,
   updateMessageWithSuccess,
+  haltCampaignIfThresholdExceeded,
 } from './query'
 import { BounceMetadata, ComplaintMetadata } from './interfaces'
 
@@ -41,11 +42,12 @@ const updateBouncedStatus = async (metadata: BounceMetadata) => {
       'Soft bounce, Amazon SES fails to deliver the email after retrying for a period of time.'
   }
 
-  await updateMessageWithError({
+  const campaignId = await updateMessageWithError({
     errorCode,
     timestamp: metadata.timestamp,
     id: metadata.id,
   })
+  await haltCampaignIfThresholdExceeded(campaignId)
 }
 
 /**
@@ -59,11 +61,12 @@ const updateComplaintStatus = async (metadata: ComplaintMetadata) => {
 
   if (errorCode && recipients) {
     await Promise.all(recipients.map(addToBlacklist))
-    await updateMessageWithError({
+    const campaignId = await updateMessageWithError({
       errorCode,
       timestamp: metadata.timestamp,
       id: metadata.id,
     })
+    await haltCampaignIfThresholdExceeded(campaignId)
   }
 }
 
