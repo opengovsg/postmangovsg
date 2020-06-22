@@ -15,6 +15,7 @@
     line-height: 150%;
     resize: none;
     background: transparent;
+    overflow: hidden; // hides scroll bar on IE and firefox
 
     &.single {
       padding-top: 0.7rem;
@@ -24,6 +25,10 @@
     &:focus {
       outline: none;
       border-color: $indigo-blue;
+    }
+
+    &::placeholder {
+      color: rgba($dark-blue, 0.6);
     }
   }
 
@@ -39,6 +44,7 @@
     p {
       color: transparent;
       font-size: 1rem;
+      margin: 0; // fix for ie: highlight appearing lower than text
     }
   }
 

@@ -1,0 +1,4 @@
+// Removes IE11 clear button in text inputs
+input::-ms-clear {
+  display: none;
+}

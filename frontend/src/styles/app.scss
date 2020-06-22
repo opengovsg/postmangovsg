@@ -3,6 +3,7 @@
 
 @import 'styles/_variables';
 @import 'styles/_mixins';
+@import 'styles/_overrides';
 
 html,
 body {
@@ -147,6 +148,7 @@ table {
     td,
     th {
       padding: 0.75rem 0;
+      display: flex;
 
       &.xs {
         flex: 1.2;
