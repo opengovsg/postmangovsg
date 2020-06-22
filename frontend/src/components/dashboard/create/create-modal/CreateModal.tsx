@@ -3,7 +3,10 @@ import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_SMS_CREDENTIALS_URL } from 'config'
+import {
+  GUIDE_SMS_CREDENTIALS_URL,
+  GUIDE_TELEGRAM_CREDENTIALS_URL,
+} from 'config'
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
@@ -94,8 +97,8 @@ const CreateModal = () => {
               <p className={styles.subtext}>
                 It is best to&nbsp;
                 <OutboundLink
-                  eventLabel={GUIDE_SMS_CREDENTIALS_URL}
-                  to={GUIDE_SMS_CREDENTIALS_URL}
+                  eventLabel={GUIDE_TELEGRAM_CREDENTIALS_URL}
+                  to={GUIDE_TELEGRAM_CREDENTIALS_URL}
                   target="_blank"
                 >
                   store and validate your credentials

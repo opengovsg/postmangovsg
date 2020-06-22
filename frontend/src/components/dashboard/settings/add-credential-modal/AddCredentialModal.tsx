@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react'
+import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 
-import { GUIDE_SMS_CREDENTIALS_URL } from 'config'
+import { GUIDE_TELEGRAM_CREDENTIALS_URL } from 'config'
 import { ChannelType, channelIcons } from 'classes'
 import { PrimaryButton, ErrorBlock, CredLabelInput } from 'components/common'
 import TwilioCredentialsInput from 'components/dashboard/create/sms/TwilioCredentialsInput'
@@ -243,13 +244,13 @@ const AddCredentialModal = ({
           <>
             Before you validate the credentials, the phone number you are
             testing with must be already subscribed to the bot.&nbsp;
-            <a
-              href={GUIDE_SMS_CREDENTIALS_URL}
+            <OutboundLink
+              eventLabel={GUIDE_TELEGRAM_CREDENTIALS_URL}
+              to={GUIDE_TELEGRAM_CREDENTIALS_URL}
               target="_blank"
-              rel="noopener noreferrer"
             >
               Learn more
-            </a>
+            </OutboundLink>
           </>
         )
         validateInput = <TelegramValidationInput onClick={validateCredential} />
