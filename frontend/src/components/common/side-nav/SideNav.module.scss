@@ -8,6 +8,19 @@ $nav-item-height: 5rem;
   width: $side-nav-width;
   min-width: $side-nav-width;
   border-right: 1px solid $indigo-blue;
+
+  @include mobile() {
+    display: none;
+  }
+}
+
+.sideNavDropdown {
+  width: 100%;
+  display: none;
+
+  @include mobile() {
+    display: block;
+  }
 }
 
 .navItem {
