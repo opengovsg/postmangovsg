@@ -40,6 +40,7 @@ export async function encryptData(payload: string, password: string) {
     const algorithm = {
       name: ENCRYPTION_METHOD,
       iv: initializationVector,
+      tagLength: 128,
     }
     const key = await importKey(password)
 
@@ -76,7 +77,7 @@ export async function decryptData(ciphertext: string, password: string) {
   try {
     const { cipher, iv } = decodeCipherText(ciphertext)
 
-    const algorithm = { name: ENCRYPTION_METHOD, iv }
+    const algorithm = { name: ENCRYPTION_METHOD, iv, tagLength: 128 }
 
     const key = await importKey(password)
 
