@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import cx from 'classnames'
 
-import { GUIDE_CREDENTIALS_URL } from 'config'
+import { GUIDE_SMS_CREDENTIALS_URL } from 'config'
 import { ChannelType, channelIcons } from 'classes'
 import { PrimaryButton, ErrorBlock, CredLabelInput } from 'components/common'
 import TwilioCredentialsInput from 'components/dashboard/create/sms/TwilioCredentialsInput'
@@ -244,7 +244,7 @@ const AddCredentialModal = ({
             Before you validate the credentials, the phone number you are
             testing with must be already subscribed to the bot.&nbsp;
             <a
-              href={GUIDE_CREDENTIALS_URL}
+              href={GUIDE_SMS_CREDENTIALS_URL}
               target="_blank"
               rel="noopener noreferrer"
             >
