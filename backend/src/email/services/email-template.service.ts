@@ -250,10 +250,30 @@ const hasInvalidEmailRecipient = (
   return records.some((record) => !validator.isEmail(record.recipient))
 }
 
+/**
+ * Attempts to hydrate the first record.
+ * @param records
+ * @param templateBody
+ * @param templateSubject - optional
+ */
+const testHydration = (
+  records: Array<MessageBulkInsertInterface>,
+  templateBody: string,
+  templateSubject?: string
+): void => {
+  const [firstRecord] = records
+  client.template(templateBody, firstRecord.params)
+
+  if (templateSubject) {
+    client.template(templateSubject, firstRecord.params)
+  }
+}
+
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
   hasInvalidEmailRecipient,
+  testHydration,
   client,
 }
