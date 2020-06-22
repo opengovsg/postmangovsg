@@ -45,10 +45,10 @@ export interface EBEnvVars {
     SES_PASS: string;
     SES_HOST: string;
     SES_PORT: string;
+    SES_FROM: string;
     SECRET_MANAGER_SALT: string;
     API_KEY_SALT_V1: string;
     JWT_SECRET: string;
-    AWS_LOG_GROUP_NAME: string;
     SENTRY_DSN: string;
     COOKIE_NAME: string;
     SESSION_SECRET: string;
@@ -62,7 +62,14 @@ export interface WorkerEnvVars {
     DB_URI: string;
     SECRET_MANAGER_SALT: string;
     MESSAGE_WORKER_SENDER: string;
-    MESSAGE_WORKER_LOGGER:  string
+    MESSAGE_WORKER_LOGGER:  string;
+    SES_USER: string;
+    SES_PASS: string;
+    SES_HOST: string;
+    SES_PORT: string;
+    SES_FROM: string;
+    BACKEND_URL: string;
+    DEFAULT_COUNTRY_CODE: string;
 }
 
 export interface TwilioCallbackEnvVars {

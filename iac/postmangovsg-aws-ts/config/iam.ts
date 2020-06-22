@@ -136,6 +136,25 @@ export const ECSReadonlyPolicyDocument : aws.iam.PolicyDocument = {
 	],
 }
 
+export const AmazonECSTaskExecutionRolePolicyDocument : aws.iam.PolicyDocument = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+
+
 export const SecretsManagerReadPolicyDocument : aws.iam.PolicyDocument =  {
 	'Version': '2012-10-17',
 	'Statement': [

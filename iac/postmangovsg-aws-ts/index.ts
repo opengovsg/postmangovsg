@@ -14,7 +14,9 @@ const config = {
 	jumphostKeyPairName: pConfig.require('jumphostKeyPairName'), // You have to create this
 	vpcSettings: pConfig.requireObject<VPCSettings>('vpcSettings'),
 	uploadBucketName: pConfig.require('uploadBucketName'),
-	ebCertificateARN: pConfig.get('ebCertificateARN'), // Not required
+	ebCertificateARN: pConfig.get('ebCertificateARN'), // Not required,
+	ebAppArn: pConfig.get('ebAppArn'),
+	ebLogGroupName: pConfig.require('ebLogGroupName'),
 	ebDomainSettings: pConfig.requireObject<EBDomainSettings>('ebDomainSettings'), 
 	ebSettings: pConfig.requireObject<EBSettings>('ebSettings'),
 	redisSettings: pConfig.requireObject<RedisSettings>('redisSettings'),
@@ -99,6 +101,9 @@ const jumphostSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-jumphost`, 
 		protocol: '-1',
 		cidrBlocks: ['0.0.0.0/0'],
 	}],
+	tags: {
+		Name: `${APP_NAME}-jumphost`
+	}
 })
 const jumpHost = new aws.ec2.Instance(`${APP_NAME}-jumphost`, {
 	ami: 'ami-0615132a0f36d24f4',
@@ -107,6 +112,9 @@ const jumpHost = new aws.ec2.Instance(`${APP_NAME}-jumphost`, {
 	vpcSecurityGroupIds: [jumphostSecurityGroup.id],
 	subnetId: pulumi.concat(vpc.publicSubnetIds).apply(o=>{return o.split(',')[0]}),
 	keyName: config.jumphostKeyPairName,
+	tags: {
+		Name: `${APP_NAME}-jumphost`
+	}
 })
 //#endregion
 
@@ -188,6 +196,9 @@ const loadBalancerSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-eb-lb`,
 		protocol: '-1',
 		cidrBlocks: ['0.0.0.0/0'],
 	}],
+	tags: {
+		Name: `${APP_NAME}-eb-lb`
+	}
 })
 // Create instance security group
 const instanceSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-eb-inst`, {
@@ -213,15 +224,22 @@ const instanceSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-eb-inst`, {
 		protocol: '-1',
 		cidrBlocks: ['0.0.0.0/0'],
 	}],
+	tags: {
+		Name: `${APP_NAME}-eb-inst`
+	}
 })
 
 // Create application and environment, with HTTPS on the load balancer
 const ebApp = new aws.elasticbeanstalk.Application(config.ebSettings.appName, {
+	name: config.ebSettings.appName,
 	description: config.ebSettings.description,
+}, {
+	...(config.ebAppArn ? { import: config.ebAppArn } : {})
 })
 const ebEnv = new aws.elasticbeanstalk.Environment(APP_NAME, {
 	application: ebApp.name,
 	solutionStackName: config.ebSettings.solutionStackName,
+	
 	settings: [
 		// Roles
 		{ namespace:'aws:elasticbeanstalk:environment', name: 'ServiceRole', value: serviceRole.arn, },
@@ -253,7 +271,7 @@ const ebEnv = new aws.elasticbeanstalk.Environment(APP_NAME, {
 		{ namespace: 'aws:elasticbeanstalk:command', name: 'DeploymentPolicy', value: config.ebSettings.deploymentPolicy, },
 		//Environment variables
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'API_KEY_SALT_V1', value: config.ebEnvVars.API_KEY_SALT_V1 },
-		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'AWS_LOG_GROUP_NAME', value: config.ebEnvVars.AWS_LOG_GROUP_NAME },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'AWS_LOG_GROUP_NAME', value: config.ebLogGroupName },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'COOKIE_NAME', value: config.ebEnvVars.COOKIE_NAME },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'DB_URI', value: config.ebEnvVars.DB_URI },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'DOMAIN_WHITELIST', value: config.ebEnvVars.DOMAIN_WHITELIST },
@@ -269,17 +287,20 @@ const ebEnv = new aws.elasticbeanstalk.Environment(APP_NAME, {
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_PASS', value: config.ebEnvVars.SES_PASS },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_PORT', value: config.ebEnvVars.SES_PORT },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_USER', value: config.ebEnvVars.SES_USER },
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SES_FROM', value: config.ebEnvVars.SES_FROM },
 		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'SESSION_SECRET', value: config.ebEnvVars.SESSION_SECRET },
-
+		{ namespace: 'aws:elasticbeanstalk:application:environment', name: 'AWS_REGION', value: config.region },
+		
 	],
 }, {
 	dependsOn: [vpc],
+	//ignoreChanges: ["settings"],
 })
 //#endregion ELASTIC BEANSTALK
 
 //#region CLOUDWATCH
 const ebLogGroup = new aws.cloudwatch.LogGroup(`${APP_NAME}-eb-log-group`, {
-	name: config.ebEnvVars.AWS_LOG_GROUP_NAME
+	name: config.ebLogGroupName
 }, {deleteBeforeReplace:true})
 //#endregion
 
@@ -299,6 +320,9 @@ const serverlessSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-serverles
 		protocol: '-1',
 		cidrBlocks: ['0.0.0.0/0'],
 	}],
+	tags: {
+		Name: `${APP_NAME}-serverless`
+	}
 })
 //#endregion
 
@@ -308,7 +332,7 @@ const serverlessSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-serverles
 
 //#region ECR 
 // Create a repo
-const ecr = new aws.ecr.Repository('postmangovsg')
+const ecr = new aws.ecr.Repository('postmangovsg', {name: 'postmangovsg'}, {import: 'postmangovsg'})
 //#endregion
 
 //#region ECS
@@ -319,10 +343,14 @@ const ECSReadonly = new aws.iam.Policy(`${config.ebSettings.appName}-ECSRead`, {
 const SecretsManagerRead = new aws.iam.Policy(`${config.ebSettings.appName}-SecretsManagerRead`, { 
 	policy: customIam.SecretsManagerReadPolicyDocument,
 })
+const AmazonECSTaskExecutionRolePolicy = new aws.iam.Policy(`${config.ebSettings.appName}-AmazonECSTaskExecutionRolePolicy`, {
+	policy: customIam.AmazonECSTaskExecutionRolePolicyDocument,
+})
 const ecsTaskRole =  new aws.iam.Role(`${APP_NAME}-ecs-task-role`,{ assumeRolePolicy: customIam.ecsTrustPolicy, })
-const ecsTaskRoleAttachment1 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-ecs-task-AWSElasticBeanstalkWebTier`, {
+const ecsTaskRoleAttachment1 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-ecs-task-AmazonECSTaskExecutionRolePolicy`, {
 	role: ecsTaskRole,
-	policyArn: 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy', // Default
+	policyArn: AmazonECSTaskExecutionRolePolicy.arn
+	
 })
 const ecsTaskRoleAttachment2 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-ecs-task-ECSReadonly`, {
 	role: ecsTaskRole,
@@ -345,23 +373,27 @@ const ecsSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-ecs-workers`, {
 		protocol: '-1',
 		cidrBlocks: ['0.0.0.0/0'],
 	}],
+	tags: {
+		Name: `${APP_NAME}-ecs-workers`
+	}
 })
 
 // Create cluster
-const clusterName = `${APP_NAME}-ecs`
+const clusterName = `${config.ebSettings.appName}-workers`
 const ecsCluster = new awsx.ecs.Cluster(clusterName, {
+	name: clusterName,
 	vpc: vpc,
-	...(config.ecsClusterId ? { cluster: aws.ecs.Cluster.get(clusterName, config.ecsClusterId), } : {}),
+	...(config.ecsClusterId ? { cluster: aws.ecs.Cluster.get(clusterName, config.ecsClusterId) } : {}),
 })
 const ecsImage = awsx.ecs.Image.fromDockerBuild(ecr,{
 	context: '../../worker',
 	dockerfile: '../../worker/Dockerfile',
 })
-const ecsSendingServiceName = `${APP_NAME}-sending`
-const ecsSendingService = new awsx.ecs.FargateService(ecsSendingServiceName,{
+const ecsSendingServiceName = pulumi.interpolate`${config.workerEnvVars.ECS_SERVICE_NAME_SENDER}`
+const ecsSendingService = new awsx.ecs.FargateService(`${APP_NAME}-sending`,{
 	name: ecsSendingServiceName,
 	cluster: ecsCluster,
-	desiredCount: 0,
+	desiredCount: 2,
 	assignPublicIp: false,
 	deploymentMaximumPercent: 100,
 	deploymentMinimumHealthyPercent: 50,
@@ -369,6 +401,7 @@ const ecsSendingService = new awsx.ecs.FargateService(ecsSendingServiceName,{
 	platformVersion: '1.4.0',
 	taskDefinitionArgs: {
 		executionRole: ecsTaskRole,
+		taskRole: ecsTaskRole,
 		containers: {
 			sending: {
 				image: ecsImage,
@@ -377,18 +410,27 @@ const ecsSendingService = new awsx.ecs.FargateService(ecsSendingServiceName,{
 					{ name: 'ECS_SERVICE_NAME', value: config.workerEnvVars.ECS_SERVICE_NAME_SENDER },
 					{ name: 'DB_URI', value: config.workerEnvVars.DB_URI },
 					{ name: 'SECRET_MANAGER_SALT', value: config.workerEnvVars.SECRET_MANAGER_SALT },
-					{ name: 'MESSAGE_WORKER_LOGGER', value: config.workerEnvVars.MESSAGE_WORKER_LOGGER },
+					{ name: 'MESSAGE_WORKER_SENDER', value: config.workerEnvVars.MESSAGE_WORKER_SENDER },
 					{ name: 'TWILIO_CALLBACK_SECRET', value: config.twilioCallbackEnvVars.TWILIO_CALLBACK_SECRET },
+					{ name: 'SES_HOST', value: config.workerEnvVars.SES_HOST },
+					{ name: 'SES_FROM', value: config.workerEnvVars.SES_FROM },
+					{ name: 'SES_USER', value: config.workerEnvVars.SES_USER },
+					{ name: 'SES_PASS', value: config.workerEnvVars.SES_PASS },
+					{ name: 'SES_PORT', value: config.workerEnvVars.SES_PORT },
+					{ name: 'SES_PORT', value: config.workerEnvVars.SES_PORT },
+					{ name: 'BACKEND_URL', value: config.workerEnvVars.BACKEND_URL },
+					{ name: 'AWS_REGION', value: config.region },
+					{ name: 'DEFAULT_COUNTRY_CODE', value: config.workerEnvVars.DEFAULT_COUNTRY_CODE },
 				]
 			},
 		},
 	},
 })
-const ecsLoggingServiceName = `${APP_NAME}-logging`
-const ecsLoggingService = new awsx.ecs.FargateService(ecsLoggingServiceName,{
+const ecsLoggingServiceName = pulumi.interpolate`${config.workerEnvVars.ECS_SERVICE_NAME_LOGGER}`
+const ecsLoggingService = new awsx.ecs.FargateService(`${APP_NAME}-logging`,{
 	name: ecsLoggingServiceName,
 	cluster: ecsCluster,
-	desiredCount: 0,
+	desiredCount: 1,
 	assignPublicIp: false,
 	deploymentMaximumPercent: 200,
 	deploymentMinimumHealthyPercent: 100,
@@ -396,6 +438,7 @@ const ecsLoggingService = new awsx.ecs.FargateService(ecsLoggingServiceName,{
 	platformVersion: '1.4.0',
 	taskDefinitionArgs: {
 		executionRole: ecsTaskRole,
+		taskRole: ecsTaskRole,
 		containers: {
 			logging: {
 				image: ecsImage,
@@ -429,6 +472,9 @@ const secretsManagerSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-sm`, 
 		protocol: '-1',
 		cidrBlocks: ['0.0.0.0/0'],
 	}],
+	tags: {
+		Name: `${APP_NAME}-secrets-manager`
+	}
 })
 
 // Create VPC endpoint assocated with secret managers' security group
@@ -487,6 +533,9 @@ const databaseSecurityGroup = new aws.ec2.SecurityGroup(`${APP_NAME}-db`, {
 		protocol: '-1',
 		cidrBlocks: ['0.0.0.0/0'],
 	}],
+	tags: {
+		Name: `${APP_NAME}-db`
+	}
 })
 
 
@@ -517,30 +566,30 @@ const redisCache = new aws.elasticache.Cluster(config.redisSettings.clusterName,
 const rdsAuditParameterGroup = new aws.rds.ParameterGroup(`${APP_NAME}-postgres11-with-audit`, {
 	family: 'postgres11',
 	parameters: customParameterGroup.postgres11WithAudit,
-})
+}, {ignoreChanges: ['parameters']})
 const rdsSubnetGroup = new aws.rds.SubnetGroup(`${APP_NAME}-rds-private`, {
 	subnetIds: vpc.privateSubnetIds,
 })
 
-const rdsInstance = new aws.rds.Instance(`${APP_NAME}-rds`, {
-	storageEncrypted: true,
-	publiclyAccessible: false,
-	instanceClass: config.rdsSettings.instanceClass,
-	vpcSecurityGroupIds: [databaseSecurityGroup.id],
-	parameterGroupName: rdsAuditParameterGroup.name,
-	dbSubnetGroupName: rdsSubnetGroup.name,
-	optionGroupName: config.rdsSettings.optionGroupName,
-	engineVersion: config.rdsSettings.engineVersion,
-	name: config.rdsSettings.dbName,
-	password: config.rdsMasterPassword,
-	username: config.rdsMasterUsername,
-	multiAz: config.rdsSettings.multiAz,
-	deletionProtection: config.rdsSettings.deletionProtection,
-	engine: 'postgres',
-	storageType: 'gp2',
-	allocatedStorage: 20,
-	maxAllocatedStorage: 1000,
-})
+// const rdsInstance = new aws.rds.Instance(`${APP_NAME}-rds`, {
+// 	storageEncrypted: true,
+// 	publiclyAccessible: false,
+// 	instanceClass: config.rdsSettings.instanceClass,
+// 	vpcSecurityGroupIds: [databaseSecurityGroup.id],
+// 	parameterGroupName: rdsAuditParameterGroup.name,
+// 	dbSubnetGroupName: rdsSubnetGroup.name,
+// 	optionGroupName: config.rdsSettings.optionGroupName,
+// 	engineVersion: config.rdsSettings.engineVersion,
+// 	name: config.rdsSettings.dbName,
+// 	password: config.rdsMasterPassword,
+// 	username: config.rdsMasterUsername,
+// 	multiAz: config.rdsSettings.multiAz,
+// 	deletionProtection: config.rdsSettings.deletionProtection,
+// 	engine: 'postgres',
+// 	storageType: 'gp2',
+// 	allocatedStorage: 20,
+// 	maxAllocatedStorage: 1000,
+// })
 //#endregion
 
 //region LAMBDA
@@ -557,24 +606,38 @@ const serverlessRoleAttachment2 = new aws.iam.RolePolicyAttachment(`${APP_NAME}-
 })
 
 
-const authorizerName = `authorizer-${config.environment}`
+const authorizerName = `authorizer`
+const authorizerRole =  new aws.iam.Role('authorizer-role', {
+	name: 'authorizer-role-f956a85',
+	assumeRolePolicy: customIam.lambdaTrustPolicy
+}, {
+	
+ //import: 'authorizer-role-f956a85' 
+})
+const authorizerRoleAttachment = new aws.iam.RolePolicyAttachment(`${authorizerName}-AWSLambdaBasicExecutionRole`, {
+	role: authorizerRole,
+	policyArn: aws.iam.ManagedPolicies.AWSLambdaBasicExecutionRole,
+}, {
+	//import: 'authorizer-role-f956a85/arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+})
 const authorizer =  new aws.lambda.Function(authorizerName,
 {
 	name: authorizerName,
 	handler: 'exports.handler',
-	role: serverlessRole.arn,
+	role: authorizerRole.arn,
 	runtime: 'nodejs12.x',
 	code: new pulumi.asset.FileArchive('authorizer.zip')
 }, {
-	deleteBeforeReplace: true,
+	//import: 'authorizer'
 })
 const authorizerApiGatewayPermission = new aws.lambda.Permission('authorizer-permission', {
     action: "lambda:InvokeFunction",
-    function: authorizer.name,
+    function: authorizer.arn,
     principal: "apigateway.amazonaws.com",
     sourceArn: pulumi.interpolate`${config.apiGatewayArn}/authorizers/*`,
+	statementId: 'authorizer-permission-1543644'
 },{
-	deleteBeforeReplace: true
+	//import: 'authorizer/authorizer-permission-1543644'
 })
 
 
@@ -586,7 +649,8 @@ const twilioCallback = new aws.lambda.Function(twilioCallbackName,
 		subnetIds: vpc.privateSubnetIds,
 		securityGroupIds: [serverlessSecurityGroup.id]
 	},
-	handler: 'exports.handler',
+	handler: 'build/index.handler',
+	timeout: 30,
 	role: serverlessRole.arn,
 	runtime: 'nodejs12.x',
 	code: new pulumi.asset.FileArchive('twilio-callback.zip'),
@@ -597,13 +661,14 @@ const twilioCallback = new aws.lambda.Function(twilioCallbackName,
 		}
 	}
 }, {
-	deleteBeforeReplace: true
+	deleteBeforeReplace: true,
+	ignoreChanges: ['code', 'description']
 })
 const twilioCallbackApiGatewayPermission = new aws.lambda.Permission('twilio-callback-permission', {
     action: "lambda:InvokeFunction",
     function: twilioCallback.name,
     principal: "apigateway.amazonaws.com",
-    sourceArn: pulumi.interpolate`${config.apiGatewayArn}/*/POST/v1/campaign/*/message/`,
+    sourceArn: pulumi.interpolate`${config.apiGatewayArn}/*/POST/v1/campaign/*/message/*`,
 })
 
 const emailCallbackName = `log-email-callback-${config.environment}`
@@ -614,7 +679,8 @@ const emailCallback = new aws.lambda.Function(emailCallbackName,
 		subnetIds: vpc.privateSubnetIds,
 		securityGroupIds: [serverlessSecurityGroup.id]
 	},
-	handler: 'exports.handler',
+	handler: 'build/index.handler',
+	timeout: 30,
 	role: serverlessRole.arn,
 	runtime: 'nodejs12.x',
 	code: new pulumi.asset.FileArchive('email-callback.zip'),
@@ -624,7 +690,8 @@ const emailCallback = new aws.lambda.Function(emailCallbackName,
 		}
 	}
 },{
-	deleteBeforeReplace: true
+	deleteBeforeReplace: true,
+	ignoreChanges: ['code', 'description']
 })
 //#endregion
 
@@ -654,11 +721,11 @@ notificationTypes.forEach(notificationType=> new aws.ses.IdentityNotificationTop
 
 
 export const appName = APP_NAME
-export const rdsEndpoint = rdsInstance.endpoint
+// export const rdsEndpoint = rdsInstance.endpoint
 export const ecrRepositoryUrl = ecr.repositoryUrl
 export const ecsClusterId = ecsCluster.id
 export const ecsClusterName = ecsCluster.cluster.name
-export const ebEnvId = ebEnv.id
+// export const ebEnvId = ebEnv.id
 
 console.log(
 	`Have you:

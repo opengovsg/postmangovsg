@@ -2,6 +2,7 @@ config:
   aws:profile: postmanv2-pulumi
   aws:region: ap-southeast-1
   postmangovsg-infra:apiGatewayArn: arn:aws:execute-api:ap-southeast-1:454894717801:fqn2xd7m3i
+  postmangovsg-infra:ebAppArn: postmangovsg
   postmangovsg-infra:ebCertificateArn: arn:aws:acm:ap-southeast-1:454894717801:certificate/6c356a80-e2c8-42e3-ada9-ab758d9eb3b4
   postmangovsg-infra:ebDomainSettings:
     domainName: postman.gov.sg
@@ -10,63 +11,66 @@ config:
     validationMethod: EMAIL
   postmangovsg-infra:ebEnvironmentVariables:
     API_KEY_SALT_V1:
-      secure: AAABAN1ryBIgvfJLQYchPMDq3aY0SZ++Lbwgj3LlYONjHhcLysoe
+      secure: AAABAGukMUXdVFHbeJKFIBpra6YHyyDhDie7+ClNifqq/tnqrf2g
     AWS_LOG_GROUP_NAME:
-      secure: AAABAN4OaS6+eCwDOR/lqoB11kQ3etd2QZBvn98XXxaggmzeLojh
+      secure: AAABAIxjk4jAru2y3MvAmElPvI7loNVymuw9gNSZ0VDo6sPqgzGC
     AWS_REGION:
-      secure: AAABAPJw+M49TVhxhhDhj6PgFXExWIT1iqufMz1rhP41gyhoYTa+
+      secure: AAABAFRkusYddYqJ7j/9AZGA/XbibypO1hxd9Kyx25RW99gJbdrS
     COOKIE_DOMAIN:
-      secure: AAABAGiZGCbYIGV0pBoU38xqNl5IePPbSrRPFoTwLK689QVF5z5s
+      secure: AAABAFxLGizWqDulp1PunoYtl36H8zCRUE3CW1b36K1i3lXZ/g5O
     COOKIE_NAME:
-      secure: AAABAHc3tLUyU9nh4G9O/VFEAicUaQ56oxdypPoTMMGdjN2bTPps
+      secure: AAABAA5O5UpS9K3ExXtUd8v9sIOPi5ilPk6umw328XPaap09vVUI
     DB_URI:
-      secure: AAABAAL2KFU40FnRFaabYETFaeXWPkbZdALq2UgprdxOJ4BkQJcD
+      secure: AAABAGTUk9TFcOD+hne8V/O5Q87E+zIgeY36ySVwLbFziKoqqFAh
     DOMAIN_WHITELIST:
-      secure: AAABAKOgEloCmc00WPtsazi8gNR1OJw+s+zf2o1IqkU767tkgV/u
+      secure: AAABAHKgqd81yD2zXjBZt/wN+owLbHKO79N/a8cZC6heOY8X1b3J
     FILE_STORAGE_BUCKET_NAME:
-      secure: AAABABRVYVdjUBuU0sm0ruKKwnZ+318yd16llOm7oiWMBZ33kEsZ
+      secure: AAABADE8/bye/N6ndlWB9FGkwh3/Wq23IIA7jhnzQIgsIXM5qElV
     FRONTEND_URL:
-      secure: AAABAG+zpLuAFKt3lZPLPNPbt4cfnZbWP3WGHilck9awS/u5e/tc
+      secure: AAABAOJoLZLPFfn0dT3BOlpZBTpy1r380vnkchpc+Tv5YNvMDQZw
     JWT_SECRET:
-      secure: AAABAI8Oith1AbgSp1nEYvv/tH5bIWREKj+uTXE30cf20ZBzk27B
+      secure: AAABAJcZLqg63W/69P9hDzLvuXng9Z0z3+JuWW+7IsA1cUHoMG/i
     NODE_ENV:
-      secure: AAABALw7btOq7M/EgP9S7IrLecmroodO3btj2Mxg9V4I1RE3xV/0
+      secure: AAABAH2vRWNtKX/1To0VRfM2U7n1ZbmoNPfmaiF4LDPRDi1DzsTI
     REDIS_OTP_URI:
-      secure: AAABAO8tIgqSO2QVKQunmlK33R4cMN7Rf1c0I9PLSvax1hCiDk80
+      secure: AAABAJIBn8MnVCtTuHwaHn6wcwLUdvXllBT7uw53vgV9P7y5lIeD
     REDIS_SESSION_URI:
-      secure: AAABADoNMLfmFRrnX5PoT1Cwu5jaIZHje6U+Fu2HyKnfBgPlwt7+
+      secure: AAABAGPijJDo5cc2ImL3qvWvHoExpCKRvsvy/OuXxUgLhTTMu37K
     SECRET_MANAGER_SALT:
-      secure: AAABAL81EUzrY+ILZmx3c2YyGTDpSHSE9fNo1BPaDFJIVPjtxvus
+      secure: AAABAN/L88JBf5bVh23xRcAJQrhne6mg9Q4btYBi5VbH4kAQYuoL
     SENTRY_DSN:
-      secure: AAABAK662AZBXhaqpvQBZjshnx32UaSkGejxIR12/9Aoy40dxYJx
+      secure: AAABAEDxBPkztoDWacFZFulflzaNlvcDcF67n+BWWA4FO6rwTKMv
+    SES_FROM:
+      secure: AAABAHCbHm5B57YklHzNRflAn956Xtfb5l/qnn2p2Bd8wkIst/Sc
     SES_HOST:
-      secure: AAABAPPwnAeCylu8QgC18/Uj9ssWjJ3sa94jdrS5+GyQi5HGR3ck
+      secure: AAABAD5cNjudiQhQWHNwtfLir1nWOYBu8+k4A9MXs9LMgpW/rln+
     SES_PASS:
-      secure: AAABANWuURDIM9oZnACDuU7htpclX+o9yz+ZhH6STYhNDH0Anhwk
+      secure: AAABANitRndnj7gFctT2nYGmeMIGel/Mf/jtScUd7MyqbU0YW8nP
     SES_PORT:
-      secure: AAABAMSeLJ/OotOjXZzwj/2/GD3GfqzNkhhiJTETGkkuGGaoU0Gl
+      secure: AAABAAGogX7io4OnX4V3vu4WlJBh8a4+UkawNmkDWSpTqHe/JmeX
     SES_USER:
-      secure: AAABAGk2TASgv41ngY17J94FfVyPUl/GNaAwd92sz00JtWUo5YHz
+      secure: AAABAG6T6pK48AyC/rtt9JUs6GuFb5+2KeVymdEfO3J7MfbBgNZJ
     SESSION_SECRET:
-      secure: AAABAGGwbEH4gQ7x0J7OJ2Z4QWzMWR4cil6VrXkg7ONk7ef3BvKL
+      secure: AAABAGf6CYsgijUJM/KJpqHBZsHB1eCpRPFpJaqEU71xUvWim/fw
+  postmangovsg-infra:ebLogGroupName: postmangovsg-staging-beanstalk-logs
   postmangovsg-infra:ebSettings:
     appName: postmangovsg
     autoScalingMax: 1
     autoScalingMin: 1
     deploymentPolicy: AllAtOnce
     description: Postman App Description
-    instanceType: t2.medium
+    instanceType: t3.medium
     keyPairName: postmangovsg-staging-jumphost-kp
     solutionStackName: 64bit Amazon Linux 2018.03 v2.15.1 running Docker 19.03.6-ce
   postmangovsg-infra:emailCallbackEnvironmentVariables:
     DB_URI:
-      secure: AAABAA5Om8z5tvE0wRrNxKWvvJRZ/R3BZaNudE+gNMYdO0j+CYRo
+      secure: AAABAJfPdyCEgbEDsubBYNrRM5vp8R8S8iBvlQ3R2vQ1qOOdGSmh
   postmangovsg-infra:environment: staging
   postmangovsg-infra:jumphostKeyPairName: postmangovsg-staging-jumphost-kp
   postmangovsg-infra:rdsMasterPassword:
-    secure: AAABAAcAtH266DLYR3t0ZLmSseoEPIMaEdR5b9BAVA4e6c7abChs
+    secure: AAABAOQ1XhLkKYMqtoFOgR0CtCTQBEFxbl96wrVqiKFaxTgM40Pt
   postmangovsg-infra:rdsMasterUsername:
-    secure: AAABAO+Fo0AA/h0QovxVkdddh7G9td8TSNEMneTsW2LvIgaDwdY3
+    secure: AAABADKUtbP+7qisWfIVYsXj3cJBA4EfmQZzGI+2VH1eWrrnwMJl
   postmangovsg-infra:rdsSettings:
     dbName: postman
     deletionProtection: false
@@ -82,27 +86,41 @@ config:
   postmangovsg-infra:sesRegion: us-east-1
   postmangovsg-infra:twilioCallbackEnvironmentVariables:
     DB_URI:
-      secure: AAABADn9I0tCtOuFXT1bdonx0S2kGDh3tyViNmfUs86VgjaMZtV5
+      secure: AAABAJBC3+6L1vPm/9e2F0nYhjRcGmf20ANj4Hav/KDJ3iQlBwwO
     TWILIO_CALLBACK_SECRET:
-      secure: AAABAA0SWRSwWGKOpJxkwBf3ttlacw5V9k3r3EK/u4mIcUNEfxiy
+      secure: AAABAADQGmiy2nVThWtMZjJRpApTTqEsn2mQDv3RbQC9QrKmFOuJ
   postmangovsg-infra:uploadBucketName: file-staging.postman.gov.sg
   postmangovsg-infra:vpcSettings:
     cidrBlock: 10.102.0.0/16
   postmangovsg-infra:workerEnvironmentVariables:
+    BACKEND_URL:
+      secure: AAABAC9zeBbOE+anGRKTtD3wYBbX8c4gDQIiYiZlgOOlm/1XqEHR
     DB_URI:
-      secure: AAABAM4mAk2pjL3efBBIGWBAUBA4xfEDwaeK7D+kDJsVb7lN8j92
+      secure: AAABAIIENkqjGDfRcH5OaevKMfT9NhxISF3U+We5LSFgREySccX2
+    DEFAULT_COUNTRY_CODE:
+      secure: AAABAGUhiTVK9pRfRTiUBC2uvfY++hrRwv+exDyhN+gA7RKmXjwq
     ECS_SERVICE_NAME:
       secure: AAABAFpiL16eVUSykWXBVLoflnM56hf596dW7Pf88i/TrXpAWRQB
     ECS_SERVICE_NAME_LOGGER:
-      secure: AAABAL3sxDAftaAFuZB4uuh/lGyQVZXWwLEn+khcuDf0+IsoBhFB
+      secure: AAABAOSsEeIpRcLoIDYr3/otfhuYRSCOaFB0bIo3nbeu1IhmJpoq
     ECS_SERVICE_NAME_SENDER:
-      secure: AAABALKX9FY8bIRDIur7hffMZq6sn9yHI5M9IrX6pHJ85WiJ1Jm6
+      secure: AAABADIWV5bASLRDjwa4UcZXxOEuzUJpo/A4DEvEO/3YjCMkfqxc
     MESSAGE_WORKER_LOGGER:
-      secure: AAABAIzG2cNc+9T+nWYouu23/gzziXkn/IhqqAndSzN6FrwKjHbr
+      secure: AAABAOl8hX3A5xO0QZI0ogIYDCCj/s7kXYy2h1uSVY8Zw+HCAR8M
     MESSAGE_WORKER_SENDER:
-      secure: AAABACvzZjlkTH5Ccmh/uGp1yuOGE3EWqZCCil9Qu1qPdGmffwHn
+      secure: AAABAHOjHeXsjtEFzbU1x3JacjVSOrtypIIyPdIYinAcxKEO8I5K
     NODE_ENV:
-      secure: AAABADdCXbDmCYRKTt1MVIaAYYHqxTyVqxsgZwQ0ZxcD32VPuJ25
+      secure: AAABABjPXeUf15j4P7U0qnbusARRlLCRJRlR6tiuOcRgioQUql/v
     SECRET_MANAGER_SALT:
-      secure: AAABAIOL3QJzKW9hm0gr/kf6aqDuc5O9JM5WyqMckJ5l5nU4kPEe
+      secure: AAABAClmzxq5o47uSlegzY6gNDUpoESBLkD3Xh3nC+3UXrWJxn6l
+    SES_FROM:
+      secure: AAABABoFIcCbtUtaqV9vyyF4VatJCO1cdLFOEajyXP/YV41bxWyG
+    SES_HOST:
+      secure: AAABAIv3b/uBsbSUe/ANZ482sw3EwXJF3pEWWca+QE5x7oxfyllw
+    SES_PASS:
+      secure: AAABAAag49KiE9g82dmQ3fXSGjWITaNP0e7T0TURuVfMbwBMuWpt
+    SES_PORT:
+      secure: AAABABsd2iNUeCQ7W5Cbfeh3jeh2a37fb0N/2CauOnpHQ2l0L4jb
+    SES_USER:
+      secure: AAABALBOkjybakeOeZ9DMatM0A59n496B9FJRoN+5Bj2n6QzTtfg
   pulumi:template: aws-typescript
