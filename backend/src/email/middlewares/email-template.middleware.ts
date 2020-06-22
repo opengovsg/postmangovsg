@@ -10,6 +10,7 @@ import {
 } from '@core/errors'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
+import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
 
@@ -152,15 +153,21 @@ const uploadCompleteHandler = async (
       throw new Error('Template does not exist, please create a template')
     }
 
-    // carry out templating / hydration
     // - download from s3
-    const { records } = await EmailTemplateService.client.testHydration({
-      campaignId: +campaignId,
-      s3Key,
-      templateSubject: emailTemplate.subject,
-      templateBody: emailTemplate.body as string,
-      templateParams: emailTemplate.params as string[],
-    })
+    const s3Client = new S3Client()
+    const fileContent = await s3Client.getCsvFile(s3Key)
+
+    const records = TemplateService.getRecordsFromCsv(
+      +campaignId,
+      fileContent,
+      emailTemplate.params as string[]
+    )
+
+    EmailTemplateService.testHydration(
+      records,
+      emailTemplate.body as string,
+      emailTemplate.subject
+    )
 
     if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
       throw new InvalidRecipientError()
