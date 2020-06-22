@@ -4,10 +4,11 @@ import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
-  TemplateError,
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
+
+import { TemplateError } from 'postman-templating'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
