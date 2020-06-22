@@ -19,6 +19,7 @@
   position: relative;
 
   @include mobile() {
+    padding: $content-top-padding $mobile-site-padding $content-bottom-padding;
     flex-direction: column;
     align-items: center;
   }
@@ -84,4 +85,8 @@
   width: 100%;
   max-width: $content-max-width;
   margin: 4rem auto;
+
+  @include mobile() {
+    margin: 0 auto;
+  }
 }
