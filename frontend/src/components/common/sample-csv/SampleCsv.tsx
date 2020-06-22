@@ -1,5 +1,6 @@
 import React from 'react'
 import { without, times, constant } from 'lodash'
+import download from 'downloadjs'
 
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import styles from './SampleCsv.module.scss'
@@ -22,18 +23,9 @@ const SampleCsv = ({
       ...times(headers.length - 1, constant('abc')),
     ]
 
-    const content = [
-      `data:text/csv;charset=utf-8,${headers.join(',')}`,
-      `${body.join(',')}`,
-    ].join('\n')
-    const encodedUri = encodeURI(content)
+    const content = [`${headers.join(',')}`, `${body.join(',')}`].join('\n')
 
-    // Trigger file download
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute('download', 'postman_sample.csv')
-    document.body.appendChild(link)
-    link.click()
+    download(content, 'postman_sample.csv', 'text/csv')
 
     sendUserEvent(GA_USER_EVENTS.DOWNLOAD_SAMPLE_FILE)
   }
