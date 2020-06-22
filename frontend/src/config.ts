@@ -10,6 +10,7 @@ const missingEnvVars = [
   'REACT_APP_BACKEND_URL',
   'REACT_APP_GUIDE_URL',
   'REACT_APP_GUIDE_SMS_CREDENTIALS_URL',
+  'REACT_APP_GUIDE_TELEGRAM_CREDENTIALS_URL',
   'REACT_APP_GUIDE_POWER_USER_URL',
   'REACT_APP_CONTACT_US_URL',
   'REACT_APP_LOGIN_EMAIL_TEXT',
@@ -34,6 +35,8 @@ axios.defaults.timeout = 100000 // 100 sec
 export const GUIDE_URL = process.env.REACT_APP_GUIDE_URL as string
 export const GUIDE_SMS_CREDENTIALS_URL = process.env
   .REACT_APP_GUIDE_SMS_CREDENTIALS_URL as string
+export const GUIDE_TELEGRAM_CREDENTIALS_URL = process.env
+  .REACT_APP_GUIDE_TELEGRAM_CREDENTIALS_URL as string
 export const GUIDE_POWER_USER_URL = process.env
   .REACT_APP_GUIDE_POWER_USER_URL as string
 export const CONTACT_US_URL = process.env.REACT_APP_CONTACT_US_URL as string
