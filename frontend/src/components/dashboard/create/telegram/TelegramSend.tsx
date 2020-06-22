@@ -84,6 +84,12 @@ const TelegramSend = ({
 
       <div className="separator"></div>
 
+      <SendRate
+        sendRate={sendRate}
+        setSendRate={setSendRate}
+        channelType={ChannelType.Telegram}
+      />
+
       <div className="progress-button">
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
