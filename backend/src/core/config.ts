@@ -137,7 +137,7 @@ const config = convict({
   },
   frontendUrl: {
     doc: 'CORS: accept requests from this origin. Can be a string, or regex',
-    default: 'https//postman.gov.sg', // prod only
+    default: 'https://postman.gov.sg', // prod only
     env: 'FRONTEND_URL',
   },
   session: {
