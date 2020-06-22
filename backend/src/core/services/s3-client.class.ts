@@ -10,7 +10,8 @@ import {
   UnexpectedDoubleQuoteError,
 } from '@core/errors/s3.errors'
 
-type CSVParamsInterface = { [key: string]: string }
+import { CSVParams } from '@core/types'
+
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
 export default class S3Client {
@@ -37,9 +38,7 @@ export default class S3Client {
    * Deduplicates the csv by overriding the same recipient with newer records
    * @param readStream
    */
-  async parseCsv(
-    readStream: NodeJS.ReadableStream
-  ): Promise<Array<CSVParamsInterface>> {
+  async parseCsv(readStream: NodeJS.ReadableStream): Promise<Array<CSVParams>> {
     const parser = CSVParse({
       delimiter: ',',
       trim: true,
@@ -53,7 +52,7 @@ export default class S3Client {
       readStream.pipe(parser)
       let headers: string[] = []
       let recipientIndex: number
-      const params: Map<string, CSVParamsInterface> = new Map()
+      const params: Map<string, CSVParams> = new Map()
       for await (const row of parser) {
         if (isEmpty(headers)) {
           // @see https://stackoverflow.com/questions/11305797/remove-zero-width-space-characters-from-a-javascript-string
@@ -64,7 +63,7 @@ export default class S3Client {
           if (recipientIndex === -1) throw new RecipientColumnMissing()
           headers = lowercaseHeaders
         } else {
-          const rowWithHeaders: CSVParamsInterface = {}
+          const rowWithHeaders: CSVParams = {}
           row.forEach((col: any, index: number) => {
             rowWithHeaders[headers[index]] = col
           })
@@ -91,7 +90,7 @@ export default class S3Client {
    * @param campaignId
    * @param s3Key
    */
-  async getCsvFile(s3Key: string): Promise<Array<CSVParamsInterface>> {
+  async getCsvFile(s3Key: string): Promise<Array<CSVParams>> {
     const downloadStream = this.download(s3Key)
     const fileContents = await this.parseCsv(downloadStream)
     return fileContents
