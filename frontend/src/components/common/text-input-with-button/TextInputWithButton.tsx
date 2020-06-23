@@ -40,10 +40,13 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
     e.preventDefault()
 
     setAsyncLoading(true)
-    await onClick()
-    // Only enable if still mounted
-    if (isMounted.current) {
-      setAsyncLoading(false)
+    try {
+      await onClick()
+    } finally {
+      // Only enable if still mounted
+      if (isMounted.current) {
+        setAsyncLoading(false)
+      }
     }
   }
 

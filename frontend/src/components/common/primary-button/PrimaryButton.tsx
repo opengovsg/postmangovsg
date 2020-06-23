@@ -31,10 +31,13 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
       onClick
         ? async () => {
             setAsyncLoading(true)
-            await onClick()
-            // Only enable if button is still mounted
-            if (isMounted.current) {
-              setAsyncLoading(false)
+            try {
+              await onClick()
+            } finally {
+              // Only enable if button is still mounted
+              if (isMounted.current) {
+                setAsyncLoading(false)
+              }
             }
           }
         : undefined,
