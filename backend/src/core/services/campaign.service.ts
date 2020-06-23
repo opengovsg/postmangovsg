@@ -20,12 +20,14 @@ const createCampaign = ({
   name,
   type,
   userId,
+  protect,
 }: {
   name: string
   type: string
   userId: number
+  protect: boolean
 }): Promise<Campaign> => {
-  return Campaign.create({ name, type, userId, valid: false })
+  return Campaign.create({ name, type, userId, valid: false, protect })
 }
 
 /**
@@ -97,6 +99,7 @@ const getCampaignDetails = async (
       'type',
       'created_at',
       'valid',
+      'protect',
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
       [
