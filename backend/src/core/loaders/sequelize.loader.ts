@@ -23,6 +23,11 @@ import logger from '@core/logger'
 const DB_URI = config.get('database.databaseUri')
 const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
 
+function parseDBUri(uri: string): any {
+  const config = parse(uri)
+  return { ...config, username: config.user }
+}
+
 const sequelizeLoader = async (): Promise<void> => {
   const dialectOptions = config.get('IS_PROD')
     ? config.get('database.dialectOptions')
@@ -32,8 +37,8 @@ const sequelizeLoader = async (): Promise<void> => {
     logging: false,
     pool: config.get('database.poolOptions'),
     replication: {
-      read: [parse(DB_READ_REPLICA_URI)],
-      write: parse(DB_URI),
+      read: [parseDBUri(DB_READ_REPLICA_URI)],
+      write: parseDBUri(DB_URI),
     },
     dialectOptions,
     query: {

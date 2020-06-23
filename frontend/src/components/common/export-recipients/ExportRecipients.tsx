@@ -18,25 +18,29 @@ const ExportRecipients = ({
   async function exportRecipients(
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) {
-    event.stopPropagation()
-    const list = await exportCampaignStats(campaignId)
-    const headers = Object.keys(list[0])
-    const sentAtTime = new Date(sentAt)
+    try {
+      event.stopPropagation()
+      const list = await exportCampaignStats(campaignId)
+      const headers = Object.keys(list[0])
+      const sentAtTime = new Date(sentAt)
 
-    const content = [`data:text/csv;charset=utf-8,${headers.join(',')}`]
-      .concat(list.map((row) => Object.values(row).join(',')))
-      .join('\n')
-    const encodedUri = encodeURI(content)
+      const content = [`data:text/csv;charset=utf-8,${headers.join(',')}`]
+        .concat(list.map((row) => Object.values(row).join(',')))
+        .join('\n')
+      const encodedUri = encodeURI(content)
 
-    // Trigger file download
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute(
-      'download',
-      `${campaignName}_${sentAtTime.toLocaleDateString()}_${sentAtTime.toLocaleTimeString()}.csv`
-    )
-    document.body.appendChild(link)
-    link.click()
+      // Trigger file download
+      const link = document.createElement('a')
+      link.setAttribute('href', encodedUri)
+      link.setAttribute(
+        'download',
+        `${campaignName}_${sentAtTime.toLocaleDateString()}_${sentAtTime.toLocaleTimeString()}.csv`
+      )
+      document.body.appendChild(link)
+      link.click()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
