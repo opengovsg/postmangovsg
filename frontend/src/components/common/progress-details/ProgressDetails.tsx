@@ -15,8 +15,8 @@ const ProgressDetails = ({
   sentAt: Date
   numRecipients: number
   stats: CampaignStats
-  handlePause: Function
-  handleRetry: Function
+  handlePause: () => Promise<void>
+  handleRetry: () => Promise<void>
 }) => {
   const { status, error, unsent, sent, invalid } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
