@@ -23,6 +23,25 @@ jobs:
       script:
         - npm run lint-no-fix
         - npm run test
+      before_deploy:
+        - cd ../
+        - export TAG=travis-$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
+        - export ECR_REPO=$REPO-backend
+        - export PATH=$PATH:$HOME/.local/bin
+          # Install tools for deployment
+        - pip install --user awscli #For docker
+
+          # Login to AWS ECR, credentials defined in $AWS_ACCESS_KEY_ID and $AWS_SECRET_ACCESS_KEY
+        - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+        - docker build -f ./backend/Dockerfile -t $ECR_REPO:$TAG .
+        - docker tag $ECR_REPO:$TAG $ECR_REPO:$TRAVIS_BRANCH
+        - docker push $ECR_REPO
+          # Edit Dockerrun from Travis environment variables
+        - sed -i -e "s|@REPO|$ECR_REPO|g" ./backend/Dockerrun.aws.json
+        - sed -i -e "s|@TAG|$TAG|g" ./backend/Dockerrun.aws.json
+          #Zip file
+        - cd backend && zip "$TAG.zip" Dockerrun.aws.json
+        - export ELASTIC_BEANSTALK_LABEL="$TAG-$(env TZ=Asia/Singapore date "+%Y%m%d%H%M%S")"
       deploy:
         - provider: elasticbeanstalk
           skip_cleanup: true
@@ -32,6 +51,7 @@ jobs:
           app: "postmangovsg"
           env: "postmangovsg-staging-40ffadb"
           bucket_name: "postmangovsg-elasticbeanstalk-appversion"
+          zip_file: "$TAG.zip"
           on:
             branch: $STAGING_BRANCH
         - provider: elasticbeanstalk
@@ -51,14 +71,15 @@ jobs:
         - npm install
       script:
         - npm run lint-no-fix
+        - cd ../
       deploy:
         - provider: script
-          script: ./deploy.sh postmangovsg-workers staging-sending staging-logging
+          script: ./worker/deploy.sh postmangovsg-workers staging-sending staging-logging
           on:
             branch: $STAGING_BRANCH
             condition: "$DEPLOY_WORKER = true"
         - provider: script
-          script: ./deploy.sh postmangovsg-workers prod-sending prod-logging
+          script: ./worker/deploy.sh postmangovsg-workers prod-sending prod-logging
           on:
             branch: $PRODUCTION_BRANCH
             condition: "$DEPLOY_WORKER = true"
