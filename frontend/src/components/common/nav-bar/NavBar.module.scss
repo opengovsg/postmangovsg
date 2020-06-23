@@ -3,8 +3,6 @@
 @import '~sass-burger';
 
 $navbar-link-margin: calc(1rem + 1vw);
-$navbar-height: 4rem;
-$navbar-mobile-height: 4rem;
 
 .navBar {
   @include flex-horizontal;
