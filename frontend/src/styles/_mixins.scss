@@ -53,6 +53,14 @@ $widescreen: 1216px;
   line-height: 1.5rem;
 }
 
+@mixin spinner {
+  position: absolute;
+  width: 3rem;
+  font-size: 3rem;
+  margin-top: 4rem;
+  left: calc(50vw - 1.5rem);
+}
+
 @mixin button($background-color) {
   background-color: $background-color;
   display: inline-flex;
