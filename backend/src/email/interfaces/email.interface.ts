@@ -8,7 +8,6 @@ export interface StoreTemplateInput {
 }
 export interface StoreTemplateOutput {
   updatedTemplate: EmailTemplate
-  numRecipients: number
   check?: {
     reupload: boolean
     extraKeys?: string[]
