@@ -61,6 +61,7 @@ const listCampaigns = ({
         literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
         'has_credential',
       ],
+      'halted',
     ],
     order: [['created_at', 'DESC']],
     include: [
