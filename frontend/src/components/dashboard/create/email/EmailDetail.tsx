@@ -82,9 +82,8 @@ const EmailDetail = ({
           <p>
             A retry button will appear if some messages had an error while
             sending. You can click on retry to try sending the message(s) again.
-            An invalid recipients download link will appear for you to download
-            a list of failed deliveries with the recipient’s email or mobile
-            number.
+            An export button will appear for you to download a list of failed
+            deliveries with the recipient’s email address.
           </p>
         </>
       )}
