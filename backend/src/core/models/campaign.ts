@@ -8,6 +8,7 @@ import {
   Table,
   HasMany,
   HasOne,
+  Default,
 } from 'sequelize-typescript'
 import { ChannelType } from '@core/constants'
 import { CampaignS3ObjectInterface } from '@core/interfaces'
@@ -17,7 +18,6 @@ import { JobQueue } from './job-queue'
 import { Statistic } from './statistic'
 import { EmailTemplate } from '@email/models'
 import { SmsTemplate } from '@sms/models'
-
 @Table({ tableName: 'campaigns', underscored: true, timestamps: true })
 export class Campaign extends Model<Campaign> {
   @HasMany(() => JobQueue, { as: 'job_queue' })
@@ -67,6 +67,13 @@ export class Campaign extends Model<Campaign> {
 
   @HasOne(() => Statistic)
   statistic?: Statistic
+
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+  halted!: boolean
 
   // Sets key in s3Object json
   static async updateS3ObjectKey(

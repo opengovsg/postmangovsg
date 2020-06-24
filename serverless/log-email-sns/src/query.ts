@@ -99,27 +99,46 @@ export const haltCampaignIfThresholdExceeded = async (campaignId?: number) => {
 
   if (invalid !== undefined && running_total !== undefined) {
     const percentageInvalid = invalid / running_total
+    const exceedsHaltNumber = invalid > config.get('minHaltNumber')
+    const exceedsHaltPercentage =
+      percentageInvalid > config.get('minHaltPercentage')
     console.log(
-      `Current campaign_id=${campaignId} invalid=${invalid} running_total=${running_total} percentageInvalid=${percentageInvalid}`
+      `Current campaign_id=${campaignId} invalid=${invalid} running_total=${running_total} 
+      percentageInvalid=${percentageInvalid} 
+      config.minHaltNumber=${config.get('minHaltNumber')}
+      config.minHaltPercentage=${config.get('minHaltPercentage')}
+      exceedsHaltNumber=${exceedsHaltNumber}
+      exceedsHaltPercentage=${exceedsHaltPercentage}`
     )
     /* With default MIN_HALT_NUMBER=10, MIN_HALT_PERCENTAGE=0.1, 
     it means that 
-    - if there were 10 messages sent thus far, and 10 invalid recipients, the campaign would halt immediately since 10/10 > MIN_HALT_PERCENTAGE
-    - if there were 101 messages sent thus far, and 10 invalid recipients, the campaign would not halt, since 10/101 < MIN_HALT_PERCENTAGE
+    - if there were 11 messages sent thus far, and 11 invalid recipients, the campaign would halt immediately since 11/11 > MIN_HALT_PERCENTAGE
+    - if there were 110 messages sent thus far, and 11 invalid recipients, the campaign would not halt, since 11/110 <= MIN_HALT_PERCENTAGE
     */
-    if (
-      invalid > config.get('minHaltNumber') &&
-      percentageInvalid > config.get('minHaltPercentage')
-    ) {
+    if (exceedsHaltNumber && exceedsHaltPercentage) {
       // Halt
       console.log(
         `Halting campaign_id=${campaignId} invalid=${invalid} running_total=${running_total} percentageInvalid=${percentageInvalid}`
       )
 
-      await sequelize?.query(`SELECT stop_jobs(:campaignId)`, {
-        replacements: { campaignId },
-        type: QueryTypes.SELECT,
-      })
+      try {
+        await sequelize?.transaction(async (_t) => {
+          await sequelize?.query(`SELECT stop_jobs(:campaignId)`, {
+            replacements: { campaignId },
+            type: QueryTypes.SELECT,
+          })
+
+          await sequelize?.query(
+            `UPDATE campaigns SET halted=TRUE where id=:campaignId;`,
+            {
+              replacements: { campaignId },
+              type: QueryTypes.UPDATE,
+            }
+          )
+        })
+      } catch (err) {
+        console.error(`Could not halt campaign_id=${campaignId} ${err.stack}`)
+      }
     }
   }
   return
