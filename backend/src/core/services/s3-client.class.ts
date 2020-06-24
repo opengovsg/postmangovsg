@@ -1,16 +1,10 @@
 import S3 from 'aws-sdk/clients/s3'
-import CSVParse from 'csv-parse'
-import { isEmpty } from 'lodash'
 
 import config from '@core/config'
-import logger from '@core/logger'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
-import {
-  RecipientColumnMissing,
-  UnexpectedDoubleQuoteError,
-} from '@core/errors/s3.errors'
 
 import { CSVParams } from '@core/types'
+import { parseCsvService } from '@core/services'
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
@@ -34,56 +28,6 @@ export default class S3Client {
   }
 
   /**
-   * Ensures that the recipient column exists and converts headers to lowercase
-   * Deduplicates the csv by overriding the same recipient with newer records
-   * @param readStream
-   */
-  async parseCsv(readStream: NodeJS.ReadableStream): Promise<Array<CSVParams>> {
-    const parser = CSVParse({
-      delimiter: ',',
-      trim: true,
-      skip_empty_lines: true,
-    })
-    try {
-      readStream.on('error', (err) => {
-        // Pass error from s3 to csv parser
-        parser.emit('error', err)
-      })
-      readStream.pipe(parser)
-      let headers: string[] = []
-      let recipientIndex: number
-      const params: Map<string, CSVParams> = new Map()
-      for await (const row of parser) {
-        if (isEmpty(headers)) {
-          // @see https://stackoverflow.com/questions/11305797/remove-zero-width-space-characters-from-a-javascript-string
-          const lowercaseHeaders = row.map((col: string) =>
-            col.toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g, '')
-          )
-          recipientIndex = lowercaseHeaders.indexOf('recipient')
-          if (recipientIndex === -1) throw new RecipientColumnMissing()
-          headers = lowercaseHeaders
-        } else {
-          const rowWithHeaders: CSVParams = {}
-          row.forEach((col: any, index: number) => {
-            rowWithHeaders[headers[index]] = col
-          })
-          // produces {header1: value1, header2: value2, ...}
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          params.set(row[recipientIndex!], rowWithHeaders) // Deduplication
-        }
-      }
-      logger.info({ message: 'Parsing complete' })
-      return Array.from(params.values())
-    } catch (err) {
-      if (err.message.includes('Invalid Opening Quote'))
-        throw new UnexpectedDoubleQuoteError()
-      if (err.message.includes('Invalid Closing Quote'))
-        throw new UnexpectedDoubleQuoteError()
-      throw err
-    }
-  }
-
-  /**
    * Download CSV file from S3 and process it into message.
    * The messages are formed from the template and parameters specified in the csv.
    *
@@ -92,7 +36,7 @@ export default class S3Client {
    */
   async getCsvFile(s3Key: string): Promise<Array<CSVParams>> {
     const downloadStream = this.download(s3Key)
-    const fileContents = await this.parseCsv(downloadStream)
+    const fileContents = await parseCsvService.parseCsv(downloadStream)
     return fileContents
   }
 }
