@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Redirect, useParams } from 'react-router-dom'
 import Lottie from 'react-lottie'
 import { fetchMessage } from 'services/crypto.service'
 
@@ -15,13 +15,13 @@ const Protected = () => {
 
   async function onAccessMail() {
     if (!id) return
-    const data = await fetchMessage(id)
-    setDecryptedMessage(data)
+    try {
+      const data = await fetchMessage(id)
+      setDecryptedMessage(data)
+    } catch (err) {
+      console.error(err)
+    }
   }
-
-  useEffect(() => {
-    if (!id) return
-  }, [id])
 
   return (
     <div className={styles.protected}>
