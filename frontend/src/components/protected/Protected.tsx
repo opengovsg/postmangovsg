@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Redirect, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Lottie from 'react-lottie'
 import { fetchMessage } from 'services/crypto.service'
 
-import { TextInputWithButton } from 'components/common'
+import { TextInputWithButton, ErrorBlock } from 'components/common'
 import styles from './Protected.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import landingAnimation from 'assets/lottie/landing.json'
@@ -12,6 +12,7 @@ const Protected = () => {
   const { id } = useParams()
   const [password, setPassword] = useState('')
   const [decryptedMessage, setDecryptedMessage] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
 
   async function onAccessMail() {
     if (!id) return
@@ -19,6 +20,7 @@ const Protected = () => {
       const data = await fetchMessage(id)
       setDecryptedMessage(data)
     } catch (err) {
+      setErrorMsg(err.message)
       console.error(err)
     }
   }
@@ -42,6 +44,7 @@ const Protected = () => {
             <h1>You&apos;ve got mail</h1>
             <div>
               <TextInputWithButton
+                type="password"
                 className={styles.input}
                 placeholder="Enter password"
                 value={password}
@@ -51,6 +54,7 @@ const Protected = () => {
               >
                 Access mail
               </TextInputWithButton>
+              <ErrorBlock>{errorMsg}</ErrorBlock>
             </div>
           </>
         )}
