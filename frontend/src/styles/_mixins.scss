@@ -127,7 +127,7 @@ $widescreen: 1216px;
     }
   }
 
-  i {
+  :global(i.bx) {
     margin-top: 0.2rem;
     margin-right: 1rem;
     font-size: 1.3rem;
