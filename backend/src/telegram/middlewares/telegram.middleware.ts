@@ -172,7 +172,7 @@ const isTelegramCampaignOwnedByUser = async (
     const { campaignId } = req.params
     const userId = req.session?.user?.id
     const campaign = await TelegramService.findCampaign(+campaignId, userId)
-    return campaign ? next() : res.sendStatus(400)
+    return campaign ? next() : res.sendStatus(403)
   } catch (err) {
     return next(err)
   }
