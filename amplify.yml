@@ -3,6 +3,9 @@ env:
   variables:
     BACKEND_URL_PRODUCTION: "https://api.postman.gov.sg/v1"
     BACKEND_URL_STAGING: "https://api-staging.postman.gov.sg/v1"
+    SENTRY_ORG: "open-government-products-re"
+    SENTRY_PROJECT: "postmangovsg-frontend"
+    REACT_APP_SENTRY_DSN: "https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024"
     REACT_APP_TITLE: "Postman.gov.sg"
     REACT_APP_DESCRIPTION: "Postman.gov.sg enables public officers to send templated messages to many recipients"
     REACT_APP_LOGIN_EMAIL_TEXT: "Sign in with your .gov.sg email"
@@ -19,12 +22,20 @@ frontend:
   phases:
     preBuild:
       commands:
-        - if [ "${AWS_BRANCH}" = "master" ]; then export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION}; else export REACT_APP_BACKEND_URL=${BACKEND_URL_STAGING}; fi
+        - if [ "${AWS_BRANCH}" = "master" ]; then
+          export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION} &&
+          export REACT_APP_SENTRY_ENVIRONMENT="production";
+          else
+          export REACT_APP_BACKEND_URL=${BACKEND_URL_STAGING} &&
+          export REACT_APP_SENTRY_ENVIRONMENT="staging";
+          fi
         - cd frontend
         - npm ci
+        - export REACT_APP_SENTRY_RELEASE=$(npm run --silent get-sentry-release)
     build:
       commands:
         - npm run build
+        - npm run upload-source-map
   artifacts:
     # IMPORTANT - Please verify your build output directory
     baseDirectory: frontend/build
@@ -48,14 +59,20 @@ frontend:
         - key: "Referrer-Policy"
           value: "same-origin"
         - key: "Content-Security-Policy"
-          value:
-            "connect-src 'self' https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com https://www.google-analytics.com;
+          value: "connect-src 'self' \
+            https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ \
+            https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com \
+            https://s3.ap-southeast-1.amazonaws.com/file-staging.postman.gov.sg/ \
+            https://s3.ap-southeast-1.amazonaws.com/file-production.postman.gov.sg/ \
+            https://o399364.ingest.sentry.io/;
             style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com;
             font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
             default-src 'self' https://*.postman.gov.sg;
             object-src 'none';
             script-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
             img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com"
+        - key: "Content-Security-Policy-Report-Only"
+          value: report-uri https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024;
     - pattern: "/static/**/*"
       headers:
         - key: "Cache-Control"

@@ -13,5 +13,19 @@
     }
     white-space: pre-wrap;
     @include block($light-red, $red);
+
+    &.withClose {
+      padding-right: 4rem;
+    }
+
+    .close {
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      &:hover,
+      &:active {
+        color: $red;
+      }
+    }
   }
 }

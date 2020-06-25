@@ -21,6 +21,7 @@ export class Campaign {
   createdAt: Date
   sentAt: Date
   status: Status
+  isCsvProcessing: boolean
 
   constructor(input: any) {
     this.id = input['id']
@@ -29,6 +30,7 @@ export class Campaign {
     this.createdAt = input['created_at']
     this.sentAt = input['sent_at']
     this.status = this.getStatus(input['job_queue'])
+    this.isCsvProcessing = input['is_csv_processing']
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {

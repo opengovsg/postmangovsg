@@ -3,15 +3,15 @@ import { Redirect } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 
 import LoginInput from './login-input'
-import { GUIDE_URL, CONTACT_US_URL } from 'config'
+import { GUIDE_URL, CONTACT_US_URL, INFO_BANNER } from 'config'
 import { AuthContext } from 'contexts/auth.context'
-
+import { InfoBanner } from 'components/common'
 import styles from './Login.module.scss'
 import loginImg from 'assets/img/landing/login.svg'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import companyLogo from 'assets/img/brand/company-logo-dark.svg'
 
-const Landing = () => {
+const Login = () => {
   const authContext = useContext(AuthContext)
 
   if (authContext.isAuthenticated) {
@@ -20,6 +20,7 @@ const Landing = () => {
 
   return (
     <>
+      <InfoBanner>{INFO_BANNER}</InfoBanner>
       <div className={styles.topContainer}>
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
@@ -66,4 +67,4 @@ const Landing = () => {
   )
 }
 
-export default Landing
+export default Login

@@ -95,6 +95,7 @@ $widescreen: 1216px;
 
   &:disabled {
     background-color: $light-grey;
+    cursor: not-allowed;
   }
 
   i {

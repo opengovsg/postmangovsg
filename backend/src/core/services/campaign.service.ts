@@ -1,9 +1,7 @@
-import { Op, literal, Transaction } from 'sequelize'
-import config from '@core/config'
+import { Op, literal, Transaction, Includeable } from 'sequelize'
 import { JobStatus } from '@core/constants'
-import { Campaign, JobQueue } from '@core/models'
-
-const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
+import { Campaign, JobQueue, Statistic } from '@core/models'
+import { CampaignDetails } from '@core/interfaces'
 
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress
@@ -28,42 +26,6 @@ const createCampaign = ({
   userId: number
 }): Promise<Campaign> => {
   return Campaign.create({ name, type, userId, valid: false })
-}
-
-/**
- * On file upload, save the transaction id and file name against the campaign so that we can download the file from s3 later
- * @param param0
- */
-const updateCampaignS3Metadata = (
-  key: string,
-  campaignId: number,
-  filename: string,
-  transaction: Transaction | undefined
-): Promise<[number, Campaign[]]> => {
-  const s3Object = {
-    key,
-    bucket: FILE_STORAGE_BUCKET_NAME,
-    filename,
-  }
-
-  return Campaign.update(
-    { s3Object },
-    {
-      where: {
-        id: campaignId,
-      },
-      returning: true,
-      transaction,
-    }
-  )
-}
-
-/**
- * Helper method to find a campaign by id
- * @param id
- */
-const retrieveCampaign = (id: number): Promise<Campaign> => {
-  return Campaign.findByPk(id)
 }
 
 /**
@@ -119,6 +81,54 @@ const listCampaigns = ({
 }
 
 /**
+ * Get campaign details
+ * @param campaignId
+ * @param includes
+ */
+const getCampaignDetails = async (
+  campaignId: number,
+  includes: Includeable[]
+): Promise<CampaignDetails> => {
+  const campaignDetails = await Campaign.findOne({
+    where: { id: campaignId },
+    attributes: [
+      'id',
+      'name',
+      'type',
+      'created_at',
+      'valid',
+      [literal('cred_name IS NOT NULL'), 'has_credential'],
+      [literal("s3_object -> 'filename'"), 'csv_filename'],
+      [
+        literal(
+          "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
+        ),
+        'is_csv_processing',
+      ],
+      [
+        literal(
+          'Statistic.unsent + Statistic.sent + Statistic.errored + Statistic.invalid'
+        ),
+        'num_recipients',
+      ],
+    ],
+    include: [
+      {
+        model: JobQueue,
+        attributes: ['status', ['created_at', 'sent_at']],
+      },
+      {
+        model: Statistic,
+        attributes: [],
+      },
+      ...includes,
+    ],
+  })
+
+  return campaignDetails?.get({ plain: true }) as CampaignDetails
+}
+
+/**
  * Helper method to set a campaign to invalid (when the template and uploaded csv's columns don't match)
  * @param campaignId
  */
@@ -155,9 +165,8 @@ const setValid = (
 export const CampaignService = {
   hasJobInProgress,
   createCampaign,
-  retrieveCampaign,
   listCampaigns,
-  updateCampaignS3Metadata,
+  getCampaignDetails,
   setInvalid,
   setValid,
 }

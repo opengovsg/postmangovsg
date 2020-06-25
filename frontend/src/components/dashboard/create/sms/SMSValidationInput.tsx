@@ -10,16 +10,13 @@ const EmailValidationInput = ({
   buttonDisabled?: boolean
 }) => {
   const [recipient, setRecipient] = useState('')
-  const [isValidating, setIsValidating] = useState(false)
 
   function isInvalidRecipient() {
     return !/^\+?\d+$/g.test(recipient)
   }
 
   async function onClickHandler() {
-    setIsValidating(true)
     await onClick(recipient)
-    setIsValidating(false)
     setRecipient('')
   }
 
@@ -29,19 +26,16 @@ const EmailValidationInput = ({
       value={recipient}
       onChange={setRecipient}
       onClick={onClickHandler}
-      inputDisabled={isValidating}
-      buttonDisabled={isInvalidRecipient() || isValidating || buttonDisabled}
+      buttonDisabled={isInvalidRecipient() || buttonDisabled}
       placeholder="Enter test mobile number"
-    >
-      {isValidating ? (
-        'Sending...'
-      ) : (
+      buttonLabel={
         <>
           Send test SMS
           <i className="bx bx-envelope-open"></i>
         </>
-      )}
-    </TextInputWithButton>
+      }
+      loadingButtonLabel="Sending..."
+    />
   )
 }
 
