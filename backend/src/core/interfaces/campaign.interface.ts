@@ -1,9 +1,18 @@
 import { ChannelType } from '@core/constants'
 
 export interface CampaignS3ObjectInterface {
-  key: string
-  bucket: string
-  filename: string
+  key?: string
+  bucket?: string
+  filename?: string
+  temp_filename?: string
+  error?: string
+}
+
+export interface CsvStatusInterface {
+  isCsvProcessing: boolean
+  filename?: string
+  tempFilename?: string
+  error?: string
 }
 
 export interface CampaignInterface {
@@ -23,6 +32,7 @@ export interface CampaignDetails {
   valid: boolean
   has_credential: boolean
   csv_filename: string
+  is_csv_processing: boolean
   num_recipients: number
   email_templates?: {
     body: string

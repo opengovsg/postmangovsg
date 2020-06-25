@@ -30,7 +30,6 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
   onGenerate,
 }) => {
   const [apiKey, setApiKey] = useState('')
-  const [isGeneratingApiKey, setIsRegeneratingApiKey] = useState(false)
   const [errorMsg, setErrorMsg] = useState(null)
   const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(
     ApiKeyState.GENERATE
@@ -85,7 +84,6 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
 
   async function onGenerateConfirm() {
     setErrorMsg(null)
-    setIsRegeneratingApiKey(true)
     try {
       const newApiKey = await regenerateApiKey()
       setApiKey(newApiKey)
@@ -93,7 +91,6 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
     } catch (e) {
       setErrorMsg(e.message)
     }
-    setIsRegeneratingApiKey(false)
     if (onGenerate) onGenerate()
   }
 
@@ -141,11 +138,13 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
         onClick={onButtonClick}
         className={buttonClass}
         textRef={apiKeyRef}
-        buttonDisabled={isGeneratingApiKey}
-      >
-        {buttonLabel} API key
-        <i className={cx('bx', buttonIcon)} />
-      </TextInputWithButton>
+        buttonLabel={
+          <>
+            {buttonLabel} API key
+            <i className={cx('bx', buttonIcon)} />
+          </>
+        }
+      />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )

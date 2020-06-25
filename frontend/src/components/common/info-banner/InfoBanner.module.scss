@@ -1,0 +1,21 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+.container {
+  background-color: $indigo-blue;
+  height: auto;
+  padding: 4px $site-padding;
+  color: white;
+  text-align: center;
+  @include flex-horizontal;
+  justify-content: center;
+
+  .infoText {
+    max-width: $header-max-width;
+    font-size: 0.8rem;
+  }
+
+  @include mobile() {
+    padding: 4px $mobile-site-padding;
+    text-align: justify;
+  }
+}

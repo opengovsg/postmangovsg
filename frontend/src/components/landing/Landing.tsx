@@ -11,10 +11,12 @@ import {
   PRIVACY_URL,
   TC_URL,
   REPORT_BUG_URL,
+  INFO_BANNER,
 } from 'config'
-import PrimaryButton from 'components/common/primary-button'
+
 import Navbar from './nav-bar'
 import Banner from './banner'
+import { InfoBanner, PrimaryButton } from 'components/common'
 import { AuthContext } from 'contexts/auth.context'
 import { getLandingStats } from 'services/stats.service'
 
@@ -150,6 +152,7 @@ const Landing = () => {
   return (
     <div className={styles.landing}>
       <Banner></Banner>
+      <InfoBanner>{INFO_BANNER}</InfoBanner>
       <div className={styles.topContainer}>
         <Navbar></Navbar>
         <div className={styles.innerContainer}>
