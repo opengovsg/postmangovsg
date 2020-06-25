@@ -1,4 +1,4 @@
-import { parseCsvService } from '@core/services/parse-csv.service'
+import { ParseCsvService } from '@core/services/parse-csv.service'
 import {
   RecipientColumnMissing,
   UnexpectedDoubleQuoteError,
@@ -24,7 +24,7 @@ describe('parse-csv', () => {
       const headers = ['recipient']
       const values = [['test@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await parseCsvService.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([{ recipient: 'test@open.gov.sg' }])
     })
 
@@ -32,7 +32,7 @@ describe('parse-csv', () => {
       const headers: Array<string> = []
       const values: Array<Array<string>> = []
       const stream = await createStream(headers, values)
-      await expect(parseCsvService.parseCsv(stream)).rejects.toThrow(
+      await expect(ParseCsvService.parseCsv(stream)).rejects.toThrow(
         RecipientColumnMissing
       )
     })
@@ -41,7 +41,7 @@ describe('parse-csv', () => {
       const headers = ['RECIPIENT']
       const values = [['test@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await parseCsvService.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([{ recipient: 'test@open.gov.sg' }])
     })
 
@@ -53,7 +53,7 @@ describe('parse-csv', () => {
         ['test3@open.gov.sg'],
       ]
       const stream = await createStream(headers, values)
-      const params = await parseCsvService.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg' },
         { recipient: 'test2@open.gov.sg' },
@@ -69,7 +69,7 @@ describe('parse-csv', () => {
         ['Amy', 'test3@open.gov.sg', '99912345'],
       ]
       const stream = await createStream(headers, values)
-      const params = await parseCsvService.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg', name: 'Ali', number: '81234567' },
         { recipient: 'test2@open.gov.sg', name: 'Ahmad', number: '91234567' },
@@ -81,7 +81,7 @@ describe('parse-csv', () => {
       const headers = ['name', 'recipient', 'number']
       const values = [['Ahmad', 'test@open.gov.sg', '']]
       const stream = await createStream(headers, values)
-      const params = await parseCsvService.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg', name: 'Ahmad', number: '' },
       ])
@@ -91,7 +91,7 @@ describe('parse-csv', () => {
       const headers = ['message', 'recipient']
       const values = [[`"hello, this is a test"`, 'test@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await parseCsvService.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg', message: 'hello, this is a test' },
       ])
@@ -103,7 +103,7 @@ describe('parse-csv', () => {
         [`New York City,40°42'46"N,74°00'21"W`, 'test@open.gov.sg'],
       ]
       const stream = await createStream(headers, values)
-      await expect(parseCsvService.parseCsv(stream)).rejects.toThrow(
+      await expect(ParseCsvService.parseCsv(stream)).rejects.toThrow(
         UnexpectedDoubleQuoteError
       )
     })

@@ -4,7 +4,7 @@ import config from '@core/config'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 
 import { CSVParams } from '@core/types'
-import { parseCsvService } from '@core/services'
+import { ParseCsvService } from '@core/services'
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
@@ -36,7 +36,7 @@ export default class S3Client {
    */
   async getCsvFile(s3Key: string): Promise<Array<CSVParams>> {
     const downloadStream = this.download(s3Key)
-    const fileContents = await parseCsvService.parseCsv(downloadStream)
+    const fileContents = await ParseCsvService.parseCsv(downloadStream)
     return fileContents
   }
 }

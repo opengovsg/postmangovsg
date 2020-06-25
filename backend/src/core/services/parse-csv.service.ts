@@ -60,6 +60,6 @@ const parseCsv = async (
   }
 }
 
-export const parseCsvService = {
+export const ParseCsvService = {
   parseCsv,
 }
