@@ -14,6 +14,8 @@ $progress-item-height: 5rem;
   width: $progress-pane-width;
   min-width: $progress-pane-width;
   border-right: 1px solid $indigo-blue;
+  min-height: calc(100vh - #{$navbar-height} - #{$title-bar-height});
+
   @include mobile() {
     display: flex;
     width: 100%;
@@ -22,6 +24,7 @@ $progress-item-height: 5rem;
     border-right: none;
     padding: 0 3vw;
     margin-top: 2vh;
+    min-height: 0;
   }
 }
 
