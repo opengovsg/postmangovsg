@@ -144,14 +144,12 @@ const storeTemplate = async ({
     })
 
     if (check.reupload) {
-      return { updatedTemplate, numRecipients: 0, check }
+      return { updatedTemplate, check }
     }
   }
 
-  const numRecipients = await TelegramMessage.count({ where: { campaignId } })
   const campaign = await Campaign.findByPk(+campaignId)
-
-  return { updatedTemplate, numRecipients, valid: campaign?.valid }
+  return { updatedTemplate, valid: campaign?.valid }
 }
 
 /**

@@ -1,4 +1,3 @@
-import config from '@core/config'
 import logger from '@core/logger'
 
 import { Request, Response, NextFunction } from 'express'
@@ -8,12 +7,11 @@ import {
   RecipientColumnMissing,
   TemplateError,
   InvalidRecipientError,
+  UnexpectedDoubleQuoteError,
 } from '@core/errors'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
-import { TelegramTemplateService } from '@telegram/services'
+import { TelegramService, TelegramTemplateService } from '@telegram/services'
 import { Campaign } from '@core/models'
-
-const uploadTimeout = Number(config.get('express.uploadCompleteTimeout'))
 
 /**
  * Store template subject and body in Telegram template table.
@@ -35,7 +33,6 @@ const storeTemplate = async (
 
     const {
       check,
-      numRecipients,
       valid,
       updatedTemplate,
     } = await TelegramTemplateService.storeTemplate({
@@ -48,7 +45,7 @@ const storeTemplate = async (
         message:
           'Please re-upload your recipient list as template has changed.',
         extra_keys: check.extraKeys,
-        num_recipients: numRecipients,
+        num_recipients: 0,
         valid: false,
         template: {
           body: updatedTemplate?.body,
@@ -60,7 +57,6 @@ const storeTemplate = async (
       return res.status(200).json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
-        num_recipients: numRecipients,
         template: {
           body: updatedTemplate?.body,
           params: updatedTemplate?.params,
@@ -85,8 +81,8 @@ const storeTemplate = async (
  * @param records
  */
 const updateCampaignAndMessages = async (
-  key: string,
   campaignId: number,
+  key: string,
   filename: string,
   records: MessageBulkInsertInterface[]
 ): Promise<void> => {
@@ -94,11 +90,10 @@ const updateCampaignAndMessages = async (
 
   try {
     transaction = await Campaign.sequelize?.transaction()
-
     // Updates metadata in project
-    await CampaignService.updateCampaignS3Metadata(
+    await TemplateService.replaceCampaignS3Metadata(
+      campaignId,
       key,
-      +campaignId,
       filename,
       transaction
     )
@@ -136,13 +131,6 @@ const uploadCompleteHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  res.setTimeout(uploadTimeout, async () => {
-    if (!res.headersSent) {
-      return res.status(408).json('Request timed out')
-    }
-    return
-  })
-
   try {
     const { campaignId } = req.params
 
@@ -160,17 +148,12 @@ const uploadCompleteHandler = async (
     // carry out templating / hydration
     // - download from s3
     try {
-      const {
-        records,
-        hydratedRecord,
-      } = await TelegramTemplateService.client.testHydration({
+      const { records } = await TelegramTemplateService.client.testHydration({
         campaignId: +campaignId,
         s3Key,
         templateBody: telegramTemplate.body as string,
         templateParams: telegramTemplate.params as string[],
       })
-
-      const recipientCount = records.length
 
       // Append default country code as telegram handler stores number with the country
       // code by default.
@@ -178,18 +161,26 @@ const uploadCompleteHandler = async (
         records
       )
 
-      await updateCampaignAndMessages(
-        s3Key,
-        +campaignId,
-        filename,
-        formattedRecords
-      )
+      // Store temp filename
+      await TemplateService.storeS3TempFilename(+campaignId, filename)
 
-      if (!res.headersSent) {
-        return res.json({
-          num_recipients: recipientCount,
-          preview: hydratedRecord,
-        })
+      try {
+        // Return early because bulk insert is slow
+        res.sendStatus(202)
+
+        await updateCampaignAndMessages(
+          +campaignId,
+          s3Key,
+          filename,
+          formattedRecords
+        )
+      } catch (err) {
+        // Do not return any response since it has already been sent
+        logger.error(
+          `Error storing messages for campaign ${campaignId}. ${err.stack}`
+        )
+        // Store error to return on poll
+        TemplateService.storeS3Error(+campaignId, err.message)
       }
     } catch (err) {
       logger.error(
@@ -198,20 +189,79 @@ const uploadCompleteHandler = async (
       throw err
     }
   } catch (err) {
-    if (!res.headersSent) {
-      if (
-        err instanceof RecipientColumnMissing ||
-        err instanceof MissingTemplateKeysError ||
-        err instanceof InvalidRecipientError
-      ) {
-        return res.status(400).json({ message: err.message })
-      }
-      return next(err)
+    const userErrors = [
+      RecipientColumnMissing,
+      MissingTemplateKeysError,
+      InvalidRecipientError,
+      UnexpectedDoubleQuoteError,
+    ]
+
+    if (userErrors.some((errType) => err instanceof errType)) {
+      return res.status(400).json({ message: err.message })
     }
+    return next(err)
+  }
+}
+
+/*
+ * Returns status of csv processing
+ */
+const pollCsvStatusHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const {
+      isCsvProcessing,
+      filename,
+      tempFilename,
+      error,
+    } = await TemplateService.getCsvStatus(+campaignId)
+
+    // If done processing, returns num recipients and preview msg
+    let numRecipients, preview
+    if (!isCsvProcessing) {
+      ;[numRecipients, preview] = await Promise.all([
+        StatsService.getNumRecipients(+campaignId),
+        TelegramService.getHydratedMessage(+campaignId),
+      ])
+    }
+
+    res.json({
+      is_csv_processing: isCsvProcessing,
+      csv_filename: filename,
+      temp_csv_filename: tempFilename,
+      csv_error: error,
+      num_recipients: numRecipients,
+      preview,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+/*
+ * Deletes csv error and temp csv name from db
+ */
+const deleteCsvErrorHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    await TemplateService.deleteS3TempKeys(+campaignId)
+    res.sendStatus(200)
+  } catch (e) {
+    next(e)
   }
 }
 
 export const TelegramTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
+  pollCsvStatusHandler,
+  deleteCsvErrorHandler,
 }

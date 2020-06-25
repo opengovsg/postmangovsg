@@ -2,20 +2,21 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
+  uploadFileToS3,
+  deleteCsvStatus,
+  getCsvStatus,
+  CsvStatusResponse,
+} from 'services/upload.service'
+import {
   FileInput,
-  InfoBlock,
+  CsvUpload,
   ErrorBlock,
   PreviewBlock,
   PrimaryButton,
   SampleCsv,
 } from 'components/common'
-import {
-  getPresignedUrl,
-  completeFileUpload,
-  getPreviewMessage,
-} from 'services/telegram.service'
-import { uploadFileWithPresignedUrl } from 'services/upload.service'
-import { sendTiming, sendException } from 'services/ga.service'
+import { TelegramCampaign, TelegramPreview } from 'classes'
+import { sendTiming } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
@@ -23,36 +24,63 @@ const TelegramRecipients = ({
   csvFilename: initialCsvFilename,
   numRecipients: initialNumRecipients,
   params,
+  isProcessing: initialIsProcessing,
   onNext,
 }: {
   csvFilename: string
   numRecipients: number
   params: Array<string>
-  onNext: (changes: any, next?: boolean) => void
+  isProcessing: boolean
+  onNext: (changes: Partial<TelegramCampaign>, next?: boolean) => void
 }) => {
   const [errorMessage, setErrorMessage] = useState(null)
-  const [csvFilename, setUploadedCsvFilename] = useState(initialCsvFilename)
-  const [numRecipients, setNumRecipients] = useState(initialNumRecipients)
+  const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
+  const [csvInfo, setCsvInfo] = useState<
+    Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
+  >({
+    numRecipients: initialNumRecipients,
+    csvFilename: initialCsvFilename,
+  })
   const [preview, setPreview] = useState({} as { body: string })
-
   const { id: campaignId } = useParams()
 
-  async function loadPreview(campaignId: string) {
-    try {
-      const msgPreview = await getPreviewMessage(+campaignId)
-      if (msgPreview) {
-        setPreview(msgPreview)
-      }
-    } catch (err) {
-      setErrorMessage(err.message)
-    }
-  }
+  const { csvFilename, numRecipients = 0 } = csvInfo
 
+  // Poll csv status
   useEffect(() => {
     if (!campaignId) return
-    loadPreview(campaignId)
-  }, [campaignId])
+
+    let timeoutId: NodeJS.Timeout
+    const pollStatus = async () => {
+      try {
+        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
+          +campaignId
+        )
+        setIsCsvProcessing(isCsvProcessing)
+        setCsvInfo(newCsvInfo)
+        if (preview) {
+          setPreview(preview as TelegramPreview)
+        }
+        if (isCsvProcessing) {
+          timeoutId = setTimeout(pollStatus, 2000)
+        }
+      } catch (e) {
+        setErrorMessage(e.message)
+      }
+    }
+
+    // Retrieve status regardless of isCsvProcessing to retrieve csvError if any
+    // If completed, it will only poll once
+    pollStatus()
+
+    return () => clearTimeout(timeoutId)
+  }, [campaignId, isCsvProcessing])
+
+  // If campaign properties change, bubble up to root campaign object
+  useEffect(() => {
+    onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
+  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
@@ -64,48 +92,26 @@ const TelegramRecipients = ({
       if (!files[0] || !campaignId) {
         return
       }
-      const uploadedFile = files[0]
-      // Get presigned url from postman server
-      const startUploadResponse = await getPresignedUrl({
-        campaignId: +campaignId,
-        uploadedFile,
-      })
-      // Upload to presigned url
-      await uploadFileWithPresignedUrl(
-        uploadedFile,
-        startUploadResponse.presignedUrl
-      )
-      const uploadResponse = await completeFileUpload({
-        campaignId: +campaignId,
-        transactionId: startUploadResponse.transactionId,
-        filename: uploadedFile.name,
-      })
+      clearCsvStatus()
+      const tempCsvFilename = await uploadFileToS3(+campaignId, files[0])
 
-      // Set state
       const uploadTimeEnd = performance.now()
       sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
-      setUploadedCsvFilename(uploadedFile.name)
-      setNumRecipients(uploadResponse.num_recipients)
 
-      await loadPreview(campaignId)
-
-      onNext(
-        {
-          csvFilename: uploadedFile.name,
-          numRecipients: uploadResponse.num_recipients,
-        },
-        false
-      )
+      setIsCsvProcessing(true)
+      setCsvInfo((info) => ({ ...info, tempCsvFilename }))
     } catch (err) {
       setErrorMessage(err.message)
-      const exceptionMsg = err.message.includes(
-        'not present in uploaded recipient list'
-      )
-        ? 'Attributes found in template not present in uploaded recipient list.'
-        : err.message
-      sendException(exceptionMsg)
     } finally {
       setIsUploading(false)
+    }
+  }
+
+  // Hide csv error from previous upload and delete from db
+  function clearCsvStatus() {
+    if (campaignId) {
+      setCsvInfo((info) => ({ ...info, csvError: undefined }))
+      deleteCsvStatus(+campaignId)
     }
   }
 
@@ -121,36 +127,24 @@ const TelegramRecipients = ({
         CSV file must include a <b>recipient</b> column with recipients&apos;
         mobile numbers
       </p>
-      {numRecipients > 0 && (
-        <InfoBlock>
-          <li>
-            <i className="bx bx-user-check"></i>
-            <p>{numRecipients} recipients</p>
-          </li>
-          {csvFilename && (
-            <li>
-              <i className="bx bx-file"></i>
-              <p>{csvFilename}</p>
-            </li>
-          )}
-        </InfoBlock>
-      )}
 
-      <div className={styles.uploadActions}>
+      <CsvUpload
+        isCsvProcessing={isCsvProcessing}
+        csvInfo={csvInfo}
+        onErrorClose={clearCsvStatus}
+      >
         <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
         <p>or</p>
-        <SampleCsv params={params} defaultRecipient="88888888" />
-      </div>
+        <SampleCsv params={params} defaultRecipient="81234567" />
+      </CsvUpload>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
 
       <div className="separator"></div>
-      {preview.body && (
+      {!isCsvProcessing && numRecipients > 0 && (
         <>
           <p className={styles.greyText}>Message preview</p>
-          <PreviewBlock
-            body={preview.body.replace(/\n/g, '<br />')}
-          ></PreviewBlock>
+          <PreviewBlock body={preview.body}></PreviewBlock>
           <div className="separator"></div>
         </>
       )}

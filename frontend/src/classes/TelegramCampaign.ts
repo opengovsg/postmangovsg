@@ -7,6 +7,10 @@ export enum TelegramProgress {
   Send,
 }
 
+export interface TelegramPreview {
+  body: string
+}
+
 export class TelegramCampaign extends Campaign {
   body: string
   params: Array<string>
