@@ -29,9 +29,9 @@ jobs:
           access_key_id: $AWS_ACCESS_KEY_ID
           secret_access_key: $AWS_SECRET_ACCESS_KEY
           region: $AWS_DEFAULT_REGION
-          app: "postmangovsg-backend"
-          env: "postmangovsg-backend-staging"
-          bucket_name: "postmangovsg-backend-elasticbeanstalk"
+          app: "postmangovsg"
+          env: "postmangovsg-staging-40ffadb"
+          bucket_name: "postmangovsg-elasticbeanstalk-appversion"
           on:
             branch: $STAGING_BRANCH
         - provider: elasticbeanstalk
@@ -39,9 +39,9 @@ jobs:
           access_key_id: $AWS_ACCESS_KEY_ID
           secret_access_key: $AWS_SECRET_ACCESS_KEY
           region: $AWS_DEFAULT_REGION
-          app: "postmangovsg-backend"
-          env: "postmangovsg-backend-prod"
-          bucket_name: "postmangovsg-backend-elasticbeanstalk"
+          app: "postmangovsg"
+          env: "postmangovsg-production-4d26c37"
+          bucket_name: "postmangovsg-elasticbeanstalk-appversion"
           on:
             branch: $PRODUCTION_BRANCH
     - name: worker
@@ -53,12 +53,12 @@ jobs:
         - npm run lint-no-fix
       deploy:
         - provider: script
-          script: ./deploy.sh postmangovsg-workers staging-sending staging-logger
+          script: ./deploy.sh postmangovsg-workers staging-sending staging-logging
           on:
             branch: $STAGING_BRANCH
             condition: "$DEPLOY_WORKER = true"
         - provider: script
-          script: ./deploy.sh postmangovsg-workers prod-sending prod-logger
+          script: ./deploy.sh postmangovsg-workers prod-sending prod-logging
           on:
             branch: $PRODUCTION_BRANCH
             condition: "$DEPLOY_WORKER = true"
@@ -114,7 +114,7 @@ jobs:
             branch: $PRODUCTION_BRANCH
         - provider: lambda
           edge: true
-          function_name: postman-api-gateway-authorizer
+          function_name: authorizer
           region: $AWS_DEFAULT_REGION
           role: $POSTMAN_AUTHORIZER_ROLE
           runtime: nodejs12.x
