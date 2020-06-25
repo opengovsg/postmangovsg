@@ -71,6 +71,14 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     })
   )
 
+  // Prevent browser caching on IE11
+  app.use((_req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('Cache-control', 'no-cache')
+    // for HTTP1.0 backward compatibility
+    res.setHeader('Pragma', 'no-cache')
+    next()
+  })
+
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
   })

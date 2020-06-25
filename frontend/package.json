@@ -21,11 +21,13 @@
     "axios": "^0.19.2",
     "boxicons": "^2.0.5",
     "classnames": "^2.2.6",
+    "downloadjs": "^1.4.7",
     "escape-html": "^1.0.3",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "papaparse": "^5.2.0",
     "react": "^16.13.1",
+    "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.13.1",
     "react-ga": "^2.7.0",
     "react-lottie": "^1.2.3",
@@ -41,6 +43,7 @@
   "devDependencies": {
     "@sentry/cli": "^1.54.0",
     "@types/classnames": "^2.2.10",
+    "@types/downloadjs": "^1.4.2",
     "@types/escape-html": "0.0.20",
     "@types/lodash": "^4.14.150",
     "@types/node": "^12.12.34",
@@ -71,7 +74,8 @@
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 safari version",
+      "IE 11"
     ]
   },
   "lint-staged": {

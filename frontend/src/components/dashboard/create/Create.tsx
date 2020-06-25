@@ -66,10 +66,11 @@ const Create = () => {
                 : 'Back to campaigns'}
             </PrimaryButton>
           </TitleBar>
-          {isLoading && (
+          {isLoading ? (
             <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
+          ) : (
+            renderCreateChannel()
           )}
-          {!isLoading && renderCreateChannel()}
         </>
       ) : (
         <p>loading..</p>

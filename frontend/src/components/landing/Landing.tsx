@@ -31,12 +31,15 @@ import momAgencyImg from 'assets/img/landing/mom-gray.png'
 import userImg from 'assets/img/landing/moe-circle.png'
 
 import onboardingImg from 'assets/img/landing/onboard.svg'
+import landingHeroImg from 'assets/img/landing/landing-hero.png'
 
 import whyUse1 from 'assets/mp4/why-use-1.mp4'
 import whyUse2 from 'assets/mp4/why-use-2.mp4'
 import whyUse3 from 'assets/mp4/why-use-3.mp4'
 
 import landingAnimation from 'assets/lottie/landing.json'
+
+const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 
 const Landing = () => {
   const authContext = useContext(AuthContext)
@@ -191,16 +194,20 @@ const Landing = () => {
             </div>
           </div>
           <div className={styles.landingAnimation}>
-            <Lottie
-              options={{
-                loop: false,
-                autoplay: true,
-                animationData: landingAnimation,
-                rendererSettings: {
-                  preserveAspectRatio: 'xMidYMid slice',
-                },
-              }}
-            />
+            {isIE11 ? (
+              <img src={landingHeroImg} className={styles.landingHero} />
+            ) : (
+              <Lottie
+                options={{
+                  loop: false,
+                  autoplay: true,
+                  animationData: landingAnimation,
+                  rendererSettings: {
+                    preserveAspectRatio: 'xMidYMid slice',
+                  },
+                }}
+              />
+            )}
           </div>
         </div>
         <div className={styles.agencyContainer}>
