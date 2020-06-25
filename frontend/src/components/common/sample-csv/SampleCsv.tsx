@@ -23,7 +23,7 @@ const SampleCsv = ({
       ...times(headers.length - 1, constant('abc')),
     ]
 
-    const content = [`${headers.join(',')}`, `${body.join(',')}`].join('\n')
+    const content = [`${headers.join(',')}`, `${body.join(',')}`].join('\r\n')
 
     download(content, 'postman_sample.csv', 'text/csv')
 
