@@ -6,9 +6,9 @@ RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-
 
 WORKDIR /usr/home/postmangovsg/backend
 
-# COPY modules /usr/home/postmangovsg/modules
+COPY modules /usr/home/postmangovsg/modules
 
-# RUN cd /usr/home/postmangovsg/modules/postman-templating && npm ci
+RUN cd /usr/home/postmangovsg/modules/postman-templating && npm ci
 
 COPY backend/package* ./
 RUN npm ci

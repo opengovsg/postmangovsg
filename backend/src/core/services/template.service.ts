@@ -12,9 +12,9 @@ import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
 import { Campaign } from '@core/models'
 import { CsvStatusInterface } from '@core/interfaces'
+import { CSVParams } from '@core/types'
 
 const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
-type CSVParams = { [key: string]: string }
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 const s3 = new S3({

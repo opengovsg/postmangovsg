@@ -5,10 +5,10 @@ import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
-  TemplateError,
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
+import { TemplateError } from 'postman-templating'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'

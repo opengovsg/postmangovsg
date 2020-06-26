@@ -1,16 +1,21 @@
 import CSVParse from 'csv-parse'
-import { CSVParams } from './types'
 import { isEmpty } from 'lodash'
-import { 
+import logger from '@core/logger'
+import {
   RecipientColumnMissing,
-  UnexpectedDoubleQuoteError
-} from './errors'
+  UnexpectedDoubleQuoteError,
+} from '@core/errors/s3.errors'
+
+import { CSVParams } from '@core/types'
+
 /**
  * Ensures that the recipient column exists and converts headers to lowercase
  * Deduplicates the csv by overriding the same recipient with newer records
  * @param readStream
  */
-export const parseCsv = async (readStream: NodeJS.ReadableStream): Promise<Array<CSVParams>> => {
+const parseCsv = async (
+  readStream: NodeJS.ReadableStream
+): Promise<Array<CSVParams>> => {
   const parser = CSVParse({
     delimiter: ',',
     trim: true,
@@ -44,6 +49,7 @@ export const parseCsv = async (readStream: NodeJS.ReadableStream): Promise<Array
         params.set(row[recipientIndex!], rowWithHeaders) // Deduplication
       }
     }
+    logger.info({ message: 'Parsing complete' })
     return Array.from(params.values())
   } catch (err) {
     if (err.message.includes('Invalid Opening Quote'))
@@ -52,4 +58,8 @@ export const parseCsv = async (readStream: NodeJS.ReadableStream): Promise<Array
       throw new UnexpectedDoubleQuoteError()
     throw err
   }
+}
+
+export const ParseCsvService = {
+  parseCsv,
 }
