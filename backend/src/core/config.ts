@@ -353,7 +353,17 @@ const config = convict({
           p: [],
           code: ['class'],
           pre: [],
-          a: ['href', 'title', 'target'],
+          a: ['href'],
+        },
+        safeAttrValue: (
+          tag: string,
+          name: string,
+          value: string
+        ): string | void => {
+          // Handle Telegram mention as xss-js does not recognize it as a valid url.
+          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+            return value
+          }
         },
         stripIgnoreTag: true,
       },
