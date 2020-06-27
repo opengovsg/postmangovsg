@@ -58,7 +58,13 @@
 .progressTitle {
   @include flex-horizontal;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  align-items: baseline;
+
+  h2 {
+    margin-right: 1rem;
+  }
 
   .pause {
     @include button($red);
@@ -73,12 +79,8 @@
     pointer-events: none;
   }
 
-  .progressMessage {
-    @include flex-horizontal;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    width: 100%;
+  a {
+    font-size: 1rem;
   }
 }
 

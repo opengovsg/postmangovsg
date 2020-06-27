@@ -11,7 +11,8 @@ import {
   ActionButton,
 } from 'components/common'
 import styles from './ProgressDetails.module.scss'
-
+import { OutboundLink } from 'react-ga'
+import { CONTACT_US_URL } from 'config'
 const ProgressDetails = ({
   campaignId,
   campaignName,
@@ -56,7 +57,21 @@ const ProgressDetails = ({
   }, [status, updatedAt, campaignId, error, invalid])
 
   function renderButton() {
-    if (isHalted) return null
+    if (isHalted) {
+      return (
+        <span>
+          Too many of your emails bounced.{' '}
+          <OutboundLink
+            eventLabel={CONTACT_US_URL}
+            to={CONTACT_US_URL}
+            target="_blank"
+          >
+            Contact us
+          </OutboundLink>{' '}
+          for details.
+        </span>
+      )
+    }
 
     if (!isSent) {
       return (
@@ -81,19 +96,13 @@ const ProgressDetails = ({
   function renderProgressTitle() {
     let progressMessage = null
     if (isHalted) {
-      progressMessage = (
-        <>
-          <h2>Halted</h2>
-          <span>Too many of your emails bounced. Contact us for details</span>
-        </>
-      )
+      progressMessage = 'Halted'
     } else if (isComplete) {
-      progressMessage = <h2>Sending completed</h2>
+      progressMessage = 'Sending completed'
     } else {
-      progressMessage = <h2>Progress</h2>
+      progressMessage = 'Progress'
     }
-
-    return <div className={styles.progressMessage}>{progressMessage}</div>
+    return <h2>{progressMessage}</h2>
   }
 
   return (
