@@ -122,10 +122,11 @@ export const haltCampaignIfThresholdExceeded = async (campaignId?: number) => {
       )
 
       try {
-        await sequelize?.transaction(async (_t) => {
+        await sequelize?.transaction(async (transaction) => {
           await sequelize?.query(`SELECT stop_jobs(:campaignId)`, {
             replacements: { campaignId },
             type: QueryTypes.SELECT,
+            transaction,
           })
 
           await sequelize?.query(
@@ -133,6 +134,7 @@ export const haltCampaignIfThresholdExceeded = async (campaignId?: number) => {
             {
               replacements: { campaignId },
               type: QueryTypes.UPDATE,
+              transaction,
             }
           )
         })
