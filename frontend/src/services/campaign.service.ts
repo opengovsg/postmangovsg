@@ -89,9 +89,10 @@ export async function getCampaignDetails(
 
 export async function createCampaign(
   name: string,
-  type: ChannelType
+  type: ChannelType,
+  protect: boolean
 ): Promise<Campaign> {
-  return axios.post('/campaigns', { name, type }).then((response) => {
+  return axios.post('/campaigns', { name, type, protect }).then((response) => {
     return new Campaign(response.data)
   })
 }

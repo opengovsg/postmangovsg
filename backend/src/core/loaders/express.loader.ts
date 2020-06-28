@@ -46,7 +46,10 @@ const sentrySessionMiddleware = (
   next()
 }
 
-Sentry.init({ dsn: config.get('sentryDsn') })
+Sentry.init({
+  dsn: config.get('sentryDsn'),
+  environment: config.get('env'),
+})
 
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
@@ -68,6 +71,14 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     })
   )
 
+  // Prevent browser caching on IE11
+  app.use((_req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('Cache-control', 'no-cache')
+    // for HTTP1.0 backward compatibility
+    res.setHeader('Pragma', 'no-cache')
+    next()
+  })
+
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
   })
@@ -75,8 +86,8 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(sentrySessionMiddleware)
 
   app.use('/v1', v1Router)
-  app.use(Sentry.Handlers.errorHandler())
   app.use(celebrateErrorMiddleware())
+  app.use(Sentry.Handlers.errorHandler())
 
   app.use(
     (

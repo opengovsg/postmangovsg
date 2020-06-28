@@ -12,7 +12,6 @@ import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { Campaign } from '@core/models'
-import { SmsMessage } from '@sms/models'
 
 /**
  * Store template subject and body in sms template table.
@@ -33,7 +32,6 @@ const storeTemplate = async (
     // extract params from template, save to db (this will be done with hook)
     const {
       check,
-      numRecipients,
       valid,
       updatedTemplate,
     }: StoreTemplateOutput = await SmsTemplateService.storeTemplate({
@@ -46,7 +44,7 @@ const storeTemplate = async (
         message:
           'Please re-upload your recipient list as template has changed.',
         extra_keys: check.extraKeys,
-        num_recipients: numRecipients,
+        num_recipients: 0,
         valid: false,
         template: {
           body: updatedTemplate?.body,
@@ -55,6 +53,7 @@ const storeTemplate = async (
         },
       })
     } else {
+      const numRecipients = await StatsService.getNumRecipients(+campaignId)
       return res.status(200).json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
@@ -77,6 +76,7 @@ const storeTemplate = async (
  * Updates the campaign and sms_messages table in a transaction, rolling back when either fails.
  * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
  * For sms_messages table, existing records are deleted and new ones are bulk inserted.
+ * Then update statistics with new unsent count
  * @param key
  * @param campaignId
  * @param filename
@@ -208,9 +208,7 @@ const pollCsvStatusHandler = async (
     let numRecipients, preview
     if (!isCsvProcessing) {
       ;[numRecipients, preview] = await Promise.all([
-        SmsMessage.count({
-          where: { campaignId: +campaignId },
-        }),
+        StatsService.getNumRecipients(+campaignId),
         SmsService.getHydratedMessage(+campaignId),
       ])
     }

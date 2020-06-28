@@ -1,0 +1,9 @@
+// Removes IE11 clear button in text inputs
+input::-ms-clear {
+  display: none;
+}
+
+// margin-block and inline not supported on ie
+p {
+  margin: 0 0 1rem;
+}

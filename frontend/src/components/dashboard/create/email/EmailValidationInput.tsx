@@ -5,22 +5,17 @@ import { TextInputWithButton } from 'components/common'
 
 const EmailValidationInput = ({
   onClick,
-  buttonDisabled,
 }: {
   onClick: (recipient: string) => any
-  buttonDisabled?: boolean
 }) => {
   const [recipient, setRecipient] = useState('')
-  const [isValidating, setIsValidating] = useState(false)
 
   function isInvalidRecipient() {
     return !isEmail(recipient)
   }
 
   async function onClickHandler() {
-    setIsValidating(true)
     await onClick(recipient)
-    setIsValidating(false)
     setRecipient('')
   }
 
@@ -30,18 +25,15 @@ const EmailValidationInput = ({
       value={recipient}
       onChange={setRecipient}
       onClick={onClickHandler}
-      inputDisabled={isValidating}
-      buttonDisabled={isInvalidRecipient() || isValidating || buttonDisabled}
-    >
-      {isValidating ? (
-        'Sending...'
-      ) : (
+      buttonDisabled={isInvalidRecipient()}
+      buttonLabel={
         <>
           Send test email
           <i className="bx bx-envelope-open"></i>
         </>
-      )}
-    </TextInputWithButton>
+      }
+      loadingButtonLabel="Sending..."
+    />
   )
 }
 
