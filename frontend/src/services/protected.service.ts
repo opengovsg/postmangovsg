@@ -14,6 +14,9 @@ export async function fetchMessage(id: string, password: string) {
     const decryptedData = await decryptData(encryptedData, password)
     return decryptedData
   } catch (err) {
+    /**
+     * Handle and obfuscate error
+     */
     throw new Error(err)
   }
 }

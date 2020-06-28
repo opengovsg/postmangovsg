@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import Lottie from 'react-lottie'
 import { fetchMessage } from 'services/protected.service'
 
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import styles from './Protected.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
-import landingAnimation from 'assets/lottie/landing.json'
+import landingHero from 'assets/img/landing/landing-hero.png'
 
 const Protected = () => {
   const { id } = useParams()
@@ -26,36 +25,24 @@ const Protected = () => {
   }
 
   return (
-    <div className={styles.protected}>
-      <div className={styles.modal}>
+    <div className={styles.outer}>
+      <div className={styles.inner}>
         {!decryptedMessage && (
           <>
             <img src={appLogo} />
-            <Lottie
-              options={{
-                loop: false,
-                autoplay: true,
-                animationData: landingAnimation,
-                rendererSettings: {
-                  preserveAspectRatio: 'xMidYMid slice',
-                },
-              }}
-            />
-            <h1>You&apos;ve got mail</h1>
-            <div>
-              <TextInputWithButton
-                type="password"
-                className={styles.input}
-                placeholder="Enter password"
-                value={password}
-                onChange={setPassword}
-                buttonDisabled={!password}
-                onClick={onAccessMail}
-              >
-                Access mail
-              </TextInputWithButton>
-              <ErrorBlock>{errorMsg}</ErrorBlock>
-            </div>
+            <img src={landingHero} className={styles.landingHero} />
+            <h2>You&apos;ve got mail</h2>
+            <TextInputWithButton
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={setPassword}
+              buttonDisabled={!password}
+              onClick={onAccessMail}
+              buttonLabel="Access Mail"
+              loadingButtonLabel="Decrypting your mail"
+            ></TextInputWithButton>
+            <ErrorBlock>{errorMsg}</ErrorBlock>
           </>
         )}
         {decryptedMessage}
