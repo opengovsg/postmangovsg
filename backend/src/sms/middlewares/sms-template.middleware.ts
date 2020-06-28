@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import config from '@core/config'
 import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
@@ -9,12 +8,10 @@ import {
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
-import { CampaignService, TemplateService } from '@core/services'
-import { SmsTemplateService } from '@sms/services'
+import { CampaignService, TemplateService, StatsService } from '@core/services'
+import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { Campaign } from '@core/models'
-
-const uploadTimeout = Number(config.get('express.uploadCompleteTimeout'))
 
 /**
  * Store template subject and body in sms template table.
@@ -35,7 +32,6 @@ const storeTemplate = async (
     // extract params from template, save to db (this will be done with hook)
     const {
       check,
-      numRecipients,
       valid,
       updatedTemplate,
     }: StoreTemplateOutput = await SmsTemplateService.storeTemplate({
@@ -48,7 +44,7 @@ const storeTemplate = async (
         message:
           'Please re-upload your recipient list as template has changed.',
         extra_keys: check.extraKeys,
-        num_recipients: numRecipients,
+        num_recipients: 0,
         valid: false,
         template: {
           body: updatedTemplate?.body,
@@ -57,6 +53,7 @@ const storeTemplate = async (
         },
       })
     } else {
+      const numRecipients = await StatsService.getNumRecipients(+campaignId)
       return res.status(200).json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
@@ -76,17 +73,18 @@ const storeTemplate = async (
 }
 
 /**
- * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
+ * Updates the campaign and sms_messages table in a transaction, rolling back when either fails.
  * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
- * For email_messages table, existing records are deleted and new ones are bulk inserted.
+ * For sms_messages table, existing records are deleted and new ones are bulk inserted.
+ * Then update statistics with new unsent count
  * @param key
  * @param campaignId
  * @param filename
  * @param records
  */
 const updateCampaignAndMessages = async (
+  campaignId: number,
   key: string,
-  campaignId: string,
   filename: string,
   records: MessageBulkInsertInterface[]
 ): Promise<void> => {
@@ -95,18 +93,21 @@ const updateCampaignAndMessages = async (
   try {
     transaction = await Campaign.sequelize?.transaction()
     // Updates metadata in project
-    await CampaignService.updateCampaignS3Metadata(
-      key,
+    await TemplateService.replaceCampaignS3Metadata(
       campaignId,
+      key,
       filename,
       transaction
     )
 
     // START populate template
-    await SmsTemplateService.addToMessageLogs(+campaignId, records, transaction)
+    await SmsTemplateService.addToMessageLogs(campaignId, records, transaction)
+
+    // Update statistic table
+    await StatsService.setNumRecipients(campaignId, records.length, transaction)
 
     // Set campaign to valid
-    await CampaignService.setValid(+campaignId, transaction)
+    await CampaignService.setValid(campaignId, transaction)
 
     transaction?.commit()
   } catch (err) {
@@ -128,19 +129,12 @@ const uploadCompleteHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  res.setTimeout(uploadTimeout, async () => {
-    if (!res.headersSent) {
-      return res.status(408).json('Request timed out')
-    }
-    return
-  })
   try {
     const { campaignId } = req.params
-    // TODO: validate if project is in editable state
 
     // extract s3Key from transactionId
     const { transaction_id: transactionId, filename } = req.body
-    const s3Key: string = TemplateService.extractS3Key(transactionId)
+    const s3Key = TemplateService.extractS3Key(transactionId)
 
     // check if template exists
     const smsTemplate = await SmsTemplateService.getFilledTemplate(+campaignId)
@@ -150,54 +144,108 @@ const uploadCompleteHandler = async (
 
     // carry out templating / hydration
     // - download from s3
+    const { records } = await SmsTemplateService.client.testHydration({
+      campaignId: +campaignId,
+      s3Key,
+      templateBody: smsTemplate.body as string,
+      templateParams: smsTemplate.params as string[],
+    })
+
+    if (SmsTemplateService.hasInvalidSmsRecipient(records)) {
+      throw new InvalidRecipientError()
+    }
+
+    // Store temp filename
+    await TemplateService.storeS3TempFilename(+campaignId, filename)
+
     try {
-      const {
-        records,
-        hydratedRecord,
-      } = await SmsTemplateService.client.testHydration({
-        campaignId: +campaignId,
-        s3Key,
-        templateBody: smsTemplate.body as string,
-        templateParams: smsTemplate.params as string[],
-      })
+      // Return early because bulk insert is slow
+      res.sendStatus(202)
 
-      if (SmsTemplateService.hasInvalidSmsRecipient(records))
-        throw new InvalidRecipientError()
-
-      const recipientCount = records.length
-
-      await updateCampaignAndMessages(s3Key, campaignId, filename, records)
-
-      if (!res.headersSent) {
-        return res.json({
-          num_recipients: recipientCount,
-          preview: hydratedRecord,
-        })
-      }
+      // Slow bulk insert
+      await updateCampaignAndMessages(+campaignId, s3Key, filename, records)
     } catch (err) {
+      // Do not return any response since it has already been sent
       logger.error(
-        `Error parsing file for campaign ${campaignId}. ${err.stack}`
+        `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
-      throw err
+      // Store error to return on poll
+      TemplateService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
-    if (!res.headersSent) {
-      const userErrors = [
-        RecipientColumnMissing,
-        MissingTemplateKeysError,
-        InvalidRecipientError,
-        UnexpectedDoubleQuoteError,
-      ]
+    const userErrors = [
+      RecipientColumnMissing,
+      MissingTemplateKeysError,
+      InvalidRecipientError,
+      UnexpectedDoubleQuoteError,
+    ]
 
-      if (userErrors.some((errType) => err instanceof errType)) {
-        return res.status(400).json({ message: err.message })
-      }
-      return next(err)
+    if (userErrors.some((errType) => err instanceof errType)) {
+      return res.status(400).json({ message: err.message })
     }
+    return next(err)
+  }
+}
+
+/*
+ * Returns status of csv processing
+ */
+const pollCsvStatusHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const {
+      isCsvProcessing,
+      filename,
+      tempFilename,
+      error,
+    } = await TemplateService.getCsvStatus(+campaignId)
+
+    // If done processing, returns num recipients and preview msg
+    let numRecipients, preview
+    if (!isCsvProcessing) {
+      ;[numRecipients, preview] = await Promise.all([
+        StatsService.getNumRecipients(+campaignId),
+        SmsService.getHydratedMessage(+campaignId),
+      ])
+    }
+
+    res.json({
+      is_csv_processing: isCsvProcessing,
+      csv_filename: filename,
+      temp_csv_filename: tempFilename,
+      csv_error: error,
+      num_recipients: numRecipients,
+      preview,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+/*
+ * Deletes csv error and temp csv name from db
+ */
+const deleteCsvErrorHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    await TemplateService.deleteS3TempKeys(+campaignId)
+    res.sendStatus(200)
+  } catch (e) {
+    next(e)
   }
 }
 
 export const SmsTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
+  pollCsvStatusHandler,
+  deleteCsvErrorHandler,
 }

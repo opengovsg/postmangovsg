@@ -6,7 +6,7 @@ import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
-import { Campaign } from '@core/models'
+import { Campaign, Statistic } from '@core/models'
 import TemplateClient from '@core/services/template-client.class'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
@@ -111,11 +111,20 @@ const checkNewTemplateParams = async ({
     // warn if params from s3 file are not a superset of saved params, remind user to re-upload a new file
     const extraKeysInTemplate = difference(updatedTemplate.params, paramsFromS3)
 
-    // the entries (message_logs) from the uploaded file are no longer valid, so we delete
-    await EmailMessage.destroy({
-      where: {
-        campaignId,
-      },
+    // delete entries (message_logs) from the uploaded file and stored count since they are no longer valid,
+    await EmailMessage.sequelize?.transaction(async (transaction) => {
+      await EmailMessage.destroy({
+        where: {
+          campaignId,
+        },
+        transaction,
+      })
+      await Statistic.destroy({
+        where: {
+          campaignId,
+        },
+        transaction,
+      })
     })
 
     return { reupload: true, extraKeys: extraKeysInTemplate }
@@ -159,9 +168,10 @@ const storeTemplate = async ({
     subject: client.replaceNewLinesAndSanitize(subject),
     body: client.replaceNewLinesAndSanitize(body),
     replyTo,
-    campaignId: +campaignId,
+    campaignId,
   })
 
+  // TODO: this is slow when table is large
   const firstRecord = await EmailMessage.findOne({
     where: { campaignId },
   })
@@ -169,18 +179,17 @@ const storeTemplate = async ({
   // if recipients list has been uploaded before, have to check if updatedTemplate still matches list
   if (firstRecord && updatedTemplate.params) {
     const check = await checkNewTemplateParams({
-      campaignId: +campaignId,
+      campaignId,
       updatedTemplate,
       firstRecord,
     })
     if (check.reupload) {
-      return { updatedTemplate, numRecipients: 0, check }
+      return { updatedTemplate, check }
     }
   }
 
-  const numRecipients = await EmailMessage.count({ where: { campaignId } })
-  const campaign = await Campaign.findByPk(+campaignId)
-  return { updatedTemplate, numRecipients, valid: campaign?.valid }
+  const campaign = await Campaign.findByPk(campaignId)
+  return { updatedTemplate, valid: campaign?.valid }
 }
 
 /**
@@ -227,6 +236,7 @@ const addToMessageLogs = async (
       const batch = chunks[idx]
       await EmailMessage.bulkCreate(batch, { transaction })
     }
+
     logger.info({ message: `Finished populateEmailTemplate for ${campaignId}` })
   } catch (err) {
     logger.error(`EmailMessage: destroy / bulkcreate failure. ${err.stack}`)

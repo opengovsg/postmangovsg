@@ -7,8 +7,8 @@ import React, {
 } from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { getUser, logout } from 'services/auth.service'
-import { setGAUserId, initializeGA, sendPageView } from 'services/ga.service'
+import { getUser, logout, setUserAnalytics } from 'services/auth.service'
+import { initializeGA, sendPageView } from 'services/ga.service'
 
 interface ContextProps {
   isAuthenticated: boolean
@@ -38,8 +38,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       setEmail(user?.email || '')
 
       initializeGA()
-      // set user id to track logged in user
-      setGAUserId(user?.id || null)
+      setUserAnalytics(user)
     } catch (err) {
       // is unauthorized
     }
@@ -53,8 +52,6 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       async function (error) {
         if (error.response && error.response.status === 401) {
           await logout()
-          setAuthenticated(false)
-          setGAUserId(null)
         }
         return Promise.reject(error)
       }

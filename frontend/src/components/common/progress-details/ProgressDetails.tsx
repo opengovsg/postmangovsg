@@ -15,10 +15,10 @@ const ProgressDetails = ({
   sentAt: Date
   numRecipients: number
   stats: CampaignStats
-  handlePause: Function
-  handleRetry: Function
+  handlePause: () => Promise<void>
+  handleRetry: () => Promise<void>
 }) => {
-  const { status, error, unsent, sent } = stats
+  const { status, error, unsent, sent, invalid } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
   useEffect(() => {
@@ -121,6 +121,16 @@ const ProgressDetails = ({
               </td>
               <td className={'md'}>Sent to recipient</td>
               <td className={'sm'}>{sent}</td>
+            </tr>
+            <tr>
+              <td className={cx(styles.status, 'md')}>
+                <i
+                  className={cx(styles.icon, styles.grey, 'bx bx-minus-circle')}
+                ></i>
+                Invalid
+              </td>
+              <td className={'md'}>Recipient does not exist</td>
+              <td className={'sm'}>{invalid}</td>
             </tr>
           </tbody>
         </table>

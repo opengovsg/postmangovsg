@@ -1,3 +1,4 @@
+import { mapKeys } from 'lodash'
 import {
   BelongsTo,
   Column,
@@ -64,6 +65,39 @@ export class Campaign extends Model<Campaign> {
   })
   valid!: boolean
 
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  })
+  protect!: boolean
+
   @HasOne(() => Statistic)
   statistic?: Statistic
+
+  // Sets key in s3Object json
+  static async updateS3ObjectKey(
+    id: number,
+    objectToMerge: CampaignS3ObjectInterface
+  ): Promise<void> {
+    await Campaign.sequelize?.transaction(async (transaction) => {
+      const campaign = await Campaign.findByPk(id, {
+        transaction,
+      })
+      if (!campaign) {
+        throw new Error('Invalid campaign')
+      }
+      if (!campaign.s3Object) {
+        campaign.s3Object = {}
+      }
+      const transformedObject = mapKeys(
+        objectToMerge,
+        (_value, key) => `s3Object.${key}`
+      )
+      // Set will ensure that the other keys in the JSON/JSONB are left unchanged
+      campaign.set(transformedObject)
+      await campaign.save({ transaction })
+    })
+    return
+  }
 }

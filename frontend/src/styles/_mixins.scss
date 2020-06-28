@@ -53,6 +53,14 @@ $widescreen: 1216px;
   line-height: 1.5rem;
 }
 
+@mixin spinner {
+  position: absolute;
+  width: 3rem;
+  font-size: 3rem;
+  margin-top: 4rem;
+  left: calc(50vw - 1.5rem);
+}
+
 @mixin button($background-color) {
   background-color: $background-color;
   display: inline-flex;
@@ -95,6 +103,7 @@ $widescreen: 1216px;
 
   &:disabled {
     background-color: $light-grey;
+    cursor: not-allowed;
   }
 
   i {
@@ -126,7 +135,7 @@ $widescreen: 1216px;
     }
   }
 
-  i {
+  :global(i.bx) {
     margin-top: 0.2rem;
     margin-right: 1rem;
     font-size: 1.3rem;

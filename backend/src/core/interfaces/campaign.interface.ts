@@ -1,9 +1,18 @@
 import { ChannelType } from '@core/constants'
 
 export interface CampaignS3ObjectInterface {
-  key: string
-  bucket: string
-  filename: string
+  key?: string
+  bucket?: string
+  filename?: string
+  temp_filename?: string
+  error?: string
+}
+
+export interface CsvStatusInterface {
+  isCsvProcessing: boolean
+  filename?: string
+  tempFilename?: string
+  error?: string
 }
 
 export interface CampaignInterface {
@@ -23,6 +32,8 @@ export interface CampaignDetails {
   valid: boolean
   has_credential: boolean
   csv_filename: string
+  is_csv_processing: boolean
+  protect: boolean
   num_recipients: number
   email_templates?: {
     body: string
@@ -37,11 +48,15 @@ export interface CampaignDetails {
   }
 }
 
-export interface CampaignStats {
+export interface CampaignStats extends CampaignStatsCount {
+  status: string
+}
+
+export interface CampaignStatsCount {
   error: number
   unsent: number
   sent: number
-  status: string
+  invalid: number
 }
 /**
  * @swagger
@@ -55,6 +70,8 @@ export interface CampaignStats {
  *          unsent:
  *            type: number
  *          sent:
+ *            type: number
+ *          invalid:
  *            type: number
  *          status:
  *            $ref: '#/components/schemas/JobStatus'

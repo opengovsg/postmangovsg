@@ -58,11 +58,9 @@ export async function getCampaignStats(
   campaignId: number
 ): Promise<CampaignStats> {
   return axios.get(`/campaign/${campaignId}/stats`).then((response) => {
-    const { error, unsent, sent, status } = response.data
+    const { status, ...counts } = response.data
     return new CampaignStats({
-      error,
-      unsent,
-      sent,
+      ...counts,
       status: parseStatus(status),
     })
   })
@@ -91,9 +89,10 @@ export async function getCampaignDetails(
 
 export async function createCampaign(
   name: string,
-  type: ChannelType
+  type: ChannelType,
+  protect: boolean
 ): Promise<Campaign> {
-  return axios.post('/campaigns', { name, type }).then((response) => {
+  return axios.post('/campaigns', { name, type, protect }).then((response) => {
     return new Campaign(response.data)
   })
 }

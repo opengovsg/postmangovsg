@@ -1,10 +1,49 @@
-import React from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import cx from 'classnames'
 
 import styles from './PrimaryButton.module.scss'
 
-const PrimaryButton = (props: any) => {
-  const { className, children, alignRight, ...otherProps } = props
+interface PrimaryButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  alignRight?: boolean
+  onClick?: (...args: any[]) => void | Promise<void>
+}
+
+const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
+  alignRight,
+  className,
+  disabled,
+  onClick,
+  children,
+  ...otherProps
+}) => {
+  const [asyncLoading, setAsyncLoading] = useState(false)
+  const isMounted = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+
+  const asyncOnClick = useMemo(
+    () =>
+      onClick
+        ? async () => {
+            setAsyncLoading(true)
+            try {
+              await onClick()
+            } finally {
+              // Only enable if button is still mounted
+              if (isMounted.current) {
+                setAsyncLoading(false)
+              }
+            }
+          }
+        : undefined,
+    [onClick]
+  )
+
   return (
     <button
       className={cx(
@@ -12,6 +51,8 @@ const PrimaryButton = (props: any) => {
         { [styles.alignRight]: alignRight },
         className
       )}
+      disabled={disabled || asyncLoading}
+      onClick={asyncOnClick}
       {...otherProps}
     >
       {children}

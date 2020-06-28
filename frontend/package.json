@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.5.2",
+  "version": "1.7.2",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
@@ -9,9 +9,12 @@
     "eject": "react-scripts eject",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx --cache . && prettier --check '**/*.{md,scss}'",
     "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx --cache --fix . && prettier --write '**/*.{md,scss}' --loglevel warn",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "get-sentry-release": "sentry-cli releases propose-version",
+    "upload-source-map": "node sentry.js"
   },
   "dependencies": {
+    "@sentry/browser": "^5.15.5",
     "@types/papaparse": "^5.0.3",
     "@types/react-lottie": "^1.2.5",
     "@types/validator": "^13.0.0",
@@ -19,6 +22,7 @@
     "boxicons": "^2.0.5",
     "buffer": "^5.6.0",
     "classnames": "^2.2.6",
+    "downloadjs": "^1.4.7",
     "escape-html": "^1.0.3",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
@@ -39,7 +43,9 @@
     "webcrypto-shim": "^0.1.5"
   },
   "devDependencies": {
+    "@sentry/cli": "^1.54.0",
     "@types/classnames": "^2.2.10",
+    "@types/downloadjs": "^1.4.2",
     "@types/escape-html": "0.0.20",
     "@types/lodash": "^4.14.150",
     "@types/node": "^12.12.34",
@@ -70,7 +76,8 @@
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 safari version",
+      "IE 11"
     ]
   },
   "lint-staged": {

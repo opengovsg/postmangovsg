@@ -1,0 +1,22 @@
+@import 'styles/_mixins';
+
+.uploadActions {
+  @include flex-horizontal;
+  justify-content: space-between;
+  width: 65%;
+
+  p {
+    margin-bottom: 0;
+  }
+
+  @include mobile() {
+    @include flex-vertical;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    p {
+      margin-bottom: 2rem;
+    }
+  }
+}

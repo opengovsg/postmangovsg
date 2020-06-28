@@ -82,6 +82,17 @@ $section-vertical-padding: 4rem;
       @include mobile {
         max-width: 100%;
       }
+
+      .landingHero {
+        max-width: 80%;
+        height: auto;
+        margin: 2rem auto;
+        display: block;
+
+        @include mobile {
+          width: 80vw;
+        }
+      }
     }
 
     .textContainer {
@@ -205,7 +216,7 @@ $section-vertical-padding: 4rem;
       @include flex-horizontal;
       justify-content: space-between;
       width: 45rem;
-      max-width: 100%;
+      max-width: 80vw;
 
       @include mobile() {
         @include flex-vertical;

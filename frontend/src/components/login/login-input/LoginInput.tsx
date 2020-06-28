@@ -1,6 +1,12 @@
 import React, { useState, useContext } from 'react'
+import * as Sentry from '@sentry/browser'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
-import { getOtpWithEmail, loginWithOtp, getUser } from 'services/auth.service'
+import {
+  getOtpWithEmail,
+  loginWithOtp,
+  getUser,
+  setUserAnalytics,
+} from 'services/auth.service'
 
 import styles from './LoginInput.module.scss'
 import { AuthContext } from 'contexts/auth.context'
@@ -26,7 +32,6 @@ const Login = () => {
   )
 
   const [otpSent, setOtpSent] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
   const [errorMsg, setErrorMsg] = useState(null)
@@ -45,7 +50,6 @@ const Login = () => {
       setErrorMsg(err.message)
       sendException(err.message)
     }
-    setIsLoading(false)
   }
 
   async function login() {
@@ -55,16 +59,14 @@ const Login = () => {
       setAuthenticated(true)
       setAuthContextEmail(email)
       const user = await getUser()
-      setGAUserId(user?.id || null)
+      setUserAnalytics(user)
     } catch (err) {
       setErrorMsg(err.message)
       sendException(err.message)
     }
-    setIsLoading(false)
   }
 
   function resetButton() {
-    setIsLoading(true)
     setErrorMsg(null)
     setCanResend(false)
   }
@@ -78,8 +80,8 @@ const Login = () => {
   function render(
     mainText: string,
     value: string,
-    onChange: Function,
-    onClick: Function,
+    onChange: (value: string) => void,
+    onClick: () => Promise<void>,
     buttonText: string[],
     placeholder: string,
     inputType?: string
@@ -99,12 +101,11 @@ const Login = () => {
           type={inputType}
           placeholder={placeholder}
           onChange={onChange}
-          buttonDisabled={!value || isLoading}
-          inputDisabled={isLoading}
+          buttonDisabled={!value}
           onClick={onClick}
-        >
-          {isLoading ? buttonText[1] : buttonText[0]}
-        </TextInputWithButton>
+          buttonLabel={buttonText[0]}
+          loadingButtonLabel={buttonText[1]}
+        />
         <ErrorBlock absolute={true}>{errorMsg}</ErrorBlock>
       </>
     )
