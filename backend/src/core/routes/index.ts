@@ -13,6 +13,10 @@ import statsRoutes from './stats.routes'
 // Import channel-specific routes
 import { smsCampaignRoutes, smsSettingsRoutes } from '@sms/routes'
 import { emailCampaignRoutes, emailSettingsRoutes } from '@email/routes'
+import {
+  telegramCampaignRoutes,
+  telegramSettingsRoutes,
+} from '@telegram/routes'
 
 const CHANNEL_ROUTES = Object.values(ChannelType).map(
   (route) => `/${route.toLowerCase()}`
@@ -97,6 +101,12 @@ router.use(
   emailCampaignRoutes
 )
 router.use(
+  '/campaign/:campaignId/telegram',
+  AuthMiddleware.isCookieOrApiKeyAuthenticated,
+  celebrate(campaignIdValidator),
+  telegramCampaignRoutes
+)
+router.use(
   '/campaign/:campaignId',
   AuthMiddleware.isCookieOrApiKeyAuthenticated,
   celebrate(campaignIdValidator),
@@ -112,6 +122,11 @@ router.use(
   '/settings/sms',
   AuthMiddleware.isCookieOrApiKeyAuthenticated,
   smsSettingsRoutes
+)
+router.use(
+  '/settings/telegram',
+  AuthMiddleware.isCookieOrApiKeyAuthenticated,
+  telegramSettingsRoutes
 )
 router.use(
   '/settings',

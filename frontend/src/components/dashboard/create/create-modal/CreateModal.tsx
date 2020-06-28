@@ -3,8 +3,11 @@ import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_CREDENTIALS_URL } from 'config'
-import { ChannelType, Campaign } from 'classes/Campaign'
+import {
+  GUIDE_SMS_CREDENTIALS_URL,
+  GUIDE_TELEGRAM_CREDENTIALS_URL,
+} from 'config'
+import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
@@ -48,36 +51,80 @@ const CreateModal = () => {
         </h5>
 
         <div className={styles.channelTypes}>
-          <PrimaryButton
-            className={cx(styles.button, {
-              [styles.active]: selectedChannel === ChannelType.SMS,
-            })}
-            onClick={() => setSelectedChannel(ChannelType.SMS)}
-          >
-            SMS
-            <i className={cx('bx', styles.icon, 'bx-message-detail')}></i>
-          </PrimaryButton>
-          <PrimaryButton
-            className={cx(styles.button, {
-              [styles.active]: selectedChannel === ChannelType.Email,
-            })}
-            onClick={() => setSelectedChannel(ChannelType.Email)}
-          >
-            Email
-            <i className={cx('bx', styles.icon, 'bx-envelope-open')}></i>
-          </PrimaryButton>
-        </div>
+          <div>
+            <PrimaryButton
+              className={cx(styles.button, {
+                [styles.active]: selectedChannel === ChannelType.SMS,
+              })}
+              onClick={() => setSelectedChannel(ChannelType.SMS)}
+            >
+              SMS
+              <i
+                className={cx('bx', styles.icon, channelIcons[ChannelType.SMS])}
+              ></i>
+            </PrimaryButton>
 
-        <p className={styles.subtext}>
-          Get your credentials ready.
-          <OutboundLink
-            eventLabel={GUIDE_CREDENTIALS_URL}
-            to={GUIDE_CREDENTIALS_URL}
-            target="_blank"
-          >
-            What is this?
-          </OutboundLink>
-        </p>
+            {selectedChannel === ChannelType.SMS && (
+              <p className={styles.subtext}>
+                Get your credentials ready.&nbsp;
+                <OutboundLink
+                  eventLabel={GUIDE_SMS_CREDENTIALS_URL}
+                  to={GUIDE_SMS_CREDENTIALS_URL}
+                  target="_blank"
+                >
+                  What is this?
+                </OutboundLink>
+              </p>
+            )}
+          </div>
+          <div>
+            <PrimaryButton
+              className={cx(styles.button, {
+                [styles.active]: selectedChannel === ChannelType.Telegram,
+              })}
+              onClick={() => setSelectedChannel(ChannelType.Telegram)}
+            >
+              Telegram
+              <i
+                className={cx(
+                  'bx',
+                  styles.icon,
+                  channelIcons[ChannelType.Telegram]
+                )}
+              ></i>
+            </PrimaryButton>
+            {selectedChannel === ChannelType.Telegram && (
+              <p className={styles.subtext}>
+                It is best to&nbsp;
+                <OutboundLink
+                  eventLabel={GUIDE_TELEGRAM_CREDENTIALS_URL}
+                  to={GUIDE_TELEGRAM_CREDENTIALS_URL}
+                  target="_blank"
+                >
+                  store and validate your credentials
+                </OutboundLink>
+                &nbsp;before you start.
+              </p>
+            )}
+          </div>
+          <div>
+            <PrimaryButton
+              className={cx(styles.button, {
+                [styles.active]: selectedChannel === ChannelType.Email,
+              })}
+              onClick={() => setSelectedChannel(ChannelType.Email)}
+            >
+              Email
+              <i
+                className={cx(
+                  'bx',
+                  styles.icon,
+                  channelIcons[ChannelType.Email]
+                )}
+              ></i>
+            </PrimaryButton>
+          </div>
+        </div>
       </div>
 
       <div className="separator"></div>

@@ -285,11 +285,18 @@ const config = convict({
       sensitive: true,
     },
   },
-  telegramBotToken: {
-    doc: 'API Key required to make use of Telegram APIs',
-    default: '',
-    env: 'TELEGRAM_BOT_TOKEN',
-    sensitive: true,
+  telegramOptions: {
+    webhookUrl: {
+      doc: 'Webhook URL to configure for all Telegram bots',
+      default: '',
+      env: 'TELEGRAM_WEBHOOK_URL',
+    },
+    telegramBotToken: {
+      doc: 'API Key required to make use of Telegram APIs',
+      default: '',
+      env: 'TELEGRAM_BOT_TOKEN',
+      sensitive: true,
+    },
   },
   maxRatePerJob: {
     doc: 'Number of messages that one worker can send at a time',
@@ -333,6 +340,31 @@ const config = convict({
       },
       sms: {
         whiteList: { br: [] },
+        stripIgnoreTag: true,
+      },
+      telegram: {
+        whiteList: {
+          b: [],
+          i: [],
+          u: [],
+          s: [],
+          strike: [],
+          del: [],
+          p: [],
+          code: ['class'],
+          pre: [],
+          a: ['href'],
+        },
+        safeAttrValue: (
+          tag: string,
+          name: string,
+          value: string
+        ): string | void => {
+          // Handle Telegram mention as xss-js does not recognize it as a valid url.
+          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+            return value
+          }
+        },
         stripIgnoreTag: true,
       },
     },
