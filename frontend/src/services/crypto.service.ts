@@ -2,6 +2,7 @@
 // instead of the node.js core module named buffer
 import { Buffer } from 'buffer/'
 import 'webcrypto-shim/webcrypto-shim'
+import bcryptjs from 'bcryptjs'
 
 const ENCRYPTION_METHOD = 'AES-GCM'
 const CIPHER_IV_DELIMITER = '.' // '.' used as delimiter since it's not part of base64 charlist
@@ -78,4 +79,8 @@ export async function decryptData(
   } catch (error) {
     throw new Error(`Error decrypting data: ${error.message}`)
   }
+}
+
+export async function hashData(text: string): Promise<string> {
+  return await bcryptjs.hash(text, 2)
 }
