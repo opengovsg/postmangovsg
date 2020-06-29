@@ -30,6 +30,16 @@ jobs:
           secret_access_key: $AWS_SECRET_ACCESS_KEY
           region: $AWS_DEFAULT_REGION
           app: "postmangovsg"
+          env: "postmangovsg-staging-telegram"
+          bucket_name: "postmangovsg-elasticbeanstalk-appversion"
+          on:
+            branch: $TELEGRAM_BRANCH
+        - provider: elasticbeanstalk
+          skip_cleanup: true
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_DEFAULT_REGION
+          app: "postmangovsg"
           env: "postmangovsg-staging-40ffadb"
           bucket_name: "postmangovsg-elasticbeanstalk-appversion"
           on:
@@ -168,7 +178,7 @@ jobs:
           publish: true
           zip: "../telegram-handler/code.zip"
           on:
-            branch: $STAGING_TELEGRAM_HANDLER_BRANCH
+            branch: $TELEGRAM_BRANCH
           environment_variables:
             - DB_URI=$STAGING_TELEGRAM_HANDLER_DB_URI
     - name: root
