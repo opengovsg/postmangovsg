@@ -132,13 +132,14 @@ const validateAndConfigureBot = async (
   telegramBotToken: string
 ): Promise<void> => {
   const telegramService = new TelegramClient(telegramBotToken)
+  let botId
   try {
-    await telegramService.getBotInfo()
+    botId = await telegramService.getBotInfo()
   } catch (err) {
     throw new Error(`Invalid token. ${err.message}`)
   }
 
-  const callbackUrl = config.get('telegramOptions.webhookUrl')
+  const callbackUrl = `${config.get('telegramOptions.webhookUrl')}/${botId}`
   await telegramService.registerCallbackUrl(callbackUrl)
 
   const commands = [
