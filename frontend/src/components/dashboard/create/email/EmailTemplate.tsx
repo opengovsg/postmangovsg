@@ -15,11 +15,13 @@ const EmailTemplate = ({
   subject: initialSubject,
   body: initialBody,
   replyTo: initialReplyTo,
+  protect,
   onNext,
 }: {
   subject: string
   body: string
   replyTo: string | null
+  protect: boolean
   onNext: (changes: any, next?: boolean) => void
 }) => {
   const [body, setBody] = useState(replaceNewLines(initialBody))
@@ -70,7 +72,7 @@ const EmailTemplate = ({
         value={subject}
         onChange={setSubject}
       />
-      <h4>Message</h4>
+      <h4>{protect ? 'Message A' : 'Message'}</h4>
       <p>
         To personalise your message, include keywords that are surrounded by
         double curly braces. The keywords in your message template should match

@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import * as Sentry from '@sentry/browser'
 import cx from 'classnames'
 import { OutboundLink } from 'react-ga'
 
@@ -9,7 +8,6 @@ import { GUIDE_URL } from 'config'
 import CreateModal from 'components/dashboard/create/create-modal'
 import { logout } from 'services/auth.service'
 import { AuthContext } from 'contexts/auth.context'
-import { setGAUserId } from 'services/ga.service'
 
 import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'

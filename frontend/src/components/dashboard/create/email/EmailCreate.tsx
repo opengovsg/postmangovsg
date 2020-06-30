@@ -5,6 +5,7 @@ import { EmailCampaign, EmailProgress } from 'classes/EmailCampaign'
 import { ProgressPane } from 'components/common'
 import EmailTemplate from './EmailTemplate'
 import EmailRecipients from './EmailRecipients'
+import ProtectedEmailRecipients from './ProtectedEmailRecipients'
 import EmailSend from './EmailSend'
 import EmailDetail from './EmailDetail'
 import EmailCredentials from './EmailCredentials'
@@ -57,10 +58,21 @@ const CreateEmail = ({
             subject={campaign.subject}
             body={campaign.body}
             replyTo={campaign.replyTo}
+            protect={campaign.protect}
             onNext={onNext}
           />
         )
       case EmailProgress.UploadRecipients:
+        if (campaign.protect) {
+          return (
+            <ProtectedEmailRecipients
+              params={campaign.params}
+              csvFilename={campaign.csvFilename}
+              numRecipients={campaign.numRecipients}
+              onNext={onNext}
+            />
+          )
+        }
         return (
           <EmailRecipients
             params={campaign.params}
@@ -74,6 +86,7 @@ const CreateEmail = ({
         return (
           <EmailCredentials
             hasCredential={campaign.hasCredential}
+            protect={campaign.protect}
             onNext={onNext}
           />
         )

@@ -95,3 +95,7 @@
 .newCredentialsButton {
   margin-top: 2rem;
 }
+
+.greenInfoBlock {
+  @include block(rgba($turquoise-green, 0.2), $turquoise-green);
+}

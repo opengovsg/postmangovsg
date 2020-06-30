@@ -3,20 +3,31 @@ import { without, times, constant } from 'lodash'
 import download from 'downloadjs'
 
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+import { extractTemplateParams } from 'services/protectedemail.service'
 import styles from './SampleCsv.module.scss'
 
 const SampleCsv = ({
   params,
+  protectedTemplate,
   defaultRecipient,
 }: {
   params: Array<string>
+  protectedTemplate?: string
   defaultRecipient: string
 }) => {
-  const RECIPIENT_HEADER = 'recipient'
+  const RECIPIENT_KEYWORDS = ['recipient', 'password']
 
-  function onDownloadFile() {
+  async function onDownloadFile() {
+    let protectedParams: Array<string> = []
+    if (protectedTemplate) {
+      protectedParams = await extractTemplateParams(protectedTemplate)
+    }
     // Add recipient column in front, remove if already in params
-    const headers = [RECIPIENT_HEADER, ...without(params, RECIPIENT_HEADER)]
+    const headers = [
+      ...RECIPIENT_KEYWORDS,
+      ...without(params, ...RECIPIENT_KEYWORDS),
+      ...without(protectedParams, ...RECIPIENT_KEYWORDS),
+    ]
     // Set default recipient as first value and pad with placeholder
     const body = [
       defaultRecipient,
