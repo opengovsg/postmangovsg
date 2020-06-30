@@ -70,7 +70,7 @@ export class CampaignStats {
     this.sent = +input['sent']
     this.invalid = input['invalid']
     this.status = input['status']
-    this.updatedAt = input['updatedAt']
+    this.updatedAt = input['updated_at']
     this.halted = input['halted']
   }
 }
