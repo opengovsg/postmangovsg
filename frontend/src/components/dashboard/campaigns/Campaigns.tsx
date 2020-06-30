@@ -13,7 +13,6 @@ import {
   TitleBar,
   PrimaryButton,
   ExportRecipients,
-  ActionButton,
 } from 'components/common'
 import { getCampaigns, hasFailedRecipients } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'

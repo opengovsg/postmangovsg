@@ -6,8 +6,9 @@ import {
   Status,
   SMSCampaign,
   EmailCampaign,
-  CampaignInvalidRecipients,
+  CampaignInvalidRecipient,
 } from 'classes'
+import moment from 'moment'
 
 const EXPORT_LINK_DISPLAY_WAIT_TIME = 5 * 60 * 1000
 
@@ -148,8 +149,16 @@ export async function retryCampaign(campaignId: number): Promise<void> {
 
 export async function exportCampaignStats(
   campaignId: number
-): Promise<Array<CampaignInvalidRecipients>> {
+): Promise<Array<CampaignInvalidRecipient>> {
   return axios.get(`/campaign/${campaignId}/export`).then((response) => {
-    return response.data
+    const invalidRecipients = response.data?.map(
+      (record: any) => new CampaignInvalidRecipient(record)
+    )
+    for (const invalidRecipient of invalidRecipients) {
+      invalidRecipient.updatedAt = moment(invalidRecipient.updatedAt)
+        .format('LLL')
+        .replace(',', '')
+    }
+    return invalidRecipients
   })
 }

@@ -141,7 +141,7 @@ const getTotalSentCount = async (): Promise<number> => {
 }
 
 /**
- * Helper method to get error_code, message_id, status and recipients for failed messages from logs table
+ * Helper method to get sent_at, status and recipients for failed messages from logs table
  * @param campaignId
  * @param logsTable
  */
@@ -157,7 +157,7 @@ const getFailedRecipients = async (
         [Op.or]: [MessageStatus.Error, MessageStatus.InvalidRecipient],
       },
     },
-    attributes: ['recipient', 'status', 'error_code', 'message_id'],
+    attributes: ['recipient', 'status', 'updated_at'],
     useMaster: false,
   })
 

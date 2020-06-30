@@ -70,18 +70,14 @@ export class CampaignStats {
   }
 }
 
-export class CampaignInvalidRecipients {
+export class CampaignInvalidRecipient {
   recipient: string
-  messageId: string
-  errorCode: string
-  sentAt: Date
-  updatedAt: Date
+  status: string
+  updatedAt: string
 
   constructor(input: any) {
     this.recipient = input['recipient']
-    this.messageId = input['message_id']
-    this.errorCode = input['error_code']
-    this.sentAt = input['sentAt']
-    this.updatedAt = input['updatedAt']
+    this.status = input['status']
+    this.updatedAt = input['updated_at']
   }
 }

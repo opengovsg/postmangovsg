@@ -618,7 +618,7 @@ router.get('/stats', SmsStatsMiddleware.getStats)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/invalid-recipients:
+ *  /campaign/{campaignId}/sms/export:
  *    get:
  *      tags:
  *        - SMS

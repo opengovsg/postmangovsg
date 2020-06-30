@@ -61,8 +61,8 @@ export interface CampaignStatsCount {
 
 export interface CampaignInvalidRecipient {
   recipient: string
-  messageId: string
-  errorCode: string
+  status: string
+  updated_at: Date
 }
 
 /**
@@ -82,4 +82,14 @@ export interface CampaignInvalidRecipient {
  *            type: number
  *          status:
  *            $ref: '#/components/schemas/JobStatus'
+ *      CampaignInvalidRecipient:
+ *        type: object
+ *        properties:
+ *          recipient:
+ *            type: string
+ *          status:
+ *            type: string
+ *          updated_at:
+ *            type: string
+ *            format: date-time
  */
