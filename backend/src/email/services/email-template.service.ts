@@ -265,14 +265,11 @@ const hasInvalidEmailRecipient = (
 const testHydration = (
   records: Array<MessageBulkInsertInterface>,
   templateBody: string,
-  templateSubject?: string
+  templateSubject: string
 ): void => {
   const [firstRecord] = records
   client.template(templateBody, firstRecord.params)
-
-  if (templateSubject) {
-    client.template(templateSubject, firstRecord.params)
-  }
+  client.template(templateSubject, firstRecord.params)
 }
 
 export const EmailTemplateService = {

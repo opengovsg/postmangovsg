@@ -167,7 +167,7 @@ const uploadCompleteHandler = async (
     EmailTemplateService.testHydration(
       records,
       emailTemplate.body as string,
-      emailTemplate.subject
+      emailTemplate.subject as string
     )
 
     if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
