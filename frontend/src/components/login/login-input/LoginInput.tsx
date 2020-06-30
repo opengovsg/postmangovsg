@@ -76,14 +76,9 @@ const Login = () => {
 
   async function resend() {
     sendUserEvent(GA_USER_EVENTS.RESEND_OTP)
-    try {
-      setIsResending(true)
-      await sendOtp()
-      setIsResending(false)
-    } catch (err) {
-      setErrorMsg(err.message)
-      sendException(err.message)
-    }
+    setIsResending(true)
+    await sendOtp()
+    setIsResending(false)
   }
 
   function render(
