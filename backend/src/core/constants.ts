@@ -46,6 +46,8 @@ export enum MessageStatus {
  *           type: boolean
  *         valid:
  *           type: boolean
+ *         halted:
+ *           type: boolean
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
  *         job_queue:
@@ -59,6 +61,9 @@ export enum MessageStatus {
  *          status:
  *            $ref: '#/components/schemas/JobStatus'
  *          sent_at:
+ *            type: string
+ *            format: date-time
+ *          status_updated_at:
  *            type: string
  *            format: date-time
  *

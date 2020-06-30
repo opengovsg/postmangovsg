@@ -11,10 +11,12 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const TelegramDetail = ({
   id,
+  name,
   sentAt,
   numRecipients,
 }: {
   id: number
+  name: string
   sentAt: Date
   numRecipients: number
 }) => {
@@ -88,6 +90,8 @@ const TelegramDetail = ({
 
       {stats.status && (
         <ProgressDetails
+          campaignId={id}
+          campaignName={name}
           sentAt={sentAt}
           numRecipients={numRecipients}
           stats={stats}

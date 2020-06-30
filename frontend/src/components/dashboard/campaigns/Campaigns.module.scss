@@ -19,7 +19,6 @@
 
 .tableContainer {
   display: block;
-  overflow-x: auto;
   max-width: 100%;
 
   table.campaignTable {
@@ -41,15 +40,24 @@
   }
 }
 
+.exportRecipients {
+  > span {
+    display: none;
+  }
+  > i {
+    color: $indigo-blue;
+    &:hover {
+      color: lighten($indigo-blue, 10%);
+    }
+  }
+}
+
 .icon {
   @include icon;
 }
 
 .spinner {
-  width: 3rem;
-  font-size: 3rem;
-  align-self: center;
-  margin: 2rem;
+  @include spinner;
 }
 
 .emptyDashboard {

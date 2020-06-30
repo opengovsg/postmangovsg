@@ -87,6 +87,7 @@ const CreateTelegram = ({
         <div className={styles.stepContainer}>
           <TelegramDetail
             id={campaign.id}
+            name={campaign.name}
             sentAt={campaign.sentAt}
             numRecipients={campaign.numRecipients}
           ></TelegramDetail>

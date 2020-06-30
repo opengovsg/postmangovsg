@@ -1,0 +1,16 @@
+@import 'styles/_mixins';
+
+.invalidRecipients {
+  @include flex-horizontal;
+  color: $indigo-blue;
+  cursor: pointer;
+}
+
+.icon {
+  @include icon;
+  margin-right: 0.5rem;
+}
+
+.disabled {
+  opacity: 0.5;
+}

@@ -8,6 +8,7 @@ import {
   Table,
   HasMany,
   HasOne,
+  Default,
 } from 'sequelize-typescript'
 import { ChannelType } from '@core/constants'
 import { CampaignS3ObjectInterface } from '@core/interfaces'
@@ -70,15 +71,20 @@ export class Campaign extends Model<Campaign> {
   @HasOne(() => Statistic)
   statistic?: Statistic
 
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+  halted!: boolean
+
   // Sets key in s3Object json
   static async updateS3ObjectKey(
     id: number,
     objectToMerge: CampaignS3ObjectInterface
   ): Promise<void> {
     await Campaign.sequelize?.transaction(async (transaction) => {
-      const campaign = await Campaign.findByPk(id, {
-        transaction,
-      })
+      const campaign = await Campaign.findByPk(id, { transaction })
       if (!campaign) {
         throw new Error('Invalid campaign')
       }

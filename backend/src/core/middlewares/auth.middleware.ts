@@ -15,7 +15,7 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
     await AuthService.canSendOtp(email)
   } catch (e) {
     logger.error(`Not allowed to send OTP to email=${email}`)
-    return res.sendStatus(401)
+    return res.status(401).json({ message: e.message })
   }
   try {
     await AuthService.sendOtp(email)

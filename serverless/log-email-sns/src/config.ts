@@ -23,6 +23,16 @@ convict.addFormats({
       return val
     },
   },
+  'float-percent': {
+    validate: function (val) {
+      if (val !== 0 && (!val || val > 1 || val < 0)) {
+        throw new Error('must be a float between 0 and 1, inclusive')
+      }
+    },
+    coerce: function (val) {
+      return parseFloat(val)
+    },
+  },
 })
 
 const config = convict({
@@ -87,6 +97,20 @@ const config = convict({
         format: 'int',
       },
     },
+  },
+  minHaltNumber: {
+    doc:
+      'Halt if there is this minimum number of invalid recipients, and it exceeds the percentage threshold',
+    default: 10,
+    env: 'MIN_HALT_NUMBER',
+    format: 'int',
+  },
+  minHaltPercentage: {
+    doc:
+      'Halt if the percentage of invalid recipients exceeds this threshold. Supply a float from 0 to 1',
+    default: 0.1,
+    env: 'MIN_HALT_PERCENTAGE',
+    format: 'float-percent',
   },
 })
 

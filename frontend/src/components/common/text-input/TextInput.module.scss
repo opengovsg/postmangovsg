@@ -16,4 +16,8 @@
     outline: none;
     border-color: $indigo-blue;
   }
+
+  &::placeholder {
+    color: rgba($dark-blue, 0.6);
+  }
 }

@@ -8,6 +8,7 @@ export enum Status {
   Draft = 'draft',
   Sending = 'sending',
   Sent = 'sent',
+  Halted = 'halted',
 }
 
 export const channelIcons = {
@@ -24,15 +25,19 @@ export class Campaign {
   sentAt: Date
   status: Status
   isCsvProcessing: boolean
+  statusUpdatedAt: Date
 
   constructor(input: any) {
     this.id = input['id']
     this.name = input['name']
     this.type = input['type']
     this.createdAt = input['created_at']
-    this.sentAt = input['sent_at']
-    this.status = this.getStatus(input['job_queue'])
+    this.status = input['halted']
+      ? Status.Halted
+      : this.getStatus(input['job_queue'])
     this.isCsvProcessing = input['is_csv_processing']
+    this.sentAt = input['sentAt']
+    this.statusUpdatedAt = input['statusUpdatedAt']
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {
@@ -58,6 +63,8 @@ export class CampaignStats {
   sent: number
   invalid: number
   status: Status
+  updatedAt: Date
+  halted: boolean
 
   constructor(input: any) {
     this.error = +input['error']
@@ -65,5 +72,19 @@ export class CampaignStats {
     this.sent = +input['sent']
     this.invalid = input['invalid']
     this.status = input['status']
+    this.updatedAt = input['updated_at']
+    this.halted = input['halted']
+  }
+}
+
+export class CampaignInvalidRecipient {
+  recipient: string
+  status: string
+  updatedAt: string
+
+  constructor(input: any) {
+    this.recipient = input['recipient']
+    this.status = input['status']
+    this.updatedAt = input['updated_at']
   }
 }

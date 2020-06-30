@@ -3,6 +3,7 @@
 
 @import 'styles/_variables';
 @import 'styles/_mixins';
+@import 'styles/_overrides';
 
 html,
 body {
@@ -27,9 +28,7 @@ body {
 }
 
 #root {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+  display: block;
   min-height: 100vh;
 }
 
@@ -147,6 +146,7 @@ table {
     td,
     th {
       padding: 0.75rem 0;
+      display: flex;
 
       &.xs {
         flex: 1.2;
