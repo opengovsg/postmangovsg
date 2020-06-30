@@ -1,4 +1,5 @@
 import S3 from 'aws-sdk/clients/s3'
+import { v4 as uuid } from 'uuid'
 
 import config from '@core/config'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
@@ -38,5 +39,31 @@ export default class S3Client {
     const downloadStream = this.download(s3Key)
     const fileContents = await ParseCsvService.parseCsv(downloadStream)
     return fileContents
+  }
+
+  /**
+   * Create a multipart upload on s3 and return the upload id and s3 key for it.
+   */
+  async startMultipartUpload(
+    contentType: string
+  ): Promise<{ uploadId: string; s3Key: string }> {
+    const s3Key = uuid()
+
+    const params = {
+      Bucket: FILE_STORAGE_BUCKET_NAME,
+      Key: s3Key,
+      ContentType: contentType,
+    }
+
+    const uploadData = await this.s3.createMultipartUpload(params).promise()
+    console.log('uploadData:')
+
+    console.log(uploadData)
+    if (!uploadData.UploadId) throw new Error('no upload id')
+
+    return {
+      uploadId: uploadData.UploadId,
+      s3Key,
+    }
   }
 }

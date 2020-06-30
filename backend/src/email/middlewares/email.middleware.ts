@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
+import S3Client from '@core/services/s3-client.class'
 import { EmailService } from '@email/services'
+
+const s3Client = new S3Client()
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
@@ -92,9 +95,36 @@ const previewFirstMessage = async (
   }
 }
 
+/**
+ * Starts multipart upload.
+ * Once started, it should either be completed when all the parts are uploaded or aborted.
+ * @param req
+ * @param res
+ * @param next
+ */
+const startMultipartUpload = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const contentType = req.query['mime_type']
+
+    const { uploadId, s3Key } = await s3Client.startMultipartUpload(contentType)
+
+    return res.json({
+      upload_id: uploadId,
+      s3_key: s3Key,
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser,
   validateAndStoreCredentials,
   getCampaignDetails,
   previewFirstMessage,
+  startMultipartUpload,
 }

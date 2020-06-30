@@ -57,6 +57,12 @@ const sendCampaignValidator = {
   }),
 }
 
+const startMultipartValidator = {
+  [Segments.QUERY]: Joi.object({
+    mime_type: Joi.string().required(),
+  }),
+}
+
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -591,5 +597,50 @@ router.get('/stats', EmailStatsMiddleware.getStats)
  *           description: Internal Server Error
  */
 router.get('/export', EmailStatsMiddleware.getFailedRecipients)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/upload/start-multipart:
+ *    get:
+ *      tags:
+ *        - Email
+ *      summary: Start multipart upload
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - name: mime_type
+ *          in: query
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 upload_id:
+ *                  type: string
+ *                 s3_key:
+ *                  type: string
+ *
+ *        "400" :
+ *           description: Invalid campaign type, not owned by user
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.get(
+  '/upload/start-multipart',
+  celebrate(startMultipartValidator),
+  EmailMiddleware.startMultipartUpload
+)
 
 export default router
