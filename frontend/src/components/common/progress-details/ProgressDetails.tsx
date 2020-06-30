@@ -8,7 +8,7 @@ import {
   ProgressBar,
   PrimaryButton,
   ExportRecipients,
-  ActionButtton,
+  ActionButton,
 } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 
@@ -50,9 +50,8 @@ const ProgressDetails = ({
       )
       setDisplayExportButton(displayExportButton)
     }
-
     checkHasExportButton()
-  }, [status, updatedAt, error, invalid, campaignId])
+  }, [status, updatedAt, campaignId, error, invalid])
 
   function renderButton() {
     if (!isSent) {
@@ -108,14 +107,14 @@ const ProgressDetails = ({
 
       {displayExportButton && (
         <div className={styles.actionButton}>
-          <ActionButtton>
+          <ActionButton>
             <ExportRecipients
               campaignId={campaignId}
               campaignName={campaignName}
               status={status}
               sentAt={sentAt}
             />
-          </ActionButtton>
+          </ActionButton>
         </div>
       )}
 

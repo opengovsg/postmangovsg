@@ -7,10 +7,12 @@ import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
 
 const ExportRecipients = ({
+  className,
   campaignId,
   campaignName,
   sentAt,
 }: {
+  className?: string
   campaignId: number
   campaignName: string
   status: Status
@@ -40,8 +42,8 @@ const ExportRecipients = ({
   }
 
   return (
-    <div onClick={(e) => exportRecipients(e)}>
-      Export
+    <div className={className} onClick={(e) => exportRecipients(e)}>
+      <span>Export</span>
       <i className={cx(styles.icon, 'bx bx-export')}></i>
     </div>
   )

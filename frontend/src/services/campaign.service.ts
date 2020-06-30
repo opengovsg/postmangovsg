@@ -37,7 +37,7 @@ export async function hasFailedRecipients(
   }
 
   let failedCount = count
-  if (!failedCount) {
+  if (failedCount === undefined) {
     const { error, invalid } = await getCampaignStats(campaignId)
     failedCount = error + invalid
   }

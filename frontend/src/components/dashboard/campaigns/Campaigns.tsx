@@ -13,7 +13,7 @@ import {
   TitleBar,
   PrimaryButton,
   ExportRecipients,
-  ActionButtton,
+  ActionButton,
 } from 'components/common'
 import { getCampaigns, hasFailedRecipients } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'
@@ -31,7 +31,7 @@ const Campaigns = () => {
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(
     new Array<Campaign>()
   )
-  const [displayExportButton, setDisplayExportButton] = useState<{
+  const [hasExport, setHasExport] = useState<{
     [key: number]: boolean
   }>({})
   const [selectedPage, setSelectedPage] = useState(0)
@@ -57,16 +57,12 @@ const Campaigns = () => {
     })
     setCampaignCount(totalCount)
     setCampaignsDisplayed(campaigns)
-    const hasExportButton: { [key: number]: boolean } = {}
+    const hasExport: { [key: number]: boolean } = {}
     for (const campaign of campaigns) {
       const { id, status, statusUpdatedAt } = campaign
-      hasExportButton[id] = await hasFailedRecipients(
-        id,
-        status,
-        statusUpdatedAt
-      )
+      hasExport[id] = await hasFailedRecipients(id, status, statusUpdatedAt)
     }
-    setDisplayExportButton(hasExportButton)
+    setHasExport(hasExport)
     setLoading(false)
   }
 
@@ -111,19 +107,18 @@ const Campaigns = () => {
       width: 'xs',
     },
     {
-      name: '',
+      name: 'Export',
       render: (campaign: Campaign) =>
-        displayExportButton[campaign.id] && (
-          <ActionButtton>
-            <ExportRecipients
-              campaignId={campaign.id}
-              campaignName={campaign.name}
-              status={campaign.status}
-              sentAt={campaign.sentAt}
-            />
-          </ActionButtton>
+        hasExport[campaign.id] && (
+          <ExportRecipients
+            className={styles.exportRecipients}
+            campaignId={campaign.id}
+            campaignName={campaign.name}
+            status={campaign.status}
+            sentAt={campaign.sentAt}
+          />
         ),
-      width: 'md',
+      width: 'xs',
     },
   ]
   /* eslint-enable react/display-name */
