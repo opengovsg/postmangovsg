@@ -116,7 +116,9 @@ const isWhitelistedEmail = async (email: string): Promise<boolean> => {
   const endsInWhitelistedDomain = validateDomain(email)
   if (!endsInWhitelistedDomain) {
     // If the email does not end in a whitelisted domain, check that it was  whitelisted by us manually
-    const user = await User.findOne({ where: { email: email } })
+    const user = await User.findOne({
+      where: { email: email },
+    })
     if (user === null) throw new Error('No user was found with this email')
   }
   return true

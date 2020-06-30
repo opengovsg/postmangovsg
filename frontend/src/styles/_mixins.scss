@@ -83,11 +83,6 @@ $widescreen: 1216px;
     white-space: nowrap;
   }
 
-  &.alignRight {
-    margin-left: auto;
-    margin-right: 0;
-  }
-
   &:hover {
     background-color: darken($background-color, 10%);
     outline: none;

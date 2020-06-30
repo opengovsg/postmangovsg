@@ -1,6 +1,11 @@
-import { fn, cast, Transaction } from 'sequelize'
+import { fn, cast, Transaction, Op } from 'sequelize'
 import { Statistic, JobQueue } from '@core/models'
-import { CampaignStats, CampaignStatsCount } from '@core/interfaces'
+import {
+  CampaignStats,
+  CampaignStatsCount,
+  CampaignInvalidRecipient,
+} from '@core/interfaces'
+import { MessageStatus } from '@core/constants'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -121,10 +126,11 @@ const getCurrentStats = async (
       // this is needed when invalid might appear in ops table, e.g. telegram immediate bounce errors
       invalid: opsStats.invalid + archivedStats.invalid,
       status: job.status,
+      updatedAt: job.updatedAt,
     }
   }
   // else, return archived stats
-  return { ...archivedStats, status: job.status }
+  return { ...archivedStats, status: job.status, updatedAt: job.updatedAt }
 }
 
 /*
@@ -134,9 +140,34 @@ const getTotalSentCount = async (): Promise<number> => {
   return Statistic.sum('sent')
 }
 
+/**
+ * Helper method to get sent_at, status and recipients for failed messages from logs table
+ * @param campaignId
+ * @param logsTable
+ */
+const getFailedRecipients = async (
+  campaignId: number,
+  logsTable: any
+): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+  const data = await logsTable.findAll({
+    raw: true,
+    where: {
+      campaignId,
+      status: {
+        [Op.or]: [MessageStatus.Error, MessageStatus.InvalidRecipient],
+      },
+    },
+    attributes: ['recipient', 'status', 'updated_at'],
+    useMaster: false,
+  })
+
+  return data
+}
+
 export const StatsService = {
   getCurrentStats,
   getTotalSentCount,
   getNumRecipients,
   setNumRecipients,
+  getFailedRecipients,
 }

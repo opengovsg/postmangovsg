@@ -73,3 +73,9 @@
     pointer-events: none;
   }
 }
+
+.actionButton {
+  @include flex-horizontal;
+  justify-content: flex-end;
+  margin: 3rem 0;
+}

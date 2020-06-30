@@ -8,8 +8,13 @@ import { capitalize } from 'lodash'
 import { GUIDE_URL } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
-import { Pagination, TitleBar, PrimaryButton } from 'components/common'
-import { getCampaigns } from 'services/campaign.service'
+import {
+  Pagination,
+  TitleBar,
+  PrimaryButton,
+  ExportRecipients,
+} from 'components/common'
+import { getCampaigns, hasFailedRecipients } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
@@ -25,6 +30,9 @@ const Campaigns = () => {
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(
     new Array<Campaign>()
   )
+  const [hasExport, setHasExport] = useState<{
+    [key: number]: boolean
+  }>({})
   const [selectedPage, setSelectedPage] = useState(0)
   const [campaignCount, setCampaignCount] = useState(0)
   const history = useHistory()
@@ -48,6 +56,12 @@ const Campaigns = () => {
     })
     setCampaignCount(totalCount)
     setCampaignsDisplayed(campaigns)
+    const hasExport: { [key: number]: boolean } = {}
+    for (const campaign of campaigns) {
+      const { id, status, statusUpdatedAt } = campaign
+      hasExport[id] = await hasFailedRecipients(id, status, statusUpdatedAt)
+    }
+    setHasExport(hasExport)
     setLoading(false)
   }
 
@@ -89,7 +103,21 @@ const Campaigns = () => {
     {
       name: 'Status',
       render: (campaign: Campaign) => campaign.status,
-      width: 'sm',
+      width: 'xs',
+    },
+    {
+      name: 'Export',
+      render: (campaign: Campaign) =>
+        hasExport[campaign.id] && (
+          <ExportRecipients
+            className={styles.exportRecipients}
+            campaignId={campaign.id}
+            campaignName={campaign.name}
+            status={campaign.status}
+            sentAt={campaign.sentAt}
+          />
+        ),
+      width: 'xs',
     },
   ]
   /* eslint-enable react/display-name */

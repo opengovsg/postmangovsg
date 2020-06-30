@@ -19,7 +19,6 @@
 
 .tableContainer {
   display: block;
-  overflow-x: auto;
   max-width: 100%;
 
   table.campaignTable {
@@ -37,6 +36,18 @@
       &:active {
         opacity: 0.5;
       }
+    }
+  }
+}
+
+.exportRecipients {
+  > span {
+    display: none;
+  }
+  > i {
+    color: $indigo-blue;
+    &:hover {
+      color: lighten($indigo-blue, 10%);
     }
   }
 }

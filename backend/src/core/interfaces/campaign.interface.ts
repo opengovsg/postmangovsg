@@ -49,6 +49,7 @@ export interface CampaignDetails {
 
 export interface CampaignStats extends CampaignStatsCount {
   status: string
+  updatedAt: Date
 }
 
 export interface CampaignStatsCount {
@@ -57,6 +58,13 @@ export interface CampaignStatsCount {
   sent: number
   invalid: number
 }
+
+export interface CampaignInvalidRecipient {
+  recipient: string
+  status: string
+  updated_at: Date
+}
+
 /**
  * @swagger
  *  components:
@@ -74,4 +82,14 @@ export interface CampaignStatsCount {
  *            type: number
  *          status:
  *            $ref: '#/components/schemas/JobStatus'
+ *      CampaignInvalidRecipient:
+ *        type: object
+ *        properties:
+ *          recipient:
+ *            type: string
+ *          status:
+ *            type: string
+ *          updated_at:
+ *            type: string
+ *            format: date-time
  */
