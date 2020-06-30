@@ -11,7 +11,7 @@ const ActionButton = (props: any) => {
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) {
     event.stopPropagation()
-    setToggleDropdown(!toggleDropdown)
+    setToggleDropdown((toggleDropdown) => !toggleDropdown)
   }
 
   return (
