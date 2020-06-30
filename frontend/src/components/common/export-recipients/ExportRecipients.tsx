@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
 import download from 'downloadjs'
 
@@ -18,11 +18,13 @@ const ExportRecipients = ({
   status: Status
   sentAt: Date
 }) => {
+  const [disabled, setDisabled] = useState(false)
   async function exportRecipients(
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) {
     try {
       event.stopPropagation()
+      setDisabled(true)
       const list = await exportCampaignStats(campaignId)
       const headers = Object.keys(list[0])
       const sentAtTime = new Date(sentAt)
@@ -38,11 +40,16 @@ const ExportRecipients = ({
       )
     } catch (error) {
       console.log(error)
+    } finally {
+      setDisabled(false)
     }
   }
 
   return (
-    <div className={className} onClick={(e) => exportRecipients(e)}>
+    <div
+      className={cx(className, { [styles.disabled]: disabled })}
+      onClick={(e) => !disabled && exportRecipients(e)}
+    >
       <span>Export</span>
       <i className={cx(styles.icon, 'bx bx-export')}></i>
     </div>
