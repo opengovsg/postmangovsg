@@ -28,7 +28,11 @@ const upsertSmsTemplate = async ({
   try {
     transaction = await SmsTemplate.sequelize?.transaction()
     // update
-    if ((await SmsTemplate.findByPk(campaignId, { transaction })) !== null) {
+    if (
+      (await SmsTemplate.findByPk(campaignId, {
+        transaction,
+      })) !== null
+    ) {
       // .update is actually a bulkUpdate
       const updatedTemplate: [number, SmsTemplate[]] = await SmsTemplate.update(
         {
@@ -181,7 +185,9 @@ const storeTemplate = async ({
 const getFilledTemplate = async (
   campaignId: number
 ): Promise<SmsTemplate | null> => {
-  const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
+  const smsTemplate = await SmsTemplate.findOne({
+    where: { campaignId },
+  })
   if (!smsTemplate?.body || !smsTemplate.params) {
     return null
   }
