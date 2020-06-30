@@ -49,7 +49,8 @@ export interface CampaignDetails {
 
 export interface CampaignStats extends CampaignStatsCount {
   status: string
-  updatedAt: Date
+  updated_at: Date
+  halted: boolean
 }
 
 export interface CampaignStatsCount {
@@ -80,8 +81,13 @@ export interface CampaignInvalidRecipient {
  *            type: number
  *          invalid:
  *            type: number
+ *          halted:
+ *            type: boolean
  *          status:
  *            $ref: '#/components/schemas/JobStatus'
+ *          updated_at:
+ *            type: string
+ *            format: date-time
  *      CampaignInvalidRecipient:
  *        type: object
  *        properties:

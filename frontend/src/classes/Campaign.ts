@@ -7,6 +7,7 @@ export enum Status {
   Draft = 'draft',
   Sending = 'sending',
   Sent = 'sent',
+  Halted = 'halted',
 }
 
 export const channelIcons = {
@@ -29,9 +30,11 @@ export class Campaign {
     this.name = input['name']
     this.type = input['type']
     this.createdAt = input['created_at']
-    this.sentAt = input['sentAt']
-    this.status = this.getStatus(input['job_queue'])
+    this.status = input['halted']
+      ? Status.Halted
+      : this.getStatus(input['job_queue'])
     this.isCsvProcessing = input['is_csv_processing']
+    this.sentAt = input['sentAt']
     this.statusUpdatedAt = input['statusUpdatedAt']
   }
 
@@ -59,6 +62,7 @@ export class CampaignStats {
   invalid: number
   status: Status
   updatedAt: Date
+  halted: boolean
 
   constructor(input: any) {
     this.error = +input['error']
@@ -66,7 +70,8 @@ export class CampaignStats {
     this.sent = +input['sent']
     this.invalid = input['invalid']
     this.status = input['status']
-    this.updatedAt = input['updatedAt']
+    this.updatedAt = input['updated_at']
+    this.halted = input['halted']
   }
 }
 

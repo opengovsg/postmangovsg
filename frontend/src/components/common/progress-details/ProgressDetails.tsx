@@ -11,7 +11,8 @@ import {
   ActionButton,
 } from 'components/common'
 import styles from './ProgressDetails.module.scss'
-
+import { OutboundLink } from 'react-ga'
+import { CONTACT_US_URL } from 'config'
 const ProgressDetails = ({
   campaignId,
   campaignName,
@@ -29,15 +30,17 @@ const ProgressDetails = ({
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
 }) => {
-  const { status, error, unsent, sent, invalid, updatedAt } = stats
+  const { status, error, unsent, sent, invalid, updatedAt, halted } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
   const [displayExportButton, setDisplayExportButton] = useState(false)
+  const [isHalted, setIsHalted] = useState(halted)
 
   useEffect(() => {
     setIsComplete(!error && !unsent)
     setIsSent(status === Status.Sent)
-  }, [status, error, unsent])
+    setIsHalted(halted)
+  }, [status, error, unsent, halted])
 
   useEffect(() => {
     async function checkHasExportButton() {
@@ -54,6 +57,22 @@ const ProgressDetails = ({
   }, [status, updatedAt, campaignId, error, invalid])
 
   function renderButton() {
+    if (isHalted) {
+      return (
+        <span>
+          Too many of your emails bounced.{' '}
+          <OutboundLink
+            eventLabel={CONTACT_US_URL}
+            to={CONTACT_US_URL}
+            target="_blank"
+          >
+            Contact us
+          </OutboundLink>{' '}
+          for details.
+        </span>
+      )
+    }
+
     if (!isSent) {
       return (
         <PrimaryButton className={styles.pause} onClick={handlePause}>
@@ -70,7 +89,20 @@ const ProgressDetails = ({
         </PrimaryButton>
       )
     }
+
     return null
+  }
+
+  function renderProgressTitle() {
+    let progressMessage = null
+    if (isHalted) {
+      progressMessage = 'Halted'
+    } else if (isComplete) {
+      progressMessage = 'Sending completed'
+    } else {
+      progressMessage = 'Progress'
+    }
+    return <h2>{progressMessage}</h2>
   }
 
   return (
@@ -96,7 +128,7 @@ const ProgressDetails = ({
       </table>
 
       <div className={styles.progressTitle}>
-        <h2>{isComplete ? 'Sending completed' : 'Progress'}</h2>
+        {renderProgressTitle()}
         {renderButton()}
       </div>
       <ProgressBar
