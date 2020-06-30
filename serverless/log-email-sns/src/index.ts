@@ -33,13 +33,11 @@ const updateBouncedStatus = async (metadata: BounceMetadata) => {
   let errorCode
 
   if (bounceType === 'Permanent') {
-    errorCode =
-      "Hard bounce, the recipient's mail server permanently rejected the email."
+    errorCode = 'Hard bounce'
     // Add to black list
     if (recipients) await Promise.all(recipients.map(addToBlacklist))
   } else {
-    errorCode =
-      'Soft bounce, Amazon SES fails to deliver the email after retrying for a period of time.'
+    errorCode = 'Soft bounce'
   }
 
   const campaignId = await updateMessageWithError({
