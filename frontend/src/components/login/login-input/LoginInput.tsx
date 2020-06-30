@@ -50,6 +50,7 @@ const Login = () => {
         setCanResend(true)
       }, RESEND_WAIT_TIME)
     } catch (err) {
+      setCanResend(true)
       setErrorMsg(err.message)
       sendException(err.message)
     }
@@ -76,21 +77,14 @@ const Login = () => {
   }
 
   async function resend() {
-    resetButton()
     sendUserEvent(GA_USER_EVENTS.RESEND_OTP)
-
     try {
       setIsResending(true)
-      await getOtpWithEmail(email)
+      await sendOtp()
+      setIsResending(false)
     } catch (err) {
       setErrorMsg(err.message)
       sendException(err.message)
-    } finally {
-      setIsResending(false)
-      // Always reset timer even if resending fails
-      setTimeout(() => {
-        setCanResend(true)
-      }, RESEND_WAIT_TIME)
     }
   }
 
