@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react'
 import cx from 'classnames'
 import { noop } from 'lodash'
-import * as Sentry from '@sentry/browser'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import {
   getOtpWithEmail,
@@ -14,7 +13,6 @@ import styles from './LoginInput.module.scss'
 import { AuthContext } from 'contexts/auth.context'
 import {
   GA_USER_EVENTS,
-  setGAUserId,
   sendUserEvent,
   sendException,
 } from 'services/ga.service'

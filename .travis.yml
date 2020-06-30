@@ -138,6 +138,8 @@ jobs:
             branch: $STAGING_BRANCH
           environment_variables:
             - DB_URI=$STAGING_EMAIL_DB_URI
+            - MIN_HALT_NUMBER=$STAGING_EMAIL_MIN_HALT_NUMBER
+            - MIN_HALT_PERCENTAGE=$STAGING_EMAIL_MIN_HALT_PERCENTAGE
         - provider: lambda
           edge: true
           function_name: log-email-callback-production
@@ -153,6 +155,8 @@ jobs:
             branch: $PRODUCTION_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_EMAIL_DB_URI
+            - MIN_HALT_NUMBER=$PRODUCTION_EMAIL_MIN_HALT_NUMBER
+            - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
     - name: root
       install:
         - npm install --ignore-scripts

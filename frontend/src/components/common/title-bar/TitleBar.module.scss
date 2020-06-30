@@ -1,8 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-$title-bar-height: 5rem;
-
 .titleBar {
   @include flex-horizontal;
   height: $title-bar-height;

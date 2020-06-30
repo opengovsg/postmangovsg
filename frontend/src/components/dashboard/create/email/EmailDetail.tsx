@@ -11,10 +11,12 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const EmailDetail = ({
   id,
+  name,
   sentAt,
   numRecipients,
 }: {
   id: number
+  name: string
   sentAt: Date
   numRecipients: number
 }) => {
@@ -78,8 +80,10 @@ const EmailDetail = ({
         <>
           <h2>Your campaign has been sent!</h2>
           <p>
-            Some messages may have failed to send. You can retry these by
-            clicking on Retry.{' '}
+            A retry button will appear if some messages had an error while
+            sending. You can click on retry to try sending the message(s) again.
+            An export button will appear for you to download a list of failed
+            deliveries with the recipient’s email address.
           </p>
         </>
       )}
@@ -88,6 +92,8 @@ const EmailDetail = ({
 
       {stats.status && (
         <ProgressDetails
+          campaignId={id}
+          campaignName={name}
           sentAt={sentAt}
           numRecipients={numRecipients}
           stats={stats}

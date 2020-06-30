@@ -1,0 +1,81 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.activeButtonContainer {
+  position: relative;
+}
+
+.actionButton {
+  @include button(white);
+  border: 1px solid $indigo-blue;
+  color: $indigo-blue;
+
+  &:hover {
+    border-width: 1.5px;
+  }
+
+  &:active {
+    background-color: $indigo-blue;
+    color: white;
+  }
+
+  &.dropdown {
+    padding: 0;
+    justify-content: space-between;
+  }
+
+  .content {
+    width: 100%;
+
+    div {
+      @include flex-center;
+
+      i {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.arrow {
+  @include flex-center;
+  border-top-right-radius: $border-radius;
+  border-bottom-right-radius: $border-radius;
+  min-width: $button-min-width / 4;
+  height: $button-height;
+  background-color: $indigo-blue;
+
+  .icon {
+    @include icon;
+    color: white;
+    margin-left: 0;
+  }
+}
+
+.dropdownMenu {
+  position: absolute;
+  width: 14rem;
+  background: white;
+  top: $button-height + 1rem;
+  right: 0;
+  box-shadow: 0.1rem 0.1rem 1rem 0 lighten($light-grey, 20%);
+  color: $indigo-blue;
+
+  div {
+    @include flex-horizontal;
+    padding: 1rem 2rem;
+    cursor: pointer;
+
+    &:hover {
+      background: $light-blue;
+    }
+
+    i {
+      @include icon;
+      font-size: 1.2rem;
+      margin-top: 0.1rem;
+      margin-left: 0.5rem;
+      margin-right: 0;
+    }
+  }
+}
