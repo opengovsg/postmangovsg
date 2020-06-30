@@ -121,10 +121,41 @@ const startMultipartUpload = async (
   }
 }
 
+/**
+ * Get a presigned url for multipart upload.
+ * @param req
+ * @param res
+ * @param next
+ */
+const getMultipartUrl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const s3Key = req.query['s3_key']
+    const uploadId = req.query['upload_id']
+    const partNumber = req.query['part_number']
+
+    const presignedUrl = await s3Client.getPresignedPartUrl({
+      s3Key,
+      uploadId,
+      partNumber,
+    })
+
+    return res.json({
+      presigned_url: presignedUrl,
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser,
   validateAndStoreCredentials,
   getCampaignDetails,
   previewFirstMessage,
   startMultipartUpload,
+  getMultipartUrl,
 }

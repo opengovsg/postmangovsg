@@ -56,14 +56,37 @@ export default class S3Client {
     }
 
     const uploadData = await this.s3.createMultipartUpload(params).promise()
-    console.log('uploadData:')
 
-    console.log(uploadData)
     if (!uploadData.UploadId) throw new Error('no upload id')
 
     return {
       uploadId: uploadData.UploadId,
       s3Key,
     }
+  }
+
+  /**
+   * Get a presigned url to upload a part for multipart upload.
+   */
+  async getPresignedPartUrl({
+    s3Key,
+    uploadId,
+    partNumber,
+  }: {
+    s3Key: string
+    uploadId: string
+    partNumber: number
+  }): Promise<string> {
+    const params = {
+      Bucket: FILE_STORAGE_BUCKET_NAME,
+      Key: s3Key,
+      PartNumber: partNumber,
+      UploadId: uploadId,
+    }
+
+    const presignedUrl = await this.s3.getSignedUrlPromise('uploadPart', params)
+
+    console.log(`presignedUrl: ${presignedUrl}`)
+    return presignedUrl
   }
 }

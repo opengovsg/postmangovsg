@@ -63,6 +63,15 @@ const startMultipartValidator = {
   }),
 }
 
+const getMultipartUrlValidator = {
+  [Segments.QUERY]: Joi.object({
+    s3_key: Joi.string().required(),
+    upload_id: Joi.string().required(),
+    // Only part numbers from 1 to 10000 allowed for s3 multipart upload
+    part_number: Joi.number().integer().min(1).max(10000).required(),
+  }),
+}
+
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -641,6 +650,60 @@ router.get(
   '/upload/start-multipart',
   celebrate(startMultipartValidator),
   EmailMiddleware.startMultipartUpload
+)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/upload/multipart-url:
+ *    get:
+ *      tags:
+ *        - Email
+ *      summary: get presigned url for multipart upload
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - name: s3_key
+ *          in: query
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - name: upload_id
+ *          in: query
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - name: part_number
+ *          in: query
+ *          required: true
+ *          schema:
+ *            type: integer
+ *            minimum: 1
+ *            maximum: 10000
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 presigned_url:
+ *                  type: string
+ *
+ *        "400" :
+ *           description: Invalid campaign type, not owned by user
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.get(
+  '/upload/multipart-url',
+  celebrate(getMultipartUrlValidator),
+  EmailMiddleware.getMultipartUrl
 )
 
 export default router
