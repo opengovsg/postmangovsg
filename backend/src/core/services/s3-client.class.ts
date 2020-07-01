@@ -89,4 +89,38 @@ export default class S3Client {
     console.log(`presignedUrl: ${presignedUrl}`)
     return presignedUrl
   }
+
+  /**
+   * Complete the multipart upload.
+   */
+  async completeMultipartUpload({
+    s3Key,
+    uploadId,
+    partCount,
+    etags,
+  }: {
+    s3Key: string
+    uploadId: string
+    partCount: number
+    etags: Array<string>
+  }): Promise<void> {
+    const parts = []
+    for (let i = 0; i < partCount; i++) {
+      parts.push({
+        ETag: etags[i],
+        PartNumber: i + 1,
+      })
+    }
+    const params = {
+      Bucket: FILE_STORAGE_BUCKET_NAME,
+      Key: s3Key,
+      MultipartUpload: {
+        Parts: parts,
+      },
+      UploadId: uploadId,
+    }
+
+    const data = await this.s3.completeMultipartUpload(params).promise()
+    console.log(data)
+  }
 }

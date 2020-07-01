@@ -72,6 +72,15 @@ const getMultipartUrlValidator = {
   }),
 }
 
+const completeMultipartValidator = {
+  [Segments.BODY]: Joi.object({
+    s3_key: Joi.string().required(),
+    upload_id: Joi.string().required(),
+    part_count: Joi.number().integer().min(1).max(10000).required(),
+    etags: Joi.array().items(Joi.string()).required(),
+  }),
+}
+
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -704,6 +713,56 @@ router.get(
   '/upload/multipart-url',
   celebrate(getMultipartUrlValidator),
   EmailMiddleware.getMultipartUrl
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/upload/complete-multipart:
+ *     post:
+ *       description: Complete multipart upload
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - s3_key
+ *                 - upload_id
+ *                 - part_count
+ *                 - etags
+ *               properties:
+ *                 s3_key:
+ *                   type: string
+ *                 upload_id:
+ *                   type: string
+ *                 part_count:
+ *                   type: integer
+ *                 etags:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       responses:
+ *         "202" :
+ *           description: Accepted.
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/upload/complete-multipart',
+  celebrate(completeMultipartValidator),
+  EmailMiddleware.completeMultipart
 )
 
 export default router

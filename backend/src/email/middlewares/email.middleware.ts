@@ -151,6 +151,40 @@ const getMultipartUrl = async (
   }
 }
 
+/**
+ * Complete a multipart upload.
+ * @param req
+ * @param res
+ * @param next
+ */
+const completeMultipart = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const {
+      s3_key: s3Key,
+      upload_id: uploadId,
+      part_count: partCount,
+      etags,
+    } = req.body
+
+    await s3Client.completeMultipartUpload({
+      s3Key,
+      uploadId,
+      partCount,
+      etags,
+    })
+
+    return res.json({
+      s3Key,
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser,
   validateAndStoreCredentials,
@@ -158,4 +192,5 @@ export const EmailMiddleware = {
   previewFirstMessage,
   startMultipartUpload,
   getMultipartUrl,
+  completeMultipart,
 }
