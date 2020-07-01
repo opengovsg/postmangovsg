@@ -21,7 +21,7 @@ const getStats = async (
 }
 
 /**
- * Gets invalid recipients for sms campaign
+ * Gets invalid recipients for Telegram campaign
  * @param req
  * @param res
  * @param next
