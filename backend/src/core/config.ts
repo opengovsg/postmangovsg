@@ -362,14 +362,20 @@ const config = convict({
           pre: [],
           a: ['href'],
         },
-        safeAttrValue: (
+        onTagAttr: (
           tag: string,
           name: string,
-          value: string
+          value: string,
+          isWhiteAttr: boolean
         ): string | void => {
           // Handle Telegram mention as xss-js does not recognize it as a valid url.
-          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
-            return value
+          if (
+            isWhiteAttr &&
+            tag === 'a' &&
+            name === 'href' &&
+            value.startsWith('tg://')
+          ) {
+            return `href="${value}"`
           }
         },
         stripIgnoreTag: true,
