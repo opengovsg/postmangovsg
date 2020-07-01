@@ -62,7 +62,7 @@ export class CampaignStats {
   invalid: number
   status: Status
   updatedAt: Date
-  halted: boolean
+  halted?: boolean
 
   constructor(input: any) {
     this.error = +input['error']
