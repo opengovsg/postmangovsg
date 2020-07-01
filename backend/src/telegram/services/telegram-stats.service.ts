@@ -1,7 +1,7 @@
 import { StatsService } from '@core/services'
-import { CampaignStats } from '@core/interfaces'
+import { CampaignStats, CampaignInvalidRecipient } from '@core/interfaces'
 
-import { TelegramOp } from '@telegram/models'
+import { TelegramOp, TelegramMessage } from '@telegram/models'
 
 /**
  * Gets stats for telegram project
@@ -11,6 +11,17 @@ const getStats = async (campaignId: number): Promise<CampaignStats> => {
   return StatsService.getCurrentStats(campaignId, TelegramOp)
 }
 
+/**
+ * Gets failed recipients for sms project
+ * @param campaignId
+ */
+const getFailedRecipients = async (
+  campaignId: number
+): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+  return StatsService.getFailedRecipients(campaignId, TelegramMessage)
+}
+
 export const TelegramStatsService = {
   getStats,
+  getFailedRecipients,
 }
