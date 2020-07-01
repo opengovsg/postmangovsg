@@ -17,6 +17,8 @@ const upsertTelegramSubscriber = async (
   telegramId: number,
   sequelize: Sequelize
 ): Promise<boolean> => {
+  phoneNumber = `+${phoneNumber}`
+
   logger.log(`Upserting Telegram subscriber: ${phoneNumber} -> ${telegramId}`)
   const affectedRows = (
     await sequelize.query(
