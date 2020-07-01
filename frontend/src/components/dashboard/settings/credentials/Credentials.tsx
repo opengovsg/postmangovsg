@@ -67,7 +67,7 @@ const Credentials = ({
       <>
         {creds.map(({ label }) => (
           <tr key={label}>
-            <td className="md">{label}</td>
+            <td className="lg">{label}</td>
             <td className={cx('sm', styles.actionColumn)}>
               <i
                 className={cx(
@@ -110,7 +110,7 @@ const Credentials = ({
         <table className={styles.credTable}>
           <tbody>
             <tr>
-              <th className="md">Label</th>
+              <th className="lg">Label</th>
               <th className={cx('sm', styles.actionColumn)}></th>
             </tr>
             {renderCredentials()}
