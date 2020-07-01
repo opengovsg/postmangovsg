@@ -4,18 +4,18 @@ FROM node:12-alpine
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
   g++ make python tini
 
-WORKDIR /usr/home/postmangovsg/worker
+WORKDIR /usr/home/postmangovsg
 
-COPY modules /usr/home/postmangovsg/modules
+COPY modules ../modules
 
-RUN cd /usr/home/postmangovsg/modules/postman-templating && npm ci
+RUN cd ../modules/postman-templating && npm ci
 
-COPY worker/package* ./
-
+COPY ./package* ./
 RUN npm ci
 
-COPY worker/src ./src
-COPY worker/tsconfig.json ./
+COPY src ./src
+COPY tsconfig.json ./
+
 RUN npm run build
 RUN npm prune --production
 
