@@ -20,6 +20,29 @@ const getStats = async (
   }
 }
 
+/**
+ * Gets invalid recipients for Telegram campaign
+ * @param req
+ * @param res
+ * @param next
+ */
+const getFailedRecipients = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { campaignId } = req.params
+  try {
+    const recipients = await TelegramStatsService.getFailedRecipients(
+      +campaignId
+    )
+    return res.json(recipients)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const TelegramStatsMiddleware = {
   getStats,
+  getFailedRecipients,
 }
