@@ -12,7 +12,7 @@ const getStats = async (campaignId: number): Promise<CampaignStats> => {
 }
 
 /**
- * Gets failed recipients for sms project
+ * Gets failed recipients for Telegram project
  * @param campaignId
  */
 const getFailedRecipients = async (
