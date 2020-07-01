@@ -72,6 +72,11 @@ jobs:
           on:
             branch: $PRODUCTION_BRANCH
             condition: "$DEPLOY_WORKER = true"
+        - provider: script
+          script: ./deploy.sh postmangovsg-workers telegram-sending telegram-logging
+          on:
+            branch: $TELEGRAM_BRANCH
+            condition: "$DEPLOY_WORKER = true"
     - name: frontend
       before_install:
         - cd frontend
@@ -172,7 +177,7 @@ jobs:
             - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
         - provider: lambda
           edge: true
-          function_name: telegram-handler-staging
+          function_name: telegram-test
           region: $AWS_DEFAULT_REGION
           role: $STAGING_CALLBACK_ROLE
           runtime: nodejs12.x
