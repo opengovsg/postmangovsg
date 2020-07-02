@@ -36,7 +36,7 @@ const ProtectedEmailRecipients = ({
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
 }) => {
   const containerRef = useRef<HTMLAnchorElement>(null)
-  const [body, setBody] = useState('')
+  const [content, setContent] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const [isUploadingToServer, setIsUploadingToServer] = useState(false)
@@ -72,8 +72,8 @@ const ProtectedEmailRecipients = ({
         <TextArea
           highlight={true}
           placeholder="Enter password protected message here"
-          value={body}
-          onChange={setBody}
+          value={content}
+          onChange={setContent}
         />
 
         <div className="separator"></div>
@@ -90,7 +90,7 @@ const ProtectedEmailRecipients = ({
       return
     }
     event.stopPropagation()
-    const protectedParams = await extractTemplateParams(body)
+    const protectedParams = await extractTemplateParams(content)
     setSampleParams(params.concat(protectedParams))
     // trigger click after compputing params
     containerRef.current?.click()
@@ -108,7 +108,7 @@ const ProtectedEmailRecipients = ({
         return
       }
       setTempFile(files[0])
-      const paramsB = await extractTemplateParams(body)
+      const paramsB = await extractTemplateParams(content)
       const allParams = paramsB.concat(params)
       const csvInfo = await validateCsv(files[0], allParams)
 
@@ -142,7 +142,7 @@ const ProtectedEmailRecipients = ({
   function resetUpload() {
     setEncryptionComplete(false)
     setCsvInfo({})
-    setBody('')
+    setContent('')
   }
 
   async function handleNext(e: any) {
