@@ -6,8 +6,9 @@ import TemplateClient from '@core/services/template-client.class'
 import logger from '@core/logger'
 import TelegramClient from '@telegram/services/telegram-client.class'
 import { CredentialService } from '@core/services/credential.service'
+import config from '@core/config'
 
-const templateClient = new TemplateClient()
+const templateClient = new TemplateClient(config.get('xssOptions.telegram'))
 
 class Telegram {
   private workerId: string
