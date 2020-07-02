@@ -300,7 +300,7 @@ async function beginMultipartUpload({
   mimeType: string
 }): Promise<{ uploadId: string; s3Key: string }> {
   const response = await axios.get(
-    `/campaign/${campaignId}/upload/start-multipart`,
+    `/campaign/${campaignId}/upload-start-multipart`,
     {
       params: {
         mime_type: mimeType,
@@ -330,7 +330,7 @@ async function getPresignedMultipartUrl({
   partNumber: number
 }): Promise<string> {
   const response = await axios.get(
-    `/campaign/${campaignId}/upload/multipart-url`,
+    `/campaign/${campaignId}/upload-multipart-url`,
     {
       params: {
         s3_key: s3Key,
@@ -380,7 +380,7 @@ async function completeMultiPartUpload({
   etags: Array<string>
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/upload/complete-multipart`, {
+    await axios.post(`/campaign/${campaignId}/upload-complete-multipart`, {
       s3_key: s3Key,
       upload_id: uploadId,
       part_count: partCount,

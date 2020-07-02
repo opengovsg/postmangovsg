@@ -178,7 +178,7 @@ const completeMultipart = async (
     })
 
     return res.json({
-      s3Key,
+      s3_key: s3Key,
     })
   } catch (err) {
     return next(err)

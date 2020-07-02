@@ -619,7 +619,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/upload/start-multipart:
+ *  /campaign/{campaignId}/upload-start-multipart:
  *    get:
  *      tags:
  *        - Email
@@ -656,7 +656,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
  *           description: Internal Server Error
  */
 router.get(
-  '/upload/start-multipart',
+  '/upload-start-multipart',
   celebrate(startMultipartValidator),
   EmailMiddleware.startMultipartUpload
 )
@@ -664,7 +664,7 @@ router.get(
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/upload/multipart-url:
+ *  /campaign/{campaignId}/upload-multipart-url:
  *    get:
  *      tags:
  *        - Email
@@ -710,7 +710,7 @@ router.get(
  *           description: Internal Server Error
  */
 router.get(
-  '/upload/multipart-url',
+  '/upload-multipart-url',
   celebrate(getMultipartUrlValidator),
   EmailMiddleware.getMultipartUrl
 )
@@ -718,7 +718,7 @@ router.get(
 /**
  * @swagger
  * path:
- *   /campaign/{campaignId}/email/upload/complete-multipart:
+ *   /campaign/{campaignId}/email/upload-complete-multipart:
  *     post:
  *       description: Complete multipart upload
  *       tags:
@@ -750,8 +750,14 @@ router.get(
  *                   items:
  *                     type: string
  *       responses:
- *         "202" :
- *           description: Accepted.
+ *         200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 s3_key:
+ *                  type: string
  *         "400" :
  *           description: Bad Request
  *         "401":
@@ -760,7 +766,7 @@ router.get(
  *           description: Internal Server Error
  */
 router.post(
-  '/upload/complete-multipart',
+  '/upload-complete-multipart',
   celebrate(completeMultipartValidator),
   EmailMiddleware.completeMultipart
 )

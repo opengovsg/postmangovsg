@@ -86,7 +86,6 @@ export default class S3Client {
 
     const presignedUrl = await this.s3.getSignedUrlPromise('uploadPart', params)
 
-    console.log(`presignedUrl: ${presignedUrl}`)
     return presignedUrl
   }
 
@@ -120,7 +119,6 @@ export default class S3Client {
       UploadId: uploadId,
     }
 
-    const data = await this.s3.completeMultipartUpload(params).promise()
-    console.log(data)
+    await this.s3.completeMultipartUpload(params).promise()
   }
 }
