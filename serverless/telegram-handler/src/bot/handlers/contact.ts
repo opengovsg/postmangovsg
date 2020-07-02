@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 
 import { Logger } from '../../utils/logger'
+import { PostmanTelegramError } from '../PostmanTelegramError'
 
 const logger = new Logger('contact')
 
@@ -86,27 +87,21 @@ export const contactMessageHandler = (
   // Parse contact data
   const contact = ctx.message?.contact
   if (!contact) {
-    throw new Error('Contact not defined')
+    throw new PostmanTelegramError('Contact not defined')
   }
 
   const { phone_number: phoneNumber, user_id: telegramId } = contact
   if (!(phoneNumber && telegramId)) {
-    await ctx.reply('Error: Invalid contact information.')
-    throw new Error('Invalid contact information')
+    throw new PostmanTelegramError('Invalid contact information')
   }
 
   const senderTelegramId = ctx.from?.id
   if (!senderTelegramId || telegramId !== senderTelegramId) {
-    await ctx.reply('Error: You can only update your own bot subscription.')
-    throw new Error('Sender and contact Telegram ID mismatch')
+    throw new PostmanTelegramError('Sender and contact mismatch')
   }
 
   // Upsert and add subscriptions
-  const didUpsertTelegramSubscriber = await upsertTelegramSubscriber(
-    phoneNumber,
-    telegramId,
-    sequelize
-  )
+  await upsertTelegramSubscriber(phoneNumber, telegramId, sequelize)
   const didAddBotSubscriber = await addBotSubscriber(
     botId,
     telegramId,
@@ -120,15 +115,8 @@ export const contactMessageHandler = (
     },
   }
 
-  if (!didUpsertTelegramSubscriber && !didAddBotSubscriber) {
-    return ctx.reply(
-      'Error: Failed to save your subscription. Are you already subscribed?',
-      replyOptions
-    )
+  if (!didAddBotSubscriber) {
+    return ctx.reply('Your phone number has been updated.', replyOptions)
   }
-  if (didUpsertTelegramSubscriber && !didAddBotSubscriber) {
-    return ctx.reply('Success: Your number has been updated.', replyOptions)
-  }
-
-  return ctx.reply('Success: You are now subscribed.', replyOptions)
+  return ctx.reply('You are now subscribed.', replyOptions)
 }

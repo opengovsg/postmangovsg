@@ -5,6 +5,7 @@ import { Sequelize } from 'sequelize-typescript'
 import { startCommandHandler } from './handlers/start'
 import { contactMessageHandler } from './handlers/contact'
 import { updatenumberCommandHandler } from './handlers/updatenumber'
+import { PostmanTelegramError } from './PostmanTelegramError'
 
 /**
  * Instantiates a Telegraf instance to handle the incoming Telegram update.
@@ -24,6 +25,19 @@ export const handleUpdate = async (
   bot.on('contact', contactMessageHandler(botId, sequelize))
 
   // Handle update
-  await bot.handleUpdate(update)
-  return
+  try {
+    await bot.handleUpdate(update)
+  } catch (err) {
+    const chatId = update.message?.from?.id
+    if (chatId) {
+      const errorMessage =
+        err instanceof PostmanTelegramError
+          ? `Error: ${err.message}, please try again.`
+          : 'An error occurred, please try again.'
+      await bot.telegram.sendMessage(chatId, errorMessage)
+    }
+
+    // Rethrow error
+    throw err
+  }
 }
