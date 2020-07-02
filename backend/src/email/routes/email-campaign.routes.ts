@@ -65,8 +65,7 @@ const startMultipartValidator = {
 
 const getMultipartUrlValidator = {
   [Segments.QUERY]: Joi.object({
-    s3_key: Joi.string().required(),
-    upload_id: Joi.string().required(),
+    transaction_id: Joi.string().required(),
     // Only part numbers from 1 to 10000 allowed for s3 multipart upload
     part_number: Joi.number().integer().min(1).max(10000).required(),
   }),
@@ -74,8 +73,7 @@ const getMultipartUrlValidator = {
 
 const completeMultipartValidator = {
   [Segments.BODY]: Joi.object({
-    s3_key: Joi.string().required(),
-    upload_id: Joi.string().required(),
+    transaction_id: Joi.string().required(),
     part_count: Joi.number().integer().min(1).max(10000).required(),
     etags: Joi.array().items(Joi.string()).required(),
   }),
@@ -643,9 +641,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
  *              schema:
  *                type: object
  *                properties:
- *                 upload_id:
- *                  type: string
- *                 s3_key:
+ *                 transaction_id:
  *                  type: string
  *
  *        "400" :
@@ -675,12 +671,7 @@ router.get(
  *          required: true
  *          schema:
  *            type: string
- *        - name: s3_key
- *          in: query
- *          required: true
- *          schema:
- *            type: string
- *        - name: upload_id
+ *        - name: transaction_id
  *          in: query
  *          required: true
  *          schema:
@@ -734,14 +725,11 @@ router.get(
  *           application/json:
  *             schema:
  *               required:
- *                 - s3_key
- *                 - upload_id
+ *                 - transaction_id
  *                 - part_count
  *                 - etags
  *               properties:
- *                 s3_key:
- *                   type: string
- *                 upload_id:
+ *                 transaction_id:
  *                   type: string
  *                 part_count:
  *                   type: integer
@@ -756,7 +744,7 @@ router.get(
  *              schema:
  *                type: object
  *                properties:
- *                 s3_key:
+ *                 transaction_id:
  *                  type: string
  *         "400" :
  *           description: Bad Request

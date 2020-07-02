@@ -1,6 +1,7 @@
 import S3 from 'aws-sdk/clients/s3'
 import { v4 as uuid } from 'uuid'
 
+import { jwtUtils } from '@core/utils/jwt'
 import config from '@core/config'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 
@@ -44,9 +45,7 @@ export default class S3Client {
   /**
    * Create a multipart upload on s3 and return the upload id and s3 key for it.
    */
-  async startMultipartUpload(
-    contentType: string
-  ): Promise<{ uploadId: string; s3Key: string }> {
+  async startMultipartUpload(contentType: string): Promise<string> {
     const s3Key = uuid()
 
     const params = {
@@ -59,24 +58,25 @@ export default class S3Client {
 
     if (!uploadData.UploadId) throw new Error('no upload id')
 
-    return {
+    const transactionId = jwtUtils.sign({
       uploadId: uploadData.UploadId,
       s3Key,
-    }
+    })
+
+    return transactionId
   }
 
   /**
    * Get a presigned url to upload a part for multipart upload.
    */
   async getPresignedPartUrl({
-    s3Key,
-    uploadId,
+    transactionId,
     partNumber,
   }: {
-    s3Key: string
-    uploadId: string
+    transactionId: string
     partNumber: number
   }): Promise<string> {
+    const { s3Key, uploadId } = this.extractS3KeyAndUploadId(transactionId)
     const params = {
       Bucket: FILE_STORAGE_BUCKET_NAME,
       Key: s3Key,
@@ -93,13 +93,11 @@ export default class S3Client {
    * Complete the multipart upload.
    */
   async completeMultipartUpload({
-    s3Key,
-    uploadId,
+    transactionId,
     partCount,
     etags,
   }: {
-    s3Key: string
-    uploadId: string
+    transactionId: string
     partCount: number
     etags: Array<string>
   }): Promise<void> {
@@ -110,6 +108,8 @@ export default class S3Client {
         PartNumber: i + 1,
       })
     }
+    const { s3Key, uploadId } = this.extractS3KeyAndUploadId(transactionId)
+
     const params = {
       Bucket: FILE_STORAGE_BUCKET_NAME,
       Key: s3Key,
@@ -120,5 +120,25 @@ export default class S3Client {
     }
 
     await this.s3.completeMultipartUpload(params).promise()
+  }
+
+  /**
+   * Decodes jwt
+   * @param transactionId
+   */
+  extractS3KeyAndUploadId(
+    transactionId: string
+  ): { s3Key: string; uploadId: string } {
+    let decoded: { s3Key: string; uploadId: string }
+    try {
+      decoded = jwtUtils.verify(transactionId) as {
+        s3Key: string
+        uploadId: string
+      }
+    } catch (err) {
+      logger.error(`${err.stack}`)
+      throw new Error('Invalid transactionId provided')
+    }
+    return decoded
   }
 }

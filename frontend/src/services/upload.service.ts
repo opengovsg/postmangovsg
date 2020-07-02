@@ -207,7 +207,7 @@ export async function multipartUploadToS3(
 
   const mimeType = await getMimeType(file)
 
-  const { uploadId, s3Key } = await beginMultipartUpload({
+  const transactionId = await beginMultipartUpload({
     campaignId,
     mimeType,
   })
@@ -239,8 +239,7 @@ export async function multipartUploadToS3(
 
         const presignedUrl = await getPresignedMultipartUrl({
           campaignId,
-          s3Key,
-          uploadId,
+          transactionId,
           partNumber,
         })
 
@@ -258,8 +257,7 @@ export async function multipartUploadToS3(
       complete: async function () {
         await completeMultiPartUpload({
           campaignId,
-          s3Key,
-          uploadId,
+          transactionId,
           partCount: partNumber,
           etags,
         })
@@ -298,7 +296,7 @@ async function beginMultipartUpload({
 }: {
   campaignId: number
   mimeType: string
-}): Promise<{ uploadId: string; s3Key: string }> {
+}): Promise<string> {
   const response = await axios.get(
     `/campaign/${campaignId}/upload-start-multipart`,
     {
@@ -307,11 +305,8 @@ async function beginMultipartUpload({
       },
     }
   )
-  const { upload_id: uploadId, s3_key: s3Key } = response.data
-  return {
-    uploadId,
-    s3Key,
-  }
+  const { transaction_id: transactionId } = response.data
+  return transactionId
 }
 
 /*
@@ -320,21 +315,18 @@ async function beginMultipartUpload({
  */
 async function getPresignedMultipartUrl({
   campaignId,
-  s3Key,
-  uploadId,
+  transactionId,
   partNumber,
 }: {
   campaignId: number
-  s3Key: string
-  uploadId: string
+  transactionId: string
   partNumber: number
 }): Promise<string> {
   const response = await axios.get(
     `/campaign/${campaignId}/upload-multipart-url`,
     {
       params: {
-        s3_key: s3Key,
-        upload_id: uploadId,
+        transaction_id: transactionId,
         part_number: partNumber,
       },
     }
@@ -368,21 +360,18 @@ async function uploadPartWithPresignedUrl({
 
 async function completeMultiPartUpload({
   campaignId,
-  s3Key,
-  uploadId,
+  transactionId,
   partCount,
   etags,
 }: {
   campaignId: number
-  s3Key: string
-  uploadId: string
+  transactionId: string
   partCount: number
   etags: Array<string>
 }): Promise<void> {
   try {
     await axios.post(`/campaign/${campaignId}/upload-complete-multipart`, {
-      s3_key: s3Key,
-      upload_id: uploadId,
+      transaction_id: transactionId,
       part_count: partCount,
       etags: etags,
     })

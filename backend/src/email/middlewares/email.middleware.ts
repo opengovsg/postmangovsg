@@ -110,11 +110,10 @@ const startMultipartUpload = async (
   try {
     const contentType = req.query['mime_type']
 
-    const { uploadId, s3Key } = await s3Client.startMultipartUpload(contentType)
+    const transactionId = await s3Client.startMultipartUpload(contentType)
 
     return res.json({
-      upload_id: uploadId,
-      s3_key: s3Key,
+      transaction_id: transactionId,
     })
   } catch (err) {
     return next(err)
@@ -133,13 +132,11 @@ const getMultipartUrl = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const s3Key = req.query['s3_key']
-    const uploadId = req.query['upload_id']
+    const transactionId = req.query['transaction_id']
     const partNumber = req.query['part_number']
 
     const presignedUrl = await s3Client.getPresignedPartUrl({
-      s3Key,
-      uploadId,
+      transactionId,
       partNumber,
     })
 
@@ -164,21 +161,20 @@ const completeMultipart = async (
 ): Promise<Response | void> => {
   try {
     const {
-      s3_key: s3Key,
-      upload_id: uploadId,
+      transaction_id: transactionId,
       part_count: partCount,
       etags,
     } = req.body
 
     await s3Client.completeMultipartUpload({
-      s3Key,
-      uploadId,
+      transactionId,
       partCount,
       etags,
     })
 
+    // Not sure what i should return here
     return res.json({
-      s3_key: s3Key,
+      transaction_id: transactionId,
     })
   } catch (err) {
     return next(err)
