@@ -27,13 +27,13 @@ export class TemplateClient {
    * @param templateBody - template body
    * @param params - dict of param variables used for interpolation
    */
-  parseTemplate = (
+  parseTemplate (
     templateBody: string,
     params?: { [key: string]: string }
   ): {
     variables: Array<string>
     tokens: Array<string>
-  } => {
+  } {
     const variables: Array<string> = []
     const tokens: Array<string> = []
 
