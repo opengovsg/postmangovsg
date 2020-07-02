@@ -8,6 +8,7 @@ $nav-item-height: 5rem;
   width: $side-nav-width;
   min-width: $side-nav-width;
   border-right: 1px solid $indigo-blue;
+  min-height: calc(100vh - 4rem - 5rem);
 
   @include mobile() {
     display: none;
