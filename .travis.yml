@@ -17,13 +17,14 @@ jobs:
   include:
     - name: backend
       before_install:
-        - cp -R modules backend
         - cd backend
       install:
         - npm install
       script:
         - npm run lint-no-fix
         - npm run test
+      before_deploy:
+        - cp -R ../modules ./
       deploy:
         - provider: elasticbeanstalk
           skip_cleanup: true
@@ -47,12 +48,13 @@ jobs:
             branch: $PRODUCTION_BRANCH
     - name: worker
       before_install:
-        - cp -R modules worker
         - cd worker
       install:
         - npm install
       script:
         - npm run lint-no-fix
+      before_deploy:
+        - cp -R ../modules ./
       deploy:
         - provider: script
           script: ./deploy.sh postmangovsg-workers staging-sending staging-logging
