@@ -209,7 +209,11 @@ const ProtectedEmailRecipients = ({
         csvInfo={csvInfo}
         onErrorClose={clearCsvStatus}
       >
-        <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+        <FileInput
+          isProcessing={isUploading}
+          onFileSelected={uploadFile}
+          label="Select"
+        />
         <p>or</p>
         <div onClickCapture={(e) => onDownloadSample(e)}>
           <SampleCsv
@@ -235,7 +239,7 @@ const ProtectedEmailRecipients = ({
           <p>
             <b>Note</b>: Once you have encrypted Message B, you have to create
             new message if you wish to edit any detail. Creating a new message
-            will require you to upload your logo and recipients all over again.
+            will require you to upload your recipients all over again.
           </p>
           {!encryptionComplete && (
             <>
