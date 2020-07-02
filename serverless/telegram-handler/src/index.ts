@@ -16,7 +16,7 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
     // Handle update
     await handleUpdate(botId, botToken, update, sequelize)
   } catch (err) {
-    console.error(`Error: ${err.message}`)
+    console.error(err)
   }
 
   return {
