@@ -8,8 +8,6 @@ WORKDIR /usr/home/postmangovsg
 
 COPY modules ../modules
 
-RUN cd ../modules/postman-templating && npm ci
-
 COPY ./package* ./
 RUN npm ci
 
