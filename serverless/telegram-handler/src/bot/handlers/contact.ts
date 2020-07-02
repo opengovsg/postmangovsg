@@ -18,7 +18,10 @@ const upsertTelegramSubscriber = async (
   telegramId: number,
   sequelize: Sequelize
 ): Promise<boolean> => {
-  phoneNumber = `+${phoneNumber}`
+  // Some Telegram clients send pre-prefixed phone numbers
+  if (!phoneNumber.startsWith('+')) {
+    phoneNumber = `+${phoneNumber}`
+  }
 
   logger.log(`Upserting Telegram subscriber: ${phoneNumber} -> ${telegramId}`)
   const affectedRows = (
