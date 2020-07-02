@@ -13,7 +13,7 @@ sudo chmod +x ecs-deploy
 
 # Login to docker and push image to ECR
 eval $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-docker build -f ./worker/Dockerfile -t $TAG .
+docker build -t $TAG .
 docker push $TAG
 
 # Update ECS
