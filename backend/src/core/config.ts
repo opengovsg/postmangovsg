@@ -5,6 +5,7 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
+import xss from 'xss'
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 /**
  * To require an env var without setting a default,
@@ -362,21 +363,16 @@ const config = convict({
           pre: [],
           a: ['href'],
         },
-        onTagAttr: (
+        safeAttrValue: (
           tag: string,
           name: string,
-          value: string,
-          isWhiteAttr: boolean
+          value: string
         ): string | void => {
           // Handle Telegram mention as xss-js does not recognize it as a valid url.
-          if (
-            isWhiteAttr &&
-            tag === 'a' &&
-            name === 'href' &&
-            value.startsWith('tg://')
-          ) {
-            return `href="${value}"`
+          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+            return value
           }
+          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
         },
         stripIgnoreTag: true,
       },
