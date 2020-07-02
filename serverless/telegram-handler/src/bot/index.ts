@@ -24,6 +24,18 @@ export const handleUpdate = async (
   bot.on('contact', contactMessageHandler(botId, sequelize))
 
   // Handle update
-  await bot.handleUpdate(update)
-  return
+  try {
+    await bot.handleUpdate(update)
+  } catch (err) {
+    const chatId = update.message?.from?.id
+    if (chatId) {
+      await bot.telegram.sendMessage(
+        chatId,
+        'An error occurred, please try again.'
+      )
+    }
+
+    // Rethrow error
+    throw err
+  }
 }
