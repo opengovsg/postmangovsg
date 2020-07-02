@@ -53,6 +53,7 @@ const config = convict({
     awsEndpoint: {
       doc:
         'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      format: '*',
       default: null,
       env: 'AWS_ENDPOINT',
     },

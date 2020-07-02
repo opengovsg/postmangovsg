@@ -57,6 +57,21 @@ brew services start redis
 
 # Check that redis is running
 redis-cli ping
+
+# Have localstack running
+docker pull localstack/localstack
+
+# Run localstack
+docker run -d -p 4566:4566 -p 8080:8080 --name localstack localstack/localstack
+
+# Seed localstack with S3 bucket and Cloudwatch Log group
+# Assumes installed aws-cli
+export AWS_ENDPOINT=http://localhost:4566
+export FILE_STORAGE_BUCKET_NAME=localstack-upload
+export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
+
+cd localstack && ./init-localstack.sh && cd ..
+
 ```
 
 ### Set environment variables
