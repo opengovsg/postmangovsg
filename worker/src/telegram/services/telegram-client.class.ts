@@ -7,7 +7,9 @@ export default class TelegramClient {
   }
 
   async send(recipient: string, message: string): Promise<number> {
-    const response = await this.client.sendMessage(recipient, message)
+    const response = await this.client.sendMessage(recipient, message, {
+      parse_mode: 'HTML',
+    })
     return response.message_id
   }
 }
