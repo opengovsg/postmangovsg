@@ -13,57 +13,48 @@ import { UserSettings } from '@core/interfaces'
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 
 /**
- * Checks if the credential has been saved
- * @param name
- */
-const isExistingCredential = async (name: string): Promise<boolean> => {
-  const result = await Credential.findOne({
-    where: {
-      name: name,
-    },
-  })
-  return !!result
-}
-
-/**
  * Upserts credential into AWS SecretsManager
  * @param name
  * @param secret
- * @returns updated - returns true if the secret was updated.
+ * @throws error if update fails
  */
 const upsertCredential = async (
   name: string,
   secret: string
-): Promise<boolean> => {
-  const exists = await isExistingCredential(name)
+): Promise<void> => {
   if (!config.get('IS_PROD')) {
     logger.info(
       `Dev env - skip storing credential in AWS secrets manager for name=${name}`
     )
-    return exists
+    return
   }
 
-  if (exists) {
-    const params = {
-      SecretId: name,
-      SecretString: secret,
-    }
+  try {
     logger.info(`Updating credential in AWS secrets manager for name=${name}`)
-    await secretsManager.putSecretValue(params).promise()
+    await secretsManager
+      .putSecretValue({
+        SecretId: name,
+        SecretString: secret,
+      })
+      .promise()
     logger.info(
       `Successfully updated credential in AWS secrets manager for name=${name}`
     )
-  } else {
-    const params = {
-      Name: name,
-      SecretString: secret,
+  } catch (err) {
+    if (err.name === 'ResourceNotFoundException') {
+      logger.info('Storing credential in AWS secrets manager')
+      await secretsManager
+        .createSecret({
+          Name: name,
+          SecretString: secret,
+        })
+        .promise()
+      logger.info('Successfully stored credential in AWS secrets manager')
+    } else {
+      throw err
     }
-    logger.info('Storing credential in AWS secrets manager')
-    await secretsManager.createSecret(params).promise()
-    logger.info('Successfully stored credential in AWS secrets manager')
   }
-
-  return exists
+  return
 }
 
 /**
@@ -72,14 +63,15 @@ const upsertCredential = async (
  * @param secret
  */
 const storeCredential = async (name: string, secret: string): Promise<void> => {
-  const updated = await upsertCredential(name, secret)
-  if (!updated) {
-    logger.info('Storing credential in DB')
-    await Credential.findCreateFind({
-      where: { name },
-    })
-    logger.info('Successfully stored credential in DB')
-  }
+  // If adding a credential to secrets manager throws an error, db will not be updated
+  // If adding a credential to secrets manager succeeds, but the db call fails, it is ok because the credential will not be associated with a campaign
+  // It results in orphan secrets manager credentials, which is acceptable.
+  await upsertCredential(name, secret)
+  logger.info('Storing credential in DB')
+  await Credential.findCreateFind({
+    where: { name },
+  })
+  logger.info('Successfully stored credential in DB')
 }
 
 /**
@@ -255,7 +247,6 @@ const regenerateApiKey = async (userId: number): Promise<string> => {
 
 export const CredentialService = {
   // Credentials (cred_name)
-  isExistingCredential,
   storeCredential,
   getTwilioCredentials,
   getTelegramCredential,
