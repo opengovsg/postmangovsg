@@ -69,7 +69,7 @@ export AWS_ENDPOINT=http://localhost:4566
 export FILE_STORAGE_BUCKET_NAME=localstack-upload
 export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
 
-cd localstack && ./init-localstack.sh cd ..
+cd localstack && ./init-localstack.sh && cd ..
 
 ```
 
