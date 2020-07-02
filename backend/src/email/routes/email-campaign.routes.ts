@@ -617,7 +617,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/upload-start-multipart:
+ *  /campaign/{campaignId}/email/upload-start-multipart:
  *    get:
  *      tags:
  *        - Email
@@ -660,7 +660,7 @@ router.get(
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/upload-multipart-url:
+ *  /campaign/{campaignId}/email/upload-multipart-url:
  *    get:
  *      tags:
  *        - Email
