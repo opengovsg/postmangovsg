@@ -144,7 +144,9 @@ const TelegramRecipients = ({
       {!isCsvProcessing && numRecipients > 0 && (
         <>
           <p className={styles.greyText}>Message preview</p>
-          <PreviewBlock body={preview.body}></PreviewBlock>
+          <PreviewBlock
+            body={preview.body?.replace(/\n/g, '<br />')}
+          ></PreviewBlock>
           <div className="separator"></div>
         </>
       )}
