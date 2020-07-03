@@ -6,11 +6,11 @@ services:
   - docker
 
 cache:
-directories:
-  - backend/node_modules
-  - worker/node_modules
-  - frontend/node_modules
-  - ./node_modules
+  directories:
+    - backend/node_modules
+    - worker/node_modules
+    - frontend/node_modules
+    - ./node_modules
 
 # Deploy from Dockerfile
 jobs:
