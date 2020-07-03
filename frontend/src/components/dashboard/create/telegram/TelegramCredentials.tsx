@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
+import { GUIDE_TELEGRAM_CREDENTIALS_URL } from 'config'
 import {
   validateStoredCredentials,
   validateNewCredentials,
@@ -158,9 +160,16 @@ const TelegramCredentials = ({
 
             <h2>Add new credentials</h2>
             <p className={styles.validateCredentialsInfo}>
-              Before you validate the credentials, the phone number you are
-              testing with <b>must be already subscribed to the bot</b>. Learn
-              more.
+              Please provide your Telegram bot token for validation. If you are
+              unsure about how to retrieve your bot token, please follow the
+              instructions provided&nbsp;
+              <OutboundLink
+                eventLabel={GUIDE_TELEGRAM_CREDENTIALS_URL}
+                to={GUIDE_TELEGRAM_CREDENTIALS_URL}
+                target="_blank"
+              >
+                here.
+              </OutboundLink>
             </p>
 
             <div className={styles.validateCredentialsInfo}>
