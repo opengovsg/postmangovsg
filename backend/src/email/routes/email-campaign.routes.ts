@@ -353,6 +353,51 @@ router.delete(
 /**
  * @swagger
  * path:
+ *   /campaign/{campaignId}/email/upload-multi/complete:
+ *     post:
+ *       description: "Complete upload session"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - transaction_id
+ *                 - filename
+ *               properties:
+ *                 transaction_id:
+ *                   type: string
+ *                 filename:
+ *                   type: string
+ *       responses:
+ *         "202" :
+ *           description: Accepted. The uploaded file is being processed.
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/upload-multi/complete',
+  celebrate(uploadCompleteValidator),
+  CampaignMiddleware.canEditCampaign,
+  EmailTemplateMiddleware.uploadMultiCompleteHandler
+)
+
+/**
+ * @swagger
+ * path:
  *  /campaign/{campaignId}/email/credentials:
  *    post:
  *      tags:

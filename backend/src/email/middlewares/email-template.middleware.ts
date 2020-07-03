@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
+import { v4 as uuid } from 'uuid'
+import url from 'url'
+
 import logger from '@core/logger'
+import config from '@core/config'
 import {
   MissingTemplateKeysError,
   HydrationError,
@@ -73,6 +77,77 @@ const storeTemplate = async (
       return res.status(400).json({ message: err.message })
     }
     return next(err)
+  }
+}
+
+/**
+ * Updates the campaign table, generate unique protected links and update email_encrypted_messages
+ * and email_messages table in a transaction, rolling back when either fails. For campaign table,
+ * the s3 meta data is updated with the uploaded file, and its validity is set to true. For
+ * email_encrypted_messages and email_messages table, existing records are deleted and new ones
+ * are bulk inserted. Then update statistics with new unsent count
+ * @param key
+ * @param campaignId
+ * @param filename
+ * @param records
+ */
+const updateProtectedCampaignAndMessages = async (
+  campaignId: number,
+  key: string,
+  filename: string,
+  records: ProtectedMessageRecordsInterface[]
+): Promise<void> => {
+  let transaction
+
+  try {
+    transaction = await Campaign.sequelize?.transaction()
+    // Updates metadata in project
+    await TemplateService.replaceCampaignS3Metadata(
+      campaignId,
+      key,
+      filename,
+      transaction
+    )
+
+    // Generate unique links
+    const frontendUrl = config.get('frontendUrl')
+    const protectedMessagesRecords: ProtectedMessageBulkInsertInterface[] = []
+    const messageLogRecords: MessageBulkInsertInterface[] = []
+    records.map((record, index) => {
+      const id = uuid()
+      protectedMessagesRecords[index] = { ...record, id }
+      const protectedLink = url.resolve(frontendUrl, `protected/${id}`)
+      messageLogRecords[index] = {
+        campaignId: record.campaignId,
+        recipient: record.recipient,
+        params: { protectedlink: protectedLink },
+      }
+    })
+
+    // Start populate encrypted messages
+    await EmailTemplateService.addToEncryptedMessageLogs(
+      campaignId,
+      protectedMessagesRecords,
+      transaction
+    )
+
+    // START populate template
+    await EmailTemplateService.addToMessageLogs(
+      campaignId,
+      messageLogRecords,
+      transaction
+    )
+
+    // Update statistic table
+    await StatsService.setNumRecipients(campaignId, records.length, transaction)
+
+    // Set campaign to valid
+    await CampaignService.setValid(campaignId, transaction)
+
+    transaction?.commit()
+  } catch (err) {
+    transaction?.rollback()
+    throw err
   }
 }
 
@@ -254,9 +329,71 @@ const deleteCsvErrorHandler = async (
   }
 }
 
+/**
+ * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
+ * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
+ * If the template and csv do not match, prompt the user to upload a new file.
+ * @param req
+ * @param res
+ * @param next
+ */
+const uploadMultiCompleteHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+
+    // extract s3Key from transactionId
+    const { transaction_id: transactionId, filename } = req.body
+    const s3Key = TemplateService.extractS3Key(transactionId)
+
+    // check if template exists
+    const emailTemplate = await EmailTemplateService.getFilledTemplate(
+      +campaignId
+    )
+    if (emailTemplate === null) {
+      throw new Error('Template does not exist, please create a template')
+    }
+
+    // STUB: read records from s3
+    // returns { campaignId, records, payload, passwordHash}
+    const records = [] as ProtectedMessageRecordsInterface[]
+
+    if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
+      throw new InvalidRecipientError()
+    }
+
+    // Store temp filename
+    await TemplateService.storeS3TempFilename(+campaignId, filename)
+
+    // Slow bulk insert
+    await updateProtectedCampaignAndMessages(
+      +campaignId,
+      s3Key,
+      filename,
+      records
+    )
+  } catch (err) {
+    const userErrors = [
+      RecipientColumnMissing,
+      MissingTemplateKeysError,
+      InvalidRecipientError,
+      UnexpectedDoubleQuoteError,
+    ]
+
+    if (userErrors.some((errType) => err instanceof errType)) {
+      return res.status(400).json({ message: err.message })
+    }
+    return next(err)
+  }
+}
+
 export const EmailTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
   pollCsvStatusHandler,
   deleteCsvErrorHandler,
+  uploadMultiCompleteHandler,
 }

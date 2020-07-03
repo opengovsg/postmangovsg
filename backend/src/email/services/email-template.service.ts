@@ -9,7 +9,11 @@ import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
 import TemplateClient from '@core/services/template-client.class'
 
-import { EmailTemplate, EmailMessage } from '@email/models'
+import {
+  EmailTemplate,
+  EmailMessage,
+  EmailEncryptedMessages,
+} from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
 const client = new TemplateClient(config.get('xssOptions.email'))
@@ -244,16 +248,60 @@ const addToMessageLogs = async (
   }
 }
 
+/**
+ * 1. delete existing entries
+ * 2. bulk insert
+ *
+ * @param campaignId
+ * @param records
+ * @param transaction
+ */
+const addToEncryptedMessageLogs = async (
+  campaignId: number,
+  records: Array<object>,
+  transaction: Transaction | undefined
+): Promise<void> => {
+  logger.info({
+    message: `Started populateEmailEncryptedMessages for ${campaignId}`,
+  })
+  try {
+    // delete existing encrypted messages entries
+    await EmailEncryptedMessages.destroy({
+      where: { campaignId },
+      transaction,
+    })
+
+    const chunks = chunk(records, 5000)
+    for (let idx = 0; idx < chunks.length; idx++) {
+      const batch = chunks[idx]
+      await EmailEncryptedMessages.bulkCreate(batch, { transaction })
+    }
+
+    logger.info({
+      message: `Finished populateEmailEncryptedMessages for ${campaignId}`,
+    })
+  } catch (err) {
+    logger.error(
+      `EmailEncryptedMessages: destroy / bulkcreate failure. ${err.stack}`
+    )
+    throw new Error('EmailEncryptedMessages: destroy / bulkcreate failure')
+  }
+}
+
 const hasInvalidEmailRecipient = (
-  records: MessageBulkInsertInterface[]
+  records: MessageBulkInsertInterface[] | ProtectedMessageRecordsInterface[]
 ): boolean => {
-  return records.some((record) => !validator.isEmail(record.recipient))
+  return records.some(
+    (record: MessageBulkInsertInterface | ProtectedMessageRecordsInterface) =>
+      !validator.isEmail(record.recipient)
+  )
 }
 
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
+  addToEncryptedMessageLogs,
   hasInvalidEmailRecipient,
   client,
 }
