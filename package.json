@@ -45,7 +45,7 @@
     "typescript": "^3.8.3"
   },
   "lint-staged": {
-    "*.{yml,md},!amplify.yml": "prettier --write"
+    "*.{yml,md}": "prettier --write"
   },
   "husky": {
     "hooks": {
