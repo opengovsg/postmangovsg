@@ -120,7 +120,7 @@ const updateProtectedCampaignAndMessages = async (
       messageLogRecords[index] = {
         campaignId: record.campaignId,
         recipient: record.recipient,
-        params: { protectedlink: protectedLink },
+        params: { protectedlink: protectedLink, recipient: record.recipient },
       }
     })
 
