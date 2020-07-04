@@ -17,7 +17,7 @@ module.exports = {
   parserOptions: {
     sourceType: 'module',
   },
-  ignorePatterns: ['build', 'dist', 'node_modules'],
+  ignorePatterns: ['build', 'dist', 'node_modules', 'locales/_build/', 'locales/**/*.js'],
   rules: {
     'react/prop-types': 'off', // No need proptypes since we're using TypeScript
     'react-hooks/rules-of-hooks': 'error', // Checks rules of Hooks
