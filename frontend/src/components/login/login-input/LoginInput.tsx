@@ -16,13 +16,16 @@ import {
   sendUserEvent,
   sendException,
 } from 'services/ga.service'
+import { i18n } from 'locales'
+import { t } from '@lingui/macro'
+import { Trans } from '@lingui/react'
 
-const emailText = 'Sign in with your gov.sg email'
-const otpText = 'One-Time Password'
-const emailButtonText = ['Get OTP', 'Sending OTP...']
-const otpButtonText = ['Sign In', 'Verifying OTP...']
-const emailPlaceholder = 'e.g. postman@agency.gov.sg'
-const otpPlaceholder = 'Enter OTP'
+const emailText = i18n._(t`Sign in with your gov.sg email`)
+const otpText = i18n._(t`One-Time Password`)
+const emailButtonText = [i18n._(t`Get OTP`), i18n._(t`Sending OTP...`)]
+const otpButtonText = [i18n._(t`Sign In`), i18n._(t`Verifying OTP...`)]
+const emailPlaceholder = i18n._(t`e.g. postman@agency.gov.sg`)
+const otpPlaceholder = i18n._(t`Enter OTP`)
 
 const RESEND_WAIT_TIME = 30000
 
@@ -99,7 +102,11 @@ const Login = () => {
               className={cx(styles.resend, { [styles.disabled]: !canResend })}
               onClick={canResend ? resend : noop}
             >
-              {isResending ? 'Resending OTP...' : 'Resend?'}
+              {isResending ? (
+                <Trans>Resending OTP...</Trans>
+              ) : (
+                <Trans>Resend?</Trans>
+              )}
             </TextButton>
           )}
         </h4>
