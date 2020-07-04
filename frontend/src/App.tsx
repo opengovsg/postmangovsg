@@ -10,25 +10,31 @@ import Login from 'components/login'
 // Routes HOC
 import ProtectedRoute from 'routes/protected.route'
 
+// Locales
+import { i18n } from 'locales'
+
 // Contexts
 import AuthContextProvider from 'contexts/auth.context'
+import { I18nProvider } from '@lingui/react'
 
 import './styles/app.scss'
 
 const App = () => {
   return (
-    <Router>
-      <AuthContextProvider>
-        <Switch>
-          <Route exact path="/" component={Landing}></Route>
-          <Route exact path="/login" component={Login}></Route>
-          <ProtectedRoute>
-            <Dashboard></Dashboard>
-          </ProtectedRoute>
-          <Route component={Error} />
-        </Switch>
-      </AuthContextProvider>
-    </Router>
+    <I18nProvider language={i18n.language} i18n={i18n}>
+      <Router>
+        <AuthContextProvider>
+          <Switch>
+            <Route exact path="/" component={Landing}></Route>
+            <Route exact path="/login" component={Login}></Route>
+            <ProtectedRoute>
+              <Dashboard></Dashboard>
+            </ProtectedRoute>
+            <Route component={Error} />
+          </Switch>
+        </AuthContextProvider>
+      </Router>
+    </I18nProvider>
   )
 }
 
