@@ -1,4 +1,6 @@
 import React, { useState, useContext } from 'react'
+import cx from 'classnames'
+import { noop } from 'lodash'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import {
   getOtpWithEmail,
@@ -34,6 +36,7 @@ const Login = () => {
   const [otp, setOtp] = useState('')
   const [errorMsg, setErrorMsg] = useState(null)
   const [canResend, setCanResend] = useState(false)
+  const [isResending, setIsResending] = useState(false)
 
   async function sendOtp() {
     resetButton()
@@ -45,13 +48,14 @@ const Login = () => {
         setCanResend(true)
       }, RESEND_WAIT_TIME)
     } catch (err) {
+      setCanResend(true)
       setErrorMsg(err.message)
       sendException(err.message)
     }
   }
 
   async function login() {
-    resetButton()
+    setErrorMsg(null)
     try {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
@@ -67,12 +71,14 @@ const Login = () => {
   function resetButton() {
     setErrorMsg(null)
     setCanResend(false)
+    setOtp('')
   }
 
-  function resend() {
-    setOtpSent(false)
-    sendOtp()
+  async function resend() {
     sendUserEvent(GA_USER_EVENTS.RESEND_OTP)
+    setIsResending(true)
+    await sendOtp()
+    setIsResending(false)
   }
 
   function render(
@@ -88,9 +94,12 @@ const Login = () => {
       <>
         <h4 className={styles.text}>
           {mainText}
-          {otpSent && canResend && (
-            <a className={styles.resend} onClick={resend}>
-              Resend?
+          {otpSent && (
+            <a
+              className={cx(styles.resend, { [styles.disabled]: !canResend })}
+              onClick={canResend ? resend : noop}
+            >
+              {isResending ? 'Resending OTP...' : 'Resend?'}
             </a>
           )}
         </h4>
