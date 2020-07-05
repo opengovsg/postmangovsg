@@ -54,11 +54,13 @@ jobs:
         - cp -R ../modules ./
       deploy:
         - provider: script
+          skip_cleanup: true
           script: ./deploy.sh postmangovsg-workers staging-sending staging-logging
           on:
             branch: $STAGING_BRANCH
             condition: "$DEPLOY_WORKER = true"
         - provider: script
+          skip_cleanup: true
           script: ./deploy.sh postmangovsg-workers prod-sending prod-logging
           on:
             branch: $PRODUCTION_BRANCH
