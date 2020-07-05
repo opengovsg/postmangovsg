@@ -5,12 +5,7 @@ node_js:
 services:
   - docker
 
-cache:
-  directories:
-    - backend/node_modules
-    - worker/node_modules
-    - frontend/node_modules
-    - ./node_modules
+cache: npm
 
 # Deploy from Dockerfile
 jobs:
@@ -19,7 +14,7 @@ jobs:
       before_install:
         - cd backend
       install:
-        - npm install
+        - npm ci
       script:
         - npm run lint-no-fix
         - npm run test
@@ -52,7 +47,7 @@ jobs:
       before_install:
         - cd worker
       install:
-        - npm install
+        - npm ci
       script:
         - npm run lint-no-fix
       before_deploy:
