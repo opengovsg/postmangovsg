@@ -9,13 +9,13 @@ import {
   Worker,
   UserCredential,
   Statistic,
+  ProtectedMessage,
 } from '@core/models'
 import {
   EmailMessage,
   EmailTemplate,
   EmailOp,
   EmailBlacklist,
-  EmailEncryptedMessages,
 } from '@email/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import logger from '@core/logger'
@@ -47,7 +47,7 @@ const sequelizeLoader = async (): Promise<void> => {
     EmailTemplate,
     EmailOp,
     EmailBlacklist,
-    EmailEncryptedMessages,
+    ProtectedMessage,
   ]
   const smsModels = [SmsMessage, SmsTemplate, SmsOp]
   sequelize.addModels([...coreModels, ...emailModels, ...smsModels])

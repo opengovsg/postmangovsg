@@ -355,7 +355,7 @@ router.delete(
  * path:
  *   /campaign/{campaignId}/email/upload-multi/complete:
  *     post:
- *       description: "Complete upload session"
+ *       description: "Complete multipart upload session, stores protected payloads"
  *       tags:
  *         - Email
  *       parameters:
@@ -392,7 +392,7 @@ router.post(
   '/upload-multi/complete',
   celebrate(uploadCompleteValidator),
   CampaignMiddleware.canEditCampaign,
-  EmailTemplateMiddleware.uploadMultiCompleteHandler
+  EmailTemplateMiddleware.uploadProtectedCompleteHandler
 )
 
 /**

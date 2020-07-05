@@ -8,12 +8,13 @@ import {
 } from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'email_messages', underscored: true, timestamps: true })
-export class EmailEncryptedMessages extends Model<EmailEncryptedMessages> {
+@Table({ tableName: 'protected_messages', underscored: true, timestamps: true })
+export class ProtectedMessage extends Model<ProtectedMessage> {
   @Column({
     primaryKey: true,
+    type: DataType.STRING,
   })
-  id!: number
+  id!: string
 
   @ForeignKey(() => Campaign)
   @Column(DataType.INTEGER)

@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import { v4 as uuid } from 'uuid'
-import url from 'url'
+import { Transaction } from 'sequelize'
 
 import logger from '@core/logger'
-import config from '@core/config'
 import {
   MissingTemplateKeysError,
   HydrationError,
@@ -12,7 +10,12 @@ import {
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
-import { CampaignService, TemplateService, StatsService } from '@core/services'
+import {
+  CampaignService,
+  TemplateService,
+  StatsService,
+  ProtectedService,
+} from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
@@ -81,77 +84,6 @@ const storeTemplate = async (
 }
 
 /**
- * Updates the campaign table, generate unique protected links and update email_encrypted_messages
- * and email_messages table in a transaction, rolling back when either fails. For campaign table,
- * the s3 meta data is updated with the uploaded file, and its validity is set to true. For
- * email_encrypted_messages and email_messages table, existing records are deleted and new ones
- * are bulk inserted. Then update statistics with new unsent count
- * @param key
- * @param campaignId
- * @param filename
- * @param records
- */
-const updateProtectedCampaignAndMessages = async (
-  campaignId: number,
-  key: string,
-  filename: string,
-  records: ProtectedMessageRecordsInterface[]
-): Promise<void> => {
-  let transaction
-
-  try {
-    transaction = await Campaign.sequelize?.transaction()
-    // Updates metadata in project
-    await TemplateService.replaceCampaignS3Metadata(
-      campaignId,
-      key,
-      filename,
-      transaction
-    )
-
-    // Generate unique links
-    const frontendUrl = config.get('frontendUrl')
-    const protectedMessagesRecords: ProtectedMessageBulkInsertInterface[] = []
-    const messageLogRecords: MessageBulkInsertInterface[] = []
-    records.map((record, index) => {
-      const id = uuid()
-      protectedMessagesRecords[index] = { ...record, id }
-      const protectedLink = url.resolve(frontendUrl, `protected/${id}`)
-      messageLogRecords[index] = {
-        campaignId: record.campaignId,
-        recipient: record.recipient,
-        params: { protectedlink: protectedLink, recipient: record.recipient },
-      }
-    })
-
-    // Start populate encrypted messages
-    await EmailTemplateService.addToEncryptedMessageLogs(
-      campaignId,
-      protectedMessagesRecords,
-      transaction
-    )
-
-    // START populate template
-    await EmailTemplateService.addToMessageLogs(
-      campaignId,
-      messageLogRecords,
-      transaction
-    )
-
-    // Update statistic table
-    await StatsService.setNumRecipients(campaignId, records.length, transaction)
-
-    // Set campaign to valid
-    await CampaignService.setValid(campaignId, transaction)
-
-    transaction?.commit()
-  } catch (err) {
-    transaction?.rollback()
-    throw err
-  }
-}
-
-/**
  * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
  * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
  * For email_messages table, existing records are deleted and new ones are bulk inserted.
@@ -165,12 +97,13 @@ const updateCampaignAndMessages = async (
   campaignId: number,
   key: string,
   filename: string,
-  records: MessageBulkInsertInterface[]
+  records: MessageBulkInsertInterface[],
+  transaction?: Transaction
 ): Promise<void> => {
-  let transaction
-
   try {
-    transaction = await Campaign.sequelize?.transaction()
+    if (!transaction) {
+      transaction = await Campaign.sequelize?.transaction()
+    }
     // Updates metadata in project
     await TemplateService.replaceCampaignS3Metadata(
       campaignId,
@@ -337,7 +270,7 @@ const deleteCsvErrorHandler = async (
  * @param res
  * @param next
  */
-const uploadMultiCompleteHandler = async (
+const uploadProtectedCompleteHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -345,21 +278,23 @@ const uploadMultiCompleteHandler = async (
   try {
     const { campaignId } = req.params
 
+    if (!(await ProtectedService.isProtectedCampaign(+campaignId))) {
+      throw new Error('Not a protected campaign')
+    }
+
+    if (!(await EmailTemplateService.getFilledTemplate(+campaignId))) {
+      throw new Error('Template does not exist, please create a template')
+    }
+
     // extract s3Key from transactionId
     const { transaction_id: transactionId, filename } = req.body
     const s3Key = TemplateService.extractS3Key(transactionId)
 
     // check if template exists
-    const emailTemplate = await EmailTemplateService.getFilledTemplate(
-      +campaignId
-    )
-    if (emailTemplate === null) {
-      throw new Error('Template does not exist, please create a template')
-    }
 
     // STUB: read records from s3
     // returns { campaignId, records, payload, passwordHash}
-    const records = [] as ProtectedMessageRecordsInterface[]
+    const records = [] as ProtectedMessageRecordInterface[]
 
     if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
       throw new InvalidRecipientError()
@@ -369,12 +304,32 @@ const uploadMultiCompleteHandler = async (
     await TemplateService.storeS3TempFilename(+campaignId, filename)
 
     // Slow bulk insert
-    await updateProtectedCampaignAndMessages(
-      +campaignId,
-      s3Key,
-      filename,
-      records
-    )
+    try {
+      // Return early because bulk insert is slow
+      res.sendStatus(202)
+
+      // Slow bulk insert
+      const transaction = await Campaign.sequelize?.transaction()
+      const messagesToStore = await ProtectedService.storeProtectedMessages(
+        +campaignId,
+        records,
+        transaction
+      )
+      await updateCampaignAndMessages(
+        +campaignId,
+        s3Key,
+        filename,
+        messagesToStore,
+        transaction
+      )
+    } catch (err) {
+      // Do not return any response since it has already been sent
+      logger.error(
+        `Error storing messages for campaign ${campaignId}. ${err.stack}`
+      )
+      // Store error to return on poll
+      TemplateService.storeS3Error(+campaignId, err.message)
+    }
   } catch (err) {
     const userErrors = [
       RecipientColumnMissing,
@@ -395,5 +350,5 @@ export const EmailTemplateMiddleware = {
   uploadCompleteHandler,
   pollCsvStatusHandler,
   deleteCsvErrorHandler,
-  uploadMultiCompleteHandler,
+  uploadProtectedCompleteHandler,
 }

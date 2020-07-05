@@ -4,16 +4,11 @@ interface MessageBulkInsertInterface {
   params: { [key: string]: string }
 }
 
-interface ProtectedMessageRecordsInterface {
+interface ProtectedMessageRecordInterface {
   campaignId: number
   recipient: string
   payload: string
   passwordHash: string
-}
-
-interface ProtectedMessageBulkInsertInterface
-  extends ProtectedMessageRecordsInterface {
-  id: string
 }
 
 interface TestHydrationResult {
