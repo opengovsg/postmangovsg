@@ -7,7 +7,7 @@ import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import TemplateClient from '@core/services/template-client.class'
+import { TemplateClient } from 'postman-templating'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
@@ -256,10 +256,27 @@ const hasInvalidEmailRecipient = (
   return records.some((record) => !validator.isEmail(record.recipient))
 }
 
+/**
+ * Attempts to hydrate the first record.
+ * @param records
+ * @param templateBody
+ * @param templateSubject - optional
+ */
+const testHydration = (
+  records: Array<MessageBulkInsertInterface>,
+  templateBody: string,
+  templateSubject: string
+): void => {
+  const [firstRecord] = records
+  client.template(templateBody, firstRecord.params)
+  client.template(templateSubject, firstRecord.params)
+}
+
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
   hasInvalidEmailRecipient,
+  testHydration,
   client,
 }
