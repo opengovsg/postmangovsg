@@ -27,6 +27,7 @@ jobs:
         - cp -R ../modules ./
       deploy:
         - provider: elasticbeanstalk
+          edge: true
           skip_cleanup: true
           access_key_id: $AWS_ACCESS_KEY_ID
           secret_access_key: $AWS_SECRET_ACCESS_KEY
@@ -37,6 +38,7 @@ jobs:
           on:
             branch: $STAGING_BRANCH
         - provider: elasticbeanstalk
+          edge: true
           skip_cleanup: true
           access_key_id: $AWS_ACCESS_KEY_ID
           secret_access_key: $AWS_SECRET_ACCESS_KEY
