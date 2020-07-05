@@ -8,6 +8,7 @@ import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
 import TemplateClient from '@core/services/template-client.class'
+import { PhoneNumberService } from '@core/services'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
@@ -204,20 +205,18 @@ const addToMessageLogs = async (
   }
 }
 
+/**
+ * Validate that recipient is a valid phone number and format it.
+ */
 const validateAndFormatNumber = (
   records: MessageBulkInsertInterface[]
 ): MessageBulkInsertInterface[] => {
-  const re = /^\+?[0-9]+$/
-
   return records.map((record) => {
     const { recipient } = record
-    if (!re.test(recipient)) {
+    try {
+      record.recipient = PhoneNumberService.normalisePhoneNumber(recipient)
+    } catch (e) {
       throw new InvalidRecipientError()
-    }
-
-    // Append default country code if does not exists.
-    if (!recipient.startsWith('+') && config.get('defaultCountryCode')) {
-      record.recipient = `+${config.get('defaultCountryCode')}${recipient}`
     }
     return record
   })
