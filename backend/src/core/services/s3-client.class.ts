@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 
 import { jwtUtils } from '@core/utils/jwt'
 import config from '@core/config'
+import logger from '@core/logger'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 
 import { CSVParams } from '@core/types'

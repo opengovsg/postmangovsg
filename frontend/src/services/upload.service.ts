@@ -1,7 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import Papa from 'papaparse'
 import { EmailPreview, SMSPreview } from 'classes'
-import { getTemplateBody } from './email.service'
 import { encryptData, hashData } from './crypto.service'
 
 interface PresignedUrlResponse {
@@ -185,8 +184,6 @@ interface ProtectedParams {
 }
 
 /*
- * SWTODO: Swap template body for content template once the new component is out
- * 1. Gets template body from backend.
  * 2. Initiate multipart upload
  * 3. Parse the csv file in chunks of 10mb
  * 4. For each chunk:
@@ -197,14 +194,15 @@ interface ProtectedParams {
  * 5. Note, for the first chunk, we need to add in the headers.
  * 6. Once the file is done parsing, we complete the multipart upload.
  */
-export async function multipartUploadToS3(
-  campaignId: number,
+export async function multipartUploadToS3({
+  campaignId,
+  file,
+  contentTemplate,
+}: {
+  campaignId: number
   file: File
-): Promise<void> {
-  const templateBody = await getTemplateBody(campaignId)
-  if (templateBody === undefined)
-    throw new Error('There is no template body for the campaign.')
-
+  contentTemplate: string
+}): Promise<void> {
   const mimeType = await getMimeType(file)
 
   const transactionId = await beginMultipartUpload({
@@ -230,12 +228,12 @@ export async function multipartUploadToS3(
         // recipient,encryptedPayload,passwordHash
         const rows = await Promise.all(
           paramsArr.map(async (params) => {
-            return await transformRow(templateBody, params)
+            return await transformRow(contentTemplate, params)
           })
         )
 
         // Join the rows into a single string
-        const data = processChunkdata(rows, partNumber)
+        const data = processChunkData(rows, partNumber)
 
         const presignedUrl = await getPresignedMultipartUrl({
           campaignId,
@@ -382,7 +380,7 @@ async function completeMultiPartUpload({
 
 // Combine the rows into a single string
 // If part number is 1, we need to add in the headers
-function processChunkdata(rows: Array<string>, partNumber: number) {
+function processChunkData(rows: Array<string>, partNumber: number) {
   // Join the rows into a single string
   if (partNumber === 1) {
     const headers = 'recipient,encrypted_payload,password_hash\n'
