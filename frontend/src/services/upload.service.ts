@@ -349,9 +349,9 @@ async function uploadPartWithPresignedUrl({
   const response = await axios.put(presignedUrl, data, {
     headers: {
       'Content-Type': contentType,
-      withCredentials: false,
-      timeout: 0,
     },
+    withCredentials: false,
+    timeout: 0,
   })
   return response.headers.etag
 }
