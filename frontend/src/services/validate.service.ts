@@ -20,7 +20,14 @@ export async function validateCsv(
 ): Promise<CsvStatus> {
   try {
     await validateHeaders(file, templateParams)
-    await validateRows(file, templateParams)
+    const numRows = await validateRows(file, templateParams)
+    return Promise.resolve({
+      csvError: '',
+      numRecipients: numRows,
+      // TODO: Change this to an actual preview
+      preview: 'This is a preview of message B',
+      csvFilename: file.name,
+    })
   } catch (err) {
     // if there is an error, return a csv status with the error message
     return Promise.resolve({
@@ -30,12 +37,6 @@ export async function validateCsv(
       csvFilename: file.name,
     })
   }
-  return Promise.resolve({
-    csvError: '',
-    numRecipients: 123,
-    preview: 'This is a preview of message B',
-    csvFilename: file.name,
-  })
 }
 
 /**
@@ -71,13 +72,14 @@ async function validateHeaders(
 
 /**
  * Read the file row by row and ensure that all the required params are there.
- *
+ * Returns the number of rows in the csv file
  */
 async function validateRows(
   file: File,
   templateParams: Array<string>
-): Promise<void> {
-  await new Promise((resolve, reject) => {
+): Promise<number> {
+  return await new Promise((resolve, reject) => {
+    let count = 0
     Papa.parse(file, {
       header: true,
       delimiter: ',',
@@ -97,9 +99,10 @@ async function validateRows(
         } catch (e) {
           reject(e.message)
         }
+        count++
       },
       complete: function () {
-        resolve()
+        resolve(count)
       },
     })
   })
