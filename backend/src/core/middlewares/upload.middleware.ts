@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import S3Client from '@core/services/s3-client.class'
 
 import logger from '@core/logger'
 import { UploadService } from '@core/services'
-
-const s3Client = new S3Client()
 
 /**
  * Start an upload by returning a presigned url to the user to upload file to s3 bucket
@@ -46,7 +43,7 @@ const startMultipartUpload = async (
   try {
     const contentType = req.query['mime_type']
 
-    const transactionId = await s3Client.startMultipartUpload(contentType)
+    const transactionId = await UploadService.startMultipartUpload(contentType)
 
     return res.json({
       transaction_id: transactionId,
@@ -71,7 +68,7 @@ const getMultipartUrl = async (
     const transactionId = req.query['transaction_id']
     const partNumber = req.query['part_number']
 
-    const presignedUrl = await s3Client.getPresignedPartUrl({
+    const presignedUrl = await UploadService.getPresignedPartUrl({
       transactionId,
       partNumber,
     })
@@ -103,7 +100,7 @@ const completeMultipart = async (
       etags,
     } = req.body
 
-    const s3Key = await s3Client.completeMultipartUpload({
+    const s3Key = await UploadService.completeMultipartUpload({
       transactionId,
       partCount,
       etags,
