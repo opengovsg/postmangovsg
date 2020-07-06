@@ -269,6 +269,7 @@ const deleteCsvErrorHandler = async (
   }
 }
 
+// TODO: refactor this handler with uploadCompleteHandler to share the same function
 /**
  * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
  * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
@@ -285,10 +286,6 @@ const uploadProtectedCompleteHandler = async (
   try {
     const { campaignId } = req.params
 
-    if (!(await ProtectedService.isProtectedCampaign(+campaignId))) {
-      throw new Error('Not a protected campaign')
-    }
-
     if (!(await EmailTemplateService.getFilledTemplate(+campaignId))) {
       throw new Error('Template does not exist, please create a template')
     }
@@ -300,11 +297,14 @@ const uploadProtectedCompleteHandler = async (
       uploadId: string
     }
 
-    // check if template exists
+    // - download from s3
+    const s3Client = new S3Client()
+    const fileContent = await s3Client.getCsvFile(s3Key)
 
-    // STUB: read records from s3
-    // returns { campaignId, records, payload, passwordHash}
-    const records = [] as ProtectedMessageRecordInterface[]
+    const records = UploadService.getProtectedRecordsFromCsv(
+      +campaignId,
+      fileContent
+    )
 
     if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
       throw new InvalidRecipientError()
@@ -338,7 +338,7 @@ const uploadProtectedCompleteHandler = async (
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
       // Store error to return on poll
-      TemplateService.storeS3Error(+campaignId, err.message)
+      UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     const userErrors = [

@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { difference, keys } from 'lodash'
+import { difference, keys, pick } from 'lodash'
 
 import S3 from 'aws-sdk/clients/s3'
 import { Transaction } from 'sequelize/types'
@@ -293,6 +293,31 @@ const getRecordsFromCsv = (
   })
 }
 
+/**
+ * Checks the csv for all the necessary columns.
+ * Transform the array of CSV rows into message interface
+ * @param campaignId
+ * @param fileContent
+ */
+const getProtectedRecordsFromCsv = (
+  campaignId: number,
+  fileContent: Array<CSVParams>
+): Array<ProtectedMessageRecordInterface> => {
+  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordHash']
+
+  checkTemplateKeysMatch(fileContent, PROTECTED_CSV_HEADERS)
+
+  return fileContent.map((entry) => {
+    return {
+      campaignId,
+      ...(pick(entry, PROTECTED_CSV_HEADERS) as Omit<
+        ProtectedMessageRecordInterface,
+        'campaignId'
+      >),
+    }
+  })
+}
+
 export const UploadService = {
   /*** S3 API Calls ****/
   getUploadParameters,
@@ -307,4 +332,5 @@ export const UploadService = {
   deleteS3TempKeys,
   getCsvStatus,
   getRecordsFromCsv,
+  getProtectedRecordsFromCsv,
 }
