@@ -33,7 +33,7 @@ convict.addFormats({
 const config = convict({
   env: {
     doc: 'The application environment.',
-    format: ['production', 'staging', 'development'],
+    format: ['production', 'staging', 'development', 'telegram'],
     default: 'production',
     env: 'NODE_ENV',
   },
