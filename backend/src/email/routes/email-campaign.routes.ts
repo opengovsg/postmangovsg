@@ -654,7 +654,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
 router.get(
   '/upload-start-multipart',
   celebrate(startMultipartValidator),
-  EmailMiddleware.startMultipartUpload
+  UploadMiddleware.startMultipartUpload
 )
 
 /**
@@ -703,7 +703,7 @@ router.get(
 router.get(
   '/upload-multipart-url',
   celebrate(getMultipartUrlValidator),
-  EmailMiddleware.getMultipartUrl
+  UploadMiddleware.getMultipartUrl
 )
 
 /**
@@ -756,7 +756,7 @@ router.get(
 router.post(
   '/upload-complete-multipart',
   celebrate(completeMultipartValidator),
-  EmailMiddleware.completeMultipart
+  UploadMiddleware.completeMultipart
 )
 
 export default router

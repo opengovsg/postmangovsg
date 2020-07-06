@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import S3Client from '@core/services/s3-client.class'
 import { EmailService } from '@email/services'
-
-const s3Client = new S3Client()
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
@@ -95,98 +92,9 @@ const previewFirstMessage = async (
   }
 }
 
-/**
- * Starts multipart upload.
- * Once started, it should either be completed when all the parts are uploaded or aborted.
- * @param req
- * @param res
- * @param next
- */
-const startMultipartUpload = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const contentType = req.query['mime_type']
-
-    const transactionId = await s3Client.startMultipartUpload(contentType)
-
-    return res.json({
-      transaction_id: transactionId,
-    })
-  } catch (err) {
-    return next(err)
-  }
-}
-
-/**
- * Get a presigned url for multipart upload.
- * @param req
- * @param res
- * @param next
- */
-const getMultipartUrl = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const transactionId = req.query['transaction_id']
-    const partNumber = req.query['part_number']
-
-    const presignedUrl = await s3Client.getPresignedPartUrl({
-      transactionId,
-      partNumber,
-    })
-
-    return res.json({
-      presigned_url: presignedUrl,
-    })
-  } catch (err) {
-    return next(err)
-  }
-}
-
-/**
- * Complete a multipart upload.
- * @param req
- * @param res
- * @param next
- */
-const completeMultipart = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const {
-      transaction_id: transactionId,
-      part_count: partCount,
-      etags,
-    } = req.body
-
-    await s3Client.completeMultipartUpload({
-      transactionId,
-      partCount,
-      etags,
-    })
-
-    // Not sure what i should return here
-    return res.json({
-      transaction_id: transactionId,
-    })
-  } catch (err) {
-    return next(err)
-  }
-}
-
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser,
   validateAndStoreCredentials,
   getCampaignDetails,
   previewFirstMessage,
-  startMultipartUpload,
-  getMultipartUrl,
-  completeMultipart,
 }
