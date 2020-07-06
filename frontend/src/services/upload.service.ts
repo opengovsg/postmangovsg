@@ -219,6 +219,7 @@ export async function multipartUploadToS3({
     Papa.parse(file, {
       header: true,
       delimiter: ',',
+      skipEmptyLines: true,
       chunk: async function (chunk, parser) {
         parser.pause()
         partNumber++

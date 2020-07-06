@@ -82,5 +82,5 @@ export async function decryptData(
 }
 
 export async function hashData(text: string): Promise<string> {
-  return await bcryptjs.hash(text, 2)
+  return await bcryptjs.hash(text, 1)
 }
