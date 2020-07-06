@@ -652,7 +652,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
  *           description: Internal Server Error
  */
 router.get(
-  '/upload-protect/start',
+  '/protect/upload/start',
   celebrate(startMultipartValidator),
   UploadMiddleware.startMultipartUpload
 )
@@ -701,7 +701,7 @@ router.get(
  *           description: Internal Server Error
  */
 router.get(
-  '/upload-multipart-url',
+  '/protect/upload/part',
   celebrate(getMultipartUrlValidator),
   UploadMiddleware.getMultipartUrl
 )
@@ -754,7 +754,7 @@ router.get(
  *           description: Internal Server Error
  */
 router.post(
-  '/upload-complete-multipart',
+  '/protect/upload/complete',
   celebrate(completeMultipartValidator),
   UploadMiddleware.completeMultipart
 )
