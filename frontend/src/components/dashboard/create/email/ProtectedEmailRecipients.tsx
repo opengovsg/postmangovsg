@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import cx from 'classnames'
 
-import { uploadEncryptedFileToS3 } from 'services/upload.service'
+import { uploadProtectedFileToS3 } from 'services/upload.service'
 import {
   CsvStatus,
   extractTemplateParams,
@@ -38,15 +37,12 @@ const ProtectedEmailRecipients = ({
   const [content, setContent] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
-  const [isUploadingToServer, setIsUploadingToServer] = useState(false)
+  const [isEncryptionComplete, setIsEncryptionComplete] = useState(false)
   const [tempFile, setTempFile] = useState<File>()
-  const [encryptedFile, setEncryptedFile] = useState<File>()
   const [csvInfo, setCsvInfo] = useState<CsvStatus>({
     numRecipients: initialNumRecipients,
     csvFilename: initialCsvFilename,
   })
-  const [encryptionComplete, setEncryptionComplete] = useState(false)
-  const [isCsvEncrypting, setIsCsvEncrypting] = useState(false)
   const { id: campaignId } = useParams()
 
   const { csvFilename, numRecipients = 0 } = csvInfo
@@ -78,10 +74,9 @@ const ProtectedEmailRecipients = ({
     )
   }
 
-  // Handle file upload
-  async function uploadFile(files: File[]) {
-    setIsUploading(true)
+  async function onFileSelected(files: File[]) {
     setErrorMessage('')
+    setIsEncryptionComplete(false)
 
     try {
       // user did not select a file
@@ -96,71 +91,27 @@ const ProtectedEmailRecipients = ({
       setCsvInfo(csvInfo)
     } catch (err) {
       setErrorMessage(err.message)
-    } finally {
-      setIsUploading(false)
     }
   }
 
-  // // Hide csv error from previous upload and delete from db
-  function clearCsvStatus() {
-    if (campaignId) {
-      setCsvInfo((info) => ({ ...info, csvError: undefined }))
-    }
-  }
-
-  async function onEncryptCsv() {
+  async function handleUpload() {
+    setIsUploading(true)
+    // hydrate templates and encrypt content
     if (!tempFile) {
       setErrorMessage('Error encrypting file')
       return
     }
-    setIsCsvEncrypting(true)
-    const encryptedFile = await encryptCsv(tempFile)
-    setEncryptedFile(encryptedFile)
-    setEncryptionComplete(true)
-    setIsCsvEncrypting(false)
-  }
-
-  function resetUpload() {
-    setEncryptionComplete(false)
-    setCsvInfo({})
-    setContent('')
-  }
-
-  async function handleNext(e: any) {
-    if (!encryptedFile) {
-      setErrorMessage('Error encrypting file')
-      return
-    }
-    await uploadFileToServer(encryptedFile)
-    onNext(e)
-  }
-
-  // Handle file upload
-  async function uploadFileToServer(file: File) {
-    setIsUploadingToServer(true)
-    setErrorMessage('')
-    const uploadTimeStart = performance.now()
-
     try {
-      // user did not select a file
-      if (!file || !campaignId) {
-        return
-      }
-      clearCsvStatus()
-      await uploadEncryptedFileToS3(+campaignId, file)
-
+      const file = await encryptCsv(tempFile)
+      const uploadTimeStart = performance.now()
+      await uploadProtectedFileToS3(campaignId, file)
       const uploadTimeEnd = performance.now()
-      sendTiming(
-        'Encrypted contacts file',
-        'upload',
-        uploadTimeEnd - uploadTimeStart
-      )
-
-      // setIsCsvProcessing(true)
+      sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
     } catch (err) {
       setErrorMessage(err.message)
     } finally {
-      setIsUploadingToServer(false)
+      setIsUploading(false)
+      setIsEncryptionComplete(true)
     }
   }
 
@@ -188,11 +139,13 @@ const ProtectedEmailRecipients = ({
       <CsvUpload
         isCsvProcessing={false}
         csvInfo={csvInfo}
-        onErrorClose={clearCsvStatus}
+        onErrorClose={() =>
+          setCsvInfo((info) => ({ ...info, csvError: undefined }))
+        }
       >
         <FileInput
-          isProcessing={isUploading}
-          onFileSelected={uploadFile}
+          isProcessing={false}
+          onFileSelected={onFileSelected}
           label="Select"
         />
         <p>or</p>
@@ -218,55 +171,48 @@ const ProtectedEmailRecipients = ({
           </p>
           <p>
             <b>Note</b>: Once you have encrypted Message B, you have to create
-            new message if you wish to edit any detail. Creating a new message
-            will require you to upload your recipients all over again.
+            new message if you wish to edit any detail. Editing the message will
+            require you to upload your recipients all over again.
           </p>
-          {!encryptionComplete && (
-            <>
-              <PreviewBlock body={csvInfo.preview || ''} />
-              <div className="progress-button">
-                <PrimaryButton
-                  className={styles.darkBlueBtn}
-                  onClick={onEncryptCsv}
-                >
-                  Encrypt
-                </PrimaryButton>
-              </div>
-            </>
-          )}
-          {isCsvEncrypting && (
-            <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
-          )}
-          {encryptionComplete && (
-            <>
-              <InfoBlock className={styles.greenInfoBlock}>
-                <li>
-                  <i className="bx bx-check-circle"></i>
-                  <span>Password protected message has been encrypted</span>
-                </li>
-              </InfoBlock>
-              <div className="progress-button">
-                <PrimaryButton
-                  className={styles.darkBlueBtn}
-                  onClick={resetUpload}
-                >
-                  Create new message
-                </PrimaryButton>
-              </div>
-            </>
+          {isUploading || isEncryptionComplete ? (
+            <InfoBlock className={styles.greenInfoBlock}>
+              <li>
+                {isUploading ? (
+                  <>
+                    <i className="bx bx-loader-alt bx-spin"></i>
+                    <span>
+                      Message encryption in progress. Do not leave the page
+                      until done.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <i className="bx bx-check-circle"></i>
+                    <span>Password protected message has been encrypted</span>
+                  </>
+                )}
+              </li>
+            </InfoBlock>
+          ) : (
+            <PreviewBlock body={csvInfo.preview || ''} />
           )}
           <div className="separator"></div>
         </>
       )}
 
       <div className="progress-button">
-        <PrimaryButton
-          disabled={!encryptionComplete}
-          onClick={(e) => handleNext(e)}
-        >
-          Next{' '}
-          {isUploadingToServer && <i className="bx bx-loader-alt bx-spin"></i>}
-        </PrimaryButton>
+        {numRecipients > 0 && !isUploading && (
+          <a className={styles.editBtn} onClick={() => setCsvInfo({})}>
+            Edit
+          </a>
+        )}
+        {numRecipients > 0 && isEncryptionComplete ? (
+          <PrimaryButton onClick={onNext}>Next</PrimaryButton>
+        ) : (
+          <PrimaryButton disabled={!numRecipients} onClick={handleUpload}>
+            Encrypt
+          </PrimaryButton>
+        )}
       </div>
     </>
   )

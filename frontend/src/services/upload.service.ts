@@ -184,7 +184,7 @@ function errorHandler(e: AxiosError, defaultMsg?: string): never {
   throw new Error(defaultMsg || e.response?.statusText)
 }
 
-export async function uploadEncryptedFileToS3(
+export async function uploadProtectedFileToS3(
   campaignId: number,
   file: File
 ): Promise<void> {

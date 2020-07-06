@@ -99,3 +99,8 @@
 .greenInfoBlock {
   @include block(rgba($turquoise-green, 0.2), $turquoise-green);
 }
+
+.editBtn {
+  margin-right: 2rem;
+  cursor: pointer;
+}
