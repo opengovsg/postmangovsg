@@ -6,7 +6,7 @@ import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import TemplateClient from '@core/services/template-client.class'
+import { TemplateClient } from 'postman-templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
@@ -28,7 +28,11 @@ const upsertSmsTemplate = async ({
   try {
     transaction = await SmsTemplate.sequelize?.transaction()
     // update
-    if ((await SmsTemplate.findByPk(campaignId, { transaction })) !== null) {
+    if (
+      (await SmsTemplate.findByPk(campaignId, {
+        transaction,
+      })) !== null
+    ) {
       // .update is actually a bulkUpdate
       const updatedTemplate: [number, SmsTemplate[]] = await SmsTemplate.update(
         {
@@ -181,7 +185,9 @@ const storeTemplate = async ({
 const getFilledTemplate = async (
   campaignId: number
 ): Promise<SmsTemplate | null> => {
-  const smsTemplate = await SmsTemplate.findOne({ where: { campaignId } })
+  const smsTemplate = await SmsTemplate.findOne({
+    where: { campaignId },
+  })
   if (!smsTemplate?.body || !smsTemplate.params) {
     return null
   }
@@ -228,10 +234,24 @@ const hasInvalidSmsRecipient = (
   return records.some((record) => !re.test(record.recipient))
 }
 
+/**
+ * Attempts to hydrate the first record.
+ * @param records
+ * @param templateBody
+ */
+const testHydration = (
+  records: Array<MessageBulkInsertInterface>,
+  templateBody: string
+): void => {
+  const [firstRecord] = records
+  client.template(templateBody, firstRecord.params)
+}
+
 export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
   hasInvalidSmsRecipient,
+  testHydration,
   client,
 }

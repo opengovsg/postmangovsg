@@ -53,6 +53,7 @@ const config = convict({
     awsEndpoint: {
       doc:
         'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      format: '*',
       default: null,
       env: 'AWS_ENDPOINT',
     },
@@ -80,6 +81,13 @@ const config = convict({
       doc: 'URI to the postgres database',
       default: '',
       env: 'DB_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
+    databaseReadReplicaUri: {
+      doc: 'URI to the postgres read replica database',
+      default: '',
+      env: 'DB_READ_REPLICA_URI',
       format: 'required-string',
       sensitive: true,
     },

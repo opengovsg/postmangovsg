@@ -1,6 +1,5 @@
-import config from '@core/config'
-import TemplateClient from '@core/services/template-client.class'
-import { TemplateError } from '@core/errors'
+import { TemplateClient } from '../src/template-client'
+import { TemplateError } from '../src/errors'
 
 describe('template', () => {
   let templateClient: TemplateClient
@@ -58,9 +57,19 @@ describe('template', () => {
 
   describe('xss', () => {
     describe('email', () => {
-      const client: TemplateClient = new TemplateClient(
-        config.get('xssOptions.email')
-      )
+      const xssOptions = {
+        whiteList: {
+          b: [],
+          i: [],
+          u: [],
+          br: [],
+          p: [],
+          a: ['href', 'title', 'target'],
+          img: ['src', 'alt', 'title', 'width', 'height'],
+        },
+        stripIgnoreTag: true,
+      }
+      const client: TemplateClient = new TemplateClient(xssOptions)
 
       describe('email template should allow b, i, u, br, a, img tags', () => {
         const body =
@@ -90,9 +99,11 @@ describe('template', () => {
       })
     })
     describe('sms', () => {
-      const client: TemplateClient = new TemplateClient(
-        config.get('xssOptions.sms')
-      )
+      const xssOptions = {
+        whiteList: { br: [] },
+        stripIgnoreTag: true,
+      }
+      const client: TemplateClient = new TemplateClient(xssOptions)
 
       describe('sms template should not allow any html tags except br', () => {
         const body =

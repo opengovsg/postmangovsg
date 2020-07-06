@@ -22,5 +22,10 @@
     text-decoration: underline;
     margin-left: 1rem;
     cursor: pointer;
+
+    &.disabled {
+      cursor: not-allowed;
+      color: $light-grey;
+    }
   }
 }
