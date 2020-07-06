@@ -200,7 +200,7 @@ const ProtectedEmailRecipients = ({
         2. Password column with recipients&apos; passwords to open registered
         mail
         <br />
-        3. Attributes in both message templates
+        3. All keywords used in Message B
       </p>
       <br />
 

@@ -30,12 +30,17 @@ const EmailTemplate = ({
   const [replyTo, setReplyTo] = useState(initialReplyTo)
   const { id: campaignId } = useParams()
 
+  const protectedBodyPlaceholder =
+    'Dear {{ recipient }}, you may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a>'
+  const bodyPlaceholder = 'Enter email message'
+
   async function handleSaveTemplate(): Promise<void> {
     setErrorMsg(null)
     try {
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
+      // TODO: Parse template and check for protectedlink params
       const { updatedTemplate, numRecipients } = await saveTemplate(
         +campaignId,
         subject,
@@ -78,24 +83,36 @@ const EmailTemplate = ({
         double curly braces. The keywords in your message template should match
         the headers in your recipients CSV file.
         <br />
-        <b>Note:</b> Recipient is a required column in the CSV file.{' '}
-        {protect && (
+        {!protect && (
           <>
-            Include <b>{'{{ protectedlink }}'}</b> to insert the unique
-            protected link for the recipient.
+            <b>Note:</b> Recipient is a required column in the CSV file.{' '}
           </>
         )}
       </p>
-      <p>
-        Example
-        <br />
-        Reminder: Dear <b>{'{{ name }}'}</b>, your next appointment at{' '}
-        <b>{'{{ clinic }}'}</b> is on <b>{'{{ date }}'} </b>
-        at <b>{'{{ time }}'}</b>.
-      </p>
+      {protect ? (
+        <>
+          <p>
+            <b>{'{{ recipient }}'}</b> - Use this keyword for your recipients.
+            <br />
+            <b>{'{{ protectedlink }}'}</b> - Include this keyword in Message A
+            template, but not in the CSV file. It will be automatically
+            generated for password protected emails.
+          </p>
+          <p>See placeholder text example below.</p>
+        </>
+      ) : (
+        <p>
+          Example
+          <br />
+          Reminder: Dear <b>{'{{ name }}'}</b>, your next appointment at{' '}
+          <b>{'{{ clinic }}'}</b> is on <b>{'{{ date }}'} </b>
+          at <b>{'{{ time }}'}</b>.
+        </p>
+      )}
+
       <TextArea
         highlight={true}
-        placeholder="Enter email message"
+        placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
         value={body}
         onChange={setBody}
       />
