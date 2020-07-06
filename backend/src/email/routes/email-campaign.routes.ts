@@ -73,6 +73,7 @@ const getMultipartUrlValidator = {
 
 const completeMultipartValidator = {
   [Segments.BODY]: Joi.object({
+    filename: Joi.string().required(),
     transaction_id: Joi.string().required(),
     part_count: Joi.number().integer().min(1).max(10000).required(),
     etags: Joi.array().items(Joi.string()).required(),
@@ -654,6 +655,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
 router.get(
   '/protect/upload/start',
   celebrate(startMultipartValidator),
+  CampaignMiddleware.canEditProtectedCampaign,
   UploadMiddleware.startMultipartUpload
 )
 
@@ -703,6 +705,7 @@ router.get(
 router.get(
   '/protect/upload/part',
   celebrate(getMultipartUrlValidator),
+  CampaignMiddleware.canEditProtectedCampaign,
   UploadMiddleware.getMultipartUrl
 )
 
@@ -725,10 +728,13 @@ router.get(
  *           application/json:
  *             schema:
  *               required:
+ *                 - filename
  *                 - transaction_id
  *                 - part_count
  *                 - etags
  *               properties:
+ *                 filename:
+ *                   type: string
  *                 transaction_id:
  *                   type: string
  *                 part_count:
@@ -756,7 +762,9 @@ router.get(
 router.post(
   '/protect/upload/complete',
   celebrate(completeMultipartValidator),
-  UploadMiddleware.completeMultipart
+  CampaignMiddleware.canEditProtectedCampaign,
+  UploadMiddleware.completeMultipart,
+  EmailTemplateMiddleware.uploadProtectedCompleteHandler
 )
 
 export default router

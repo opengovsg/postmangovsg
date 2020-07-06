@@ -90,7 +90,7 @@ const getMultipartUrl = async (
  */
 const completeMultipart = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   try {
@@ -100,14 +100,11 @@ const completeMultipart = async (
       etags,
     } = req.body
 
-    const s3Key = await UploadService.completeMultipartUpload({
+    await UploadService.completeMultipartUpload({
       transactionId,
       partCount,
       etags,
     })
-
-    // Passing the s3Key to the next middleware
-    res.locals.s3Key = s3Key
 
     return next()
   } catch (err) {

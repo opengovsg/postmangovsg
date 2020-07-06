@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
+import { Transaction } from 'sequelize'
+
 import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
@@ -7,9 +9,13 @@ import {
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
-
 import { TemplateError } from 'postman-templating'
-import { CampaignService, UploadService, StatsService } from '@core/services'
+import {
+  CampaignService,
+  UploadService,
+  StatsService,
+  ProtectedService,
+} from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
@@ -92,12 +98,13 @@ const updateCampaignAndMessages = async (
   campaignId: number,
   key: string,
   filename: string,
-  records: MessageBulkInsertInterface[]
+  records: MessageBulkInsertInterface[],
+  transaction?: Transaction
 ): Promise<void> => {
-  let transaction
-
   try {
-    transaction = await Campaign.sequelize?.transaction()
+    if (!transaction) {
+      transaction = await Campaign.sequelize?.transaction()
+    }
     // Updates metadata in project
     await UploadService.replaceCampaignS3Metadata(
       campaignId,
@@ -262,9 +269,96 @@ const deleteCsvErrorHandler = async (
   }
 }
 
+/**
+ * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
+ * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
+ * If the template and csv do not match, prompt the user to upload a new file.
+ * @param req
+ * @param res
+ * @param next
+ */
+const uploadProtectedCompleteHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+
+    if (!(await ProtectedService.isProtectedCampaign(+campaignId))) {
+      throw new Error('Not a protected campaign')
+    }
+
+    if (!(await EmailTemplateService.getFilledTemplate(+campaignId))) {
+      throw new Error('Template does not exist, please create a template')
+    }
+
+    // extract s3Key from transactionId
+    const { transaction_id: transactionId, filename } = req.body
+    const { s3Key } = UploadService.extractParamsFromJwt(transactionId) as {
+      s3Key: string
+      uploadId: string
+    }
+
+    // check if template exists
+
+    // STUB: read records from s3
+    // returns { campaignId, records, payload, passwordHash}
+    const records = [] as ProtectedMessageRecordInterface[]
+
+    if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
+      throw new InvalidRecipientError()
+    }
+
+    // Store temp filename
+    await UploadService.storeS3TempFilename(+campaignId, filename)
+
+    // Slow bulk insert
+    try {
+      // Return early because bulk insert is slow
+      res.sendStatus(202)
+
+      // Slow bulk insert
+      const transaction = await Campaign.sequelize?.transaction()
+      const messagesToStore = await ProtectedService.storeProtectedMessages(
+        +campaignId,
+        records,
+        transaction
+      )
+      await updateCampaignAndMessages(
+        +campaignId,
+        s3Key,
+        filename,
+        messagesToStore,
+        transaction
+      )
+    } catch (err) {
+      // Do not return any response since it has already been sent
+      logger.error(
+        `Error storing messages for campaign ${campaignId}. ${err.stack}`
+      )
+      // Store error to return on poll
+      TemplateService.storeS3Error(+campaignId, err.message)
+    }
+  } catch (err) {
+    const userErrors = [
+      RecipientColumnMissing,
+      MissingTemplateKeysError,
+      InvalidRecipientError,
+      UnexpectedDoubleQuoteError,
+    ]
+
+    if (userErrors.some((errType) => err instanceof errType)) {
+      return res.status(400).json({ message: err.message })
+    }
+    return next(err)
+  }
+}
+
 export const EmailTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
   pollCsvStatusHandler,
   deleteCsvErrorHandler,
+  uploadProtectedCompleteHandler,
 }
