@@ -1,7 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import Papa from 'papaparse'
 import { EmailPreview, SMSPreview } from 'classes'
-import { encryptData, hashData } from './crypto.service'
 
 interface PresignedUrlResponse {
   presignedUrl: string
@@ -177,119 +176,11 @@ export async function deleteCsvStatus(campaignId: number): Promise<void> {
   }
 }
 
-//SWTODO: Move this interface somewhere else
-interface ProtectedParams {
-  recipient: string
-  password: string
-}
-
-/*
- * 2. Initiate multipart upload
- * 3. Parse the csv file in chunks of 10mb
- * 4. For each chunk:
- *    - Loop through each params in the chunk, and transform the data into the following format:
- *    - `recipient,encryptedPayload,passwordHash`
- *    - Join all the data into a single string
- *    - Get a presigned url from backend and upload to s3 with the presigned url.
- * 5. Note, for the first chunk, we need to add in the headers.
- * 6. Once the file is done parsing, we complete the multipart upload.
- */
-export async function multipartUploadToS3({
-  campaignId,
-  file,
-  contentTemplate,
-}: {
-  campaignId: number
-  file: File
-  contentTemplate: string
-}): Promise<void> {
-  const mimeType = await getMimeType(file)
-
-  const transactionId = await beginMultipartUpload({
-    campaignId,
-    mimeType,
-  })
-
-  let partNumber = 0
-
-  const etags: Array<string> = []
-
-  // Parse file
-  await new Promise((resolve) => {
-    Papa.parse(file, {
-      header: true,
-      delimiter: ',',
-      skipEmptyLines: true,
-      chunk: async function (chunk, parser) {
-        parser.pause()
-        partNumber++
-        const paramsArr = chunk.data as Array<ProtectedParams>
-
-        // transform into rows of data in this format:
-        // recipient,encryptedPayload,passwordHash
-        const rows = await Promise.all(
-          paramsArr.map(async (params) => {
-            return await transformRow(contentTemplate, params)
-          })
-        )
-
-        // Join the rows into a single string
-        const data = processChunkData(rows, partNumber)
-
-        const presignedUrl = await getPresignedMultipartUrl({
-          campaignId,
-          transactionId,
-          partNumber,
-        })
-
-        // Upload the single string onto s3 based through the presigned url
-        const etag = await uploadPartWithPresignedUrl({
-          presignedUrl,
-          contentType: mimeType,
-          data,
-        })
-
-        etags.push(etag)
-
-        parser.resume()
-      },
-      complete: async function () {
-        await completeMultiPartUpload({
-          campaignId,
-          transactionId,
-          partCount: partNumber,
-          etags,
-        })
-        resolve()
-      },
-    })
-  })
-}
-
-/*
- * 1. Hydrates the template with the params.
- * 2. Encrypt the hydrated message with the password that is from the params.
- * 3. Hash the password
- * 4. Return in the format of `recipient,encryptedPayload,passwordHash`
- */
-async function transformRow(
-  template: string,
-  params: ProtectedParams
-): Promise<string> {
-  const recipient = params.recipient
-  const password = params.password
-  // SWTODO: import templating module and hydrate
-  const hydratedMessage = template
-  const encryptedPayload = await encryptData(hydratedMessage, password)
-  const passwordHash = await hashData(password)
-  return `"${recipient}","${encryptedPayload}","${passwordHash}"`
-}
-
 /*
  * Start multi part upload.
  * Returns the uploadId and s3Key, which is crucial for retrieving presigned url
  */
-async function beginMultipartUpload({
+export async function beginMultipartUpload({
   campaignId,
   mimeType,
 }: {
@@ -297,7 +188,7 @@ async function beginMultipartUpload({
   mimeType: string
 }): Promise<string> {
   const response = await axios.get(
-    `/campaign/${campaignId}/upload-start-multipart`,
+    `/campaign/${campaignId}/protect/upload/start`,
     {
       params: {
         mime_type: mimeType,
@@ -312,7 +203,7 @@ async function beginMultipartUpload({
  * Gets a presigned url from backend for s3 multipart upload.
  * The part number is important. If it is repeated, it will override the previous uploads.
  */
-async function getPresignedMultipartUrl({
+export async function getPresignedMultipartUrl({
   campaignId,
   transactionId,
   partNumber,
@@ -322,7 +213,7 @@ async function getPresignedMultipartUrl({
   partNumber: number
 }): Promise<string> {
   const response = await axios.get(
-    `/campaign/${campaignId}/upload-multipart-url`,
+    `/campaign/${campaignId}/protect/upload/part`,
     {
       params: {
         transaction_id: transactionId,
@@ -338,7 +229,7 @@ async function getPresignedMultipartUrl({
  * Upload a string to the presigned url.
  * Returns an etag that is essential to complete a multipart upload.
  */
-async function uploadPartWithPresignedUrl({
+export async function uploadPartWithPresignedUrl({
   presignedUrl,
   contentType,
   data,
@@ -357,7 +248,7 @@ async function uploadPartWithPresignedUrl({
   return response.headers.etag
 }
 
-async function completeMultiPartUpload({
+export async function completeMultiPartUpload({
   campaignId,
   transactionId,
   partCount,
@@ -369,25 +260,13 @@ async function completeMultiPartUpload({
   etags: Array<string>
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/upload-complete-multipart`, {
+    await axios.post(`/campaign/${campaignId}/protect/upload/complete`, {
       transaction_id: transactionId,
       part_count: partCount,
       etags: etags,
     })
   } catch (e) {
     errorHandler(e, 'Error completing multipart upload')
-  }
-}
-
-// Combine the rows into a single string
-// If part number is 1, we need to add in the headers
-function processChunkData(rows: Array<string>, partNumber: number) {
-  // Join the rows into a single string
-  if (partNumber === 1) {
-    const headers = 'recipient,encrypted_payload,password_hash\n'
-    return headers + rows.join('\n')
-  } else {
-    return rows.join('\n')
   }
 }
 
