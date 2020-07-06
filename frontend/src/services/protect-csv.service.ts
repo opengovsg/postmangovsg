@@ -21,7 +21,7 @@ async function transformRows(
 ): Promise<string> {
   const transformed = []
   if (partNumber === 1) {
-    transformed.push('recipient,payload,passwordHash')
+    transformed.push('recipient,payload,passwordhash')
   }
   for (const row of rows) {
     const { recipient, password } = row
@@ -44,15 +44,11 @@ async function transformRows(
  * 4. Note, for the first chunk, we need to add in the headers.
  * 5. Once the file is done parsing, we complete the multipart upload.
  */
-export async function protectAndUploadCsv({
-  campaignId,
-  file,
-  template,
-}: {
-  campaignId: number
-  file: File
+export async function protectAndUploadCsv(
+  campaignId: number,
+  file: File,
   template: string
-}): Promise<void> {
+): Promise<void> {
   const transactionId = await beginMultipartUpload({
     campaignId,
     mimeType: 'text/csv', // no need to check mime type, since we're creating the csv

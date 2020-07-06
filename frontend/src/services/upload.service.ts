@@ -250,17 +250,20 @@ export async function uploadPartWithPresignedUrl({
 
 export async function completeMultiPartUpload({
   campaignId,
+  filename,
   transactionId,
   partCount,
   etags,
 }: {
   campaignId: number
+  filename: string
   transactionId: string
   partCount: number
   etags: Array<string>
 }): Promise<void> {
   try {
     await axios.post(`/campaign/${campaignId}/protect/upload/complete`, {
+      filename,
       transaction_id: transactionId,
       part_count: partCount,
       etags: etags,

@@ -92,7 +92,7 @@ const completeMultipart = async (
   req: Request,
   _res: Response,
   next: NextFunction
-): Promise<Response | void> => {
+): Promise<void> => {
   try {
     const {
       transaction_id: transactionId,
@@ -106,9 +106,9 @@ const completeMultipart = async (
       etags,
     })
 
-    return next()
+    next()
   } catch (err) {
-    return next(err)
+    next(err)
   }
 }
 

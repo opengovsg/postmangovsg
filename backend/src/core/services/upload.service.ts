@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { difference, keys, pick } from 'lodash'
+import { difference, keys } from 'lodash'
 
 import S3 from 'aws-sdk/clients/s3'
 import { Transaction } from 'sequelize/types'
@@ -303,17 +303,17 @@ const getProtectedRecordsFromCsv = (
   campaignId: number,
   fileContent: Array<CSVParams>
 ): Array<ProtectedMessageRecordInterface> => {
-  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordHash']
+  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash']
 
   checkTemplateKeysMatch(fileContent, PROTECTED_CSV_HEADERS)
 
   return fileContent.map((entry) => {
+    const { recipient, payload, passwordhash } = entry
     return {
       campaignId,
-      ...(pick(entry, PROTECTED_CSV_HEADERS) as Omit<
-        ProtectedMessageRecordInterface,
-        'campaignId'
-      >),
+      recipient,
+      payload,
+      passwordHash: passwordhash,
     }
   })
 }

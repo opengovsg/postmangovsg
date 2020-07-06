@@ -25,7 +25,7 @@ const canEditCampaign = async (
       UploadService.getCsvStatus(+campaignId),
       ProtectedService.isProtectedCampaign(+campaignId),
     ])
-    if (!hasJob && !csvStatus?.isCsvProcessing && protect === isProtected) {
+    if (!hasJob && !csvStatus?.isCsvProcessing && (isProtected || !protect)) {
       return next()
     } else {
       return res.sendStatus(403)
