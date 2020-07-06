@@ -605,4 +605,36 @@ router.post(
  */
 router.get('/stats', EmailStatsMiddleware.getStats)
 
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/email/export:
+ *    get:
+ *      tags:
+ *        - Email
+ *      summary: Get recipients of unsuccessful emails in campaign
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: array
+ *                items:
+ *                  $ref: '#/components/schemas/CampaignInvalidRecipient'
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.get('/export', EmailStatsMiddleware.getFailedRecipients)
+
 export default router

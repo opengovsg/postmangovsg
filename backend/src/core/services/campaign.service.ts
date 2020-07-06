@@ -63,12 +63,17 @@ const listCampaigns = ({
         literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
         'has_credential',
       ],
+      'halted',
     ],
     order: [['created_at', 'DESC']],
     include: [
       {
         model: JobQueue,
-        attributes: ['status', ['created_at', 'sent_at']],
+        attributes: [
+          'status',
+          ['created_at', 'sent_at'],
+          ['updated_at', 'status_updated_at'],
+        ],
       },
     ],
   }

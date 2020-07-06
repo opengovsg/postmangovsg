@@ -6,12 +6,43 @@ import {
   Status,
   SMSCampaign,
   EmailCampaign,
+  CampaignInvalidRecipient,
 } from 'classes'
+import moment from 'moment'
 
-function getSentAt(jobs: Array<{ sent_at: Date }>): Date {
+const EXPORT_LINK_DISPLAY_WAIT_TIME = 5 * 60 * 1000
+
+function getJobTimestamps(
+  jobs: Array<{ sent_at: Date; status_updated_at: Date }>
+): { sentAt: Date; statusUpdatedAt: Date } {
   const jobsSentAt = jobs.map((x) => x.sent_at).sort()
+  const jobsUpdatedAt = jobs.map((x) => x.status_updated_at).sort()
   // returns job with the earliest sentAt time
-  return jobsSentAt[0]
+  return { sentAt: jobsSentAt[0], statusUpdatedAt: jobsUpdatedAt[0] }
+}
+
+export async function hasFailedRecipients(
+  campaignId: number,
+  status: Status,
+  updatedAt: Date,
+  count?: number
+) {
+  if (status !== Status.Sent) {
+    return false
+  }
+
+  const updatedAtTimestamp = +new Date(updatedAt)
+  const campaignAge = Date.now() - updatedAtTimestamp
+  if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {
+    return false
+  }
+
+  let failedCount = count
+  if (failedCount === undefined) {
+    const { error, invalid } = await getCampaignStats(campaignId)
+    failedCount = error + invalid
+  }
+  return failedCount > 0
 }
 
 export async function getCampaigns(params: {
@@ -24,9 +55,11 @@ export async function getCampaigns(params: {
   return axios.get('/campaigns', { params }).then((response) => {
     const { campaigns, total_count } = response.data
     const campaignList: Campaign[] = campaigns.map((data: any) => {
+      const { sentAt, statusUpdatedAt } = getJobTimestamps(data.job_queue)
       const details = {
         ...data,
-        sent_at: getSentAt(data.job_queue),
+        sentAt,
+        statusUpdatedAt,
       }
 
       return new Campaign(details)
@@ -58,10 +91,11 @@ export async function getCampaignStats(
   campaignId: number
 ): Promise<CampaignStats> {
   return axios.get(`/campaign/${campaignId}/stats`).then((response) => {
-    const { status, ...counts } = response.data
+    const { status, updatedAt, ...counts } = response.data
     return new CampaignStats({
       ...counts,
       status: parseStatus(status),
+      updatedAt,
     })
   })
 }
@@ -71,9 +105,10 @@ export async function getCampaignDetails(
 ): Promise<EmailCampaign | SMSCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
     const campaign = response.data
+    const { sentAt } = getJobTimestamps(campaign.job_queue)
     const details = {
       ...campaign,
-      sent_at: getSentAt(campaign.job_queue),
+      sentAt,
     }
 
     switch (campaign.type) {
@@ -111,4 +146,20 @@ export async function stopCampaign(campaignId: number): Promise<void> {
 
 export async function retryCampaign(campaignId: number): Promise<void> {
   await axios.post(`/campaign/${campaignId}/retry`)
+}
+
+export async function exportCampaignStats(
+  campaignId: number
+): Promise<Array<CampaignInvalidRecipient>> {
+  return axios.get(`/campaign/${campaignId}/export`).then((response) => {
+    const invalidRecipients = response.data?.map(
+      (record: any) => new CampaignInvalidRecipient(record)
+    )
+    for (const invalidRecipient of invalidRecipients) {
+      invalidRecipient.updatedAt = moment(invalidRecipient.updatedAt)
+        .format('LLL')
+        .replace(',', '')
+    }
+    return invalidRecipients
+  })
 }

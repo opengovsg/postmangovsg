@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "Backend / API server for Postman",
   "main": "build/server.js",
   "scripts": {
@@ -49,12 +49,13 @@
     "nodemailer-direct-transport": "^3.3.2",
     "otplib": "^12.0.1",
     "pg": "^8.2.1",
+    "pg-connection-string": "^2.2.3",
+    "postman-templating": "file:../modules/postman-templating",
     "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.21.5",
     "sequelize-typescript": "^1.1.0",
     "source-map-support": "^0.5.16",
-    "squirrelly": "^8.0.0-beta.10",
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4",
     "threads": "^1.4.0",
@@ -62,8 +63,7 @@
     "twilio": "^3.42.1",
     "uuid": "^7.0.3",
     "winston": "^3.2.1",
-    "winston-cloudwatch": "^2.3.2",
-    "xss": "^1.0.6"
+    "winston-cloudwatch": "^2.3.2"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.30",

@@ -1,19 +1,24 @@
-import React from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import React, { Suspense, lazy } from 'react'
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom'
 
 // Components
 import Landing from 'components/landing'
-import Dashboard from 'components/dashboard'
-import Error from 'components/error'
 import Login from 'components/login'
-
-// Routes HOC
-import ProtectedRoute from 'routes/protected.route'
+import ProtectedPage from 'components/protected'
 
 // Contexts
 import AuthContextProvider from 'contexts/auth.context'
 
 import './styles/app.scss'
+
+// lazy load admin dashboard views
+const ProtectedRoute = lazy(() => import('routes/protected.route'))
+const Dashboard = lazy(() => import('components/dashboard'))
 
 const App = () => {
   return (
@@ -22,10 +27,15 @@ const App = () => {
         <Switch>
           <Route exact path="/" component={Landing}></Route>
           <Route exact path="/login" component={Login}></Route>
-          <ProtectedRoute>
-            <Dashboard></Dashboard>
-          </ProtectedRoute>
-          <Route component={Error} />
+          <Redirect exact from="/protected" to="/" />
+          <Route exact path="/protected/:id" component={ProtectedPage}></Route>
+          <Suspense
+            fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
+          >
+            <ProtectedRoute>
+              <Dashboard></Dashboard>
+            </ProtectedRoute>
+          </Suspense>
         </Switch>
       </AuthContextProvider>
     </Router>

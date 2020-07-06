@@ -8,7 +8,7 @@ async function getOtpWithEmail(email: string): Promise<void> {
       email,
     })
   } catch (e) {
-    errorHandler(e, { 401: 'User is not authorized' })
+    errorHandler(e)
   }
 }
 
@@ -58,6 +58,8 @@ function errorHandler(e: AxiosError, customHandlers: any = {}) {
     const code = e.response.status
     if (customHandlers[code]) {
       throw new Error(customHandlers[code])
+    } else if (e.response.data?.message) {
+      throw new Error(e.response.data.message)
     } else {
       throw new Error(e.response.statusText)
     }

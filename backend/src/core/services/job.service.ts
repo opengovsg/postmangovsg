@@ -32,7 +32,12 @@ const createJob = async ({
  */
 const canSendCampaign = async (campaignId: number): Promise<boolean> => {
   const campaign = await Campaign.findOne({
-    where: { id: campaignId, valid: true, credName: { [Op.ne]: null } },
+    where: {
+      id: campaignId,
+      valid: true,
+      credName: { [Op.ne]: null },
+      halted: false,
+    },
   })
   return campaign !== null
 }
