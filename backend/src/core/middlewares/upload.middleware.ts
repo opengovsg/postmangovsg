@@ -29,6 +29,6 @@ const uploadStartHandler = async (
   }
 }
 
-export const TemplateMiddleware = {
+export const UploadMiddleware = {
   uploadStartHandler,
 }
