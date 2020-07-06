@@ -131,4 +131,5 @@ if (config.get('env') === 'development') {
   })
 }
 
+config.validate()
 export default config

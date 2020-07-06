@@ -28,8 +28,8 @@ const getReferenceId = (message: any): string | undefined => {
  *  @param timestamp ISO string from notification timestamp
  */
 const updateBouncedStatus = async (metadata: BounceMetadata) => {
-  const bounceType = metadata.message?.bounce?.bounceType
-  const recipients = metadata?.message?.mail?.commonHeaders?.to
+  const bounceType = metadata.bounceType
+  const recipients = metadata.to
   let errorCode
 
   if (bounceType === 'Permanent') {
@@ -54,8 +54,8 @@ const updateBouncedStatus = async (metadata: BounceMetadata) => {
  *  @param timestamp ISO string from notification timestamp
  */
 const updateComplaintStatus = async (metadata: ComplaintMetadata) => {
-  const errorCode = metadata.message?.complaint?.complaintFeedbackType
-  const recipients = metadata?.message?.mail?.commonHeaders?.to
+  const errorCode = metadata.complaintType
+  const recipients = metadata.to
 
   if (errorCode && recipients) {
     await Promise.all(recipients.map(addToBlacklist))
@@ -89,10 +89,18 @@ const handleMessage = async (record: any) => {
       await updateMessageWithSuccess(metadata)
       break
     case 'Bounce':
-      await updateBouncedStatus({ ...metadata, message })
+      await updateBouncedStatus({
+        ...metadata,
+        bounceType: message?.bounce?.bounceType,
+        to: message?.mail?.commonHeaders?.to,
+      })
       break
     case 'Complaint':
-      await updateComplaintStatus({ ...metadata, message })
+      await updateComplaintStatus({
+        ...metadata,
+        complaintType: message?.complaint?.complaintFeedbackType,
+        to: message?.mail?.commonHeaders?.to,
+      })
       break
     default:
       console.error(
