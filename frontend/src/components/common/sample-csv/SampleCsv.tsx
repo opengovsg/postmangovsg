@@ -1,29 +1,40 @@
-import React, { RefObject } from 'react'
+import React from 'react'
 import { without, times, constant } from 'lodash'
 import download from 'downloadjs'
 
+import { extractTemplateParams } from 'services/protectedemail.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import styles from './SampleCsv.module.scss'
 
 const SampleCsv = ({
   params,
   defaultRecipient,
-  elementRef,
+  protect = false,
+  contentTemplate,
 }: {
   params: Array<string>
   defaultRecipient: string
-  elementRef?: RefObject<HTMLAnchorElement>
+  protect?: boolean
+  contentTemplate?: string
 }) => {
-  const RECIPIENT_KEYWORDS = ['recipient', 'password']
+  const RECIPIENT_HEADER = ['recipient']
+  const RECIPIENT_PROTECTED_HEADER = ['recipient', 'password']
 
-  function onDownloadFile(
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
-  ) {
-    // Add recipient column in front, remove if already in params
+  async function onDownloadFile() {
+    let allParams = params
+    if (protect && contentTemplate) {
+      const protectedParams = await extractTemplateParams(contentTemplate)
+      allParams = allParams.concat(protectedParams)
+    }
+    // Add keyword columns in front, remove if already in params
+    const headerKeywords = protect
+      ? RECIPIENT_PROTECTED_HEADER
+      : RECIPIENT_HEADER
     const headers = [
-      ...RECIPIENT_KEYWORDS,
-      ...without(params, ...RECIPIENT_KEYWORDS),
+      ...headerKeywords,
+      ...without(allParams, ...headerKeywords),
     ]
+
     // Set default recipient as first value and pad with placeholder
     const body = [
       defaultRecipient,
@@ -38,7 +49,7 @@ const SampleCsv = ({
   }
 
   return (
-    <a ref={elementRef} className={styles.sampleCsv} onClick={onDownloadFile}>
+    <a className={styles.sampleCsv} onClick={onDownloadFile}>
       Download a sample .csv file
     </a>
   )

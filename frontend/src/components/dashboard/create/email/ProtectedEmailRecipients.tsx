@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -35,7 +35,6 @@ const ProtectedEmailRecipients = ({
   params: Array<string>
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
 }) => {
-  const containerRef = useRef<HTMLAnchorElement>(null)
   const [content, setContent] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
@@ -48,8 +47,6 @@ const ProtectedEmailRecipients = ({
   })
   const [encryptionComplete, setEncryptionComplete] = useState(false)
   const [isCsvEncrypting, setIsCsvEncrypting] = useState(false)
-  const [sampleParams, setSampleParams] = useState(params)
-  const [triggerDownload, setTriggerDownload] = useState(false)
   const { id: campaignId } = useParams()
 
   const { csvFilename, numRecipients = 0 } = csvInfo
@@ -79,22 +76,6 @@ const ProtectedEmailRecipients = ({
         <div className="separator"></div>
       </>
     )
-  }
-
-  async function onDownloadSample(
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) {
-    // flag to prevent click event loop
-    if (triggerDownload) {
-      setTriggerDownload(false)
-      return
-    }
-    event.stopPropagation()
-    const protectedParams = await extractTemplateParams(content)
-    setSampleParams(params.concat(protectedParams))
-    // trigger click after compputing params
-    containerRef.current?.click()
-    setTriggerDownload(true)
   }
 
   // Handle file upload
@@ -215,13 +196,12 @@ const ProtectedEmailRecipients = ({
           label="Select"
         />
         <p>or</p>
-        <div onClickCapture={(e) => onDownloadSample(e)}>
-          <SampleCsv
-            elementRef={containerRef}
-            params={sampleParams}
-            defaultRecipient="user@email.com"
-          />
-        </div>
+        <SampleCsv
+          protect
+          contentTemplate={content}
+          params={params}
+          defaultRecipient="user@email.com"
+        />
       </CsvUpload>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
