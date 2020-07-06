@@ -2,7 +2,7 @@ import React from 'react'
 import { without, times, constant } from 'lodash'
 import download from 'downloadjs'
 
-import { extractTemplateParams } from 'services/protectedemail.service'
+import { extractTemplateParams } from 'services/protected.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import styles from './SampleCsv.module.scss'
 

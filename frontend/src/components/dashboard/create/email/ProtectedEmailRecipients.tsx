@@ -8,7 +8,7 @@ import {
   extractTemplateParams,
   validateCsv,
   encryptCsv,
-} from 'services/protectedemail.service'
+} from 'services/protected.service'
 import {
   FileInput,
   CsvUpload,
