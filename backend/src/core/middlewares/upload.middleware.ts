@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import S3Client from '@core/services/s3-client.class'
 
 import logger from '@core/logger'
-import { TemplateService } from '@core/services'
+import { UploadService } from '@core/services'
 
 const s3Client = new S3Client()
 
@@ -17,10 +17,9 @@ const uploadStartHandler = async (
 ): Promise<Response> => {
   try {
     const contentType = req.query['mime_type']
-    const {
-      presignedUrl,
-      signedKey,
-    } = await TemplateService.getUploadParameters(contentType)
+    const { presignedUrl, signedKey } = await UploadService.getUploadParameters(
+      contentType
+    )
 
     return res.status(200).json({
       presigned_url: presignedUrl,

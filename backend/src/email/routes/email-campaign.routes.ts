@@ -617,7 +617,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/upload-start-multipart:
+ *  /campaign/{campaignId}/email/upload-protect/start:
  *    get:
  *      tags:
  *        - Email
@@ -652,7 +652,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
  *           description: Internal Server Error
  */
 router.get(
-  '/upload-start-multipart',
+  '/upload-protect/start',
   celebrate(startMultipartValidator),
   UploadMiddleware.startMultipartUpload
 )

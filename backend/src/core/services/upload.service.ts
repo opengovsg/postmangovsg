@@ -203,7 +203,7 @@ const getRecordsFromCsv = (
   })
 }
 
-export const TemplateService = {
+export const UploadService = {
   getUploadParameters,
   extractS3Key,
   replaceCampaignS3Metadata,

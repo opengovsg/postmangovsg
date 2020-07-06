@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
-import { CampaignService, TemplateService } from '@core/services'
+import { CampaignService, UploadService } from '@core/services'
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -17,7 +17,7 @@ const canEditCampaign = async (
     const { campaignId } = req.params
     const [hasJob, csvStatus] = await Promise.all([
       CampaignService.hasJobInProgress(+campaignId),
-      TemplateService.getCsvStatus(+campaignId),
+      UploadService.getCsvStatus(+campaignId),
     ])
     if (!hasJob && !csvStatus?.isCsvProcessing) {
       return next()
