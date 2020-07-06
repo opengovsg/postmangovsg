@@ -1,5 +1,4 @@
 import { parsePhoneNumber, CountryCode } from 'libphonenumber-js/max'
-import config from '@core/config'
 
 /**
  * Validate and normalise phone number format. Default country code will
@@ -7,11 +6,11 @@ import config from '@core/config'
  * @param phoneNumber
  * @return formatted - E.164 formatted phone number
  */
-const normalisePhoneNumber = (phoneNumber: string): string => {
-  let parsed = parsePhoneNumber(
-    phoneNumber,
-    config.get('defaultCountry') as CountryCode
-  )
+const normalisePhoneNumber = (
+  phoneNumber: string,
+  defaultCountry: string
+): string => {
+  let parsed = parsePhoneNumber(phoneNumber, defaultCountry as CountryCode)
 
   if (!parsed.isValid()) {
     // If parsing fails with default country code, we retry by prepending a + sign.

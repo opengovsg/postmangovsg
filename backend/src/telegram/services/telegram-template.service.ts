@@ -214,7 +214,10 @@ const validateAndFormatNumber = (
   return records.map((record) => {
     const { recipient } = record
     try {
-      record.recipient = PhoneNumberService.normalisePhoneNumber(recipient)
+      record.recipient = PhoneNumberService.normalisePhoneNumber(
+        recipient,
+        config.get('defaultCountry')
+      )
     } catch (e) {
       throw new InvalidRecipientError()
     }
