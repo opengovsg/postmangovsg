@@ -87,6 +87,7 @@ const getMultipartUrl = async (
 
 /**
  * Complete a multipart upload.
+ * Adds the s3Key to res.locals so that the middleware downstream can access it.
  * @param req
  * @param res
  * @param next
@@ -103,16 +104,16 @@ const completeMultipart = async (
       etags,
     } = req.body
 
-    await s3Client.completeMultipartUpload({
+    const s3Key = await s3Client.completeMultipartUpload({
       transactionId,
       partCount,
       etags,
     })
 
-    // Not sure what i should return here
-    return res.json({
-      transaction_id: transactionId,
-    })
+    // Passing the s3Key to the next middleware
+    res.locals.s3Key = s3Key
+
+    return next()
   } catch (err) {
     return next(err)
   }

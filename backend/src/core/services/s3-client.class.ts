@@ -92,6 +92,7 @@ export default class S3Client {
 
   /**
    * Complete the multipart upload.
+   * Returns the s3Key for the upload.
    */
   async completeMultipartUpload({
     transactionId,
@@ -101,7 +102,7 @@ export default class S3Client {
     transactionId: string
     partCount: number
     etags: Array<string>
-  }): Promise<void> {
+  }): Promise<string> {
     const parts = []
     for (let i = 0; i < partCount; i++) {
       parts.push({
@@ -121,6 +122,7 @@ export default class S3Client {
     }
 
     await this.s3.completeMultipartUpload(params).promise()
+    return s3Key
   }
 
   /**
