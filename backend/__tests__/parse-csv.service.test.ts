@@ -1,12 +1,10 @@
-import S3Client from '@core/services/s3-client.class'
+import { ParseCsvService } from '@core/services/parse-csv.service'
 import {
   RecipientColumnMissing,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
 
 import { Readable } from 'stream'
-
-const s3Client = new S3Client()
 
 const createStream = (
   headers: Array<string>,
@@ -20,13 +18,13 @@ const createStream = (
   return Readable.from(data.join('\n'))
 }
 
-describe('S3 Service', () => {
+describe('parse-csv', () => {
   describe('parseCsv', () => {
     test('valid file', async () => {
       const headers = ['recipient']
       const values = [['test@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await s3Client.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([{ recipient: 'test@open.gov.sg' }])
     })
 
@@ -34,7 +32,7 @@ describe('S3 Service', () => {
       const headers: Array<string> = []
       const values: Array<Array<string>> = []
       const stream = await createStream(headers, values)
-      await expect(s3Client.parseCsv(stream)).rejects.toThrow(
+      await expect(ParseCsvService.parseCsv(stream)).rejects.toThrow(
         RecipientColumnMissing
       )
     })
@@ -43,7 +41,7 @@ describe('S3 Service', () => {
       const headers = ['RECIPIENT']
       const values = [['test@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await s3Client.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([{ recipient: 'test@open.gov.sg' }])
     })
 
@@ -55,7 +53,7 @@ describe('S3 Service', () => {
         ['test3@open.gov.sg'],
       ]
       const stream = await createStream(headers, values)
-      const params = await s3Client.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg' },
         { recipient: 'test2@open.gov.sg' },
@@ -71,7 +69,7 @@ describe('S3 Service', () => {
         ['Amy', 'test3@open.gov.sg', '99912345'],
       ]
       const stream = await createStream(headers, values)
-      const params = await s3Client.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg', name: 'Ali', number: '81234567' },
         { recipient: 'test2@open.gov.sg', name: 'Ahmad', number: '91234567' },
@@ -83,7 +81,7 @@ describe('S3 Service', () => {
       const headers = ['name', 'recipient', 'number']
       const values = [['Ahmad', 'test@open.gov.sg', '']]
       const stream = await createStream(headers, values)
-      const params = await s3Client.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg', name: 'Ahmad', number: '' },
       ])
@@ -93,7 +91,7 @@ describe('S3 Service', () => {
       const headers = ['message', 'recipient']
       const values = [[`"hello, this is a test"`, 'test@open.gov.sg']]
       const stream = await createStream(headers, values)
-      const params = await s3Client.parseCsv(stream)
+      const params = await ParseCsvService.parseCsv(stream)
       expect(params).toEqual([
         { recipient: 'test@open.gov.sg', message: 'hello, this is a test' },
       ])
@@ -105,7 +103,7 @@ describe('S3 Service', () => {
         [`New York City,40°42'46"N,74°00'21"W`, 'test@open.gov.sg'],
       ]
       const stream = await createStream(headers, values)
-      await expect(s3Client.parseCsv(stream)).rejects.toThrow(
+      await expect(ParseCsvService.parseCsv(stream)).rejects.toThrow(
         UnexpectedDoubleQuoteError
       )
     })
