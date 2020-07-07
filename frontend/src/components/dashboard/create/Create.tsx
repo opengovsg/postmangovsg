@@ -39,11 +39,26 @@ const Create = () => {
   function renderCreateChannel() {
     switch (campaign.type) {
       case ChannelType.SMS:
-        return <SMSCreate campaign={campaign as SMSCampaign} />
+        return (
+          <SMSCreate
+            campaign={campaign as SMSCampaign}
+            onCampaignChange={setCampaign}
+          />
+        )
       case ChannelType.Email:
-        return <EmailCreate campaign={campaign as EmailCampaign} />
+        return (
+          <EmailCreate
+            campaign={campaign as EmailCampaign}
+            onCampaignChange={setCampaign}
+          />
+        )
       case ChannelType.Telegram:
-        return <TelegramCreate campaign={campaign as TelegramCampaign} />
+        return (
+          <TelegramCreate
+            campaign={campaign as TelegramCampaign}
+            onCampaignChange={setCampaign}
+          />
+        )
       default:
         return <p>Invalid Channel Type</p>
     }
