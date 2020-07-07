@@ -18,7 +18,7 @@ export const verifyBotIdRegistered = async (
   sequelize: Sequelize
 ): Promise<void> => {
   const { exists: botIdExists } = await sequelize.query(
-    `SELECT EXISTS (SELECT * FROM credentials WHERE name = :botId);`,
+    `SELECT 1 AS exists FROM credentials WHERE name = :botId;`,
     {
       replacements: {
         botId,
