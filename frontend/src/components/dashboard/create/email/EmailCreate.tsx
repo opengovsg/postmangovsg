@@ -66,9 +66,9 @@ const CreateEmail = ({
         if (campaign.protect) {
           return (
             <ProtectedEmailRecipients
-              params={campaign.params}
               csvFilename={campaign.csvFilename}
               numRecipients={campaign.numRecipients}
+              isProcessing={campaign.isCsvProcessing}
               onNext={onNext}
             />
           )

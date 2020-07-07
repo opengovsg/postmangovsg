@@ -183,14 +183,3 @@ function errorHandler(e: AxiosError, defaultMsg?: string): never {
   }
   throw new Error(defaultMsg || e.response?.statusText)
 }
-
-export async function uploadProtectedFileToS3(
-  campaignId: number,
-  file: File
-): Promise<void> {
-  return new Promise(function (resolve) {
-    setTimeout(function () {
-      resolve()
-    }, 5000)
-  })
-}

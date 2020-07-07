@@ -31,8 +31,9 @@ const EmailTemplate = ({
   const { id: campaignId } = useParams()
 
   const protectedBodyPlaceholder =
-    'Dear {{ recipient }}, you may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a>'
-  const bodyPlaceholder = 'Enter email message'
+    'Dear {{ recipient }}, \n\n You may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a> . \n\nPlease login with your birthday (DDMMYYYY) followed by the last 4 characters of your NRIC. E.g. 311290123A'
+  const bodyPlaceholder =
+    'Dear {{ name }}, your next appointment at {{ clinic }} is on {{ date }} at {{ time }}'
 
   async function handleSaveTemplate(): Promise<void> {
     setErrorMsg(null)
@@ -83,33 +84,14 @@ const EmailTemplate = ({
         double curly braces. The keywords in your message template should match
         the headers in your recipients CSV file.
         <br />
-        {!protect && (
-          <>
-            <b>Note:</b> Recipient is a required column in the CSV file.{' '}
-          </>
-        )}
       </p>
-      {protect ? (
-        <>
-          <p>
-            <b>{'{{ recipient }}'}</b> - Use this keyword for your recipients.
-            <br />
-            <b>{'{{ protectedlink }}'}</b> - Include this keyword in Message A
-            template, but not in the CSV file. It will be automatically
-            generated for password protected emails.
-          </p>
-          <p>See placeholder text example below.</p>
-        </>
-      ) : (
+      {protect && (
         <p>
-          Example
-          <br />
-          Reminder: Dear <b>{'{{ name }}'}</b>, your next appointment at{' '}
-          <b>{'{{ clinic }}'}</b> is on <b>{'{{ date }}'} </b>
-          at <b>{'{{ time }}'}</b>.
+          <b>{'{{ protectedlink }}'}</b> - Include this keyword in Message A
+          template, but not in the CSV file. It will be automatically generated
+          for password protected emails.
         </p>
       )}
-
       <TextArea
         highlight={true}
         placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}

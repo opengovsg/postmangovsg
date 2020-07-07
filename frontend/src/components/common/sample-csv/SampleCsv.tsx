@@ -4,35 +4,32 @@ import download from 'downloadjs'
 
 import { extractTemplateParams } from 'services/protected.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import styles from './SampleCsv.module.scss'
+import TextButton from '../text-button'
 
 const SampleCsv = ({
-  params,
   defaultRecipient,
+  params,
+  template,
   protect = false,
-  contentTemplate,
 }: {
-  params: Array<string>
   defaultRecipient: string
+  params?: Array<string>
+  template?: string
   protect?: boolean
-  contentTemplate?: string
 }) => {
   const RECIPIENT_HEADER = ['recipient']
   const RECIPIENT_PROTECTED_HEADER = ['recipient', 'password']
 
   async function onDownloadFile() {
-    let allParams = params
-    if (protect && contentTemplate) {
-      const protectedParams = await extractTemplateParams(contentTemplate)
-      allParams = allParams.concat(protectedParams)
+    let variableHeaders = params
+    if (protect) {
+      variableHeaders = template ? await extractTemplateParams(template) : []
     }
     // Add keyword columns in front, remove if already in params
-    const headerKeywords = protect
-      ? RECIPIENT_PROTECTED_HEADER
-      : RECIPIENT_HEADER
+    const fixedHeaders = protect ? RECIPIENT_PROTECTED_HEADER : RECIPIENT_HEADER
     const headers = [
-      ...headerKeywords,
-      ...without(allParams, ...headerKeywords),
+      ...fixedHeaders,
+      ...without(variableHeaders, ...fixedHeaders),
     ]
 
     // Set default recipient as first value and pad with placeholder
@@ -49,9 +46,9 @@ const SampleCsv = ({
   }
 
   return (
-    <a className={styles.sampleCsv} onClick={onDownloadFile}>
+    <TextButton onClick={onDownloadFile}>
       Download a sample .csv file
-    </a>
+    </TextButton>
   )
 }
 
