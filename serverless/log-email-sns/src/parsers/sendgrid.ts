@@ -5,7 +5,8 @@ import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
-} from '../update-status'
+} from '../util/update-status'
+import { isAuthenticated } from '../util/auth'
 const PUBLIC_KEY = PublicKey.fromPem(config.get('sendgridPublicKey'))
 const SIGNATURE_HEADER = 'X-Twilio-Email-Event-Webhook-Signature'
 const TIMESTAMP_HEADER = 'X-Twilio-Email-Event-Webhook-Timestamp'
@@ -24,6 +25,8 @@ type SendgridRecord = {
 }
 
 const isHttpEvent = (event: any): boolean => {
+  if (!isAuthenticated(event.headers['Authorization']))
+    throw new Error('Unauthorized')
   const signature = event.headers[SIGNATURE_HEADER]
   const timestamp = event.headers[TIMESTAMP_HEADER]
   if (!(signature && timestamp && event.body)) {

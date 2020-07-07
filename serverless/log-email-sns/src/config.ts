@@ -118,6 +118,13 @@ const config = convict({
     default: '',
     format: 'required-string',
   },
+  callbackSecret: {
+    doc: 'Secret for basic auth',
+    env: 'CALLBACK_SECRET',
+    default: '',
+    format: 'required-string',
+    sensitive: true,
+  },
 })
 
 // Only development is a non-production environment

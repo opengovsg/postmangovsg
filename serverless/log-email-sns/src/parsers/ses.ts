@@ -5,7 +5,8 @@ import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
-} from '../update-status'
+} from '../util/update-status'
+import { isAuthenticated } from '../util/auth'
 const REFERENCE_ID_HEADER_V1 = 'X-Postman-ID' // Case sensitive
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
 const certCache: { [key: string]: string } = {}
@@ -107,6 +108,8 @@ const isSnsEvent = (event: any): boolean => {
 }
 
 const isHttpEvent = (event: any): boolean => {
+  if (!isAuthenticated(event.headers['Authorization']))
+    throw new Error('Unauthorized')
   return (
     event.headers['x-amz-sns-message-type'] !== undefined &&
     event.body !== undefined

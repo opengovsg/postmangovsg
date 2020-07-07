@@ -17,10 +17,3 @@ export interface ComplaintMetadata extends Metadata {
 export interface UpdateMessageWithErrorCode extends Metadata {
   errorCode: string
 }
-
-// export interface EventParser {
-//   validateSignature (event: any) : boolean;
-//   parseDelivered (event: any) : boolean;
-//   parseBounce (event: any) : boolean;
-//   parseComplaint (event: any) : boolean;
-// }

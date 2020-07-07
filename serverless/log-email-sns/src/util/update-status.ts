@@ -3,8 +3,8 @@ import {
   updateMessageWithError,
   updateMessageWithSuccess,
   haltCampaignIfThresholdExceeded,
-} from './query'
-import { BounceMetadata, ComplaintMetadata, Metadata } from './interfaces'
+} from '../query'
+import { BounceMetadata, ComplaintMetadata, Metadata } from '../interfaces'
 
 export const updateDeliveredStatus = async (metadata: Metadata) => {
   await updateMessageWithSuccess(metadata)

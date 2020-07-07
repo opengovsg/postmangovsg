@@ -144,6 +144,7 @@ jobs:
             - MIN_HALT_NUMBER=$STAGING_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$STAGING_EMAIL_MIN_HALT_PERCENTAGE
             - SENDGRID_PUBLIC_KEY=$STAGING_EMAIL_SENDGRID_PUBLIC_KEY
+            - CALLBACK_SECRET=$STAGING_EMAIL_CALLBACK_SECRET
         - provider: lambda
           edge: true
           function_name: log-email-callback-production
@@ -162,6 +163,7 @@ jobs:
             - MIN_HALT_NUMBER=$PRODUCTION_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
             - SENDGRID_PUBLIC_KEY=$PRODUCTION_EMAIL_SENDGRID_PUBLIC_KEY
+            - CALLBACK_SECRET=$STAGING_EMAIL_CALLBACK_SECRET
     - name: root
       install:
         - npm install --ignore-scripts
