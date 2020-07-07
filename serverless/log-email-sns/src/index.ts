@@ -1,4 +1,5 @@
 import * as ses from './parsers/ses'
+import * as sendgrid from './parsers/sendgrid'
 import { init } from './query'
 
 /**
@@ -10,10 +11,11 @@ exports.handler = async (event: any) => {
   try {
     await init()
     if (ses.isSESEvent(event)) {
-      const castedEvent = (event as unknown) as ses.SESEvent
-      await Promise.all(
-        castedEvent.Records.map(({ Sns }) => ses.parseRecord(Sns))
-      )
+      const sesEvent: ses.SESEvent = (event as unknown) as ses.SESEvent
+      await Promise.all(sesEvent.Records.map(({ Sns }) => ses.parseRecord(Sns)))
+    } else if (sendgrid.isSendgridEvent(event)) {
+      const sgEvent: sendgrid.SendgridEvent = { body: JSON.parse(event.body) }
+      await Promise.all(sgEvent.body.map(sendgrid.parseRecord))
     } else {
       console.error('Unable to handle this event')
     }

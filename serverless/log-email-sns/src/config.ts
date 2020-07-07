@@ -112,6 +112,12 @@ const config = convict({
     env: 'MIN_HALT_PERCENTAGE',
     format: 'float-percent',
   },
+  sendgridPublicKey: {
+    doc: 'Public key used to verify webhook events from sendgrid',
+    env: 'SENDGRID_PUBLIC_KEY',
+    default: '',
+    format: 'required-string',
+  },
 })
 
 // Only development is a non-production environment

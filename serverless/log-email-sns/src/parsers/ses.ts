@@ -21,9 +21,8 @@ type SESRecord = {
   SignatureVersion: string
 }
 
-
 type SESEvent = {
-    Records: Array<{ Sns: SESRecord }>
+  Records: Array<{ Sns: SESRecord }>
 }
 
 type SmtpApiHeader = {
@@ -118,7 +117,7 @@ const parseRecord = async (record: SESRecord) => {
   const messageId = message?.mail?.commonHeaders?.messageId
   const id = getReferenceID(message)
   if (id === undefined) {
-    console.log(`No reference id found for ${messageId}`)
+    console.log(`No reference message id found for ${messageId}`)
     return
   }
   const notificationType = message?.notificationType
