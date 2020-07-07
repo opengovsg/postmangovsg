@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import { map } from 'lodash'
 
-import TemplateClient from '@core/services/template-client.class'
+import { TemplateClient } from 'postman-templating'
 import logger from '@core/logger'
 import TelegramClient from '@telegram/services/telegram-client.class'
 import { CredentialService } from '@core/services/credential.service'
