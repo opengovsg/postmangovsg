@@ -25,6 +25,7 @@ type SendgridRecord = {
 }
 
 const isHttpEvent = (event: any): boolean => {
+  if (!event.headers) return false
   if (!isAuthenticated(event.headers['Authorization']))
     throw new Error('Unauthorized')
   const signature = event.headers[SIGNATURE_HEADER]

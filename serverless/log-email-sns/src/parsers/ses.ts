@@ -104,10 +104,15 @@ const validateSignature = async (
 }
 
 const isSnsEvent = (event: any): boolean => {
-  return event.Records instanceof Array && event.Records[0].Sns !== undefined
+  return (
+    event.Records instanceof Array &&
+    event.Records.length > 0 &&
+    event.Records[0].Sns !== undefined
+  )
 }
 
 const isHttpEvent = (event: any): boolean => {
+  if (!event.headers) return false
   if (!isAuthenticated(event.headers['Authorization']))
     throw new Error('Unauthorized')
   return (
