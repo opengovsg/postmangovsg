@@ -24,11 +24,14 @@ async function transformRows(
     transformed.push('recipient,payload,passwordhash')
   }
   for (const row of rows) {
+    console.time('row')
     const { recipient, password } = row
     const hydratedMessage = template
     const encryptedPayload = await encryptData(hydratedMessage, password)
-    const passwordHash = await hashData(password)
+    console.timeLog('row')
+    const passwordHash = password
     transformed.push(`${recipient},"${encryptedPayload}",${passwordHash}`)
+    console.timeEnd('row')
   }
   return transformed.join('\n')
 }
@@ -54,19 +57,26 @@ export async function protectAndUploadCsv(
     mimeType: 'text/csv', // no need to check mime type, since we're creating the csv
   })
 
+  console.time('start')
   let partNumber = 0
 
   const etags: Array<string> = []
 
   // Start parsing by chunks
+  Papa.LocalChunkSize = '100000'
+
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
       delimiter: ',',
       skipEmptyLines: true,
+      // worker: true,
       chunk: async function (chunk, parser) {
         parser.pause()
+        console.log(chunk.meta)
+        console.time('chunk')
         partNumber++
+        console.log('part no.', partNumber)
         const rows = chunk.data
 
         // transform into rows of data into {recipient,payload,passwordHash}
@@ -86,11 +96,15 @@ export async function protectAndUploadCsv(
           data,
         })
         etags.push(etag)
+        console.timeEnd('chunk')
         parser.resume()
       },
       complete: async function () {
+        console.log('complete')
+        console.timeEnd('start')
         await completeMultiPartUpload({
           campaignId,
+          filename: file.name,
           transactionId,
           partCount: partNumber,
           etags,
