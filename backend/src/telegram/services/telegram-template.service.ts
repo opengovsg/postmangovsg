@@ -7,8 +7,8 @@ import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
-import TemplateClient from '@core/services/template-client.class'
 import { PhoneNumberService } from '@core/services'
+import { TemplateClient } from 'postman-templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
@@ -225,10 +225,24 @@ const validateAndFormatNumber = (
   })
 }
 
+/**
+ * Attempts to hydrate the first record.
+ * @param records
+ * @param templateBody
+ */
+const testHydration = (
+  records: Array<MessageBulkInsertInterface>,
+  templateBody: string
+): void => {
+  const [firstRecord] = records
+  client.template(templateBody, firstRecord.params)
+}
+
 export const TelegramTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
   validateAndFormatNumber,
+  testHydration,
   client,
 }
