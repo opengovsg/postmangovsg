@@ -94,8 +94,8 @@ const validateSignature = async (
   encoding = 'utf8'
 ): Promise<boolean> => {
   const certUrl = record.SigningCertUrl || record.SigningCertURL
-  if (!certUrl) throw new Error('Empty certificate url')
-  if (!isValidCertUrl) throw new Error('Invalid certificate url')
+  if (!certUrl || !isValidCertUrl(certUrl))
+    throw new Error('Invald certificate url')
 
   const certificate = await getCertificate(certUrl)
   const verifier = crypto.createVerify('RSA-SHA1')
