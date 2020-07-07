@@ -7,13 +7,13 @@ import {
   updateComplaintStatus,
 } from '../update-status'
 const PUBLIC_KEY = PublicKey.fromPem(config.get('sendgridPublicKey'))
+const SIGNATURE_HEADER = 'X-Twilio-Email-Event-Webhook-Signature'
+const TIMESTAMP_HEADER = 'X-Twilio-Email-Event-Webhook-Timestamp'
 
-type SendgridEvent = {
-  body: Array<SendgridRecord>
-}
+type SendgridEvent = SendgridRecord[]
+
 type SendgridRecord = {
   // the unique_args that we passed
-  environment: string
   message_id: string
   // standard args
   email: string
@@ -23,15 +23,18 @@ type SendgridRecord = {
   timestamp: number
 }
 
-const isSendgridEvent = (event: any): boolean => {
-  const signature = event.headers['X-Twilio-Email-Event-Webhook-Signature']
-  const timestamp = event.headers['X-Twilio-Email-Event-Webhook-Timestamp']
-  if (!(event.body && signature && timestamp)) {
+const isHttpEvent = (event: any): boolean => {
+  const signature = event.headers[SIGNATURE_HEADER]
+  const timestamp = event.headers[TIMESTAMP_HEADER]
+  if (!(signature && timestamp && event.body)) {
     return false
   }
   const decodedSignature = Signature.fromBase64(signature)
   const timestampPayload = timestamp + event.body
-  return Ecdsa.verify(timestampPayload, decodedSignature, PUBLIC_KEY)
+  if (!Ecdsa.verify(timestampPayload, decodedSignature, PUBLIC_KEY)) {
+    throw new Error('Invalid record')
+  }
+  return true
 }
 
 const parseRecord = async (record: SendgridRecord) => {
@@ -77,4 +80,4 @@ const parseRecord = async (record: SendgridRecord) => {
   }
 }
 
-export { SendgridEvent, SendgridRecord, isSendgridEvent, parseRecord }
+export { SendgridEvent, isHttpEvent, parseRecord }

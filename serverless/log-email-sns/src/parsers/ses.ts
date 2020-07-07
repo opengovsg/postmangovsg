@@ -10,25 +10,27 @@ const REFERENCE_ID_HEADER_V1 = 'X-Postman-ID' // Case sensitive
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
 const certCache: { [key: string]: string } = {}
 
-type SESRecord = {
+type SesRecord = {
   Message: string
   MessageId: string
   Timestamp: string
   TopicArn: string
   Type: string
   Signature: string
-  SigningCertUrl: string
   SignatureVersion: string
+  SigningCertUrl?: string // Sns Record
+  SigningCertURL?: string // Http Record
 }
 
-type SESEvent = {
-  Records: Array<{ Sns: SESRecord }>
+type SnsEvent = {
+  Records: Array<{ Sns: SesRecord }>
 }
+
+type HttpEvent = SesRecord[]
 
 type SmtpApiHeader = {
   unique_args: {
     message_id: string
-    environment: string
   }
 }
 
@@ -76,7 +78,7 @@ const getCertificate = (certUrl: string): Promise<string> => {
   })
 }
 
-const basestring = (record: SESRecord): string => {
+const basestring = (record: SesRecord): string => {
   return (
     `Message\n${record.Message}\n` +
     `MessageId\n${record.MessageId}\n` +
@@ -87,29 +89,32 @@ const basestring = (record: SESRecord): string => {
 }
 
 const validateSignature = async (
-  record: SESRecord,
+  record: SesRecord,
   encoding = 'utf8'
 ): Promise<boolean> => {
-  const certificate = await getCertificate(record.SigningCertUrl)
+  const certUrl = record.SigningCertUrl || record.SigningCertURL
+  if (!certUrl) throw new Error('Empty certificate url')
+  if (!isValidCertUrl) throw new Error('Invalid certificate url')
+
+  const certificate = await getCertificate(certUrl)
   const verifier = crypto.createVerify('RSA-SHA1')
   verifier.update(basestring(record), encoding as Utf8AsciiLatin1Encoding)
   return verifier.verify(certificate, record.Signature, 'base64')
 }
 
-const isValidRecord = async (record: SESRecord): Promise<boolean> => {
-  return (
-    record.SignatureVersion === '1' &&
-    isValidCertUrl(record.SigningCertUrl) &&
-    (await validateSignature(record))
-  )
-}
-
-const isSESEvent = (event: any): boolean => {
+const isSnsEvent = (event: any): boolean => {
   return event.Records instanceof Array && event.Records[0].Sns !== undefined
 }
 
-const parseRecord = async (record: SESRecord) => {
-  if (!(await isValidRecord(record))) {
+const isHttpEvent = (event: any): boolean => {
+  return (
+    event.headers['x-amz-sns-message-type'] !== undefined &&
+    event.body !== undefined
+  )
+}
+
+const parseRecord = async (record: SesRecord) => {
+  if (!(record.SignatureVersion === '1' && (await validateSignature(record)))) {
     throw new Error(`Invalid record`)
   }
 
@@ -148,4 +153,4 @@ const parseRecord = async (record: SESRecord) => {
       return
   }
 }
-export { SESEvent, SESRecord, isSESEvent, parseRecord }
+export { SnsEvent, HttpEvent, SesRecord, isSnsEvent, isHttpEvent, parseRecord }
