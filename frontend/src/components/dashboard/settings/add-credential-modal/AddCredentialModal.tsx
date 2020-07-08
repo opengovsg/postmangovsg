@@ -43,7 +43,7 @@ const AddCredentialModal = ({
   onSuccess: Function
 }) => {
   // Using channel type as proxy for credential type for now
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(credType !== null)
   const [label, setLabel] = useState('')
   const [credLabels, setCredLabels] = useState([] as string[])
   const [selectedCredType, setSelectedCredType] = useState(credType)
