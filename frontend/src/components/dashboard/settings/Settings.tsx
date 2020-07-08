@@ -45,7 +45,6 @@ const Settings = () => {
     modalContext.setModalContent(
       <AddCredentialModal
         credType={null}
-        labels={creds.map((c) => c.label)}
         onSuccess={fetchUserSettings}
       ></AddCredentialModal>
     )

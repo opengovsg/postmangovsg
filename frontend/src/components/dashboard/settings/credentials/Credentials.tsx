@@ -29,7 +29,6 @@ const Credentials = ({
     modalContext.setModalContent(
       <AddCredentialModal
         credType={credType}
-        labels={creds.map((c) => c.label)}
         onSuccess={refresh}
       ></AddCredentialModal>
     )
