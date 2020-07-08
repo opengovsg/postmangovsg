@@ -72,6 +72,13 @@ export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
 
 cd localstack && ./init-localstack.sh && cd ..
 
+# Optional: get cw to tail Cloudwatch logs
+brew tap lucagrulla/tap
+brew install cw
+
+# Tail logs on localstack
+cw tail -r ap-northeast-1 -u $AWS_ENDPOINT -f $AWS_LOG_GROUP_NAME:`node --eval='console.log(require("os").hostname())'`
+
 ```
 
 ### Set environment variables
