@@ -1,12 +1,18 @@
+import { Transaction } from 'sequelize'
+
 import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
-import { MailService, CampaignService } from '@core/services'
+import {
+  MailService,
+  CampaignService,
+  UploadService,
+  StatsService,
+} from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
-
 /**
  * Gets a message's parameters
  * @param campaignId
@@ -148,10 +154,66 @@ const getCampaignDetails = async (
   ])
 }
 
+/**
+ * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
+ * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
+ * For email_messages table, existing records are deleted and new ones are bulk inserted.
+ * Then update statistics with new unsent count
+ * @param key
+ * @param campaignId
+ * @param filename
+ * @param records
+ */
+const updateCampaignAndMessages = async ({
+  campaignId,
+  key,
+  filename,
+  records,
+  transaction,
+}: {
+  campaignId: number
+  key: string
+  filename: string
+  records: MessageBulkInsertInterface[]
+  transaction?: Transaction
+}): Promise<void> => {
+  try {
+    if (!transaction) {
+      transaction = await Campaign.sequelize?.transaction()
+    }
+    // Updates metadata in project
+    await UploadService.replaceCampaignS3Metadata(
+      campaignId,
+      key,
+      filename,
+      transaction
+    )
+
+    // START populate template
+    await EmailTemplateService.addToMessageLogs(
+      campaignId,
+      records,
+      transaction
+    )
+
+    // Update statistic table
+    await StatsService.setNumRecipients(campaignId, records.length, transaction)
+
+    // Set campaign to valid
+    await CampaignService.setValid(campaignId, transaction)
+
+    transaction?.commit()
+  } catch (err) {
+    transaction?.rollback()
+    throw err
+  }
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
   setCampaignCredential,
   getCampaignDetails,
   getHydratedMessage,
+  updateCampaignAndMessages,
 }
