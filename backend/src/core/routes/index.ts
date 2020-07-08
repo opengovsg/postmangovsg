@@ -6,6 +6,7 @@ import { AuthMiddleware } from '@core/middlewares'
 
 // Core routes
 import authenticationRoutes from './auth.routes'
+import protectedCampaignRoutes from './protectedCampaign.routes'
 import campaignRoutes from './campaign.routes'
 import settingsRoutes from './settings.routes'
 import statsRoutes from './stats.routes'
@@ -78,6 +79,7 @@ const router = Router()
 router.use('/ping', ping)
 router.use('/auth', authenticationRoutes)
 router.use('/stats', statsRoutes)
+router.use('/protect', protectedCampaignRoutes)
 
 router.use(
   '/campaigns',

@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid'
+import crypto from 'crypto'
 import url from 'url'
 
 import config from '@core/config'
@@ -64,4 +65,36 @@ const storeProtectedMessages = async (
   }
 }
 
-export const ProtectedService = { isProtectedCampaign, storeProtectedMessages }
+const findProtectedMessage = async (
+  uuid: string
+): Promise<ProtectedMessage | null> => {
+  const protectedMsg = await ProtectedMessage.findOne({
+    where: { id: uuid },
+  })
+  return protectedMsg
+}
+
+const verifyPasswordHash = async (
+  protectedMsg: ProtectedMessage,
+  inputHash: string
+): Promise<string | null> => {
+  const { passwordHash, payload } = protectedMsg
+
+  // Buffers must be of same length
+  const isPasswordValid = crypto.timingSafeEqual(
+    Buffer.from(passwordHash),
+    Buffer.from(inputHash)
+  )
+
+  if (!isPasswordValid) {
+    return null
+  }
+  return payload
+}
+
+export const ProtectedService = {
+  isProtectedCampaign,
+  storeProtectedMessages,
+  findProtectedMessage,
+  verifyPasswordHash,
+}
