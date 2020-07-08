@@ -16,6 +16,13 @@ const isProtectedCampaign = async (campaignId: number): Promise<boolean> => {
   }))
 }
 
+const extractSalt = (passwordHash: string): string => {
+  // split the hash by $, the last component contains the salt (first 22 chars) and the hash value
+  const hashComponents = passwordHash.split('$')
+  const salt = hashComponents[hashComponents.length - 1].slice(0, 22)
+  return salt
+}
+
 const storeProtectedMessages = async (
   campaignId: number,
   protectedMessages: ProtectedMessageRecordInterface[],
@@ -47,14 +54,19 @@ const storeProtectedMessages = async (
     }
 
     // Map to message format
-    return messagesToStore.map(({ campaignId, recipient, id }) => ({
-      campaignId,
-      recipient,
-      params: {
+    return messagesToStore.map(
+      ({ campaignId, recipient, id, passwordHash }) => ({
+        campaignId,
         recipient,
-        protectedlink: url.resolve(frontendUrl, `${protectedPath}/${id}`),
-      },
-    }))
+        params: {
+          recipient,
+          protectedlink: url.resolve(
+            frontendUrl,
+            `${protectedPath}/${id}#${extractSalt(passwordHash)}`
+          ),
+        },
+      })
+    )
   } catch (e) {
     transaction?.rollback()
     logger.error(
