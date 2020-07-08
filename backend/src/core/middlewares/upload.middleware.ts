@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 
 import logger from '@core/logger'
-import { UploadService } from '@core/services'
+import { UploadService, MultipartUploadService } from '@core/services'
 
 /**
  * Start an upload by returning a presigned url to the user to upload file to s3 bucket
@@ -43,7 +43,9 @@ const startMultipartUpload = async (
   try {
     const contentType = req.query['mime_type']
 
-    const transactionId = await UploadService.startMultipartUpload(contentType)
+    const transactionId = await MultipartUploadService.startMultipartUpload(
+      contentType
+    )
 
     return res.json({
       transaction_id: transactionId,
@@ -68,7 +70,7 @@ const getMultipartUrl = async (
     const transactionId = req.query['transaction_id']
     const partNumber = req.query['part_number']
 
-    const presignedUrl = await UploadService.getPresignedPartUrl({
+    const presignedUrl = await MultipartUploadService.getPresignedPartUrl({
       transactionId,
       partNumber,
     })
@@ -100,7 +102,7 @@ const completeMultipart = async (
       etags,
     } = req.body
 
-    await UploadService.completeMultipartUpload({
+    await MultipartUploadService.completeMultipartUpload({
       transactionId,
       partCount,
       etags,

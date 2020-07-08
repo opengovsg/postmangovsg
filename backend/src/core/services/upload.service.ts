@@ -14,13 +14,6 @@ import { Campaign } from '@core/models'
 import { CsvStatusInterface } from '@core/interfaces'
 import { CSVParams } from '@core/types'
 
-import {
-  extractParamsFromJwt,
-  startMultipartUpload,
-  getPresignedPartUrl,
-  completeMultipartUpload,
-} from './upload-multi.service'
-
 const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
@@ -28,6 +21,23 @@ const s3 = new S3({
   signatureVersion: 'v4',
   ...configureEndpoint(config),
 })
+
+/**
+ * Decodes jwt
+ * @param transactionId
+ */
+const extractParamsFromJwt = (
+  transactionId: string
+): string | { s3Key: string; uploadId: string } => {
+  let decoded
+  try {
+    decoded = jwtUtils.verify(transactionId)
+  } catch (err) {
+    logger.error(`${err.stack}`)
+    throw new Error('Invalid transactionId provided')
+  }
+  return decoded as string | { s3Key: string; uploadId: string }
+}
 
 /**
  * Returns a presigned url for uploading file to s3 bucket
@@ -224,9 +234,6 @@ export const UploadService = {
   /*** S3 API Calls ****/
   getUploadParameters,
   extractParamsFromJwt,
-  startMultipartUpload,
-  getPresignedPartUrl,
-  completeMultipartUpload,
   /**** Handle S3Key in DB *****/
   replaceCampaignS3Metadata,
   storeS3TempFilename,

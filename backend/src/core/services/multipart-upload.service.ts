@@ -5,30 +5,14 @@ import config from '@core/config'
 
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
-import logger from '@core/logger'
+
+import { UploadService } from '@core/services'
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 const s3 = new S3({
   signatureVersion: 'v4',
   ...configureEndpoint(config),
 })
-
-/**
- * Decodes jwt
- * @param transactionId
- */
-const extractParamsFromJwt = (
-  transactionId: string
-): string | { s3Key: string; uploadId: string } => {
-  let decoded
-  try {
-    decoded = jwtUtils.verify(transactionId)
-  } catch (err) {
-    logger.error(`${err.stack}`)
-    throw new Error('Invalid transactionId provided')
-  }
-  return decoded as string | { s3Key: string; uploadId: string }
-}
 
 /**
  * Create a multipart upload on s3 and return the upload id and s3 key for it.
@@ -64,7 +48,9 @@ const getPresignedPartUrl = async ({
   transactionId: string
   partNumber: number
 }): Promise<string> => {
-  const { s3Key, uploadId } = extractParamsFromJwt(transactionId) as {
+  const { s3Key, uploadId } = UploadService.extractParamsFromJwt(
+    transactionId
+  ) as {
     s3Key: string
     uploadId: string
   }
@@ -100,7 +86,9 @@ const completeMultipartUpload = async ({
       PartNumber: i + 1,
     })
   }
-  const { s3Key, uploadId } = extractParamsFromJwt(transactionId) as {
+  const { s3Key, uploadId } = UploadService.extractParamsFromJwt(
+    transactionId
+  ) as {
     s3Key: string
     uploadId: string
   }
@@ -118,8 +106,7 @@ const completeMultipartUpload = async ({
   return s3Key
 }
 
-export {
-  extractParamsFromJwt,
+export const MultipartUploadService = {
   startMultipartUpload,
   getPresignedPartUrl,
   completeMultipartUpload,
