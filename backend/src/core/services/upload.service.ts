@@ -51,7 +51,7 @@ const getUploadParameters = async (
  */
 const extractParamsFromJwt = (
   transactionId: string
-): string | { s3Key: string; uploadId: string } => {
+): { s3Key: string; uploadId?: string } => {
   let decoded
   try {
     decoded = jwtUtils.verify(transactionId)
@@ -59,7 +59,9 @@ const extractParamsFromJwt = (
     logger.error(`${err.stack}`)
     throw new Error('Invalid transactionId provided')
   }
-  return decoded as string | { s3Key: string; uploadId: string }
+  return typeof decoded === 'string'
+    ? { s3Key: decoded }
+    : (decoded as { s3Key: string; uploadId: string }) //multipart
 }
 
 /**

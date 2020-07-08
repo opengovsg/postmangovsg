@@ -151,7 +151,7 @@ const uploadCompleteHandler = async (
 
     // extract s3Key from transactionId
     const { transaction_id: transactionId, filename } = req.body
-    const s3Key = UploadService.extractParamsFromJwt(transactionId) as string
+    const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
     // check if template exists
     const emailTemplate = await EmailTemplateService.getFilledTemplate(
