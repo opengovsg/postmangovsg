@@ -3,30 +3,51 @@ import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import {
-  GUIDE_SMS_CREDENTIALS_URL,
-  GUIDE_TELEGRAM_CREDENTIALS_URL,
-} from 'config'
+import { GUIDE_SMS_CREDENTIALS_URL } from 'config'
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
-const CreateModal = () => {
+import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
+
+const CreateModal = ({
+  name = '',
+  channelType = ChannelType.SMS,
+}: {
+  name?: string
+  channelType?: ChannelType
+}) => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()
-  const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
-  const [name, setName] = useState('')
+  const [selectedChannel, setSelectedChannel] = useState(channelType)
+  const [selectedName, setSelectedName] = useState(name)
+
   async function handleCreateCampaign() {
     try {
-      const campaign: Campaign = await createCampaign(name, selectedChannel)
+      const campaign: Campaign = await createCampaign(
+        selectedName,
+        selectedChannel
+      )
       // close modal and go to create view
       modalContext.setModalContent(null)
       history.push(`/campaigns/${campaign.id}`)
     } catch (err) {
       console.error(err)
     }
+  }
+
+  function handleAddCredentials(channelType: ChannelType) {
+    const saved = (
+      <CreateModal name={selectedName} channelType={selectedChannel} />
+    )
+    modalContext.setModalContent(
+      <AddCredentialModal
+        credType={channelType}
+        onSuccess={() => modalContext.setModalContent(saved)}
+      ></AddCredentialModal>
+    )
   }
 
   return (
@@ -39,7 +60,8 @@ const CreateModal = () => {
         <TextInput
           className={styles.input}
           type="text"
-          onChange={setName}
+          value={selectedName}
+          onChange={setSelectedName}
         ></TextInput>
       </div>
       <div className={cx(styles.section, styles.separator)}>
@@ -96,13 +118,9 @@ const CreateModal = () => {
             {selectedChannel === ChannelType.Telegram && (
               <p className={styles.subtext}>
                 It is best to&nbsp;
-                <OutboundLink
-                  eventLabel={GUIDE_TELEGRAM_CREDENTIALS_URL}
-                  to={GUIDE_TELEGRAM_CREDENTIALS_URL}
-                  target="_blank"
-                >
+                <a onClick={() => handleAddCredentials(ChannelType.Telegram)}>
                   store and validate your credentials
-                </OutboundLink>
+                </a>
                 &nbsp;before you start.
               </p>
             )}
@@ -132,7 +150,7 @@ const CreateModal = () => {
         <PrimaryButton
           className={styles.bottomButton}
           onClick={handleCreateCampaign}
-          disabled={!name}
+          disabled={!selectedName}
         >
           Create campaign
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
