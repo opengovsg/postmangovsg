@@ -129,10 +129,7 @@ router.delete(
  *              schema:
  *                type: array
  *                items:
- *                  type: object
- *                  properties:
- *                    label:
- *                     type: string
+ *                  type: string
  *
  */
 router.get(
