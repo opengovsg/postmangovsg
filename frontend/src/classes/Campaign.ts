@@ -80,11 +80,13 @@ export class CampaignStats {
 export class CampaignInvalidRecipient {
   recipient: string
   status: string
+  errorCode: string
   updatedAt: string
 
   constructor(input: any) {
     this.recipient = input['recipient']
     this.status = input['status']
+    this.errorCode = input['error_code']
     this.updatedAt = input['updated_at']
   }
 }

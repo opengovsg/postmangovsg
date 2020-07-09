@@ -172,7 +172,7 @@ const getFailedRecipients = async (
         [Op.or]: [MessageStatus.Error, MessageStatus.InvalidRecipient],
       },
     },
-    attributes: ['recipient', 'status', 'updated_at'],
+    attributes: ['recipient', 'status', 'error_code', 'updated_at'],
     useMaster: false,
   })
 
