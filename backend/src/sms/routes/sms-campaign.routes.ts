@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
-  TemplateMiddleware,
+  UploadMiddleware,
   JobMiddleware,
 } from '@core/middlewares'
 import {
@@ -209,7 +209,7 @@ router.get(
   '/upload/start',
   celebrate(uploadStartValidator),
   CampaignMiddleware.canEditCampaign,
-  TemplateMiddleware.uploadStartHandler
+  UploadMiddleware.uploadStartHandler
 )
 
 /**

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
-  TemplateMiddleware,
+  UploadMiddleware,
   JobMiddleware,
 } from '@core/middlewares'
 import {
@@ -54,6 +54,29 @@ const storeCredentialsValidator = {
 const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
     rate: Joi.number().integer().positive().default(35),
+  }),
+}
+
+const startMultipartValidator = {
+  [Segments.QUERY]: Joi.object({
+    mime_type: Joi.string().required(),
+  }),
+}
+
+const getMultipartUrlValidator = {
+  [Segments.QUERY]: Joi.object({
+    transaction_id: Joi.string().required(),
+    // Only part numbers from 1 to 10000 allowed for s3 multipart upload
+    part_number: Joi.number().integer().min(1).max(10000).required(),
+  }),
+}
+
+const completeMultipartValidator = {
+  [Segments.BODY]: Joi.object({
+    filename: Joi.string().required(),
+    transaction_id: Joi.string().required(),
+    part_count: Joi.number().integer().min(1).max(10000).required(),
+    etags: Joi.array().items(Joi.string()).required(),
   }),
 }
 
@@ -220,7 +243,7 @@ router.get(
   '/upload/start',
   celebrate(uploadStartValidator),
   CampaignMiddleware.canEditCampaign,
-  TemplateMiddleware.uploadStartHandler
+  UploadMiddleware.uploadStartHandler
 )
 
 /**
@@ -591,5 +614,157 @@ router.get('/stats', EmailStatsMiddleware.getStats)
  *           description: Internal Server Error
  */
 router.get('/export', EmailStatsMiddleware.getFailedRecipients)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/email/upload-protect/start:
+ *    get:
+ *      tags:
+ *        - Email
+ *      summary: Start multipart upload
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - name: mime_type
+ *          in: query
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 transaction_id:
+ *                  type: string
+ *
+ *        "400" :
+ *           description: Invalid campaign type, not owned by user
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.get(
+  '/protect/upload/start',
+  celebrate(startMultipartValidator),
+  CampaignMiddleware.canEditProtectedCampaign,
+  UploadMiddleware.startMultipartUpload
+)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/email/upload-multipart-url:
+ *    get:
+ *      tags:
+ *        - Email
+ *      summary: get presigned url for multipart upload
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - name: transaction_id
+ *          in: query
+ *          required: true
+ *          schema:
+ *            type: string
+ *        - name: part_number
+ *          in: query
+ *          required: true
+ *          schema:
+ *            type: integer
+ *            minimum: 1
+ *            maximum: 10000
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 presigned_url:
+ *                  type: string
+ *
+ *        "400" :
+ *           description: Invalid campaign type, not owned by user
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.get(
+  '/protect/upload/part',
+  celebrate(getMultipartUrlValidator),
+  CampaignMiddleware.canEditProtectedCampaign,
+  UploadMiddleware.getMultipartUrl
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/upload-complete-multipart:
+ *     post:
+ *       description: Complete multipart upload
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - filename
+ *                 - transaction_id
+ *                 - part_count
+ *                 - etags
+ *               properties:
+ *                 filename:
+ *                   type: string
+ *                 transaction_id:
+ *                   type: string
+ *                 part_count:
+ *                   type: integer
+ *                 etags:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       responses:
+ *         200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                 transaction_id:
+ *                  type: string
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/protect/upload/complete',
+  celebrate(completeMultipartValidator),
+  CampaignMiddleware.canEditProtectedCampaign,
+  UploadMiddleware.completeMultipart,
+  EmailTemplateMiddleware.uploadProtectedCompleteHandler
+)
 
 export default router

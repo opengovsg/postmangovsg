@@ -176,6 +176,103 @@ export async function deleteCsvStatus(campaignId: number): Promise<void> {
   }
 }
 
+/*
+ * Start multi part upload.
+ * Returns the uploadId and s3Key, which is crucial for retrieving presigned url
+ */
+export async function beginMultipartUpload({
+  campaignId,
+  mimeType,
+}: {
+  campaignId: number
+  mimeType: string
+}): Promise<string> {
+  const response = await axios.get(
+    `/campaign/${campaignId}/protect/upload/start`,
+    {
+      params: {
+        mime_type: mimeType,
+      },
+    }
+  )
+  const { transaction_id: transactionId } = response.data
+  return transactionId
+}
+
+/*
+ * Gets a presigned url from backend for s3 multipart upload.
+ * The part number is important. If it is repeated, it will override the previous uploads.
+ */
+export async function getPresignedMultipartUrl({
+  campaignId,
+  transactionId,
+  partNumber,
+}: {
+  campaignId: number
+  transactionId: string
+  partNumber: number
+}): Promise<string> {
+  const response = await axios.get(
+    `/campaign/${campaignId}/protect/upload/part`,
+    {
+      params: {
+        transaction_id: transactionId,
+        part_number: partNumber,
+      },
+    }
+  )
+  const { presigned_url: presignedUrl } = response.data
+  return presignedUrl
+}
+
+/*
+ * Upload a string to the presigned url.
+ * Returns an etag that is essential to complete a multipart upload.
+ */
+export async function uploadPartWithPresignedUrl({
+  presignedUrl,
+  contentType,
+  data,
+}: {
+  presignedUrl: string
+  contentType: string
+  data: string
+}): Promise<string> {
+  const response = await axios.put(presignedUrl, data, {
+    headers: {
+      'Content-Type': contentType,
+    },
+    withCredentials: false,
+    timeout: 0,
+  })
+  return response.headers.etag
+}
+
+export async function completeMultiPartUpload({
+  campaignId,
+  filename,
+  transactionId,
+  partCount,
+  etags,
+}: {
+  campaignId: number
+  filename: string
+  transactionId: string
+  partCount: number
+  etags: Array<string>
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/protect/upload/complete`, {
+      filename,
+      transaction_id: transactionId,
+      part_count: partCount,
+      etags: etags,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error completing multipart upload')
+  }
+}
+
 function errorHandler(e: AxiosError, defaultMsg?: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {

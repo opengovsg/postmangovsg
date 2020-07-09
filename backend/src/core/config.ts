@@ -148,6 +148,11 @@ const config = convict({
     default: 'https://postman.gov.sg', // prod only
     env: 'FRONTEND_URL',
   },
+  protectedPath: {
+    doc: 'Frontend url path for password-protected messages',
+    default: '/p',
+    env: 'PROTECTED_PATH',
+  },
   session: {
     cookieName: {
       doc: 'Identifier for the cookie',

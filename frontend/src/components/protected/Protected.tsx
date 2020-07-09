@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { fetchMessage } from 'services/protected.service'
+import { fetchMessage } from 'services/decrypt-mail.service'
 
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import styles from './Protected.module.scss'

@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
+import { Transaction } from 'sequelize'
+
 import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
@@ -7,9 +9,13 @@ import {
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
-
 import { TemplateError } from 'postman-templating'
-import { CampaignService, TemplateService, StatsService } from '@core/services'
+import {
+  CampaignService,
+  UploadService,
+  StatsService,
+  ProtectedService,
+} from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
@@ -92,14 +98,15 @@ const updateCampaignAndMessages = async (
   campaignId: number,
   key: string,
   filename: string,
-  records: MessageBulkInsertInterface[]
+  records: MessageBulkInsertInterface[],
+  transaction?: Transaction
 ): Promise<void> => {
-  let transaction
-
   try {
-    transaction = await Campaign.sequelize?.transaction()
+    if (!transaction) {
+      transaction = await Campaign.sequelize?.transaction()
+    }
     // Updates metadata in project
-    await TemplateService.replaceCampaignS3Metadata(
+    await UploadService.replaceCampaignS3Metadata(
       campaignId,
       key,
       filename,
@@ -144,7 +151,7 @@ const uploadCompleteHandler = async (
 
     // extract s3Key from transactionId
     const { transaction_id: transactionId, filename } = req.body
-    const s3Key = TemplateService.extractS3Key(transactionId)
+    const s3Key = UploadService.extractParamsFromJwt(transactionId) as string
 
     // check if template exists
     const emailTemplate = await EmailTemplateService.getFilledTemplate(
@@ -158,7 +165,7 @@ const uploadCompleteHandler = async (
     const s3Client = new S3Client()
     const fileContent = await s3Client.getCsvFile(s3Key)
 
-    const records = TemplateService.getRecordsFromCsv(
+    const records = UploadService.getRecordsFromCsv(
       +campaignId,
       fileContent,
       emailTemplate.params as string[]
@@ -175,7 +182,7 @@ const uploadCompleteHandler = async (
     }
 
     // Store temp filename
-    await TemplateService.storeS3TempFilename(+campaignId, filename)
+    await UploadService.storeS3TempFilename(+campaignId, filename)
 
     try {
       // Return early because bulk insert is slow
@@ -189,7 +196,7 @@ const uploadCompleteHandler = async (
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
       // Store error to return on poll
-      TemplateService.storeS3Error(+campaignId, err.message)
+      UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     const userErrors = [
@@ -221,7 +228,7 @@ const pollCsvStatusHandler = async (
       filename,
       tempFilename,
       error,
-    } = await TemplateService.getCsvStatus(+campaignId)
+    } = await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
     let numRecipients, preview
@@ -255,10 +262,96 @@ const deleteCsvErrorHandler = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    await TemplateService.deleteS3TempKeys(+campaignId)
+    await UploadService.deleteS3TempKeys(+campaignId)
     res.sendStatus(200)
   } catch (e) {
     next(e)
+  }
+}
+
+// TODO: refactor this handler with uploadCompleteHandler to share the same function
+/**
+ * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
+ * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
+ * If the template and csv do not match, prompt the user to upload a new file.
+ * @param req
+ * @param res
+ * @param next
+ */
+const uploadProtectedCompleteHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+
+    if (!(await EmailTemplateService.getFilledTemplate(+campaignId))) {
+      throw new Error('Template does not exist, please create a template')
+    }
+
+    // extract s3Key from transactionId
+    const { transaction_id: transactionId, filename } = req.body
+    const { s3Key } = UploadService.extractParamsFromJwt(transactionId) as {
+      s3Key: string
+      uploadId: string
+    }
+
+    // - download from s3
+    const s3Client = new S3Client()
+    const fileContent = await s3Client.getCsvFile(s3Key)
+
+    const records = UploadService.getProtectedRecordsFromCsv(
+      +campaignId,
+      fileContent
+    )
+
+    if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
+      throw new InvalidRecipientError()
+    }
+
+    // Store temp filename
+    await UploadService.storeS3TempFilename(+campaignId, filename)
+
+    // Slow bulk insert
+    try {
+      // Return early because bulk insert is slow
+      res.sendStatus(202)
+
+      // Slow bulk insert
+      const transaction = await Campaign.sequelize?.transaction()
+      const messagesToStore = await ProtectedService.storeProtectedMessages(
+        +campaignId,
+        records,
+        transaction
+      )
+      await updateCampaignAndMessages(
+        +campaignId,
+        s3Key,
+        filename,
+        messagesToStore,
+        transaction
+      )
+    } catch (err) {
+      // Do not return any response since it has already been sent
+      logger.error(
+        `Error storing messages for campaign ${campaignId}. ${err.stack}`
+      )
+      // Store error to return on poll
+      UploadService.storeS3Error(+campaignId, err.message)
+    }
+  } catch (err) {
+    const userErrors = [
+      RecipientColumnMissing,
+      MissingTemplateKeysError,
+      InvalidRecipientError,
+      UnexpectedDoubleQuoteError,
+    ]
+
+    if (userErrors.some((errType) => err instanceof errType)) {
+      return res.status(400).json({ message: err.message })
+    }
+    return next(err)
   }
 }
 
@@ -267,4 +360,5 @@ export const EmailTemplateMiddleware = {
   uploadCompleteHandler,
   pollCsvStatusHandler,
   deleteCsvErrorHandler,
+  uploadProtectedCompleteHandler,
 }
