@@ -3,10 +3,12 @@ import Papa from 'papaparse'
 import { encryptData, hashData } from './crypto.service'
 import {
   beginMultipartUpload,
-  getPresignedMultipartUrl,
   uploadPartWithPresignedUrl,
   completeMultiPartUpload,
 } from './upload.service'
+
+const DEFAULT_CHUNK_SIZE = 10000000 // 10 Mb
+const MIN_UPLOAD_SIZE = 5000000 // 5Mb minimum needed for uploading each part
 
 /*
  * 1. Hydrates the template with the params.
@@ -50,8 +52,6 @@ async function transformRows(
 }
 
 async function chunkSize(file: File, template: string): Promise<number> {
-  const defaultChunkSize = 10000000 // 10 Mb
-  const minChunkSize = 5000000 // 5Mb minimum needed for uploading each part
   let numChars = template.length
   let rowChars = 0
   return new Promise((resolve) => {
@@ -79,14 +79,19 @@ async function chunkSize(file: File, template: string): Promise<number> {
 
         const templatedSize = numChars * 4 // 4 bytes per character
         const rowSize = rowChars * 4
-        const size = Math.ceil((minChunkSize / templatedSize) * rowSize)
+        const size = Math.ceil((MIN_UPLOAD_SIZE / templatedSize) * rowSize)
         console.log(
-          JSON.stringify({ size, templatedSize, rowSize, minChunkSize })
+          JSON.stringify({
+            chunkSize: size,
+            templatedSize,
+            rowSize,
+            minUploadSize: MIN_UPLOAD_SIZE,
+          })
         )
         resolve(size)
       },
       error: function () {
-        resolve(defaultChunkSize)
+        resolve(DEFAULT_CHUNK_SIZE)
       },
     })
   })
@@ -108,22 +113,24 @@ export async function protectAndUploadCsv(
   file: File,
   template: string
 ): Promise<void> {
-  const transactionId = await beginMultipartUpload({
+  const size = await chunkSize(file, template)
+  const partCount = Math.ceil(file.size / size)
+  console.log(
+    JSON.stringify({ fileSize: file.size, chunkSize: size, partCount })
+  )
+  console.time('beginMultipartUpload')
+  const { transactionId, presignedUrls } = await beginMultipartUpload({
     campaignId,
     mimeType: 'text/csv', // no need to check mime type, since we're creating the csv
+    partCount,
   })
-
+  console.timeEnd('beginMultipartUpload')
   console.time('start')
   let partNumber = 0
 
   const etags: Array<string> = []
   // Start parsing by chunks
-  const size = await chunkSize(file, template)
-  Papa.LocalChunkSize = String(size)
-  const partsNeeded = Math.ceil(file.size / size)
-  console.log(
-    JSON.stringify({ fileSize: file.size, chunkSize: size, partsNeeded })
-  )
+
   Papa.LocalChunkSize = String(size)
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
@@ -143,16 +150,10 @@ export async function protectAndUploadCsv(
         //  and join the rows into a single string
         const data = await transformRows(template, rows, partNumber)
 
-        const presignedUrl = await getPresignedMultipartUrl({
-          campaignId,
-          transactionId,
-          partNumber,
-        })
-
         console.time('uploadPartWithPresignedUrl')
         // Upload the single string onto s3 based through the presigned url
         const etag = await uploadPartWithPresignedUrl({
-          presignedUrl,
+          presignedUrl: presignedUrls[partNumber - 1],
           data,
         })
         etags.push(etag)

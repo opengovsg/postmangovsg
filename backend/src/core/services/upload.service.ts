@@ -65,15 +65,42 @@ const extractParamsFromJwt = (
 }
 
 /**
+ * Get a presigned url to upload a part for multipart upload.
+ */
+const getPresignedPartUrl = async ({
+  s3Key,
+  uploadId,
+  partNumber,
+}: {
+  s3Key: string
+  uploadId: string
+  partNumber: number
+}): Promise<string> => {
+  const params = {
+    Bucket: FILE_STORAGE_BUCKET_NAME,
+    Key: s3Key,
+    PartNumber: partNumber,
+    UploadId: uploadId,
+  }
+
+  const presignedUrl = await s3.getSignedUrlPromise('uploadPart', params)
+
+  return presignedUrl
+}
+
+/**
  * Create a multipart upload on s3 and return the upload id and s3 key for it.
  */
-const startMultipartUpload = async (contentType: string): Promise<string> => {
+const startMultipartUpload = async (
+  mimeType: string,
+  partCount: number
+): Promise<{ transactionId: string; presignedUrls: string[] }> => {
   const s3Key = uuid()
 
   const params = {
     Bucket: FILE_STORAGE_BUCKET_NAME,
     Key: s3Key,
-    ContentType: contentType,
+    ContentType: mimeType,
   }
 
   const { UploadId } = await s3.createMultipartUpload(params).promise()
@@ -85,33 +112,18 @@ const startMultipartUpload = async (contentType: string): Promise<string> => {
     s3Key,
   })
 
-  return transactionId
-}
-
-/**
- * Get a presigned url to upload a part for multipart upload.
- */
-const getPresignedPartUrl = async ({
-  transactionId,
-  partNumber,
-}: {
-  transactionId: string
-  partNumber: number
-}): Promise<string> => {
-  const { s3Key, uploadId } = extractParamsFromJwt(transactionId) as {
-    s3Key: string
-    uploadId: string
+  const getPresignedPartUrls = []
+  for (let partNumber = 1; partNumber <= partCount; partNumber++) {
+    getPresignedPartUrls.push(
+      getPresignedPartUrl({ s3Key, uploadId: UploadId, partNumber })
+    )
   }
-  const params = {
-    Bucket: FILE_STORAGE_BUCKET_NAME,
-    Key: s3Key,
-    PartNumber: partNumber,
-    UploadId: uploadId,
+  const presignedUrls = await Promise.all(getPresignedPartUrls)
+
+  return {
+    transactionId,
+    presignedUrls,
   }
-
-  const presignedUrl = await s3.getSignedUrlPromise('uploadPart', params)
-
-  return presignedUrl
 }
 
 /**
