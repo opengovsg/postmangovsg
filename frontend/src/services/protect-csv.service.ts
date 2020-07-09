@@ -19,21 +19,34 @@ async function transformRows(
   rows: any[],
   partNumber: number
 ): Promise<string[]> {
-  const transformed = []
-  if (partNumber === 1) {
-    transformed.push('recipient,payload,passwordhash\n')
-  }
-  for (const row of rows) {
-    console.time('row')
-    const { recipient, password } = row
-    const hydratedMessage = template
-    const encryptedPayload = await encryptData(hydratedMessage, password)
-    console.timeLog('row')
-    const passwordHash = password
-    transformed.push(`${recipient},"${encryptedPayload}",${passwordHash}\n`)
-    console.timeEnd('row')
-  }
-  return transformed
+  const t0 = performance.now()
+  const transformed = await Promise.allSettled(
+    rows.map(async (row) => {
+      const { recipient, password } = row
+      const hydratedMessage = template
+      const encryptedPayload = await encryptData(hydratedMessage, password)
+      const passwordHash = password
+      return `${recipient},"${encryptedPayload}",${passwordHash}\n`
+    })
+  )
+    .then((results) =>
+      results.filter((result) => result.status === 'fulfilled')
+    )
+    .then((results) =>
+      results.map((result) => (result as PromiseFulfilledResult<string>).value)
+    )
+
+  const t1 = performance.now()
+  console.log(
+    JSON.stringify({
+      numRows: rows.length,
+      totalMsEncrypt: t1 - t0,
+      averageMsPerRow: (t1 - t0) / rows.length,
+    })
+  )
+  return partNumber === 1
+    ? ['recipient,payload,passwordhash\n'].concat(transformed)
+    : transformed
 }
 
 async function chunkSize(file: File, template: string): Promise<number> {
@@ -105,9 +118,13 @@ export async function protectAndUploadCsv(
 
   const etags: Array<string> = []
   // Start parsing by chunks
-  const size = String(await chunkSize(file, template))
-  Papa.LocalChunkSize = size
-
+  const size = await chunkSize(file, template)
+  Papa.LocalChunkSize = String(size)
+  const partsNeeded = Math.ceil(file.size / size)
+  console.log(
+    JSON.stringify({ fileSize: file.size, chunkSize: size, partsNeeded })
+  )
+  Papa.LocalChunkSize = String(size)
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
@@ -117,7 +134,7 @@ export async function protectAndUploadCsv(
       chunk: async function (chunk, parser) {
         parser.pause()
         console.log(chunk.meta)
-        console.time('chunk')
+
         partNumber++
         console.log('part no.', partNumber)
         const rows = chunk.data
@@ -132,13 +149,14 @@ export async function protectAndUploadCsv(
           partNumber,
         })
 
+        console.time('uploadPartWithPresignedUrl')
         // Upload the single string onto s3 based through the presigned url
         const etag = await uploadPartWithPresignedUrl({
           presignedUrl,
           data,
         })
         etags.push(etag)
-        console.timeEnd('chunk')
+        console.timeEnd('uploadPartWithPresignedUrl')
         parser.resume()
       },
       complete: async function () {
