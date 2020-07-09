@@ -90,6 +90,7 @@ export async function protectAndUploadCsv(
       },
       complete: async function () {
         await completeMultiPartUpload({
+          filename: file.name,
           campaignId,
           transactionId,
           partCount: partNumber,
