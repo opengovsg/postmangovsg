@@ -123,20 +123,25 @@ export const haltCampaignIfThresholdExceeded = async (campaignId?: number) => {
 
       try {
         await sequelize?.transaction(async (transaction) => {
-          await sequelize?.query(`SELECT stop_jobs(:campaignId)`, {
-            replacements: { campaignId },
-            type: QueryTypes.SELECT,
-            transaction,
-          })
-
-          await sequelize?.query(
-            `UPDATE campaigns SET halted=TRUE where id=:campaignId;`,
+          const results = await sequelize?.query(
+            `UPDATE campaigns SET halted=TRUE where id=:campaignId 
+            AND halted=FALSE;`, // If halted is null (forcefully overriden), do not halt. If halted is true, campaign has already been halted
             {
               replacements: { campaignId },
               type: QueryTypes.UPDATE,
               transaction,
             }
           )
+          if (!results || results[1] !== 1)
+            throw new Error(
+              'Campaign has already been halted, or forcefully overridden with null to prevent halting.'
+            )
+
+          await sequelize?.query(`SELECT stop_jobs(:campaignId)`, {
+            replacements: { campaignId },
+            type: QueryTypes.SELECT,
+            transaction,
+          })
         })
       } catch (err) {
         console.error(`Could not halt campaign_id=${campaignId} ${err.stack}`)
