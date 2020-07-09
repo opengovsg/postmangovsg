@@ -57,7 +57,7 @@ async function chunkSize(file: File, template: string): Promise<number> {
         for (const [field, value] of row) {
           if (/^[a-zA-Z0-9\s-_'"/]+$/.test(field)) {
             // field is of an acceptable format
-            const regexp = new RegExp(`\\s+${field}\\s+`, 'gi')
+            const regexp = new RegExp(`{{\\s*${field}\\s*}}`, 'gi')
             const numReplacements = template.match(regexp)?.length || 0
             numChars += value.length * numReplacements
             rowChars += value.length
