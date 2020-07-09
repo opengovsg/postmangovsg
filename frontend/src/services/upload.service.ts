@@ -226,25 +226,25 @@ export async function getPresignedMultipartUrl({
 }
 
 /*
- * Upload a string to the presigned url.
+ * Upload an array buffer to the presigned url.
  * Returns an etag that is essential to complete a multipart upload.
  */
 export async function uploadPartWithPresignedUrl({
   presignedUrl,
-  contentType,
   data,
 }: {
   presignedUrl: string
-  contentType: string
-  data: string
+  data: string[]
 }): Promise<string> {
-  const response = await axios.put(presignedUrl, data, {
-    headers: {
-      'Content-Type': contentType,
-    },
-    withCredentials: false,
-    timeout: 0,
-  })
+  const contentType = 'text/csv'
+  const response = await axios.put(
+    presignedUrl,
+    new Blob(data, { type: contentType }),
+    {
+      withCredentials: false,
+      timeout: 0,
+    }
+  )
   return response.headers.etag
 }
 

@@ -18,10 +18,10 @@ async function transformRows(
   template: string,
   rows: any[],
   partNumber: number
-): Promise<string> {
+): Promise<string[]> {
   const transformed = []
   if (partNumber === 1) {
-    transformed.push('recipient,payload,passwordhash')
+    transformed.push('recipient,payload,passwordhash\n')
   }
   for (const row of rows) {
     console.time('row')
@@ -30,10 +30,10 @@ async function transformRows(
     const encryptedPayload = await encryptData(hydratedMessage, password)
     console.timeLog('row')
     const passwordHash = password
-    transformed.push(`${recipient},"${encryptedPayload}",${passwordHash}`)
+    transformed.push(`${recipient},"${encryptedPayload}",${passwordHash}\n`)
     console.timeEnd('row')
   }
-  return transformed.join('\n')
+  return transformed
 }
 
 async function chunkSize(file: File, template: string): Promise<number> {
@@ -135,7 +135,6 @@ export async function protectAndUploadCsv(
         // Upload the single string onto s3 based through the presigned url
         const etag = await uploadPartWithPresignedUrl({
           presignedUrl,
-          contentType: 'text/csv',
           data,
         })
         etags.push(etag)
