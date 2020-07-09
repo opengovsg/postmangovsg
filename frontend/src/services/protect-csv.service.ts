@@ -36,6 +36,49 @@ async function transformRows(
   return transformed.join('\n')
 }
 
+async function chunkSize(file: File, template: string): Promise<number> {
+  const defaultChunkSize = 10000000 // 10 Mb
+  const minChunkSize = 5000000 // 5Mb minimum needed for uploading each part
+  let numChars = template.length
+  let rowChars = 0
+  return new Promise((resolve) => {
+    Papa.parse(file, {
+      header: true,
+      delimiter: ',',
+      step: function (_, parser: Papa.Parser) {
+        // Checks first row only
+        parser.pause()
+        parser.abort()
+      },
+      complete: function (results) {
+        // We can also check for recipient and password here.
+        // results.data will contain 1 row of results because we aborted on the first step
+        const row = Object.entries(results.data) as Array<[string, string]>
+        for (const [field, value] of row) {
+          if (/^[a-zA-Z0-9\s-_'"/]+$/.test(field)) {
+            // field is of an acceptable format
+            const regexp = new RegExp(`\\s+${field}\\s+`, 'gi')
+            const numReplacements = template.match(regexp)?.length || 0
+            numChars += value.length * numReplacements
+            rowChars += value.length
+          }
+        }
+
+        const templatedSize = numChars * 4 // 4 bytes per character
+        const rowSize = rowChars * 4
+        const size = Math.ceil((minChunkSize / templatedSize) * rowSize)
+        console.log(
+          JSON.stringify({ size, templatedSize, rowSize, minChunkSize })
+        )
+        resolve(size)
+      },
+      error: function () {
+        resolve(defaultChunkSize)
+      },
+    })
+  })
+}
+
 /*
  * 1. Initiate multipart upload
  * 2. Parse the csv file in chunks of 10mb
@@ -61,9 +104,9 @@ export async function protectAndUploadCsv(
   let partNumber = 0
 
   const etags: Array<string> = []
-
   // Start parsing by chunks
-  Papa.LocalChunkSize = '100000'
+  const size = String(await chunkSize(file, template))
+  Papa.LocalChunkSize = size
 
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
