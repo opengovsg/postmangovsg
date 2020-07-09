@@ -73,7 +73,7 @@ describe('template', () => {
       }
       const client: TemplateClient = new TemplateClient(xssOptions)
 
-      describe('email template should allow b, i, u, br, a, img tags', () => {
+      test('email template should allow b, i, u, br, a, img tags', () => {
         const body =
           'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
           '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>' +
@@ -81,7 +81,7 @@ describe('template', () => {
 
         expect(client.template(body, {})).toEqual(body)
       })
-      describe('email template should not allow any other html tags', () => {
+      test('email template should not allow any other html tags', () => {
         const script = "<script>alert('xss!')</script>"
         const body =
           'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
@@ -93,7 +93,7 @@ describe('template', () => {
           strippedScript + body
         )
       })
-      describe('email template should also strip params of tags', () => {
+      test('email template should also strip params of tags', () => {
         const params = { xss: "<script>alert('xss!')</script>", text: 'hello' }
         const body = 'test {{xss}} {{text}}'
         const output = "test alert('xss!') hello"
@@ -107,7 +107,7 @@ describe('template', () => {
       }
       const client: TemplateClient = new TemplateClient(xssOptions)
 
-      describe('sms template should not allow any html tags except br', () => {
+      test('sms template should not allow any html tags except br', () => {
         const body =
           'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
           '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>' +
@@ -116,7 +116,7 @@ describe('template', () => {
 
         expect(client.template(body, {})).toEqual(output)
       })
-      describe('sms template should also strip params of tags', () => {
+      test('sms template should also strip params of tags', () => {
         const params = { xss: "<script>alert('xss!')</script>", text: 'hello' }
         const body = 'test {{xss}} {{text}}'
         const output = "test alert('xss!') hello"
@@ -153,7 +153,7 @@ describe('template', () => {
       }
 
       const client: TemplateClient = new TemplateClient(xssOptions, '\n')
-      describe('Telegram should support b i u s strike del p code pre a', () => {
+      test('Telegram should support b i u s strike del p code pre a', () => {
         const body = 
           '<b>bold</b>' +
           '<i>italic</i>' +
@@ -165,25 +165,25 @@ describe('template', () => {
 
         expect(client.template(body, {})).toEqual(body)
       })
-      describe('inline mention links should be supported', () => {
+      test('inline mention links should be supported', () => {
         const body = '<a href="tg://user?id=837238105">me</a>'
         expect(client.template(body, {})).toEqual(body)
       })
-      describe('line breaks should be preserved', () => {
+      test('line breaks should be preserved', () => {
         const body = 'hello\nhello'
         expect(client.template(body, {})).toEqual(body)
       })
-      describe('unsupported HTML tags should be stripped', () => {
+      test('unsupported HTML tags should be stripped', () => {
         const body = '<div>hello</div><span>world</span>'
         const output = 'helloworld'
         expect(client.template(body, {})).toEqual(output)
       })
-      describe('unsupported HTML tag attrs should be stripped', () => {
+      test('unsupported HTML tag attrs should be stripped', () => {
         const body = '<a href="https://open.gov.sg" target="_blank">OGP</a>'
         const output = '<a href="https://open.gov.sg">OGP</a>'
         expect(client.template(body, {})).toEqual(output)
       })
-      describe('Telegram template should strip params of tags', () => {
+      test('Telegram template should strip params of tags', () => {
         const params = { xss: "<script>alert('xss!')</script>", text: 'hello' }
         const body = 'test {{xss}} {{text}}'
         const output = "test alert('xss!') hello"
