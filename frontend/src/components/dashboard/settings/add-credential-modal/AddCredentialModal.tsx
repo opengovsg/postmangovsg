@@ -124,7 +124,7 @@ const AddCredentialModal = ({
     }
     return (
       <>
-        <img src={ConfirmImage}></img>
+        <img src={ConfirmImage} alt="" />
         <h2>Almost there, validate credentials to finish</h2>
         <p>
           To ensure your credentials are working perfectly, please enter an
@@ -155,7 +155,7 @@ const AddCredentialModal = ({
       case AddCredentialStep.Success:
         return (
           <div className={styles.centerAlign}>
-            <img src={SuccessImage} />
+            <img src={SuccessImage} alt="" />
             <h3>Your credentials are working well.</h3>
             <PrimaryButton
               className={styles.padTop}
@@ -169,7 +169,7 @@ const AddCredentialModal = ({
       case AddCredentialStep.Failure:
         return (
           <div className={styles.centerAlign}>
-            <img src={FailureImage} />
+            <img src={FailureImage} alt="" />
             <h3>Sorry, something went wrong.</h3>
             <ErrorBlock>{errorMessage}</ErrorBlock>
             <PrimaryButton onClick={() => setCredStep(AddCredentialStep.Input)}>

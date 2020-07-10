@@ -195,7 +195,7 @@ const Landing = () => {
           </div>
           <div className={styles.landingAnimation}>
             {isIE11 ? (
-              <img src={landingHeroImg} className={styles.landingHero} />
+              <img src={landingHeroImg} className={styles.landingHero} alt="" />
             ) : (
               <Lottie
                 options={{
