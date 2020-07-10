@@ -141,8 +141,8 @@ const AddCredentialModal = ({
       case AddCredentialStep.SelectType:
         return (
           <>
-            <button onClick={() => setCredType(ChannelType.SMS)}>sms</button>
-            <button onClick={() => setCredType(ChannelType.Email)}>sms</button>
+            <button type="button" onClick={() => setCredType(ChannelType.SMS)}>sms</button>
+            <button type="button" onClick={() => setCredType(ChannelType.Email)}>sms</button>
           </>
         )
       // Input credentials step
