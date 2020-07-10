@@ -31,9 +31,9 @@ const SampleCsv = ({
   }
 
   return (
-    <a className={styles.sampleCsv} onClick={onDownloadFile}>
+    <button type="button" className={styles.sampleCsv} onClick={onDownloadFile}>
       Download a sample .csv file
-    </a>
+    </button>
   )
 }
 

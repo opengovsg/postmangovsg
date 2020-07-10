@@ -95,12 +95,13 @@ const Login = () => {
         <h4 className={styles.text}>
           {mainText}
           {otpSent && (
-            <a
+            <button
+              type="button"
               className={cx(styles.resend, { [styles.disabled]: !canResend })}
               onClick={canResend ? resend : noop}
             >
               {isResending ? 'Resending OTP...' : 'Resend?'}
-            </a>
+            </button>
           )}
         </h4>
         <TextInputWithButton
