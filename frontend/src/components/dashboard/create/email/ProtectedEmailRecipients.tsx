@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import isEmail from 'validator/lib/isEmail'
 
 import {
   PrimaryButton,
   TextButton,
   TextArea,
   InfoBlock,
+  ErrorBlock,
 } from 'components/common'
 import EmailRecipients from './EmailRecipients'
 import { EmailCampaign } from 'classes'
 import { sendTiming } from 'services/ga.service'
+import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 
 enum ProtectPhase {
   READY,
@@ -33,14 +36,11 @@ const ProtectedEmailRecipients = ({
 }) => {
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const [tempCsvInfo, setTempCsvInfo] = useState<{
-    tempNumRecipients: number
-    tempCsvFilename: string
-    tempPreview: string
-  }>()
+  const [selectedFile, setSelectedFile] = useState<File>()
+  const [protectedCsvInfo, setProtectedCsvInfo] = useState<ProtectedCsvInfo>()
   const { id: campaignId } = useParams()
 
-  let initialPhase = ProtectPhase.PREVIEW
+  let initialPhase = ProtectPhase.READY
   if (numRecipients) {
     initialPhase = ProtectPhase.DONE
   }
@@ -52,10 +52,10 @@ const ProtectedEmailRecipients = ({
   async function onFileSelected(campaignId: number, file: File) {
     setErrorMessage('')
     setPhase(ProtectPhase.VALIDATING)
+    setSelectedFile(file)
     try {
-      // user did not select a file
-      // TODO: Validate CSV info
-      setTempCsvInfo(tempCsvInfo)
+      const validationInfo = await validateCsv(file, template, isEmail)
+      setProtectedCsvInfo(validationInfo)
       setPhase(ProtectPhase.PREVIEW)
     } catch (err) {
       setErrorMessage(err.message)
@@ -65,11 +65,10 @@ const ProtectedEmailRecipients = ({
 
   async function onFileUpload() {
     setPhase(ProtectPhase.UPLOADING)
-    // hydrate templates and encrypt content
     if (!campaignId) {
       throw new Error('No campaign id')
     }
-    if (!tempCsvInfo?.tempCsvFilename) {
+    if (!selectedFile) {
       throw new Error('No csv selected')
     }
     try {
@@ -117,22 +116,34 @@ const ProtectedEmailRecipients = ({
       <InfoBlock>
         <li>
           <i className="bx bx-user-check"></i>
-          <p>{tempCsvInfo?.tempCsvFilename} recipients</p>
+          <p>{protectedCsvInfo?.numRecipients} recipients</p>
         </li>
         <li>
           <i className="bx bx-file"></i>
-          <p>{tempCsvInfo?.tempCsvFilename}</p>
+          <p>{protectedCsvInfo?.csvFilename}</p>
         </li>
         <hr />
         <li>
-          <p>{tempCsvInfo?.tempPreview}</p>
+          <p>{protectedCsvInfo?.preview}</p>
         </li>
       </InfoBlock>
       <div className="progress-button">
         <TextButton onClick={() => setPhase(ProtectPhase.READY)}>
           Back
         </TextButton>
-        <PrimaryButton onClick={onFileUpload}>Confirm</PrimaryButton>
+        <PrimaryButton
+          onClick={onFileUpload}
+          disabled={phase === ProtectPhase.UPLOADING}
+        >
+          {phase === ProtectPhase.UPLOADING ? (
+            <>
+              <i className="bx bx-loader-alt bx-spin"></i>
+              Protecting Messages
+            </>
+          ) : (
+            'Confirm'
+          )}
+        </PrimaryButton>
       </div>
     </>
   )
@@ -174,6 +185,7 @@ const ProtectedEmailRecipients = ({
     <>
       <sub>Step 2</sub>
       {render()}
+      <ErrorBlock>{errorMessage}</ErrorBlock>
     </>
   )
 }

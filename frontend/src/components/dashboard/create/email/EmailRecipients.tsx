@@ -187,15 +187,16 @@ const EmailRecipients = ({
           <div className="separator"></div>
         </>
       )}
-
-      <div className="progress-button">
-        <PrimaryButton
-          disabled={!numRecipients || isCsvProcessing}
-          onClick={onNext}
-        >
-          Preview →
-        </PrimaryButton>
-      </div>
+      {!protect && (
+        <div className="progress-button">
+          <PrimaryButton
+            disabled={!numRecipients || isCsvProcessing}
+            onClick={onNext}
+          >
+            Preview →
+          </PrimaryButton>
+        </div>
+      )}
     </>
   )
 }

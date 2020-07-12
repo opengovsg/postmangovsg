@@ -2,7 +2,10 @@ import React from 'react'
 import { without, times, constant } from 'lodash'
 import download from 'downloadjs'
 
-import { extractTemplateParams } from 'services/protected.service'
+import {
+  PROTECTED_CSV_HEADERS,
+  extractParams,
+} from 'services/validate-csv.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import TextButton from '../text-button'
 
@@ -18,15 +21,14 @@ const SampleCsv = ({
   protect?: boolean
 }) => {
   const RECIPIENT_HEADER = ['recipient']
-  const RECIPIENT_PROTECTED_HEADER = ['recipient', 'password']
 
   async function onDownloadFile() {
     let variableHeaders = params
     if (protect) {
-      variableHeaders = template ? await extractTemplateParams(template) : []
+      variableHeaders = template ? await extractParams(template) : []
     }
     // Add keyword columns in front, remove if already in params
-    const fixedHeaders = protect ? RECIPIENT_PROTECTED_HEADER : RECIPIENT_HEADER
+    const fixedHeaders = protect ? PROTECTED_CSV_HEADERS : RECIPIENT_HEADER
     const headers = [
       ...fixedHeaders,
       ...without(variableHeaders, ...fixedHeaders),

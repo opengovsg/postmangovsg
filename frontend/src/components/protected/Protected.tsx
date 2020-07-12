@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { fetchMessage } from 'services/protected.service'
 
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import styles from './Protected.module.scss'
@@ -16,7 +15,7 @@ const Protected = () => {
   async function onAccessMail() {
     if (!id) return
     try {
-      const data = await fetchMessage(id, password)
+      const data = ''
       setDecryptedMessage(data)
     } catch (err) {
       setErrorMsg(err.message)
