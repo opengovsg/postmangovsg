@@ -1,6 +1,7 @@
 import Papa from 'papaparse'
 
 import { encryptData, hashData } from './crypto.service'
+import { getPreviewOfFirstRow } from './validate-csv.service'
 import {
   beginMultipartUpload,
   uploadPartWithPresignedUrl,
@@ -37,8 +38,6 @@ async function transformRows(
 
 // Calculates approximate chunk size for multipart upload
 async function chunkSize(file: File, template: string): Promise<number> {
-  let numChars = template.length
-  let rowChars = 0
   return new Promise((resolve) => {
     Papa.parse(file, {
       header: true,
@@ -48,22 +47,14 @@ async function chunkSize(file: File, template: string): Promise<number> {
         parser.pause()
         parser.abort()
       },
-      complete: function (results) {
+      complete: async function (results) {
         // results.data will contain 1 row of results because we aborted on the first step
-        const row = Object.entries(results.data) as Array<[string, string]>
-        for (const [field, value] of row) {
-          if (/^[a-zA-Z0-9\s-_'"/]+$/.test(field)) {
-            // field is of an acceptable format
-            const regexp = new RegExp(`{{\\s*${field}\\s*}}`, 'gi')
-            const numReplacements = template.match(regexp)?.length || 0
-            numChars += value.length * numReplacements
-            rowChars += value.length
-          }
-        }
-
-        const templatedSize = numChars * 4 // 4 bytes per character
-        const rowSize = rowChars * 4
-        const size = Math.ceil((MIN_UPLOAD_SIZE / templatedSize) * rowSize)
+        const row = results.data
+        const templatedSize = getPreviewOfFirstRow(template, row).length
+        const rowSize = Object.values(row).join(',').length
+        const size = Math.ceil(
+          (MIN_UPLOAD_SIZE / 4) * (rowSize / templatedSize) // convert bytes to chars
+        )
         resolve(size)
       },
       error: function () {
