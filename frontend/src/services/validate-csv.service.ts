@@ -60,7 +60,7 @@ export async function validateCsv(
           const row = step.data
           validateRow(row, requiredParams, recipientValidator)
           if (count === 1) {
-            preview = getPreviewOfFirstRow(template, row)
+            preview = hydrateTemplate(template, row)
           }
         } catch (e) {
           // If there is errors, append to the errors array
@@ -86,10 +86,7 @@ export async function validateCsv(
   })
 }
 
-export function getPreviewOfFirstRow(
-  template: string,
-  row: Record<string, any>
-) {
+export function hydrateTemplate(template: string, row: Record<string, any>) {
   return templateClient.template(template, row)
 }
 
