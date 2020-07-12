@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { fetchMessage } from 'services/decrypt-mail.service'
 
 import { TextInputWithButton, ErrorBlock } from 'components/common'
 import styles from './Protected.module.scss'
@@ -15,7 +16,9 @@ const Protected = () => {
   async function onAccessMail() {
     if (!id) return
     try {
-      const data = ''
+      // TODO: hash password
+      // TODO: fetch encrypted payload
+      const data = await fetchMessage(id, password)
       setDecryptedMessage(data)
     } catch (err) {
       setErrorMsg(err.message)

@@ -122,7 +122,6 @@ router.get(
 router.post(
   '/',
   celebrate(createCampaignValidator),
-  CampaignMiddleware.canCreateProtectedCampaign,
   CampaignMiddleware.createCampaign
 )
 

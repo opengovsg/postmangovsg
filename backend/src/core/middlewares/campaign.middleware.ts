@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
-import { CampaignService, TemplateService } from '@core/services'
+import {
+  CampaignService,
+  UploadService,
+  ProtectedService,
+} from '@core/services'
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -11,15 +15,17 @@ import { CampaignService, TemplateService } from '@core/services'
 const canEditCampaign = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  protect = false
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const [hasJob, csvStatus] = await Promise.all([
+    const [hasJob, csvStatus, isProtected] = await Promise.all([
       CampaignService.hasJobInProgress(+campaignId),
-      TemplateService.getCsvStatus(+campaignId),
+      UploadService.getCsvStatus(+campaignId),
+      ProtectedService.isProtectedCampaign(+campaignId),
     ])
-    if (!hasJob && !csvStatus?.isCsvProcessing) {
+    if (!hasJob && !csvStatus?.isCsvProcessing && (isProtected || !protect)) {
       return next()
     } else {
       return res.sendStatus(403)
@@ -30,25 +36,17 @@ const canEditCampaign = async (
 }
 
 /**
- *  If a campaign's channel is not a supported password protected channel, then it cannot be created with protect set to true
+ * Limit certain routes for protected campaigns only
  * @param req
  * @param res
  * @param next
  */
-const canCreateProtectedCampaign = async (
+const canEditProtectedCampaign = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  try {
-    const { type, protect }: { type: string; protect: boolean } = req.body
-    if (protect && type !== ChannelType.Email) {
-      return res.sendStatus(403)
-    }
-    return next()
-  } catch (err) {
-    return next(err)
-  }
+  return canEditCampaign(req, res, next, true)
 }
 
 /**
@@ -68,6 +66,12 @@ const createCampaign = async (
       type,
       protect,
     }: { name: string; type: string; protect: boolean } = req.body
+
+    // Check that protected campaign can only be created for emails
+    if (protect && type !== ChannelType.Email) {
+      return res.sendStatus(403)
+    }
+
     const userId = req.session?.user?.id
     const campaign = await CampaignService.createCampaign({
       name,
@@ -118,7 +122,7 @@ const listCampaigns = async (
 
 export const CampaignMiddleware = {
   canEditCampaign,
-  canCreateProtectedCampaign,
+  canEditProtectedCampaign,
   createCampaign,
   listCampaigns,
 }

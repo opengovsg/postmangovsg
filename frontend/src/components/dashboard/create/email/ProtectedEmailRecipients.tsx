@@ -13,6 +13,7 @@ import EmailRecipients from './EmailRecipients'
 import { EmailCampaign } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
+import { protectAndUploadCsv } from 'services/protect-csv.service'
 
 enum ProtectPhase {
   READY,
@@ -73,7 +74,7 @@ const ProtectedEmailRecipients = ({
     }
     try {
       const uploadTimeStart = performance.now()
-      // TODO: parse and upload
+      await protectAndUploadCsv(campaignId, selectedFile, template)
       const uploadTimeEnd = performance.now()
       sendTiming(
         'Contacts file',

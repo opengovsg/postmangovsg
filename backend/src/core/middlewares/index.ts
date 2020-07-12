@@ -1,5 +1,5 @@
 export * from './campaign.middleware'
-export * from './template.middleware'
+export * from './upload.middleware'
 export * from './auth.middleware'
 export * from './job.middleware'
 export * from './settings.middleware'
