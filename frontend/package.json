@@ -29,6 +29,7 @@
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "papaparse": "^5.2.0",
+    "postman-templating": "file:../modules/postman-templating",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.13.1",
