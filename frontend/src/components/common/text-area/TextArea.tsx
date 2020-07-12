@@ -20,7 +20,7 @@ const TextArea = ({
   value: string
   onChange: Function
 }) => {
-  const minRows = singleRow ? 1 : 5
+  const minRows = singleRow ? 1 : 7
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
 
   useEffect(() => {

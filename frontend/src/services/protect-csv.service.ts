@@ -107,7 +107,6 @@ export async function protectAndUploadCsv(
       header: true,
       delimiter: ',',
       skipEmptyLines: true,
-      // worker: true,
       chunk: async function (chunk, parser) {
         parser.pause()
         partNumber++

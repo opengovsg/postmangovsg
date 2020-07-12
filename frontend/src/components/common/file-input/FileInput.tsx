@@ -5,9 +5,11 @@ import styles from './FileInput.module.scss'
 const FileInput = ({
   isProcessing,
   onFileSelected,
+  label = 'Upload',
 }: {
   isProcessing: boolean
   onFileSelected: Function
+  label?: string
 }) => {
   return (
     <div className={styles.container}>
@@ -23,11 +25,11 @@ const FileInput = ({
       <label htmlFor="recipient-upload-input">
         {isProcessing ? (
           <>
-            Uploading<i className="bx bx-loader-alt bx-spin"></i>
+            {label}ing<i className="bx bx-loader-alt bx-spin"></i>
           </>
         ) : (
           <>
-            Upload File <i className="bx bx-upload"></i>
+            {label} File <i className="bx bx-upload"></i>
           </>
         )}
       </label>

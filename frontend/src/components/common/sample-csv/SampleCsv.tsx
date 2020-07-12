@@ -2,21 +2,38 @@ import React from 'react'
 import { without, times, constant } from 'lodash'
 import download from 'downloadjs'
 
+import {
+  PROTECTED_CSV_HEADERS,
+  extractParams,
+} from 'services/validate-csv.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import styles from './SampleCsv.module.scss'
+import TextButton from '../text-button'
 
 const SampleCsv = ({
-  params,
   defaultRecipient,
+  params,
+  template,
+  protect = false,
 }: {
-  params: Array<string>
   defaultRecipient: string
+  params?: Array<string>
+  template?: string
+  protect?: boolean
 }) => {
-  const RECIPIENT_HEADER = 'recipient'
+  const RECIPIENT_HEADER = ['recipient']
 
-  function onDownloadFile() {
-    // Add recipient column in front, remove if already in params
-    const headers = [RECIPIENT_HEADER, ...without(params, RECIPIENT_HEADER)]
+  async function onDownloadFile() {
+    let variableHeaders = params
+    if (protect) {
+      variableHeaders = template ? await extractParams(template) : []
+    }
+    // Add keyword columns in front, remove if already in params
+    const fixedHeaders = protect ? PROTECTED_CSV_HEADERS : RECIPIENT_HEADER
+    const headers = [
+      ...fixedHeaders,
+      ...without(variableHeaders, ...fixedHeaders),
+    ]
+
     // Set default recipient as first value and pad with placeholder
     const body = [
       defaultRecipient,
@@ -31,9 +48,9 @@ const SampleCsv = ({
   }
 
   return (
-    <a className={styles.sampleCsv} onClick={onDownloadFile}>
+    <TextButton onClick={onDownloadFile}>
       Download a sample .csv file
-    </a>
+    </TextButton>
   )
 }
 

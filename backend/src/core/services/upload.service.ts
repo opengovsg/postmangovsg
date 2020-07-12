@@ -82,10 +82,7 @@ const getPresignedPartUrl = async ({
     PartNumber: partNumber,
     UploadId: uploadId,
   }
-
-  const presignedUrl = await s3.getSignedUrlPromise('uploadPart', params)
-
-  return presignedUrl
+  return await s3.getSignedUrlPromise('uploadPart', params)
 }
 
 /**
