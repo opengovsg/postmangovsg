@@ -63,7 +63,6 @@ export async function validateCsv(
             preview = getPreviewOfFirstRow(template, row)
           }
         } catch (e) {
-          console.log(e)
           // If there is errors, append to the errors array
           errors.push(`${count}: ${e.message}`)
           if (errors.length === 3) {
@@ -72,8 +71,7 @@ export async function validateCsv(
           }
         }
       },
-      complete: function (a, b) {
-        console.log(a, b, errors)
+      complete: function () {
         if (errors.length) {
           reject(new Error(`Errors found in csv: \n${errors.join('\n')}`))
         } else {
@@ -88,7 +86,10 @@ export async function validateCsv(
   })
 }
 
-function getPreviewOfFirstRow(template: string, row: Record<string, any>) {
+export function getPreviewOfFirstRow(
+  template: string,
+  row: Record<string, any>
+) {
   return templateClient.template(template, row)
 }
 

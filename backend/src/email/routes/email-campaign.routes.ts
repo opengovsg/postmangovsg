@@ -60,14 +60,7 @@ const sendCampaignValidator = {
 const startMultipartValidator = {
   [Segments.QUERY]: Joi.object({
     mime_type: Joi.string().required(),
-  }),
-}
-
-const getMultipartUrlValidator = {
-  [Segments.QUERY]: Joi.object({
-    transaction_id: Joi.string().required(),
-    // Only part numbers from 1 to 10000 allowed for s3 multipart upload
-    part_number: Joi.number().integer().min(1).max(10000).required(),
+    part_count: Joi.number().integer().min(1).max(10000).default(1),
   }),
 }
 
@@ -618,7 +611,7 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/upload-protect/start:
+ *  /campaign/{campaignId}/email/protect/upload/start:
  *    get:
  *      tags:
  *        - Email
@@ -634,7 +627,14 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
  *          required: true
  *          schema:
  *            type: string
- *
+ *        - name: part_count
+ *          in: query
+ *          required: true
+ *          schema:
+ *            type: integer
+ *            minimum: 1
+ *            maximum: 100
+ *            default: 1
  *      responses:
  *        200:
  *          content:
@@ -644,6 +644,10 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
  *                properties:
  *                 transaction_id:
  *                  type: string
+ *                 presigned_urls:
+ *                  type: array
+ *                  items:
+ *                    type: string
  *
  *        "400" :
  *           description: Invalid campaign type, not owned by user
@@ -662,57 +666,7 @@ router.get(
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/upload-multipart-url:
- *    get:
- *      tags:
- *        - Email
- *      summary: get presigned url for multipart upload
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *        - name: transaction_id
- *          in: query
- *          required: true
- *          schema:
- *            type: string
- *        - name: part_number
- *          in: query
- *          required: true
- *          schema:
- *            type: integer
- *            minimum: 1
- *            maximum: 10000
- *      responses:
- *        200:
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                 presigned_url:
- *                  type: string
- *
- *        "400" :
- *           description: Invalid campaign type, not owned by user
- *        "401":
- *           description: Unauthorized
- *        "500":
- *           description: Internal Server Error
- */
-router.get(
-  '/protect/upload/part',
-  celebrate(getMultipartUrlValidator),
-  CampaignMiddleware.canEditProtectedCampaign,
-  UploadMiddleware.getMultipartUrl
-)
-
-/**
- * @swagger
- * path:
- *   /campaign/{campaignId}/email/upload-complete-multipart:
+ *   /campaign/{campaignId}/email/protect/upload/complete:
  *     post:
  *       description: Complete multipart upload
  *       tags:

@@ -51,7 +51,7 @@ const getUploadParameters = async (
  */
 const extractParamsFromJwt = (
   transactionId: string
-): string | { s3Key: string; uploadId: string } => {
+): { s3Key: string; uploadId?: string } => {
   let decoded
   try {
     decoded = jwtUtils.verify(transactionId)
@@ -59,19 +59,45 @@ const extractParamsFromJwt = (
     logger.error(`${err.stack}`)
     throw new Error('Invalid transactionId provided')
   }
-  return decoded as string | { s3Key: string; uploadId: string }
+  return typeof decoded === 'string'
+    ? { s3Key: decoded }
+    : (decoded as { s3Key: string; uploadId: string }) //multipart
+}
+
+/**
+ * Get a presigned url to upload a part for multipart upload.
+ */
+const getPresignedPartUrl = async ({
+  s3Key,
+  uploadId,
+  partNumber,
+}: {
+  s3Key: string
+  uploadId: string
+  partNumber: number
+}): Promise<string> => {
+  const params = {
+    Bucket: FILE_STORAGE_BUCKET_NAME,
+    Key: s3Key,
+    PartNumber: partNumber,
+    UploadId: uploadId,
+  }
+  return await s3.getSignedUrlPromise('uploadPart', params)
 }
 
 /**
  * Create a multipart upload on s3 and return the upload id and s3 key for it.
  */
-const startMultipartUpload = async (contentType: string): Promise<string> => {
+const startMultipartUpload = async (
+  mimeType: string,
+  partCount: number
+): Promise<{ transactionId: string; presignedUrls: string[] }> => {
   const s3Key = uuid()
 
   const params = {
     Bucket: FILE_STORAGE_BUCKET_NAME,
     Key: s3Key,
-    ContentType: contentType,
+    ContentType: mimeType,
   }
 
   const { UploadId } = await s3.createMultipartUpload(params).promise()
@@ -83,33 +109,18 @@ const startMultipartUpload = async (contentType: string): Promise<string> => {
     s3Key,
   })
 
-  return transactionId
-}
-
-/**
- * Get a presigned url to upload a part for multipart upload.
- */
-const getPresignedPartUrl = async ({
-  transactionId,
-  partNumber,
-}: {
-  transactionId: string
-  partNumber: number
-}): Promise<string> => {
-  const { s3Key, uploadId } = extractParamsFromJwt(transactionId) as {
-    s3Key: string
-    uploadId: string
+  const presignedUrlPromises = []
+  for (let partNumber = 1; partNumber <= partCount; partNumber++) {
+    presignedUrlPromises.push(
+      getPresignedPartUrl({ s3Key, uploadId: UploadId, partNumber })
+    )
   }
-  const params = {
-    Bucket: FILE_STORAGE_BUCKET_NAME,
-    Key: s3Key,
-    PartNumber: partNumber,
-    UploadId: uploadId,
+  const presignedUrls = await Promise.all(presignedUrlPromises)
+
+  return {
+    transactionId,
+    presignedUrls,
   }
-
-  const presignedUrl = await s3.getSignedUrlPromise('uploadPart', params)
-
-  return presignedUrl
 }
 
 /**
@@ -323,7 +334,6 @@ export const UploadService = {
   getUploadParameters,
   extractParamsFromJwt,
   startMultipartUpload,
-  getPresignedPartUrl,
   completeMultipartUpload,
   /**** Handle S3Key in DB *****/
   replaceCampaignS3Metadata,

@@ -41,40 +41,11 @@ const startMultipartUpload = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const contentType = req.query['mime_type']
-
-    const transactionId = await UploadService.startMultipartUpload(contentType)
-
+    const { mime_type: mimeType, part_count: partCount } = req.query
+    const data = await UploadService.startMultipartUpload(mimeType, partCount)
     return res.json({
-      transaction_id: transactionId,
-    })
-  } catch (err) {
-    return next(err)
-  }
-}
-
-/**
- * Get a presigned url for multipart upload.
- * @param req
- * @param res
- * @param next
- */
-const getMultipartUrl = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const transactionId = req.query['transaction_id']
-    const partNumber = req.query['part_number']
-
-    const presignedUrl = await UploadService.getPresignedPartUrl({
-      transactionId,
-      partNumber,
-    })
-
-    return res.json({
-      presigned_url: presignedUrl,
+      transaction_id: data.transactionId,
+      presigned_urls: data.presignedUrls,
     })
   } catch (err) {
     return next(err)
@@ -115,6 +86,5 @@ const completeMultipart = async (
 export const UploadMiddleware = {
   uploadStartHandler,
   startMultipartUpload,
-  getMultipartUrl,
   completeMultipart,
 }

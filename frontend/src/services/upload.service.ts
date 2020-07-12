@@ -183,68 +183,48 @@ export async function deleteCsvStatus(campaignId: number): Promise<void> {
 export async function beginMultipartUpload({
   campaignId,
   mimeType,
+  partCount,
 }: {
   campaignId: number
   mimeType: string
-}): Promise<string> {
+  partCount: number
+}): Promise<{ transactionId: string; presignedUrls: string[] }> {
   const response = await axios.get(
     `/campaign/${campaignId}/protect/upload/start`,
     {
       params: {
         mime_type: mimeType,
+        part_count: partCount,
       },
     }
   )
-  const { transaction_id: transactionId } = response.data
-  return transactionId
+  const {
+    transaction_id: transactionId,
+    presigned_urls: presignedUrls,
+  } = response.data
+  return { transactionId, presignedUrls }
 }
 
 /*
- * Gets a presigned url from backend for s3 multipart upload.
- * The part number is important. If it is repeated, it will override the previous uploads.
- */
-export async function getPresignedMultipartUrl({
-  campaignId,
-  transactionId,
-  partNumber,
-}: {
-  campaignId: number
-  transactionId: string
-  partNumber: number
-}): Promise<string> {
-  const response = await axios.get(
-    `/campaign/${campaignId}/protect/upload/part`,
-    {
-      params: {
-        transaction_id: transactionId,
-        part_number: partNumber,
-      },
-    }
-  )
-  const { presigned_url: presignedUrl } = response.data
-  return presignedUrl
-}
-
-/*
- * Upload a string to the presigned url.
+ * Upload an array buffer to the presigned url.
  * Returns an etag that is essential to complete a multipart upload.
  */
 export async function uploadPartWithPresignedUrl({
   presignedUrl,
-  contentType,
   data,
 }: {
   presignedUrl: string
-  contentType: string
-  data: string
+  data: string[]
 }): Promise<string> {
-  const response = await axios.put(presignedUrl, data, {
-    headers: {
-      'Content-Type': contentType,
-    },
-    withCredentials: false,
-    timeout: 0,
-  })
+  const contentType = 'text/csv'
+  const response = await axios.put(
+    presignedUrl,
+    new Blob(data, { type: contentType }),
+    {
+      withCredentials: false,
+      timeout: 0,
+    }
+  )
   return response.headers.etag
 }
 

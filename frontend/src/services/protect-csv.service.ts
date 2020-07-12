@@ -1,12 +1,15 @@
 import Papa from 'papaparse'
 
 import { encryptData, hashData } from './crypto.service'
+import { getPreviewOfFirstRow } from './validate-csv.service'
 import {
   beginMultipartUpload,
-  getPresignedMultipartUrl,
   uploadPartWithPresignedUrl,
   completeMultiPartUpload,
 } from './upload.service'
+
+const DEFAULT_CHUNK_SIZE = 10000000 // 10 Mb
+const MIN_UPLOAD_SIZE = 5000000 // 5Mb minimum needed for uploading each part
 
 /*
  * 1. Hydrates the template with the params.
@@ -18,19 +21,47 @@ async function transformRows(
   template: string,
   rows: any[],
   partNumber: number
-): Promise<string> {
-  const transformed = []
-  if (partNumber === 1) {
-    transformed.push('recipient,payload,passwordhash')
-  }
-  for (const row of rows) {
-    const { recipient, password } = row
-    const hydratedMessage = template
-    const encryptedPayload = await encryptData(hydratedMessage, password)
-    const passwordHash = await hashData(password)
-    transformed.push(`${recipient},"${encryptedPayload}",${passwordHash}`)
-  }
-  return transformed.join('\n')
+): Promise<string[]> {
+  const transformed = await Promise.all(
+    rows.map(async (row) => {
+      const { recipient, password } = row
+      const hydratedMessage = template
+      const encryptedPayload = await encryptData(hydratedMessage, password)
+      const passwordHash = password
+      return `${recipient},"${encryptedPayload}",${passwordHash}\n`
+    })
+  )
+  return partNumber === 1
+    ? ['recipient,payload,passwordhash\n'].concat(transformed)
+    : transformed
+}
+
+// Calculates approximate chunk size for multipart upload
+async function chunkSize(file: File, template: string): Promise<number> {
+  return new Promise((resolve) => {
+    Papa.parse(file, {
+      header: true,
+      delimiter: ',',
+      step: function (_, parser) {
+        // Checks first row only
+        parser.pause()
+        parser.abort()
+      },
+      complete: async function (results) {
+        // results.data will contain 1 row of results because we aborted on the first step
+        const row = results.data
+        const templatedSize = getPreviewOfFirstRow(template, row).length
+        const rowSize = Object.values(row).join(',').length
+        const size = Math.ceil(
+          (MIN_UPLOAD_SIZE / 4) * (rowSize / templatedSize) // convert bytes to chars
+        )
+        resolve(size)
+      },
+      error: function () {
+        resolve(DEFAULT_CHUNK_SIZE)
+      },
+    })
+  })
 }
 
 /*
@@ -49,16 +80,19 @@ export async function protectAndUploadCsv(
   file: File,
   template: string
 ): Promise<void> {
-  const transactionId = await beginMultipartUpload({
+  const size = await chunkSize(file, template)
+  const partCount = Math.ceil(file.size / size)
+  const { transactionId, presignedUrls } = await beginMultipartUpload({
     campaignId,
     mimeType: 'text/csv', // no need to check mime type, since we're creating the csv
+    partCount,
   })
-
   let partNumber = 0
 
   const etags: Array<string> = []
-
   // Start parsing by chunks
+
+  Papa.LocalChunkSize = String(size)
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
@@ -73,16 +107,9 @@ export async function protectAndUploadCsv(
         //  and join the rows into a single string
         const data = await transformRows(template, rows, partNumber)
 
-        const presignedUrl = await getPresignedMultipartUrl({
-          campaignId,
-          transactionId,
-          partNumber,
-        })
-
         // Upload the single string onto s3 based through the presigned url
         const etag = await uploadPartWithPresignedUrl({
-          presignedUrl,
-          contentType: 'text/csv',
+          presignedUrl: presignedUrls[partNumber - 1],
           data,
         })
         etags.push(etag)
@@ -90,8 +117,8 @@ export async function protectAndUploadCsv(
       },
       complete: async function () {
         await completeMultiPartUpload({
-          filename: file.name,
           campaignId,
+          filename: file.name,
           transactionId,
           partCount: partNumber,
           etags,
