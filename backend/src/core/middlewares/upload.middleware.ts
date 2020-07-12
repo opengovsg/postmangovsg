@@ -71,13 +71,11 @@ const completeMultipart = async (
       etags,
     } = req.body
 
-    const s3Key = await UploadService.completeMultipartUpload({
+    await UploadService.completeMultipartUpload({
       transactionId,
       partCount,
       etags,
     })
-
-    console.log(s3Key)
 
     next()
   } catch (err) {

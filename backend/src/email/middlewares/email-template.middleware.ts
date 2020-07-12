@@ -301,14 +301,10 @@ const uploadProtectedCompleteHandler = async (
     const s3Client = new S3Client()
     const fileContent = await s3Client.getCsvFile(s3Key)
 
-    console.log(fileContent)
-
     const records = UploadService.getProtectedRecordsFromCsv(
       +campaignId,
       fileContent
     )
-
-    console.log(records)
 
     if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
       throw new InvalidRecipientError()

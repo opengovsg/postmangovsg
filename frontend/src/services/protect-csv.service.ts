@@ -21,8 +21,7 @@ async function transformRows(
   rows: any[],
   partNumber: number
 ): Promise<string[]> {
-  const t0 = performance.now()
-  const transformed = await Promise.allSettled(
+  const transformed = await Promise.all(
     rows.map(async (row) => {
       const { recipient, password } = row
       const hydratedMessage = template
@@ -31,26 +30,12 @@ async function transformRows(
       return `${recipient},"${encryptedPayload}",${passwordHash}\n`
     })
   )
-    .then((results) =>
-      results.filter((result) => result.status === 'fulfilled')
-    )
-    .then((results) =>
-      results.map((result) => (result as PromiseFulfilledResult<string>).value)
-    )
-
-  const t1 = performance.now()
-  console.log(
-    JSON.stringify({
-      numRows: rows.length,
-      totalMsEncrypt: t1 - t0,
-      averageMsPerRow: (t1 - t0) / rows.length,
-    })
-  )
   return partNumber === 1
     ? ['recipient,payload,passwordhash\n'].concat(transformed)
     : transformed
 }
 
+// Calculates approximate chunk size for multipart upload
 async function chunkSize(file: File, template: string): Promise<number> {
   let numChars = template.length
   let rowChars = 0
@@ -58,13 +43,12 @@ async function chunkSize(file: File, template: string): Promise<number> {
     Papa.parse(file, {
       header: true,
       delimiter: ',',
-      step: function (_, parser: Papa.Parser) {
+      step: function (_, parser) {
         // Checks first row only
         parser.pause()
         parser.abort()
       },
       complete: function (results) {
-        // We can also check for recipient and password here.
         // results.data will contain 1 row of results because we aborted on the first step
         const row = Object.entries(results.data) as Array<[string, string]>
         for (const [field, value] of row) {
@@ -80,14 +64,6 @@ async function chunkSize(file: File, template: string): Promise<number> {
         const templatedSize = numChars * 4 // 4 bytes per character
         const rowSize = rowChars * 4
         const size = Math.ceil((MIN_UPLOAD_SIZE / templatedSize) * rowSize)
-        console.log(
-          JSON.stringify({
-            chunkSize: size,
-            templatedSize,
-            rowSize,
-            minUploadSize: MIN_UPLOAD_SIZE,
-          })
-        )
         resolve(size)
       },
       error: function () {
@@ -115,17 +91,11 @@ export async function protectAndUploadCsv(
 ): Promise<void> {
   const size = await chunkSize(file, template)
   const partCount = Math.ceil(file.size / size)
-  console.log(
-    JSON.stringify({ fileSize: file.size, chunkSize: size, partCount })
-  )
-  console.time('beginMultipartUpload')
   const { transactionId, presignedUrls } = await beginMultipartUpload({
     campaignId,
     mimeType: 'text/csv', // no need to check mime type, since we're creating the csv
     partCount,
   })
-  console.timeEnd('beginMultipartUpload')
-  console.time('start')
   let partNumber = 0
 
   const etags: Array<string> = []
@@ -140,29 +110,22 @@ export async function protectAndUploadCsv(
       // worker: true,
       chunk: async function (chunk, parser) {
         parser.pause()
-        console.log(chunk.meta)
-
         partNumber++
-        console.log('part no.', partNumber)
         const rows = chunk.data
 
         // transform into rows of data into {recipient,payload,passwordHash}
         //  and join the rows into a single string
         const data = await transformRows(template, rows, partNumber)
 
-        console.time('uploadPartWithPresignedUrl')
         // Upload the single string onto s3 based through the presigned url
         const etag = await uploadPartWithPresignedUrl({
           presignedUrl: presignedUrls[partNumber - 1],
           data,
         })
         etags.push(etag)
-        console.timeEnd('uploadPartWithPresignedUrl')
         parser.resume()
       },
       complete: async function () {
-        console.log('complete')
-        console.timeEnd('start')
         await completeMultiPartUpload({
           campaignId,
           filename: file.name,

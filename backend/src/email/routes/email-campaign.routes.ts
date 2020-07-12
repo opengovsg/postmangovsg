@@ -718,9 +718,6 @@ router.post(
   celebrate(completeMultipartValidator),
   CampaignMiddleware.canEditProtectedCampaign,
   UploadMiddleware.completeMultipart,
-  // (_req, res) => {
-  //   res.json({ message: 'ok' })
-  // }
   EmailTemplateMiddleware.uploadProtectedCompleteHandler
 )
 

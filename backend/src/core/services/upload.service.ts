@@ -112,13 +112,13 @@ const startMultipartUpload = async (
     s3Key,
   })
 
-  const getPresignedPartUrls = []
+  const presignedUrlPromises = []
   for (let partNumber = 1; partNumber <= partCount; partNumber++) {
-    getPresignedPartUrls.push(
+    presignedUrlPromises.push(
       getPresignedPartUrl({ s3Key, uploadId: UploadId, partNumber })
     )
   }
-  const presignedUrls = await Promise.all(getPresignedPartUrls)
+  const presignedUrls = await Promise.all(presignedUrlPromises)
 
   return {
     transactionId,
@@ -337,7 +337,6 @@ export const UploadService = {
   getUploadParameters,
   extractParamsFromJwt,
   startMultipartUpload,
-  getPresignedPartUrl,
   completeMultipartUpload,
   /**** Handle S3Key in DB *****/
   replaceCampaignS3Metadata,
