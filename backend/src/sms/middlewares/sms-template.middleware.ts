@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from 'express'
 import logger from '@core/logger'
+import S3Client from '@core/services/s3-client.class'
 import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
-  TemplateError,
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
+import { TemplateError } from 'postman-templating'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
@@ -142,14 +143,16 @@ const uploadCompleteHandler = async (
       throw new Error('Template does not exist, please create a template')
     }
 
-    // carry out templating / hydration
-    // - download from s3
-    const { records } = await SmsTemplateService.client.testHydration({
-      campaignId: +campaignId,
-      s3Key,
-      templateBody: smsTemplate.body as string,
-      templateParams: smsTemplate.params as string[],
-    })
+    const s3Client = new S3Client()
+    const fileContent = await s3Client.getCsvFile(s3Key)
+
+    const records = TemplateService.getRecordsFromCsv(
+      +campaignId,
+      fileContent,
+      smsTemplate.params as string[]
+    )
+
+    await SmsTemplateService.testHydration(records, smsTemplate.body as string)
 
     if (SmsTemplateService.hasInvalidSmsRecipient(records)) {
       throw new InvalidRecipientError()

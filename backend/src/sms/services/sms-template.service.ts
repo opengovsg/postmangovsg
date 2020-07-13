@@ -6,7 +6,7 @@ import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import TemplateClient from '@core/services/template-client.class'
+import { TemplateClient } from 'postman-templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
@@ -234,10 +234,24 @@ const hasInvalidSmsRecipient = (
   return records.some((record) => !re.test(record.recipient))
 }
 
+/**
+ * Attempts to hydrate the first record.
+ * @param records
+ * @param templateBody
+ */
+const testHydration = (
+  records: Array<MessageBulkInsertInterface>,
+  templateBody: string
+): void => {
+  const [firstRecord] = records
+  client.template(templateBody, firstRecord.params)
+}
+
 export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
   hasInvalidSmsRecipient,
+  testHydration,
   client,
 }

@@ -1,14 +1,15 @@
 import logger from '@core/logger'
+import S3Client from '@core/services/s3-client.class'
 
 import { Request, Response, NextFunction } from 'express'
 import {
   MissingTemplateKeysError,
   HydrationError,
   RecipientColumnMissing,
-  TemplateError,
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
+import { TemplateError } from 'postman-templating'
 import { CampaignService, TemplateService, StatsService } from '@core/services'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
 import { Campaign } from '@core/models'
@@ -145,48 +146,46 @@ const uploadCompleteHandler = async (
       throw new Error('Template does not exist, please create a template')
     }
 
-    // carry out templating / hydration
-    // - download from s3
+    const s3Client = new S3Client()
+    const fileContent = await s3Client.getCsvFile(s3Key)
+
+    const records = TemplateService.getRecordsFromCsv(
+      +campaignId,
+      fileContent,
+      telegramTemplate.params as string[]
+    )
+
+    TelegramTemplateService.testHydration(
+      records,
+      telegramTemplate.body as string
+    )
+
+    // Append default country code as telegram handler stores number with the country
+    // code by default.
+    const formattedRecords = TelegramTemplateService.validateAndFormatNumber(
+      records
+    )
+
+    // Store temp filename
+    await TemplateService.storeS3TempFilename(+campaignId, filename)
+
     try {
-      const { records } = await TelegramTemplateService.client.testHydration({
-        campaignId: +campaignId,
+      // Return early because bulk insert is slow
+      res.sendStatus(202)
+
+      await updateCampaignAndMessages(
+        +campaignId,
         s3Key,
-        templateBody: telegramTemplate.body as string,
-        templateParams: telegramTemplate.params as string[],
-      })
-
-      // Append default country code as telegram handler stores number with the country
-      // code by default.
-      const formattedRecords = TelegramTemplateService.validateAndFormatNumber(
-        records
+        filename,
+        formattedRecords
       )
-
-      // Store temp filename
-      await TemplateService.storeS3TempFilename(+campaignId, filename)
-
-      try {
-        // Return early because bulk insert is slow
-        res.sendStatus(202)
-
-        await updateCampaignAndMessages(
-          +campaignId,
-          s3Key,
-          filename,
-          formattedRecords
-        )
-      } catch (err) {
-        // Do not return any response since it has already been sent
-        logger.error(
-          `Error storing messages for campaign ${campaignId}. ${err.stack}`
-        )
-        // Store error to return on poll
-        TemplateService.storeS3Error(+campaignId, err.message)
-      }
     } catch (err) {
+      // Do not return any response since it has already been sent
       logger.error(
-        `Error parsing file for campaign ${campaignId}. ${err.stack}`
+        `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
-      throw err
+      // Store error to return on poll
+      TemplateService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     const userErrors = [
