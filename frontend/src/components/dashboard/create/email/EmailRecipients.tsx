@@ -25,9 +25,10 @@ const EmailRecipients = ({
   numRecipients: initialNumRecipients,
   params,
   isProcessing: initialIsProcessing,
-  protect = false,
+  protect,
   onFileSelected,
   template,
+  forceReset,
   onNext,
 }: {
   csvFilename: string
@@ -37,6 +38,7 @@ const EmailRecipients = ({
   protect?: boolean
   onFileSelected?: (campaignId: number, file: File) => Promise<any>
   template?: string
+  forceReset?: boolean // this forces upload button to show without csv info and preview
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
 }) => {
   const [errorMessage, setErrorMessage] = useState(null)
@@ -66,6 +68,10 @@ const EmailRecipients = ({
     let timeoutId: NodeJS.Timeout
     const pollStatus = async () => {
       try {
+        if (forceReset) {
+          setCsvInfo({})
+          return
+        }
         const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
           +campaignId
         )
@@ -87,7 +93,7 @@ const EmailRecipients = ({
     pollStatus()
 
     return () => clearTimeout(timeoutId)
-  }, [campaignId, isCsvProcessing])
+  }, [campaignId, forceReset, isCsvProcessing])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
@@ -152,7 +158,7 @@ const EmailRecipients = ({
               a <b>password</b> column with the password to access the protected
               message
             </li>
-            <li>all other keywords in the template above</li>
+            <li>all other keywords in the template</li>
           </>
         )}
       </p>
@@ -162,14 +168,23 @@ const EmailRecipients = ({
         csvInfo={csvInfo}
         onErrorClose={clearCsvStatus}
       >
-        <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
-        <p>or</p>
-        <SampleCsv
-          params={params}
-          protect={protect}
-          template={template}
-          defaultRecipient="user@email.com"
-        />
+        {/* Dont show upload button when upload completed for protected component */}
+        {(!protect || !numRecipients) && (
+          <>
+            <FileInput
+              isProcessing={isUploading}
+              onFileSelected={uploadFile}
+              disabled={protect && !template}
+            />
+            <p>or</p>
+            <SampleCsv
+              params={params}
+              protect={protect}
+              template={template}
+              defaultRecipient="user@email.com"
+            />
+          </>
+        )}
       </CsvUpload>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
@@ -193,7 +208,7 @@ const EmailRecipients = ({
             disabled={!numRecipients || isCsvProcessing}
             onClick={onNext}
           >
-            Preview →
+            Test Message →
           </PrimaryButton>
         </div>
       )}
