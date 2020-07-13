@@ -1,4 +1,5 @@
 import url from 'url'
+import crypto from 'crypto'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -85,8 +86,37 @@ const checkTemplateVariables = (body: string): void => {
   }
 }
 
+const findProtectedMessage = async (
+  uuid: string
+): Promise<ProtectedMessage | null> => {
+  const protectedMsg = await ProtectedMessage.findOne({
+    where: { id: uuid },
+  })
+  return protectedMsg
+}
+
+const verifyPasswordHash = async (
+  protectedMsg: ProtectedMessage,
+  inputHash: string
+): Promise<string | null> => {
+  const { passwordHash, payload } = protectedMsg
+
+  // Buffers must be of same length
+  const isPasswordValid = crypto.timingSafeEqual(
+    Buffer.from(passwordHash),
+    Buffer.from(inputHash)
+  )
+
+  if (!isPasswordValid) {
+    return null
+  }
+  return payload
+}
+
 export const ProtectedService = {
   isProtectedCampaign,
   checkTemplateVariables,
   storeProtectedMessages,
+  findProtectedMessage,
+  verifyPasswordHash,
 }
