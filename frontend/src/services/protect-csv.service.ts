@@ -31,13 +31,13 @@ async function transformRows(
       const hydratedMessage = hydrateTemplate(template, row)
       // Generate uuid which acts as salt
       const id = uuid()
-      const { encrypted: encryptedPayload, key } = await encryptData(
+      const { encrypted, key } = await encryptData(
         hydratedMessage,
         password,
         id
       )
       const passwordHash = await sha256(key)
-      return `${recipient},"${encryptedPayload}",${passwordHash},${id}\n`
+      return `${recipient},"${encrypted}",${passwordHash},${id}\n`
     })
   )
   return partNumber === 1

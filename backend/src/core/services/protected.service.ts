@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid'
 import url from 'url'
 
 import config from '@core/config'
@@ -24,12 +23,6 @@ const storeProtectedMessages = async (
   const frontendUrl = config.get('frontendUrl')
   const protectedPath = config.get('protectedPath')
 
-  // Generate unique id for each message
-  const messagesToStore = protectedMessages.map((message) => ({
-    ...message,
-    id: uuid(),
-  }))
-
   try {
     // Delete existing rows
     await ProtectedMessage.destroy({
@@ -41,13 +34,13 @@ const storeProtectedMessages = async (
 
     // Insert new rows
     const batchSize = 5000
-    for (let i = 0; i < messagesToStore.length; i += batchSize) {
-      const batch = messagesToStore.slice(i, i + batchSize)
+    for (let i = 0; i < protectedMessages.length; i += batchSize) {
+      const batch = protectedMessages.slice(i, i + batchSize)
       await ProtectedMessage.bulkCreate(batch, { transaction })
     }
 
     // Map to message format
-    return messagesToStore.map(({ campaignId, recipient, id }) => ({
+    return protectedMessages.map(({ campaignId, recipient, id }) => ({
       campaignId,
       recipient,
       params: {

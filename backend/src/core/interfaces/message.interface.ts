@@ -6,6 +6,7 @@ interface MessageBulkInsertInterface {
 
 interface ProtectedMessageRecordInterface {
   campaignId: number
+  id: string
   recipient: string
   payload: string
   passwordHash: string

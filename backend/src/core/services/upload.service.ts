@@ -314,14 +314,15 @@ const getProtectedRecordsFromCsv = (
   campaignId: number,
   fileContent: Array<CSVParams>
 ): Array<ProtectedMessageRecordInterface> => {
-  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash']
+  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash', 'id']
 
   checkTemplateKeysMatch(fileContent, PROTECTED_CSV_HEADERS)
 
   return fileContent.map((entry) => {
-    const { recipient, payload, passwordhash } = entry
+    const { recipient, payload, passwordhash, id } = entry
     return {
       campaignId,
+      id,
       recipient,
       payload,
       passwordHash: passwordhash,
