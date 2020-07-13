@@ -8,6 +8,22 @@ import {
   completeMultiPartUpload,
 } from './upload.service'
 
+import { TemplateClient } from 'postman-templating'
+
+// TODO: Move xss option elsewhere
+const templateClient = new TemplateClient({
+  whiteList: {
+    b: [],
+    i: [],
+    u: [],
+    br: [],
+    p: [],
+    a: ['href', 'title', 'target'],
+    img: ['src', 'alt', 'title', 'width', 'height'],
+  },
+  stripIgnoreTag: true,
+})
+
 const DEFAULT_CHUNK_SIZE = 10000000 // 10 Mb
 const MIN_UPLOAD_SIZE = 5000000 // 5Mb minimum needed for uploading each part
 
@@ -25,14 +41,14 @@ async function transformRows(
   const transformed = await Promise.all(
     rows.map(async (row) => {
       const { recipient, password } = row
-      const hydratedMessage = template
+      const hydratedMessage = templateClient.template(template, row)
       const salt = await genSalt()
       const encryptedPayload = await encryptData(
         hydratedMessage,
         password,
         salt
       )
-      const passwordHash = password
+      const passwordHash = await hashData(password, salt)
       return `${recipient},"${encryptedPayload}",${passwordHash}\n`
     })
   )
