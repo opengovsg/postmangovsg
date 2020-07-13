@@ -5,6 +5,7 @@ import download from 'downloadjs'
 import { Status } from 'classes/Campaign'
 import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
+import moment from 'moment'
 
 const ExportRecipients = ({
   className,
@@ -26,15 +27,23 @@ const ExportRecipients = ({
       event.stopPropagation()
       setDisabled(true)
       const list = await exportCampaignStats(campaignId)
-      const headers = Object.keys(list[0])
+      const headers = Object.keys(list[0]).map((key) => `"${key}"`)
       const sentAtTime = new Date(sentAt)
-
-      const content = [`${headers.join(',')}`]
-        .concat(list.map((row) => Object.values(row).join(',')))
-        .join('\n')
+      const explanation = `"This report was exported on ${moment()
+        .format('LLL')
+        .replace(
+          ',',
+          ''
+        )} and can change in the future when Postman receives notifications about the sent messages."\n`
+      const content = [explanation, `${headers.join(',')}\n`].concat(
+        list.map((row) => {
+          const values = Object.values(row)
+          return `${values.map((value) => `"${value}"`).join(',')}\n`
+        })
+      )
 
       download(
-        content,
+        new Blob(content),
         `${campaignName}_${sentAtTime.toLocaleDateString()}_${sentAtTime.toLocaleTimeString()}.csv`,
         'text/csv'
       )
