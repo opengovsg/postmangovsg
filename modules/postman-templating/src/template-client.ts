@@ -33,7 +33,7 @@ export class TemplateClient {
    * @param templateBody - template body
    * @param params - dict of param variables used for interpolation
    */
-  parseTemplate (
+  parseTemplate(
     templateBody: string,
     params?: { [key: string]: string }
   ): {
