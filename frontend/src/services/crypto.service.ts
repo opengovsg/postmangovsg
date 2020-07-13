@@ -116,3 +116,13 @@ export async function decryptData(
     throw new Error(`Error decrypting data: ${error.message}`)
   }
 }
+
+export async function hashPassword(
+  password: string,
+  salt: string
+): Promise<string> {
+  const cryptoKey = await deriveKey(password, salt)
+  const key = await exportKey(cryptoKey)
+  const hash = await sha256(key)
+  return hash
+}

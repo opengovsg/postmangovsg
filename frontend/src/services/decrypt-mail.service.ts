@@ -1,4 +1,5 @@
-import { decryptData } from './crypto.service'
+import axios from 'axios'
+import { decryptData, hashPassword } from './crypto.service'
 
 /**
  * This function should hash the password with salt in url
@@ -10,7 +11,8 @@ import { decryptData } from './crypto.service'
  */
 export async function fetchMessage(id: string, password: string, salt = id) {
   try {
-    const encryptedData = await Promise.resolve('Stubbed message')
+    const hashedPassword = await hashPassword(password, salt)
+    const encryptedData = await getEncryptedPayload(id, hashedPassword)
     const decryptedData = await decryptData(encryptedData, password, salt)
     return decryptedData
   } catch (err) {
@@ -19,4 +21,17 @@ export async function fetchMessage(id: string, password: string, salt = id) {
      */
     throw new Error(err)
   }
+}
+
+/**
+ * Fetches encrypted payload from server
+ * @param id
+ * @param hashedPassword
+ */
+async function getEncryptedPayload(
+  id: string,
+  hashedPassword: string
+): Promise<string> {
+  const response = await axios.post(`/protect/${id}`, { hashedPassword })
+  return response.data.payload
 }

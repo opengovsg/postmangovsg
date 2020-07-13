@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { fetchMessage } from 'services/decrypt-mail.service'
 
+import { fetchMessage } from 'services/decrypt-mail.service'
 import { TextInputWithButton, ErrorBlock } from 'components/common'
+
 import styles from './Protected.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import landingHero from 'assets/img/landing/landing-hero.png'
@@ -16,20 +17,17 @@ const Protected = () => {
   async function onAccessMail() {
     if (!id) return
     try {
-      // TODO: hash password
-      // TODO: fetch encrypted payload
       const data = await fetchMessage(id, password)
       setDecryptedMessage(data)
     } catch (err) {
       setErrorMsg(err.message)
-      console.error(err)
     }
   }
 
   return (
     <div className={styles.outer}>
       <div className={styles.inner}>
-        {!decryptedMessage && (
+        {decryptedMessage || (
           <>
             <img src={appLogo} />
             <img src={landingHero} className={styles.landingHero} />
@@ -47,7 +45,6 @@ const Protected = () => {
             <ErrorBlock>{errorMsg}</ErrorBlock>
           </>
         )}
-        {decryptedMessage}
       </div>
     </div>
   )
