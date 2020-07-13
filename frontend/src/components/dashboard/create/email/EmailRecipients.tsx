@@ -75,6 +75,9 @@ const EmailRecipients = ({
         const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
           +campaignId
         )
+        // Prevent setting state if unmounted
+        if (!isMounted.current) return
+
         setIsCsvProcessing(isCsvProcessing)
         setCsvInfo(newCsvInfo)
         if (preview) {
@@ -118,7 +121,7 @@ const EmailRecipients = ({
       const uploadTimeEnd = performance.now()
       sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
 
-      // Prevent updating state when component is unmounted in protectedrecipient component
+      // Prevent setting state if unmounted
       if (!isMounted.current) {
         return
       }

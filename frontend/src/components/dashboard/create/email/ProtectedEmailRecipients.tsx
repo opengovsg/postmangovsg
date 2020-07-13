@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import isEmail from 'validator/lib/isEmail'
 
@@ -41,14 +41,27 @@ const ProtectedEmailRecipients = ({
   const [protectedCsvInfo, setProtectedCsvInfo] = useState<ProtectedCsvInfo>()
   const { id: campaignId } = useParams()
 
-  let initialPhase = ProtectPhase.READY
-  if (numRecipients) {
-    initialPhase = ProtectPhase.DONE
+  const [phase, setPhase] = useState<ProtectPhase>(
+    computePhase(numRecipients, isProcessing)
+  )
+
+  useEffect(() => {
+    setPhase(computePhase(numRecipients, isProcessing))
+  }, [numRecipients, isProcessing])
+
+  function computePhase(
+    numRecipients: number,
+    isProcessing: boolean
+  ): ProtectPhase {
+    let computedPhase = ProtectPhase.READY
+    if (numRecipients) {
+      computedPhase = ProtectPhase.UPLOADING
+    }
+    if (isProcessing) {
+      computedPhase = ProtectPhase.PROCESSING
+    }
+    return computedPhase
   }
-  if (isProcessing) {
-    initialPhase = ProtectPhase.PROCESSING
-  }
-  const [phase, setPhase] = useState<ProtectPhase>(initialPhase)
 
   async function onFileSelected(campaignId: number, file: File) {
     setErrorMessage('')
@@ -138,8 +151,8 @@ const ProtectedEmailRecipients = ({
         >
           {phase === ProtectPhase.UPLOADING ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
               Protecting Messages
+              <i className="bx bx-loader-alt bx-spin"></i>
             </>
           ) : (
             'Confirm'
