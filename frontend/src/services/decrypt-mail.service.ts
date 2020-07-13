@@ -11,8 +11,9 @@ import { decryptData } from './crypto.service'
 export async function fetchMessage(id: string, password: string) {
   try {
     const encryptedData = await Promise.resolve('Stubbed message')
-    const decryptedData = await decryptData(encryptedData, password)
-    return decryptedData
+    // const decryptedData = await decryptData(encryptedData, password, [])
+    // return decryptedData
+    return ''
   } catch (err) {
     /**
      * Handle and obfuscate error

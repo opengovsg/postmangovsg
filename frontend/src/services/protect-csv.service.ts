@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 
-import { encryptData, hashData } from './crypto.service'
+import { encryptData, hashData, genSalt } from './crypto.service'
 import { getPreviewOfFirstRow } from './validate-csv.service'
 import {
   beginMultipartUpload,
@@ -26,7 +26,12 @@ async function transformRows(
     rows.map(async (row) => {
       const { recipient, password } = row
       const hydratedMessage = template
-      const encryptedPayload = await encryptData(hydratedMessage, password)
+      const salt = await genSalt()
+      const encryptedPayload = await encryptData(
+        hydratedMessage,
+        password,
+        salt
+      )
       const passwordHash = password
       return `${recipient},"${encryptedPayload}",${passwordHash}\n`
     })
