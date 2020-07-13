@@ -14,13 +14,8 @@ const verifyTemplateBody = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { campaignId } = req.params
-    const isProtectedCampaign = await ProtectedService.isProtectedCampaign(
-      +campaignId
-    )
-
     // If it is not a protected campaign, move on to the next middleware
-    if (!isProtectedCampaign) {
+    if (!res.locals.isProtected) {
       return next()
     }
 

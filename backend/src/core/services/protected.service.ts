@@ -77,11 +77,18 @@ const checkTemplateVariables = (body: string): void => {
 
   const essential = ['protectedlink']
 
-  // Look for compulsory keys that is not in the body's variables
-  const missing = essential.filter((v) => !variables.includes(v))
+  const missing = essential.filter((keyword) => !variables.includes(keyword))
 
   if (missing.length !== 0) {
-    throw new Error(`Compulsory keys missing from template: ${missing}`)
+    throw new Error(
+      `Compulsory keywords are missing from the template: ${missing}`
+    )
+  }
+
+  if (variables.length !== essential.length) {
+    throw new Error(
+      `Only 'protectedlink' is allowed as a keyword in the template.`
+    )
   }
 }
 
