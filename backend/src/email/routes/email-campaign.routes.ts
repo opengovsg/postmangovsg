@@ -9,6 +9,7 @@ import {
   EmailTemplateMiddleware,
   EmailStatsMiddleware,
   EmailMiddleware,
+  EmailUploadMiddleware,
 } from '@email/middlewares'
 
 const router = Router({ mergeParams: true })
@@ -281,7 +282,7 @@ router.post(
   '/upload/complete',
   celebrate(uploadCompleteValidator),
   CampaignMiddleware.canEditCampaign,
-  EmailTemplateMiddleware.uploadCompleteHandler
+  EmailUploadMiddleware.uploadCompleteHandler
 )
 
 /**
@@ -334,7 +335,7 @@ router.post(
  *         "500":
  *           description: Internal Server Error
  */
-router.get('/upload/status', EmailTemplateMiddleware.pollCsvStatusHandler)
+router.get('/upload/status', EmailUploadMiddleware.pollCsvStatusHandler)
 
 /**
  * @swagger
@@ -363,7 +364,7 @@ router.get('/upload/status', EmailTemplateMiddleware.pollCsvStatusHandler)
 router.delete(
   '/upload/status',
   CampaignMiddleware.canEditCampaign,
-  EmailTemplateMiddleware.deleteCsvErrorHandler
+  EmailUploadMiddleware.deleteCsvErrorHandler
 )
 
 /**
@@ -718,7 +719,7 @@ router.post(
   celebrate(completeMultipartValidator),
   CampaignMiddleware.canEditProtectedCampaign,
   UploadMiddleware.completeMultipart,
-  EmailTemplateMiddleware.uploadProtectedCompleteHandler
+  EmailUploadMiddleware.uploadProtectedCompleteHandler
 )
 
 export default router
