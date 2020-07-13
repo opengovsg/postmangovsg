@@ -6,10 +6,12 @@ const FileInput = ({
   isProcessing,
   onFileSelected,
   label = 'Upload',
+  disabled,
 }: {
   isProcessing: boolean
   onFileSelected: Function
   label?: string
+  disabled?: boolean
 }) => {
   return (
     <div className={styles.container}>
@@ -18,7 +20,7 @@ const FileInput = ({
         type="file"
         name="file"
         accept=".csv"
-        disabled={isProcessing}
+        disabled={disabled || isProcessing}
         onClick={(e) => ((e.target as HTMLInputElement).value = '')} // reset target value to allow selecting of new files
         onChange={(e) => onFileSelected(e.target.files)}
       />

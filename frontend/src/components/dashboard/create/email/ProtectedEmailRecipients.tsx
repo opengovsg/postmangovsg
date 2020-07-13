@@ -158,8 +158,18 @@ const ProtectedEmailRecipients = ({
       protect={true}
       template={template}
       onFileSelected={onFileSelected}
+      forceReset={phase === ProtectPhase.READY}
       onNext={onNext}
     ></EmailRecipients>
+  )
+
+  const completeButtons = (
+    <div className="progress-button">
+      <TextButton onClick={() => setPhase(ProtectPhase.READY)}>
+        Edit Message
+      </TextButton>
+      <PrimaryButton onClick={onNext}>Test Message →</PrimaryButton>
+    </div>
   )
 
   function render() {
@@ -177,8 +187,14 @@ const ProtectedEmailRecipients = ({
       case ProtectPhase.UPLOADING:
         return messageBPreview
       case ProtectPhase.PROCESSING:
-      case ProtectPhase.DONE:
         return uploadRecipients
+      case ProtectPhase.DONE:
+        return (
+          <>
+            {uploadRecipients}
+            {completeButtons}
+          </>
+        )
     }
   }
 
