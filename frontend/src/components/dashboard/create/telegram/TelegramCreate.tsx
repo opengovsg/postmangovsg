@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { cloneDeep } from 'lodash'
 
-import { TelegramCampaign, TelegramProgress, Status } from 'classes'
+import { Campaign, TelegramCampaign, TelegramProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import TelegramTemplate from './TelegramTemplate'
 import TelegramRecipients from './TelegramRecipients'
@@ -20,11 +20,17 @@ const TELEGRAM_PROGRESS_STEPS = [
 
 const CreateTelegram = ({
   campaign: initialCampaign,
+  onCampaignChange,
 }: {
   campaign: TelegramCampaign
+  onCampaignChange: (c: Campaign) => void
 }) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
+
+  useEffect(() => {
+    onCampaignChange(campaign)
+  }, [campaign, onCampaignChange])
 
   // Modifies campaign object in state and navigates to next step
   const onNext = useCallback((changes: any, next = true) => {
