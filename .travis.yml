@@ -76,6 +76,7 @@ jobs:
             branch: $PRODUCTION_BRANCH
             condition: "$DEPLOY_WORKER = true"
         - provider: script
+          skip_cleanup: true
           script: ./deploy.sh postmangovsg-workers telegram-sending telegram-logging
           on:
             branch: $TELEGRAM_BRANCH
