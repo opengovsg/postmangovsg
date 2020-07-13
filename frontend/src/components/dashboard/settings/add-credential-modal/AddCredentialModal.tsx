@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 
@@ -11,8 +11,12 @@ import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInp
 import TelegramValidationInput from 'components/dashboard/create/telegram/TelegramValidationInput'
 import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
 import { ModalContext } from 'contexts/modal.context'
-import { storeCredentials as storeSmsCredentials } from 'services/sms.service'
 import {
+  getStoredCredentials as getSmsStoredCredentials,
+  storeCredentials as storeSmsCredentials,
+} from 'services/sms.service'
+import {
+  getStoredCredentials as getTelegramStoredCredentials,
   verifyUserCredentials as verifyUserTelegramCredentials,
   storeCredentials as storeTelegramCredentials,
 } from 'services/telegram.service'
@@ -32,23 +36,21 @@ enum AddCredentialStep {
 }
 
 const AddCredentialModal = ({
-  labels,
   credType,
   onSuccess,
 }: {
-  labels: string[]
   credType: ChannelType | null
   onSuccess: Function
 }) => {
   // Using channel type as proxy for credential type for now
-  // Hardcode to add new twilio cred
+  const [isLoading, setIsLoading] = useState(credType !== null)
   const [label, setLabel] = useState('')
+  const [credLabels, setCredLabels] = useState([] as string[])
   const [selectedCredType, setSelectedCredType] = useState(credType)
   const [credStep, setCredStep] = useState(
     credType ? AddCredentialStep.Input : AddCredentialStep.SelectType
   )
   const [credentials, setCredentials] = useState(null as any)
-  const [isValidating, setIsValidating] = useState(false)
   const [error, setError] = useState(
     null as null | {
       message: string
@@ -58,8 +60,34 @@ const AddCredentialModal = ({
   )
   const modalContext = useContext(ModalContext)
 
+  async function loadCredLabels(channelType: ChannelType) {
+    setIsLoading(true)
+
+    let storedCredLabels: string[]
+    switch (channelType) {
+      case ChannelType.SMS:
+        storedCredLabels = await getSmsStoredCredentials()
+        break
+      case ChannelType.Telegram:
+        storedCredLabels = await getTelegramStoredCredentials()
+        break
+      default:
+        storedCredLabels = []
+        break
+    }
+
+    setCredLabels(storedCredLabels)
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    if (credType) {
+      loadCredLabels(credType)
+    }
+  }, [credType])
+
   function isValidLabel() {
-    return label && !labels.includes(label)
+    return label && !credLabels.includes(label)
   }
 
   // Render credential input based on selected type of credential
@@ -103,10 +131,8 @@ const AddCredentialModal = ({
           </>
         )
 
-        nextFunc = async () => {
-          setIsValidating(true)
-          await validateTelegramBotToken()
-          setIsValidating(false)
+        nextFunc = () => {
+          return validateTelegramBotToken()
         }
         break
     }
@@ -116,16 +142,14 @@ const AddCredentialModal = ({
         <div className="separator"></div>
         <div className="progress-button">
           <PrimaryButton
-            disabled={!isValidLabel() || !credentials || isValidating}
             onClick={nextFunc}
-          >
-            {isValidating ? (
+            loadingPlaceholder={
               <>
                 Validating<i className="bx bx-loader-alt bx-spin"></i>
               </>
-            ) : (
-              'Next →'
-            )}
+            }
+          >
+            Next →
           </PrimaryButton>
         </div>
       </>
@@ -312,7 +336,17 @@ const AddCredentialModal = ({
     }
   }
 
-  return <div className={styles.container}>{renderAddCredStep()}</div>
+  return (
+    <div className={styles.container}>
+      {isLoading ? (
+        <div className={styles.loading}>
+          <i className={'bx bx-loader-alt bx-spin'}></i>
+        </div>
+      ) : (
+        renderAddCredStep()
+      )}
+    </div>
+  )
 }
 
 export default AddCredentialModal
