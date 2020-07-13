@@ -8,7 +8,7 @@ import styles from './TextArea.module.scss'
 const HIGHLIGHT_REGEX = /{{\s*?\w+\s*?}}/g
 
 const TextArea = ({
-  highlight,
+  highlight = false,
   singleRow,
   placeholder,
   value,
@@ -16,7 +16,7 @@ const TextArea = ({
 }: {
   highlight: boolean
   singleRow?: boolean
-  placeholder: string
+  placeholder?: string
   value: string
   onChange: Function
 }) => {

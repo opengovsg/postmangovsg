@@ -6,12 +6,12 @@ import { decryptData } from './crypto.service'
  * Then decrypt with password
  * @param id
  * @param password
- *
+ * @param salt
  */
-export async function fetchMessage(id: string, password: string) {
+export async function fetchMessage(id: string, password: string, salt = id) {
   try {
     const encryptedData = await Promise.resolve('Stubbed message')
-    const decryptedData = await decryptData(encryptedData, password)
+    const decryptedData = await decryptData(encryptedData, password, salt)
     return decryptedData
   } catch (err) {
     /**

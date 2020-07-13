@@ -2,23 +2,52 @@
 // instead of the node.js core module named buffer
 import { Buffer } from 'buffer/'
 import 'webcrypto-shim/webcrypto-shim'
-import bcryptjs from 'bcryptjs'
 
 const ENCRYPTION_METHOD = 'AES-GCM'
+const KEY_DERIVATION_FUNCTION = 'PBKDF2'
 const CIPHER_IV_DELIMITER = '.' // '.' used as delimiter since it's not part of base64 charlist
 const STRING_ENCODING = 'base64'
 
-async function importKey(password: string): Promise<CryptoKey> {
-  const pwUtf8 = Buffer.from(password)
-  const pwHash = await window.crypto.subtle.digest('SHA-256', pwUtf8)
-  const key = await window.crypto.subtle.importKey(
+// Note: the same password and salt will always give the same derived key
+async function deriveKey(
+  password: string,
+  salt: string,
+  iterations = 4000
+): Promise<CryptoKey> {
+  const passwordBuffer = Buffer.from(password)
+  const saltBuffer = Buffer.from(salt)
+  const keyMaterial = await window.crypto.subtle.importKey(
     'raw',
-    pwHash,
-    ENCRYPTION_METHOD,
+    passwordBuffer,
+    KEY_DERIVATION_FUNCTION,
     false, // extractable option
-    ['encrypt', 'decrypt'] // possible actions that can be done with the key
+    ['deriveBits', 'deriveKey'] // possible actions that can be done with the key
+  )
+  const key = await window.crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: saltBuffer,
+      iterations,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
   )
   return key
+}
+
+async function exportKey(key: CryptoKey): Promise<ArrayBuffer> {
+  return window.crypto.subtle.exportKey('raw', key)
+}
+
+export async function sha256(key: ArrayBuffer | string): Promise<string> {
+  if (typeof key === 'string') {
+    key = Buffer.from(key)
+  }
+  const hashedKey = await crypto.subtle.digest('SHA-256', key)
+  return Buffer.from(hashedKey).toString(STRING_ENCODING)
 }
 
 function encodeCipherToBase64(cipher: ArrayBuffer, iv: Uint8Array): string {
@@ -30,21 +59,27 @@ function encodeCipherToBase64(cipher: ArrayBuffer, iv: Uint8Array): string {
 
 export async function encryptData(
   payload: string,
-  password: string
-): Promise<string> {
+  password: string,
+  salt: string,
+  iterations?: number
+): Promise<{ encrypted: string; key: ArrayBuffer }> {
   try {
     const iv = window.crypto.getRandomValues(new Uint8Array(12))
     const algorithm = { name: ENCRYPTION_METHOD, iv, tagLength: 128 }
-    const key = await importKey(password)
+    const derviedKey = await deriveKey(password, salt, iterations)
 
     const encodedPayload = Buffer.from(payload)
     const cipherBuffer = await window.crypto.subtle.encrypt(
       algorithm,
-      key,
+      derviedKey,
       encodedPayload
     )
 
-    return encodeCipherToBase64(cipherBuffer, iv)
+    const key = await exportKey(derviedKey)
+    return {
+      encrypted: encodeCipherToBase64(cipherBuffer, iv),
+      key,
+    }
   } catch (error) {
     throw new Error(`Error encrypting data: ${error.message}`)
   }
@@ -59,14 +94,15 @@ function decodeCipherText(ciphertext: string): { cipher: Buffer; iv: Buffer } {
 
 export async function decryptData(
   ciphertext: string,
-  password: string
+  password: string,
+  salt: string
 ): Promise<string> {
   try {
     const { cipher, iv } = decodeCipherText(ciphertext)
 
     const algorithm = { name: ENCRYPTION_METHOD, iv, tagLength: 128 }
 
-    const key = await importKey(password)
+    const key = await deriveKey(password, salt)
 
     const plainBuffer = await window.crypto.subtle.decrypt(
       algorithm,
@@ -79,8 +115,4 @@ export async function decryptData(
   } catch (error) {
     throw new Error(`Error decrypting data: ${error.message}`)
   }
-}
-
-export async function hashData(text: string): Promise<string> {
-  return await bcryptjs.hash(text, 1)
 }

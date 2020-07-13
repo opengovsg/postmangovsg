@@ -10,6 +10,7 @@ import {
 import Landing from 'components/landing'
 import Login from 'components/login'
 import ProtectedPage from 'components/protected'
+import CryptoTest from 'components/cryptoTest'
 
 // Contexts
 import AuthContextProvider from 'contexts/auth.context'
@@ -27,6 +28,7 @@ const App = () => {
         <Switch>
           <Route exact path="/" component={Landing}></Route>
           <Route exact path="/login" component={Login}></Route>
+          <Route exact path="/crypto-test" component={CryptoTest}></Route>
           <Redirect exact from="/protected" to="/" />
           <Route exact path="/protected/:id" component={ProtectedPage}></Route>
           <Suspense
