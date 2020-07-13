@@ -37,7 +37,7 @@ const storeCredential = async (name: string, secret: string): Promise<void> => {
   }
 
   // If credential doesn't exist, upload credential to secret manager, unless in development
-  if (!config.get('IS_PROD')) {
+  if (!config.get('IS_PROD') && !config.get('aws.awsEndpoint')) {
     logger.info(
       `Dev env - skip storing credential in AWS secrets manager for name=${name}`
     )
@@ -65,7 +65,7 @@ const storeCredential = async (name: string, secret: string): Promise<void> => {
 const getTwilioCredentials = async (
   name: string
 ): Promise<TwilioCredentials> => {
-  if (!config.get('IS_PROD')) {
+  if (!config.get('IS_PROD') && !config.get('aws.awsEndpoint')) {
     logger.info(
       `Dev env - getTwilioCredentials - returning default credentials for name=${name}`
     )

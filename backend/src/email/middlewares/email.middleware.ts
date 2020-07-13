@@ -79,12 +79,12 @@ const previewFirstMessage = async (
 
     if (!message) return res.json({})
 
-    const { body, subject, replyTo: reply_to } = message
+    const { body, subject, replyTo } = message
     return res.json({
       preview: {
         body,
         subject,
-        reply_to,
+        reply_to: replyTo,
       },
     })
   } catch (err) {

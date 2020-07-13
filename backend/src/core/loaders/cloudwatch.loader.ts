@@ -1,4 +1,5 @@
 import WinstonCloudwatch from 'winston-cloudwatch'
+import { hostname } from 'os'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -9,7 +10,9 @@ import { configureEndpoint } from '@core/utils/aws-endpoint'
  * Writes logs directly to cloudwatch instead of relying on Elastic beanstalk's Cloudwatch agent
  */
 const cloudwatchLoader = async (): Promise<void> => {
-  const instanceId = await getInstanceId()
+  const instanceId = config.get('aws.awsEndpoint')
+    ? hostname()
+    : await getInstanceId()
   try {
     if (instanceId) {
       logger.info({ message: `Detected instanceId as ${instanceId}` })

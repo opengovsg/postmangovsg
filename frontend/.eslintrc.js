@@ -24,7 +24,10 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn', // Checks effect dependencies
 
     '@typescript-eslint/no-use-before-define': ['error', { functions: false }],
-    '@typescript-eslint/camelcase': 'off',
+    '@typescript-eslint/camelcase': [
+      'error',
+      { properties: 'never', ignoreDestructuring: true },
+    ],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
 

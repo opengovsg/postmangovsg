@@ -5,12 +5,7 @@ node_js:
 services:
   - docker
 
-cache:
-  directories:
-    - backend/node_modules
-    - worker/node_modules
-    - frontend/node_modules
-    - ./node_modules
+cache: npm
 
 # Deploy from Dockerfile
 jobs:
@@ -19,12 +14,15 @@ jobs:
       before_install:
         - cd backend
       install:
-        - npm install
+        - npm ci
       script:
         - npm run lint-no-fix
         - npm run test
+      before_deploy:
+        - cp -R ../modules ./
       deploy:
         - provider: elasticbeanstalk
+          edge: true
           skip_cleanup: true
           access_key_id: $AWS_ACCESS_KEY_ID
           secret_access_key: $AWS_SECRET_ACCESS_KEY
@@ -35,6 +33,7 @@ jobs:
           on:
             branch: $STAGING_BRANCH
         - provider: elasticbeanstalk
+          edge: true
           skip_cleanup: true
           access_key_id: $AWS_ACCESS_KEY_ID
           secret_access_key: $AWS_SECRET_ACCESS_KEY
@@ -48,16 +47,20 @@ jobs:
       before_install:
         - cd worker
       install:
-        - npm install
+        - npm ci
       script:
         - npm run lint-no-fix
+      before_deploy:
+        - cp -R ../modules ./
       deploy:
         - provider: script
+          skip_cleanup: true
           script: ./deploy.sh postmangovsg-workers staging-sending staging-logging
           on:
             branch: $STAGING_BRANCH
             condition: "$DEPLOY_WORKER = true"
         - provider: script
+          skip_cleanup: true
           script: ./deploy.sh postmangovsg-workers prod-sending prod-logging
           on:
             branch: $PRODUCTION_BRANCH
@@ -140,6 +143,8 @@ jobs:
             - DB_URI=$STAGING_EMAIL_DB_URI
             - MIN_HALT_NUMBER=$STAGING_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$STAGING_EMAIL_MIN_HALT_PERCENTAGE
+            - SENDGRID_PUBLIC_KEY=$STAGING_EMAIL_SENDGRID_PUBLIC_KEY
+            - CALLBACK_SECRET=$STAGING_EMAIL_CALLBACK_SECRET
         - provider: lambda
           edge: true
           function_name: log-email-callback-production
@@ -157,6 +162,8 @@ jobs:
             - DB_URI=$PRODUCTION_EMAIL_DB_URI
             - MIN_HALT_NUMBER=$PRODUCTION_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
+            - SENDGRID_PUBLIC_KEY=$PRODUCTION_EMAIL_SENDGRID_PUBLIC_KEY
+            - CALLBACK_SECRET=$PRODUCTION_EMAIL_CALLBACK_SECRET
     - name: root
       install:
         - npm install --ignore-scripts

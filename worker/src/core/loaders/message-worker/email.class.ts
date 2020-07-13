@@ -5,7 +5,7 @@ import map from 'lodash/map'
 import logger from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
-import TemplateClient from '@core/services/template-client.class'
+import { TemplateClient } from 'postman-templating'
 
 const templateClient = new TemplateClient(config.get('xssOptions.email'))
 class Email {

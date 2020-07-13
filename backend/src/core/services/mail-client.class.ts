@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer'
 import directTransport from 'nodemailer-direct-transport'
 import logger from '@core/logger'
 import { MailToSend, MailCredentials } from '@core/interfaces'
-const REFERENCE_ID_HEADER = 'X-Postman-ID' // Case sensitive
+const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
 export default class MailClient {
   private email: string
   private mailer: nodemailer.Transporter
@@ -51,7 +51,12 @@ export default class MailClient {
         headers: {},
       }
       if (input.referenceId !== undefined) {
-        options.headers = { [REFERENCE_ID_HEADER]: input.referenceId }
+        // Signature expected by Sendgrid
+        // https://sendgrid.com/docs/for-developers/tracking-events/event/#unique-arguments
+        const headerValue = JSON.stringify({
+          unique_args: { message_id: input.referenceId },
+        })
+        options.headers = { [REFERENCE_ID_HEADER]: headerValue }
       }
       this.mailer.sendMail(options, (err, info) => {
         if (err !== null) {
