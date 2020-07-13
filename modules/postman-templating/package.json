@@ -6,6 +6,8 @@
   "scripts": {
     "start": "tsc && node build/index.js",
     "build": "rimraf build && tsc",
+    "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
+    "lint": "npm run lint-no-fix -- --fix",
     "postinstall": "npm run build",
     "test": "jest"
   },
@@ -22,7 +24,13 @@
   "homepage": "https://github.com/datagovsg/postmangovsg#readme",
   "devDependencies": {
     "@types/jest": "^25.2.3",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
     "jest": "^26.0.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "prettier": "^2.0.5",
     "ts-jest": "^26.1.0"
   },
   "dependencies": {

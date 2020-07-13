@@ -36,7 +36,7 @@ const canSendCampaign = async (campaignId: number): Promise<boolean> => {
       id: campaignId,
       valid: true,
       credName: { [Op.ne]: null },
-      halted: false,
+      [Op.or]: [{ halted: { [Op.eq]: null } }, { halted: false }],
     },
   })
   return campaign !== null

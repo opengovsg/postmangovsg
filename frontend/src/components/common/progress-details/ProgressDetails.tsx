@@ -34,12 +34,12 @@ const ProgressDetails = ({
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
   const [displayExportButton, setDisplayExportButton] = useState(false)
-  const [isHalted, setIsHalted] = useState(halted)
+  const [isHalted, setIsHalted] = useState(!!halted)
 
   useEffect(() => {
     setIsComplete(!error && !unsent)
     setIsSent(status === Status.Sent)
-    setIsHalted(halted)
+    setIsHalted(!!halted)
   }, [status, error, unsent, halted])
 
   useEffect(() => {
