@@ -16,8 +16,6 @@ const Protected = () => {
   async function onAccessMail() {
     if (!id) return
     try {
-      // TODO: hash password
-      // TODO: fetch encrypted payload
       const data = await fetchMessage(id, password)
       setDecryptedMessage(data)
     } catch (err) {
