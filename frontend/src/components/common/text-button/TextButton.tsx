@@ -1,8 +1,16 @@
 import React from 'react'
+import cx from 'classnames'
+
 import styles from './TextButton.module.scss'
 
 const TextButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
-  return <button className={styles.textButton} {...props}></button>
+  const { className, ...otherProps } = props
+  return (
+    <button
+      className={cx(styles.textButton, className)}
+      {...otherProps}
+    ></button>
+  )
 }
 
 export default TextButton

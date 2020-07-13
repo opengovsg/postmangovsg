@@ -87,7 +87,8 @@ export async function validateCsv(
 }
 
 export function hydrateTemplate(template: string, row: Record<string, any>) {
-  return templateClient.template(template, row)
+  const newLinesReplaced = template.replace(/(?:\r\n|\r|\n)/g, '<br>')
+  return templateClient.template(newLinesReplaced, row)
 }
 
 // Validate row has required headers and valid recipient

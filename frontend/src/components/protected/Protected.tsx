@@ -2,7 +2,11 @@ import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { fetchMessage } from 'services/decrypt-mail.service'
-import { TextInputWithButton, ErrorBlock } from 'components/common'
+import {
+  TextInputWithButton,
+  ErrorBlock,
+  ProtectedPreview,
+} from 'components/common'
 
 import styles from './Protected.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
@@ -27,7 +31,9 @@ const Protected = () => {
   return (
     <div className={styles.outer}>
       <div className={styles.inner}>
-        {decryptedMessage || (
+        {decryptedMessage ? (
+          <ProtectedPreview html={decryptedMessage} />
+        ) : (
           <>
             <img src={appLogo} />
             <img src={landingHero} className={styles.landingHero} />

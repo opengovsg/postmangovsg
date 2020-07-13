@@ -8,6 +8,7 @@ import {
   TextArea,
   InfoBlock,
   ErrorBlock,
+  ProtectedPreview,
 } from 'components/common'
 import EmailRecipients from './EmailRecipients'
 import { EmailCampaign } from 'classes'
@@ -136,9 +137,15 @@ const ProtectedEmailRecipients = ({
           <i className="bx bx-file"></i>
           <p>{protectedCsvInfo?.csvFilename}</p>
         </li>
-        <hr />
         <li>
-          <p>{protectedCsvInfo?.preview}</p>
+          <i className="bx bx-message-dots"></i>
+          <p>Preview:</p>
+        </li>
+        <br />
+        <li>
+          {protectedCsvInfo?.preview && (
+            <ProtectedPreview html={protectedCsvInfo?.preview} />
+          )}
         </li>
       </InfoBlock>
       <div className="progress-button">

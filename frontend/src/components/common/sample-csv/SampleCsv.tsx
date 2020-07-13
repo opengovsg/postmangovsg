@@ -9,6 +9,8 @@ import {
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import TextButton from '../text-button'
 
+import styles from './SampleCsv.module.scss'
+
 const SampleCsv = ({
   defaultRecipient,
   params,
@@ -48,7 +50,7 @@ const SampleCsv = ({
   }
 
   return (
-    <TextButton onClick={onDownloadFile}>
+    <TextButton className={styles.sampleCsv} onClick={onDownloadFile}>
       Download a sample .csv file
     </TextButton>
   )
