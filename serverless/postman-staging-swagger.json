@@ -5,6 +5,8 @@
     "version": "2020-05-14T03:59:08Z",
     "title": "postman"
   },
+  "host": "callback.postman.gov.sg",
+  "basePath": "/staging",
   "schemes": [
     "https"
   ],
@@ -33,7 +35,72 @@
           {
             "postman-authorizer": []
           }
-        ]
+        ],
+        "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:454894717801:function:${stageVariables.callbackFunction}/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/v1/email": {
+      "post": {
+        "produces": [
+          "application/json"
+        ],
+        "responses": {},
+        "security": [
+          {
+            "postman-authorizer": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:454894717801:function:${stageVariables.emailCallback}/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/v1/telegram/{botId}": {
+      "post": {
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "botId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {},
+        "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:454894717801:function:${stageVariables.telegramHandler}/invocations",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "contentHandling": "CONVERT_TO_TEXT",
+          "type": "aws_proxy"
+        }
       }
     }
   },
@@ -42,7 +109,24 @@
       "type": "apiKey",
       "name": "Authorization",
       "in": "header",
-      "x-amazon-apigateway-authtype": "custom"
+      "x-amazon-apigateway-authtype": "custom",
+      "x-amazon-apigateway-authorizer": {
+        "authorizerUri": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:454894717801:function:authorizer/invocations",
+        "authorizerResultTtlInSeconds": 0,
+        "identitySource": "method.request.header.Authorization",
+        "type": "request"
+      }
+    }
+  },
+  "x-amazon-apigateway-gateway-responses": {
+    "UNAUTHORIZED": {
+      "statusCode": 401,
+      "responseParameters": {
+        "gatewayresponse.header.WWW-Authenticate": "'Basic realm=\"TwilioCallback\"'"
+      },
+      "responseTemplates": {
+        "application/json": "{\"message\":$context.error.messageString}"
+      }
     }
   }
 }
