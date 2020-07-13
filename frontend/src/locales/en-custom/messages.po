@@ -13,42 +13,42 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/login/login-input/LoginInput.tsx:26
+#: src/components/login/login-input/LoginInput.tsx:86
 msgid "Enter OTP"
 msgstr "[Enter OTP]"
 
-#: src/components/login/login-input/LoginInput.tsx:23
+#: src/components/login/login-input/LoginInput.tsx:86
 msgid "Get OTP"
 msgstr "[Get OTP]"
 
-#: src/components/login/login-input/LoginInput.tsx:22
+#: src/components/login/login-input/LoginInput.tsx:79
 msgid "One-Time Password"
 msgstr "[One-Time Password]"
 
-#: src/components/login/login-input/LoginInput.tsx:88
+#: src/components/login/login-input/LoginInput.tsx:82
 msgid "Resend?"
 msgstr "[Resend?]"
 
-#: src/components/login/login-input/LoginInput.tsx:88
+#: src/components/login/login-input/LoginInput.tsx:82
 msgid "Resending OTP..."
 msgstr "[Resending OTP...]"
 
-#: src/components/login/login-input/LoginInput.tsx:23
+#: src/components/login/login-input/LoginInput.tsx:86
 msgid "Sending OTP..."
 msgstr "[Sending OTP...]"
 
-#: src/components/login/login-input/LoginInput.tsx:24
+#: src/components/login/login-input/LoginInput.tsx:86
 msgid "Sign In"
 msgstr "[Sign In]"
 
-#: src/components/login/login-input/LoginInput.tsx:21
+#: src/components/login/login-input/LoginInput.tsx:79
 msgid "Sign in with your gov.sg email"
 msgstr "[Sign in with your gov.sg email]"
 
-#: src/components/login/login-input/LoginInput.tsx:24
+#: src/components/login/login-input/LoginInput.tsx:86
 msgid "Verifying OTP..."
 msgstr "[Verifying OTP...]"
 
-#: src/components/login/login-input/LoginInput.tsx:25
+#: src/components/login/login-input/LoginInput.tsx:86
 msgid "e.g. postman@agency.gov.sg"
 msgstr "[e.g. postman@agency.gov.sg]"
