@@ -30,6 +30,35 @@ const verifyTemplateBody = async (
   }
 }
 
+/**
+ * Retrieves a message for this campaign
+ * @param req
+ * @param res
+ * @param next
+ */
+const verifyPasswordHash = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { id } = req.params
+    const { password_hash: passwordHash } = req.body
+    const protectedMessage = await ProtectedService.getProtectedMessage(
+      id,
+      passwordHash
+    )
+    if (!protectedMessage) {
+      // Return not found if nothing retrieved from db
+      return res.sendStatus(404)
+    }
+    return res.json({ payload: protectedMessage.payload })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const ProtectedMiddleware = {
   verifyTemplateBody,
+  verifyPasswordHash,
 }
