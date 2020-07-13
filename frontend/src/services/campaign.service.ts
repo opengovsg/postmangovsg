@@ -10,7 +10,7 @@ import {
 } from 'classes'
 import moment from 'moment'
 
-const EXPORT_LINK_DISPLAY_WAIT_TIME = 5 * 60 * 1000
+const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
 
 function getJobTimestamps(
   jobs: Array<{ sent_at: Date; status_updated_at: Date }>
