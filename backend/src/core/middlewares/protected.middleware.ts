@@ -42,18 +42,17 @@ const verifyPasswordHash = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { uuid } = req.params
-    const { hashedPassword } = req.body
-    const protectedMessage = await ProtectedService.findProtectedMessage(uuid)
-    if (!protectedMessage) return res.sendStatus(404)
-
-    const payload = await ProtectedService.verifyPasswordHash(
-      protectedMessage,
-      hashedPassword
+    const { id } = req.params
+    const { password_hash: passwordHash } = req.body
+    const protectedMessage = await ProtectedService.getProtectedMessage(
+      id,
+      passwordHash
     )
-
-    if (!payload) return res.sendStatus(401)
-    return res.json({ payload })
+    if (!protectedMessage) {
+      // Return not found if nothing retrieved from db
+      return res.sendStatus(404)
+    }
+    return res.json({ payload: protectedMessage.payload })
   } catch (err) {
     return next(err)
   }

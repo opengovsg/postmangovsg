@@ -1,13 +1,10 @@
 import url from 'url'
-import crypto from 'crypto'
+import { Transaction } from 'sequelize'
+import { TemplateClient } from 'postman-templating'
 
 import config from '@core/config'
 import logger from '@core/logger'
-
 import { ProtectedMessage, Campaign } from '@core/models'
-import { Transaction } from 'sequelize'
-
-import { TemplateClient } from 'postman-templating'
 
 const templateClient = new TemplateClient()
 /**
@@ -86,37 +83,25 @@ const checkTemplateVariables = (body: string): void => {
   }
 }
 
-const findProtectedMessage = async (
-  uuid: string
+/**
+ * Get corresponding payload for given message id and password hash
+ * @param id
+ * @param passwordHash
+ */
+const getProtectedMessage = async (
+  id: string,
+  passwordHash: string
 ): Promise<ProtectedMessage | null> => {
   const protectedMsg = await ProtectedMessage.findOne({
-    where: { id: uuid },
+    where: { id, passwordHash },
+    attributes: ['payload'],
   })
   return protectedMsg
-}
-
-const verifyPasswordHash = async (
-  protectedMsg: ProtectedMessage,
-  inputHash: string
-): Promise<string | null> => {
-  const { passwordHash, payload } = protectedMsg
-
-  // Buffers must be of same length
-  const isPasswordValid = crypto.timingSafeEqual(
-    Buffer.from(passwordHash),
-    Buffer.from(inputHash)
-  )
-
-  if (!isPasswordValid) {
-    return null
-  }
-  return payload
 }
 
 export const ProtectedService = {
   isProtectedCampaign,
   checkTemplateVariables,
   storeProtectedMessages,
-  findProtectedMessage,
-  verifyPasswordHash,
+  getProtectedMessage,
 }

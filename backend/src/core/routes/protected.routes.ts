@@ -6,25 +6,20 @@ const router = Router()
 
 const protectVerifyValidator = {
   [Segments.BODY]: Joi.object({
-    hashedPassword: Joi.string().required(),
+    password_hash: Joi.string().required(),
   }),
 }
 
 /**
  * @swagger
  * path:
- *   /protect/{uuid}:
+ *   /protect/{id}:
  *     post:
- *       description: Verify hashed password and return encrypted payload
+ *       description: Verify password hash and return encrypted payload
  *       tags:
  *         - Email
  *       parameters:
- *         - name: campaignId
- *           in: path
- *           required: true
- *           schema:
- *             type: string
- *         - name: uuid
+ *         - name: id
  *           in: path
  *           required: true
  *           schema:
@@ -34,9 +29,9 @@ const protectVerifyValidator = {
  *           application/json:
  *             schema:
  *               required:
- *                 - hashedPassword
+ *                 - password_hash
  *               properties:
- *                 hashedPassword:
+ *                 password_hash:
  *                   type: string
  *       responses:
  *         200:
@@ -47,15 +42,13 @@ const protectVerifyValidator = {
  *                properties:
  *                 payload:
  *                  type: string
- *         "400" :
- *           description: Bad Request
- *         "401":
- *           description: Unauthorized
+ *         "404":
+ *           description: Not Found
  *         "500":
  *           description: Internal Server Error
  */
 router.post(
-  '/:uuid',
+  '/:id',
   celebrate(protectVerifyValidator),
   ProtectedMiddleware.verifyPasswordHash
 )
