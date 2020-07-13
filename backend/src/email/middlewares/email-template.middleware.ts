@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import { Transaction } from 'sequelize'
-
 import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
@@ -10,12 +8,7 @@ import {
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
 import { TemplateError } from 'postman-templating'
-import {
-  CampaignService,
-  UploadService,
-  StatsService,
-  ProtectedService,
-} from '@core/services'
+import { UploadService, StatsService, ProtectedService } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
@@ -85,55 +78,6 @@ const storeTemplate = async (
 }
 
 /**
- * Updates the campaign and email_messages table in a transaction, rolling back when either fails.
- * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
- * For email_messages table, existing records are deleted and new ones are bulk inserted.
- * Then update statistics with new unsent count
- * @param key
- * @param campaignId
- * @param filename
- * @param records
- */
-const updateCampaignAndMessages = async (
-  campaignId: number,
-  key: string,
-  filename: string,
-  records: MessageBulkInsertInterface[],
-  transaction?: Transaction
-): Promise<void> => {
-  try {
-    if (!transaction) {
-      transaction = await Campaign.sequelize?.transaction()
-    }
-    // Updates metadata in project
-    await UploadService.replaceCampaignS3Metadata(
-      campaignId,
-      key,
-      filename,
-      transaction
-    )
-
-    // START populate template
-    await EmailTemplateService.addToMessageLogs(
-      campaignId,
-      records,
-      transaction
-    )
-
-    // Update statistic table
-    await StatsService.setNumRecipients(campaignId, records.length, transaction)
-
-    // Set campaign to valid
-    await CampaignService.setValid(campaignId, transaction)
-
-    transaction?.commit()
-  } catch (err) {
-    transaction?.rollback()
-    throw err
-  }
-}
-
-/**
  * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
  * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
  * If the template and csv do not match, prompt the user to upload a new file.
@@ -189,7 +133,12 @@ const uploadCompleteHandler = async (
       res.sendStatus(202)
 
       // Slow bulk insert
-      await updateCampaignAndMessages(+campaignId, s3Key, filename, records)
+      await EmailService.updateCampaignAndMessages(
+        +campaignId,
+        s3Key,
+        filename,
+        records
+      )
     } catch (err) {
       // Do not return any response since it has already been sent
       logger.error(
@@ -325,7 +274,7 @@ const uploadProtectedCompleteHandler = async (
         records,
         transaction
       )
-      await updateCampaignAndMessages(
+      await EmailService.updateCampaignAndMessages(
         +campaignId,
         s3Key,
         filename,
