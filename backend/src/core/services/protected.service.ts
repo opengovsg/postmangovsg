@@ -7,6 +7,12 @@ import logger from '@core/logger'
 import { ProtectedMessage, Campaign } from '@core/models'
 import { Transaction } from 'sequelize'
 
+import { TemplateClient } from 'postman-templating'
+
+const templateClient = new TemplateClient()
+/**
+ * Whether a campaign is protected or not
+ */
 const isProtectedCampaign = async (campaignId: number): Promise<boolean> => {
   return !!(await Campaign.findOne({
     where: {
@@ -63,5 +69,24 @@ const storeProtectedMessages = async (
     throw e
   }
 }
+/**
+ * Verifies that the template for protected campaigns has the compulsory keywords
+ */
+const checkTemplateVariables = (body: string): void => {
+  const { variables } = templateClient.parseTemplate(body)
 
-export const ProtectedService = { isProtectedCampaign, storeProtectedMessages }
+  const essential = ['protectedlink']
+
+  // Look for compulsory keys that is not in the body's variables
+  const missing = essential.filter((v) => !variables.includes(v))
+
+  if (missing.length !== 0) {
+    throw new Error(`Compulsory keys missing from template: ${missing}`)
+  }
+}
+
+export const ProtectedService = {
+  isProtectedCampaign,
+  checkTemplateVariables,
+  storeProtectedMessages,
+}

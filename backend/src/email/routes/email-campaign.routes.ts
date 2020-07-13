@@ -4,6 +4,7 @@ import {
   CampaignMiddleware,
   UploadMiddleware,
   JobMiddleware,
+  ProtectedMiddleware,
 } from '@core/middlewares'
 import {
   EmailTemplateMiddleware,
@@ -189,6 +190,7 @@ router.put(
   '/template',
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
+  ProtectedMiddleware.verifyTemplateBody,
   EmailTemplateMiddleware.storeTemplate
 )
 
