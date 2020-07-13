@@ -66,6 +66,7 @@ const storeProtectedMessages = async (
 }
 /**
  * Verifies that the template for protected campaigns has the compulsory keywords
+ * The template should not contain any other keywords other than the compulsory ones.
  */
 const checkTemplateVariables = (body: string): void => {
   const { variables } = templateClient.parseTemplate(body)

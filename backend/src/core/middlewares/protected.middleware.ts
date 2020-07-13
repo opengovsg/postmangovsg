@@ -3,7 +3,7 @@ import { ProtectedService } from '@core/services'
 import logger from '@core/logger'
 
 /**
- * Ensure that the template has the necessary keywords if it is a protected campaign.
+ * Ensure that the template only has the necessary keywords if it is a protected campaign.
  * @param req
  * @param res
  * @param next
