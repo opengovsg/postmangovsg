@@ -3,12 +3,13 @@ import { ProtectedService } from '@core/services'
 import logger from '@core/logger'
 
 /**
- * Ensure that the template only has the necessary keywords if it is a protected campaign.
+ * Ensure that the template body only has the necessary keywords if it is a protected campaign.
+ * Subject should not have any keywords.
  * @param req
  * @param res
  * @param next
  */
-const verifyTemplateBody = async (
+const verifyTemplate = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -19,9 +20,10 @@ const verifyTemplateBody = async (
       return next()
     }
 
-    const { body } = req.body
+    const { subject, body } = req.body
 
-    ProtectedService.checkTemplateVariables(body)
+    ProtectedService.checkTemplateSubject(subject)
+    ProtectedService.checkTemplateBody(body)
 
     return next()
   } catch (err) {
@@ -59,6 +61,6 @@ const verifyPasswordHash = async (
 }
 
 export const ProtectedMiddleware = {
-  verifyTemplateBody,
+  verifyTemplate,
   verifyPasswordHash,
 }

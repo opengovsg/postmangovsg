@@ -68,7 +68,7 @@ const storeProtectedMessages = async (
  * Verifies that the template for protected campaigns has the compulsory keywords
  * The template should not contain any other keywords other than the compulsory ones.
  */
-const checkTemplateVariables = (body: string): void => {
+const checkTemplateBody = (body: string): void => {
   const { variables } = templateClient.parseTemplate(body)
 
   const unique = [...new Set(variables)]
@@ -93,6 +93,18 @@ const checkTemplateVariables = (body: string): void => {
 }
 
 /**
+ * Ensures that subject does not have any keywords.
+ */
+const checkTemplateSubject = (subject: string): void => {
+  const { variables } = templateClient.parseTemplate(subject)
+  if (variables.length !== 0) {
+    throw new Error(
+      `Subject should not contain any keywords. Currently contains ${variables}`
+    )
+  }
+}
+
+/**
  * Get corresponding payload for given message id and password hash
  * @param id
  * @param passwordHash
@@ -110,7 +122,8 @@ const getProtectedMessage = async (
 
 export const ProtectedService = {
   isProtectedCampaign,
-  checkTemplateVariables,
+  checkTemplateBody,
+  checkTemplateSubject,
   storeProtectedMessages,
   getProtectedMessage,
 }
