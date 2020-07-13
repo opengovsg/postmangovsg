@@ -6,6 +6,8 @@ import config from '@core/config'
 import logger from '@core/logger'
 import { ProtectedMessage, Campaign } from '@core/models'
 
+const PROTECT_METHOD_VERSION = 1
+
 const templateClient = new TemplateClient()
 /**
  * Whether a campaign is protected or not
@@ -39,7 +41,9 @@ const storeProtectedMessages = async (
     // Insert new rows
     const batchSize = 5000
     for (let i = 0; i < protectedMessages.length; i += batchSize) {
-      const batch = protectedMessages.slice(i, i + batchSize)
+      const batch = protectedMessages
+        .slice(i, i + batchSize)
+        .map((row) => ({ ...row, version: PROTECT_METHOD_VERSION }))
       await ProtectedMessage.bulkCreate(batch, { transaction })
     }
 

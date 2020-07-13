@@ -28,4 +28,10 @@ export class ProtectedMessage extends Model<ProtectedMessage> {
 
   @Column(DataType.STRING)
   passwordHash!: string
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  version!: number
 }

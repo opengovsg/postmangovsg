@@ -55,7 +55,7 @@ const ProtectedEmailRecipients = ({
   ): ProtectPhase {
     let computedPhase = ProtectPhase.READY
     if (numRecipients) {
-      computedPhase = ProtectPhase.UPLOADING
+      computedPhase = ProtectPhase.DONE
     }
     if (isProcessing) {
       computedPhase = ProtectPhase.PROCESSING
