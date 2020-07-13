@@ -37,11 +37,11 @@ async function transformRows(
         id
       )
       const passwordHash = await sha256(key)
-      return `${recipient},"${encryptedPayload}",${passwordHash},${id}`
+      return `${recipient},"${encryptedPayload}",${passwordHash},${id}\n`
     })
   )
   return partNumber === 1
-    ? ['recipient,payload,passwordhash\n'].concat(transformed)
+    ? ['recipient,payload,passwordhash,id\n'].concat(transformed)
     : transformed
 }
 
