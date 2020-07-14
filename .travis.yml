@@ -196,7 +196,7 @@ jobs:
           publish: true
           zip: "../telegram-handler/code.zip"
           on:
-            branch: $PRODUCTION_BRANCH
+            branch: telegram-travis
           environment_variables:
             - DB_URI=$PRODUCTION_TELEGRAM_HANDLER_DB_URI
         - provider: lambda
