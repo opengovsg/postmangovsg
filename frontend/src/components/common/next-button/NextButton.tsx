@@ -3,15 +3,21 @@ import React from 'react'
 import { PrimaryButton } from 'components/common'
 
 const NextButton = ({
-  disabled,
   onClick,
+  disabled,
+  loadingPlaceholder,
 }: {
-  disabled: boolean
   onClick: (...args: any[]) => void | Promise<void>
+  disabled?: boolean
+  loadingPlaceholder?: string | React.ReactElement
 }) => {
   return (
     <div className="progress-button">
-      <PrimaryButton disabled={disabled} onClick={onClick}>
+      <PrimaryButton
+        disabled={disabled}
+        onClick={onClick}
+        loadingPlaceholder={loadingPlaceholder}
+      >
         Next <i className="bx bx-right-arrow-alt"></i>
       </PrimaryButton>
     </div>

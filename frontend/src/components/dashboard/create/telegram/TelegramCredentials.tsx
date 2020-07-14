@@ -12,6 +12,7 @@ import {
 } from 'services/telegram.service'
 import {
   PrimaryButton,
+  NextButton,
   InfoBlock,
   ErrorBlock,
   Dropdown,
@@ -262,11 +263,7 @@ const TelegramCredentials = ({
               <ErrorBlock>{errorMessage}</ErrorBlock>
               <div className="separator"></div>
 
-              <div className="progress-button">
-                <PrimaryButton disabled={!hasCredential} onClick={onNext}>
-                  Send messages →
-                </PrimaryButton>
-              </div>
+              <NextButton disabled={!hasCredential} onClick={onNext} />
             </>
           )}
         </>
