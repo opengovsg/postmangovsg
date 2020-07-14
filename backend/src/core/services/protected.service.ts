@@ -1,4 +1,5 @@
 import url from 'url'
+import { uniq, difference } from 'lodash'
 import { Transaction } from 'sequelize'
 import { TemplateClient } from 'postman-templating'
 
@@ -68,29 +69,32 @@ const storeProtectedMessages = async (
   }
 }
 /**
- * Verifies that the template for protected campaigns has the compulsory keywords
- * The template should not contain any other keywords other than the compulsory ones.
+ * Verifies that the template for protected campaigns has the required and optional keywords.
+ * The template should not contain any other keywords other than these.
  */
 const checkTemplateBody = (body: string): void => {
   const { variables } = templateClient.parseTemplate(body)
 
-  const unique = [...new Set(variables)]
+  const unique = uniq(variables.map((v) => v.toLowerCase()))
 
-  const essential = ['protectedlink']
+  const required = ['protectedlink']
+  const optional = ['recipient']
 
-  const missing = essential.filter((keyword) => !unique.includes(keyword))
+  const missing = difference(required, unique)
 
-  // Makes sure that all the compulsory keywords are inside the template
+  // Makes sure that all the required keywords are inside the template
   if (missing.length !== 0) {
     throw new Error(
-      `Compulsory keywords are missing from the template: ${missing}`
+      `Required keywords are missing from the template: ${missing}`
     )
   }
 
-  // Should only contain the the compulsory keywords
-  if (unique.length !== essential.length) {
+  const whitelist = [...required, ...optional]
+  const forbidden = difference(unique, whitelist)
+  // Should only contain the whitelisted keywords
+  if (forbidden.length > 0) {
     throw new Error(
-      `Only 'protectedlink' is allowed as a keyword in the template.`
+      `Only these keywords are allowed: ${whitelist}.\nRemove the other keywords from the template: ${forbidden}`
     )
   }
 }

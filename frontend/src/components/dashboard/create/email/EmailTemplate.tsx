@@ -79,16 +79,20 @@ const EmailTemplate = ({
       />
       <h4>{protect ? 'Message A' : 'Message'}</h4>
       <p>
-        To personalise your message, include keywords that are surrounded by
-        double curly braces. The keywords in your message template should match
-        the headers in your recipients CSV file.
-        <br />
+        You can use the following keywords in Message A to personalise your
+        message.
       </p>
       {protect && (
         <p>
-          <b>{'{{ protectedlink }}'}</b> - Include this keyword in Message A
-          template, but not in the CSV file. It will be automatically generated
-          for password protected emails.
+          <li>
+            <b>{'{{ protectedlink }}'}</b> - <i>Required</i>. Include this
+            keyword in Message A template, but not in the CSV file. It will be
+            automatically generated for password protected emails.
+          </li>
+          <li>
+            <b>{'{{ recipient }}'}</b> - <i>Optional</i>. This keyword will be
+            replaced by the email address of the recipient.
+          </li>
         </p>
       )}
       <TextArea
