@@ -53,7 +53,10 @@ const storeProtectedMessages = async (
       recipient,
       params: {
         recipient,
-        protectedlink: url.resolve(frontendUrl, `${protectedPath}/${id}`),
+        protectedlink: url.resolve(
+          frontendUrl,
+          `${protectedPath}/${PROTECT_METHOD_VERSION}/${id}`
+        ),
       },
     }))
   } catch (e) {

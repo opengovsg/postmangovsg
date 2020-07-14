@@ -29,7 +29,7 @@ const App = () => {
           <Route exact path="/" component={Landing}></Route>
           <Route exact path="/login" component={Login}></Route>
           <Route exact path="/crypto-test" component={CryptoTest}></Route>
-          <Route exact path="/p/:id" component={ProtectedPage}></Route>
+          <Route exact path="/p/:version/:id" component={ProtectedPage}></Route>
           <Redirect exact from="/p" to="/" />
           <Suspense
             fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
