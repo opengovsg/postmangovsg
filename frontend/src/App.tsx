@@ -1,10 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  Redirect,
-} from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 // Components
 import Landing from 'components/landing'
@@ -18,7 +13,7 @@ import AuthContextProvider from 'contexts/auth.context'
 import './styles/app.scss'
 
 // lazy load admin dashboard views
-const ProtectedRoute = lazy(() => import('routes/protected.route'))
+import ProtectedRoute from 'routes/protected.route'
 const Dashboard = lazy(() => import('components/dashboard'))
 
 const App = () => {
@@ -30,14 +25,13 @@ const App = () => {
           <Route exact path="/login" component={Login}></Route>
           <Route exact path="/crypto-test" component={CryptoTest}></Route>
           <Route exact path="/p/:version/:id" component={ProtectedPage}></Route>
-          <Redirect exact from="/p" to="/" />
-          <Suspense
-            fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
-          >
-            <ProtectedRoute>
+          <ProtectedRoute>
+            <Suspense
+              fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
+            >
               <Dashboard></Dashboard>
-            </ProtectedRoute>
-          </Suspense>
+            </Suspense>
+          </ProtectedRoute>
         </Switch>
       </AuthContextProvider>
     </Router>
