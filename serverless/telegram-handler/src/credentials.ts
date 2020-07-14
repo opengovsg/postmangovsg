@@ -58,3 +58,13 @@ export const getBotTokenFromId = async (botId: string): Promise<string> => {
 
   return botToken
 }
+
+/**
+ * Compares two bot tokens and throws an error if they do not match.
+ */
+export const verifyBotToken = (token1: string, token2: string): void => {
+  if (token1 !== token2) {
+    throw new Error('Bot token mismatch')
+  }
+  logger.log('Bot token verified')
+}
