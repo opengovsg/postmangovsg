@@ -12,7 +12,7 @@ import {
   CsvUpload,
   ErrorBlock,
   PreviewBlock,
-  PrimaryButton,
+  NextButton,
   SampleCsv,
 } from 'components/common'
 import { EmailCampaign, EmailPreview } from 'classes'
@@ -155,14 +155,10 @@ const EmailRecipients = ({
         </>
       )}
 
-      <div className="progress-button">
-        <PrimaryButton
-          disabled={!numRecipients || isCsvProcessing}
-          onClick={onNext}
-        >
-          Preview →
-        </PrimaryButton>
-      </div>
+      <NextButton
+        disabled={!numRecipients || isCsvProcessing}
+        onClick={onNext}
+      />
     </>
   )
 }

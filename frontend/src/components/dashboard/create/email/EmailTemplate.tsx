@@ -1,11 +1,6 @@
 import React, { useState } from 'react'
 
-import {
-  TextArea,
-  PrimaryButton,
-  ErrorBlock,
-  TextInput,
-} from 'components/common'
+import { TextArea, NextButton, ErrorBlock, TextInput } from 'components/common'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/email.service'
 
@@ -104,14 +99,7 @@ const EmailTemplate = ({
         onChange={setReplyTo}
       />
       <div className="separator"></div>
-      <div className="progress-button">
-        <PrimaryButton
-          disabled={!body || !subject}
-          onClick={handleSaveTemplate}
-        >
-          Upload recipients →
-        </PrimaryButton>
-      </div>
+      <NextButton disabled={!body || !subject} onClick={handleSaveTemplate} />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )

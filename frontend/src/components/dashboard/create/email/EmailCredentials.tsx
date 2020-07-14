@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { sendPreviewMessage } from 'services/email.service'
-import { PrimaryButton, InfoBlock, ErrorBlock } from 'components/common'
+import { NextButton, InfoBlock, ErrorBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
 
 import EmailValidationInput from './EmailValidationInput'
@@ -59,11 +59,7 @@ const EmailCredentials = ({
 
           <div className="separator"></div>
 
-          <div className="progress-button">
-            <PrimaryButton disabled={!hasCredential} onClick={onNext}>
-              Send messages →
-            </PrimaryButton>
-          </div>
+          <NextButton disabled={!hasCredential} onClick={onNext} />
         </>
       }
     </>
