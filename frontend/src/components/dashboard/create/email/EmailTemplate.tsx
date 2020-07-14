@@ -41,7 +41,6 @@ const EmailTemplate = ({
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
-      // TODO: Parse template and check for protectedlink params
       const { updatedTemplate, numRecipients } = await saveTemplate(
         +campaignId,
         subject,

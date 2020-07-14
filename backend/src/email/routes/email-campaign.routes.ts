@@ -190,7 +190,7 @@ router.put(
   '/template',
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
-  ProtectedMiddleware.verifyTemplateBody,
+  ProtectedMiddleware.verifyTemplate,
   EmailTemplateMiddleware.storeTemplate
 )
 

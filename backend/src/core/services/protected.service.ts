@@ -66,23 +66,40 @@ const storeProtectedMessages = async (
 }
 /**
  * Verifies that the template for protected campaigns has the compulsory keywords
+ * The template should not contain any other keywords other than the compulsory ones.
  */
-const checkTemplateVariables = (body: string): void => {
+const checkTemplateBody = (body: string): void => {
   const { variables } = templateClient.parseTemplate(body)
+
+  const unique = [...new Set(variables)]
 
   const essential = ['protectedlink']
 
-  const missing = essential.filter((keyword) => !variables.includes(keyword))
+  const missing = essential.filter((keyword) => !unique.includes(keyword))
 
+  // Makes sure that all the compulsory keywords are inside the template
   if (missing.length !== 0) {
     throw new Error(
       `Compulsory keywords are missing from the template: ${missing}`
     )
   }
 
-  if (variables.length !== essential.length) {
+  // Should only contain the the compulsory keywords
+  if (unique.length !== essential.length) {
     throw new Error(
       `Only 'protectedlink' is allowed as a keyword in the template.`
+    )
+  }
+}
+
+/**
+ * Ensures that subject does not have any keywords.
+ */
+const checkTemplateSubject = (subject: string): void => {
+  const { variables } = templateClient.parseTemplate(subject)
+  if (variables.length !== 0) {
+    throw new Error(
+      `Subject should not contain any keywords. Currently contains ${variables}`
     )
   }
 }
@@ -105,7 +122,8 @@ const getProtectedMessage = async (
 
 export const ProtectedService = {
   isProtectedCampaign,
-  checkTemplateVariables,
+  checkTemplateBody,
+  checkTemplateSubject,
   storeProtectedMessages,
   getProtectedMessage,
 }
