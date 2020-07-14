@@ -355,6 +355,22 @@ const config = convict({
           img: ['src', 'alt', 'title', 'width', 'height'],
         },
         stripIgnoreTag: true,
+        // Overriding the default safeAttrValue
+        safeAttrValue: (tag: string, name: string, value: string): string => {
+          const keywordRegex = /{{\s*?\w+\s*?}}/g
+          // Do not sanitize keyword when it's a href link, eg: <a href="{{protectedlink}}">link</a>
+          if (tag === 'a' && name === 'href' && value.match(keywordRegex)) {
+            return value
+          }
+
+          // Do not sanitize keyword when it's a img src, eg: <img src="{{protectedImg}}">
+          if (tag === 'img' && name === 'src' && value.match(keywordRegex)) {
+            return value
+          }
+          // The default safeAttrValue does guard against some edge cases
+          // https://github.com/leizongmin/js-xss/blob/446f5daa3b65e9e8f0e9c71276cf61dad73d1ec3/dist/xss.js
+          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
+        },
       },
       sms: {
         whiteList: { br: [] },
