@@ -76,7 +76,8 @@ const EmailTemplate = ({
         double curly braces. The keywords in your message template should match
         the headers in your recipients CSV file.
         <br />
-        <b>Note:</b> Recipient is a required column in the CSV file.
+        <b>Note:</b> Recipient (email address) is a required column in the CSV
+        file.
       </p>
       <p>
         Example

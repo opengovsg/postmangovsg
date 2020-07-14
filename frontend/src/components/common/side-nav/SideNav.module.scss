@@ -1,0 +1,61 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+$side-nav-width: 25rem;
+$nav-item-height: 5rem;
+
+.sideNav {
+  width: $side-nav-width;
+  min-width: $side-nav-width;
+  border-right: 1px solid $indigo-blue;
+  min-height: calc(100vh - 4rem - 5rem);
+
+  @include mobile() {
+    display: none;
+  }
+}
+
+.sideNavDropdown {
+  width: 100%;
+  display: none;
+
+  @include mobile() {
+    display: block;
+  }
+}
+
+.navItem {
+  @include flex-horizontal;
+  justify-content: space-between;
+  color: $dark-blue;
+  font-size: 1rem;
+  padding: 0 2.5rem 0 4rem;
+  user-select: none;
+  height: $nav-item-height;
+  cursor: pointer;
+
+  &.active {
+    $border-left: 0.5rem;
+    border-left: $border-left solid $indigo-blue;
+    background-color: $light-blue;
+    padding-left: calc(4rem - #{$border-left});
+  }
+
+  &:hover {
+    background: $light-blue;
+  }
+
+  span {
+    @include flex-horizontal;
+    align-items: center;
+
+    .icon {
+      margin-right: 0.7rem;
+      color: $indigo-blue;
+    }
+  }
+}
+
+.icon {
+  @include icon;
+}

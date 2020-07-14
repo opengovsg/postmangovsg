@@ -1,5 +1,6 @@
 import { TemplateClient } from '../src/template-client'
 import { TemplateError } from '../src/errors'
+import xss from 'xss'
 
 describe('template', () => {
   let templateClient: TemplateClient
@@ -48,6 +49,7 @@ describe('template', () => {
     const table = [
       ['Single quote', "'"],
       ['Backslash', '\\'],
+      ['Line break', '\n'],
     ]
 
     test.each(table)('%s', (_, body) => {
@@ -71,7 +73,7 @@ describe('template', () => {
       }
       const client: TemplateClient = new TemplateClient(xssOptions)
 
-      describe('email template should allow b, i, u, br, a, img tags', () => {
+      test('email template should allow b, i, u, br, a, img tags', () => {
         const body =
           'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
           '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>' +
@@ -79,7 +81,7 @@ describe('template', () => {
 
         expect(client.template(body, {})).toEqual(body)
       })
-      describe('email template should not allow any other html tags', () => {
+      test('email template should not allow any other html tags', () => {
         const script = "<script>alert('xss!')</script>"
         const body =
           'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
@@ -91,7 +93,7 @@ describe('template', () => {
           strippedScript + body
         )
       })
-      describe('email template should also strip params of tags', () => {
+      test('email template should also strip params of tags', () => {
         const params = { xss: "<script>alert('xss!')</script>", text: 'hello' }
         const body = 'test {{xss}} {{text}}'
         const output = "test alert('xss!') hello"
@@ -105,7 +107,7 @@ describe('template', () => {
       }
       const client: TemplateClient = new TemplateClient(xssOptions)
 
-      describe('sms template should not allow any html tags except br', () => {
+      test('sms template should not allow any html tags except br', () => {
         const body =
           'XSS Test<b>bold</b><u>underline</u><i>italic</i>' +
           '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"></img>' +
@@ -114,11 +116,77 @@ describe('template', () => {
 
         expect(client.template(body, {})).toEqual(output)
       })
-      describe('sms template should also strip params of tags', () => {
+      test('sms template should also strip params of tags', () => {
         const params = { xss: "<script>alert('xss!')</script>", text: 'hello' }
         const body = 'test {{xss}} {{text}}'
         const output = "test alert('xss!') hello"
 
+        expect(client.template(body, params)).toEqual(output)
+      })
+    })
+    describe('telegram', () => {
+      const xssOptions = {
+        whiteList: {
+          b: [],
+          i: [],
+          u: [],
+          s: [],
+          strike: [],
+          del: [],
+          p: [],
+          code: ['class'],
+          pre: [],
+          a: ['href'],
+        },
+        safeAttrValue: (
+          tag: string,
+          name: string,
+          value: string
+        ): string => {
+          // Handle Telegram mention as xss-js does not recognize it as a valid url.
+          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+            return value
+          }
+          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
+        },
+        stripIgnoreTag: true,
+      }
+
+      const client: TemplateClient = new TemplateClient(xssOptions, '\n')
+      test('Telegram should support b i u s strike del p code pre a', () => {
+        const body = 
+          '<b>bold</b>' +
+          '<i>italic</i>' +
+          '<u>underline</u>' +
+          '<s>strike</s> <strike>strike</strike> <del>strike</del>' +
+          '<a href="https://open.gov.sg">OGP</a>' +
+          '<pre>pre-formatted</pre>' +
+          '<code class="language-python">print("hello world")</code>'
+
+        expect(client.template(body, {})).toEqual(body)
+      })
+      test('inline mention links should be supported', () => {
+        const body = '<a href="tg://user?id=837238105">me</a>'
+        expect(client.template(body, {})).toEqual(body)
+      })
+      test('line breaks should be preserved', () => {
+        const body = 'hello\nhello'
+        expect(client.template(body, {})).toEqual(body)
+      })
+      test('unsupported HTML tags should be stripped', () => {
+        const body = '<div>hello</div><span>world</span>'
+        const output = 'helloworld'
+        expect(client.template(body, {})).toEqual(output)
+      })
+      test('unsupported HTML tag attrs should be stripped', () => {
+        const body = '<a href="https://open.gov.sg" target="_blank">OGP</a>'
+        const output = '<a href="https://open.gov.sg">OGP</a>'
+        expect(client.template(body, {})).toEqual(output)
+      })
+      test('Telegram template should strip params of tags', () => {
+        const params = { xss: "<script>alert('xss!')</script>", text: 'hello' }
+        const body = 'test {{xss}} {{text}}'
+        const output = "test alert('xss!') hello"
         expect(client.template(body, params)).toEqual(output)
       })
     })

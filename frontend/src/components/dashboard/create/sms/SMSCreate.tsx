@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { cloneDeep } from 'lodash'
 
-import { SMSCampaign, SMSProgress, Status } from 'classes'
+import { Campaign, SMSCampaign, SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import SMSTemplate from './SMSTemplate'
 import SMSRecipients from './SMSRecipients'
@@ -20,11 +20,17 @@ const SMS_PROGRESS_STEPS = [
 
 const CreateSMS = ({
   campaign: initialCampaign,
+  onCampaignChange,
 }: {
   campaign: SMSCampaign
+  onCampaignChange: (c: Campaign) => void
 }) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
+
+  useEffect(() => {
+    onCampaignChange(campaign)
+  }, [campaign, onCampaignChange])
 
   // Modifies campaign object in state and navigates to next step
   const onNext = useCallback((changes: any, next = true) => {

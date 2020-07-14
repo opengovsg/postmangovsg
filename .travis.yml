@@ -28,6 +28,17 @@ jobs:
           secret_access_key: $AWS_SECRET_ACCESS_KEY
           region: $AWS_DEFAULT_REGION
           app: "postmangovsg"
+          env: "postmangovsg-staging-telegram"
+          bucket_name: "postmangovsg-elasticbeanstalk-appversion"
+          on:
+            branch: $TELEGRAM_BRANCH
+        - provider: elasticbeanstalk
+          edge: true
+          skip_cleanup: true
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_DEFAULT_REGION
+          app: "postmangovsg"
           env: "postmangovsg-staging-40ffadb"
           bucket_name: "postmangovsg-elasticbeanstalk-appversion"
           on:
@@ -65,6 +76,12 @@ jobs:
           on:
             branch: $PRODUCTION_BRANCH
             condition: "$DEPLOY_WORKER = true"
+        - provider: script
+          skip_cleanup: true
+          script: ./deploy.sh postmangovsg-workers telegram-sending telegram-logging
+          on:
+            branch: $TELEGRAM_BRANCH
+            condition: "$DEPLOY_WORKER = true"
     - name: frontend
       before_install:
         - cd frontend
@@ -80,6 +97,9 @@ jobs:
         - zip -qr code.zip build package.json node_modules/
         - cd $TRAVIS_BUILD_DIR/serverless/postman-api-gateway-authorizer && zip -qr code.zip *
         - cd $TRAVIS_BUILD_DIR/serverless/log-email-sns
+        - npm install && npm run build
+        - zip -qr code.zip build package.json node_modules/
+        - cd $TRAVIS_BUILD_DIR/serverless/telegram-handler
         - npm install && npm run build
         - zip -qr code.zip build package.json node_modules/
       deploy:
@@ -164,6 +184,36 @@ jobs:
             - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
             - SENDGRID_PUBLIC_KEY=$PRODUCTION_EMAIL_SENDGRID_PUBLIC_KEY
             - CALLBACK_SECRET=$PRODUCTION_EMAIL_CALLBACK_SECRET
+        - provider: lambda
+          edge: true
+          function_name: telegram-handler-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_TELEGRAM_HANDLER_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../telegram-handler/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_TELEGRAM_HANDLER_DB_URI
+        - provider: lambda
+          edge: true
+          function_name: telegram-test
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_TELEGRAM_HANDLER_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../telegram-handler/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - DB_URI=$STAGING_TELEGRAM_HANDLER_DB_URI
     - name: root
       install:
         - npm install --ignore-scripts
