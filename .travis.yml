@@ -188,7 +188,7 @@ jobs:
           edge: true
           function_name: telegram-handler-production
           region: $AWS_DEFAULT_REGION
-          role: $PRODUCTION_TELEGRAM_HANDLER_CALLBACK_ROLE
+          role: $PRODUCTION_TELEGRAM_HANDLER_ROLE
           runtime: nodejs12.x
           module_name: build/index
           handler_name: handler
@@ -203,7 +203,7 @@ jobs:
           edge: true
           function_name: telegram-test
           region: $AWS_DEFAULT_REGION
-          role: $STAGING_TELEGRAM_HANDLER_CALLBACK_ROLE
+          role: $STAGING_TELEGRAM_HANDLER_ROLE
           runtime: nodejs12.x
           module_name: build/index
           handler_name: handler
