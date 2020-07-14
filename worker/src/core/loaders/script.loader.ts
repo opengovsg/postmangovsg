@@ -5,6 +5,7 @@ import config from '@core/config'
 import { sqlFilePaths } from '@core/resources/sql'
 import { sqlFilePaths as emailSqlFilePaths } from '@email/resources/sql'
 import { sqlFilePaths as smsSqlFilePaths } from '@sms/resources/sql'
+import { sqlFilePaths as telegramSqlFilePaths } from '@telegram/resources/sql'
 
 const scriptLoader = async (): Promise<void> => {
   const dialectOptions = config.get('IS_PROD')
@@ -22,6 +23,7 @@ const scriptLoader = async (): Promise<void> => {
     ...sqlFilePaths,
     ...emailSqlFilePaths,
     ...smsSqlFilePaths,
+    ...telegramSqlFilePaths,
   ]
   const scripts = scriptsFilePaths.map((filePath: string) => {
     return new Promise((resolve, reject) => {

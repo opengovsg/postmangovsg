@@ -80,7 +80,11 @@ const SMSSend = ({
         <PreviewBlock body={preview.body}></PreviewBlock>
       </div>
 
-      <SendRate sendRate={sendRate} setSendRate={setSendRate} />
+      <SendRate
+        sendRate={sendRate}
+        setSendRate={setSendRate}
+        channelType={ChannelType.SMS}
+      />
 
       <div className="separator"></div>
 

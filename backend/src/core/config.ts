@@ -5,6 +5,8 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
+import xss from 'xss'
+import { isSupportedCountry } from 'libphonenumber-js'
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 /**
  * To require an env var without setting a default,
@@ -32,7 +34,7 @@ convict.addFormats({
 const config = convict({
   env: {
     doc: 'The application environment.',
-    format: ['production', 'staging', 'development'],
+    format: ['production', 'staging', 'development', 'telegram'],
     default: 'production',
     env: 'NODE_ENV',
   },
@@ -262,6 +264,14 @@ const config = convict({
     default: '',
     env: 'SES_FROM',
   },
+  defaultCountry: {
+    doc: 'Two-letter ISO country code to use in libphonenumber-js',
+    default: 'SG',
+    env: 'DEFAULT_COUNTRY',
+    format: (countryCode: string): boolean => {
+      return isSupportedCountry(countryCode)
+    },
+  },
   defaultCountryCode: {
     doc: 'Country code to prepend to phone numbers',
     default: '65',
@@ -290,6 +300,19 @@ const config = convict({
       doc: 'ID of the messaging service ',
       default: '',
       env: 'TWILIO_MESSAGING_SERVICE_SID',
+      sensitive: true,
+    },
+  },
+  telegramOptions: {
+    webhookUrl: {
+      doc: 'Webhook URL to configure for all Telegram bots',
+      default: '',
+      env: 'TELEGRAM_WEBHOOK_URL',
+    },
+    telegramBotToken: {
+      doc: 'API Key required to make use of Telegram APIs',
+      default: '',
+      env: 'TELEGRAM_BOT_TOKEN',
       sensitive: true,
     },
   },
@@ -335,6 +358,32 @@ const config = convict({
       },
       sms: {
         whiteList: { br: [] },
+        stripIgnoreTag: true,
+      },
+      telegram: {
+        whiteList: {
+          b: [],
+          i: [],
+          u: [],
+          s: [],
+          strike: [],
+          del: [],
+          p: [],
+          code: ['class'],
+          pre: [],
+          a: ['href'],
+        },
+        safeAttrValue: (
+          tag: string,
+          name: string,
+          value: string
+        ): string | void => {
+          // Handle Telegram mention as xss-js does not recognize it as a valid url.
+          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+            return value
+          }
+          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
+        },
         stripIgnoreTag: true,
       },
     },

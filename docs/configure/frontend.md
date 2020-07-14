@@ -12,22 +12,23 @@ Further reference: [Create-react-app documentation](https://create-react-app.dev
 
 ### Minimal set of environment variables
 
-| Name                                | Description                                                                                                                                                               |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `REACT_APP_BACKEND_URL`             | URL of the API server. Example: `http://localhost:4000/v1`                                                                                                                |
-| `REACT_APP_TITLE`                   | Title of the app. Example: `Postman.gov.sg`                                                                                                                               |
-| `REACT_APP_DESCRIPTION`             | Meta description. Example: `Postman.gov.sg enables public officers to send templated messages to many recipients`                                                         |
-| `REACT_APP_GUIDE_URL`               | URL to an FAQ site. Example: `https://guide.postman.gov.sg`                                                                                                               |
-| `REACT_APP_GUIDE_CREDENTIALS_URL`   | URL to explain how someone may onboard themselves onto Twilio. Example: `https://guide.postman.gov.sg/twilio-sms.html#where-can-i-find-credentials-on-the-twilio-console` |
-| `REACT_APP_GUIDE_POWER_USER_URL`    | URL to explain what Twilio send rate is. Example: `https://guide.postman.gov.sg/poweruser.html`                                                                           |
-| `REACT_APP_CONTACT_US_URL`          | URL to a contact form. Example: `https://form.gov.sg/#!/5e8db1736d789b0011743202`                                                                                         |
-| `REACT_APP_LOGIN_EMAIL_TEXT`        | Call to action text on landing page. Example: `Sign in with your .gov.sg email`                                                                                           |
-| `REACT_APP_LOGIN_EMAIL_PLACEHOLDER` | Placeholder for login input box. Example: `e.g. postman@agency.gov.sg`                                                                                                    |
-| `REACT_APP_CONTRIBUTE_URL`          | URL to a repository. Example: `https://github.com/opengovsg/postman`                                                                                                      |
-| `REACT_APP_REQUEST_URL`             | URL to a request form. Example: `https://form.gov.sg/#!/5ec2064a85d58100112184a4`                                                                                         |
-| `REACT_APP_PRIVACY_URL`             | URL to privacy policy. Example: `https://guide.postman.gov.sg/privacy.html`                                                                                               |
-| `REACT_APP_TC_URL`                  | URL to terms of use. Example: `https://guide.postman.gov.sg/t-c.html`                                                                                                     |
-| `REACT_APP_REPORT_BUG_URL`          | URL to a form for reporting bugs. Example: `https://form.gov.sg/#!/5e8db1736d789b0011743202`                                                                              |
+| Name                                       | Description                                                                                                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `REACT_APP_BACKEND_URL`                    | URL of the API server. Example: `http://localhost:4000/v1`                                                                                                                |
+| `REACT_APP_TITLE`                          | Title of the app. Example: `Postman.gov.sg`                                                                                                                               |
+| `REACT_APP_DESCRIPTION`                    | Meta description. Example: `Postman.gov.sg enables public officers to send templated messages to many recipients`                                                         |
+| `REACT_APP_GUIDE_URL`                      | URL to an FAQ site. Example: `https://guide.postman.gov.sg`                                                                                                               |
+| `REACT_APP_GUIDE_SMS_CREDENTIALS_URL`      | URL to explain how someone may onboard themselves onto Twilio. Example: `https://guide.postman.gov.sg/twilio-sms.html#where-can-i-find-credentials-on-the-twilio-console` |
+| `REACT_APP_GUIDE_TELEGRAM_CREDENTIALS_URL` | URL to explain how someone may onboard themselves onto Telegram. Example: `https://guide.postman.gov.sg/telegram.html`                                                    |
+| `REACT_APP_GUIDE_POWER_USER_URL`           | URL to explain what Twilio send rate is. Example: `https://guide.postman.gov.sg/poweruser.html`                                                                           |
+| `REACT_APP_CONTACT_US_URL`                 | URL to a contact form. Example: `https://form.gov.sg/#!/5e8db1736d789b0011743202`                                                                                         |
+| `REACT_APP_LOGIN_EMAIL_TEXT`               | Call to action text on landing page. Example: `Sign in with your .gov.sg email`                                                                                           |
+| `REACT_APP_LOGIN_EMAIL_PLACEHOLDER`        | Placeholder for login input box. Example: `e.g. postman@agency.gov.sg`                                                                                                    |
+| `REACT_APP_CONTRIBUTE_URL`                 | URL to a repository. Example: `https://github.com/opengovsg/postman`                                                                                                      |
+| `REACT_APP_REQUEST_URL`                    | URL to a request form. Example: `https://form.gov.sg/#!/5ec2064a85d58100112184a4`                                                                                         |
+| `REACT_APP_PRIVACY_URL`                    | URL to privacy policy. Example: `https://guide.postman.gov.sg/privacy.html`                                                                                               |
+| `REACT_APP_TC_URL`                         | URL to terms of use. Example: `https://guide.postman.gov.sg/t-c.html`                                                                                                     |
+| `REACT_APP_REPORT_BUG_URL`                 | URL to a form for reporting bugs. Example: `https://form.gov.sg/#!/5e8db1736d789b0011743202`                                                                              |
 
 ### Images and brands
 
