@@ -62,7 +62,7 @@ async function chunkSize(file: File, template: string): Promise<number> {
         const templatedSize = hydrateTemplate(template, row).length
         const rowSize = Object.values(row).join(',').length
         const size = Math.ceil(
-          (MIN_UPLOAD_SIZE / 4) * (rowSize / templatedSize) // convert bytes to chars
+          (MIN_UPLOAD_SIZE / templatedSize) * rowSize // convert bytes to chars
         )
         resolve(size)
       },
@@ -93,6 +93,7 @@ export async function protectAndUploadCsv(
   })
   let partNumber = 0
   const etags: Array<string> = []
+  // Start parsing by chunks
   Papa.LocalChunkSize = String(size)
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
