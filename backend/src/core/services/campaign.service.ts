@@ -64,6 +64,7 @@ const listCampaigns = ({
         'has_credential',
       ],
       'halted',
+      'protect',
     ],
     order: [['created_at', 'DESC']],
     include: [

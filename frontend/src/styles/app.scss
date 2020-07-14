@@ -145,12 +145,12 @@ table {
 
     td,
     th {
-      padding: 0.75rem 0;
+      padding: 0.75rem 0.25rem;
       display: flex;
 
       &.xs {
         flex: 1.2;
-        text-align: center;
+        justify-content: center;
       }
 
       &.sm {
