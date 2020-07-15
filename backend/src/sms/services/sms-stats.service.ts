@@ -7,8 +7,11 @@ import { SmsOp, SmsMessage } from '@sms/models'
  * Gets stats for sms project
  * @param campaignId
  */
-const getStats = async (campaignId: number): Promise<CampaignStats> => {
-  return StatsService.getCurrentStats(campaignId, SmsOp)
+const getStats = async (
+  campaignId: number,
+  refresh: boolean
+): Promise<CampaignStats> => {
+  return StatsService.getCurrentStats(campaignId, SmsOp, refresh)
 }
 
 /**

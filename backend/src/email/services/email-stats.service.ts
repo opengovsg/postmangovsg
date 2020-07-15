@@ -7,8 +7,11 @@ import { EmailOp, EmailMessage } from '@email/models'
  * Gets stats for email project
  * @param campaignId
  */
-const getStats = async (campaignId: number): Promise<CampaignStats> => {
-  return StatsService.getCurrentStats(campaignId, EmailOp)
+const getStats = (
+  campaignId: number,
+  refresh: boolean
+): Promise<CampaignStats> => {
+  return StatsService.getCurrentStats(campaignId, EmailOp, refresh)
 }
 
 /**

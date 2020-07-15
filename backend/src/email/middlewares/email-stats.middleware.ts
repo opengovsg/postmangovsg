@@ -12,8 +12,9 @@ const getStats = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { campaignId } = req.params
+  const { refresh } = req.query
   try {
-    const stats = await EmailStatsService.getStats(+campaignId)
+    const stats = await EmailStatsService.getStats(+campaignId, refresh)
     return res.json(stats)
   } catch (err) {
     next(err)

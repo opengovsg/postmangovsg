@@ -7,8 +7,11 @@ import { TelegramOp, TelegramMessage } from '@telegram/models'
  * Gets stats for telegram project
  * @param campaignId
  */
-const getStats = async (campaignId: number): Promise<CampaignStats> => {
-  return StatsService.getCurrentStats(campaignId, TelegramOp)
+const getStats = async (
+  campaignId: number,
+  refresh: boolean
+): Promise<CampaignStats> => {
+  return StatsService.getCurrentStats(campaignId, TelegramOp, refresh)
 }
 
 /**

@@ -1,19 +1,73 @@
-import { fn, cast, Transaction, Op } from 'sequelize'
+import { fn, cast, Transaction, Op, QueryTypes } from 'sequelize'
 import { Statistic, JobQueue, Campaign } from '@core/models'
 import {
   CampaignStats,
   CampaignStatsCount,
   CampaignInvalidRecipient,
 } from '@core/interfaces'
-import { MessageStatus } from '@core/constants'
+import { MessageStatus, ChannelType } from '@core/constants'
+import logger from '@core/logger'
+
+/**
+ * Calls update_stats SQL function for respective channels.
+ * fails silently
+ * @param campaignId
+ */
+const updateStats = async (campaignId: number): Promise<void> => {
+  const campaign = await Campaign.findOne({
+    where: { id: campaignId },
+  })
+  if (!campaign) return
+  switch (campaign.type) {
+    case ChannelType.Email: {
+      await Statistic.sequelize?.query(
+        'SELECT update_stats_email(:campaign_id);',
+        {
+          replacements: { campaign_id: campaignId },
+          type: QueryTypes.SELECT,
+        }
+      )
+      break
+    }
+    case ChannelType.SMS: {
+      await Statistic.sequelize?.query(
+        'SELECT update_stats_sms(:campaign_id);',
+        {
+          replacements: { campaign_id: campaignId },
+          type: QueryTypes.SELECT,
+        }
+      )
+      break
+    }
+    case ChannelType.Telegram: {
+      await Statistic.sequelize?.query(
+        'SELECT update_stats_telegram(:campaign_id);',
+        {
+          replacements: { campaign_id: campaignId },
+          type: QueryTypes.SELECT,
+        }
+      )
+      break
+    }
+    default: {
+      logger.error(`Invalid channel type found for campaign ${campaignId}`)
+    }
+  }
+}
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
+ * Optional parameter to force retrieval of stats from respective messages tables.
  * @param campaignId
+ * @param refresh optional
  */
 const getStatsFromArchive = async (
-  campaignId: number
+  campaignId: number,
+  refresh = false
 ): Promise<CampaignStatsCount> => {
+  if (refresh) {
+    await updateStats(campaignId)
+  }
   const stats = await Statistic.findByPk(campaignId)
   if (!stats) {
     return {
@@ -28,6 +82,7 @@ const getStatsFromArchive = async (
     sent: stats?.sent,
     unsent: stats?.unsent,
     invalid: stats?.invalid,
+    updatedAt: stats?.updatedAt,
   }
 }
 
@@ -101,7 +156,8 @@ const getStatsFromTable = async (
  */
 const getCurrentStats = async (
   campaignId: number,
-  opsTable: any
+  opsTable: any,
+  refresh = false
 ): Promise<CampaignStats> => {
   // Get job from job_queue table
   const job = await JobQueue.findOne({
@@ -118,7 +174,7 @@ const getCurrentStats = async (
     throw new Error('Unable to find campaign in job queue table.')
 
   // Get stats from statistics table
-  const archivedStats = await getStatsFromArchive(campaignId)
+  const archivedStats = await getStatsFromArchive(campaignId, refresh)
 
   // If job is sending, sent or stopped, i.e. not logged back to message table,
   // Retrieve current stats from ops table
@@ -143,7 +199,8 @@ const getCurrentStats = async (
   return {
     ...archivedStats,
     status: job.status,
-    updated_at: job.updatedAt,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    updated_at: archivedStats.updatedAt!,
     halted: job.campaign.halted,
   }
 }

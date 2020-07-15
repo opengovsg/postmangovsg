@@ -56,6 +56,12 @@ const sendCampaignValidator = {
   }),
 }
 
+const statsValidator = {
+  [Segments.QUERY]: Joi.object({
+    refresh: Joi.boolean().default(false),
+  }),
+}
+
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -599,6 +605,10 @@ router.post(
  *          required: true
  *          schema:
  *            type: string
+ *        - name: refresh
+ *          in: query
+ *          schema:
+ *            type: boolean
  *
  *      responses:
  *        200:
@@ -613,7 +623,7 @@ router.post(
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/stats', SmsStatsMiddleware.getStats)
+router.get('/stats', celebrate(statsValidator), SmsStatsMiddleware.getStats)
 
 /**
  * @swagger
