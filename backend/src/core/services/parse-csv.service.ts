@@ -1,11 +1,6 @@
-import CSVParse from 'csv-parse'
-import { isEmpty } from 'lodash'
+import Papa, { ParseResult } from 'papaparse'
+import { RecipientColumnMissing } from '@core/errors/s3.errors'
 import logger from '@core/logger'
-import {
-  RecipientColumnMissing,
-  UnexpectedDoubleQuoteError,
-} from '@core/errors/s3.errors'
-
 import { CSVParams } from '@core/types'
 
 /**
@@ -16,48 +11,37 @@ import { CSVParams } from '@core/types'
 const parseCsv = async (
   readStream: NodeJS.ReadableStream
 ): Promise<Array<CSVParams>> => {
-  const parser = CSVParse({
-    delimiter: ',',
-    trim: true,
-    skip_empty_lines: true,
-  })
-  try {
-    readStream.on('error', (err) => {
-      // Pass error from s3 to csv parser
-      parser.emit('error', err)
-    })
-    readStream.pipe(parser)
-    let headers: string[] = []
-    let recipientIndex: number
-    const params: Map<string, CSVParams> = new Map()
-    for await (const row of parser) {
-      if (isEmpty(headers)) {
+  const fileContents: Map<string, CSVParams> = new Map()
+  return new Promise((resolve, reject) => {
+    Papa.parse(readStream, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: (header: string) => {
         // @see https://stackoverflow.com/questions/11305797/remove-zero-width-space-characters-from-a-javascript-string
-        const lowercaseHeaders = row.map((col: string) =>
-          col.toLowerCase().replace(/[\u200B-\u200D\uFEFF]/g, '')
-        )
-        recipientIndex = lowercaseHeaders.indexOf('recipient')
-        if (recipientIndex === -1) throw new RecipientColumnMissing()
-        headers = lowercaseHeaders
-      } else {
-        const rowWithHeaders: CSVParams = {}
-        row.forEach((col: any, index: number) => {
-          rowWithHeaders[headers[index]] = col
+        const lowercaseHeader = header
+          .toLowerCase()
+          .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        return lowercaseHeader
+      },
+      chunk: (rows: ParseResult<CSVParams>) => {
+        const { data, meta } = rows // Ignore parsing errors https://www.papaparse.com/docs#errors
+        if (meta.fields?.length > 0 && !meta.fields?.includes('recipient'))
+          reject(new RecipientColumnMissing())
+
+        data.forEach((row: any) => {
+          fileContents.set(row['recipient'], row as CSVParams) // Deduplication
         })
-        // produces {header1: value1, header2: value2, ...}
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        params.set(row[recipientIndex!], rowWithHeaders) // Deduplication
-      }
-    }
-    logger.info({ message: 'Parsing complete' })
-    return Array.from(params.values())
-  } catch (err) {
-    if (err.message.includes('Invalid Opening Quote'))
-      throw new UnexpectedDoubleQuoteError()
-    if (err.message.includes('Invalid Closing Quote'))
-      throw new UnexpectedDoubleQuoteError()
-    throw err
-  }
+      },
+      complete: () => {
+        const results = Array.from(fileContents.values())
+        logger.info({ message: 'Parsing complete' })
+        resolve(results)
+      },
+      error: (error) => {
+        reject(error)
+      },
+    })
+  })
 }
 
 export const ParseCsvService = {
