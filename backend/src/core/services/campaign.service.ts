@@ -63,6 +63,12 @@ const listCampaigns = ({
         literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
         'has_credential',
       ],
+      [
+        literal(
+          'CASE WHEN Statistic IS NULL THEN False ELSE (Statistic.errored + Statistic.invalid) > 0 END'
+        ),
+        'has_failed_recipients',
+      ],
       'halted',
       'protect',
     ],
@@ -75,6 +81,11 @@ const listCampaigns = ({
           ['created_at', 'sent_at'],
           ['updated_at', 'status_updated_at'],
         ],
+      },
+      {
+        model: Statistic,
+        attributes: [],
+        required: true,
       },
     ],
   }

@@ -46,7 +46,6 @@ const ProgressDetails = ({
     async function checkHasExportButton() {
       const failedCount = error + invalid
       const displayExportButton = await hasFailedRecipients(
-        campaignId,
         status,
         updatedAt,
         failedCount

@@ -23,10 +23,9 @@ function getJobTimestamps(
 }
 
 export async function hasFailedRecipients(
-  campaignId: number,
   status: Status,
   updatedAt: Date,
-  count?: number
+  failedCount: number
 ) {
   if (status !== Status.Sent) {
     return false
@@ -38,11 +37,6 @@ export async function hasFailedRecipients(
     return false
   }
 
-  let failedCount = count
-  if (failedCount === undefined) {
-    const { error, invalid } = await getCampaignStats(campaignId)
-    failedCount = error + invalid
-  }
   return failedCount > 0
 }
 

@@ -14,7 +14,7 @@ import {
   PrimaryButton,
   ExportRecipients,
 } from 'components/common'
-import { getCampaigns, hasFailedRecipients } from 'services/campaign.service'
+import { getCampaigns } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
@@ -30,9 +30,6 @@ const Campaigns = () => {
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(
     new Array<Campaign>()
   )
-  const [hasExport, setHasExport] = useState<{
-    [key: number]: boolean
-  }>({})
   const [selectedPage, setSelectedPage] = useState(0)
   const [campaignCount, setCampaignCount] = useState(0)
   const history = useHistory()
@@ -56,12 +53,6 @@ const Campaigns = () => {
     })
     setCampaignCount(totalCount)
     setCampaignsDisplayed(campaigns)
-    const hasExport: { [key: number]: boolean } = {}
-    for (const campaign of campaigns) {
-      const { id, status, statusUpdatedAt } = campaign
-      hasExport[id] = await hasFailedRecipients(id, status, statusUpdatedAt)
-    }
-    setHasExport(hasExport)
     setLoading(false)
   }
 
@@ -113,7 +104,7 @@ const Campaigns = () => {
     {
       name: 'Export',
       render: (campaign: Campaign) =>
-        hasExport[campaign.id] && (
+        campaign.hasFailedRecipients && (
           <ExportRecipients
             className={styles.exportRecipients}
             campaignId={campaign.id}

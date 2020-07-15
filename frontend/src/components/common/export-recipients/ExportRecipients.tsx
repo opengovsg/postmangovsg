@@ -48,7 +48,7 @@ const ExportRecipients = ({
         'text/csv'
       )
     } catch (error) {
-      console.log(error)
+      console.error(error)
     } finally {
       setDisabled(false)
     }
