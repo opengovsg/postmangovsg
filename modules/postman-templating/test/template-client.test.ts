@@ -1,6 +1,7 @@
 import { TemplateClient } from '../src/template-client'
 import { TemplateError } from '../src/errors'
-import xss from 'xss'
+
+import { XssEmailOption, XssSmsOption, XssTelegramOption } from '../src/xss-options'
 
 describe('template', () => {
   let templateClient: TemplateClient
@@ -59,19 +60,7 @@ describe('template', () => {
 
   describe('xss', () => {
     describe('email', () => {
-      const xssOptions = {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          br: [],
-          p: [],
-          a: ['href', 'title', 'target'],
-          img: ['src', 'alt', 'title', 'width', 'height'],
-        },
-        stripIgnoreTag: true,
-      }
-      const client: TemplateClient = new TemplateClient(xssOptions)
+      const client: TemplateClient = new TemplateClient(XssEmailOption)
 
       test('email template should allow b, i, u, br, a, img tags', () => {
         const body =
@@ -101,11 +90,7 @@ describe('template', () => {
       })
     })
     describe('sms', () => {
-      const xssOptions = {
-        whiteList: { br: [] },
-        stripIgnoreTag: true,
-      }
-      const client: TemplateClient = new TemplateClient(xssOptions)
+      const client: TemplateClient = new TemplateClient(XssSmsOption)
 
       test('sms template should not allow any html tags except br', () => {
         const body =
@@ -125,34 +110,8 @@ describe('template', () => {
       })
     })
     describe('telegram', () => {
-      const xssOptions = {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          s: [],
-          strike: [],
-          del: [],
-          p: [],
-          code: ['class'],
-          pre: [],
-          a: ['href'],
-        },
-        safeAttrValue: (
-          tag: string,
-          name: string,
-          value: string
-        ): string => {
-          // Handle Telegram mention as xss-js does not recognize it as a valid url.
-          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
-            return value
-          }
-          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
-        },
-        stripIgnoreTag: true,
-      }
 
-      const client: TemplateClient = new TemplateClient(xssOptions, '\n')
+      const client: TemplateClient = new TemplateClient(XssTelegramOption, '\n')
       test('Telegram should support b i u s strike del p code pre a', () => {
         const body = 
           '<b>bold</b>' +
@@ -189,6 +148,31 @@ describe('template', () => {
         const output = "test alert('xss!') hello"
         expect(client.template(body, params)).toEqual(output)
       })
+    })
+  })
+})
+
+describe('replaceNewLinesAndSanitize', () => {
+  describe('email', () => {
+    const client: TemplateClient = new TemplateClient(XssEmailOption)
+
+    test('Should not sanitize keyword in a href', () => {
+      const body = '<a href="{{protectedlink}}">link</a>'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
+    })
+    
+    test('Should not sanitize keyword in a img src', () => {
+      const body = '<img src="{{protectedimage}}">'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
+    })
+  })
+
+  describe('telegram', () => {
+    const client: TemplateClient = new TemplateClient(XssTelegramOption)
+
+    test('Should not sanitize tg:// telegram links', () => {
+      const body = '<a href="tg://join?invite=">link</a>'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
     })
   })
 })
