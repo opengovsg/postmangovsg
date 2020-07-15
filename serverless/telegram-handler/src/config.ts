@@ -90,13 +90,6 @@ const config = convict({
       },
     },
   },
-  aws: {
-    awsRegion: {
-      doc: 'Region for the S3 bucket that is used to store file uploads',
-      default: 'ap-northeast-1',
-      env: 'AWS_REGION',
-    },
-  },
 })
 
 // Only development is a non-production environment
