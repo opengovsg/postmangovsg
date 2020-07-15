@@ -5,9 +5,9 @@ import map from 'lodash/map'
 import logger from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
-import { TemplateClient, XssEmailOption } from 'postman-templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
-const templateClient = new TemplateClient(XssEmailOption)
+const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
 class Email {
   private workerId: string
   private connection: Sequelize

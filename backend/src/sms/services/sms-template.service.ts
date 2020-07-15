@@ -5,12 +5,12 @@ import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import { TemplateClient, XssSmsOption } from 'postman-templating'
+import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(XssSmsOption)
+const client = new TemplateClient(XSS_SMS_OPTION)
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,

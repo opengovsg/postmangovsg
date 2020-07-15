@@ -1,5 +1,5 @@
 import xss from 'xss'
-export const XssEmailOption = {
+export const XSS_EMAIL_OPTION = {
   whiteList: {
     b: [],
     i: [],
@@ -27,12 +27,12 @@ export const XssEmailOption = {
   stripIgnoreTag: true,
 }
 
-export const XssSmsOption = {
+export const XSS_SMS_OPTION = {
   whiteList: { br: [] },
   stripIgnoreTag: true,
 }
 
-export const XssTelegramOption = {
+export const XSS_TELEGRAM_OPTION = {
   whiteList: {
     b: [],
     i: [],

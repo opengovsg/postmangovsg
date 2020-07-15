@@ -2,12 +2,12 @@ import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import { map } from 'lodash'
 
-import { TemplateClient, XssTelegramOption } from 'postman-templating'
+import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
 import logger from '@core/logger'
 import TelegramClient from '@telegram/services/telegram-client.class'
 import { CredentialService } from '@core/services/credential.service'
 
-const templateClient = new TemplateClient(XssTelegramOption)
+const templateClient = new TemplateClient(XSS_TELEGRAM_OPTION)
 
 class Telegram {
   private workerId: string
