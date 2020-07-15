@@ -15,11 +15,14 @@ import {
   UploadService,
   StatsService,
   ProtectedService,
+  ParseCsvService,
 } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
+import { EmailTemplate, EmailMessage } from '@email/models'
+import { CSVParams } from '@core/types'
 
 /**
  * Store template subject and body in email template table.
@@ -133,6 +136,101 @@ const updateCampaignAndMessages = async (
   }
 }
 
+const uploadCompleteOnPreview = ({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: EmailTemplate
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    UploadService.checkTemplateKeysMatch(data, template.params!)
+
+    EmailTemplateService.testHydration(
+      [{ params: data[0] }],
+      template.body as string,
+      template.subject as string
+    )
+    try {
+      // delete message_logs entries
+      await EmailMessage.destroy({
+        where: { campaignId },
+        transaction,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+const uploadCompleteOnChunk = ({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: EmailTemplate
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    try {
+      const records = UploadService.getRecordsFromCsv(
+        campaignId,
+        data,
+        template.params as string[]
+      )
+      // START populate template
+      await EmailMessage.bulkCreate(records, {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          }
+        },
+        benchmark: true,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+const uploadCompleteOnComplete = ({
+  transaction,
+  campaignId,
+  key,
+  filename,
+}: {
+  transaction: Transaction
+  campaignId: number
+  key: string
+  filename: string
+}): ((numRecords: number) => Promise<void>) => {
+  return async (numRecords: number): Promise<void> => {
+    try {
+      // Updates metadata in project
+      await UploadService.replaceCampaignS3Metadata(
+        campaignId,
+        key,
+        filename,
+        transaction
+      )
+
+      await StatsService.setNumRecipients(campaignId, numRecords, transaction)
+
+      // Set campaign to valid
+      await CampaignService.setValid(campaignId, transaction)
+      transaction?.commit()
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+
 /**
  * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
  * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
@@ -154,42 +252,46 @@ const uploadCompleteHandler = async (
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
     // check if template exists
-    const emailTemplate = await EmailTemplateService.getFilledTemplate(
-      +campaignId
-    )
-    if (emailTemplate === null) {
+    const template = await EmailTemplateService.getFilledTemplate(+campaignId)
+    if (template === null) {
       throw new Error('Template does not exist, please create a template')
-    }
-
-    // - download from s3
-    const s3Client = new S3Client()
-    const fileContent = await s3Client.getCsvFile(s3Key)
-
-    const records = UploadService.getRecordsFromCsv(
-      +campaignId,
-      fileContent,
-      emailTemplate.params as string[]
-    )
-
-    EmailTemplateService.testHydration(
-      records,
-      emailTemplate.body as string,
-      emailTemplate.subject as string
-    )
-
-    if (EmailTemplateService.hasInvalidEmailRecipient(records)) {
-      throw new InvalidRecipientError()
     }
 
     // Store temp filename
     await UploadService.storeS3TempFilename(+campaignId, filename)
 
-    try {
-      // Return early because bulk insert is slow
-      res.sendStatus(202)
+    // Return early because bulk insert is slow
+    res.sendStatus(202)
 
-      // Slow bulk insert
-      await updateCampaignAndMessages(+campaignId, s3Key, filename, records)
+    try {
+      // Continue processing
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const transaction = await Campaign.sequelize!.transaction()
+      // - download from s3
+      const s3Client = new S3Client()
+      const downloadStream = s3Client.download(
+        //s3Key
+        '147651b0-e34c-41ce-925c-499a7e49e202' || s3Key
+      )
+      await ParseCsvService.parseAndProcessCsv(
+        downloadStream,
+        uploadCompleteOnPreview({
+          transaction,
+          template,
+          campaignId: +campaignId,
+        }),
+        uploadCompleteOnChunk({
+          transaction,
+          template,
+          campaignId: +campaignId,
+        }),
+        uploadCompleteOnComplete({
+          transaction,
+          campaignId: +campaignId,
+          key: s3Key,
+          filename,
+        })
+      )
     } catch (err) {
       // Do not return any response since it has already been sent
       logger.error(

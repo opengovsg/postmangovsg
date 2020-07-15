@@ -178,7 +178,6 @@ const checkTemplateKeysMatch = (
   templateParams: Array<string>
 ): void => {
   const csvRecord = csvContent[0]
-
   if (!isSuperSet(keys(csvRecord), templateParams)) {
     const missingKeys = difference(templateParams, keys(csvRecord))
     throw new MissingTemplateKeysError(missingKeys)
@@ -245,4 +244,5 @@ export const UploadService = {
   getCsvStatus,
   getRecordsFromCsv,
   getProtectedRecordsFromCsv,
+  checkTemplateKeysMatch,
 }

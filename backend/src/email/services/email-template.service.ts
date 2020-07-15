@@ -264,7 +264,7 @@ const hasInvalidEmailRecipient = (
  * @param templateSubject - optional
  */
 const testHydration = (
-  records: Array<MessageBulkInsertInterface>,
+  records: Array<{ params: { [key: string]: string } }>,
   templateBody: string,
   templateSubject: string
 ): void => {
