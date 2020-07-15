@@ -239,7 +239,14 @@ const addToMessageLogs = async (
     const chunks = chunk(records, 5000)
     for (let idx = 0; idx < chunks.length; idx++) {
       const batch = chunks[idx]
-      await EmailMessage.bulkCreate(batch, { transaction })
+      await EmailMessage.bulkCreate(batch, {
+        transaction,
+        logging: function (_message, benchmark) {
+          console.info(`BulkCreate Elapsed time: ${benchmark} ms`)
+        },
+        benchmark: true,
+        returning: false,
+      })
     }
 
     logger.info({ message: `Finished populateEmailTemplate for ${campaignId}` })

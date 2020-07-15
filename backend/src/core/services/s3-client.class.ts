@@ -5,7 +5,6 @@ import { configureEndpoint } from '@core/utils/aws-endpoint'
 
 import { CSVParams } from '@core/types'
 import { ParseCsvService } from '@core/services'
-
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
 export default class S3Client {
