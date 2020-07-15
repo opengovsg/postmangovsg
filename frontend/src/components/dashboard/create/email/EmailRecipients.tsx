@@ -69,7 +69,7 @@ const EmailRecipients = ({
     const pollStatus = async () => {
       try {
         if (forceReset) {
-          setCsvInfo({})
+          setCsvInfo({ csvFilename })
           return
         }
         const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
@@ -96,7 +96,7 @@ const EmailRecipients = ({
     pollStatus()
 
     return () => clearTimeout(timeoutId)
-  }, [campaignId, forceReset, isCsvProcessing])
+  }, [campaignId, csvFilename, forceReset, isCsvProcessing])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {

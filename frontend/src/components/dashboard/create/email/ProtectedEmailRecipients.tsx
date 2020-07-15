@@ -170,17 +170,26 @@ const ProtectedEmailRecipients = ({
   )
 
   const uploadRecipients = (
-    <EmailRecipients
-      csvFilename={csvFilename}
-      numRecipients={numRecipients}
-      params={[]}
-      isProcessing={isProcessing}
-      protect={true}
-      template={template}
-      onFileSelected={onFileSelected}
-      forceReset={phase === ProtectPhase.READY}
-      onNext={onNext}
-    ></EmailRecipients>
+    <>
+      <EmailRecipients
+        csvFilename={csvFilename}
+        numRecipients={numRecipients}
+        params={[]}
+        isProcessing={isProcessing}
+        protect={true}
+        template={template}
+        onFileSelected={onFileSelected}
+        forceReset={phase === ProtectPhase.READY}
+        onNext={onNext}
+      ></EmailRecipients>
+      {phase === ProtectPhase.READY && csvFilename && (
+        <div className="progress-button">
+          <TextButton onClick={() => setPhase(ProtectPhase.DONE)}>
+            Cancel
+          </TextButton>
+        </div>
+      )}
+    </>
   )
 
   const completeButtons = (
