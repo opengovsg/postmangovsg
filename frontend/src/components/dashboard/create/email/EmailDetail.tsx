@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import Moment from 'react-moment'
 
 import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
 import {
@@ -104,6 +105,8 @@ const EmailDetail = ({
           handleRetry={handleRetry}
         />
       )}
+
+      Stats last retrieved on {stats.updatedAt}
     </>
   )
 }
