@@ -345,7 +345,7 @@ const uploadProtectedCompleteHandler = async (
       RecipientColumnMissing,
       MissingTemplateKeysError,
       InvalidRecipientError,
-      UnexpectedDoubleQuoteError,
+      UserError,
     ]
 
     if (userErrors.some((errType) => err instanceof errType)) {
