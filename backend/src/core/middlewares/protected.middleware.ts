@@ -82,8 +82,10 @@ const verifyPasswordHash = async (
       passwordHash
     )
     if (!protectedMessage) {
-      // Return not found if nothing retrieved from db
-      return res.sendStatus(404)
+      // Return unauthorized if nothing retrieved from db
+      return res
+        .status(401)
+        .json({ message: 'Wrong password or message id. Please try again.' })
     }
     return res.json({ payload: protectedMessage.payload })
   } catch (err) {
