@@ -10,6 +10,7 @@ import {
   Worker,
   UserCredential,
   Statistic,
+  ProtectedMessage,
 } from '@core/models'
 import {
   EmailMessage,
@@ -63,7 +64,13 @@ const sequelizeLoader = async (): Promise<void> => {
     UserCredential,
     Statistic,
   ]
-  const emailModels = [EmailMessage, EmailTemplate, EmailOp, EmailBlacklist]
+  const emailModels = [
+    EmailMessage,
+    EmailTemplate,
+    EmailOp,
+    EmailBlacklist,
+    ProtectedMessage,
+  ]
   const smsModels = [SmsMessage, SmsTemplate, SmsOp]
   const telegramModels = [
     BotSubscriber,

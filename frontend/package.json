@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
@@ -15,17 +15,20 @@
   },
   "dependencies": {
     "@sentry/browser": "^5.15.5",
+    "@types/bcryptjs": "^2.4.2",
     "@types/papaparse": "^5.0.3",
     "@types/react-lottie": "^1.2.5",
     "@types/validator": "^13.0.0",
     "axios": "^0.19.2",
     "boxicons": "^2.0.5",
+    "buffer": "^5.6.0",
     "classnames": "^2.2.6",
     "downloadjs": "^1.4.7",
     "escape-html": "^1.0.3",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "papaparse": "^5.2.0",
+    "postman-templating": "file:../modules/postman-templating",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.13.1",
@@ -38,7 +41,9 @@
     "react-textarea-autosize": "^7.1.2",
     "sass-burger": "^1.3.1",
     "typescript": "^3.7.5",
-    "validator": "^13.0.0"
+    "uuidv4": "^6.1.1",
+    "validator": "^13.0.0",
+    "webcrypto-shim": "^0.1.5"
   },
   "devDependencies": {
     "@sentry/cli": "^1.54.0",

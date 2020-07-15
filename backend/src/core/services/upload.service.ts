@@ -49,15 +49,116 @@ const getUploadParameters = async (
  * Decodes jwt
  * @param transactionId
  */
-const extractS3Key = (transactionId: string): string => {
-  let decoded: string
+const extractParamsFromJwt = (
+  transactionId: string
+): { s3Key: string; uploadId?: string } => {
+  let decoded
   try {
-    decoded = jwtUtils.verify(transactionId) as string
+    decoded = jwtUtils.verify(transactionId)
   } catch (err) {
     logger.error(`${err.stack}`)
     throw new Error('Invalid transactionId provided')
   }
-  return decoded as string
+  return typeof decoded === 'string'
+    ? { s3Key: decoded }
+    : (decoded as { s3Key: string; uploadId: string }) //multipart
+}
+
+/**
+ * Get a presigned url to upload a part for multipart upload.
+ */
+const getPresignedPartUrl = async ({
+  s3Key,
+  uploadId,
+  partNumber,
+}: {
+  s3Key: string
+  uploadId: string
+  partNumber: number
+}): Promise<string> => {
+  const params = {
+    Bucket: FILE_STORAGE_BUCKET_NAME,
+    Key: s3Key,
+    PartNumber: partNumber,
+    UploadId: uploadId,
+  }
+  return await s3.getSignedUrlPromise('uploadPart', params)
+}
+
+/**
+ * Create a multipart upload on s3 and return the upload id and s3 key for it.
+ */
+const startMultipartUpload = async (
+  mimeType: string,
+  partCount: number
+): Promise<{ transactionId: string; presignedUrls: string[] }> => {
+  const s3Key = uuid()
+
+  const params = {
+    Bucket: FILE_STORAGE_BUCKET_NAME,
+    Key: s3Key,
+    ContentType: mimeType,
+  }
+
+  const { UploadId } = await s3.createMultipartUpload(params).promise()
+
+  if (!UploadId) throw new Error('no upload id')
+
+  const transactionId = jwtUtils.sign({
+    uploadId: UploadId,
+    s3Key,
+  })
+
+  const presignedUrlPromises = []
+  for (let partNumber = 1; partNumber <= partCount; partNumber++) {
+    presignedUrlPromises.push(
+      getPresignedPartUrl({ s3Key, uploadId: UploadId, partNumber })
+    )
+  }
+  const presignedUrls = await Promise.all(presignedUrlPromises)
+
+  return {
+    transactionId,
+    presignedUrls,
+  }
+}
+
+/**
+ * Complete the multipart upload.
+ * Returns the s3Key for the upload.
+ */
+const completeMultipartUpload = async ({
+  transactionId,
+  partCount,
+  etags,
+}: {
+  transactionId: string
+  partCount: number
+  etags: Array<string>
+}): Promise<string> => {
+  const parts = []
+  for (let i = 0; i < partCount; i++) {
+    parts.push({
+      ETag: etags[i],
+      PartNumber: i + 1,
+    })
+  }
+  const { s3Key, uploadId } = extractParamsFromJwt(transactionId) as {
+    s3Key: string
+    uploadId: string
+  }
+
+  const params = {
+    Bucket: FILE_STORAGE_BUCKET_NAME,
+    Key: s3Key,
+    MultipartUpload: {
+      Parts: parts,
+    },
+    UploadId: uploadId,
+  }
+
+  await s3.completeMultipartUpload(params).promise()
+  return s3Key
 }
 
 /**
@@ -203,13 +304,44 @@ const getRecordsFromCsv = (
   })
 }
 
-export const TemplateService = {
+/**
+ * Checks the csv for all the necessary columns.
+ * Transform the array of CSV rows into message interface
+ * @param campaignId
+ * @param fileContent
+ */
+const getProtectedRecordsFromCsv = (
+  campaignId: number,
+  fileContent: Array<CSVParams>
+): Array<ProtectedMessageRecordInterface> => {
+  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash', 'id']
+
+  checkTemplateKeysMatch(fileContent, PROTECTED_CSV_HEADERS)
+
+  return fileContent.map((entry) => {
+    const { recipient, payload, passwordhash, id } = entry
+    return {
+      campaignId,
+      id,
+      recipient,
+      payload,
+      passwordHash: passwordhash,
+    }
+  })
+}
+
+export const UploadService = {
+  /*** S3 API Calls ****/
   getUploadParameters,
-  extractS3Key,
+  extractParamsFromJwt,
+  startMultipartUpload,
+  completeMultipartUpload,
+  /**** Handle S3Key in DB *****/
   replaceCampaignS3Metadata,
   storeS3TempFilename,
   storeS3Error,
   deleteS3TempKeys,
   getCsvStatus,
   getRecordsFromCsv,
+  getProtectedRecordsFromCsv,
 }

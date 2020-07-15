@@ -251,7 +251,7 @@ const addToMessageLogs = async (
 }
 
 const hasInvalidEmailRecipient = (
-  records: MessageBulkInsertInterface[]
+  records: (MessageBulkInsertInterface | ProtectedMessageRecordInterface)[]
 ): boolean => {
   return records.some((record) => !validator.isEmail(record.recipient))
 }

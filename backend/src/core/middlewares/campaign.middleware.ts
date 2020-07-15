@@ -1,5 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
-import { CampaignService, TemplateService } from '@core/services'
+import { ChannelType } from '@core/constants'
+import {
+  CampaignService,
+  UploadService,
+  ProtectedService,
+} from '@core/services'
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -10,15 +15,18 @@ import { CampaignService, TemplateService } from '@core/services'
 const canEditCampaign = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  protect = false
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const [hasJob, csvStatus] = await Promise.all([
+    const [hasJob, csvStatus, isProtected] = await Promise.all([
       CampaignService.hasJobInProgress(+campaignId),
-      TemplateService.getCsvStatus(+campaignId),
+      UploadService.getCsvStatus(+campaignId),
+      ProtectedService.isProtectedCampaign(+campaignId),
     ])
-    if (!hasJob && !csvStatus?.isCsvProcessing) {
+    if (!hasJob && !csvStatus?.isCsvProcessing && (isProtected || !protect)) {
+      res.locals.isProtected = isProtected
       return next()
     } else {
       return res.sendStatus(403)
@@ -26,6 +34,20 @@ const canEditCampaign = async (
   } catch (err) {
     return next(err)
   }
+}
+
+/**
+ * Limit certain routes for protected campaigns only
+ * @param req
+ * @param res
+ * @param next
+ */
+const canEditProtectedCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  return canEditCampaign(req, res, next, true)
 }
 
 /**
@@ -40,18 +62,30 @@ const createCampaign = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const { name, type }: { name: string; type: string } = req.body
+    const {
+      name,
+      type,
+      protect,
+    }: { name: string; type: string; protect: boolean } = req.body
+
+    // Check that protected campaign can only be created for emails
+    if (protect && type !== ChannelType.Email) {
+      return res.sendStatus(403)
+    }
+
     const userId = req.session?.user?.id
     const campaign = await CampaignService.createCampaign({
       name,
       type,
       userId,
+      protect,
     })
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
       created_at: campaign.createdAt,
       type: campaign.type,
+      protect: campaign.protect,
     })
   } catch (err) {
     return next(err)
@@ -89,6 +123,7 @@ const listCampaigns = async (
 
 export const CampaignMiddleware = {
   canEditCampaign,
+  canEditProtectedCampaign,
   createCampaign,
   listCampaigns,
 }

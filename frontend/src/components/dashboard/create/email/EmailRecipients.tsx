@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
@@ -25,12 +25,20 @@ const EmailRecipients = ({
   numRecipients: initialNumRecipients,
   params,
   isProcessing: initialIsProcessing,
+  protect,
+  onFileSelected,
+  template,
+  forceReset,
   onNext,
 }: {
   csvFilename: string
   numRecipients: number
   params: Array<string>
   isProcessing: boolean
+  protect?: boolean
+  onFileSelected?: (campaignId: number, file: File) => Promise<any>
+  template?: string
+  forceReset?: boolean // this forces upload button to show without csv info and preview
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
 }) => {
   const [errorMessage, setErrorMessage] = useState(null)
@@ -44,8 +52,14 @@ const EmailRecipients = ({
   })
   const [preview, setPreview] = useState({} as EmailPreview)
   const { id: campaignId } = useParams()
-
   const { csvFilename, numRecipients = 0 } = csvInfo
+  const isMounted = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
 
   // Poll csv status
   useEffect(() => {
@@ -54,9 +68,16 @@ const EmailRecipients = ({
     let timeoutId: NodeJS.Timeout
     const pollStatus = async () => {
       try {
+        if (forceReset) {
+          setCsvInfo({})
+          return
+        }
         const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
           +campaignId
         )
+        // Prevent setting state if unmounted
+        if (!isMounted.current) return
+
         setIsCsvProcessing(isCsvProcessing)
         setCsvInfo(newCsvInfo)
         if (preview) {
@@ -75,7 +96,7 @@ const EmailRecipients = ({
     pollStatus()
 
     return () => clearTimeout(timeoutId)
-  }, [campaignId, isCsvProcessing])
+  }, [campaignId, forceReset, isCsvProcessing])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
@@ -94,18 +115,23 @@ const EmailRecipients = ({
         return
       }
       clearCsvStatus()
-      const tempCsvFilename = await uploadFileToS3(+campaignId, files[0])
+
+      await (onFileSelected || uploadFileToS3)(+campaignId, files[0])
 
       const uploadTimeEnd = performance.now()
       sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
 
+      // Prevent setting state if unmounted
+      if (!isMounted.current) {
+        return
+      }
+
       setIsCsvProcessing(true)
-      setCsvInfo((info) => ({ ...info, tempCsvFilename }))
+      setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
     } catch (err) {
       setErrorMessage(err.message)
-    } finally {
-      setIsUploading(false)
     }
+    setIsUploading(false)
   }
 
   // Hide csv error from previous upload and delete from db
@@ -118,15 +144,26 @@ const EmailRecipients = ({
 
   return (
     <>
-      <sub>Step 2</sub>
+      {!protect && <sub>Step 2</sub>}
       <h2>Upload recipient list in CSV format</h2>
       <p>
         Only CSV format files are allowed. If you have an Excel file, please
         convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
       </p>
       <p>
-        CSV file must include a <b>recipient</b> column with recipients&apos;
-        email addresses
+        CSV file must include:
+        <li>
+          a <b>recipient</b> column with recipients&apos; email addresses
+        </li>
+        {protect && (
+          <>
+            <li>
+              a <b>password</b> column with the password to access the protected
+              message
+            </li>
+            <li>all other keywords in the template</li>
+          </>
+        )}
       </p>
 
       <CsvUpload
@@ -134,9 +171,23 @@ const EmailRecipients = ({
         csvInfo={csvInfo}
         onErrorClose={clearCsvStatus}
       >
-        <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
-        <p>or</p>
-        <SampleCsv params={params} defaultRecipient="user@email.com" />
+        {/* Dont show upload button when upload completed for protected component */}
+        {(!protect || !numRecipients) && (
+          <>
+            <FileInput
+              isProcessing={isUploading}
+              onFileSelected={uploadFile}
+              disabled={protect && !template}
+            />
+            <p>or</p>
+            <SampleCsv
+              params={params}
+              protect={protect}
+              template={template}
+              defaultRecipient="user@email.com"
+            />
+          </>
+        )}
       </CsvUpload>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
@@ -154,11 +205,12 @@ const EmailRecipients = ({
           <div className="separator"></div>
         </>
       )}
-
-      <NextButton
-        disabled={!numRecipients || isCsvProcessing}
-        onClick={onNext}
-      />
+      {!protect && (
+        <NextButton
+          disabled={!numRecipients || isCsvProcessing}
+          onClick={onNext}
+        />
+      )}
     </>
   )
 }
