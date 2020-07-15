@@ -2,11 +2,7 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { parseEvent } from './parser'
 import sequelizeLoader from './sequelize-loader'
-import {
-  getBotTokenFromId,
-  verifyBotIdRegistered,
-  verifyBotToken,
-} from './credentials'
+import { verifyBotIdRegistered } from './credentials'
 import { handleUpdate } from './bot'
 
 let sequelize: Sequelize | undefined
@@ -18,12 +14,10 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
     }
 
     // Parse botToken and Telegram update
-    const { botId, botToken: unverifiedBotToken, update } = parseEvent(event)
+    const { botId, botToken, update } = parseEvent(event)
 
-    // Verify botId, fetch and verify bot token
+    // Verify botId
     await verifyBotIdRegistered(botId, sequelize)
-    const botToken = await getBotTokenFromId(botId)
-    verifyBotToken(unverifiedBotToken, botToken)
 
     // Handle update
     await handleUpdate(botId, botToken, update, sequelize)
