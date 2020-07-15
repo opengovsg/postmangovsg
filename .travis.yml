@@ -28,17 +28,6 @@ jobs:
           secret_access_key: $AWS_SECRET_ACCESS_KEY
           region: $AWS_DEFAULT_REGION
           app: "postmangovsg"
-          env: "postmangovsg-staging-telegram"
-          bucket_name: "postmangovsg-elasticbeanstalk-appversion"
-          on:
-            branch: $TELEGRAM_BRANCH
-        - provider: elasticbeanstalk
-          edge: true
-          skip_cleanup: true
-          access_key_id: $AWS_ACCESS_KEY_ID
-          secret_access_key: $AWS_SECRET_ACCESS_KEY
-          region: $AWS_DEFAULT_REGION
-          app: "postmangovsg"
           env: "postmangovsg-staging-40ffadb"
           bucket_name: "postmangovsg-elasticbeanstalk-appversion"
           on:
@@ -75,12 +64,6 @@ jobs:
           script: ./deploy.sh postmangovsg-workers prod-sending prod-logging
           on:
             branch: $PRODUCTION_BRANCH
-            condition: "$DEPLOY_WORKER = true"
-        - provider: script
-          skip_cleanup: true
-          script: ./deploy.sh postmangovsg-workers telegram-sending telegram-logging
-          on:
-            branch: $TELEGRAM_BRANCH
             condition: "$DEPLOY_WORKER = true"
     - name: frontend
       before_install:
