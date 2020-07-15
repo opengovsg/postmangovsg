@@ -40,7 +40,7 @@ export class TemplateClient {
     variables: Array<string>
     tokens: Array<string>
   } {
-    const variables: Array<string> = []
+    const variables: Set<string> = new Set()
     const tokens: Array<string> = []
 
     /**
@@ -102,7 +102,7 @@ export class TemplateClient {
           }
 
           // add key regardless, note that this is also returned in lowercase
-          variables.push(key)
+          variables.add(key)
 
           // if no params continue with the loop
           if (!params) return
@@ -128,7 +128,7 @@ export class TemplateClient {
         }
       })
       return {
-        variables,
+        variables: Array.from(variables), // variables are unique
         tokens,
       }
     } catch (err) {

@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import { keys, difference, uniq } from 'lodash'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
 export interface ProtectedCsvInfo {
   csvFilename: string
@@ -10,20 +10,7 @@ export interface ProtectedCsvInfo {
 
 export const PROTECTED_CSV_HEADERS = ['recipient', 'password']
 
-const protectedMailXssOptions = {
-  whiteList: {
-    b: [],
-    i: [],
-    u: [],
-    br: [],
-    p: [],
-    a: ['href', 'title', 'target'],
-    img: ['src', 'alt', 'title', 'width', 'height'],
-  },
-  stripIgnoreTag: true,
-}
-
-const templateClient = new TemplateClient(protectedMailXssOptions)
+const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
 
 export function extractParams(template: string): string[] {
   return templateClient.parseTemplate(template).variables

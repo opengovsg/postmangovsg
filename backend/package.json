@@ -65,8 +65,7 @@
     "twilio": "^3.42.1",
     "uuid": "^7.0.3",
     "winston": "^3.2.1",
-    "winston-cloudwatch": "^2.3.2",
-    "xss": "^1.0.6"
+    "winston-cloudwatch": "^2.3.2"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.30",

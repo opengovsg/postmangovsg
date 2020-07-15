@@ -1,7 +1,7 @@
 import url from 'url'
-import { uniq, difference } from 'lodash'
+import { difference } from 'lodash'
 import { Transaction } from 'sequelize'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -9,7 +9,7 @@ import { ProtectedMessage, Campaign } from '@core/models'
 
 const PROTECT_METHOD_VERSION = 1
 
-const templateClient = new TemplateClient()
+const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
 /**
  * Whether a campaign is protected or not
  */
@@ -70,17 +70,15 @@ const storeProtectedMessages = async (
 }
 /**
  * Verifies that the template for protected campaigns has the required and optional keywords.
- * The template should not contain any other keywords other than these.
  */
-const checkTemplateBody = (body: string): void => {
-  const { variables } = templateClient.parseTemplate(body)
+const checkTemplateVariables = (
+  template: string,
+  required: string[],
+  optional: string[]
+): void => {
+  const { variables } = templateClient.parseTemplate(template)
 
-  const unique = uniq(variables.map((v) => v.toLowerCase()))
-
-  const required = ['protectedlink']
-  const optional = ['recipient']
-
-  const missing = difference(required, unique)
+  const missing = difference(required, variables)
 
   // Makes sure that all the required keywords are inside the template
   if (missing.length !== 0) {
@@ -90,23 +88,11 @@ const checkTemplateBody = (body: string): void => {
   }
 
   const whitelist = [...required, ...optional]
-  const forbidden = difference(unique, whitelist)
+  const forbidden = difference(variables, whitelist)
   // Should only contain the whitelisted keywords
   if (forbidden.length > 0) {
     throw new Error(
       `Only these keywords are allowed: ${whitelist}.\nRemove the other keywords from the template: ${forbidden}`
-    )
-  }
-}
-
-/**
- * Ensures that subject does not have any keywords.
- */
-const checkTemplateSubject = (subject: string): void => {
-  const { variables } = templateClient.parseTemplate(subject)
-  if (variables.length !== 0) {
-    throw new Error(
-      `Subject should not contain any keywords. Currently contains ${variables}`
     )
   }
 }
@@ -129,8 +115,7 @@ const getProtectedMessage = async (
 
 export const ProtectedService = {
   isProtectedCampaign,
-  checkTemplateBody,
-  checkTemplateSubject,
+  checkTemplateVariables,
   storeProtectedMessages,
   getProtectedMessage,
 }
