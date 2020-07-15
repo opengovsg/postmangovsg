@@ -241,11 +241,6 @@ const addToMessageLogs = async (
       const batch = chunks[idx]
       await EmailMessage.bulkCreate(batch, {
         transaction,
-        logging: function (_message, benchmark) {
-          console.info(`BulkCreate Elapsed time: ${benchmark} ms`)
-        },
-        benchmark: true,
-        returning: false,
       })
     }
 
