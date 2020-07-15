@@ -27,8 +27,7 @@ const storeProtectedMessages = async (
   protectedMessages: ProtectedMessageRecordInterface[],
   transaction?: Transaction
 ): Promise<MessageBulkInsertInterface[]> => {
-  const frontendUrl = config.get('frontendUrl')
-  const protectedPath = config.get('protectedPath')
+  const protectedUrl = config.get('protectedUrl')
 
   try {
     // Delete existing rows
@@ -55,8 +54,8 @@ const storeProtectedMessages = async (
       params: {
         recipient,
         protectedlink: url.resolve(
-          frontendUrl,
-          `${protectedPath}/${PROTECT_METHOD_VERSION}/${id}`
+          protectedUrl,
+          `${PROTECT_METHOD_VERSION}/${id}`
         ),
       },
     }))
