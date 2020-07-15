@@ -8,12 +8,12 @@ import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
 import { PhoneNumberService } from '@core/services'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, XssTelegramOption } from 'postman-templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(config.get('xssOptions.telegram'), '\n')
+const client = new TemplateClient(XssTelegramOption, '\n')
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,

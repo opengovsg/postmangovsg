@@ -1,17 +1,16 @@
 import { difference, keys, chunk } from 'lodash'
 import { Transaction } from 'sequelize'
 
-import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, XssSmsOption } from 'postman-templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(config.get('xssOptions.sms'))
+const client = new TemplateClient(XssSmsOption)
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,

@@ -2,12 +2,11 @@ import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import map from 'lodash/map'
 import logger from '@core/logger'
-import config from '@core/config'
 import { CredentialService } from '@core/services/credential.service'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, XssSmsOption } from 'postman-templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 
-const templateClient = new TemplateClient(config.get('xssOptions.sms'))
+const templateClient = new TemplateClient(XssSmsOption)
 class SMS {
   private workerId: string
   private connection: Sequelize
