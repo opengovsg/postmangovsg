@@ -125,7 +125,7 @@ const CryptoTest = () => {
       </div>
       <h3>Time taken:</h3>
       {spinning ? (
-        <i className="spinner bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin"></i>
       ) : (
         <h4>{timeTaken}</h4>
       )}

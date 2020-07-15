@@ -62,7 +62,7 @@ async function chunkSize(file: File, template: string): Promise<number> {
         const templatedSize = hydrateTemplate(template, row).length
         const rowSize = Object.values(row).join(',').length
         const size = Math.ceil(
-          (MIN_UPLOAD_SIZE / templatedSize) * rowSize // convert bytes to chars
+          (MIN_UPLOAD_SIZE / templatedSize) * rowSize // taking 1 char as 1 byte
         )
         resolve(size)
       },

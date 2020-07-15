@@ -1,6 +1,7 @@
 export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
+  Telegram = 'TELEGRAM',
 }
 
 export enum JobStatus {
@@ -28,6 +29,7 @@ export enum MessageStatus {
  *       enum:
  *       - SMS
  *       - EMAIL
+ *       - TELEGRAM
  *
  *
  *     CampaignMeta:
@@ -45,6 +47,8 @@ export enum MessageStatus {
  *         valid:
  *           type: boolean
  *         halted:
+ *           type: boolean
+ *         protect:
  *           type: boolean
  *         type:
  *           $ref: '#/components/schemas/ChannelType'

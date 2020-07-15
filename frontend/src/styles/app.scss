@@ -73,6 +73,7 @@ h5 {
 a {
   font-size: 0.8rem;
   text-decoration: none;
+  cursor: pointer;
 }
 
 li,
@@ -145,12 +146,12 @@ table {
 
     td,
     th {
-      padding: 0.75rem 0;
+      padding: 0.75rem 0.25rem;
       display: flex;
 
       &.xs {
         flex: 1.2;
-        text-align: center;
+        justify-content: center;
       }
 
       &.sm {
@@ -169,9 +170,5 @@ table {
 }
 
 .spinner {
-  @include icon;
-  width: 3rem;
-  font-size: 3rem;
-  align-self: center;
-  margin: 2rem;
+  @include spinner;
 }

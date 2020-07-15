@@ -6,6 +6,7 @@ import {
   Status,
   SMSCampaign,
   EmailCampaign,
+  TelegramCampaign,
   CampaignInvalidRecipient,
 } from 'classes'
 import moment from 'moment'
@@ -102,7 +103,7 @@ export async function getCampaignStats(
 
 export async function getCampaignDetails(
   campaignId: number
-): Promise<EmailCampaign | SMSCampaign> {
+): Promise<EmailCampaign | SMSCampaign | TelegramCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
     const campaign = response.data
     const { sentAt } = getJobTimestamps(campaign.job_queue)
@@ -116,6 +117,8 @@ export async function getCampaignDetails(
         return new SMSCampaign(details)
       case ChannelType.Email:
         return new EmailCampaign(details)
+      case ChannelType.Telegram:
+        return new TelegramCampaign(details)
       default:
         throw new Error('Invalid channel type')
     }

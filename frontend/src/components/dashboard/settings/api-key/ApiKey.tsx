@@ -15,6 +15,7 @@ const RESET_COPY_TIMEOUT = 1000
 
 interface ApiKeyProps {
   hasApiKey: boolean
+  onGenerate?: Function
 }
 
 enum ApiKeyState {
@@ -24,7 +25,10 @@ enum ApiKeyState {
   REGENERATE = 'REGENERATE',
 }
 
-const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
+const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
+  hasApiKey,
+  onGenerate,
+}) => {
   const [apiKey, setApiKey] = useState('')
   const [errorMsg, setErrorMsg] = useState(null)
   const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(
@@ -87,6 +91,7 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
     } catch (e) {
       setErrorMsg(e.message)
     }
+    if (onGenerate) onGenerate()
   }
 
   let buttonLabel = ''
@@ -120,14 +125,11 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({ hasApiKey }) => {
   return (
     <>
       <h2>API Key</h2>
-      {(apiKeyState === ApiKeyState.COPY ||
-        apiKeyState === ApiKeyState.COPIED) && (
-        <p>
-          After generating your API key, please make a copy of it immediately as
-          it will only be shown once. Upon leaving or refreshing this page, the
-          key will be hidden.
-        </p>
-      )}
+      <p className={styles.helpText}>
+        After generating your API key, please make a copy of it immediately as
+        it will only be shown once. Upon leaving or refreshing this page, the
+        key will be hidden.
+      </p>
       <TextInputWithButton
         value={apiKey}
         onChange={() => {
