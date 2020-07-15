@@ -22,8 +22,16 @@ const verifyTemplate = async (
 
     const { subject, body } = req.body
 
-    ProtectedService.checkTemplateSubject(subject)
-    ProtectedService.checkTemplateBody(body)
+    ProtectedService.checkTemplateVariables(
+      subject,
+      [],
+      ['protectedlink', 'recipient']
+    )
+    ProtectedService.checkTemplateVariables(
+      body,
+      ['protectedlink'],
+      ['recipient']
+    )
 
     return next()
   } catch (err) {
