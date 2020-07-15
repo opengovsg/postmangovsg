@@ -1,0 +1,33 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.outer {
+  @include flex-center();
+  background-color: $light-blue;
+  width: 100vw;
+  min-height: 100vh;
+  overflow: auto;
+}
+
+.landingHero {
+  margin: 2rem 0;
+  width: 500px;
+  max-width: 70%;
+}
+
+.inner {
+  @include flex-center();
+  flex-direction: column;
+  max-width: $content-max-width;
+  background-color: white;
+  padding: 5vw;
+  margin: 2rem 0;
+  border-radius: $border-radius;
+  box-shadow: 0.2rem 0.2rem 1rem 0 lighten($light-grey, 20%);
+
+  @include mobile() {
+    min-height: 100vh;
+    border-radius: 0;
+    margin: 0;
+  }
+}

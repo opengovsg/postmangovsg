@@ -62,7 +62,7 @@ const CsvUpload = ({
   }
 
   return (
-    <>
+    <div className={styles.container}>
       {renderFileUploadInput()}
       <ErrorBlock onClose={onErrorClose}>
         {csvError && (
@@ -73,7 +73,7 @@ const CsvUpload = ({
           </>
         )}
       </ErrorBlock>
-    </>
+    </div>
   )
 }
 

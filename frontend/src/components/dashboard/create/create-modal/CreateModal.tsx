@@ -1,9 +1,9 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_SMS_CREDENTIALS_URL } from 'config'
+import { GUIDE_URL, GUIDE_SMS_CREDENTIALS_URL } from 'config'
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
@@ -23,12 +23,18 @@ const CreateModal = ({
   const history = useHistory()
   const [selectedChannel, setSelectedChannel] = useState(channelType)
   const [selectedName, setSelectedName] = useState(name)
+  const [protect, setProtected] = useState(false)
+
+  useEffect(() => {
+    setProtected(false)
+  }, [selectedChannel])
 
   async function handleCreateCampaign() {
     try {
       const campaign: Campaign = await createCampaign(
         selectedName,
-        selectedChannel
+        selectedChannel,
+        protect
       )
       // close modal and go to create view
       modalContext.setModalContent(null)
@@ -73,7 +79,7 @@ const CreateModal = ({
         </h5>
 
         <div className={styles.channelTypes}>
-          <div>
+          <div className={styles.channelContainer}>
             <PrimaryButton
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.SMS,
@@ -99,7 +105,7 @@ const CreateModal = ({
               </p>
             )}
           </div>
-          <div>
+          <div className={styles.channelContainer}>
             <PrimaryButton
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.Telegram,
@@ -117,7 +123,7 @@ const CreateModal = ({
             </PrimaryButton>
             {selectedChannel === ChannelType.Telegram && (
               <p className={styles.subtext}>
-                It is best to&nbsp;
+                It is best to
                 <a onClick={() => handleAddCredentials(ChannelType.Telegram)}>
                   store and validate your credentials
                 </a>
@@ -125,7 +131,7 @@ const CreateModal = ({
               </p>
             )}
           </div>
-          <div>
+          <div className={styles.channelContainer}>
             <PrimaryButton
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.Email,
@@ -141,6 +147,32 @@ const CreateModal = ({
                 )}
               ></i>
             </PrimaryButton>
+            {selectedChannel === ChannelType.Email && (
+              <div
+                className={styles.protectedOption}
+                onClick={() => setProtected(!protect)}
+              >
+                <i
+                  className={cx(
+                    'bx',
+                    styles.icon,
+                    { 'bx-checkbox': !protect },
+                    { 'bxs-checkbox-checked': protect }
+                  )}
+                ></i>
+                <p className={styles.subtext}>
+                  Password protected.
+                  {/* TODO: change url to passsword protected section in guide */}
+                  <OutboundLink
+                    eventLabel={GUIDE_URL}
+                    to={GUIDE_URL}
+                    target="_blank"
+                  >
+                    Learn more
+                  </OutboundLink>
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

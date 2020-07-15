@@ -176,6 +176,83 @@ export async function deleteCsvStatus(campaignId: number): Promise<void> {
   }
 }
 
+/*
+ * Start multi part upload.
+ * Returns the uploadId and s3Key, which is crucial for retrieving presigned url
+ */
+export async function beginMultipartUpload({
+  campaignId,
+  mimeType,
+  partCount,
+}: {
+  campaignId: number
+  mimeType: string
+  partCount: number
+}): Promise<{ transactionId: string; presignedUrls: string[] }> {
+  const response = await axios.get(
+    `/campaign/${campaignId}/protect/upload/start`,
+    {
+      params: {
+        mime_type: mimeType,
+        part_count: partCount,
+      },
+    }
+  )
+  const {
+    transaction_id: transactionId,
+    presigned_urls: presignedUrls,
+  } = response.data
+  return { transactionId, presignedUrls }
+}
+
+/*
+ * Upload an array buffer to the presigned url.
+ * Returns an etag that is essential to complete a multipart upload.
+ */
+export async function uploadPartWithPresignedUrl({
+  presignedUrl,
+  data,
+}: {
+  presignedUrl: string
+  data: string[]
+}): Promise<string> {
+  const contentType = 'text/csv'
+  const response = await axios.put(
+    presignedUrl,
+    new Blob(data, { type: contentType }),
+    {
+      withCredentials: false,
+      timeout: 0,
+    }
+  )
+  return response.headers.etag
+}
+
+export async function completeMultiPartUpload({
+  campaignId,
+  filename,
+  transactionId,
+  partCount,
+  etags,
+}: {
+  campaignId: number
+  filename: string
+  transactionId: string
+  partCount: number
+  etags: Array<string>
+}): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/protect/upload/complete`, {
+      filename,
+      transaction_id: transactionId,
+      part_count: partCount,
+      etags: etags,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error completing multipart upload')
+  }
+}
+
 function errorHandler(e: AxiosError, defaultMsg?: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {

@@ -48,6 +48,8 @@ export enum MessageStatus {
  *           type: boolean
  *         halted:
  *           type: boolean
+ *         protect:
+ *           type: boolean
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
  *         job_queue:

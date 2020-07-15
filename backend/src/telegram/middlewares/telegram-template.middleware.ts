@@ -10,7 +10,7 @@ import {
   UnexpectedDoubleQuoteError,
 } from '@core/errors'
 import { TemplateError } from 'postman-templating'
-import { CampaignService, TemplateService, StatsService } from '@core/services'
+import { CampaignService, UploadService, StatsService } from '@core/services'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
 import { Campaign } from '@core/models'
 
@@ -92,7 +92,7 @@ const updateCampaignAndMessages = async (
   try {
     transaction = await Campaign.sequelize?.transaction()
     // Updates metadata in project
-    await TemplateService.replaceCampaignS3Metadata(
+    await UploadService.replaceCampaignS3Metadata(
       campaignId,
       key,
       filename,
@@ -137,7 +137,7 @@ const uploadCompleteHandler = async (
 
     // extract s3Key from transactionId
     const { transaction_id: transactionId, filename } = req.body
-    const s3Key: string = TemplateService.extractS3Key(transactionId)
+    const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
     const telegramTemplate = await TelegramTemplateService.getFilledTemplate(
       +campaignId
@@ -149,7 +149,7 @@ const uploadCompleteHandler = async (
     const s3Client = new S3Client()
     const fileContent = await s3Client.getCsvFile(s3Key)
 
-    const records = TemplateService.getRecordsFromCsv(
+    const records = UploadService.getRecordsFromCsv(
       +campaignId,
       fileContent,
       telegramTemplate.params as string[]
@@ -167,7 +167,7 @@ const uploadCompleteHandler = async (
     )
 
     // Store temp filename
-    await TemplateService.storeS3TempFilename(+campaignId, filename)
+    await UploadService.storeS3TempFilename(+campaignId, filename)
 
     try {
       // Return early because bulk insert is slow
@@ -185,7 +185,7 @@ const uploadCompleteHandler = async (
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
       // Store error to return on poll
-      TemplateService.storeS3Error(+campaignId, err.message)
+      UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     const userErrors = [
@@ -217,7 +217,7 @@ const pollCsvStatusHandler = async (
       filename,
       tempFilename,
       error,
-    } = await TemplateService.getCsvStatus(+campaignId)
+    } = await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
     let numRecipients, preview
@@ -251,7 +251,7 @@ const deleteCsvErrorHandler = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    await TemplateService.deleteS3TempKeys(+campaignId)
+    await UploadService.deleteS3TempKeys(+campaignId)
     res.sendStatus(200)
   } catch (e) {
     next(e)

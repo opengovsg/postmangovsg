@@ -13,7 +13,7 @@ export enum Status {
 
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
-  [ChannelType.Email]: 'bx-envelope-open',
+  [ChannelType.Email]: 'bx-envelope',
   [ChannelType.Telegram]: 'bxl-telegram',
 }
 
@@ -26,6 +26,7 @@ export class Campaign {
   status: Status
   isCsvProcessing: boolean
   statusUpdatedAt: Date
+  protect: boolean
 
   constructor(input: any) {
     this.id = input['id']
@@ -38,6 +39,7 @@ export class Campaign {
     this.isCsvProcessing = input['is_csv_processing']
     this.sentAt = input['sentAt']
     this.statusUpdatedAt = input['statusUpdatedAt']
+    this.protect = input['protect']
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {
