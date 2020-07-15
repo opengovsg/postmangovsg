@@ -23,17 +23,22 @@ const parseCsv = async (
           .replace(/[\u200B-\u200D\uFEFF]/g, '')
         return lowercaseHeader
       },
-      chunk: (rows: ParseResult<CSVParams>) => {
-        const { data, meta, errors } = rows
-        if (meta.fields?.length > 0 && !meta.fields?.includes('recipient'))
-          reject(new RecipientColumnMissing())
-        if (errors[0]?.type === 'FieldMismatch')
-          // Ignore other parsing errors https://www.papaparse.com/docs#errors
-          reject(new UserError(errors[0].code, errors[0].message))
+      chunk: (rows: ParseResult<CSVParams>, parser: Papa.Parser) => {
+        try {
+          const { data, meta, errors } = rows
+          if (meta.fields?.length > 0 && !meta.fields?.includes('recipient'))
+            throw new RecipientColumnMissing()
+          if (errors[0]?.type === 'FieldMismatch')
+            // Ignore other parsing errors https://www.papaparse.com/docs#errors
+            throw new UserError(errors[0].code, errors[0].message)
 
-        data.forEach((row: any) => {
-          fileContents.set(row['recipient'], row as CSVParams) // Deduplication
-        })
+          data.forEach((row: any) => {
+            fileContents.set(row['recipient'], row as CSVParams) // Deduplication
+          })
+        } catch (error) {
+          reject(error)
+          parser.abort()
+        }
       },
       complete: () => {
         const results = Array.from(fileContents.values())
