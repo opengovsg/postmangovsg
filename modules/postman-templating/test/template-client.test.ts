@@ -1,7 +1,11 @@
 import { TemplateClient } from '../src/template-client'
 import { TemplateError } from '../src/errors'
 
-import { XSS_EMAIL_OPTION, XSS_SMS_OPTION, XSS_TELEGRAM_OPTION } from '../src/xss-options'
+import {
+  XSS_EMAIL_OPTION,
+  XSS_SMS_OPTION,
+  XSS_TELEGRAM_OPTION,
+} from '../src/xss-options'
 
 describe('template', () => {
   let templateClient: TemplateClient
@@ -110,10 +114,12 @@ describe('template', () => {
       })
     })
     describe('telegram', () => {
-
-      const client: TemplateClient = new TemplateClient(XSS_TELEGRAM_OPTION, '\n')
+      const client: TemplateClient = new TemplateClient(
+        XSS_TELEGRAM_OPTION,
+        '\n'
+      )
       test('Telegram should support b i u s strike del p code pre a', () => {
-        const body = 
+        const body =
           '<b>bold</b>' +
           '<i>italic</i>' +
           '<u>underline</u>' +
@@ -160,7 +166,13 @@ describe('replaceNewLinesAndSanitize', () => {
       const body = '<a href="{{protectedlink}}">link</a>'
       expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
     })
-    
+
+    test('Should strip if href contains keyword with prohibited values', () => {
+      const body = '<a href="fakemailto:{{recipient}}">link</a>'
+      const expected = '<a href>link</a>'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(expected)
+    })
+
     test('Should not sanitize keyword in a img src', () => {
       const body = '<img src="{{protectedimage}}">'
       expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
