@@ -7,8 +7,7 @@ import {
   HydrationError,
   RecipientColumnMissing,
   InvalidRecipientError,
-  UnexpectedDoubleQuoteError,
-  CSVNotFoundError,
+  UserError,
 } from '@core/errors'
 import { TemplateError } from 'postman-templating'
 import { CampaignService, UploadService, StatsService } from '@core/services'
@@ -190,11 +189,10 @@ const uploadCompleteHandler = async (
     }
   } catch (err) {
     const userErrors = [
+      UserError,
       RecipientColumnMissing,
       MissingTemplateKeysError,
       InvalidRecipientError,
-      UnexpectedDoubleQuoteError,
-      CSVNotFoundError,
     ]
 
     if (userErrors.some((errType) => err instanceof errType)) {

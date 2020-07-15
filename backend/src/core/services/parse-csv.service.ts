@@ -1,5 +1,5 @@
-import Papa, { ParseResult } from 'papaparse'
-import { RecipientColumnMissing } from '@core/errors/s3.errors'
+import Papa, { ParseResult, ParseError } from 'papaparse'
+import { RecipientColumnMissing, UserError } from '@core/errors/s3.errors'
 import logger from '@core/logger'
 import { CSVParams } from '@core/types'
 
@@ -24,9 +24,12 @@ const parseCsv = async (
         return lowercaseHeader
       },
       chunk: (rows: ParseResult<CSVParams>) => {
-        const { data, meta } = rows // Ignore parsing errors https://www.papaparse.com/docs#errors
+        const { data, meta, errors } = rows
         if (meta.fields?.length > 0 && !meta.fields?.includes('recipient'))
           reject(new RecipientColumnMissing())
+        if (errors[0]?.type === 'FieldMismatch')
+          // Ignore other parsing errors https://www.papaparse.com/docs#errors
+          reject(new UserError(errors[0].code, errors[0].message))
 
         data.forEach((row: any) => {
           fileContents.set(row['recipient'], row as CSVParams) // Deduplication
@@ -37,7 +40,7 @@ const parseCsv = async (
         logger.info({ message: 'Parsing complete' })
         resolve(results)
       },
-      error: (error) => {
+      error: (error: ParseError) => {
         reject(error)
       },
     })

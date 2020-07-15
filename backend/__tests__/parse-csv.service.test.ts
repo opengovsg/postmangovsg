@@ -1,8 +1,5 @@
 import { ParseCsvService } from '@core/services/parse-csv.service'
-import {
-  RecipientColumnMissing,
-  UnexpectedDoubleQuoteError,
-} from '@core/errors'
+import { RecipientColumnMissing, UserError } from '@core/errors'
 
 import { Readable } from 'stream'
 
@@ -103,9 +100,23 @@ describe('parse-csv', () => {
         [`New York City,40°42'46"N,74°00'21"W`, 'test@open.gov.sg'],
       ]
       const stream = await createStream(headers, values)
-      await expect(ParseCsvService.parseCsv(stream)).rejects.toThrow(
-        UnexpectedDoubleQuoteError
-      )
+      await expect(ParseCsvService.parseCsv(stream)).rejects.toThrow(UserError)
+    })
+
+    test('throws error when there are too many fields', async () => {
+      const headers = ['message', 'recipient', 'extrafield']
+      const values = [[`"hello, this is a test"`, 'test@open.gov.sg']]
+      const stream = await createStream(headers, values)
+      await expect(ParseCsvService.parseCsv(stream)).rejects.toThrow(UserError)
+    })
+
+    test('throws error when there are too few fields', async () => {
+      const headers = ['message', 'recipient']
+      const values = [
+        [`"hello, this is a test"`, 'test@open.gov.sg', 'extra value'],
+      ]
+      const stream = await createStream(headers, values)
+      await expect(ParseCsvService.parseCsv(stream)).rejects.toThrow(UserError)
     })
   })
 })
