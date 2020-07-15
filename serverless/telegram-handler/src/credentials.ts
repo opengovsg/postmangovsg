@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk'
 import { Sequelize } from 'sequelize-typescript'
+import crypto from 'crypto'
 
 import config from './config'
 import { Logger } from './utils/logger'
@@ -63,8 +64,15 @@ export const getBotTokenFromId = async (botId: string): Promise<string> => {
  * Compares two bot tokens and throws an error if they do not match.
  */
 export const verifyBotToken = (token1: string, token2: string): void => {
-  if (token1 !== token2) {
+  // `crypto#timingSafeEqual` throws an error if the input buffers are of different length
+  // and returns false if they are of the same length but different contents. Handle both cases.
+  try {
+    if (!crypto.timingSafeEqual(Buffer.from(token1), Buffer.from(token2))) {
+      throw new Error()
+    }
+
+    logger.log('Bot token verified')
+  } catch (err) {
     throw new Error('Bot token mismatch')
   }
-  logger.log('Bot token verified')
 }
