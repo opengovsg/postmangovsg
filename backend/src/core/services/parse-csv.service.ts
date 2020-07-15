@@ -60,15 +60,13 @@ const parseAndProcessCsv = async (
 ): Promise<void> => {
   let previewed = false
   let numRecords = 0
-  // Papa.LocalChunkSize = String(DEFAULT_CHUNK_SIZE)
-  // Papa.RemoteChunkSize = String(DEFAULT_CHUNK_SIZE)
+
   let buffer: CSVParams[] = []
   let approxRowSize = 0
   let batchSize = 0
   return new Promise((resolve, reject) => {
     console.time('parseAndProcessCsv')
     Papa.parse(readStream, {
-      // chunkSize: DEFAULT_CHUNK_SIZE,
       header: true,
       skipEmptyLines: true,
       transformHeader: (header: string) => {
