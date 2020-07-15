@@ -1,5 +1,5 @@
 import url from 'url'
-import { uniq, difference } from 'lodash'
+import { difference } from 'lodash'
 import { Transaction } from 'sequelize'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
@@ -75,12 +75,10 @@ const storeProtectedMessages = async (
 const checkTemplateBody = (body: string): void => {
   const { variables } = templateClient.parseTemplate(body)
 
-  const unique = uniq(variables.map((v) => v.toLowerCase()))
-
   const required = ['protectedlink']
   const optional = ['recipient']
 
-  const missing = difference(required, unique)
+  const missing = difference(required, variables)
 
   // Makes sure that all the required keywords are inside the template
   if (missing.length !== 0) {
@@ -90,7 +88,7 @@ const checkTemplateBody = (body: string): void => {
   }
 
   const whitelist = [...required, ...optional]
-  const forbidden = difference(unique, whitelist)
+  const forbidden = difference(variables, whitelist)
   // Should only contain the whitelisted keywords
   if (forbidden.length > 0) {
     throw new Error(

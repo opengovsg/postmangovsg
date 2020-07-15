@@ -62,6 +62,20 @@ describe('template', () => {
     })
   })
 
+  describe('parseTemplate variables', () => {
+    test('variables should be unique, lowercased and returned in order of appearance', () => {
+      const body = '{{ blah }} {{chip}}{{ BLAH}} {{chip}} {{F1sh}}'
+      const expected = ['blah', 'chip', 'f1sh']
+      expect(templateClient.parseTemplate(body).variables).toEqual(expected)
+    })
+
+    test('variables should return an empty array if no keywords', () => {
+      const body = 'fishpaste is good'
+      const expected: string[] = []
+      expect(templateClient.parseTemplate(body).variables).toEqual(expected)
+    })
+  })
+
   describe('xss', () => {
     describe('email', () => {
       const client: TemplateClient = new TemplateClient(XSS_EMAIL_OPTION)
