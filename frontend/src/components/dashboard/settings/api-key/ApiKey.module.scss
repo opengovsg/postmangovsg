@@ -12,3 +12,7 @@
 .redButton {
   @include button($red);
 }
+
+.helpText {
+  margin-bottom: 2rem;
+}

@@ -8,68 +8,66 @@
 
 .channelTypes {
   @include flex-horizontal;
+  align-items: flex-start;
   justify-content: space-between;
 
   @include mobile() {
     @include flex-vertical;
   }
 
-  .button {
-    @include flex-horizontal;
-    justify-content: space-between;
+  .channelContainer {
+    @include flex-vertical;
     flex: 1;
-    height: 4.5rem;
-    border: 1px solid $indigo-blue;
-    font-size: 1.3rem;
-    margin-right: 2rem;
+    margin-right: 1rem;
 
     &:last-child {
       margin-right: 0;
     }
 
-    &:not(.active) {
-      color: $indigo-blue;
-      background: $light-blue;
-
-      &:hover {
-        background: $indigo-blue;
-        color: white;
-      }
-    }
-
     @include mobile() {
       margin-right: 0;
       margin-bottom: 1rem;
-      padding: 1rem 1rem;
+    }
 
-      &:last-child {
+    .button {
+      @include flex-horizontal;
+      justify-content: space-between;
+      height: 4.5rem;
+      border: 1px solid $indigo-blue;
+      font-size: 1.3rem;
+
+      &:not(.active) {
+        color: $indigo-blue;
+        background: $light-blue;
+
+        &:hover {
+          background: $indigo-blue;
+          color: white;
+        }
+      }
+    }
+
+    .subtext {
+      @include mobile() {
+        margin-bottom: 1rem;
+      }
+    }
+    .protectedOption {
+      margin-top: 1rem;
+      display: flex;
+      cursor: pointer;
+      align-items: center;
+
+      .icon {
+        margin-right: 0.2rem;
+      }
+
+      .subtext {
+        user-select: none;
+        margin-top: 0;
         margin-bottom: 0;
       }
     }
-  }
-}
-
-.protectedOption {
-  height: 1.5rem;
-  width: 50%;
-  align-self: flex-end;
-  @include flex-horizontal;
-  margin-top: 1rem;
-  padding-left: 1rem;
-  cursor: pointer;
-
-  @include mobile() {
-    width: 100%;
-    padding-left: 0px;
-    align-self: stretch;
-  }
-
-  .icon {
-    margin-right: 0.2rem;
-  }
-
-  p {
-    margin: 0;
   }
 }
 
@@ -91,17 +89,17 @@
   font-size: 0.85rem;
   font-weight: normal;
   margin-top: 0;
-  margin-bottom: 1.25rem;
+  margin-bottom: 2.5rem;
 }
 
 .subtext {
   height: 1.5rem;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   margin-top: 1rem;
   margin-bottom: 0;
 
   a {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-style: italic;
     color: $dark-blue;
     line-height: 1.5rem;

@@ -88,8 +88,8 @@
   }
 }
 
-.validateSMSCredentialsInfo {
-  margin-bottom: 2rem;
+.validateCredentialsInfo {
+  margin-bottom: 2.5rem;
 }
 
 .newCredentialsButton {
@@ -103,4 +103,13 @@
 .editBtn {
   margin-right: 2rem;
   cursor: pointer;
+}
+
+.inputLabelHelpLink {
+  margin-left: 0.5rem;
+  font-weight: normal;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: $dark-blue;
+  text-decoration: underline;
 }

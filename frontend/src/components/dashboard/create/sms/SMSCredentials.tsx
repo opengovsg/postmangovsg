@@ -119,7 +119,7 @@ const SMSCredentials = ({
         <div className="separator"></div>
 
         <h2>Validate your credentials by doing a test send</h2>
-        <p className={styles.validateSMSCredentialsInfo}>
+        <p className={styles.validateCredentialsInfo}>
           To ensure your credentials are working perfectly, please send a test
           SMS to an available phone number to receive a preview of your message.
         </p>

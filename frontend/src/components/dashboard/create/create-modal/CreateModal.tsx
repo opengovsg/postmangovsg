@@ -3,18 +3,26 @@ import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_URL, GUIDE_CREDENTIALS_URL } from 'config'
-import { ChannelType, Campaign } from 'classes/Campaign'
+import { GUIDE_URL, GUIDE_SMS_CREDENTIALS_URL } from 'config'
+import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
-const CreateModal = () => {
+import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
+
+const CreateModal = ({
+  name = '',
+  channelType = ChannelType.SMS,
+}: {
+  name?: string
+  channelType?: ChannelType
+}) => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()
-  const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
-  const [name, setName] = useState('')
+  const [selectedChannel, setSelectedChannel] = useState(channelType)
+  const [selectedName, setSelectedName] = useState(name)
   const [protect, setProtected] = useState(false)
 
   useEffect(() => {
@@ -24,7 +32,7 @@ const CreateModal = () => {
   async function handleCreateCampaign() {
     try {
       const campaign: Campaign = await createCampaign(
-        name,
+        selectedName,
         selectedChannel,
         protect
       )
@@ -34,6 +42,18 @@ const CreateModal = () => {
     } catch (err) {
       console.error(err)
     }
+  }
+
+  function handleAddCredentials(channelType: ChannelType) {
+    const saved = (
+      <CreateModal name={selectedName} channelType={selectedChannel} />
+    )
+    modalContext.setModalContent(
+      <AddCredentialModal
+        credType={channelType}
+        onSuccess={() => modalContext.setModalContent(saved)}
+      ></AddCredentialModal>
+    )
   }
 
   return (
@@ -46,7 +66,8 @@ const CreateModal = () => {
         <TextInput
           className={styles.input}
           type="text"
-          onChange={setName}
+          value={selectedName}
+          onChange={setSelectedName}
         ></TextInput>
       </div>
       <div className={cx(styles.section, styles.separator)}>
@@ -58,65 +79,102 @@ const CreateModal = () => {
         </h5>
 
         <div className={styles.channelTypes}>
-          <PrimaryButton
-            className={cx(styles.button, {
-              [styles.active]: selectedChannel === ChannelType.SMS,
-            })}
-            onClick={() => setSelectedChannel(ChannelType.SMS)}
-          >
-            SMS
-            <i className={cx('bx', styles.icon, 'bx-message-detail')}></i>
-          </PrimaryButton>
-          <PrimaryButton
-            className={cx(styles.button, {
-              [styles.active]: selectedChannel === ChannelType.Email,
-            })}
-            onClick={() => setSelectedChannel(ChannelType.Email)}
-          >
-            Email
-            <i className={cx('bx', styles.icon, 'bx-envelope-open')}></i>
-          </PrimaryButton>
-        </div>
-
-        {selectedChannel === ChannelType.Email && (
-          <div
-            className={styles.protectedOption}
-            onClick={() => setProtected(!protect)}
-          >
-            <i
-              className={cx(
-                'bx',
-                styles.icon,
-                { 'bx-checkbox': !protect },
-                { 'bxs-checkbox-checked': protect }
-              )}
-            ></i>
-            <p className={styles.subtext}>
-              Password protected.
-              {/* TODO: change url to passsword protected section in guide */}
-              <OutboundLink
-                eventLabel={GUIDE_URL}
-                to={GUIDE_URL}
-                target="_blank"
-              >
-                Learn more
-              </OutboundLink>
-            </p>
-          </div>
-        )}
-
-        {selectedChannel === ChannelType.SMS && (
-          <p className={styles.subtext}>
-            Get your credentials ready.
-            <OutboundLink
-              eventLabel={GUIDE_CREDENTIALS_URL}
-              to={GUIDE_CREDENTIALS_URL}
-              target="_blank"
+          <div className={styles.channelContainer}>
+            <PrimaryButton
+              className={cx(styles.button, {
+                [styles.active]: selectedChannel === ChannelType.SMS,
+              })}
+              onClick={() => setSelectedChannel(ChannelType.SMS)}
             >
-              What is this?
-            </OutboundLink>
-          </p>
-        )}
+              SMS
+              <i
+                className={cx('bx', styles.icon, channelIcons[ChannelType.SMS])}
+              ></i>
+            </PrimaryButton>
+
+            {selectedChannel === ChannelType.SMS && (
+              <p className={styles.subtext}>
+                Get your credentials ready.&nbsp;
+                <OutboundLink
+                  eventLabel={GUIDE_SMS_CREDENTIALS_URL}
+                  to={GUIDE_SMS_CREDENTIALS_URL}
+                  target="_blank"
+                >
+                  What is this?
+                </OutboundLink>
+              </p>
+            )}
+          </div>
+          <div className={styles.channelContainer}>
+            <PrimaryButton
+              className={cx(styles.button, {
+                [styles.active]: selectedChannel === ChannelType.Telegram,
+              })}
+              onClick={() => setSelectedChannel(ChannelType.Telegram)}
+            >
+              Telegram
+              <i
+                className={cx(
+                  'bx',
+                  styles.icon,
+                  channelIcons[ChannelType.Telegram]
+                )}
+              ></i>
+            </PrimaryButton>
+            {selectedChannel === ChannelType.Telegram && (
+              <p className={styles.subtext}>
+                It is best to
+                <a onClick={() => handleAddCredentials(ChannelType.Telegram)}>
+                  store and validate your credentials
+                </a>
+                &nbsp;before you start.
+              </p>
+            )}
+          </div>
+          <div className={styles.channelContainer}>
+            <PrimaryButton
+              className={cx(styles.button, {
+                [styles.active]: selectedChannel === ChannelType.Email,
+              })}
+              onClick={() => setSelectedChannel(ChannelType.Email)}
+            >
+              Email
+              <i
+                className={cx(
+                  'bx',
+                  styles.icon,
+                  channelIcons[ChannelType.Email]
+                )}
+              ></i>
+            </PrimaryButton>
+            {selectedChannel === ChannelType.Email && (
+              <div
+                className={styles.protectedOption}
+                onClick={() => setProtected(!protect)}
+              >
+                <i
+                  className={cx(
+                    'bx',
+                    styles.icon,
+                    { 'bx-checkbox': !protect },
+                    { 'bxs-checkbox-checked': protect }
+                  )}
+                ></i>
+                <p className={styles.subtext}>
+                  Password protected.
+                  {/* TODO: change url to passsword protected section in guide */}
+                  <OutboundLink
+                    eventLabel={GUIDE_URL}
+                    to={GUIDE_URL}
+                    target="_blank"
+                  >
+                    Learn more
+                  </OutboundLink>
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="separator"></div>
@@ -124,7 +182,7 @@ const CreateModal = () => {
         <PrimaryButton
           className={styles.bottomButton}
           onClick={handleCreateCampaign}
-          disabled={!name}
+          disabled={!selectedName}
         >
           Create campaign
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>

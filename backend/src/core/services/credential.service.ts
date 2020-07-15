@@ -13,16 +13,49 @@ import { UserSettings } from '@core/interfaces'
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 
 /**
- * Checks if the credential has been saved
+ * Upserts credential into AWS SecretsManager
  * @param name
+ * @param secret
+ * @throws error if update fails
  */
-const isExistingCredential = async (name: string): Promise<boolean> => {
-  const result = await Credential.findOne({
-    where: {
-      name: name,
-    },
-  })
-  return !!result
+const upsertCredential = async (
+  name: string,
+  secret: string
+): Promise<void> => {
+  // If credential doesn't exist, upload credential to secret manager, unless in development
+  if (!config.get('IS_PROD') && !config.get('aws.awsEndpoint')) {
+    logger.info(
+      `Dev env - skip storing credential in AWS secrets manager for name=${name}`
+    )
+    return
+  }
+
+  try {
+    logger.info(`Updating credential in AWS secrets manager for name=${name}`)
+    await secretsManager
+      .putSecretValue({
+        SecretId: name,
+        SecretString: secret,
+      })
+      .promise()
+    logger.info(
+      `Successfully updated credential in AWS secrets manager for name=${name}`
+    )
+  } catch (err) {
+    if (err.name === 'ResourceNotFoundException') {
+      logger.info('Storing credential in AWS secrets manager')
+      await secretsManager
+        .createSecret({
+          Name: name,
+          SecretString: secret,
+        })
+        .promise()
+      logger.info('Successfully stored credential in AWS secrets manager')
+    } else {
+      throw err
+    }
+  }
+  return
 }
 
 /**
@@ -31,26 +64,10 @@ const isExistingCredential = async (name: string): Promise<boolean> => {
  * @param secret
  */
 const storeCredential = async (name: string, secret: string): Promise<void> => {
-  // If credential exists, no need to store it again
-  if (await isExistingCredential(name)) {
-    return
-  }
-
-  // If credential doesn't exist, upload credential to secret manager, unless in development
-  if (!config.get('IS_PROD') && !config.get('aws.awsEndpoint')) {
-    logger.info(
-      `Dev env - skip storing credential in AWS secrets manager for name=${name}`
-    )
-  } else {
-    const params = {
-      Name: name,
-      SecretString: secret,
-    }
-    logger.info('Storing credential in AWS secrets manager')
-    await secretsManager.createSecret(params).promise()
-    logger.info('Successfully stored credential in AWS secrets manager')
-  }
-
+  // If adding a credential to secrets manager throws an error, db will not be updated
+  // If adding a credential to secrets manager succeeds, but the db call fails, it is ok because the credential will not be associated with a campaign
+  // It results in orphan secrets manager credentials, which is acceptable.
+  await upsertCredential(name, secret)
   logger.info('Storing credential in DB')
   await Credential.findCreateFind({
     where: { name },
@@ -78,6 +95,24 @@ const getTwilioCredentials = async (
   if (!secretString)
     throw new Error('Missing secret string from AWS secrets manager.')
   return JSON.parse(secretString)
+}
+
+/**
+ * Retrieve Telegram credentials from secrets manager
+ * @param name
+ */
+const getTelegramCredential = async (name: string): Promise<string> => {
+  if (!config.get('IS_PROD')) {
+    logger.info(
+      `Dev env - getTelegramCredential - returning default credentials set in env var`
+    )
+    return config.get('telegramOptions.telegramBotToken')
+  }
+  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
+  const secretString = get(data, 'SecretString', '')
+  if (!secretString)
+    throw new Error('Missing secret string from AWS secrets manager.')
+  return secretString
 }
 
 /**
@@ -154,6 +189,23 @@ const getSmsUserCredentialLabels = async (
 }
 
 /**
+ * Gets only the telegram credential labels for that user
+ * @param userId
+ */
+const getTelegramUserCredentialLabels = async (
+  userId: number
+): Promise<string[]> => {
+  const creds = await UserCredential.findAll({
+    where: {
+      type: ChannelType.Telegram,
+      userId: userId,
+    },
+    attributes: ['label'],
+  })
+  return creds.map((c) => c.label)
+}
+
+/**
  * Gets api keys and credential labels for that user
  * @param userId
  */
@@ -196,14 +248,15 @@ const regenerateApiKey = async (userId: number): Promise<string> => {
 
 export const CredentialService = {
   // Credentials (cred_name)
-  isExistingCredential,
   storeCredential,
   getTwilioCredentials,
+  getTelegramCredential,
   // User credentials (user - label - cred_name)
   createUserCredential,
   deleteUserCredential,
   getUserCredential,
   getSmsUserCredentialLabels,
+  getTelegramUserCredentialLabels,
   getUserSettings,
   // Api Key
   regenerateApiKey,

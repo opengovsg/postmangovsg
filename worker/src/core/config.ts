@@ -5,6 +5,7 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
+import xss from 'xss'
 
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 
@@ -169,6 +170,12 @@ const config = convict({
       sensitive: true,
     },
   },
+  telegramBotToken: {
+    doc: 'API key required to make use of Telegram APIs',
+    default: '',
+    env: 'TELEGRAM_BOT_TOKEN',
+    sensitive: true,
+  },
   callbackSecret: {
     doc: 'Secret key used to generate Twilio callback url',
     default: '',
@@ -198,6 +205,32 @@ const config = convict({
       },
       sms: {
         whiteList: { br: [] },
+        stripIgnoreTag: true,
+      },
+      telegram: {
+        whiteList: {
+          b: [],
+          i: [],
+          u: [],
+          s: [],
+          strike: [],
+          del: [],
+          p: [],
+          code: ['class'],
+          pre: [],
+          a: ['href'],
+        },
+        safeAttrValue: (
+          tag: string,
+          name: string,
+          value: string
+        ): string | void => {
+          // Handle Telegram mention as xss-js does not recognize it as a valid url.
+          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+            return value
+          }
+          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
+        },
         stripIgnoreTag: true,
       },
     },
@@ -248,10 +281,8 @@ if (config.get('IS_PROD')) {
       config.get('messageWorker.numLogger') !==
     1
   ) {
-    throw new Error(`Only 1 worker of 1 variant per task supported in production. 
-    You supplied MESSAGE_WORKER_SENDER=${config.get(
-      'messageWorker.numSender'
-    )}, 
+    throw new Error(`Only 1 worker of 1 variant per task supported in production.
+    You supplied MESSAGE_WORKER_SENDER=${config.get('messageWorker.numSender')},
     MESSAGE_WORKER_LOGGER=${config.get('messageWorker.numLogger')}`)
   }
 
