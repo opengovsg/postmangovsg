@@ -185,7 +185,10 @@ const TelegramCredentials = ({
                     Validating<i className="bx bx-loader-alt bx-spin"></i>
                   </>
                 ) : (
-                  'Validate credentials →'
+                  <>
+                    Validate credentials{' '}
+                    <i className="bx bx-right-arrow-alt"></i>
+                  </>
                 )}
               </PrimaryButton>
             </div>
@@ -212,7 +215,9 @@ const TelegramCredentials = ({
                     Validating<i className="bx bx-loader-alt bx-spin"></i>
                   </>
                 ) : (
-                  'Select credentials →'
+                  <>
+                    Select credentials <i className="bx bx-right-arrow-alt"></i>
+                  </>
                 )}
               </PrimaryButton>
             </div>

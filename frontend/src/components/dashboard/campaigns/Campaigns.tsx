@@ -151,7 +151,7 @@ const Campaigns = () => {
         <h5>To get you started, we have prepared a guide for your reference</h5>
         <OutboundLink eventLabel={GUIDE_URL} to={GUIDE_URL} target="_blank">
           <PrimaryButton className={styles.darkBlueButton}>
-            Learn how to set up →
+            Learn how to set up <i className="bx bx-right-arrow-alt"></i>
           </PrimaryButton>
         </OutboundLink>
         <h5>Or you can begin creating your campaign here</h5>
