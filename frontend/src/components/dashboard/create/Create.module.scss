@@ -104,3 +104,18 @@
   color: $dark-blue;
   text-decoration: underline;
 }
+
+.twilioCredentialsInput {
+  h5 {
+    display: inline-block;
+    margin-right: 0.6rem;
+  }
+
+  a {
+    font-size: 1rem;
+
+    &:visited {
+      color: $dark-blue;
+    }
+  }
+}
