@@ -12,7 +12,7 @@ export enum Status {
 
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
-  [ChannelType.Email]: 'bx-envelope-open',
+  [ChannelType.Email]: 'bx-envelope',
 }
 
 export class Campaign {
