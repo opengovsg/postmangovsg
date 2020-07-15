@@ -661,7 +661,8 @@ router.get('/export', EmailStatsMiddleware.getFailedRecipients)
 router.get(
   '/protect/upload/start',
   celebrate(startMultipartValidator),
-  CampaignMiddleware.canEditProtectedCampaign,
+  CampaignMiddleware.canEditCampaign,
+  ProtectedMiddleware.isProtectedCampaign,
   UploadMiddleware.startMultipartUpload
 )
 
@@ -718,7 +719,8 @@ router.get(
 router.post(
   '/protect/upload/complete',
   celebrate(completeMultipartValidator),
-  CampaignMiddleware.canEditProtectedCampaign,
+  CampaignMiddleware.canEditCampaign,
+  ProtectedMiddleware.isProtectedCampaign,
   UploadMiddleware.completeMultipart,
   EmailTemplateMiddleware.uploadProtectedCompleteHandler
 )

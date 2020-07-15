@@ -1,10 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
-import {
-  CampaignService,
-  UploadService,
-  ProtectedService,
-} from '@core/services'
+import { CampaignService, UploadService } from '@core/services'
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -15,39 +11,21 @@ import {
 const canEditCampaign = async (
   req: Request,
   res: Response,
-  next: NextFunction,
-  protect = false
+  next: NextFunction
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const [hasJob, csvStatus, isProtected] = await Promise.all([
+    const [hasJob, csvStatus] = await Promise.all([
       CampaignService.hasJobInProgress(+campaignId),
       UploadService.getCsvStatus(+campaignId),
-      ProtectedService.isProtectedCampaign(+campaignId),
     ])
-    if (!hasJob && !csvStatus?.isCsvProcessing && (isProtected || !protect)) {
-      res.locals.isProtected = isProtected
+    if (!hasJob && !csvStatus?.isCsvProcessing) {
       return next()
-    } else {
-      return res.sendStatus(403)
     }
+    return res.sendStatus(403)
   } catch (err) {
     return next(err)
   }
-}
-
-/**
- * Limit certain routes for protected campaigns only
- * @param req
- * @param res
- * @param next
- */
-const canEditProtectedCampaign = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  return canEditCampaign(req, res, next, true)
 }
 
 /**
@@ -123,7 +101,6 @@ const listCampaigns = async (
 
 export const CampaignMiddleware = {
   canEditCampaign,
-  canEditProtectedCampaign,
   createCampaign,
   listCampaigns,
 }
