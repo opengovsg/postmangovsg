@@ -1,6 +1,6 @@
 import url from 'url'
 import { Transaction } from 'sequelize'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -8,7 +8,7 @@ import { ProtectedMessage, Campaign } from '@core/models'
 
 const PROTECT_METHOD_VERSION = 1
 
-const templateClient = new TemplateClient()
+const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
 /**
  * Whether a campaign is protected or not
  */
