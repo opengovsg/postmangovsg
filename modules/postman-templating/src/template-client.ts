@@ -94,7 +94,7 @@ export class TemplateClient {
           }
 
           // only allow alphanumeric, underscore template, prevents code execution
-          const keyHasValidChars = key.match(/[^a-zA-Z0-9\_]/) === null
+          const keyHasValidChars = key.match(/\W/) === null
           if (!keyHasValidChars) {
             throw new TemplateError(
               `Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person-Name }} are not allowed, but {{ Person_Name }} is allowed.`
