@@ -6,6 +6,7 @@ import {
   RecipientColumnMissing,
   InvalidRecipientError,
   UnexpectedDoubleQuoteError,
+  CSVNotFoundError,
 } from '@core/errors'
 
 import { TemplateError } from 'postman-templating'
@@ -197,6 +198,7 @@ const uploadCompleteHandler = async (
       MissingTemplateKeysError,
       InvalidRecipientError,
       UnexpectedDoubleQuoteError,
+      CSVNotFoundError,
     ]
 
     if (userErrors.some((errType) => err instanceof errType)) {

@@ -6,6 +6,7 @@ import { configureEndpoint } from '@core/utils/aws-endpoint'
 
 import { CSVParams } from '@core/types'
 import { ParseCsvService } from '@core/services'
+import { CSVNotFoundError } from '@core/errors'
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
@@ -36,7 +37,7 @@ export default class S3Client {
    * @param s3Key
    */
   async getCsvFile(s3Key: string): Promise<Array<CSVParams>> {
-    return await retry(
+    return retry(
       async (bail) => {
         try {
           const downloadStream = this.download(s3Key)
@@ -47,11 +48,11 @@ export default class S3Client {
             bail(e)
             return []
           }
-          throw e
+          throw new CSVNotFoundError()
         }
       },
       {
-        retries: 5,
+        retries: 3,
         minTimeout: 1000,
         maxTimeout: 3 * 1000,
         factor: 1,
