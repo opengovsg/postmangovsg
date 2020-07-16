@@ -9,5 +9,5 @@
  */
 export const generatePadding = (): string => {
   const padLength = Math.round(Math.random() * 100)
-  return ' '.repeat(padLength)
+  return '​'.repeat(padLength)
 }
