@@ -151,7 +151,6 @@ table {
 
       &.xs {
         flex: 1.2;
-        justify-content: center;
       }
 
       &.sm {
@@ -164,6 +163,10 @@ table {
 
       &.lg {
         flex: 4;
+      }
+
+      &.center {
+        justify-content: center;
       }
     }
   }

@@ -72,7 +72,7 @@ const Campaigns = () => {
           )}
         </div>
       ),
-      width: 'xs',
+      width: 'xs center',
     },
     {
       name: 'Name',
@@ -102,7 +102,7 @@ const Campaigns = () => {
       width: 'xs',
     },
     {
-      name: 'Export',
+      name: 'Export Error List',
       render: (campaign: Campaign) => {
         const { status, statusUpdatedAt, hasFailedRecipients } = campaign
         return (
@@ -117,7 +117,7 @@ const Campaigns = () => {
           )
         )
       },
-      width: 'xs',
+      width: 'md center',
     },
   ]
   /* eslint-enable react/display-name */
