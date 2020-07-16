@@ -185,6 +185,7 @@ const EmailRecipients = ({
               protect={protect}
               template={template}
               defaultRecipient="user@email.com"
+              setErrorMsg={setErrorMessage}
             />
           </>
         )}
