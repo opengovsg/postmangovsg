@@ -93,11 +93,11 @@ export class TemplateClient {
             )
           }
 
-          // only allow alphanumeric template, prevents code execution
-          const keyHasValidChars = key.match(/[^a-zA-Z0-9]/) === null
+          // only allow alphanumeric, underscore template, prevents code execution
+          const keyHasValidChars = key.match(/[^a-zA-Z0-9\_]/) === null
           if (!keyHasValidChars) {
             throw new TemplateError(
-              `Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters and numbers.\nKeywords like {{ Person_Name }} are not allowed, but {{ PersonName }} is allowed.`
+              `Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person-Name }} are not allowed, but {{ Person_Name }} is allowed.`
             )
           }
 
@@ -139,7 +139,7 @@ export class TemplateClient {
         )
       if (err.message.includes('unclosed string'))
         throw new TemplateError(
-          "Check that the keywords only contain letters and numbers.\nKeywords like {{ Person's Name }} are not allowed, but {{ PersonsName }} is allowed."
+          "Check that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person's Name }} are not allowed, but {{ Person_Name }} is allowed."
         )
       if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
       throw err
