@@ -1,14 +1,10 @@
-import AWS from 'aws-sdk'
 import { Sequelize } from 'sequelize-typescript'
+import Telegraf from 'telegraf'
+import { TelegrafContext } from 'telegraf/typings/context'
 
-import config from './config'
 import { Logger } from './utils/logger'
 
 const logger = new Logger('credentials')
-
-const secretsManager = new AWS.SecretsManager({
-  region: config.get('aws.awsRegion'),
-})
 
 /**
  * Verifies that the given bot id is registered, otherwise throws an error.
@@ -17,7 +13,7 @@ export const verifyBotIdRegistered = async (
   botId: string,
   sequelize: Sequelize
 ): Promise<void> => {
-  const { exists: botIdExists } = await sequelize.query(
+  const botIdExists = await sequelize.query(
     `SELECT 1 AS exists FROM credentials WHERE name = :botId;`,
     {
       replacements: {
@@ -32,29 +28,15 @@ export const verifyBotIdRegistered = async (
 }
 
 /**
- * Fetches a bot token for the given bot id.
- *
- * In development, this returns the configured `DEV_SERVER_BOT_TOKEN` env var.
- * Otherwise, the bot token is fetched from AWS Secrets Manager.
+ * Verifies that a bot token is valid and not revoked by calling Telegram's `getMe` endpoint.
  */
-export const getBotTokenFromId = async (botId: string): Promise<string> => {
-  if (config.get('env') === 'development') {
-    logger.log('Dev env - returning DEV_SERVER_BOT_TOKEN')
-
-    const { botToken } = config.get('devServer')
-    return botToken
+export const verifyBotToken = async (
+  bot: Telegraf<TelegrafContext>
+): Promise<void> => {
+  try {
+    await bot.telegram.getMe()
+    logger.log('Bot token verified.')
+  } catch (err) {
+    throw new Error('Bot token invalid.')
   }
-
-  logger.log('Getting bot token from Secrets Manager')
-  const data = await secretsManager
-    .getSecretValue({
-      SecretId: botId,
-    })
-    .promise()
-  logger.log('Gotten bot token from Secrets Manager')
-
-  const botToken = data.SecretString
-  if (!botToken) throw new Error('Bot token missing in Secrets manager')
-
-  return botToken
 }

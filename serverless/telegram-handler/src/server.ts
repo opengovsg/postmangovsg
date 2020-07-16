@@ -14,7 +14,7 @@ if (!TOKEN) {
 const app = express()
 app.use(express.json())
 
-app.post('/:botId', async (req, res) => {
+app.post('/:botToken', async (req, res) => {
   const event = {
     body: JSON.stringify(req.body), // simulate Lambda's stringified body
     pathParameters: req.params,
