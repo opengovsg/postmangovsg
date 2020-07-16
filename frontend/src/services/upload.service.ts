@@ -189,20 +189,24 @@ export async function beginMultipartUpload({
   mimeType: string
   partCount: number
 }): Promise<{ transactionId: string; presignedUrls: string[] }> {
-  const response = await axios.get(
-    `/campaign/${campaignId}/protect/upload/start`,
-    {
-      params: {
-        mime_type: mimeType,
-        part_count: partCount,
-      },
-    }
-  )
-  const {
-    transaction_id: transactionId,
-    presigned_urls: presignedUrls,
-  } = response.data
-  return { transactionId, presignedUrls }
+  try {
+    const response = await axios.get(
+      `/campaign/${campaignId}/protect/upload/start`,
+      {
+        params: {
+          mime_type: mimeType,
+          part_count: partCount,
+        },
+      }
+    )
+    const {
+      transaction_id: transactionId,
+      presigned_urls: presignedUrls,
+    } = response.data
+    return { transactionId, presignedUrls }
+  } catch (e) {
+    errorHandler(e, 'Failed to begin multipart upload.')
+  }
 }
 
 /*
