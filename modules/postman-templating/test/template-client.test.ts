@@ -30,6 +30,13 @@ describe('template', () => {
       const body = 'Hello {{name}}'
       expect(templateClient.template(body, params)).toEqual('Hello ')
     })
+
+    test('supports underscore in keyword', () => {
+      const params = {postal_cd: '123456'}
+      const body = 'Your postal code: {{postal_cd}}'
+      expect(templateClient.template(body, params))
+        .toEqual('Your postal code: 123456')
+    })
   })
 
   describe('parsing errors', () => {
