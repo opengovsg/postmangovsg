@@ -117,20 +117,23 @@ export async function protectAndUploadCsv(
           etags.push(etag)
         } catch (e) {
           reject(e)
+          parser.abort()
         }
 
         parser.resume()
       },
-      complete: async function () {
+      complete: async function (results) {
         try {
-          await completeMultiPartUpload({
-            campaignId,
-            filename: file.name,
-            transactionId,
-            partCount: partNumber,
-            etags,
-          })
-          resolve()
+          if (!results.meta?.aborted) {
+            await completeMultiPartUpload({
+              campaignId,
+              filename: file.name,
+              transactionId,
+              partCount: partNumber,
+              etags,
+            })
+            resolve()
+          }
         } catch (e) {
           reject(e)
         }
