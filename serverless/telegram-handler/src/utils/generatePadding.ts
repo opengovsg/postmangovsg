@@ -5,9 +5,12 @@
  * continue hiding the custom keyboard sent with subsequent messages if there are no changes
  * detected in the button labels. A random-length whitespace string is padded to the button labels
  * to force clients to always show the custom keyboard. This has no visible effect to users because
- * Telegram trims whitespace before it reaches the user.
+ * we use a zero-width space character to form the string.
  */
 export const generatePadding = (): string => {
+  // This is a zero-width space character, unicode U+200B
+  const SPACE_CHARACTER = '​'
+
   const padLength = Math.round(Math.random() * 100)
-  return '​'.repeat(padLength)
+  return SPACE_CHARACTER.repeat(padLength)
 }
