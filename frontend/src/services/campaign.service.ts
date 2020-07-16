@@ -13,6 +13,12 @@ import moment from 'moment'
 
 const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
 
+export enum CampaignExportStatus {
+  Loading = 'Loading',
+  Ready = 'Ready',
+  NoError = 'No Error',
+}
+
 function getJobTimestamps(
   jobs: Array<{ sent_at: Date; status_updated_at: Date }>
 ): { sentAt: Date; statusUpdatedAt: Date } {
@@ -22,22 +28,19 @@ function getJobTimestamps(
   return { sentAt: jobsSentAt[0], statusUpdatedAt: jobsUpdatedAt[0] }
 }
 
-export function hasExportButton(
-  status: Status,
+export function getExportStatus(
   updatedAt: Date,
   failedCount: number
-): boolean {
-  if (status !== Status.Sent) {
-    return false
-  }
-
+): CampaignExportStatus {
   const updatedAtTimestamp = +new Date(updatedAt)
   const campaignAge = Date.now() - updatedAtTimestamp
   if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {
-    return false
+    return CampaignExportStatus.Loading
   }
 
   return failedCount > 0
+    ? CampaignExportStatus.Ready
+    : CampaignExportStatus.NoError
 }
 
 export async function getCampaigns(params: {

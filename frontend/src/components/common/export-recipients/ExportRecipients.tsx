@@ -3,21 +3,25 @@ import cx from 'classnames'
 import download from 'downloadjs'
 
 import { Status } from 'classes/Campaign'
-import { exportCampaignStats } from 'services/campaign.service'
+import {
+  exportCampaignStats,
+  CampaignExportStatus,
+} from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
 import moment from 'moment'
 
 const ExportRecipients = ({
-  className,
   campaignId,
   campaignName,
   sentAt,
+  exportStatus,
 }: {
   className?: string
   campaignId: number
   campaignName: string
   status: Status
   sentAt: Date
+  exportStatus: CampaignExportStatus
 }) => {
   const [disabled, setDisabled] = useState(false)
   async function exportRecipients(
@@ -54,13 +58,30 @@ const ExportRecipients = ({
     }
   }
 
+  function renderExportButton() {
+    if (exportStatus === CampaignExportStatus.NoError) {
+      return <span>No error</span>
+    }
+    const icon =
+      exportStatus === CampaignExportStatus.Loading ? (
+        <i className={cx(styles.icon, 'bx bx-loader-alt')}></i>
+      ) : (
+        <i className={cx(styles.icon, 'bx bx-export')}></i>
+      )
+    return (
+      <>
+        {icon}
+        <span>Error list</span>
+      </>
+    )
+  }
+
   return (
     <div
-      className={cx(className, { [styles.disabled]: disabled })}
+      className={cx(styles.export, { [styles.disabled]: disabled })}
       onClick={(e) => !disabled && exportRecipients(e)}
     >
-      <span>Export</span>
-      <i className={cx(styles.icon, 'bx bx-export')}></i>
+      {renderExportButton()}
     </div>
   )
 }

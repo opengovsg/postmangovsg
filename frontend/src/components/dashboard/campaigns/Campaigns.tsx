@@ -14,8 +14,8 @@ import {
   PrimaryButton,
   ExportRecipients,
 } from 'components/common'
-import { getCampaigns, hasExportButton } from 'services/campaign.service'
-import { Campaign, channelIcons } from 'classes'
+import { getCampaigns, getExportStatus } from 'services/campaign.service'
+import { Campaign, channelIcons, Status } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
@@ -104,17 +104,19 @@ const Campaigns = () => {
     {
       name: 'Export Error List',
       render: (campaign: Campaign) => {
-        const { status, statusUpdatedAt, hasFailedRecipients } = campaign
+        if (campaign.status !== Status.Sent) return
+        const { statusUpdatedAt, hasFailedRecipients } = campaign
         return (
-          hasExportButton(status, statusUpdatedAt, +hasFailedRecipients) && (
-            <ExportRecipients
-              className={styles.exportRecipients}
-              campaignId={campaign.id}
-              campaignName={campaign.name}
-              status={campaign.status}
-              sentAt={campaign.sentAt}
-            />
-          )
+          <ExportRecipients
+            campaignId={campaign.id}
+            campaignName={campaign.name}
+            status={campaign.status}
+            sentAt={campaign.sentAt}
+            exportStatus={getExportStatus(
+              statusUpdatedAt,
+              +hasFailedRecipients
+            )}
+          />
         )
       },
       width: 'md center',
