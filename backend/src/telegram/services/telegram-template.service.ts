@@ -1,11 +1,10 @@
 import { chunk, difference, keys } from 'lodash'
 import { Transaction } from 'sequelize'
 
-import { InvalidRecipientError } from '@core/errors'
 import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
-import { HydrationError } from '@core/errors'
+import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
 import { PhoneNumberService } from '@core/services'
 import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
