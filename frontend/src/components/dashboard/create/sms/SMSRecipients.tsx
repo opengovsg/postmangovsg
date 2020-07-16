@@ -136,7 +136,11 @@ const SMSRecipients = ({
       >
         <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
         <p>or</p>
-        <SampleCsv params={params} defaultRecipient="81234567" />
+        <SampleCsv
+          params={params}
+          defaultRecipient="81234567"
+          setErrorMsg={setErrorMessage}
+        />
       </CsvUpload>
 
       <ErrorBlock>{errorMessage}</ErrorBlock>
