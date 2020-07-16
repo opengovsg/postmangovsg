@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
-import { hasFailedRecipients } from 'services/campaign.service'
+import { hasExportButton } from 'services/campaign.service'
 import { CampaignStats, Status } from 'classes/Campaign'
 import {
   ProgressBar,
@@ -45,7 +45,7 @@ const ProgressDetails = ({
   useEffect(() => {
     async function checkHasExportButton() {
       const failedCount = error + invalid
-      const displayExportButton = await hasFailedRecipients(
+      const displayExportButton = hasExportButton(
         status,
         updatedAt,
         failedCount

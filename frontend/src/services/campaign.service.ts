@@ -22,11 +22,11 @@ function getJobTimestamps(
   return { sentAt: jobsSentAt[0], statusUpdatedAt: jobsUpdatedAt[0] }
 }
 
-export async function hasFailedRecipients(
+export function hasExportButton(
   status: Status,
   updatedAt: Date,
   failedCount: number
-) {
+): boolean {
   if (status !== Status.Sent) {
     return false
   }

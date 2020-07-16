@@ -14,7 +14,7 @@ import {
   PrimaryButton,
   ExportRecipients,
 } from 'components/common'
-import { getCampaigns } from 'services/campaign.service'
+import { getCampaigns, hasExportButton } from 'services/campaign.service'
 import { Campaign, channelIcons } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
@@ -103,16 +103,20 @@ const Campaigns = () => {
     },
     {
       name: 'Export',
-      render: (campaign: Campaign) =>
-        campaign.hasFailedRecipients && (
-          <ExportRecipients
-            className={styles.exportRecipients}
-            campaignId={campaign.id}
-            campaignName={campaign.name}
-            status={campaign.status}
-            sentAt={campaign.sentAt}
-          />
-        ),
+      render: (campaign: Campaign) => {
+        const { status, statusUpdatedAt, hasFailedRecipients } = campaign
+        return (
+          hasExportButton(status, statusUpdatedAt, +hasFailedRecipients) && (
+            <ExportRecipients
+              className={styles.exportRecipients}
+              campaignId={campaign.id}
+              campaignName={campaign.name}
+              status={campaign.status}
+              sentAt={campaign.sentAt}
+            />
+          )
+        )
+      },
       width: 'xs',
     },
   ]
