@@ -98,7 +98,7 @@ const Campaigns = () => {
     },
     {
       name: 'Status',
-      render: (campaign: Campaign) => campaign.status,
+      render: (campaign: Campaign) => capitalize(campaign.status),
       width: 'xs',
     },
     {
