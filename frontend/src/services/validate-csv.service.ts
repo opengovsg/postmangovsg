@@ -84,7 +84,8 @@ function validateRow(
   requiredParams: Array<string>,
   recipientValidator: Function
 ): boolean {
-  const missingParams = difference(requiredParams, keys(row))
+  const params = keys(row).map((key) => key.toLowerCase())
+  const missingParams = difference(requiredParams, params)
   if (missingParams.length) {
     throw new Error(`Missing params: ${missingParams.join(',')}`)
   }
