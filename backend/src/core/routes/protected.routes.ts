@@ -42,7 +42,7 @@ const protectVerifyValidator = {
  *                properties:
  *                 payload:
  *                  type: string
- *         "401":
+ *         "403":
  *           description: Wrong password or message id
  *         "500":
  *           description: Internal Server Error
