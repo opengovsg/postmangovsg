@@ -1,4 +1,3 @@
-import url from 'url'
 import { difference } from 'lodash'
 import { Transaction } from 'sequelize'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
@@ -7,6 +6,7 @@ import config from '@core/config'
 import logger from '@core/logger'
 import { ProtectedMessage, Campaign } from '@core/models'
 
+const PROTECTED_URL = config.get('protectedUrl')
 const PROTECT_METHOD_VERSION = 1
 
 const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
@@ -27,9 +27,6 @@ const storeProtectedMessages = async (
   protectedMessages: ProtectedMessageRecordInterface[],
   transaction?: Transaction
 ): Promise<MessageBulkInsertInterface[]> => {
-  const frontendUrl = config.get('frontendUrl')
-  const protectedPath = config.get('protectedPath')
-
   try {
     // Delete existing rows
     await ProtectedMessage.destroy({
@@ -54,10 +51,7 @@ const storeProtectedMessages = async (
       recipient,
       params: {
         recipient,
-        protectedlink: url.resolve(
-          frontendUrl,
-          `${protectedPath}/${PROTECT_METHOD_VERSION}/${id}`
-        ),
+        protectedlink: `${PROTECTED_URL}/${PROTECT_METHOD_VERSION}/${id}`,
       },
     }))
   } catch (e) {

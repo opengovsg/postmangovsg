@@ -3,6 +3,28 @@ import { ProtectedService } from '@core/services'
 import logger from '@core/logger'
 
 /**
+ * Limit certain routes for protected campaigns only
+ * @param req
+ * @param res
+ * @param next
+ */
+const isProtectedCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    if (await ProtectedService.isProtectedCampaign(+campaignId)) {
+      return next()
+    }
+    return res.sendStatus(403)
+  } catch (err) {
+    return next(err)
+  }
+}
+
+/**
  * Ensure that the template body only has the necessary keywords if it is a protected campaign.
  * Subject should not have any keywords.
  * @param req
@@ -16,7 +38,8 @@ const verifyTemplate = async (
 ): Promise<Response | void> => {
   try {
     // If it is not a protected campaign, move on to the next middleware
-    if (!res.locals.isProtected) {
+    const { campaignId } = req.params
+    if (!(await ProtectedService.isProtectedCampaign(+campaignId))) {
       return next()
     }
 
@@ -59,8 +82,10 @@ const verifyPasswordHash = async (
       passwordHash
     )
     if (!protectedMessage) {
-      // Return not found if nothing retrieved from db
-      return res.sendStatus(404)
+      // Return unauthorized if nothing retrieved from db
+      return res
+        .status(401)
+        .json({ message: 'Wrong password or message id. Please try again.' })
     }
     return res.json({ payload: protectedMessage.payload })
   } catch (err) {
@@ -69,6 +94,7 @@ const verifyPasswordHash = async (
 }
 
 export const ProtectedMiddleware = {
+  isProtectedCampaign,
   verifyTemplate,
   verifyPasswordHash,
 }

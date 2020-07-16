@@ -149,10 +149,10 @@ const config = convict({
     default: 'https://postman.gov.sg', // prod only
     env: 'FRONTEND_URL',
   },
-  protectedPath: {
-    doc: 'Frontend url path for password-protected messages',
-    default: '/p',
-    env: 'PROTECTED_PATH',
+  protectedUrl: {
+    doc: 'Url domain and path for password-protected messages',
+    default: 'https://postman.gov.sg/p', // prod only
+    env: 'PROTECTED_URL',
   },
   session: {
     cookieName: {
@@ -370,6 +370,7 @@ switch (config.get('env')) {
   case 'staging':
     config.load({
       frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
+      protectedUrl: 'https://staging.postman.gov.sg/p',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
@@ -390,6 +391,7 @@ switch (config.get('env')) {
     config.set('IS_PROD', false)
     config.load({
       frontendUrl: 'http://localhost:3000',
+      protectedUrl: 'http://localhost:3000/p',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-testing',

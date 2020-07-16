@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { decryptData, hashPassword } from './crypto.service'
 
 /**
@@ -10,17 +10,10 @@ import { decryptData, hashPassword } from './crypto.service'
  * @param salt
  */
 export async function fetchMessage(id: string, password: string, salt = id) {
-  try {
-    const passwordHash = await hashPassword(password, salt)
-    const encryptedData = await getEncryptedPayload(id, passwordHash)
-    const decryptedData = await decryptData(encryptedData, password, salt)
-    return decryptedData
-  } catch (err) {
-    /**
-     * Handle and obfuscate error
-     */
-    throw new Error(err)
-  }
+  const passwordHash = await hashPassword(password, salt)
+  const encryptedData = await getEncryptedPayload(id, passwordHash)
+  const decryptedData = await decryptData(encryptedData, password, salt)
+  return decryptedData
 }
 
 /**
@@ -32,8 +25,24 @@ async function getEncryptedPayload(
   id: string,
   passwordHash: string
 ): Promise<string> {
-  const response = await axios.post(`/protect/${id}`, {
-    password_hash: passwordHash,
-  })
-  return response.data.payload
+  try {
+    const response = await axios.post(`/protect/${id}`, {
+      password_hash: passwordHash,
+    })
+    return response.data.payload
+  } catch (e) {
+    errorHandler(e, 'Unable to fetch protected message.')
+  }
+}
+
+function errorHandler(e: AxiosError, defaultMsg: string): never {
+  console.error(e)
+  if (e.response?.status === 429) {
+    // Rate limited
+    throw new Error('Attempts exceeded. Please try again later.')
+  }
+  if (e.response && e.response.data && e.response.data.message) {
+    throw new Error(e.response.data.message)
+  }
+  throw new Error(defaultMsg || e.response?.statusText)
 }
