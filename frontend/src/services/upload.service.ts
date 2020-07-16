@@ -189,20 +189,24 @@ export async function beginMultipartUpload({
   mimeType: string
   partCount: number
 }): Promise<{ transactionId: string; presignedUrls: string[] }> {
-  const response = await axios.get(
-    `/campaign/${campaignId}/protect/upload/start`,
-    {
-      params: {
-        mime_type: mimeType,
-        part_count: partCount,
-      },
-    }
-  )
-  const {
-    transaction_id: transactionId,
-    presigned_urls: presignedUrls,
-  } = response.data
-  return { transactionId, presignedUrls }
+  try {
+    const response = await axios.get(
+      `/campaign/${campaignId}/protect/upload/start`,
+      {
+        params: {
+          mime_type: mimeType,
+          part_count: partCount,
+        },
+      }
+    )
+    const {
+      transaction_id: transactionId,
+      presigned_urls: presignedUrls,
+    } = response.data
+    return { transactionId, presignedUrls }
+  } catch (e) {
+    errorHandler(e, 'Failed to begin multipart upload.')
+  }
 }
 
 /*
@@ -216,16 +220,20 @@ export async function uploadPartWithPresignedUrl({
   presignedUrl: string
   data: string[]
 }): Promise<string> {
-  const contentType = 'text/csv'
-  const response = await axios.put(
-    presignedUrl,
-    new Blob(data, { type: contentType }),
-    {
-      withCredentials: false,
-      timeout: 0,
-    }
-  )
-  return response.headers.etag
+  try {
+    const contentType = 'text/csv'
+    const response = await axios.put(
+      presignedUrl,
+      new Blob(data, { type: contentType }),
+      {
+        withCredentials: false,
+        timeout: 0,
+      }
+    )
+    return response.headers.etag
+  } catch (e) {
+    errorHandler(e, 'Error uploading part with presigned url')
+  }
 }
 
 export async function completeMultiPartUpload({

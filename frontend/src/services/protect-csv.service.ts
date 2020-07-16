@@ -106,25 +106,37 @@ export async function protectAndUploadCsv(
         const rows = chunk.data
 
         // transform into rows of data into {recipient,payload,passwordHash,id}
-        const data = await transformRows(template, rows, partNumber)
+        try {
+          const data = await transformRows(template, rows, partNumber)
 
-        // Upload the single string onto s3 based through the presigned url
-        const etag = await uploadPartWithPresignedUrl({
-          presignedUrl: presignedUrls[partNumber - 1],
-          data,
-        })
-        etags.push(etag)
+          // Upload the single string onto s3 based through the presigned url
+          const etag = await uploadPartWithPresignedUrl({
+            presignedUrl: presignedUrls[partNumber - 1],
+            data,
+          })
+          etags.push(etag)
+        } catch (e) {
+          reject(e)
+          parser.abort()
+        }
+
         parser.resume()
       },
-      complete: async function () {
-        await completeMultiPartUpload({
-          campaignId,
-          filename: file.name,
-          transactionId,
-          partCount: partNumber,
-          etags,
-        })
-        resolve()
+      complete: async function (results) {
+        try {
+          if (!results.meta?.aborted) {
+            await completeMultiPartUpload({
+              campaignId,
+              filename: file.name,
+              transactionId,
+              partCount: partNumber,
+              etags,
+            })
+            resolve()
+          }
+        } catch (e) {
+          reject(e)
+        }
       },
       error: reject,
     })
