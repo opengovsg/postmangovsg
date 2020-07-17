@@ -5,14 +5,14 @@ import styles from './ProtectedPreview.module.scss'
 
 const ProtectedPreview = ({
   html,
-  className,
+  style = 'style1',
 }: {
   html: string
-  className?: string
+  style?: string
 }) => {
   return (
     <div
-      className={cx(styles.preview, className)}
+      className={cx(styles.preview, styles[style])}
       dangerouslySetInnerHTML={{ __html: html }}
     ></div>
   )
