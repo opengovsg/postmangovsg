@@ -31,16 +31,12 @@ async function getEncryptedPayload(
     })
     return response.data.payload
   } catch (e) {
-    errorHandler(e, 'Unable to fetch protected message.')
+    errorHandler(e, 'Please try again later.')
   }
 }
 
 function errorHandler(e: AxiosError, defaultMsg: string): never {
   console.error(e)
-  if (e.response?.status === 429) {
-    // Rate limited
-    throw new Error('Attempts exceeded. Please try again later.')
-  }
   if (e.response && e.response.data && e.response.data.message) {
     throw new Error(e.response.data.message)
   }
