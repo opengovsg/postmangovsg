@@ -3,6 +3,7 @@
  * All defaults can be changed
  */
 import convict from 'convict'
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import { isSupportedCountry } from 'libphonenumber-js'
@@ -356,6 +357,29 @@ const config = convict({
     doc: 'Sentry DSN for backend',
     default: '',
     env: 'SENTRY_DSN',
+  },
+  unsubscribeHmac: {
+    version: {
+      doc: 'Version of unsubscribe HMAC options, defaults to v1',
+      default: 'v1',
+      format: ['v1'],
+      env: 'UNSUBSCRIBE_HMAC_VERSION',
+    },
+    v1: {
+      algo: {
+        doc: 'V1 HMAC algorithm',
+        default: '',
+        format: crypto.getHashes(),
+        env: 'UNSUBSCRIBE_HMAC_ALGO_V1',
+      },
+      key: {
+        doc: 'V1 HMAC key',
+        default: '',
+        format: 'required-string',
+        env: 'UNSUBSCRIBE_HMAC_KEY_V1',
+        sensitive: true,
+      },
+    },
   },
 })
 

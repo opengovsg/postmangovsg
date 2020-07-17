@@ -3,6 +3,7 @@
  * All defaults can be changed
  */
 import convict from 'convict'
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 
@@ -199,6 +200,29 @@ const config = convict({
       default: 0,
       env: 'MESSAGE_WORKER_LOGGER',
       format: 'int',
+    },
+  },
+  unsubscribeHmac: {
+    version: {
+      doc: 'Version of unsubscribe HMAC options, defaults to v1',
+      default: 'v1',
+      format: ['v1'],
+      env: 'UNSUBSCRIBE_HMAC_VERSION',
+    },
+    v1: {
+      algo: {
+        doc: 'V1 HMAC algorithm',
+        default: '',
+        format: crypto.getHashes(),
+        env: 'UNSUBSCRIBE_HMAC_ALGO_V1',
+      },
+      key: {
+        doc: 'V1 HMAC key',
+        default: '',
+        format: 'required-string',
+        env: 'UNSUBSCRIBE_HMAC_KEY_V1',
+        sensitive: true,
+      },
     },
   },
 })
