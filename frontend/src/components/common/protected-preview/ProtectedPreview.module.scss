@@ -6,6 +6,11 @@
   max-width: 90vw;
   margin: auto;
 
+  /**
+  * IMPORTANT!!!
+  * When modifying style1, please make sure it is backward compatible!!
+  * See ProtectedPreview.tsx for more info
+  */
   &.style1 {
     img {
       display: block;
