@@ -1,13 +1,7 @@
 import { difference } from 'lodash'
-import { Transaction } from 'sequelize'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
-import config from '@core/config'
-import logger from '@core/logger'
 import { ProtectedMessage, Campaign } from '@core/models'
-
-const PROTECTED_URL = config.get('protectedUrl')
-const PROTECT_METHOD_VERSION = 1
 
 const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
 /**
@@ -22,46 +16,6 @@ const isProtectedCampaign = async (campaignId: number): Promise<boolean> => {
   }))
 }
 
-const storeProtectedMessages = async (
-  campaignId: number,
-  protectedMessages: ProtectedMessageRecordInterface[],
-  transaction?: Transaction
-): Promise<MessageBulkInsertInterface[]> => {
-  try {
-    // Delete existing rows
-    await ProtectedMessage.destroy({
-      where: {
-        campaignId,
-      },
-      transaction,
-    })
-
-    // Insert new rows
-    const batchSize = 5000
-    for (let i = 0; i < protectedMessages.length; i += batchSize) {
-      const batch = protectedMessages
-        .slice(i, i + batchSize)
-        .map((row) => ({ ...row, version: PROTECT_METHOD_VERSION }))
-      await ProtectedMessage.bulkCreate(batch, { transaction })
-    }
-
-    // Map to message format
-    return protectedMessages.map(({ campaignId, recipient, id }) => ({
-      campaignId,
-      recipient,
-      params: {
-        recipient,
-        protectedlink: `${PROTECTED_URL}/${PROTECT_METHOD_VERSION}/${id}`,
-      },
-    }))
-  } catch (e) {
-    transaction?.rollback()
-    logger.error(
-      `Error storing protected payloads for campaign ${campaignId}: ${e}`
-    )
-    throw e
-  }
-}
 /**
  * Verifies that the template for protected campaigns has the required and optional keywords.
  */
@@ -110,6 +64,5 @@ const getProtectedMessage = async (
 export const ProtectedService = {
   isProtectedCampaign,
   checkTemplateVariables,
-  storeProtectedMessages,
   getProtectedMessage,
 }

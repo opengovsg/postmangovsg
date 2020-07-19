@@ -10,9 +10,9 @@ import {
   UserError,
 } from '@core/errors'
 import { TemplateError } from 'postman-templating'
-import { CampaignService, UploadService, StatsService } from '@core/services'
-import { TelegramService, TelegramTemplateService } from '@telegram/services'
+import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { Campaign } from '@core/models'
+import { TelegramService, TelegramTemplateService } from '@telegram/services'
 
 /**
  * Store template subject and body in Telegram template table.
@@ -73,53 +73,6 @@ const storeTemplate = async (
 }
 
 /**
- * Updates the campaign and telegram_messages table in a transaction, rolling back when either fails.
- * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
- * For email_messages table, existing records are deleted and new ones are bulk inserted.
- * @param key
- * @param campaignId
- * @param filename
- * @param records
- */
-const updateCampaignAndMessages = async (
-  campaignId: number,
-  key: string,
-  filename: string,
-  records: MessageBulkInsertInterface[]
-): Promise<void> => {
-  let transaction
-
-  try {
-    transaction = await Campaign.sequelize?.transaction()
-    // Updates metadata in project
-    await UploadService.replaceCampaignS3Metadata(
-      campaignId,
-      key,
-      filename,
-      transaction
-    )
-
-    // START populate template
-    await TelegramTemplateService.addToMessageLogs(
-      campaignId,
-      records,
-      transaction
-    )
-
-    // Update statistic table
-    await StatsService.setNumRecipients(campaignId, records.length, transaction)
-
-    // Set campaign to valid
-    await CampaignService.setValid(campaignId, transaction)
-
-    transaction?.commit()
-  } catch (err) {
-    transaction?.rollback()
-    throw err
-  }
-}
-
-/**
  * Downloads the file from s3 and checks that its columns match the attributes provided in the template.
  * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
  * If the template and csv do not match, prompt the user to upload a new file.
@@ -139,45 +92,39 @@ const uploadCompleteHandler = async (
     const { transaction_id: transactionId, filename } = req.body
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
-    const telegramTemplate = await TelegramTemplateService.getFilledTemplate(
+    const template = await TelegramTemplateService.getFilledTemplate(
       +campaignId
     )
-    if (telegramTemplate === null) {
+    if (template === null) {
       throw new Error('Template does not exist, please create a template')
     }
-
-    const s3Client = new S3Client()
-    const fileContent = await s3Client.getCsvFile(s3Key)
-
-    const records = UploadService.getRecordsFromCsv(
-      +campaignId,
-      fileContent,
-      telegramTemplate.params as string[]
-    )
-
-    TelegramTemplateService.testHydration(
-      records,
-      telegramTemplate.body as string
-    )
-
-    // Append default country code as telegram handler stores number with the country
-    // code by default.
-    const formattedRecords = TelegramTemplateService.validateAndFormatNumber(
-      records
-    )
 
     // Store temp filename
     await UploadService.storeS3TempFilename(+campaignId, filename)
 
-    try {
-      // Return early because bulk insert is slow
-      res.sendStatus(202)
+    // Return early because bulk insert is slow
+    res.sendStatus(202)
 
-      await updateCampaignAndMessages(
-        +campaignId,
-        s3Key,
-        filename,
-        formattedRecords
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const transaction = await Campaign.sequelize!.transaction()
+      // - download from s3
+      const s3Client = new S3Client()
+      const downloadStream = s3Client.download(s3Key)
+      const params = {
+        transaction,
+        template,
+        campaignId: +campaignId,
+      }
+      await ParseCsvService.parseAndProcessCsv(
+        downloadStream,
+        TelegramService.uploadCompleteOnPreview(params),
+        TelegramService.uploadCompleteOnChunk(params),
+        TelegramService.uploadCompleteOnComplete({
+          ...params,
+          key: s3Key,
+          filename,
+        })
       )
     } catch (err) {
       // Do not return any response since it has already been sent

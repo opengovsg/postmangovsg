@@ -1,4 +1,4 @@
-import { literal } from 'sequelize'
+import { literal, Transaction } from 'sequelize'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
@@ -14,6 +14,9 @@ import {
 import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
+import { CSVParams } from '@core/types'
+import { UploadService, StatsService, CampaignService } from '@core/services'
+import logger from '@core/logger'
 
 /**
  * Gets a message's parameters
@@ -37,7 +40,7 @@ const getParams = async (
 const getHydratedMessage = async (
   campaignId: number
 ): Promise<{ body: string } | null> => {
-  // get sms template
+  // get telegram template
   const template = await TelegramTemplateService.getFilledTemplate(campaignId)
 
   // Get params
@@ -225,6 +228,117 @@ const getCampaignDetails = async (
   } as CampaignDetails
 }
 
+const uploadCompleteOnPreview = ({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: TelegramTemplate
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    UploadService.checkTemplateKeysMatch(data, template.params!)
+
+    TelegramTemplateService.testHydration(
+      [{ params: data[0] }],
+      template.body as string
+    )
+    try {
+      // delete message_logs entries
+      await TelegramMessage.destroy({
+        where: { campaignId },
+        transaction,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+const uploadCompleteOnChunk = ({
+  transaction,
+  campaignId,
+}: {
+  transaction: Transaction
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    try {
+      const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+        return {
+          campaignId,
+          recipient: entry['recipient'],
+          params: entry,
+        }
+      })
+
+      // NOTE FOR TELEGRAM: Validate the phone number before insertion because this service
+      // must have correctly formatted phone number before enqueue.
+
+      // Append default country code as telegram handler stores number with the country
+      // code by default.
+      const formattedRecords = TelegramTemplateService.validateAndFormatNumber(
+        records
+      )
+      // START populate template
+      await TelegramMessage.bulkCreate(formattedRecords, {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          }
+        },
+        benchmark: true,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+/**
+ * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
+ * update statistics with new unsent count
+ * @param param.transaction
+ * @param param.campaignId
+ * @param param.key
+ * @param param.filename
+ */
+const uploadCompleteOnComplete = ({
+  transaction,
+  campaignId,
+  key,
+  filename,
+}: {
+  transaction: Transaction
+  campaignId: number
+  key: string
+  filename: string
+}): ((numRecords: number) => Promise<void>) => {
+  return async (numRecords: number): Promise<void> => {
+    try {
+      // Updates metadata in project
+      await UploadService.replaceCampaignS3Metadata(
+        campaignId,
+        key,
+        filename,
+        transaction
+      )
+
+      await StatsService.setNumRecipients(campaignId, numRecords, transaction)
+
+      // Set campaign to valid
+      await CampaignService.setValid(campaignId, transaction)
+      transaction?.commit()
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+
 export const TelegramService = {
   findCampaign,
   getCampaignDetails,
@@ -233,4 +347,7 @@ export const TelegramService = {
   sendCampaignMessage,
   getHydratedMessage,
   validateAndConfigureBot,
+  uploadCompleteOnPreview,
+  uploadCompleteOnChunk,
+  uploadCompleteOnComplete,
 }

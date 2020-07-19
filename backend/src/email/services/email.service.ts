@@ -1,12 +1,22 @@
+import { Transaction } from 'sequelize'
 import logger from '@core/logger'
+import { CSVParams } from '@core/types'
+
 import { ChannelType } from '@core/constants'
-import { Campaign } from '@core/models'
-import { MailService, CampaignService } from '@core/services'
+import { Campaign, ProtectedMessage } from '@core/models'
+import {
+  MailService,
+  CampaignService,
+  UploadService,
+  StatsService,
+} from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
-
+import config from '@core/config'
+const PROTECTED_URL = config.get('protectedUrl')
+const PROTECT_METHOD_VERSION = 1
 /**
  * Gets a message's parameters
  * @param campaignId
@@ -148,10 +158,217 @@ const getCampaignDetails = async (
   ])
 }
 
+const uploadCompleteOnPreview = ({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: EmailTemplate
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    UploadService.checkTemplateKeysMatch(data, template.params!)
+
+    EmailTemplateService.testHydration(
+      [{ params: data[0] }],
+      template.body as string,
+      template.subject as string
+    )
+    try {
+      // delete message_logs entries
+      await EmailMessage.destroy({
+        where: { campaignId },
+        transaction,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+const uploadCompleteOnChunk = ({
+  transaction,
+  campaignId,
+}: {
+  transaction: Transaction
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    try {
+      const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+        return {
+          campaignId,
+          recipient: entry['recipient'],
+          params: entry,
+        }
+      })
+      // START populate template
+      await EmailMessage.bulkCreate(records, {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          }
+        },
+        benchmark: true,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+/**
+ * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
+ * update statistics with new unsent count
+ * @param param.transaction
+ * @param param.campaignId
+ * @param param.key
+ * @param param.filename
+ */
+const uploadCompleteOnComplete = ({
+  transaction,
+  campaignId,
+  key,
+  filename,
+}: {
+  transaction: Transaction
+  campaignId: number
+  key: string
+  filename: string
+}): ((numRecords: number) => Promise<void>) => {
+  return async (numRecords: number): Promise<void> => {
+    try {
+      // Updates metadata in project
+      await UploadService.replaceCampaignS3Metadata(
+        campaignId,
+        key,
+        filename,
+        transaction
+      )
+
+      await StatsService.setNumRecipients(campaignId, numRecords, transaction)
+
+      // Set campaign to valid
+      await CampaignService.setValid(campaignId, transaction)
+      transaction?.commit()
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+
+const uploadProtectedCompleteOnPreview = ({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: EmailTemplate
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    // Checks the csv for all the necessary columns.
+    const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash', 'id']
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    UploadService.checkTemplateKeysMatch(data, PROTECTED_CSV_HEADERS)
+
+    EmailTemplateService.testHydration(
+      [{ params: data[0] }],
+      template.body as string,
+      template.subject as string
+    )
+    try {
+      // Delete existing rows
+      await ProtectedMessage.destroy({
+        where: {
+          campaignId,
+        },
+        transaction,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+const uploadProtectedCompleteOnChunk = ({
+  transaction,
+  campaignId,
+}: {
+  transaction: Transaction
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    try {
+      // These records go into the protected message table
+      const protectedMessages: Array<ProtectedMessageRecordInterface> = data.map(
+        (entry) => {
+          const { recipient, payload, passwordhash, id } = entry
+          return {
+            campaignId,
+            id,
+            recipient,
+            payload,
+            passwordHash: passwordhash,
+            version: PROTECT_METHOD_VERSION,
+          }
+        }
+      )
+      // START populate template
+      await ProtectedMessage.bulkCreate(protectedMessages, {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info(
+              `uploadProtectedCompleteOnChunk - ProtectedMessage: ElapsedTime ${benchmark} ms`
+            )
+          }
+        },
+        benchmark: true,
+      })
+
+      const emailMessages = protectedMessages.map(
+        ({ campaignId, recipient, id }) => ({
+          campaignId,
+          recipient,
+          params: {
+            recipient,
+            protectedlink: `${PROTECTED_URL}/${PROTECT_METHOD_VERSION}/${id}`,
+          },
+        })
+      )
+      await EmailMessage.bulkCreate(emailMessages, {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info(
+              `uploadProtectedCompleteOnChunk - EmailMessage: ElapsedTime ${benchmark} ms`
+            )
+          }
+        },
+        benchmark: true,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
   setCampaignCredential,
   getCampaignDetails,
   getHydratedMessage,
+  uploadCompleteOnPreview,
+  uploadCompleteOnChunk,
+  uploadCompleteOnComplete,
+  uploadProtectedCompleteOnPreview,
+  uploadProtectedCompleteOnChunk,
+  uploadProtectedCompleteOnComplete: uploadCompleteOnComplete,
 }

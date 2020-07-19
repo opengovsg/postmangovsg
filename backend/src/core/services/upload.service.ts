@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { difference, keys } from 'lodash'
 
 import S3 from 'aws-sdk/clients/s3'
-import { Transaction } from 'sequelize/types'
+import { Transaction } from 'sequelize'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -184,54 +184,6 @@ const checkTemplateKeysMatch = (
   }
 }
 
-/**
- * Checks the csv for all the necessary columns.
- * Transform the array of CSV rows into message interface
- * @param campaignId
- * @param fileContent
- */
-const getRecordsFromCsv = (
-  campaignId: number,
-  fileContent: Array<CSVParams>,
-  templateParams: Array<string>
-): Array<MessageBulkInsertInterface> => {
-  checkTemplateKeysMatch(fileContent, templateParams)
-
-  return fileContent.map((entry) => {
-    return {
-      campaignId,
-      recipient: entry['recipient'],
-      params: entry,
-    }
-  })
-}
-
-/**
- * Checks the csv for all the necessary columns.
- * Transform the array of CSV rows into message interface
- * @param campaignId
- * @param fileContent
- */
-const getProtectedRecordsFromCsv = (
-  campaignId: number,
-  fileContent: Array<CSVParams>
-): Array<ProtectedMessageRecordInterface> => {
-  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash', 'id']
-
-  checkTemplateKeysMatch(fileContent, PROTECTED_CSV_HEADERS)
-
-  return fileContent.map((entry) => {
-    const { recipient, payload, passwordhash, id } = entry
-    return {
-      campaignId,
-      id,
-      recipient,
-      payload,
-      passwordHash: passwordhash,
-    }
-  })
-}
-
 export const UploadService = {
   /*** S3 API Calls ****/
   getUploadParameters,
@@ -242,7 +194,5 @@ export const UploadService = {
   storeS3Error,
   deleteS3TempKeys,
   getCsvStatus,
-  getRecordsFromCsv,
-  getProtectedRecordsFromCsv,
   checkTemplateKeysMatch,
 }
