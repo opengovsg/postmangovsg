@@ -15,3 +15,11 @@ export class UnexpectedDoubleQuoteError extends Error {
     Error.captureStackTrace(this)
   }
 }
+
+export class CSVNotFoundError extends Error {
+  constructor() {
+    super(`File could not be loaded. Try re-uploading your file.`)
+    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
+    Error.captureStackTrace(this)
+  }
+}
