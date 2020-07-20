@@ -56,6 +56,7 @@ class Email {
       body: string
       subject: string
       replyTo: string | null
+      campaignId: number
     }[]
   > {
     return this.connection
