@@ -78,7 +78,7 @@ const VerifyCredentialModal = ({
 
     return (
       <>
-        <img src={ConfirmImage}></img>
+        <img src={ConfirmImage} alt="" />
         <h2>Verify {label} credentials</h2>
         <p>
           To verify that your credentials are still working perfectly, please
@@ -98,7 +98,7 @@ const VerifyCredentialModal = ({
       case VerifyCredentialStep.Success:
         return (
           <div className={styles.centerAlign}>
-            <img src={SuccessImage} />
+            <img src={SuccessImage} alt="" />
             <h3>Your credentials are working well.</h3>
             <PrimaryButton
               className={styles.padTop}
@@ -112,7 +112,7 @@ const VerifyCredentialModal = ({
       case VerifyCredentialStep.Failure:
         return (
           <div className={styles.centerAlign}>
-            <img src={FailureImage} />
+            <img src={FailureImage} alt="" />
             <h3>Sorry, something went wrong.</h3>
             <ErrorBlock>{errorMessage}</ErrorBlock>
           </div>

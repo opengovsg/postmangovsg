@@ -16,7 +16,9 @@ const ProgressItem = ({
   isEnabled: boolean
 }) => {
   return (
-    <a
+    <div
+      role="menuitem"
+      aria-current={isActive ? 'step' : undefined}
       className={cx(styles.progressItem, {
         [styles.active]: isActive,
         [styles.enabled]: isEnabled,
@@ -25,7 +27,7 @@ const ProgressItem = ({
     >
       <div className={styles.number}>{number}</div>
       <span>{step}</span>
-    </a>
+    </div>
   )
 }
 
@@ -43,7 +45,7 @@ const ProgressPane = ({
   disabled?: boolean
 }) => {
   return (
-    <div className={styles.progressPane}>
+    <nav aria-label="progress" className={styles.progressPane}>
       {steps.map((step: string, index: number) => (
         <ProgressItem
           step={step}
@@ -54,7 +56,7 @@ const ProgressPane = ({
           onClick={() => setActiveStep(index)}
         ></ProgressItem>
       ))}
-    </div>
+    </nav>
   )
 }
 

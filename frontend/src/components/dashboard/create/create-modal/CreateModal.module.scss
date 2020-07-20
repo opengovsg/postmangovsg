@@ -98,12 +98,13 @@
   margin-top: 1rem;
   margin-bottom: 0;
 
-  a {
+  .link {
     font-size: 0.8rem;
     font-style: italic;
     color: $dark-blue;
     line-height: 1.5rem;
     text-decoration: underline;
     margin-left: 0.2rem;
+    cursor: pointer;
   }
 }
