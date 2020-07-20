@@ -17,6 +17,7 @@ app.use(express.json())
 app.post('/:botToken', async (req, res) => {
   const event = {
     body: JSON.stringify(req.body), // simulate Lambda's stringified body
+    httpMethod: req.method,
     pathParameters: req.params,
   }
   const result = await handler(event) // execute handler
