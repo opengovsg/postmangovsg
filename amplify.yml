@@ -11,7 +11,8 @@ env:
     REACT_APP_LOGIN_EMAIL_TEXT: "Sign in with your .gov.sg email"
     REACT_APP_LOGIN_EMAIL_PLACEHOLDER: "e.g. postman@agency.gov.sg"
     REACT_APP_GUIDE_URL: "https://guide.postman.gov.sg"
-    REACT_APP_GUIDE_CREDENTIALS_URL: "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
+    REACT_APP_GUIDE_SMS_CREDENTIALS_URL: "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
+    REACT_APP_GUIDE_TELEGRAM_CREDENTIALS_URL: "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
     REACT_APP_GUIDE_POWER_USER_URL: "https://guide.postman.gov.sg/guide/power-users"
     REACT_APP_CONTACT_US_URL: "https://go.gov.sg/postman-contact-us"
     REACT_APP_CONTRIBUTE_URL: "https://github.com/opengovsg/postmangovsg"
@@ -69,8 +70,8 @@ frontend:
             font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
             default-src 'self' https://*.postman.gov.sg;
             object-src 'none';
-            script-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
-            img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com"
+            script-src 'self' 'unsafe-eval' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
+            img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://file.go.gov.sg"
         - key: "Content-Security-Policy-Report-Only"
           value: report-uri https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024;
     - pattern: "/static/**/*"

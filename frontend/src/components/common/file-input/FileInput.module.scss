@@ -4,6 +4,10 @@
 .container {
   input {
     display: none;
+    &:disabled + label {
+      background-color: $light-grey;
+      cursor: not-allowed;
+    }
   }
 
   label {

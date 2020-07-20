@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { cloneDeep } from 'lodash'
 
-import { EmailCampaign, EmailProgress } from 'classes/EmailCampaign'
+import { Campaign, EmailCampaign, EmailProgress } from 'classes'
 import { ProgressPane } from 'components/common'
 import EmailTemplate from './EmailTemplate'
 import EmailRecipients from './EmailRecipients'
+import ProtectedEmailRecipients from './ProtectedEmailRecipients'
 import EmailSend from './EmailSend'
 import EmailDetail from './EmailDetail'
 import EmailCredentials from './EmailCredentials'
@@ -21,11 +22,17 @@ const EMAIL_PROGRESS_STEPS = [
 
 const CreateEmail = ({
   campaign: initialCampaign,
+  onCampaignChange,
 }: {
   campaign: EmailCampaign
+  onCampaignChange: (c: Campaign) => void
 }) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
+
+  useEffect(() => {
+    onCampaignChange(campaign)
+  }, [campaign, onCampaignChange])
 
   // Modifies campaign object in state and navigates to next step
   const onNext = useCallback((changes: any, next = true) => {
@@ -57,10 +64,21 @@ const CreateEmail = ({
             subject={campaign.subject}
             body={campaign.body}
             replyTo={campaign.replyTo}
+            protect={campaign.protect}
             onNext={onNext}
           />
         )
       case EmailProgress.UploadRecipients:
+        if (campaign.protect) {
+          return (
+            <ProtectedEmailRecipients
+              csvFilename={campaign.csvFilename}
+              numRecipients={campaign.numRecipients}
+              isProcessing={campaign.isCsvProcessing}
+              onNext={onNext}
+            />
+          )
+        }
         return (
           <EmailRecipients
             params={campaign.params}
@@ -74,6 +92,7 @@ const CreateEmail = ({
         return (
           <EmailCredentials
             hasCredential={campaign.hasCredential}
+            protect={campaign.protect}
             onNext={onNext}
           />
         )

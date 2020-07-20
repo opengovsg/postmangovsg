@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Backend / API server for Postman",
   "main": "build/server.js",
   "scripts": {
@@ -42,6 +42,7 @@
     "express-validator": "^6.4.0",
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
+    "libphonenumber-js": "^1.7.54",
     "lodash": "^4.17.15",
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
@@ -58,6 +59,7 @@
     "source-map-support": "^0.5.16",
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4",
+    "telegraf": "^3.38.0",
     "threads": "^1.4.0",
     "tiny-worker": "^2.3.0",
     "twilio": "^3.42.1",
@@ -94,7 +96,8 @@
   "_moduleAliases": {
     "@core": "build/core",
     "@sms": "build/sms",
-    "@email": "build/email"
+    "@email": "build/email",
+    "@telegram": "build/telegram"
   },
   "repository": {
     "type": "git",

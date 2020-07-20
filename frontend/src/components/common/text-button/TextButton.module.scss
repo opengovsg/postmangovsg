@@ -1,0 +1,12 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.textButton {
+  @include button(transparent);
+  color: $indigo-blue;
+  font-weight: 500;
+  &:hover {
+    text-decoration: underline;
+    color: $dark-blue;
+  }
+}

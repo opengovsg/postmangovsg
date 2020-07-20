@@ -2,17 +2,16 @@ import { difference, keys, chunk } from 'lodash'
 import validator from 'validator'
 import { Transaction } from 'sequelize'
 
-import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
-const client = new TemplateClient(config.get('xssOptions.email'))
+const client = new TemplateClient(XSS_EMAIL_OPTION)
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,
@@ -251,7 +250,7 @@ const addToMessageLogs = async (
 }
 
 const hasInvalidEmailRecipient = (
-  records: MessageBulkInsertInterface[]
+  records: (MessageBulkInsertInterface | ProtectedMessageRecordInterface)[]
 ): boolean => {
   return records.some((record) => !validator.isEmail(record.recipient))
 }

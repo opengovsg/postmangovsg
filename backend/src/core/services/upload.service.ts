@@ -49,15 +49,19 @@ const getUploadParameters = async (
  * Decodes jwt
  * @param transactionId
  */
-const extractS3Key = (transactionId: string): string => {
-  let decoded: string
+const extractParamsFromJwt = (
+  transactionId: string
+): { s3Key: string; uploadId?: string } => {
+  let decoded
   try {
-    decoded = jwtUtils.verify(transactionId) as string
+    decoded = jwtUtils.verify(transactionId)
   } catch (err) {
     logger.error(`${err.stack}`)
     throw new Error('Invalid transactionId provided')
   }
-  return decoded as string
+  return typeof decoded === 'string'
+    ? { s3Key: decoded }
+    : (decoded as { s3Key: string; uploadId: string }) //multipart
 }
 
 /**
@@ -203,13 +207,42 @@ const getRecordsFromCsv = (
   })
 }
 
-export const TemplateService = {
+/**
+ * Checks the csv for all the necessary columns.
+ * Transform the array of CSV rows into message interface
+ * @param campaignId
+ * @param fileContent
+ */
+const getProtectedRecordsFromCsv = (
+  campaignId: number,
+  fileContent: Array<CSVParams>
+): Array<ProtectedMessageRecordInterface> => {
+  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash', 'id']
+
+  checkTemplateKeysMatch(fileContent, PROTECTED_CSV_HEADERS)
+
+  return fileContent.map((entry) => {
+    const { recipient, payload, passwordhash, id } = entry
+    return {
+      campaignId,
+      id,
+      recipient,
+      payload,
+      passwordHash: passwordhash,
+    }
+  })
+}
+
+export const UploadService = {
+  /*** S3 API Calls ****/
   getUploadParameters,
-  extractS3Key,
+  extractParamsFromJwt,
+  /**** Handle S3Key in DB *****/
   replaceCampaignS3Metadata,
   storeS3TempFilename,
   storeS3Error,
   deleteS3TempKeys,
   getCsvStatus,
   getRecordsFromCsv,
+  getProtectedRecordsFromCsv,
 }

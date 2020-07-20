@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
 @import '~boxicons/css/boxicons.min.css';
 
 @import 'styles/_variables';
@@ -115,6 +117,7 @@ a,
 button {
   font-size: 0.8rem;
   text-decoration: none;
+  cursor: pointer;
 }
 
 li,
@@ -187,12 +190,12 @@ table {
 
     td,
     th {
-      padding: 0.75rem 0;
+      padding: 0.75rem 0.25rem;
       display: flex;
 
       &.xs {
         flex: 1.2;
-        text-align: center;
+        justify-content: center;
       }
 
       &.sm {
@@ -208,4 +211,8 @@ table {
       }
     }
   }
+}
+
+.spinner {
+  @include spinner;
 }

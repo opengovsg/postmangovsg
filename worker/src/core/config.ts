@@ -169,6 +169,12 @@ const config = convict({
       sensitive: true,
     },
   },
+  telegramBotToken: {
+    doc: 'API key required to make use of Telegram APIs',
+    default: '',
+    env: 'TELEGRAM_BOT_TOKEN',
+    sensitive: true,
+  },
   callbackSecret: {
     doc: 'Secret key used to generate Twilio callback url',
     default: '',
@@ -180,27 +186,6 @@ const config = convict({
     default: '',
     env: 'BACKEND_URL',
     sensitive: true,
-  },
-  xssOptions: {
-    doc: 'List of html tags allowed',
-    default: {
-      email: {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          br: [],
-          p: [],
-          a: ['href', 'title', 'target'],
-          img: ['src', 'alt', 'title', 'width', 'height'],
-        },
-        stripIgnoreTag: true,
-      },
-      sms: {
-        whiteList: { br: [] },
-        stripIgnoreTag: true,
-      },
-    },
   },
   messageWorker: {
     numSender: {
@@ -248,10 +233,8 @@ if (config.get('IS_PROD')) {
       config.get('messageWorker.numLogger') !==
     1
   ) {
-    throw new Error(`Only 1 worker of 1 variant per task supported in production. 
-    You supplied MESSAGE_WORKER_SENDER=${config.get(
-      'messageWorker.numSender'
-    )}, 
+    throw new Error(`Only 1 worker of 1 variant per task supported in production.
+    You supplied MESSAGE_WORKER_SENDER=${config.get('messageWorker.numSender')},
     MESSAGE_WORKER_LOGGER=${config.get('messageWorker.numLogger')}`)
   }
 

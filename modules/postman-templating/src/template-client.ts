@@ -6,8 +6,11 @@ import { TemplateError } from './errors'
 
 export class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
-  constructor(xssOptions?: xss.IFilterXSSOptions) {
+  lineBreak: string
+
+  constructor(xssOptions?: xss.IFilterXSSOptions, lineBreak = '<br />') {
     this.xssOptions = xssOptions
+    this.lineBreak = lineBreak
   }
 
   /**
@@ -16,7 +19,10 @@ export class TemplateClient {
    * @param value
    */
   replaceNewLinesAndSanitize(value: string): string {
-    return xss.filterXSS(value.replace(/(\n|\r\n)/g, '<br/>'), this.xssOptions)
+    return xss.filterXSS(
+      value.replace(/(\n|\r\n)/g, this.lineBreak),
+      this.xssOptions
+    )
   }
 
   /**
@@ -27,14 +33,14 @@ export class TemplateClient {
    * @param templateBody - template body
    * @param params - dict of param variables used for interpolation
    */
-  parseTemplate (
+  parseTemplate(
     templateBody: string,
     params?: { [key: string]: string }
   ): {
     variables: Array<string>
     tokens: Array<string>
   } {
-    const variables: Array<string> = []
+    const variables: Set<string> = new Set()
     const tokens: Array<string> = []
 
     /**
@@ -87,16 +93,16 @@ export class TemplateClient {
             )
           }
 
-          // only allow alphanumeric template, prevents code execution
-          const keyHasValidChars = key.match(/[^a-zA-Z0-9]/) === null
+          // only allow alphanumeric, underscore template, prevents code execution
+          const keyHasValidChars = key.match(/\W/) === null
           if (!keyHasValidChars) {
             throw new TemplateError(
-              `Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters and numbers.\nKeywords like {{ Person_Name }} are not allowed, but {{ PersonName }} is allowed.`
+              `Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person-Name }} are not allowed, but {{ Person_Name }} is allowed.`
             )
           }
 
           // add key regardless, note that this is also returned in lowercase
-          variables.push(key)
+          variables.add(key)
 
           // if no params continue with the loop
           if (!params) return
@@ -122,7 +128,7 @@ export class TemplateClient {
         }
       })
       return {
-        variables,
+        variables: Array.from(variables), // variables are unique
         tokens,
       }
     } catch (err) {
@@ -133,7 +139,7 @@ export class TemplateClient {
         )
       if (err.message.includes('unclosed string'))
         throw new TemplateError(
-          "Check that the keywords only contain letters and numbers.\nKeywords like {{ Person's Name }} are not allowed, but {{ PersonsName }} is allowed."
+          "Check that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person's Name }} are not allowed, but {{ Person_Name }} is allowed."
         )
       if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
       throw err
@@ -147,8 +153,12 @@ export class TemplateClient {
    */
   template(templateBody: string, params: { [key: string]: string }): string {
     const parsed = this.parseTemplate(templateBody, params)
-    // Remove extra '\' infront of single quotes and backslashes, added by Squirrelly when it escaped the csv
-    const templated = parsed.tokens.join('').replace(/\\([\\'])/g, '$1')
+    // Remove extra '\' infront of single quotes and backslashes, added by Squirrelly when it escaped the csv.
+    // Remove extra '\' infront of \n added by Squirrelly when it escaped the message body.
+    const templated = parsed.tokens
+      .join('')
+      .replace(/\\([\\'])/g, '$1')
+      .replace(/\\n/g, '\n')
     return xss.filterXSS(templated, this.xssOptions)
   }
 }

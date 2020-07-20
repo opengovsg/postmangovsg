@@ -6,11 +6,12 @@ import {
   Status,
   SMSCampaign,
   EmailCampaign,
+  TelegramCampaign,
   CampaignInvalidRecipient,
 } from 'classes'
 import moment from 'moment'
 
-const EXPORT_LINK_DISPLAY_WAIT_TIME = 5 * 60 * 1000
+const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
 
 function getJobTimestamps(
   jobs: Array<{ sent_at: Date; status_updated_at: Date }>
@@ -102,7 +103,7 @@ export async function getCampaignStats(
 
 export async function getCampaignDetails(
   campaignId: number
-): Promise<EmailCampaign | SMSCampaign> {
+): Promise<EmailCampaign | SMSCampaign | TelegramCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
     const campaign = response.data
     const { sentAt } = getJobTimestamps(campaign.job_queue)
@@ -116,6 +117,8 @@ export async function getCampaignDetails(
         return new SMSCampaign(details)
       case ChannelType.Email:
         return new EmailCampaign(details)
+      case ChannelType.Telegram:
+        return new TelegramCampaign(details)
       default:
         throw new Error('Invalid channel type')
     }
@@ -124,9 +127,10 @@ export async function getCampaignDetails(
 
 export async function createCampaign(
   name: string,
-  type: ChannelType
+  type: ChannelType,
+  protect: boolean
 ): Promise<Campaign> {
-  return axios.post('/campaigns', { name, type }).then((response) => {
+  return axios.post('/campaigns', { name, type, protect }).then((response) => {
     return new Campaign(response.data)
   })
 }

@@ -82,10 +82,13 @@ export const haltCampaignIfThresholdExceeded = async (campaignId?: number) => {
   if (campaignId === undefined) {
     return
   }
-  // Compute threshold
+
+  // Compute threshold for Hard bounces
+  // Your bounce rate includes only hard bounces to domains you haven't verified. 
+  // Source: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/faqs-enforcement.html#e-faq-bn
   const [result] =
     (await sequelize?.query(
-      `SELECT SUM(CASE WHEN status='INVALID_RECIPIENT' THEN 1 ELSE 0 END) AS invalid, COUNT(1) AS running_total FROM email_messages WHERE campaign_id=:campaignId AND status IS NOT NULL`,
+      `SELECT SUM(CASE WHEN error_code='Hard bounce' THEN 1 ELSE 0 END) AS invalid, COUNT(1) AS running_total FROM email_messages WHERE campaign_id=:campaignId AND status IS NOT NULL`,
       {
         replacements: { campaignId },
         type: QueryTypes.SELECT,

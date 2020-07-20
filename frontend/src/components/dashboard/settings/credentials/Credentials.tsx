@@ -5,7 +5,6 @@ import { ChannelType } from 'classes'
 import { PrimaryButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { UserCredential, deleteCredential } from 'services/settings.service'
-import { channelIcons } from 'classes'
 
 import AddCredentialModal from '../add-credential-modal'
 import EmptyCredentialsImage from 'assets/img/credentials.svg'
@@ -14,17 +13,22 @@ import styles from './Credentials.module.scss'
 
 const Credentials = ({
   creds,
+  credType,
   refresh,
+  title,
 }: {
   creds: UserCredential[]
+  credType: ChannelType
   refresh: Function
+  title: string
 }) => {
   const modalContext = useContext(ModalContext)
+  creds = creds.filter((cred: UserCredential) => cred.type === credType)
 
   function onAddCredentialClicked() {
     modalContext.setModalContent(
       <AddCredentialModal
-        labels={creds.map((c) => c.label)}
+        credType={credType}
         onSuccess={refresh}
       ></AddCredentialModal>
     )
@@ -60,21 +64,18 @@ const Credentials = ({
   function renderCredentials() {
     return (
       <>
-        {creds.map(({ label, type }) => (
+        {creds.map(({ label }) => (
           <tr key={label}>
-            <td className="xs">
-              <i className={cx('bx', styles.icon, channelIcons[type])}></i>
-            </td>
-            <td className="md">{label}</td>
+            <td className="lg">{label}</td>
             <td className={cx('sm', styles.actionColumn)}>
               <i
                 className={cx(
                   'bx',
-                  'bx-message-check',
+                  'bx-list-check',
                   styles.icon,
                   styles.verifyButton
                 )}
-                onClick={() => onVerifyCredClicked(label, type)}
+                onClick={() => onVerifyCredClicked(label, credType)}
               ></i>
               <i
                 className={cx(
@@ -95,7 +96,7 @@ const Credentials = ({
   return (
     <>
       <div className={styles.credHeader}>
-        <h2>Credentials</h2>
+        <h2>{title}</h2>
         <PrimaryButton
           className={styles.blueButton}
           onClick={onAddCredentialClicked}
@@ -108,8 +109,7 @@ const Credentials = ({
         <table className={styles.credTable}>
           <tbody>
             <tr>
-              <th className="xs">Mode</th>
-              <th className="md">Label</th>
+              <th className="lg">Label</th>
               <th className={cx('sm', styles.actionColumn)}></th>
             </tr>
             {renderCredentials()}

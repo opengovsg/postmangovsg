@@ -82,6 +82,9 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/serverless/log-email-sns
         - npm install && npm run build
         - zip -qr code.zip build package.json node_modules/
+        - cd $TRAVIS_BUILD_DIR/serverless/telegram-handler
+        - npm install && npm run build
+        - zip -qr code.zip build package.json node_modules/
       deploy:
         - provider: lambda
           edge: true
@@ -143,6 +146,8 @@ jobs:
             - DB_URI=$STAGING_EMAIL_DB_URI
             - MIN_HALT_NUMBER=$STAGING_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$STAGING_EMAIL_MIN_HALT_PERCENTAGE
+            - SENDGRID_PUBLIC_KEY=$STAGING_EMAIL_SENDGRID_PUBLIC_KEY
+            - CALLBACK_SECRET=$STAGING_EMAIL_CALLBACK_SECRET
         - provider: lambda
           edge: true
           function_name: log-email-callback-production
@@ -160,6 +165,38 @@ jobs:
             - DB_URI=$PRODUCTION_EMAIL_DB_URI
             - MIN_HALT_NUMBER=$PRODUCTION_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
+            - SENDGRID_PUBLIC_KEY=$PRODUCTION_EMAIL_SENDGRID_PUBLIC_KEY
+            - CALLBACK_SECRET=$PRODUCTION_EMAIL_CALLBACK_SECRET
+        - provider: lambda
+          edge: true
+          function_name: telegram-handler-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../telegram-handler/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_TELEGRAM_HANDLER_DB_URI
+        - provider: lambda
+          edge: true
+          function_name: telegram-test
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../telegram-handler/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - DB_URI=$STAGING_TELEGRAM_HANDLER_DB_URI
     - name: root
       install:
         - npm install --ignore-scripts

@@ -18,11 +18,14 @@ import { JobQueue } from './job-queue'
 import { Statistic } from './statistic'
 import { EmailTemplate } from '@email/models'
 import { SmsTemplate } from '@sms/models'
+import { TelegramTemplate } from '@telegram/models'
+
 @Table({ tableName: 'campaigns', underscored: true, timestamps: true })
 export class Campaign extends Model<Campaign> {
   @HasMany(() => JobQueue, { as: 'job_queue' })
   @HasOne(() => EmailTemplate, { as: 'email_templates' })
   @HasOne(() => SmsTemplate, { as: 'sms_templates' })
+  @HasOne(() => TelegramTemplate, { as: 'telegram_templates' })
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
@@ -64,6 +67,13 @@ export class Campaign extends Model<Campaign> {
     allowNull: false,
   })
   valid!: boolean
+
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  })
+  protect!: boolean
 
   @HasOne(() => Statistic)
   statistic?: Statistic

@@ -4,8 +4,10 @@ import { ChannelType } from 'classes'
 import { PrimaryButton, ErrorBlock } from 'components/common'
 import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
 import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
+import TelegramValidationInput from 'components/dashboard/create/telegram/TelegramValidationInput'
 import { ModalContext } from 'contexts/modal.context'
 import { verifyUserCredentials as VerifyUserSmsCredentials } from 'services/sms.service'
+import { verifyUserCredentials as VerifyUserTelegramCredentials } from 'services/telegram.service'
 
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
@@ -36,6 +38,9 @@ const VerifyCredentialModal = ({
         case ChannelType.SMS:
           await VerifyUserSmsCredentials({ recipient, label })
           break
+        case ChannelType.Telegram:
+          await VerifyUserTelegramCredentials({ recipient, label })
+          break
         case ChannelType.Email:
           throw new Error('not implemented')
       }
@@ -53,6 +58,13 @@ const VerifyCredentialModal = ({
       case ChannelType.SMS:
         validateInput = (
           <SMSValidationInput onClick={verifyCredential}></SMSValidationInput>
+        )
+        break
+      case ChannelType.Telegram:
+        validateInput = (
+          <TelegramValidationInput
+            onClick={verifyCredential}
+          ></TelegramValidationInput>
         )
         break
       case ChannelType.Email:

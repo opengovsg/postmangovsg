@@ -33,6 +33,7 @@ export interface CampaignDetails {
   has_credential: boolean
   csv_filename: string
   is_csv_processing: boolean
+  protect: boolean
   num_recipients: number
   email_templates?: {
     body: string

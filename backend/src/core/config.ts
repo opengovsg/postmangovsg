@@ -5,6 +5,7 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
+import { isSupportedCountry } from 'libphonenumber-js'
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 /**
  * To require an env var without setting a default,
@@ -148,6 +149,11 @@ const config = convict({
     default: 'https://postman.gov.sg', // prod only
     env: 'FRONTEND_URL',
   },
+  protectedUrl: {
+    doc: 'Url domain and path for password-protected messages',
+    default: 'https://postman.gov.sg/p', // prod only
+    env: 'PROTECTED_URL',
+  },
   session: {
     cookieName: {
       doc: 'Identifier for the cookie',
@@ -262,6 +268,14 @@ const config = convict({
     default: '',
     env: 'SES_FROM',
   },
+  defaultCountry: {
+    doc: 'Two-letter ISO country code to use in libphonenumber-js',
+    default: 'SG',
+    env: 'DEFAULT_COUNTRY',
+    format: (countryCode: string): boolean => {
+      return isSupportedCountry(countryCode)
+    },
+  },
   defaultCountryCode: {
     doc: 'Country code to prepend to phone numbers',
     default: '65',
@@ -293,6 +307,19 @@ const config = convict({
       sensitive: true,
     },
   },
+  telegramOptions: {
+    webhookUrl: {
+      doc: 'Webhook URL to configure for all Telegram bots',
+      default: '',
+      env: 'TELEGRAM_WEBHOOK_URL',
+    },
+    telegramBotToken: {
+      doc: 'API Key required to make use of Telegram APIs',
+      default: '',
+      env: 'TELEGRAM_BOT_TOKEN',
+      sensitive: true,
+    },
+  },
   maxRatePerJob: {
     doc: 'Number of messages that one worker can send at a time',
     default: 150,
@@ -317,27 +344,6 @@ const config = convict({
     doc: 'Semi-colon separated list of domains that can sign in to the app.',
     default: '.gov.sg',
     env: 'DOMAIN_WHITELIST',
-  },
-  xssOptions: {
-    doc: 'List of html tags allowed',
-    default: {
-      email: {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          br: [],
-          p: [],
-          a: ['href', 'title', 'target'],
-          img: ['src', 'alt', 'title', 'width', 'height'],
-        },
-        stripIgnoreTag: true,
-      },
-      sms: {
-        whiteList: { br: [] },
-        stripIgnoreTag: true,
-      },
-    },
   },
   csvProcessingTimeout: {
     doc:
@@ -364,6 +370,7 @@ switch (config.get('env')) {
   case 'staging':
     config.load({
       frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
+      protectedUrl: 'https://staging.postman.gov.sg/p',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
@@ -384,6 +391,7 @@ switch (config.get('env')) {
     config.set('IS_PROD', false)
     config.load({
       frontendUrl: 'http://localhost:3000',
+      protectedUrl: 'http://localhost:3000/p',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-testing',

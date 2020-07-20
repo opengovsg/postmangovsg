@@ -5,29 +5,13 @@ export interface Metadata {
 }
 
 export interface BounceMetadata extends Metadata {
-  message?: {
-    bounce?: {
-      bounceType?: string
-    }
-    mail?: {
-      commonHeaders?: {
-        to?: string[]
-      }
-    }
-  }
+  bounceType?: string
+  to?: string[]
 }
 
 export interface ComplaintMetadata extends Metadata {
-  message?: {
-    complaint?: {
-      complaintFeedbackType?: string
-    }
-    mail?: {
-      commonHeaders?: {
-        to?: string[]
-      }
-    }
-  }
+  complaintType?: string
+  to?: string[]
 }
 
 export interface UpdateMessageWithErrorCode extends Metadata {

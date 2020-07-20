@@ -7,6 +7,7 @@ interface PrimaryButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   alignRight?: boolean
   onClick?: (...args: any[]) => void | Promise<void>
+  loadingPlaceholder?: string | React.ReactElement
 }
 
 const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
@@ -15,6 +16,7 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
   disabled,
   onClick,
   children,
+  loadingPlaceholder,
   ...otherProps
 }) => {
   const [asyncLoading, setAsyncLoading] = useState(false)
@@ -56,7 +58,7 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
       onClick={asyncOnClick}
       {...otherProps}
     >
-      {children}
+      {loadingPlaceholder && asyncLoading ? loadingPlaceholder : children}
     </button>
   )
 }
