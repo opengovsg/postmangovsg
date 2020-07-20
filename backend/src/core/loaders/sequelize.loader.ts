@@ -11,7 +11,7 @@ import {
   UserCredential,
   Statistic,
   ProtectedMessage,
-  Unsubscribe,
+  Unsubscriber,
 } from '@core/models'
 import {
   EmailMessage,
@@ -64,7 +64,7 @@ const sequelizeLoader = async (): Promise<void> => {
     Worker,
     UserCredential,
     Statistic,
-    Unsubscribe,
+    Unsubscriber,
   ]
   const emailModels = [
     EmailMessage,

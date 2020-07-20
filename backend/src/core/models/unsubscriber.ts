@@ -8,8 +8,8 @@ import {
 } from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'unsubscribe', underscored: true, timestamps: true })
-export class Unsubscribe extends Model<Unsubscribe> {
+@Table({ tableName: 'unsubscribers', underscored: true, timestamps: true })
+export class Unsubscriber extends Model<Unsubscriber> {
   @ForeignKey(() => Campaign)
   @Column({
     type: DataType.INTEGER,
