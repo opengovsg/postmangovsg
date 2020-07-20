@@ -1,4 +1,5 @@
 import logger from '@core/logger'
+import retry from 'async-retry'
 import S3Client from '@core/services/s3-client.class'
 
 import { Request, Response, NextFunction } from 'express'
@@ -13,7 +14,12 @@ import { TemplateError } from 'postman-templating'
 import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { Campaign } from '@core/models'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
-
+const RETRY_CONFIG = {
+  retries: 3,
+  minTimeout: 1000,
+  maxTimeout: 3 * 1000,
+  factor: 1,
+}
 /**
  * Store template subject and body in Telegram template table.
  * If an existing csv has been uploaded for this campaign but whose columns do not match the
@@ -110,22 +116,30 @@ const uploadCompleteHandler = async (
       const transaction = await Campaign.sequelize!.transaction()
       // - download from s3
       const s3Client = new S3Client()
-      const downloadStream = s3Client.download(s3Key)
-      const params = {
-        transaction,
-        template,
-        campaignId: +campaignId,
-      }
-      await ParseCsvService.parseAndProcessCsv(
-        downloadStream,
-        TelegramService.uploadCompleteOnPreview(params),
-        TelegramService.uploadCompleteOnChunk(params),
-        TelegramService.uploadCompleteOnComplete({
-          ...params,
-          key: s3Key,
-          filename,
+      await retry(async (bail) => {
+        const downloadStream = s3Client.download(s3Key)
+        const params = {
+          transaction,
+          template,
+          campaignId: +campaignId,
+        }
+        await ParseCsvService.parseAndProcessCsv(
+          downloadStream,
+          TelegramService.uploadCompleteOnPreview(params),
+          TelegramService.uploadCompleteOnChunk(params),
+          TelegramService.uploadCompleteOnComplete({
+            ...params,
+            key: s3Key,
+            filename,
+          })
+        ).catch((e) => {
+          if (e.code !== 'NoSuchKey') {
+            bail(e)
+          } else {
+            throw e
+          }
         })
-      )
+      }, RETRY_CONFIG)
     } catch (err) {
       // Do not return any response since it has already been sent
       logger.error(

@@ -41,7 +41,7 @@ const parseAndProcessCsv = async (
         return lowercaseHeader
       },
 
-      chunk: async (rows: ParseResult<CSVParams>, parser) => {
+      chunk: async (rows: ParseResult<CSVParams>, parser: Papa.Parser) => {
         parser.pause()
         const { data, meta, errors } = rows
         try {
