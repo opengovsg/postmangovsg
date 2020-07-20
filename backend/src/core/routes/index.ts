@@ -10,6 +10,7 @@ import protectedMailRoutes from './protected.routes'
 import campaignRoutes from './campaign.routes'
 import settingsRoutes from './settings.routes'
 import statsRoutes from './stats.routes'
+import unsubscriberRoutes from './unsubscriber.routes'
 
 // Import channel-specific routes
 import { smsCampaignRoutes, smsSettingsRoutes } from '@sms/routes'
@@ -84,6 +85,7 @@ router.use('/ping', ping)
 router.use('/auth', authenticationRoutes)
 router.use('/stats', statsRoutes)
 router.use('/protect', protectedMailRoutes)
+router.use('/unsubscribe', unsubscriberRoutes)
 
 router.use(
   '/campaigns',
