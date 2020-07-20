@@ -17,6 +17,7 @@ const ActionButton = (props: any) => {
   return (
     <div className={styles.activeButtonContainer}>
       <button
+        type="button"
         className={cx(styles.actionButton, styles.dropdown, className)}
         {...otherProps}
       >

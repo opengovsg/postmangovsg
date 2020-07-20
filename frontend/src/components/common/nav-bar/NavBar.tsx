@@ -41,14 +41,15 @@ const NavBar = () => {
         <a href="/campaigns" className={styles.appLogo}>
           <img src={AppLogo} alt="Postman logo" />
         </a>
-        <a
+        <button
+          type="button"
           className={styles.burgerButton}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span
             className={cx(styles.burger, { [styles.isActive]: menuOpen })}
           ></span>
-        </a>
+        </button>
       </div>
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink
@@ -59,12 +60,13 @@ const NavBar = () => {
         >
           Campaigns
         </NavLink>
-        <a
+        <button
+          type="button"
           className={cx(styles.link, { [styles.active]: isCreatePath() })}
           onClick={handleCreateCampaign}
         >
           Create
-        </a>
+        </button>
         <OutboundLink
           className={styles.link}
           eventLabel={GUIDE_URL}
@@ -93,7 +95,8 @@ const NavBar = () => {
         >
           {email}
         </span>
-        <a
+        <button
+          type="button"
           className={cx(
             styles.active,
             styles.link,
@@ -104,7 +107,7 @@ const NavBar = () => {
         >
           Sign out
           <i className={cx(styles.icon, 'bx bx-log-out-circle')}></i>
-        </a>
+        </button>
       </div>
     </nav>
   )
