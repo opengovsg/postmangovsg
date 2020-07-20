@@ -103,7 +103,6 @@ const parseAndProcessCsv = async (
             }
             await onComplete(numRecords)
           } catch (err) {
-            console.error(`error in complete: ${err}`)
             reject(err)
           }
         }
