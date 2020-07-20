@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import cx from 'classnames'
 import { noop } from 'lodash'
-import { TextInputWithButton, ErrorBlock } from 'components/common'
+import { TextInputWithButton, ErrorBlock, TextButton } from 'components/common'
 import {
   getOtpWithEmail,
   loginWithOtp,
@@ -95,13 +95,12 @@ const Login = () => {
         <h4 className={styles.text}>
           {mainText}
           {otpSent && (
-            <button
-              type="button"
+            <TextButton
               className={cx(styles.resend, { [styles.disabled]: !canResend })}
               onClick={canResend ? resend : noop}
             >
               {isResending ? 'Resending OTP...' : 'Resend?'}
-            </button>
+            </TextButton>
           )}
         </h4>
         <TextInputWithButton

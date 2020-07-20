@@ -5,6 +5,7 @@ import { OutboundLink } from 'react-ga'
 
 import { ModalContext } from 'contexts/modal.context'
 import { GUIDE_URL } from 'config'
+import { TextButton } from 'components/common'
 import CreateModal from 'components/dashboard/create/create-modal'
 import { logout } from 'services/auth.service'
 import { AuthContext } from 'contexts/auth.context'
@@ -41,15 +42,15 @@ const NavBar = () => {
         <a href="/campaigns" className={styles.appLogo}>
           <img src={AppLogo} alt="Postman logo" />
         </a>
-        <button
-          type="button"
+        <TextButton
+          noUnderline
           className={styles.burgerButton}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span
             className={cx(styles.burger, { [styles.isActive]: menuOpen })}
           ></span>
-        </button>
+        </TextButton>
       </div>
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink
@@ -60,13 +61,13 @@ const NavBar = () => {
         >
           Campaigns
         </NavLink>
-        <button
-          type="button"
+        <TextButton
+          noUnderline
           className={cx(styles.link, { [styles.active]: isCreatePath() })}
           onClick={handleCreateCampaign}
         >
           Create
-        </button>
+        </TextButton>
         <OutboundLink
           className={styles.link}
           eventLabel={GUIDE_URL}
@@ -95,8 +96,8 @@ const NavBar = () => {
         >
           {email}
         </span>
-        <button
-          type="button"
+        <TextButton
+          noUnderline
           className={cx(
             styles.active,
             styles.link,
@@ -107,7 +108,7 @@ const NavBar = () => {
         >
           Sign out
           <i className={cx(styles.icon, 'bx bx-log-out-circle')}></i>
-        </button>
+        </TextButton>
       </div>
     </nav>
   )
