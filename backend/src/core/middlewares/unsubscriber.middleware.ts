@@ -14,11 +14,11 @@ const isUnsubscribeRequestValid = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const params = req.query.c ? req.query : req.body
-  const { c: campaignId, r: recipient, h: hmac } = params
-
   try {
-    UnsubscriberService.validateHmac(campaignId, recipient, hmac)
+    const params = req.query.c ? req.query : req.body
+    const { c: campaignId, r: recipient, v: version, h: hmac } = params
+
+    UnsubscriberService.validateHmac({ campaignId, recipient, version, hmac })
 
     const campaign = await CampaignService.getCampaignDetails(campaignId, [])
     if (!campaign) {
@@ -30,7 +30,7 @@ const isUnsubscribeRequestValid = async (
       recipient,
     }
 
-    return next()
+    next()
   } catch (err) {
     return res.status(400).json({
       message: 'Invalid unsubscribe request',
