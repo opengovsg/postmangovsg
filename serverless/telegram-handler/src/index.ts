@@ -21,8 +21,8 @@ let sequelize: Sequelize | undefined
 const captureSentryException = async (err: Error, event: any) => {
   Sentry.captureException(err, (scope) => {
     // Enrich event with HTTP request method and payload
-    scope.addEventProcessor((ev) => ({
-      ...ev,
+    scope.addEventProcessor((sentryEvent) => ({
+      ...sentryEvent,
       request: {
         method: event.httpMethod,
         data: event.body,
