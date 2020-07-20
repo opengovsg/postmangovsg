@@ -182,6 +182,8 @@ jobs:
             branch: $PRODUCTION_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_TELEGRAM_HANDLER_DB_URI
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - SENTRY_LAMBDA_FUNCTION_NAME=telegram-handler-production
         - provider: lambda
           edge: true
           function_name: telegram-test
@@ -197,6 +199,8 @@ jobs:
             branch: $STAGING_BRANCH
           environment_variables:
             - DB_URI=$STAGING_TELEGRAM_HANDLER_DB_URI
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - SENTRY_LAMBDA_FUNCTION_NAME=telegram-test
     - name: root
       install:
         - npm install --ignore-scripts
