@@ -8,19 +8,6 @@ import {
 import { MessageStatus, ChannelType } from '@core/constants'
 import logger from '@core/logger'
 
-import bluebird from 'bluebird'
-
-const getUnfinalisedCampaigns = async (): Promise<Array<number>> => {
-  const result = await Statistic.sequelize?.query(`
-      SELECT id FROM campaigns WHERE id NOT IN (
-        SELECT DISTINCT(campaign_id) FROM email_messages
-        WHERE
-          updated_at::TIMESTAMP > (clock_timestamp() - '36 hours'::INTERVAL)
-          AND status IS NOT NULL
-      ) AND halted <> TRUE;`)
-  return result?.[0].map((r: any) => r.id as number) || []
-}
-
 /**
  * Calls update_stats SQL function for respective channels.
  * fails silently
@@ -69,19 +56,6 @@ const updateStats = async (campaignId: number): Promise<void> => {
       logger.error(`Invalid channel type found for campaign ${campaignId}`)
     }
   }
-}
-
-const consolidateStats = async (): Promise<void> => {
-  const campaigns = await getUnfinalisedCampaigns()
-  await bluebird.map(
-    campaigns,
-    (campaign) => {
-      return updateStats(campaign)
-    },
-    {
-      concurrency: 5,
-    }
-  )
 }
 
 /**
@@ -267,7 +241,6 @@ const getFailedRecipients = async (
 }
 
 export const StatsService = {
-  consolidateStats,
   getCurrentStats,
   getTotalSentCount,
   getNumRecipients,
