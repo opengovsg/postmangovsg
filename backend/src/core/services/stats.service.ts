@@ -250,6 +250,7 @@ const getFailedRecipients = async (
   campaignId: number,
   logsTable: any
 ): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+  await updateStats(+campaignId)
   const data = await logsTable.findAll({
     raw: true,
     where: {
