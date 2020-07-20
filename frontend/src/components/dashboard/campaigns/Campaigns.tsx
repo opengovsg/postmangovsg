@@ -99,15 +99,16 @@ const Campaigns = () => {
     {
       name: 'Status',
       render: (campaign: Campaign) => capitalize(campaign.status),
-      width: 'xs',
+      width: 'xs center',
     },
     {
-      name: 'Export Error List',
+      name: 'Export',
       render: (campaign: Campaign) => {
         if (campaign.status !== Status.Sent) return
         const { statusUpdatedAt, hasFailedRecipients } = campaign
         return (
           <ExportRecipients
+            alignLabel
             campaignId={campaign.id}
             campaignName={campaign.name}
             status={campaign.status}

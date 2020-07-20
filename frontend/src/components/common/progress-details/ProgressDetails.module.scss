@@ -26,10 +26,6 @@
   }
 }
 
-.campaignStatus {
-  text-transform: capitalize;
-}
-
 .stats {
   margin-top: 3rem;
 }
@@ -88,4 +84,16 @@
   @include flex-horizontal;
   justify-content: flex-end;
   margin: 3rem 0;
+
+  .disabledExport {
+    border: 1px solid $grey;
+
+    &:hover {
+      border-width: 1px;
+    }
+  }
+
+  .disablePointerEvents {
+    pointer-events: none;
+  }
 }

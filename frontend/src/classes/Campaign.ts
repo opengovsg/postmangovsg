@@ -5,10 +5,10 @@ export enum ChannelType {
 }
 
 export enum Status {
-  Draft = 'draft',
-  Sending = 'sending',
-  Sent = 'sent',
-  Halted = 'halted',
+  Draft = 'Draft',
+  Sending = 'Sending',
+  Sent = 'Sent',
+  Halted = 'Halted',
 }
 
 export const channelIcons = {

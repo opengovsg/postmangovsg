@@ -4,11 +4,19 @@
   @include flex-horizontal;
   color: $indigo-blue;
   cursor: pointer;
-}
 
-.icon {
-  @include icon;
-  margin-right: 0.5rem;
+  .noError {
+    color: $grey;
+
+    &.alignLabel {
+      margin-left: 2rem;
+    }
+  }
+
+  .icon {
+    @include icon;
+    margin-right: 0.5rem;
+  }
 }
 
 .disabled {

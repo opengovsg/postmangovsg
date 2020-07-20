@@ -15,6 +15,7 @@ const ExportRecipients = ({
   campaignName,
   sentAt,
   exportStatus,
+  alignLabel,
 }: {
   className?: string
   campaignId: number
@@ -22,8 +23,10 @@ const ExportRecipients = ({
   status: Status
   sentAt: Date
   exportStatus: CampaignExportStatus
+  alignLabel?: boolean
 }) => {
   const [disabled, setDisabled] = useState(false)
+
   async function exportRecipients(
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) {
@@ -60,11 +63,17 @@ const ExportRecipients = ({
 
   function renderExportButton() {
     if (exportStatus === CampaignExportStatus.NoError) {
-      return <span>No error</span>
+      return (
+        <span
+          className={cx(styles.noError, { [styles.alignLabel]: alignLabel })}
+        >
+          No error
+        </span>
+      )
     }
     const icon =
       exportStatus === CampaignExportStatus.Loading ? (
-        <i className={cx(styles.icon, 'bx bx-loader-alt')}></i>
+        <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
       ) : (
         <i className={cx(styles.icon, 'bx bx-export')}></i>
       )

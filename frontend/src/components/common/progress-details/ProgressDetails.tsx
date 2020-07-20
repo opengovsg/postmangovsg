@@ -122,7 +122,7 @@ const ProgressDetails = ({
             </td>
 
             <td className={'md'}>{numRecipients}</td>
-            <td className={cx(styles.campaignStatus, 'sm')}>{status}</td>
+            <td className={'sm'}>{status}</td>
           </tr>
         </tbody>
       </table>
@@ -139,7 +139,18 @@ const ProgressDetails = ({
 
       {exportStatus && (
         <div className={styles.actionButton}>
-          <ActionButton>
+          <ActionButton
+            className={cx(
+              {
+                [styles.disabledExport]:
+                  exportStatus === CampaignExportStatus.NoError,
+              },
+              {
+                [styles.disablePointerEvents]:
+                  exportStatus !== CampaignExportStatus.Ready,
+              }
+            )}
+          >
             <ExportRecipients
               campaignId={campaignId}
               campaignName={campaignName}
