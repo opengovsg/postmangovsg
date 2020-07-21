@@ -1,24 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { debounce } from 'lodash'
 import { parse } from 'papaparse'
-import { hydrateTemplate } from 'services/validate-csv.service'
 
-import { TextArea, ProtectedPreview } from 'components/common'
+import { hydrateTemplate } from 'services/validate-csv.service'
+import { TextArea, ProtectedPreview, Checkbox } from 'components/common'
 import styles from './TemplateTest.module.scss'
 
 const TemplateTest = () => {
   const [body, setBody] = useState('')
   const [csv, setCsv] = useState('')
   const [html, setHtml] = useState('')
+  const [trimNewLines, setTrimNewLines] = useState(false)
 
   const updatePreview = useCallback(
-    debounce((template: string, csvString: string) => {
+    debounce((template: string, csvString: string, trim: boolean) => {
       try {
         const data = parse(csvString, { header: true }).data as Record<
           string,
           any
         >[]
-        const preview = hydrateTemplate(template, data[0])
+        const preview = hydrateTemplate(template, data[0], trim)
         setHtml(preview)
       } catch (e) {
         console.error(e)
@@ -28,8 +29,8 @@ const TemplateTest = () => {
   )
 
   useEffect(() => {
-    updatePreview(body, csv)
-  }, [body, csv, updatePreview])
+    updatePreview(body, csv, trimNewLines)
+  }, [body, csv, updatePreview, trimNewLines])
 
   return (
     <div className={styles.container}>
@@ -46,6 +47,9 @@ const TemplateTest = () => {
           value={csv}
           placeholder="Paste csv here"
         />
+        <Checkbox checked={trimNewLines} onChange={setTrimNewLines}>
+          Trim new lines
+        </Checkbox>
       </div>
       <div className={styles.previewColumn}>
         <div className={styles.previewContainer}>

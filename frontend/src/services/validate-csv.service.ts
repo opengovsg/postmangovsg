@@ -13,6 +13,9 @@ export const PROTECTED_CSV_HEADERS = ['recipient', 'password']
 // Using default xss options for registered mail
 const templateClient = new TemplateClient()
 
+// Looks for 2 or more <br>, <br/> or <br />
+const CONSECUTIVE_LINEBREAK_REGEX = /(\s)*(<br\s*\/?>(\s)*(\n|\r\n)?){2,}/g
+
 export function extractParams(template: string): string[] {
   return templateClient.parseTemplate(template).variables
 }
@@ -74,9 +77,22 @@ export async function validateCsv(
   })
 }
 
-export function hydrateTemplate(template: string, row: Record<string, any>) {
-  const newLinesReplaced = template.replace(/(?:\r\n|\r|\n)/g, '<br>')
-  return templateClient.template(newLinesReplaced, row)
+export function hydrateTemplate(
+  template: string,
+  row: Record<string, any>,
+  trimNewLines?: boolean
+) {
+  const newLinesReplaced = templateClient.replaceNewLinesAndSanitize(template)
+  const hydrated = templateClient.template(newLinesReplaced, row)
+  // Replace multiple linebreaks with a single one,
+  // effectively removing empty lines
+  if (trimNewLines) {
+    return hydrated.replace(
+      CONSECUTIVE_LINEBREAK_REGEX,
+      templateClient.lineBreak
+    )
+  }
+  return hydrated
 }
 
 // Validate row has required headers and valid recipient
