@@ -33,7 +33,14 @@ const config = convict({
   },
   env: {
     doc: 'The application environment',
-    format: ['production', 'staging', 'development'],
+    format: (val: string) => {
+      if (!/^(production|staging|development)(-\d+)?$/.test(val)) {
+        throw new Error(
+          `${val} is not a valid environment. NODE_ENV must be one of 'production', 'staging', 'development' 
+          or one of these keywords appended with '-digits'. eg. production-01`
+        )
+      }
+    },
     default: 'production',
     env: 'NODE_ENV',
   },
