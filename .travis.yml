@@ -184,7 +184,7 @@ jobs:
             - DB_URI=$PRODUCTION_TELEGRAM_HANDLER_DB_URI
         - provider: lambda
           edge: true
-          function_name: telegram-test
+          function_name: telegram-handler-staging
           region: $AWS_DEFAULT_REGION
           role: $STAGING_CALLBACK_ROLE
           runtime: nodejs12.x
