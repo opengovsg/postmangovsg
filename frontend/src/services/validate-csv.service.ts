@@ -26,11 +26,17 @@ export function extractParams(template: string): string[] {
  * recipient,password
  *
  */
-export async function validateCsv(
-  file: File,
-  template: string,
+export async function validateCsv({
+  file,
+  template,
+  recipientValidator,
+  trimEmptyLines,
+}: {
+  file: File
+  template: string
   recipientValidator: Function
-): Promise<ProtectedCsvInfo> {
+  trimEmptyLines: boolean
+}): Promise<ProtectedCsvInfo> {
   const csvFilename = file.name
   const templateParams = extractParams(template)
   const requiredParams = uniq(PROTECTED_CSV_HEADERS.concat(templateParams))
@@ -51,7 +57,7 @@ export async function validateCsv(
           const row = step.data
           validateRow(row, requiredParams, recipientValidator)
           if (count === 1) {
-            preview = hydrateTemplate(template, row)
+            preview = hydrateTemplate(template, row, trimEmptyLines)
           }
         } catch (e) {
           // If there is errors, append to the errors array
@@ -80,13 +86,13 @@ export async function validateCsv(
 export function hydrateTemplate(
   template: string,
   row: Record<string, any>,
-  trimNewLines?: boolean
+  trimEmptyLines?: boolean
 ) {
   const newLinesReplaced = templateClient.replaceNewLinesAndSanitize(template)
   const hydrated = templateClient.template(newLinesReplaced, row)
   // Replace multiple linebreaks with a single one,
   // effectively removing empty lines
-  if (trimNewLines) {
+  if (trimEmptyLines) {
     return hydrated.replace(
       CONSECUTIVE_LINEBREAK_REGEX,
       templateClient.lineBreak

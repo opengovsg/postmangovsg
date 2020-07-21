@@ -10,7 +10,7 @@ const TemplateTest = () => {
   const [body, setBody] = useState('')
   const [csv, setCsv] = useState('')
   const [html, setHtml] = useState('')
-  const [trimNewLines, setTrimNewLines] = useState(false)
+  const [trimEmptyLines, setTrimEmptyLines] = useState(false)
 
   const updatePreview = useCallback(
     debounce((template: string, csvString: string, trim: boolean) => {
@@ -29,8 +29,8 @@ const TemplateTest = () => {
   )
 
   useEffect(() => {
-    updatePreview(body, csv, trimNewLines)
-  }, [body, csv, updatePreview, trimNewLines])
+    updatePreview(body, csv, trimEmptyLines)
+  }, [body, csv, updatePreview, trimEmptyLines])
 
   return (
     <div className={styles.container}>
@@ -47,7 +47,7 @@ const TemplateTest = () => {
           value={csv}
           placeholder="Paste csv here"
         />
-        <Checkbox checked={trimNewLines} onChange={setTrimNewLines}>
+        <Checkbox checked={trimEmptyLines} onChange={setTrimEmptyLines}>
           Trim new lines
         </Checkbox>
       </div>

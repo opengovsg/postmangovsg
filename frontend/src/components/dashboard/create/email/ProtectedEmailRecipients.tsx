@@ -9,6 +9,7 @@ import {
   InfoBlock,
   ErrorBlock,
   ProtectedPreview,
+  Checkbox,
 } from 'components/common'
 import EmailRecipients from './EmailRecipients'
 import { EmailCampaign } from 'classes'
@@ -39,6 +40,7 @@ const ProtectedEmailRecipients = ({
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState<File>()
+  const [trimEmptyLines, setTrimEmptyLines] = useState(false)
   const [protectedCsvInfo, setProtectedCsvInfo] = useState<ProtectedCsvInfo>()
   const { id: campaignId } = useParams()
 
@@ -69,7 +71,12 @@ const ProtectedEmailRecipients = ({
     setPhase(ProtectPhase.VALIDATING)
     setSelectedFile(file)
     try {
-      const validationInfo = await validateCsv(file, template, isEmail)
+      const validationInfo = await validateCsv({
+        file,
+        template,
+        trimEmptyLines,
+        recipientValidator: isEmail,
+      })
       setProtectedCsvInfo(validationInfo)
       setPhase(ProtectPhase.PREVIEW)
     } catch (err) {
@@ -88,7 +95,12 @@ const ProtectedEmailRecipients = ({
     }
     try {
       const uploadTimeStart = performance.now()
-      await protectAndUploadCsv(campaignId, selectedFile, template)
+      await protectAndUploadCsv({
+        campaignId,
+        file: selectedFile,
+        template,
+        trimEmptyLines,
+      })
       const uploadTimeEnd = performance.now()
       sendTiming(
         'Contacts file',
@@ -121,7 +133,12 @@ const ProtectedEmailRecipients = ({
         value={template}
         onChange={setTemplate}
       />
-
+      <Checkbox checked={trimEmptyLines} onChange={setTrimEmptyLines}>
+        <p>
+          <b>Trim empty lines.</b> When checked, use {'<b></b>'} to preserve
+          empty lines.
+        </p>
+      </Checkbox>
       <div className="separator"></div>
     </>
   )
