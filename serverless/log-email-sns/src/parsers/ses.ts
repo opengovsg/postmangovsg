@@ -7,8 +7,8 @@ import {
   updateComplaintStatus,
 } from '../util/update-status'
 import { isAuthenticated } from '../util/auth'
-const REFERENCE_ID_HEADER_V1 = 'X-Postman-ID' // Case sensitive
-const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
+import config from '../config'
+const REFERENCE_ID_HEADER_V1 = 'X-SMTPAPI' // Case sensitive
 const certCache: { [key: string]: string } = {}
 
 type SesRecord = {
@@ -32,25 +32,24 @@ type HttpEvent = SesRecord[]
 type SmtpApiHeader = {
   unique_args: {
     message_id: string
+    environment?: string // TODO: make this mandatory when the messages are being sent with this property consistently
   }
 }
 
 /**
- * Parses the message to find the matching email_message id
+ * Extracts the smtp header from message
  * @param message
  */
-const getReferenceID = (message: any): string | undefined => {
+const getSmtpApiHeader = (message: any): SmtpApiHeader | undefined => {
   const headers: Array<{ name: string; value: string }> = message?.mail?.headers
   const smtpApiHeaderValue = headers.find(
-    ({ name }) => name === REFERENCE_ID_HEADER_V2
+    ({ name }) => name === REFERENCE_ID_HEADER_V1
   )?.value
   if (smtpApiHeaderValue !== undefined) {
     const smtpApiHeader = JSON.parse(smtpApiHeaderValue) as SmtpApiHeader
-    return smtpApiHeader.unique_args.message_id
-  } else {
-    // TODO: Remove 'X-Postman-ID' once the implementation for X-SMTPAPI is stable
-    return headers.find(({ name }) => name === REFERENCE_ID_HEADER_V1)?.value
+    return smtpApiHeader
   }
+  return
 }
 
 const isValidCertUrl = (urlToValidate: string): boolean => {
@@ -128,14 +127,28 @@ const parseRecord = async (record: SesRecord) => {
 
   const message = JSON.parse(record.Message)
   const messageId = message?.mail?.commonHeaders?.messageId
-  const id = getReferenceID(message)
-  if (id === undefined) {
-    console.log(`No reference message id found for ${messageId}`)
+  const smtpApiHeader = getSmtpApiHeader(message)
+  if (!smtpApiHeader) {
+    console.log(`No smtp api header found for ${messageId}`)
     return
   }
+  const environment = smtpApiHeader.unique_args.environment
+  if (environment && environment !== config.get('env')) {
+    console.log(
+      `Mismatched environment for ${messageId}. Lambda: ${config.get(
+        'env'
+      )}. Message: ${environment}. `
+    )
+    return
+  }
+
   const notificationType = message?.notificationType
   console.log(`Update for notificationType = ${notificationType}`)
-  const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
+  const metadata = {
+    id: smtpApiHeader.unique_args.message_id,
+    timestamp: record.Timestamp,
+    messageId: messageId,
+  }
   switch (notificationType) {
     case 'Delivery':
       await updateDeliveredStatus(metadata)

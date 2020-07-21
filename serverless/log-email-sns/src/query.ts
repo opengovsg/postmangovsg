@@ -84,7 +84,7 @@ export const haltCampaignIfThresholdExceeded = async (campaignId?: number) => {
   }
 
   // Compute threshold for Hard bounces
-  // Your bounce rate includes only hard bounces to domains you haven't verified. 
+  // Your bounce rate includes only hard bounces to domains you haven't verified.
   // Source: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/faqs-enforcement.html#e-faq-bn
   const [result] =
     (await sequelize?.query(

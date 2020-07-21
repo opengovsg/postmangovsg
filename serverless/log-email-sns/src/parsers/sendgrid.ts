@@ -16,6 +16,7 @@ type SendgridEvent = SendgridRecord[]
 type SendgridRecord = {
   // the unique_args that we passed
   message_id: string
+  environment?: string // TODO: make this mandatory when the messages are being sent with this property consistently
   // standard args
   email: string
   event: string
@@ -46,10 +47,18 @@ const parseRecord = async (record: SendgridRecord) => {
     console.log(`No reference message id found for ${record['smtp-id']}`)
     return
   }
+  if (record.environment && record.environment !== config.get('env')) {
+    console.log(
+      `Mismatched environment for ${record.message_id}. Lambda: ${config.get(
+        'env'
+      )}. Message: ${record.environment}. `
+    )
+    return
+  }
   const metadata = {
     id: record.message_id,
     timestamp: new Date(record.timestamp * 1000).toISOString(),
-    messageId: record['smtp-id'],
+    messageId: record['smtp-id'], 
   }
   switch (record.event) {
     case 'delivered':
