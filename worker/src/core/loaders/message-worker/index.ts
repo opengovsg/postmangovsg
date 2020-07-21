@@ -70,7 +70,7 @@ const enqueueMessages = (jobId: number, campaignId: number): Promise<void> => {
   return service().enqueueMessages(jobId, campaignId)
 }
 
-const calculateHmac = (campaignId: number, recipient: string) => {
+const calculateHash = (campaignId: number, recipient: string) => {
   const version = config.get('unsubscribeHmac.version')
   return crypto
     .createHmac(
@@ -83,11 +83,11 @@ const calculateHmac = (campaignId: number, recipient: string) => {
 
 const generateUnsubLink = (campaignId: number, recipient: string): URL => {
   const version = config.get('unsubscribeHmac.version')
-  const hmac = calculateHmac(campaignId, recipient)
+  const hash = calculateHash(campaignId, recipient)
   const link = new URL(`/unsubscribe/${version}`, config.get('frontendUrl'))
   link.searchParams.append('c', campaignId.toString())
   link.searchParams.append('r', recipient)
-  link.searchParams.append('h', hmac)
+  link.searchParams.append('h', hash)
   return link
 }
 
