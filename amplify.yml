@@ -2,6 +2,7 @@ version: 0.1
 env:
   variables:
     BACKEND_URL_PRODUCTION: "https://api.postman.gov.sg/v1"
+    BACKEND_URL_PRODUCTION_MOM: "https://api-mom.postman.gov.sg/v1"
     BACKEND_URL_STAGING: "https://api-staging.postman.gov.sg/v1"
     SENTRY_ORG: "open-government-products-re"
     SENTRY_PROJECT: "postmangovsg-frontend"
@@ -29,6 +30,9 @@ frontend:
         - if [ "${AWS_BRANCH}" = "master" ]; then
           export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION} &&
           export REACT_APP_SENTRY_ENVIRONMENT="production";
+          elif [ "${AWS_BRANCH}" = "momgovsg" ]; then
+          export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION_MOM} &&
+          export REACT_APP_SENTRY_ENVIRONMENT="production-02";
           else
           export REACT_APP_BACKEND_URL=${BACKEND_URL_STAGING} &&
           export REACT_APP_SENTRY_ENVIRONMENT="staging";
