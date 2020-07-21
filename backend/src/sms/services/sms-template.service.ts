@@ -235,16 +235,19 @@ const validateAndFormatNumber = (
   records: MessageBulkInsertInterface[]
 ): MessageBulkInsertInterface[] => {
   return records.map((record) => {
-    const { recipient } = record
     try {
-      record.recipient = PhoneNumberService.normalisePhoneNumber(
+      const { recipient } = record
+      const normalised = PhoneNumberService.normalisePhoneNumber(
         recipient,
         config.get('defaultCountry')
       )
+      return {
+        ...record,
+        recipient: normalised,
+      }
     } catch (e) {
       throw new InvalidRecipientError()
     }
-    return record
   })
 }
 
