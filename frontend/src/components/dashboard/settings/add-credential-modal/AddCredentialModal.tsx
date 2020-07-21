@@ -164,7 +164,7 @@ const AddCredentialModal = ({
   function renderSelect() {
     return (
       <div className={styles.centerAlign}>
-        <img src={ChooseChannelsImage}></img>
+        <img src={ChooseChannelsImage} alt="" />
         <h2>Select channel type to add credentials</h2>
         <div className={styles.channelTypes}>
           <PrimaryButton onClick={() => selectCredentialType(ChannelType.SMS)}>
@@ -283,7 +283,7 @@ const AddCredentialModal = ({
 
     return (
       <>
-        <img src={ConfirmImage}></img>
+        <img src={ConfirmImage} alt="" />
         <h2>{messageTitle}</h2>
         <p>{message}</p>
         {validateInput}
@@ -306,7 +306,7 @@ const AddCredentialModal = ({
       case AddCredentialStep.Success:
         return (
           <div className={styles.centerAlign}>
-            <img src={SuccessImage} />
+            <img src={SuccessImage} alt="" />
             <h3>Your credentials are working well.</h3>
             <PrimaryButton
               className={styles.padTop}
@@ -320,7 +320,7 @@ const AddCredentialModal = ({
       case AddCredentialStep.Failure:
         return (
           <div className={styles.centerAlign}>
-            <img src={FailureImage} />
+            <img src={FailureImage} alt="" />
             <h3>Sorry, something went wrong.</h3>
             <ErrorBlock>{error?.message}</ErrorBlock>
             <PrimaryButton

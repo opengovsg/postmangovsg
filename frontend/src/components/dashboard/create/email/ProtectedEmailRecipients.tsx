@@ -149,7 +149,7 @@ const ProtectedEmailRecipients = ({
         </li>
       </InfoBlock>
       <div className="progress-button">
-        <TextButton onClick={() => setPhase(ProtectPhase.READY)}>
+        <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
           Back
         </TextButton>
         <PrimaryButton
@@ -184,7 +184,10 @@ const ProtectedEmailRecipients = ({
       ></EmailRecipients>
       {phase === ProtectPhase.READY && csvFilename && (
         <div className="progress-button">
-          <TextButton onClick={() => setPhase(ProtectPhase.DONE)}>
+          <TextButton
+            minButtonWidth
+            onClick={() => setPhase(ProtectPhase.DONE)}
+          >
             Cancel
           </TextButton>
         </div>
@@ -194,7 +197,7 @@ const ProtectedEmailRecipients = ({
 
   const completeButtons = (
     <div className="progress-button">
-      <TextButton onClick={() => setPhase(ProtectPhase.READY)}>
+      <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
         Edit Message
       </TextButton>
       <PrimaryButton onClick={onNext}>Test Message →</PrimaryButton>

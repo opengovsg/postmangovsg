@@ -186,7 +186,7 @@ jobs:
             - SENTRY_LAMBDA_FUNCTION_NAME=telegram-handler-production
         - provider: lambda
           edge: true
-          function_name: telegram-test
+          function_name: telegram-handler-staging
           region: $AWS_DEFAULT_REGION
           role: $STAGING_CALLBACK_ROLE
           runtime: nodejs12.x

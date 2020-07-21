@@ -5,15 +5,17 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import Landing from 'components/landing'
 import Login from 'components/login'
 import ProtectedPage from 'components/protected'
-import CryptoTest from 'components/cryptoTest'
+import TestUtils from 'components/test-utils'
 
 // Contexts
 import AuthContextProvider from 'contexts/auth.context'
 
 import './styles/app.scss'
 
-// lazy load admin dashboard views
+// HOC
 import ProtectedRoute from 'routes/protected.route'
+
+// lazy loaded components
 const Dashboard = lazy(() => import('components/dashboard'))
 
 const App = () => {
@@ -23,7 +25,7 @@ const App = () => {
         <Switch>
           <Route exact path="/" component={Landing}></Route>
           <Route exact path="/login" component={Login}></Route>
-          <Route exact path="/crypto-test" component={CryptoTest}></Route>
+          <Route path="/test" component={TestUtils}></Route>
           <Route exact path="/p/:version/:id" component={ProtectedPage}></Route>
           <ProtectedRoute>
             <Suspense

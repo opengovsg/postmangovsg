@@ -117,7 +117,7 @@ const Credentials = ({
         </table>
       ) : (
         <div className={styles.emptyCredentials}>
-          <img src={EmptyCredentialsImage} />
+          <img src={EmptyCredentialsImage} alt="" />
           <h3>There’s nothing to show yet!</h3>
           <p>
             But here’s what you can do. Start adding credentials by clicking the

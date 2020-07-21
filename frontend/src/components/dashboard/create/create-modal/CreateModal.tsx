@@ -96,6 +96,7 @@ const CreateModal = ({
               <p className={styles.subtext}>
                 Get your credentials ready.&nbsp;
                 <OutboundLink
+                  className={styles.link}
                   eventLabel={GUIDE_SMS_CREDENTIALS_URL}
                   to={GUIDE_SMS_CREDENTIALS_URL}
                   target="_blank"
@@ -124,9 +125,12 @@ const CreateModal = ({
             {selectedChannel === ChannelType.Telegram && (
               <p className={styles.subtext}>
                 It is best to
-                <a onClick={() => handleAddCredentials(ChannelType.Telegram)}>
+                <span
+                  className={styles.link}
+                  onClick={() => handleAddCredentials(ChannelType.Telegram)}
+                >
                   store and validate your credentials
-                </a>
+                </span>
                 &nbsp;before you start.
               </p>
             )}
@@ -164,6 +168,7 @@ const CreateModal = ({
                   Password protected.
                   {/* TODO: change url to passsword protected section in guide */}
                   <OutboundLink
+                    className={styles.link}
                     eventLabel={GUIDE_URL}
                     to={GUIDE_URL}
                     target="_blank"
