@@ -2,7 +2,9 @@ import nodemailer from 'nodemailer'
 import directTransport from 'nodemailer-direct-transport'
 import logger from '@core/logger'
 import { MailToSend, MailCredentials } from '@email/interfaces'
+import config from '@core/config'
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
+const ENVIRONMENT = config.get('env')
 export default class MailClient {
   private email: string
   private mailer: nodemailer.Transporter
@@ -50,7 +52,10 @@ export default class MailClient {
         // Signature expected by Sendgrid
         // https://sendgrid.com/docs/for-developers/tracking-events/event/#unique-arguments
         const headerValue = JSON.stringify({
-          unique_args: { message_id: input.referenceId },
+          unique_args: {
+            message_id: input.referenceId,
+            environment: ENVIRONMENT,
+          },
         })
         options.headers = { [REFERENCE_ID_HEADER]: headerValue }
       }
