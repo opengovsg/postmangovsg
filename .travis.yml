@@ -201,6 +201,7 @@ jobs:
             - DB_URI=$STAGING_TELEGRAM_HANDLER_DB_URI
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - SENTRY_LAMBDA_FUNCTION_NAME=telegram-test
+            - NODE_ENV=staging
     - name: root
       install:
         - npm install --ignore-scripts
