@@ -2,7 +2,6 @@ import { expose } from 'threads/worker'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-import crypto from 'crypto'
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 import config from '@core/config'
 import logger from '@core/logger'
@@ -70,45 +69,7 @@ const enqueueMessages = (jobId: number, campaignId: number): Promise<void> => {
   return service().enqueueMessages(jobId, campaignId)
 }
 
-const calculateHash = (campaignId: number, recipient: string) => {
-  const version = config.get('unsubscribeHmac.version')
-  return crypto
-    .createHmac(
-      config.get(`unsubscribeHmac.${version}.algo`),
-      config.get(`unsubscribeHmac.${version}.key`)
-    )
-    .update(`${campaignId}.${recipient}`)
-    .digest('hex')
-}
-
-const generateUnsubLink = (campaignId: number, recipient: string): URL => {
-  const version = config.get('unsubscribeHmac.version')
-  const hash = calculateHash(campaignId, recipient)
-  const link = new URL(`/unsubscribe/${version}`, config.get('frontendUrl'))
-  link.searchParams.append('c', campaignId.toString())
-  link.searchParams.append('r', recipient)
-  link.searchParams.append('h', hash)
-  return link
-}
-
-const getMessageWithUnsub = (msg: Message): Message => {
-  // TODO: Not sure how to handle if campaignId is undefined
-  if (msg.campaignId === undefined) return msg
-  const url = generateUnsubLink(msg.campaignId, msg.recipient)
-  const unsubMessage = `Click here to unsubscribe: ${url.toString()}`
-  const newBody = `${msg.body}<br>${unsubMessage}`
-  return {
-    ...msg,
-    body: newBody,
-  }
-}
-
 const getMessages = async (jobId: number, rate: number): Promise<Message[]> => {
-  // Append unsubscribe link to each message body if it's email
-  if (currentCampaignType === 'EMAIL') {
-    const messages = await service().getMessages(jobId, rate)
-    return messages.map((msg) => getMessageWithUnsub(msg))
-  }
   return await service().getMessages(jobId, rate)
 }
 
