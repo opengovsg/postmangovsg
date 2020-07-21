@@ -78,10 +78,7 @@ const EmailTemplate = ({
         onChange={setSubject}
       />
       <h4>{protect ? 'Message A' : 'Message'}</h4>
-      <p>
-        You can use the following keywords in Message A to personalise your
-        message.
-      </p>
+      <p>You can use the following keywords to personalise your message.</p>
       {protect && (
         <p>
           <li>
