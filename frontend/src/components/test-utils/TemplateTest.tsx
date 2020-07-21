@@ -48,7 +48,7 @@ const TemplateTest = () => {
           placeholder="Paste csv here"
         />
         <Checkbox checked={trimEmptyLines} onChange={setTrimEmptyLines}>
-          Trim new lines
+          Trim empty lines
         </Checkbox>
       </div>
       <div className={styles.previewColumn}>
