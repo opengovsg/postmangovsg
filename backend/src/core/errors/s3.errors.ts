@@ -7,10 +7,9 @@ export class RecipientColumnMissing extends Error {
 }
 
 export class UserError extends Error {
-  constructor(name: string, message: string, stack?: string) {
+  constructor(name: string, message: string) {
     super(message)
     this.name = name
-    if (stack) this.stack = stack
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
     Error.captureStackTrace(this)
   }

@@ -7,7 +7,7 @@ import { CSVParams } from '@core/types'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
-import { CampaignService, UploadService, StatsService } from '@core/services'
+import { CampaignService, UploadService } from '@core/services'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
@@ -216,46 +216,6 @@ const uploadCompleteOnChunk = ({
     }
   }
 }
-/**
- * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
- * update statistics with new unsent count
- * @param param.transaction
- * @param param.campaignId
- * @param param.key
- * @param param.filename
- */
-const uploadCompleteOnComplete = ({
-  transaction,
-  campaignId,
-  key,
-  filename,
-}: {
-  transaction: Transaction
-  campaignId: number
-  key: string
-  filename: string
-}): ((numRecords: number) => Promise<void>) => {
-  return async (numRecords: number): Promise<void> => {
-    try {
-      // Updates metadata in project
-      await UploadService.replaceCampaignS3Metadata(
-        campaignId,
-        key,
-        filename,
-        transaction
-      )
-
-      await StatsService.setNumRecipients(campaignId, numRecords, transaction)
-
-      // Set campaign to valid
-      await CampaignService.setValid(campaignId, transaction)
-      transaction?.commit()
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
-  }
-}
 
 export const SmsService = {
   getEncodedHash,
@@ -267,5 +227,4 @@ export const SmsService = {
   setCampaignCredential,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
-  uploadCompleteOnComplete,
 }

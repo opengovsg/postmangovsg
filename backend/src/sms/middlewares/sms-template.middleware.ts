@@ -127,7 +127,7 @@ const uploadCompleteHandler = async (
           downloadStream,
           SmsService.uploadCompleteOnPreview(params),
           SmsService.uploadCompleteOnChunk(params),
-          SmsService.uploadCompleteOnComplete({
+          UploadService.uploadCompleteOnComplete({
             ...params,
             key: s3Key,
             filename,

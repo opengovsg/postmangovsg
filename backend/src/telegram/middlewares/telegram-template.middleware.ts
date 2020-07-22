@@ -127,7 +127,7 @@ const uploadCompleteHandler = async (
           downloadStream,
           TelegramService.uploadCompleteOnPreview(params),
           TelegramService.uploadCompleteOnChunk(params),
-          TelegramService.uploadCompleteOnComplete({
+          UploadService.uploadCompleteOnComplete({
             ...params,
             key: s3Key,
             filename,

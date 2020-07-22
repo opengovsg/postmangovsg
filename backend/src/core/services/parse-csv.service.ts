@@ -102,12 +102,13 @@ const parseAndProcessCsv = async (
               )
             }
             await onComplete(numRecords)
+            logger.info({ message: 'Parsing complete' })
           } catch (err) {
             reject(err)
           }
+        } else {
+          logger.info({ message: 'Parsing aborted' })
         }
-
-        logger.info({ message: 'Parsing complete' })
         resolve()
       },
       error: reject,

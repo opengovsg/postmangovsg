@@ -1,8 +1,14 @@
+import { Transaction } from 'sequelize'
 import { difference } from 'lodash'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
 import { ProtectedMessage, Campaign } from '@core/models'
+import logger from '@core/logger'
+import config from '@core/config'
+import { CSVParams } from '@core/types'
 
+const PROTECTED_URL = config.get('protectedUrl')
+const PROTECT_METHOD_VERSION = 1
 const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
 /**
  * Whether a campaign is protected or not
@@ -61,8 +67,56 @@ const getProtectedMessage = async (
   return protectedMsg
 }
 
+const storeProtectedMessages = async ({
+  transaction,
+  campaignId,
+  data,
+}: {
+  transaction: Transaction
+  campaignId: number
+  data: CSVParams[]
+}): Promise<MessageBulkInsertInterface[]> => {
+  // These records go into the protected message table
+  const protectedMessages: Array<ProtectedMessageRecordInterface> = data.map(
+    (entry) => {
+      const { recipient, payload, passwordhash, id } = entry
+      return {
+        campaignId,
+        id,
+        recipient,
+        payload,
+        passwordHash: passwordhash,
+        version: PROTECT_METHOD_VERSION,
+      }
+    }
+  )
+  // START populate template
+  await ProtectedMessage.bulkCreate(protectedMessages, {
+    transaction,
+    logging: (_message, benchmark) => {
+      if (benchmark) {
+        logger.info(
+          `uploadProtectedCompleteOnChunk - ProtectedMessage: ElapsedTime ${benchmark} ms`
+        )
+      }
+    },
+    benchmark: true,
+  })
+
+  const messages = protectedMessages.map(({ campaignId, recipient, id }) => ({
+    campaignId,
+    recipient,
+    params: {
+      recipient,
+      protectedlink: `${PROTECTED_URL}/${PROTECT_METHOD_VERSION}/${id}`,
+    },
+  }))
+  return messages
+}
+
 export const ProtectedService = {
   isProtectedCampaign,
   checkTemplateVariables,
   getProtectedMessage,
+  storeProtectedMessages,
 }

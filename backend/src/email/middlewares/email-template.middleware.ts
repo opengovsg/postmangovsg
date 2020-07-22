@@ -133,7 +133,7 @@ const uploadCompleteHandler = async (
           downloadStream,
           EmailService.uploadCompleteOnPreview(params),
           EmailService.uploadCompleteOnChunk(params),
-          EmailService.uploadCompleteOnComplete({
+          UploadService.uploadCompleteOnComplete({
             ...params,
             key: s3Key,
             filename,
@@ -277,7 +277,7 @@ const uploadProtectedCompleteHandler = async (
           downloadStream,
           EmailService.uploadProtectedCompleteOnPreview(params),
           EmailService.uploadProtectedCompleteOnChunk(params),
-          EmailService.uploadProtectedCompleteOnComplete({
+          UploadService.uploadCompleteOnComplete({
             ...params,
             key: s3Key,
             filename,
