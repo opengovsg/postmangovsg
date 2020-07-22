@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import map from 'lodash/map'
-
+import crypto from 'crypto'
 import logger from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
@@ -56,6 +56,7 @@ class Email {
       body: string
       subject: string
       replyTo: string | null
+      campaignId: number
     }[]
   > {
     return this.connection
@@ -66,13 +67,49 @@ class Email {
       .then((result) => map(result, 'get_messages_to_send_email'))
   }
 
-  sendMessage({
+  calculateHash(campaignId: number, recipient: string): string {
+    const version = config.get('unsubscribeHmac.version')
+    return crypto
+      .createHmac(
+        config.get(`unsubscribeHmac.${version}.algo`),
+        config.get(`unsubscribeHmac.${version}.key`)
+      )
+      .update(`${campaignId}.${recipient}`)
+      .digest('hex')
+  }
+
+  generateUnsubLink(campaignId: number, recipient: string): URL {
+    const version = config.get('unsubscribeHmac.version')
+    const hmac = this.calculateHash(campaignId, recipient)
+    const link = new URL(`/unsubscribe/${version}`, config.get('frontendUrl'))
+    link.searchParams.append('c', campaignId.toString())
+    link.searchParams.append('r', recipient)
+    link.searchParams.append('h', hmac)
+    return link
+  }
+
+  appendUnsubToMessage(msg: string, unsubUrl: string): string {
+    return `${msg} <br><hr> 
+    <p style="font-size:12px;color:#818284;line-height:2em">\
+      <a href="https://postman.gov.sg" style="color:#edae49" target="_blank">Postman.gov.sg</a>
+      is a mass messaging platform used by the Singapore Government to communicate with stakeholders.
+      For more information, please visit our <a href="https://guide.postman.gov.sg/faqs/faq-recipients" style="color:#edae49" target="_blank">site</a>. 
+    </p>
+    <p style="font-size:12px;color:#818284;line-height:2em">
+      If you wish to unsubscribe from similar emails from your sender, please click <a href="${unsubUrl}" style="color:#edae49" target="_blank">here</a>
+      to unsubscribe and we will inform the respective agency.
+    </p>
+    `
+  }
+
+  async sendMessage({
     id,
     recipient,
     params,
     body,
     subject,
     replyTo,
+    campaignId,
   }: {
     id: number
     recipient: string
@@ -80,7 +117,12 @@ class Email {
     body: string
     subject?: string
     replyTo?: string | null
+    campaignId?: number
   }): Promise<void> {
+    const unsubUrl = await this.generateUnsubLink(
+      campaignId!,
+      recipient
+    ).toString()
     return Promise.resolve()
       .then(() => {
         return {
@@ -97,10 +139,14 @@ class Email {
           subject: string
           hydratedBody: string
         }) => {
+          const bodyWithUnsub = this.appendUnsubToMessage(
+            hydratedBody,
+            unsubUrl
+          )
           return this.mailService.sendMail({
             recipients: [recipient],
             subject,
-            body: hydratedBody,
+            body: bodyWithUnsub,
             referenceId: String(id),
             ...(replyTo ? { replyTo } : {}),
           })
