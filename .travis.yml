@@ -84,7 +84,7 @@ jobs:
         - zip -qr code.zip build package.json node_modules/
         - cd $TRAVIS_BUILD_DIR/serverless/telegram-handler
         - npm install && npm run build
-        - zip -qr code.zip build package.json node_modules/
+        - zip -qr code.zip build src package.json node_modules/
       deploy:
         - provider: lambda
           edge: true
@@ -182,6 +182,8 @@ jobs:
             branch: $PRODUCTION_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_TELEGRAM_HANDLER_DB_URI
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - SENTRY_LAMBDA_FUNCTION_NAME=telegram-handler-production
         - provider: lambda
           edge: true
           function_name: telegram-handler-staging
@@ -197,6 +199,9 @@ jobs:
             branch: $STAGING_BRANCH
           environment_variables:
             - DB_URI=$STAGING_TELEGRAM_HANDLER_DB_URI
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - SENTRY_LAMBDA_FUNCTION_NAME=telegram-handler-staging
+            - NODE_ENV=staging
     - name: root
       install:
         - npm install --ignore-scripts
