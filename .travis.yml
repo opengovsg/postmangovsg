@@ -84,7 +84,7 @@ jobs:
         - zip -qr code.zip build package.json node_modules/
         - cd $TRAVIS_BUILD_DIR/serverless/telegram-handler
         - npm install && npm run build
-        - zip -qr code.zip build package.json node_modules/
+        - zip -qr code.zip build src package.json node_modules/
       deploy:
         - provider: lambda
           edge: true
