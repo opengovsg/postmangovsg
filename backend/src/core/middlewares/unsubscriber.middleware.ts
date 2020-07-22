@@ -16,9 +16,9 @@ const isUnsubscribeRequestValid = async (
 ): Promise<Response | void> => {
   try {
     const params = req.query.c ? req.query : req.body
-    const { c: campaignId, r: recipient, v: version, h: hmac } = params
+    const { c: campaignId, r: recipient, v: version, h: hash } = params
 
-    UnsubscriberService.validateHmac({ campaignId, recipient, version, hmac })
+    UnsubscriberService.validateHash({ campaignId, recipient, version, hash })
 
     const campaign = await CampaignService.getCampaignDetails(campaignId, [])
     if (!campaign) {

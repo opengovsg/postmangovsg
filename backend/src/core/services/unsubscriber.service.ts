@@ -13,22 +13,22 @@ const createHmac = (version: string): crypto.Hmac => {
 }
 
 /**
- * Validate that the HMAC is valid for a given campaignId, recipient and version
+ * Validate hash for a given campaignId, recipient and version
  */
-const validateHmac = ({
+const validateHash = ({
   campaignId,
   recipient,
   version,
-  hmac,
+  hash,
 }: {
   campaignId: number
   recipient: string
   version: string
-  hmac: string
+  hash: string
 }): void => {
   const data = `${campaignId}.${recipient}`
   const digest = createHmac(version).update(data).digest('hex')
-  const valid = crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(hmac))
+  const valid = crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(hash))
 
   if (!valid) {
     throw new Error('Invalid hmac')
@@ -65,7 +65,7 @@ const createUnsubscriber = ({
 }
 
 export const UnsubscriberService = {
-  validateHmac,
+  validateHash,
   getUnsubscriber,
   createUnsubscriber,
 }
