@@ -67,7 +67,7 @@ class Email {
       .then((result) => map(result, 'get_messages_to_send_email'))
   }
 
-  calculateHmac(campaignId: number, recipient: string) {
+  calculateHash(campaignId: number, recipient: string): string {
     const version = config.get('unsubscribeHmac.version')
     return crypto
       .createHmac(
@@ -80,7 +80,7 @@ class Email {
 
   generateUnsubLink(campaignId: number, recipient: string): URL {
     const version = config.get('unsubscribeHmac.version')
-    const hmac = this.calculateHmac(campaignId, recipient)
+    const hmac = this.calculateHash(campaignId, recipient)
     const link = new URL(`/unsubscribe/${version}`, config.get('frontendUrl'))
     link.searchParams.append('c', campaignId.toString())
     link.searchParams.append('r', recipient)
