@@ -1,0 +1,90 @@
+import { Sequelize } from 'sequelize-typescript'
+import { QueryTypes } from 'sequelize'
+
+import { Logger } from './utils/logger'
+import sequelizeLoader from './sequelize-loader'
+import { UserUnsubscribeDigest } from './interface'
+import MailClient from './mail-client.class'
+import { createEmailBody } from './utils/generate-digest-mail'
+import config from './config'
+
+const logger = new Logger('unsubscribe')
+
+const mailClient = new MailClient(
+  config.get('mailFrom'),
+  config.get('mailOptions')
+)
+
+let sequelize: Sequelize | undefined
+
+export const init = async (): Promise<void> => {
+  if (!sequelize) {
+    sequelize = await sequelizeLoader()
+  }
+}
+
+/**
+ * Gets list of unsubscribing recipients grouped by campaign and user email
+ */
+export const getUnsubscribeList = async (): Promise<
+  Array<UserUnsubscribeDigest>
+> => {
+  const unsubscribeList = (
+    await sequelize?.query(
+      `WITH unsent_unsubscribers AS (
+        SELECT users.email, json_build_object('id', campaigns.id, 'name',campaigns.name, 'unsubscribers',
+            array_agg(recipient)) AS unsubscribed_campaigns
+        FROM
+          unsubscribers
+          INNER JOIN campaigns ON unsubscribers.campaign_id = campaigns.id
+          INNER JOIN users ON campaigns.user_id = users.id
+        WHERE sent_at IS NULL
+        GROUP BY users.email, campaigns.id
+      )
+      SELECT email, json_agg(unsubscribed_campaigns) as unsubscribe_list
+      FROM unsent_unsubscribers
+      GROUP BY email;`,
+      { useMaster: false }
+    )
+  )?.[0] as Array<UserUnsubscribeDigest>
+  return unsubscribeList
+}
+
+/**
+ * Generates unsubscribe digest email body for a user
+ * Send the unsubscribe digest email to the user
+ * Update sent_at in subscribers table for all recipients which were included in this digest
+ */
+export const sendEmailAndUpdateUnsubscribers = async ({
+  email,
+  unsubscribe_list,
+}: UserUnsubscribeDigest): Promise<void> => {
+  const emailBody = createEmailBody(unsubscribe_list)
+
+  await mailClient.sendMail({
+    recipients: [email],
+    subject: 'Postman: Weekly Digest [Unsubscribe]',
+    body: emailBody,
+  })
+
+  for (const { id } of unsubscribe_list) {
+    await updateUnsubscribers(id)
+  }
+}
+
+/**
+ * Updates unsubscribers table to set sent_at as now for all recipients
+ * of this campaign which have sent_at as null
+ */
+const updateUnsubscribers = async (campaignId: number): Promise<void> => {
+  logger.log(
+    `Update sent_at for campaign id ${campaignId} in unsubscribers table`
+  )
+  await sequelize?.query(
+    `UPDATE unsubscribers SET sent_at = now() WHERE campaign_id = :campaignId AND sent_at IS NULL;`,
+    {
+      replacements: { campaignId },
+      type: QueryTypes.UPDATE,
+    }
+  )
+}
