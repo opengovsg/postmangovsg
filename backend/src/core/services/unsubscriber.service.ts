@@ -31,7 +31,7 @@ const validateHash = ({
   const valid = crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(hash))
 
   if (!valid) {
-    throw new Error('Invalid hmac')
+    throw new Error('Invalid hash')
   }
 }
 

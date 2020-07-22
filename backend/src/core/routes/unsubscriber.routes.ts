@@ -48,7 +48,7 @@ const createUnsubscribeValidator = {
  *            type: string
  *        - in: query
  *          name: h
- *          description: HMAC
+ *          description: unsubscribe hash
  *          required: true
  *          schema:
  *            type: string
@@ -107,7 +107,7 @@ router.get(
  *                  description: HMAC version
  *                h:
  *                  type: string
- *                  description: HMAC
+ *                  description: unsubscribe hash
  *              required:
  *                - c
  *                - r
