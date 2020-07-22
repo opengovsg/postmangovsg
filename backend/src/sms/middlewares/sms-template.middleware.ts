@@ -153,11 +153,11 @@ const uploadCompleteHandler = async (
       smsTemplate.params as string[]
     )
 
-    await SmsTemplateService.testHydration(records, smsTemplate.body as string)
+    SmsTemplateService.testHydration(records, smsTemplate.body as string)
 
-    if (SmsTemplateService.hasInvalidSmsRecipient(records)) {
-      throw new InvalidRecipientError()
-    }
+    // Append default country code as telegram handler stores number with the country
+    // code by default.
+    const formattedRecords = SmsTemplateService.validateAndFormatNumber(records)
 
     // Store temp filename
     await UploadService.storeS3TempFilename(+campaignId, filename)
@@ -167,7 +167,12 @@ const uploadCompleteHandler = async (
       res.sendStatus(202)
 
       // Slow bulk insert
-      await updateCampaignAndMessages(+campaignId, s3Key, filename, records)
+      await updateCampaignAndMessages(
+        +campaignId,
+        s3Key,
+        filename,
+        formattedRecords
+      )
     } catch (err) {
       // Do not return any response since it has already been sent
       logger.error(

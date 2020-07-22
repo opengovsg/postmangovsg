@@ -138,11 +138,6 @@ const config = convict({
     default: '',
     env: 'SES_FROM',
   },
-  defaultCountryCode: {
-    doc: 'Country code to prepend to phone numbers',
-    default: '65',
-    env: 'DEFAULT_COUNTRY_CODE',
-  },
   smsOptions: {
     accountSid: {
       doc: 'Id of the Twilio account',

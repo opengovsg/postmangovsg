@@ -10,6 +10,7 @@ import { CampaignService } from '@core/services'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
 import { TwilioCredentials } from '@sms/interfaces'
+import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
 
@@ -64,6 +65,10 @@ const sendCampaignMessage = async (
   if (!msg) throw new Error('No message to send')
 
   const twilioService = new TwilioClient(credential)
+  recipient = PhoneNumberService.normalisePhoneNumber(
+    recipient,
+    config.get('defaultCountry')
+  )
   return twilioService.send(recipient, msg?.body)
 }
 
@@ -77,6 +82,10 @@ const sendValidationMessage = async (
   credential: TwilioCredentials
 ): Promise<string | void> => {
   const twilioService = new TwilioClient(credential)
+  recipient = PhoneNumberService.normalisePhoneNumber(
+    recipient,
+    config.get('defaultCountry')
+  )
   return twilioService.send(
     recipient,
     'Your Twilio credential has been validated.'
