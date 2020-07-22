@@ -89,9 +89,17 @@ class Email {
   }
 
   appendUnsubToMessage(msg: string, unsubUrl: string): string {
-    return `${msg} <br> <hr> <p style="font-size:12px;color:#818284;line-height:2em">
-    Click <a href="${unsubUrl}" style="color:#edae49" target="_blank">here</a> to unsubscribe.
-</p>`
+    return `${msg} <br><hr> 
+    <p style="font-size:12px;color:#818284;line-height:2em">\
+      <a href="https://postman.gov.sg" style="color:#edae49" target="_blank">Postman.gov.sg</a>
+      is a mass messaging platform used by the Singapore Government to communicate with stakeholders.
+      For more information, please visit our <a href="https://guide.postman.gov.sg/faqs/faq-recipients" style="color:#edae49" target="_blank">site</a>. 
+    </p>
+    <p style="font-size:12px;color:#818284;line-height:2em">
+      If you wish to unsubscribe from similar emails from your sender, please click <a href="${unsubUrl}" style="color:#edae49" target="_blank">here</a
+      to unsubscribe and we will inform the respective agency.
+    </p>
+    `
   }
 
   async sendMessage({
