@@ -101,7 +101,7 @@ const Unsubscribe = () => {
             <img src={appLogo} />
             <img src={landingHero} className={styles.landingHero} />
             <h2>Confirm unsubscription</h2>
-            {isUnsubscribed ? (
+            {!isUnsubscribed ? (
               <PrimaryButton
                 className={styles.sampleCsv}
                 onClick={onConfirmation}
