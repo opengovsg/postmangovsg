@@ -3,7 +3,11 @@
 .export {
   @include flex-horizontal;
   color: $indigo-blue;
-  cursor: pointer;
+  padding: 0.5rem;
+
+  .ready {
+    cursor: pointer;
+  }
 
   .unavailable {
     color: $grey;

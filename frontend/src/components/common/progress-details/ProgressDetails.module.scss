@@ -87,13 +87,14 @@
 
   .disabledExport {
     border: 1px solid $grey;
-
-    &:hover {
-      border-width: 1px;
-    }
   }
 
   .disablePointerEvents {
-    pointer-events: none;
+    cursor: default;
+
+    &:hover {
+      border-width: 1px;
+      background-color: white;
+    }
   }
 }

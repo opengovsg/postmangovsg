@@ -61,6 +61,19 @@ const ExportRecipients = ({
     }
   }
 
+  function renderTitle() {
+    switch (exportStatus) {
+      case CampaignExportStatus.Unavailable:
+        return 'The error list would be available for download after sending is complete'
+      case CampaignExportStatus.Loading:
+        return 'The error list is being generated and would be available in a few minutes'
+      case CampaignExportStatus.Ready:
+        return 'Download list of recipients with failed deliveries'
+      case CampaignExportStatus.NoError:
+        return 'There are no failed deliveries for this campaign'
+    }
+  }
+
   function renderExportButton() {
     if (exportStatus === CampaignExportStatus.NoError) {
       return (
@@ -95,8 +108,17 @@ const ExportRecipients = ({
 
   return (
     <div
-      className={cx(styles.export, { [styles.disabled]: disabled })}
-      onClick={(e) => !disabled && exportRecipients(e)}
+      className={cx(
+        styles.export,
+        { [styles.ready]: exportStatus === CampaignExportStatus.Ready },
+        { [styles.disabled]: disabled }
+      )}
+      onClick={(e) =>
+        !disabled &&
+        exportStatus === CampaignExportStatus.Ready &&
+        exportRecipients(e)
+      }
+      title={renderTitle()}
     >
       {renderExportButton()}
     </div>
