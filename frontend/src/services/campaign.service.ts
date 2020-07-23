@@ -14,6 +14,7 @@ import moment from 'moment'
 const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
 
 export enum CampaignExportStatus {
+  Unavailable = 'Unavailable',
   Loading = 'Loading',
   Ready = 'Ready',
   NoError = 'No Error',
@@ -29,9 +30,14 @@ function getJobTimestamps(
 }
 
 export function getExportStatus(
+  status: Status,
   updatedAt: Date,
   failedCount: number
 ): CampaignExportStatus {
+  if (status === Status.Sending) {
+    return CampaignExportStatus.Unavailable
+  }
+
   const updatedAtTimestamp = +new Date(updatedAt)
   const campaignAge = Date.now() - updatedAtTimestamp
   if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {

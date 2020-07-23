@@ -104,8 +104,7 @@ const Campaigns = () => {
     {
       name: 'Export',
       render: (campaign: Campaign) => {
-        if (campaign.status !== Status.Sent) return
-        const { statusUpdatedAt, hasFailedRecipients } = campaign
+        if (campaign.status === Status.Draft) return
         return (
           <ExportRecipients
             alignLabel
@@ -114,8 +113,9 @@ const Campaigns = () => {
             status={campaign.status}
             sentAt={campaign.sentAt}
             exportStatus={getExportStatus(
-              statusUpdatedAt,
-              +hasFailedRecipients
+              campaign.status,
+              campaign.statusUpdatedAt,
+              +campaign.hasFailedRecipients
             )}
           />
         )

@@ -65,24 +65,32 @@ const ExportRecipients = ({
     if (exportStatus === CampaignExportStatus.NoError) {
       return (
         <span
-          className={cx(styles.noError, { [styles.alignLabel]: alignLabel })}
+          className={cx(styles.unavailable, {
+            [styles.alignLabel]: alignLabel,
+          })}
         >
           No error
         </span>
       )
     }
-    const icon =
-      exportStatus === CampaignExportStatus.Loading ? (
-        <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
-      ) : (
-        <i className={cx(styles.icon, 'bx bx-export')}></i>
+    if (exportStatus === CampaignExportStatus.Loading) {
+      return (
+        <>
+          <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
+          <span>Error list</span>
+        </>
       )
-    return (
-      <>
-        {icon}
-        <span>Error list</span>
-      </>
-    )
+    } else {
+      const unavailableStyle = {
+        [styles.unavailable]: exportStatus === CampaignExportStatus.Unavailable,
+      }
+      return (
+        <>
+          <i className={cx(styles.icon, unavailableStyle, 'bx bx-export')}></i>
+          <span className={cx(unavailableStyle)}>Error list</span>
+        </>
+      )
+    }
   }
 
   return (

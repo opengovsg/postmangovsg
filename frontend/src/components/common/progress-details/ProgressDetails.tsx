@@ -48,12 +48,10 @@ const ProgressDetails = ({
   useEffect(() => {
     async function checkHasExportButton() {
       const failedCount = error + invalid
-      const exportStatus = getExportStatus(updatedAt, failedCount)
+      const exportStatus = getExportStatus(status, updatedAt, failedCount)
       setExportStatus(exportStatus)
     }
-    if (status === Status.Sent) {
-      checkHasExportButton()
-    }
+    checkHasExportButton()
   }, [status, updatedAt, error, invalid])
 
   function renderButton() {
@@ -143,7 +141,8 @@ const ProgressDetails = ({
             className={cx(
               {
                 [styles.disabledExport]:
-                  exportStatus === CampaignExportStatus.NoError,
+                  exportStatus === CampaignExportStatus.NoError ||
+                  exportStatus === CampaignExportStatus.Unavailable,
               },
               {
                 [styles.disablePointerEvents]:
