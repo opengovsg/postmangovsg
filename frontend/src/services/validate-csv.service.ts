@@ -74,8 +74,17 @@ export async function validateCsv(
   })
 }
 
+function removeNewLinesFromTables(template: string) {
+  // Get all text within <table> tags
+  return template.replace(/<table\s*>(.*?)<\/table\s*>/gs, (match) =>
+    // Remove all new lines
+    match.replace(/(\r\n|\r|\n)/g, '')
+  )
+}
+
 export function hydrateTemplate(template: string, row: Record<string, any>) {
-  const newLinesReplaced = template.replace(/(?:\r\n|\r|\n)/g, '<br>')
+  const cleanedTemplate = removeNewLinesFromTables(template)
+  const newLinesReplaced = cleanedTemplate.replace(/(?:\r\n|\r|\n)/g, '<br>')
   return templateClient.template(newLinesReplaced, row)
 }
 
