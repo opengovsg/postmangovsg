@@ -135,7 +135,7 @@ const ProtectedEmailRecipients = ({
       />
       <Checkbox checked={trimEmptyLines} onChange={setTrimEmptyLines}>
         <p>
-          <b>Trim empty lines.</b> When checked, use {'<b></b>'} to preserve
+          <b>Trim empty lines.</b> When checked, use {'<p></p>'} to preserve
           empty lines.
         </p>
       </Checkbox>
