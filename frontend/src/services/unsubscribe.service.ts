@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios'
-export async function unsubscribeRecipient({
+export async function unsubscribeRequest({
   campaignId,
   recipient,
   hash,

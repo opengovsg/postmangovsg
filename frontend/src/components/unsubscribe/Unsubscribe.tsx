@@ -6,10 +6,10 @@ import { ErrorBlock, PrimaryButton } from 'components/common'
 
 import styles from './Unsubscribe.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
-import landingHero from 'assets/img/landing/landing-hero.png'
+import landingHero from 'assets/img/unsubscribe/request-unsubscribe.png'
 
 import {
-  unsubscribeRecipient,
+  unsubscribeRequest,
   isUserUnsubscribed,
 } from 'services/unsubscribe.service'
 
@@ -25,7 +25,7 @@ const Unsubscribe = () => {
 
   async function onConfirmation() {
     try {
-      await unsubscribeRecipient({
+      await unsubscribeRequest({
         campaignId: +campaignId,
         recipient,
         hash,
@@ -91,28 +91,49 @@ const Unsubscribe = () => {
     })
   }, [location.search, version])
 
+  function renderUnsubscribeSection() {
+    if (isUnsubscribed) {
+      return (
+        <>
+          <h2>Unsubscribed successfully.</h2>
+          <p>
+            You have been removed from the agency’s mailing list. If you have
+            unsubscribed by mistake, you can send a request email to the agency.
+          </p>
+        </>
+      )
+    } else {
+      return (
+        <>
+          <h2>We’re sad to see you go!</h2>
+          <p>
+            We will inform the agency that sent you this campaign about your
+            wish to unsubscribe. You will be removed from their mailing list.
+          </p>
+          <PrimaryButton
+            onClick={onConfirmation}
+            loadingPlaceholder="Processing"
+          >
+            Unsubscribe
+          </PrimaryButton>
+        </>
+      )
+    }
+  }
+
   return (
     <div className={styles.outer}>
-      {!isValid ? (
-        <Redirect to="/"></Redirect>
-      ) : (
+      {isValid ? (
         <div className={styles.inner}>
           <>
             <img src={appLogo} />
             <img src={landingHero} className={styles.landingHero} />
-            <h2>Confirm unsubscription</h2>
-            {!isUnsubscribed ? (
-              <PrimaryButton
-                className={styles.sampleCsv}
-                onClick={onConfirmation}
-                loadingPlaceholder="Processing"
-              >
-                Unsubscribe
-              </PrimaryButton>
-            ) : null}
+            {renderUnsubscribeSection()}
             <ErrorBlock>{errorMsg}</ErrorBlock>
           </>
         </div>
+      ) : (
+        <Redirect to="/"></Redirect>
       )}
     </div>
   )
