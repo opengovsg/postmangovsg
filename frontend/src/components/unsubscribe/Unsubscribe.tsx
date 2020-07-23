@@ -105,7 +105,7 @@ const Unsubscribe = () => {
     } else {
       return (
         <>
-          <h2>We’re sad to see you go!</h2>
+          <h2>We&#39;re sad to see you go!</h2>
           <p>
             We will inform the agency that sent you this campaign about your
             wish to unsubscribe. You will be removed from their mailing list.
