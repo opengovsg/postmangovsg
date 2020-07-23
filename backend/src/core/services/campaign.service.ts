@@ -59,10 +59,7 @@ const listCampaigns = ({
       'type',
       'created_at',
       'valid',
-      [
-        literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
-        'has_credential',
-      ],
+      [literal('"cred_name" IS NOT NULL'), 'has_credential'],
       'halted',
       'protect',
     ],
