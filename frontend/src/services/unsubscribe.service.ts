@@ -12,10 +12,10 @@ export async function unsubscribeRecipient({
 }): Promise<void> {
   try {
     await axios.post(`/unsubscribe`, {
-      campaign_id: campaignId,
-      recipient,
-      hash,
-      version,
+      c: campaignId,
+      r: recipient,
+      h: hash,
+      v: version,
     })
     return
   } catch (e) {
