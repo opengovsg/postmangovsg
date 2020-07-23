@@ -65,28 +65,26 @@ const Unsubscribe = () => {
   }
 
   useEffect(() => {
-    // Remove the question mark infront
-    // ?c=32&r=shaowei%40open.gov.sg&h=82f3 -> c=32&r=shaowei%40open.gov.sg&h=82f3
-    const query = location.search.substr(1)
-    const { c, r, h } = querystring.parse(query)
-    if (
-      typeof c !== 'string' ||
-      typeof r !== 'string' ||
-      typeof h !== 'string'
-    ) {
-      setValid(false)
+    const query = new URL(window.location.href).searchParams.toString()
+    const params = querystring.parse(query)
+    // Check to make sure that the search params are all strings and not []strings
+    const isValid = Object.values(params).every((v) => typeof v === 'string')
+    if (!isValid) {
+      setValid(isValid)
       return
     }
 
-    setCampaignId(c)
-    setRecipient(r)
-    setHash(h)
+    const { c, r, h } = params
+
+    setCampaignId(c as string)
+    setRecipient(r as string)
+    setHash(h as string)
 
     // Seems like setting state is asynchronous, so can't rely on the values here
     isUrlValid({
       campaignId: +c,
-      recipient: r,
-      hash: h,
+      recipient: r as string,
+      hash: h as string,
       version,
     })
   }, [location.search, version])
