@@ -5,6 +5,7 @@ import { Sequelize } from 'sequelize-typescript'
 import { startCommandHandler } from './handlers/start'
 import { contactMessageHandler } from './handlers/contact'
 import { updatenumberCommandHandler } from './handlers/updatenumber'
+import { helpCommandHandler } from './handlers/help'
 import { PostmanTelegramError } from './PostmanTelegramError'
 import { verifyBotToken } from '../credentials'
 
@@ -26,6 +27,7 @@ export const handleUpdate = async (
   // Attach handlers
   bot.command('start', startCommandHandler)
   bot.command('updatenumber', updatenumberCommandHandler)
+  bot.command('help', helpCommandHandler)
   bot.on('contact', contactMessageHandler(botId, sequelize))
 
   // Handle update

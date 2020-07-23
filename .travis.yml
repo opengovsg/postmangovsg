@@ -184,6 +184,8 @@ jobs:
             - DB_URI=$PRODUCTION_TELEGRAM_HANDLER_DB_URI
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - SENTRY_LAMBDA_FUNCTION_NAME=telegram-handler-production
+            - TELEGRAM_BOT_CONTACT_US_URL=$TELEGRAM_BOT_CONTACT_US_URL
+            - TELEGRAM_BOT_GUIDE_URL=$TELEGRAM_BOT_GUIDE_URL
         - provider: lambda
           edge: true
           function_name: telegram-handler-staging
@@ -202,6 +204,8 @@ jobs:
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - SENTRY_LAMBDA_FUNCTION_NAME=telegram-handler-staging
             - NODE_ENV=staging
+            - TELEGRAM_BOT_CONTACT_US_URL=$TELEGRAM_BOT_CONTACT_US_URL
+            - TELEGRAM_BOT_GUIDE_URL=$TELEGRAM_BOT_GUIDE_URL
     - name: root
       install:
         - npm install --ignore-scripts

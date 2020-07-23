@@ -145,6 +145,7 @@ const validateAndConfigureBot = async (
 
   const commands = [
     { command: 'updatenumber', description: 'Update linked phone number' },
+    { command: 'help', description: 'Get help' },
   ]
   await telegramService.setCommands(commands)
 }
