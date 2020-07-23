@@ -78,9 +78,9 @@ const EmailTemplate = ({
         onChange={setSubject}
       />
       <h4>{protect ? 'Message A' : 'Message'}</h4>
-      <p>You can use the following keywords to personalise your message.</p>
-      {protect && (
+      {protect ? (
         <p>
+          You can use the following keywords to personalise your message.
           <li>
             <b>{'{{ protectedlink }}'}</b> - <i>Required</i>. Include this
             keyword in Message A template, but not in the CSV file. It will be
@@ -90,6 +90,15 @@ const EmailTemplate = ({
             <b>{'{{ recipient }}'}</b> - <i>Optional</i>. This keyword will be
             replaced by the email address of the recipient.
           </li>
+        </p>
+      ) : (
+        <p>
+          To personalise your message, include keywords that are surrounded by
+          double curly braces. The keywords in your message template should
+          match the headers in your recipients CSV file.
+          <br />
+          <b>Note:</b> Recipient (email address) is a required column in the CSV
+          file.
         </p>
       )}
       <TextArea
