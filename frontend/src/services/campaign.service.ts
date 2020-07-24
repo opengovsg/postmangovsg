@@ -95,16 +95,27 @@ export async function getCampaignStats(
   campaignId: number,
   forceRefresh = false
 ): Promise<CampaignStats> {
-  return axios
-    .get(`/campaign/${campaignId}/stats?refresh=${forceRefresh}`)
-    .then((response) => {
-      const { status, updatedAt, ...counts } = response.data
-      return new CampaignStats({
-        ...counts,
-        status: parseStatus(status),
-        updatedAt,
+  if (forceRefresh) {
+    return axios
+      .post(`/campaign/${campaignId}/refresh-stats`)
+      .then((response) => {
+        const { status, updatedAt, ...counts } = response.data
+        return new CampaignStats({
+          ...counts,
+          status: parseStatus(status),
+          updatedAt,
+        })
       })
+  }
+
+  return axios.get(`/campaign/${campaignId}/stats`).then((response) => {
+    const { status, updatedAt, ...counts } = response.data
+    return new CampaignStats({
+      ...counts,
+      status: parseStatus(status),
+      updatedAt,
     })
+  })
 }
 
 export async function getCampaignDetails(
