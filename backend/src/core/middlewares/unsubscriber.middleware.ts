@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import { UniqueConstraintError } from 'sequelize'
 
 import { CampaignService, UnsubscriberService } from '@core/services'
 
@@ -15,18 +14,23 @@ const isUnsubscribeRequestValid = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
-    const params = req.query.c ? req.query : req.body
-    const { c: campaignId, r: recipient, v: version, h: hash } = params
+    const { campaignId, recipient } = req.params
+    const { v: version, h: hash } = req.body
 
-    UnsubscriberService.validateHash({ campaignId, recipient, version, hash })
+    UnsubscriberService.validateHash({
+      campaignId: +campaignId,
+      recipient,
+      version,
+      hash,
+    })
 
-    const campaign = await CampaignService.getCampaignDetails(campaignId, [])
+    const campaign = await CampaignService.getCampaignDetails(+campaignId, [])
     if (!campaign) {
       throw new Error('Invalid campaign')
     }
 
-    res.locals.unsubscribe = {
-      campaign,
+    res.locals.unsubscriber = {
+      campaignId: +campaignId,
       recipient,
     }
 
@@ -39,66 +43,26 @@ const isUnsubscribeRequestValid = async (
 }
 
 /**
- * Retrieves the unsubscribe status and the associated campaign
- * @param _req
- * @param res
- */
-const getUnsubscriberStatus = async (
-  _req: Request,
-  res: Response
-): Promise<Response> => {
-  const { campaign, recipient } = res.locals.unsubscribe
-  const unsubscribe = await UnsubscriberService.getUnsubscriber(
-    campaign.id,
-    recipient
-  )
-
-  return res.json({
-    unsubscribed: unsubscribe !== null,
-    campaign: {
-      name: campaign.name,
-      channelType: campaign.type,
-    },
-  })
-}
-
-/**
  * Creates a new unsubscribe record
  * @param _req
  * @param res
  * @param next
  */
-const createUnsubscriber = async (
+const findOrCreateUnsubscriber = async (
   _req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
-  try {
-    const { campaign, recipient } = res.locals.unsubscribe
-    await UnsubscriberService.createUnsubscriber({
-      campaignId: campaign.id,
-      recipient,
-    })
-    return res.status(201).json({
-      unsubscribed: true,
-      campaign: {
-        name: campaign.name,
-        channelType: campaign.type,
-      },
-    })
-  } catch (err) {
-    if (err instanceof UniqueConstraintError) {
-      return res.status(400).json({
-        message: 'Campaign is already unsubscribed',
-      })
-    }
+  const { campaignId, recipient } = res.locals.unsubscriber
+  const { 1: created } = await UnsubscriberService.findOrCreateUnsubscriber({
+    campaignId,
+    recipient,
+  })
 
-    next(err)
-  }
+  const statusCode = created ? 201 : 200
+  return res.sendStatus(statusCode)
 }
 
 export const UnsubscriberMiddleware = {
   isUnsubscribeRequestValid,
-  getUnsubscriberStatus,
-  createUnsubscriber,
+  findOrCreateUnsubscriber,
 }
