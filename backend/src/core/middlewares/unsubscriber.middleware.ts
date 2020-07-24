@@ -53,20 +53,15 @@ const findOrCreateUnsubscriber = async (
   res: Response
 ): Promise<Response | void> => {
   const { campaignId, recipient } = res.locals.unsubscriber
-  const [
-    unsubscriber,
-    created,
-  ] = await UnsubscriberService.findOrCreateUnsubscriber({
+  const { 1: created } = await UnsubscriberService.findOrCreateUnsubscriber({
     campaignId,
     recipient,
   })
 
   const statusCode = created ? 201 : 200
-  const { createdAt } = unsubscriber
   return res.status(statusCode).json({
     campaign_id: campaignId,
     recipient,
-    created_at: createdAt,
   })
 }
 

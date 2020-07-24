@@ -21,7 +21,7 @@ const findOrCreateUnsubscribeValidator = {
  * path:
  *  /unsubscribe/{campaignId}/{recipient}:
  *    put:
- *      summary: Add a new unsubscriber
+ *      summary: Add an unsubscriber
  *      tags:
  *        - Unsubscribe
  *      parameters:
@@ -61,9 +61,6 @@ const findOrCreateUnsubscribeValidator = {
  *                    type: integer
  *                  recipient:
  *                    type: string
- *                  created_at:
- *                    type: string
- *                    format: date-time
  *        "201":
  *          content:
  *            application/json:
@@ -74,9 +71,6 @@ const findOrCreateUnsubscribeValidator = {
  *                    type: integer
  *                  recipient:
  *                    type: string
- *                  created_at:
- *                    type: string
- *                    format: date-time
  *        "400":
  *           description: Bad Request (invalid request, already unsubscribed)
  *        "500":
