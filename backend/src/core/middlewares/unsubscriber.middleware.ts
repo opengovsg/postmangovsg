@@ -64,9 +64,9 @@ const findOrCreateUnsubscriber = async (
   const statusCode = created ? 201 : 200
   const { createdAt } = unsubscriber
   return res.status(statusCode).json({
-    campaignId,
+    campaign_id: campaignId,
     recipient,
-    createdAt,
+    created_at: createdAt,
   })
 }
 

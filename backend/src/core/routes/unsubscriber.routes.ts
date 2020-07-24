@@ -27,7 +27,7 @@ const findOrCreateUnsubscribeValidator = {
  *      parameters:
  *        - name: campaignId
  *          in: path
- *          type: string
+ *          type: integer
  *          required: true
  *        - name: recipient
  *          in: path
@@ -57,20 +57,26 @@ const findOrCreateUnsubscribeValidator = {
  *              schema:
  *                type: object
  *                properties:
- *                  campaignId:
+ *                  campaign_id:
  *                    type: integer
  *                  recipient:
  *                    type: string
+ *                  created_at:
+ *                    type: string
+ *                    format: date-time
  *        "201":
  *          content:
  *            application/json:
  *              schema:
  *                type: object
  *                properties:
- *                  campaignId:
+ *                  campaign_id:
  *                    type: integer
  *                  recipient:
  *                    type: string
+ *                  created_at:
+ *                    type: string
+ *                    format: date-time
  *        "400":
  *           description: Bad Request (invalid request, already unsubscribed)
  *        "500":
