@@ -57,9 +57,9 @@ export const getUnsubscribeList = async (): Promise<
  */
 export const sendEmailAndUpdateUnsubscribers = async ({
   email,
-  unsubscribe_list,
+  unsubscribe_list: unsubscribeList,
 }: UserUnsubscribeDigest): Promise<void> => {
-  const emailBody = createEmailBody(unsubscribe_list)
+  const emailBody = createEmailBody(unsubscribeList)
 
   await mailClient.sendMail({
     recipients: [email],
@@ -67,23 +67,24 @@ export const sendEmailAndUpdateUnsubscribers = async ({
     body: emailBody,
   })
 
-  for (const { id } of unsubscribe_list) {
-    await updateUnsubscribers(id)
-  }
+  const campaignIds = unsubscribeList.map(({ id }) => id)
+  updateUnsubscribers(campaignIds)
 }
 
 /**
  * Updates unsubscribers table to set sent_at as now for all recipients
- * of this campaign which have sent_at as null
+ * of campaign ids which have sent_at as null
  */
-const updateUnsubscribers = async (campaignId: number): Promise<void> => {
+const updateUnsubscribers = async (
+  campaignIds: Array<number>
+): Promise<void> => {
   logger.log(
-    `Update sent_at for campaign id ${campaignId} in unsubscribers table`
+    `Update sent_at for campaigns ${campaignIds} in unsubscribers table`
   )
   await sequelize?.query(
-    `UPDATE unsubscribers SET sent_at = now() WHERE campaign_id = :campaignId AND sent_at IS NULL;`,
+    `UPDATE unsubscribers SET sent_at = now() WHERE sent_at IS NULL AND campaign_id IN(:campaignIds);`,
     {
-      replacements: { campaignId },
+      replacements: { campaignIds },
       type: QueryTypes.UPDATE,
     }
   )
