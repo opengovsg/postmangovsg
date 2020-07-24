@@ -89,7 +89,9 @@ const ExportRecipients = ({
       }
       return (
         <>
-          <i className={cx(styles.icon, unavailableStyle, 'bx bx-export')}></i>
+          <i
+            className={cx(styles.icon, unavailableStyle, 'bx bx-download')}
+          ></i>
           <span className={cx(unavailableStyle)}>Error list</span>
         </>
       )

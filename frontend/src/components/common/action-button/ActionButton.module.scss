@@ -12,6 +12,7 @@
 
   &:hover {
     border-width: 1.5px;
+    background-color: #f5f6fc;
   }
 
   &:active {
@@ -22,6 +23,10 @@
   &.dropdown {
     padding: 0;
     justify-content: space-between;
+  }
+
+  &.disabled {
+    border: 1px solid $light-grey;
   }
 
   .content {

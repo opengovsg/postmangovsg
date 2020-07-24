@@ -2,7 +2,6 @@
 
 .export {
   @include flex-horizontal;
-  color: $indigo-blue;
   padding: 0.5rem;
 
   .ready {
@@ -10,7 +9,7 @@
   }
 
   .unavailable {
-    color: $grey;
+    color: $light-grey;
   }
 
   .icon {
