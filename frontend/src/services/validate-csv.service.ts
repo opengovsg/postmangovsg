@@ -75,8 +75,8 @@ export async function validateCsv(
 }
 
 function removeNewLinesFromTables(template: string) {
-  // Get all text within <table> tags
-  return template.replace(/<table\s*>(.*?)<\/table\s*>/gs, (match) =>
+  // Get all text within <table (attr?)> tags
+  return template.replace(/<table(\s+.*?|\s*)>(.*?)<\/table\s*>/gs, (match) =>
     // Remove all new lines
     match.replace(/(\r\n|\r|\n)/g, '')
   )
