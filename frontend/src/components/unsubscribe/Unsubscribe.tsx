@@ -40,7 +40,7 @@ const Unsubscribe = () => {
       })
       setUnsubscribed(true)
     } catch (err) {
-      setErrorMsg(err.message)
+      setErrorMsg('Invalid subscribe request')
     }
   }
 
