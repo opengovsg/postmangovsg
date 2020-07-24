@@ -2,7 +2,7 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 
-import { CONTRIBUTE_URL, TRANSTEXT } from 'config'
+import { TRANSTEXT } from 'config'
 import PrimaryButton from 'components/common/primary-button'
 import AppLogo from 'assets/img/brand/app-logo.svg'
 import AppBrandmark from 'assets/img/brand/app-brandmark.svg'
@@ -30,8 +30,8 @@ const NavBar = () => {
         <div className={styles.links}>
           <OutboundLink
             className={styles.link}
-            eventLabel={CONTRIBUTE_URL}
-            to={CONTRIBUTE_URL}
+            eventLabel={i18n._(TRANSTEXT.contributeUrl)}
+            to={i18n._(TRANSTEXT.contributeUrl)}
             target="_blank"
           >
             Contribute

@@ -4,15 +4,7 @@ import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 import Lottie from 'react-lottie'
 
-import {
-  TRANSTEXT,
-  CONTACT_US_URL,
-  CONTRIBUTE_URL,
-  PRIVACY_URL,
-  TC_URL,
-  REPORT_BUG_URL,
-  INFO_BANNER,
-} from 'config'
+import { TRANSTEXT, INFO_BANNER } from 'config'
 
 import Navbar from './nav-bar'
 import Banner from './banner'
@@ -187,8 +179,8 @@ const Landing = () => {
               </PrimaryButton>
               <OutboundLink
                 className={styles.contactUs}
-                eventLabel={CONTACT_US_URL}
-                to={CONTACT_US_URL}
+                eventLabel={i18n._(TRANSTEXT.contactUsUrl)}
+                to={i18n._(TRANSTEXT.contactUsUrl)}
                 target="_blank"
               >
                 Need help?<span>Talk to us</span>
@@ -300,8 +292,8 @@ const Landing = () => {
                 />
               </PrimaryButton>
               <OutboundLink
-                eventLabel={CONTACT_US_URL}
-                to={CONTACT_US_URL}
+                eventLabel={i18n._(TRANSTEXT.contactUsUrl)}
+                to={i18n._(TRANSTEXT.contactUsUrl)}
                 target="_blank"
               >
                 Contact us
@@ -336,8 +328,8 @@ const Landing = () => {
                 Guide
               </OutboundLink>
               <OutboundLink
-                eventLabel={CONTRIBUTE_URL}
-                to={CONTRIBUTE_URL}
+                eventLabel={i18n._(TRANSTEXT.contributeUrl)}
+                to={i18n._(TRANSTEXT.contributeUrl)}
                 target="_blank"
               >
                 Contribute
@@ -354,18 +346,22 @@ const Landing = () => {
             <div className={styles.links}>
               <OutboundLink
                 className={styles.navLink}
-                eventLabel={PRIVACY_URL}
-                to={PRIVACY_URL}
+                eventLabel={i18n._(TRANSTEXT.privacyUrl)}
+                to={i18n._(TRANSTEXT.privacyUrl)}
                 target="_blank"
               >
                 Privacy
               </OutboundLink>
-              <OutboundLink eventLabel={TC_URL} to={TC_URL} target="_blank">
+              <OutboundLink
+                eventLabel={i18n._(TRANSTEXT.tncUrl)}
+                to={i18n._(TRANSTEXT.tncUrl)}
+                target="_blank"
+              >
                 Terms of Use
               </OutboundLink>
               <OutboundLink
-                eventLabel={REPORT_BUG_URL}
-                to={REPORT_BUG_URL}
+                eventLabel={i18n._(TRANSTEXT.reportBugUrl)}
+                to={i18n._(TRANSTEXT.reportBugUrl)}
                 target="_blank"
               >
                 Report Vulnerability

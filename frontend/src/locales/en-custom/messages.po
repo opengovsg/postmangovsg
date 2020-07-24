@@ -53,6 +53,14 @@ msgstr "[Verifying OTP...]"
 msgid "e.g. postman@agency.gov.sg"
 msgstr "[e.g. postman@agency.gov.sg]"
 
+#: src/config.ts:38
+msgid "text.contactUsUrl"
+msgstr "https://go.gov.sg/postman-contact-us"
+
+#: src/config.ts:39
+msgid "text.contributeUrl"
+msgstr "https://github.com/opengovsg/postmangovsg"
+
 #: src/config.ts:37
 msgid "text.guidePowerUserUrl"
 msgstr "https://guide.postman.gov.sg/guide/power-users"
@@ -68,3 +76,15 @@ msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
 #: src/config.ts:34
 msgid "text.guideUrl"
 msgstr "https://guide.postman.gov.sg"
+
+#: src/config.ts:41
+msgid "text.privacyUrl"
+msgstr "https://guide.postman.gov.sg/legal/privacy"
+
+#: src/config.ts:42
+msgid "text.reportBugUrl"
+msgstr "https://guide.postman.gov.sg/contact-us"
+
+#: src/config.ts:40
+msgid "text.tncUrl"
+msgstr "https://guide.postman.gov.sg/legal/t-and-c"

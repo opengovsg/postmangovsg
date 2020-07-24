@@ -11,13 +11,8 @@ const missingEnvVars = [
   'REACT_APP_GUIDE_SMS_ACCOUNT_SID_URL',
   'REACT_APP_GUIDE_SMS_API_KEY_URL',
   'REACT_APP_GUIDE_SMS_MESSAGING_SERVICE_URL',
-  'REACT_APP_CONTACT_US_URL',
   'REACT_APP_LOGIN_EMAIL_TEXT',
   'REACT_APP_LOGIN_EMAIL_PLACEHOLDER',
-  'REACT_APP_CONTRIBUTE_URL',
-  'REACT_APP_PRIVACY_URL',
-  'REACT_APP_TC_URL',
-  'REACT_APP_REPORT_BUG_URL',
   'REACT_APP_SENTRY_DSN',
   'REACT_APP_SENTRY_RELEASE',
 ].reduce(function (acc: string[], name: string) {
@@ -39,17 +34,17 @@ export const TRANSTEXT = {
   guideSmsUrl: t('text.guideSmsUrl')``,
   guideTelegramUrl: t('text.guideTelegramUrl')``,
   guidePowerUserUrl: t('text.guidePowerUserUrl')``,
+  contactUsUrl: t('text.contactUsUrl')``,
+  contributeUrl: t('text.contributeUrl')``,
+  tncUrl: t('text.tncUrl')``,
+  privacyUrl: t('text.privacyUrl')``,
+  reportBugUrl: t('text.reportBugUrl')``,
 }
 //#endregion
 
-export const CONTACT_US_URL = process.env.REACT_APP_CONTACT_US_URL as string
 export const LOGIN_EMAIL_TEXT = process.env.REACT_APP_LOGIN_EMAIL_TEXT as string
 export const LOGIN_EMAIL_PLACEHOLDER = process.env
   .REACT_APP_LOGIN_EMAIL_PLACEHOLDER as string
-export const CONTRIBUTE_URL = process.env.REACT_APP_CONTRIBUTE_URL as string
-export const PRIVACY_URL = process.env.REACT_APP_PRIVACY_URL as string
-export const TC_URL = process.env.REACT_APP_TC_URL as string
-export const REPORT_BUG_URL = process.env.REACT_APP_REPORT_BUG_URL as string
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN as string
 export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
