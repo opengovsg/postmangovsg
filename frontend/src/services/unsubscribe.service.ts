@@ -11,9 +11,7 @@ export async function unsubscribeRequest({
   version: string
 }): Promise<void> {
   try {
-    await axios.post(`/unsubscribe`, {
-      c: campaignId,
-      r: recipient,
+    await axios.put(`/unsubscribe/${campaignId}/${recipient}`, {
       h: hash,
       v: version,
     })
