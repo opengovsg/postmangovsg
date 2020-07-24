@@ -52,25 +52,9 @@ const findOrCreateUnsubscribeValidator = {
  *
  *      responses:
  *        "200":
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  campaign_id:
- *                    type: integer
- *                  recipient:
- *                    type: string
+ *           description: OK (subscriber already exists, no update required)
  *        "201":
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  campaign_id:
- *                    type: integer
- *                  recipient:
- *                    type: string
+ *           description: Created (new subscriber added)
  *        "400":
  *           description: Bad Request (invalid request, already unsubscribed)
  *        "500":

@@ -59,10 +59,7 @@ const findOrCreateUnsubscriber = async (
   })
 
   const statusCode = created ? 201 : 200
-  return res.status(statusCode).json({
-    campaign_id: campaignId,
-    recipient,
-  })
+  return res.sendStatus(statusCode)
 }
 
 export const UnsubscriberMiddleware = {
