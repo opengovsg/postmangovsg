@@ -76,12 +76,7 @@ const listCampaigns = ({
       {
         model: Statistic,
         attributes: [
-          [
-            literal(
-              'CASE WHEN (errored + invalid) > 0 THEN True ELSE False END'
-            ),
-            'has_failed_recipients',
-          ],
+          [literal('(errored + invalid) > 0'), 'has_failed_recipients'],
         ],
       },
     ],
