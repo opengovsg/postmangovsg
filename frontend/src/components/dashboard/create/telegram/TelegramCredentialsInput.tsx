@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { GUIDE_TELEGRAM_CREDENTIALS_URL } from 'config'
+import { TRANSTEXT } from 'config'
 
 import { TextInput, LabelWithExternalLink } from 'components/common'
+import { i18n } from 'locales'
 
 const TelegramCredentialsInput = ({
   onFilled,
@@ -22,7 +23,7 @@ const TelegramCredentialsInput = ({
     <>
       <LabelWithExternalLink
         label="Telegram Bot Token"
-        link={GUIDE_TELEGRAM_CREDENTIALS_URL}
+        link={i18n._(TRANSTEXT.guideTelegramUrl)}
       />
       <TextInput
         placeholder="Enter Telegram Bot Token"

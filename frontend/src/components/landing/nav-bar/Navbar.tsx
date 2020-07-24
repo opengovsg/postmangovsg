@@ -2,11 +2,12 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 
-import { GUIDE_URL, CONTRIBUTE_URL } from 'config'
+import { CONTRIBUTE_URL, TRANSTEXT } from 'config'
 import PrimaryButton from 'components/common/primary-button'
 import AppLogo from 'assets/img/brand/app-logo.svg'
 import AppBrandmark from 'assets/img/brand/app-brandmark.svg'
 import styles from './NavBar.module.scss'
+import { i18n } from 'locales'
 
 const NavBar = () => {
   const history = useHistory()
@@ -37,8 +38,8 @@ const NavBar = () => {
           </OutboundLink>
           <OutboundLink
             className={styles.link}
-            eventLabel={GUIDE_URL}
-            to={GUIDE_URL}
+            eventLabel={i18n._(TRANSTEXT.guideUrl)}
+            to={i18n._(TRANSTEXT.guideUrl)}
             target="_blank"
           >
             Guide

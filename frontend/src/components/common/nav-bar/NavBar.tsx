@@ -4,7 +4,6 @@ import cx from 'classnames'
 import { OutboundLink } from 'react-ga'
 
 import { ModalContext } from 'contexts/modal.context'
-import { GUIDE_URL } from 'config'
 import { TextButton } from 'components/common'
 import CreateModal from 'components/dashboard/create/create-modal'
 import { logout } from 'services/auth.service'
@@ -12,6 +11,9 @@ import { AuthContext } from 'contexts/auth.context'
 
 import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
+
+import { i18n } from 'locales'
+import { TRANSTEXT } from 'config'
 
 const NavBar = () => {
   const { setAuthenticated, email } = useContext(AuthContext)
@@ -70,8 +72,8 @@ const NavBar = () => {
         </TextButton>
         <OutboundLink
           className={styles.link}
-          eventLabel={GUIDE_URL}
-          to={GUIDE_URL}
+          eventLabel={i18n._(TRANSTEXT.guideUrl)}
+          to={i18n._(TRANSTEXT.guideUrl)}
           target="_blank"
         >
           Guide

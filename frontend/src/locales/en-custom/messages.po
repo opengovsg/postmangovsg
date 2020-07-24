@@ -52,3 +52,19 @@ msgstr "[Verifying OTP...]"
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "e.g. postman@agency.gov.sg"
 msgstr "[e.g. postman@agency.gov.sg]"
+
+#: src/config.ts:37
+msgid "text.guidePowerUserUrl"
+msgstr "https://guide.postman.gov.sg/guide/power-users"
+
+#: src/config.ts:35
+msgid "text.guideSmsUrl"
+msgstr "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
+
+#: src/config.ts:36
+msgid "text.guideTelegramUrl"
+msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
+
+#: src/config.ts:34
+msgid "text.guideUrl"
+msgstr "https://guide.postman.gov.sg"

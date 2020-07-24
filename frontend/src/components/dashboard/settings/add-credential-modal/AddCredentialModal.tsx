@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 
-import { GUIDE_TELEGRAM_CREDENTIALS_URL } from 'config'
+import { TRANSTEXT } from 'config'
 import { ChannelType, channelIcons } from 'classes'
 import {
   PrimaryButton,
@@ -31,6 +31,7 @@ import ChooseChannelsImage from 'assets/img/choose-channels.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
 import styles from './AddCredentialModal.module.scss'
+import { i18n } from 'locales'
 
 enum AddCredentialStep {
   SelectType,
@@ -270,8 +271,8 @@ const AddCredentialModal = ({
             Before you validate the credentials, the phone number you are
             testing with must be already subscribed to the bot.&nbsp;
             <OutboundLink
-              eventLabel={GUIDE_TELEGRAM_CREDENTIALS_URL}
-              to={GUIDE_TELEGRAM_CREDENTIALS_URL}
+              eventLabel={i18n._(TRANSTEXT.guideTelegramUrl)}
+              to={i18n._(TRANSTEXT.guideTelegramUrl)}
               target="_blank"
             >
               Learn more

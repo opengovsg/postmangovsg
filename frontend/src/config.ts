@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import { t } from '@lingui/macro'
 /**
  * React env vars are used for injecting variables at build time
  * https://create-react-app.dev/docs/adding-custom-environment-variables/#referencing-environment-variables-in-the-html
@@ -8,13 +8,9 @@ const missingEnvVars = [
   'REACT_APP_TITLE',
   'REACT_APP_DESCRIPTION',
   'REACT_APP_BACKEND_URL',
-  'REACT_APP_GUIDE_URL',
-  'REACT_APP_GUIDE_SMS_CREDENTIALS_URL',
   'REACT_APP_GUIDE_SMS_ACCOUNT_SID_URL',
   'REACT_APP_GUIDE_SMS_API_KEY_URL',
   'REACT_APP_GUIDE_SMS_MESSAGING_SERVICE_URL',
-  'REACT_APP_GUIDE_TELEGRAM_CREDENTIALS_URL',
-  'REACT_APP_GUIDE_POWER_USER_URL',
   'REACT_APP_CONTACT_US_URL',
   'REACT_APP_LOGIN_EMAIL_TEXT',
   'REACT_APP_LOGIN_EMAIL_PLACEHOLDER',
@@ -37,13 +33,15 @@ axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL as string
 axios.defaults.withCredentials = true
 axios.defaults.timeout = 100000 // 100 sec
 
-export const GUIDE_URL = process.env.REACT_APP_GUIDE_URL as string
-export const GUIDE_SMS_CREDENTIALS_URL = process.env
-  .REACT_APP_GUIDE_SMS_CREDENTIALS_URL as string
-export const GUIDE_TELEGRAM_CREDENTIALS_URL = process.env
-  .REACT_APP_GUIDE_TELEGRAM_CREDENTIALS_URL as string
-export const GUIDE_POWER_USER_URL = process.env
-  .REACT_APP_GUIDE_POWER_USER_URL as string
+//#region Set up translations
+export const TRANSTEXT = {
+  guideUrl: t('text.guideUrl')``,
+  guideSmsUrl: t('text.guideSmsUrl')``,
+  guideTelegramUrl: t('text.guideTelegramUrl')``,
+  guidePowerUserUrl: t('text.guidePowerUserUrl')``,
+}
+//#endregion
+
 export const CONTACT_US_URL = process.env.REACT_APP_CONTACT_US_URL as string
 export const LOGIN_EMAIL_TEXT = process.env.REACT_APP_LOGIN_EMAIL_TEXT as string
 export const LOGIN_EMAIL_PLACEHOLDER = process.env

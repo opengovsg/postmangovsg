@@ -5,7 +5,7 @@ import cx from 'classnames'
 import Lottie from 'react-lottie'
 
 import {
-  GUIDE_URL,
+  TRANSTEXT,
   CONTACT_US_URL,
   CONTRIBUTE_URL,
   PRIVACY_URL,
@@ -38,6 +38,8 @@ import whyUse2 from 'assets/mp4/why-use-2.mp4'
 import whyUse3 from 'assets/mp4/why-use-3.mp4'
 
 import landingAnimation from 'assets/lottie/landing.json'
+
+import { i18n } from 'locales'
 
 const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 
@@ -327,8 +329,8 @@ const Landing = () => {
                 </span>
               </div>
               <OutboundLink
-                eventLabel={GUIDE_URL}
-                to={GUIDE_URL}
+                eventLabel={i18n._(TRANSTEXT.guideUrl)}
+                to={i18n._(TRANSTEXT.guideUrl)}
                 target="_blank"
               >
                 Guide

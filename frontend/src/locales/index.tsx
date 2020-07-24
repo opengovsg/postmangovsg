@@ -1,6 +1,6 @@
 import { setupI18n } from '@lingui/core'
-import catalogEnCustom from './en-custom/messages.js'
 import { Catalogs, I18n } from '@lingui/core/i18n'
+import catalogEnCustom from './en-custom/messages.js'
 
 const catalogs: Catalogs = { 'en-custom': catalogEnCustom }
 

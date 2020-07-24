@@ -1,10 +1,11 @@
 import React, { Dispatch, SetStateAction, useState } from 'react'
 import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
-import { GUIDE_POWER_USER_URL } from 'config'
+import { TRANSTEXT } from 'config'
 import { TextInput } from 'components/common'
 import styles from './SendRate.module.scss'
 import { ChannelType } from 'classes'
+import { i18n } from 'locales'
 
 const SendRate = ({
   sendRate,
@@ -27,8 +28,8 @@ const SendRate = ({
               not max out Twilio&apos;s REST API concurrency limit.&nbsp;
               <OutboundLink
                 className={styles.link}
-                eventLabel={GUIDE_POWER_USER_URL}
-                to={GUIDE_POWER_USER_URL}
+                eventLabel={i18n._(TRANSTEXT.guidePowerUserUrl)}
+                to={i18n._(TRANSTEXT.guidePowerUserUrl)}
                 target="_blank"
               >
                 Learn more about send rate limits

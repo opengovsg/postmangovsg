@@ -3,13 +3,14 @@ import { Redirect } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 
 import LoginInput from './login-input'
-import { GUIDE_URL, CONTACT_US_URL, INFO_BANNER } from 'config'
+import { TRANSTEXT, CONTACT_US_URL, INFO_BANNER } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { InfoBanner } from 'components/common'
 import styles from './Login.module.scss'
 import loginImg from 'assets/img/landing/login.svg'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import companyLogo from 'assets/img/brand/company-logo-dark.svg'
+import { i18n } from 'locales'
 
 const Login = () => {
   const authContext = useContext(AuthContext)
@@ -46,8 +47,8 @@ const Login = () => {
           <div className={styles.linkBar}>
             <OutboundLink
               className={styles.navLink}
-              eventLabel={GUIDE_URL}
-              to={GUIDE_URL}
+              eventLabel={i18n._(TRANSTEXT.guideUrl)}
+              to={i18n._(TRANSTEXT.guideUrl)}
               target="_blank"
             >
               Guide
