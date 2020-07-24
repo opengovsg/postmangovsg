@@ -36,36 +36,26 @@ const validateHash = ({
 }
 
 /**
- * Retrieves unsubscriber
- * @param campaignId
- * @param recipient
- */
-const getUnsubscriber = (
-  campaignId: number,
-  recipient: string
-): Promise<Unsubscriber> => {
-  return Unsubscriber.findOne({
-    where: { campaignId, recipient },
-  })
-}
-
-/**
  * Create a new unsubscriber
  * @param campaignId
  * @param recipient
  */
-const createUnsubscriber = ({
+const findOrCreateUnsubscriber = ({
   campaignId,
   recipient,
 }: {
   campaignId: number
   recipient: string
-}): Promise<Unsubscriber> => {
-  return Unsubscriber.create({ campaignId, recipient })
+}): Promise<[Unsubscriber, boolean]> => {
+  return Unsubscriber.findOrCreate({
+    where: {
+      campaignId,
+      recipient,
+    },
+  })
 }
 
 export const UnsubscriberService = {
   validateHash,
-  getUnsubscriber,
-  createUnsubscriber,
+  findOrCreateUnsubscriber,
 }
