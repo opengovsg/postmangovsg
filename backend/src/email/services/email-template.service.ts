@@ -239,7 +239,9 @@ const addToMessageLogs = async (
     const chunks = chunk(records, 5000)
     for (let idx = 0; idx < chunks.length; idx++) {
       const batch = chunks[idx]
-      await EmailMessage.bulkCreate(batch, { transaction })
+      await EmailMessage.bulkCreate(batch, {
+        transaction,
+      })
     }
 
     logger.info({ message: `Finished populateEmailTemplate for ${campaignId}` })
@@ -262,7 +264,7 @@ const hasInvalidEmailRecipient = (
  * @param templateSubject - optional
  */
 const testHydration = (
-  records: Array<MessageBulkInsertInterface>,
+  records: Array<{ params: { [key: string]: string } }>,
   templateBody: string,
   templateSubject: string
 ): void => {
