@@ -5,7 +5,7 @@ import {
   GUIDE_SMS_ACCOUNT_SID_URL,
   GUIDE_SMS_MESSAGING_SERVICE_URL,
 } from 'config'
-import { TextInput } from 'components/common'
+import { TextInput, LabelWithExternalLink } from 'components/common'
 import styles from '../Create.module.scss'
 
 export interface TwilioCredentials {
@@ -33,45 +33,42 @@ const TwilioCredentialsInput = ({
     }
   }, [accountSid, apiKey, apiSecret, messagingServiceSid, onFilled])
 
-  const renderLabel = (label: string, link: string) => (
-    <>
-      <h5>{label}</h5>
-      <a href={link} target="_blank" rel="noopener noreferrer">
-        <i className="bx bx-link-external" />
-      </a>
-    </>
-  )
-
   return (
-    <div className={styles.twilioCredentialsInput}>
-      {renderLabel('Account SID', GUIDE_SMS_ACCOUNT_SID_URL)}
+    <>
+      <LabelWithExternalLink
+        label="Account SID"
+        link={GUIDE_SMS_ACCOUNT_SID_URL}
+      />
       <TextInput
         placeholder="Enter Account SID"
         value={accountSid}
         onChange={setAccountSid}
       />
 
-      {renderLabel('API Key SID', GUIDE_SMS_API_KEY_URL)}
+      <LabelWithExternalLink label="API Key SID" link={GUIDE_SMS_API_KEY_URL} />
       <TextInput
         placeholder="Enter API Key SID"
         value={apiKey}
         onChange={setApiKey}
       />
 
-      {renderLabel('API Secret', GUIDE_SMS_API_KEY_URL)}
+      <LabelWithExternalLink label="API Secret" link={GUIDE_SMS_API_KEY_URL} />
       <TextInput
         placeholder="Enter API Secret"
         value={apiSecret}
         onChange={setApiSecret}
       />
 
-      {renderLabel('Messaging Service ID', GUIDE_SMS_MESSAGING_SERVICE_URL)}
+      <LabelWithExternalLink
+        label="Messaging Service ID"
+        link={GUIDE_SMS_MESSAGING_SERVICE_URL}
+      />
       <TextInput
         placeholder="Enter Messaging Service ID"
         value={messagingServiceSid}
         onChange={setMessagingServiceSid}
       />
-    </div>
+    </>
   )
 }
 
