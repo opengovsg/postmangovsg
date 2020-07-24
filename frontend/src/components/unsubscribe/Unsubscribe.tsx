@@ -95,9 +95,10 @@ const Unsubscribe = () => {
     <div className={styles.outer}>
       <div className={styles.inner}>
         <>
-          <img src={appLogo} />
+          <img src={appLogo} alt="Postman logo" />
           <img
             src={isStaying ? cancelRequestHero : landingHero}
+            alt="Landing hero"
             className={styles.landingHero}
           />
           {renderUnsubscribeSection()}
