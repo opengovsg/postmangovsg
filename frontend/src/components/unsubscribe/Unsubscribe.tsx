@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import querystring from 'querystring'
 
-import { ErrorBlock, PrimaryButton } from 'components/common'
+import { ErrorBlock, PrimaryButton, TextButton } from 'components/common'
 
 import styles from './Unsubscribe.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import landingHero from 'assets/img/unsubscribe/request-unsubscribe.png'
+import cancelRequestHero from 'assets/img/unsubscribe/cancel-request.png'
 
 import { unsubscribeRequest } from 'services/unsubscribe.service'
 
@@ -14,6 +15,7 @@ const Unsubscribe = () => {
   const { version } = useParams()
   const [errorMsg, setErrorMsg] = useState('')
   const [isUnsubscribed, setUnsubscribed] = useState(false)
+  const [isStaying, setStaying] = useState(false)
 
   async function onConfirmation() {
     try {
@@ -43,6 +45,17 @@ const Unsubscribe = () => {
   }
 
   function renderUnsubscribeSection() {
+    if (isStaying) {
+      return (
+        <>
+          <h2>Excellent choice!</h2>
+          <p>
+            Thank you for staying subscribed to this campaign. Happy that we are
+            still keeping in touch.
+          </p>
+        </>
+      )
+    }
     if (isUnsubscribed) {
       return (
         <>
@@ -61,12 +74,18 @@ const Unsubscribe = () => {
             We will inform the agency that sent you this campaign about your
             wish to unsubscribe. You will be removed from their mailing list.
           </p>
-          <PrimaryButton
-            onClick={onConfirmation}
-            loadingPlaceholder="Processing"
-          >
-            Unsubscribe
-          </PrimaryButton>
+          <div>
+            <PrimaryButton
+              onClick={() => {
+                setStaying(true)
+                setErrorMsg('')
+              }}
+              loadingPlaceholder="Processing"
+            >
+              I&#39;d rather stay
+            </PrimaryButton>
+            <TextButton onClick={onConfirmation}>Unsubscribe me</TextButton>
+          </div>
         </>
       )
     }
@@ -77,7 +96,10 @@ const Unsubscribe = () => {
       <div className={styles.inner}>
         <>
           <img src={appLogo} />
-          <img src={landingHero} className={styles.landingHero} />
+          <img
+            src={isStaying ? cancelRequestHero : landingHero}
+            className={styles.landingHero}
+          />
           {renderUnsubscribeSection()}
           <ErrorBlock>{errorMsg}</ErrorBlock>
         </>
