@@ -107,7 +107,6 @@ const Campaigns = () => {
         if (campaign.status === Status.Draft) return
         return (
           <ExportRecipients
-            alignLabel
             campaignId={campaign.id}
             campaignName={campaign.name}
             status={campaign.status}

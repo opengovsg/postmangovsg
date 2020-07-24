@@ -15,7 +15,6 @@ const ExportRecipients = ({
   campaignName,
   sentAt,
   exportStatus,
-  alignLabel,
 }: {
   className?: string
   campaignId: number
@@ -23,7 +22,6 @@ const ExportRecipients = ({
   status: Status
   sentAt: Date
   exportStatus: CampaignExportStatus
-  alignLabel?: boolean
 }) => {
   const [disabled, setDisabled] = useState(false)
 
@@ -76,15 +74,7 @@ const ExportRecipients = ({
 
   function renderExportButton() {
     if (exportStatus === CampaignExportStatus.NoError) {
-      return (
-        <span
-          className={cx(styles.unavailable, {
-            [styles.alignLabel]: alignLabel,
-          })}
-        >
-          No error
-        </span>
-      )
+      return <span className={styles.unavailable}>No error</span>
     }
     if (exportStatus === CampaignExportStatus.Loading) {
       return (
