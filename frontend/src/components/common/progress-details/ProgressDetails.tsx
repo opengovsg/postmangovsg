@@ -105,6 +105,22 @@ const ProgressDetails = ({
     return <h2>{progressMessage}</h2>
   }
 
+  function renderUpdateStats() {
+    if (isSent) {
+      return (
+        <div className={styles.statsLastUpdated}>
+          <span>
+            Stats last retrieved on{' '}
+            <Moment format="LLL">{stats.updatedAt}</Moment>
+          </span>
+          <PrimaryButton onClick={handleRefreshStats}>
+            Refresh stats
+          </PrimaryButton>
+        </div>
+      )
+    }
+  }
+
   return (
     <div className={styles.progress}>
       <table>
@@ -210,16 +226,7 @@ const ProgressDetails = ({
           </tr>
         </tbody>
       </table>
-
-      <div className={styles.statsLastUpdated}>
-        <span>
-          Stats last retrieved on{' '}
-          <Moment format="LLL">{stats.updatedAt}</Moment>
-        </span>
-        <PrimaryButton onClick={handleRefreshStats}>
-          Refresh stats
-        </PrimaryButton>
-      </div>
+      {renderUpdateStats()}
     </div>
   )
 }
