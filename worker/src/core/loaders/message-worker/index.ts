@@ -137,7 +137,8 @@ const enqueueAndSend = async (): Promise<void> => {
         hasNext = false
       } else {
         const start = Date.now()
-        await Promise.all(messages.map((m) => sendMessage(m)))
+        // Fire and forget. This risks opening too many unresolved connections if the rate is high (Error: read ECONNRESET)
+        messages.forEach((m) => sendMessage(m))
         // Make sure at least 1 second has elapsed
         const wait = Math.max(0, 1000 - (Date.now() - start))
         await waitForMs(wait)
