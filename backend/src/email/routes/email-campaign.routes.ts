@@ -74,12 +74,6 @@ const completeMultipartValidator = {
   }),
 }
 
-const statsValidator = {
-  [Segments.QUERY]: Joi.object({
-    refresh: Joi.boolean().default(false),
-  }),
-}
-
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -570,10 +564,6 @@ router.post(
  *          required: true
  *          schema:
  *            type: string
- *        - name: refresh
- *          in: query
- *          schema:
- *            type: boolean
  *
  *      responses:
  *        200:
@@ -586,7 +576,35 @@ router.post(
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/stats', celebrate(statsValidator), EmailStatsMiddleware.getStats)
+router.get('/stats', EmailStatsMiddleware.getStats)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/email/refresh-stats:
+ *    post:
+ *      tags:
+ *        - Email
+ *      summary: Get email campaign stats
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post('/refresh-stats', EmailStatsMiddleware.updateAndGetStats)
 
 /**
  * @swagger

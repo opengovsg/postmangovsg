@@ -56,12 +56,6 @@ const sendCampaignValidator = {
   }),
 }
 
-const statsValidator = {
-  [Segments.QUERY]: Joi.object({
-    refresh: Joi.boolean().default(false),
-  }),
-}
-
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -605,10 +599,6 @@ router.post(
  *          required: true
  *          schema:
  *            type: string
- *        - name: refresh
- *          in: query
- *          schema:
- *            type: boolean
  *
  *      responses:
  *        200:
@@ -623,7 +613,37 @@ router.post(
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/stats', celebrate(statsValidator), SmsStatsMiddleware.getStats)
+router.get('/stats', SmsStatsMiddleware.getStats)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/refresh-stats:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Forcibly refresh sms campaign stats, then retrieves them
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post('/refresh-stats', SmsStatsMiddleware.updateAndGetStats)
 
 /**
  * @swagger

@@ -7,11 +7,16 @@ import { TelegramOp, TelegramMessage } from '@telegram/models'
  * Gets stats for telegram project
  * @param campaignId
  */
-const getStats = async (
-  campaignId: number,
-  refresh: boolean
-): Promise<CampaignStats> => {
-  return StatsService.getCurrentStats(campaignId, TelegramOp, refresh)
+const getStats = async (campaignId: number): Promise<CampaignStats> => {
+  return StatsService.getCurrentStats(campaignId, TelegramOp)
+}
+
+/**
+ * Forcibly updates stats from telegram_messages table
+ * @param campaignId
+ */
+const refreshStats = async (campaignId: number): Promise<void> => {
+  return StatsService.updateStats(campaignId)
 }
 
 /**
@@ -27,4 +32,5 @@ const getFailedRecipients = async (
 export const TelegramStatsService = {
   getStats,
   getFailedRecipients,
+  refreshStats,
 }

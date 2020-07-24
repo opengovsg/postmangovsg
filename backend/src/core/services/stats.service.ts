@@ -246,4 +246,5 @@ export const StatsService = {
   getNumRecipients,
   setNumRecipients,
   getFailedRecipients,
+  updateStats,
 }

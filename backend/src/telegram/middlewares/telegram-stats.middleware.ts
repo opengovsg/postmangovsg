@@ -12,9 +12,29 @@ const getStats = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { campaignId } = req.params
-  const { refresh } = req.query
   try {
-    const stats = await TelegramStatsService.getStats(+campaignId, refresh)
+    const stats = await TelegramStatsService.getStats(+campaignId)
+    return res.json(stats)
+  } catch (err) {
+    next(err)
+  }
+}
+
+/**
+ * Forcibly refresh stats for campaign, then retrieves them
+ * @param req
+ * @param res
+ * @param next
+ */
+const updateAndGetStats = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { campaignId } = req.params
+  try {
+    await TelegramStatsService.refreshStats(+campaignId)
+    const stats = await TelegramStatsService.getStats(+campaignId)
     return res.json(stats)
   } catch (err) {
     next(err)
@@ -46,4 +66,5 @@ const getFailedRecipients = async (
 export const TelegramStatsMiddleware = {
   getStats,
   getFailedRecipients,
+  updateAndGetStats,
 }
