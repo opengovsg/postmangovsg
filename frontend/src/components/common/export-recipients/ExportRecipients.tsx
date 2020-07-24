@@ -15,6 +15,7 @@ const ExportRecipients = ({
   campaignName,
   sentAt,
   exportStatus,
+  iconPosition,
 }: {
   className?: string
   campaignId: number
@@ -22,6 +23,7 @@ const ExportRecipients = ({
   status: Status
   sentAt: Date
   exportStatus: CampaignExportStatus
+  iconPosition: string
 }) => {
   const [disabled, setDisabled] = useState(false)
 
@@ -112,7 +114,7 @@ const ExportRecipients = ({
       }
       title={renderTitle()}
     >
-      {renderExportButton()}
+      <div className={styles[iconPosition]}>{renderExportButton()}</div>
     </div>
   )
 }

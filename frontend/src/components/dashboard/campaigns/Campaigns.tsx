@@ -107,6 +107,7 @@ const Campaigns = () => {
         if (campaign.status === Status.Draft) return
         return (
           <ExportRecipients
+            iconPosition="left"
             campaignId={campaign.id}
             campaignName={campaign.name}
             status={campaign.status}

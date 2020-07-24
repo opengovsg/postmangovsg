@@ -151,6 +151,7 @@ const ProgressDetails = ({
             )}
           >
             <ExportRecipients
+              iconPosition="right"
               campaignId={campaignId}
               campaignName={campaignName}
               status={status}

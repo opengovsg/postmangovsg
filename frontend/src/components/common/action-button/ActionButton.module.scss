@@ -17,7 +17,11 @@
 
   &:active {
     background-color: $indigo-blue;
-    color: white;
+
+    i,
+    span {
+      color: white;
+    }
   }
 
   &.dropdown {
@@ -36,7 +40,7 @@
       @include flex-center;
 
       i {
-        margin-left: 0;
+        margin-right: 0;
       }
     }
   }
@@ -66,7 +70,7 @@
   box-shadow: 0.1rem 0.1rem 1rem 0 lighten($light-grey, 20%);
   color: $indigo-blue;
 
-  div {
+  > div {
     @include flex-horizontal;
     padding: 1rem 2rem;
     cursor: pointer;
