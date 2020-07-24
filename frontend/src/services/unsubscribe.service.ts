@@ -23,34 +23,6 @@ export async function unsubscribeRequest({
   }
 }
 
-export async function isUserUnsubscribed({
-  campaignId,
-  recipient,
-  hash,
-  version,
-}: {
-  campaignId: number
-  recipient: string
-  hash: string
-  version: string
-}): Promise<boolean> {
-  try {
-    const response = await axios.get('/unsubscribe', {
-      params: {
-        c: campaignId,
-        r: recipient,
-        h: hash,
-        v: version,
-      },
-    })
-    const { unsubscribed } = response.data
-
-    return unsubscribed
-  } catch (e) {
-    errorHandler(e, 'Error checking if user is unsubscribed')
-  }
-}
-
 function errorHandler(e: AxiosError, defaultMsg?: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {

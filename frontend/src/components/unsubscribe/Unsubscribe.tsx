@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { useLocation, useParams, Redirect } from 'react-router-dom'
+import React, { useState } from 'react'
+import { useParams } from 'react-router-dom'
 import querystring from 'querystring'
 
 import { ErrorBlock, PrimaryButton } from 'components/common'
@@ -8,27 +8,32 @@ import styles from './Unsubscribe.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import landingHero from 'assets/img/unsubscribe/request-unsubscribe.png'
 
-import {
-  unsubscribeRequest,
-  isUserUnsubscribed,
-} from 'services/unsubscribe.service'
+import { unsubscribeRequest } from 'services/unsubscribe.service'
 
 const Unsubscribe = () => {
   const { version } = useParams()
-  const location = useLocation()
   const [errorMsg, setErrorMsg] = useState('')
-  const [isValid, setValid] = useState(true)
   const [isUnsubscribed, setUnsubscribed] = useState(false)
-  const [campaignId, setCampaignId] = useState('')
-  const [recipient, setRecipient] = useState('')
-  const [hash, setHash] = useState('')
 
   async function onConfirmation() {
     try {
+      const query = new URL(window.location.href).searchParams.toString()
+      const params = querystring.parse(query)
+
+      // Check to make sure that the search params are all strings and not []strings
+      const isValid = Object.values(params).every((v) => typeof v === 'string')
+      if (!isValid) {
+        throw new Error(
+          'Search params should all be strings and not array of strings.'
+        )
+      }
+
+      const { c: campaignId, r: recipient, h: hash } = params
+
       await unsubscribeRequest({
         campaignId: +campaignId,
-        recipient,
-        hash,
+        recipient: recipient as string,
+        hash: hash as string,
         version,
       })
       setUnsubscribed(true)
@@ -36,58 +41,6 @@ const Unsubscribe = () => {
       setErrorMsg(err.message)
     }
   }
-
-  async function isUrlValid({
-    campaignId,
-    recipient,
-    hash,
-    version,
-  }: {
-    campaignId: number
-    recipient: string
-    hash: string
-    version: string
-  }) {
-    try {
-      const isUnsub = await isUserUnsubscribed({
-        campaignId: +campaignId,
-        recipient,
-        hash,
-        version,
-      })
-
-      setUnsubscribed(isUnsub)
-      setValid(true)
-      return
-    } catch (e) {
-      setValid(false)
-    }
-  }
-
-  useEffect(() => {
-    const query = new URL(window.location.href).searchParams.toString()
-    const params = querystring.parse(query)
-    // Check to make sure that the search params are all strings and not []strings
-    const isValid = Object.values(params).every((v) => typeof v === 'string')
-    if (!isValid) {
-      setValid(isValid)
-      return
-    }
-
-    const { c, r, h } = params
-
-    setCampaignId(c as string)
-    setRecipient(r as string)
-    setHash(h as string)
-
-    // Seems like setting state is asynchronous, so can't rely on the values here
-    isUrlValid({
-      campaignId: +c,
-      recipient: r as string,
-      hash: h as string,
-      version,
-    })
-  }, [location.search, version])
 
   function renderUnsubscribeSection() {
     if (isUnsubscribed) {
@@ -121,18 +74,14 @@ const Unsubscribe = () => {
 
   return (
     <div className={styles.outer}>
-      {isValid ? (
-        <div className={styles.inner}>
-          <>
-            <img src={appLogo} />
-            <img src={landingHero} className={styles.landingHero} />
-            {renderUnsubscribeSection()}
-            <ErrorBlock>{errorMsg}</ErrorBlock>
-          </>
-        </div>
-      ) : (
-        <Redirect to="/"></Redirect>
-      )}
+      <div className={styles.inner}>
+        <>
+          <img src={appLogo} />
+          <img src={landingHero} className={styles.landingHero} />
+          {renderUnsubscribeSection()}
+          <ErrorBlock>{errorMsg}</ErrorBlock>
+        </>
+      </div>
     </div>
   )
 }
