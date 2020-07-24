@@ -17,8 +17,6 @@ Further reference: [Create-react-app documentation](https://create-react-app.dev
 | `REACT_APP_BACKEND_URL`             | URL of the API server. Example: `http://localhost:4000/v1`                                                        |
 | `REACT_APP_TITLE`                   | Title of the app. Example: `Postman.gov.sg`                                                                       |
 | `REACT_APP_DESCRIPTION`             | Meta description. Example: `Postman.gov.sg enables public officers to send templated messages to many recipients` |
-| `REACT_APP_LOGIN_EMAIL_TEXT`        | Call to action text on landing page. Example: `Sign in with your .gov.sg email`                                   |
-| `REACT_APP_LOGIN_EMAIL_PLACEHOLDER` | Placeholder for login input box. Example: `e.g. postman@agency.gov.sg`                                            |
 
 ### Images and brands
 
