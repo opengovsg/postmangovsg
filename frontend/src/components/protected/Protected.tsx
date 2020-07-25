@@ -35,8 +35,8 @@ const Protected = () => {
           <ProtectedPreview html={decryptedMessage} />
         ) : (
           <>
-            <img src={appLogo} />
-            <img src={landingHero} className={styles.landingHero} />
+            <img src={appLogo} alt="" />
+            <img src={landingHero} className={styles.landingHero} alt="" />
             <h2>You&apos;ve got mail</h2>
             <TextInputWithButton
               type="password"

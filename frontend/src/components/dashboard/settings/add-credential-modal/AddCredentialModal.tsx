@@ -4,7 +4,12 @@ import cx from 'classnames'
 
 import { GUIDE_TELEGRAM_CREDENTIALS_URL } from 'config'
 import { ChannelType, channelIcons } from 'classes'
-import { PrimaryButton, ErrorBlock, CredLabelInput } from 'components/common'
+import {
+  PrimaryButton,
+  NextButton,
+  ErrorBlock,
+  CredLabelInput,
+} from 'components/common'
 import TwilioCredentialsInput from 'components/dashboard/create/sms/TwilioCredentialsInput'
 import TelegramCredentialsInput from 'components/dashboard/create/telegram/TelegramCredentialsInput'
 import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
@@ -140,18 +145,14 @@ const AddCredentialModal = ({
       <>
         {credInput}
         <div className="separator"></div>
-        <div className="progress-button">
-          <PrimaryButton
-            onClick={nextFunc}
-            loadingPlaceholder={
-              <>
-                Validating<i className="bx bx-loader-alt bx-spin"></i>
-              </>
-            }
-          >
-            Next →
-          </PrimaryButton>
-        </div>
+        <NextButton
+          onClick={nextFunc}
+          loadingPlaceholder={
+            <>
+              Validating<i className="bx bx-loader-alt bx-spin"></i>
+            </>
+          }
+        />
       </>
     )
   }
@@ -164,7 +165,7 @@ const AddCredentialModal = ({
   function renderSelect() {
     return (
       <div className={styles.centerAlign}>
-        <img src={ChooseChannelsImage}></img>
+        <img src={ChooseChannelsImage} alt="" />
         <h2>Select channel type to add credentials</h2>
         <div className={styles.channelTypes}>
           <PrimaryButton onClick={() => selectCredentialType(ChannelType.SMS)}>
@@ -283,7 +284,7 @@ const AddCredentialModal = ({
 
     return (
       <>
-        <img src={ConfirmImage}></img>
+        <img src={ConfirmImage} alt="" />
         <h2>{messageTitle}</h2>
         <p>{message}</p>
         {validateInput}
@@ -306,7 +307,7 @@ const AddCredentialModal = ({
       case AddCredentialStep.Success:
         return (
           <div className={styles.centerAlign}>
-            <img src={SuccessImage} />
+            <img src={SuccessImage} alt="" />
             <h3>Your credentials are working well.</h3>
             <PrimaryButton
               className={styles.padTop}
@@ -320,7 +321,7 @@ const AddCredentialModal = ({
       case AddCredentialStep.Failure:
         return (
           <div className={styles.centerAlign}>
-            <img src={FailureImage} />
+            <img src={FailureImage} alt="" />
             <h3>Sorry, something went wrong.</h3>
             <ErrorBlock>{error?.message}</ErrorBlock>
             <PrimaryButton

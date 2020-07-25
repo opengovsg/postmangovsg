@@ -12,7 +12,7 @@ import {
   CsvUpload,
   ErrorBlock,
   PreviewBlock,
-  PrimaryButton,
+  NextButton,
   SampleCsv,
 } from 'components/common'
 import { EmailCampaign, EmailPreview } from 'classes'
@@ -185,6 +185,7 @@ const EmailRecipients = ({
               protect={protect}
               template={template}
               defaultRecipient="user@email.com"
+              setErrorMsg={setErrorMessage}
             />
           </>
         )}
@@ -206,14 +207,10 @@ const EmailRecipients = ({
         </>
       )}
       {!protect && (
-        <div className="progress-button">
-          <PrimaryButton
-            disabled={!numRecipients || isCsvProcessing}
-            onClick={onNext}
-          >
-            Test Message →
-          </PrimaryButton>
-        </div>
+        <NextButton
+          disabled={!numRecipients || isCsvProcessing}
+          onClick={onNext}
+        />
       )}
     </>
   )

@@ -1,15 +1,18 @@
 import bcrypt from 'bcrypt'
+import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-
+import logger from '@core/logger'
+import { CSVParams } from '@core/types'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
-import { CampaignService } from '@core/services'
+import { CampaignService, UploadService } from '@core/services'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
 import { TwilioCredentials } from '@sms/interfaces'
+import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
 
@@ -64,6 +67,10 @@ const sendCampaignMessage = async (
   if (!msg) throw new Error('No message to send')
 
   const twilioService = new TwilioClient(credential)
+  recipient = PhoneNumberService.normalisePhoneNumber(
+    recipient,
+    config.get('defaultCountry')
+  )
   return twilioService.send(recipient, msg?.body)
 }
 
@@ -77,6 +84,10 @@ const sendValidationMessage = async (
   credential: TwilioCredentials
 ): Promise<string | void> => {
   const twilioService = new TwilioClient(credential)
+  recipient = PhoneNumberService.normalisePhoneNumber(
+    recipient,
+    config.get('defaultCountry')
+  )
   return twilioService.send(
     recipient,
     'Your Twilio credential has been validated.'
@@ -144,6 +155,68 @@ const getEncodedHash = async (secret: string): Promise<string> => {
   return Buffer.from(secretHash).toString('base64')
 }
 
+const uploadCompleteOnPreview = ({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: SmsTemplate
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    UploadService.checkTemplateKeysMatch(data, template.params!)
+
+    SmsTemplateService.testHydration(
+      [{ params: data[0] }],
+      template.body as string
+    )
+    try {
+      // delete message_logs entries
+      await SmsMessage.destroy({
+        where: { campaignId },
+        transaction,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+const uploadCompleteOnChunk = ({
+  transaction,
+  campaignId,
+}: {
+  transaction: Transaction
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    try {
+      const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+        return {
+          campaignId,
+          recipient: entry['recipient'],
+          params: entry,
+        }
+      })
+      // START populate template
+      await SmsMessage.bulkCreate(records, {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          }
+        },
+        benchmark: true,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+
 export const SmsService = {
   getEncodedHash,
   findCampaign,
@@ -152,4 +225,6 @@ export const SmsService = {
   sendCampaignMessage,
   sendValidationMessage,
   setCampaignCredential,
+  uploadCompleteOnPreview,
+  uploadCompleteOnChunk,
 }

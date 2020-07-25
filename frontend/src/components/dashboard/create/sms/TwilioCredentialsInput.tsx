@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react'
 
-import { TextInput } from 'components/common'
+import {
+  GUIDE_SMS_API_KEY_URL,
+  GUIDE_SMS_ACCOUNT_SID_URL,
+  GUIDE_SMS_MESSAGING_SERVICE_URL,
+} from 'config'
+import { TextInput, LabelWithExternalLink } from 'components/common'
+import styles from '../Create.module.scss'
 
 export interface TwilioCredentials {
   accountSid: string
@@ -29,28 +35,34 @@ const TwilioCredentialsInput = ({
 
   return (
     <>
-      <h5>Account SID</h5>
+      <LabelWithExternalLink
+        label="Account SID"
+        link={GUIDE_SMS_ACCOUNT_SID_URL}
+      />
       <TextInput
         placeholder="Enter Account SID"
         value={accountSid}
         onChange={setAccountSid}
       />
 
-      <h5>API Key</h5>
+      <LabelWithExternalLink label="API Key SID" link={GUIDE_SMS_API_KEY_URL} />
       <TextInput
-        placeholder="Enter API Key"
+        placeholder="Enter API Key SID"
         value={apiKey}
         onChange={setApiKey}
       />
 
-      <h5>API Secret</h5>
+      <LabelWithExternalLink label="API Secret" link={GUIDE_SMS_API_KEY_URL} />
       <TextInput
         placeholder="Enter API Secret"
         value={apiSecret}
         onChange={setApiSecret}
       />
 
-      <h5>Messaging Service ID</h5>
+      <LabelWithExternalLink
+        label="Messaging Service ID"
+        link={GUIDE_SMS_MESSAGING_SERVICE_URL}
+      />
       <TextInput
         placeholder="Enter Messaging Service ID"
         value={messagingServiceSid}

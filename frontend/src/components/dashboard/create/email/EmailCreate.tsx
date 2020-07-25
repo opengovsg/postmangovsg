@@ -17,7 +17,7 @@ const EMAIL_PROGRESS_STEPS = [
   'Create Template',
   'Upload Recipients',
   'Send Test Message',
-  'Send',
+  'Preview & Send',
 ]
 
 const CreateEmail = ({

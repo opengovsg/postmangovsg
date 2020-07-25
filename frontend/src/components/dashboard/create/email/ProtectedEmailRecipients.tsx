@@ -4,6 +4,7 @@ import isEmail from 'validator/lib/isEmail'
 
 import {
   PrimaryButton,
+  NextButton,
   TextButton,
   TextArea,
   InfoBlock,
@@ -149,7 +150,7 @@ const ProtectedEmailRecipients = ({
         </li>
       </InfoBlock>
       <div className="progress-button">
-        <TextButton onClick={() => setPhase(ProtectPhase.READY)}>
+        <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
           Back
         </TextButton>
         <PrimaryButton
@@ -184,7 +185,10 @@ const ProtectedEmailRecipients = ({
       ></EmailRecipients>
       {phase === ProtectPhase.READY && csvFilename && (
         <div className="progress-button">
-          <TextButton onClick={() => setPhase(ProtectPhase.DONE)}>
+          <TextButton
+            minButtonWidth
+            onClick={() => setPhase(ProtectPhase.DONE)}
+          >
             Cancel
           </TextButton>
         </div>
@@ -194,10 +198,12 @@ const ProtectedEmailRecipients = ({
 
   const completeButtons = (
     <div className="progress-button">
-      <TextButton onClick={() => setPhase(ProtectPhase.READY)}>
+      <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
         Edit Message
       </TextButton>
-      <PrimaryButton onClick={onNext}>Test Message →</PrimaryButton>
+      <PrimaryButton onClick={onNext}>
+        Next <i className="bx bx-right-arrow-alt"></i>
+      </PrimaryButton>
     </div>
   )
 

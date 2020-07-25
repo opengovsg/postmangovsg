@@ -71,7 +71,12 @@ class SMS {
     body: string
     campaignId?: number
   }): Promise<void> {
-    return Promise.resolve()
+    return new Promise((resolve, reject) => {
+      if (!/^\+?[0-9]+$/.test(recipient)) {
+        return reject(new Error('Recipient is incorrectly formatted'))
+      }
+      return resolve()
+    })
       .then(() => {
         return this.twilioClient?.send(
           id,
