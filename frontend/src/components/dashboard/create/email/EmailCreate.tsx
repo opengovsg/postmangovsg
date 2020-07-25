@@ -14,10 +14,10 @@ import styles from '../Create.module.scss'
 import { Status } from 'classes'
 
 const EMAIL_PROGRESS_STEPS = [
-  'Create Template',
-  'Upload Recipients',
-  'Send Test Message',
-  'Preview & Send',
+  'Create message',
+  'Upload recipients',
+  'Send test message',
+  'Preview and send',
 ]
 
 const CreateEmail = ({

@@ -12,10 +12,10 @@ import TelegramDetail from './TelegramDetail'
 import styles from '../Create.module.scss'
 
 const TELEGRAM_PROGRESS_STEPS = [
-  'Create Template',
-  'Upload Recipients',
-  'Insert Credentials',
-  'Preview & Send',
+  'Create message',
+  'Upload recipients',
+  'Insert credentials',
+  'Preview and send',
 ]
 
 const CreateTelegram = ({
