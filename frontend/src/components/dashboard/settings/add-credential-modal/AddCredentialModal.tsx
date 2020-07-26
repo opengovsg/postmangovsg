@@ -4,7 +4,12 @@ import cx from 'classnames'
 
 import { GUIDE_TELEGRAM_CREDENTIALS_URL } from 'config'
 import { ChannelType, channelIcons } from 'classes'
-import { PrimaryButton, ErrorBlock, CredLabelInput } from 'components/common'
+import {
+  PrimaryButton,
+  NextButton,
+  ErrorBlock,
+  CredLabelInput,
+} from 'components/common'
 import TwilioCredentialsInput from 'components/dashboard/create/sms/TwilioCredentialsInput'
 import TelegramCredentialsInput from 'components/dashboard/create/telegram/TelegramCredentialsInput'
 import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
@@ -140,18 +145,14 @@ const AddCredentialModal = ({
       <>
         {credInput}
         <div className="separator"></div>
-        <div className="progress-button">
-          <PrimaryButton
-            onClick={nextFunc}
-            loadingPlaceholder={
-              <>
-                Validating<i className="bx bx-loader-alt bx-spin"></i>
-              </>
-            }
-          >
-            Next →
-          </PrimaryButton>
-        </div>
+        <NextButton
+          onClick={nextFunc}
+          loadingPlaceholder={
+            <>
+              Validating<i className="bx bx-loader-alt bx-spin"></i>
+            </>
+          }
+        />
       </>
     )
   }

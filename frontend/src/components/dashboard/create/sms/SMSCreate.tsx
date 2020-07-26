@@ -15,7 +15,7 @@ const SMS_PROGRESS_STEPS = [
   'Create Template',
   'Upload Recipients',
   'Insert Credentials',
-  'Send',
+  'Preview & Send',
 ]
 
 const CreateSMS = ({

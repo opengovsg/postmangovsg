@@ -12,7 +12,7 @@ import {
   CsvUpload,
   ErrorBlock,
   PreviewBlock,
-  PrimaryButton,
+  NextButton,
   SampleCsv,
 } from 'components/common'
 import { TelegramCampaign, TelegramPreview } from 'classes'
@@ -155,14 +155,7 @@ const TelegramRecipients = ({
         </>
       )}
 
-      <div className="progress-button">
-        <PrimaryButton
-          disabled={!numRecipients || !csvFilename}
-          onClick={onNext}
-        >
-          Insert credentials →
-        </PrimaryButton>
-      </div>
+      <NextButton disabled={!numRecipients || !csvFilename} onClick={onNext} />
     </>
   )
 }

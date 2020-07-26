@@ -25,7 +25,7 @@
     "classnames": "^2.2.6",
     "downloadjs": "^1.4.7",
     "escape-html": "^1.0.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.24.0",
     "papaparse": "^5.2.0",
     "postman-templating": "file:../modules/postman-templating",

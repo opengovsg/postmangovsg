@@ -4,6 +4,7 @@ import isEmail from 'validator/lib/isEmail'
 
 import {
   PrimaryButton,
+  NextButton,
   TextButton,
   TextArea,
   InfoBlock,
@@ -217,7 +218,9 @@ const ProtectedEmailRecipients = ({
       <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
         Edit Message
       </TextButton>
-      <PrimaryButton onClick={onNext}>Test Message →</PrimaryButton>
+      <PrimaryButton onClick={onNext}>
+        Next <i className="bx bx-right-arrow-alt"></i>
+      </PrimaryButton>
     </div>
   )
 

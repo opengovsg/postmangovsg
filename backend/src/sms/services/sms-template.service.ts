@@ -257,7 +257,7 @@ const validateAndFormatNumber = (
  * @param templateBody
  */
 const testHydration = (
-  records: Array<MessageBulkInsertInterface>,
+  records: Array<{ params: { [key: string]: string } }>,
   templateBody: string
 ): void => {
   const [firstRecord] = records

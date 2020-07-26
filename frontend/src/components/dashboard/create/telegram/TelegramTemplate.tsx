@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { TextArea, PrimaryButton, ErrorBlock } from 'components/common'
+import { TextArea, NextButton, ErrorBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/telegram.service'
 
@@ -65,11 +65,7 @@ const TelegramTemplate = ({
         value={body}
         onChange={setBody}
       />
-      <div className="progress-button">
-        <PrimaryButton disabled={!body} onClick={handleSaveTemplate}>
-          Upload recipients →
-        </PrimaryButton>
-      </div>
+      <NextButton disabled={!body} onClick={handleSaveTemplate} />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )

@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import map from 'lodash/map'
+import validator from 'validator'
 
 import logger from '@core/logger'
 import config from '@core/config'
@@ -81,7 +82,12 @@ class Email {
     subject?: string
     replyTo?: string | null
   }): Promise<void> {
-    return Promise.resolve()
+    return new Promise((resolve, reject) => {
+      if (!validator.isEmail(recipient)) {
+        return reject(new Error('Recipient is incorrectly formatted'))
+      }
+      return resolve()
+    })
       .then(() => {
         return {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
