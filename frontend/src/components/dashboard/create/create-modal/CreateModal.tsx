@@ -5,7 +5,7 @@ import cx from 'classnames'
 
 import { GUIDE_URL, GUIDE_SMS_CREDENTIALS_URL } from 'config'
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
-import { TextInput, PrimaryButton } from 'components/common'
+import { TextInput, PrimaryButton, Checkbox } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
@@ -152,18 +152,11 @@ const CreateModal = ({
               ></i>
             </PrimaryButton>
             {selectedChannel === ChannelType.Email && (
-              <div
+              <Checkbox
                 className={styles.protectedOption}
-                onClick={() => setProtected(!protect)}
+                checked={protect}
+                onChange={setProtected}
               >
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    { 'bx-checkbox': !protect },
-                    { 'bxs-checkbox-checked': protect }
-                  )}
-                ></i>
                 <p className={styles.subtext}>
                   Password protected.
                   {/* TODO: change url to passsword protected section in guide */}
@@ -176,7 +169,7 @@ const CreateModal = ({
                     Learn more
                   </OutboundLink>
                 </p>
-              </div>
+              </Checkbox>
             )}
           </div>
         </div>

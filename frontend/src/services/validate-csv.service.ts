@@ -23,11 +23,17 @@ export function extractParams(template: string): string[] {
  * recipient,password
  *
  */
-export async function validateCsv(
-  file: File,
-  template: string,
+export async function validateCsv({
+  file,
+  template,
+  recipientValidator,
+  removeEmptyLines,
+}: {
+  file: File
+  template: string
   recipientValidator: Function
-): Promise<ProtectedCsvInfo> {
+  removeEmptyLines: boolean
+}): Promise<ProtectedCsvInfo> {
   const csvFilename = file.name
   const templateParams = extractParams(template)
   const requiredParams = uniq(PROTECTED_CSV_HEADERS.concat(templateParams))
@@ -48,7 +54,7 @@ export async function validateCsv(
           const row = step.data
           validateRow(row, requiredParams, recipientValidator)
           if (count === 1) {
-            preview = hydrateTemplate(template, row)
+            preview = hydrateTemplate(template, row, removeEmptyLines)
           }
         } catch (e) {
           // If there is errors, append to the errors array
@@ -74,18 +80,17 @@ export async function validateCsv(
   })
 }
 
-function removeNewLinesFromTables(template: string) {
-  // Get all text within <table (attr?)> tags
-  return template.replace(/<table(\s+.*?|\s*)>(.*?)<\/table\s*>/gs, (match) =>
-    // Remove all new lines
-    match.replace(/(\r\n|\r|\n)/g, '')
-  )
-}
-
-export function hydrateTemplate(template: string, row: Record<string, any>) {
-  const cleanedTemplate = removeNewLinesFromTables(template)
-  const newLinesReplaced = cleanedTemplate.replace(/(?:\r\n|\r|\n)/g, '<br>')
-  return templateClient.template(newLinesReplaced, row)
+export function hydrateTemplate(
+  template: string,
+  row: Record<string, any>,
+  removeEmptyLines?: boolean
+) {
+  const hydrated = templateClient.template(template, row, {
+    removeEmptyLines,
+    replaceNewLines: true,
+    removeEmptyLinesFromTables: true,
+  })
+  return hydrated
 }
 
 // Validate row has required headers and valid recipient

@@ -162,6 +162,7 @@ export class TemplateClient {
       templateBody,
       configWithDefaults
     )
+
     const parsed = this.parseTemplate(preProcessed, params)
     // Remove extra '\' infront of single quotes and backslashes, added by Squirrelly when it escaped the csv.
     // Remove extra '\' infront of \n added by Squirrelly when it escaped the message body.
@@ -175,25 +176,33 @@ export class TemplateClient {
 
   preProcessTemplate(template: string, options: TemplatingConfig): string {
     let result = template
-    /*
-     * removeEmptyLinesFromTables:
-     * Get all text within <table (attr?)> tags
+    /**
+     * removeEmptyLinesFromTables
      */
     if (options.removeEmptyLinesFromTables) {
       result = result.replace(
+        // Get all text within <table (attr?)> tags
         /<table(\s+.*?|\s*)>(.*?)<\/table\s*>/gs,
         (match) =>
           // Remove all new lines
           match.replace(/(\r\n|\r|\n)/g, '')
       )
     }
+    if (options.replaceNewLines) {
+      result = result.replace(/(\n|\r\n)/g, this.lineBreak)
+    }
     return result
   }
 
   postProcessTemplate(template: string, options: TemplatingConfig): string {
-    const result = template
-    if (options.trimEmptyLines) {
-      // TODO: Do something
+    let result = template
+    /**
+     * removeEmptyLines
+     */
+    if (options.removeEmptyLines) {
+      // Looks for 2 or more consecutive <br>, <br/> or <br />
+      const CONSECUTIVE_LINEBREAK_REGEX = /(\s)*(<br\s*\/?>(\s)*(\n|\r\n)?){2,}/g
+      result = result.replace(CONSECUTIVE_LINEBREAK_REGEX, this.lineBreak)
     }
     return result
   }

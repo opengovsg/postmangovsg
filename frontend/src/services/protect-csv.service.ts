@@ -19,16 +19,22 @@ const MIN_UPLOAD_SIZE = 5000000 // 5Mb minimum needed for uploading each part
  * 4. Hash the derived key with SHA-256
  * 5. Return in the format of `recipient,encryptedPayload,passwordHash,id`
  */
-async function transformRows(
-  template: string,
-  rows: any[],
+async function transformRows({
+  template,
+  rows,
+  partNumber,
+  removeEmptyLines,
+}: {
+  template: string
+  rows: any[]
   partNumber: number
-): Promise<string[]> {
+  removeEmptyLines: boolean
+}): Promise<string[]> {
   const transformed = await Promise.all(
     rows.map(async (row) => {
       const { recipient, password } = row
       // Hydrate template
-      const hydratedMessage = hydrateTemplate(template, row)
+      const hydratedMessage = hydrateTemplate(template, row, removeEmptyLines)
       // Generate uuid which acts as salt
       const id = uuid()
       const { encrypted, key } = await encryptData(
@@ -79,11 +85,17 @@ async function chunkSize(file: File, template: string): Promise<number> {
  * 3. Transform the csv file in chunks of the calculated size
  * 4. Complete the multipart upload.
  */
-export async function protectAndUploadCsv(
-  campaignId: number,
-  file: File,
+export async function protectAndUploadCsv({
+  campaignId,
+  file,
+  template,
+  removeEmptyLines,
+}: {
+  campaignId: number
+  file: File
   template: string
-): Promise<void> {
+  removeEmptyLines: boolean
+}): Promise<void> {
   const size = await chunkSize(file, template)
   const partCount = Math.ceil(file.size / size)
   const { transactionId, presignedUrls } = await beginMultipartUpload({
@@ -107,8 +119,12 @@ export async function protectAndUploadCsv(
 
         // transform into rows of data into {recipient,payload,passwordHash,id}
         try {
-          const data = await transformRows(template, rows, partNumber)
-
+          const data = await transformRows({
+            template,
+            rows,
+            partNumber,
+            removeEmptyLines,
+          })
           // Upload the single string onto s3 based through the presigned url
           const etag = await uploadPartWithPresignedUrl({
             presignedUrl: presignedUrls[partNumber - 1],

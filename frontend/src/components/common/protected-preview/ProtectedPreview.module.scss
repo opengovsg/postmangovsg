@@ -54,6 +54,7 @@
       font-size: 1rem;
     }
 
+    // Override table css from app.scss
     table {
       width: 100%;
       border-collapse: collapse;
@@ -70,6 +71,12 @@
           border-bottom: none;
         }
       }
+    }
+
+    // Remove bottom margin from p tags
+    p {
+      margin-block-end: 0;
+      margin-bottom: 0;
     }
   }
 }

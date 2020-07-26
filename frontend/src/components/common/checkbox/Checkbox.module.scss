@@ -1,0 +1,13 @@
+.container {
+  display: flex;
+  cursor: pointer;
+  align-items: flex-start;
+  margin-top: 1rem;
+  user-select: none;
+  font-size: 0.9rem;
+
+  .icon {
+    font-size: 1.4rem;
+    margin-right: 0.2rem;
+  }
+}
