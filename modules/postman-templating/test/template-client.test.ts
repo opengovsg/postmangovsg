@@ -70,6 +70,51 @@ describe('template', () => {
     })
   })
 
+  /**
+   * Templating Config
+   */
+  describe('Templating config', () => {
+    describe('removeEmptyLines', () => {
+      const body = 'hello\n\n\n123'
+      test('emptys lines should not be removed', () => {
+        const expected = 'hello<br /><br /><br />123'
+        expect(
+          templateClient.template(body, {}, { replaceNewLines: true })
+        ).toEqual(expected)
+      })
+      test('emptys lines should be removed', () => {
+        const expected = 'hello<br />123'
+        expect(
+          templateClient.template(
+            body,
+            {},
+            { replaceNewLines: true, removeEmptyLines: true }
+          )
+        ).toEqual(expected)
+      })
+    })
+    describe('removeEmptyLinesFromTables', () => {
+      const body = `<table>\n<tr>\n<th>Firstname</th>\n</tr>\n\n</table>`
+      test('emptys lines from tables should not be removed', () => {
+        const expected =
+          '<table><br /><tr><br /><th>Firstname</th><br /></tr><br /><br /></table>'
+        expect(
+          templateClient.template(body, {}, { replaceNewLines: true })
+        ).toEqual(expected)
+      })
+      test('emptys lines from tables should be removed', () => {
+        const expected = '<table><tr><th>Firstname</th></tr></table>'
+        expect(
+          templateClient.template(
+            body,
+            {},
+            { replaceNewLines: true, removeEmptyLinesFromTables: true }
+          )
+        ).toEqual(expected)
+      })
+    })
+  })
+
   describe('parseTemplate variables', () => {
     test('variables should be unique, lowercased and returned in order of appearance', () => {
       const body = '{{ blah }} {{chip}}{{ BLAH}} {{chip}} {{F1sh}}'
