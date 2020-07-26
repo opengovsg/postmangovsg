@@ -4,7 +4,6 @@ import isEmail from 'validator/lib/isEmail'
 
 import {
   PrimaryButton,
-  NextButton,
   TextButton,
   TextArea,
   InfoBlock,
