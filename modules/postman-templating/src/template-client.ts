@@ -3,6 +3,7 @@ import xss from 'xss'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { TemplateError } from './errors'
+import { TemplatingConfig, TemplatingConfigDefault } from './interfaces'
 
 export class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
@@ -151,14 +152,49 @@ export class TemplateClient {
    * @param templateBody
    * @param params
    */
-  template(templateBody: string, params: { [key: string]: string }): string {
-    const parsed = this.parseTemplate(templateBody, params)
+  template(
+    templateBody: string,
+    params: { [key: string]: string },
+    config?: Partial<TemplatingConfig>
+  ): string {
+    const configWithDefaults = { ...TemplatingConfigDefault, ...config }
+    const preProcessed = this.preProcessTemplate(
+      templateBody,
+      configWithDefaults
+    )
+    const parsed = this.parseTemplate(preProcessed, params)
     // Remove extra '\' infront of single quotes and backslashes, added by Squirrelly when it escaped the csv.
     // Remove extra '\' infront of \n added by Squirrelly when it escaped the message body.
     const templated = parsed.tokens
       .join('')
       .replace(/\\([\\'])/g, '$1')
       .replace(/\\n/g, '\n')
-    return xss.filterXSS(templated, this.xssOptions)
+    const filtered = xss.filterXSS(templated, this.xssOptions)
+    return this.postProcessTemplate(filtered, configWithDefaults)
+  }
+
+  preProcessTemplate(template: string, options: TemplatingConfig): string {
+    let result = template
+    /*
+     * removeEmptyLinesFromTables:
+     * Get all text within <table (attr?)> tags
+     */
+    if (options.removeEmptyLinesFromTables) {
+      result = result.replace(
+        /<table(\s+.*?|\s*)>(.*?)<\/table\s*>/gs,
+        (match) =>
+          // Remove all new lines
+          match.replace(/(\r\n|\r|\n)/g, '')
+      )
+    }
+    return result
+  }
+
+  postProcessTemplate(template: string, options: TemplatingConfig): string {
+    const result = template
+    if (options.trimEmptyLines) {
+      // TODO: Do something
+    }
+    return result
   }
 }
