@@ -1,13 +1,19 @@
 import axios, { AxiosError } from 'axios'
+import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
 import { SMSPreview } from 'classes'
+
+const templateClient = new TemplateClient(XSS_SMS_OPTION)
 
 // Twilio states that total character limit for sms is 1600 characters
 // this defines a threshold at which we warn the users on their template length
 const SMS_WARN_EXCEED_CHARACTER_THRESHOLD = 1000
 
-export function exceedsCharacterThreshold(template: string): boolean {
-  console.log(template.trim().length)
-  return template.trim().length > SMS_WARN_EXCEED_CHARACTER_THRESHOLD
+export function exceedsCharacterThreshold(body: string): boolean {
+  // replace <br /> new lines with \n as how it would be sent to twilio
+  const smsTemplate = (body || '').replace(/<br\s*\/?>/g, '\n')
+  // template the body with empty params to extract out the template only
+  const extractedTemplate = templateClient.template(smsTemplate, {})
+  return extractedTemplate.length > SMS_WARN_EXCEED_CHARACTER_THRESHOLD
 }
 
 export async function saveTemplate(

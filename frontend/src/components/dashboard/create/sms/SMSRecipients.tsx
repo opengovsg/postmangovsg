@@ -51,13 +51,14 @@ const SMSRecipients = ({
   const { csvFilename, numRecipients = 0 } = csvInfo
 
   useEffect(() => {
+    console.log(params)
     if (exceedsCharacterThreshold(body)) {
       setErrorMessage(
         `Note: If any of your messages exceeds 1600 characters, they won't be sent. 
         Consider shortening your message to avoid errors during sending.` as any
       )
     }
-  }, [body])
+  }, [body, params])
 
   // Poll csv status
   useEffect(() => {
