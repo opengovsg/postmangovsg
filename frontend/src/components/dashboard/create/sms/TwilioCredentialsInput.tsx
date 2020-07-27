@@ -6,7 +6,6 @@ import {
   GUIDE_SMS_MESSAGING_SERVICE_URL,
 } from 'config'
 import { TextInput, LabelWithExternalLink } from 'components/common'
-import styles from '../Create.module.scss'
 
 export interface TwilioCredentials {
   accountSid: string

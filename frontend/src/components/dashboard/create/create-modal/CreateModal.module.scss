@@ -53,15 +53,10 @@
       }
     }
     .protectedOption {
-      margin-top: 1rem;
-      display: flex;
-      cursor: pointer;
-      align-items: center;
-
-      .icon {
-        margin-right: 0.2rem;
+      i {
+        font-size: 1.3rem;
+        margin-top: 0.1rem;
       }
-
       .subtext {
         user-select: none;
         margin-top: 0;

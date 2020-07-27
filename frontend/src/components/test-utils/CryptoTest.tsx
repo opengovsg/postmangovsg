@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { uuid } from 'uuidv4'
-import cx from 'classnames'
 
 import {
   TextArea,
   TextInput,
   PrimaryButton,
   ErrorBlock,
+  Checkbox,
 } from 'components/common'
 import { encryptData, sha256 } from 'services/crypto.service'
 import styles from './CryptoTest.module.scss'
@@ -112,17 +112,9 @@ const CryptoTest = () => {
           Hash
         </PrimaryButton>
       </div>
-      <div className={styles.row} onClick={() => setPrint((a) => !a)}>
-        <i
-          className={cx(
-            'bx',
-            styles.icon,
-            { 'bx-checkbox': !print },
-            { 'bxs-checkbox-checked': print }
-          )}
-        ></i>
+      <Checkbox checked={print} onChange={setPrint}>
         Print derived key in console
-      </div>
+      </Checkbox>
       <h3>Time taken:</h3>
       {spinning ? (
         <i className="bx bx-loader-alt bx-spin"></i>
