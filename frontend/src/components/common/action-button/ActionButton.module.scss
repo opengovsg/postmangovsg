@@ -12,16 +12,31 @@
 
   &:hover {
     border-width: 1.5px;
+    background-color: #f5f6fc;
   }
 
   &:active {
     background-color: $indigo-blue;
-    color: white;
+
+    i,
+    span {
+      color: white;
+    }
   }
 
   &.dropdown {
     padding: 0;
     justify-content: space-between;
+  }
+
+  &:disabled {
+    border: 1px solid $light-grey;
+    background-color: white;
+
+    i,
+    span {
+      color: $light-grey;
+    }
   }
 
   .content {
@@ -61,7 +76,7 @@
   box-shadow: 0.1rem 0.1rem 1rem 0 lighten($light-grey, 20%);
   color: $indigo-blue;
 
-  div {
+  > div {
     @include flex-horizontal;
     padding: 1rem 2rem;
     cursor: pointer;

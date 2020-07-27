@@ -149,12 +149,11 @@ table {
 
     td,
     th {
-      padding: 0.75rem 0.25rem;
+      padding: 1rem 0.25rem;
       display: flex;
 
       &.xs {
         flex: 1.2;
-        justify-content: center;
       }
 
       &.sm {
@@ -167,6 +166,10 @@ table {
 
       &.lg {
         flex: 4;
+      }
+
+      &.center {
+        justify-content: center;
       }
     }
   }

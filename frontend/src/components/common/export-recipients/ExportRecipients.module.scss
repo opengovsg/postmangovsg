@@ -1,14 +1,31 @@
 @import 'styles/_mixins';
 
-.invalidRecipients {
+.export {
   @include flex-horizontal;
   color: $indigo-blue;
-  cursor: pointer;
-}
+  padding: 0.5rem;
 
-.icon {
-  @include icon;
-  margin-right: 0.5rem;
+  .ready {
+    cursor: pointer;
+  }
+
+  .unavailable {
+    color: $light-grey;
+  }
+
+  .icon {
+    @include icon;
+    margin-right: 0.5rem;
+  }
+
+  div.left {
+    display: flex;
+  }
+
+  div.right {
+    display: flex;
+    flex-direction: row-reverse;
+  }
 }
 
 .disabled {
