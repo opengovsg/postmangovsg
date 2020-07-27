@@ -88,7 +88,9 @@ const Unsubscribe = () => {
             >
               I&#39;d rather stay
             </PrimaryButton>
-            <TextButton onClick={onConfirmation}>Unsubscribe me</TextButton>
+            <TextButton minButtonWidth onClick={onConfirmation}>
+              Unsubscribe me
+            </TextButton>
           </div>
         </>
       )
