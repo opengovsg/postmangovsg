@@ -239,13 +239,18 @@ const uploadProtectedCompleteOnPreview = ({
       template.subject as string
     )
     try {
-      // Delete existing rows
-      await ProtectedMessage.destroy({
-        where: {
-          campaignId,
-        },
-        transaction,
-      })
+      await Promise.all([
+        // Delete existing protected messages
+        ProtectedMessage.destroy({
+          where: { campaignId },
+          transaction,
+        }),
+        // Delete existing email messages
+        EmailMessage.destroy({
+          where: { campaignId },
+          transaction,
+        }),
+      ])
     } catch (err) {
       transaction?.rollback()
       throw err
