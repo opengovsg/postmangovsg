@@ -23,7 +23,7 @@ const ExportRecipients = ({
   status: Status
   sentAt: Date
   exportStatus: CampaignExportStatus
-  iconPosition: string
+  iconPosition: 'left' | 'right'
 }) => {
   const [disabled, setDisabled] = useState(false)
 
