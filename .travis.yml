@@ -223,7 +223,7 @@ jobs:
             - SES_PORT=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_PORT
         - provider: lambda
           edge: true
-          function_name: telegram-test
+          function_name: unsubscribe-digest-staging
           region: $AWS_DEFAULT_REGION
           role: $STAGING_CALLBACK_ROLE
           runtime: nodejs12.x
