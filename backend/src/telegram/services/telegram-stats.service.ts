@@ -1,3 +1,5 @@
+import { QueryTypes } from 'sequelize'
+import logger from '@core/logger'
 import { StatsService } from '@core/services'
 import { CampaignStats, CampaignInvalidRecipient } from '@core/interfaces'
 
@@ -16,7 +18,15 @@ const getStats = async (campaignId: number): Promise<CampaignStats> => {
  * @param campaignId
  */
 const refreshStats = async (campaignId: number): Promise<void> => {
-  return StatsService.updateStats(campaignId)
+  logger.info(`updateStats invoked for campaign ${campaignId}`)
+
+  await TelegramMessage.sequelize?.query(
+    'SELECT update_stats_telegram(:campaign_id)',
+    {
+      replacements: { campaign_id: campaignId },
+      type: QueryTypes.SELECT,
+    }
+  )
 }
 
 /**
@@ -26,6 +36,7 @@ const refreshStats = async (campaignId: number): Promise<void> => {
 const getFailedRecipients = async (
   campaignId: number
 ): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+  await refreshStats(+campaignId)
   return StatsService.getFailedRecipients(campaignId, TelegramMessage)
 }
 
