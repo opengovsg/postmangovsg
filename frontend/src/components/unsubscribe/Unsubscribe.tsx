@@ -32,12 +32,16 @@ const Unsubscribe = () => {
 
       const { c: campaignId, r: recipient, h: hash } = params
 
-      await unsubscribeRequest({
-        campaignId: +campaignId,
-        recipient: recipient as string,
-        hash: hash as string,
-        version,
-      })
+      // Version is set to 'test' when the unsub link is generated from a campaign
+      // test email. As such, we should not make any API calls.
+      if (version !== 'test') {
+        await unsubscribeRequest({
+          campaignId: +campaignId,
+          recipient: recipient as string,
+          hash: hash as string,
+          version,
+        })
+      }
       setUnsubscribed(true)
     } catch (err) {
       setErrorMsg('Invalid subscribe request')

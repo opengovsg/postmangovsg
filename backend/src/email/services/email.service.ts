@@ -1,7 +1,11 @@
 import logger from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
-import { MailService, CampaignService } from '@core/services'
+import {
+  MailService,
+  CampaignService,
+  UnsubscriberService,
+} from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
@@ -66,7 +70,7 @@ const getCampaignMessage = async (
     const { body, subject, replyTo } = message
     const mailToSend: MailToSend = {
       recipients: [recipient],
-      body,
+      body: UnsubscriberService.appendTestEmailUnsubLink(body),
       subject,
       ...(replyTo ? { replyTo } : {}),
     }
