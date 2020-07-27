@@ -5,7 +5,7 @@
   @include flex-vertical;
   padding: $content-top-padding $site-padding $content-bottom-padding;
   margin: 0 auto;
-  width: 1000px;
+  width: 1200px;
   max-width: 100%;
 
   @include mobile() {
@@ -20,6 +20,7 @@
 .tableContainer {
   display: block;
   max-width: 100%;
+  overflow: auto;
 
   table.campaignTable {
     min-width: calc(
@@ -40,20 +41,21 @@
   }
 }
 
-.exportRecipients {
-  > span {
-    display: none;
-  }
-  > i {
-    color: $indigo-blue;
-    &:hover {
-      color: lighten($indigo-blue, 10%);
-    }
-  }
+.iconContainer {
+  position: relative;
 }
 
 .icon {
   @include icon;
+}
+
+.lockIcon {
+  font-size: 1rem;
+  line-height: 1rem;
+  position: absolute;
+  bottom: 0.2rem;
+  right: -0.5rem;
+  color: $pastel-blue;
 }
 
 .spinner {

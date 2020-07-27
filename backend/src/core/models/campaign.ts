@@ -68,6 +68,13 @@ export class Campaign extends Model<Campaign> {
   })
   valid!: boolean
 
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  })
+  protect!: boolean
+
   @HasOne(() => Statistic)
   statistic?: Statistic
 

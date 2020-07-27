@@ -1,11 +1,6 @@
 import React, { useState } from 'react'
 
-import {
-  TextArea,
-  PrimaryButton,
-  ErrorBlock,
-  TextInput,
-} from 'components/common'
+import { TextArea, NextButton, ErrorBlock, TextInput } from 'components/common'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/email.service'
 
@@ -15,11 +10,13 @@ const EmailTemplate = ({
   subject: initialSubject,
   body: initialBody,
   replyTo: initialReplyTo,
+  protect,
   onNext,
 }: {
   subject: string
   body: string
   replyTo: string | null
+  protect: boolean
   onNext: (changes: any, next?: boolean) => void
 }) => {
   const [body, setBody] = useState(replaceNewLines(initialBody))
@@ -27,6 +24,11 @@ const EmailTemplate = ({
   const [subject, setSubject] = useState(initialSubject)
   const [replyTo, setReplyTo] = useState(initialReplyTo)
   const { id: campaignId } = useParams()
+
+  const protectedBodyPlaceholder =
+    'Dear {{ recipient }}, \n\n You may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a> . \n\nPlease login with your birthday (DDMMYYYY) followed by the last 4 characters of your NRIC. E.g. 311290123A'
+  const bodyPlaceholder =
+    'Dear {{ name }}, your next appointment at {{ clinic }} is on {{ date }} at {{ time }}'
 
   async function handleSaveTemplate(): Promise<void> {
     setErrorMsg(null)
@@ -70,25 +72,33 @@ const EmailTemplate = ({
         value={subject}
         onChange={setSubject}
       />
-      <h4>Message</h4>
-      <p>
-        To personalise your message, include keywords that are surrounded by
-        double curly braces. The keywords in your message template should match
-        the headers in your recipients CSV file.
-        <br />
-        <b>Note:</b> Recipient (email address) is a required column in the CSV
-        file.
-      </p>
-      <p>
-        Example
-        <br />
-        Reminder: Dear <b>{'{{ name }}'}</b>, your next appointment at{' '}
-        <b>{'{{ clinic }}'}</b> is on <b>{'{{ date }}'} </b>
-        at <b>{'{{ time }}'}</b>.
-      </p>
+      <h4>{protect ? 'Message A' : 'Message'}</h4>
+      {protect ? (
+        <p>
+          You can use the following keywords to personalise your message.
+          <li>
+            <b>{'{{ protectedlink }}'}</b> - <i>Required</i>. Include this
+            keyword in Message A template, but not in the CSV file. It will be
+            automatically generated for password protected emails.
+          </li>
+          <li>
+            <b>{'{{ recipient }}'}</b> - <i>Optional</i>. This keyword will be
+            replaced by the email address of the recipient.
+          </li>
+        </p>
+      ) : (
+        <p>
+          To personalise your message, include keywords that are surrounded by
+          double curly braces. The keywords in your message template should
+          match the headers in your recipients CSV file.
+          <br />
+          <b>Note:</b> Recipient (email address) is a required column in the CSV
+          file.
+        </p>
+      )}
       <TextArea
         highlight={true}
-        placeholder="Enter email message"
+        placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
         value={body}
         onChange={setBody}
       />
@@ -104,14 +114,7 @@ const EmailTemplate = ({
         onChange={setReplyTo}
       />
       <div className="separator"></div>
-      <div className="progress-button">
-        <PrimaryButton
-          disabled={!body || !subject}
-          onClick={handleSaveTemplate}
-        >
-          Upload recipients →
-        </PrimaryButton>
-      </div>
+      <NextButton disabled={!body || !subject} onClick={handleSaveTemplate} />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )

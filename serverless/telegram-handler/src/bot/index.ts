@@ -5,7 +5,9 @@ import { Sequelize } from 'sequelize-typescript'
 import { startCommandHandler } from './handlers/start'
 import { contactMessageHandler } from './handlers/contact'
 import { updatenumberCommandHandler } from './handlers/updatenumber'
+import { helpCommandHandler } from './handlers/help'
 import { PostmanTelegramError } from './PostmanTelegramError'
+import { verifyBotToken } from '../credentials'
 
 /**
  * Instantiates a Telegraf instance to handle the incoming Telegram update.
@@ -19,9 +21,13 @@ export const handleUpdate = async (
   // Instantiate bot
   const bot = new Telegraf(botToken)
 
+  // Verify botToken
+  await verifyBotToken(bot)
+
   // Attach handlers
   bot.command('start', startCommandHandler)
   bot.command('updatenumber', updatenumberCommandHandler)
+  bot.command('help', helpCommandHandler)
   bot.on('contact', contactMessageHandler(botId, sequelize))
 
   // Handle update

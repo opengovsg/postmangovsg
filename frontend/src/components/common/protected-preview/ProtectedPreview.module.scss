@@ -1,0 +1,82 @@
+@import 'styles/_variables';
+
+.preview {
+  display: block;
+  width: 500px;
+  max-width: 90vw;
+  margin: auto;
+
+  /**
+  * IMPORTANT!!!
+  * When modifying style1, please make sure it is backward compatible!!
+  * See ProtectedPreview.tsx for more info
+  */
+  &.style1 {
+    img {
+      display: block;
+      margin: 0 auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin: 0;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      font-weight: normal;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+    }
+
+    code {
+      font-family: $monospace-font-stack;
+    }
+
+    hr {
+      display: block;
+      height: 1px;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      border-top: 1px solid $transparent-dark-blue;
+    }
+
+    a {
+      font-size: 1rem;
+    }
+
+    // Override table css from app.scss
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      tr {
+        display: table-row;
+        border-bottom: 1px solid $transparent-blue;
+
+        td,
+        th {
+          display: table-cell;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    // Remove bottom margin from p tags
+    p {
+      margin-block-end: 0;
+      margin-bottom: 0;
+    }
+  }
+}

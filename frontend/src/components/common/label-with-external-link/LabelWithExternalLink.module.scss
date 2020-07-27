@@ -1,0 +1,14 @@
+@import 'styles/_variables';
+
+.label {
+  display: inline-block;
+  margin-right: 0.6rem;
+}
+
+.link {
+  font-size: 1rem;
+
+  &:visited {
+    color: $dark-blue;
+  }
+}

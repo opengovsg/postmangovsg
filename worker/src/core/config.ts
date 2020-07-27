@@ -5,7 +5,7 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
-import xss from 'xss'
+import { isSupportedCountry } from 'libphonenumber-js'
 
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 
@@ -139,10 +139,13 @@ const config = convict({
     default: '',
     env: 'SES_FROM',
   },
-  defaultCountryCode: {
-    doc: 'Country code to prepend to phone numbers',
-    default: '65',
-    env: 'DEFAULT_COUNTRY_CODE',
+  defaultCountry: {
+    doc: 'Two-letter ISO country code to use in libphonenumber-js',
+    default: 'SG',
+    env: 'DEFAULT_COUNTRY',
+    format: (countryCode: string): boolean => {
+      return isSupportedCountry(countryCode)
+    },
   },
   smsOptions: {
     accountSid: {
@@ -187,53 +190,6 @@ const config = convict({
     default: '',
     env: 'BACKEND_URL',
     sensitive: true,
-  },
-  xssOptions: {
-    doc: 'List of html tags allowed',
-    default: {
-      email: {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          br: [],
-          p: [],
-          a: ['href', 'title', 'target'],
-          img: ['src', 'alt', 'title', 'width', 'height'],
-        },
-        stripIgnoreTag: true,
-      },
-      sms: {
-        whiteList: { br: [] },
-        stripIgnoreTag: true,
-      },
-      telegram: {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          s: [],
-          strike: [],
-          del: [],
-          p: [],
-          code: ['class'],
-          pre: [],
-          a: ['href'],
-        },
-        safeAttrValue: (
-          tag: string,
-          name: string,
-          value: string
-        ): string | void => {
-          // Handle Telegram mention as xss-js does not recognize it as a valid url.
-          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
-            return value
-          }
-          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
-        },
-        stripIgnoreTag: true,
-      },
-    },
   },
   messageWorker: {
     numSender: {

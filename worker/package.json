@@ -1,6 +1,6 @@
 {
   "name": "worker",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Workers for Postman",
   "main": "build/server.js",
   "scripts": {
@@ -26,7 +26,8 @@
     "bcrypt": "^4.0.1",
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
-    "lodash": "^4.17.15",
+    "libphonenumber-js": "^1.7.55",
+    "lodash": "^4.17.19",
     "module-alias": "^2.2.2",
     "nodemailer": "^6.4.6",
     "nodemailer-direct-transport": "^3.3.2",
@@ -40,8 +41,7 @@
     "threads": "^1.4.0",
     "tiny-worker": "^2.3.0",
     "twilio": "^3.42.1",
-    "winston": "^3.2.1",
-    "xss": "^1.0.6"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.30",

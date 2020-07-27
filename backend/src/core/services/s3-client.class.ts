@@ -3,9 +3,6 @@ import S3 from 'aws-sdk/clients/s3'
 import config from '@core/config'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 
-import { CSVParams } from '@core/types'
-import { ParseCsvService } from '@core/services'
-
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 
 export default class S3Client {
@@ -25,18 +22,5 @@ export default class S3Client {
       Key: key,
     }
     return this.s3.getObject(params).createReadStream()
-  }
-
-  /**
-   * Download CSV file from S3 and process it into message.
-   * The messages are formed from the template and parameters specified in the csv.
-   *
-   * @param campaignId
-   * @param s3Key
-   */
-  async getCsvFile(s3Key: string): Promise<Array<CSVParams>> {
-    const downloadStream = this.download(s3Key)
-    const fileContents = await ParseCsvService.parseCsv(downloadStream)
-    return fileContents
   }
 }

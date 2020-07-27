@@ -5,9 +5,13 @@ import styles from './FileInput.module.scss'
 const FileInput = ({
   isProcessing,
   onFileSelected,
+  label = 'Upload',
+  disabled,
 }: {
   isProcessing: boolean
   onFileSelected: Function
+  label?: string
+  disabled?: boolean
 }) => {
   return (
     <div className={styles.container}>
@@ -16,18 +20,18 @@ const FileInput = ({
         type="file"
         name="file"
         accept=".csv"
-        disabled={isProcessing}
+        disabled={disabled || isProcessing}
         onClick={(e) => ((e.target as HTMLInputElement).value = '')} // reset target value to allow selecting of new files
         onChange={(e) => onFileSelected(e.target.files)}
       />
       <label htmlFor="recipient-upload-input">
         {isProcessing ? (
           <>
-            Uploading<i className="bx bx-loader-alt bx-spin"></i>
+            {label}ing<i className="bx bx-loader-alt bx-spin"></i>
           </>
         ) : (
           <>
-            Upload File <i className="bx bx-upload"></i>
+            {label} File <i className="bx bx-upload"></i>
           </>
         )}
       </label>

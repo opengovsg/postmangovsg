@@ -1,19 +1,18 @@
 import { chunk, difference, keys } from 'lodash'
 import { Transaction } from 'sequelize'
 
-import { InvalidRecipientError } from '@core/errors'
 import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
-import { HydrationError } from '@core/errors'
+import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
 import { PhoneNumberService } from '@core/services'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(config.get('xssOptions.telegram'), '\n')
+const client = new TemplateClient(XSS_TELEGRAM_OPTION, '\n')
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,
@@ -212,16 +211,19 @@ const validateAndFormatNumber = (
   records: MessageBulkInsertInterface[]
 ): MessageBulkInsertInterface[] => {
   return records.map((record) => {
-    const { recipient } = record
     try {
-      record.recipient = PhoneNumberService.normalisePhoneNumber(
+      const { recipient } = record
+      const normalised = PhoneNumberService.normalisePhoneNumber(
         recipient,
         config.get('defaultCountry')
       )
+      return {
+        ...record,
+        recipient: normalised,
+      }
     } catch (e) {
       throw new InvalidRecipientError()
     }
-    return record
   })
 }
 
@@ -231,7 +233,7 @@ const validateAndFormatNumber = (
  * @param templateBody
  */
 const testHydration = (
-  records: Array<MessageBulkInsertInterface>,
+  records: Array<{ params: { [key: string]: string } }>,
   templateBody: string
 ): void => {
   const [firstRecord] = records

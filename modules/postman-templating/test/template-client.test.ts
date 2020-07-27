@@ -1,6 +1,11 @@
 import { TemplateClient } from '../src/template-client'
 import { TemplateError } from '../src/errors'
-import xss from 'xss'
+
+import {
+  XSS_EMAIL_OPTION,
+  XSS_SMS_OPTION,
+  XSS_TELEGRAM_OPTION,
+} from '../src/xss-options'
 
 describe('template', () => {
   let templateClient: TemplateClient
@@ -24,6 +29,14 @@ describe('template', () => {
       const params = {}
       const body = 'Hello {{name}}'
       expect(templateClient.template(body, params)).toEqual('Hello ')
+    })
+
+    test('supports underscore in keyword', () => {
+      const params = { postal_cd: '123456' }
+      const body = 'Your postal code: {{postal_cd}}'
+      expect(templateClient.template(body, params)).toEqual(
+        'Your postal code: 123456'
+      )
     })
   })
 
@@ -57,21 +70,68 @@ describe('template', () => {
     })
   })
 
+  /**
+   * Templating Config
+   */
+  describe('Templating config', () => {
+    describe('removeEmptyLines', () => {
+      const body = 'hello\n\n\n123'
+      test('emptys lines should not be removed', () => {
+        const expected = 'hello<br /><br /><br />123'
+        expect(
+          templateClient.template(body, {}, { replaceNewLines: true })
+        ).toEqual(expected)
+      })
+      test('emptys lines should be removed', () => {
+        const expected = 'hello<br />123'
+        expect(
+          templateClient.template(
+            body,
+            {},
+            { replaceNewLines: true, removeEmptyLines: true }
+          )
+        ).toEqual(expected)
+      })
+    })
+    describe('removeEmptyLinesFromTables', () => {
+      const body = `<table>\n<tr>\n<th>Firstname</th>\n</tr>\n\n</table>`
+      test('emptys lines from tables should not be removed', () => {
+        const expected =
+          '<table><br /><tr><br /><th>Firstname</th><br /></tr><br /><br /></table>'
+        expect(
+          templateClient.template(body, {}, { replaceNewLines: true })
+        ).toEqual(expected)
+      })
+      test('emptys lines from tables should be removed', () => {
+        const expected = '<table><tr><th>Firstname</th></tr></table>'
+        expect(
+          templateClient.template(
+            body,
+            {},
+            { replaceNewLines: true, removeEmptyLinesFromTables: true }
+          )
+        ).toEqual(expected)
+      })
+    })
+  })
+
+  describe('parseTemplate variables', () => {
+    test('variables should be unique, lowercased and returned in order of appearance', () => {
+      const body = '{{ blah }} {{chip}}{{ BLAH}} {{chip}} {{F1sh}}'
+      const expected = ['blah', 'chip', 'f1sh']
+      expect(templateClient.parseTemplate(body).variables).toEqual(expected)
+    })
+
+    test('variables should return an empty array if no keywords', () => {
+      const body = 'fishpaste is good'
+      const expected: string[] = []
+      expect(templateClient.parseTemplate(body).variables).toEqual(expected)
+    })
+  })
+
   describe('xss', () => {
     describe('email', () => {
-      const xssOptions = {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          br: [],
-          p: [],
-          a: ['href', 'title', 'target'],
-          img: ['src', 'alt', 'title', 'width', 'height'],
-        },
-        stripIgnoreTag: true,
-      }
-      const client: TemplateClient = new TemplateClient(xssOptions)
+      const client: TemplateClient = new TemplateClient(XSS_EMAIL_OPTION)
 
       test('email template should allow b, i, u, br, a, img tags', () => {
         const body =
@@ -101,11 +161,7 @@ describe('template', () => {
       })
     })
     describe('sms', () => {
-      const xssOptions = {
-        whiteList: { br: [] },
-        stripIgnoreTag: true,
-      }
-      const client: TemplateClient = new TemplateClient(xssOptions)
+      const client: TemplateClient = new TemplateClient(XSS_SMS_OPTION)
 
       test('sms template should not allow any html tags except br', () => {
         const body =
@@ -125,36 +181,12 @@ describe('template', () => {
       })
     })
     describe('telegram', () => {
-      const xssOptions = {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          s: [],
-          strike: [],
-          del: [],
-          p: [],
-          code: ['class'],
-          pre: [],
-          a: ['href'],
-        },
-        safeAttrValue: (
-          tag: string,
-          name: string,
-          value: string
-        ): string => {
-          // Handle Telegram mention as xss-js does not recognize it as a valid url.
-          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
-            return value
-          }
-          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
-        },
-        stripIgnoreTag: true,
-      }
-
-      const client: TemplateClient = new TemplateClient(xssOptions, '\n')
+      const client: TemplateClient = new TemplateClient(
+        XSS_TELEGRAM_OPTION,
+        '\n'
+      )
       test('Telegram should support b i u s strike del p code pre a', () => {
-        const body = 
+        const body =
           '<b>bold</b>' +
           '<i>italic</i>' +
           '<u>underline</u>' +
@@ -189,6 +221,37 @@ describe('template', () => {
         const output = "test alert('xss!') hello"
         expect(client.template(body, params)).toEqual(output)
       })
+    })
+  })
+})
+
+describe('replaceNewLinesAndSanitize', () => {
+  describe('email', () => {
+    const client: TemplateClient = new TemplateClient(XSS_EMAIL_OPTION)
+
+    test('Should not sanitize keyword in a href', () => {
+      const body = '<a href="{{protectedlink}}">link</a>'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
+    })
+
+    test('Should strip if href contains keyword with prohibited values', () => {
+      const body = '<a href="fakemailto:{{recipient}}">link</a>'
+      const expected = '<a href>link</a>'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(expected)
+    })
+
+    test('Should not sanitize keyword in a img src', () => {
+      const body = '<img src="{{protectedimage}}">'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
+    })
+  })
+
+  describe('telegram', () => {
+    const client: TemplateClient = new TemplateClient(XSS_TELEGRAM_OPTION)
+
+    test('Should not sanitize tg:// telegram links', () => {
+      const body = '<a href="tg://join?invite=">link</a>'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
     })
   })
 })

@@ -20,12 +20,14 @@ const createCampaign = ({
   name,
   type,
   userId,
+  protect,
 }: {
   name: string
   type: string
   userId: number
+  protect: boolean
 }): Promise<Campaign> => {
-  return Campaign.create({ name, type, userId, valid: false })
+  return Campaign.create({ name, type, userId, valid: false, protect })
 }
 
 /**
@@ -57,11 +59,9 @@ const listCampaigns = ({
       'type',
       'created_at',
       'valid',
-      [
-        literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
-        'has_credential',
-      ],
+      [literal('"cred_name" IS NOT NULL'), 'has_credential'],
       'halted',
+      'protect',
     ],
     order: [['created_at', 'DESC']],
     include: [
@@ -71,6 +71,12 @@ const listCampaigns = ({
           'status',
           ['created_at', 'sent_at'],
           ['updated_at', 'status_updated_at'],
+        ],
+      },
+      {
+        model: Statistic,
+        attributes: [
+          [literal('(errored + invalid) > 0'), 'has_failed_recipients'],
         ],
       },
     ],
@@ -102,6 +108,7 @@ const getCampaignDetails = async (
       'type',
       'created_at',
       'valid',
+      'protect',
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
       [

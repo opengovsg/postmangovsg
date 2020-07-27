@@ -5,7 +5,6 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
-import xss from 'xss'
 import { isSupportedCountry } from 'libphonenumber-js'
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 /**
@@ -34,7 +33,7 @@ convict.addFormats({
 const config = convict({
   env: {
     doc: 'The application environment.',
-    format: ['production', 'staging', 'development', 'telegram'],
+    format: ['production', 'staging', 'development'],
     default: 'production',
     env: 'NODE_ENV',
   },
@@ -149,6 +148,11 @@ const config = convict({
     doc: 'CORS: accept requests from this origin. Can be a string, or regex',
     default: 'https://postman.gov.sg', // prod only
     env: 'FRONTEND_URL',
+  },
+  protectedUrl: {
+    doc: 'Url domain and path for password-protected messages',
+    default: 'https://postman.gov.sg/p', // prod only
+    env: 'PROTECTED_URL',
   },
   session: {
     cookieName: {
@@ -341,53 +345,6 @@ const config = convict({
     default: '.gov.sg',
     env: 'DOMAIN_WHITELIST',
   },
-  xssOptions: {
-    doc: 'List of html tags allowed',
-    default: {
-      email: {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          br: [],
-          p: [],
-          a: ['href', 'title', 'target'],
-          img: ['src', 'alt', 'title', 'width', 'height'],
-        },
-        stripIgnoreTag: true,
-      },
-      sms: {
-        whiteList: { br: [] },
-        stripIgnoreTag: true,
-      },
-      telegram: {
-        whiteList: {
-          b: [],
-          i: [],
-          u: [],
-          s: [],
-          strike: [],
-          del: [],
-          p: [],
-          code: ['class'],
-          pre: [],
-          a: ['href'],
-        },
-        safeAttrValue: (
-          tag: string,
-          name: string,
-          value: string
-        ): string | void => {
-          // Handle Telegram mention as xss-js does not recognize it as a valid url.
-          if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
-            return value
-          }
-          return xss.safeAttrValue(tag, name, value, xss.cssFilter)
-        },
-        stripIgnoreTag: true,
-      },
-    },
-  },
   csvProcessingTimeout: {
     doc:
       'Max duration for csv processing before timeout. Prevent campaigns from being stuck in csv processing state if server dies.',
@@ -413,6 +370,7 @@ switch (config.get('env')) {
   case 'staging':
     config.load({
       frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
+      protectedUrl: 'https://staging.postman.gov.sg/p',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
@@ -433,6 +391,7 @@ switch (config.get('env')) {
     config.set('IS_PROD', false)
     config.load({
       frontendUrl: 'http://localhost:3000',
+      protectedUrl: 'http://localhost:3000/p',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-testing',

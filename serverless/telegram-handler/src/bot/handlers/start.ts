@@ -2,6 +2,7 @@ import { TelegrafContext } from 'telegraf/typings/context'
 import { Message } from 'telegraf/typings/telegram-types'
 
 import { Logger } from '../../utils/logger'
+import { generatePadding } from '../../utils/generatePadding'
 
 const logger = new Logger('start')
 
@@ -17,7 +18,15 @@ export const startCommandHandler = async (
     'Hello! To complete the subscription, please send me your phone number by pressing the button below.'
   return ctx.reply(REPLY, {
     reply_markup: {
-      keyboard: [[{ text: 'Send your phone number', request_contact: true }]],
+      keyboard: [
+        [
+          {
+            // Refer to generatePadding for more details
+            text: `Send your phone number ${generatePadding()}`,
+            request_contact: true,
+          },
+        ],
+      ],
     },
   })
 }

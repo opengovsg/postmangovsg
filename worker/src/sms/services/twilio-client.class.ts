@@ -32,7 +32,7 @@ export default class TwilioClient {
     return this.generateStatusCallbackUrl(messageId, campaignId)
       .then((callbackUrl) => {
         return this.client.messages.create({
-          to: this.addDefaultCountryCode(recipient),
+          to: recipient,
           body: this.replaceNewLines(message),
           from: this.messagingServiceSid,
           ...(callbackUrl ? { statusCallback: callbackUrl } : {}),
@@ -73,13 +73,6 @@ export default class TwilioClient {
     callbackUrl.pathname = `${callbackUrl.pathname}/campaign/${campaignId}/message/${messageId}`
     logger.info(`Status callback url for ${messageId}: ${callbackUrl}`)
     return callbackUrl.toString()
-  }
-
-  private addDefaultCountryCode(recipient: string): string {
-    if (!recipient.startsWith('+') && config.get('defaultCountryCode')) {
-      return `+${config.get('defaultCountryCode')}${recipient}`
-    }
-    return recipient
   }
 
   private replaceNewLines(body: string): string {

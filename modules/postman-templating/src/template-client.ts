@@ -3,6 +3,7 @@ import xss from 'xss'
 import * as Sqrl from 'squirrelly'
 import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { TemplateError } from './errors'
+import { TemplatingConfig, TemplatingConfigDefault } from './interfaces'
 
 export class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
@@ -40,7 +41,7 @@ export class TemplateClient {
     variables: Array<string>
     tokens: Array<string>
   } {
-    const variables: Array<string> = []
+    const variables: Set<string> = new Set()
     const tokens: Array<string> = []
 
     /**
@@ -93,16 +94,16 @@ export class TemplateClient {
             )
           }
 
-          // only allow alphanumeric template, prevents code execution
-          const keyHasValidChars = key.match(/[^a-zA-Z0-9]/) === null
+          // only allow alphanumeric, underscore template, prevents code execution
+          const keyHasValidChars = key.match(/\W/) === null
           if (!keyHasValidChars) {
             throw new TemplateError(
-              `Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters and numbers.\nKeywords like {{ Person_Name }} are not allowed, but {{ PersonName }} is allowed.`
+              `Invalid characters in the keyword: {{${key}}}.\nCheck that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person-Name }} are not allowed, but {{ Person_Name }} is allowed.`
             )
           }
 
           // add key regardless, note that this is also returned in lowercase
-          variables.push(key)
+          variables.add(key)
 
           // if no params continue with the loop
           if (!params) return
@@ -128,7 +129,7 @@ export class TemplateClient {
         }
       })
       return {
-        variables,
+        variables: Array.from(variables), // variables are unique
         tokens,
       }
     } catch (err) {
@@ -139,7 +140,7 @@ export class TemplateClient {
         )
       if (err.message.includes('unclosed string'))
         throw new TemplateError(
-          "Check that the keywords only contain letters and numbers.\nKeywords like {{ Person's Name }} are not allowed, but {{ PersonsName }} is allowed."
+          "Check that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person's Name }} are not allowed, but {{ Person_Name }} is allowed."
         )
       if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
       throw err
@@ -151,14 +152,58 @@ export class TemplateClient {
    * @param templateBody
    * @param params
    */
-  template(templateBody: string, params: { [key: string]: string }): string {
-    const parsed = this.parseTemplate(templateBody, params)
+  template(
+    templateBody: string,
+    params: { [key: string]: string },
+    config?: Partial<TemplatingConfig>
+  ): string {
+    const configWithDefaults = { ...TemplatingConfigDefault, ...config }
+    const preProcessed = this.preProcessTemplate(
+      templateBody,
+      configWithDefaults
+    )
+
+    const parsed = this.parseTemplate(preProcessed, params)
     // Remove extra '\' infront of single quotes and backslashes, added by Squirrelly when it escaped the csv.
     // Remove extra '\' infront of \n added by Squirrelly when it escaped the message body.
     const templated = parsed.tokens
       .join('')
       .replace(/\\([\\'])/g, '$1')
       .replace(/\\n/g, '\n')
-    return xss.filterXSS(templated, this.xssOptions)
+    const filtered = xss.filterXSS(templated, this.xssOptions)
+    return this.postProcessTemplate(filtered, configWithDefaults)
+  }
+
+  preProcessTemplate(template: string, options: TemplatingConfig): string {
+    let result = template
+    /**
+     * removeEmptyLinesFromTables
+     */
+    if (options.removeEmptyLinesFromTables) {
+      result = result.replace(
+        // Get all text within <table (attr?)> tags
+        /<table(\s+.*?|\s*)>(.*?)<\/table\s*>/gs,
+        (match) =>
+          // Remove all new lines
+          match.replace(/(\r\n|\r|\n)/g, '')
+      )
+    }
+    if (options.replaceNewLines) {
+      result = result.replace(/(\n|\r\n)/g, this.lineBreak)
+    }
+    return result
+  }
+
+  postProcessTemplate(template: string, options: TemplatingConfig): string {
+    let result = template
+    /**
+     * removeEmptyLines
+     */
+    if (options.removeEmptyLines) {
+      // Looks for 2 or more consecutive <br>, <br/> or <br />
+      const CONSECUTIVE_LINEBREAK_REGEX = /(\s)*(<br\s*\/?>(\s)*(\n|\r\n)?){2,}/g
+      result = result.replace(CONSECUTIVE_LINEBREAK_REGEX, this.lineBreak)
+    }
+    return result
   }
 }

@@ -1,11 +1,11 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_SMS_CREDENTIALS_URL } from 'config'
+import { GUIDE_URL, GUIDE_SMS_CREDENTIALS_URL } from 'config'
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
-import { TextInput, PrimaryButton } from 'components/common'
+import { TextInput, PrimaryButton, Checkbox } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
@@ -23,12 +23,18 @@ const CreateModal = ({
   const history = useHistory()
   const [selectedChannel, setSelectedChannel] = useState(channelType)
   const [selectedName, setSelectedName] = useState(name)
+  const [protect, setProtected] = useState(false)
+
+  useEffect(() => {
+    setProtected(false)
+  }, [selectedChannel])
 
   async function handleCreateCampaign() {
     try {
       const campaign: Campaign = await createCampaign(
         selectedName,
-        selectedChannel
+        selectedChannel,
+        protect
       )
       // close modal and go to create view
       modalContext.setModalContent(null)
@@ -73,7 +79,7 @@ const CreateModal = ({
         </h5>
 
         <div className={styles.channelTypes}>
-          <div>
+          <div className={styles.channelContainer}>
             <PrimaryButton
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.SMS,
@@ -90,6 +96,7 @@ const CreateModal = ({
               <p className={styles.subtext}>
                 Get your credentials ready.&nbsp;
                 <OutboundLink
+                  className={styles.link}
                   eventLabel={GUIDE_SMS_CREDENTIALS_URL}
                   to={GUIDE_SMS_CREDENTIALS_URL}
                   target="_blank"
@@ -99,7 +106,7 @@ const CreateModal = ({
               </p>
             )}
           </div>
-          <div>
+          <div className={styles.channelContainer}>
             <PrimaryButton
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.Telegram,
@@ -117,15 +124,18 @@ const CreateModal = ({
             </PrimaryButton>
             {selectedChannel === ChannelType.Telegram && (
               <p className={styles.subtext}>
-                It is best to&nbsp;
-                <a onClick={() => handleAddCredentials(ChannelType.Telegram)}>
+                It is best to
+                <span
+                  className={styles.link}
+                  onClick={() => handleAddCredentials(ChannelType.Telegram)}
+                >
                   store and validate your credentials
-                </a>
+                </span>
                 &nbsp;before you start.
               </p>
             )}
           </div>
-          <div>
+          <div className={styles.channelContainer}>
             <PrimaryButton
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.Email,
@@ -141,6 +151,26 @@ const CreateModal = ({
                 )}
               ></i>
             </PrimaryButton>
+            {selectedChannel === ChannelType.Email && (
+              <Checkbox
+                className={styles.protectedOption}
+                checked={protect}
+                onChange={setProtected}
+              >
+                <p className={styles.subtext}>
+                  Password protected.
+                  {/* TODO: change url to passsword protected section in guide */}
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel={GUIDE_URL}
+                    to={GUIDE_URL}
+                    target="_blank"
+                  >
+                    Learn more
+                  </OutboundLink>
+                </p>
+              </Checkbox>
+            )}
           </div>
         </div>
       </div>
