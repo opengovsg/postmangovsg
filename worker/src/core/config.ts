@@ -5,6 +5,7 @@
 import convict from 'convict'
 import fs from 'fs'
 import path from 'path'
+import { isSupportedCountry } from 'libphonenumber-js'
 
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 
@@ -137,6 +138,14 @@ const config = convict({
     doc: 'The email address that appears in the From field of an email',
     default: '',
     env: 'SES_FROM',
+  },
+  defaultCountry: {
+    doc: 'Two-letter ISO country code to use in libphonenumber-js',
+    default: 'SG',
+    env: 'DEFAULT_COUNTRY',
+    format: (countryCode: string): boolean => {
+      return isSupportedCountry(countryCode)
+    },
   },
   smsOptions: {
     accountSid: {
