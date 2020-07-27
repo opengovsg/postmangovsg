@@ -1,9 +1,14 @@
+import { Transaction } from 'sequelize'
 import logger from '@core/logger'
+import { CSVParams } from '@core/types'
+
 import { ChannelType } from '@core/constants'
-import { Campaign } from '@core/models'
+import { Campaign, ProtectedMessage } from '@core/models'
 import {
   MailService,
   CampaignService,
+  UploadService,
+  ProtectedService,
   UnsubscriberService,
 } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
@@ -152,10 +157,142 @@ const getCampaignDetails = async (
   ])
 }
 
+const uploadCompleteOnPreview = ({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: EmailTemplate
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    UploadService.checkTemplateKeysMatch(data, template.params!)
+
+    EmailTemplateService.testHydration(
+      [{ params: data[0] }],
+      template.body as string,
+      template.subject as string
+    )
+    try {
+      // delete message_logs entries
+      await EmailMessage.destroy({
+        where: { campaignId },
+        transaction,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+const uploadCompleteOnChunk = ({
+  transaction,
+  campaignId,
+}: {
+  transaction: Transaction
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    try {
+      const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+        return {
+          campaignId,
+          recipient: entry['recipient'],
+          params: entry,
+        }
+      })
+      // START populate template
+      await EmailMessage.bulkCreate(records, {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          }
+        },
+        benchmark: true,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+
+const uploadProtectedCompleteOnPreview = ({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: EmailTemplate
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    // Checks the csv for all the necessary columns.
+    const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash', 'id']
+    UploadService.checkTemplateKeysMatch(data, PROTECTED_CSV_HEADERS)
+
+    EmailTemplateService.testHydration(
+      [{ params: data[0] }],
+      template.body as string,
+      template.subject as string
+    )
+    try {
+      // Delete existing rows
+      await ProtectedMessage.destroy({
+        where: {
+          campaignId,
+        },
+        transaction,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+const uploadProtectedCompleteOnChunk = ({
+  transaction,
+  campaignId,
+}: {
+  transaction: Transaction
+  campaignId: number
+}): ((data: CSVParams[]) => Promise<void>) => {
+  return async (data: CSVParams[]): Promise<void> => {
+    try {
+      const messages = await ProtectedService.storeProtectedMessages({
+        transaction,
+        campaignId,
+        data,
+      })
+      await EmailMessage.bulkCreate(messages, {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info(
+              `uploadProtectedCompleteOnChunk - EmailMessage: ElapsedTime ${benchmark} ms`
+            )
+          }
+        },
+        benchmark: true,
+      })
+    } catch (err) {
+      transaction?.rollback()
+      throw err
+    }
+  }
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
   setCampaignCredential,
   getCampaignDetails,
   getHydratedMessage,
+  uploadCompleteOnPreview,
+  uploadCompleteOnChunk,
+  uploadProtectedCompleteOnPreview,
+  uploadProtectedCompleteOnChunk,
 }

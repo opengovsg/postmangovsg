@@ -1,0 +1,25 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.container {
+  display: flex;
+  padding: 5vh 5vw;
+  background-color: $light-blue;
+  min-height: 100vh;
+}
+
+.editColumn,
+.previewColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 2rem;
+}
+
+.previewContainer {
+  background-color: white;
+  padding: 5vw 2vw;
+  margin: 2rem 0;
+  border-radius: $border-radius;
+  box-shadow: 0.2rem 0.2rem 1rem 0 lighten($light-grey, 20%);
+}

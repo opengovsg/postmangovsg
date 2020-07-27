@@ -80,10 +80,13 @@ const EmailDetail = ({
         <>
           <h2>Your campaign has been sent!</h2>
           <p>
-            A retry button will appear if some messages had an error while
-            sending. You can click on retry to try sending the message(s) again.
-            An export button will appear for you to download a list of failed
-            deliveries with the recipient’s email address.
+            If there are errors with sending your messages, you can click Retry
+            to send again.
+          </p>
+          <p>
+            If you encounter failed deliveries, you can download the error list
+            from this page or the dashboard few minutes after sending has
+            completed.
           </p>
         </>
       )}

@@ -226,20 +226,13 @@ const addToMessageLogs = async (
   }
 }
 
-const hasInvalidSmsRecipient = (
-  records: MessageBulkInsertInterface[]
-): boolean => {
-  const re = /^\+?[0-9]+$/
-  return records.some((record) => !re.test(record.recipient))
-}
-
 /**
  * Attempts to hydrate the first record.
  * @param records
  * @param templateBody
  */
 const testHydration = (
-  records: Array<MessageBulkInsertInterface>,
+  records: Array<{ params: { [key: string]: string } }>,
   templateBody: string
 ): void => {
   const [firstRecord] = records
@@ -250,7 +243,6 @@ export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
-  hasInvalidSmsRecipient,
   testHydration,
   client,
 }

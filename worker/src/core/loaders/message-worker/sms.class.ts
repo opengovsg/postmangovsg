@@ -2,7 +2,9 @@ import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import map from 'lodash/map'
 import logger from '@core/logger'
+import config from '@core/config'
 import { CredentialService } from '@core/services/credential.service'
+import { PhoneNumberService } from '@core/services/phone-number.service'
 import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 
@@ -71,11 +73,21 @@ class SMS {
     body: string
     campaignId?: number
   }): Promise<void> {
-    return Promise.resolve()
-      .then(() => {
+    return new Promise<string>((resolve, reject) => {
+      try {
+        const normalisedRecipient = PhoneNumberService.normalisePhoneNumber(
+          recipient,
+          config.get('defaultCountry')
+        )
+        return resolve(normalisedRecipient)
+      } catch (err) {
+        return reject(new Error('Recipient is incorrectly formatted'))
+      }
+    })
+      .then((normalisedRecipient: string) => {
         return this.twilioClient?.send(
           id,
-          recipient,
+          normalisedRecipient,
           templateClient.template(body, params),
           campaignId
         )

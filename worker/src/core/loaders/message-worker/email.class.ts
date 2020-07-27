@@ -2,6 +2,8 @@ import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import map from 'lodash/map'
 import crypto from 'crypto'
+import validator from 'validator'
+
 import logger from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
@@ -119,11 +121,12 @@ class Email {
     replyTo?: string | null
     campaignId?: number
   }): Promise<void> {
-    const unsubUrl = await this.generateUnsubLink(
-      campaignId!,
-      recipient
-    ).toString()
-    return Promise.resolve()
+    return new Promise((resolve, reject) => {
+      if (!validator.isEmail(recipient)) {
+        return reject(new Error('Recipient is incorrectly formatted'))
+      }
+      return resolve()
+    })
       .then(() => {
         return {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -139,6 +142,10 @@ class Email {
           subject: string
           hydratedBody: string
         }) => {
+          const unsubUrl = this.generateUnsubLink(
+            campaignId!,
+            recipient
+          ).toString()
           const bodyWithUnsub = this.appendUnsubToMessage(
             hydratedBody,
             unsubUrl

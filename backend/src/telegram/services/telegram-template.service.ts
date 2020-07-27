@@ -1,11 +1,10 @@
 import { chunk, difference, keys } from 'lodash'
 import { Transaction } from 'sequelize'
 
-import { InvalidRecipientError } from '@core/errors'
 import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
-import { HydrationError } from '@core/errors'
+import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
 import { PhoneNumberService } from '@core/services'
 import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
@@ -212,16 +211,19 @@ const validateAndFormatNumber = (
   records: MessageBulkInsertInterface[]
 ): MessageBulkInsertInterface[] => {
   return records.map((record) => {
-    const { recipient } = record
     try {
-      record.recipient = PhoneNumberService.normalisePhoneNumber(
+      const { recipient } = record
+      const normalised = PhoneNumberService.normalisePhoneNumber(
         recipient,
         config.get('defaultCountry')
       )
+      return {
+        ...record,
+        recipient: normalised,
+      }
     } catch (e) {
       throw new InvalidRecipientError()
     }
-    return record
   })
 }
 
@@ -231,7 +233,7 @@ const validateAndFormatNumber = (
  * @param templateBody
  */
 const testHydration = (
-  records: Array<MessageBulkInsertInterface>,
+  records: Array<{ params: { [key: string]: string } }>,
   templateBody: string
 ): void => {
   const [firstRecord] = records

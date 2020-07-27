@@ -90,6 +90,30 @@ const config = convict({
       },
     },
   },
+  sentryDsn: {
+    doc: 'Sentry DSN for serverless',
+    default: '',
+    env: 'SENTRY_DSN',
+  },
+  sentryLambdaFunctionName: {
+    doc: 'Sentry tag to idenitfy lambda function',
+    default: 'telegram-handler',
+    env: 'SENTRY_LAMBDA_FUNCTION_NAME',
+  },
+  help: {
+    contactUsUrl: {
+      doc: 'URL to contact form',
+      default: '',
+      env: 'TELEGRAM_BOT_CONTACT_US_URL',
+      format: 'required',
+    },
+    guideUrl: {
+      doc: 'URL to recipient guide',
+      default: '',
+      env: 'TELEGRAM_BOT_GUIDE_URL',
+      format: 'required',
+    },
+  },
 })
 
 // Only development is a non-production environment

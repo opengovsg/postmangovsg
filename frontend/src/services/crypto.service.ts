@@ -66,16 +66,16 @@ export async function encryptData(
   try {
     const iv = window.crypto.getRandomValues(new Uint8Array(12))
     const algorithm = { name: ENCRYPTION_METHOD, iv, tagLength: 128 }
-    const derviedKey = await deriveKey(password, salt, iterations)
+    const derivedKey = await deriveKey(password, salt, iterations)
 
     const encodedPayload = Buffer.from(payload)
     const cipherBuffer = await window.crypto.subtle.encrypt(
       algorithm,
-      derviedKey,
+      derivedKey,
       encodedPayload
     )
 
-    const key = await exportKey(derviedKey)
+    const key = await exportKey(derivedKey)
     return {
       encrypted: encodeCipherToBase64(cipherBuffer, iv),
       key,
