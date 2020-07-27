@@ -29,8 +29,14 @@
     justify-content: space-between;
   }
 
-  &.disabled {
+  &:disabled {
     border: 1px solid $light-grey;
+    background-color: white;
+
+    i,
+    span {
+      color: $light-grey;
+    }
   }
 
   .content {

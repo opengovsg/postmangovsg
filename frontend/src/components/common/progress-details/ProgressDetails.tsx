@@ -138,17 +138,14 @@ const ProgressDetails = ({
       {exportStatus && (
         <div className={styles.actionButton}>
           <ActionButton
-            className={cx(
-              {
-                [styles.disabledExport]:
-                  exportStatus === CampaignExportStatus.NoError ||
-                  exportStatus === CampaignExportStatus.Unavailable,
-              },
-              {
-                [styles.disablePointerEvents]:
-                  exportStatus !== CampaignExportStatus.Ready,
-              }
-            )}
+            disabled={
+              exportStatus === CampaignExportStatus.NoError ||
+              exportStatus === CampaignExportStatus.Unavailable
+            }
+            className={cx({
+              [styles.disableActiveState]:
+                exportStatus === CampaignExportStatus.Loading,
+            })}
           >
             <ExportRecipients
               iconPosition="right"

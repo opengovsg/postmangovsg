@@ -85,12 +85,15 @@
   justify-content: flex-end;
   margin: 3rem 0;
 
-  .disabledExport {
-    border: 1px solid $light-grey;
-  }
+  .disableActiveState {
+    cursor: not-allowed;
 
-  .disablePointerEvents {
-    cursor: default;
+    &:active {
+      span,
+      i {
+        color: $indigo-blue;
+      }
+    }
 
     &:hover {
       border-width: 1px;
