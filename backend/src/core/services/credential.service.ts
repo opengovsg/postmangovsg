@@ -16,11 +16,13 @@ const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
  * Upserts credential into AWS SecretsManager
  * @param name
  * @param secret
+ * @param isBotToken
  * @throws error if update fails
  */
 const upsertCredential = async (
   name: string,
-  secret: string
+  secret: string,
+  isBotToken: boolean
 ): Promise<void> => {
   // If credential doesn't exist, upload credential to secret manager, unless in development
   if (!config.get('IS_PROD') && !config.get('aws.awsEndpoint')) {
@@ -48,6 +50,9 @@ const upsertCredential = async (
         .createSecret({
           Name: name,
           SecretString: secret,
+          ...(isBotToken
+            ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
+            : {}),
         })
         .promise()
       logger.info('Successfully stored credential in AWS secrets manager')
@@ -62,12 +67,17 @@ const upsertCredential = async (
  * Save a credential into secrets manager and the credential table
  * @param name
  * @param secret
+ * @param isBotToken
  */
-const storeCredential = async (name: string, secret: string): Promise<void> => {
+const storeCredential = async (
+  name: string,
+  secret: string,
+  isBotToken = false
+): Promise<void> => {
   // If adding a credential to secrets manager throws an error, db will not be updated
   // If adding a credential to secrets manager succeeds, but the db call fails, it is ok because the credential will not be associated with a campaign
   // It results in orphan secrets manager credentials, which is acceptable.
-  await upsertCredential(name, secret)
+  await upsertCredential(name, secret, isBotToken)
   logger.info('Storing credential in DB')
   await Credential.findCreateFind({
     where: { name },

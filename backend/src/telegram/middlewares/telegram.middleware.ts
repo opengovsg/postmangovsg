@@ -115,7 +115,11 @@ const validateAndStoreCredentials = async (
       // botId.
       credentialName = telegramBotToken.split(':')[0]
 
-      await CredentialService.storeCredential(credentialName, telegramBotToken)
+      await CredentialService.storeCredential(
+        credentialName,
+        telegramBotToken,
+        true
+      )
     } catch (err) {
       return res.status(400).json({ message: `${err.message}` })
     }
