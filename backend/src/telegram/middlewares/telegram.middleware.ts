@@ -121,7 +121,7 @@ const validateAndStoreCredentials = async (
         true
       )
     } catch (err) {
-      return res.status(400).json({ message: `${err.message}` })
+      return res.status(400).json({ message: 'Error storing credentials' })
     }
   }
 

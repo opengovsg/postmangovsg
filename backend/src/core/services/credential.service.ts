@@ -57,6 +57,7 @@ const upsertCredential = async (
         .promise()
       logger.info('Successfully stored credential in AWS secrets manager')
     } else {
+      logger.error(err)
       throw err
     }
   }
