@@ -6,6 +6,7 @@ import Landing from 'components/landing'
 import Login from 'components/login'
 import ProtectedPage from 'components/protected'
 import CryptoTest from 'components/cryptoTest'
+import Unsubscribe from 'components/unsubscribe'
 
 // Contexts
 import AuthContextProvider from 'contexts/auth.context'
@@ -25,6 +26,11 @@ const App = () => {
           <Route exact path="/login" component={Login}></Route>
           <Route exact path="/crypto-test" component={CryptoTest}></Route>
           <Route exact path="/p/:version/:id" component={ProtectedPage}></Route>
+          <Route
+            exact
+            path="/unsubscribe/:version"
+            component={Unsubscribe}
+          ></Route>
           <ProtectedRoute>
             <Suspense
               fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
