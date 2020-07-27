@@ -1,12 +1,10 @@
 import { difference, keys, chunk } from 'lodash'
 import { Transaction } from 'sequelize'
 
-import config from '@core/config'
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
-import { InvalidRecipientError, HydrationError } from '@core/errors'
+import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import { PhoneNumberService } from '@core/services'
 import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
@@ -229,29 +227,6 @@ const addToMessageLogs = async (
 }
 
 /**
- * Validate that recipient is a valid phone number and format it.
- */
-const validateAndFormatNumber = (
-  records: MessageBulkInsertInterface[]
-): MessageBulkInsertInterface[] => {
-  return records.map((record) => {
-    try {
-      const { recipient } = record
-      const normalised = PhoneNumberService.normalisePhoneNumber(
-        recipient,
-        config.get('defaultCountry')
-      )
-      return {
-        ...record,
-        recipient: normalised,
-      }
-    } catch (e) {
-      throw new InvalidRecipientError()
-    }
-  })
-}
-
-/**
  * Attempts to hydrate the first record.
  * @param records
  * @param templateBody
@@ -268,7 +243,6 @@ export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   addToMessageLogs,
-  validateAndFormatNumber,
   testHydration,
   client,
 }
