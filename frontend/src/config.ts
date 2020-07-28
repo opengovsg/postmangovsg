@@ -8,9 +8,6 @@ const missingEnvVars = [
   'REACT_APP_TITLE',
   'REACT_APP_DESCRIPTION',
   'REACT_APP_BACKEND_URL',
-  'REACT_APP_GUIDE_SMS_ACCOUNT_SID_URL',
-  'REACT_APP_GUIDE_SMS_API_KEY_URL',
-  'REACT_APP_GUIDE_SMS_MESSAGING_SERVICE_URL',
   'REACT_APP_SENTRY_DSN',
   'REACT_APP_SENTRY_RELEASE',
 ].reduce(function (acc: string[], name: string) {
@@ -25,11 +22,13 @@ if (missingEnvVars.length > 0) {
 axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL as string
 axios.defaults.withCredentials = true
 axios.defaults.timeout = 100000 // 100 sec
-
 //#region Set up translations
 export const TRANSTEXT = {
   guideUrl: t('text.guideUrl')``,
   guideSmsUrl: t('text.guideSmsUrl')``,
+  guideSmsAccountSidUrl: t('text.guideSmsAccountSidUrl')``,
+  guideSmsApiKeyUrl: t('text.guideSmsApiKeyUrl')``,
+  guideSmsMessagingServiceUrl: t('text.guideSmsMessagingServiceUrl')``,
   guideTelegramUrl: t('text.guideTelegramUrl')``,
   guidePowerUserUrl: t('text.guidePowerUserUrl')``,
   contactUsUrl: t('text.contactUsUrl')``,
@@ -46,9 +45,3 @@ export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
 export const SENTRY_ENVIRONMENT =
   (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
-export const GUIDE_SMS_ACCOUNT_SID_URL = process.env
-  .REACT_APP_GUIDE_SMS_ACCOUNT_SID_URL as string
-export const GUIDE_SMS_API_KEY_URL = process.env
-  .REACT_APP_GUIDE_SMS_API_KEY_URL as string
-export const GUIDE_SMS_MESSAGING_SERVICE_URL = process.env
-  .REACT_APP_GUIDE_SMS_MESSAGING_SERVICE_URL as string
