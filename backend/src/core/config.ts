@@ -37,9 +37,6 @@ const config = convict({
     default: 'production',
     env: 'NODE_ENV',
   },
-  IS_PROD: {
-    default: true,
-  },
   APP_NAME: {
     doc: 'Name of the app',
     default: 'Postman.gov.sg',
@@ -388,7 +385,6 @@ switch (config.get('env')) {
     })
     break
   case 'development':
-    config.set('IS_PROD', false)
     config.load({
       frontendUrl: 'http://localhost:3000',
       protectedUrl: 'http://localhost:3000/p',
