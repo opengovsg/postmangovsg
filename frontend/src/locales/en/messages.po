@@ -53,50 +53,50 @@ msgstr "Verifying OTP..."
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
 
-#: src/config.ts:37
+#: src/config.ts:34
 msgid "text.contactUsUrl"
 msgstr "https://go.gov.sg/postman-contact-us"
 
-#: src/config.ts:38
+#: src/config.ts:35
 msgid "text.contributeUrl"
 msgstr "https://github.com/opengovsg/postmangovsg"
 
-#: src/config.ts:36
+#: src/config.ts:33
 msgid "text.guidePowerUserUrl"
 msgstr "https://guide.postman.gov.sg/guide/power-users"
 
-#: src/config.ts:32
+#: src/config.ts:29
 msgid "text.guideSmsAccountSidUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-1-account-sid-and-auth-token"
 
-#: src/config.ts:33
+#: src/config.ts:30
 msgid "text.guideSmsApiKeyUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-2-set-up-a-standard-api-key"
 
-#: src/config.ts:34
+#: src/config.ts:31
 msgid "text.guideSmsMessagingServiceUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-3-set-up-your-messaging-service"
 
-#: src/config.ts:31
+#: src/config.ts:28
 msgid "text.guideSmsUrl"
 msgstr "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
 
-#: src/config.ts:35
+#: src/config.ts:32
 msgid "text.guideTelegramUrl"
 msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
 
-#: src/config.ts:30
+#: src/config.ts:27
 msgid "text.guideUrl"
 msgstr "https://guide.postman.gov.sg"
 
-#: src/config.ts:40
+#: src/config.ts:37
 msgid "text.privacyUrl"
 msgstr "https://guide.postman.gov.sg/legal/privacy"
 
-#: src/config.ts:41
+#: src/config.ts:38
 msgid "text.reportBugUrl"
 msgstr "https://guide.postman.gov.sg/contact-us"
 
-#: src/config.ts:39
+#: src/config.ts:36
 msgid "text.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
