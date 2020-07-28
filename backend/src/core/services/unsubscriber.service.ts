@@ -3,6 +3,8 @@ import config from '@core/config'
 
 import { Unsubscriber } from '@core/models'
 
+const UNSUBSCRIBE_URL = config.get('unsubscribeUrl')
+
 /**
  * Creates a new HMAC object based on the active unsubscribe version
  * @param version
@@ -56,7 +58,7 @@ const findOrCreateUnsubscriber = ({
 }
 
 const appendTestEmailUnsubLink = (body: string): string => {
-  const testUnsubUrl = new URL(`/unsubscribe/test`, config.get('frontendUrl'))
+  const testUnsubUrl = `${UNSUBSCRIBE_URL}/test`
   const colors = {
     text: '#697783',
     link: '#2C2CDC',
