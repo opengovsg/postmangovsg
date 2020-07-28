@@ -131,6 +131,10 @@ const config = convict({
   },
 })
 
+// If mailFrom was not set in an env var, set it using the app_name
+const defaultMailFrom = 'Postman.gov.sg <donotreply@mail.postman.gov.sg>'
+config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
+
 // Only development is a non-production environment
 // Override with local config
 if (config.get('env') === 'development') {
