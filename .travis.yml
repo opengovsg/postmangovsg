@@ -85,6 +85,9 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/serverless/telegram-handler
         - npm install && npm run build
         - zip -qr code.zip build src package.json node_modules/
+        - cd $TRAVIS_BUILD_DIR/serverless/unsubscribe-digest
+        - npm install && npm run build
+        - zip -qr code.zip build package.json node_modules/
       deploy:
         - provider: lambda
           edge: true
@@ -206,6 +209,48 @@ jobs:
             - NODE_ENV=staging
             - TELEGRAM_BOT_CONTACT_US_URL=$TELEGRAM_BOT_CONTACT_US_URL
             - TELEGRAM_BOT_GUIDE_URL=$TELEGRAM_BOT_GUIDE_URL
+        - provider: lambda
+          edge: true
+          function_name: unsubscribe-digest-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../unsubscribe-digest/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_UNSUBSCRIBE_DIGEST_DB_URI
+            - DB_READ_REPLICA_URI=$PRODUCTION_UNSUBSCRIBE_DIGEST_DB_READ_REPLICA_URI
+            - SES_FROM=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_FROM
+            - SES_HOST=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_HOST
+            - SES_PASS=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_PASS
+            - SES_USER=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_USER
+            - SES_PORT=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_PORT
+        - provider: lambda
+          edge: true
+          function_name: unsubscribe-digest-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../unsubscribe-digest/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - DB_URI=$STAGING_UNSUBSCRIBE_DIGEST_DB_URI
+            - DB_READ_REPLICA_URI=$STAGING_UNSUBSCRIBE_DIGEST_DB_READ_REPLICA_URI
+            - SES_FROM=$STAGING_UNSUBSCRIBE_DIGEST_SES_FROM
+            - SES_HOST=$STAGING_UNSUBSCRIBE_DIGEST_SES_HOST
+            - SES_PASS=$STAGING_UNSUBSCRIBE_DIGEST_SES_PASS
+            - SES_USER=$STAGING_UNSUBSCRIBE_DIGEST_SES_USER
+            - SES_PORT=$STAGING_UNSUBSCRIBE_DIGEST_SES_PORT
     - name: root
       install:
         - npm install --ignore-scripts
