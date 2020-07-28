@@ -22,9 +22,9 @@ const SMSTemplate = ({
         (
           <span>
             Seems like you have more than 1000 characters in your template. If
-            your message exceeds 1600 characters then they won&apos;t be sent.
-            Consider making your message short and sweet to make it easier to
-            read on a mobile device.
+            your message exceeds the total 1600 characters (including keywords),
+            then they won&apos;t be sent. Consider making your message short and
+            sweet to make it easier to read on a mobile device.
           </span>
         ) as any
       )
@@ -83,7 +83,7 @@ const SMSTemplate = ({
         value={body}
         onChange={setBody}
       />
-      <p className={styles.characterCount}>Characters: {body.length}/1600</p>
+      <p className={styles.characterCount}>{body.length} characters</p>
       <NextButton disabled={!body} onClick={handleSaveTemplate} />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
