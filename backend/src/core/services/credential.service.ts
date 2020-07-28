@@ -102,7 +102,7 @@ const getTwilioCredentials = async (
  * @param name
  */
 const getTelegramCredential = async (name: string): Promise<string> => {
-  if (config.get('env') === 'development') {
+  if (config.get('env') === 'development' && !config.get('aws.awsEndpoint')) {
     logger.info(
       `Dev env - getTelegramCredential - returning default credentials set in env var`
     )
