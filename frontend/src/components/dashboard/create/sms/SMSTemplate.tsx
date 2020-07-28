@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { TextArea, NextButton, ErrorBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
-import { saveTemplate } from 'services/sms.service'
+import { exceedsCharacterThreshold, saveTemplate } from 'services/sms.service'
+import styles from '../Create.module.scss'
 
 const SMSTemplate = ({
   body: initialBody,
@@ -14,6 +15,23 @@ const SMSTemplate = ({
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
+
+  useEffect(() => {
+    if (exceedsCharacterThreshold(body)) {
+      setErrorMsg(
+        (
+          <span>
+            Seems like you have more than 1000 characters in your template. If
+            your message exceeds 1600 characters then they won&apos;t be sent.
+            Consider making your message short and sweet to make it easier to
+            read on a mobile device.
+          </span>
+        ) as any
+      )
+    } else {
+      setErrorMsg(null)
+    }
+  }, [body])
 
   async function handleSaveTemplate(): Promise<void> {
     setErrorMsg(null)
@@ -65,6 +83,7 @@ const SMSTemplate = ({
         value={body}
         onChange={setBody}
       />
+      <p className={styles.characterCount}>Characters: {body.length}/1600</p>
       <NextButton disabled={!body} onClick={handleSaveTemplate} />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>

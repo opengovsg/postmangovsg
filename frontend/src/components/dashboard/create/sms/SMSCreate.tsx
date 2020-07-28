@@ -61,7 +61,6 @@ const CreateSMS = ({
       case SMSProgress.UploadRecipients:
         return (
           <SMSRecipients
-            body={campaign.body}
             params={campaign.params}
             csvFilename={campaign.csvFilename}
             numRecipients={campaign.numRecipients}

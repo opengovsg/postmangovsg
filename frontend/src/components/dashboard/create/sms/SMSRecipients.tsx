@@ -7,7 +7,6 @@ import {
   getCsvStatus,
   CsvStatusResponse,
 } from 'services/upload.service'
-import { exceedsCharacterThreshold } from 'services/sms.service'
 import {
   FileInput,
   CsvUpload,
@@ -24,14 +23,12 @@ import styles from '../Create.module.scss'
 const SMSRecipients = ({
   csvFilename: initialCsvFilename,
   numRecipients: initialNumRecipients,
-  body,
   params,
   isProcessing: initialIsProcessing,
   onNext,
 }: {
   csvFilename: string
   numRecipients: number
-  body: string
   params: Array<string>
   isProcessing: boolean
   onNext: (changes: Partial<SMSCampaign>, next?: boolean) => void
@@ -49,16 +46,6 @@ const SMSRecipients = ({
   const { id: campaignId } = useParams()
 
   const { csvFilename, numRecipients = 0 } = csvInfo
-
-  useEffect(() => {
-    console.log(params)
-    if (exceedsCharacterThreshold(body)) {
-      setErrorMessage(
-        `Note: If any of your messages exceeds 1600 characters, they won't be sent. 
-        Consider shortening your message to avoid errors during sending.` as any
-      )
-    }
-  }, [body, params])
 
   // Poll csv status
   useEffect(() => {
