@@ -22,8 +22,9 @@ export async function saveTemplate(
   }
 }
 
-export async function validateNewCredentials({
+export async function validateAndStoreNewCredentials({
   campaignId,
+  label,
   accountSid,
   apiKey,
   apiSecret,
@@ -31,6 +32,7 @@ export async function validateNewCredentials({
   recipient,
 }: {
   campaignId: number
+  label: string
   recipient: string
   accountSid: string
   apiKey: string
@@ -39,6 +41,7 @@ export async function validateNewCredentials({
 }): Promise<void> {
   try {
     await axios.post(`/campaign/${campaignId}/sms/new-credentials`, {
+      label,
       recipient,
       twilio_account_sid: accountSid,
       twilio_api_key: apiKey,
