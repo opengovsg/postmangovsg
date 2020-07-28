@@ -260,7 +260,7 @@ if (config.get('env') === 'development') {
 
 if (config.get('env') === 'staging') {
   config.load({
-    frontendUrl: 'https://staging.postman.gov.sg/p',
+    frontendUrl: 'https://staging.postman.gov.sg',
   })
 }
 
