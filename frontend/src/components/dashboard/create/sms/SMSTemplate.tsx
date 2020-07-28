@@ -21,10 +21,10 @@ const SMSTemplate = ({
       setErrorMsg(
         (
           <span>
-            Seems like you have more than 1000 characters in your template. If
-            your message exceeds the total 1600 characters (including keywords),
-            then they won&apos;t be sent. Consider making your message short and
-            sweet to make it easier to read on a mobile device.
+            Your template has more than 1000 characters. Messages which are
+            longer than <b>1600</b> characters (including keywords) can&apos;t
+            be sent. Consider making your message short and sweet to make it
+            easier to read on a mobile device.
           </span>
         ) as any
       )
