@@ -24,6 +24,4 @@ const handler = async (): Promise<{ statusCode: number }> => {
   }
 }
 
-handler()
-
 export { handler }
