@@ -68,7 +68,7 @@ export const sendEmailAndUpdateUnsubscribers = async ({
   })
 
   const campaignIds = unsubscribeList.map(({ id }) => id)
-  updateUnsubscribers(campaignIds)
+  await updateUnsubscribers(campaignIds)
 }
 
 /**
@@ -78,14 +78,14 @@ export const sendEmailAndUpdateUnsubscribers = async ({
 const updateUnsubscribers = async (
   campaignIds: Array<number>
 ): Promise<void> => {
-  logger.log(
-    `Update sent_at for campaigns ${campaignIds} in unsubscribers table`
-  )
   await sequelize?.query(
     `UPDATE unsubscribers SET sent_at = now() WHERE sent_at IS NULL AND campaign_id IN(:campaignIds);`,
     {
       replacements: { campaignIds },
       type: QueryTypes.UPDATE,
     }
+  )
+  logger.log(
+    `Updated sent_at for campaigns ${campaignIds} in unsubscribers table`
   )
 }
