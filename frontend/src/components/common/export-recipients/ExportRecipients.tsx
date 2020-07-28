@@ -3,23 +3,30 @@ import cx from 'classnames'
 import download from 'downloadjs'
 
 import { Status } from 'classes/Campaign'
-import { exportCampaignStats } from 'services/campaign.service'
+import {
+  exportCampaignStats,
+  CampaignExportStatus,
+} from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
 import moment from 'moment'
 
 const ExportRecipients = ({
-  className,
   campaignId,
   campaignName,
   sentAt,
+  exportStatus,
+  iconPosition,
 }: {
   className?: string
   campaignId: number
   campaignName: string
   status: Status
   sentAt: Date
+  exportStatus: CampaignExportStatus
+  iconPosition: 'left' | 'right'
 }) => {
   const [disabled, setDisabled] = useState(false)
+
   async function exportRecipients(
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) {
@@ -48,19 +55,66 @@ const ExportRecipients = ({
         'text/csv'
       )
     } catch (error) {
-      console.log(error)
+      console.error(error)
     } finally {
       setDisabled(false)
     }
   }
 
+  function renderTitle() {
+    switch (exportStatus) {
+      case CampaignExportStatus.Unavailable:
+        return 'The error list would be available for download after sending is complete'
+      case CampaignExportStatus.Loading:
+        return 'The error list is being generated and would be available in a few minutes'
+      case CampaignExportStatus.Ready:
+        return 'Download list of recipients with failed deliveries'
+      case CampaignExportStatus.NoError:
+        return 'There are no failed deliveries for this campaign'
+    }
+  }
+
+  function renderExportButton() {
+    if (exportStatus === CampaignExportStatus.NoError) {
+      return <span className={styles.unavailable}>No error</span>
+    }
+    if (exportStatus === CampaignExportStatus.Loading) {
+      return (
+        <>
+          <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
+          <span>Error list</span>
+        </>
+      )
+    } else {
+      const unavailableStyle = {
+        [styles.unavailable]: exportStatus === CampaignExportStatus.Unavailable,
+      }
+      return (
+        <>
+          <i
+            className={cx(styles.icon, unavailableStyle, 'bx bx-download')}
+          ></i>
+          <span className={cx(unavailableStyle)}>Error list</span>
+        </>
+      )
+    }
+  }
+
   return (
     <div
-      className={cx(className, { [styles.disabled]: disabled })}
-      onClick={(e) => !disabled && exportRecipients(e)}
+      className={cx(
+        styles.export,
+        { [styles.ready]: exportStatus === CampaignExportStatus.Ready },
+        { [styles.disabled]: disabled }
+      )}
+      onClick={(e) =>
+        !disabled &&
+        exportStatus === CampaignExportStatus.Ready &&
+        exportRecipients(e)
+      }
+      title={renderTitle()}
     >
-      <span>Export</span>
-      <i className={cx(styles.icon, 'bx bx-export')}></i>
+      <div className={styles[iconPosition]}>{renderExportButton()}</div>
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid'
 import { difference, keys } from 'lodash'
 
 import S3 from 'aws-sdk/clients/s3'
-import { Transaction } from 'sequelize/types'
+import { Transaction } from 'sequelize'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -13,6 +13,7 @@ import { jwtUtils } from '@core/utils/jwt'
 import { Campaign } from '@core/models'
 import { CsvStatusInterface } from '@core/interfaces'
 import { CSVParams } from '@core/types'
+import { StatsService, CampaignService } from '.'
 
 const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 
@@ -178,59 +179,45 @@ const checkTemplateKeysMatch = (
   templateParams: Array<string>
 ): void => {
   const csvRecord = csvContent[0]
-
   if (!isSuperSet(keys(csvRecord), templateParams)) {
     const missingKeys = difference(templateParams, keys(csvRecord))
     throw new MissingTemplateKeysError(missingKeys)
   }
 }
-
 /**
- * Checks the csv for all the necessary columns.
- * Transform the array of CSV rows into message interface
- * @param campaignId
- * @param fileContent
+ * For campaign table, the s3 meta data is updated with the uploaded file, and its validity is set to true.
+ * update statistics with new unsent count
+ * @param param.transaction
+ * @param param.campaignId
+ * @param param.key
+ * @param param.filename
  */
-const getRecordsFromCsv = (
-  campaignId: number,
-  fileContent: Array<CSVParams>,
-  templateParams: Array<string>
-): Array<MessageBulkInsertInterface> => {
-  checkTemplateKeysMatch(fileContent, templateParams)
+const uploadCompleteOnComplete = ({
+  transaction,
+  campaignId,
+  key,
+  filename,
+}: {
+  transaction: Transaction
+  campaignId: number
+  key: string
+  filename: string
+}): ((numRecords: number) => Promise<void>) => {
+  return async (numRecords: number): Promise<void> => {
+    try {
+      // Updates metadata in project
+      await replaceCampaignS3Metadata(campaignId, key, filename, transaction)
 
-  return fileContent.map((entry) => {
-    return {
-      campaignId,
-      recipient: entry['recipient'],
-      params: entry,
+      await StatsService.setNumRecipients(campaignId, numRecords, transaction)
+
+      // Set campaign to valid
+      await CampaignService.setValid(campaignId, transaction)
+      transaction?.commit()
+    } catch (err) {
+      transaction?.rollback()
+      throw err
     }
-  })
-}
-
-/**
- * Checks the csv for all the necessary columns.
- * Transform the array of CSV rows into message interface
- * @param campaignId
- * @param fileContent
- */
-const getProtectedRecordsFromCsv = (
-  campaignId: number,
-  fileContent: Array<CSVParams>
-): Array<ProtectedMessageRecordInterface> => {
-  const PROTECTED_CSV_HEADERS = ['recipient', 'payload', 'passwordhash', 'id']
-
-  checkTemplateKeysMatch(fileContent, PROTECTED_CSV_HEADERS)
-
-  return fileContent.map((entry) => {
-    const { recipient, payload, passwordhash, id } = entry
-    return {
-      campaignId,
-      id,
-      recipient,
-      payload,
-      passwordHash: passwordhash,
-    }
-  })
+  }
 }
 
 export const UploadService = {
@@ -238,11 +225,11 @@ export const UploadService = {
   getUploadParameters,
   extractParamsFromJwt,
   /**** Handle S3Key in DB *****/
-  replaceCampaignS3Metadata,
   storeS3TempFilename,
   storeS3Error,
   deleteS3TempKeys,
   getCsvStatus,
-  getRecordsFromCsv,
-  getProtectedRecordsFromCsv,
+  checkTemplateKeysMatch,
+  /** Shared uploadComplete function */
+  uploadCompleteOnComplete,
 }

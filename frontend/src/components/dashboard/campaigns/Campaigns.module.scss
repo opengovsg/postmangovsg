@@ -41,18 +41,6 @@
   }
 }
 
-.exportRecipients {
-  > span {
-    display: none;
-  }
-  > i {
-    color: $indigo-blue;
-    &:hover {
-      color: lighten($indigo-blue, 10%);
-    }
-  }
-}
-
 .iconContainer {
   position: relative;
 }

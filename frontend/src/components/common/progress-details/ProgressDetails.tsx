@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
-import { hasFailedRecipients } from 'services/campaign.service'
+import {
+  getExportStatus,
+  CampaignExportStatus,
+} from 'services/campaign.service'
 import { CampaignStats, Status } from 'classes/Campaign'
 import {
   ProgressBar,
@@ -33,7 +36,7 @@ const ProgressDetails = ({
   const { status, error, unsent, sent, invalid, updatedAt, halted } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
-  const [displayExportButton, setDisplayExportButton] = useState(false)
+  const [exportStatus, setExportStatus] = useState(CampaignExportStatus.Loading)
   const [isHalted, setIsHalted] = useState(!!halted)
 
   useEffect(() => {
@@ -45,16 +48,11 @@ const ProgressDetails = ({
   useEffect(() => {
     async function checkHasExportButton() {
       const failedCount = error + invalid
-      const displayExportButton = await hasFailedRecipients(
-        campaignId,
-        status,
-        updatedAt,
-        failedCount
-      )
-      setDisplayExportButton(displayExportButton)
+      const exportStatus = getExportStatus(status, updatedAt, failedCount)
+      setExportStatus(exportStatus)
     }
     checkHasExportButton()
-  }, [status, updatedAt, campaignId, error, invalid])
+  }, [status, updatedAt, error, invalid])
 
   function renderButton() {
     if (isHalted) {
@@ -122,7 +120,7 @@ const ProgressDetails = ({
             </td>
 
             <td className={'md'}>{numRecipients}</td>
-            <td className={cx(styles.campaignStatus, 'sm')}>{status}</td>
+            <td className={'sm'}>{status}</td>
           </tr>
         </tbody>
       </table>
@@ -137,14 +135,25 @@ const ProgressDetails = ({
         isComplete={isComplete}
       />
 
-      {displayExportButton && (
+      {exportStatus && (
         <div className={styles.actionButton}>
-          <ActionButton>
+          <ActionButton
+            disabled={
+              exportStatus === CampaignExportStatus.NoError ||
+              exportStatus === CampaignExportStatus.Unavailable
+            }
+            className={cx({
+              [styles.disableActiveState]:
+                exportStatus === CampaignExportStatus.Loading,
+            })}
+          >
             <ExportRecipients
+              iconPosition="right"
               campaignId={campaignId}
               campaignName={campaignName}
               status={status}
               sentAt={sentAt}
+              exportStatus={exportStatus}
             />
           </ActionButton>
         </div>

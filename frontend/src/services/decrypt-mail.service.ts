@@ -1,19 +1,27 @@
 import axios, { AxiosError } from 'axios'
+
+import { hydrateTemplate } from './validate-csv.service'
 import { decryptData, hashPassword } from './crypto.service'
 
 /**
  * This function should hash the password with salt in url
  * Use messageId and hashpassword to fetch encrypted message
  * Then decrypt with password
+ * Decrypted html is sanitized again in case it was bypassed during encryption
  * @param id
  * @param password
  * @param salt
  */
-export async function fetchMessage(id: string, password: string, salt = id) {
+export async function fetchMessage(
+  id: string,
+  password: string,
+  salt = id
+): Promise<string> {
   const passwordHash = await hashPassword(password, salt)
-  const encryptedData = await getEncryptedPayload(id, passwordHash)
-  const decryptedData = await decryptData(encryptedData, password, salt)
-  return decryptedData
+  const { payload } = await getEncryptedPayload(id, passwordHash)
+  const decryptedData = await decryptData(payload, password, salt)
+  const santizedHtml = hydrateTemplate(decryptedData, {})
+  return santizedHtml
 }
 
 /**
@@ -24,12 +32,12 @@ export async function fetchMessage(id: string, password: string, salt = id) {
 async function getEncryptedPayload(
   id: string,
   passwordHash: string
-): Promise<string> {
+): Promise<{ payload: string }> {
   try {
     const response = await axios.post(`/protect/${id}`, {
       password_hash: passwordHash,
     })
-    return response.data.payload
+    return response.data
   } catch (e) {
     errorHandler(e, 'Please try again later.')
   }

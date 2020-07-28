@@ -7,7 +7,12 @@ import {
   validateNewCredentials,
   getStoredCredentials,
 } from 'services/sms.service'
-import { PrimaryButton, ErrorBlock, Dropdown } from 'components/common'
+import {
+  PrimaryButton,
+  NextButton,
+  ErrorBlock,
+  Dropdown,
+} from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
   TwilioCredentials,
@@ -155,11 +160,7 @@ const SMSCredentials = ({
 
           <div className="separator"></div>
 
-          <div className="progress-button">
-            <PrimaryButton disabled={!hasCredential} onClick={onNext}>
-              Send messages →
-            </PrimaryButton>
-          </div>
+          <NextButton disabled={!hasCredential} onClick={onNext} />
         </>
       ) : (
         <>{renderCredentialFields()}</>

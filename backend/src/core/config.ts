@@ -155,6 +155,11 @@ const config = convict({
     default: 'https://postman.gov.sg/p', // prod only
     env: 'PROTECTED_URL',
   },
+  unsubscribeUrl: {
+    doc: 'Url domain and path for unsubscribe page',
+    default: 'https://postman.gov.sg/unsubscribe', // prod only
+    env: 'UNSUBSCRIBE_URL',
+  },
   session: {
     cookieName: {
       doc: 'Identifier for the cookie',
@@ -395,6 +400,7 @@ switch (config.get('env')) {
     config.load({
       frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
       protectedUrl: 'https://staging.postman.gov.sg/p',
+      unsubscribeUrl: 'https://staging.postman.gov.sg/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
@@ -416,6 +422,7 @@ switch (config.get('env')) {
     config.load({
       frontendUrl: 'http://localhost:3000',
       protectedUrl: 'http://localhost:3000/p',
+      unsubscribeUrl: 'http://localhost:3000/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-testing',

@@ -52,6 +52,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       async function (error) {
         if (error.response && error.response.status === 401) {
           await logout()
+          setAuthenticated(false)
         }
         return Promise.reject(error)
       }

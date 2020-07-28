@@ -6,11 +6,18 @@ export class RecipientColumnMissing extends Error {
   }
 }
 
-export class UnexpectedDoubleQuoteError extends Error {
+export class UserError extends Error {
+  constructor(name: string, message: string) {
+    super(message)
+    this.name = name
+    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
+    Error.captureStackTrace(this)
+  }
+}
+
+export class CSVNotFoundError extends Error {
   constructor() {
-    super(
-      `Double quote is misused, it should only use to quote a field.\nCorrect :"Hi how are you?" \nIncorrect : 40"N`
-    )
+    super(`File could not be loaded. Try re-uploading your file.`)
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
     Error.captureStackTrace(this)
   }

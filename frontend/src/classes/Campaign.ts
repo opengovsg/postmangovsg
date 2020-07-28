@@ -5,10 +5,10 @@ export enum ChannelType {
 }
 
 export enum Status {
-  Draft = 'draft',
-  Sending = 'sending',
-  Sent = 'sent',
-  Halted = 'halted',
+  Draft = 'Draft',
+  Sending = 'Sending',
+  Sent = 'Sent',
+  Halted = 'Halted',
 }
 
 export const channelIcons = {
@@ -27,6 +27,7 @@ export class Campaign {
   isCsvProcessing: boolean
   statusUpdatedAt: Date
   protect: boolean
+  hasFailedRecipients: boolean
 
   constructor(input: any) {
     this.id = input['id']
@@ -40,6 +41,7 @@ export class Campaign {
     this.sentAt = input['sentAt']
     this.statusUpdatedAt = input['statusUpdatedAt']
     this.protect = input['protect']
+    this.hasFailedRecipients = this.getFailedRecipients(input['statistic'])
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {
@@ -56,6 +58,10 @@ export class Campaign {
       }
     }
     return Status.Draft
+  }
+
+  getFailedRecipients(statistic: { has_failed_recipients: boolean }): boolean {
+    return statistic && statistic.has_failed_recipients
   }
 }
 

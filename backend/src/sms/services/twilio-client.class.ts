@@ -1,5 +1,4 @@
 import twilio from 'twilio'
-import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
 
 export default class TwilioClient {
@@ -15,7 +14,7 @@ export default class TwilioClient {
   public send(recipient: string, message: string): Promise<string | void> {
     return this.client.messages
       .create({
-        to: this.addDefaultCountryCode(recipient),
+        to: recipient,
         body: this.replaceNewLines(message),
         from: this.messagingServiceSid,
       })
@@ -31,17 +30,6 @@ export default class TwilioClient {
           return Promise.reject(new Error(`${status};Unknown error`))
         }
       })
-  }
-
-  /**
-   * Add a default country code if the recipient does not contain one
-   * @param recipient
-   */
-  private addDefaultCountryCode(recipient: string): string {
-    if (!recipient.startsWith('+') && config.get('defaultCountryCode')) {
-      return `+${config.get('defaultCountryCode')}${recipient}`
-    }
-    return recipient
   }
 
   /**

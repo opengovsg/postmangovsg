@@ -48,6 +48,7 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
 
   return (
     <button
+      type="button"
       className={cx(
         styles.button,
         { [styles.alignRight]: alignRight },
