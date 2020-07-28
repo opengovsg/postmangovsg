@@ -8,20 +8,6 @@ env:
     REACT_APP_SENTRY_DSN: "https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024"
     REACT_APP_TITLE: "Postman.gov.sg"
     REACT_APP_DESCRIPTION: "Postman.gov.sg enables public officers to send templated messages to many recipients"
-    REACT_APP_LOGIN_EMAIL_TEXT: "Sign in with your .gov.sg email"
-    REACT_APP_LOGIN_EMAIL_PLACEHOLDER: "e.g. postman@agency.gov.sg"
-    REACT_APP_GUIDE_URL: "https://guide.postman.gov.sg"
-    REACT_APP_GUIDE_SMS_CREDENTIALS_URL: "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
-    REACT_APP_GUIDE_SMS_ACCOUNT_SID_URL: 'https://guide.postman.gov.sg/guide/quick-start/sms#step-1-account-sid-and-auth-token'
-    REACT_APP_GUIDE_SMS_API_KEY_URL: 'https://guide.postman.gov.sg/guide/quick-start/sms#step-2-set-up-a-standard-api-key'
-    REACT_APP_GUIDE_SMS_MESSAGING_SERVICE_URL: 'https://guide.postman.gov.sg/guide/quick-start/sms#step-3-set-up-your-messaging-service'
-    REACT_APP_GUIDE_TELEGRAM_CREDENTIALS_URL: "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
-    REACT_APP_GUIDE_POWER_USER_URL: "https://guide.postman.gov.sg/guide/power-users"
-    REACT_APP_CONTACT_US_URL: "https://go.gov.sg/postman-contact-us"
-    REACT_APP_CONTRIBUTE_URL: "https://github.com/opengovsg/postmangovsg"
-    REACT_APP_TC_URL: "https://guide.postman.gov.sg/legal/t-and-c"
-    REACT_APP_PRIVACY_URL: "https://guide.postman.gov.sg/legal/privacy"
-    REACT_APP_REPORT_BUG_URL: "https://guide.postman.gov.sg/contact-us"
 frontend:
   phases:
     preBuild:
