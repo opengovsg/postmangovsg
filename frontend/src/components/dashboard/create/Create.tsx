@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -24,6 +24,9 @@ const Create = () => {
 
   const [campaign, setCampaign] = useState(new Campaign({}))
   const [isLoading, setLoading] = useState(true)
+  const finishLaterCallbackRef: React.MutableRefObject<
+    (() => Promise<void>) | undefined
+  > = useRef()
 
   async function loadProject(id: string) {
     const campaign = await getCampaignDetails(+id)
@@ -50,6 +53,7 @@ const Create = () => {
           <EmailCreate
             campaign={campaign as EmailCampaign}
             onCampaignChange={setCampaign}
+            finishLaterCallbackRef={finishLaterCallbackRef}
           />
         )
       case ChannelType.Telegram:
@@ -70,12 +74,20 @@ const Create = () => {
         <>
           <TitleBar title={campaign.name}>
             <PrimaryButton
-              onClick={() => {
+              onClick={async () => {
                 if (campaign.status === Status.Draft) {
                   sendUserEvent(
                     GA_USER_EVENTS.FINISH_CAMPAIGN_LATER,
                     campaign.type
                   )
+
+                  if (finishLaterCallbackRef.current) {
+                    try {
+                      await finishLaterCallbackRef.current()
+                    } catch (err) {
+                      return // Short-circuit to prevent navigation
+                    }
+                  }
                 }
                 history.push('/campaigns')
               }}
