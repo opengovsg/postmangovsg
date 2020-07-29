@@ -204,19 +204,14 @@ const uploadCompleteOnComplete = ({
   filename: string
 }): ((numRecords: number) => Promise<void>) => {
   return async (numRecords: number): Promise<void> => {
-    try {
-      // Updates metadata in project
-      await replaceCampaignS3Metadata(campaignId, key, filename, transaction)
+    // Updates metadata in project
+    await replaceCampaignS3Metadata(campaignId, key, filename, transaction)
 
-      await StatsService.setNumRecipients(campaignId, numRecords, transaction)
+    await StatsService.setNumRecipients(campaignId, numRecords, transaction)
 
-      // Set campaign to valid
-      await CampaignService.setValid(campaignId, transaction)
-      transaction?.commit()
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+    // Set campaign to valid
+    await CampaignService.setValid(campaignId, transaction)
+    transaction?.commit()
   }
 }
 

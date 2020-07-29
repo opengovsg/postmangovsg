@@ -117,11 +117,13 @@ const uploadCompleteHandler = async (
 
     try {
       // Continue processing
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const transaction = await Campaign.sequelize!.transaction()
+
       // - download from s3
       const s3Client = new S3Client()
       await retry(async (bail) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const transaction = await Campaign.sequelize!.transaction()
+
         const downloadStream = s3Client.download(s3Key)
         const params = {
           transaction,
@@ -139,6 +141,7 @@ const uploadCompleteHandler = async (
             filename,
           })
         ).catch((e) => {
+          transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
@@ -261,11 +264,12 @@ const uploadProtectedCompleteHandler = async (
 
     // Slow bulk insert
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const transaction = await Campaign.sequelize!.transaction()
       //Download from s3
       const s3Client = new S3Client()
       await retry(async (bail) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const transaction = await Campaign.sequelize!.transaction()
+
         const downloadStream = s3Client.download(s3Key)
         const params = {
           transaction,
@@ -283,6 +287,7 @@ const uploadProtectedCompleteHandler = async (
             filename,
           })
         ).catch((e) => {
+          transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
