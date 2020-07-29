@@ -60,6 +60,7 @@ const storeUserCredential = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { label } = req.body
+  const { campaignId } = req.params
   const userId = req.session?.user?.id
   const { credentialName, channelType } = res.locals
   try {
@@ -72,7 +73,12 @@ const storeUserCredential = async (
       credentialName,
       +userId
     )
-    return res.json({ message: 'OK' })
+    // If campaignId exists, associate campaign with this credential
+    if (campaignId) {
+      next()
+    } else {
+      return res.json({ message: 'OK' })
+    }
   } catch (e) {
     next(e)
   }
