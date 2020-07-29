@@ -88,6 +88,7 @@ jobs:
       install:
         - npm install
       script:
+        - npm run compile
         - npm run lint-no-fix
         - CI=false npm run build
     - name: serverless

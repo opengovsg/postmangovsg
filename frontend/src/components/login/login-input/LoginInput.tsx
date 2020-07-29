@@ -16,13 +16,9 @@ import {
   sendUserEvent,
   sendException,
 } from 'services/ga.service'
-
-const emailText = 'Sign in with your gov.sg email'
-const otpText = 'One-Time Password'
-const emailButtonText = ['Get OTP', 'Sending OTP...']
-const otpButtonText = ['Sign In', 'Verifying OTP...']
-const emailPlaceholder = 'e.g. postman@agency.gov.sg'
-const otpPlaceholder = 'Enter OTP'
+import { i18n } from 'locales'
+import { t } from '@lingui/macro'
+import { Trans } from '@lingui/macro'
 
 const RESEND_WAIT_TIME = 30000
 
@@ -81,64 +77,53 @@ const Login = () => {
     setIsResending(false)
   }
 
-  function render(
-    mainText: string,
-    value: string,
-    onChange: (value: string) => void,
-    onClick: () => Promise<void>,
-    buttonText: string[],
-    placeholder: string,
-    inputType?: string
-  ) {
-    return (
-      <>
-        <h4 className={styles.text}>
-          {mainText}
-          {otpSent && (
-            <TextButton
-              className={cx(styles.resend, { [styles.disabled]: !canResend })}
-              onClick={canResend ? resend : noop}
-            >
-              {isResending ? 'Resending OTP...' : 'Resend?'}
-            </TextButton>
-          )}
-        </h4>
-        <TextInputWithButton
-          value={value}
-          type={inputType}
-          placeholder={placeholder}
-          onChange={onChange}
-          buttonDisabled={!value}
-          onClick={onClick}
-          buttonLabel={buttonText[0]}
-          loadingButtonLabel={buttonText[1]}
-        />
-        <ErrorBlock absolute={true}>{errorMsg}</ErrorBlock>
-      </>
-    )
-  }
-
   return (
     <div className={styles.container}>
-      {!otpSent
-        ? render(
-            emailText,
-            email,
-            setEmail,
-            sendOtp,
-            emailButtonText,
-            emailPlaceholder,
-            'email'
-          )
-        : render(
-            otpText,
-            otp,
-            setOtp,
-            login,
-            otpButtonText,
-            otpPlaceholder,
-            'tel'
-          )}
+      <h4 className={styles.text}>
+        {!otpSent ? (
+          <Trans>Sign in with your gov.sg email</Trans>
+        ) : (
+          <Trans>One-Time Password</Trans>
+        )}
+
+        {otpSent && (
+          <TextButton
+            className={cx(styles.resend, { [styles.disabled]: !canResend })}
+            onClick={canResend ? resend : noop}
+          >
+            {isResending ? (
+              <Trans>Resending OTP...</Trans>
+            ) : (
+              <Trans>Resend?</Trans>
+            )}
+          </TextButton>
+        )}
+      </h4>
+
+      {!otpSent ? (
+        <TextInputWithButton
+          value={email}
+          type={'email'}
+          placeholder={i18n._(t`e.g. postman@agency.gov.sg`)}
+          onChange={setEmail}
+          buttonDisabled={!email}
+          onClick={sendOtp}
+          buttonLabel={<Trans>Get OTP</Trans>}
+          loadingButtonLabel={<Trans>Sending OTP...</Trans>}
+        />
+      ) : (
+        <TextInputWithButton
+          value={otp}
+          type={'tel'}
+          placeholder={i18n._(t`Enter OTP`)}
+          onChange={setOtp}
+          buttonDisabled={!otp}
+          onClick={login}
+          buttonLabel={<Trans>Sign In</Trans>}
+          loadingButtonLabel={<Trans>Verifying OTP...</Trans>}
+        />
+      )}
+      <ErrorBlock absolute={true}>{errorMsg}</ErrorBlock>
     </div>
   )
 }

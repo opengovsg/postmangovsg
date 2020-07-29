@@ -4,15 +4,7 @@ import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 import Lottie from 'react-lottie'
 
-import {
-  GUIDE_URL,
-  CONTACT_US_URL,
-  CONTRIBUTE_URL,
-  PRIVACY_URL,
-  TC_URL,
-  REPORT_BUG_URL,
-  INFO_BANNER,
-} from 'config'
+import { LINKS, INFO_BANNER } from 'config'
 
 import Navbar from './nav-bar'
 import Banner from './banner'
@@ -38,6 +30,8 @@ import whyUse2 from 'assets/mp4/why-use-2.mp4'
 import whyUse3 from 'assets/mp4/why-use-3.mp4'
 
 import landingAnimation from 'assets/lottie/landing.json'
+
+import { i18n } from 'locales'
 
 const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 
@@ -185,8 +179,8 @@ const Landing = () => {
               </PrimaryButton>
               <OutboundLink
                 className={styles.contactUs}
-                eventLabel={CONTACT_US_URL}
-                to={CONTACT_US_URL}
+                eventLabel={i18n._(LINKS.contactUsUrl)}
+                to={i18n._(LINKS.contactUsUrl)}
                 target="_blank"
               >
                 Need help?<span>Talk to us</span>
@@ -298,8 +292,8 @@ const Landing = () => {
                 />
               </PrimaryButton>
               <OutboundLink
-                eventLabel={CONTACT_US_URL}
-                to={CONTACT_US_URL}
+                eventLabel={i18n._(LINKS.contactUsUrl)}
+                to={i18n._(LINKS.contactUsUrl)}
                 target="_blank"
               >
                 Contact us
@@ -327,15 +321,15 @@ const Landing = () => {
                 </span>
               </div>
               <OutboundLink
-                eventLabel={GUIDE_URL}
-                to={GUIDE_URL}
+                eventLabel={i18n._(LINKS.guideUrl)}
+                to={i18n._(LINKS.guideUrl)}
                 target="_blank"
               >
                 Guide
               </OutboundLink>
               <OutboundLink
-                eventLabel={CONTRIBUTE_URL}
-                to={CONTRIBUTE_URL}
+                eventLabel={i18n._(LINKS.contributeUrl)}
+                to={i18n._(LINKS.contributeUrl)}
                 target="_blank"
               >
                 Contribute
@@ -352,18 +346,22 @@ const Landing = () => {
             <div className={styles.links}>
               <OutboundLink
                 className={styles.navLink}
-                eventLabel={PRIVACY_URL}
-                to={PRIVACY_URL}
+                eventLabel={i18n._(LINKS.privacyUrl)}
+                to={i18n._(LINKS.privacyUrl)}
                 target="_blank"
               >
                 Privacy
               </OutboundLink>
-              <OutboundLink eventLabel={TC_URL} to={TC_URL} target="_blank">
+              <OutboundLink
+                eventLabel={i18n._(LINKS.tncUrl)}
+                to={i18n._(LINKS.tncUrl)}
+                target="_blank"
+              >
                 Terms of Use
               </OutboundLink>
               <OutboundLink
-                eventLabel={REPORT_BUG_URL}
-                to={REPORT_BUG_URL}
+                eventLabel={i18n._(LINKS.reportBugUrl)}
+                to={i18n._(LINKS.reportBugUrl)}
                 target="_blank"
               >
                 Report Vulnerability
