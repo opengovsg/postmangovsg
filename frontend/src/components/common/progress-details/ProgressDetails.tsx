@@ -39,7 +39,9 @@ const ProgressDetails = ({
   const { status, error, unsent, sent, invalid, updatedAt, halted } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
-  const [exportStatus, setExportStatus] = useState(CampaignExportStatus.Loading)
+  const [exportStatus, setExportStatus] = useState(
+    CampaignExportStatus.Unavailable
+  )
   const [isHalted, setIsHalted] = useState(!!halted)
 
   useEffect(() => {
@@ -49,12 +51,22 @@ const ProgressDetails = ({
   }, [status, error, unsent, halted])
 
   useEffect(() => {
-    async function checkHasExportButton() {
+    let timeoutId: NodeJS.Timeout
+
+    function checkHasExportButton() {
       const failedCount = error + invalid
       const exportStatus = getExportStatus(status, updatedAt, failedCount)
       setExportStatus(exportStatus)
+      // keep polling until export status has reached finalised status (Ready or No Error)
+      if (exportStatus === CampaignExportStatus.Loading) {
+        timeoutId = setTimeout(checkHasExportButton, 2000)
+      }
     }
+
     checkHasExportButton()
+    return () => {
+      timeoutId && clearTimeout(timeoutId)
+    }
   }, [status, updatedAt, error, invalid])
 
   function renderButton() {
