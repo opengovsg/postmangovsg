@@ -25,6 +25,7 @@ axios.defaults.timeout = 100000 // 100 sec
 //#region Set up translations
 export const LINKS = {
   guideUrl: t('link.guideUrl')``,
+  guideEmailPasswordProtectedUrl: t('link.guideEmailPasswordProtectedUrl')``,
   guideSmsUrl: t('link.guideSmsUrl')``,
   guideSmsAccountSidUrl: t('link.guideSmsAccountSidUrl')``,
   guideSmsApiKeyUrl: t('link.guideSmsApiKeyUrl')``,

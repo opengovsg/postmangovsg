@@ -164,8 +164,8 @@ const CreateModal = ({
                   {/* TODO: change url to passsword protected section in guide */}
                   <OutboundLink
                     className={styles.link}
-                    eventLabel={i18n._(LINKS.guideUrl)}
-                    to={i18n._(LINKS.guideUrl)}
+                    eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
                     target="_blank"
                   >
                     Learn more
