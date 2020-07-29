@@ -43,6 +43,17 @@ jobs:
           bucket_name: "postmangovsg-elasticbeanstalk-appversion"
           on:
             branch: $PRODUCTION_BRANCH
+        - provider: elasticbeanstalk
+          edge: true
+          skip_cleanup: true
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_DEFAULT_REGION
+          app: "postmangovsg"
+          env: "postmangovsg-production-02"
+          bucket_name: "postmangovsg-elasticbeanstalk-appversion"
+          on:
+            branch: $PRODUCTION_02_BRANCH
     - name: worker
       before_install:
         - cd worker
@@ -64,6 +75,12 @@ jobs:
           script: ./deploy.sh postmangovsg-workers prod-sending prod-logging
           on:
             branch: $PRODUCTION_BRANCH
+            condition: "$DEPLOY_WORKER = true"
+        - provider: script
+          skip_cleanup: true
+          script: ./deploy.sh postmangovsg-workers prod-sending-02 prod-logging-02
+          on:
+            branch: $PRODUCTION_02_BRANCH
             condition: "$DEPLOY_WORKER = true"
     - name: frontend
       before_install:
@@ -163,6 +180,25 @@ jobs:
             branch: $PRODUCTION_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_EMAIL_DB_URI
+            - MIN_HALT_NUMBER=$PRODUCTION_EMAIL_MIN_HALT_NUMBER
+            - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
+            - SENDGRID_PUBLIC_KEY=$PRODUCTION_EMAIL_SENDGRID_PUBLIC_KEY
+            - CALLBACK_SECRET=$PRODUCTION_EMAIL_CALLBACK_SECRET
+        - provider: lambda
+          edge: true
+          function_name: log-email-callback-production-02
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_CALLBACK_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 30
+          publish: true
+          zip: "../log-email-sns/code.zip"
+          on:
+            branch: $PRODUCTION_02_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_02_EMAIL_DB_URI
             - MIN_HALT_NUMBER=$PRODUCTION_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
             - SENDGRID_PUBLIC_KEY=$PRODUCTION_EMAIL_SENDGRID_PUBLIC_KEY
