@@ -679,6 +679,36 @@ router.get('/stats', TelegramStatsMiddleware.getStats)
 /**
  * @swagger
  * path:
+ *  /campaign/{campaignId}/telegram/update-stats:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Get telegram campaign stats
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post('/refresh-stats', TelegramStatsMiddleware.updateAndGetStats)
+
+/**
+ * @swagger
+ * path:
  *  /campaign/{campaignId}/telegram/export:
  *    get:
  *      tags:

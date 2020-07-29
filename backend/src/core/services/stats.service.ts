@@ -28,6 +28,7 @@ const getStatsFromArchive = async (
     sent: stats?.sent,
     unsent: stats?.unsent,
     invalid: stats?.invalid,
+    updatedAt: stats?.updatedAt,
   }
 }
 
@@ -143,7 +144,8 @@ const getCurrentStats = async (
   return {
     ...archivedStats,
     status: job.status,
-    updated_at: job.updatedAt,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    updated_at: archivedStats.updatedAt!,
     halted: job.campaign.halted,
   }
 }
