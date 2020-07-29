@@ -3,7 +3,7 @@ import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
-import { TRANSTEXT } from 'config'
+import { LINKS } from 'config'
 import {
   validateStoredCredentials,
   validateNewCredentials,
@@ -166,8 +166,8 @@ const TelegramCredentials = ({
               unsure about how to retrieve your bot token, please follow the
               instructions provided&nbsp;
               <OutboundLink
-                eventLabel={i18n._(TRANSTEXT.guideTelegramUrl)}
-                to={i18n._(TRANSTEXT.guideTelegramUrl)}
+                eventLabel={i18n._(LINKS.guideTelegramUrl)}
+                to={i18n._(LINKS.guideTelegramUrl)}
                 target="_blank"
               >
                 here.

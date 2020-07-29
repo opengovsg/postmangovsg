@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 
 import LoginInput from './login-input'
-import { TRANSTEXT, INFO_BANNER } from 'config'
+import { LINKS, INFO_BANNER } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { InfoBanner } from 'components/common'
 import styles from './Login.module.scss'
@@ -47,16 +47,16 @@ const Login = () => {
           <div className={styles.linkBar}>
             <OutboundLink
               className={styles.navLink}
-              eventLabel={i18n._(TRANSTEXT.guideUrl)}
-              to={i18n._(TRANSTEXT.guideUrl)}
+              eventLabel={i18n._(LINKS.guideUrl)}
+              to={i18n._(LINKS.guideUrl)}
               target="_blank"
             >
               Guide
             </OutboundLink>
             <OutboundLink
               className={styles.navLink}
-              eventLabel={i18n._(TRANSTEXT.contactUsUrl)}
-              to={i18n._(TRANSTEXT.contactUsUrl)}
+              eventLabel={i18n._(LINKS.contactUsUrl)}
+              to={i18n._(LINKS.contactUsUrl)}
               target="_blank"
             >
               Contact Us

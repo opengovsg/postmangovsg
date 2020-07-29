@@ -13,7 +13,7 @@ import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
 
 import { i18n } from 'locales'
-import { TRANSTEXT } from 'config'
+import { LINKS } from 'config'
 
 const NavBar = () => {
   const { setAuthenticated, email } = useContext(AuthContext)
@@ -72,8 +72,8 @@ const NavBar = () => {
         </TextButton>
         <OutboundLink
           className={styles.link}
-          eventLabel={i18n._(TRANSTEXT.guideUrl)}
-          to={i18n._(TRANSTEXT.guideUrl)}
+          eventLabel={i18n._(LINKS.guideUrl)}
+          to={i18n._(LINKS.guideUrl)}
           target="_blank"
         >
           Guide

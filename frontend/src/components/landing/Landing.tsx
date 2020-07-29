@@ -4,7 +4,7 @@ import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 import Lottie from 'react-lottie'
 
-import { TRANSTEXT, INFO_BANNER } from 'config'
+import { LINKS, INFO_BANNER } from 'config'
 
 import Navbar from './nav-bar'
 import Banner from './banner'
@@ -179,8 +179,8 @@ const Landing = () => {
               </PrimaryButton>
               <OutboundLink
                 className={styles.contactUs}
-                eventLabel={i18n._(TRANSTEXT.contactUsUrl)}
-                to={i18n._(TRANSTEXT.contactUsUrl)}
+                eventLabel={i18n._(LINKS.contactUsUrl)}
+                to={i18n._(LINKS.contactUsUrl)}
                 target="_blank"
               >
                 Need help?<span>Talk to us</span>
@@ -292,8 +292,8 @@ const Landing = () => {
                 />
               </PrimaryButton>
               <OutboundLink
-                eventLabel={i18n._(TRANSTEXT.contactUsUrl)}
-                to={i18n._(TRANSTEXT.contactUsUrl)}
+                eventLabel={i18n._(LINKS.contactUsUrl)}
+                to={i18n._(LINKS.contactUsUrl)}
                 target="_blank"
               >
                 Contact us
@@ -321,15 +321,15 @@ const Landing = () => {
                 </span>
               </div>
               <OutboundLink
-                eventLabel={i18n._(TRANSTEXT.guideUrl)}
-                to={i18n._(TRANSTEXT.guideUrl)}
+                eventLabel={i18n._(LINKS.guideUrl)}
+                to={i18n._(LINKS.guideUrl)}
                 target="_blank"
               >
                 Guide
               </OutboundLink>
               <OutboundLink
-                eventLabel={i18n._(TRANSTEXT.contributeUrl)}
-                to={i18n._(TRANSTEXT.contributeUrl)}
+                eventLabel={i18n._(LINKS.contributeUrl)}
+                to={i18n._(LINKS.contributeUrl)}
                 target="_blank"
               >
                 Contribute
@@ -346,22 +346,22 @@ const Landing = () => {
             <div className={styles.links}>
               <OutboundLink
                 className={styles.navLink}
-                eventLabel={i18n._(TRANSTEXT.privacyUrl)}
-                to={i18n._(TRANSTEXT.privacyUrl)}
+                eventLabel={i18n._(LINKS.privacyUrl)}
+                to={i18n._(LINKS.privacyUrl)}
                 target="_blank"
               >
                 Privacy
               </OutboundLink>
               <OutboundLink
-                eventLabel={i18n._(TRANSTEXT.tncUrl)}
-                to={i18n._(TRANSTEXT.tncUrl)}
+                eventLabel={i18n._(LINKS.tncUrl)}
+                to={i18n._(LINKS.tncUrl)}
                 target="_blank"
               >
                 Terms of Use
               </OutboundLink>
               <OutboundLink
-                eventLabel={i18n._(TRANSTEXT.reportBugUrl)}
-                to={i18n._(TRANSTEXT.reportBugUrl)}
+                eventLabel={i18n._(LINKS.reportBugUrl)}
+                to={i18n._(LINKS.reportBugUrl)}
                 target="_blank"
               >
                 Report Vulnerability

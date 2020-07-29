@@ -23,19 +23,19 @@ axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL as string
 axios.defaults.withCredentials = true
 axios.defaults.timeout = 100000 // 100 sec
 //#region Set up translations
-export const TRANSTEXT = {
-  guideUrl: t('text.guideUrl')``,
-  guideSmsUrl: t('text.guideSmsUrl')``,
-  guideSmsAccountSidUrl: t('text.guideSmsAccountSidUrl')``,
-  guideSmsApiKeyUrl: t('text.guideSmsApiKeyUrl')``,
-  guideSmsMessagingServiceUrl: t('text.guideSmsMessagingServiceUrl')``,
-  guideTelegramUrl: t('text.guideTelegramUrl')``,
-  guidePowerUserUrl: t('text.guidePowerUserUrl')``,
-  contactUsUrl: t('text.contactUsUrl')``,
-  contributeUrl: t('text.contributeUrl')``,
-  tncUrl: t('text.tncUrl')``,
-  privacyUrl: t('text.privacyUrl')``,
-  reportBugUrl: t('text.reportBugUrl')``,
+export const LINKS = {
+  guideUrl: t('link.guideUrl')``,
+  guideSmsUrl: t('link.guideSmsUrl')``,
+  guideSmsAccountSidUrl: t('link.guideSmsAccountSidUrl')``,
+  guideSmsApiKeyUrl: t('link.guideSmsApiKeyUrl')``,
+  guideSmsMessagingServiceUrl: t('link.guideSmsMessagingServiceUrl')``,
+  guideTelegramUrl: t('link.guideTelegramUrl')``,
+  guidePowerUserUrl: t('link.guidePowerUserUrl')``,
+  contactUsUrl: t('link.contactUsUrl')``,
+  contributeUrl: t('link.contributeUrl')``,
+  tncUrl: t('link.tncUrl')``,
+  privacyUrl: t('link.privacyUrl')``,
+  reportBugUrl: t('link.reportBugUrl')``,
 }
 //#endregion
 

@@ -15,7 +15,7 @@ import {
 } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
-import { TRANSTEXT } from 'config'
+import { LINKS } from 'config'
 import { i18n } from 'locales'
 const ProgressDetails = ({
   campaignId,
@@ -61,8 +61,8 @@ const ProgressDetails = ({
         <span>
           Too many of your emails bounced.{' '}
           <OutboundLink
-            eventLabel={i18n._(TRANSTEXT.contactUsUrl)}
-            to={i18n._(TRANSTEXT.contactUsUrl)}
+            eventLabel={i18n._(LINKS.contactUsUrl)}
+            to={i18n._(LINKS.contactUsUrl)}
             target="_blank"
           >
             Contact us

@@ -21,7 +21,7 @@ import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
 
 import { i18n } from 'locales'
-import { TRANSTEXT } from 'config'
+import { LINKS } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -150,8 +150,8 @@ const Campaigns = () => {
         <h2>We are excited to have you here!</h2>
         <h5>To get you started, we have prepared a guide for your reference</h5>
         <OutboundLink
-          eventLabel={i18n._(TRANSTEXT.guideUrl)}
-          to={i18n._(TRANSTEXT.guideUrl)}
+          eventLabel={i18n._(LINKS.guideUrl)}
+          to={i18n._(LINKS.guideUrl)}
           target="_blank"
         >
           <PrimaryButton className={styles.darkBlueButton}>

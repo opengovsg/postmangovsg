@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { TRANSTEXT } from 'config'
+import { LINKS } from 'config'
 import { TextInput, LabelWithExternalLink } from 'components/common'
 import { i18n } from 'locales'
 
@@ -33,7 +33,7 @@ const TwilioCredentialsInput = ({
     <>
       <LabelWithExternalLink
         label="Account SID"
-        link={i18n._(TRANSTEXT.guideSmsAccountSidUrl)}
+        link={i18n._(LINKS.guideSmsAccountSidUrl)}
       />
       <TextInput
         placeholder="Enter Account SID"
@@ -43,7 +43,7 @@ const TwilioCredentialsInput = ({
 
       <LabelWithExternalLink
         label="API Key SID"
-        link={i18n._(TRANSTEXT.guideSmsApiKeyUrl)}
+        link={i18n._(LINKS.guideSmsApiKeyUrl)}
       />
       <TextInput
         placeholder="Enter API Key SID"
@@ -53,7 +53,7 @@ const TwilioCredentialsInput = ({
 
       <LabelWithExternalLink
         label="API Secret"
-        link={i18n._(TRANSTEXT.guideSmsApiKeyUrl)}
+        link={i18n._(LINKS.guideSmsApiKeyUrl)}
       />
       <TextInput
         placeholder="Enter API Secret"
@@ -63,7 +63,7 @@ const TwilioCredentialsInput = ({
 
       <LabelWithExternalLink
         label="Messaging Service ID"
-        link={i18n._(TRANSTEXT.guideSmsMessagingServiceUrl)}
+        link={i18n._(LINKS.guideSmsMessagingServiceUrl)}
       />
       <TextInput
         placeholder="Enter Messaging Service ID"

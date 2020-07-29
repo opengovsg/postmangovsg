@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 
-import { TRANSTEXT } from 'config'
+import { LINKS } from 'config'
 import { ChannelType, channelIcons } from 'classes'
 import {
   PrimaryButton,
@@ -271,8 +271,8 @@ const AddCredentialModal = ({
             Before you validate the credentials, the phone number you are
             testing with must be already subscribed to the bot.&nbsp;
             <OutboundLink
-              eventLabel={i18n._(TRANSTEXT.guideTelegramUrl)}
-              to={i18n._(TRANSTEXT.guideTelegramUrl)}
+              eventLabel={i18n._(LINKS.guideTelegramUrl)}
+              to={i18n._(LINKS.guideTelegramUrl)}
               target="_blank"
             >
               Learn more

@@ -3,7 +3,7 @@ import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { TRANSTEXT } from 'config'
+import { LINKS } from 'config'
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
 import { TextInput, PrimaryButton, Checkbox } from 'components/common'
 import styles from './CreateModal.module.scss'
@@ -99,8 +99,8 @@ const CreateModal = ({
                 Get your credentials ready.&nbsp;
                 <OutboundLink
                   className={styles.link}
-                  eventLabel={i18n._(TRANSTEXT.guideSmsUrl)}
-                  to={i18n._(TRANSTEXT.guideSmsUrl)}
+                  eventLabel={i18n._(LINKS.guideSmsUrl)}
+                  to={i18n._(LINKS.guideSmsUrl)}
                   target="_blank"
                 >
                   What is this?
@@ -164,8 +164,8 @@ const CreateModal = ({
                   {/* TODO: change url to passsword protected section in guide */}
                   <OutboundLink
                     className={styles.link}
-                    eventLabel={i18n._(TRANSTEXT.guideUrl)}
-                    to={i18n._(TRANSTEXT.guideUrl)}
+                    eventLabel={i18n._(LINKS.guideUrl)}
+                    to={i18n._(LINKS.guideUrl)}
                     target="_blank"
                   >
                     Learn more
