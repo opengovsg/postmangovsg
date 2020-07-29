@@ -62,6 +62,7 @@ const Create = () => {
           <TelegramCreate
             campaign={campaign as TelegramCampaign}
             onCampaignChange={setCampaign}
+            finishLaterCallbackRef={finishLaterCallbackRef}
           />
         )
       default:
