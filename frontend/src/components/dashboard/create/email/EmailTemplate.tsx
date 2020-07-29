@@ -72,12 +72,14 @@ const EmailTemplate = ({
   // Set callback for finish later button
   useEffect(() => {
     finishLaterCallbackRef.current = async () => {
-      await handleSaveTemplate(false)
+      if (subject && body) {
+        await handleSaveTemplate(false)
+      }
     }
     return () => {
       finishLaterCallbackRef.current = undefined
     }
-  }, [finishLaterCallbackRef, handleSaveTemplate])
+  }, [body, finishLaterCallbackRef, handleSaveTemplate, subject])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
