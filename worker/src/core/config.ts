@@ -32,9 +32,6 @@ const config = convict({
     default: 'production',
     env: 'NODE_ENV',
   },
-  IS_PROD: {
-    default: true,
-  },
   aws: {
     awsRegion: {
       doc: 'Region for the S3 bucket that is used to store file uploads',
@@ -215,7 +212,6 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 // Override with local config
 if (config.get('env') === 'development') {
   config.load({
-    IS_PROD: false,
     database: {
       dialectOptions: {
         ssl: {
@@ -231,7 +227,7 @@ if (config.get('env') === 'development') {
 // If the environment is a prod environment,
 // we ensure that there is only 1 worker per ecs task,
 // and required credentials are set
-if (config.get('IS_PROD')) {
+if (config.get('env') !== 'development') {
   if (
     config.get('messageWorker.numSender') +
       config.get('messageWorker.numLogger') !==

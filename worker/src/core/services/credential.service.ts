@@ -29,7 +29,7 @@ const getCredentialsFromSecretsManager = async (name: string): Promise<any> => {
 const getTwilioCredentials = async (
   name: string
 ): Promise<TwilioCredentials> => {
-  if (!config.get('IS_PROD')) {
+  if (config.get('env') === 'development') {
     logger.info(
       `Dev env - getTwilioCredentials - returning default credentials for name=${name}`
     )
@@ -41,7 +41,7 @@ const getTwilioCredentials = async (
 const getTelegramCredentials = async (
   name: string
 ): Promise<TelegramCredentials> => {
-  if (!config.get('IS_PROD')) {
+  if (config.get('env') === 'development') {
     logger.info(
       `Dev env - getTelegramCredentials - returning default credentials for name=${name}`
     )
