@@ -15,7 +15,8 @@ import {
 } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
-import { CONTACT_US_URL } from 'config'
+import { LINKS } from 'config'
+import { i18n } from 'locales'
 const ProgressDetails = ({
   campaignId,
   campaignName,
@@ -24,6 +25,7 @@ const ProgressDetails = ({
   stats,
   handlePause,
   handleRetry,
+  handleRefreshStats,
 }: {
   campaignId: number
   campaignName: string
@@ -32,6 +34,7 @@ const ProgressDetails = ({
   stats: CampaignStats
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
+  handleRefreshStats: () => Promise<void>
 }) => {
   const { status, error, unsent, sent, invalid, updatedAt, halted } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
@@ -60,8 +63,8 @@ const ProgressDetails = ({
         <span>
           Too many of your emails bounced.{' '}
           <OutboundLink
-            eventLabel={CONTACT_US_URL}
-            to={CONTACT_US_URL}
+            eventLabel={i18n._(LINKS.contactUsUrl)}
+            to={i18n._(LINKS.contactUsUrl)}
             target="_blank"
           >
             Contact us
@@ -103,6 +106,22 @@ const ProgressDetails = ({
     return <h2>{progressMessage}</h2>
   }
 
+  function renderUpdateStats() {
+    if (isSent) {
+      return (
+        <div className={styles.statsLastUpdated}>
+          <span>
+            Stats last retrieved on{' '}
+            <Moment format="LLL">{stats.updatedAt}</Moment>
+          </span>
+          <PrimaryButton onClick={handleRefreshStats}>
+            Refresh stats
+          </PrimaryButton>
+        </div>
+      )
+    }
+  }
+
   return (
     <div className={styles.progress}>
       <table>
@@ -124,7 +143,6 @@ const ProgressDetails = ({
           </tr>
         </tbody>
       </table>
-
       <div className={styles.progressTitle}>
         {renderProgressTitle()}
         {renderButton()}
@@ -158,7 +176,6 @@ const ProgressDetails = ({
           </ActionButton>
         </div>
       )}
-
       <table className={styles.stats}>
         <thead>
           <tr>
@@ -210,6 +227,7 @@ const ProgressDetails = ({
           </tr>
         </tbody>
       </table>
+      {renderUpdateStats()}
     </div>
   )
 }

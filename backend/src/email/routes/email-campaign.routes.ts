@@ -11,6 +11,7 @@ import {
   EmailStatsMiddleware,
   EmailMiddleware,
 } from '@email/middlewares'
+import config from '@core/config'
 
 const router = Router({ mergeParams: true })
 
@@ -54,7 +55,10 @@ const storeCredentialsValidator = {
 
 const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
-    rate: Joi.number().integer().positive().default(35),
+    rate: Joi.number()
+      .integer()
+      .positive()
+      .default(config.get('mailDefaultRate')),
   }),
 }
 
@@ -577,6 +581,34 @@ router.post(
  *           description: Internal Server Error
  */
 router.get('/stats', EmailStatsMiddleware.getStats)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/email/refresh-stats:
+ *    post:
+ *      tags:
+ *        - Email
+ *      summary: Get email campaign stats
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ *        "401":
+ *           description: Unauthorized
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post('/refresh-stats', EmailStatsMiddleware.updateAndGetStats)
 
 /**
  * @swagger

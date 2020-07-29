@@ -96,7 +96,7 @@ const ProtectedEmailRecipients = ({
     try {
       const uploadTimeStart = performance.now()
       await protectAndUploadCsv({
-        campaignId,
+        campaignId: +campaignId,
         file: selectedFile,
         template,
         removeEmptyLines,
