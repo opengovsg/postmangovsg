@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
-    "start": "npm run build && node -r dotenv/config build/index"
+    "dev": "npm run build && tsc-watch --onSuccess \"node -r dotenv/config build/dev\""
   },
   "repository": {
     "type": "git",
@@ -38,6 +38,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "nodemailer": "^6.4.10",
     "prettier": "^2.0.5",
+    "tsc-watch": "^4.2.9",
     "typescript": "^3.9.7"
   }
 }
