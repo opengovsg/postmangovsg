@@ -11,6 +11,7 @@ import {
   EmailStatsMiddleware,
   EmailMiddleware,
 } from '@email/middlewares'
+import config from '@core/config'
 
 const router = Router({ mergeParams: true })
 
@@ -54,7 +55,10 @@ const storeCredentialsValidator = {
 
 const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
-    rate: Joi.number().integer().positive().default(35),
+    rate: Joi.number()
+      .integer()
+      .positive()
+      .default(config.get('mailDefaultRate')),
   }),
 }
 
