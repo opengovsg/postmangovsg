@@ -1,4 +1,5 @@
 import { CampaignUnsubscribeList } from '../interface'
+import config from '../config'
 
 /**
  * Generates unsubscribe digest email body by concatenating
@@ -25,8 +26,10 @@ export const createEmailBody = (
     digest += campaignDigest(campaign)
   }
 
+  const guideUrl = config.get('guideUrl')
   const signOff = `
-    Please visit our guide if you have additional questions on the unsubscribe feature for the recipient.<br><br>
+    Please visit our <a href='${guideUrl}' target=_blank>guide</a> if you have 
+    additional questions on the unsubscribe feature for the recipient.<br><br>
     Thank you,<br>
     Postman.gov.sg
   `

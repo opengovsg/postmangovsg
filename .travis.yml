@@ -230,6 +230,7 @@ jobs:
             - SES_PASS=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_PASS
             - SES_USER=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_USER
             - SES_PORT=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_PORT
+            - UNSUBSCRIBE_GUIDE_URL=$UNSUBSCRIBE_GUIDE_URL
         - provider: lambda
           edge: true
           function_name: unsubscribe-digest-staging
@@ -251,6 +252,7 @@ jobs:
             - SES_PASS=$STAGING_UNSUBSCRIBE_DIGEST_SES_PASS
             - SES_USER=$STAGING_UNSUBSCRIBE_DIGEST_SES_USER
             - SES_PORT=$STAGING_UNSUBSCRIBE_DIGEST_SES_PORT
+            - UNSUBSCRIBE_GUIDE_URL=$UNSUBSCRIBE_GUIDE_URL
     - name: root
       install:
         - npm install --ignore-scripts

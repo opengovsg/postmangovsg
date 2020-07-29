@@ -129,6 +129,12 @@ const config = convict({
     default: '',
     env: 'SES_FROM',
   },
+  guideUrl: {
+    doc: 'URL to unsubscribe guide',
+    default: '',
+    env: 'UNSUBSCRIBE_GUIDE_URL',
+    format: 'required-string',
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
