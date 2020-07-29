@@ -46,6 +46,7 @@ const Create = () => {
           <SMSCreate
             campaign={campaign as SMSCampaign}
             onCampaignChange={setCampaign}
+            finishLaterCallbackRef={finishLaterCallbackRef}
           />
         )
       case ChannelType.Email:
