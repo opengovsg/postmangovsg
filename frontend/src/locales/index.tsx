@@ -2,10 +2,9 @@ import { setupI18n } from '@lingui/core'
 import { Catalogs, I18n } from '@lingui/core/i18n'
 
 /**
- * To create a new language or translation:
- * Copy the `en` folder, and rename it to eg. `en-custom`.
- * Then import it and setup i18n.
- * Run `npm run extract && npm run compile`.
+ * To create a new language or translation, for example, `en-custom`:
+ * `npm run add-locale en-custom`
+ * then import it here
  *  */
 
 import catalogEn from './en/messages.js'
