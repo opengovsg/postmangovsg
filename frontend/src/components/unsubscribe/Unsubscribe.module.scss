@@ -35,3 +35,14 @@
     text-align: center;
   }
 }
+
+.options {
+  @include mobile() {
+    display: flex;
+    flex-direction: column;
+
+    button {
+      margin-top: 0.5rem;
+    }
+  }
+}

@@ -78,7 +78,7 @@ const Unsubscribe = () => {
             We will inform the agency that sent you this campaign about your
             wish to unsubscribe. You will be removed from their mailing list.
           </p>
-          <div>
+          <div className={styles.options}>
             <PrimaryButton
               onClick={() => {
                 setStaying(true)
