@@ -103,7 +103,7 @@ const SMSCredentials = ({
         {isManual ? (
           <>
             <h2>Insert your Twilio credentials</h2>
-            <CredLabelInput value={label} onChange={setLabel}></CredLabelInput>
+            <CredLabelInput value={label} onChange={setLabel} />
             <TwilioCredentialsInput
               onFilled={setCreds}
             ></TwilioCredentialsInput>

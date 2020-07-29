@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
+  SettingsMiddleware,
   CampaignMiddleware,
   UploadMiddleware,
   JobMiddleware,
@@ -34,6 +35,11 @@ const uploadCompleteValidator = {
 }
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
+    label: Joi.string()
+      .min(1)
+      .max(50)
+      .pattern(/^[a-z0-9-]+$/)
+      .required(),
     telegram_bot_token: Joi.string().trim().required(),
   }),
 }
@@ -430,8 +436,10 @@ router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
+  SettingsMiddleware.checkUserCredentialLabel,
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
+  SettingsMiddleware.storeUserCredential,
   TelegramMiddleware.setCampaignCredential
 )
 
