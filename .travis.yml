@@ -217,7 +217,8 @@ jobs:
           runtime: nodejs12.x
           module_name: build/index
           handler_name: handler
-          timeout: 30
+          timeout: 600
+          memory_size: 256
           publish: true
           zip: "../unsubscribe-digest/code.zip"
           on:
@@ -239,7 +240,8 @@ jobs:
           runtime: nodejs12.x
           module_name: build/index
           handler_name: handler
-          timeout: 30
+          timeout: 600
+          memory_size: 256
           publish: true
           zip: "../unsubscribe-digest/code.zip"
           on:
