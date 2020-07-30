@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import querystring from 'querystring'
+import { Trans } from '@lingui/macro'
 
 import { ErrorBlock, PrimaryButton, TextButton } from 'components/common'
 
@@ -86,10 +87,10 @@ const Unsubscribe = () => {
               }}
               loadingPlaceholder="Processing"
             >
-              I&#39;d rather stay
+              <Trans>I&#39;d rather stay</Trans>
             </PrimaryButton>
             <TextButton minButtonWidth onClick={onConfirmation}>
-              Unsubscribe me
+              <Trans>Unsubscribe me</Trans>
             </TextButton>
           </div>
         </>
