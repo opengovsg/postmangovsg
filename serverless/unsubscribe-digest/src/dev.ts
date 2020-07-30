@@ -10,8 +10,12 @@ const prompt = () => {
   rl.question(
     '\nPress [ENTER] to send unsub digest (ctrl-c twice to quit): ',
     async () => {
-      await handler()
-      console.log('Completed')
+      try {
+        await handler()
+        console.log('Completed')
+      } catch (err) {
+        console.log('Sending failed')
+      }
       prompt()
     }
   )

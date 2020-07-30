@@ -17,6 +17,8 @@ const handler = async (): Promise<{ statusCode: number }> => {
     }
   } catch (err) {
     console.error(err)
+    // Rethrow error so that Lambda will recognize this as a failed invocation
+    throw err
   }
 
   return {
