@@ -175,16 +175,12 @@ const uploadCompleteOnPreview = ({
       template.body as string,
       template.subject as string
     )
-    try {
-      // delete message_logs entries
-      await EmailMessage.destroy({
-        where: { campaignId },
-        transaction,
-      })
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+
+    // delete message_logs entries
+    await EmailMessage.destroy({
+      where: { campaignId },
+      transaction,
+    })
   }
 }
 const uploadCompleteOnChunk = ({
@@ -195,28 +191,23 @@ const uploadCompleteOnChunk = ({
   campaignId: number
 }): ((data: CSVParams[]) => Promise<void>) => {
   return async (data: CSVParams[]): Promise<void> => {
-    try {
-      const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
-        return {
-          campaignId,
-          recipient: entry['recipient'],
-          params: entry,
+    const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+      return {
+        campaignId,
+        recipient: entry['recipient'],
+        params: entry,
+      }
+    })
+    // START populate template
+    await EmailMessage.bulkCreate(records, {
+      transaction,
+      logging: (_message, benchmark) => {
+        if (benchmark) {
+          logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
         }
-      })
-      // START populate template
-      await EmailMessage.bulkCreate(records, {
-        transaction,
-        logging: (_message, benchmark) => {
-          if (benchmark) {
-            logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
-          }
-        },
-        benchmark: true,
-      })
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+      },
+      benchmark: true,
+    })
   }
 }
 
@@ -239,18 +230,18 @@ const uploadProtectedCompleteOnPreview = ({
       template.body as string,
       template.subject as string
     )
-    try {
-      // Delete existing rows
-      await ProtectedMessage.destroy({
-        where: {
-          campaignId,
-        },
+    await Promise.all([
+      // Delete existing protected messages
+      ProtectedMessage.destroy({
+        where: { campaignId },
         transaction,
-      })
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+      }),
+      // Delete existing email messages
+      EmailMessage.destroy({
+        where: { campaignId },
+        transaction,
+      }),
+    ])
   }
 }
 const uploadProtectedCompleteOnChunk = ({
@@ -261,27 +252,22 @@ const uploadProtectedCompleteOnChunk = ({
   campaignId: number
 }): ((data: CSVParams[]) => Promise<void>) => {
   return async (data: CSVParams[]): Promise<void> => {
-    try {
-      const messages = await ProtectedService.storeProtectedMessages({
-        transaction,
-        campaignId,
-        data,
-      })
-      await EmailMessage.bulkCreate(messages, {
-        transaction,
-        logging: (_message, benchmark) => {
-          if (benchmark) {
-            logger.info(
-              `uploadProtectedCompleteOnChunk - EmailMessage: ElapsedTime ${benchmark} ms`
-            )
-          }
-        },
-        benchmark: true,
-      })
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+    const messages = await ProtectedService.storeProtectedMessages({
+      transaction,
+      campaignId,
+      data,
+    })
+    await EmailMessage.bulkCreate(messages, {
+      transaction,
+      logging: (_message, benchmark) => {
+        if (benchmark) {
+          logger.info(
+            `uploadProtectedCompleteOnChunk - EmailMessage: ElapsedTime ${benchmark} ms`
+          )
+        }
+      },
+      benchmark: true,
+    })
   }
 }
 

@@ -172,16 +172,11 @@ const uploadCompleteOnPreview = ({
       [{ params: data[0] }],
       template.body as string
     )
-    try {
-      // delete message_logs entries
-      await SmsMessage.destroy({
-        where: { campaignId },
-        transaction,
-      })
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+    // delete message_logs entries
+    await SmsMessage.destroy({
+      where: { campaignId },
+      transaction,
+    })
   }
 }
 const uploadCompleteOnChunk = ({
@@ -192,28 +187,23 @@ const uploadCompleteOnChunk = ({
   campaignId: number
 }): ((data: CSVParams[]) => Promise<void>) => {
   return async (data: CSVParams[]): Promise<void> => {
-    try {
-      const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
-        return {
-          campaignId,
-          recipient: entry['recipient'],
-          params: entry,
+    const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+      return {
+        campaignId,
+        recipient: entry['recipient'],
+        params: entry,
+      }
+    })
+    // START populate template
+    await SmsMessage.bulkCreate(records, {
+      transaction,
+      logging: (_message, benchmark) => {
+        if (benchmark) {
+          logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
         }
-      })
-      // START populate template
-      await SmsMessage.bulkCreate(records, {
-        transaction,
-        logging: (_message, benchmark) => {
-          if (benchmark) {
-            logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
-          }
-        },
-        benchmark: true,
-      })
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+      },
+      benchmark: true,
+    })
   }
 }
 

@@ -59,6 +59,7 @@ export interface CampaignStatsCount {
   unsent: number
   sent: number
   invalid: number
+  updatedAt?: Date
 }
 
 export interface CampaignInvalidRecipient {

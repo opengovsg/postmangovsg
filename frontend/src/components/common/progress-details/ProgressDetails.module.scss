@@ -80,6 +80,11 @@
   }
 }
 
+.statsLastUpdated {
+  @include flex-horizontal;
+  justify-content: space-between;
+}
+
 .actionButton {
   @include flex-horizontal;
   justify-content: flex-end;

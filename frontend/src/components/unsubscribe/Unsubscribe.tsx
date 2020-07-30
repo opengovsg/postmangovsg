@@ -39,7 +39,7 @@ const Unsubscribe = () => {
           campaignId: +campaignId,
           recipient: recipient as string,
           hash: hash as string,
-          version,
+          version: version as string,
         })
       }
       setUnsubscribed(true)

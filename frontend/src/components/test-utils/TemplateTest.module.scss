@@ -6,6 +6,14 @@
   padding: 5vh 5vw;
   background-color: $light-blue;
   min-height: 100vh;
+
+  @include mobile() {
+    flex-direction: column;
+  }
+
+  @include tablet() {
+    flex-direction: column;
+  }
 }
 
 .editColumn,

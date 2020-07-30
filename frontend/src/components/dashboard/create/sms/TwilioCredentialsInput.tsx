@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
-import {
-  GUIDE_SMS_API_KEY_URL,
-  GUIDE_SMS_ACCOUNT_SID_URL,
-  GUIDE_SMS_MESSAGING_SERVICE_URL,
-} from 'config'
+import { LINKS } from 'config'
 import { TextInput, LabelWithExternalLink } from 'components/common'
-import styles from '../Create.module.scss'
+import { i18n } from 'locales'
 
 export interface TwilioCredentials {
   accountSid: string
@@ -37,7 +33,7 @@ const TwilioCredentialsInput = ({
     <>
       <LabelWithExternalLink
         label="Account SID"
-        link={GUIDE_SMS_ACCOUNT_SID_URL}
+        link={i18n._(LINKS.guideSmsAccountSidUrl)}
       />
       <TextInput
         placeholder="Enter Account SID"
@@ -45,14 +41,20 @@ const TwilioCredentialsInput = ({
         onChange={setAccountSid}
       />
 
-      <LabelWithExternalLink label="API Key SID" link={GUIDE_SMS_API_KEY_URL} />
+      <LabelWithExternalLink
+        label="API Key SID"
+        link={i18n._(LINKS.guideSmsApiKeyUrl)}
+      />
       <TextInput
         placeholder="Enter API Key SID"
         value={apiKey}
         onChange={setApiKey}
       />
 
-      <LabelWithExternalLink label="API Secret" link={GUIDE_SMS_API_KEY_URL} />
+      <LabelWithExternalLink
+        label="API Secret"
+        link={i18n._(LINKS.guideSmsApiKeyUrl)}
+      />
       <TextInput
         placeholder="Enter API Secret"
         value={apiSecret}
@@ -61,7 +63,7 @@ const TwilioCredentialsInput = ({
 
       <LabelWithExternalLink
         label="Messaging Service ID"
-        link={GUIDE_SMS_MESSAGING_SERVICE_URL}
+        link={i18n._(LINKS.guideSmsMessagingServiceUrl)}
       />
       <TextInput
         placeholder="Enter Messaging Service ID"

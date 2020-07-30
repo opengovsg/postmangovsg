@@ -3,14 +3,16 @@ import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_URL, GUIDE_SMS_CREDENTIALS_URL } from 'config'
+import { LINKS } from 'config'
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
-import { TextInput, PrimaryButton } from 'components/common'
+import { TextInput, PrimaryButton, Checkbox } from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
 import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
+
+import { i18n } from 'locales'
 
 const CreateModal = ({
   name = '',
@@ -97,8 +99,8 @@ const CreateModal = ({
                 Get your credentials ready.&nbsp;
                 <OutboundLink
                   className={styles.link}
-                  eventLabel={GUIDE_SMS_CREDENTIALS_URL}
-                  to={GUIDE_SMS_CREDENTIALS_URL}
+                  eventLabel={i18n._(LINKS.guideSmsUrl)}
+                  to={i18n._(LINKS.guideSmsUrl)}
                   target="_blank"
                 >
                   What is this?
@@ -152,31 +154,24 @@ const CreateModal = ({
               ></i>
             </PrimaryButton>
             {selectedChannel === ChannelType.Email && (
-              <div
+              <Checkbox
                 className={styles.protectedOption}
-                onClick={() => setProtected(!protect)}
+                checked={protect}
+                onChange={setProtected}
               >
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    { 'bx-checkbox': !protect },
-                    { 'bxs-checkbox-checked': protect }
-                  )}
-                ></i>
                 <p className={styles.subtext}>
                   Password protected.
                   {/* TODO: change url to passsword protected section in guide */}
                   <OutboundLink
                     className={styles.link}
-                    eventLabel={GUIDE_URL}
-                    to={GUIDE_URL}
+                    eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
                     target="_blank"
                   >
                     Learn more
                   </OutboundLink>
                 </p>
-              </div>
+              </Checkbox>
             )}
           </div>
         </div>

@@ -53,5 +53,30 @@
     a {
       font-size: 1rem;
     }
+
+    // Override table css from app.scss
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      tr {
+        display: table-row;
+        border-bottom: 1px solid $transparent-blue;
+
+        td,
+        th {
+          display: table-cell;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    // Remove bottom margin from p tags
+    p {
+      margin-block-end: 0;
+      margin-bottom: 0;
+    }
   }
 }
