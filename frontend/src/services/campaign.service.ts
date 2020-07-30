@@ -11,15 +11,6 @@ import {
 } from 'classes'
 import moment from 'moment'
 
-const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
-
-export enum CampaignExportStatus {
-  Unavailable = 'Unavailable',
-  Loading = 'Loading',
-  Ready = 'Ready',
-  NoError = 'No Error',
-}
-
 function getJobTimestamps(
   jobs: Array<{ sent_at: Date; status_updated_at: Date }>
 ): { sentAt: Date; statusUpdatedAt: Date } {
@@ -27,26 +18,6 @@ function getJobTimestamps(
   const jobsUpdatedAt = jobs.map((x) => x.status_updated_at).sort()
   // returns job with the earliest sentAt time
   return { sentAt: jobsSentAt[0], statusUpdatedAt: jobsUpdatedAt[0] }
-}
-
-export function getExportStatus(
-  status: Status,
-  updatedAt: Date,
-  failedCount: number
-): CampaignExportStatus {
-  if (status === Status.Sending) {
-    return CampaignExportStatus.Unavailable
-  }
-
-  const updatedAtTimestamp = +new Date(updatedAt)
-  const campaignAge = Date.now() - updatedAtTimestamp
-  if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {
-    return CampaignExportStatus.Loading
-  }
-
-  return failedCount > 0
-    ? CampaignExportStatus.Ready
-    : CampaignExportStatus.NoError
 }
 
 export async function getCampaigns(params: {

@@ -1,31 +1,75 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import download from 'downloadjs'
 
 import { Status } from 'classes/Campaign'
-import {
-  exportCampaignStats,
-  CampaignExportStatus,
-} from 'services/campaign.service'
+import { ActionButton } from 'components/common'
+import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
 import moment from 'moment'
+
+export enum CampaignExportStatus {
+  Unavailable = 'Unavailable',
+  Loading = 'Loading',
+  Ready = 'Ready',
+  NoError = 'No Error',
+}
+
+const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
 
 const ExportRecipients = ({
   campaignId,
   campaignName,
   sentAt,
-  exportStatus,
+  status,
+  updatedAt,
+  hasFailedRecipients,
   iconPosition,
+  isButton = false,
 }: {
-  className?: string
   campaignId: number
   campaignName: string
-  status: Status
   sentAt: Date
-  exportStatus: CampaignExportStatus
+  status: Status
+  updatedAt: Date
+  hasFailedRecipients: boolean
   iconPosition: 'left' | 'right'
+  isButton?: boolean
 }) => {
+  const [exportStatus, setExportStatus] = useState(
+    CampaignExportStatus.Unavailable
+  )
   const [disabled, setDisabled] = useState(false)
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
+    function getExportStatus(): void {
+      if (status === Status.Sending) {
+        return setExportStatus(CampaignExportStatus.Unavailable)
+      }
+
+      const updatedAtTimestamp = +new Date(updatedAt)
+      const campaignAge = Date.now() - updatedAtTimestamp
+      console.log(campaignAge)
+      if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {
+        // poll export status until it has reached finalised status (Ready or No Error)
+        timeoutId = setTimeout(getExportStatus, 2000)
+        return setExportStatus(CampaignExportStatus.Loading)
+      }
+
+      return setExportStatus(
+        hasFailedRecipients
+          ? CampaignExportStatus.Ready
+          : CampaignExportStatus.NoError
+      )
+    }
+
+    getExportStatus()
+    return () => {
+      timeoutId && clearTimeout(timeoutId)
+    }
+  })
 
   async function exportRecipients(
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -74,7 +118,7 @@ const ExportRecipients = ({
     }
   }
 
-  function renderExportButton() {
+  function renderExportButtonContent() {
     if (exportStatus === CampaignExportStatus.NoError) {
       return <span className={styles.unavailable}>No error</span>
     }
@@ -100,22 +144,49 @@ const ExportRecipients = ({
     }
   }
 
+  function renderExportButton() {
+    return (
+      <div
+        className={cx(
+          styles.export,
+          { [styles.ready]: exportStatus === CampaignExportStatus.Ready },
+          { [styles.disabled]: disabled }
+        )}
+        onClick={(e) =>
+          !disabled &&
+          exportStatus === CampaignExportStatus.Ready &&
+          exportRecipients(e)
+        }
+        title={renderTitle()}
+      >
+        <div className={styles[iconPosition]}>
+          {renderExportButtonContent()}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={cx(
-        styles.export,
-        { [styles.ready]: exportStatus === CampaignExportStatus.Ready },
-        { [styles.disabled]: disabled }
+    <>
+      {isButton ? (
+        <div className={styles.actionButton}>
+          <ActionButton
+            disabled={
+              exportStatus === CampaignExportStatus.NoError ||
+              exportStatus === CampaignExportStatus.Unavailable
+            }
+            className={cx({
+              [styles.disableActiveState]:
+                exportStatus === CampaignExportStatus.Loading,
+            })}
+          >
+            {renderExportButton()}
+          </ActionButton>
+        </div>
+      ) : (
+        renderExportButton()
       )}
-      onClick={(e) =>
-        !disabled &&
-        exportStatus === CampaignExportStatus.Ready &&
-        exportRecipients(e)
-      }
-      title={renderTitle()}
-    >
-      <div className={styles[iconPosition]}>{renderExportButton()}</div>
-    </div>
+    </>
   )
 }
 

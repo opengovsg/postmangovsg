@@ -2,17 +2,8 @@ import React, { useState, useEffect } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
-import {
-  getExportStatus,
-  CampaignExportStatus,
-} from 'services/campaign.service'
 import { CampaignStats, Status } from 'classes/Campaign'
-import {
-  ProgressBar,
-  PrimaryButton,
-  ExportRecipients,
-  ActionButton,
-} from 'components/common'
+import { ProgressBar, PrimaryButton, ExportRecipients } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
 import { LINKS } from 'config'
@@ -39,9 +30,6 @@ const ProgressDetails = ({
   const { status, error, unsent, sent, invalid, updatedAt, halted } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
-  const [exportStatus, setExportStatus] = useState(
-    CampaignExportStatus.Unavailable
-  )
   const [isHalted, setIsHalted] = useState(!!halted)
 
   useEffect(() => {
@@ -49,25 +37,6 @@ const ProgressDetails = ({
     setIsSent(status === Status.Sent)
     setIsHalted(!!halted)
   }, [status, error, unsent, halted])
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-
-    function checkHasExportButton() {
-      const failedCount = error + invalid
-      const exportStatus = getExportStatus(status, updatedAt, failedCount)
-      setExportStatus(exportStatus)
-      // keep polling until export status has reached finalised status (Ready or No Error)
-      if (exportStatus === CampaignExportStatus.Loading) {
-        timeoutId = setTimeout(checkHasExportButton, 2000)
-      }
-    }
-
-    checkHasExportButton()
-    return () => {
-      timeoutId && clearTimeout(timeoutId)
-    }
-  }, [status, updatedAt, error, invalid])
 
   function renderButton() {
     if (isHalted) {
@@ -165,29 +134,17 @@ const ProgressDetails = ({
         isComplete={isComplete}
       />
 
-      {exportStatus && (
-        <div className={styles.actionButton}>
-          <ActionButton
-            disabled={
-              exportStatus === CampaignExportStatus.NoError ||
-              exportStatus === CampaignExportStatus.Unavailable
-            }
-            className={cx({
-              [styles.disableActiveState]:
-                exportStatus === CampaignExportStatus.Loading,
-            })}
-          >
-            <ExportRecipients
-              iconPosition="right"
-              campaignId={campaignId}
-              campaignName={campaignName}
-              status={status}
-              sentAt={sentAt}
-              exportStatus={exportStatus}
-            />
-          </ActionButton>
-        </div>
-      )}
+      <ExportRecipients
+        iconPosition="right"
+        campaignId={campaignId}
+        campaignName={campaignName}
+        status={status}
+        sentAt={sentAt}
+        updatedAt={updatedAt}
+        hasFailedRecipients={error + invalid > 0}
+        isButton
+      />
+
       <table className={styles.stats}>
         <thead>
           <tr>
