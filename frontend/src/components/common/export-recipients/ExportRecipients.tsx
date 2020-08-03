@@ -145,11 +145,7 @@ const ExportRecipients = ({
         className={cx(
           styles.export,
           { [styles.ready]: exportStatus === CampaignExportStatus.Ready },
-          {
-            [styles.unavailable]:
-              exportStatus === CampaignExportStatus.NoError ||
-              exportStatus === CampaignExportStatus.Unavailable,
-          },
+          { [styles.unavailable]: exportStatus !== CampaignExportStatus.Ready },
           { [styles.disabled]: disabled }
         )}
         onClick={(e) =>
@@ -171,10 +167,7 @@ const ExportRecipients = ({
       {isButton ? (
         <div className={styles.actionButton}>
           <ActionButton
-            disabled={
-              exportStatus === CampaignExportStatus.NoError ||
-              exportStatus === CampaignExportStatus.Unavailable
-            }
+            disabled={exportStatus !== CampaignExportStatus.Ready}
             className={cx({
               [styles.disableActiveState]:
                 exportStatus === CampaignExportStatus.Loading,
