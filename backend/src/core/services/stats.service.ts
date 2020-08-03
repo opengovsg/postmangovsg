@@ -142,7 +142,10 @@ const getCurrentStats = async (
   }
   // else, return archived stats
   return {
-    ...archivedStats,
+    error: archivedStats.error,
+    unsent: archivedStats.unsent,
+    sent: archivedStats.sent,
+    invalid: archivedStats.invalid,
     status: job.status,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     updated_at: archivedStats.updatedAt!,
