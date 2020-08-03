@@ -79,3 +79,8 @@
     font-size: 1rem;
   }
 }
+
+.statsLastUpdated {
+  @include flex-horizontal;
+  justify-content: space-between;
+}
