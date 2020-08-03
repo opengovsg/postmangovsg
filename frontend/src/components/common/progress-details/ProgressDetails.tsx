@@ -27,7 +27,16 @@ const ProgressDetails = ({
   handleRetry: () => Promise<void>
   handleRefreshStats: () => Promise<void>
 }) => {
-  const { status, error, unsent, sent, invalid, updatedAt, halted } = stats
+  const {
+    status,
+    statusUpdatedAt,
+    error,
+    unsent,
+    sent,
+    invalid,
+    updatedAt,
+    halted,
+  } = stats
   const [isSent, setIsSent] = useState(status === Status.Sent)
   const [isComplete, setIsComplete] = useState(!error && !unsent)
   const [isHalted, setIsHalted] = useState(!!halted)
@@ -92,8 +101,7 @@ const ProgressDetails = ({
       return (
         <div className={styles.statsLastUpdated}>
           <span>
-            Stats last retrieved on{' '}
-            <Moment format="LLL">{stats.updatedAt}</Moment>
+            Stats last retrieved on <Moment format="LLL">{updatedAt}</Moment>
           </span>
           <PrimaryButton onClick={handleRefreshStats}>
             Refresh stats
@@ -138,9 +146,9 @@ const ProgressDetails = ({
         iconPosition="right"
         campaignId={campaignId}
         campaignName={campaignName}
-        status={status}
         sentAt={sentAt}
-        updatedAt={updatedAt}
+        status={status}
+        statusUpdatedAt={statusUpdatedAt}
         hasFailedRecipients={error + invalid > 0}
         isButton
       />

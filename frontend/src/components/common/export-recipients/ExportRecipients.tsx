@@ -22,7 +22,7 @@ const ExportRecipients = ({
   campaignName,
   sentAt,
   status,
-  updatedAt,
+  statusUpdatedAt,
   hasFailedRecipients,
   iconPosition,
   isButton = false,
@@ -31,7 +31,7 @@ const ExportRecipients = ({
   campaignName: string
   sentAt: Date
   status: Status
-  updatedAt: Date
+  statusUpdatedAt: Date
   hasFailedRecipients: boolean
   iconPosition: 'left' | 'right'
   isButton?: boolean
@@ -49,9 +49,8 @@ const ExportRecipients = ({
         return setExportStatus(CampaignExportStatus.Unavailable)
       }
 
-      const updatedAtTimestamp = +new Date(updatedAt)
+      const updatedAtTimestamp = +new Date(statusUpdatedAt)
       const campaignAge = Date.now() - updatedAtTimestamp
-      console.log(campaignAge)
       if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {
         // poll export status until it has reached finalised status (Ready or No Error)
         timeoutId = setTimeout(getExportStatus, 2000)
@@ -119,28 +118,24 @@ const ExportRecipients = ({
   }
 
   function renderExportButtonContent() {
-    if (exportStatus === CampaignExportStatus.NoError) {
-      return <span className={styles.unavailable}>No error</span>
-    }
-    if (exportStatus === CampaignExportStatus.Loading) {
-      return (
-        <>
-          <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
-          <span>Error list</span>
-        </>
-      )
-    } else {
-      const unavailableStyle = {
-        [styles.unavailable]: exportStatus === CampaignExportStatus.Unavailable,
-      }
-      return (
-        <>
-          <i
-            className={cx(styles.icon, unavailableStyle, 'bx bx-download')}
-          ></i>
-          <span className={cx(unavailableStyle)}>Error list</span>
-        </>
-      )
+    switch (exportStatus) {
+      case CampaignExportStatus.Loading:
+        return (
+          <>
+            <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
+            <span>Error list</span>
+          </>
+        )
+      case CampaignExportStatus.NoError:
+        return <span>No error</span>
+      case CampaignExportStatus.Unavailable:
+      case CampaignExportStatus.Ready:
+        return (
+          <>
+            <i className={cx(styles.icon, 'bx bx-download')}></i>
+            <span>Error list</span>
+          </>
+        )
     }
   }
 
@@ -150,6 +145,11 @@ const ExportRecipients = ({
         className={cx(
           styles.export,
           { [styles.ready]: exportStatus === CampaignExportStatus.Ready },
+          {
+            [styles.unavailable]:
+              exportStatus === CampaignExportStatus.NoError ||
+              exportStatus === CampaignExportStatus.Unavailable,
+          },
           { [styles.disabled]: disabled }
         )}
         onClick={(e) =>
