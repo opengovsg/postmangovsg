@@ -84,25 +84,3 @@
   @include flex-horizontal;
   justify-content: space-between;
 }
-
-.actionButton {
-  @include flex-horizontal;
-  justify-content: flex-end;
-  margin: 3rem 0;
-
-  .disableActiveState {
-    cursor: not-allowed;
-
-    &:active {
-      span,
-      i {
-        color: $indigo-blue;
-      }
-    }
-
-    &:hover {
-      border-width: 1px;
-      background-color: white;
-    }
-  }
-}

@@ -21,6 +21,7 @@ const getStatsFromArchive = async (
       sent: 0,
       unsent: 0,
       invalid: 0,
+      updated_at: new Date(),
     }
   }
   return {
@@ -28,7 +29,7 @@ const getStatsFromArchive = async (
     sent: stats?.sent,
     unsent: stats?.unsent,
     invalid: stats?.invalid,
-    updatedAt: stats?.updatedAt,
+    updated_at: stats?.updatedAt,
   }
 }
 
@@ -92,6 +93,7 @@ const getStatsFromTable = async (
     sent: +data.sent,
     unsent: +data.unsent,
     invalid: +data.invalid,
+    updated_at: new Date(),
   }
 }
 
@@ -142,11 +144,15 @@ const getCurrentStats = async (
   }
   // else, return archived stats
   return {
-    ...archivedStats,
+    error: archivedStats.error,
+    unsent: archivedStats.unsent,
+    sent: archivedStats.sent,
+    invalid: archivedStats.invalid,
     status: job.status,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    updated_at: archivedStats.updatedAt!,
+    updated_at: archivedStats.updated_at,
     halted: job.campaign.halted,
+    status_updated_at: job.updatedAt, // Timestamp when job was logged
   }
 }
 
