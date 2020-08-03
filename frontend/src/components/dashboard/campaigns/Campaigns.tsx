@@ -13,7 +13,7 @@ import {
   PrimaryButton,
   ExportRecipients,
 } from 'components/common'
-import { getCampaigns, getExportStatus } from 'services/campaign.service'
+import { getCampaigns } from 'services/campaign.service'
 import { Campaign, channelIcons, Status } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
@@ -112,13 +112,10 @@ const Campaigns = () => {
             iconPosition="left"
             campaignId={campaign.id}
             campaignName={campaign.name}
-            status={campaign.status}
             sentAt={campaign.sentAt}
-            exportStatus={getExportStatus(
-              campaign.status,
-              campaign.statusUpdatedAt,
-              +campaign.hasFailedRecipients
-            )}
+            status={campaign.status}
+            statusUpdatedAt={campaign.statusUpdatedAt}
+            hasFailedRecipients={campaign.hasFailedRecipients}
           />
         )
       },

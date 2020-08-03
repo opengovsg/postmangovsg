@@ -37,6 +37,10 @@ describe('Phone Number Service', () => {
         expectNormalised('80123456', '+6580123456')
       })
 
+      test('should normalise number starting with 802', () => {
+        expectNormalised('80223456', '+6580223456')
+      })
+
       test('should normalise number starting with 89', () => {
         expectNormalised('89123456', '+6589123456')
       })
