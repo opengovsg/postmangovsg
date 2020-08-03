@@ -1,6 +1,6 @@
 import { parsePhoneNumber, CountryCode } from 'libphonenumber-js/max'
 
-const SG_NUMBER_FORMAT = /^(\+?65)?(6|8|9)\d{7}$/
+const SG_NUMBER_FORMAT = /^(\+?65)?(8|9)\d{7}$/
 
 /**
  * Validate and normalise phone number format. Default country code will
