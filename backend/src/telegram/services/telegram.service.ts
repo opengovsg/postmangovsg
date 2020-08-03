@@ -15,7 +15,7 @@ import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
-import { UploadService } from '@core/services'
+import { PhoneNumberService, UploadService } from '@core/services'
 import logger from '@core/logger'
 
 /**
@@ -62,10 +62,10 @@ const getSubscriberTelegramId = async (
   phoneNumber: string,
   botId: string
 ): Promise<number> => {
-  // Append default country code if does not exists.
-  if (!phoneNumber.startsWith('+') && config.get('defaultCountryCode')) {
-    phoneNumber = `+${config.get('defaultCountryCode')}${phoneNumber}`
-  }
+  phoneNumber = PhoneNumberService.normalisePhoneNumber(
+    phoneNumber,
+    config.get('defaultCountry')
+  )
 
   const subscriber = await TelegramSubscriber.findOne({
     where: { phoneNumber },
