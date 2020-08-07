@@ -10,10 +10,11 @@
     "build:backend": "cd backend && npm run build",
     "build:worker": "cd worker && npm run build",
     "start": "cd backend && npm start",
-    "dev": "concurrently -k -p \"[{name}]\" -n \"Backend,Worker,Frontend\" -c \"yellow.bold,cyan.bold,white.bold\" \"npm run dev:backend\" \"npm run dev:worker\" \"npm run dev:frontend\"",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"Services,Backend,Worker,Frontend\" -c \"magenta.bold,yellow.bold,cyan.bold,white.bold\" \"npm run dev:services --silent\" \"npm run dev:backend\" \"npm run dev:worker\" \"npm run dev:frontend\"",
     "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run dev",
-    "dev:worker": "cd worker && npm run dev",
+    "dev:backend": "npm run wait:services && cd backend && npm run dev",
+    "dev:worker": "npm run wait:backend && cd worker && npm run dev",
+    "dev:services": "docker-compose -f docker-compose.yml up",
     "postinstall": "npm run postinstall:backend && npm run postinstall:worker && npm run postinstall:frontend",
     "postinstall:frontend": "cd frontend && npm install",
     "postinstall:backend": "cd backend && npm install",
@@ -24,7 +25,9 @@
     "precommit:worker": "cd worker && npm run precommit",
     "precommit:root": "lint-staged",
     "lint-no-fix": "prettier --check '**/*.{yml,md}'",
-    "lint": "prettier --write '**/*.{yml,md}' --loglevel warn"
+    "lint": "prettier --write '**/*.{yml,md}' --loglevel warn",
+    "wait:backend": "wait-on http-get://localhost:4000",
+    "wait:services": "wait-on http-get://localhost:4566/health tcp:5432 tcp:6379"
   },
   "repository": {
     "type": "git",
@@ -42,7 +45,8 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "wait-on": "^5.1.0"
   },
   "lint-staged": {
     "*.{yml,md}": "prettier --write"
