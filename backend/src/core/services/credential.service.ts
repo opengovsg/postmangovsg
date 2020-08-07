@@ -24,16 +24,11 @@ const upsertCredential = async (
   secret: string,
   restrictEnvironment: boolean
 ): Promise<void> => {
-  // If credential doesn't exist, upload credential to secret manager, unless in development
-  if (config.get('env') === 'development' && !config.get('aws.awsEndpoint')) {
-    logger.info(
-      `Dev env - skip storing credential in AWS secrets manager for name=${name}`
-    )
-    return
-  }
-
+  // If credential doesn't exist, upload credential to secret manager
   try {
     logger.info(`Updating credential in AWS secrets manager for name=${name}`)
+    // Secrets stored in localstack will not be tagged as no error is thrown by localstack if the secret
+    // does not exists.
     await secretsManager
       .putSecretValue({
         SecretId: name,
@@ -93,12 +88,6 @@ const storeCredential = async (
 const getTwilioCredentials = async (
   name: string
 ): Promise<TwilioCredentials> => {
-  if (config.get('env') === 'development' && !config.get('aws.awsEndpoint')) {
-    logger.info(
-      `Dev env - getTwilioCredentials - returning default credentials for name=${name}`
-    )
-    return config.get('smsOptions')
-  }
   logger.info('Getting secret from AWS secrets manager.')
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   logger.info('Gotten secret from AWS secrets manager.')
@@ -113,12 +102,6 @@ const getTwilioCredentials = async (
  * @param name
  */
 const getTelegramCredential = async (name: string): Promise<string> => {
-  if (config.get('env') === 'development' && !config.get('aws.awsEndpoint')) {
-    logger.info(
-      `Dev env - getTelegramCredential - returning default credentials set in env var`
-    )
-    return config.get('telegramOptions.telegramBotToken')
-  }
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   const secretString = get(data, 'SecretString', '')
   if (!secretString)
