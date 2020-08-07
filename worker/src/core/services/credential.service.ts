@@ -4,10 +4,9 @@ import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
 import { TelegramCredentials } from '@telegram/interfaces'
 import { get } from 'lodash'
+import { configureEndpoint } from '@core/utils/aws-endpoint'
 
-const secretsManager = new AWS.SecretsManager({
-  region: config.get('aws.awsRegion'),
-})
+const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 
 const getCredentialsFromSecretsManager = async (name: string): Promise<any> => {
   logger.info('Getting secret from AWS secrets manager.')
@@ -29,24 +28,12 @@ const getCredentialsFromSecretsManager = async (name: string): Promise<any> => {
 const getTwilioCredentials = async (
   name: string
 ): Promise<TwilioCredentials> => {
-  if (config.get('env') === 'development') {
-    logger.info(
-      `Dev env - getTwilioCredentials - returning default credentials for name=${name}`
-    )
-    return config.get('smsOptions')
-  }
   return await getCredentialsFromSecretsManager(name)
 }
 
 const getTelegramCredentials = async (
   name: string
 ): Promise<TelegramCredentials> => {
-  if (config.get('env') === 'development') {
-    logger.info(
-      `Dev env - getTelegramCredentials - returning default credentials for name=${name}`
-    )
-    return config.get('telegramBotToken')
-  }
   return await getCredentialsFromSecretsManager(name)
 }
 

@@ -38,6 +38,13 @@ const config = convict({
       default: 'ap-northeast-1',
       env: 'AWS_REGION',
     },
+    awsEndpoint: {
+      doc:
+        'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      format: '*',
+      default: null,
+      env: 'AWS_ENDPOINT',
+    },
     secretManagerSalt: {
       doc:
         'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
