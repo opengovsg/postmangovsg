@@ -1,6 +1,14 @@
 import axios, { AxiosError } from 'axios'
 import { SMSPreview } from 'classes'
 
+// Twilio states that total character limit for sms is 1600 characters
+// this defines a threshold at which we warn the users on their template length
+const SMS_WARN_EXCEED_CHARACTER_THRESHOLD = 1000
+
+export function exceedsCharacterThreshold(body: string): boolean {
+  return body.length > SMS_WARN_EXCEED_CHARACTER_THRESHOLD
+}
+
 export async function saveTemplate(
   campaignId: number,
   body: string

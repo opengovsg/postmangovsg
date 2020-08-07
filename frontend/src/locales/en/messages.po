@@ -1,0 +1,106 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2020-07-05 21:22+0800\n"
+"Mime-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/components/login/login-input/LoginInput.tsx:86
+msgid "Enter OTP"
+msgstr "Enter OTP"
+
+#: src/components/login/login-input/LoginInput.tsx:86
+msgid "Get OTP"
+msgstr "Get OTP"
+
+#: src/components/login/login-input/LoginInput.tsx:79
+msgid "One-Time Password"
+msgstr "One-Time Password"
+
+#: src/components/login/login-input/LoginInput.tsx:82
+msgid "Resend?"
+msgstr "Resend?"
+
+#: src/components/login/login-input/LoginInput.tsx:82
+msgid "Resending OTP..."
+msgstr "Resending OTP..."
+
+#: src/components/login/login-input/LoginInput.tsx:86
+msgid "Sending OTP..."
+msgstr "Sending OTP..."
+
+#: src/components/login/login-input/LoginInput.tsx:86
+msgid "Sign In"
+msgstr "Sign In"
+
+#: src/components/login/login-input/LoginInput.tsx:79
+msgid "Sign in with your gov.sg email"
+msgstr "Sign in with your gov.sg email"
+
+#: src/components/login/login-input/LoginInput.tsx:86
+msgid "Verifying OTP..."
+msgstr "Verifying OTP..."
+
+#: src/components/login/login-input/LoginInput.tsx:86
+msgid "e.g. postman@agency.gov.sg"
+msgstr "e.g. postman@agency.gov.sg"
+
+#: src/config.ts:35
+msgid "link.contactUsUrl"
+msgstr "https://go.gov.sg/postman-contact-us"
+
+#: src/config.ts:36
+msgid "link.contributeUrl"
+msgstr "https://github.com/opengovsg/postmangovsg"
+
+#: src/config.ts:28
+msgid "link.guideEmailPasswordProtectedUrl"
+msgstr "https://guide.postman.gov.sg/guide/quick-start/password-protected-email"
+
+#: src/config.ts:34
+msgid "link.guidePowerUserUrl"
+msgstr "https://guide.postman.gov.sg/guide/power-users"
+
+#: src/config.ts:30
+msgid "link.guideSmsAccountSidUrl"
+msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-1-account-sid-and-auth-token"
+
+#: src/config.ts:31
+msgid "link.guideSmsApiKeyUrl"
+msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-2-set-up-a-standard-api-key"
+
+#: src/config.ts:32
+msgid "link.guideSmsMessagingServiceUrl"
+msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-3-set-up-your-messaging-service"
+
+#: src/config.ts:29
+msgid "link.guideSmsUrl"
+msgstr "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
+
+#: src/config.ts:33
+msgid "link.guideTelegramUrl"
+msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
+
+#: src/config.ts:27
+msgid "link.guideUrl"
+msgstr "https://guide.postman.gov.sg"
+
+#: src/config.ts:38
+msgid "link.privacyUrl"
+msgstr "https://guide.postman.gov.sg/legal/privacy"
+
+#: src/config.ts:39
+msgid "link.reportBugUrl"
+msgstr "https://guide.postman.gov.sg/contact-us"
+
+#: src/config.ts:37
+msgid "link.tncUrl"
+msgstr "https://guide.postman.gov.sg/legal/t-and-c"

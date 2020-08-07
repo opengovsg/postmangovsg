@@ -71,7 +71,8 @@ export class CampaignStats {
   sent: number
   invalid: number
   status: Status
-  updatedAt: Date
+  statusUpdatedAt: Date // Timestamp when job's status was changed to this status
+  updatedAt: Date // Timestamp when statistic was updated
   halted?: boolean
 
   constructor(input: any) {
@@ -80,6 +81,7 @@ export class CampaignStats {
     this.sent = +input['sent']
     this.invalid = input['invalid']
     this.status = input['status']
+    this.statusUpdatedAt = input['status_updated_at']
     this.updatedAt = input['updated_at']
     this.halted = input['halted']
   }
