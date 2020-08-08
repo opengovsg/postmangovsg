@@ -151,38 +151,6 @@ const config = convict({
       return isSupportedCountry(countryCode)
     },
   },
-  smsOptions: {
-    accountSid: {
-      doc: 'Id of the Twilio account',
-      default: '',
-      env: 'TWILIO_ACCOUNT_SID',
-      sensitive: true,
-    },
-    apiKey: {
-      doc: 'API Key to access Twilio',
-      default: '',
-      env: 'TWILIO_API_KEY',
-      sensitive: true,
-    },
-    apiSecret: {
-      doc: 'Corresponding API Secret to access Twilio',
-      default: '',
-      env: 'TWILIO_API_SECRET',
-      sensitive: true,
-    },
-    messagingServiceSid: {
-      doc: 'ID of the messaging service',
-      default: '',
-      env: 'TWILIO_MESSAGING_SERVICE_SID',
-      sensitive: true,
-    },
-  },
-  telegramBotToken: {
-    doc: 'API key required to make use of Telegram APIs',
-    default: '',
-    env: 'TELEGRAM_BOT_TOKEN',
-    sensitive: true,
-  },
   callbackSecret: {
     doc: 'Secret key used to generate Twilio callback url',
     default: '',

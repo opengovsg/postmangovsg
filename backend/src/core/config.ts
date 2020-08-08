@@ -284,43 +284,11 @@ const config = convict({
     default: '65',
     env: 'DEFAULT_COUNTRY_CODE',
   },
-  smsOptions: {
-    accountSid: {
-      doc: 'Id of the Twilio account',
-      default: '',
-      env: 'TWILIO_ACCOUNT_SID',
-      sensitive: true,
-    },
-    apiKey: {
-      doc: 'API Key to access Twilio',
-      default: '',
-      env: 'TWILIO_API_KEY',
-      sensitive: true,
-    },
-    apiSecret: {
-      doc: 'Corresponding API Secret to access Twilio',
-      default: '',
-      env: 'TWILIO_API_SECRET',
-      sensitive: true,
-    },
-    messagingServiceSid: {
-      doc: 'ID of the messaging service ',
-      default: '',
-      env: 'TWILIO_MESSAGING_SERVICE_SID',
-      sensitive: true,
-    },
-  },
   telegramOptions: {
     webhookUrl: {
       doc: 'Webhook URL to configure for all Telegram bots',
       default: '',
       env: 'TELEGRAM_WEBHOOK_URL',
-    },
-    telegramBotToken: {
-      doc: 'API Key required to make use of Telegram APIs',
-      default: '',
-      env: 'TELEGRAM_BOT_TOKEN',
-      sensitive: true,
     },
   },
   maxRatePerJob: {
