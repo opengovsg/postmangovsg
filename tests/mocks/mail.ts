@@ -7,7 +7,7 @@ const MAILDEV_URL = 'http://localhost:1080'
 /**
  * Initialize and start mailDev server
  */
-export const mailDevLoader = async (): Promise<void> => {
+export const startMailDev = async (): Promise<void> => {
   return new Promise((resolve, reject) => {
     const maildev = new MailDev({})
     maildev.listen((err) => {

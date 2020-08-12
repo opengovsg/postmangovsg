@@ -4,13 +4,13 @@
   "description": "End-to-end tests for Postman",
   "main": "index.ts",
   "scripts": {
-    "test": "ts-node -r dotenv/config index.ts",
-    "dev": "npm test -- --live-mode",
+    "test:e2e": "ts-node -r dotenv/config end-to-end/index.ts",
+    "dev:e2e": "npm test -- --live-mode",
     "lint-no-fix": "eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
     "mock": "concurrently -k -p \"[{name}]\" -n \"Email,Telegram\" -c \"cyan.bold,yellow.bold\" \"npm run mock:mail\" \"npm run mock:telegram\"",
     "mock:mail": "maildev",
-    "mock:telegram": "MOCK_TELEGRAM_API_PORT=true && ts-node -e \"require('./helpers').mockTelegramApiLoader(1081, true).catch(err => console.error(err))\"",
+    "mock:telegram": "ts-node -e \"require('./mocks').startMockTelegramApi(1081, true).catch(err => console.error(err))\"",
     "precommit": "lint-staged"
   },
   "keywords": [],

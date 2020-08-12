@@ -20,7 +20,7 @@ convict.addFormats({
 const config = convict({
   testFiles: {
     doc: 'Comma separated list of file patterns to chose which tests to run.',
-    default: 'tests/',
+    default: './end-to-end/*.e2e.ts',
     format: String,
     arg: 'test-files',
   },

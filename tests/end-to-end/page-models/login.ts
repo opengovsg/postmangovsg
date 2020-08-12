@@ -1,7 +1,7 @@
 import { t } from 'testcafe'
 import { ReactSelector } from 'testcafe-react-selectors'
 
-import { MailClient } from './../helpers'
+import { MailClient } from './../../mocks'
 
 const emailInput = ReactSelector('Login TextInputWithButton').withProps({
   type: 'email',

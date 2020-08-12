@@ -1,6 +1,6 @@
 import { waitForReact } from 'testcafe-react-selectors'
-import { LandingPage, LoginPage } from './../page-models'
-import { generateRandomEmail, getPageUrl } from './../helpers'
+import { LandingPage, LoginPage } from './page-models'
+import { generateRandomEmail, getPageUrl } from './helpers'
 import config from './../config'
 
 fixture`Login Page`.page(config.get('frontendUrl')).beforeEach(async () => {

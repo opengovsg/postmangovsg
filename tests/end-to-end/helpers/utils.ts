@@ -1,7 +1,7 @@
 import waitOn from 'wait-on'
 import { customAlphabet } from 'nanoid'
 import { ClientFunction } from 'testcafe'
-import config from './../config'
+import config from './../../config'
 
 // MailDev expects all email addresses to be lowercase
 const nanoid = customAlphabet('1234567890abcdef', 5)

@@ -1,6 +1,6 @@
 import { t } from 'testcafe'
 import { ReactSelector } from 'testcafe-react-selectors'
-import config from './../config'
+import config from './../../config'
 
 const statisticsTable = ReactSelector('ProgressDetails table')
   .nth(1)
@@ -26,12 +26,11 @@ const checkStatistics = async ({
   sent: number
   invalid: number
 }): Promise<void> => {
-  await t.expect(unsentCount.textContent).eql('0', {
-    timeout: config.get('timeout.sendComplete'),
-  })
-  await t.expect(errorCount.textContent).eql(`${error}`)
-  await t.expect(sentCount.textContent).eql(`${sent}`)
-  await t.expect(invalidCount.textContent).eql(`${invalid}`)
+  const timeout = config.get('timeout.sendComplete')
+  await t.expect(unsentCount.textContent).eql('0', { timeout })
+  await t.expect(errorCount.textContent).eql(`${error}`, { timeout })
+  await t.expect(sentCount.textContent).eql(`${sent}`, { timeout })
+  await t.expect(invalidCount.textContent).eql(`${invalid}`, { timeout })
 }
 
 export const ProgressDetailsPage = {

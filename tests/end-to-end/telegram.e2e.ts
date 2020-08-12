@@ -6,13 +6,13 @@ import {
   LoginPage,
   TelegramCampaignPage,
   ProgressDetailsPage,
-} from './../page-models'
+} from './page-models'
+import { TelegramClient, MailClient } from './../mocks'
 import {
-  TelegramClient,
-  MailClient,
   getPageUrl,
   generateRandomEmail,
-} from './../helpers'
+  addTelegramSubscriber,
+} from './helpers'
 import config from './../config'
 
 fixture`Telegram campaigns`
@@ -23,7 +23,7 @@ fixture`Telegram campaigns`
     const botToken = `${botId}:thisisadummybottoken`
     const telegramId = 123456
     const phoneNumber = '+6591234567'
-    await TelegramClient.addSubscriber(telegramId, phoneNumber, botId)
+    await addTelegramSubscriber(telegramId, phoneNumber, botId)
     t.ctx = { email, botId, botToken, telegramId, phoneNumber }
 
     await waitForReact()

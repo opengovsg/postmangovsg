@@ -1,7 +1,5 @@
 import http from 'http'
 import express, { Router, Request, Response, NextFunction } from 'express'
-import { sequelize } from './database'
-import { QueryTypes } from 'sequelize'
 
 interface TelegramMessage {
   botId: number
@@ -166,7 +164,7 @@ const createMockApiServer = (logApiCalls: boolean): http.Server => {
  * @param port Port to start mock Telegram API on
  * @param logApiCalls Whether to log API calls to stdout
  */
-export const mockTelegramApiLoader = async (
+export const startMockTelegramApi = async (
   port = 1081,
   logApiCalls = false
 ): Promise<http.Server> => {
@@ -212,54 +210,9 @@ const getBotInfo = (botId: string): BotInfo | null => {
   return botId in BOTS ? BOTS[botId] : null
 }
 
-/**
- * Add a new subscriber. If the subscriber already exists, does nothing
- * @param telegramId
- * @param phoneNumber
- * @param botId
- */
-const addSubscriber = async (
-  telegramId: number,
-  phoneNumber: string,
-  botId: number
-): Promise<void> => {
-  const transaction = await sequelize.transaction()
-  try {
-    await sequelize.query(
-      `
-        INSERT INTO telegram_subscribers (phone_number, telegram_id, created_at, updated_at)
-        VALUES (:phoneNumber, :telegramId, clock_timestamp(), clock_timestamp())
-        ON CONFLICT DO NOTHING
-      `,
-      {
-        transaction,
-        type: QueryTypes.INSERT,
-        replacements: { phoneNumber, telegramId },
-      }
-    )
-
-    await sequelize.query(
-      `
-        INSERT INTO bot_subscribers (bot_id, telegram_id, created_at, updated_at)
-        VALUES (:botId, :telegramId, clock_timestamp(), clock_timestamp())
-        ON CONFLICT DO NOTHING
-      `,
-      {
-        transaction,
-        type: QueryTypes.INSERT,
-        replacements: { botId, telegramId },
-      }
-    )
-    await transaction.commit()
-  } catch (err) {
-    await transaction.rollback()
-  }
-}
-
 export const TelegramClient = {
   getMessages,
   getLastestMessage,
   deleteAll,
-  addSubscriber,
   getBotInfo,
 }

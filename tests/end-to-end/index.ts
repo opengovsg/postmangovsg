@@ -1,21 +1,17 @@
 import fs from 'fs'
 import createTestCafe from 'testcafe'
-import config from './config'
+import config from './../config'
 
-import {
-  waitForAppReady,
-  mailDevLoader,
-  mockTelegramApiLoader,
-  sequelizeLoader,
-} from './helpers'
+import { startMailDev, startMockTelegramApi } from './../mocks'
+import { waitForAppReady, sequelizeLoader } from './helpers'
 
 const CHROME_BROWSER = 'chrome --allow-insecure-localhost'
 
 const loadServices = async (): Promise<void> => {
   await Promise.all([
     waitForAppReady(),
-    mockTelegramApiLoader(),
-    mailDevLoader(),
+    startMockTelegramApi(),
+    startMailDev(),
     sequelizeLoader(),
   ])
 }

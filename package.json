@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test:e2e",
-    "test:e2e": "concurrently -s first -k \"NODE_ENV=test npm run dev > /dev/null 2>&1\" \"cd tests/ && npm run test\"",
+    "test:e2e": "concurrently -s first -k \"NODE_ENV=test npm run dev > /dev/null 2>&1\" \"cd tests/ && npm run test:e2e\"",
     "build": "npm run build:backend && npm run build:worker && npm run build:frontend",
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",

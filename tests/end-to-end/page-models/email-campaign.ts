@@ -1,7 +1,7 @@
 import { t } from 'testcafe'
 import { ReactSelector } from 'testcafe-react-selectors'
 import { nextButton, recipientUpload } from './common'
-import config from './../config'
+import config from './../../config'
 
 // Normal email template
 const subjectInput = ReactSelector('EmailTemplate TextArea').nth(0)

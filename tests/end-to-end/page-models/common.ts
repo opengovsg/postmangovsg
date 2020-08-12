@@ -1,6 +1,6 @@
 import { Selector } from 'testcafe'
 import { ReactSelector } from 'testcafe-react-selectors'
-import config from './../config'
+import config from './../../config'
 
 export const nextButton = Selector(
   ReactSelector('PrimaryButton').withText('Next').withProps({

@@ -6,8 +6,9 @@ import {
   LoginPage,
   SmsCampaignPage,
   ProgressDetailsPage,
-} from './../page-models'
-import { MailClient, getPageUrl, generateRandomEmail } from './../helpers'
+} from './page-models'
+import { MailClient } from './../mocks'
+import { getPageUrl, generateRandomEmail } from './helpers'
 import config from './../config'
 
 fixture`SMS campaigns`
