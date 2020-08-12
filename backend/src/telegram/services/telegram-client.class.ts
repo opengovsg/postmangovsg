@@ -1,10 +1,13 @@
 import { Telegram } from 'telegraf'
+import config from '@core/config'
 
 export default class TelegramClient {
   private client: Telegram
 
   constructor(botToken: string) {
-    this.client = new Telegram(botToken)
+    this.client = new Telegram(botToken, {
+      apiRoot: config.get('telegramOptions.apiRoot'),
+    })
   }
 
   /**

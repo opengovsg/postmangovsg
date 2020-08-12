@@ -33,7 +33,7 @@ convict.addFormats({
 const config = convict({
   env: {
     doc: 'The application environment.',
-    format: ['production', 'staging', 'development'],
+    format: ['production', 'staging', 'development', 'test'],
     default: 'production',
     env: 'NODE_ENV',
   },
@@ -314,6 +314,11 @@ const config = convict({
     },
   },
   telegramOptions: {
+    apiRoot: {
+      doc: 'Telegram API root url',
+      default: 'https://api.telegram.org',
+      env: 'TELEGRAM_API_ROOT',
+    },
     webhookUrl: {
       doc: 'Webhook URL to configure for all Telegram bots',
       default: '',
@@ -372,6 +377,33 @@ const defaultMailFrom = `${config.get(
 config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 
 // Override some defaults
+const developmentOverrides = {
+  frontendUrl: 'http://localhost:3000',
+  protectedUrl: 'http://localhost:3000/p',
+  aws: {
+    uploadBucket: 'postmangovsg-dev-upload',
+    logGroupName: 'postmangovsg-beanstalk-testing',
+  },
+  database: {
+    dialectOptions: {
+      ssl: {
+        require: false, // No ssl connection needed
+        rejectUnauthorized: true,
+        ca: false,
+      },
+    },
+  },
+  session: {
+    cookieSettings: {
+      httpOnly: true,
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: true,
+      domain: 'localhost',
+      path: '/',
+    },
+  },
+}
 switch (config.get('env')) {
   case 'staging':
     config.load({
@@ -395,31 +427,23 @@ switch (config.get('env')) {
     break
   case 'development':
     config.set('IS_PROD', false)
+    config.load(developmentOverrides)
+    break
+  case 'test':
+    config.set('IS_PROD', false)
     config.load({
-      frontendUrl: 'http://localhost:3000',
-      protectedUrl: 'http://localhost:3000/p',
-      aws: {
-        uploadBucket: 'postmangovsg-dev-upload',
-        logGroupName: 'postmangovsg-beanstalk-testing',
-      },
-      database: {
-        dialectOptions: {
-          ssl: {
-            require: false, // No ssl connection needed
-            rejectUnauthorized: true,
-            ca: false,
-          },
+      ...developmentOverrides,
+      mailOptions: {
+        host: 'localhost',
+        port: 1025,
+        auth: {
+          user: 'user',
+          pass: 'password',
         },
       },
-      session: {
-        cookieSettings: {
-          httpOnly: true,
-          secure: false,
-          maxAge: 24 * 60 * 60 * 1000,
-          sameSite: true,
-          domain: 'localhost',
-          path: '/',
-        },
+      telegramOptions: {
+        apiRoot: 'http://localhost:1081',
+        telegramBotToken: '11111111:thisisadummybottoken',
       },
     })
     break

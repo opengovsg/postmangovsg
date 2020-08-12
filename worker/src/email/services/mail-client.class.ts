@@ -29,6 +29,7 @@ export default class MailClient {
     this.mailer = nodemailer.createTransport({
       host: host,
       port: +port,
+      ignoreTLS: host === 'localhost',
       auth: {
         user: auth.user,
         pass: auth.pass,

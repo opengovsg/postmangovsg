@@ -28,7 +28,7 @@ convict.addFormats({
 const config = convict({
   env: {
     doc: 'The application environment.',
-    format: ['production', 'staging', 'development'],
+    format: ['production', 'staging', 'development', 'test'],
     default: 'production',
     env: 'NODE_ENV',
   },
@@ -173,11 +173,18 @@ const config = convict({
       sensitive: true,
     },
   },
-  telegramBotToken: {
-    doc: 'API key required to make use of Telegram APIs',
-    default: '',
-    env: 'TELEGRAM_BOT_TOKEN',
-    sensitive: true,
+  telegramOptions: {
+    telegramBotToken: {
+      doc: 'API key required to make use of Telegram APIs',
+      default: '',
+      env: 'TELEGRAM_BOT_TOKEN',
+      sensitive: true,
+    },
+    apiRoot: {
+      doc: 'Telegram API root url',
+      default: 'https://api.telegram.org',
+      env: 'TELEGRAM_API_ROOT',
+    },
   },
   callbackSecret: {
     doc: 'Secret key used to generate Twilio callback url',
@@ -213,7 +220,23 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 
 // Only development is a non-production environment
 // Override with local config
-if (config.get('env') === 'development') {
+const environment = config.get('env')
+if (environment === 'development' || environment === 'test') {
+  const channelOptionsOverrides =
+    environment !== 'test'
+      ? {}
+      : {
+          mailOptions: {
+            host: 'localhost',
+            port: 1025,
+            auth: { user: 'user', pass: 'pass' },
+          },
+          telegramOptions: {
+            apiRoot: 'http://localhost:1081',
+            telegramBotToken: '11111111:thisisadummybottoken',
+          },
+        }
+
   config.load({
     IS_PROD: false,
     database: {
@@ -225,6 +248,7 @@ if (config.get('env') === 'development') {
         },
       },
     },
+    ...channelOptionsOverrides,
   })
 }
 

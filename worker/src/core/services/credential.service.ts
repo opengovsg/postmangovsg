@@ -45,7 +45,7 @@ const getTelegramCredentials = async (
     logger.info(
       `Dev env - getTelegramCredentials - returning default credentials for name=${name}`
     )
-    return config.get('telegramBotToken')
+    return config.get('telegramOptions.telegramBotToken')
   }
   return await getCredentialsFromSecretsManager(name)
 }
