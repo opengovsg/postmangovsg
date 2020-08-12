@@ -41,15 +41,34 @@
 Set up a **postgresql@11** database, **redis** cache and localstack server
 
 ```bash
-# Use docker-compose to bring up postgresql, redis and localstack
-npm run dev:services
+# Install postgres
+brew install postgresql@11
+brew services start postgresql@11
+
+# Create the database
+createdb postmangovsg_dev
+
+# Check if you can connect to the database
+psql -h localhost -p 5432 postmangovsg_dev
+
+# Install redis
+brew install redis
+brew services start redis
+
+# Check that redis is running
+redis-cli ping
+
+# Have localstack running
+export AWS_ENDPOINT=http://localhost:4566
+export FILE_STORAGE_BUCKET_NAME=localstack-upload
+export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
+npm run dev:localstack
 
 # Optional: get cw to tail Cloudwatch logs
 brew tap lucagrulla/tap
 brew install cw
 
 # Tail logs on localstack
-export AWS_ENDPOINT=http://localhost:4566
 cw tail -r ap-northeast-1 -u $AWS_ENDPOINT -f $AWS_LOG_GROUP_NAME:`node --eval='console.log(require("os").hostname())'`
 
 ```

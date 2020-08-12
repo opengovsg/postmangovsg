@@ -21,8 +21,8 @@ services:
     environment:
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
-      - FILE_STORAGE_BUCKET_NAME=localstack-upload
-      - AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
+      - FILE_STORAGE_BUCKET_NAME=${FILE_STORAGE_BUCKET_NAME:-localstack-upload}
+      - AWS_LOG_GROUP_NAME=${AWS_LOG_GROUP_NAME:-postmangovsg-beanstalk-localstack}
     volumes:
       - ./localstack:/docker-entrypoint-initaws.d
       - localstack-data:/tmp/localstack
