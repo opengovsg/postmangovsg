@@ -8,7 +8,7 @@ import {
   ProgressDetailsPage,
   ProtectedPage,
 } from './page-models'
-import { MailClient } from './../mocks'
+import { MockMailServer } from './../mocks'
 import { getPageUrl, generateRandomEmail } from './helpers'
 import config from './../config'
 
@@ -26,7 +26,7 @@ fixture`Email campaigns`
     await t.expect(getPageUrl()).contains('/campaigns')
   })
   .afterEach(async () => {
-    await MailClient.deleteAll()
+    await MockMailServer.deleteAll()
   })
 
 test('Create email campaign', async (t) => {
@@ -74,7 +74,7 @@ test('Create protected email campaign', async (t) => {
     invalid: 0,
   })
 
-  const { html } = await MailClient.getLatestEmail('test@open.gov.sg')
+  const { html } = await MockMailServer.getLatestEmail('test@open.gov.sg')
   const protectedLink = html.match(/(https?:\/\/[^ ]*)/g)[0]
   await t.navigateTo(protectedLink)
 

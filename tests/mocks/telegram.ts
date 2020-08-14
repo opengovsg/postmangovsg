@@ -147,10 +147,10 @@ const createMockApiServer = (logApiCalls: boolean): http.Server => {
   mountRoute(router, '/sendMessage', sendMessage)
 
   app.get('/messages', (_req: Request, res: Response) =>
-    res.json(TelegramClient.getMessages())
+    res.json(MockTelegramServer.getMessages())
   )
   app.delete('/messages', (_req: Request, res: Response) => {
-    TelegramClient.deleteAll()
+    MockTelegramServer.deleteAll()
     return res.sendStatus(200)
   })
 
@@ -161,12 +161,12 @@ const createMockApiServer = (logApiCalls: boolean): http.Server => {
 
 /**
  * Initialize and start mock Telegram API
- * @param port Port to start mock Telegram API on
  * @param logApiCalls Whether to log API calls to stdout
+ * @param port Port to start mock Telegram API on
  */
-export const startMockTelegramApi = async (
-  port = 1081,
-  logApiCalls = false
+const start = async (
+  logApiCalls = false,
+  port = 1081
 ): Promise<http.Server> => {
   const server = createMockApiServer(logApiCalls)
   return new Promise((resolve) => {
@@ -210,7 +210,8 @@ const getBotInfo = (botId: string): BotInfo | null => {
   return botId in BOTS ? BOTS[botId] : null
 }
 
-export const TelegramClient = {
+export const MockTelegramServer = {
+  start,
   getMessages,
   getLastestMessage,
   deleteAll,

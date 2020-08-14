@@ -2,7 +2,7 @@ import fs from 'fs'
 import createTestCafe from 'testcafe'
 import config from './../config'
 
-import { startMailDev, startMockTelegramApi } from './../mocks'
+import { MockMailServer, MockTelegramServer } from './../mocks'
 import { waitForAppReady, sequelizeLoader } from './helpers'
 
 const CHROME_BROWSER = 'chrome --allow-insecure-localhost'
@@ -10,8 +10,8 @@ const CHROME_BROWSER = 'chrome --allow-insecure-localhost'
 const loadServices = async (): Promise<void> => {
   await Promise.all([
     waitForAppReady(),
-    startMockTelegramApi(),
-    startMailDev(),
+    MockMailServer.start(),
+    MockTelegramServer.start(),
     sequelizeLoader(),
   ])
 }

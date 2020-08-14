@@ -7,7 +7,7 @@ import {
   TelegramCampaignPage,
   ProgressDetailsPage,
 } from './page-models'
-import { TelegramClient, MailClient } from './../mocks'
+import { MockTelegramServer, MockMailServer } from './../mocks'
 import {
   getPageUrl,
   generateRandomEmail,
@@ -34,8 +34,8 @@ fixture`Telegram campaigns`
     await t.expect(getPageUrl()).contains('/campaigns')
   })
   .afterEach(async () => {
-    await MailClient.deleteAll()
-    TelegramClient.deleteAll()
+    await MockMailServer.deleteAll()
+    MockTelegramServer.deleteAll()
   })
 
 test('Create Telegram campaign', async (t) => {
@@ -53,7 +53,7 @@ test('Create Telegram campaign', async (t) => {
     botToken,
     phoneNumber,
   })
-  const botInfo = TelegramClient.getBotInfo(botId)
+  const botInfo = MockTelegramServer.getBotInfo(botId)
   await t.expect(botInfo.webhookUrl).ok()
   await t.expect(botInfo.commands.length).eql(2)
 
@@ -64,6 +64,6 @@ test('Create Telegram campaign', async (t) => {
     invalid: 0,
   })
 
-  const latestMessage = TelegramClient.getLastestMessage(telegramId)
+  const latestMessage = MockTelegramServer.getLastestMessage(telegramId)
   await t.expect(latestMessage.text).eql('This is a test message')
 })

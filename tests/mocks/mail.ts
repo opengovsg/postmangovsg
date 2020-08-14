@@ -7,7 +7,7 @@ const MAILDEV_URL = 'http://localhost:1080'
 /**
  * Initialize and start mailDev server
  */
-export const startMailDev = async (): Promise<void> => {
+const start = async (): Promise<void> => {
   return new Promise((resolve, reject) => {
     const maildev = new MailDev({})
     maildev.listen((err) => {
@@ -53,7 +53,8 @@ const deleteAll = (): Promise<void> => {
   return axios.delete(`${MAILDEV_URL}/email/all`)
 }
 
-export const MailClient = {
+export const MockMailServer = {
+  start,
   getAll,
   getLatestEmail,
   deleteById,

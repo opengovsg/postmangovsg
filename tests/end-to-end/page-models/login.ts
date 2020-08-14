@@ -1,7 +1,7 @@
 import { t } from 'testcafe'
 import { ReactSelector } from 'testcafe-react-selectors'
 
-import { MailClient } from './../../mocks'
+import { MockMailServer } from './../../mocks'
 
 const emailInput = ReactSelector('Login TextInputWithButton').withProps({
   type: 'email',
@@ -18,14 +18,14 @@ const errorBlock = ReactSelector('Login ErrorBlock')
 const getOtp = async (toEmail: string): Promise<string> => {
   let latestEmail: any
   try {
-    latestEmail = await MailClient.getLatestEmail(toEmail)
+    latestEmail = await MockMailServer.getLatestEmail(toEmail)
     const otp = latestEmail.html.match(/\d{6}/)[0]
     return otp
   } catch (err) {
     throw new Error('Unable to find OTP')
   } finally {
     if (latestEmail) {
-      await MailClient.deleteById(latestEmail.id)
+      await MockMailServer.deleteById(latestEmail.id)
     }
   }
 }

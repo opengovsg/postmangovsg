@@ -7,7 +7,7 @@ import {
   SmsCampaignPage,
   ProgressDetailsPage,
 } from './page-models'
-import { MailClient } from './../mocks'
+import { MockMailServer } from './../mocks'
 import { getPageUrl, generateRandomEmail } from './helpers'
 import config from './../config'
 
@@ -25,7 +25,7 @@ fixture`SMS campaigns`
     await t.expect(getPageUrl()).contains('/campaigns')
   })
   .afterEach(async () => {
-    await MailClient.deleteAll()
+    await MockMailServer.deleteAll()
   })
 
 test('Create SMS campaign', async () => {

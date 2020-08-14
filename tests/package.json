@@ -9,8 +9,8 @@
     "lint-no-fix": "eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
     "mock": "concurrently -k -p \"[{name}]\" -n \"Email,Telegram\" -c \"cyan.bold,yellow.bold\" \"npm run mock:mail\" \"npm run mock:telegram\"",
-    "mock:mail": "maildev",
-    "mock:telegram": "ts-node -e \"require('./mocks').startMockTelegramApi(1081, true).catch(err => console.error(err))\"",
+    "mock:mail": "ts-node -e \"require('./mocks').MockMailServer.start().catch(err => console.error(err))\"",
+    "mock:telegram": "ts-node -e \"require('./mocks').MockTelegramServer.start(true).catch(err => console.error(err))\"",
     "precommit": "lint-staged"
   },
   "keywords": [],
