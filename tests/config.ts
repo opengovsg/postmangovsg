@@ -81,30 +81,6 @@ const config = convict({
       env: 'TEST_TIMEOUT_SEND_COMPLETE',
     },
   },
-  testCredentials: {
-    sms: {
-      accountSid: {
-        doc: 'Test Twilio account SID',
-        env: 'TEST_TWILIO_ACCOUNT_SID',
-        default: '',
-        format: 'required-string',
-        sensitive: true,
-      },
-      apiSecret: {
-        doc: 'Test API Secret to access Twilio',
-        env: 'TEST_TWILIO_API_SECRET',
-        default: '',
-        format: 'required-string',
-        sensitive: true,
-      },
-      messagingServiceSid: {
-        doc: 'ID of the messaging service ',
-        default: '+15005550006',
-        env: 'TEST_TWILIO_MESSAGING_SERVICE_SID',
-        sensitive: true,
-      },
-    },
-  },
 })
 
 export default config

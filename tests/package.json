@@ -8,9 +8,10 @@
     "dev:e2e": "npm test -- --live-mode",
     "lint-no-fix": "eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
-    "mock": "concurrently -k -p \"[{name}]\" -n \"Email,Telegram\" -c \"cyan.bold,yellow.bold\" \"npm run mock:mail\" \"npm run mock:telegram\"",
+    "mock": "concurrently -k -p \"[{name}]\" -n \"Email,Telegram,Twilio\" -c \"cyan.bold,yellow.bold,white.bold\" \"npm run mock:mail\" \"npm run mock:telegram\" \"npm run mock:twilio\"",
     "mock:mail": "ts-node -e \"require('./mocks').MockMailServer.start().catch(err => console.error(err))\"",
     "mock:telegram": "ts-node -e \"require('./mocks').MockTelegramServer.start(true).catch(err => console.error(err))\"",
+    "mock:twilio": "ts-node -e \"require('./mocks').MockTwilioServer.start(true).catch(err => console.error(err))\"",
     "precommit": "lint-staged"
   },
   "keywords": [],

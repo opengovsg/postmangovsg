@@ -50,18 +50,20 @@ const uploadRecipient = async ({
  */
 const enterAndValidateNewCredentials = async ({
   accountSid,
+  apiKey,
   apiSecret,
   messagingServiceSid,
   phoneNumber,
 }: {
   accountSid: string
+  apiKey: string
   apiSecret: string
   messagingServiceSid: string
   phoneNumber: string
 }): Promise<void> => {
   await t
     .typeText(twilioCredentialsInput.nth(0), accountSid)
-    .typeText(twilioCredentialsInput.nth(1), accountSid)
+    .typeText(twilioCredentialsInput.nth(1), apiKey)
     .typeText(twilioCredentialsInput.nth(2), apiSecret)
     .typeText(twilioCredentialsInput.nth(3), messagingServiceSid)
 

@@ -1,5 +1,36 @@
-import twilio from 'twilio'
+import twilio, { Twilio } from 'twilio'
+import { URL } from 'url'
+import RequestClient from 'twilio/lib/base/RequestClient'
+import Response from 'twilio/lib/http/response'
 import { TwilioCredentials } from '@sms/interfaces'
+import logger from '@core/logger'
+import config from '@core/config'
+
+const TWILIO_API_ROOT = config.get('smsOptions.apiRoot')
+
+class CustomRequestClient extends RequestClient {
+  apiUrl: URL
+
+  constructor(apiUrl: string) {
+    super()
+    this.apiUrl = new URL(apiUrl)
+    logger.info(`Using custom Twilio API located at ${apiUrl}`)
+  }
+
+  patchUrl(opts: RequestClient.RequestOptions): void {
+    const uri = new URL(opts.uri)
+    uri.host = this.apiUrl.host
+    uri.port = this.apiUrl.port
+    uri.protocol = this.apiUrl.protocol
+
+    opts.uri = uri.toString()
+  }
+
+  request(opts: RequestClient.RequestOptions): Promise<Response<any>> {
+    this.patchUrl(opts)
+    return super.request(opts)
+  }
+}
 
 export default class TwilioClient {
   private client: any
@@ -7,7 +38,12 @@ export default class TwilioClient {
 
   constructor(credential: TwilioCredentials) {
     const { accountSid, apiKey, apiSecret, messagingServiceSid } = credential
-    this.client = twilio(apiKey, apiSecret, { accountSid })
+    const opts: Twilio.TwilioClientOptions = { accountSid }
+    if (TWILIO_API_ROOT !== config.default('smsOptions.apiRoot')) {
+      opts.httpClient = new CustomRequestClient(TWILIO_API_ROOT)
+    }
+
+    this.client = twilio(apiKey, apiSecret, opts)
     this.messagingServiceSid = messagingServiceSid
   }
 

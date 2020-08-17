@@ -288,29 +288,36 @@ const config = convict({
     env: 'DEFAULT_COUNTRY_CODE',
   },
   smsOptions: {
-    accountSid: {
-      doc: 'Id of the Twilio account',
-      default: '',
-      env: 'TWILIO_ACCOUNT_SID',
-      sensitive: true,
+    credentials: {
+      accountSid: {
+        doc: 'Id of the Twilio account',
+        default: '',
+        env: 'TWILIO_ACCOUNT_SID',
+        sensitive: true,
+      },
+      apiKey: {
+        doc: 'API Key to access Twilio',
+        default: '',
+        env: 'TWILIO_API_KEY',
+        sensitive: true,
+      },
+      apiSecret: {
+        doc: 'Corresponding API Secret to access Twilio',
+        default: '',
+        env: 'TWILIO_API_SECRET',
+        sensitive: true,
+      },
+      messagingServiceSid: {
+        doc: 'ID of the messaging service ',
+        default: '',
+        env: 'TWILIO_MESSAGING_SERVICE_SID',
+        sensitive: true,
+      },
     },
-    apiKey: {
-      doc: 'API Key to access Twilio',
-      default: '',
-      env: 'TWILIO_API_KEY',
-      sensitive: true,
-    },
-    apiSecret: {
-      doc: 'Corresponding API Secret to access Twilio',
-      default: '',
-      env: 'TWILIO_API_SECRET',
-      sensitive: true,
-    },
-    messagingServiceSid: {
-      doc: 'ID of the messaging service ',
-      default: '',
-      env: 'TWILIO_MESSAGING_SERVICE_SID',
-      sensitive: true,
+    apiRoot: {
+      doc: 'Twilio API root url',
+      default: 'https://api.twilio.com',
+      env: 'TWILIO_API_ROOT',
     },
   },
   telegramOptions: {
@@ -444,6 +451,15 @@ switch (config.get('env')) {
       telegramOptions: {
         apiRoot: 'http://localhost:1081',
         telegramBotToken: '11111111:thisisadummybottoken',
+      },
+      smsOptions: {
+        apiRoot: 'http://localhost:1082',
+        credentials: {
+          accountSid: 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+          apiKey: 'SKXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+          apiSecret: 'thisisdummysecretfortwiliocredentials',
+          messagingServiceSid: 'MGXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        },
       },
     })
     break

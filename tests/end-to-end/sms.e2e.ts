@@ -7,7 +7,7 @@ import {
   SmsCampaignPage,
   ProgressDetailsPage,
 } from './page-models'
-import { MockMailServer } from './../mocks'
+import { MockMailServer, MockTwilioServer } from './../mocks'
 import { getPageUrl, generateRandomEmail } from './helpers'
 import config from './../config'
 
@@ -16,6 +16,12 @@ fixture`SMS campaigns`
   .beforeEach(async (t) => {
     const email = generateRandomEmail()
     t.ctx.email = email
+    t.ctx.credentials = {
+      accountSid: 'ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      apiKey: 'SKXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      apiSecret: 'thisisdummysecretfortwiliocredentials',
+      messagingServiceSid: 'MGXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    }
 
     await waitForReact()
     await LandingPage.selectLogin()
@@ -26,9 +32,11 @@ fixture`SMS campaigns`
   })
   .afterEach(async () => {
     await MockMailServer.deleteAll()
+    MockTwilioServer.deleteAll()
   })
 
-test('Create SMS campaign', async () => {
+test('Create SMS campaign', async (t) => {
+  const { credentials } = t.ctx
   await CampaignsPage.selectCreateCampaign()
   await CreateModalPage.createCampaign('sms', 'SMS')
 
@@ -39,7 +47,7 @@ test('Create SMS campaign', async () => {
     filename: './../files/sms.csv',
   })
   await SmsCampaignPage.enterAndValidateNewCredentials({
-    ...config.get('testCredentials.sms'),
+    ...credentials,
     phoneNumber: '91234567',
   })
   await SmsCampaignPage.sendCampaign()
@@ -48,4 +56,7 @@ test('Create SMS campaign', async () => {
     sent: 4,
     invalid: 0,
   })
+
+  const latestMessage = MockTwilioServer.getLastestMessage('+6591234567')
+  await t.expect(latestMessage.body).eql('This is a test message')
 })

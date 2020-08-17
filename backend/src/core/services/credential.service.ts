@@ -97,7 +97,7 @@ const getTwilioCredentials = async (
     logger.info(
       `Dev env - getTwilioCredentials - returning default credentials for name=${name}`
     )
-    return config.get('smsOptions')
+    return config.get('smsOptions.credentials')
   }
   logger.info('Getting secret from AWS secrets manager.')
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
