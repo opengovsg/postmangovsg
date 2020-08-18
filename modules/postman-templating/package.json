@@ -5,10 +5,11 @@
   "main": "build/index.js",
   "scripts": {
     "start": "tsc && node build/index.js",
+    "list-modules": "npm list --depth=0",
     "build": "rimraf build && tsc",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
-    "postinstall": "npm run build",
+    "postinstall": "npm run list-modules && npm run build",
     "test": "jest"
   },
   "types": "build/index",
@@ -41,6 +42,6 @@
     "mustache": "^4.0.1",
     "rimraf": "^3.0.2",
     "typescript": "^3.9.5",
-    "xss": "^1.0.6"
+    "xss": "=1.0.6"
   }
 }
