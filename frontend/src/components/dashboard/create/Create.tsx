@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -10,7 +10,8 @@ import {
   TelegramCampaign,
   Status,
 } from 'classes'
-import { TitleBar, PrimaryButton } from 'components/common'
+import { ModalContext } from 'contexts/modal.context'
+import { TitleBar, PrimaryButton, ConfirmModal } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import SMSCreate from './sms/SMSCreate'
@@ -22,6 +23,7 @@ const Create = () => {
   const { id } = useParams()
   const history = useHistory()
 
+  const modalContext = useContext(ModalContext)
   const [campaign, setCampaign] = useState(new Campaign({}))
   const [isLoading, setLoading] = useState(true)
   const finishLaterCallbackRef: React.MutableRefObject<
@@ -38,6 +40,31 @@ const Create = () => {
     if (!id) return
     loadProject(id)
   }, [id])
+
+  async function handleFinishLater() {
+    if (campaign.status === Status.Draft) {
+      sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
+
+      if (finishLaterCallbackRef.current) {
+        return modalContext.setModalContent(
+          <ConfirmModal
+            title="Would you like to save your draft?"
+            subtitle='Your current template will be saved and you can return to it later by selecting the "Create message" step on the navigation bar at the side.'
+            buttonText="Save draft"
+            cancelText="Skip saving draft"
+            onConfirm={async () => {
+              if (finishLaterCallbackRef.current) {
+                await finishLaterCallbackRef.current()
+              }
+              history.push('/campaigns')
+            }}
+            onCancel={() => history.push('/campaigns')}
+          />
+        )
+      }
+    }
+    history.push('/campaigns')
+  }
 
   function renderCreateChannel() {
     switch (campaign.type) {
@@ -75,25 +102,7 @@ const Create = () => {
       {campaign ? (
         <>
           <TitleBar title={campaign.name}>
-            <PrimaryButton
-              onClick={async () => {
-                if (campaign.status === Status.Draft) {
-                  sendUserEvent(
-                    GA_USER_EVENTS.FINISH_CAMPAIGN_LATER,
-                    campaign.type
-                  )
-
-                  if (finishLaterCallbackRef.current) {
-                    try {
-                      await finishLaterCallbackRef.current()
-                    } catch (err) {
-                      return // Short-circuit to prevent navigation
-                    }
-                  }
-                }
-                history.push('/campaigns')
-              }}
-            >
+            <PrimaryButton onClick={handleFinishLater}>
               {campaign.status === Status.Draft
                 ? 'Finish this later'
                 : 'Back to campaigns'}
