@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 
 import { TextArea, NextButton, ErrorBlock, TextInput } from 'components/common'
+import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/email.service'
 
@@ -19,10 +21,9 @@ const EmailTemplate = ({
   replyTo: string | null
   protect: boolean
   onNext: (changes: any, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<
-    (() => Promise<void>) | undefined
-  >
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
+  const modalContext = useContext(ModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
@@ -71,15 +72,21 @@ const EmailTemplate = ({
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = async () => {
-      if (subject && body) {
-        await handleSaveTemplate(false)
-      }
+    finishLaterCallbackRef.current = () => {
+      modalContext.setModalContent(
+        <SaveDraftModal
+          onSave={async () => {
+            if (subject && body) {
+              await handleSaveTemplate(false)
+            }
+          }}
+        />
+      )
     }
     return () => {
       finishLaterCallbackRef.current = undefined
     }
-  }, [body, finishLaterCallbackRef, handleSaveTemplate, subject])
+  }, [body, finishLaterCallbackRef, handleSaveTemplate, modalContext, subject])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''

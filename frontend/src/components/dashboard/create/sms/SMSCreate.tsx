@@ -25,9 +25,7 @@ const CreateSMS = ({
 }: {
   campaign: SMSCampaign
   onCampaignChange: (c: Campaign) => void
-  finishLaterCallbackRef: React.MutableRefObject<
-    (() => Promise<void>) | undefined
-  >
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)

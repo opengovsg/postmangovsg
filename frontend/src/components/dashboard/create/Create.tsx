@@ -27,7 +27,7 @@ const Create = () => {
   const [campaign, setCampaign] = useState(new Campaign({}))
   const [isLoading, setLoading] = useState(true)
   const finishLaterCallbackRef: React.MutableRefObject<
-    (() => Promise<void>) | undefined
+    (() => void) | undefined
   > = useRef()
 
   async function loadProject(id: string) {
@@ -46,21 +46,7 @@ const Create = () => {
       sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
 
       if (finishLaterCallbackRef.current) {
-        return modalContext.setModalContent(
-          <ConfirmModal
-            title="Would you like to save your draft?"
-            subtitle='Your current template will be saved and you can return to it later by selecting the "Create message" step on the navigation bar at the side.'
-            buttonText="Save draft"
-            cancelText="Skip saving draft"
-            onConfirm={async () => {
-              if (finishLaterCallbackRef.current) {
-                await finishLaterCallbackRef.current()
-              }
-              history.push('/campaigns')
-            }}
-            onCancel={() => history.push('/campaigns')}
-          />
-        )
+        return finishLaterCallbackRef.current()
       }
     }
     history.push('/campaigns')
