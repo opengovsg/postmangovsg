@@ -1,9 +1,9 @@
 import { mapKeys } from 'lodash'
 import xss from 'xss'
-import * as Sqrl from 'squirrelly'
-import { AstObject, TemplateObject } from 'squirrelly/dist/types/parse'
 import { TemplateError } from './errors'
 import { TemplatingConfig, TemplatingConfigDefault } from './interfaces'
+
+import mustache from 'mustache'
 
 export class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
@@ -44,49 +44,14 @@ export class TemplateClient {
     const variables: Set<string> = new Set()
     const tokens: Array<string> = []
 
-    /**
-     * dict used for checking keys in lowercase
-     * dict === {} if param === undefined
-     */
     const dict = mapKeys(params, (_value, key) => key.toLowerCase())
-
     try {
-      const parseTree = Sqrl.parse(templateBody, Sqrl.defaultConfig)
-      parseTree.forEach((astObject: AstObject) => {
-        // AstObject = TemplateObject | string
-
-        // normal string (non variable portion)
-        if (typeof astObject === 'string') {
-          tokens.push(astObject)
-          return
-        }
-
-        // ie. it is a TemplateObject
-        const templateObject = astObject as TemplateObject
-        // templateObject.t means TagType, default is r
-        // templateObject.raw means ???
-        // templateObject.f refers to filter (eg. {{ var | humanize }}), we want to make sure this is empty
-        if (
-          templateObject.t === 'r' &&
-          !templateObject.raw &&
-          templateObject.f?.length === 0
-        ) {
-          /**
-           * - templateObject.c has type string | undefined
-           * - templateObject.c contains the param key, c stands for content
-           * - this is the extracted variable name from the template AST
-           * - this extracted key is already trimmed (ie. no leading nor trailing spaces)
-           * - coerce to lowercase for comparison
-           */
-          const key = templateObject.c?.toLowerCase()
-
-          // Have not found a case that triggers this
-          if (key === undefined) {
-            console.error(
-              `Templating error: templateObject.c of ${templateObject} is undefined.`
-            )
-            throw new TemplateError('TemplateObject has no content')
-          }
+      const parsed = mustache.parse(templateBody)
+      for (const meta of parsed) {
+        const tokenType = meta[0]
+        const token = meta[1]
+        if (tokenType === 'name') {
+          const key = token.toLowerCase()
 
           if (key.length === 0) {
             throw new TemplateError(
@@ -102,47 +67,43 @@ export class TemplateClient {
             )
           }
 
-          // add key regardless, note that this is also returned in lowercase
           variables.add(key)
 
           // if no params continue with the loop
-          if (!params) return
+          if (!params) continue
 
-          // if params provided == attempt to carry out templating
           if (dict[key]) {
             const templated = dict[key]
             tokens.push(templated)
-            return
+          } else {
+            // recipient key must have param
+            if (key === 'recipient') {
+              throw new TemplateError(`Param ${key} not found`)
+            }
           }
-
-          // recipient key must have param
-          if (key === 'recipient')
-            throw new TemplateError(`Param ${templateObject.c} not found`)
-        } else {
-          // FIXME: be more specific about templateObject, just pass the error itself?
-          console.error(
-            `Templating error: invalid template provided. templateObject= ${JSON.stringify(
-              templateObject
-            )}`
-          )
-          throw new TemplateError('Invalid template provided')
+        } else if (tokenType === 'text') {
+          tokens.push(token)
         }
-      })
+      }
+
       return {
         variables: Array.from(variables), // variables are unique
         tokens,
       }
     } catch (err) {
       console.error({ message: `${err.stack}` })
-      if (err.message.includes('unclosed tag'))
+      if (err.message.includes('Unclosed tag'))
         throw new TemplateError(
           'Check that all the keywords have double curly brackets around them.\nA correct example is {{ keyword }}, and incorrect ones are {{ keyword } or {{ keyword . '
         )
-      if (err.message.includes('unclosed string'))
+      // reserved chars in mustache are '^' and '#' and '/'
+      if (
+        err.message.includes('Unclosed section') ||
+        err.message.includes('Unopened section')
+      )
         throw new TemplateError(
           "Check that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person's Name }} are not allowed, but {{ Person_Name }} is allowed."
         )
-      if (err.name === 'Squirrelly Error') throw new TemplateError(err.message)
       throw err
     }
   }
