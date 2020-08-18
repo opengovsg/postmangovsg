@@ -51,6 +51,7 @@ const TelegramTemplate = ({
     finishLaterCallbackRef.current = () => {
       modalContext.setModalContent(
         <SaveDraftModal
+          saveable
           onSave={async () => {
             if (body) await handleSaveTemplate(false)
           }}

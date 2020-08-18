@@ -75,6 +75,7 @@ const EmailTemplate = ({
     finishLaterCallbackRef.current = () => {
       modalContext.setModalContent(
         <SaveDraftModal
+          saveable
           onSave={async () => {
             if (subject && body) {
               await handleSaveTemplate(false)

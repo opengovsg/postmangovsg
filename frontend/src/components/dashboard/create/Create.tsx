@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -10,8 +10,7 @@ import {
   TelegramCampaign,
   Status,
 } from 'classes'
-import { ModalContext } from 'contexts/modal.context'
-import { TitleBar, PrimaryButton, ConfirmModal } from 'components/common'
+import { TitleBar, PrimaryButton } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import SMSCreate from './sms/SMSCreate'
@@ -23,7 +22,6 @@ const Create = () => {
   const { id } = useParams()
   const history = useHistory()
 
-  const modalContext = useContext(ModalContext)
   const [campaign, setCampaign] = useState(new Campaign({}))
   const [isLoading, setLoading] = useState(true)
   const finishLaterCallbackRef: React.MutableRefObject<

@@ -79,6 +79,7 @@ const CreateEmail = ({
               numRecipients={campaign.numRecipients}
               isProcessing={campaign.isCsvProcessing}
               onNext={onNext}
+              finishLaterCallbackRef={finishLaterCallbackRef}
             />
           )
         }
