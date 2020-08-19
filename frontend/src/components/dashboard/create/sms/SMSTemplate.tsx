@@ -39,7 +39,7 @@ const SMSTemplate = ({
   }, [body])
 
   const handleSaveTemplate = useCallback(
-    async (next = true): Promise<void> => {
+    async (propagateError = false): Promise<void> => {
       setErrorMsg(null)
       try {
         if (!campaignId) {
@@ -49,16 +49,14 @@ const SMSTemplate = ({
           +campaignId,
           body
         )
-        onNext(
-          {
-            body: updatedTemplate?.body,
-            params: updatedTemplate?.params,
-            numRecipients,
-          },
-          next
-        )
+        onNext({
+          body: updatedTemplate?.body,
+          params: updatedTemplate?.params,
+          numRecipients,
+        })
       } catch (err) {
         setErrorMsg(err.message)
+        if (propagateError) throw err
       }
     },
     [body, campaignId, onNext]
@@ -71,7 +69,7 @@ const SMSTemplate = ({
         <SaveDraftModal
           saveable
           onSave={async () => {
-            if (body) await handleSaveTemplate(false)
+            if (body) await handleSaveTemplate(true)
           }}
         />
       )

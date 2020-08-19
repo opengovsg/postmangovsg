@@ -36,7 +36,7 @@ const EmailTemplate = ({
     'Dear {{ name }}, your next appointment at {{ clinic }} is on {{ date }} at {{ time }}'
 
   const handleSaveTemplate = useCallback(
-    async (next = true): Promise<void> => {
+    async (propagateError = false): Promise<void> => {
       setErrorMsg(null)
       try {
         if (!campaignId) {
@@ -48,23 +48,16 @@ const EmailTemplate = ({
           body,
           replyTo
         )
-        onNext(
-          {
-            subject: updatedTemplate?.subject,
-            body: updatedTemplate?.body,
-            replyTo: updatedTemplate?.reply_to,
-            params: updatedTemplate?.params,
-            numRecipients,
-          },
-          next
-        )
+        onNext({
+          subject: updatedTemplate?.subject,
+          body: updatedTemplate?.body,
+          replyTo: updatedTemplate?.reply_to,
+          params: updatedTemplate?.params,
+          numRecipients,
+        })
       } catch (err) {
         setErrorMsg(err.message)
-
-        // Rethrow error to be handled elsewhere
-        if (!next) {
-          throw err
-        }
+        if (propagateError) throw err
       }
     },
     [body, campaignId, onNext, replyTo, subject]
@@ -78,7 +71,7 @@ const EmailTemplate = ({
           saveable
           onSave={async () => {
             if (subject && body) {
-              await handleSaveTemplate(false)
+              await handleSaveTemplate(true)
             }
           }}
         />
