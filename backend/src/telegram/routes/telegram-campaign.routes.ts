@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
-  SettingsMiddleware,
   CampaignMiddleware,
   UploadMiddleware,
   JobMiddleware,
@@ -35,11 +34,6 @@ const uploadCompleteValidator = {
 }
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    label: Joi.string()
-      .min(1)
-      .max(50)
-      .pattern(/^[a-z0-9-]+$/)
-      .required(),
     telegram_bot_token: Joi.string().trim().required(),
   }),
 }
@@ -436,10 +430,8 @@ router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
-  SettingsMiddleware.checkUserCredentialLabel,
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
-  SettingsMiddleware.storeUserCredential,
   TelegramMiddleware.setCampaignCredential
 )
 
@@ -683,6 +675,36 @@ router.post(
  *           description: Internal Server Error
  */
 router.get('/stats', TelegramStatsMiddleware.getStats)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/update-stats:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Get telegram campaign stats
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post('/refresh-stats', TelegramStatsMiddleware.updateAndGetStats)
 
 /**
  * @swagger

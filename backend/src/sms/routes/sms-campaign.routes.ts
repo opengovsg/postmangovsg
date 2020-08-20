@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
-  SettingsMiddleware,
   CampaignMiddleware,
   UploadMiddleware,
   JobMiddleware,
@@ -36,11 +35,6 @@ const uploadCompleteValidator = {
 
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    label: Joi.string()
-      .min(1)
-      .max(50)
-      .pattern(/^[a-z0-9-]+$/)
-      .required(),
     twilio_account_sid: Joi.string().trim().required(),
     twilio_api_secret: Joi.string().trim().required(),
     twilio_api_key: Joi.string().trim().required(),
@@ -349,7 +343,7 @@ router.delete(
  *    post:
  *      tags:
  *        - SMS
- *      summary: Validate and store twilio credentials for user and assign to campaign
+ *      summary: Validate twilio credentials and assign to campaign
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -365,12 +359,6 @@ router.delete(
  *                - $ref: '#/components/schemas/TwilioCredentials'
  *                - type: object
  *                  properties:
- *                    label:
- *                      type: string
- *                      pattern: '/^[a-z0-9-]+$/'
- *                      minLength: 1
- *                      maxLength: 50
- *                      description: should only consist of lowercase alphanumeric characters and dashes
  *                    recipient:
  *                      type: string
  *
@@ -394,10 +382,8 @@ router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
-  SettingsMiddleware.checkUserCredentialLabel,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
-  SettingsMiddleware.storeUserCredential,
   SmsMiddleware.setCampaignCredential
 )
 
@@ -628,6 +614,36 @@ router.post(
  *           description: Internal Server Error
  */
 router.get('/stats', SmsStatsMiddleware.getStats)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/sms/refresh-stats:
+ *    post:
+ *      tags:
+ *        - SMS
+ *      summary: Forcibly refresh sms campaign stats, then retrieves them
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *
+ *      responses:
+ *        200:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/CampaignStats'
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post('/refresh-stats', SmsStatsMiddleware.updateAndGetStats)
 
 /**
  * @swagger
