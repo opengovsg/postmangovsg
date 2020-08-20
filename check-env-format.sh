@@ -13,7 +13,7 @@ if [ "$UNQUOTED" != "" ]; then
   echo "All values need to be quoted in order for detect-secrets to identify possible secrets."
   echo
   echo "Please check the following file(s):"
-  git diff --name-only --staged -z $against -- '*.env*' | xargs -0 echo " -"
+  git diff --name-only --staged -z $against -- '*.env*' | xargs -0 -n1 printf " - %s\n"
   echo
 
   exit 1
