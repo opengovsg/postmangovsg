@@ -18,24 +18,27 @@ const Unsubscribe = () => {
   const [isUnsubscribed, setUnsubscribed] = useState(false)
   const [isStaying, setStaying] = useState(false)
 
+  function validateParams(params: querystring.ParsedUrlQuery): void {
+    // Ensure that all required params exists and are strings and not []strings
+    const isValid = ['c', 'r', 'h'].every(
+      (key) => params[key] && typeof params[key] === 'string'
+    )
+    if (!isValid) {
+      throw new Error('Parameters are missing or invalid')
+    }
+  }
+
   async function onConfirmation() {
     try {
-      const query = new URL(window.location.href).searchParams.toString()
-      const params = querystring.parse(query)
-
-      // Check to make sure that the search params are all strings and not []strings
-      const isValid = Object.values(params).every((v) => typeof v === 'string')
-      if (!isValid) {
-        throw new Error(
-          'Search params should all be strings and not array of strings.'
-        )
-      }
-
-      const { c: campaignId, r: recipient, h: hash } = params
-
       // Version is set to 'test' when the unsub link is generated from a campaign
       // test email. As such, we should not make any API calls.
       if (version !== 'test') {
+        const query = new URL(window.location.href).searchParams.toString()
+        const params = querystring.parse(query)
+        validateParams(params)
+
+        const { c: campaignId, r: recipient, h: hash } = params
+
         await unsubscribeRequest({
           campaignId: +campaignId,
           recipient: recipient as string,
