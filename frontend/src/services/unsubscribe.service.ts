@@ -11,6 +11,7 @@ export async function unsubscribeRequest({
   version: string
 }): Promise<void> {
   try {
+    recipient = window.encodeURIComponent(recipient)
     await axios.put(`/unsubscribe/${campaignId}/${recipient}`, {
       h: hash,
       v: version,
