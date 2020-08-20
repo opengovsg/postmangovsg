@@ -2,11 +2,12 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 
-import { GUIDE_URL, CONTRIBUTE_URL } from 'config'
+import { LINKS } from 'config'
 import PrimaryButton from 'components/common/primary-button'
 import AppLogo from 'assets/img/brand/app-logo.svg'
 import AppBrandmark from 'assets/img/brand/app-brandmark.svg'
 import styles from './NavBar.module.scss'
+import { i18n } from 'locales'
 
 const NavBar = () => {
   const history = useHistory()
@@ -29,16 +30,16 @@ const NavBar = () => {
         <div className={styles.links}>
           <OutboundLink
             className={styles.link}
-            eventLabel={CONTRIBUTE_URL}
-            to={CONTRIBUTE_URL}
+            eventLabel={i18n._(LINKS.contributeUrl)}
+            to={i18n._(LINKS.contributeUrl)}
             target="_blank"
           >
             Contribute
           </OutboundLink>
           <OutboundLink
             className={styles.link}
-            eventLabel={GUIDE_URL}
-            to={GUIDE_URL}
+            eventLabel={i18n._(LINKS.guideUrl)}
+            to={i18n._(LINKS.guideUrl)}
             target="_blank"
           >
             Guide

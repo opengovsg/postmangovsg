@@ -21,6 +21,27 @@ const getStats = async (
 }
 
 /**
+ * Forcibly refresh stats for campaign, then retrieves them
+ * @param req
+ * @param res
+ * @param next
+ */
+const updateAndGetStats = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { campaignId } = req.params
+  try {
+    await TelegramStatsService.refreshStats(+campaignId)
+    const stats = await TelegramStatsService.getStats(+campaignId)
+    return res.json(stats)
+  } catch (err) {
+    next(err)
+  }
+}
+
+/**
  * Gets invalid recipients for Telegram campaign
  * @param req
  * @param res
@@ -45,4 +66,5 @@ const getFailedRecipients = async (
 export const TelegramStatsMiddleware = {
   getStats,
   getFailedRecipients,
+  updateAndGetStats,
 }

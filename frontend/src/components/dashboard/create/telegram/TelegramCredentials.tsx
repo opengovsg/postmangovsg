@@ -3,7 +3,7 @@ import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
-import { GUIDE_TELEGRAM_CREDENTIALS_URL } from 'config'
+import { LINKS } from 'config'
 import {
   validateStoredCredentials,
   validateAndStoreNewCredentials,
@@ -21,6 +21,7 @@ import {
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
+import { i18n } from 'locales'
 
 const TelegramCredentials = ({
   hasCredential: initialHasCredential,
@@ -168,8 +169,8 @@ const TelegramCredentials = ({
               unsure about how to retrieve your bot token, please follow the
               instructions provided&nbsp;
               <OutboundLink
-                eventLabel={GUIDE_TELEGRAM_CREDENTIALS_URL}
-                to={GUIDE_TELEGRAM_CREDENTIALS_URL}
+                eventLabel={i18n._(LINKS.guideTelegramUrl)}
+                to={i18n._(LINKS.guideTelegramUrl)}
                 target="_blank"
               >
                 here.

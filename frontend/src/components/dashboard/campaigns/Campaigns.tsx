@@ -5,7 +5,6 @@ import cx from 'classnames'
 import Moment from 'react-moment'
 import { capitalize } from 'lodash'
 
-import { GUIDE_URL } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
 import {
@@ -14,12 +13,15 @@ import {
   PrimaryButton,
   ExportRecipients,
 } from 'components/common'
-import { getCampaigns, getExportStatus } from 'services/campaign.service'
+import { getCampaigns } from 'services/campaign.service'
 import { Campaign, channelIcons, Status } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
+
+import { i18n } from 'locales'
+import { LINKS } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -110,13 +112,10 @@ const Campaigns = () => {
             iconPosition="left"
             campaignId={campaign.id}
             campaignName={campaign.name}
-            status={campaign.status}
             sentAt={campaign.sentAt}
-            exportStatus={getExportStatus(
-              campaign.status,
-              campaign.statusUpdatedAt,
-              +campaign.hasFailedRecipients
-            )}
+            status={campaign.status}
+            statusUpdatedAt={campaign.statusUpdatedAt}
+            hasFailedRecipients={campaign.hasFailedRecipients}
           />
         )
       },
@@ -147,7 +146,11 @@ const Campaigns = () => {
         />
         <h2>We are excited to have you here!</h2>
         <h5>To get you started, we have prepared a guide for your reference</h5>
-        <OutboundLink eventLabel={GUIDE_URL} to={GUIDE_URL} target="_blank">
+        <OutboundLink
+          eventLabel={i18n._(LINKS.guideUrl)}
+          to={i18n._(LINKS.guideUrl)}
+          target="_blank"
+        >
           <PrimaryButton className={styles.darkBlueButton}>
             Learn how to set up <i className="bx bx-right-arrow-alt"></i>
           </PrimaryButton>

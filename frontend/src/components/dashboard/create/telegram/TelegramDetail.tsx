@@ -22,10 +22,18 @@ const TelegramDetail = ({
 }) => {
   const [stats, setStats] = useState(new CampaignStats({}))
 
-  async function refreshCampaignStats(id: number) {
-    const campaignStats = await getCampaignStats(id)
+  async function refreshCampaignStats(id: number, forceRefresh = false) {
+    const campaignStats = await getCampaignStats(id, forceRefresh)
     setStats(campaignStats)
     return campaignStats
+  }
+
+  async function handleRefreshStats() {
+    try {
+      await refreshCampaignStats(id, true)
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   async function handlePause() {
@@ -99,6 +107,7 @@ const TelegramDetail = ({
           stats={stats}
           handlePause={handlePause}
           handleRetry={handleRetry}
+          handleRefreshStats={handleRefreshStats}
         />
       )}
     </>

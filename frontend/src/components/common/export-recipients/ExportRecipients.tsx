@@ -1,31 +1,74 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import download from 'downloadjs'
 
 import { Status } from 'classes/Campaign'
-import {
-  exportCampaignStats,
-  CampaignExportStatus,
-} from 'services/campaign.service'
+import { ActionButton } from 'components/common'
+import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
 import moment from 'moment'
+
+export enum CampaignExportStatus {
+  Unavailable = 'Unavailable',
+  Loading = 'Loading',
+  Ready = 'Ready',
+  NoError = 'No Error',
+}
+
+const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
 
 const ExportRecipients = ({
   campaignId,
   campaignName,
   sentAt,
-  exportStatus,
+  status,
+  statusUpdatedAt,
+  hasFailedRecipients,
   iconPosition,
+  isButton = false,
 }: {
-  className?: string
   campaignId: number
   campaignName: string
-  status: Status
   sentAt: Date
-  exportStatus: CampaignExportStatus
+  status: Status
+  statusUpdatedAt: Date
+  hasFailedRecipients: boolean
   iconPosition: 'left' | 'right'
+  isButton?: boolean
 }) => {
+  const [exportStatus, setExportStatus] = useState(
+    CampaignExportStatus.Unavailable
+  )
   const [disabled, setDisabled] = useState(false)
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
+    function getExportStatus(): void {
+      if (status === Status.Sending) {
+        return setExportStatus(CampaignExportStatus.Unavailable)
+      }
+
+      const updatedAtTimestamp = +new Date(statusUpdatedAt)
+      const campaignAge = Date.now() - updatedAtTimestamp
+      if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {
+        // poll export status until it has reached finalised status (Ready or No Error)
+        timeoutId = setTimeout(getExportStatus, 2000)
+        return setExportStatus(CampaignExportStatus.Loading)
+      }
+
+      return setExportStatus(
+        hasFailedRecipients
+          ? CampaignExportStatus.Ready
+          : CampaignExportStatus.NoError
+      )
+    }
+
+    getExportStatus()
+    return () => {
+      timeoutId && clearTimeout(timeoutId)
+    }
+  })
 
   async function exportRecipients(
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -74,48 +117,69 @@ const ExportRecipients = ({
     }
   }
 
-  function renderExportButton() {
-    if (exportStatus === CampaignExportStatus.NoError) {
-      return <span className={styles.unavailable}>No error</span>
-    }
-    if (exportStatus === CampaignExportStatus.Loading) {
-      return (
-        <>
-          <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
-          <span>Error list</span>
-        </>
-      )
-    } else {
-      const unavailableStyle = {
-        [styles.unavailable]: exportStatus === CampaignExportStatus.Unavailable,
-      }
-      return (
-        <>
-          <i
-            className={cx(styles.icon, unavailableStyle, 'bx bx-download')}
-          ></i>
-          <span className={cx(unavailableStyle)}>Error list</span>
-        </>
-      )
+  function renderExportButtonContent() {
+    switch (exportStatus) {
+      case CampaignExportStatus.Loading:
+        return (
+          <>
+            <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
+            <span>Error list</span>
+          </>
+        )
+      case CampaignExportStatus.NoError:
+        return <span>No error</span>
+      case CampaignExportStatus.Unavailable:
+      case CampaignExportStatus.Ready:
+        return (
+          <>
+            <i className={cx(styles.icon, 'bx bx-download')}></i>
+            <span>Error list</span>
+          </>
+        )
     }
   }
 
+  function renderExportButton() {
+    return (
+      <div
+        className={cx(
+          styles.export,
+          { [styles.ready]: exportStatus === CampaignExportStatus.Ready },
+          { [styles.unavailable]: exportStatus !== CampaignExportStatus.Ready },
+          { [styles.disabled]: disabled }
+        )}
+        onClick={(e) =>
+          !disabled &&
+          exportStatus === CampaignExportStatus.Ready &&
+          exportRecipients(e)
+        }
+        title={renderTitle()}
+      >
+        <div className={styles[iconPosition]}>
+          {renderExportButtonContent()}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={cx(
-        styles.export,
-        { [styles.ready]: exportStatus === CampaignExportStatus.Ready },
-        { [styles.disabled]: disabled }
+    <>
+      {isButton ? (
+        <div className={styles.actionButton}>
+          <ActionButton
+            disabled={exportStatus !== CampaignExportStatus.Ready}
+            className={cx({
+              [styles.disableActiveState]:
+                exportStatus === CampaignExportStatus.Loading,
+            })}
+          >
+            {renderExportButton()}
+          </ActionButton>
+        </div>
+      ) : (
+        renderExportButton()
       )}
-      onClick={(e) =>
-        !disabled &&
-        exportStatus === CampaignExportStatus.Ready &&
-        exportRecipients(e)
-      }
-      title={renderTitle()}
-    >
-      <div className={styles[iconPosition]}>{renderExportButton()}</div>
-    </div>
+    </>
   )
 }
 

@@ -268,6 +268,12 @@ const config = convict({
     default: '',
     env: 'SES_FROM',
   },
+  mailDefaultRate: {
+    doc: 'The default rate at which an email campaign will be sent',
+    default: 35,
+    env: 'EMAIL_DEFAULT_RATE',
+    format: 'int',
+  },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
     default: 'SG',

@@ -15,7 +15,7 @@ import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
-import { UploadService } from '@core/services'
+import { PhoneNumberService, UploadService } from '@core/services'
 import logger from '@core/logger'
 
 /**
@@ -62,10 +62,10 @@ const getSubscriberTelegramId = async (
   phoneNumber: string,
   botId: string
 ): Promise<number> => {
-  // Append default country code if does not exists.
-  if (!phoneNumber.startsWith('+') && config.get('defaultCountryCode')) {
-    phoneNumber = `+${config.get('defaultCountryCode')}${phoneNumber}`
-  }
+  phoneNumber = PhoneNumberService.normalisePhoneNumber(
+    phoneNumber,
+    config.get('defaultCountry')
+  )
 
   const subscriber = await TelegramSubscriber.findOne({
     where: { phoneNumber },
@@ -246,16 +246,11 @@ const uploadCompleteOnPreview = ({
       [{ params: data[0] }],
       template.body as string
     )
-    try {
-      // delete message_logs entries
-      await TelegramMessage.destroy({
-        where: { campaignId },
-        transaction,
-      })
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+    // delete message_logs entries
+    await TelegramMessage.destroy({
+      where: { campaignId },
+      transaction,
+    })
   }
 }
 const uploadCompleteOnChunk = ({
@@ -266,37 +261,32 @@ const uploadCompleteOnChunk = ({
   campaignId: number
 }): ((data: CSVParams[]) => Promise<void>) => {
   return async (data: CSVParams[]): Promise<void> => {
-    try {
-      const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
-        return {
-          campaignId,
-          recipient: entry['recipient'],
-          params: entry,
+    const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+      return {
+        campaignId,
+        recipient: entry['recipient'],
+        params: entry,
+      }
+    })
+
+    // NOTE FOR TELEGRAM: Validate the phone number before insertion because this service
+    // must have correctly formatted phone number before enqueue.
+
+    // Append default country code as telegram handler stores number with the country
+    // code by default.
+    const formattedRecords = TelegramTemplateService.validateAndFormatNumber(
+      records
+    )
+    // START populate template
+    await TelegramMessage.bulkCreate(formattedRecords, {
+      transaction,
+      logging: (_message, benchmark) => {
+        if (benchmark) {
+          logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
         }
-      })
-
-      // NOTE FOR TELEGRAM: Validate the phone number before insertion because this service
-      // must have correctly formatted phone number before enqueue.
-
-      // Append default country code as telegram handler stores number with the country
-      // code by default.
-      const formattedRecords = TelegramTemplateService.validateAndFormatNumber(
-        records
-      )
-      // START populate template
-      await TelegramMessage.bulkCreate(formattedRecords, {
-        transaction,
-        logging: (_message, benchmark) => {
-          if (benchmark) {
-            logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
-          }
-        },
-        benchmark: true,
-      })
-    } catch (err) {
-      transaction?.rollback()
-      throw err
-    }
+      },
+      benchmark: true,
+    })
   }
 }
 

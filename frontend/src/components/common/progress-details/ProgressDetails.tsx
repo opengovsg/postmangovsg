@@ -2,20 +2,12 @@ import React, { useState, useEffect } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
-import {
-  getExportStatus,
-  CampaignExportStatus,
-} from 'services/campaign.service'
 import { CampaignStats, Status } from 'classes/Campaign'
-import {
-  ProgressBar,
-  PrimaryButton,
-  ExportRecipients,
-  ActionButton,
-} from 'components/common'
+import { ProgressBar, PrimaryButton, ExportRecipients } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
-import { CONTACT_US_URL } from 'config'
+import { LINKS } from 'config'
+import { i18n } from 'locales'
 const ProgressDetails = ({
   campaignId,
   campaignName,
@@ -24,6 +16,7 @@ const ProgressDetails = ({
   stats,
   handlePause,
   handleRetry,
+  handleRefreshStats,
 }: {
   campaignId: number
   campaignName: string
@@ -32,27 +25,22 @@ const ProgressDetails = ({
   stats: CampaignStats
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
+  handleRefreshStats: () => Promise<void>
 }) => {
-  const { status, error, unsent, sent, invalid, updatedAt, halted } = stats
-  const [isSent, setIsSent] = useState(status === Status.Sent)
-  const [isComplete, setIsComplete] = useState(!error && !unsent)
-  const [exportStatus, setExportStatus] = useState(CampaignExportStatus.Loading)
-  const [isHalted, setIsHalted] = useState(!!halted)
+  const {
+    status,
+    statusUpdatedAt,
+    error,
+    unsent,
+    sent,
+    invalid,
+    updatedAt,
+    halted,
+  } = stats
 
-  useEffect(() => {
-    setIsComplete(!error && !unsent)
-    setIsSent(status === Status.Sent)
-    setIsHalted(!!halted)
-  }, [status, error, unsent, halted])
-
-  useEffect(() => {
-    async function checkHasExportButton() {
-      const failedCount = error + invalid
-      const exportStatus = getExportStatus(status, updatedAt, failedCount)
-      setExportStatus(exportStatus)
-    }
-    checkHasExportButton()
-  }, [status, updatedAt, error, invalid])
+  const isSent = status === Status.Sent
+  const isComplete = !error && !unsent
+  const isHalted = !!halted
 
   function renderButton() {
     if (isHalted) {
@@ -60,8 +48,8 @@ const ProgressDetails = ({
         <span>
           Too many of your emails bounced.{' '}
           <OutboundLink
-            eventLabel={CONTACT_US_URL}
-            to={CONTACT_US_URL}
+            eventLabel={i18n._(LINKS.contactUsUrl)}
+            to={i18n._(LINKS.contactUsUrl)}
             target="_blank"
           >
             Contact us
@@ -103,6 +91,21 @@ const ProgressDetails = ({
     return <h2>{progressMessage}</h2>
   }
 
+  function renderUpdateStats() {
+    if (isSent) {
+      return (
+        <div className={styles.statsLastUpdated}>
+          <span>
+            Stats last retrieved on <Moment format="LLL">{updatedAt}</Moment>
+          </span>
+          <PrimaryButton onClick={handleRefreshStats}>
+            Refresh stats
+          </PrimaryButton>
+        </div>
+      )
+    }
+  }
+
   return (
     <div className={styles.progress}>
       <table>
@@ -124,7 +127,6 @@ const ProgressDetails = ({
           </tr>
         </tbody>
       </table>
-
       <div className={styles.progressTitle}>
         {renderProgressTitle()}
         {renderButton()}
@@ -135,29 +137,16 @@ const ProgressDetails = ({
         isComplete={isComplete}
       />
 
-      {exportStatus && (
-        <div className={styles.actionButton}>
-          <ActionButton
-            disabled={
-              exportStatus === CampaignExportStatus.NoError ||
-              exportStatus === CampaignExportStatus.Unavailable
-            }
-            className={cx({
-              [styles.disableActiveState]:
-                exportStatus === CampaignExportStatus.Loading,
-            })}
-          >
-            <ExportRecipients
-              iconPosition="right"
-              campaignId={campaignId}
-              campaignName={campaignName}
-              status={status}
-              sentAt={sentAt}
-              exportStatus={exportStatus}
-            />
-          </ActionButton>
-        </div>
-      )}
+      <ExportRecipients
+        iconPosition="right"
+        campaignId={campaignId}
+        campaignName={campaignName}
+        sentAt={sentAt}
+        status={status}
+        statusUpdatedAt={statusUpdatedAt}
+        hasFailedRecipients={error + invalid > 0}
+        isButton
+      />
 
       <table className={styles.stats}>
         <thead>
@@ -210,6 +199,7 @@ const ProgressDetails = ({
           </tr>
         </tbody>
       </table>
+      {renderUpdateStats()}
     </div>
   )
 }
