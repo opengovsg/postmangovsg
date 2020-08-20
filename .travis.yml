@@ -105,7 +105,7 @@ jobs:
         - zip -qr code.zip build src package.json node_modules/
         - cd $TRAVIS_BUILD_DIR/serverless/unsubscribe-digest
         - npm install && npm run build
-        - zip -qr code.zip build package.json node_modules/
+        - zip -qr code.zip build src package.json node_modules/
       deploy:
         - provider: lambda
           edge: true
@@ -263,6 +263,7 @@ jobs:
           environment_variables:
             - DB_URI=$PRODUCTION_UNSUBSCRIBE_DIGEST_DB_URI
             - DB_READ_REPLICA_URI=$PRODUCTION_UNSUBSCRIBE_DIGEST_DB_READ_REPLICA_URI
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - SES_FROM=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_FROM
             - SES_HOST=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_HOST
             - SES_PASS=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_PASS
@@ -286,6 +287,7 @@ jobs:
           environment_variables:
             - DB_URI=$STAGING_UNSUBSCRIBE_DIGEST_DB_URI
             - DB_READ_REPLICA_URI=$STAGING_UNSUBSCRIBE_DIGEST_DB_READ_REPLICA_URI
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - SES_FROM=$STAGING_UNSUBSCRIBE_DIGEST_SES_FROM
             - SES_HOST=$STAGING_UNSUBSCRIBE_DIGEST_SES_HOST
             - SES_PASS=$STAGING_UNSUBSCRIBE_DIGEST_SES_PASS

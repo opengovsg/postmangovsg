@@ -26,6 +26,7 @@
     "sequelize-typescript": "^1.1.0"
   },
   "devDependencies": {
+    "@sentry/node": "^5.21.1",
     "@types/convict": "^5.2.1",
     "@types/nodemailer": "^6.4.0",
     "@types/nodemailer-direct-transport": "^1.0.31",
@@ -38,6 +39,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "nodemailer": "^6.4.10",
     "prettier": "^2.0.5",
+    "source-map-support": "^0.5.19",
     "tsc-watch": "^4.2.9",
     "typescript": "^3.9.7"
   }

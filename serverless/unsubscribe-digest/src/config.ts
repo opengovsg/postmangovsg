@@ -135,6 +135,12 @@ const config = convict({
     env: 'UNSUBSCRIBE_GUIDE_URL',
     format: 'required-string',
   },
+  sentryDsn: {
+    doc: 'Sentry DSN for serverless',
+    default: '',
+    env: 'SENTRY_DSN',
+    format: 'required-string',
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
