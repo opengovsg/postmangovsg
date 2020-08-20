@@ -19,6 +19,7 @@ const storeCredentialValidator = {
     twilio_api_key: Joi.string().trim().required(),
     twilio_messaging_service_sid: Joi.string().trim().required(),
     recipient: Joi.string().trim().required(),
+    validate: Joi.boolean().default(true),
   }),
 }
 
@@ -54,6 +55,9 @@ const verifyCredentialValidator = {
  *                      description: should only consist of lowercase alphanumeric characters and dashes
  *                    recipient:
  *                      type: string
+ *                    validate:
+ *                      type: boolean
+ *                      default: true
  *
  *      responses:
  *        200:

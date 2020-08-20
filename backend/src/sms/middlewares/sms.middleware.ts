@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
+import { TwilioCredentials } from '@sms/interfaces'
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'SMS' type, and belongs to the user
@@ -84,6 +85,26 @@ const getCredentialsFromLabel = async (
 }
 
 /**
+ * Sends a test message to validate credentials
+ * @param campaignId
+ * @param recipient
+ * @param credentials
+ */
+const sendValidationMessage = async (
+  campaignId: string,
+  recipient: string,
+  credentials: TwilioCredentials
+): Promise<void> => {
+  if (campaignId) {
+    // Sends first hydrated message from campaign
+    await SmsService.sendCampaignMessage(+campaignId, recipient, credentials)
+  } else {
+    // Sends generic validation message if campaignId not specified
+    await SmsService.sendValidationMessage(recipient, credentials)
+  }
+}
+
+/**
  * Sends a test message. If the test message succeeds,
  * store the credentials in AWS secrets manager and db.
  * Set the credentialName and channelType in res.locals to be passed downstream
@@ -95,16 +116,16 @@ const validateAndStoreCredentials = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { recipient } = req.body
+  const { recipient, validate } = req.body
   const { campaignId } = req.params
   const { credentials, credentialName } = res.locals
+
   try {
-    if (campaignId) {
-      // Sends first hydrated message from campaign
-      await SmsService.sendCampaignMessage(+campaignId, recipient, credentials)
-    } else {
-      // Sends generic validation message if campaignId not specified
-      await SmsService.sendValidationMessage(recipient, credentials)
+    // validate is only included in body params for /settings/sms/credentials endpoint
+    // since validate could be undefined,
+    // don't send test msg only when validate is explicitly defined as false
+    if (validate !== false) {
+      await sendValidationMessage(campaignId, recipient, credentials)
     }
     // If credentialName exists, credential has already been stored
     if (credentialName) {
