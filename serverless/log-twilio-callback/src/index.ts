@@ -1,5 +1,5 @@
 import querystring from 'querystring'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import { QueryTypes } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 
