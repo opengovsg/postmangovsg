@@ -18,7 +18,7 @@
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
     "dev:worker": "npm run wait:backend && cd worker && npm run dev",
-    "dev:localstack": "docker-compose -f docker-compose.yml up localstack",
+    "dev:localstack": "docker-compose -f docker-compose.yml up -d localstack",
     "dev:services": "docker-compose -f docker-compose.yml up",
     "postinstall": "npm run postinstall:backend && npm run postinstall:worker && npm run postinstall:frontend",
     "postinstall:frontend": "cd frontend && npm install",
