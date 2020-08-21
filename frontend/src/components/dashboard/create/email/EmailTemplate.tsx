@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 
 import { TextArea, NextButton, ErrorBlock, TextInput } from 'components/common'
+import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/email.service'
 
@@ -12,13 +14,16 @@ const EmailTemplate = ({
   replyTo: initialReplyTo,
   protect,
   onNext,
+  finishLaterCallbackRef,
 }: {
   subject: string
   body: string
   replyTo: string | null
   protect: boolean
   onNext: (changes: any, next?: boolean) => void
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
+  const modalContext = useContext(ModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
@@ -30,29 +35,52 @@ const EmailTemplate = ({
   const bodyPlaceholder =
     'Dear {{ name }}, your next appointment at {{ clinic }} is on {{ date }} at {{ time }}'
 
-  async function handleSaveTemplate(): Promise<void> {
-    setErrorMsg(null)
-    try {
-      if (!campaignId) {
-        throw new Error('Invalid campaign id')
+  const handleSaveTemplate = useCallback(
+    async (propagateError = false): Promise<void> => {
+      setErrorMsg(null)
+      try {
+        if (!campaignId) {
+          throw new Error('Invalid campaign id')
+        }
+        const { updatedTemplate, numRecipients } = await saveTemplate(
+          +campaignId,
+          subject,
+          body,
+          replyTo
+        )
+        onNext({
+          subject: updatedTemplate?.subject,
+          body: updatedTemplate?.body,
+          replyTo: updatedTemplate?.reply_to,
+          params: updatedTemplate?.params,
+          numRecipients,
+        })
+      } catch (err) {
+        setErrorMsg(err.message)
+        if (propagateError) throw err
       }
-      const { updatedTemplate, numRecipients } = await saveTemplate(
-        +campaignId,
-        subject,
-        body,
-        replyTo
+    },
+    [body, campaignId, onNext, replyTo, subject]
+  )
+
+  // Set callback for finish later button
+  useEffect(() => {
+    finishLaterCallbackRef.current = () => {
+      modalContext.setModalContent(
+        <SaveDraftModal
+          saveable
+          onSave={async () => {
+            if (subject && body) {
+              await handleSaveTemplate(true)
+            }
+          }}
+        />
       )
-      onNext({
-        subject: updatedTemplate?.subject,
-        body: updatedTemplate?.body,
-        replyTo: updatedTemplate?.reply_to,
-        params: updatedTemplate?.params,
-        numRecipients,
-      })
-    } catch (err) {
-      setErrorMsg(err.message)
     }
-  }
+    return () => {
+      finishLaterCallbackRef.current = undefined
+    }
+  }, [body, finishLaterCallbackRef, handleSaveTemplate, modalContext, subject])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''

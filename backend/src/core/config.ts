@@ -3,6 +3,7 @@
  * All defaults can be changed
  */
 import convict from 'convict'
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import { isSupportedCountry } from 'libphonenumber-js'
@@ -150,6 +151,11 @@ const config = convict({
     doc: 'Url domain and path for password-protected messages',
     default: 'https://postman.gov.sg/p', // prod only
     env: 'PROTECTED_URL',
+  },
+  unsubscribeUrl: {
+    doc: 'Url domain and path for unsubscribe page',
+    default: 'https://postman.gov.sg/unsubscribe', // prod only
+    env: 'UNSUBSCRIBE_URL',
   },
   session: {
     cookieName: {
@@ -328,6 +334,29 @@ const config = convict({
     default: '',
     env: 'SENTRY_DSN',
   },
+  unsubscribeHmac: {
+    version: {
+      doc: 'Version of unsubscribe HMAC options, defaults to v1',
+      default: 'v1',
+      format: ['v1'],
+      env: 'UNSUBSCRIBE_HMAC_VERSION',
+    },
+    v1: {
+      algo: {
+        doc: 'V1 HMAC algorithm',
+        default: '',
+        format: crypto.getHashes(),
+        env: 'UNSUBSCRIBE_HMAC_ALGO_V1',
+      },
+      key: {
+        doc: 'V1 HMAC key',
+        default: '',
+        format: 'required-string',
+        env: 'UNSUBSCRIBE_HMAC_KEY_V1',
+        sensitive: true,
+      },
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
@@ -342,6 +371,7 @@ switch (config.get('env')) {
     config.load({
       frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
       protectedUrl: 'https://staging.postman.gov.sg/p',
+      unsubscribeUrl: 'https://staging.postman.gov.sg/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
@@ -362,6 +392,7 @@ switch (config.get('env')) {
     config.load({
       frontendUrl: 'http://localhost:3000',
       protectedUrl: 'http://localhost:3000/p',
+      unsubscribeUrl: 'http://localhost:3000/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-testing',

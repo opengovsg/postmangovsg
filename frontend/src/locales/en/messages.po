@@ -21,6 +21,10 @@ msgstr "Enter OTP"
 msgid "Get OTP"
 msgstr "Get OTP"
 
+#: src/components/unsubscribe/Unsubscribe.tsx:84
+msgid "I'd rather stay"
+msgstr "I'd rather stay"
+
 #: src/components/login/login-input/LoginInput.tsx:79
 msgid "One-Time Password"
 msgstr "One-Time Password"
@@ -44,6 +48,10 @@ msgstr "Sign In"
 #: src/components/login/login-input/LoginInput.tsx:79
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
+
+#: src/components/unsubscribe/Unsubscribe.tsx:87
+msgid "Unsubscribe me"
+msgstr "Unsubscribe me"
 
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "Verifying OTP..."

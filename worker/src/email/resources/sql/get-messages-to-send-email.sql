@@ -17,7 +17,7 @@ BEGIN
       id in (SELECT * from selected_ids)
       RETURNING id, recipient, params, campaign_id
     )
-    SELECT json_build_object('id', m.id, 'recipient', m.recipient, 'params', m.params, 'body', t.body, 'subject', t.subject, 'replyTo', t.reply_to)
+    SELECT json_build_object('id', m.id, 'recipient', m.recipient, 'params', m.params, 'campaignId', m.campaign_id, 'body', t.body, 'subject', t.subject, 'replyTo', t.reply_to)
     FROM messages m, email_templates t
     WHERE m.campaign_id = t.campaign_id;
 		
