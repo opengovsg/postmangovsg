@@ -38,7 +38,9 @@
 
 ### Install and run required services
 
-Set up a **postgresql@11** database, **redis** cache and localstack server
+Set up a **postgresql@11** database, **redis** cache and **localstack** server. Postgresql and redis can be started either natively or using Docker.
+
+Starting postgresql and redis natively:
 
 ```bash
 # Install postgres
@@ -58,19 +60,32 @@ brew services start redis
 # Check that redis is running
 redis-cli ping
 
-# Have localstack running
+# Start localstack container
 export AWS_ENDPOINT=http://localhost:4566
 export FILE_STORAGE_BUCKET_NAME=localstack-upload
 export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
-npm run dev:localstack
 
-# Optional: get cw to tail Cloudwatch logs
+npm run dev:localstack
+```
+
+Starting all services using Docker:
+
+```
+export AWS_ENDPOINT=http://localhost:4566
+export FILE_STORAGE_BUCKET_NAME=localstack-upload
+export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
+
+npm run dev:services
+```
+
+Optionally, run the following to install and use `cw` to tail Cloudwatch logs:
+
+```
 brew tap lucagrulla/tap
 brew install cw
 
 # Tail logs on localstack
 cw tail -r ap-northeast-1 -u $AWS_ENDPOINT -f $AWS_LOG_GROUP_NAME:`node --eval='console.log(require("os").hostname())'`
-
 ```
 
 ### Set environment variables
