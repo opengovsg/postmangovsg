@@ -31,6 +31,7 @@ const TelegramCredentials = ({
   onNext: (changes: any, next?: boolean) => void
 }) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
+  const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
   )
@@ -53,6 +54,7 @@ const TelegramCredentials = ({
   async function populateStoredCredentials() {
     try {
       const storedCredLabels = await getStoredCredentials()
+      setCredLabels(storedCredLabels)
       setStoredCredentials(
         storedCredLabels.map((c) => ({ label: c, value: c }))
       )
@@ -178,7 +180,11 @@ const TelegramCredentials = ({
             </p>
 
             <div className={styles.validateCredentialsInfo}>
-              <CredLabelInput value={label} onChange={setLabel} />
+              <CredLabelInput
+                value={label}
+                onChange={setLabel}
+                labels={credLabels}
+              />
               <TelegramCredentialsInput onFilled={setCreds} />
             </div>
             <ErrorBlock>{errorMessage}</ErrorBlock>
