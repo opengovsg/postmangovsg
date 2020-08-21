@@ -6,6 +6,7 @@ import Landing from 'components/landing'
 import Login from 'components/login'
 import ProtectedPage from 'components/protected'
 import TestUtils from 'components/test-utils'
+import Unsubscribe from 'components/unsubscribe'
 
 // Locales
 import { i18n } from 'locales'
@@ -35,6 +36,11 @@ const App = () => {
               exact
               path="/p/:version/:id"
               component={ProtectedPage}
+            ></Route>
+            <Route
+              exact
+              path="/unsubscribe/:version"
+              component={Unsubscribe}
             ></Route>
             <ProtectedRoute>
               <Suspense

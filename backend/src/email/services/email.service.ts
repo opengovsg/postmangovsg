@@ -9,6 +9,7 @@ import {
   CampaignService,
   UploadService,
   ProtectedService,
+  UnsubscriberService,
 } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
@@ -74,7 +75,7 @@ const getCampaignMessage = async (
     const { body, subject, replyTo } = message
     const mailToSend: MailToSend = {
       recipients: [recipient],
-      body,
+      body: UnsubscriberService.appendTestEmailUnsubLink(body),
       subject,
       ...(replyTo ? { replyTo } : {}),
     }
