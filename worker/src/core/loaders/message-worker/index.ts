@@ -10,6 +10,7 @@ import SMS from './sms.class'
 import Telegram from './telegram.class'
 import ECSUtil from './util/ecs'
 import assignment from './util/assignment'
+import { Message } from './interface'
 let connection: Sequelize,
   workerId: string,
   currentCampaignType: string,
@@ -68,32 +69,11 @@ const enqueueMessages = (jobId: number, campaignId: number): Promise<void> => {
   return service().enqueueMessages(jobId, campaignId)
 }
 
-const getMessages = (
-  jobId: number,
-  rate: number
-): Promise<
-  {
-    id: number
-    recipient: string
-    params: { [key: string]: string }
-    body: string
-    subject?: string
-    replyTo?: string | null
-    campaignId?: number
-  }[]
-> => {
-  return service().getMessages(jobId, rate)
+const getMessages = async (jobId: number, rate: number): Promise<Message[]> => {
+  return await service().getMessages(jobId, rate)
 }
 
-const sendMessage = (message: {
-  id: number
-  recipient: string
-  params: { [key: string]: string }
-  body: string
-  subject?: string
-  replyTo?: string | null
-  campaignId?: number
-}): Promise<void> => {
+const sendMessage = (message: Message): Promise<void> => {
   return service().sendMessage(message)
 }
 

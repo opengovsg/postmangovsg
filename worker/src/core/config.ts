@@ -3,6 +3,7 @@
  * All defaults can be changed
  */
 import convict from 'convict'
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import { isSupportedCountry } from 'libphonenumber-js'
@@ -205,6 +206,34 @@ const config = convict({
       format: 'int',
     },
   },
+  unsubscribeHmac: {
+    version: {
+      doc: 'Version of unsubscribe HMAC options, defaults to v1',
+      default: 'v1',
+      format: ['v1'],
+      env: 'UNSUBSCRIBE_HMAC_VERSION',
+    },
+    v1: {
+      algo: {
+        doc: 'V1 HMAC algorithm',
+        default: '',
+        format: crypto.getHashes(),
+        env: 'UNSUBSCRIBE_HMAC_ALGO_V1',
+      },
+      key: {
+        doc: 'V1 HMAC key',
+        default: '',
+        format: 'required-string',
+        env: 'UNSUBSCRIBE_HMAC_KEY_V1',
+        sensitive: true,
+      },
+    },
+  },
+  frontendUrl: {
+    doc: 'Used to generate unsubscribe url',
+    default: 'https://postman.gov.sg', // prod only
+    env: 'FRONTEND_URL',
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
@@ -215,6 +244,7 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 // Override with local config
 if (config.get('env') === 'development') {
   config.load({
+    frontendUrl: 'http://localhost:3000',
     IS_PROD: false,
     database: {
       dialectOptions: {
@@ -225,6 +255,12 @@ if (config.get('env') === 'development') {
         },
       },
     },
+  })
+}
+
+if (config.get('env') === 'staging') {
+  config.load({
+    frontendUrl: 'https://staging.postman.gov.sg',
   })
 }
 
