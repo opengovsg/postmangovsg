@@ -7,6 +7,7 @@ import {
   LoginPage,
   ProgressDetailsPage,
   ProtectedPage,
+  UnsubscribePage,
 } from './page-models'
 import { MockMailServer } from './../mocks'
 import { getPageUrl, generateRandomEmail } from './helpers'
@@ -49,6 +50,26 @@ test('Create email campaign', async (t) => {
     sent: 1,
     invalid: 0,
   })
+
+  const { html } = await MockMailServer.getLatestEmail('test@open.gov.sg')
+  const unsubscribeLink = html.match(
+    /(https?:\/\/[^ ]*\/unsubscribe\/[^ "']*)/g
+  )[0]
+
+  // Check for unsubscribe
+  await t.navigateTo(unsubscribeLink)
+  await UnsubscribePage.stay()
+
+  await t.navigateTo(unsubscribeLink)
+  await UnsubscribePage.unsubscribe()
+
+  // Unsubscribe with an invalid hash
+  try {
+    await t.navigateTo(unsubscribeLink + 'abc')
+    await UnsubscribePage.unsubscribe()
+  } catch (err) {
+    await t.expect(err.message).contains('Invalid')
+  }
 })
 
 test('Create protected email campaign', async (t) => {
