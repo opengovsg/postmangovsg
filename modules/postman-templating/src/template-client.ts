@@ -83,6 +83,10 @@ export class TemplateClient {
           }
         } else if (tokenType === 'text') {
           tokens.push(token)
+        } else {
+          throw new TemplateError(
+            "Check that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person's Name }} are not allowed, but {{ Person_Name }} is allowed."
+          )
         }
       }
 
