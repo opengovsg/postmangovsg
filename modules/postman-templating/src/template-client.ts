@@ -75,11 +75,12 @@ export class TemplateClient {
           if (dict[key]) {
             const templated = dict[key]
             tokens.push(templated)
-          } else {
-            // recipient key must have param
-            if (key === 'recipient') {
-              throw new TemplateError(`Param ${key} not found`)
-            }
+            continue
+          }
+
+          // recipient key must have param
+          if (key === 'recipient') {
+            throw new TemplateError(`Param ${key} not found`)
           }
         } else if (tokenType === 'text') {
           tokens.push(token)
