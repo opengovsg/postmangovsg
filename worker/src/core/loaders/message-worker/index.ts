@@ -2,6 +2,7 @@ import { expose } from 'threads/worker'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
+import plimit from 'p-limit'
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 import config from '@core/config'
 import logger from '@core/logger'
@@ -130,15 +131,20 @@ const enqueueAndSend = async (): Promise<void> => {
   if (jobId && rate && credName && campaignId) {
     await service().setSendingService(credName)
     await enqueueMessages(jobId, campaignId)
+
+    const sendMessageLimit = plimit(rate)
     let hasNext = true
     while (hasNext) {
+      const start = Date.now()
       const messages = await getMessages(jobId, rate)
       if (!messages[0]) {
         hasNext = false
       } else {
-        const start = Date.now()
-        // Fire and forget. This risks opening too many unresolved connections if the rate is high (Error: read ECONNRESET)
-        messages.forEach((m) => sendMessage(m))
+        for (const message of messages) {
+          sendMessageLimit(() => {
+            sendMessage(message)
+          })
+        }
         // Make sure at least 1 second has elapsed
         const wait = Math.max(0, 1000 - (Date.now() - start))
         await waitForMs(wait)
@@ -146,6 +152,9 @@ const enqueueAndSend = async (): Promise<void> => {
           `${workerId}: jobId=${jobId} rate=${rate} numMessages=${messages.length} wait=${wait}`
         )
       }
+    }
+    while (sendMessageLimit.pendingCount > 0) {
+      await waitForMs(1000)
     }
     await service().destroySendingService()
   }
