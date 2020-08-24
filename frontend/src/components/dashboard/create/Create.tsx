@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -24,6 +24,9 @@ const Create = () => {
 
   const [campaign, setCampaign] = useState(new Campaign({}))
   const [isLoading, setLoading] = useState(true)
+  const finishLaterCallbackRef: React.MutableRefObject<
+    (() => void) | undefined
+  > = useRef()
 
   async function loadProject(id: string) {
     const campaign = await getCampaignDetails(+id)
@@ -36,6 +39,17 @@ const Create = () => {
     loadProject(id)
   }, [id])
 
+  async function handleFinishLater() {
+    if (campaign.status === Status.Draft) {
+      sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
+
+      if (finishLaterCallbackRef.current) {
+        return finishLaterCallbackRef.current()
+      }
+    }
+    history.push('/campaigns')
+  }
+
   function renderCreateChannel() {
     switch (campaign.type) {
       case ChannelType.SMS:
@@ -43,6 +57,7 @@ const Create = () => {
           <SMSCreate
             campaign={campaign as SMSCampaign}
             onCampaignChange={setCampaign}
+            finishLaterCallbackRef={finishLaterCallbackRef}
           />
         )
       case ChannelType.Email:
@@ -50,6 +65,7 @@ const Create = () => {
           <EmailCreate
             campaign={campaign as EmailCampaign}
             onCampaignChange={setCampaign}
+            finishLaterCallbackRef={finishLaterCallbackRef}
           />
         )
       case ChannelType.Telegram:
@@ -57,6 +73,7 @@ const Create = () => {
           <TelegramCreate
             campaign={campaign as TelegramCampaign}
             onCampaignChange={setCampaign}
+            finishLaterCallbackRef={finishLaterCallbackRef}
           />
         )
       default:
@@ -69,17 +86,7 @@ const Create = () => {
       {campaign ? (
         <>
           <TitleBar title={campaign.name}>
-            <PrimaryButton
-              onClick={() => {
-                if (campaign.status === Status.Draft) {
-                  sendUserEvent(
-                    GA_USER_EVENTS.FINISH_CAMPAIGN_LATER,
-                    campaign.type
-                  )
-                }
-                history.push('/campaigns')
-              }}
-            >
+            <PrimaryButton onClick={handleFinishLater}>
               {campaign.status === Status.Draft
                 ? 'Finish this later'
                 : 'Back to campaigns'}

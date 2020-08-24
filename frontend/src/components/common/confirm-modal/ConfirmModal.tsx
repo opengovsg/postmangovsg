@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import cx from 'classnames'
 
-import { PrimaryButton, ErrorBlock } from 'components/common'
+import { PrimaryButton, TextButton, ErrorBlock } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 
 import ConfirmImage from 'assets/img/confirm-modal.svg'
@@ -12,15 +12,19 @@ const ConfirmModal = ({
   subtitle,
   buttonText,
   buttonIcon,
+  cancelText,
   destructive,
   onConfirm,
+  onCancel,
 }: {
   title: string
   subtitle: string
   buttonText: string
   buttonIcon?: string
+  cancelText?: string
   destructive?: boolean
-  onConfirm: () => Promise<any>
+  onConfirm: () => Promise<any> | any
+  onCancel?: () => Promise<any> | any
 }) => {
   const modalContext = useContext(ModalContext)
   const [errorMessage, setErrorMessage] = useState('')
@@ -34,6 +38,16 @@ const ConfirmModal = ({
       setErrorMessage(err.message)
     }
   }
+
+  async function onCancelClicked(): Promise<void> {
+    try {
+      if (onCancel) await onCancel()
+      // Closes the modal
+      modalContext.setModalContent(null)
+    } catch (err) {
+      setErrorMessage(err.message)
+    }
+  }
   return (
     <div className={styles.confirm}>
       <div className={styles.modalImg}>
@@ -41,13 +55,20 @@ const ConfirmModal = ({
       </div>
       <h2 className={styles.title}>{title}</h2>
       <h4 className={styles.subtitle}>{subtitle}</h4>
-      <PrimaryButton
-        className={destructive ? styles.redButton : styles.greenButton}
-        onClick={onConfirmedClicked}
-      >
-        {buttonText}
-        {buttonIcon && <i className={cx('bx', styles.icon, buttonIcon)}></i>}
-      </PrimaryButton>
+      <div className={styles.options}>
+        <PrimaryButton
+          className={destructive ? styles.redButton : styles.greenButton}
+          onClick={onConfirmedClicked}
+        >
+          {buttonText}
+          {buttonIcon && <i className={cx('bx', styles.icon, buttonIcon)}></i>}
+        </PrimaryButton>
+        {cancelText && (
+          <TextButton minButtonWidth onClick={onCancelClicked}>
+            {cancelText}
+          </TextButton>
+        )}
+      </div>
       <ErrorBlock>{errorMessage}</ErrorBlock>
     </div>
   )

@@ -21,9 +21,11 @@ const SMS_PROGRESS_STEPS = [
 const CreateSMS = ({
   campaign: initialCampaign,
   onCampaignChange,
+  finishLaterCallbackRef,
 }: {
   campaign: SMSCampaign
   onCampaignChange: (c: Campaign) => void
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
@@ -57,7 +59,13 @@ const CreateSMS = ({
   function renderStep() {
     switch (activeStep) {
       case SMSProgress.CreateTemplate:
-        return <SMSTemplate body={campaign.body} onNext={onNext} />
+        return (
+          <SMSTemplate
+            body={campaign.body}
+            onNext={onNext}
+            finishLaterCallbackRef={finishLaterCallbackRef}
+          />
+        )
       case SMSProgress.UploadRecipients:
         return (
           <SMSRecipients
