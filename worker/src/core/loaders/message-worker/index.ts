@@ -131,7 +131,6 @@ const enqueueAndSend = async (): Promise<void> => {
   if (jobId && rate && credName && campaignId) {
     await service().setSendingService(credName)
     await enqueueMessages(jobId, campaignId)
-
     const sendMessageLimit = plimit(rate)
     let hasNext = true
     while (hasNext) {
@@ -153,8 +152,13 @@ const enqueueAndSend = async (): Promise<void> => {
         )
       }
     }
-    while (sendMessageLimit.pendingCount > 0) {
+
+    // Fail safe value so that the worker does not get stuck in the while loop.
+    // The worker will allow each promise an extra second to complete, and automatically complete the job even if not all promises have completed.
+    let failSafe = sendMessageLimit.activeCount
+    while (sendMessageLimit.pendingCount > 0 && failSafe > 0) {
       await waitForMs(1000)
+      failSafe--
     }
     await service().destroySendingService()
   }
