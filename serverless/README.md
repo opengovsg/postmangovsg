@@ -69,3 +69,24 @@ The callback url provided includes username and password, where `username` is a 
 | ------------------------ | ----------------------------------------------------------------------------|
 | `DB_URI`                 | URI to the postgres database                                                |
 | `TWILIO_CALLBACK_SECRET` | Secret used to generate the basic auth credentials for twilio callback      |
+
+## Unsubscribe Email Digest
+`unsubscribe-email-digest` consolidates unsubscribed recipients for campaigns for each user. This lambda can be scheduled to run at weekly schedule in Cloudwatch Events.
+
+### Overview
+The `unsubscribers` table stores unsubscribed recipients by `campaign_id` and `sent_at` time which indicates if the recipient has already been included in an unsubscribe digest. 
+
+`unsubscribe-email-digest` retrieves all unsubscribed recipients and consolidated them by campaign for each user. Every user with unsubscribed recipients are sent an email with this digest. The `unsubscribers` table is updated to reflect the email digest `sent_at` time.
+
+### Environment variables
+| Name | Description |
+| ------------------------ | ---------------------------------------------- |
+| `DB_URI` | URI to the postgres database |
+| `DB_URI` | URI to the postgres read replica database |
+| `SES_HOST` | Amazon SES SMTP endpoint. |
+| `SES_PORT` | Amazon SES SMTP port, defaults to 465 |
+| `SES_USER` | SMTP username |
+| `SES_PASS` | SMTP password |
+| `SES_FROM` | The email address that appears in the From field of an email |
+| `UNSUBSCRIBE_GUIDE_URL` | URL to unsubscribe guide |
+| `SENTRY_DSN` | Sentry DSN for serverless |
