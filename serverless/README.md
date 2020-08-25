@@ -1,37 +1,24 @@
 # Serverless
+The serverless functions are deployed onto Lambda, and called via API Gateway. 
 
- - [Email status update from SES](#email-status-update-from-ses)
- - [Postman API Gateway Authorizer](postman-api-gateway-authorizer)
- - [SMS status update from Twilio](#sms-status-update-from-twilio)
-
-## Email status update from SES
-`log-email-sns`: Meant for SNS to call when SES updates the status of email delivery, essentially acting as the bounce/complaint processor.
-
-![Flow for email status](https://user-images.githubusercontent.com/33112945/83092446-e3475a00-a0cf-11ea-8626-dcdb7c4d5dfe.png)
-
-
-### Creating Topics
-Create SNS topics for the SES delivery status update. Read [here](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/configure-sns-notifications.html).
-
-### Include original headers
-In the lambda, we make use of the message id in the original headers to find out which message the notification is for. Please enable it.
-
-### Connecting to DB
-Once the lambda is deployed, ensure that the lambda is in the same VPC with the database and the right security group configurations.
-
-### Topics supported
-Currently, the lambda handles:
-- Successful deliveries
-- Bounces
-
-### Environment variables
-| Name                  | Description                                                                       |
-| --------------------- | --------------------------------------------------------------------------------- |
-| `DB_URI`              | URI to the postgres database                                                      |
-| `CALLBACK_SECRET`     | Secret for basic auth                                                             |
-| `MIN_HALT_NUMBER`     | Halt if there is this minimum number of invalid recipients, and it exceeds the percentage threshold |
-| `MIN_HALT_PERCENTAGE` | Halt if the percentage of invalid recipients exceeds this threshold. Supply a float from 0 to 1  |
-| `SENDGRID_PUBLIC_KEY` | Public key used to verify webhook events from sendgrid  |
+* [Postman API Gateway Authorizer](#postman-api-gateway-authorizer)
+    + [Setup API Gateway Authorizer](#setup-api-gateway-authorizer)
+    + [Setup Gateway Response](#setup-gateway-response)
+* [Email status update](#email-status-update)
+    + [Handling updates from SES](#handling-updates-from-ses)
+        - [Create topics](#create-topics)
+        - [Include original headers](#include-original-headers)
+    + [Handling updates from Sendgrid](#handling-updates-from-sendgrid)
+    + [Environment variables](#environment-variables)
+* [SMS status update from Twilio](#sms-status-update-from-twilio)
+    + [Configuring callback url](#configuring-callback-url)
+    + [Authorizing incoming Twilio requests](#authorizing-incoming-twilio-requests)
+    + [Finalised delivery statuses](#finalised-delivery-statuses)
+    + [Environment variables](#environment-variables-1)
+* [Unsubscribe Email Digest](#unsubscribe-email-digest)
+    + [Overview](#overview)
+    + [Environment variables](#environment-variables-2)
+* [Telegram handler](#telegram-handler)
 
 ## Postman API Gateway Authorizer
 `postman-api-gateway-authorizer` controls access to the twilio callback endpoint in API Gateway. 
@@ -42,11 +29,38 @@ The following setup guides explain how to setup the authorizer and gateway respo
 
 ### Setup API Gateway Authorizer
 1. Create a new lambda authorizer in API Gateway and assign it to authorizer lambda function
-2. Choose lambda event payload to be Request and Authorization header as an identitiy source
+2. Choose lambda event payload to be Request and Authorization header as an identity source
 Refer to [guide](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html#api-gateway-lambda-authorizer-request-lambda-function-create)
 
 ### Setup Gateway Response
 Configure the Unauthorized response type with `WWW-Authenticate: Basic realm=TwilioCallback`
+
+
+## Email status update
+`log-email-sns`: When the status of an email is updated, this function is called to process the delivered/bounce/complaint status. 
+
+### Handling updates from SES 
+
+#### Create topics 
+Create SNS topics for the SES delivery status update. Read [here](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/configure-sns-notifications.html).
+The SNS topic can either call the lambda directly, or call the api gateway endpoint which points to the lambda. 
+
+#### Include original headers
+Enable `Include original headers` when subscribing to the SNS topics from SES. To pass the message id to the lambda, we include the message id in the sent message, using the header `X-SMTPAPI`. 
+
+### Handling updates from Sendgrid
+We use Sendgrid as a backup email provider. Set the [Sendgrid webhook url](https://sendgrid.com/docs/for-developers/tracking-events/getting-started-event-webhook-security-features) to the api gateway endpoint that points to this lambda.
+
+
+### Environment variables
+| Name                  | Description                                                                       |
+| --------------------- | --------------------------------------------------------------------------------- |
+| `DB_URI`              | URI to the postgres database                                                      |
+| `CALLBACK_SECRET`     | Secret for basic auth                                                             |
+| `MIN_HALT_NUMBER`     | Halt if there is this minimum number of invalid recipients, and it exceeds the percentage threshold |
+| `MIN_HALT_PERCENTAGE` | Halt if the percentage of invalid recipients exceeds this threshold. Supply a float from 0 to 1  |
+| `SENDGRID_PUBLIC_KEY` | Public key used to verify webhook events from sendgrid  |
+
 
 ## SMS status update from Twilio
 
@@ -90,3 +104,7 @@ The `unsubscribers` table stores unsubscribed recipients by `campaign_id` and `s
 | `SES_FROM` | The email address that appears in the From field of an email |
 | `UNSUBSCRIBE_GUIDE_URL` | URL to unsubscribe guide |
 | `SENTRY_DSN` | Sentry DSN for serverless |
+
+
+## Telegram handler
+To be updated
