@@ -142,6 +142,11 @@ const ProtectedEmailRecipients = ({
         double curly braces. The keywords in your message template should match
         the headers in your recipients CSV file.
       </p>
+      <p>
+        <b>Note:</b> For security reasons, we do not store password protected
+        messages. You will lose the content below if you refresh your tab or go
+        back to Step 1 to edit.
+      </p>
       <TextArea
         highlight={true}
         placeholder="Enter password protected message here"
@@ -160,6 +165,16 @@ const ProtectedEmailRecipients = ({
 
   const messageBPreview = (
     <>
+      <h2>Confirm password protected message</h2>
+      <p>
+        If you choose to edit your message, do note that you will have to
+        re-upload your recipients list.
+      </p>
+      <p>
+        <b>Note:</b> For security reasons, we do not store password protected
+        messages. You will lose the content below if you refresh your tab or go
+        back to Step 1 to edit.
+      </p>
       <InfoBlock>
         <li>
           <i className="bx bx-user-check"></i>
@@ -169,17 +184,22 @@ const ProtectedEmailRecipients = ({
           <i className="bx bx-file"></i>
           <p>{protectedCsvInfo?.csvFilename}</p>
         </li>
-        <li>
-          <i className="bx bx-message-dots"></i>
-          <p>Preview:</p>
-        </li>
-        <br />
-        <li>
-          {protectedCsvInfo?.preview && (
-            <ProtectedPreview html={protectedCsvInfo?.preview} />
-          )}
-        </li>
       </InfoBlock>
+      <div className="separator"></div>
+      {protectedCsvInfo?.preview && (
+        <>
+          <h4>Message B</h4>
+          <InfoBlock>
+            <li>
+              <b>Results</b>
+            </li>
+            <li>
+              <ProtectedPreview html={protectedCsvInfo?.preview} />
+            </li>
+          </InfoBlock>
+        </>
+      )}
+
       <div className="progress-button">
         <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
           Back
