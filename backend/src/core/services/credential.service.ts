@@ -26,31 +26,29 @@ const upsertCredential = async (
 ): Promise<void> => {
   // If credential doesn't exist, upload credential to secret manager
   try {
-    logger.info(`Updating credential in AWS secrets manager for name=${name}`)
-    // Secrets stored in localstack will not be tagged as no error is thrown by localstack if the secret
-    // does not exists.
+    logger.info('Storing credential in AWS secrets manager')
     await secretsManager
-      .putSecretValue({
-        SecretId: name,
+      .createSecret({
+        Name: name,
         SecretString: secret,
+        ...(restrictEnvironment
+          ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
+          : {}),
       })
       .promise()
-    logger.info(
-      `Successfully updated credential in AWS secrets manager for name=${name}`
-    )
+    logger.info('Successfully stored credential in AWS secrets manager')
   } catch (err) {
-    if (err.name === 'ResourceNotFoundException') {
-      logger.info('Storing credential in AWS secrets manager')
+    if (err.name === 'ResourceExistsException') {
+      logger.info(`Updating credential in AWS secrets manager for name=${name}`)
       await secretsManager
-        .createSecret({
-          Name: name,
+        .putSecretValue({
+          SecretId: name,
           SecretString: secret,
-          ...(restrictEnvironment
-            ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
-            : {}),
         })
         .promise()
-      logger.info('Successfully stored credential in AWS secrets manager')
+      logger.info(
+        `Successfully updated credential in AWS secrets manager for name=${name}`
+      )
     } else {
       logger.error(err)
       throw err
