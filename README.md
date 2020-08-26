@@ -7,8 +7,10 @@
 ## Table of Contents
 
 - [Features](#features)
+- [API Usage](#api-usage)
 - [Development](#development)
   - [Install and run required services](#install-and-run-required-services)
+  - [Secrets detection](#secrets-detection)
   - [Set environment variables](#set-environment-variables)
   - [Install and run the app](#install-and-run-the-app)
 - [Deployment](#deployment)
@@ -33,6 +35,10 @@
 - **Send emails**: Just click send and Postman will send those messages out to your intended audience via email
 - **Send SMSes**: Enter your twilio credentials, and Postman will send those messages via SMS. No integration with twilio is necessary
 - **View stats**: Keep track of your campaign's progress as it's sending, and check back when it's done.
+
+## API Usage
+
+Just want to use the API? See [api-usage.md](docs/api-usage.md) for details.
 
 ## Development
 
@@ -70,7 +76,7 @@ npm run dev:localstack
 
 Starting all services using Docker:
 
-```
+```bash
 export AWS_ENDPOINT=http://localhost:4566
 export FILE_STORAGE_BUCKET_NAME=localstack-upload
 export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
@@ -80,12 +86,21 @@ npm run dev:services
 
 Optionally, run the following to install and use `cw` to tail Cloudwatch logs:
 
-```
+```bash
 brew tap lucagrulla/tap
 brew install cw
 
 # Tail logs on localstack
 cw tail -r ap-northeast-1 -u $AWS_ENDPOINT -f $AWS_LOG_GROUP_NAME:`node --eval='console.log(require("os").hostname())'`
+```
+
+### Secrets detection
+
+This project makes of [detect-secrets](https://github.com/Yelp/detect-secrets) to prevent secrets and credentials from being committed to the repository.
+It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo. Run the following to install:
+
+```bash
+pip install detect-secrets
 ```
 
 ### Set environment variables

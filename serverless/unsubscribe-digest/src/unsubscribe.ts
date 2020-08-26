@@ -63,7 +63,7 @@ export const sendEmailAndUpdateUnsubscribers = async ({
 
   await mailClient.sendMail({
     recipients: [email],
-    subject: 'Postman: Weekly Digest [Unsubscribe]',
+    subject: 'Postman.gov.sg: Weekly Digest for Recipients who Unsubscribed',
     body: emailBody,
   })
 
