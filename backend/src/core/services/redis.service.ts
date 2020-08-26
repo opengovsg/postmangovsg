@@ -2,10 +2,6 @@ import redis from 'redis'
 import config from '@core/config'
 import logger from '@core/logger'
 
-if (!config.get('redisOtpUri')) {
-  throw new Error('otpClient: redisOtpUri not found')
-}
-
 /**
  * Client to redis cache for storing otps
  */
@@ -17,10 +13,6 @@ const otpClient = redis
   .on('error', (err: Error) => {
     logger.error(String(err))
   })
-
-if (!config.get('redisSessionUri')) {
-  throw new Error('sessionClient: redisSessionUri not found')
-}
 
 /**
  * Client to redis cache for storing sessions

@@ -9,14 +9,15 @@ import path from 'path'
 import { isSupportedCountry } from 'libphonenumber-js'
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 /**
- * To require an env var without setting a default,
+ * To require a config from Secrets Manager
+ * Please add the secrets in secrets.loader.ts
  * use
  *    default: '',
- *    format: 'required-string',
+ *    format: 'secret-from-SM',
  *    sensitive: true,
  */
 convict.addFormats({
-  'required-string': {
+  'secret-from-SM': {
     validate: (val: any): void => {
       if (val === '') {
         throw new Error('Required value cannot be empty')
@@ -32,12 +33,6 @@ convict.addFormats({
 })
 
 const config = convict({
-  test: {
-    doc: 'For testing purposes',
-    default: '',
-    format: 'required-string',
-    sensitive: true,
-  },
   env: {
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
@@ -76,8 +71,7 @@ const config = convict({
       doc:
         'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
       default: '',
-      env: 'SECRET_MANAGER_SALT',
-      format: 'required-string',
+      format: 'secret-from-SM',
       sensitive: true,
     },
   },
@@ -85,15 +79,13 @@ const config = convict({
     databaseUri: {
       doc: 'URI to the postgres database',
       default: '',
-      env: 'DB_URI',
-      format: 'required-string',
+      format: 'secret-from-SM',
       sensitive: true,
     },
     databaseReadReplicaUri: {
       doc: 'URI to the postgres read replica database',
       default: '',
-      env: 'DB_READ_REPLICA_URI',
-      format: 'required-string',
+      format: 'secret-from-SM',
       sensitive: true,
     },
     dialectOptions: {
@@ -138,8 +130,7 @@ const config = convict({
     doc:
       'Secret used to sign pre-signed urls for uploading CSV files to AWS S3',
     default: '',
-    env: 'JWT_SECRET',
-    format: 'required-string',
+    format: 'secret-from-SM',
     sensitive: true,
   },
   MORGAN_LOG_FORMAT: {
@@ -172,8 +163,7 @@ const config = convict({
     secret: {
       doc: 'Secret used to sign the session ID cookie',
       default: '',
-      env: 'SESSION_SECRET',
-      format: 'required-string',
+      format: 'secret-from-SM',
       sensitive: true,
     },
     cookieSettings: {
@@ -234,15 +224,13 @@ const config = convict({
   redisOtpUri: {
     doc: 'URI to the redis cache for storing one time passwords',
     default: '',
-    env: 'REDIS_OTP_URI',
-    format: 'required-string',
+    format: 'secret-from-SM',
     sensitive: true,
   },
   redisSessionUri: {
     doc: 'URI to the redis cache for storing login sessions',
     default: '',
-    env: 'REDIS_SESSION_URI',
-    format: 'required-string',
+    format: 'secret-from-SM',
     sensitive: true,
   },
   mailOptions: {
@@ -313,8 +301,7 @@ const config = convict({
     salt: {
       doc: 'Secret used to hash API Keys before storing them in the database',
       default: '',
-      env: 'API_KEY_SALT_V1',
-      format: 'required-string',
+      format: 'secret-from-SM',
       sensitive: true,
     },
     version: {
@@ -357,8 +344,7 @@ const config = convict({
       key: {
         doc: 'V1 HMAC key',
         default: '',
-        format: 'required-string',
-        env: 'UNSUBSCRIBE_HMAC_KEY_V1',
+        format: 'secret-from-SM',
         sensitive: true,
       },
     },
