@@ -18,6 +18,7 @@ import { EmailCampaign } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 import { protectAndUploadCsv } from 'services/protect-csv.service'
+import styles from '../Create.module.scss'
 
 enum ProtectPhase {
   READY,
@@ -189,7 +190,7 @@ const ProtectedEmailRecipients = ({
       {protectedCsvInfo?.preview && (
         <>
           <h4>Message B</h4>
-          <InfoBlock>
+          <InfoBlock className={styles.protectedPreview}>
             <li>
               <b>Results</b>
             </li>
@@ -249,7 +250,11 @@ const ProtectedEmailRecipients = ({
 
   const completeButtons = (
     <div className="progress-button">
-      <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
+      <TextButton
+        className={styles.darkBlueText}
+        minButtonWidth
+        onClick={() => setPhase(ProtectPhase.READY)}
+      >
         Edit Message
       </TextButton>
       <PrimaryButton onClick={onNext}>
