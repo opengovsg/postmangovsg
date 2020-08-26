@@ -58,6 +58,9 @@ brew services start redis
 # Check that redis is running
 redis-cli ping
 
+# Install detect-secrets in order to make commits
+pip install detect-secrets
+
 # Have localstack running
 docker pull localstack/localstack
 
