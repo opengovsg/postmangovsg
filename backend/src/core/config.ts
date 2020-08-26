@@ -36,6 +36,7 @@ const config = convict({
     doc: 'For testing purposes',
     default: '',
     format: 'required-string',
+    sensitive: true,
   },
   env: {
     doc: 'The application environment.',
