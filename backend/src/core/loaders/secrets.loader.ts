@@ -4,7 +4,7 @@ import AWS from 'aws-sdk'
 const REGION = 'ap-southeast-1'
 const NAME = 'develop/shaowei/test'
 
-const loader = async (): Promise<void> => {
+const secretsLoader = async (): Promise<void> => {
   const client = new AWS.SecretsManager({
     region: REGION,
   })
@@ -18,4 +18,4 @@ const loader = async (): Promise<void> => {
   config.validate()
 }
 
-export default loader
+export default secretsLoader
