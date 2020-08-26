@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useContext } from 'react'
 
 import { TextArea, NextButton, ErrorBlock } from 'components/common'
+import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
 import { exceedsCharacterThreshold, saveTemplate } from 'services/sms.service'
 import styles from '../Create.module.scss'
@@ -8,10 +10,13 @@ import styles from '../Create.module.scss'
 const SMSTemplate = ({
   body: initialBody,
   onNext,
+  finishLaterCallbackRef,
 }: {
   body: string
   onNext: (changes: any, next?: boolean) => void
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
+  const modalContext = useContext(ModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
@@ -33,25 +38,46 @@ const SMSTemplate = ({
     }
   }, [body])
 
-  async function handleSaveTemplate(): Promise<void> {
-    setErrorMsg(null)
-    try {
-      if (!campaignId) {
-        throw new Error('Invalid campaign id')
+  const handleSaveTemplate = useCallback(
+    async (propagateError = false): Promise<void> => {
+      setErrorMsg(null)
+      try {
+        if (!campaignId) {
+          throw new Error('Invalid campaign id')
+        }
+        const { updatedTemplate, numRecipients } = await saveTemplate(
+          +campaignId,
+          body
+        )
+        onNext({
+          body: updatedTemplate?.body,
+          params: updatedTemplate?.params,
+          numRecipients,
+        })
+      } catch (err) {
+        setErrorMsg(err.message)
+        if (propagateError) throw err
       }
-      const { updatedTemplate, numRecipients } = await saveTemplate(
-        +campaignId,
-        body
+    },
+    [body, campaignId, onNext]
+  )
+
+  // Set callback for finish later button
+  useEffect(() => {
+    finishLaterCallbackRef.current = () => {
+      modalContext.setModalContent(
+        <SaveDraftModal
+          saveable
+          onSave={async () => {
+            if (body) await handleSaveTemplate(true)
+          }}
+        />
       )
-      onNext({
-        body: updatedTemplate?.body,
-        params: updatedTemplate?.params,
-        numRecipients,
-      })
-    } catch (err) {
-      setErrorMsg(err.message)
     }
-  }
+    return () => {
+      finishLaterCallbackRef.current = undefined
+    }
+  }, [body, finishLaterCallbackRef, handleSaveTemplate, modalContext])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')

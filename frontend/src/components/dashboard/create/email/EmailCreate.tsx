@@ -23,9 +23,11 @@ const EMAIL_PROGRESS_STEPS = [
 const CreateEmail = ({
   campaign: initialCampaign,
   onCampaignChange,
+  finishLaterCallbackRef,
 }: {
   campaign: EmailCampaign
   onCampaignChange: (c: Campaign) => void
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
@@ -66,6 +68,7 @@ const CreateEmail = ({
             replyTo={campaign.replyTo}
             protect={campaign.protect}
             onNext={onNext}
+            finishLaterCallbackRef={finishLaterCallbackRef}
           />
         )
       case EmailProgress.UploadRecipients:
@@ -76,6 +79,7 @@ const CreateEmail = ({
               numRecipients={campaign.numRecipients}
               isProcessing={campaign.isCsvProcessing}
               onNext={onNext}
+              finishLaterCallbackRef={finishLaterCallbackRef}
             />
           )
         }

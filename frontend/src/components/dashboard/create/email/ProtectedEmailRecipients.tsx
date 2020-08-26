@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import isEmail from 'validator/lib/isEmail'
 
@@ -11,6 +11,8 @@ import {
   ProtectedPreview,
   Checkbox,
 } from 'components/common'
+import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { ModalContext } from 'contexts/modal.context'
 import EmailRecipients from './EmailRecipients'
 import { EmailCampaign } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -31,12 +33,15 @@ const ProtectedEmailRecipients = ({
   numRecipients,
   isProcessing,
   onNext,
+  finishLaterCallbackRef,
 }: {
   csvFilename: string
   numRecipients: number
   isProcessing: boolean
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
+  const modalContext = useContext(ModalContext)
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState<File>()
@@ -51,6 +56,16 @@ const ProtectedEmailRecipients = ({
   useEffect(() => {
     setPhase(computePhase(numRecipients, isProcessing))
   }, [numRecipients, isProcessing])
+
+  // Set callback for finish later button
+  useEffect(() => {
+    finishLaterCallbackRef.current = () => {
+      modalContext.setModalContent(<SaveDraftModal />)
+    }
+    return () => {
+      finishLaterCallbackRef.current = undefined
+    }
+  }, [template, finishLaterCallbackRef, modalContext])
 
   function computePhase(
     numRecipients: number,

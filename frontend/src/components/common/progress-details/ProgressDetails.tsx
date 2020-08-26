@@ -37,15 +37,10 @@ const ProgressDetails = ({
     updatedAt,
     halted,
   } = stats
-  const [isSent, setIsSent] = useState(status === Status.Sent)
-  const [isComplete, setIsComplete] = useState(!error && !unsent)
-  const [isHalted, setIsHalted] = useState(!!halted)
 
-  useEffect(() => {
-    setIsComplete(!error && !unsent)
-    setIsSent(status === Status.Sent)
-    setIsHalted(!!halted)
-  }, [status, error, unsent, halted])
+  const isSent = status === Status.Sent
+  const isComplete = !error && !unsent
+  const isHalted = !!halted
 
   function renderButton() {
     if (isHalted) {
