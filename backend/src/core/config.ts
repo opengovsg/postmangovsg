@@ -32,6 +32,11 @@ convict.addFormats({
 })
 
 const config = convict({
+  test: {
+    doc: 'For testing purposes',
+    default: '',
+    format: 'required-string',
+  },
   env: {
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
