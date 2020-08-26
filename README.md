@@ -7,6 +7,7 @@
 ## Table of Contents
 
 - [Features](#features)
+- [API Usage](#api-usage)
 - [Development](#development)
   - [Install and run required services](#install-and-run-required-services)
   - [Set environment variables](#set-environment-variables)
@@ -33,6 +34,10 @@
 - **Send emails**: Just click send and Postman will send those messages out to your intended audience via email
 - **Send SMSes**: Enter your twilio credentials, and Postman will send those messages via SMS. No integration with twilio is necessary
 - **View stats**: Keep track of your campaign's progress as it's sending, and check back when it's done.
+
+## API Usage
+
+Just want to use the API? See [api-usage.md](docs/api-usage.md) for details.
 
 ## Development
 
