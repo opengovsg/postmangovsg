@@ -1,3 +1,4 @@
+import logger from '@core/logger'
 import config from '@core/config'
 import AWS from 'aws-sdk'
 
@@ -16,6 +17,8 @@ const secretsLoader = async (): Promise<void> => {
   }
   // Validate to make sure all the required env vars have been set
   config.validate()
+
+  logger.info({ message: 'Secrets loaded' })
 }
 
 export default secretsLoader
