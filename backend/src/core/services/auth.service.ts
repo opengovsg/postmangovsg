@@ -178,8 +178,12 @@ const canSendOtp = async (email: string): Promise<void> => {
 /**
  * Sends an email containing the otp to the user
  * @param email
+ * @param ipAddress originating IP address that requests for OTP.
  */
-const sendOtp = async (email: string): Promise<string | void> => {
+const sendOtp = async (
+  email: string,
+  ipAddress: string
+): Promise<string | void> => {
   const otp = generateOtp()
   const hashValue = await bcrypt.hash(otp, SALT_ROUNDS)
   const hashedOtp: HashedOtp = {
@@ -189,15 +193,16 @@ const sendOtp = async (email: string): Promise<string | void> => {
   }
   await saveHashedOtp(email, hashedOtp)
 
+  const appName = config.get('APP_NAME')
   return MailService.mailClient.sendMail({
     recipients: [email],
     subject: `One-Time Password (OTP) for ${config.get('APP_NAME')}`,
     body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(
       OTP_EXPIRY / 60
     )} minutes.
-    Please use this to login to your ${config.get(
-      'APP_NAME'
-    )} account. <p>If your OTP does not work, please request for a new OTP.</p>`,
+    Please use this to login to your ${appName} account. <p>If your OTP does not work, please request for a new OTP.</p>
+    <p>This login attempt was made from the IP: ${ipAddress}. If you did not attempt to log in to ${appName}, you may choose to investigate this IP address further.</p>
+    <p>The ${appName} Support Team</p>`,
   })
 }
 
