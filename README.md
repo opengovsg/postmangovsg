@@ -7,6 +7,7 @@
 ## Table of Contents
 
 - [Features](#features)
+- [API Usage](#api-usage)
 - [Development](#development)
   - [Install and run required services](#install-and-run-required-services)
   - [Set environment variables](#set-environment-variables)
@@ -34,6 +35,10 @@
 - **Send SMSes**: Enter your twilio credentials, and Postman will send those messages via SMS. No integration with twilio is necessary
 - **View stats**: Keep track of your campaign's progress as it's sending, and check back when it's done.
 
+## API Usage
+
+Just want to use the API? See [api-usage.md](docs/api-usage.md) for details.
+
 ## Development
 
 ### Install and run required services
@@ -57,6 +62,9 @@ brew services start redis
 
 # Check that redis is running
 redis-cli ping
+
+# Install detect-secrets in order to make commits
+pip install detect-secrets
 
 # Have localstack running
 docker pull localstack/localstack

@@ -48,7 +48,7 @@ const Unsubscribe = () => {
       }
       setUnsubscribed(true)
     } catch (err) {
-      setErrorMsg('Invalid subscribe request')
+      setErrorMsg('Invalid unsubscribe request')
     }
   }
 
@@ -105,7 +105,7 @@ const Unsubscribe = () => {
     <div className={styles.outer}>
       <div className={styles.inner}>
         <>
-          <img src={appLogo} alt="Postman logo" />
+          <img src={appLogo} alt="Postman logo" className={styles.appLogo} />
           <img
             src={isStaying ? cancelRequestHero : landingHero}
             alt="Landing hero"
