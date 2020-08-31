@@ -4,7 +4,7 @@ const isAuthenticated = (_header: string | undefined): boolean => {
 }
 const parseEvent = (_event: any): void => {
   if (ses.isEvent(_event)) {
-    ses.parseRecord(event)
+    ses.parseRecord(_event)
   } else if (sendgrid.isEvent(_event)) {
     sendgrid.parseRecord(_event)
   } else {
