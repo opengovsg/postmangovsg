@@ -130,6 +130,11 @@ const config = convict({
         format: 'int',
       },
     },
+    useIam: {
+      doc: 'Whether to use IAM for authentication to database',
+      default: false,
+      env: 'DB_USE_IAM',
+    },
   },
   jwtSecret: {
     doc:
