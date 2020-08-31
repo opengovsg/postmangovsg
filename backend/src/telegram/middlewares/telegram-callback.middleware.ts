@@ -7,7 +7,7 @@ const verifyBotIdRegistered = (
   return res.sendStatus(403)
 }
 
-const addSubscriber = (
+const handleUpdate = (
   _req: Request,
   res: Response,
   _next: NextFunction
@@ -17,5 +17,5 @@ const addSubscriber = (
 
 export const TelegramCallbackMiddleware = {
   verifyBotIdRegistered,
-  addSubscriber,
+  handleUpdate,
 }
