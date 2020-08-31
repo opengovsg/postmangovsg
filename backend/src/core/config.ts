@@ -19,7 +19,7 @@ const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 convict.addFormats({
   'secret-from-SM': {
     validate: (val: any): void => {
-      if (val === '') {
+      if (val === undefined) {
         throw new Error('Required value cannot be empty')
       }
     },
@@ -70,7 +70,7 @@ const config = convict({
     secretManagerSalt: {
       doc:
         'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
-      default: '',
+      default: undefined,
       format: 'secret-from-SM',
       sensitive: true,
     },
@@ -78,13 +78,13 @@ const config = convict({
   database: {
     databaseUri: {
       doc: 'URI to the postgres database',
-      default: '',
+      default: undefined,
       format: 'secret-from-SM',
       sensitive: true,
     },
     databaseReadReplicaUri: {
       doc: 'URI to the postgres read replica database',
-      default: '',
+      default: undefined,
       format: 'secret-from-SM',
       sensitive: true,
     },
@@ -129,7 +129,7 @@ const config = convict({
   jwtSecret: {
     doc:
       'Secret used to sign pre-signed urls for uploading CSV files to AWS S3',
-    default: '',
+    default: undefined,
     format: 'secret-from-SM',
     sensitive: true,
   },
@@ -162,7 +162,7 @@ const config = convict({
     },
     secret: {
       doc: 'Secret used to sign the session ID cookie',
-      default: '',
+      default: undefined,
       format: 'secret-from-SM',
       sensitive: true,
     },
@@ -223,13 +223,13 @@ const config = convict({
   },
   redisOtpUri: {
     doc: 'URI to the redis cache for storing one time passwords',
-    default: '',
+    default: undefined,
     format: 'secret-from-SM',
     sensitive: true,
   },
   redisSessionUri: {
     doc: 'URI to the redis cache for storing login sessions',
-    default: '',
+    default: undefined,
     format: 'secret-from-SM',
     sensitive: true,
   },
@@ -300,7 +300,7 @@ const config = convict({
   apiKey: {
     salt: {
       doc: 'Secret used to hash API Keys before storing them in the database',
-      default: '',
+      default: undefined,
       format: 'secret-from-SM',
       sensitive: true,
     },
@@ -343,7 +343,7 @@ const config = convict({
       },
       key: {
         doc: 'V1 HMAC key',
-        default: '',
+        default: undefined,
         format: 'secret-from-SM',
         sensitive: true,
       },
