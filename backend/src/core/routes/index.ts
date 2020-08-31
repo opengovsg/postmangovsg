@@ -13,11 +13,20 @@ import statsRoutes from './stats.routes'
 import unsubscriberRoutes from './unsubscriber.routes'
 
 // Import channel-specific routes
-import { smsCampaignRoutes, smsSettingsRoutes } from '@sms/routes'
-import { emailCampaignRoutes, emailSettingsRoutes } from '@email/routes'
+import {
+  smsCampaignRoutes,
+  smsSettingsRoutes,
+  smsCallbackRoutes,
+} from '@sms/routes'
+import {
+  emailCampaignRoutes,
+  emailSettingsRoutes,
+  emailCallbackRoutes,
+} from '@email/routes'
 import {
   telegramCampaignRoutes,
   telegramSettingsRoutes,
+  telegramCallbackRoutes,
 } from '@telegram/routes'
 
 const CHANNEL_ROUTES = Object.values(ChannelType).map(
@@ -138,4 +147,9 @@ router.use(
   settingsRoutes
 )
 
+router.use('/callback/email', emailCallbackRoutes)
+
+router.use('/callback/email', smsCallbackRoutes)
+
+router.use('/callback/telegram', telegramCallbackRoutes)
 export default router
