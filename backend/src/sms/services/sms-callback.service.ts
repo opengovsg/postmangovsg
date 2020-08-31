@@ -2,6 +2,7 @@ import { Request } from 'express'
 import bcrypt from 'bcrypt'
 import { QueryTypes } from 'sequelize'
 import config from '@core/config'
+import logger from '@core/logger'
 import { SmsMessage } from '@sms/models'
 const FINALIZED_STATUS = ['sent', 'delivered', 'undelivered', 'failed']
 
@@ -32,7 +33,7 @@ const parseEvent = async (req: Request): Promise<void> => {
   if (FINALIZED_STATUS.indexOf(twilioMessageStatus as string) === -1) {
     return
   }
-  console.log(`Updating messageId ${messageId} in sms_messages`)
+  logger.info(`Updating messageId ${messageId} in sms_messages`)
   if (twilioErrorCode) {
     await SmsMessage?.sequelize?.query(
       `UPDATE sms_messages SET error_code=:twilioErrorCode, updated_at = clock_timestamp(), status = 'ERROR' WHERE id=:messageId AND campaign_id=:campaignId`,
