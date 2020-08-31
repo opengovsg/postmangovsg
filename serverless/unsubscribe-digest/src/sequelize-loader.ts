@@ -3,13 +3,14 @@ import { parse } from 'pg-connection-string'
 
 import config from './config'
 import { Logger } from './utils/logger'
+import { MutableConfig, generateRdsIamAuthToken } from './utils/rds-iam'
 
 const logger = new Logger('db')
 
 const DB_URI = config.get('database.databaseUri')
 const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
 
-function parseDBUri(uri: string): any {
+const parseDBUri = (uri: string): any => {
   const config = parse(uri)
   return { ...config, username: config.user }
 }
@@ -30,6 +31,13 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
     dialectOptions,
     query: {
       useMaster: true,
+    },
+    hooks: {
+      beforeConnect: async (dbConfig: MutableConfig): Promise<void> => {
+        if (config.get('database.useIam')) {
+          dbConfig.password = await generateRdsIamAuthToken(dbConfig)
+        }
+      },
     },
   })
 

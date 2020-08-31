@@ -18,6 +18,7 @@
     "@types/lodash": "^4.14.157",
     "@types/node": "^14.0.23",
     "@types/validator": "^13.1.0",
+    "aws-sdk": "^2.742.0",
     "nodemailer-direct-transport": "^3.3.2",
     "pg": "^8.3.0",
     "pg-connection-string": "^2.3.0",
