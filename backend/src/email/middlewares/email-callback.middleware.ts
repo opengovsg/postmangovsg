@@ -12,8 +12,8 @@ const isAuthenticated = (
   return res.sendStatus(401)
 }
 
-const parseEvent = (req: Request, res: Response): Response => {
-  EmailCallbackService.parseEvent(req.body)
+const parseEvent = async (req: Request, res: Response): Promise<Response> => {
+  await EmailCallbackService.parseEvent(req.body)
   return res.sendStatus(200)
 }
 

@@ -1,4 +1,5 @@
 import { Request } from 'express'
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa'
 import config from '@core/config'
@@ -7,7 +8,9 @@ import {
   updateBouncedStatus,
   updateComplaintStatus,
 } from '@email/utils/callback/update-status'
-const PUBLIC_KEY = PublicKey.fromPem(config.get('sendgridPublicKey'))
+const PUBLIC_KEY = PublicKey.fromPem(
+  config.get('emailCallback.sendgridPublicKey')
+)
 const SIGNATURE_HEADER = 'X-Twilio-Email-Event-Webhook-Signature'
 const TIMESTAMP_HEADER = 'X-Twilio-Email-Event-Webhook-Timestamp'
 
