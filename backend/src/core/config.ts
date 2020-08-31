@@ -397,6 +397,14 @@ const config = convict({
       doc: 'Secret for basic auth',
       env: 'CALLBACK_SECRET',
       default: '',
+    },
+  },
+  smsCallback: {
+    callbackSecret: {
+      doc:
+        'Secret used to generate the basic auth credentials for twilio callback',
+      default: '',
+      env: 'TWILIO_CALLBACK_SECRET',
       format: 'required-string',
       sensitive: true,
     },
