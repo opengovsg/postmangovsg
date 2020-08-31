@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize-typescript'
 import config from './config'
+import { MutableConfig, generateRdsIamAuthToken } from './util/rds-iam'
 
 const sequelizeLoader = async (): Promise<Sequelize> => {
   try {
@@ -11,6 +12,13 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
       logging: false,
       pool: config.get('database.poolOptions'),
       dialectOptions,
+      hooks: {
+        beforeConnect: async (dbConfig: MutableConfig): Promise<void> => {
+          if (config.get('database.useIam')) {
+            dbConfig.password = await generateRdsIamAuthToken(dbConfig)
+          }
+        },
+      },
     })
     await sequelize.authenticate()
     console.log('Connection has been established successfully.')
