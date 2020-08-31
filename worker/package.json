@@ -31,6 +31,7 @@
     "module-alias": "^2.2.2",
     "nodemailer": "^6.4.6",
     "nodemailer-direct-transport": "^3.3.2",
+    "p-limit": "^3.0.2",
     "pg": "^8.2.1",
     "postman-templating": "file:../modules/postman-templating",
     "reflect-metadata": "^0.1.13",
