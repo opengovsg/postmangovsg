@@ -87,6 +87,11 @@ const config = convict({
         format: 'int',
       },
     },
+    useIam: {
+      doc: 'Whether to use IAM for authentication to database',
+      default: false,
+      env: 'DB_USE_IAM',
+    },
   },
   callbackSecret: {
     doc:
@@ -95,6 +100,13 @@ const config = convict({
     env: 'TWILIO_CALLBACK_SECRET',
     format: 'required-string',
     sensitive: true,
+  },
+  aws: {
+    awsRegion: {
+      doc: 'Region for where the lambda will be deployed in.',
+      default: 'ap-southeast-1',
+      env: 'AWS_REGION',
+    },
   },
 })
 
