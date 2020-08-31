@@ -120,7 +120,7 @@ const getCurrentStats = async (
     ],
   })
 
-  if (job == null)
+  if (job === null)
     throw new Error('Unable to find campaign in job queue table.')
 
   // Get stats from statistics table
@@ -146,8 +146,8 @@ const getCurrentStats = async (
       halted: job.campaign.halted,
     }
   }
-  // else, return archived stats
-  return {
+
+  const stats = {
     error: archivedStats.error,
     unsent: archivedStats.unsent,
     sent: archivedStats.sent,
@@ -157,6 +157,73 @@ const getCurrentStats = async (
     updated_at: archivedStats.updated_at,
     halted: job.campaign.halted,
     status_updated_at: job.updatedAt, // Timestamp when job was logged
+  }
+
+  // If job is not in send queue, return archived stats
+  if (job.status !== JobStatus.Ready) {
+    return stats
+  }
+
+  const campaign = await Campaign.findByPk(campaignId)
+  if (!campaign || !campaign.credName) {
+    throw new Error('Unable to find campaign in campaigns table.')
+  }
+
+  // check if there exists a job in progress using this credential
+  const runningJob = await JobQueue.findOne({
+    where: { workerId: { [Op.ne]: null } },
+    include: [
+      {
+        model: Campaign,
+        where: { credName: campaign.credName },
+        include: [Statistic],
+      },
+    ],
+  })
+
+  // get all jobs in send queue using this credential
+  const sharedCredentialJobs = await JobQueue.findAll({
+    where: { status: JobStatus.Ready },
+    include: [
+      {
+        model: Campaign,
+        where: { credName: campaign.credName },
+        include: [Statistic],
+      },
+    ],
+  })
+
+  // get the job's posiiton in the queue
+  const position = await sharedCredentialJobs.findIndex(
+    (job) => job.campaignId === campaignId
+  )
+
+  // if there are no existing jobs running and this job is the first in the send queue
+  // no need to send queue status
+  if (!runningJob && position === 0) {
+    return stats
+  }
+
+  // get all jobs in queue before this job
+  const jobsInQueue = sharedCredentialJobs.slice(0, position)
+  if (runningJob) jobsInQueue.push(runningJob)
+
+  // use number of unsent messages from statistics and job send_rate
+  // to compute approx time needed to complete jobs
+  let totalTime = 0
+  jobsInQueue.map((job) => {
+    if (job.campaign.statistic?.unsent && job.sendRate) {
+      const timeCurrJob = job.campaign.statistic.unsent / job.sendRate
+      totalTime += timeCurrJob
+    }
+  })
+
+  return {
+    ...stats,
+    queueStatus: {
+      position,
+      time: Math.ceil(totalTime),
+    },
   }
 }
 
