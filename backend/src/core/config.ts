@@ -409,7 +409,7 @@ const config = convict({
       sensitive: true,
     },
   },
-  telegramAddSubscriber: {
+  telegramCallback: {
     contactUsUrl: {
       doc: 'URL to contact form',
       default: '',

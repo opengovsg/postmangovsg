@@ -10,12 +10,12 @@ const HELP_MESSAGE = `
 /help - show this help message
 
 If you are experiencing issues with the Telegram bot, please contact us by submitting a [support form](${config.get(
-  'telegramAddSubscriber.contactUsUrl'
+  'telegramCallback.contactUsUrl'
 )}) to the Postman team.
 
 --
 This bot is powered by Postman – a mass messaging platform used by the Government to communicate with stakeholders. For more information, please visit our [site](${config.get(
-  'telegramAddSubscriber.guideUrl'
+  'telegramCallback.guideUrl'
 )}).
 `
 

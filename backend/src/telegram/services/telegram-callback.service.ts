@@ -8,8 +8,8 @@ import {
   contactMessageHandler,
   helpCommandHandler,
   updatenumberCommandHandler,
-} from '@telegram/utils/add-subscriber/handlers'
-import { PostmanTelegramError } from '@telegram/utils/add-subscriber/PostmanTelegramError'
+} from '@telegram/utils/callback/handlers'
+import { PostmanTelegramError } from '@telegram/utils/callback/PostmanTelegramError'
 
 /**
  * Verifies that the given bot id is registered, otherwise throws an error.
