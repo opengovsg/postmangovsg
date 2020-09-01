@@ -12,9 +12,9 @@ import {
 import { PostmanTelegramError } from '@telegram/utils/callback/PostmanTelegramError'
 
 /**
- * Verifies that the given bot id is registered, otherwise throws an error.
+ * Verifies that the given bot id is registered
  */
-const verifyBotIdRegistered = async (botId: string): Promise<void> => {
+const verifyBotIdRegistered = async (botId: string): Promise<boolean> => {
   const botIdExists = await Credential?.sequelize?.query(
     `SELECT 1 AS exists FROM credentials WHERE name = :botId;`,
     {
@@ -24,9 +24,7 @@ const verifyBotIdRegistered = async (botId: string): Promise<void> => {
       plain: true,
     }
   )
-  if (!botIdExists) {
-    throw new Error(`botId ${botId} not recognized.`)
-  }
+  return !!botIdExists
 }
 
 /**
