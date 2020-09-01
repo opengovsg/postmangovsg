@@ -2,11 +2,13 @@ import { Request } from 'express'
 import url from 'url'
 import crypto, { Utf8AsciiLatin1Encoding } from 'crypto'
 import https from 'https'
+import logger from '@core/logger'
 import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
 } from '@email/utils/callback/update-status'
+
 const REFERENCE_ID_HEADER_V1 = 'X-Postman-ID' // Case sensitive
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
 const certCache: { [key: string]: string } = {}
@@ -109,11 +111,11 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   const messageId = message?.mail?.commonHeaders?.messageId
   const id = getReferenceID(message)
   if (id === undefined) {
-    console.log(`No reference message id found for ${messageId}`)
+    logger.info(`No reference message id found for ${messageId}`)
     return
   }
   const notificationType = message?.notificationType
-  console.log(`Update for notificationType = ${notificationType}`)
+  logger.info(`Update for notificationType = ${notificationType}`)
   const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
   switch (notificationType) {
     case 'Delivery':
@@ -134,7 +136,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       })
       break
     default:
-      console.error(
+      logger.error(
         `Can't handle messages with this notification type. notificationType = ${notificationType}`
       )
       return

@@ -3,6 +3,7 @@ import { Request } from 'express'
 // @ts-ignore
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa'
 import config from '@core/config'
+import logger from '@core/logger'
 import {
   updateDeliveredStatus,
   updateBouncedStatus,
@@ -42,7 +43,7 @@ const isEvent = (req: Request): boolean => {
 
 const parseRecord = async (record: SendgridRecord): Promise<void> => {
   if (record.message_id === undefined) {
-    console.log(`No reference message id found for ${record['smtp-id']}`)
+    logger.info(`No reference message id found for ${record['smtp-id']}`)
     return
   }
   const metadata = {
@@ -76,7 +77,7 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
       })
       break
     default:
-      console.error(
+      logger.error(
         `Can't handle messages with this notification type. notificationType = ${record.event}`
       )
       return

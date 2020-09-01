@@ -5,6 +5,8 @@ import {
 } from '@email/interfaces/callback.interface'
 import { EmailBlacklist } from '@email/models'
 import config from '@core/config'
+import logger from '@core/logger'
+
 /**
  * Adds email to blacklist table if it does not exist
  * @param recipientEmail
@@ -12,7 +14,7 @@ import config from '@core/config'
 export const addToBlacklist = (
   recipientEmail: string
 ): Promise<any> | undefined => {
-  console.log(`Updating blacklist table with ${recipientEmail}`)
+  logger.info(`Updating blacklist table with ${recipientEmail}`)
   return EmailBlacklist?.sequelize?.query(
     `INSERT INTO email_blacklist (recipient, created_at, updated_at) VALUES (:recipientEmail, clock_timestamp(), clock_timestamp()) 
         ON CONFLICT DO NOTHING;`,
@@ -32,7 +34,7 @@ export const updateMessageWithError = async (
 ): Promise<number | undefined> => {
   const { errorCode, timestamp, id } = opts
 
-  console.log(`Updating email_messages table. ${JSON.stringify(opts)}`)
+  logger.info(`Updating email_messages table. ${JSON.stringify(opts)}`)
   const [result] =
     (await EmailBlacklist?.sequelize?.query(
       `UPDATE email_messages SET error_code=:errorCode, received_at=:timestamp, status='INVALID_RECIPIENT', updated_at = clock_timestamp()
@@ -55,7 +57,7 @@ export const updateMessageWithError = async (
 export const updateMessageWithSuccess = async (
   metadata: Metadata
 ): Promise<number | undefined> => {
-  console.log(`Updating email_messages table. ${JSON.stringify(metadata)}`)
+  logger.info(`Updating email_messages table. ${JSON.stringify(metadata)}`)
   // Since notifications for the same messageId can be interleaved, we only update that message if this notification is newer than the previous.
   const [result] =
     (await EmailBlacklist?.sequelize?.query(
@@ -103,7 +105,7 @@ export const haltCampaignIfThresholdExceeded = async (
       invalid > config.get('emailCallback.minHaltNumber')
     const exceedsHaltPercentage =
       percentageInvalid > config.get('emailCallback.minHaltPercentage')
-    console.log(
+    logger.info(
       `Current campaign_id=${campaignId} invalid=${invalid} running_total=${runningTotal} 
         percentageInvalid=${percentageInvalid} 
         config.minHaltNumber=${config.get('emailCallback.minHaltNumber')}
@@ -120,7 +122,7 @@ export const haltCampaignIfThresholdExceeded = async (
       */
     if (exceedsHaltNumber && exceedsHaltPercentage) {
       // Halt
-      console.log(
+      logger.info(
         `Halting campaign_id=${campaignId} invalid=${invalid} running_total=${runningTotal} percentageInvalid=${percentageInvalid}`
       )
 
@@ -150,7 +152,7 @@ export const haltCampaignIfThresholdExceeded = async (
           )
         })
       } catch (err) {
-        console.error(`Could not halt campaign_id=${campaignId} ${err.stack}`)
+        logger.error(`Could not halt campaign_id=${campaignId} ${err.stack}`)
       }
     }
   }

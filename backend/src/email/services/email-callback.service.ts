@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import { ses, sendgrid } from '@email/utils/callback/parsers'
 import config from '@core/config'
+import logger from '@core/logger'
 const isAuthenticated = (authHeader?: string): boolean => {
   const headerKey = 'Basic'
   if (!authHeader) return false
@@ -11,7 +12,7 @@ const isAuthenticated = (authHeader?: string): boolean => {
   const decoded = Buffer.from(secret, 'base64').toString('utf8')
   const authorized = decoded === config.get('emailCallback.callbackSecret')
   if (!authorized)
-    console.log(`Request made with incorrect credential ${decoded}`)
+    logger.info(`Request made with incorrect credential ${decoded}`)
   return authorized
 }
 
