@@ -10,7 +10,13 @@ export type MutableConfig = {
   -readonly [K in keyof Config]: Config[K]
 }
 
-export const generateRdsIamAuthToken = async (config: any): Promise<string> => {
+/**
+ * Generate an RDS authentication token using attached IAM role
+ * @param config
+ */
+export const generateRdsIamAuthToken = async (
+  config: MutableConfig
+): Promise<string> => {
   const { username, port, host } = config
 
   // getAuthToken is called asynchronously because we are using an asynchronous credential provider
@@ -19,7 +25,7 @@ export const generateRdsIamAuthToken = async (config: any): Promise<string> => {
     rdsSigner.getAuthToken(
       {
         hostname: host,
-        port: +port,
+        port: port ? +port : 5432,
         username,
       },
       (err, token) => {
