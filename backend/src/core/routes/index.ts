@@ -149,7 +149,7 @@ router.use(
 
 router.use('/callback/email', emailCallbackRoutes)
 
-router.use('/callback/email', smsCallbackRoutes)
+router.use('/callback/sms', smsCallbackRoutes)
 
 router.use('/callback/telegram', telegramCallbackRoutes)
 export default router
