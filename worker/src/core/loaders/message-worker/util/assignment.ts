@@ -96,7 +96,7 @@ const assignment = async (
 ): Promise<boolean> => {
   try {
     let deadWorkers: string[] = []
-    if (config.get('IS_PROD')) {
+    if (config.get('env') !== 'development') {
       deadWorkers = await getDeadWorkers(connection, workerId)
     } else {
       logger.info(`${workerId}: Dev env - assignment - assumed no dead workers`)

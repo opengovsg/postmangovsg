@@ -42,9 +42,6 @@ const config = convict({
     default: 'production',
     env: 'NODE_ENV',
   },
-  IS_PROD: {
-    default: true,
-  },
   database: {
     databaseUri: {
       doc: 'URI to the postgres database',
@@ -143,7 +140,6 @@ const config = convict({
 // Override with local config
 if (config.get('env') === 'development') {
   config.load({
-    IS_PROD: false,
     database: {
       dialectOptions: {
         ssl: {

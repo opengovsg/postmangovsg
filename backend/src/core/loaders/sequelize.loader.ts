@@ -40,9 +40,10 @@ const parseDBUri = (uri: string): any => {
 }
 
 const sequelizeLoader = async (): Promise<void> => {
-  const dialectOptions = config.get('IS_PROD')
-    ? config.get('database.dialectOptions')
-    : {}
+  const dialectOptions =
+    config.get('env') !== 'development'
+      ? config.get('database.dialectOptions')
+      : {}
 
   const masterConfig = parseDBUri(DB_URI)
   const readReplicaConfig = parseDBUri(DB_READ_REPLICA_URI)
