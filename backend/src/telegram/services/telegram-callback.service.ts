@@ -15,15 +15,7 @@ import { PostmanTelegramError } from '@telegram/utils/callback/PostmanTelegramEr
  * Verifies that the given bot id is registered
  */
 const verifyBotIdRegistered = async (botId: string): Promise<boolean> => {
-  const botIdExists = await Credential?.sequelize?.query(
-    `SELECT 1 AS exists FROM credentials WHERE name = :botId;`,
-    {
-      replacements: {
-        botId,
-      },
-      plain: true,
-    }
-  )
+  const botIdExists = await Credential.findOne({ where: { name: botId } })
   return !!botIdExists
 }
 

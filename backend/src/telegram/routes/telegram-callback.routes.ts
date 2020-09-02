@@ -23,7 +23,7 @@ const router = Router()
  *          description: Bad Request
  */
 router.post(
-  '/:botId',
+  '/:botToken',
   TelegramCallbackMiddleware.verifyBotIdRegistered,
   TelegramCallbackMiddleware.handleUpdate
 )
