@@ -3,7 +3,7 @@ import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 
 import logger from '@core/logger'
 import { PostmanTelegramError } from '../PostmanTelegramError'
-import { TelegramSubscriber } from '@telegram/models'
+import { TelegramSubscriber, BotSubscriber } from '@telegram/models'
 /**
  * Upserts a Telegram subscriber.
  *
@@ -20,6 +20,12 @@ const upsertTelegramSubscriber = async (
   }
 
   logger.info(`Upserting Telegram subscriber: ${phoneNumber} -> ${telegramId}`)
+  /**
+   * Insert a telegram id and phone number, if that telegram id doesn't exist.
+   * Otherwise, if the new phone number does not exist,
+   * update the existing phone number associated with that telegram id with the new phone number,
+   * to maintain a 1-1 mapping.
+   */
   const result = await TelegramSubscriber?.sequelize?.query(
     `
         INSERT INTO telegram_subscribers (phone_number, telegram_id, created_at, updated_at)
@@ -52,23 +58,13 @@ const addBotSubscriber = async (
   telegramId: number
 ): Promise<boolean> => {
   logger.info(`Upserting bot subscriber: ${telegramId} -> bot ${botId}`)
-  const result = await TelegramSubscriber?.sequelize?.query(
-    `
-        INSERT INTO bot_subscribers (bot_id, telegram_id, created_at, updated_at)
-        VALUES (:botId, :telegramId, clock_timestamp(), clock_timestamp())
-        ON CONFLICT DO NOTHING
-      `,
-    {
-      replacements: {
-        botId,
-        telegramId,
-      },
-    }
+  const [, created] = await BotSubscriber.findOrCreate({
+    where: { botId, telegramId },
+  })
+  logger.info(
+    created ? `Upserted Bot subscriber` : `Bot subscriber already exists`
   )
-  const affectedRows = result ? (result[1] as number) : 0
-  logger.info(`Upserted ${affectedRows} bot subscription`)
-
-  return affectedRows > 0
+  return created
 }
 
 /**
