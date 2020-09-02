@@ -206,8 +206,10 @@ export async function validateAndStoreNewCredentials({
   telegramBotToken: string
 }): Promise<void> {
   try {
-    await storeCredentials({ label, telegramBotToken })
-    await validateStoredCredentials({ campaignId, label })
+    await axios.post(`/campaign/${campaignId}/telegram/new-credentials`, {
+      label,
+      telegram_bot_token: telegramBotToken,
+    })
   } catch (e) {
     errorHandler(e, 'Error validating credentials.')
   }

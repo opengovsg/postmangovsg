@@ -48,16 +48,14 @@ export async function validateAndStoreNewCredentials({
   messagingServiceSid: string
 }): Promise<void> {
   try {
-    await storeCredentials({
+    await axios.post(`/campaign/${campaignId}/sms/new-credentials`, {
       label,
-      accountSid,
-      apiKey,
-      apiSecret,
-      messagingServiceSid,
       recipient,
-      validate: false,
+      twilio_account_sid: accountSid,
+      twilio_api_key: apiKey,
+      twilio_api_secret: apiSecret,
+      twilio_messaging_service_sid: messagingServiceSid,
     })
-    await validateStoredCredentials({ campaignId, recipient, label })
   } catch (e) {
     errorHandler(e, 'Error validating credentials.')
   }
