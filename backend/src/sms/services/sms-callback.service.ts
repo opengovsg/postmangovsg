@@ -1,6 +1,5 @@
 import { Request } from 'express'
 import bcrypt from 'bcrypt'
-import { QueryTypes } from 'sequelize'
 import config from '@core/config'
 import logger from '@core/logger'
 import { SmsMessage } from '@sms/models'
@@ -35,19 +34,29 @@ const parseEvent = async (req: Request): Promise<void> => {
   }
   logger.info(`Updating messageId ${messageId} in sms_messages`)
   if (twilioErrorCode) {
-    await SmsMessage?.sequelize?.query(
-      `UPDATE sms_messages SET error_code=:twilioErrorCode, updated_at = clock_timestamp(), status = 'ERROR' WHERE id=:messageId AND campaign_id=:campaignId`,
+    await SmsMessage.update(
       {
-        replacements: { twilioErrorCode, messageId, campaignId },
-        type: QueryTypes.UPDATE,
+        errorCode: twilioErrorCode,
+        status: 'ERROR',
+      },
+      {
+        where: {
+          id: messageId,
+          campaignId,
+        },
       }
     )
   } else {
-    await SmsMessage?.sequelize?.query(
-      `UPDATE sms_messages SET received_at = clock_timestamp(), updated_at = clock_timestamp(), status = 'SUCCESS' WHERE id=:messageId AND campaign_id=:campaignId`,
+    await SmsMessage.update(
       {
-        replacements: { messageId, campaignId },
-        type: QueryTypes.UPDATE,
+        receivedAt: new Date(),
+        status: 'SUCCESS',
+      },
+      {
+        where: {
+          id: messageId,
+          campaignId,
+        },
       }
     )
   }
