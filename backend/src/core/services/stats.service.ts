@@ -5,7 +5,7 @@ import {
   CampaignStatsCount,
   CampaignInvalidRecipient,
 } from '@core/interfaces'
-import { MessageStatus } from '@core/constants'
+import { MessageStatus, JobStatus } from '@core/constants'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -81,10 +81,13 @@ const getStatsFromTable = async (
     raw: true,
     where: { campaignId },
     attributes: [
-      [fn('sum', cast({ status: 'ERROR' }, 'int')), 'error'],
-      [fn('sum', cast({ status: 'SENDING' }, 'int')), 'sent'],
+      [fn('sum', cast({ status: MessageStatus.Error }, 'int')), 'error'],
+      [fn('sum', cast({ status: MessageStatus.Sending }, 'int')), 'sent'],
       [fn('sum', cast({ status: null }, 'int')), 'unsent'],
-      [fn('sum', cast({ status: 'INVALID_RECIPIENT' }, 'int')), 'invalid'],
+      [
+        fn('sum', cast({ status: MessageStatus.InvalidRecipient }, 'int')),
+        'invalid',
+      ],
     ],
   })
 
@@ -125,7 +128,8 @@ const getCurrentStats = async (
 
   // If job is sending, sent or stopped, i.e. not logged back to message table,
   // Retrieve current stats from ops table
-  if (['SENDING', 'SENT', 'STOPPED'].includes(job.status)) {
+  const { Sending, Sent, Stopped } = JobStatus
+  if ([Sending, Sent, Stopped].includes(job.status)) {
     const opsStats = await getStatsFromTable(campaignId, opsTable)
 
     // Sent count must be added to archived sent count since sent messages are
