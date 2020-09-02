@@ -13,17 +13,18 @@ MFA_TOKEN=""
 SSH_PUBLIC_KEY=""
 
 show_help() {
-  echo "usage: connect-rds.sh [CONFIG_FILE_PATH] [MFA_ARN] [SSH_PUBLIC_KEY]"
+  echo "usage: connect-rds.sh [CONFIG_FILE_PATH] [MFA_ARN] [SSH_PRIVATE_KEY] [SSH_PUBLIC_KEY]"
   echo
   echo "Arguments:"
-  echo "  CONFIG_FILE_PATH - path to config file with connection variables"
-  echo "  MFA_ARN          - ARN for MFA device. Can be retrieved from AWS Console > My Security Credentials."
-  echo "  SSH_PUBLIC_KEY   - SSH public key to use for EC2 instance connect. Can be generated with ssh-keygen."
+  echo "  CONFIG_FILE_PATH  - path to config file with connection variables"
+  echo "  MFA_ARN           - ARN for MFA device. Can be retrieved from AWS Console > My Security Credentials."
+  echo "  SSH_PRIVATE_KEY   - SSH private key to use for connecting to the jumphost. Can be generated with ssh-keygen."
+  echo "  SSH_PUBLIC_KEY    - Optional SSH public key to use for connecting to the jumphost. Can be generated with ssh-keygen."
   echo
 }
 
 parse_args() {
-  if [ "$#" -ne 3 ]; then
+  if [ "$#" -lt 3 ] || [ "$#" -gt 4 ]; then
     show_help
     echo "Invalid number of arguments."
     exit 1
@@ -31,7 +32,8 @@ parse_args() {
 
   CONFIG_FILE=$1
   MFA_ARN=$2
-  SSH_PUBLIC_KEY=$3
+  SSH_PRIVATE_KEY=$3
+  SSH_PUBLIC_KEY=$4
 
   if [ ! -f "$CONFIG_FILE" ]; then
     show_help
@@ -39,9 +41,9 @@ parse_args() {
     exit 1
   fi
 
-  if [ ! -f "$SSH_PUBLIC_KEY" ]; then
+  if [ ! -f "$SSH_PRIVATE_KEY" ]; then
     show_help
-    echo "SSH public key ($SSH_PUBLIC_KEY) does not exists"
+    echo "SSH private key ($SSH_PRIVATE_KEY) does not exists"
     exit 1
   fi
 }
@@ -92,6 +94,17 @@ generate_aws_session_credentials() {
 }
 
 send_ssh_key() {
+  # Check that public key is provided only if we are using EC2 Instance Connect
+  if [ -z "$SSH_PUBLIC_KEY" ]; then
+    show_help
+    echo "Please provide your SSH public key to be used for EC2 instance connect."
+    exit 1
+  elif [ ! -f "$SSH_PUBLIC_KEY" ]; then
+    show_help
+    echo "SSH public key ($SSH_PUBLIC_KEY) does not exists"
+    exit 1
+  fi
+
   OUTPUT=$(aws ec2-instance-connect send-ssh-public-key \
     --output text \
     --instance-id $JUMPHOST_INSTANCE_ID \
@@ -121,7 +134,7 @@ start_rds_ssh_tunnel() {
   echo
   echo "Press (Ctrl-C) to close the tunnel"
 
-  ssh -N -L 15432:$RDS_HOST:$RDS_PORT $JUMPHOST_USER@$JUMPHOST_HOST
+  ssh -N -L 15432:$RDS_HOST:$RDS_PORT $JUMPHOST_USER@$JUMPHOST_HOST -i $SSH_PRIVATE_KEY
 }
 
 # Main
@@ -135,7 +148,9 @@ echo "Loaded config file located at $CONFIG_FILE"
 generate_aws_session_credentials
 echo "Generated AWS session credentials"
 
-send_ssh_key
-echo "Sent SSH key ($SSH_PUBLIC_KEY) to jumphost using EC2 instance connect"
+if [ ! -z "$USE_EC2_INSTANCE_CONNECT" ]; then
+  send_ssh_key
+  echo "Sent SSH key ($SSH_PUBLIC_KEY) to jumphost using EC2 instance connect"
+fi
 
 start_rds_ssh_tunnel
