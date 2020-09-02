@@ -7,7 +7,7 @@ const isAuthenticated = (
 ): Response | void => {
   if (!req.get('authorization')) {
     res.set('WWW-Authenticate', 'Basic realm="Twilio"')
-    res.sendStatus(401)
+    return res.sendStatus(401)
   }
   const { messageId, campaignId } = req.params
   if (
