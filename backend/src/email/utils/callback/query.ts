@@ -1,11 +1,12 @@
-import { QueryTypes } from 'sequelize'
+import { QueryTypes, Op, cast, fn } from 'sequelize'
 import {
   UpdateMessageWithErrorCode,
   Metadata,
 } from '@email/interfaces/callback.interface'
-import { EmailBlacklist } from '@email/models'
+import { EmailBlacklist, EmailMessage } from '@email/models'
 import config from '@core/config'
 import logger from '@core/logger'
+import { Campaign } from '@core/models'
 
 /**
  * Adds email to blacklist table if it does not exist
@@ -15,14 +16,7 @@ export const addToBlacklist = (
   recipientEmail: string
 ): Promise<any> | undefined => {
   logger.info(`Updating blacklist table with ${recipientEmail}`)
-  return EmailBlacklist?.sequelize?.query(
-    `INSERT INTO email_blacklist (recipient, created_at, updated_at) VALUES (:recipientEmail, clock_timestamp(), clock_timestamp()) 
-        ON CONFLICT DO NOTHING;`,
-    {
-      replacements: { recipientEmail },
-      type: QueryTypes.INSERT,
-    }
-  )
+  return EmailBlacklist.findOrCreate({ where: { recipient: recipientEmail } })
 }
 
 /**
@@ -35,19 +29,28 @@ export const updateMessageWithError = async (
   const { errorCode, timestamp, id } = opts
 
   logger.info(`Updating email_messages table. ${JSON.stringify(opts)}`)
-  const [result] =
-    (await EmailBlacklist?.sequelize?.query(
-      `UPDATE email_messages SET error_code=:errorCode, received_at=:timestamp, status='INVALID_RECIPIENT', updated_at = clock_timestamp()
-        WHERE id=:id 
-        AND (received_at IS NULL OR received_at < :timestamp)
-        RETURNING campaign_id;`,
-      {
-        replacements: { errorCode, timestamp, id },
-        type: QueryTypes.UPDATE,
-      }
-    )) || []
-  const campaign: { campaign_id: number } = (result || [])[0]
-  return campaign?.campaign_id
+  const [, result] = await EmailMessage.update(
+    {
+      errorCode: errorCode,
+      receivedAt: timestamp,
+      status: 'INVALID_RECIPIENT',
+    },
+    {
+      where: {
+        [Op.and]: [
+          { id },
+          {
+            [Op.or]: [
+              { receivedAt: null },
+              { receivedAt: { [Op.lt]: timestamp } },
+            ],
+          },
+        ],
+      },
+      returning: true,
+    }
+  )
+  return result[0]?.campaignId
 }
 
 /**
@@ -58,21 +61,29 @@ export const updateMessageWithSuccess = async (
   metadata: Metadata
 ): Promise<number | undefined> => {
   logger.info(`Updating email_messages table. ${JSON.stringify(metadata)}`)
+  const { timestamp, id } = metadata
   // Since notifications for the same messageId can be interleaved, we only update that message if this notification is newer than the previous.
-  const [result] =
-    (await EmailBlacklist?.sequelize?.query(
-      `UPDATE email_messages SET received_at=:timestamp, updated_at = clock_timestamp(), status='SUCCESS' 
-        WHERE id=:id 
-        AND (received_at IS NULL OR received_at < :timestamp)
-        RETURNING campaign_id;`,
-      {
-        replacements: { timestamp: metadata.timestamp, id: metadata.id },
-        type: QueryTypes.UPDATE,
-      }
-    )) || []
-
-  const campaign: { campaign_id: number } = (result || [])[0]
-  return campaign?.campaign_id
+  const [, result] = await EmailMessage.update(
+    {
+      receivedAt: timestamp,
+      status: 'SUCCESS',
+    },
+    {
+      where: {
+        [Op.and]: [
+          { id },
+          {
+            [Op.or]: [
+              { receivedAt: null },
+              { receivedAt: { [Op.lt]: timestamp } },
+            ],
+          },
+        ],
+      },
+      returning: true,
+    }
+  )
+  return result[0]?.campaignId
 }
 
 export const haltCampaignIfThresholdExceeded = async (
@@ -85,15 +96,14 @@ export const haltCampaignIfThresholdExceeded = async (
   // Compute threshold for Hard bounces
   // Your bounce rate includes only hard bounces to domains you haven't verified.
   // Source: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/faqs-enforcement.html#e-faq-bn
-  const [result] =
-    (await EmailBlacklist?.sequelize?.query(
-      `SELECT SUM(CASE WHEN error_code='Hard bounce' THEN 1 ELSE 0 END) AS invalid, COUNT(1) AS running_total FROM email_messages WHERE campaign_id=:campaignId AND status IS NOT NULL`,
-      {
-        replacements: { campaignId },
-        type: QueryTypes.SELECT,
-      }
-    )) || []
-
+  const [result] = (await EmailMessage.findAll({
+    raw: true,
+    where: { campaignId, status: { [Op.ne]: null } },
+    attributes: [
+      [fn('sum', cast({ error_code: 'Hard bounce' }, 'int')), 'invalid'],
+      [fn('count', 1), 'running_total'],
+    ],
+  })) as any[]
   const {
     invalid,
     running_total: runningTotal,
@@ -128,19 +138,16 @@ export const haltCampaignIfThresholdExceeded = async (
 
       try {
         await EmailBlacklist?.sequelize?.transaction(async (transaction) => {
-          const results = await EmailBlacklist?.sequelize?.query(
-            `UPDATE campaigns SET halted=TRUE where id=:campaignId 
-              AND halted=FALSE;`, // If halted is null (forcefully overriden), do not halt. If halted is true, campaign has already been halted
-            {
-              replacements: { campaignId },
-              type: QueryTypes.UPDATE,
-              transaction,
-            }
+          const [numUpdated] = await Campaign.update(
+            { halted: true },
+            { where: { id: campaignId, halted: false }, transaction }
           )
-          if (!results || results[1] !== 1)
-            throw new Error(
+          if (numUpdated !== 1) {
+            logger.info(
               'Campaign has already been halted, or forcefully overridden with null to prevent halting.'
             )
+            return
+          }
 
           await EmailBlacklist?.sequelize?.query(
             `SELECT stop_jobs(:campaignId)`,
