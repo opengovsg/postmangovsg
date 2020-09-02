@@ -36,11 +36,5 @@ BEGIN
   )
   FROM messages m, telegram_templates t
   WHERE m.campaign_id = t.campaign_id;
-
-  IF NOT FOUND THEN
-    UPDATE job_queue
-    SET status = 'SENT', updated_at = clock_timestamp()
-    WHERE id = job_id
-      AND status = 'SENDING';
-  END IF;
+  
 END $$;

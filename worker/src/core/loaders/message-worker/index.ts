@@ -78,6 +78,16 @@ const sendMessage = (message: Message): Promise<void> => {
   return service().sendMessage(message)
 }
 
+const jobCanBeFinalized = (jobId: number): Promise<void> => {
+  return connection
+    .query('SELECT set_job_to_sent(:job_id);', {
+      replacements: { job_id: jobId },
+      type: QueryTypes.SELECT,
+    })
+    .catch((err) => {
+      logger.error(err)
+    })
+}
 const finalize = (): Promise<void> => {
   const logEmailJob = connection
     .query('SELECT log_next_job_email();')
@@ -160,6 +170,7 @@ const enqueueAndSend = async (): Promise<void> => {
       await waitForMs(1000)
       failSafe--
     }
+    await jobCanBeFinalized(jobId)
     await service().destroySendingService()
   }
 }
