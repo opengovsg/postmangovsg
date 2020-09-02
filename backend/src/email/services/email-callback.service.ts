@@ -21,11 +21,11 @@ const parseEvent = async (req: Request): Promise<void> => {
   if (ses.isEvent(req)) {
     // body could be one record or an array of records, hence we concat
     const body: ses.SesRecord[] = []
-    const sesHttpEvent = body.concat(JSON.parse(req.body))
+    const sesHttpEvent = body.concat(req.body)
     records = sesHttpEvent.map(ses.parseRecord)
   } else if (sendgrid.isEvent(req)) {
     // body is always an array
-    const sgEvent = JSON.parse(req.body)
+    const sgEvent = req.body
     records = sgEvent.map(sendgrid.parseRecord)
   } else {
     throw new Error('Unable to handle this event')
