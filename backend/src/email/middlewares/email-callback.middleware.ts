@@ -6,10 +6,6 @@ const isAuthenticated = (
   res: Response,
   next: NextFunction
 ): Response | void => {
-  if (req.body.Type === 'SubscriptionConfirmation') {
-    console.log(req.body.SubscribeURL)
-  }
-
   const authHeader = req.get('authorization')
   if (!authHeader) {
     res.set('WWW-Authenticate', 'Basic realm="Email"')
