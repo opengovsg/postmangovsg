@@ -1,9 +1,16 @@
-import { Router } from 'express'
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  RequestHandler,
+} from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
   UploadMiddleware,
   JobMiddleware,
+  SettingsMiddleware,
 } from '@core/middlewares'
 import {
   TelegramMiddleware,
@@ -34,6 +41,11 @@ const uploadCompleteValidator = {
 }
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
+    label: Joi.string()
+      .min(1)
+      .max(50)
+      .pattern(/^[a-z0-9-]+$/)
+      .optional(),
     telegram_bot_token: Joi.string().trim().required(),
   }),
 }
@@ -54,6 +66,18 @@ const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
     rate: Joi.number().integer().positive().max(30).default(30),
   }),
+}
+
+const applyIf = (
+  condition: (req: Request) => boolean,
+  middleware: RequestHandler
+): RequestHandler => {
+  return (req: Request, res: Response, next: NextFunction): any => {
+    if (condition(req)) {
+      return middleware(req, res, next)
+    }
+    next()
+  }
 }
 
 // Routes
@@ -430,8 +454,16 @@ router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
+  applyIf(
+    (req: Request) => req.body?.label,
+    SettingsMiddleware.checkUserCredentialLabel
+  ),
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
+  applyIf(
+    (req: Request) => req.body?.label,
+    SettingsMiddleware.storeUserCredential
+  ),
   TelegramMiddleware.setCampaignCredential
 )
 

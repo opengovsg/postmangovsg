@@ -72,7 +72,8 @@ router.post(
   SettingsMiddleware.checkUserCredentialLabel,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
-  SettingsMiddleware.storeUserCredential
+  SettingsMiddleware.storeUserCredential,
+  (_req: Request, res: Response) => res.json({ message: 'OK' })
 )
 
 /**

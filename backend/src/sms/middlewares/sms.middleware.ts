@@ -116,17 +116,13 @@ const validateAndStoreCredentials = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { recipient, validate } = req.body
+  const { recipient } = req.body
   const { campaignId } = req.params
   const { credentials, credentialName } = res.locals
 
   try {
-    // validate is only included in body params for /settings/sms/credentials endpoint
-    // since validate could be undefined,
-    // don't send test msg only when validate is explicitly defined as false
-    if (validate !== false) {
-      await sendValidationMessage(campaignId, recipient, credentials)
-    }
+    await sendValidationMessage(campaignId, recipient, credentials)
+
     // If credentialName exists, credential has already been stored
     if (credentialName) {
       return next()
