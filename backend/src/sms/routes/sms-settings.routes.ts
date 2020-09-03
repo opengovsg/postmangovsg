@@ -1,5 +1,4 @@
-import { Request, Response } from 'express'
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
 import { SmsMiddleware } from '@sms/middlewares'
@@ -55,9 +54,6 @@ const verifyCredentialValidator = {
  *                      description: should only consist of lowercase alphanumeric characters and dashes
  *                    recipient:
  *                      type: string
- *                    validate:
- *                      type: boolean
- *                      default: true
  *
  *      responses:
  *        200:
@@ -72,8 +68,7 @@ router.post(
   SettingsMiddleware.checkUserCredentialLabel,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
-  SettingsMiddleware.storeUserCredential,
-  (_req: Request, res: Response) => res.json({ message: 'OK' })
+  SettingsMiddleware.storeUserCredential
 )
 
 /**

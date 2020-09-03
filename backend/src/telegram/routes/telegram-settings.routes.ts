@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express'
+import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
 import { TelegramMiddleware } from '@telegram/middlewares'
@@ -65,8 +65,7 @@ router.post(
   SettingsMiddleware.checkUserCredentialLabel,
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
-  SettingsMiddleware.storeUserCredential,
-  (_req: Request, res: Response) => res.json({ message: 'OK' })
+  SettingsMiddleware.storeUserCredential
 )
 
 /**
