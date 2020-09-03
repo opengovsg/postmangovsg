@@ -61,7 +61,8 @@ export default class TwilioClient {
     messageId: number,
     recipient: string,
     message: string,
-    campaignId?: number
+    campaignId?: number,
+    forceDelivery = false
   ): Promise<string | void> {
     return this.generateStatusCallbackUrl(messageId, campaignId)
       .then((callbackUrl) => {
@@ -69,6 +70,7 @@ export default class TwilioClient {
           to: recipient,
           body: this.replaceNewLines(message),
           from: this.messagingServiceSid,
+          forceDelivery: forceDelivery,
           ...(callbackUrl ? { statusCallback: callbackUrl } : {}),
         })
       })
@@ -85,6 +87,13 @@ export default class TwilioClient {
         }
       })
       .catch((error) => {
+        // Handle +65802 errors by forcing delivery once
+        if (
+          /\+65802\d+ is not a valid phone number/.test(error.message) &&
+          !forceDelivery
+        ) {
+          return this.send(messageId, recipient, message, campaignId, true)
+        }
         return Promise.reject(new Error(error.message))
       })
   }
