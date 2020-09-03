@@ -22,9 +22,17 @@ const isAuthenticated = (
   return res.sendStatus(403)
 }
 
-const parseEvent = async (req: Request, res: Response): Promise<Response> => {
-  await SmsCallbackService.parseEvent(req)
-  return res.sendStatus(200)
+const parseEvent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    await SmsCallbackService.parseEvent(req)
+    return res.sendStatus(200)
+  } catch (err) {
+    return next(err)
+  }
 }
 
 export const SmsCallbackMiddleware = {
