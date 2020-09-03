@@ -1,17 +1,13 @@
 import logger from '@core/logger'
 import config from '@core/config'
 import AWS from 'aws-sdk'
-
-const REGION = 'ap-southeast-1'
-const NAME = 'develop/shaowei/test'
+import { configureEndpoint } from '@core/utils/aws-endpoint'
 
 const secretsLoader = async (): Promise<void> => {
-  const secretsManager = new AWS.SecretsManager({
-    region: REGION,
-  })
+  const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
   try {
     const data = await secretsManager
-      .getSecretValue({ SecretId: NAME })
+      .getSecretValue({ SecretId: config.get('aws.configSecretName') })
       .promise()
     const secretString = data.SecretString
     if (secretString === undefined)
@@ -28,13 +24,13 @@ const secretsLoader = async (): Promise<void> => {
       unsubscribeHmacKeyV1,
     } = JSON.parse(secretString)
 
-    config.set('aws.secretManagerSalt', secretManagerSalt)
     config.set('database.databaseUri', databaseUri)
     config.set('database.databaseReadReplicaUri', databaseReadReplicaUri)
-    config.set('jwtSecret', jwtSecret)
     config.set('session.secret', sessionSecret)
     config.set('redisOtpUri', redisOtpUri)
     config.set('redisSessionUri', redisSessionUri)
+    config.set('jwtSecret', jwtSecret)
+    config.set('aws.secretManagerSalt', secretManagerSalt)
     config.set('apiKey.salt', apiKeySaltV1)
     config.set('unsubscribeHmac.v1.key', unsubscribeHmacKeyV1)
   } catch (err) {

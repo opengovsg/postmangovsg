@@ -74,6 +74,12 @@ const config = convict({
       format: 'secret-from-SM',
       sensitive: true,
     },
+    configSecretName: {
+      doc:
+        'Name of the secret in Secrets Manager that holds all the secret env vars',
+      default: undefined,
+      env: 'AWS_CONFIG_SECRET_NAME',
+    },
   },
   database: {
     databaseUri: {
