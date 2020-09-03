@@ -5,29 +5,38 @@ const verifyBotIdRegistered = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { botToken } = req.params
-  const botId = botToken.split(':')[0]
-  if (!(botId && req.body)) {
-    throw new Error('botId, botToken and Telegram update must be specified.')
+  try {
+    const { botToken } = req.params
+    const botId = botToken.split(':')[0]
+    if (!(botId && req.body)) {
+      throw new Error('botId, botToken and Telegram update must be specified.')
+    }
+    if (await TelegramCallbackService.verifyBotIdRegistered(botId)) {
+      res.locals.botId = botId
+      res.locals.botToken = botToken
+      return next()
+    }
+    return res.sendStatus(400)
+  } catch (err) {
+    return next(err)
   }
-  if (await TelegramCallbackService.verifyBotIdRegistered(botId)) {
-    res.locals.botId = botId
-    res.locals.botToken = botToken
-    return next()
-  }
-  return res.sendStatus(400)
 }
 
 const handleUpdate = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<Response | void> => {
-  await TelegramCallbackService.handleUpdate(
-    res.locals.botId,
-    res.locals.botToken,
-    req.body
-  )
-  return res.sendStatus(200)
+  try {
+    await TelegramCallbackService.handleUpdate(
+      res.locals.botId,
+      res.locals.botToken,
+      req.body
+    )
+    return res.sendStatus(200)
+  } catch (err) {
+    return next(err)
+  }
 }
 export const TelegramCallbackMiddleware = {
   verifyBotIdRegistered,
