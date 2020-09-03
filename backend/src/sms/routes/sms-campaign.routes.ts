@@ -68,6 +68,11 @@ const sendCampaignValidator = {
   }),
 }
 
+/**
+ * Conditionally applies a middleware based on return value of a condition function
+ * @param condition Function to evaluate if the middleware should be applied
+ * @param middlware Middleware to be applied conditionally
+ */
 const applyIf = (
   condition: (req: Request) => boolean,
   middleware: RequestHandler
@@ -383,6 +388,12 @@ router.delete(
  *                - $ref: '#/components/schemas/TwilioCredentials'
  *                - type: object
  *                  properties:
+ *                    label:
+ *                      type: string
+ *                      pattern: '/^[a-z0-9-]+$/'
+ *                      minLength: 1
+ *                      maxLength: 50
+ *                      description: should only consist of lowercase alphanumeric characters and dashes
  *                    recipient:
  *                      type: string
  *
@@ -402,6 +413,9 @@ router.delete(
  *        "500":
  *           description: Internal Server Error
  */
+
+// In order to preserve backward compatbility, we conditionally apply middlewares for storage
+// of user credentials based on the presence of label in the request body.
 router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
