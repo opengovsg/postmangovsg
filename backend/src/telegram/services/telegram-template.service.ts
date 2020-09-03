@@ -1,5 +1,4 @@
-import { chunk, difference, keys } from 'lodash'
-import { Transaction } from 'sequelize'
+import { difference, keys } from 'lodash'
 
 import config from '@core/config'
 import logger from '@core/logger'
@@ -169,42 +168,6 @@ const getFilledTemplate = async (
 }
 
 /**
- * 1. delete existing entries
- * 2. bulk insert
- * @param campaignId
- * @param records
- * @param transaction
- */
-const addToMessageLogs = async (
-  campaignId: number,
-  records: Array<object>,
-  transaction: Transaction | undefined
-): Promise<void> => {
-  try {
-    logger.info({
-      message: `Started populateTelegramTemplate for ${campaignId}`,
-    })
-    // delete message_logs entries
-    await TelegramMessage.destroy({
-      where: { campaignId },
-      transaction,
-    })
-
-    const chunks = chunk(records, 5000)
-    for (let idx = 0; idx < chunks.length; idx++) {
-      const batch = chunks[idx]
-      await TelegramMessage.bulkCreate(batch, { transaction })
-    }
-    logger.info({
-      message: `Finished populateTelegramTemplate for ${campaignId}`,
-    })
-  } catch (err) {
-    logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
-    throw new Error('SmsMessage: destroy / bulkcreate failure')
-  }
-}
-
-/**
  * Validate that recipient is a valid phone number and format it.
  */
 const validateAndFormatNumber = (
@@ -243,7 +206,6 @@ const testHydration = (
 export const TelegramTemplateService = {
   storeTemplate,
   getFilledTemplate,
-  addToMessageLogs,
   validateAndFormatNumber,
   testHydration,
   client,

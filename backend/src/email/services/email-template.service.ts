@@ -1,6 +1,4 @@
-import { difference, keys, chunk } from 'lodash'
-import validator from 'validator'
-import { Transaction } from 'sequelize'
+import { difference, keys } from 'lodash'
 
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
@@ -216,48 +214,6 @@ const getFilledTemplate = async (
 }
 
 /**
- * 1. delete existing entries
- * 2. bulk insert
- *
- * @param campaignId
- * @param records
- * @param transaction
- */
-const addToMessageLogs = async (
-  campaignId: number,
-  records: Array<object>,
-  transaction: Transaction | undefined
-): Promise<void> => {
-  logger.info({ message: `Started populateEmailTemplate for ${campaignId}` })
-  try {
-    // delete message_logs entries
-    await EmailMessage.destroy({
-      where: { campaignId },
-      transaction,
-    })
-
-    const chunks = chunk(records, 5000)
-    for (let idx = 0; idx < chunks.length; idx++) {
-      const batch = chunks[idx]
-      await EmailMessage.bulkCreate(batch, {
-        transaction,
-      })
-    }
-
-    logger.info({ message: `Finished populateEmailTemplate for ${campaignId}` })
-  } catch (err) {
-    logger.error(`EmailMessage: destroy / bulkcreate failure. ${err.stack}`)
-    throw new Error('EmailMessage: destroy / bulkcreate failure')
-  }
-}
-
-const hasInvalidEmailRecipient = (
-  records: (MessageBulkInsertInterface | ProtectedMessageRecordInterface)[]
-): boolean => {
-  return records.some((record) => !validator.isEmail(record.recipient))
-}
-
-/**
  * Attempts to hydrate the first record.
  * @param records
  * @param templateBody
@@ -276,8 +232,6 @@ const testHydration = (
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
-  addToMessageLogs,
-  hasInvalidEmailRecipient,
   testHydration,
   client,
 }
