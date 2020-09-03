@@ -3,6 +3,7 @@ import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 import { TwilioCredentials } from '@sms/interfaces'
+import config from '@core/config'
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'SMS' type, and belongs to the user
@@ -136,9 +137,13 @@ const validateAndStoreCredentials = async (
     const credentialName = await SmsService.getEncodedHash(
       stringifiedCredential
     )
+
+    // We only want to tag Twilio credentials with the environment tag in SecretsManager
+    // when env is development. This allows us to quickly identify and clean up dev secrets.
     await CredentialService.storeCredential(
       credentialName,
-      stringifiedCredential
+      stringifiedCredential,
+      config.get('env') === 'development'
     )
     // Pass on to next middleware/handler
     res.locals.credentialName = credentialName

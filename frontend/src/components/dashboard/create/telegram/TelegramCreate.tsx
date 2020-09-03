@@ -21,9 +21,11 @@ const TELEGRAM_PROGRESS_STEPS = [
 const CreateTelegram = ({
   campaign: initialCampaign,
   onCampaignChange,
+  finishLaterCallbackRef,
 }: {
   campaign: TelegramCampaign
   onCampaignChange: (c: Campaign) => void
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
   const [activeStep, setActiveStep] = useState(initialCampaign.progress)
   const [campaign, setCampaign] = useState(initialCampaign)
@@ -57,7 +59,13 @@ const CreateTelegram = ({
   function renderStep() {
     switch (activeStep) {
       case TelegramProgress.CreateTemplate:
-        return <TelegramTemplate body={campaign.body} onNext={onNext} />
+        return (
+          <TelegramTemplate
+            body={campaign.body}
+            onNext={onNext}
+            finishLaterCallbackRef={finishLaterCallbackRef}
+          />
+        )
       case TelegramProgress.UploadRecipients:
         return (
           <TelegramRecipients

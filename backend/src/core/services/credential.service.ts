@@ -24,38 +24,31 @@ const upsertCredential = async (
   secret: string,
   restrictEnvironment: boolean
 ): Promise<void> => {
-  // If credential doesn't exist, upload credential to secret manager, unless in development
-  if (!config.get('IS_PROD') && !config.get('aws.awsEndpoint')) {
-    logger.info(
-      `Dev env - skip storing credential in AWS secrets manager for name=${name}`
-    )
-    return
-  }
-
+  // If credential doesn't exist, upload credential to secret manager
   try {
-    logger.info(`Updating credential in AWS secrets manager for name=${name}`)
+    logger.info('Storing credential in AWS secrets manager')
     await secretsManager
-      .putSecretValue({
-        SecretId: name,
+      .createSecret({
+        Name: name,
         SecretString: secret,
+        ...(restrictEnvironment
+          ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
+          : {}),
       })
       .promise()
-    logger.info(
-      `Successfully updated credential in AWS secrets manager for name=${name}`
-    )
+    logger.info('Successfully stored credential in AWS secrets manager')
   } catch (err) {
-    if (err.name === 'ResourceNotFoundException') {
-      logger.info('Storing credential in AWS secrets manager')
+    if (err.name === 'ResourceExistsException') {
+      logger.info(`Updating credential in AWS secrets manager for name=${name}`)
       await secretsManager
-        .createSecret({
-          Name: name,
+        .putSecretValue({
+          SecretId: name,
           SecretString: secret,
-          ...(restrictEnvironment
-            ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
-            : {}),
         })
         .promise()
-      logger.info('Successfully stored credential in AWS secrets manager')
+      logger.info(
+        `Successfully updated credential in AWS secrets manager for name=${name}`
+      )
     } else {
       logger.error(err)
       throw err
@@ -93,12 +86,6 @@ const storeCredential = async (
 const getTwilioCredentials = async (
   name: string
 ): Promise<TwilioCredentials> => {
-  if (!config.get('IS_PROD') && !config.get('aws.awsEndpoint')) {
-    logger.info(
-      `Dev env - getTwilioCredentials - returning default credentials for name=${name}`
-    )
-    return config.get('smsOptions')
-  }
   logger.info('Getting secret from AWS secrets manager.')
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   logger.info('Gotten secret from AWS secrets manager.')
@@ -113,12 +100,6 @@ const getTwilioCredentials = async (
  * @param name
  */
 const getTelegramCredential = async (name: string): Promise<string> => {
-  if (!config.get('IS_PROD')) {
-    logger.info(
-      `Dev env - getTelegramCredential - returning default credentials set in env var`
-    )
-    return config.get('telegramOptions.telegramBotToken')
-  }
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   const secretString = get(data, 'SecretString', '')
   if (!secretString)

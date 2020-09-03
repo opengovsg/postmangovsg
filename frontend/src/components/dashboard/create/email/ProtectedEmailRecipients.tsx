@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import isEmail from 'validator/lib/isEmail'
 
@@ -11,11 +11,14 @@ import {
   ProtectedPreview,
   Checkbox,
 } from 'components/common'
+import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { ModalContext } from 'contexts/modal.context'
 import EmailRecipients from './EmailRecipients'
 import { EmailCampaign } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 import { protectAndUploadCsv } from 'services/protect-csv.service'
+import styles from '../Create.module.scss'
 
 enum ProtectPhase {
   READY,
@@ -31,12 +34,15 @@ const ProtectedEmailRecipients = ({
   numRecipients,
   isProcessing,
   onNext,
+  finishLaterCallbackRef,
 }: {
   csvFilename: string
   numRecipients: number
   isProcessing: boolean
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
+  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
+  const modalContext = useContext(ModalContext)
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState<File>()
@@ -51,6 +57,16 @@ const ProtectedEmailRecipients = ({
   useEffect(() => {
     setPhase(computePhase(numRecipients, isProcessing))
   }, [numRecipients, isProcessing])
+
+  // Set callback for finish later button
+  useEffect(() => {
+    finishLaterCallbackRef.current = () => {
+      modalContext.setModalContent(<SaveDraftModal />)
+    }
+    return () => {
+      finishLaterCallbackRef.current = undefined
+    }
+  }, [template, finishLaterCallbackRef, modalContext])
 
   function computePhase(
     numRecipients: number,
@@ -127,6 +143,11 @@ const ProtectedEmailRecipients = ({
         double curly braces. The keywords in your message template should match
         the headers in your recipients CSV file.
       </p>
+      <p>
+        <b>Note:</b> For security reasons, we do not store password protected
+        messages. You will lose the content below if you refresh your tab or go
+        back to Step 1 to edit.
+      </p>
       <TextArea
         highlight={true}
         placeholder="Enter password protected message here"
@@ -145,6 +166,16 @@ const ProtectedEmailRecipients = ({
 
   const messageBPreview = (
     <>
+      <h2>Confirm password protected message</h2>
+      <p>
+        If you choose to edit your message, do note that you will have to
+        re-upload your recipients list.
+      </p>
+      <p>
+        <b>Note:</b> For security reasons, we do not store password protected
+        messages. You will lose the content below if you refresh your tab or go
+        back to Step 1 to edit.
+      </p>
       <InfoBlock>
         <li>
           <i className="bx bx-user-check"></i>
@@ -154,17 +185,22 @@ const ProtectedEmailRecipients = ({
           <i className="bx bx-file"></i>
           <p>{protectedCsvInfo?.csvFilename}</p>
         </li>
-        <li>
-          <i className="bx bx-message-dots"></i>
-          <p>Preview:</p>
-        </li>
-        <br />
-        <li>
-          {protectedCsvInfo?.preview && (
-            <ProtectedPreview html={protectedCsvInfo?.preview} />
-          )}
-        </li>
       </InfoBlock>
+      <div className="separator"></div>
+      {protectedCsvInfo?.preview && (
+        <>
+          <h4>Message B</h4>
+          <InfoBlock className={styles.protectedPreview}>
+            <li>
+              <b>Results</b>
+            </li>
+            <li>
+              <ProtectedPreview html={protectedCsvInfo?.preview} />
+            </li>
+          </InfoBlock>
+        </>
+      )}
+
       <div className="progress-button">
         <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
           Back
@@ -214,7 +250,11 @@ const ProtectedEmailRecipients = ({
 
   const completeButtons = (
     <div className="progress-button">
-      <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
+      <TextButton
+        className={styles.darkBlueText}
+        minButtonWidth
+        onClick={() => setPhase(ProtectPhase.READY)}
+      >
         Edit Message
       </TextButton>
       <PrimaryButton onClick={onNext}>

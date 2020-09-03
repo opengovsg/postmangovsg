@@ -1,5 +1,5 @@
 import querystring from 'querystring'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import { QueryTypes } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 
@@ -54,7 +54,7 @@ exports.handler = async (event: any) => {
     console.log(`Updating messageId ${messageId} in sms_messages`)
     if (twilioErrorCode) {
       await sequelize.query(
-        `UPDATE sms_messages SET errorCode=:twilioErrorCode, updated_at = clock_timestamp(), status = 'ERROR' WHERE id=:messageId AND campaign_id=:campaignId`,
+        `UPDATE sms_messages SET error_code=:twilioErrorCode, updated_at = clock_timestamp(), status = 'ERROR' WHERE id=:messageId AND campaign_id=:campaignId`,
         {
           replacements: { twilioErrorCode, messageId, campaignId },
           type: QueryTypes.UPDATE,

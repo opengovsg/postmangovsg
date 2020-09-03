@@ -10,11 +10,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@types/bcryptjs": "^2.4.2",
+    "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.30",
     "@types/convict": "^5.2.1",
     "@types/validator": "^13.0.0",
-    "bcryptjs": "^2.4.3",
+    "bcrypt": "^5.0.0",
     "convict": "^6.0.0",
     "pg": "^8.2.1",
     "reflect-metadata": "^0.1.13",

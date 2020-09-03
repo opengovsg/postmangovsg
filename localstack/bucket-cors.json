@@ -6,5 +6,5 @@
       "AllowedOrigins": ["*"],
       "ExposeHeaders": ["ETag"]
     }
-  ] 
+  ]
 }

@@ -3,6 +3,7 @@
  * All defaults can be changed
  */
 import convict from 'convict'
+import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import { isSupportedCountry } from 'libphonenumber-js'
@@ -37,9 +38,6 @@ const config = convict({
     default: 'production',
     env: 'NODE_ENV',
   },
-  IS_PROD: {
-    default: true,
-  },
   APP_NAME: {
     doc: 'Name of the app',
     default: 'Postman.gov.sg',
@@ -48,7 +46,7 @@ const config = convict({
   aws: {
     awsRegion: {
       doc: 'Region for the S3 bucket that is used to store file uploads',
-      default: 'ap-northeast-1',
+      default: 'ap-southeast-1',
       env: 'AWS_REGION',
     },
     awsEndpoint: {
@@ -153,6 +151,11 @@ const config = convict({
     doc: 'Url domain and path for password-protected messages',
     default: 'https://postman.gov.sg/p', // prod only
     env: 'PROTECTED_URL',
+  },
+  unsubscribeUrl: {
+    doc: 'Url domain and path for unsubscribe page',
+    default: 'https://postman.gov.sg/unsubscribe', // prod only
+    env: 'UNSUBSCRIBE_URL',
   },
   session: {
     cookieName: {
@@ -287,43 +290,11 @@ const config = convict({
     default: '65',
     env: 'DEFAULT_COUNTRY_CODE',
   },
-  smsOptions: {
-    accountSid: {
-      doc: 'Id of the Twilio account',
-      default: '',
-      env: 'TWILIO_ACCOUNT_SID',
-      sensitive: true,
-    },
-    apiKey: {
-      doc: 'API Key to access Twilio',
-      default: '',
-      env: 'TWILIO_API_KEY',
-      sensitive: true,
-    },
-    apiSecret: {
-      doc: 'Corresponding API Secret to access Twilio',
-      default: '',
-      env: 'TWILIO_API_SECRET',
-      sensitive: true,
-    },
-    messagingServiceSid: {
-      doc: 'ID of the messaging service ',
-      default: '',
-      env: 'TWILIO_MESSAGING_SERVICE_SID',
-      sensitive: true,
-    },
-  },
   telegramOptions: {
     webhookUrl: {
       doc: 'Webhook URL to configure for all Telegram bots',
       default: '',
       env: 'TELEGRAM_WEBHOOK_URL',
-    },
-    telegramBotToken: {
-      doc: 'API Key required to make use of Telegram APIs',
-      default: '',
-      env: 'TELEGRAM_BOT_TOKEN',
-      sensitive: true,
     },
   },
   maxRatePerJob: {
@@ -363,6 +334,29 @@ const config = convict({
     default: '',
     env: 'SENTRY_DSN',
   },
+  unsubscribeHmac: {
+    version: {
+      doc: 'Version of unsubscribe HMAC options, defaults to v1',
+      default: 'v1',
+      format: ['v1'],
+      env: 'UNSUBSCRIBE_HMAC_VERSION',
+    },
+    v1: {
+      algo: {
+        doc: 'V1 HMAC algorithm',
+        default: '',
+        format: crypto.getHashes(),
+        env: 'UNSUBSCRIBE_HMAC_ALGO_V1',
+      },
+      key: {
+        doc: 'V1 HMAC key',
+        default: '',
+        format: 'required-string',
+        env: 'UNSUBSCRIBE_HMAC_KEY_V1',
+        sensitive: true,
+      },
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
@@ -377,6 +371,7 @@ switch (config.get('env')) {
     config.load({
       frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
       protectedUrl: 'https://staging.postman.gov.sg/p',
+      unsubscribeUrl: 'https://staging.postman.gov.sg/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
@@ -394,10 +389,10 @@ switch (config.get('env')) {
     })
     break
   case 'development':
-    config.set('IS_PROD', false)
     config.load({
       frontendUrl: 'http://localhost:3000',
       protectedUrl: 'http://localhost:3000/p',
+      unsubscribeUrl: 'http://localhost:3000/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-testing',

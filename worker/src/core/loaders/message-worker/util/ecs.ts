@@ -38,10 +38,10 @@ class ECSUtil {
   }
   static load(): Promise<void> {
     logger.info({
-      prod: config.get('IS_PROD'),
+      prod: config.get('env') !== 'development',
       metadataUri: config.get('aws.metadataUri'),
     })
-    if (config.get('IS_PROD') && config.get('aws.metadataUri')) {
+    if (config.get('env') !== 'development' && config.get('aws.metadataUri')) {
       return axios
         .get(`${config.get('aws.metadataUri')}/task`)
         .then((response) => {

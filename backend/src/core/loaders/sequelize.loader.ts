@@ -11,6 +11,7 @@ import {
   UserCredential,
   Statistic,
   ProtectedMessage,
+  Unsubscriber,
 } from '@core/models'
 import {
   EmailMessage,
@@ -38,9 +39,10 @@ function parseDBUri(uri: string): any {
 }
 
 const sequelizeLoader = async (): Promise<void> => {
-  const dialectOptions = config.get('IS_PROD')
-    ? config.get('database.dialectOptions')
-    : {}
+  const dialectOptions =
+    config.get('env') !== 'development'
+      ? config.get('database.dialectOptions')
+      : {}
   const sequelize = new Sequelize({
     dialect: 'postgres',
     logging: false,
@@ -63,6 +65,7 @@ const sequelizeLoader = async (): Promise<void> => {
     Worker,
     UserCredential,
     Statistic,
+    Unsubscriber,
   ]
   const emailModels = [
     EmailMessage,
