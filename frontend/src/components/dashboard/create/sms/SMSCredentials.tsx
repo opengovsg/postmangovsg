@@ -65,6 +65,7 @@ const SMSCredentials = ({
   function toggleInputMode() {
     setIsManual((m) => !m)
     setCreds(null)
+    setLabel('')
     setSelectedCredential('')
   }
 
