@@ -109,10 +109,9 @@ const finalize = (): Promise<void> => {
 }
 
 const createConnection = (): Sequelize => {
-  const dialectOptions =
-    config.get('env') !== 'development'
-      ? config.get('database.dialectOptions')
-      : {}
+  const dialectOptions = !['development', 'test'].includes(config.get('env'))
+    ? config.get('database.dialectOptions')
+    : {}
   return new Sequelize(config.get('database.databaseUri'), {
     dialect: 'postgres',
     logging: false,

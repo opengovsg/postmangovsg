@@ -39,10 +39,9 @@ function parseDBUri(uri: string): any {
 }
 
 const sequelizeLoader = async (): Promise<void> => {
-  const dialectOptions =
-    config.get('env') !== 'development'
-      ? config.get('database.dialectOptions')
-      : {}
+  const dialectOptions = !['development', 'test'].includes(config.get('env'))
+    ? config.get('database.dialectOptions')
+    : {}
   const sequelize = new Sequelize({
     dialect: 'postgres',
     logging: false,

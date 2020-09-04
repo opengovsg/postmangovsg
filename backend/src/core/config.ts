@@ -428,11 +428,9 @@ switch (config.get('env')) {
     })
     break
   case 'development':
-    config.set('IS_PROD', false)
     config.load(developmentOverrides)
     break
   case 'test':
-    config.set('IS_PROD', false)
     config.load({
       ...developmentOverrides,
       mailOptions: {

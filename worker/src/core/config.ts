@@ -271,7 +271,7 @@ if (config.get('env') === 'staging') {
 // If the environment is a prod environment,
 // we ensure that there is only 1 worker per ecs task,
 // and required credentials are set
-if (config.get('env') !== 'development') {
+if (!['development', 'test'].includes(config.get('env'))) {
   if (
     config.get('messageWorker.numSender') +
       config.get('messageWorker.numLogger') !==

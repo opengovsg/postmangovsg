@@ -8,10 +8,9 @@ import { sqlFilePaths as smsSqlFilePaths } from '@sms/resources/sql'
 import { sqlFilePaths as telegramSqlFilePaths } from '@telegram/resources/sql'
 
 const scriptLoader = async (): Promise<void> => {
-  const dialectOptions =
-    config.get('env') !== 'development'
-      ? config.get('database.dialectOptions')
-      : {}
+  const dialectOptions = !['development', 'test'].includes(config.get('env'))
+    ? config.get('database.dialectOptions')
+    : {}
   const sequelize = new Sequelize(config.get('database.databaseUri'), {
     dialect: 'postgres',
     logging: false,
