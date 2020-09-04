@@ -9,7 +9,10 @@ import {
 } from './../mocks'
 import { waitForAppReady, sequelizeLoader } from './helpers'
 
-const CHROME_BROWSER = 'chrome --allow-insecure-localhost'
+const HEADLESS = config.get('headless')
+const CHROME_BROWSER = `chrome${
+  HEADLESS ? ':headless' : ''
+} --allow-insecure-localhost`
 
 const loadServices = async (): Promise<void> => {
   await Promise.all([

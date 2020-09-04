@@ -30,6 +30,12 @@ const config = convict({
     format: Boolean,
     arg: 'live-mode',
   },
+  headless: {
+    doc: 'Whether to run tests with headless browser',
+    default: false,
+    format: Boolean,
+    env: 'TEST_HEADLESS',
+  },
   backendUrl: {
     doc: 'URL to backend API',
     default: 'http://localhost:4000',
