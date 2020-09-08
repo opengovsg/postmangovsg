@@ -1,5 +1,9 @@
 import { Request, Response } from 'express'
 import { Router } from 'express'
+import axios from 'axios'
+import config from '@core/config'
+import logger from '@core/logger'
+// import logger from '@core/logger'
 const router = Router()
 
 /**
@@ -27,7 +31,28 @@ const router = Router()
  */
 router.post(
   '/:campaignId(\\d+)/:messageId(\\d+)',
-  (_req: Request, res: Response) => res.sendStatus(200)
+  (req: Request, res: Response) => {
+    const { campaignId, messageId } = req.params
+    const redirectTo = `https://callback.postman.gov.sg/${config.get(
+      'env'
+    )}/v1/campaign/${campaignId}/message/${messageId}`
+    return axios
+      .post(redirectTo, req.body, {
+        headers: { Authorization: req.headers.authorization || '' },
+      })
+      .then(() => res.sendStatus(200))
+      .catch((err) => {
+        if (err.response) {
+          logger.error(
+            `${err.response.status}: ${JSON.stringify(err.response.headers)}`
+          )
+          return res.sendStatus(err.response.status)
+        } else {
+          logger.error(err)
+          return res.sendStatus(500)
+        }
+      })
+  }
 )
 
 export default router
