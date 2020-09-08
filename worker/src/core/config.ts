@@ -33,14 +33,18 @@ const config = convict({
     default: 'production',
     env: 'NODE_ENV',
   },
-  IS_PROD: {
-    default: true,
-  },
   aws: {
     awsRegion: {
       doc: 'Region for the S3 bucket that is used to store file uploads',
-      default: 'ap-northeast-1',
+      default: 'ap-southeast-1',
       env: 'AWS_REGION',
+    },
+    awsEndpoint: {
+      doc:
+        'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      format: '*',
+      default: null,
+      env: 'AWS_ENDPOINT',
     },
     secretManagerSalt: {
       doc:
@@ -148,38 +152,6 @@ const config = convict({
       return isSupportedCountry(countryCode)
     },
   },
-  smsOptions: {
-    accountSid: {
-      doc: 'Id of the Twilio account',
-      default: '',
-      env: 'TWILIO_ACCOUNT_SID',
-      sensitive: true,
-    },
-    apiKey: {
-      doc: 'API Key to access Twilio',
-      default: '',
-      env: 'TWILIO_API_KEY',
-      sensitive: true,
-    },
-    apiSecret: {
-      doc: 'Corresponding API Secret to access Twilio',
-      default: '',
-      env: 'TWILIO_API_SECRET',
-      sensitive: true,
-    },
-    messagingServiceSid: {
-      doc: 'ID of the messaging service',
-      default: '',
-      env: 'TWILIO_MESSAGING_SERVICE_SID',
-      sensitive: true,
-    },
-  },
-  telegramBotToken: {
-    doc: 'API key required to make use of Telegram APIs',
-    default: '',
-    env: 'TELEGRAM_BOT_TOKEN',
-    sensitive: true,
-  },
   callbackSecret: {
     doc: 'Secret key used to generate Twilio callback url',
     default: '',
@@ -245,7 +217,6 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 if (config.get('env') === 'development') {
   config.load({
     frontendUrl: 'http://localhost:3000',
-    IS_PROD: false,
     database: {
       dialectOptions: {
         ssl: {
@@ -267,7 +238,7 @@ if (config.get('env') === 'staging') {
 // If the environment is a prod environment,
 // we ensure that there is only 1 worker per ecs task,
 // and required credentials are set
-if (config.get('IS_PROD')) {
+if (config.get('env') !== 'development') {
   if (
     config.get('messageWorker.numSender') +
       config.get('messageWorker.numLogger') !==

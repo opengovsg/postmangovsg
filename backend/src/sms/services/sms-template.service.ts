@@ -1,5 +1,4 @@
-import { difference, keys, chunk } from 'lodash'
-import { Transaction } from 'sequelize'
+import { difference, keys } from 'lodash'
 
 import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
@@ -194,39 +193,6 @@ const getFilledTemplate = async (
 }
 
 /**
- * 1. delete existing entries
- * 2. bulk insert
- * @param campaignId
- * @param records
- * @param transaction
- */
-const addToMessageLogs = async (
-  campaignId: number,
-  records: Array<object>,
-  transaction: Transaction | undefined
-): Promise<void> => {
-  try {
-    logger.info({ message: `Started populateSmsTemplate for ${campaignId}` })
-    // delete message_logs entries
-    await SmsMessage.destroy({
-      where: { campaignId },
-      transaction,
-    })
-
-    const chunks = chunk(records, 5000)
-    for (let idx = 0; idx < chunks.length; idx++) {
-      const batch = chunks[idx]
-      await SmsMessage.bulkCreate(batch, { transaction })
-    }
-
-    logger.info({ message: `Finished populateSmsTemplate for ${campaignId}` })
-  } catch (err) {
-    logger.error(`SmsMessage: destroy / bulkcreate failure. ${err.stack}`)
-    throw new Error('SmsMessage: destroy / bulkcreate failure')
-  }
-}
-
-/**
  * Attempts to hydrate the first record.
  * @param records
  * @param templateBody
@@ -242,7 +208,6 @@ const testHydration = (
 export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
-  addToMessageLogs,
   testHydration,
   client,
 }
