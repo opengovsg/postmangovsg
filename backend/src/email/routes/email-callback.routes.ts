@@ -40,15 +40,23 @@ const printConfirmSubscription = (
  *          description: Bad Request
  */
 router.post('/', printConfirmSubscription, (req: Request, res: Response) => {
+  if (!req.headers.authorization) {
+    return res
+      .header('WWW-Authenticate', 'Basic realm="Email callback"')
+      .sendStatus(401)
+  }
   const redirectTo = `https://callback.postman.gov.sg/${config.get(
     'env'
   )}/v1/email`
-  // return res.redirect(307, redirectTo)
   // res.redirect(307, url.toString()) somehow strips the authorization header when redirected to api gateway.
   // Request cannot get past authorizer on api gateway, but works on localhost
+  const headers = {
+    Authorization: req.headers.authorization,
+    'x-amz-sns-message-type': req.headers['x-amz-sns-message-type'],
+  }
   return axios
     .post(redirectTo, req.body, {
-      headers: { Authorization: req.headers.authorization || '' },
+      headers,
     })
     .then(() => res.sendStatus(200))
     .catch((err) => {
