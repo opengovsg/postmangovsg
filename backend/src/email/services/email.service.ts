@@ -195,7 +195,7 @@ const uploadCompleteOnChunk = ({
       const { recipient } = entry
       return {
         campaignId,
-        recipient: recipient.toLowerCase(),
+        recipient: recipient.trim().toLowerCase(),
         params: entry,
       }
     })
