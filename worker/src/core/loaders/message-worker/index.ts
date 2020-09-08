@@ -2,7 +2,6 @@ import { expose } from 'threads/worker'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-import plimit from 'p-limit'
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 import config from '@core/config'
 import logger from '@core/logger'
@@ -78,16 +77,6 @@ const sendMessage = (message: Message): Promise<void> => {
   return service().sendMessage(message)
 }
 
-const jobCanBeFinalized = (jobId: number): Promise<void> => {
-  return connection
-    .query('SELECT set_job_to_sent(:job_id);', {
-      replacements: { job_id: jobId },
-      type: QueryTypes.SELECT,
-    })
-    .catch((err) => {
-      logger.error(err)
-    })
-}
 const finalize = (): Promise<void> => {
   const logEmailJob = connection
     .query('SELECT log_next_job_email();')
@@ -142,19 +131,14 @@ const enqueueAndSend = async (): Promise<void> => {
   if (jobId && rate && credName && campaignId) {
     await service().setSendingService(credName)
     await enqueueMessages(jobId, campaignId)
-    const sendMessageLimit = plimit(rate)
     let hasNext = true
     while (hasNext) {
-      const start = Date.now()
       const messages = await getMessages(jobId, rate)
       if (!messages[0]) {
         hasNext = false
       } else {
-        for (const message of messages) {
-          sendMessageLimit(() => {
-            sendMessage(message)
-          })
-        }
+        const start = Date.now()
+        await Promise.all(messages.map((m) => sendMessage(m)))
         // Make sure at least 1 second has elapsed
         const wait = Math.max(0, 1000 - (Date.now() - start))
         await waitForMs(wait)
@@ -163,15 +147,6 @@ const enqueueAndSend = async (): Promise<void> => {
         )
       }
     }
-
-    // Fail safe value so that the worker does not get stuck in the while loop.
-    // The worker will allow each promise an extra second to complete, and automatically complete the job even if not all promises have completed.
-    let failSafe = sendMessageLimit.activeCount
-    while (sendMessageLimit.pendingCount > 0 && failSafe > 0) {
-      await waitForMs(1000)
-      failSafe--
-    }
-    await jobCanBeFinalized(jobId)
     await service().destroySendingService()
   }
 }
