@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import config from '@core/config'
 import logger from '@core/logger'
 import { AuthService } from '@core/services'
+import { getRequestIp } from '@core/utils/request'
 
 /**
  *  Determines if an email is whitelisted / enough time has elapsed since the last otp request,
@@ -18,7 +19,8 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
     return res.status(401).json({ message: e.message })
   }
   try {
-    await AuthService.sendOtp(email)
+    const ipAddress = getRequestIp(req)
+    await AuthService.sendOtp(email, ipAddress)
   } catch (e) {
     logger.error(`Error sending OTP: ${e}. email=${email}`)
     return res.sendStatus(500)
