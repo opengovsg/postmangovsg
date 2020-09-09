@@ -1,0 +1,38 @@
+{
+  "name": "database-backup",
+  "version": "1.0.0",
+  "description": "Backup database to S3",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "rm -rf build && tsc && cp -r src/assets build/assets",
+    "dev": "npm run build && tsc-watch --onSuccess \"node -r dotenv/config build/index\""
+  },
+  "keywords": [],
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datagovsg/postmangovsg.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/datagovsg/postmangovsg/issues"
+  },
+  "homepage": "https://github.com/datagovsg/postmangovsg#readme",
+  "devDependencies": {
+    "@types/convict": "^5.2.1",
+    "@types/node": "^14.6.4",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "eslint": "^7.8.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "@sentry/node": "^5.22.3",
+    "convict": "^6.0.0",
+    "dotenv": "^8.2.0",
+    "pg-connection-string": "^2.3.0"
+  }
+}
