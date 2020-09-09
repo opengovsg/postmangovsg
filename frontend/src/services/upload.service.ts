@@ -228,6 +228,10 @@ export async function uploadPartWithPresignedUrl({
       {
         withCredentials: false,
         timeout: 0,
+        headers: {
+          // Localstack requires Content-Type to be stated explicitly in order to parse the request body properly.
+          'Content-Type': contentType,
+        },
       }
     )
     return response.headers.etag

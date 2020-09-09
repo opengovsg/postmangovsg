@@ -53,17 +53,17 @@ frontend:
         - key: "Referrer-Policy"
           value: "same-origin"
         - key: "Content-Security-Policy"
-          value: "connect-src 'self' 
-            https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/ 
-            https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com 
-            https://s3.ap-southeast-1.amazonaws.com/file-staging.postman.gov.sg/ 
-            https://s3.ap-southeast-1.amazonaws.com/file-production.postman.gov.sg/ 
+          value: "connect-src 'self'
+            https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/
+            https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com
+            https://s3.ap-southeast-1.amazonaws.com/file-staging.postman.gov.sg/
+            https://s3.ap-southeast-1.amazonaws.com/file-production.postman.gov.sg/
             https://o399364.ingest.sentry.io/;
             style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com;
             font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
             default-src 'self' https://*.postman.gov.sg;
             object-src 'none';
-            script-src 'self' 'unsafe-eval' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
+            script-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
             img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://file.go.gov.sg"
         - key: "Content-Security-Policy-Report-Only"
           value: report-uri https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024;

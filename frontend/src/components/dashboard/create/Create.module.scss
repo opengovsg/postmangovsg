@@ -42,6 +42,10 @@
   color: $light-grey;
 }
 
+.darkBlueText {
+  color: $dark-blue;
+}
+
 .darkBlueBtn {
   @include button($dark-blue);
 }
@@ -119,4 +123,8 @@
   text-align: right;
   font-size: 0.85rem;
   color: $light-grey;
+}
+
+.protectedPreview {
+  border-radius: 1.25rem;
 }

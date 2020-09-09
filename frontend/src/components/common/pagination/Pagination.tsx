@@ -9,7 +9,7 @@ const MARGIN_PAGES_DISPLAYED = 2 // number of pages displayed after ellipsis
 const Pagination = (props: any) => {
   const { itemsCount, selectedPage, setSelectedPage, itemsPerPage } = props
 
-  const pageCount = itemsCount / itemsPerPage
+  const pageCount = Math.ceil(itemsCount / itemsPerPage)
 
   const previousButton = (
     <span className={styles.icon}>
