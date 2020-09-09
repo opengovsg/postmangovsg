@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { TelegramCallbackService } from '@telegram/services'
+import logger from '@core/logger'
 const verifyBotIdRegistered = async (
   req: Request,
   res: Response,
@@ -11,14 +12,15 @@ const verifyBotIdRegistered = async (
     if (!(botId && req.body)) {
       throw new Error('botId, botToken and Telegram update must be specified.')
     }
-    if (await TelegramCallbackService.verifyBotIdRegistered(botId)) {
-      res.locals.botId = botId
-      res.locals.botToken = botToken
-      return next()
+    if (!(await TelegramCallbackService.verifyBotIdRegistered(botId))) {
+      throw new Error(`botId ${botId} not recognized`)
     }
-    return res.sendStatus(400)
+    res.locals.botId = botId
+    res.locals.botToken = botToken
+    return next()
   } catch (err) {
-    return next(err)
+    logger.error(`Could not verify botId: ${err.stack}`)
+    return res.sendStatus(200) // On errors, Do not trigger retries by Telegram API
   }
 }
 
