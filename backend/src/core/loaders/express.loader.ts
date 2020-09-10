@@ -74,6 +74,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(loggerMiddleware)
   app.use(overrideContentTypeHeaderMiddleware)
 
+  app.use(overrideContentTypeHeaderMiddleware)
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: false }))
   // ref: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
