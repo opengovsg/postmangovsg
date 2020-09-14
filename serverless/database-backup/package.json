@@ -9,7 +9,7 @@
     "build:layer:copy": "docker cp pgdump:/layer.zip ./layer.zip",
     "build:layer:clean": "docker rm pgdump",
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
-    "dev": "npm run build && tsc-watch --onSuccess \"node -r dotenv/config build/index\""
+    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -h handler -e examples/event-rds-backup-complete.js\""
   },
   "keywords": [],
   "author": "",
@@ -30,6 +30,7 @@
     "eslint": "^7.8.1",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "lambda-local": "^1.7.3",
     "tsc-watch": "^4.2.9",
     "typescript": "^4.0.2"
   },
