@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import path from 'path'
 import convict from 'convict'
 import dotenv from 'dotenv'
@@ -6,12 +7,32 @@ dotenv.config()
 
 const rdsCaCert = path.join(__dirname, './assets/db-ca.pem')
 
-convict.addFormat({
-  name: 'required',
-  validate: (val: string | number) => {
-    if (!val) {
-      throw new Error('Required value cannot be empty')
-    }
+convict.addFormats({
+  'required-string': {
+    validate: (val: any): void => {
+      if (val === '') {
+        throw new Error('Required value cannot be empty')
+      }
+    },
+    coerce: (val: any): any => {
+      if (val === null) return ''
+      return val
+    },
+  },
+  'required-hex-string': {
+    validate: (val: string): void => {
+      if (val === '') {
+        throw new Error('Required value cannot be emtpy')
+      }
+
+      if (!/^[a-fA-F0-9]+$/.test(val)) {
+        throw new Error('Must be an hex string')
+      }
+    },
+    coerce: (val: any): string => {
+      if (val === null) return ''
+      return val.toString()
+    },
   },
 })
 
@@ -27,7 +48,7 @@ const config = convict({
       doc: 'URI to the postgres database',
       default: '',
       env: 'DB_URI',
-      format: 'required',
+      format: 'required-string',
       sensitive: true,
     },
     useIam: {
@@ -37,15 +58,9 @@ const config = convict({
       env: 'DB_USE_IAM',
     },
     ssl: {
-      require: {
-        doc: 'Whether to require SSL to connect to database',
-        default: false,
-        format: Boolean,
-        env: 'DB_REQUIRE_SSL',
-      },
       mode: {
         doc: 'SSL mode to connect to database',
-        default: 'verify-full',
+        default: 'verify-ca',
         format: [
           'disable',
           'allow',
@@ -80,9 +95,24 @@ const config = convict({
     },
     backupBucket: {
       doc: 'Name of the S3 bucket to store backups to',
-      format: 'required',
-      default: 'postmangovsg-prod-backup',
+      default: 'postmangovsg-rds-backup-production',
       env: 'BACKUP_BUCKET_NAME',
+    },
+  },
+  encryption: {
+    algorithm: {
+      doc: 'Encryption algorithm to use to encrypt backup',
+      default: 'aes-256-cbc',
+      format: crypto.getCiphers(),
+      env: 'ENCRYPTION_ALGORITHM',
+    },
+    key: {
+      doc:
+        'Symmetric encryption key to use represented as a hexadecimal string',
+      default: '',
+      format: 'required-hex-string',
+      sensitive: true,
+      env: 'ENCRYPTION_KEY',
     },
   },
   sentryDsn: {
@@ -96,18 +126,18 @@ switch (config.get('env')) {
   case 'staging':
     config.load({
       aws: {
-        backupBucket: 'postmangovsg-staging-backup',
+        backupBucket: 'postmangovsg-rds-backup-staging',
       },
     })
     break
   case 'development':
     config.load({
       aws: {
-        backupBucket: 'postmangovsg-dev-backup',
+        backupBucket: 'postmangovsg-rds-backup-dev',
       },
       database: {
         ssl: {
-          require: false,
+          mode: 'disable',
         },
       },
     })

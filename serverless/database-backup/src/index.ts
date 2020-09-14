@@ -1,5 +1,9 @@
+import 'source-map-support/register'
 import * as Sentry from '@sentry/node'
+
 import config from './config'
+import EncryptedPgdump, { DatabaseConfig, EncryptionConfig } from './pgdump'
+import { uploadBackup } from './upload'
 
 Sentry.init({
   dsn: config.get('sentryDsn'),
@@ -16,6 +20,23 @@ Sentry.configureScope((scope) => {
  * Lambda to run pg_dump to S3 for backup
  * @param event
  */
-exports.handler = async (_event: any) => {
-  return
+const handler = async (_event: any) => {
+  try {
+    const dbConfig = config.get('database') as DatabaseConfig
+    const encryptionConfig = config.get('encryption') as EncryptionConfig
+
+    const backup = new EncryptedPgdump(dbConfig, encryptionConfig)
+    const backupLocation = await uploadBackup(backup)
+
+    console.log(`Database backup uploaded to ${backupLocation}`)
+  } catch (err) {
+    console.error(err)
+
+    Sentry.captureException(err)
+    await Sentry.flush(2000)
+
+    throw err
+  }
 }
+
+exports.handler = handler
