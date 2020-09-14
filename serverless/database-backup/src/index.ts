@@ -2,7 +2,9 @@ import 'source-map-support/register'
 import * as Sentry from '@sentry/node'
 
 import config from './config'
-import EncryptedPgdump, { DatabaseConfig, EncryptionConfig } from './pgdump'
+import EncryptedPgdump from './pgdump'
+import { EncryptionConfig, DatabaseConfig } from './interfaces'
+import { parseRdsEvents, RDS_EVENTS } from './event'
 import { uploadBackup } from './upload'
 
 Sentry.init({
@@ -20,15 +22,21 @@ Sentry.configureScope((scope) => {
  * Lambda to run pg_dump to S3 for backup
  * @param event
  */
-const handler = async (_event: any) => {
+const handler = async (event: any) => {
   try {
-    const dbConfig = config.get('database') as DatabaseConfig
-    const encryptionConfig = config.get('encryption') as EncryptionConfig
+    const events = parseRdsEvents(event)
+    for (const ev of events) {
+      if (ev.eventId === RDS_EVENTS.BACKUP_COMPLETE) {
+        const dbConfig = config.get('database') as DatabaseConfig
+        const encryptionConfig = config.get('encryption') as EncryptionConfig
 
-    const backup = new EncryptedPgdump(dbConfig, encryptionConfig)
-    const backupLocation = await uploadBackup(backup)
+        const backup = new EncryptedPgdump(dbConfig, encryptionConfig)
+        const backupLocation = await uploadBackup(backup)
 
-    console.log(`Database backup uploaded to ${backupLocation}`)
+        console.log(`Database backup uploaded to ${backupLocation}`)
+      }
+    }
+    return { statusCode: 200 }
   } catch (err) {
     console.error(err)
 

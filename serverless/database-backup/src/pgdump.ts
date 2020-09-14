@@ -3,19 +3,12 @@ import { spawn } from 'child_process'
 import { EventEmitter } from 'events'
 import { parse } from 'pg-connection-string'
 import { generateRdsIamAuthToken } from './utils/rds-iam'
+import { EncryptionConfig, DatabaseConfig } from './interfaces'
 
 const PGDUMP_COMMAND = 'pg_dump'
-
-export interface EncryptionConfig {
-  algorithm: string
-  key: string
-}
-
-export interface DatabaseConfig {
-  databaseUri: string
-  useIam: boolean
-  ssl: { mode: string; cert: string }
-}
+// We do not include owners and privileges to avoid dumping RDS specific roles (rds_iam, rds_superuser) as there might be incompatibilities
+// with the restoration target.
+const PGDUMP_ARGS = ['-Fc', '--no-owner', '--no-privileges']
 
 class EncryptedPgdump extends EventEmitter {
   host: string
@@ -77,7 +70,7 @@ class EncryptedPgdump extends EventEmitter {
       PGSSLROOTCERT: this.sslCert,
     }
 
-    const pgdump = spawn(PGDUMP_COMMAND, ['-Fc'], { env })
+    const pgdump = spawn(PGDUMP_COMMAND, PGDUMP_ARGS, { env })
 
     let errorMsg = ''
     pgdump.stderr.on('data', (data) => {
