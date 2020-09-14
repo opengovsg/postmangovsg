@@ -2,7 +2,6 @@
 
 # Copy local module
 cp -R ../modules ./
-echo $STAGING_SECRET_ID
 # Replace the secret id according to the right branch
 # Using '#' as a delimiter for SED instead of '/'
 # '/' will clash with secret id names, eg: 'staging/eb/postmangovsg-staging-40ffadb'
