@@ -19,7 +19,7 @@ jobs:
         - npm run lint-no-fix
         - npm run test
       before_deploy:
-        - cp -R ../modules ./
+        - ./before-deploy.sh
       deploy:
         - provider: elasticbeanstalk
           edge: true
