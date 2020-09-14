@@ -1,9 +1,16 @@
-import { Router } from 'express'
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  RequestHandler,
+} from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
   UploadMiddleware,
   JobMiddleware,
+  SettingsMiddleware,
 } from '@core/middlewares'
 import {
   SmsMiddleware,
@@ -35,6 +42,11 @@ const uploadCompleteValidator = {
 
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
+    label: Joi.string()
+      .min(1)
+      .max(50)
+      .pattern(/^[a-z0-9-]+$/)
+      .optional(),
     twilio_account_sid: Joi.string().trim().required(),
     twilio_api_secret: Joi.string().trim().required(),
     twilio_api_key: Joi.string().trim().required(),
@@ -54,6 +66,23 @@ const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
     rate: Joi.number().integer().positive().default(10),
   }),
+}
+
+/**
+ * Conditionally applies a middleware based on return value of a condition function
+ * @param condition Function to evaluate if the middleware should be applied
+ * @param middlware Middleware to be applied conditionally
+ */
+const applyIf = (
+  condition: (req: Request) => boolean,
+  middleware: RequestHandler
+): RequestHandler => {
+  return (req: Request, res: Response, next: NextFunction): any => {
+    if (condition(req)) {
+      return middleware(req, res, next)
+    }
+    next()
+  }
 }
 
 // Routes
@@ -359,6 +388,12 @@ router.delete(
  *                - $ref: '#/components/schemas/TwilioCredentials'
  *                - type: object
  *                  properties:
+ *                    label:
+ *                      type: string
+ *                      pattern: '/^[a-z0-9-]+$/'
+ *                      minLength: 1
+ *                      maxLength: 50
+ *                      description: should only consist of lowercase alphanumeric characters and dashes
  *                    recipient:
  *                      type: string
  *
@@ -378,12 +413,23 @@ router.delete(
  *        "500":
  *           description: Internal Server Error
  */
+
+// In order to preserve backward compatbility, we conditionally apply middlewares for storage
+// of user credentials based on the presence of label in the request body.
 router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
+  applyIf(
+    (req: Request) => req.body?.label,
+    SettingsMiddleware.checkUserCredentialLabel
+  ),
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
+  applyIf(
+    (req: Request) => req.body?.label,
+    SettingsMiddleware.storeUserCredential
+  ),
   SmsMiddleware.setCampaignCredential
 )
 

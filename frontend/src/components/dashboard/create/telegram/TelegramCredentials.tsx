@@ -6,7 +6,7 @@ import cx from 'classnames'
 import { LINKS } from 'config'
 import {
   validateStoredCredentials,
-  validateNewCredentials,
+  validateAndStoreNewCredentials,
   verifyCampaignCredentials,
   getStoredCredentials,
 } from 'services/telegram.service'
@@ -16,6 +16,7 @@ import {
   InfoBlock,
   ErrorBlock,
   Dropdown,
+  CredLabelInput,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -30,11 +31,13 @@ const TelegramCredentials = ({
   onNext: (changes: any, next?: boolean) => void
 }) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
+  const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
   )
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as any)
+  const [label, setLabel] = useState('')
   const [showCredentialFields, setShowCredentialFields] = useState(
     !hasCredential
   )
@@ -51,6 +54,7 @@ const TelegramCredentials = ({
   async function populateStoredCredentials() {
     try {
       const storedCredLabels = await getStoredCredentials()
+      setCredLabels(storedCredLabels)
       setStoredCredentials(
         storedCredLabels.map((c) => ({ label: c, value: c }))
       )
@@ -66,6 +70,7 @@ const TelegramCredentials = ({
   function toggleInputMode() {
     setIsManual((m) => !m)
     setCreds(null)
+    setLabel('')
     setSelectedCredential('')
   }
 
@@ -109,8 +114,9 @@ const TelegramCredentials = ({
         throw new Error('Invalid campaign id')
       }
 
-      await validateNewCredentials({
+      await validateAndStoreNewCredentials({
         campaignId: +campaignId,
+        label,
         ...creds,
       })
 
@@ -175,6 +181,11 @@ const TelegramCredentials = ({
             </p>
 
             <div className={styles.validateCredentialsInfo}>
+              <CredLabelInput
+                value={label}
+                onChange={setLabel}
+                labels={credLabels}
+              />
               <TelegramCredentialsInput onFilled={setCreds} />
             </div>
             <ErrorBlock>{errorMessage}</ErrorBlock>

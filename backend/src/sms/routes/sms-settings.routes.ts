@@ -1,5 +1,4 @@
-import { Request, Response } from 'express'
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 
 import { SmsMiddleware } from '@sms/middlewares'
@@ -19,6 +18,7 @@ const storeCredentialValidator = {
     twilio_api_key: Joi.string().trim().required(),
     twilio_messaging_service_sid: Joi.string().trim().required(),
     recipient: Joi.string().trim().required(),
+    validate: Joi.boolean().default(true),
   }),
 }
 
