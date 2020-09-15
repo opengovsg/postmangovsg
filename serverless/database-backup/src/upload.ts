@@ -5,7 +5,10 @@ import config from './config'
 import EncryptedPgdump from './pgdump'
 import { configureEndpoint } from './utils/aws-endpoint'
 
-const S3 = new AWS.S3(configureEndpoint(config))
+const S3 = new AWS.S3({
+  ...configureEndpoint(config),
+  computeChecksums: true,
+})
 
 const getBackupFolderName = (): string => {
   const today = new Date()
