@@ -316,6 +316,50 @@ jobs:
             - SES_USER=$STAGING_UNSUBSCRIBE_DIGEST_SES_USER
             - SES_PORT=$STAGING_UNSUBSCRIBE_DIGEST_SES_PORT
             - UNSUBSCRIBE_GUIDE_URL=$UNSUBSCRIBE_GUIDE_URL
+    - name: serverless-database-backup
+      before_deploy:
+        - cd $TRAVIS_BUILD_DIR/serverless/database-backup
+        - npm run build:docker
+      deploy:
+        - provider: lambda
+          edge: true
+          function_name: database-backup-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_BACKUP_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 600
+          publish: true
+          zip: "../database-backup/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_BACKUP_DB_URI
+            - DB_USE_IAM=$PRODUCTION_DB_USE_IAM
+            - BACKUP_BUCKET_NAME=$PRODUCTION_BACKUP_BUCKET_NAME
+            - ENCRYPTION_KEY=$PRODUCTION_BACKUP_ENCRYPTION_KEY
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+        - provider: lambda
+          edge: true
+          function_name: database-backup-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_BACKUP_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 600
+          publish: true
+          zip: "../database-backup/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - NODE_ENV=staging
+            - DB_URI=$STAGING_BACKUP_DB_URI
+            - DB_USE_IAM=$STAGING_DB_USE_IAM
+            - BACKUP_BUCKET_NAME=$STAGING_BACKUP_BUCKET_NAME
+            - ENCRYPTION_KEY=$STAGING_BACKUP_ENCRYPTION_KEY
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
     - name: root
       install:
         - npm install --ignore-scripts
