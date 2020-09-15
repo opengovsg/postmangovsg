@@ -2,10 +2,17 @@ import crypto from 'crypto'
 import { spawn } from 'child_process'
 import { EventEmitter } from 'events'
 import { parse } from 'pg-connection-string'
+
+import config from './config'
 import { generateRdsIamAuthToken } from './utils/rds-iam'
 import { EncryptionConfig, DatabaseConfig } from './interfaces'
 
-const PGDUMP_COMMAND = 'pg_dump'
+// Provide absolute path when running in lambda
+const PGDUMP_COMMAND =
+  config.get('env') === 'development'
+    ? 'pg_dump'
+    : `${process.env.LAMBDA_TASK_ROOT}/bin/pg_dump`
+
 // We do not include owners and privileges to avoid dumping RDS specific roles (rds_iam, rds_superuser) as there might be incompatibilities
 // with the restoration target.
 const PGDUMP_ARGS = ['-Fc', '--no-owner', '--no-privileges']

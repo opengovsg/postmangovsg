@@ -1,2 +1,3 @@
-# Generated Lambda layer zip file
-layer.zip
+# Generated folders for pg_dump
+bin/
+lib/

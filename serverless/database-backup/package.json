@@ -4,10 +4,7 @@
   "description": "Backup database to S3",
   "main": "src/index.js",
   "scripts": {
-    "build:layer": "npm run build:layer:make-zip && npm run build:layer:copy && npm run build:layer:clean",
-    "build:layer:make-zip": "docker run --name pgdump -e PG_VERSION=$PG_VERSION -v $PWD/build-layer.sh:/build-layer.sh lambci/lambda:build-nodejs12.x /build-layer.sh",
-    "build:layer:copy": "docker cp pgdump:/layer.zip ./layer.zip",
-    "build:layer:clean": "docker rm pgdump",
+    "build:docker": "docker run --rm  -e PG_VERSION=$PG_VERSION -v $PWD:/var/task lambci/lambda:build-nodejs12.x ./build.sh",
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
     "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -h handler -e examples/event-rds-backup-complete.js\""
   },
