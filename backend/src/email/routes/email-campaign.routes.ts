@@ -27,6 +27,12 @@ const storeTemplateValidator = {
       .lowercase()
       .allow(null)
       .required(),
+    from: Joi.string()
+      .trim()
+      .email()
+      .options({ convert: true })
+      .lowercase()
+      .required(),
   }),
 }
 
@@ -144,7 +150,8 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                 reply_to:
  *                   type: string
  *                   nullable: true
- *
+ *                 from:
+ *                   type: string
  *       responses:
  *         200:
  *           description: Success
@@ -180,6 +187,8 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                         type: array
  *                         items:
  *                           type: string
+ *                       from:
+ *                         type: string
  *
  *         "400":
  *           description: Bad Request
@@ -195,6 +204,7 @@ router.put(
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
   ProtectedMiddleware.verifyTemplate,
+  EmailTemplateMiddleware.validateFromEmailAddress,
   EmailTemplateMiddleware.storeTemplate
 )
 
