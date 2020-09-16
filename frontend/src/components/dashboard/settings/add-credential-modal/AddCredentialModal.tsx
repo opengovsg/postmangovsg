@@ -92,14 +92,21 @@ const AddCredentialModal = ({
     }
   }, [credType])
 
+  function isValidLabel() {
+    return label && !credLabels.includes(label)
+  }
+
   // Render credential input based on selected type of credential
   function renderCredentialInput() {
     let credInput = (
-      <CredLabelInput
-        value={label}
-        onChange={setLabel}
-        labels={credLabels}
-      ></CredLabelInput>
+      <>
+        <CredLabelInput value={label} onChange={setLabel}></CredLabelInput>
+        {label && !isValidLabel() && (
+          <ErrorBlock>
+            Label already exists. Please use a different one.
+          </ErrorBlock>
+        )}
+      </>
     )
 
     let nextFunc = () => setCredStep(AddCredentialStep.Validate)
