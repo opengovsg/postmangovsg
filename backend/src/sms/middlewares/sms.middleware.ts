@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
-import { TwilioCredentials } from '@sms/interfaces'
 import config from '@core/config'
 
 /**
@@ -86,26 +85,6 @@ const getCredentialsFromLabel = async (
 }
 
 /**
- * Sends a test message to validate credentials
- * @param campaignId
- * @param recipient
- * @param credentials
- */
-const sendValidationMessage = async (
-  campaignId: string,
-  recipient: string,
-  credentials: TwilioCredentials
-): Promise<void> => {
-  if (campaignId) {
-    // Sends first hydrated message from campaign
-    await SmsService.sendCampaignMessage(+campaignId, recipient, credentials)
-  } else {
-    // Sends generic validation message if campaignId not specified
-    await SmsService.sendValidationMessage(recipient, credentials)
-  }
-}
-
-/**
  * Sends a test message. If the test message succeeds,
  * store the credentials in AWS secrets manager and db.
  * Set the credentialName and channelType in res.locals to be passed downstream
@@ -120,10 +99,14 @@ const validateAndStoreCredentials = async (
   const { recipient } = req.body
   const { campaignId } = req.params
   const { credentials, credentialName } = res.locals
-
   try {
-    await sendValidationMessage(campaignId, recipient, credentials)
-
+    if (campaignId) {
+      // Sends first hydrated message from campaign
+      await SmsService.sendCampaignMessage(+campaignId, recipient, credentials)
+    } else {
+      // Sends generic validation message if campaignId not specified
+      await SmsService.sendValidationMessage(recipient, credentials)
+    }
     // If credentialName exists, credential has already been stored
     if (credentialName) {
       return next()
