@@ -1,6 +1,10 @@
+import crypto from 'crypto'
+
 export interface EncryptionConfig {
-  algorithm: string
-  key: string
+  algorithm: crypto.CipherGCMTypes
+  keySize: number
+  keyEncryptionAlgorithm: string
+  keyEncryptionPublicKey: string
 }
 
 export interface DatabaseConfig {

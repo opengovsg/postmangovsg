@@ -1,4 +1,3 @@
-import crypto from 'crypto'
 import path from 'path'
 import convict from 'convict'
 import dotenv from 'dotenv'
@@ -17,21 +16,6 @@ convict.addFormats({
     coerce: (val: any): any => {
       if (val === null) return ''
       return val
-    },
-  },
-  'required-hex-string': {
-    validate: (val: string): void => {
-      if (val === '') {
-        throw new Error('Required value cannot be emtpy')
-      }
-
-      if (!/^[a-fA-F0-9]+$/.test(val)) {
-        throw new Error('Must be an hex string')
-      }
-    },
-    coerce: (val: any): string => {
-      if (val === null) return ''
-      return val.toString()
     },
   },
 })
@@ -102,17 +86,22 @@ const config = convict({
   encryption: {
     algorithm: {
       doc: 'Encryption algorithm to use to encrypt backup',
-      default: 'aes-256-cbc',
-      format: crypto.getCiphers(),
+      default: 'aes-256-gcm',
+      format: ['aes-128-gcm', 'aes-192-gcm', 'aes-256-gcm'],
       env: 'ENCRYPTION_ALGORITHM',
     },
-    key: {
-      doc:
-        'Symmetric encryption key to use represented as a hexadecimal string',
+    keySize: {
+      doc: 'Symmetric key size in bytes to be used for encrypting dump',
+      default: 32,
+      format: Number,
+      env: 'ENCRYPTION_KEY_SIZE',
+    },
+    keyEncryptionPublicKey: {
+      doc: 'PEM encoded value for public key used to encrypt symmetric key',
       default: '',
-      format: 'required-hex-string',
+      format: 'required-string',
       sensitive: true,
-      env: 'ENCRYPTION_KEY',
+      env: 'KEY_ENCRYPTION_PUBLIC_KEY',
     },
   },
   sentryDsn: {

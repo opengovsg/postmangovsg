@@ -29,9 +29,13 @@ class EncryptedPgdump extends EventEmitter {
   sslMode: string
   sslCert: string
 
-  algorithm: string
+  algorithm: crypto.CipherGCMTypes
   iv: Buffer
-  key: crypto.CipherKey
+  key: crypto.KeyObject
+  authTag?: Buffer
+
+  keyEncryptionPublicKey: crypto.KeyObject
+  encryptedKey: Buffer
 
   constructor(dbConfig: DatabaseConfig, encryptionConfig: EncryptionConfig) {
     super()
@@ -49,11 +53,18 @@ class EncryptedPgdump extends EventEmitter {
     this.sslMode = mode || 'disable'
     this.sslCert = cert || ''
 
-    const { key, algorithm } = encryptionConfig
+    const { keySize, algorithm, keyEncryptionPublicKey } = encryptionConfig
+
     this.iv = crypto.randomBytes(16)
     this.algorithm = algorithm
-    // TODO: Support generating a data key using KMS
-    this.key = Buffer.from(key, 'hex')
+    this.key = crypto.createSecretKey(crypto.randomBytes(keySize))
+
+    const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${keyEncryptionPublicKey}\n-----END PUBLIC KEY-----\n`
+    this.keyEncryptionPublicKey = crypto.createPublicKey(publicKeyPem)
+    this.encryptedKey = crypto.publicEncrypt(
+      this.keyEncryptionPublicKey,
+      this.key.export()
+    )
   }
 
   private async pgdump(): Promise<NodeJS.ReadableStream> {
@@ -96,6 +107,9 @@ class EncryptedPgdump extends EventEmitter {
   private encrypt(inputStream: NodeJS.ReadableStream): NodeJS.ReadableStream {
     const cipher = crypto.createCipheriv(this.algorithm, this.key, this.iv)
     cipher.on('error', (err) => this.emit('error', err))
+    cipher.on('end', () => {
+      this.authTag = cipher.getAuthTag()
+    })
 
     return inputStream.pipe(cipher)
   }
