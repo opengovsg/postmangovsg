@@ -41,6 +41,7 @@ const getHydratedMessage = async (
   body: string
   subject: string
   replyTo: string | null
+  from: string
 } | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
@@ -57,7 +58,12 @@ const getHydratedMessage = async (
   )
   const body = EmailTemplateService.client.template(template?.body!, params)
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
-  return { body, subject, replyTo: template.replyTo || null }
+  return {
+    body,
+    subject,
+    replyTo: template.replyTo || null,
+    from: template?.from!,
+  }
 }
 
 /**
@@ -72,8 +78,9 @@ const getCampaignMessage = async (
   // get the body and subject
   const message = await getHydratedMessage(campaignId)
   if (message) {
-    const { body, subject, replyTo } = message
+    const { body, subject, replyTo, from } = message
     const mailToSend: MailToSend = {
+      from,
       recipients: [recipient],
       body: UnsubscriberService.appendTestEmailUnsubLink(body),
       subject,
