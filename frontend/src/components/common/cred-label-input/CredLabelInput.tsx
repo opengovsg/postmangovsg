@@ -1,16 +1,13 @@
 import React from 'react'
 
 import TextInput from '../text-input'
-import ErrorBlock from '../error-block'
 
 const CredLabelInput = ({
   value,
   onChange,
-  labels,
 }: {
   value: string
   onChange: (newValue: string) => any
-  labels: string[]
 }) => {
   function onLabelChange(value: string) {
     if (value) {
@@ -24,10 +21,6 @@ const CredLabelInput = ({
     }
   }
 
-  function isValidLabel() {
-    return value && !labels.includes(value)
-  }
-
   return (
     <>
       <h5>Credential Label</h5>
@@ -37,11 +30,6 @@ const CredLabelInput = ({
         maxLength="50"
         onChange={onLabelChange}
       />
-      {value && !isValidLabel() && (
-        <ErrorBlock>
-          Label already exists. Please use a different one.
-        </ErrorBlock>
-      )}
     </>
   )
 }
