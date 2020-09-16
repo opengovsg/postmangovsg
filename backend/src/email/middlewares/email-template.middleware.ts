@@ -35,7 +35,7 @@ const storeTemplate = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { subject, body, reply_to: replyTo } = req.body
+    const { subject, body, reply_to: replyTo, from } = req.body
     const {
       check,
       valid,
@@ -45,6 +45,7 @@ const storeTemplate = async (
       subject,
       body,
       replyTo,
+      from,
     })
 
     if (check?.reupload) {

@@ -5,6 +5,7 @@ export interface StoreTemplateInput {
   subject: string
   body: string
   replyTo: string | null
+  from: string
 }
 export interface StoreTemplateOutput {
   updatedTemplate: EmailTemplate
