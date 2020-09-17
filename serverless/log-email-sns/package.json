@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/datagovsg/postmangovsg#readme",
   "dependencies": {
+    "aws-sdk": "^2.742.0",
     "convict": "^6.0.0",
     "pg": "^8.2.1",
     "reflect-metadata": "^0.1.13",
