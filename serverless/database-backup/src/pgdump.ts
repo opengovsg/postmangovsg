@@ -62,7 +62,11 @@ class EncryptedPgdump extends EventEmitter {
     const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${keyEncryptionPublicKey}\n-----END PUBLIC KEY-----\n`
     this.keyEncryptionPublicKey = crypto.createPublicKey(publicKeyPem)
     this.encryptedKey = crypto.publicEncrypt(
-      this.keyEncryptionPublicKey,
+      {
+        key: this.keyEncryptionPublicKey,
+        oaepHash: 'sha256',
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+      },
       this.key.export()
     )
   }
