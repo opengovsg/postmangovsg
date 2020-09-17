@@ -319,20 +319,10 @@ const uploadProtectedCompleteHandler = async (
   }
 }
 
-const validateFromEmailAddress = async (
-  _req: Request,
-  _res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  // SWTODO: validate the 'from' email address
-  return next()
-}
-
 export const EmailTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
   pollCsvStatusHandler,
   deleteCsvErrorHandler,
   uploadProtectedCompleteHandler,
-  validateFromEmailAddress,
 }

@@ -1,5 +1,6 @@
 import { Transaction } from 'sequelize'
 import logger from '@core/logger'
+import dns from 'dns'
 import { CSVParams } from '@core/types'
 
 import { ChannelType } from '@core/constants'
@@ -279,6 +280,25 @@ const uploadProtectedCompleteOnChunk = ({
   }
 }
 
+// SWTODO: Add documentation + move to a separate service. Not sure about the service name yet
+const verifyCnames = async (cnames: Array<string>): Promise<void> => {
+  for (const cname of cnames) {
+    await dns.promises.resolve(cname, 'CNAME')
+  }
+}
+
+// SWTODO: Add documentation
+const verifyFromEmailAddress = async (email: string): Promise<void> => {
+  // SWTODO: Verify with AWS using SDK (getIdentityDkimAttributes)
+
+  // SWTODO: replace the cnames with values retrieved from verifying with AWS
+  try {
+    await verifyCnames([])
+  } catch (e) {
+    logger.info(`Failed to verify cnames for ${email}.`)
+  }
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
@@ -289,4 +309,5 @@ export const EmailService = {
   uploadCompleteOnChunk,
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
+  verifyFromEmailAddress,
 }

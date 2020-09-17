@@ -92,9 +92,25 @@ const previewFirstMessage = async (
   }
 }
 
+// SWTODO: Add documentation
+const verifyFromEmailAddress = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { from } = req.body
+  try {
+    EmailService.verifyFromEmailAddress(from)
+  } catch (err) {
+    return res.status(400).json({ message: err.message })
+  }
+  return next()
+}
+
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser,
   validateAndStoreCredentials,
   getCampaignDetails,
   previewFirstMessage,
+  verifyFromEmailAddress,
 }
