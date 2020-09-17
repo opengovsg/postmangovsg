@@ -72,7 +72,6 @@ const overrideContentTypeHeaderMiddleware = (
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
   app.use(loggerMiddleware)
-  app.use(overrideContentTypeHeaderMiddleware)
 
   app.use(overrideContentTypeHeaderMiddleware)
   app.use(bodyParser.json())
