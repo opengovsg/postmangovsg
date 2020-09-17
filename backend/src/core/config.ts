@@ -409,6 +409,20 @@ const config = convict({
       sensitive: true,
     },
   },
+  telegramCallback: {
+    contactUsUrl: {
+      doc: 'URL to contact form',
+      default: '',
+      env: 'TELEGRAM_BOT_CONTACT_US_URL',
+      format: 'required-string',
+    },
+    guideUrl: {
+      doc: 'URL to recipient guide',
+      default: '',
+      env: 'TELEGRAM_BOT_GUIDE_URL',
+      format: 'required-string',
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
