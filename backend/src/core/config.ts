@@ -29,6 +29,16 @@ convict.addFormats({
       return val
     },
   },
+  'float-percent': {
+    validate: (val: any): void => {
+      if (val !== 0 && (!val || val > 1 || val < 0)) {
+        throw new Error('must be a float between 0 and 1, inclusive')
+      }
+    },
+    coerce: (val: any): number => {
+      return parseFloat(val)
+    },
+  },
 })
 
 const config = convict({
@@ -360,6 +370,43 @@ const config = convict({
         env: 'UNSUBSCRIBE_HMAC_KEY_V1',
         sensitive: true,
       },
+    },
+  },
+  emailCallback: {
+    minHaltNumber: {
+      doc:
+        'Halt if there is this minimum number of invalid recipients, and it exceeds the percentage threshold',
+      default: 10,
+      env: 'MIN_HALT_NUMBER',
+      format: 'int',
+    },
+    minHaltPercentage: {
+      doc:
+        'Halt if the percentage of invalid recipients exceeds this threshold. Supply a float from 0 to 1',
+      default: 0.1,
+      env: 'MIN_HALT_PERCENTAGE',
+      format: 'float-percent',
+    },
+    sendgridPublicKey: {
+      doc: 'Public key used to verify webhook events from sendgrid',
+      env: 'SENDGRID_PUBLIC_KEY',
+      default: '',
+      format: 'required-string',
+    },
+    callbackSecret: {
+      doc: 'Secret for basic auth',
+      env: 'CALLBACK_SECRET',
+      default: '',
+    },
+  },
+  smsCallback: {
+    callbackSecret: {
+      doc:
+        'Secret used to generate the basic auth credentials for twilio callback',
+      default: '',
+      env: 'TWILIO_CALLBACK_SECRET',
+      format: 'required-string',
+      sensitive: true,
     },
   },
 })
