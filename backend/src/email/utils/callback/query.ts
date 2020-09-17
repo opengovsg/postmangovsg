@@ -132,10 +132,6 @@ export const haltCampaignIfThresholdExceeded = async (
       */
     if (exceedsHaltNumber && exceedsHaltPercentage) {
       // Halt
-      logger.info(
-        `Halting campaign_id=${campaignId} invalid=${invalid} running_total=${runningTotal} percentageInvalid=${percentageInvalid}`
-      )
-
       try {
         await EmailBlacklist?.sequelize?.transaction(async (transaction) => {
           const [numUpdated] = await Campaign.update(
@@ -147,6 +143,10 @@ export const haltCampaignIfThresholdExceeded = async (
               'Campaign has already been halted, or forcefully overridden with null to prevent halting.'
             )
             return
+          } else {
+            logger.info(
+              `Successfully halted campaign_id=${campaignId} invalid=${invalid} running_total=${runningTotal} percentageInvalid=${percentageInvalid}`
+            )
           }
 
           await EmailBlacklist?.sequelize?.query(
