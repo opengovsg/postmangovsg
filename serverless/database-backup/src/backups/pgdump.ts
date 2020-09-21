@@ -2,9 +2,9 @@ import { spawn } from 'child_process'
 import { EventEmitter } from 'events'
 import { parse } from 'pg-connection-string'
 
-import config from './config'
-import { generateRdsIamAuthToken } from './utils/rds-iam'
-import { DatabaseConfig } from './interfaces'
+import config from '../config'
+import { generateRdsIamAuthToken } from '../utils/rds-iam'
+import { DatabaseConfig } from '../interfaces'
 
 // Provide absolute path when running in lambda
 const PGDUMP_COMMAND =

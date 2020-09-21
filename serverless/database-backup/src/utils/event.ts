@@ -1,4 +1,4 @@
-import { RdsEvent } from './interfaces'
+import { RdsEvent } from '../interfaces'
 
 export const RDS_EVENTS = {
   BACKUP_COMPLETE: 'RDS-EVENT-0002',
