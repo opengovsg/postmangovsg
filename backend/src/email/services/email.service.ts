@@ -14,7 +14,7 @@ import {
 } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
-import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailTemplate, EmailMessage, VerifiedEmail } from '@email/models'
 import { EmailTemplateService } from '@email/services'
 
 /**
@@ -299,6 +299,19 @@ const verifyFromEmailAddress = async (email: string): Promise<void> => {
   }
 }
 
+// SWTODO: Add documentation
+const storeVerifiedEmail = async (email: string): Promise<void> => {
+  try {
+    await VerifiedEmail.findOrCreate({
+      where: {
+        email,
+      },
+    })
+  } catch (e) {
+    throw new Error(`Failed to store verified email for ${email}`)
+  }
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
@@ -310,4 +323,5 @@ export const EmailService = {
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
   verifyFromEmailAddress,
+  storeVerifiedEmail,
 }
