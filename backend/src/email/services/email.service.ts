@@ -1,10 +1,11 @@
 import { Transaction } from 'sequelize'
 import logger from '@core/logger'
 import dns from 'dns'
+import AWS from 'aws-sdk'
 import { CSVParams } from '@core/types'
 
 import { ChannelType } from '@core/constants'
-import { Campaign, ProtectedMessage } from '@core/models'
+import { Campaign, ProtectedMessage, User } from '@core/models'
 import {
   MailService,
   CampaignService,
@@ -16,6 +17,8 @@ import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage, VerifiedEmail } from '@email/models'
 import { EmailTemplateService } from '@email/services'
+
+const ses = new AWS.SES({ region: 'eu-central-1' })
 
 /**
  * Gets a message's parameters
@@ -281,22 +284,53 @@ const uploadProtectedCompleteOnChunk = ({
 }
 
 // SWTODO: Add documentation + move to a separate service. Not sure about the service name yet
-const verifyCnames = async (cnames: Array<string>): Promise<void> => {
-  for (const cname of cnames) {
-    await dns.promises.resolve(cname, 'CNAME')
+const verifyCnames = async (
+  tokens: Array<string>,
+  email: string
+): Promise<void> => {
+  // get email domain
+  const domain = email.slice(email.lastIndexOf('@') + 1)
+  const cnames = tokens.map((token) => `${token}._domainkey.${domain}`)
+  try {
+    for (const cname of cnames) {
+      await dns.promises.resolve(cname, 'CNAME')
+    }
+  } catch (e) {
+    throw new Error(`Verification of dkim records failed for ${email}`)
   }
 }
 
-// SWTODO: Add documentation
-const verifyFromEmailAddress = async (email: string): Promise<void> => {
-  // SWTODO: Verify with AWS using SDK (getIdentityDkimAttributes)
-
-  // SWTODO: replace the cnames with values retrieved from verifying with AWS
-  try {
-    await verifyCnames([])
-  } catch (e) {
-    logger.info(`Failed to verify cnames for ${email}.`)
+//SWTODO: Add documentation
+const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
+  // Get the dkim attributes for the email address
+  const params = {
+    Identities: [email],
   }
+  const { DkimAttributes } = await ses
+    .getIdentityDkimAttributes(params)
+    .promise()
+  if (DkimAttributes[email]?.DkimVerificationStatus! !== 'Success') {
+    throw new Error(`Email address not verified by AWS SES. email=${email}`)
+  }
+  return DkimAttributes[email]?.DkimTokens!
+}
+
+// SWTODO: Add documentation
+const verifyFromEmailAddress = async (
+  email: string,
+  userId: number
+): Promise<void> => {
+  // Verify email address that is provided
+  const user = await User.findOne({ where: { id: userId } })
+  if (user === null) throw new Error(`Failed to find user id: ${userId}`)
+
+  if (user.email !== email) {
+    throw new Error(
+      `From email address not allowed. User's email: ${user.email}, given: ${email} `
+    )
+  }
+  const DkimTokens = await verifyEmailWithAWS(email)
+  await verifyCnames(DkimTokens, email)
 }
 
 // SWTODO: Add documentation

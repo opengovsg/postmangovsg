@@ -98,9 +98,10 @@ const verifyFromEmailAddress = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
+  const userId = req.session?.user?.id
   const { from } = req.body
   try {
-    EmailService.verifyFromEmailAddress(from)
+    EmailService.verifyFromEmailAddress(from, userId)
   } catch (err) {
     return res.status(400).json({ message: err.message })
   }
