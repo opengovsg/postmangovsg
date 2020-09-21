@@ -2,7 +2,8 @@ import 'source-map-support/register'
 import * as Sentry from '@sentry/node'
 
 import config from './config'
-import EncryptedPgdump from './pgdump'
+import Pgdump from './pgdump'
+import Encryptor from './encryptor'
 import { EncryptionConfig, DatabaseConfig } from './interfaces'
 import { parseRdsEvents, RDS_EVENTS } from './event'
 import { uploadBackup } from './upload'
@@ -27,11 +28,13 @@ const handler = async (event: any) => {
     const events = parseRdsEvents(event)
     for (const ev of events) {
       if (ev.eventId === RDS_EVENTS.BACKUP_COMPLETE) {
-        const dbConfig = config.get('database') as DatabaseConfig
         const encryptionConfig = config.get('encryption') as EncryptionConfig
+        const encryptor = new Encryptor(encryptionConfig)
 
-        const backup = new EncryptedPgdump(dbConfig, encryptionConfig)
-        const backupLocation = await uploadBackup(backup)
+        const dbConfig = config.get('database') as DatabaseConfig
+        const pgdump = new Pgdump(dbConfig)
+
+        const backupLocation = await uploadBackup(pgdump, encryptor)
 
         console.log(`Database backup uploaded to ${backupLocation}`)
       }

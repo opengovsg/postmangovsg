@@ -1,11 +1,10 @@
-import crypto from 'crypto'
 import { spawn } from 'child_process'
 import { EventEmitter } from 'events'
 import { parse } from 'pg-connection-string'
 
 import config from './config'
 import { generateRdsIamAuthToken } from './utils/rds-iam'
-import { EncryptionConfig, DatabaseConfig } from './interfaces'
+import { DatabaseConfig } from './interfaces'
 
 // Provide absolute path when running in lambda
 const PGDUMP_COMMAND =
@@ -17,7 +16,7 @@ const PGDUMP_COMMAND =
 // with the restoration target.
 const PGDUMP_ARGS = ['-Fc', '--no-owner', '--no-privileges']
 
-class EncryptedPgdump extends EventEmitter {
+class Pgdump extends EventEmitter {
   host: string
   port: number
 
@@ -29,15 +28,7 @@ class EncryptedPgdump extends EventEmitter {
   sslMode: string
   sslCert: string
 
-  algorithm: crypto.CipherGCMTypes
-  iv: Buffer
-  key: crypto.KeyObject
-  authTag?: Buffer
-
-  keyEncryptionPublicKey: crypto.KeyObject
-  encryptedKey: Buffer
-
-  constructor(dbConfig: DatabaseConfig, encryptionConfig: EncryptionConfig) {
+  constructor(dbConfig: DatabaseConfig) {
     super()
 
     this.useIam = dbConfig.useIam
@@ -52,26 +43,9 @@ class EncryptedPgdump extends EventEmitter {
     const { mode, cert } = dbConfig.ssl
     this.sslMode = mode || 'disable'
     this.sslCert = cert || ''
-
-    const { keySize, algorithm, keyEncryptionPublicKey } = encryptionConfig
-
-    this.iv = crypto.randomBytes(16)
-    this.algorithm = algorithm
-    this.key = crypto.createSecretKey(crypto.randomBytes(keySize))
-
-    const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${keyEncryptionPublicKey}\n-----END PUBLIC KEY-----\n`
-    this.keyEncryptionPublicKey = crypto.createPublicKey(publicKeyPem)
-    this.encryptedKey = crypto.publicEncrypt(
-      {
-        key: this.keyEncryptionPublicKey,
-        oaepHash: 'sha256',
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-      },
-      this.key.export()
-    )
   }
 
-  private async pgdump(): Promise<NodeJS.ReadableStream> {
+  async run(): Promise<NodeJS.ReadableStream> {
     const password = this.useIam
       ? await generateRdsIamAuthToken({
           username: this.user,
@@ -107,21 +81,6 @@ class EncryptedPgdump extends EventEmitter {
 
     return pgdump.stdout
   }
-
-  private encrypt(inputStream: NodeJS.ReadableStream): NodeJS.ReadableStream {
-    const cipher = crypto.createCipheriv(this.algorithm, this.key, this.iv)
-    cipher.on('error', (err) => this.emit('error', err))
-    cipher.on('end', () => {
-      this.authTag = cipher.getAuthTag()
-    })
-
-    return inputStream.pipe(cipher)
-  }
-
-  async run(): Promise<NodeJS.ReadableStream> {
-    const output = await this.pgdump()
-    return this.encrypt(output)
-  }
 }
 
-export default EncryptedPgdump
+export default Pgdump
