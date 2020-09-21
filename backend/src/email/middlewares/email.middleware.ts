@@ -92,7 +92,9 @@ const previewFirstMessage = async (
   }
 }
 
-// SWTODO: Add documentation
+/**
+ * Verifies the from email address
+ */
 const verifyFromEmailAddress = async (
   req: Request,
   res: Response,
@@ -108,7 +110,9 @@ const verifyFromEmailAddress = async (
   return next()
 }
 
-// SWTODO: Add documentation
+/**
+ * Stores the verified email address that we can use to send out emails.
+ */
 const storeVerifiedEmail = async (
   req: Request,
   res: Response,

@@ -283,7 +283,11 @@ const uploadProtectedCompleteOnChunk = ({
   }
 }
 
-// SWTODO: Add documentation + move to a separate service. Not sure about the service name yet
+/**
+ * Verifies if the cname records are in the email's domain dns
+ * @throws Error if verification fails
+ */
+// SWTODO: move to a separate service. Not sure about the service name yet
 const verifyCnames = async (
   tokens: Array<string>,
   email: string
@@ -300,7 +304,10 @@ const verifyCnames = async (
   }
 }
 
-//SWTODO: Add documentation
+/**
+ * Verifies if the cname records are in the email's domain dns
+ * @throws Error if the domain's dns do not have the cname records
+ */
 const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
   // Get the dkim attributes for the email address
   const params = {
@@ -315,11 +322,11 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
   return DkimAttributes[email]?.DkimTokens!
 }
 
-// SWTODO: Add documentation
-const verifyFromEmailAddress = async (
-  email: string,
-  userId: number
-): Promise<void> => {
+/**
+ * Verifies if the email provided matches the user's
+ * @throws Error if the emails doesn't match
+ */
+const verifyEmail = async (email: string, userId: number): Promise<void> => {
   // Verify email address that is provided
   const user = await User.findOne({ where: { id: userId } })
   if (user === null) throw new Error(`Failed to find user id: ${userId}`)
@@ -329,11 +336,28 @@ const verifyFromEmailAddress = async (
       `From email address not allowed. User's email: ${user.email}, given: ${email} `
     )
   }
+}
+
+/**
+ * Verifies the from email address in different ways:
+ * 1. Against the user's email address
+ * 2. With AWS to ensure that we can use the email address to send
+ * 3. Checks the domain's dns to ensure that the cnames are there
+ * @throws Error if any of the verification fails
+ */
+const verifyFromEmailAddress = async (
+  email: string,
+  userId: number
+): Promise<void> => {
+  await verifyEmail(email, userId)
   const DkimTokens = await verifyEmailWithAWS(email)
   await verifyCnames(DkimTokens, email)
 }
 
-// SWTODO: Add documentation
+/**
+ * Stores the provided email address in verified_email table
+ * @throws Error if it fails to store the email address.
+ */
 const storeVerifiedEmail = async (email: string): Promise<void> => {
   try {
     await VerifiedEmail.findOrCreate({
