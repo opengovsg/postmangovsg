@@ -50,13 +50,16 @@ class SecretsManagerDump {
           })
         : this.password
 
+      const ssl =
+        this.sslMode !== 'disable' ? { ssl: { ca: [this.sslCert] } } : {}
+
       const config: ClientConfig = {
         host: this.host,
         port: this.port,
         database: this.database,
         user: this.user,
         password,
-        ...(this.sslMode !== 'disable' ? { ca: [this.sslCert] } : {}),
+        ...ssl,
       }
 
       this.client = new Client(config)
