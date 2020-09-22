@@ -1,7 +1,7 @@
 import { Column, DataType, Model, Table } from 'sequelize-typescript'
 
-@Table({ tableName: 'verified_email', underscored: true, timestamps: true })
-export class VerifiedEmail extends Model<VerifiedEmail> {
+@Table({ tableName: 'email_from_address', underscored: true, timestamps: true })
+export class EmailFromAddress extends Model<EmailFromAddress> {
   @Column({
     type: DataType.STRING,
     primaryKey: true,

@@ -13,7 +13,7 @@ import {
 } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
-import { EmailTemplate, EmailMessage, VerifiedEmail } from '@email/models'
+import { EmailTemplate, EmailMessage, EmailFromAddress } from '@email/models'
 import { EmailTemplateService, CustomDomainService } from '@email/services'
 
 /**
@@ -286,7 +286,7 @@ const uploadProtectedCompleteOnChunk = ({
  * 3. Checks the domain's dns to ensure that the cnames are there
  * @throws Error if any of the verification fails
  */
-const verifyFromEmailAddress = async (
+const verifyFromAddress = async (
   email: string,
   userId: number
 ): Promise<void> => {
@@ -299,9 +299,9 @@ const verifyFromEmailAddress = async (
  * Stores the provided email address in verified_email table
  * @throws Error if it fails to store the email address.
  */
-const storeVerifiedEmail = async (email: string): Promise<void> => {
+const storeFromAddress = async (email: string): Promise<void> => {
   try {
-    await VerifiedEmail.findOrCreate({
+    await EmailFromAddress.findOrCreate({
       where: {
         email,
       },
@@ -321,6 +321,6 @@ export const EmailService = {
   uploadCompleteOnChunk,
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
-  verifyFromEmailAddress,
-  storeVerifiedEmail,
+  verifyFromAddress,
+  storeFromAddress,
 }

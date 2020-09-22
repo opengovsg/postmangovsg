@@ -18,7 +18,7 @@ import {
   EmailTemplate,
   EmailOp,
   EmailBlacklist,
-  VerifiedEmail,
+  EmailFromAddress,
 } from '@email/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import {
@@ -86,7 +86,7 @@ const sequelizeLoader = async (): Promise<void> => {
     EmailOp,
     EmailBlacklist,
     ProtectedMessage,
-    VerifiedEmail,
+    EmailFromAddress,
   ]
   const smsModels = [SmsMessage, SmsTemplate, SmsOp]
   const telegramModels = [

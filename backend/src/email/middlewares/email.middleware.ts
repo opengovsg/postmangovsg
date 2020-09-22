@@ -95,7 +95,7 @@ const previewFirstMessage = async (
 /**
  * Verifies the from email address
  */
-const verifyFromEmailAddress = async (
+const verifyFromAddress = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -103,7 +103,7 @@ const verifyFromEmailAddress = async (
   const userId = req.session?.user?.id
   const { from } = req.body
   try {
-    EmailService.verifyFromEmailAddress(from, userId)
+    EmailService.verifyFromAddress(from, userId)
   } catch (err) {
     return res.status(400).json({ message: err.message })
   }
@@ -113,14 +113,14 @@ const verifyFromEmailAddress = async (
 /**
  * Stores the verified email address that we can use to send out emails.
  */
-const storeVerifiedEmail = async (
+const storeFromAddress = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   const { from } = req.body
   try {
-    await EmailService.storeVerifiedEmail(from)
+    await EmailService.storeFromAddress(from)
   } catch (err) {
     return next(err)
   }
@@ -132,6 +132,6 @@ export const EmailMiddleware = {
   validateAndStoreCredentials,
   getCampaignDetails,
   previewFirstMessage,
-  verifyFromEmailAddress,
-  storeVerifiedEmail,
+  verifyFromAddress,
+  storeFromAddress,
 }

@@ -45,8 +45,8 @@ const verifyEmailValidator = {
 router.post(
   '/verify',
   celebrate(verifyEmailValidator),
-  EmailMiddleware.verifyFromEmailAddress,
-  EmailMiddleware.storeVerifiedEmail
+  EmailMiddleware.verifyFromAddress,
+  EmailMiddleware.storeFromAddress
 )
 
 export default router
