@@ -3,7 +3,7 @@ import AWS from 'aws-sdk'
 
 import config from './config'
 import Encryptor from './encryptor'
-import { Pgdump } from './backups'
+import { Pgdump, SecretsManagerDump } from './backups'
 import { configureEndpoint } from './utils/aws-endpoint'
 
 const S3 = new AWS.S3({
@@ -22,11 +22,17 @@ const getBackupFolderName = (): string => {
 
 class Upload {
   pgdump: Pgdump
+  secrets: SecretsManagerDump
   encryptor: Encryptor
 
-  constructor(encryptor: Encryptor, pgdump: Pgdump) {
+  constructor(
+    encryptor: Encryptor,
+    pgdump: Pgdump,
+    secrets: SecretsManagerDump
+  ) {
     this.pgdump = pgdump
     this.encryptor = encryptor
+    this.secrets = secrets
   }
 
   async upload(): Promise<string> {
@@ -34,16 +40,31 @@ class Upload {
     const bucket = config.get('aws.backupBucket')
     const folder = getBackupFolderName()
 
-    const body = await this.pgdump.run()
+    const pgdumpBody = await this.pgdump.run()
     await new Promise((resolve, reject) => {
       const pgdumpPath = path.join(folder, `${database}.dump`)
       const params = {
         Bucket: bucket,
         Key: pgdumpPath,
-        Body: this.encryptor.encrypt(body),
+        Body: this.encryptor.encrypt(pgdumpBody),
       }
-      // Reject when an error occurs in one of the underlying streams
       this.pgdump.on('error', (err: Error) => reject(err))
+      this.encryptor.on('error', (err: Error) => reject(err))
+
+      S3.upload(params, (err: Error) => {
+        if (err) reject(err)
+        resolve()
+      })
+    })
+
+    const secretsDumpBody = await this.secrets.run()
+    await new Promise((resolve, reject) => {
+      const secretsDumpPath = path.join(folder, 'secrets.dump')
+      const params = {
+        Bucket: bucket,
+        Key: secretsDumpPath,
+        Body: this.encryptor.encrypt(secretsDumpBody),
+      }
       this.encryptor.on('error', (err: Error) => reject(err))
 
       S3.upload(params, (err: Error) => {

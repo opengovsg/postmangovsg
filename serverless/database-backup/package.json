@@ -6,7 +6,7 @@
   "scripts": {
     "build:docker": "docker run --rm  -e PG_VERSION=$PG_VERSION -v $PWD:/var/task lambci/lambda:build-nodejs12.x ./build.sh",
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
-    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -h handler -e examples/event-rds-backup-complete.js\""
+    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 60000 -h handler -e examples/event-rds-backup-complete.js\""
   },
   "keywords": [],
   "author": "",
@@ -35,9 +35,11 @@
   "dependencies": {
     "@google-cloud/kms": "^2.1.2",
     "@sentry/node": "^5.22.3",
+    "@types/pg": "^7.14.5",
     "aws-sdk": "^2.749.0",
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
+    "pg": "^8.3.3",
     "pg-connection-string": "^2.3.0",
     "source-map-support": "^0.5.19",
     "yargs": "^16.0.3"
