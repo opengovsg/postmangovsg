@@ -3,7 +3,7 @@ import AWS from 'aws-sdk'
 
 import config from './config'
 import Encryptor from './encryptor'
-import { PgDump, SecretsManagerDump } from './backups'
+import { PgDump, SecretsManagerDump } from './dumps'
 import { configureEndpoint } from './utils/aws-endpoint'
 
 const S3 = new AWS.S3({
@@ -11,34 +11,35 @@ const S3 = new AWS.S3({
   computeChecksums: true,
 })
 
-const getBackupFolderName = (): string => {
-  const today = new Date()
-  const yyyy = today.getFullYear()
-  const dd = today.getDate().toString().padStart(2, '0')
-  const mm = (today.getMonth() + 1).toString().padStart(2, '0')
-
-  return `${yyyy}-${mm}-${dd}`
-}
-
-class Upload {
+class Backup {
   pgDump: PgDump
-  secrets: SecretsManagerDump
+  secretsDump: SecretsManagerDump
   encryptor: Encryptor
 
-  constructor(
-    encryptor: Encryptor,
-    pgDump: PgDump,
-    secrets: SecretsManagerDump
-  ) {
+  constructor(options: {
+    pgDump: PgDump
+    secretsDump: SecretsManagerDump
+    encryptor: Encryptor
+  }) {
+    const { pgDump, secretsDump, encryptor } = options
     this.pgDump = pgDump
     this.encryptor = encryptor
-    this.secrets = secrets
+    this.secretsDump = secretsDump
+  }
+
+  private getBackupFolderName(): string {
+    const today = new Date()
+    const yyyy = today.getFullYear()
+    const dd = today.getDate().toString().padStart(2, '0')
+    const mm = (today.getMonth() + 1).toString().padStart(2, '0')
+
+    return `${yyyy}-${mm}-${dd}`
   }
 
   async upload(): Promise<string> {
     const { database } = this.pgDump
     const bucket = config.get('aws.backupBucket')
-    const folder = getBackupFolderName()
+    const folder = this.getBackupFolderName()
 
     const dumpParams = []
 
@@ -64,7 +65,7 @@ class Upload {
       authTag: pgDumpAuthTag?.toString('base64'),
     })
 
-    const secretsDumpBody = await this.secrets.run()
+    const secretsDumpBody = await this.secretsDump.run()
     const secretsDumpFilename = 'secrets.dump'
     await new Promise((resolve, reject) => {
       const params = {
@@ -98,4 +99,4 @@ class Upload {
   }
 }
 
-export default Upload
+export default Backup
