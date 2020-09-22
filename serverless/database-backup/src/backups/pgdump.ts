@@ -16,7 +16,7 @@ const PGDUMP_COMMAND =
 // with the restoration target.
 const PGDUMP_ARGS = ['-Fc', '--no-owner', '--no-privileges']
 
-class Pgdump extends EventEmitter {
+class PgDump extends EventEmitter {
   host: string
   port: number
 
@@ -83,4 +83,4 @@ class Pgdump extends EventEmitter {
   }
 }
 
-export default Pgdump
+export default PgDump

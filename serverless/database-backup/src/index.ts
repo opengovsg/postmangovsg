@@ -2,7 +2,7 @@ import 'source-map-support/register'
 import * as Sentry from '@sentry/node'
 
 import config from './config'
-import { Pgdump, SecretsManagerDump } from './backups'
+import { PgDump, SecretsManagerDump } from './backups'
 import Encryptor from './encryptor'
 import Upload from './upload'
 
@@ -30,7 +30,7 @@ const handler = async (event: any) => {
     for (const ev of events) {
       if (ev.eventId === RDS_EVENTS.BACKUP_COMPLETE) {
         const dbConfig = config.get('database') as DatabaseConfig
-        const pgdump = new Pgdump(dbConfig)
+        const pgdump = new PgDump(dbConfig)
         const secretsManagerDump = new SecretsManagerDump(dbConfig)
 
         const encryptionConfig = config.get('encryption') as EncryptionConfig

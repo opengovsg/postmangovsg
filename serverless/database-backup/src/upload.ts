@@ -3,7 +3,7 @@ import AWS from 'aws-sdk'
 
 import config from './config'
 import Encryptor from './encryptor'
-import { Pgdump, SecretsManagerDump } from './backups'
+import { PgDump, SecretsManagerDump } from './backups'
 import { configureEndpoint } from './utils/aws-endpoint'
 
 const S3 = new AWS.S3({
@@ -21,34 +21,36 @@ const getBackupFolderName = (): string => {
 }
 
 class Upload {
-  pgdump: Pgdump
+  pgDump: PgDump
   secrets: SecretsManagerDump
   encryptor: Encryptor
 
   constructor(
     encryptor: Encryptor,
-    pgdump: Pgdump,
+    pgDump: PgDump,
     secrets: SecretsManagerDump
   ) {
-    this.pgdump = pgdump
+    this.pgDump = pgDump
     this.encryptor = encryptor
     this.secrets = secrets
   }
 
   async upload(): Promise<string> {
-    const { database } = this.pgdump
+    const { database } = this.pgDump
     const bucket = config.get('aws.backupBucket')
     const folder = getBackupFolderName()
 
-    const pgdumpBody = await this.pgdump.run()
+    const dumpParams = []
+
+    const pgDumpBody = await this.pgDump.run()
+    const pgDumpFilename = `${database}.dump`
     await new Promise((resolve, reject) => {
-      const pgdumpPath = path.join(folder, `${database}.dump`)
       const params = {
         Bucket: bucket,
-        Key: pgdumpPath,
-        Body: this.encryptor.encrypt(pgdumpBody),
+        Key: path.join(folder, pgDumpFilename),
+        Body: this.encryptor.encrypt(pgDumpBody),
       }
-      this.pgdump.on('error', (err: Error) => reject(err))
+      this.pgDump.on('error', (err: Error) => reject(err))
       this.encryptor.on('error', (err: Error) => reject(err))
 
       S3.upload(params, (err: Error) => {
@@ -56,13 +58,18 @@ class Upload {
         resolve()
       })
     })
+    const pgDumpAuthTag = this.encryptor.authTag
+    dumpParams.push({
+      filename: pgDumpFilename,
+      authTag: pgDumpAuthTag?.toString('base64'),
+    })
 
     const secretsDumpBody = await this.secrets.run()
+    const secretsDumpFilename = 'secrets.dump'
     await new Promise((resolve, reject) => {
-      const secretsDumpPath = path.join(folder, 'secrets.dump')
       const params = {
         Bucket: bucket,
-        Key: secretsDumpPath,
+        Key: path.join(folder, secretsDumpFilename),
         Body: this.encryptor.encrypt(secretsDumpBody),
       }
       this.encryptor.on('error', (err: Error) => reject(err))
@@ -72,6 +79,11 @@ class Upload {
         resolve()
       })
     })
+    const secretsDumpAuthTag = this.encryptor.authTag
+    dumpParams.push({
+      filename: secretsDumpFilename,
+      authTag: secretsDumpAuthTag?.toString('base64'),
+    })
 
     // We need to wait for upload to complete before authTag is available when the cipher is finalised.
     const encryptionParams = this.encryptor.getEncryptionParams()
@@ -79,7 +91,7 @@ class Upload {
     await S3.upload({
       Bucket: bucket,
       Key: encryptionParamsPath,
-      Body: JSON.stringify(encryptionParams),
+      Body: JSON.stringify({ encryption: encryptionParams, dumps: dumpParams }),
     }).promise()
 
     return `s3://${bucket}/${folder}/`

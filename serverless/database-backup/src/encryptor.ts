@@ -46,20 +46,13 @@ class Encryptor extends EventEmitter {
     algorithm: string
     iv: string
     encryptedKey: string
-    authTag: string
   } {
-    const { algorithm, iv, encryptedKey, authTag } = this
-    if (!authTag) {
-      throw new Error(
-        'authTag not available. Make sure encryption has completed.'
-      )
-    }
+    const { algorithm, iv, encryptedKey } = this
 
     return {
       algorithm: algorithm,
       iv: iv.toString('base64'),
       encryptedKey: encryptedKey.toString('base64'),
-      authTag: authTag?.toString('base64'),
     }
   }
 }
