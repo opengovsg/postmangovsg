@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { EmailService } from '@email/services'
+import { EmailService, CustomDomainService } from '@email/services'
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
@@ -93,17 +93,24 @@ const previewFirstMessage = async (
 }
 
 /**
- * Verifies the from email address
+ * Verifies the from email address in different ways:
+ * 1. Checks if email is already verified
+ * 2. With AWS to ensure that we can use the email address to send
+ * 3. Checks the domain's dns to ensure that the cnames are there
  */
 const verifyFromAddress = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const userId = req.session?.user?.id
-  const { from } = req.body
+  const email = req.session?.user?.email
   try {
-    EmailService.verifyFromAddress(from, userId)
+    const isVerified = await CustomDomainService.isEmailVerified(email)
+    if (isVerified) return res.status(200).json({ email })
+
+    const dkimTokens = await CustomDomainService.verifyEmailWithAWS(email)
+
+    await CustomDomainService.verifyCnames(dkimTokens, email)
   } catch (err) {
     return res.status(400).json({ message: err.message })
   }
@@ -118,13 +125,13 @@ const storeFromAddress = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { from } = req.body
+  const email = req.session?.user?.email
   try {
-    await EmailService.storeFromAddress(from)
+    await CustomDomainService.storeFromAddress(email)
   } catch (err) {
     return next(err)
   }
-  return res.status(200).json({ from })
+  return res.status(200).json({ email })
 }
 
 export const EmailMiddleware = {

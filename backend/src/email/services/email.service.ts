@@ -13,8 +13,8 @@ import {
 } from '@core/services'
 import { MailToSend, CampaignDetails } from '@core/interfaces'
 
-import { EmailTemplate, EmailMessage, EmailFromAddress } from '@email/models'
-import { EmailTemplateService, CustomDomainService } from '@email/services'
+import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailTemplateService } from '@email/services'
 
 /**
  * Gets a message's parameters
@@ -279,38 +279,6 @@ const uploadProtectedCompleteOnChunk = ({
   }
 }
 
-/**
- * Verifies the from email address in different ways:
- * 1. Against the user's email address
- * 2. With AWS to ensure that we can use the email address to send
- * 3. Checks the domain's dns to ensure that the cnames are there
- * @throws Error if any of the verification fails
- */
-const verifyFromAddress = async (
-  email: string,
-  userId: number
-): Promise<void> => {
-  await CustomDomainService.verifyEmail(email, userId)
-  const DkimTokens = await CustomDomainService.verifyEmailWithAWS(email)
-  await CustomDomainService.verifyCnames(DkimTokens, email)
-}
-
-/**
- * Stores the provided email address in verified_email table
- * @throws Error if it fails to store the email address.
- */
-const storeFromAddress = async (email: string): Promise<void> => {
-  try {
-    await EmailFromAddress.findOrCreate({
-      where: {
-        email,
-      },
-    })
-  } catch (e) {
-    throw new Error(`Failed to store verified email for ${email}`)
-  }
-}
-
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
@@ -321,6 +289,4 @@ export const EmailService = {
   uploadCompleteOnChunk,
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
-  verifyFromAddress,
-  storeFromAddress,
 }

@@ -1,7 +1,7 @@
 import dns from 'dns'
 import AWS from 'aws-sdk'
 
-import { User } from '@core/models'
+import { EmailFromAddress } from '@email/models'
 
 const ses = new AWS.SES({ region: 'eu-central-1' })
 /**
@@ -14,10 +14,13 @@ const verifyCnames = async (
 ): Promise<void> => {
   // get email domain
   const domain = email.slice(email.lastIndexOf('@') + 1)
-  const cnames = tokens.map((token) => `${token}._domainkey.${domain}`)
   try {
-    for (const cname of cnames) {
-      await dns.promises.resolve(cname, 'CNAME')
+    for (const token of tokens) {
+      const cname = `${token}._domainkey.${domain}`
+      const [result] = await dns.promises.resolve(cname, 'CNAME')
+      if (result !== `${token}.dkim.amazonses.com`) {
+        throw new Error(`Dkim record doesn't match for ${email}`)
+      }
     }
   } catch (e) {
     throw new Error(`Verification of dkim records failed for ${email}`)
@@ -25,7 +28,8 @@ const verifyCnames = async (
 }
 
 /**
- * Verifies if the cname records are in the email's domain dns
+ * Checks that the email address is verified with AWS
+ * @returns DKIM tokens generated for the email address
  * @throws Error if the domain's dns do not have the cname records
  */
 const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
@@ -36,33 +40,46 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
   const { DkimAttributes } = await ses
     .getIdentityDkimAttributes(params)
     .promise()
-  if (
-    DkimAttributes[email]?.DkimVerificationStatus! !== 'Success' ||
-    DkimAttributes
-  ) {
+
+  const verificationStatus = DkimAttributes[email]?.DkimVerificationStatus
+  const dkimTokens = DkimAttributes[email]?.DkimTokens
+
+  // Check verification status & make sure dkim tokens are present
+  if (!verificationStatus || verificationStatus !== 'Success' || !dkimTokens) {
     throw new Error(`Email address not verified by AWS SES. email=${email}`)
   }
-  return DkimAttributes[email]?.DkimTokens
+  // Make sure the dkim tokens are there.
+  return dkimTokens
 }
 
 /**
- * Verifies if the email provided matches the user's
- * @throws Error if the emails doesn't match
+ * Checks if the email address is already in email_from_address
  */
-const verifyEmail = async (email: string, userId: number): Promise<void> => {
-  // Verify email address that is provided
-  const user = await User.findOne({ where: { id: userId } })
-  if (user === null) throw new Error(`Failed to find user id: ${userId}`)
+const isEmailVerified = async (email: string): Promise<boolean> => {
+  return !!(await EmailFromAddress.findOne({
+    where: { email },
+  }))
+}
 
-  if (user.email !== email) {
-    throw new Error(
-      `From email address not allowed. User's email: ${user.email}, given: ${email} `
-    )
+/**
+ * Stores the provided email address in verified_email table
+ * @throws Error if it fails to store the email address.
+ */
+const storeFromAddress = async (email: string): Promise<void> => {
+  try {
+    await EmailFromAddress.findOrCreate({
+      where: {
+        email,
+      },
+    })
+  } catch (e) {
+    throw new Error(`Failed to store verified email for ${email}`)
   }
 }
 
 export const CustomDomainService = {
   verifyCnames,
-  verifyEmail,
   verifyEmailWithAWS,
+  isEmailVerified,
+  storeFromAddress,
 }
