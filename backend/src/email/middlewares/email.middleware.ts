@@ -93,10 +93,7 @@ const previewFirstMessage = async (
 }
 
 /**
- * Verifies the from email address in different ways:
- * 1. Checks if email is already verified
- * 2. With AWS to ensure that we can use the email address to send
- * 3. Checks the domain's dns to ensure that the cnames are there
+ * Verifies the user's email address to see if it can be used as custom 'from' address
  */
 const verifyFromAddress = async (
   req: Request,
@@ -105,12 +102,7 @@ const verifyFromAddress = async (
 ): Promise<Response | void> => {
   const email = req.session?.user?.email
   try {
-    const isVerified = await CustomDomainService.isEmailVerified(email)
-    if (isVerified) return res.status(200).json({ email })
-
-    const dkimTokens = await CustomDomainService.verifyEmailWithAWS(email)
-
-    await CustomDomainService.verifyCnames(dkimTokens, email)
+    await CustomDomainService.verifyFromAddress(email)
   } catch (err) {
     return res.status(400).json({ message: err.message })
   }
@@ -137,7 +129,7 @@ const storeFromAddress = async (
 /**
  * Verifies if the user's email address can be used as custom 'from' address
  */
-const isEmailVerified = async (
+const getCustomFromAddress = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -152,6 +144,30 @@ const isEmailVerified = async (
   return res.status(200).json({ email: '' })
 }
 
+/**
+ * Verifies that the 'from' address provided is valid
+ */
+const isFromAddressVerified = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { from } = req.body
+  if (from === 'default') return next()
+
+  const email = req.session?.user?.email
+
+  // from should be the same as email if it is not default
+  if (from !== email)
+    return res.status(400).json({ message: "Invalid 'from' email address." })
+  try {
+    await CustomDomainService.isFromAddressVerified(from)
+  } catch (err) {
+    return res.status(400).json({ message: err.message })
+  }
+  return next()
+}
+
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser,
   validateAndStoreCredentials,
@@ -159,5 +175,6 @@ export const EmailMiddleware = {
   previewFirstMessage,
   verifyFromAddress,
   storeFromAddress,
-  isEmailVerified,
+  getCustomFromAddress,
+  isFromAddressVerified,
 }

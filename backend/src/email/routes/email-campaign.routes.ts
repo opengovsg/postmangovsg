@@ -204,7 +204,7 @@ router.put(
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
   ProtectedMiddleware.verifyTemplate,
-  EmailMiddleware.verifyFromAddress,
+  EmailMiddleware.isFromAddressVerified,
   EmailTemplateMiddleware.storeTemplate
 )
 

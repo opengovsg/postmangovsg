@@ -77,9 +77,37 @@ const storeFromAddress = async (email: string): Promise<void> => {
   }
 }
 
+/**
+ * 1. Checks if email is verified
+ * 2. With AWS to ensure that we can use the email address to send
+ * 3. Checks the domain's dns to ensure that the cnames are there
+ */
+const isFromAddressVerified = async (email: string): Promise<void> => {
+  const isVerified = await isEmailVerified(email)
+  if (!isVerified) throw new Error("Invalid 'from' email address.")
+
+  const dkimTokens = await verifyEmailWithAWS(email)
+
+  await verifyCnames(dkimTokens, email)
+}
+
+/**
+ * 1. Checks if email is already verified
+ * 2. With AWS to ensure that we can use the email address to send
+ * 3. Checks the domain's dns to ensure that the cnames are there
+ */
+const verifyFromAddress = async (email: string): Promise<void> => {
+  const isVerified = await isEmailVerified(email)
+  if (isVerified) return
+
+  const dkimTokens = await verifyEmailWithAWS(email)
+
+  await verifyCnames(dkimTokens, email)
+}
+
 export const CustomDomainService = {
-  verifyCnames,
-  verifyEmailWithAWS,
   isEmailVerified,
   storeFromAddress,
+  isFromAddressVerified,
+  verifyFromAddress,
 }

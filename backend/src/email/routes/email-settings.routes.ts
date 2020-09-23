@@ -60,6 +60,6 @@ router.post(
  *          description: Internal Server Error
  *
  */
-router.get('/verify', EmailMiddleware.isEmailVerified)
+router.get('/verify', EmailMiddleware.getCustomFromAddress)
 
 export default router
