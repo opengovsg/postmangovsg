@@ -330,6 +330,7 @@ jobs:
           module_name: build/index
           handler_name: handler
           timeout: 600
+          memory_size: 512
           publish: true
           zip: "../database-backup/code.zip"
           on:
@@ -349,6 +350,7 @@ jobs:
           module_name: build/index
           handler_name: handler
           timeout: 600
+          memory_size: 512
           publish: true
           zip: "../database-backup/code.zip"
           on:
