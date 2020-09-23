@@ -42,6 +42,14 @@ async function deleteCredential(label: string): Promise<void> {
   }
 }
 
+async function getCustomFromAddresses(): Promise<string[]> {
+  // try {
+  return ['donotreply@mail.postman.gov.sg', 'dummy@dummy.gov.sg']
+  // } catch (e) {
+  //   errorHandler(e, 'Error getting custom From Address')
+  // }
+}
+
 function errorHandler(e: AxiosError, defaultMsg: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {
@@ -50,4 +58,9 @@ function errorHandler(e: AxiosError, defaultMsg: string): never {
   throw new Error(defaultMsg)
 }
 
-export { regenerateApiKey, getUserSettings, deleteCredential }
+export {
+  regenerateApiKey,
+  getUserSettings,
+  deleteCredential,
+  getCustomFromAddresses,
+}

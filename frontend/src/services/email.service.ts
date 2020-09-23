@@ -9,6 +9,7 @@ export async function saveTemplate(
 ): Promise<{
   numRecipients: number
   updatedTemplate?: {
+    from: string
     body: string
     subject: string
     reply_to: string | null

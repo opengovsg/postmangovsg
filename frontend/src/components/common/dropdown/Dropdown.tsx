@@ -6,13 +6,17 @@ import styles from './Dropdown.module.scss'
 const Dropdown = ({
   options,
   onSelect,
+  defaultLabel,
 }: {
   options: { label: string; value: string }[]
   onSelect: (value: string) => any
+  defaultLabel?: string
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedLabel, setSelectedLabel] = useState('')
+  const [selectedLabel, setSelectedLabel] = useState(
+    defaultLabel || 'Select an option'
+  )
 
   useEffect(() => {
     function handleClickOutside(event: { target: any }) {
@@ -44,7 +48,7 @@ const Dropdown = ({
       ref={containerRef}
     >
       <div className={styles.select} onClick={() => setIsOpen(!isOpen)}>
-        {selectedLabel || 'Select an option'}
+        {selectedLabel}
         <i className={cx(styles.caret, 'bx bx-caret-down')}></i>
       </div>
       <div className={styles.menu}>

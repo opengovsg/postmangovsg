@@ -63,6 +63,7 @@ const CreateEmail = ({
       case EmailProgress.CreateTemplate:
         return (
           <EmailTemplate
+            from={'donotreply@mail.postman.gov.sg'} //TODO: Get this value from campaign
             subject={campaign.subject}
             body={campaign.body}
             replyTo={campaign.replyTo}
