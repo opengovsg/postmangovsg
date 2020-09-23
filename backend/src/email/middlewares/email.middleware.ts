@@ -134,6 +134,24 @@ const storeFromAddress = async (
   return res.status(200).json({ email })
 }
 
+/**
+ * Verifies if the user's email address can be used as custom 'from' address
+ */
+const isEmailVerified = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const email = req.session?.user?.email
+  try {
+    const isVerified = await CustomDomainService.isEmailVerified(email)
+    if (isVerified) return res.status(200).json({ email })
+  } catch (err) {
+    return next(err)
+  }
+  return res.status(200).json({ email: '' })
+}
+
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser,
   validateAndStoreCredentials,
@@ -141,4 +159,5 @@ export const EmailMiddleware = {
   previewFirstMessage,
   verifyFromAddress,
   storeFromAddress,
+  isEmailVerified,
 }

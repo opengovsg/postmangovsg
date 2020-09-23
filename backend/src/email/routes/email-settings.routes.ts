@@ -37,4 +37,29 @@ router.post(
   EmailMiddleware.storeFromAddress
 )
 
+/**
+ * @swagger
+ * path:
+ *  /settings/email/verify:
+ *    get:
+ *      summary: Returns the user's email address if it is a valid custom 'from' email address.
+ *      tags:
+ *        - Settings
+ *
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  email:
+ *                    type: string
+ *        500:
+ *          description: Internal Server Error
+ *
+ */
+router.get('/verify', EmailMiddleware.isEmailVerified)
+
 export default router
