@@ -11,6 +11,7 @@ import ApiKey from './api-key'
 import Credentials from './credentials'
 import AddCredentialModal from './add-credential-modal'
 import AddApiKeyModal from './add-api-key-modal'
+import CustomDomain from './custom-domain'
 import CredentialsImage from 'assets/img/credentials.svg'
 import styles from './Settings.module.scss'
 
@@ -19,6 +20,11 @@ const SETTINGS_LINKS = [
     label: 'API Keys',
     location: '/settings/api',
     icon: 'bx-key',
+  },
+  {
+    label: 'Email',
+    location: '/settings/email',
+    icon: channelIcons[ChannelType.Email],
   },
   {
     label: 'SMS',
@@ -99,6 +105,9 @@ const Settings = () => {
           <Switch>
             <Route exact path="/settings/api">
               <ApiKey hasApiKey={hasApiKey} />
+            </Route>
+            <Route exact path="/settings/email">
+              <CustomDomain />
             </Route>
             <Route exact path="/settings/sms">
               <Credentials

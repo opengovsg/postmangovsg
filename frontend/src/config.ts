@@ -37,6 +37,7 @@ export const LINKS = {
   tncUrl: t('link.tncUrl')``,
   privacyUrl: t('link.privacyUrl')``,
   reportBugUrl: t('link.reportBugUrl')``,
+  customDomainRequestUrl: t('link.customDomainRequestUrl')``,
 }
 //#endregion
 

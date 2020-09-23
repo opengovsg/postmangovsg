@@ -1,0 +1,11 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.customDomainContainer {
+    .requestButton {
+        margin-top:2rem;
+    }
+    .darkBlueButton {
+        @include button($dark-blue);
+    }
+}

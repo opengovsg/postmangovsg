@@ -21,7 +21,7 @@ msgstr "Enter OTP"
 msgid "Get OTP"
 msgstr "Get OTP"
 
-#: src/components/unsubscribe/Unsubscribe.tsx:84
+#: src/components/unsubscribe/Unsubscribe.tsx:87
 msgid "I'd rather stay"
 msgstr "I'd rather stay"
 
@@ -49,13 +49,17 @@ msgstr "Sign In"
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
 
-#: src/components/unsubscribe/Unsubscribe.tsx:87
+#: src/components/unsubscribe/Unsubscribe.tsx:90
 msgid "Unsubscribe me"
 msgstr "Unsubscribe me"
 
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
+
+#: src/components/dashboard/settings/custom-domain/CustomDomain.tsx:19
+msgid "defaultMailFrom"
+msgstr "donotreply@mail.postman.gov.sg"
 
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "e.g. postman@agency.gov.sg"
@@ -68,6 +72,10 @@ msgstr "https://go.gov.sg/postman-contact-us"
 #: src/config.ts:36
 msgid "link.contributeUrl"
 msgstr "https://github.com/opengovsg/postmangovsg"
+
+#: src/config.ts:40
+msgid "link.customDomainRequestUrl"
+msgstr "https://go.gov.sg/postman-custom-domain"
 
 #: src/config.ts:28
 msgid "link.guideEmailPasswordProtectedUrl"
