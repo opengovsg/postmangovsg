@@ -89,6 +89,11 @@ const config = convict({
         format: 'int',
       },
     },
+    useIam: {
+      doc: 'Whether to use IAM for authentication to database',
+      default: false,
+      env: 'DB_USE_IAM',
+    },
   },
   sentryDsn: {
     doc: 'Sentry DSN for serverless',
@@ -112,6 +117,13 @@ const config = convict({
       default: '',
       env: 'TELEGRAM_BOT_GUIDE_URL',
       format: 'required',
+    },
+  },
+  aws: {
+    awsRegion: {
+      doc: 'Region for where the lambda will be deployed in.',
+      default: 'ap-southeast-1',
+      env: 'AWS_REGION',
     },
   },
 })

@@ -262,9 +262,10 @@ const uploadCompleteOnChunk = ({
 }): ((data: CSVParams[]) => Promise<void>) => {
   return async (data: CSVParams[]): Promise<void> => {
     const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+      const { recipient } = entry
       return {
         campaignId,
-        recipient: entry['recipient'],
+        recipient: recipient.trim(),
         params: entry,
       }
     })

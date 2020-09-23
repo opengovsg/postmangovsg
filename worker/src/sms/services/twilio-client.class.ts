@@ -113,7 +113,7 @@ export default class TwilioClient {
     callbackUrl.username = username
     // encode password as the hash contains special characters
     callbackUrl.password = encodeURIComponent(hashedPwd)
-    callbackUrl.pathname = `${callbackUrl.pathname}/campaign/${campaignId}/message/${messageId}`
+    callbackUrl.pathname = `${callbackUrl.pathname}/${campaignId}/${messageId}`
     logger.info(`Status callback url for ${messageId}: ${callbackUrl}`)
     return callbackUrl.toString()
   }

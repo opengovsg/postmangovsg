@@ -44,7 +44,13 @@ describe('template', () => {
     const table = [
       ['unclosed curly braces', 'Hello {{'],
       ['empty variable', '{{}}'],
-      ['special character', '{{^^}}'],
+      ['special character: ^', '{{^^}}'],
+      ['special character: &', '{{&ampersand}}'],
+      ['special character: #', '{{#hash}}this should also be hidden{{/hash}}'],
+      ['special character: !', '{{!var}}'],
+      ['special character: >', '{{>var}}'],
+      ['nested variables', '{{nested.var}}'],
+      ['triple braces', '{{{triple_braces}}}'],
       ['single quote', "{{'}}"],
       ['should not allow strings in variables', "{{'hello'}}"],
     ]

@@ -1,6 +1,6 @@
 {
   "name": "postmangovsg",
-  "version": "1.12.0",
+  "version": "1.14.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,7 @@
     "precommit:backend": "cd backend && npm run precommit",
     "precommit:worker": "cd worker && npm run precommit",
     "precommit:tests": "cd tests && npm run precommit",
-    "precommit:root": "lint-staged && npm run detect-secrets",
+    "precommit:root": "lint-staged && sh check-env-format.sh && npm run detect-secrets",
     "lint-no-fix": "prettier --check '**/*.{yml,md}'",
     "lint": "prettier --write '**/*.{yml,md}' --loglevel warn",
     "wait:backend": "wait-on http-get://localhost:4000"

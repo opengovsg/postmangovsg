@@ -111,6 +111,7 @@ jobs:
           environment_variables:
             - TWILIO_CALLBACK_SECRET=$STAGING_TWILIO_CALLBACK_SECRET
             - DB_URI=$STAGING_TWILIO_DB_URI
+            - DB_USE_IAM=$STAGING_DB_USE_IAM
           on:
             branch: $STAGING_BRANCH
         - provider: lambda
@@ -127,6 +128,7 @@ jobs:
           environment_variables:
             - TWILIO_CALLBACK_SECRET=$PRODUCTION_TWILIO_CALLBACK_SECRET
             - DB_URI=$PRODUCTION_TWILIO_DB_URI
+            - DB_USE_IAM=$PRODUCTION_DB_USE_IAM
           on:
             branch: $PRODUCTION_BRANCH
     - name: serverless-postman-api-gateway-authorizer
@@ -165,6 +167,7 @@ jobs:
             branch: $STAGING_BRANCH
           environment_variables:
             - DB_URI=$STAGING_EMAIL_DB_URI
+            - DB_USE_IAM=$STAGING_DB_USE_IAM
             - MIN_HALT_NUMBER=$STAGING_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$STAGING_EMAIL_MIN_HALT_PERCENTAGE
             - SENDGRID_PUBLIC_KEY=$STAGING_EMAIL_SENDGRID_PUBLIC_KEY
@@ -184,6 +187,7 @@ jobs:
             branch: $PRODUCTION_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_EMAIL_DB_URI
+            - DB_USE_IAM=$PRODUCTION_DB_USE_IAM
             - MIN_HALT_NUMBER=$PRODUCTION_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
             - SENDGRID_PUBLIC_KEY=$PRODUCTION_EMAIL_SENDGRID_PUBLIC_KEY
@@ -203,6 +207,7 @@ jobs:
             branch: $PRODUCTION_02_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_02_EMAIL_DB_URI
+            - DB_USE_IAM=$PRODUCTION_02_DB_USE_IAM
             - MIN_HALT_NUMBER=$PRODUCTION_EMAIL_MIN_HALT_NUMBER
             - MIN_HALT_PERCENTAGE=$PRODUCTION_EMAIL_MIN_HALT_PERCENTAGE
             - SENDGRID_PUBLIC_KEY=$PRODUCTION_EMAIL_SENDGRID_PUBLIC_KEY
@@ -228,6 +233,7 @@ jobs:
             branch: $PRODUCTION_BRANCH
           environment_variables:
             - DB_URI=$PRODUCTION_TELEGRAM_HANDLER_DB_URI
+            - DB_USE_IAM=$PRODUCTION_DB_USE_IAM
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - SENTRY_LAMBDA_FUNCTION_NAME=telegram-handler-production
             - TELEGRAM_BOT_CONTACT_US_URL=$TELEGRAM_BOT_CONTACT_US_URL
@@ -247,6 +253,7 @@ jobs:
             branch: $STAGING_BRANCH
           environment_variables:
             - DB_URI=$STAGING_TELEGRAM_HANDLER_DB_URI
+            - DB_USE_IAM=$STAGING_DB_USE_IAM
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - SENTRY_LAMBDA_FUNCTION_NAME=telegram-handler-staging
             - NODE_ENV=staging
@@ -275,6 +282,7 @@ jobs:
           environment_variables:
             - DB_URI=$PRODUCTION_UNSUBSCRIBE_DIGEST_DB_URI
             - DB_READ_REPLICA_URI=$PRODUCTION_UNSUBSCRIBE_DIGEST_DB_READ_REPLICA_URI
+            - DB_USE_IAM=$PRODUCTION_DB_USE_IAM
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - SES_FROM=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_FROM
             - SES_HOST=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_HOST
@@ -299,6 +307,7 @@ jobs:
           environment_variables:
             - DB_URI=$STAGING_UNSUBSCRIBE_DIGEST_DB_URI
             - DB_READ_REPLICA_URI=$STAGING_UNSUBSCRIBE_DIGEST_DB_READ_REPLICA_URI
+            - DB_USE_IAM=$STAGING_DB_USE_IAM
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
             - NODE_ENV=staging
             - SES_FROM=$STAGING_UNSUBSCRIBE_DIGEST_SES_FROM

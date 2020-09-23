@@ -51,11 +51,31 @@ Sentry.init({
   environment: config.get('env'),
 })
 
+/**
+ * SNS defaults the content-type header to 'content-type': 'text/plain; charset=UTF-8',
+ * even though it is sending a json document, causing bodyParser to not work
+ * @param req
+ * @param _res
+ * @param next
+ */
+const overrideContentTypeHeaderMiddleware = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): Response | void => {
+  if (req.get('x-amz-sns-message-type')) {
+    req.headers['content-type'] = 'application/json'
+  }
+  return next()
+}
+
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
   app.use(loggerMiddleware)
 
+  app.use(overrideContentTypeHeaderMiddleware)
   app.use(bodyParser.json())
+  app.use(bodyParser.urlencoded({ extended: false }))
   // ref: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
   // Default CORS setting:
   // {
