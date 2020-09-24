@@ -1,6 +1,9 @@
 import axios, { AxiosError } from 'axios'
 import Papa from 'papaparse'
+import SparkMD5 from 'spark-md5'
 import { EmailPreview, SMSPreview } from 'classes'
+
+const MD5_CHUNK_SIZE = 5000000 // 5MB
 
 interface PresignedUrlResponse {
   presignedUrl: string
@@ -16,13 +19,53 @@ export interface CsvStatusResponse {
   preview?: EmailPreview | SMSPreview
 }
 
+async function getMd5(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const buffer = new SparkMD5.ArrayBuffer()
+    const reader = new FileReader()
+
+    const totalChunks = Math.ceil(blob.size / MD5_CHUNK_SIZE)
+    let currentChunk = 0
+
+    const loadChunk = () => {
+      const start = currentChunk * MD5_CHUNK_SIZE
+      const end =
+        start + MD5_CHUNK_SIZE >= blob.size ? blob.size : start + MD5_CHUNK_SIZE
+      reader.readAsArrayBuffer(blob.slice(start, end))
+    }
+
+    reader.onerror = () => reject(reader.error)
+
+    reader.onload = (event) => {
+      const data = event.target?.result
+      if (data) {
+        buffer.append(data as ArrayBuffer)
+        currentChunk++
+
+        if (currentChunk < totalChunks) {
+          return loadChunk()
+        }
+
+        const md5 = Buffer.from(buffer.end(), 'hex').toString('base64')
+        resolve(md5)
+      }
+    }
+
+    loadChunk()
+  })
+}
+
 export async function uploadFileWithPresignedUrl(
   uploadedFile: File,
   presignedUrl: string
 ): Promise<void> {
   try {
+    const md5 = await getMd5(uploadedFile)
     await axios.put(presignedUrl, uploadedFile, {
-      headers: { 'Content-Type': uploadedFile.type },
+      headers: {
+        'Content-Type': uploadedFile.type,
+        'Content-MD5': md5,
+      },
       withCredentials: false,
       timeout: 0,
     })
@@ -222,18 +265,18 @@ export async function uploadPartWithPresignedUrl({
 }): Promise<string> {
   try {
     const contentType = 'text/csv'
-    const response = await axios.put(
-      presignedUrl,
-      new Blob(data, { type: contentType }),
-      {
-        withCredentials: false,
-        timeout: 0,
-        headers: {
-          // Localstack requires Content-Type to be stated explicitly in order to parse the request body properly.
-          'Content-Type': contentType,
-        },
-      }
-    )
+    const blob = new Blob(data, { type: contentType })
+    const md5 = await getMd5(blob)
+
+    const response = await axios.put(presignedUrl, blob, {
+      withCredentials: false,
+      timeout: 0,
+      headers: {
+        // Localstack requires Content-Type to be stated explicitly in order to parse the request body properly.
+        'Content-Type': contentType,
+        'Content-MD5': md5,
+      },
+    })
     return response.headers.etag
   } catch (e) {
     errorHandler(e, 'Error uploading part with presigned url')
