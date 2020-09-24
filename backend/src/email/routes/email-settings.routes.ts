@@ -2,9 +2,14 @@ import { Router } from 'express'
 
 import { EmailMiddleware } from '@email/middlewares'
 
+import { celebrate, Joi, Segments } from 'celebrate'
+
 const router = Router()
 
 // validators
+const verifyValidator = {
+  [Segments.BODY]: Joi.object({}),
+}
 
 /**
  * @swagger
@@ -33,6 +38,7 @@ const router = Router()
  */
 router.post(
   '/verify',
+  celebrate(verifyValidator),
   EmailMiddleware.verifyFromAddress,
   EmailMiddleware.storeFromAddress
 )
