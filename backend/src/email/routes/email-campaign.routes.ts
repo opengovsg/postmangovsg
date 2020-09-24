@@ -32,7 +32,8 @@ const storeTemplateValidator = {
       .email()
       .options({ convert: true })
       .lowercase()
-      .default('default'),
+      .allow('')
+      .default(''),
   }),
 }
 

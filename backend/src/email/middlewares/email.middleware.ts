@@ -153,7 +153,7 @@ const isFromAddressVerified = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { from } = req.body
-  if (from === 'default') return next()
+  if (from === '') return next()
 
   const email = req.session?.user?.email
 
