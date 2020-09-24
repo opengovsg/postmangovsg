@@ -1,9 +1,11 @@
 import dns from 'dns'
 import AWS from 'aws-sdk'
+import config from '@core/config'
 
 import { EmailFromAddress } from '@email/models'
 
-const ses = new AWS.SES({ region: 'eu-central-1' })
+const [, region] = config.get('mailOptions.host').split('.')
+const ses = new AWS.SES({ region: region })
 /**
  * Verifies if the cname records are in the email's domain dns
  * @throws Error if verification fails
