@@ -63,6 +63,19 @@ export async function getPreviewMessage(
   }
 }
 
+export async function verifyFromAddress(
+  recipient: string,
+  label: string
+): Promise<void> {
+  try {
+    await axios.post(`/settings/email/from/verify`, {
+      recipient,
+      label,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error verifying From Address.')
+  }
+}
 function errorHandler(e: AxiosError, defaultMsg: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {

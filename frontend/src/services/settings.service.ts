@@ -43,7 +43,7 @@ async function deleteCredential(label: string): Promise<void> {
 }
 
 async function getCustomFromAddresses(): Promise<string[]> {
-  // try {
+  //try {
   return ['donotreply@mail.postman.gov.sg', 'dummy@dummy.gov.sg']
   // } catch (e) {
   //   errorHandler(e, 'Error getting custom From Address')
