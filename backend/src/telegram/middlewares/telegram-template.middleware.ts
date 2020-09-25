@@ -95,7 +95,7 @@ const uploadCompleteHandler = async (
     const { campaignId } = req.params
 
     // extract s3Key from transactionId
-    const { transaction_id: transactionId, filename } = req.body
+    const { transaction_id: transactionId, filename, etag } = req.body
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
     const template = await TelegramTemplateService.getFilledTemplate(
@@ -118,7 +118,7 @@ const uploadCompleteHandler = async (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 
-        const downloadStream = s3Client.download(s3Key)
+        const downloadStream = s3Client.download(s3Key, etag)
         const params = {
           transaction,
           template,

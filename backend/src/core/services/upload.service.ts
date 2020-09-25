@@ -28,7 +28,8 @@ const s3 = new S3({
  * @param contentType
  */
 const getUploadParameters = async (
-  contentType: string
+  contentType: string,
+  md5: string
 ): Promise<{ presignedUrl: string; signedKey: string }> => {
   const s3Key = uuid()
 
@@ -37,6 +38,7 @@ const getUploadParameters = async (
     Key: s3Key,
     ContentType: contentType,
     Expires: 180, // seconds
+    ...(md5 ? { ContentMD5: md5 } : {}),
   }
 
   const signedKey = jwtUtils.sign(s3Key)

@@ -14,8 +14,10 @@ const uploadStartHandler = async (
 ): Promise<Response> => {
   try {
     const contentType = req.query['mime_type']
+    const md5 = req.query['md5']
     const { presignedUrl, signedKey } = await UploadService.getUploadParameters(
-      contentType
+      contentType,
+      md5
     )
 
     return res.status(200).json({
@@ -64,7 +66,7 @@ const startMultipartUpload = async (
  */
 const completeMultipart = async (
   req: Request,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
@@ -74,11 +76,12 @@ const completeMultipart = async (
       etags,
     } = req.body
 
-    await MultipartUploadService.completeMultipartUpload({
+    const { etag } = await MultipartUploadService.completeMultipartUpload({
       transactionId,
       partCount,
       etags,
     })
+    res.locals.etag = etag
 
     next()
   } catch (err) {

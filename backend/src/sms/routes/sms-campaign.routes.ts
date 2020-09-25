@@ -23,6 +23,7 @@ const storeTemplateValidator = {
 const uploadStartValidator = {
   [Segments.QUERY]: Joi.object({
     mime_type: Joi.string().required(),
+    md5: Joi.string().optional(),
   }),
 }
 
@@ -30,6 +31,7 @@ const uploadCompleteValidator = {
   [Segments.BODY]: Joi.object({
     transaction_id: Joi.string().required(),
     filename: Joi.string().required(),
+    etag: Joi.string().optional(),
   }),
 }
 
@@ -182,6 +184,10 @@ router.put(
  *         - name: mime_type
  *           in: query
  *           required: true
+ *           schema:
+ *             type: string
+ *         - name: md5
+ *           in: query
  *           schema:
  *             type: string
  *       responses:

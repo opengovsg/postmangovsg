@@ -58,10 +58,10 @@ async function getMd5(blob: Blob): Promise<string> {
 export async function uploadFileWithPresignedUrl(
   uploadedFile: File,
   presignedUrl: string
-): Promise<void> {
+): Promise<string> {
   try {
     const md5 = await getMd5(uploadedFile)
-    await axios.put(presignedUrl, uploadedFile, {
+    const response = await axios.put(presignedUrl, uploadedFile, {
       headers: {
         'Content-Type': uploadedFile.type,
         'Content-MD5': md5,
@@ -69,7 +69,7 @@ export async function uploadFileWithPresignedUrl(
       withCredentials: false,
       timeout: 0,
     })
-    return
+    return response.headers.etag
   } catch (e) {
     errorHandler(e)
   }
@@ -84,9 +84,11 @@ export async function getPresignedUrl({
 }): Promise<PresignedUrlResponse> {
   try {
     const mimeType = await getMimeType(uploadedFile)
+    const md5 = await getMd5(uploadedFile)
     const response = await axios.get(`/campaign/${campaignId}/upload/start`, {
       params: {
         mime_type: mimeType,
+        md5,
       },
     })
     const {
@@ -103,15 +105,18 @@ export async function completeFileUpload({
   campaignId,
   transactionId,
   filename,
+  etag,
 }: {
   campaignId: number
   transactionId: string
   filename: string
+  etag: string
 }): Promise<void> {
   try {
     await axios.post(`/campaign/${campaignId}/upload/complete`, {
       transaction_id: transactionId,
       filename,
+      etag,
     })
     return
   } catch (e) {
@@ -201,11 +206,15 @@ export async function uploadFileToS3(
     uploadedFile: file,
   })
   // Upload to presigned url
-  await uploadFileWithPresignedUrl(file, startUploadResponse.presignedUrl)
+  const etag = await uploadFileWithPresignedUrl(
+    file,
+    startUploadResponse.presignedUrl
+  )
   await completeFileUpload({
     campaignId: +campaignId,
     transactionId: startUploadResponse.transactionId,
     filename: file.name,
+    etag,
   })
   return file.name
 }
@@ -266,7 +275,6 @@ export async function uploadPartWithPresignedUrl({
   try {
     const contentType = 'text/csv'
     const blob = new Blob(data, { type: contentType })
-    const md5 = await getMd5(blob)
 
     const response = await axios.put(presignedUrl, blob, {
       withCredentials: false,
@@ -274,7 +282,6 @@ export async function uploadPartWithPresignedUrl({
       headers: {
         // Localstack requires Content-Type to be stated explicitly in order to parse the request body properly.
         'Content-Type': contentType,
-        'Content-MD5': md5,
       },
     })
     return response.headers.etag
