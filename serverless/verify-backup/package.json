@@ -5,9 +5,11 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "rm -rf build && tsc",
-    "start": "node build/index",
-    "dev": "npm run build && tsc-watch --onSuccess \"node ./build/decrypt-dump.js\"",
+    "start": "node build/index && npm run restore-dump",
+    "start-server": "http-server -p $PORT",
+    "dev": "npm run build && tsc-watch --onSuccess \"node ./build/index.js\"",
     "restore-dump": "pg_restore --no-owner -h localhost -p 5432 -U postgres -d postmangovsg_dev postman.decrypted.dump",
+    "catch-error": "echo 'Data dump restoration failed!' && exit 1",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -26,6 +28,8 @@
     "@sentry/node": "^5.23.0",
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
+    "googleapis": "^60.0.1",
+    "http-server": "^0.12.3",
     "source-map-support": "^0.5.19"
   },
   "devDependencies": {

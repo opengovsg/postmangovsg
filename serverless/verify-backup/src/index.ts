@@ -1,6 +1,4 @@
-// Imports the Google Cloud client library
 import { Storage, File } from '@google-cloud/storage'
-import path from 'path'
 import config from './config'
 import { decrypt } from './decrypt-dump'
 
@@ -38,13 +36,13 @@ async function downloadFile(srcFilename: string): Promise<void> {
 }
 
 async function getLatestBackup(files: Array<File>) {
-  // get last files in list which is in lexicographic order
+  // get last three files in list which is in lexicographic order
+  // db dump, secrets dump and params json
   files.reverse()
-  const [dumpFile] = files
-  if (path.extname(dumpFile.name) !== '.dump') {
-    throw new Error('Invalid file type!')
+  for (let i = 0; i < 3; i++) {
+    console.log(files[i].name)
+    await downloadFile(files[i].name)
   }
-  await downloadFile(dumpFile.name)
 }
 
 async function run(): Promise<void> {
