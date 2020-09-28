@@ -59,7 +59,8 @@ const EmailTemplate = ({
           +campaignId,
           subject,
           body,
-          replyTo
+          replyTo,
+          from
         )
         onNext({
           from: updatedTemplate?.from,
@@ -74,7 +75,7 @@ const EmailTemplate = ({
         if (propagateError) throw err
       }
     },
-    [body, campaignId, onNext, replyTo, subject]
+    [body, campaignId, from, onNext, replyTo, subject]
   )
 
   async function populateFromAddresses() {
@@ -87,6 +88,9 @@ const EmailTemplate = ({
   useEffect(() => {
     populateFromAddresses()
   }, [])
+  // useEffect(() => {
+  //   if (!from) setFrom(customFromAddresses[0].label)
+  // }, [customFromAddresses, from])
   // Set callback for finish later button
   useEffect(() => {
     finishLaterCallbackRef.current = () => {
@@ -127,7 +131,7 @@ const EmailTemplate = ({
       <Dropdown
         onSelect={setFrom}
         options={customFromAddresses}
-        defaultLabel={from}
+        defaultLabel={from || customFromAddresses[0]?.label}
       ></Dropdown>
 
       <h4>Subject</h4>

@@ -81,6 +81,7 @@ const EmailRecipients = ({
         setIsCsvProcessing(isCsvProcessing)
         setCsvInfo(newCsvInfo)
         if (preview) {
+          console.log('preview', preview)
           setPreview(preview as EmailPreview)
         }
         if (isCsvProcessing) {
@@ -202,6 +203,7 @@ const EmailRecipients = ({
             body={preview?.body}
             subject={preview?.subject}
             replyTo={preview?.replyTo}
+            from={preview?.from}
           />
           <div className="separator"></div>
         </>

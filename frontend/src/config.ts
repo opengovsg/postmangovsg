@@ -39,6 +39,7 @@ export const LINKS = {
   reportBugUrl: t('link.reportBugUrl')``,
   customDomainRequestUrl: t('link.customDomainRequestUrl')``,
 }
+export const DEFAULT_MAIL_FROM = t('defaultMailFrom')``
 //#endregion
 
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string

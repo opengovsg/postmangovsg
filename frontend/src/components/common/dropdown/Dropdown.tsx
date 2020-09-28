@@ -14,9 +14,7 @@ const Dropdown = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedLabel, setSelectedLabel] = useState(
-    defaultLabel || 'Select an option'
-  )
+  const [selectedLabel, setSelectedLabel] = useState('')
 
   useEffect(() => {
     function handleClickOutside(event: { target: any }) {
@@ -41,6 +39,15 @@ const Dropdown = ({
     setSelectedLabel(item.label)
     setIsOpen(false)
   }
+
+  useEffect(() => {
+    if (defaultLabel) {
+      setSelectedLabel(defaultLabel)
+      onSelect(defaultLabel)
+    } else {
+      setSelectedLabel('Select an option')
+    }
+  }, [defaultLabel, onSelect])
 
   return (
     <div

@@ -5,7 +5,8 @@ export async function saveTemplate(
   campaignId: number,
   subject: string,
   body: string,
-  replyTo: string | null
+  replyTo: string | null,
+  from: string
 ): Promise<{
   numRecipients: number
   updatedTemplate?: {
@@ -24,6 +25,7 @@ export async function saveTemplate(
       // 1. User saves the template with no replyTo email - undefined
       // 2. User deletes the replyTo email after previously setting it - empty string
       reply_to: replyTo || null,
+      from,
     })
     const {
       num_recipients: numRecipients,
@@ -56,8 +58,8 @@ export async function getPreviewMessage(
 ): Promise<EmailPreview> {
   try {
     const response = await axios.get(`/campaign/${campaignId}/email/preview`)
-    const { body, subject, reply_to: replyTo } = response.data?.preview
-    return { body, subject, replyTo }
+    const { body, subject, reply_to: replyTo, from } = response.data?.preview
+    return { body, subject, replyTo, from }
   } catch (e) {
     errorHandler(e, 'Unable to get preview message')
   }
