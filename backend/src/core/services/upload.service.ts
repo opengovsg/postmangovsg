@@ -29,7 +29,7 @@ const s3 = new S3({
  */
 const getUploadParameters = async (
   contentType: string,
-  md5: string
+  md5?: string
 ): Promise<{ presignedUrl: string; signedKey: string }> => {
   const s3Key = uuid()
 

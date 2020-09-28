@@ -13,8 +13,7 @@ const uploadStartHandler = async (
   res: Response
 ): Promise<Response> => {
   try {
-    const contentType = req.query['mime_type']
-    const md5 = req.query['md5']
+    const { mime_type: contentType, md5 } = req.query
     const { presignedUrl, signedKey } = await UploadService.getUploadParameters(
       contentType,
       md5
