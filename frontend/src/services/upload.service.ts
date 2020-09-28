@@ -85,12 +85,15 @@ export async function getPresignedUrl({
   try {
     const mimeType = await getMimeType(uploadedFile)
     const md5 = await getMd5(uploadedFile)
-    const response = await axios.get(`/campaign/${campaignId}/upload/start`, {
-      params: {
-        mime_type: mimeType,
-        md5,
-      },
-    })
+    const response = await axios.get(
+      `/campaign/${campaignId}/upload/start-v2`,
+      {
+        params: {
+          mime_type: mimeType,
+          md5,
+        },
+      }
+    )
     const {
       transaction_id: transactionId,
       presigned_url: presignedUrl,
@@ -113,7 +116,7 @@ export async function completeFileUpload({
   etag: string
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/upload/complete`, {
+    await axios.post(`/campaign/${campaignId}/upload/complete-v2`, {
       transaction_id: transactionId,
       filename,
       etag,
