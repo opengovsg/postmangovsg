@@ -43,11 +43,13 @@ async function deleteCredential(label: string): Promise<void> {
 }
 
 async function getCustomFromAddresses(): Promise<string[]> {
-  //try {
-  return ['donotreply@mail.postman.gov.sg', 'dummy@dummy.gov.sg']
-  // } catch (e) {
-  //   errorHandler(e, 'Error getting custom From Address')
-  // }
+  try {
+    const response = await axios.get('/settings/email/from')
+    const { from } = response.data
+    return from
+  } catch (e) {
+    errorHandler(e, 'Error getting from addresses')
+  }
 }
 
 function errorHandler(e: AxiosError, defaultMsg: string): never {

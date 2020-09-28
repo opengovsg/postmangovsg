@@ -65,12 +65,12 @@ export async function getPreviewMessage(
 
 export async function verifyFromAddress(
   recipient: string,
-  label: string
+  from: string
 ): Promise<void> {
   try {
     await axios.post(`/settings/email/from/verify`, {
       recipient,
-      label,
+      from,
     })
   } catch (e) {
     errorHandler(e, 'Error verifying From Address.')

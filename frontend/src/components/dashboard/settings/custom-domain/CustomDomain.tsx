@@ -36,7 +36,7 @@ const CustomDomain = () => {
   function renderFromAddresses() {
     return (
       <>
-        <p>You can now send emails from the following email addresses: </p>
+        <p>You can now send emails from the following email address: </p>
         <table className={styles.credTable}>
           <tbody>
             <tr>
