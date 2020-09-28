@@ -110,6 +110,23 @@ const verifyFromAddress = async (
 }
 
 /**
+ * Sends a test email from the specified from address
+ */
+const sendValidationMessage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { recipient, from } = req.body
+  try {
+    await CustomDomainService.sendValidationMessage(recipient, from)
+  } catch (err) {
+    return res.status(400).json({ message: err.message })
+  }
+  return next()
+}
+
+/**
  * Stores the verified email address that we can use to send out emails.
  */
 const storeFromAddress = async (
@@ -136,18 +153,18 @@ const getCustomFromAddress = async (
 ): Promise<Response | void> => {
   const email = req.session?.user?.email
   try {
-    const isVerified = await CustomDomainService.isEmailVerified(email)
-    if (isVerified) return res.status(200).json({ email })
+    const exists = await CustomDomainService.existsFromAddress(email)
+    if (exists) return res.status(200).json({ from: [email] })
   } catch (err) {
     return next(err)
   }
-  return res.status(200).json({ email: '' })
+  return res.status(200).json({ from: [] })
 }
 
 /**
  * Verifies that the 'from' address provided is valid
  */
-const isFromAddressVerified = async (
+const existsFromAddress = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -155,15 +172,27 @@ const isFromAddressVerified = async (
   const { from } = req.body
   if (from === '') return next()
 
-  const email = req.session?.user?.email
-
-  // from should be the same as email if it is not default
-  if (from !== email)
-    return res.status(400).json({ message: "Invalid 'from' email address." })
   try {
-    await CustomDomainService.isFromAddressVerified(from)
+    const exists = await CustomDomainService.existsFromAddress(from)
+    if (!exists) throw new Error('From Address has not been verified.')
   } catch (err) {
     return res.status(400).json({ message: err.message })
+  }
+  return next()
+}
+
+/**
+ * Checks that the from address is either the user's email or the default app email
+ */
+const isFromAddressAccepted = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { from } = req.body
+  const email = req.session?.user?.email
+  if (from !== email && from !== '') {
+    return res.status(400).json({ message: "Invalid 'from' email address." })
   }
   return next()
 }
@@ -176,5 +205,7 @@ export const EmailMiddleware = {
   verifyFromAddress,
   storeFromAddress,
   getCustomFromAddress,
-  isFromAddressVerified,
+  existsFromAddress,
+  isFromAddressAccepted,
+  sendValidationMessage,
 }

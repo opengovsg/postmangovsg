@@ -3,6 +3,7 @@ import AWS from 'aws-sdk'
 import config from '@core/config'
 
 import { EmailFromAddress } from '@email/models'
+import { MailService } from '@core/services'
 
 const [, region] = config.get('mailOptions.host').split('.')
 const ses = new AWS.SES({ region: region })
@@ -48,7 +49,7 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 
   // Check verification status & make sure dkim tokens are present
   if (!verificationStatus || verificationStatus !== 'Success' || !dkimTokens) {
-    throw new Error(`Email address not verified by AWS SES. email=${email}`)
+    throw new Error(`The From Address is not verified. email=${email}`)
   }
   // Make sure the dkim tokens are there.
   return dkimTokens
@@ -57,7 +58,7 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 /**
  * Checks if the email address is already in email_from_address
  */
-const isEmailVerified = async (email: string): Promise<boolean> => {
+const existsFromAddress = async (email: string): Promise<boolean> => {
   return !!(await EmailFromAddress.findOne({
     where: { email },
   }))
@@ -80,36 +81,35 @@ const storeFromAddress = async (email: string): Promise<void> => {
 }
 
 /**
- * 1. Checks if email is verified
- * 2. With AWS to ensure that we can use the email address to send
- * 3. Checks the domain's dns to ensure that the cnames are there
- */
-const isFromAddressVerified = async (email: string): Promise<void> => {
-  const isVerified = await isEmailVerified(email)
-  if (!isVerified) throw new Error("Invalid 'from' email address.")
-
-  const dkimTokens = await verifyEmailWithAWS(email)
-
-  await verifyCnames(dkimTokens, email)
-}
-
-/**
  * 1. Checks if email is already verified
  * 2. With AWS to ensure that we can use the email address to send
  * 3. Checks the domain's dns to ensure that the cnames are there
  */
 const verifyFromAddress = async (email: string): Promise<void> => {
-  const isVerified = await isEmailVerified(email)
-  if (isVerified) return
-
   const dkimTokens = await verifyEmailWithAWS(email)
 
   await verifyCnames(dkimTokens, email)
 }
 
+const sendValidationMessage = async (
+  recipient: string,
+  from: string
+): Promise<void> => {
+  MailService.mailClient.sendMail({
+    from: from || config.get('mailFrom'),
+    recipients: [recipient],
+    subject: `Your From Address has been validated on ${config.get(
+      'APP_NAME'
+    )}`,
+    body: `Congratulations, emails can be sent from this address: <b>${from}</b> on ${config.get(
+      'APP_NAME'
+    )}`,
+  })
+}
+
 export const CustomDomainService = {
-  isEmailVerified,
+  existsFromAddress,
   storeFromAddress,
-  isFromAddressVerified,
   verifyFromAddress,
+  sendValidationMessage,
 }

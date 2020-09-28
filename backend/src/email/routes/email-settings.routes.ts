@@ -8,13 +8,24 @@ const router = Router()
 
 // validators
 const verifyValidator = {
-  [Segments.BODY]: Joi.object({}),
+  [Segments.BODY]: Joi.object({
+    recipient: Joi.string()
+      .email()
+      .options({ convert: true })
+      .lowercase()
+      .optional(),
+    from: Joi.string()
+      .email()
+      .options({ convert: true })
+      .lowercase()
+      .default(''),
+  }),
 }
 
 /**
  * @swagger
  * path:
- *  /settings/email/verify:
+ *  /settings/email/from/verify:
  *    post:
  *      summary: Verifies the user's email address to see if it can be used to send out emails
  *      tags:
@@ -37,18 +48,20 @@ const verifyValidator = {
  *
  */
 router.post(
-  '/verify',
+  '/from/verify',
   celebrate(verifyValidator),
+  EmailMiddleware.isFromAddressAccepted,
   EmailMiddleware.verifyFromAddress,
+  EmailMiddleware.sendValidationMessage,
   EmailMiddleware.storeFromAddress
 )
 
 /**
  * @swagger
  * path:
- *  /settings/email/verify:
+ *  /settings/email/from:
  *    get:
- *      summary: Returns the user's email address if it is a valid custom 'from' email address.
+ *      summary: Returns an array of valid custom 'from' email addresses for the user
  *      tags:
  *        - Settings
  *
@@ -60,12 +73,14 @@ router.post(
  *              schema:
  *                type: object
  *                properties:
- *                  email:
- *                    type: string
+ *                  from:
+ *                    type: array
+ *                    items:
+ *                      type: string
  *        500:
  *          description: Internal Server Error
  *
  */
-router.get('/verify', EmailMiddleware.getCustomFromAddress)
+router.get('/from', EmailMiddleware.getCustomFromAddress)
 
 export default router

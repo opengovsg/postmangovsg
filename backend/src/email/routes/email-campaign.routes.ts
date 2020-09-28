@@ -32,7 +32,6 @@ const storeTemplateValidator = {
       .email()
       .options({ convert: true })
       .lowercase()
-      .allow('')
       .default(''),
   }),
 }
@@ -204,8 +203,10 @@ router.put(
   '/template',
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
+  EmailMiddleware.isFromAddressAccepted,
+  EmailMiddleware.existsFromAddress,
+  EmailMiddleware.verifyFromAddress,
   ProtectedMiddleware.verifyTemplate,
-  EmailMiddleware.isFromAddressVerified,
   EmailTemplateMiddleware.storeTemplate
 )
 

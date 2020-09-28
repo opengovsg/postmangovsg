@@ -38,7 +38,7 @@ const storeTemplate = async (
     const { campaignId } = req.params
     const { subject, body, reply_to: replyTo, from } = req.body
 
-    const fromAddress = from === '' ? config.get('mailFrom') : from
+    const fromAddress = from || config.get('mailFrom')
 
     const {
       check,
