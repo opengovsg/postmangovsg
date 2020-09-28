@@ -15,7 +15,13 @@ enum VerifyEmailStep {
   Failure,
 }
 
-const VerifyCustomDomainModal = ({ label }: { label: string }) => {
+const VerifyCustomDomainModal = ({
+  label,
+  onSuccess,
+}: {
+  label: string
+  onSuccess: Function
+}) => {
   const [step, setStep] = useState(VerifyEmailStep.Verify)
   const [errorMessage, setErrorMessage] = useState('')
   const modalContext = useContext(ModalContext)
@@ -25,6 +31,7 @@ const VerifyCustomDomainModal = ({ label }: { label: string }) => {
     try {
       await verifyFromAddress(recipient, label)
       setStep(VerifyEmailStep.Success)
+      onSuccess()
     } catch (e) {
       console.error(e)
       setErrorMessage(e.message)

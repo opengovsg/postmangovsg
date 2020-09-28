@@ -8,18 +8,23 @@ import { i18n } from 'locales'
 import { getCustomFromAddresses } from 'services/settings.service'
 
 import { ModalContext } from 'contexts/modal.context'
+import { AuthContext } from 'contexts/auth.context'
 import { PrimaryButton } from 'components/common'
 import styles from './CustomDomain.module.scss'
 import VerifyCustomDomainModal from '../verify-custom-domain-modal'
 
-const CustomDomain = () => {
+const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
   const [customFromAddresses, setCustomFromAddresses] = useState([] as string[])
   const modalContext = useContext(ModalContext)
+  const { email } = useContext(AuthContext)
   const title = 'From Address'
 
   async function onVerifyFromAddressClicked(label: string) {
     modalContext.setModalContent(
-      <VerifyCustomDomainModal label={label}></VerifyCustomDomainModal>
+      <VerifyCustomDomainModal
+        label={label}
+        onSuccess={onSuccess}
+      ></VerifyCustomDomainModal>
     )
   }
 
@@ -36,7 +41,7 @@ const CustomDomain = () => {
   function renderFromAddresses() {
     return (
       <>
-        <p>You can now send emails from the following email address: </p>
+        <p>You can now send emails from the following email addresses: </p>
         <table className={styles.credTable}>
           <tbody>
             <tr>
@@ -86,16 +91,22 @@ const CustomDomain = () => {
             <li>Wait for us to contact you within 5 working days</li>
           </ol>
         </p>
-        <div className={styles.requestButton}>
+        <div className={styles.actionButtons}>
           <OutboundLink
             eventLabel={i18n._(LINKS.customDomainRequestUrl)}
             to={i18n._(LINKS.customDomainRequestUrl)}
             target="_blank"
           >
-            <PrimaryButton className={styles.darkBlueButton}>
+            <PrimaryButton className={styles.request}>
               Fill in request form <i className="bx bx-right-arrow-alt"></i>
             </PrimaryButton>
           </OutboundLink>
+          <PrimaryButton
+            className={styles.status}
+            onClick={() => onVerifyFromAddressClicked(email)}
+          >
+            Check verification status <i className="bx bx-refresh"></i>
+          </PrimaryButton>
         </div>
       </>
     )
@@ -105,9 +116,9 @@ const CustomDomain = () => {
       <div>
         <h2>{title}</h2>
       </div>
-      {customFromAddresses.length === 0
-        ? renderRequestForm()
-        : renderFromAddresses()}
+      {customFromAddresses.length > 1
+        ? renderFromAddresses()
+        : renderRequestForm()}
     </div>
   )
 }

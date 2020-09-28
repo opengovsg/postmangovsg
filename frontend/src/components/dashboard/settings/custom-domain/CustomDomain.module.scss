@@ -2,43 +2,72 @@
 @import 'styles/_mixins';
 
 .customDomainContainer {
-    .requestButton {
-        margin-top:3.5rem;
-    }
-    .darkBlueButton {
-        @include button($dark-blue);
+  .actionButtons {
+    margin-top: 4rem;
+
+    @include mobile() {
+      @include flex-vertical;
     }
 
-    table.credTable {
-        width: 100%;
-      
-        .actionColumn {
-          display: flex;
-          justify-content: center;
-        }
-      
-        .icon {
-          @include icon;
-          margin-right: 2rem;
-      
-          &:last-child {
-            margin-right: 0rem;
-          }
-      
-          &.deleteButton {
-            cursor: pointer;
-            &:hover {
-              color: $red;
-            }
-          }
-      
-          &.verifyButton {
-            cursor: pointer;
-            &:hover {
-              color: $light-grey;
-            }
-          }
+    button {
+      @include flex-horizontal;
+      justify-content: space-between;
+      padding: 1.5rem 2.5rem;
+      font-size: 1rem;
+      margin-right: 1.5rem;
+
+      @include mobile() {
+        margin-bottom: 1rem;
+        &:last-child {
+          margin-right: 0;
         }
       }
-      
+    }
+
+    .status {
+      @include button(white);
+      border: 1px solid $indigo-blue;
+      color: $indigo-blue;
+      &:hover {
+        background: $light-blue;
+      }
+    }
+    .request {
+      @include button($dark-blue) @include mobile() {
+        width: 100%;
+      }
+    }
+  }
+
+  table.credTable {
+    width: 100%;
+
+    .actionColumn {
+      display: flex;
+      justify-content: center;
+    }
+
+    .icon {
+      @include icon;
+      margin-right: 2rem;
+
+      &:last-child {
+        margin-right: 0rem;
+      }
+
+      &.deleteButton {
+        cursor: pointer;
+        &:hover {
+          color: $red;
+        }
+      }
+
+      &.verifyButton {
+        cursor: pointer;
+        &:hover {
+          color: $light-grey;
+        }
+      }
+    }
+  }
 }
