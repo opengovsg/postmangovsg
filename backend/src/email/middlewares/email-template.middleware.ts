@@ -52,6 +52,14 @@ const storeTemplate = async (
       from: fromAddress,
     })
 
+    const template = {
+      body: updatedTemplate?.body,
+      subject: updatedTemplate?.subject,
+      params: updatedTemplate?.params,
+      reply_to: updatedTemplate?.replyTo,
+      from: updatedTemplate?.from,
+    }
+
     if (check?.reupload) {
       return res.json({
         message:
@@ -59,12 +67,7 @@ const storeTemplate = async (
         extra_keys: check.extraKeys,
         num_recipients: 0,
         valid: false,
-        template: {
-          body: updatedTemplate?.body,
-          subject: updatedTemplate?.subject,
-          params: updatedTemplate?.params,
-          reply_to: updatedTemplate?.replyTo,
-        },
+        template,
       })
     } else {
       const numRecipients = await StatsService.getNumRecipients(+campaignId)
@@ -72,12 +75,7 @@ const storeTemplate = async (
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
         num_recipients: numRecipients,
-        template: {
-          body: updatedTemplate?.body,
-          subject: updatedTemplate?.subject,
-          params: updatedTemplate?.params,
-          reply_to: updatedTemplate?.replyTo,
-        },
+        template,
       })
     }
   } catch (err) {

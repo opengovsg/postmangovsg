@@ -1,9 +1,11 @@
 import dns from 'dns'
 import AWS from 'aws-sdk'
+import escapeHTML from 'escape-html'
 import config from '@core/config'
 
 import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
+import logger from '@core/logger'
 
 const [, region] = config.get('mailOptions.host').split('.')
 const ses = new AWS.SES({ region: region })
@@ -26,7 +28,10 @@ const verifyCnames = async (
       }
     }
   } catch (e) {
-    throw new Error(`Verification of dkim records failed for ${email}`)
+    logger.error(`Verification of dkim records failed. email=${email}`)
+    throw new Error(
+      `This From Address cannot be used to send emails. Select another email address to send from.`
+    )
   }
 }
 
@@ -49,7 +54,10 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 
   // Check verification status & make sure dkim tokens are present
   if (!verificationStatus || verificationStatus !== 'Success' || !dkimTokens) {
-    throw new Error(`The From Address is not verified. email=${email}`)
+    logger.error(`Verification on AWS failed. email=${email}`)
+    throw new Error(
+      `This From Address cannot be used to send emails. Select another email address to send from.`
+    )
   }
   // Make sure the dkim tokens are there.
   return dkimTokens
@@ -95,15 +103,16 @@ const sendValidationMessage = async (
   recipient: string,
   from: string
 ): Promise<void> => {
+  const fromAddress = from || config.get('mailFrom')
+  const appName = config.get('APP_NAME')
   MailService.mailClient.sendMail({
-    from: from || config.get('mailFrom'),
+    from: fromAddress,
     recipients: [recipient],
-    subject: `Your From Address has been validated on ${config.get(
-      'APP_NAME'
-    )}`,
-    body: `Congratulations, emails can be sent from this address: <b>${from}</b> on ${config.get(
-      'APP_NAME'
-    )}`,
+    subject: `Your From Address has been validated on ${appName}`,
+    body: `<p>Congratulations, emails can be sent from this address: <b>${escapeHTML(
+      fromAddress
+    )}</b> on ${appName}</p>
+    <p>The ${appName} Support Team</p>`,
   })
 }
 

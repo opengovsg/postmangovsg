@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailService, CustomDomainService } from '@email/services'
+import config from '@core/config'
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
@@ -79,17 +80,56 @@ const previewFirstMessage = async (
 
     if (!message) return res.json({})
 
-    const { body, subject, replyTo } = message
+    const { body, subject, replyTo, from } = message
     return res.json({
       preview: {
         body,
         subject,
         reply_to: replyTo,
+        from,
       },
     })
   } catch (err) {
     return next(err)
   }
+}
+
+/**
+ * Checks that the from address is either the user's email or the default app email
+ */
+const isFromAddressAccepted = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { from } = req.body
+  const userEmail = req.session?.user?.email
+  const defaultEmail = config.get('mailFrom')
+  if (from !== userEmail && from !== defaultEmail) {
+    return res.status(400).json({ message: "Invalid 'from' email address." })
+  }
+  return next()
+}
+
+/**
+ * Verifies that the 'from' address provided is valid
+ */
+const existsFromAddress = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { from } = req.body
+  const defaultEmail = config.get('mailFrom')
+  if (from === defaultEmail) return next()
+
+  try {
+    const exists = await CustomDomainService.existsFromAddress(from)
+    if (!exists) throw new Error('From Address has not been verified.')
+  } catch (err) {
+    return res.status(400).json({ message: err.message })
+  }
+  return next()
 }
 
 /**
@@ -100,13 +140,55 @@ const verifyFromAddress = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const email = req.session?.user?.email
+  const { from } = req.body
+  const defaultEmail = config.get('mailFrom')
+  if (from === defaultEmail) return next()
+
   try {
-    await CustomDomainService.verifyFromAddress(email)
+    await CustomDomainService.verifyFromAddress(from)
   } catch (err) {
     return res.status(400).json({ message: err.message })
   }
   return next()
+}
+
+/**
+ * Stores the verified email address that we can use to send out emails.
+ */
+const storeFromAddress = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { from } = req.body
+  const defaultEmail = config.get('mailFrom')
+  if (from === defaultEmail) return res.sendStatus(200)
+
+  try {
+    await CustomDomainService.storeFromAddress(from)
+  } catch (err) {
+    return next(err)
+  }
+  return res.status(200).json({ email: from })
+}
+
+/**
+ * Verifies if the user's email address can be used as custom 'from' address
+ */
+const getCustomFromAddress = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const email = req.session?.user?.email
+  const result = [config.get('mailFrom')]
+  try {
+    const exists = await CustomDomainService.existsFromAddress(email)
+    if (exists) result.unshift(email)
+  } catch (err) {
+    return next(err)
+  }
+  return res.status(200).json({ from: result })
 }
 
 /**
@@ -122,77 +204,6 @@ const sendValidationMessage = async (
     await CustomDomainService.sendValidationMessage(recipient, from)
   } catch (err) {
     return res.status(400).json({ message: err.message })
-  }
-  return next()
-}
-
-/**
- * Stores the verified email address that we can use to send out emails.
- */
-const storeFromAddress = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const email = req.session?.user?.email
-  try {
-    await CustomDomainService.storeFromAddress(email)
-  } catch (err) {
-    return next(err)
-  }
-  return res.status(200).json({ email })
-}
-
-/**
- * Verifies if the user's email address can be used as custom 'from' address
- */
-const getCustomFromAddress = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const email = req.session?.user?.email
-  try {
-    const exists = await CustomDomainService.existsFromAddress(email)
-    if (exists) return res.status(200).json({ from: [email] })
-  } catch (err) {
-    return next(err)
-  }
-  return res.status(200).json({ from: [] })
-}
-
-/**
- * Verifies that the 'from' address provided is valid
- */
-const existsFromAddress = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { from } = req.body
-  if (from === '') return next()
-
-  try {
-    const exists = await CustomDomainService.existsFromAddress(from)
-    if (!exists) throw new Error('From Address has not been verified.')
-  } catch (err) {
-    return res.status(400).json({ message: err.message })
-  }
-  return next()
-}
-
-/**
- * Checks that the from address is either the user's email or the default app email
- */
-const isFromAddressAccepted = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { from } = req.body
-  const email = req.session?.user?.email
-  if (from !== email && from !== '') {
-    return res.status(400).json({ message: "Invalid 'from' email address." })
   }
   return next()
 }

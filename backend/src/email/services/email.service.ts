@@ -159,7 +159,7 @@ const getCampaignDetails = async (
   return await CampaignService.getCampaignDetails(campaignId, [
     {
       model: EmailTemplate,
-      attributes: ['body', 'subject', 'params', 'reply_to'],
+      attributes: ['body', 'subject', 'params', 'reply_to', 'from'],
     },
   ])
 }
