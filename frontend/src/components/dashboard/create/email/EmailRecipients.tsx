@@ -81,7 +81,6 @@ const EmailRecipients = ({
         setIsCsvProcessing(isCsvProcessing)
         setCsvInfo(newCsvInfo)
         if (preview) {
-          console.log('preview', preview)
           setPreview(preview as EmailPreview)
         }
         if (isCsvProcessing) {
