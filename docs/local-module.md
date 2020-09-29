@@ -8,10 +8,14 @@
 
 ## Background
 
+On Postman, we made use of a local node module to share code between `frontend`, `backend` & `worker`. It is similar to how one would install npm modules from npm registry or github, except that the path is pointed to a local folder.
+
+ie: `"postman-templating": "file:../modules/postman-templating"`.
+
 We wanted to find a way to share the templating logic because:
 
 1. Used in frontend, backend & worker.
-2. Better consistency, we just have change the code in one place rather than three.
+2. Better consistency, we just have to change the code in one place rather than three.
 
 There are several options that we considered:
 
