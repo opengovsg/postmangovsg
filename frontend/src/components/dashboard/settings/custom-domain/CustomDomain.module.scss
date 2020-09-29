@@ -2,6 +2,9 @@
 @import 'styles/_mixins';
 
 .customDomainContainer {
+  ol {
+    font-size: 0.9rem;
+  }
   .actionButtons {
     margin-top: 4rem;
 

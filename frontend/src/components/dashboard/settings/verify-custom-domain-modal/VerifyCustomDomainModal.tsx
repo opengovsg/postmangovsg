@@ -45,7 +45,7 @@ const VerifyCustomDomainModal = ({
         <img src={ConfirmImage} alt="" />
         <h2>Verify From Address</h2>
         <p>
-          To verify that emails can be sent from <b>{label}</b> please enter an
+          To verify that emails can be sent from <b>{label}</b>, please enter an
           available recipient to receive a validation message.
         </p>
         {

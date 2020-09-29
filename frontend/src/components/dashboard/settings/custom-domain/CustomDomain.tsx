@@ -73,8 +73,9 @@ const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
     return (
       <>
         <p>
-          You can now add your email address as the From Address. Recipients
-          will receive emails from this address, instead of the default{' '}
+          You can now add your email address <b>{email}</b> as the From Address.
+          Recipients will receive emails from this address, instead of the
+          default{' '}
           <b>
             <Trans id="defaultMailFrom" />
           </b>
@@ -86,11 +87,12 @@ const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
         </p>
         <p>
           <b>How to proceed</b>:
-          <ol>
-            <li>Fill in request form on FormSG</li>
-            <li>Wait for us to contact you within 5 working days</li>
-          </ol>
         </p>
+        <ol>
+          <li>Fill in request form on FormSG</li>
+          <li>Wait for us to contact you within 5 working days</li>
+        </ol>
+
         <div className={styles.actionButtons}>
           <OutboundLink
             eventLabel={i18n._(LINKS.customDomainRequestUrl)}
