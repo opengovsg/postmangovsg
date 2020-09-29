@@ -5,11 +5,9 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "rm -rf build && tsc",
-    "start": "node build/index && npm run restore-dump",
-    "start-server": "http-server -p $PORT",
+    "start": "node build/server",
+    "decrypt-dump": "node build/index",
     "dev": "npm run build && tsc-watch --onSuccess \"node ./build/index.js\"",
-    "restore-dump": "pg_restore --no-owner -h localhost -p 5432 -U postgres -d postmangovsg_dev postman.decrypted.dump",
-    "catch-error": "echo 'Data dump restoration failed!' && exit 1",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -25,12 +23,12 @@
   "dependencies": {
     "@google-cloud/kms": "^2.1.2",
     "@google-cloud/storage": "^5.3.0",
-    "@sentry/node": "^5.23.0",
+    "@slack/webhook": "^5.0.3",
+    "@types/express": "^4.17.8",
+    "body-parser": "^1.19.0",
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
-    "googleapis": "^60.0.1",
-    "http-server": "^0.12.3",
-    "source-map-support": "^0.5.19"
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "@types/convict": "^5.2.1",

@@ -11,9 +11,9 @@ RUN npm ci
 COPY src ./src
 COPY tsconfig.json ./
 COPY postmangovsg-service-account-key.json ./
-COPY run.sh ./
+COPY scripts ./scripts
 
 RUN npm run build
 RUN npm prune --production
 
-ENTRYPOINT ["sh", "run.sh"]
+ENTRYPOINT ["sh", "scripts/run.sh"]

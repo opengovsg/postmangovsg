@@ -1,0 +1,20 @@
+{
+  "name": "verify-backup-failure-notify-slack",
+  "version": "1.0.0",
+  "description": "Notify Slack on failure to verify database backup",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datagovsg/postmangovsg.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/datagovsg/postmangovsg/issues"
+  },
+  "dependencies": {
+    "@slack/webhook": "^5.0.3",
+    "dotenv": "^8.2.0"
+  }
+}
