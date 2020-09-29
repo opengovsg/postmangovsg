@@ -43,13 +43,13 @@ To test the changes you want to make to a module like `postman-templating`:
 
 ## Deploying or building in Travis
 
-If there are any new dependencies installed in the local node module, the root folder's `package-lock.json` needs to be updated. This can be done through deleting the `node_modules` and running `npm install`.
+If there are any new dependencies installed in the local node module, the parent folder's `package-lock.json` needs to be updated. This can be done through deleting the `node_modules` and running `npm install`.
 
 1. Install dependency in `postman-templating`.
 2. Run `npm start build` in `postman-templating`.
-3. Delete `node_modules` in the root folder. eg `backend` or `frontend`.
-4. Run `npm install` in the root folder
-5. Root folder's `package-lock.json` should be updated.
+3. Delete `node_modules` in the parent folder. eg `backend` or `frontend`.
+4. Run `npm install` in the parent folder
+5. Parent folder's `package-lock.json` should be updated.
 
 ## Build dependencies
 
