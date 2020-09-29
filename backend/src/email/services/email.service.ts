@@ -15,6 +15,7 @@ import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
+import config from '@core/config'
 
 /**
  * Gets a message's parameters
@@ -80,7 +81,7 @@ const getCampaignMessage = async (
   if (message) {
     const { body, subject, replyTo, from } = message
     const mailToSend: MailToSend = {
-      from,
+      from: from || config.get('mailFrom'),
       recipients: [recipient],
       body: UnsubscriberService.appendTestEmailUnsubLink(body),
       subject,
