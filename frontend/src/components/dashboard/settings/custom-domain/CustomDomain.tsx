@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import cx from 'classnames'
 import { Trans } from '@lingui/macro'
 import { LINKS } from 'config'
@@ -20,6 +21,7 @@ const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
   const title = 'From Address'
 
   async function onVerifyFromAddressClicked(label: string) {
+    sendUserEvent(GA_USER_EVENTS.ADD_FROM_ADDRESS)
     modalContext.setModalContent(
       <VerifyCustomDomainModal
         label={label}
