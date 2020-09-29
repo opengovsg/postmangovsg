@@ -43,7 +43,6 @@ const config = convict({
     doc: 'Path to service account key JSON used to authenticate gcloud',
     default: '',
     env: 'GOOGLE_APPLICATION_CREDENTIALS',
-    format: 'required-string',
   },
   gcloudProjectId: {
     doc: 'Project id of the current Google Cloud Project',

@@ -9,9 +9,8 @@ COPY ./package* ./
 RUN npm ci
 
 COPY src ./src
-COPY tsconfig.json ./
-COPY postmangovsg-service-account-key.json ./
 COPY scripts ./scripts
+COPY tsconfig.json ./
 
 RUN npm run build
 RUN npm prune --production
