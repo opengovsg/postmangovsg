@@ -95,6 +95,21 @@ const previewFirstMessage = async (
 }
 
 /**
+ * Parses display name and email address from a From Address like  `DISPLAY_NAME <email@email.com>`
+ */
+const getNameAndAddress = (
+  email: string
+): { name: string | null; fromAddress: string } => {
+  // Regex from https://github.com/validatorjs/validator.js/blob/685c3d2edef67d68c27193d28db84d08c0f4534a/src/lib/isEmail.js#L18
+  // eslint-disable-next-line no-control-regex
+  const address = email.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
+  if (address !== null) {
+    const [, name, fromAddress] = address
+    return { name, fromAddress }
+  }
+  return { name: null, fromAddress: email }
+}
+/**
  * Checks that the from address is either the user's email or the default app email
  */
 const isFromAddressAccepted = async (
@@ -105,9 +120,15 @@ const isFromAddressAccepted = async (
   const { from } = req.body
   const userEmail = req.session?.user?.email
   const defaultEmail = config.get('mailFrom')
-  if (from !== userEmail && from !== defaultEmail) {
+
+  // Since from addresses with display name are accepted, we need to extract just the email address
+  const { name, fromAddress } = getNameAndAddress(from)
+  if (fromAddress !== userEmail && fromAddress !== defaultEmail) {
     return res.status(400).json({ message: "Invalid 'from' email address." })
   }
+  res.locals.fromName = name
+  res.locals.from = fromAddress
+
   return next()
 }
 
@@ -124,8 +145,9 @@ const existsFromAddress = async (
   if (from === defaultEmail) return next()
 
   try {
-    const exists = await CustomDomainService.existsFromAddress(from)
-    if (!exists) throw new Error('From Address has not been verified.')
+    const { from: fromAddress } = res.locals
+    const result = await CustomDomainService.getCustomFromAddress(fromAddress)
+    if (!result) throw new Error('From Address has not been verified.')
   } catch (err) {
     return res.status(400).json({ message: err.message })
   }
@@ -145,7 +167,8 @@ const verifyFromAddress = async (
   if (from === defaultEmail) return next()
 
   try {
-    await CustomDomainService.verifyFromAddress(from)
+    const { from: fromAddress } = res.locals
+    await CustomDomainService.verifyFromAddress(fromAddress)
   } catch (err) {
     return res.status(400).json({ message: err.message })
   }
@@ -165,7 +188,8 @@ const storeFromAddress = async (
   if (from === defaultEmail) return res.sendStatus(200)
 
   try {
-    await CustomDomainService.storeFromAddress(from)
+    const { fromName, from: fromAddress } = res.locals
+    await CustomDomainService.storeFromAddress(fromName, fromAddress)
   } catch (err) {
     return next(err)
   }
@@ -181,13 +205,17 @@ const getCustomFromAddress = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const email = req.session?.user?.email
-  const result = [config.get('mailFrom')]
+  const defaultEmail = config.get('mailFrom')
+  const result = []
+
   try {
-    const exists = await CustomDomainService.existsFromAddress(email)
-    if (exists) result.unshift(email)
+    const exists = await CustomDomainService.getCustomFromAddress(email)
+    if (exists) result.push(email)
+    result.push(defaultEmail)
   } catch (err) {
     return next(err)
   }
+
   return res.status(200).json({ from: result })
 }
 

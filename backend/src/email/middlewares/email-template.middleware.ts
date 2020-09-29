@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import retry from 'async-retry'
 import logger from '@core/logger'
-import config from '@core/config'
 import {
   MissingTemplateKeysError,
   HydrationError,
@@ -38,8 +37,6 @@ const storeTemplate = async (
     const { campaignId } = req.params
     const { subject, body, reply_to: replyTo, from } = req.body
 
-    const fromAddress = from || config.get('mailFrom')
-
     const {
       check,
       valid,
@@ -49,7 +46,7 @@ const storeTemplate = async (
       subject,
       body,
       replyTo,
-      from: fromAddress,
+      from,
     })
 
     const template = {

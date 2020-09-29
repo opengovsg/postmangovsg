@@ -7,4 +7,9 @@ export class EmailFromAddress extends Model<EmailFromAddress> {
     primaryKey: true,
   })
   email!: string
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  name!: string
 }

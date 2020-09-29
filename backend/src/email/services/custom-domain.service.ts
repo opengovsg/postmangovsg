@@ -66,20 +66,28 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 /**
  * Checks if the email address is already in email_from_address
  */
-const existsFromAddress = async (email: string): Promise<boolean> => {
-  return !!(await EmailFromAddress.findOne({
+const getCustomFromAddress = async (email: string): Promise<string | null> => {
+  const result = await EmailFromAddress.findOne({
     where: { email },
-  }))
+  })
+  if (!result) {
+    return null
+  }
+  return result.name ? `${result.name} <${result.email}>` : result.email
 }
 
 /**
  * Stores the provided email address in verified_email table
  * @throws Error if it fails to store the email address.
  */
-const storeFromAddress = async (email: string): Promise<void> => {
+const storeFromAddress = async (
+  name: string | null,
+  email: string
+): Promise<void> => {
   try {
     await EmailFromAddress.findOrCreate({
       where: {
+        name,
         email,
       },
     })
@@ -117,7 +125,7 @@ const sendValidationMessage = async (
 }
 
 export const CustomDomainService = {
-  existsFromAddress,
+  getCustomFromAddress,
   storeFromAddress,
   verifyFromAddress,
   sendValidationMessage,
