@@ -12,7 +12,7 @@ import {
   EmailMiddleware,
 } from '@email/middlewares'
 import config from '@core/config'
-import validator from 'validator'
+import { fromAddressValidator } from '@core/utils/from-address'
 
 const router = Router({ mergeParams: true })
 
@@ -28,17 +28,7 @@ const storeTemplateValidator = {
       .lowercase()
       .allow(null)
       .required(),
-    from: Joi.string()
-      .trim()
-      .required()
-      .default(config.get('mailFrom'))
-      .custom((value: string, helpers) => {
-        if (validator.isEmail(value, { allow_display_name: true })) {
-          if (!/[<>]/.test(value)) return value.toLowerCase() // If the email does not contain display name, convert to lowercase
-          return value // return the email with display name as is
-        }
-        return helpers.error('string.email')
-      }),
+    from: fromAddressValidator,
   }),
 }
 

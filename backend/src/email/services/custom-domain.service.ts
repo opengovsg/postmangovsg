@@ -6,6 +6,7 @@ import config from '@core/config'
 import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
 import logger from '@core/logger'
+import { formatFromAddress } from '@core/utils/from-address'
 
 const [, region] = config.get('mailOptions.host').split('.')
 const ses = new AWS.SES({ region: region })
@@ -70,10 +71,10 @@ const getCustomFromAddress = async (email: string): Promise<string | null> => {
   const result = await EmailFromAddress.findOne({
     where: { email },
   })
-  if (!result) {
-    return null
+  if (result) {
+    return formatFromAddress(result.name, result.email)
   }
-  return result.name ? `${result.name} <${result.email}>` : result.email
+  return null
 }
 
 /**

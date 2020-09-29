@@ -1,10 +1,8 @@
 import { Router } from 'express'
-import validator from 'validator'
+import { celebrate, Joi, Segments } from 'celebrate'
 
 import { EmailMiddleware } from '@email/middlewares'
-
-import { celebrate, Joi, Segments } from 'celebrate'
-import config from '@core/config'
+import { fromAddressValidator } from '@core/utils/from-address'
 
 const router = Router()
 
@@ -16,17 +14,7 @@ const verifyValidator = {
       .options({ convert: true })
       .lowercase()
       .optional(),
-    from: Joi.string()
-      .trim()
-      .required()
-      .default(config.get('mailFrom'))
-      .custom((value: string, helpers) => {
-        if (validator.isEmail(value, { allow_display_name: true })) {
-          if (!/[<>]/.test(value)) return value.toLowerCase() // If the email does not contain display name, convert to lowercase
-          return value // return the email with display name as is
-        }
-        return helpers.error('string.email')
-      }),
+    from: fromAddressValidator,
   }),
 }
 

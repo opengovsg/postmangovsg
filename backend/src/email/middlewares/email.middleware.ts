@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailService, CustomDomainService } from '@email/services'
 import config from '@core/config'
+import { parseFromAddress } from '@core/utils/from-address'
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
@@ -95,21 +96,6 @@ const previewFirstMessage = async (
 }
 
 /**
- * Parses display name and email address from a From Address like  `DISPLAY_NAME <email@email.com>`
- */
-const getNameAndAddress = (
-  email: string
-): { name: string | null; fromAddress: string } => {
-  // Regex from https://github.com/validatorjs/validator.js/blob/685c3d2edef67d68c27193d28db84d08c0f4534a/src/lib/isEmail.js#L18
-  // eslint-disable-next-line no-control-regex
-  const address = email.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
-  if (address !== null) {
-    const [, name, fromAddress] = address
-    return { name: name.trim(), fromAddress }
-  }
-  return { name: null, fromAddress: email }
-}
-/**
  * Checks that the from address is either the user's email or the default app email
  */
 const isFromAddressAccepted = async (
@@ -122,7 +108,7 @@ const isFromAddressAccepted = async (
   const defaultEmail = config.get('mailFrom')
 
   // Since from addresses with display name are accepted, we need to extract just the email address
-  const { name, fromAddress } = getNameAndAddress(from)
+  const { name, fromAddress } = parseFromAddress(from)
 
   if (fromAddress !== userEmail && from !== defaultEmail) {
     return res.status(400).json({ message: "Invalid 'from' email address." })
