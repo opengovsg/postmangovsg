@@ -105,7 +105,7 @@ const getNameAndAddress = (
   const address = email.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
   if (address !== null) {
     const [, name, fromAddress] = address
-    return { name, fromAddress }
+    return { name: name.trim(), fromAddress }
   }
   return { name: null, fromAddress: email }
 }
@@ -123,7 +123,8 @@ const isFromAddressAccepted = async (
 
   // Since from addresses with display name are accepted, we need to extract just the email address
   const { name, fromAddress } = getNameAndAddress(from)
-  if (fromAddress !== userEmail && fromAddress !== defaultEmail) {
+
+  if (fromAddress !== userEmail && from !== defaultEmail) {
     return res.status(400).json({ message: "Invalid 'from' email address." })
   }
   res.locals.fromName = name
@@ -209,8 +210,8 @@ const getCustomFromAddress = async (
   const result = []
 
   try {
-    const exists = await CustomDomainService.getCustomFromAddress(email)
-    if (exists) result.push(email)
+    const fromAddress = await CustomDomainService.getCustomFromAddress(email)
+    if (fromAddress) result.push(fromAddress)
     result.push(defaultEmail)
   } catch (err) {
     return next(err)

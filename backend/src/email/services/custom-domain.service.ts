@@ -85,13 +85,12 @@ const storeFromAddress = async (
   email: string
 ): Promise<void> => {
   try {
-    await EmailFromAddress.findOrCreate({
-      where: {
-        name,
-        email,
-      },
+    await EmailFromAddress.upsert({
+      name,
+      email,
     })
-  } catch (e) {
+  } catch (err) {
+    logger.error(`${err.stack}`)
     throw new Error(`Failed to store verified email for ${email}`)
   }
 }

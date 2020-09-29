@@ -60,6 +60,7 @@ const upsertEmailTemplate = async ({
         body,
         subject,
         replyTo,
+        from,
       },
       {
         transaction,

@@ -11,5 +11,5 @@ export class EmailFromAddress extends Model<EmailFromAddress> {
     type: DataType.TEXT,
     allowNull: true,
   })
-  name!: string
+  name?: string
 }
