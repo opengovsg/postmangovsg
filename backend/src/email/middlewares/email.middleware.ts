@@ -132,9 +132,12 @@ const existsFromAddress = async (
   if (from === defaultEmail) return next()
 
   try {
-    const { from: fromAddress } = res.locals
-    const result = await CustomDomainService.getCustomFromAddress(fromAddress)
-    if (!result) throw new Error('From Address has not been verified.')
+    const { fromName, from: fromAddress } = res.locals
+    const exists = await CustomDomainService.existsFromAddress(
+      fromName,
+      fromAddress
+    )
+    if (!exists) throw new Error('From Address has not been verified.')
   } catch (err) {
     return res.status(400).json({ message: err.message })
   }
