@@ -25,10 +25,6 @@ interface Params {
   dumps: Array<DumpParams>
 }
 
-// const encryptedDumpFile = 'postman.dump'
-// const paramsFile = 'postman.json'
-// const decryptedDumpFile = 'postman.decrypted.dump'
-
 const encryptedDumpFile = 'postman.dump'
 const paramsFile = 'postman.json'
 const decryptedDumpFile = 'postman.decrypted.dump'
