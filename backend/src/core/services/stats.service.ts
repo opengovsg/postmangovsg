@@ -1,4 +1,4 @@
-import { fn, cast, Transaction, Op } from 'sequelize'
+import { fn, cast, Transaction, Op, literal } from 'sequelize'
 import { Statistic, JobQueue, Campaign } from '@core/models'
 import {
   CampaignStats,
@@ -169,9 +169,14 @@ const getCurrentStats = async (
     throw new Error('Unable to find campaign in campaigns table.')
   }
 
-  // check if there exists a job in progress using this credential
-  const runningJob = await JobQueue.findOne({
-    where: { workerId: { [Op.ne]: null } },
+  // get send time of all campaigns using this credential that are queued before this campaign
+  const data = await JobQueue.findAll({
+    where: {
+      updated_at: { [Op.lt]: job.updatedAt },
+      status: {
+        [Op.or]: [JobStatus.Enqueued, JobStatus.Ready, JobStatus.Sending],
+      },
+    },
     include: [
       {
         model: Campaign,
@@ -179,51 +184,18 @@ const getCurrentStats = async (
         include: [Statistic],
       },
     ],
+    attributes: [[literal('unsent / send_rate'), 'send_time']],
+    raw: true,
   })
 
-  // get all jobs in send queue using this credential
-  const sharedCredentialJobs = await JobQueue.findAll({
-    where: { status: JobStatus.Ready },
-    include: [
-      {
-        model: Campaign,
-        where: { credName: campaign.credName },
-        include: [Statistic],
-      },
-    ],
-  })
-
-  // get the job's posiiton in the queue
-  const position = await sharedCredentialJobs.findIndex(
-    (job) => job.campaignId === campaignId
-  )
-
-  // if there are no existing jobs running and this job is the first in the send queue
-  // no need to send queue status
-  if (!runningJob && position === 0) {
-    return stats
-  }
-
-  // get all jobs in queue before this job
-  const jobsInQueue = sharedCredentialJobs.slice(0, position)
-  if (runningJob) jobsInQueue.push(runningJob)
-
-  // use number of unsent messages from statistics and job send_rate
-  // to compute approx time needed to complete jobs
-  let totalTime = 0
-  jobsInQueue.map((job) => {
-    if (job.campaign.statistic?.unsent && job.sendRate) {
-      const timeCurrJob = job.campaign.statistic.unsent / job.sendRate
-      totalTime += timeCurrJob
-    }
-  })
+  const totalWaitTime = data.reduce(function (time, job) {
+    const { send_time: sendTime } = job as any
+    return time + sendTime
+  }, 0)
 
   return {
     ...stats,
-    queueStatus: {
-      position,
-      time: Math.ceil(totalTime),
-    },
+    queue_time: totalWaitTime,
   }
 }
 
