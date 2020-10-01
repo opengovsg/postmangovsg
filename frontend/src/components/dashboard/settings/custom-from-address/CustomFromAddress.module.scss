@@ -1,7 +1,7 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.customDomainContainer {
+.fromAddressContainer {
   ol {
     font-size: 0.9rem;
   }
@@ -56,13 +56,6 @@
 
       &:last-child {
         margin-right: 0rem;
-      }
-
-      &.deleteButton {
-        cursor: pointer;
-        &:hover {
-          color: $red;
-        }
       }
 
       &.verifyButton {

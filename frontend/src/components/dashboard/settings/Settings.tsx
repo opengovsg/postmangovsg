@@ -13,10 +13,10 @@ import { ChannelType, channelIcons } from 'classes'
 
 import ApiKey from './api-key'
 import Credentials from './credentials'
-import CustomDomain from './custom-domain'
+import CustomFromAddress from './custom-from-address'
 import AddCredentialModal from './add-credential-modal'
 import AddApiKeyModal from './add-api-key-modal'
-import AddCustomDomainModal from './add-custom-domain-modal'
+import AddCustomFromAddress from './add-custom-from-address-modal'
 
 import CredentialsImage from 'assets/img/credentials.svg'
 import styles from './Settings.module.scss'
@@ -47,7 +47,8 @@ const SETTINGS_LINKS = [
 const Settings = () => {
   const modalContext = useContext(ModalContext)
   const [hasApiKey, setHasApiKey] = useState(false)
-  const [hasCustomDomain, setHasCustomDomain] = useState(false)
+  const [hasCustomFromAddresses, setHasCustomFromAddresses] = useState(false)
+  const [customFromAddresses, setCustomFromAddresses] = useState([] as string[])
   const [creds, setCreds] = useState([] as UserCredential[])
 
   useEffect(() => {
@@ -70,9 +71,12 @@ const Settings = () => {
     )
   }
 
-  function onAddCustomDomainClicked() {
+  function onAddCustomFromAddressClicked() {
     modalContext.setModalContent(
-      <AddCustomDomainModal onSuccess={fetchCustomFromAddresses} />
+      <AddCustomFromAddress
+        customFromAddresses={customFromAddresses}
+        onSuccess={fetchCustomFromAddresses}
+      />
     )
   }
 
@@ -84,7 +88,8 @@ const Settings = () => {
 
   async function fetchCustomFromAddresses() {
     const customFromAddresses = await getCustomFromAddresses()
-    setHasCustomDomain(customFromAddresses.length > 1)
+    setCustomFromAddresses(customFromAddresses)
+    setHasCustomFromAddresses(customFromAddresses.length > 1)
   }
 
   function renderEmptySettings() {
@@ -110,7 +115,7 @@ const Settings = () => {
               Generate API key
               <i className={cx('bx', 'bx-key')}></i>
             </button>
-            <button onClick={onAddCustomDomainClicked}>
+            <button onClick={onAddCustomFromAddressClicked}>
               Add From Address
               <i className={cx('bx', 'bx-mail-send')}></i>
             </button>
@@ -130,7 +135,10 @@ const Settings = () => {
               <ApiKey hasApiKey={hasApiKey} />
             </Route>
             <Route exact path="/settings/email">
-              <CustomDomain onSuccess={fetchCustomFromAddresses} />
+              <CustomFromAddress
+                customFromAddresses={customFromAddresses}
+                onSuccess={fetchCustomFromAddresses}
+              />
             </Route>
             <Route exact path="/settings/sms">
               <Credentials
@@ -158,7 +166,7 @@ const Settings = () => {
   return (
     <>
       <TitleBar title="Settings"> </TitleBar>
-      {!hasApiKey && creds.length < 1 && !hasCustomDomain
+      {!hasApiKey && creds.length < 1 && !hasCustomFromAddresses
         ? renderEmptySettings()
         : renderSettings()}
     </>

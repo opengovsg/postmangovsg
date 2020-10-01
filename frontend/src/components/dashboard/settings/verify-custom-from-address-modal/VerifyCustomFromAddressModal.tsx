@@ -7,7 +7,7 @@ import { verifyFromAddress } from 'services/email.service'
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
-import styles from './VerifyCustomDomainModal.module.scss'
+import styles from './VerifyCustomFromAddressModal.module.scss'
 
 enum VerifyEmailStep {
   Verify,
@@ -15,7 +15,7 @@ enum VerifyEmailStep {
   Failure,
 }
 
-const VerifyCustomDomainModal = ({
+const VerifyCustomFromAddressModal = ({
   label,
   onSuccess,
 }: {
@@ -26,7 +26,7 @@ const VerifyCustomDomainModal = ({
   const [errorMessage, setErrorMessage] = useState('')
   const modalContext = useContext(ModalContext)
 
-  async function verifyCustomDomain(recipient: string) {
+  async function verifyOnClick(recipient: string) {
     setErrorMessage('')
     try {
       await verifyFromAddress(recipient, label)
@@ -48,11 +48,7 @@ const VerifyCustomDomainModal = ({
           To verify that emails can be sent from <b>{label}</b>, please enter an
           available recipient to receive a validation message.
         </p>
-        {
-          <EmailValidationInput
-            onClick={verifyCustomDomain}
-          ></EmailValidationInput>
-        }
+        {<EmailValidationInput onClick={verifyOnClick}></EmailValidationInput>}
       </>
     )
   }
@@ -92,4 +88,4 @@ const VerifyCustomDomainModal = ({
   return <div className={styles.container}>{renderVerifyCredStep()}</div>
 }
 
-export default VerifyCustomDomainModal
+export default VerifyCustomFromAddressModal

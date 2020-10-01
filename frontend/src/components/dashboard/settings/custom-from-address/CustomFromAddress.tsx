@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import cx from 'classnames'
@@ -6,16 +6,19 @@ import { Trans } from '@lingui/macro'
 import { LINKS } from 'config'
 import { i18n } from 'locales'
 
-import { getCustomFromAddresses } from 'services/settings.service'
-
 import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
 import { PrimaryButton } from 'components/common'
-import styles from './CustomDomain.module.scss'
-import VerifyCustomDomainModal from '../verify-custom-domain-modal'
+import styles from './CustomFromAddress.module.scss'
+import VerifyCustomFromAddressModal from '../verify-custom-from-address-modal'
 
-const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
-  const [customFromAddresses, setCustomFromAddresses] = useState([] as string[])
+const CustomFromAddress = ({
+  customFromAddresses,
+  onSuccess,
+}: {
+  customFromAddresses: string[]
+  onSuccess: Function
+}) => {
   const modalContext = useContext(ModalContext)
   const { email } = useContext(AuthContext)
   const title = 'From Address'
@@ -23,22 +26,12 @@ const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
   async function onVerifyFromAddressClicked(label: string) {
     sendUserEvent(GA_USER_EVENTS.ADD_FROM_ADDRESS)
     modalContext.setModalContent(
-      <VerifyCustomDomainModal
+      <VerifyCustomFromAddressModal
         label={label}
         onSuccess={onSuccess}
-      ></VerifyCustomDomainModal>
+      ></VerifyCustomFromAddressModal>
     )
   }
-
-  async function populateFromAddresses() {
-    const fromAddresses = await getCustomFromAddresses()
-    setCustomFromAddresses(fromAddresses)
-  }
-
-  // Get custom from addresses
-  useEffect(() => {
-    populateFromAddresses()
-  }, [])
 
   function renderFromAddresses() {
     return (
@@ -97,8 +90,8 @@ const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
 
         <div className={styles.actionButtons}>
           <OutboundLink
-            eventLabel={i18n._(LINKS.customDomainRequestUrl)}
-            to={i18n._(LINKS.customDomainRequestUrl)}
+            eventLabel={i18n._(LINKS.customFromAddressRequestUrl)}
+            to={i18n._(LINKS.customFromAddressRequestUrl)}
             target="_blank"
           >
             <PrimaryButton className={styles.request}>
@@ -116,7 +109,7 @@ const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
     )
   }
   return (
-    <div className={styles.customDomainContainer}>
+    <div className={styles.fromAddressContainer}>
       <div>
         <h2>{title}</h2>
       </div>
@@ -127,4 +120,4 @@ const CustomDomain = ({ onSuccess }: { onSuccess: Function }) => {
   )
 }
 
-export default CustomDomain
+export default CustomFromAddress

@@ -37,7 +37,7 @@ export const LINKS = {
   tncUrl: t('link.tncUrl')``,
   privacyUrl: t('link.privacyUrl')``,
   reportBugUrl: t('link.reportBugUrl')``,
-  customDomainRequestUrl: t('link.customDomainRequestUrl')``,
+  customFromAddressRequestUrl: t('link.customFromAddressRequestUrl')``,
 }
 export const DEFAULT_MAIL_FROM = t('defaultMailFrom')``
 //#endregion

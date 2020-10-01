@@ -88,9 +88,7 @@ const EmailTemplate = ({
   useEffect(() => {
     populateFromAddresses()
   }, [])
-  // useEffect(() => {
-  //   if (!from) setFrom(customFromAddresses[0].label)
-  // }, [customFromAddresses, from])
+
   // Set callback for finish later button
   useEffect(() => {
     finishLaterCallbackRef.current = () => {
