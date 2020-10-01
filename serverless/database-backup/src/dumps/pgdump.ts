@@ -12,9 +12,9 @@ const PGDUMP_COMMAND =
     ? 'pg_dump'
     : `${process.env.LAMBDA_TASK_ROOT}/bin/pg_dump`
 
-// We do not include owners and privileges to avoid dumping RDS specific roles (rds_iam, rds_superuser) as there might be incompatibilities
+// We do not include privileges to avoid dumping RDS specific roles (rds_iam, rds_superuser) as there might be incompatibilities
 // with the restoration target.
-const PGDUMP_ARGS = ['-Fc', '--no-owner', '--no-privileges']
+const PGDUMP_ARGS = ['-Fc', '--no-privileges']
 
 class PgDump extends EventEmitter {
   host: string
