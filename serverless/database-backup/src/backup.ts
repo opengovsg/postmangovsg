@@ -27,19 +27,10 @@ class Backup {
     this.secretsDump = secretsDump
   }
 
-  private getBackupFolderName(): string {
-    const today = new Date()
-    const yyyy = today.getFullYear()
-    const dd = today.getDate().toString().padStart(2, '0')
-    const mm = (today.getMonth() + 1).toString().padStart(2, '0')
-
-    return `${yyyy}-${mm}-${dd}`
-  }
-
   async upload(): Promise<string> {
     const { database } = this.pgDump
     const bucket = config.get('aws.backupBucket')
-    const folder = this.getBackupFolderName()
+    const folder = new Date().toISOString().substring(0, 10)
 
     const dumpParams = []
 
