@@ -12,6 +12,7 @@ import {
   NextButton,
   ErrorBlock,
   Dropdown,
+  CredLabelInput,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
@@ -27,11 +28,13 @@ const SMSCredentials = ({
   onNext: (changes: any, next?: boolean) => void
 }) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
+  const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
   )
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as TwilioCredentials | null)
+  const [label, setLabel] = useState('')
   const [showCredentialFields, setShowCredentialFields] = useState(
     !hasCredential
   )
@@ -46,6 +49,7 @@ const SMSCredentials = ({
   async function populateStoredCredentials() {
     try {
       const storedCredLabels = await getStoredCredentials()
+      setCredLabels(storedCredLabels)
       setStoredCredentials(
         storedCredLabels.map((c) => ({ label: c, value: c }))
       )
@@ -61,6 +65,7 @@ const SMSCredentials = ({
   function toggleInputMode() {
     setIsManual((m) => !m)
     setCreds(null)
+    setLabel('')
     setSelectedCredential('')
   }
 
@@ -100,6 +105,11 @@ const SMSCredentials = ({
         {isManual ? (
           <>
             <h2>Insert your Twilio credentials</h2>
+            <CredLabelInput
+              value={label}
+              onChange={setLabel}
+              labels={credLabels}
+            />
             <TwilioCredentialsInput
               onFilled={setCreds}
             ></TwilioCredentialsInput>
