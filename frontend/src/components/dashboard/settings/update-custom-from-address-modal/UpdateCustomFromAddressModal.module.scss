@@ -1,0 +1,18 @@
+.container {
+  padding: 1rem 0;
+
+  .centerAlign {
+    text-align: center;
+  }
+
+  .padTop {
+    margin-top: 1rem;
+  }
+
+  img {
+    height: 30vh;
+    max-height: 200px;
+    margin: 5vh auto;
+    display: block;
+  }
+}

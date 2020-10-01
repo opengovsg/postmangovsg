@@ -62,8 +62,8 @@ const VerifyCustomFromAddressModal = ({
           <div className={styles.centerAlign}>
             <img src={SuccessImage} alt="" />
             <h3>
-              We sent your message from {label}. Check your inbox to see if you
-              received it.
+              We sent your message from <b>{label}</b>. Check your inbox to see
+              if you received it.
             </h3>
             <PrimaryButton
               className={styles.padTop}

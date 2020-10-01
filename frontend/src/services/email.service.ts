@@ -78,6 +78,7 @@ export async function verifyFromAddress(
     errorHandler(e, 'Error verifying From Address.')
   }
 }
+
 function errorHandler(e: AxiosError, defaultMsg: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {

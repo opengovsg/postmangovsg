@@ -63,6 +63,10 @@
         &:hover {
           color: $light-grey;
         }
+        &.disabled {
+          color: $light-grey;
+          cursor: not-allowed;
+        }
       }
     }
   }

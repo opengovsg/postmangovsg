@@ -11,6 +11,7 @@ import { AuthContext } from 'contexts/auth.context'
 import { PrimaryButton } from 'components/common'
 import styles from './CustomFromAddress.module.scss'
 import VerifyCustomFromAddressModal from '../verify-custom-from-address-modal'
+import UpdateCustomFromAddressModal from '../update-custom-from-address-modal'
 
 const CustomFromAddress = ({
   customFromAddresses,
@@ -33,7 +34,20 @@ const CustomFromAddress = ({
     )
   }
 
+  async function onUpdateDisplayNameClicked(label: string) {
+    sendUserEvent(GA_USER_EVENTS.UPDATE_FROM_ADDRESS)
+    modalContext.setModalContent(
+      <UpdateCustomFromAddressModal
+        label={label}
+        onSuccess={onSuccess}
+      ></UpdateCustomFromAddressModal>
+    )
+  }
+
   function renderFromAddresses() {
+    function isLastUpdateButton(i: number) {
+      return i >= customFromAddresses.length - 1
+    }
     return (
       <>
         <p>You can now send emails from the following email addresses: </p>
@@ -43,7 +57,7 @@ const CustomFromAddress = ({
               <th className="lg">Label</th>
               <th></th>
             </tr>
-            {customFromAddresses.map((label: string) => (
+            {customFromAddresses.map((label: string, idx: number) => (
               <tr key={label}>
                 <td className="lg">{label}</td>
                 <td className={cx('sm', styles.actionColumn)}>
@@ -55,6 +69,20 @@ const CustomFromAddress = ({
                       styles.verifyButton
                     )}
                     onClick={() => onVerifyFromAddressClicked(label)}
+                  ></i>
+
+                  <i
+                    className={cx(
+                      'bx',
+                      'bx-pencil',
+                      styles.icon,
+                      styles.verifyButton,
+                      isLastUpdateButton(idx) && styles.disabled
+                    )}
+                    onClick={() =>
+                      !isLastUpdateButton(idx) &&
+                      onUpdateDisplayNameClicked(label)
+                    }
                   ></i>
                 </td>
               </tr>
