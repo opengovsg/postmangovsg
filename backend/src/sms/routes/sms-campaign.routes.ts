@@ -44,14 +44,18 @@ const storeCredentialsValidator = {
   }),
 }
 
-const newCredentialsValidator = {
+const storeCredentialsValidatorV2 = {
   [Segments.BODY]: Joi.object({
     twilio_account_sid: Joi.string().trim().required(),
     twilio_api_secret: Joi.string().trim().required(),
     twilio_api_key: Joi.string().trim().required(),
     twilio_messaging_service_sid: Joi.string().trim().required(),
     recipient: Joi.string().trim().required(),
-    label: Joi.string().trim().optional(),
+    label: Joi.string()
+      .min(1)
+      .max(50)
+      .pattern(/^[a-z0-9-]+$/)
+      .optional(),
   }),
 }
 
@@ -424,6 +428,12 @@ router.post(
  *                  properties:
  *                    recipient:
  *                      type: string
+ *                    label:
+ *                      type: string
+ *                      pattern: '/^[a-z0-9-]+$/'
+ *                      minLength: 1
+ *                      maxLength: 50
+ *                      description: should only consist of lowercase alphanumeric characters and dashes
  *
  *      responses:
  *        200:
@@ -443,7 +453,7 @@ router.post(
  */
 router.post(
   '/new-credentials/v2',
-  celebrate(newCredentialsValidator),
+  celebrate(storeCredentialsValidatorV2),
   CampaignMiddleware.canEditCampaign,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,

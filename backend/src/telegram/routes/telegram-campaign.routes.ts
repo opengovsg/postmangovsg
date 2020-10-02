@@ -4,6 +4,7 @@ import {
   CampaignMiddleware,
   UploadMiddleware,
   JobMiddleware,
+  SettingsMiddleware,
 } from '@core/middlewares'
 import {
   TelegramMiddleware,
@@ -32,9 +33,21 @@ const uploadCompleteValidator = {
     filename: Joi.string().required(),
   }),
 }
+
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
     telegram_bot_token: Joi.string().trim().required(),
+  }),
+}
+
+const storeCredentialsValidatorV2 = {
+  [Segments.BODY]: Joi.object({
+    telegram_bot_token: Joi.string().trim().required(),
+    label: Joi.string()
+      .min(1)
+      .max(50)
+      .pattern(/^[a-z0-9-]+$/)
+      .optional(),
   }),
 }
 
@@ -432,6 +445,61 @@ router.post(
   CampaignMiddleware.canEditCampaign,
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
+  TelegramMiddleware.setCampaignCredential
+)
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/telegram/new-credentials/v2:
+ *    post:
+ *      tags:
+ *        - Telegram
+ *      summary: Validate Telegram bot token and assign to campaign, if label is provided store new telegram credentials for user
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                telegram_bot_token:
+ *                  type: string
+ *                label:
+ *                      type: string
+ *                      pattern: '/^[a-z0-9-]+$/'
+ *                      minLength: 1
+ *                      maxLength: 50
+ *                      description: should only consist of lowercase alphanumeric characters and dashes
+ *
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *        "400" :
+ *           description: Bad Request
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user or job in progress
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/new-credentials/v2',
+  celebrate(storeCredentialsValidatorV2),
+  CampaignMiddleware.canEditCampaign,
+  TelegramMiddleware.getCredentialsFromBody,
+  TelegramMiddleware.validateAndStoreCredentials,
+  SettingsMiddleware.checkAndStoreLabelIfExists,
   TelegramMiddleware.setCampaignCredential
 )
 
