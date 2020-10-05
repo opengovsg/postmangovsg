@@ -423,6 +423,26 @@ const config = convict({
       format: 'required-string',
     },
   },
+  callbackJitterOptions: {
+    windowMs: {
+      doc: 'Window',
+      default: 60000,
+      env: 'CALLBACK_WINDOW_MS',
+      format: 'int',
+    },
+    maxJitterMs: {
+      doc: 'max jitter',
+      default: 10000,
+      env: 'CALLBACK_MAX_JITTER_MS',
+      format: 'int',
+    },
+    delayAfter: {
+      doc: 'Delay after this number of requests within the window',
+      default: 120,
+      env: 'CALLBACK_DELAY_AFTER',
+      format: 'int',
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name

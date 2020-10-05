@@ -1,4 +1,10 @@
-import { Router, Request, Response, NextFunction } from 'express'
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  RequestHandler,
+} from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
@@ -28,6 +34,7 @@ import {
   telegramSettingsRoutes,
   telegramCallbackRoutes,
 } from '@telegram/routes'
+import config from '@core/config'
 
 const CHANNEL_ROUTES = Object.values(ChannelType).map(
   (route) => `/${route.toLowerCase()}`
@@ -147,9 +154,39 @@ router.use(
   settingsRoutes
 )
 
-router.use('/callback/email', emailCallbackRoutes)
+const createJitter = ({
+  windowMs,
+  maxJitterMs,
+  delayAfter,
+}: {
+  windowMs: number
+  maxJitterMs: number
+  delayAfter: number
+}): RequestHandler => {
+  const status = { inWindow: 0 }
+  let currentTime = Date.now()
+  const jitter = (_req: Request, _res: Response, next: NextFunction): void => {
+    status.inWindow += 1
+    const now = Date.now()
+    if (now - currentTime > windowMs) {
+      currentTime = now
+      status.inWindow = Math.max(status.inWindow - delayAfter, 0)
+    }
+    if (status.inWindow > delayAfter) {
+      setTimeout(() => {
+        return next()
+      }, Math.ceil(Math.random() * maxJitterMs))
+    } else {
+      return next()
+    }
+  }
+  return jitter
+}
+const jitter = createJitter(config.get('callbackJitterOptions'))
 
-router.use('/callback/sms', smsCallbackRoutes)
+router.use('/callback/email', jitter, emailCallbackRoutes)
+
+router.use('/callback/sms', jitter, smsCallbackRoutes)
 
 router.use('/callback/telegram', telegramCallbackRoutes)
 export default router
