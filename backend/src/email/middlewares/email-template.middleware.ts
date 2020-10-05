@@ -154,6 +154,13 @@ const uploadCompleteHandler = async (
       logger.error(
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
+
+      // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
+      if (err.code === 'PreconditionFailed') {
+        err.message =
+          'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
+      }
+
       // Store error to return on poll
       UploadService.storeS3Error(+campaignId, err.message)
     }
@@ -301,6 +308,13 @@ const uploadProtectedCompleteHandler = async (
       logger.error(
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
+
+      // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
+      if (err.code === 'PreconditionFailed') {
+        err.message =
+          'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
+      }
+
       // Store error to return on poll
       UploadService.storeS3Error(+campaignId, err.message)
     }

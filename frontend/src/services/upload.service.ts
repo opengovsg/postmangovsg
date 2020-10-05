@@ -71,7 +71,10 @@ export async function uploadFileWithPresignedUrl(
     })
     return response.headers.etag
   } catch (e) {
-    errorHandler(e)
+    errorHandler(
+      e,
+      'Please try again. Error uploading file. Please contact the Postman team if this problem persists.'
+    )
   }
 }
 
