@@ -33,6 +33,8 @@ const verifyValidator = {
  *            schema:
  *              type: object
  *              properties:
+ *                recipient:
+ *                  type: string
  *                from:
  *                  type: string
  *

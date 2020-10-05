@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { EmailService, CustomDomainService } from '@email/services'
 import config from '@core/config'
 import { parseFromAddress } from '@core/utils/from-address'
+import { AuthService } from '@core/services'
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
@@ -104,7 +105,9 @@ const isFromAddressAccepted = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { from } = req.body
-  const userEmail = req.session?.user?.email
+  const userEmail =
+    req.session?.user?.email ||
+    (await AuthService.findUser(req.session?.user?.id))?.email
   const defaultEmail = config.get('mailFrom')
 
   // Since from addresses with display name are accepted, we need to extract just the email address
@@ -194,7 +197,9 @@ const getCustomFromAddress = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const email = req.session?.user?.email
+  const email =
+    req.session?.user?.email ||
+    (await AuthService.findUser(req.session?.user?.id))?.email
   const defaultEmail = config.get('mailFrom')
   const result = []
 
