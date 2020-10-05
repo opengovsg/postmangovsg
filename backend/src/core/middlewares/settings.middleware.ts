@@ -83,11 +83,11 @@ const checkAndStoreLabelIfExists = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  if (!req.body.label) {
+  const { label } = req.body
+  if (!label) {
     return next()
   }
   const userId = req.session?.user?.id
-  const { label } = req.body
   const { credentialName, channelType } = res.locals
 
   try {
