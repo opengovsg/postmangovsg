@@ -1,16 +1,9 @@
-import {
-  Router,
-  Request,
-  Response,
-  NextFunction,
-  RequestHandler,
-} from 'express'
+import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
   UploadMiddleware,
   JobMiddleware,
-  SettingsMiddleware,
 } from '@core/middlewares'
 import {
   TelegramMiddleware,
@@ -28,24 +21,37 @@ const storeTemplateValidator = {
 }
 
 const uploadStartValidator = {
-  [Segments.QUERY]: Joi.object({
-    mime_type: Joi.string().required(),
-  }),
+  v1: {
+    [Segments.QUERY]: Joi.object({
+      mime_type: Joi.string().required(),
+    }),
+  },
+  v2: {
+    [Segments.QUERY]: Joi.object({
+      mime_type: Joi.string().required(),
+      md5: Joi.string().required(),
+    }),
+  },
 }
 
 const uploadCompleteValidator = {
-  [Segments.BODY]: Joi.object({
-    transaction_id: Joi.string().required(),
-    filename: Joi.string().required(),
-  }),
+  v1: {
+    [Segments.BODY]: Joi.object({
+      transaction_id: Joi.string().required(),
+      filename: Joi.string().required(),
+    }),
+  },
+  v2: {
+    [Segments.BODY]: Joi.object({
+      transaction_id: Joi.string().required(),
+      filename: Joi.string().required(),
+      etag: Joi.string().required(),
+    }),
+  },
 }
+
 const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
-    label: Joi.string()
-      .min(1)
-      .max(50)
-      .pattern(/^[a-z0-9-]+$/)
-      .optional(),
     telegram_bot_token: Joi.string().trim().required(),
   }),
 }
@@ -66,23 +72,6 @@ const sendCampaignValidator = {
   [Segments.BODY]: Joi.object({
     rate: Joi.number().integer().positive().max(30).default(30),
   }),
-}
-
-/**
- * Conditionally applies a middleware based on return value of a condition function
- * @param condition Function to evaluate if the middleware should be applied
- * @param middlware Middleware to be applied conditionally
- */
-const applyIf = (
-  condition: (req: Request) => boolean,
-  middleware: RequestHandler
-): RequestHandler => {
-  return (req: Request, res: Response, next: NextFunction): any => {
-    if (condition(req)) {
-      return middleware(req, res, next)
-    }
-    next()
-  }
 }
 
 // Routes
@@ -240,7 +229,59 @@ router.put(
  */
 router.get(
   '/upload/start',
-  celebrate(uploadStartValidator),
+  celebrate(uploadStartValidator.v1),
+  CampaignMiddleware.canEditCampaign,
+  UploadMiddleware.uploadStartHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/telegram/upload/start-v2:
+ *     get:
+ *       description: "Get a presigned URL for upload with Content-MD5 header"
+ *       tags:
+ *         - Telegram
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: mime_type
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: md5
+ *           required: true
+ *           in: query
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   presigned_url:
+ *                     type: string
+ *                   transaction_id:
+ *                     type: string
+ *         "400":
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden, campaign not owned by user or job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.get(
+  '/upload/start-v2',
+  celebrate(uploadStartValidator.v2),
   CampaignMiddleware.canEditCampaign,
   UploadMiddleware.uploadStartHandler
 )
@@ -297,7 +338,66 @@ router.get(
  */
 router.post(
   '/upload/complete',
-  celebrate(uploadCompleteValidator),
+  celebrate(uploadCompleteValidator.v1),
+  CampaignMiddleware.canEditCampaign,
+  TelegramTemplateMiddleware.uploadCompleteHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/telegram/upload/complete-v2:
+ *     post:
+ *       description: "Complete upload session with ETag verification"
+ *       tags:
+ *         - Telegram
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - transaction_id
+ *                 - filename
+ *               properties:
+ *                 transaction_id:
+ *                   type: string
+ *                 filename:
+ *                   type: string
+ *                 etag:
+ *                   type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 properties:
+ *                   num_recipients:
+ *                     type: number
+ *                   preview:
+ *                     type: object
+ *                     properties:
+ *                       body:
+ *                         type: string
+ *
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *          description: Forbidden, campaign not owned by user or job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/upload/complete-v2',
+  celebrate(uploadCompleteValidator.v2),
   CampaignMiddleware.canEditCampaign,
   TelegramTemplateMiddleware.uploadCompleteHandler
 )
@@ -430,6 +530,7 @@ router.get('/preview', TelegramMiddleware.previewFirstMessage)
  *          schema:
  *            type: string
  *      requestBody:
+ *        required: true
  *        content:
  *          application/json:
  *            schema:
@@ -437,13 +538,6 @@ router.get('/preview', TelegramMiddleware.previewFirstMessage)
  *              properties:
  *                telegram_bot_token:
  *                  type: string
- *                  required: true
- *                label:
- *                  type: string
- *                  pattern: '/^[a-z0-9-]+$/'
- *                  minLength: 1
- *                  maxLength: 50
- *                  description: should only consist of lowercase alphanumeric characters and dashes
  *
  *      responses:
  *        200:
@@ -461,23 +555,12 @@ router.get('/preview', TelegramMiddleware.previewFirstMessage)
  *        "500":
  *           description: Internal Server Error
  */
-
-// In order to preserve backward compatbility, we conditionally apply middlewares for storage
-// of user credentials based on the presence of label in the request body.
 router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
-  applyIf(
-    (req: Request) => req.body?.label,
-    SettingsMiddleware.checkUserCredentialLabel
-  ),
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
-  applyIf(
-    (req: Request) => req.body?.label,
-    SettingsMiddleware.storeUserCredential
-  ),
   TelegramMiddleware.setCampaignCredential
 )
 

@@ -21,6 +21,7 @@
   - [Amplify rewrite rule](#amplify-rewrite-rule)
   - [Elastic Container Service](#elastic-container-service)
 - [Architecture](#architecture)
+- [Local node module](#local-node-module)
 - [How messages are sent](#how-messages-are-sent)
 - [Forking and configuring this product](#forking-and-configuring-this-product)
   - [Backend](#backend)
@@ -239,6 +240,10 @@ Create a cluster with four services. These names are currently hardcoded for dep
 ## Architecture
 
 See [architecture](docs/architecture/index.md) for details
+
+## Local node module
+
+See [local-module.md](docs/local-module.md) for details
 
 ## How messages are sent
 

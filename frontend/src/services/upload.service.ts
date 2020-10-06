@@ -1,6 +1,9 @@
 import axios, { AxiosError } from 'axios'
 import Papa from 'papaparse'
+import SparkMD5 from 'spark-md5'
 import { EmailPreview, SMSPreview } from 'classes'
+
+const MD5_CHUNK_SIZE = 5000000 // 5MB
 
 interface PresignedUrlResponse {
   presignedUrl: string
@@ -16,19 +19,62 @@ export interface CsvStatusResponse {
   preview?: EmailPreview | SMSPreview
 }
 
+async function getMd5(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const buffer = new SparkMD5.ArrayBuffer()
+    const reader = new FileReader()
+
+    const totalChunks = Math.ceil(blob.size / MD5_CHUNK_SIZE)
+    let currentChunk = 0
+
+    const loadChunk = () => {
+      const start = currentChunk * MD5_CHUNK_SIZE
+      const end =
+        start + MD5_CHUNK_SIZE >= blob.size ? blob.size : start + MD5_CHUNK_SIZE
+      reader.readAsArrayBuffer(blob.slice(start, end))
+    }
+
+    reader.onerror = () => reject(reader.error)
+
+    reader.onload = (event) => {
+      const data = event.target?.result
+      if (data) {
+        buffer.append(data as ArrayBuffer)
+        currentChunk++
+
+        if (currentChunk < totalChunks) {
+          return loadChunk()
+        }
+
+        const md5 = Buffer.from(buffer.end(), 'hex').toString('base64')
+        resolve(md5)
+      }
+    }
+
+    loadChunk()
+  })
+}
+
 export async function uploadFileWithPresignedUrl(
   uploadedFile: File,
   presignedUrl: string
-): Promise<void> {
+): Promise<string> {
   try {
-    await axios.put(presignedUrl, uploadedFile, {
-      headers: { 'Content-Type': uploadedFile.type },
+    const md5 = await getMd5(uploadedFile)
+    const response = await axios.put(presignedUrl, uploadedFile, {
+      headers: {
+        'Content-Type': uploadedFile.type,
+        'Content-MD5': md5,
+      },
       withCredentials: false,
       timeout: 0,
     })
-    return
+    return response.headers.etag
   } catch (e) {
-    errorHandler(e)
+    errorHandler(
+      e,
+      'Please try again. Error uploading file. Please contact the Postman team if this problem persists.'
+    )
   }
 }
 
@@ -41,11 +87,16 @@ export async function getPresignedUrl({
 }): Promise<PresignedUrlResponse> {
   try {
     const mimeType = await getMimeType(uploadedFile)
-    const response = await axios.get(`/campaign/${campaignId}/upload/start`, {
-      params: {
-        mime_type: mimeType,
-      },
-    })
+    const md5 = await getMd5(uploadedFile)
+    const response = await axios.get(
+      `/campaign/${campaignId}/upload/start-v2`,
+      {
+        params: {
+          mime_type: mimeType,
+          md5,
+        },
+      }
+    )
     const {
       transaction_id: transactionId,
       presigned_url: presignedUrl,
@@ -60,15 +111,18 @@ export async function completeFileUpload({
   campaignId,
   transactionId,
   filename,
+  etag,
 }: {
   campaignId: number
   transactionId: string
   filename: string
+  etag: string
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/upload/complete`, {
+    await axios.post(`/campaign/${campaignId}/upload/complete-v2`, {
       transaction_id: transactionId,
       filename,
+      etag,
     })
     return
   } catch (e) {
@@ -157,11 +211,15 @@ export async function uploadFileToS3(
     uploadedFile: file,
   })
   // Upload to presigned url
-  await uploadFileWithPresignedUrl(file, startUploadResponse.presignedUrl)
+  const etag = await uploadFileWithPresignedUrl(
+    file,
+    startUploadResponse.presignedUrl
+  )
   await completeFileUpload({
     campaignId: +campaignId,
     transactionId: startUploadResponse.transactionId,
     filename: file.name,
+    etag,
   })
   return file.name
 }
@@ -221,18 +279,16 @@ export async function uploadPartWithPresignedUrl({
 }): Promise<string> {
   try {
     const contentType = 'text/csv'
-    const response = await axios.put(
-      presignedUrl,
-      new Blob(data, { type: contentType }),
-      {
-        withCredentials: false,
-        timeout: 0,
-        headers: {
-          // Localstack requires Content-Type to be stated explicitly in order to parse the request body properly.
-          'Content-Type': contentType,
-        },
-      }
-    )
+    const blob = new Blob(data, { type: contentType })
+
+    const response = await axios.put(presignedUrl, blob, {
+      withCredentials: false,
+      timeout: 0,
+      headers: {
+        // Localstack requires Content-Type to be stated explicitly in order to parse the request body properly.
+        'Content-Type': contentType,
+      },
+    })
     return response.headers.etag
   } catch (e) {
     errorHandler(e, 'Error uploading part with presigned url')
