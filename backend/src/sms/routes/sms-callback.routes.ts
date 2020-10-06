@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { SmsCallbackMiddleware } from '@sms/middlewares'
+import { jitter } from '@core/utils/request'
 const router = Router()
 
 /**
@@ -28,6 +29,7 @@ const router = Router()
 router.post(
   '/:campaignId(\\d+)/:messageId(\\d+)',
   SmsCallbackMiddleware.isAuthenticated,
+  jitter,
   SmsCallbackMiddleware.parseEvent
 )
 

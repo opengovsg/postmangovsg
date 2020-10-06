@@ -117,7 +117,8 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       _next: express.NextFunction
     ) => {
       logger.error(`${JSON.stringify(err.stack, null, 4)}`)
-      return res.sendStatus(500)
+      if (!res.headersSent) return res.sendStatus(500)
+      return
     }
   )
 

@@ -25,7 +25,7 @@ const parseEvent = async (
 ): Promise<Response | void> => {
   try {
     await EmailCallbackService.parseEvent(req)
-    return res.sendStatus(200)
+    if (!res.headersSent) return res.sendStatus(200)
   } catch (err) {
     next(err)
   }

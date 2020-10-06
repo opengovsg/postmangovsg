@@ -29,7 +29,7 @@ const parseEvent = async (
 ): Promise<Response | void> => {
   try {
     await SmsCallbackService.parseEvent(req)
-    return res.sendStatus(200)
+    if (!res.headersSent) return res.sendStatus(200)
   } catch (err) {
     return next(err)
   }
