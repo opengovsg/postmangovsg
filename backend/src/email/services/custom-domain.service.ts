@@ -31,7 +31,7 @@ const verifyCnames = async (
   } catch (e) {
     logger.error(`Verification of dkim records failed. email=${email}`)
     throw new Error(
-      `This From Address cannot be used to send emails. Select another email address to send from.`
+      `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
     )
   }
 }
@@ -57,7 +57,7 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
   if (!verificationStatus || verificationStatus !== 'Success' || !dkimTokens) {
     logger.error(`Verification on AWS failed. email=${email}`)
     throw new Error(
-      `This From Address cannot be used to send emails. Select another email address to send from.`
+      `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
     )
   }
   // Make sure the dkim tokens are there.
