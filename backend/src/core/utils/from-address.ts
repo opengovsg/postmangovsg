@@ -32,7 +32,6 @@ export const formatFromAddress = (
 
 export const fromAddressValidator = Joi.string()
   .trim()
-  .required()
   .default(config.get('mailFrom'))
   .custom((value: string, helpers: any) => {
     if (validator.isEmail(value, { allow_display_name: true })) {
