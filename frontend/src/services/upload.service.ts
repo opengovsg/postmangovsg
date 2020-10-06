@@ -97,8 +97,7 @@ export async function getCsvStatus(
       numRecipients,
     } as CsvStatusResponse
     if (preview) {
-      const { subject, body, reply_to: replyTo } = preview
-      result.preview = { subject, body, replyTo }
+      result.preview = preview
     }
     return result
   } catch (e) {
