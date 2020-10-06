@@ -16,10 +16,11 @@ export default class S3Client {
       })
   }
 
-  download(key: string): NodeJS.ReadableStream {
+  download(key: string, etag?: string): NodeJS.ReadableStream {
     const params: S3.GetObjectRequest = {
       Bucket: FILE_STORAGE_BUCKET_NAME,
       Key: key,
+      ...(etag ? { IfMatch: etag } : {}),
     }
     return this.s3.getObject(params).createReadStream()
   }

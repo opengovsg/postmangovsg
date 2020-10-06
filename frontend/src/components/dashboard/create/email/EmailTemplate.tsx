@@ -1,14 +1,22 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react'
 
-import { TextArea, NextButton, ErrorBlock, TextInput } from 'components/common'
+import {
+  TextArea,
+  NextButton,
+  ErrorBlock,
+  TextInput,
+  Dropdown,
+} from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/email.service'
 
 import styles from './EmailTemplate.module.scss'
+import { getCustomFromAddresses } from 'services/settings.service'
 
 const EmailTemplate = ({
+  from: initialFrom,
   subject: initialSubject,
   body: initialBody,
   replyTo: initialReplyTo,
@@ -16,6 +24,7 @@ const EmailTemplate = ({
   onNext,
   finishLaterCallbackRef,
 }: {
+  from: string
   subject: string
   body: string
   replyTo: string | null
@@ -28,6 +37,10 @@ const EmailTemplate = ({
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
   const [replyTo, setReplyTo] = useState(initialReplyTo)
+  const [from, setFrom] = useState(initialFrom)
+  const [customFromAddresses, setCustomFromAddresses] = useState(
+    [] as { label: string; value: string }[]
+  )
   const { id: campaignId } = useParams()
 
   const protectedBodyPlaceholder =
@@ -46,9 +59,11 @@ const EmailTemplate = ({
           +campaignId,
           subject,
           body,
-          replyTo
+          replyTo,
+          from
         )
         onNext({
+          from: updatedTemplate?.from,
           subject: updatedTemplate?.subject,
           body: updatedTemplate?.body,
           replyTo: updatedTemplate?.reply_to,
@@ -60,8 +75,19 @@ const EmailTemplate = ({
         if (propagateError) throw err
       }
     },
-    [body, campaignId, onNext, replyTo, subject]
+    [body, campaignId, from, onNext, replyTo, subject]
   )
+
+  async function populateFromAddresses() {
+    const fromAddresses = await getCustomFromAddresses()
+    const options = fromAddresses.map((v) => ({ label: v, value: v }))
+    setCustomFromAddresses(options)
+  }
+
+  // Get custom from addresses
+  useEffect(() => {
+    populateFromAddresses()
+  }, [])
 
   // Set callback for finish later button
   useEffect(() => {
@@ -70,7 +96,7 @@ const EmailTemplate = ({
         <SaveDraftModal
           saveable
           onSave={async () => {
-            if (subject && body) {
+            if (subject && body && from) {
               await handleSaveTemplate(true)
             }
           }}
@@ -80,7 +106,14 @@ const EmailTemplate = ({
     return () => {
       finishLaterCallbackRef.current = undefined
     }
-  }, [body, finishLaterCallbackRef, handleSaveTemplate, modalContext, subject])
+  }, [
+    body,
+    finishLaterCallbackRef,
+    handleSaveTemplate,
+    modalContext,
+    subject,
+    from,
+  ])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
@@ -90,6 +123,14 @@ const EmailTemplate = ({
     <>
       <sub>Step 1</sub>
       <h2>Create email message</h2>
+
+      <h4>From</h4>
+      <p>Emails will be sent from this address</p>
+      <Dropdown
+        onSelect={setFrom}
+        options={customFromAddresses}
+        defaultLabel={from || customFromAddresses[0]?.label}
+      ></Dropdown>
 
       <h4>Subject</h4>
       <p>Enter subject of the email</p>

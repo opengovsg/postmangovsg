@@ -20,12 +20,8 @@ const upsertEmailTemplate = async ({
   body,
   replyTo,
   campaignId,
-}: {
-  subject: string
-  body: string
-  replyTo: string | null
-  campaignId: number
-}): Promise<EmailTemplate> => {
+  from,
+}: StoreTemplateInput): Promise<EmailTemplate> => {
   let transaction
   try {
     transaction = await EmailTemplate.sequelize?.transaction()
@@ -44,6 +40,7 @@ const upsertEmailTemplate = async ({
           subject,
           body,
           replyTo,
+          from,
         },
         {
           where: { campaignId },
@@ -63,6 +60,7 @@ const upsertEmailTemplate = async ({
         body,
         subject,
         replyTo,
+        from,
       },
       {
         transaction,
@@ -163,6 +161,7 @@ const storeTemplate = async ({
   subject,
   body,
   replyTo,
+  from,
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const updatedTemplate = await upsertEmailTemplate({
@@ -170,6 +169,7 @@ const storeTemplate = async ({
     body: client.replaceNewLinesAndSanitize(body),
     replyTo,
     campaignId,
+    from,
   })
 
   // TODO: this is slow when table is large

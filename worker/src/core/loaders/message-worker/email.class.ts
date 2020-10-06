@@ -17,10 +17,7 @@ class Email {
   constructor(workerId: string, connection: Sequelize) {
     this.workerId = workerId
     this.connection = connection
-    this.mailService = new MailClient(
-      config.get('mailFrom'),
-      config.get('mailOptions')
-    )
+    this.mailService = new MailClient(config.get('mailOptions'))
   }
 
   enqueueMessages(jobId: number, campaignId: number): Promise<void> {
@@ -58,6 +55,7 @@ class Email {
       body: string
       subject: string
       replyTo: string | null
+      from: string
       campaignId: number
     }[]
   > {
@@ -116,6 +114,7 @@ class Email {
     body,
     subject,
     replyTo,
+    from,
     campaignId,
   }: {
     id: number
@@ -124,6 +123,7 @@ class Email {
     body: string
     subject?: string
     replyTo?: string | null
+    from?: string
     campaignId?: number
   }): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -156,6 +156,7 @@ class Email {
             unsubUrl
           )
           return this.mailService.sendMail({
+            from: from || config.get('mailFrom'),
             recipients: [recipient],
             subject,
             body: bodyWithUnsub,

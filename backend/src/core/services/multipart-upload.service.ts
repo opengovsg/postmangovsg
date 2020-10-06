@@ -82,7 +82,7 @@ const completeMultipartUpload = async ({
   transactionId: string
   partCount: number
   etags: Array<string>
-}): Promise<string> => {
+}): Promise<{ s3Key: string; etag?: string }> => {
   const parts = []
   for (let i = 0; i < partCount; i++) {
     parts.push({
@@ -106,8 +106,8 @@ const completeMultipartUpload = async ({
     UploadId: uploadId,
   }
 
-  await s3.completeMultipartUpload(params).promise()
-  return s3Key
+  const { ETag: etag } = await s3.completeMultipartUpload(params).promise()
+  return { s3Key, etag }
 }
 
 export const MultipartUploadService = {

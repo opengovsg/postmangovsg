@@ -42,6 +42,16 @@ async function deleteCredential(label: string): Promise<void> {
   }
 }
 
+async function getCustomFromAddresses(): Promise<string[]> {
+  try {
+    const response = await axios.get('/settings/email/from')
+    const { from } = response.data
+    return from
+  } catch (e) {
+    errorHandler(e, 'Error getting from addresses')
+  }
+}
+
 function errorHandler(e: AxiosError, defaultMsg: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {
@@ -50,4 +60,9 @@ function errorHandler(e: AxiosError, defaultMsg: string): never {
   throw new Error(defaultMsg)
 }
 
-export { regenerateApiKey, getUserSettings, deleteCredential }
+export {
+  regenerateApiKey,
+  getUserSettings,
+  deleteCredential,
+  getCustomFromAddresses,
+}

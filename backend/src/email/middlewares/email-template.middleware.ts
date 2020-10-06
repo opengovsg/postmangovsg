@@ -35,7 +35,8 @@ const storeTemplate = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { subject, body, reply_to: replyTo } = req.body
+    const { subject, body, reply_to: replyTo, from } = req.body
+
     const {
       check,
       valid,
@@ -45,7 +46,16 @@ const storeTemplate = async (
       subject,
       body,
       replyTo,
+      from,
     })
+
+    const template = {
+      body: updatedTemplate?.body,
+      subject: updatedTemplate?.subject,
+      params: updatedTemplate?.params,
+      reply_to: updatedTemplate?.replyTo,
+      from: updatedTemplate?.from,
+    }
 
     if (check?.reupload) {
       return res.json({
@@ -54,12 +64,7 @@ const storeTemplate = async (
         extra_keys: check.extraKeys,
         num_recipients: 0,
         valid: false,
-        template: {
-          body: updatedTemplate?.body,
-          subject: updatedTemplate?.subject,
-          params: updatedTemplate?.params,
-          reply_to: updatedTemplate?.replyTo,
-        },
+        template,
       })
     } else {
       const numRecipients = await StatsService.getNumRecipients(+campaignId)
@@ -67,12 +72,7 @@ const storeTemplate = async (
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
         num_recipients: numRecipients,
-        template: {
-          body: updatedTemplate?.body,
-          subject: updatedTemplate?.subject,
-          params: updatedTemplate?.params,
-          reply_to: updatedTemplate?.replyTo,
-        },
+        template,
       })
     }
   } catch (err) {
@@ -100,7 +100,7 @@ const uploadCompleteHandler = async (
     const { campaignId } = req.params
 
     // extract s3Key from transactionId
-    const { transaction_id: transactionId, filename } = req.body
+    const { transaction_id: transactionId, filename, etag } = req.body
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
     // check if template exists
@@ -124,7 +124,7 @@ const uploadCompleteHandler = async (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 
-        const downloadStream = s3Client.download(s3Key)
+        const downloadStream = s3Client.download(s3Key, etag)
         const params = {
           transaction,
           template,
@@ -154,6 +154,13 @@ const uploadCompleteHandler = async (
       logger.error(
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
+
+      // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
+      if (err.code === 'PreconditionFailed') {
+        err.message =
+          'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
+      }
+
       // Store error to return on poll
       UploadService.storeS3Error(+campaignId, err.message)
     }
@@ -270,7 +277,8 @@ const uploadProtectedCompleteHandler = async (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 
-        const downloadStream = s3Client.download(s3Key)
+        const { etag } = res.locals
+        const downloadStream = s3Client.download(s3Key, etag)
         const params = {
           transaction,
           template,
@@ -300,6 +308,13 @@ const uploadProtectedCompleteHandler = async (
       logger.error(
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
+
+      // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
+      if (err.code === 'PreconditionFailed') {
+        err.message =
+          'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
+      }
+
       // Store error to return on poll
       UploadService.storeS3Error(+campaignId, err.message)
     }

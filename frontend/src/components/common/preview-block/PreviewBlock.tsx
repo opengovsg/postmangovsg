@@ -1,5 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
+import escapeHTML from 'escape-html'
 
 import InfoBlock from '../info-block'
 import styles from './PreviewBlock.module.scss'
@@ -8,6 +9,7 @@ interface PreviewBlockProps {
   body: string
   subject?: string
   replyTo?: string | null
+  from?: string
   className?: string
 }
 
@@ -15,6 +17,7 @@ const PreviewBlock: React.FunctionComponent<PreviewBlockProps> = ({
   body,
   subject,
   replyTo,
+  from,
   className,
   ...otherProps
 }) => {
@@ -30,23 +33,14 @@ const PreviewBlock: React.FunctionComponent<PreviewBlockProps> = ({
   }
 
   function constructHtml() {
-    let html = `<p>${body}</p>`
-    if (subject) {
-      html =
-        `
-        <h5>Subject</h5>
-        <p>${subject}</p>
-        <h5>Body</h5>
-      ` + html
+    function h(name: string, value?: string | null) {
+      if (value) return `<h5>${name}</h5><p>${escapeHTML(value)}</p>`
+      return ''
     }
-    if (replyTo) {
-      html =
-        html +
-        `
-        <h5>Replies</h5>
-        <p>${replyTo}</p>
-      `
-    }
+    const html = `${h('From', from)}
+    ${h('Subject', subject)}
+    ${h('Body', body)}
+    ${h('Replies', replyTo)}`
     return html
   }
 
