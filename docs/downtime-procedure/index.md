@@ -20,6 +20,7 @@
 - [ ] Put up maintenance page on cloudflare by deploying the maintenance worker to the the routes api.postman.gov.sg and postman.gov.sg
 - [ ] Visit api.postman.gov.sg and postman.gov.sg and make sure the maintenance page is up
 - [ ] Set your ip in elastic beanstalk load balancer security group and make sure you can hit the load balancer
+- [ ] Disable routine database dump as `pg_dump` locks the table and prevent table schema changes
 - [ ] Spin down elastic beanstalk instances
 - [ ] Spin down ECS tasks (sending)
 - [ ] Spin down ECS tasks (logging)
@@ -36,6 +37,7 @@
 - [ ] Spin up ECS tasks (sending)
 - [ ] Spin up ECS tasks (logging)
 - [ ] Spin up elastic beanstalk instances
+- [ ] Enable routine database dump
 - [ ] Hit the load balancer to make sure the app is up
 - [ ] Remove your ip from load balancer security group
 - [ ] Remove maintenance page from cloudflare
@@ -62,3 +64,7 @@
 #### Set maintenance page on Cloudflare
 
 ![deploy the maintenance worker](./how-to-set-maintenance-page.png)
+
+#### Disable database backup lambda
+
+![disable database backup lambda](./how-to-disable-database-dump.png)
