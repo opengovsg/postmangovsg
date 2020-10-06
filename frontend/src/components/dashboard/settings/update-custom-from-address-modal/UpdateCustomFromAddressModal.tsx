@@ -35,15 +35,38 @@ const UpdateCustomFromAddressModal = ({
   const [fromAddress, setFromAddress] = useState(label)
   const modalContext = useContext(ModalContext)
 
+  function parseFromAddress(
+    email: string
+  ): { name: string | null; fromAddress: string } {
+    // Regex from https://github.com/validatorjs/validator.js/blob/685c3d2edef67d68c27193d28db84d08c0f4534a/src/lib/isEmail.js#L18
+    // eslint-disable-next-line no-control-regex
+    const address = email.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
+    if (address !== null) {
+      const [, name, fromAddress] = address
+      return { name: name.trim(), fromAddress }
+    }
+    return { name: null, fromAddress: email }
+  }
+
+  function formatFromAddress(
+    name: string | null | undefined,
+    fromAddress: string
+  ): string {
+    const from = fromAddress.toLowerCase()
+    if (name) return `${name} <${from}>`
+    return from
+  }
+
+  // On load, prepopulate the display name input box
+  useEffect(() => {
+    const { name } = parseFromAddress(label)
+    setDisplayName(name || '')
+  }, [label])
+
   // Construct email from display name and label
   useEffect(() => {
-    // eslint-disable-next-line no-control-regex
-    const address = label.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
-    const from = (address !== null
-      ? address[address.length - 1]
-      : label
-    ).toLowerCase()
-    setFromAddress(displayName ? `${displayName} <${from}>` : from)
+    const { fromAddress: address } = parseFromAddress(label)
+    setFromAddress(formatFromAddress(displayName, address))
   }, [displayName, label])
 
   async function updateOnClick() {
@@ -88,7 +111,7 @@ const UpdateCustomFromAddressModal = ({
           name for the from address, and an available recipient to receive a
           validation message.
         </p>
-        <h5>Display name</h5>
+        <h5>Display name (optional)</h5>
         <TextInput
           placeholder="Enter a name"
           value={displayName}
