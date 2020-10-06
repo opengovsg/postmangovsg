@@ -6,9 +6,11 @@ import styles from './Dropdown.module.scss'
 const Dropdown = ({
   options,
   onSelect,
+  defaultLabel,
 }: {
   options: { label: string; value: string }[]
   onSelect: (value: string) => any
+  defaultLabel?: string
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -38,13 +40,22 @@ const Dropdown = ({
     setIsOpen(false)
   }
 
+  useEffect(() => {
+    if (defaultLabel) {
+      setSelectedLabel(defaultLabel)
+      onSelect(defaultLabel)
+    } else {
+      setSelectedLabel('Select an option')
+    }
+  }, [defaultLabel, onSelect])
+
   return (
     <div
       className={cx(styles.container, { [styles.open]: isOpen })}
       ref={containerRef}
     >
       <div className={styles.select} onClick={() => setIsOpen(!isOpen)}>
-        {selectedLabel || 'Select an option'}
+        {selectedLabel}
         <i className={cx(styles.caret, 'bx bx-caret-down')}></i>
       </div>
       <div className={styles.menu}>
