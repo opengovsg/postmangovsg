@@ -35,7 +35,8 @@ const storeTemplate = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { subject, body, reply_to: replyTo } = req.body
+    const { subject, body, reply_to: replyTo, from } = req.body
+
     const {
       check,
       valid,
@@ -45,7 +46,16 @@ const storeTemplate = async (
       subject,
       body,
       replyTo,
+      from,
     })
+
+    const template = {
+      body: updatedTemplate?.body,
+      subject: updatedTemplate?.subject,
+      params: updatedTemplate?.params,
+      reply_to: updatedTemplate?.replyTo,
+      from: updatedTemplate?.from,
+    }
 
     if (check?.reupload) {
       return res.json({
@@ -54,12 +64,7 @@ const storeTemplate = async (
         extra_keys: check.extraKeys,
         num_recipients: 0,
         valid: false,
-        template: {
-          body: updatedTemplate?.body,
-          subject: updatedTemplate?.subject,
-          params: updatedTemplate?.params,
-          reply_to: updatedTemplate?.replyTo,
-        },
+        template,
       })
     } else {
       const numRecipients = await StatsService.getNumRecipients(+campaignId)
@@ -67,12 +72,7 @@ const storeTemplate = async (
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
         num_recipients: numRecipients,
-        template: {
-          body: updatedTemplate?.body,
-          subject: updatedTemplate?.subject,
-          params: updatedTemplate?.params,
-          reply_to: updatedTemplate?.replyTo,
-        },
+        template,
       })
     }
   } catch (err) {

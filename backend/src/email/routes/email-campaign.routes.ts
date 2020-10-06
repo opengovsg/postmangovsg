@@ -12,6 +12,7 @@ import {
   EmailMiddleware,
 } from '@email/middlewares'
 import config from '@core/config'
+import { fromAddressValidator } from '@core/utils/from-address'
 
 const router = Router({ mergeParams: true })
 
@@ -27,6 +28,7 @@ const storeTemplateValidator = {
       .lowercase()
       .allow(null)
       .required(),
+    from: fromAddressValidator,
   }),
 }
 
@@ -144,7 +146,8 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                 reply_to:
  *                   type: string
  *                   nullable: true
- *
+ *                 from:
+ *                   type: string
  *       responses:
  *         200:
  *           description: Success
@@ -180,6 +183,8 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                         type: array
  *                         items:
  *                           type: string
+ *                       from:
+ *                         type: string
  *
  *         "400":
  *           description: Bad Request
@@ -194,6 +199,9 @@ router.put(
   '/template',
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
+  EmailMiddleware.isFromAddressAccepted,
+  EmailMiddleware.existsFromAddress,
+  EmailMiddleware.verifyFromAddress,
   ProtectedMiddleware.verifyTemplate,
   EmailTemplateMiddleware.storeTemplate
 )

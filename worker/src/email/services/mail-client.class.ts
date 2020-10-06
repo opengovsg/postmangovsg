@@ -4,17 +4,10 @@ import logger from '@core/logger'
 import { MailToSend, MailCredentials } from '@email/interfaces'
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
 export default class MailClient {
-  private email: string
   private mailer: nodemailer.Transporter
 
-  constructor(email: string, credentials: MailCredentials) {
+  constructor(credentials: MailCredentials) {
     const { host, port, auth } = credentials
-
-    if (!email)
-      throw new Error(
-        'Missing email from credentials while constructing MailService.'
-      )
-    this.email = email
 
     if (!host) {
       logger.info('Mailer: Using direct transport')
@@ -39,7 +32,7 @@ export default class MailClient {
   public sendMail(input: MailToSend): Promise<string | void> {
     return new Promise<string | void>((resolve, reject) => {
       const options = {
-        from: this.email,
+        from: input.from,
         to: input.recipients,
         subject: input.subject,
         replyTo: input.replyTo,
