@@ -26,6 +26,7 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
     return res.sendStatus(500)
   }
 
+  logger.info(`Login OTP sent successfully to email=${email}`)
   return res.sendStatus(200)
 }
 
@@ -43,6 +44,7 @@ const verifyOtp = async (
   const { email, otp } = req.body
   const authorized = await AuthService.verifyOtp({ email, otp })
   if (!authorized) {
+    logger.error(`Failed to verify OTP for email=${email}`)
     return res.sendStatus(401)
   }
   try {
@@ -53,8 +55,12 @@ const verifyOtp = async (
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
+      logger.info(
+        `User session saved successfully for email=${email} and id=${user.id}`
+      )
       return res.sendStatus(200)
     }
+    logger.error('Session object not found!')
     return res.sendStatus(401)
   } catch (err) {
     return next(err)
@@ -72,8 +78,12 @@ const getUser = async (
 ): Promise<Response | void> => {
   if (req?.session?.user?.id) {
     const user = await AuthService.findUser(req?.session?.user?.id)
+    logger.info(
+      `Existing user session found for email=${user.email} id=${user.id}`
+    )
     return res.json({ email: user?.email, id: user?.id })
   }
+  logger.info('No existing user session found!')
   return res.json({})
 }
 
@@ -100,9 +110,11 @@ const isCookieOrApiKeyAuthenticated = async (
       // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
       req.session.user = user
       req.session.apiKey = true
+      logger.info(`User authenticated by API key. email=${user.email}`)
       return next()
     }
 
+    logger.error('Invalid API key provided!')
     return res.sendStatus(401)
   } catch (err) {
     return next(err)
@@ -126,6 +138,7 @@ const logout = async (
       if (!err) {
         resolve(res.sendStatus(200))
       }
+      logger.error(`Failed to destroy session for id=${req?.session?.user.id}`)
       reject(err)
     })
   }).catch((err) => next(err))
