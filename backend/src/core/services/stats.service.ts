@@ -3,7 +3,7 @@ import { Statistic, JobQueue, Campaign } from '@core/models'
 import {
   CampaignStats,
   CampaignStatsCount,
-  CampaignInvalidRecipient,
+  CampaignRecipient,
 } from '@core/interfaces'
 import { MessageStatus, JobStatus } from '@core/constants'
 
@@ -168,20 +168,20 @@ const getTotalSentCount = async (): Promise<number> => {
 }
 
 /**
- * Helper method to get sent_at, status and recipients for failed messages from logs table
+ * Helper method to get delivered messages from logs table
  * @param campaignId
  * @param logsTable
  */
-const getFailedRecipients = async (
+const getDeliveredRecipients = async (
   campaignId: number,
   logsTable: any
-): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+): Promise<Array<CampaignRecipient>> => {
   const data = await logsTable.findAll({
     raw: true,
     where: {
       campaignId,
       status: {
-        [Op.or]: [MessageStatus.Error, MessageStatus.InvalidRecipient],
+        [Op.not]: MessageStatus.Sending,
       },
     },
     attributes: ['recipient', 'status', 'error_code', 'updated_at'],
@@ -196,5 +196,5 @@ export const StatsService = {
   getTotalSentCount,
   getNumRecipients,
   setNumRecipients,
-  getFailedRecipients,
+  getDeliveredRecipients,
 }
