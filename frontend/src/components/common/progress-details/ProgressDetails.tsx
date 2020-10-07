@@ -144,7 +144,6 @@ const ProgressDetails = ({
         sentAt={sentAt}
         status={status}
         statusUpdatedAt={statusUpdatedAt}
-        hasFailedRecipients={error + invalid > 0}
         isButton
       />
 
