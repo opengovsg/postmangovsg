@@ -69,22 +69,33 @@ const ExportRecipients = ({
     try {
       event.stopPropagation()
       setDisabled(true)
+
       const list = await exportCampaignStats(campaignId)
-      const headers = Object.keys(list[0]).map((key) => `"${key}"`)
-      const sentAtTime = new Date(sentAt)
-      const explanation = `"This report was exported on ${moment()
-        .format('LLL')
-        .replace(
-          ',',
-          ''
-        )} and can change in the future when Postman receives notifications about the sent messages."\n`
-      const content = [explanation, `${headers.join(',')}\n`].concat(
-        list.map((row) => {
+
+      const exportedAt = moment().format('LLL').replace(',', '')
+      const explanation = `"This report was exported on ${exportedAt} and can change in the future when Postman receives notifications about the sent messages."\n`
+
+      let content = [explanation]
+
+      // Handle the edge case where the display wait time is reached but none of the status are updated yet in the message table.
+      if (list.length > 0) {
+        const headers = Object.keys(list[0])
+          .map((key) => `"${key}"`)
+          .join(',')
+          .concat('\n')
+
+        const recipients = list.map((row) => {
           const values = Object.values(row)
           return `${values.map((value) => `"${value}"`).join(',')}\n`
         })
-      )
 
+        content = content.concat(headers, recipients)
+      } else {
+        const emptyExplaination = `"Finalised delivery statuses for your messages are not yet available, try exporting again later."\n`
+        content = content.concat(emptyExplaination)
+      }
+
+      const sentAtTime = new Date(sentAt)
       download(
         new Blob(content),
         `${campaignName}_${sentAtTime.toLocaleDateString()}_${sentAtTime.toLocaleTimeString()}.csv`,
