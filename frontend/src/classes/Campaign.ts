@@ -81,7 +81,7 @@ export class CampaignStats {
   }
 }
 
-export class CampaignInvalidRecipient {
+export class CampaignRecipient {
   recipient: string
   status: string
   errorCode: string
