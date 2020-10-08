@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { TelegramService } from '@telegram/services'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
 
 /**
  * Parse telegram credentials from request body, setting it to res.locals.credentials to be passed downstream
@@ -38,6 +41,12 @@ const getCredentialsFromLabel = async (
     // if label provided, fetch from aws secrets
     const userCred = await CredentialService.getUserCredential(+userId, label)
     if (!userCred) {
+      logger.error({
+        message: 'User credentials not found',
+        userId,
+        label,
+        action: 'getCredentialsFromLabel',
+      })
       res.status(400).json({ message: 'User credentials cannot be found' })
       return
     }
@@ -69,6 +78,13 @@ const getCampaignCredential = async (
 
   const { credName } = campaign
   if (!credName) {
+    logger.error({
+      message: 'Credential not found for this campaign',
+      campaignId,
+      id: userId,
+      credName,
+      action: 'getCampaignCredential',
+    })
     return res
       .status(400)
       .json({ message: 'No credentials found for this campaign.' })
@@ -98,6 +114,10 @@ const validateAndStoreCredentials = async (
 ): Promise<Response | void> => {
   let { credentialName } = res.locals
   const { telegramBotToken } = res.locals.credentials
+  const logMeta = {
+    credentialName,
+    action: 'validateAndStoreCredentials',
+  }
 
   // If credentialName is provided, the credential has already been saved and we
   // do not need to re-validate it.
@@ -105,6 +125,11 @@ const validateAndStoreCredentials = async (
     try {
       await TelegramService.validateAndConfigureBot(telegramBotToken)
     } catch (err) {
+      logger.error({
+        message: 'Failed to validate and store credentials',
+        error: err,
+        ...logMeta,
+      })
       return res.status(400).json({ message: `${err}` })
     }
 
@@ -121,6 +146,11 @@ const validateAndStoreCredentials = async (
         true
       )
     } catch (err) {
+      logger.error({
+        message: 'Failed to validate and store credentials',
+        error: err,
+        ...logMeta,
+      })
       return res.status(400).json({ message: 'Error storing credentials' })
     }
   }
@@ -144,6 +174,7 @@ const sendValidationMessage = async (
   const { recipient } = req.body
   const { credentials } = res.locals
   const { telegramBotToken } = credentials
+  const logMeta = { campaignId, recipient, action: 'sendValidationMessage' }
 
   try {
     if (!campaignId) {
@@ -155,8 +186,14 @@ const sendValidationMessage = async (
         telegramBotToken
       )
     }
+    logger.info({ message: 'Sent validation message', ...logMeta })
     return res.json({ message: 'OK' })
   } catch (err) {
+    logger.info({
+      message: 'Failed to send validation message',
+      error: err,
+      ...logMeta,
+    })
     return res.status(400).json({ message: `${err.message}` })
   }
 }
@@ -176,7 +213,17 @@ const isTelegramCampaignOwnedByUser = async (
     const { campaignId } = req.params
     const userId = req.session?.user?.id
     const campaign = await TelegramService.findCampaign(+campaignId, userId)
-    return campaign ? next() : res.sendStatus(403)
+    if (campaign) {
+      return next()
+    } else {
+      logger.error({
+        message: 'Campaign does not belong to user',
+        campaignId,
+        userId,
+        action: 'isTelegramCampaignOwnedByUser',
+      })
+      return res.sendStatus(403)
+    }
   } catch (err) {
     return next(err)
   }
@@ -196,6 +243,11 @@ const getCampaignDetails = async (
   try {
     const { campaignId } = req.params
     const result = await TelegramService.getCampaignDetails(+campaignId)
+    logger.info({
+      message: 'Retreived campaign details',
+      campaignId,
+      action: 'getCampaignDetails',
+    })
     return res.json(result)
   } catch (err) {
     return next(err)
@@ -241,6 +293,12 @@ const setCampaignCredential = async (
       throw new Error('Credential does not exist')
     }
     await TelegramService.setCampaignCredential(+campaignId, credentialName)
+    logger.info({
+      message: 'Set credential associated to campaign',
+      campaignId,
+      credentialName,
+      action: 'setCampaignCredential',
+    })
     return res.json({ message: 'OK' })
   } catch (err) {
     next(err)

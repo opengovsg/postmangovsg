@@ -1,6 +1,9 @@
 import validator from 'validator'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import config from '@core/config'
+
+const logger = createCustomLogger(module)
+
 type ValidateDomainFunction = (email: string) => boolean
 const getValidateDomain = (domains: string): ValidateDomainFunction => {
   const domainsToWhitelist: string[] = domains
@@ -26,7 +29,11 @@ const getValidateDomain = (domains: string): ValidateDomainFunction => {
       `No domains were whitelisted - the supplied DOMAIN_WHITELIST is ${domains}`
     )
   } else {
-    logger.info(`Domains whitelisted: ${domainsToWhitelist}`)
+    logger.info({
+      message: 'Domains whitelisted',
+      domainsToWhitelist,
+      action: 'getValidateDomain',
+    })
   }
   return (email): boolean => {
     return (

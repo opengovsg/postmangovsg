@@ -5,7 +5,7 @@ import S3 from 'aws-sdk/clients/s3'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import { isSuperSet } from '@core/utils'
 import { MissingTemplateKeysError } from '@core/errors/template.errors'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
@@ -15,6 +15,7 @@ import { CsvStatusInterface } from '@core/interfaces'
 import { CSVParams } from '@core/types'
 import { StatsService, CampaignService } from '.'
 
+const logger = createCustomLogger(module)
 const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
@@ -59,7 +60,6 @@ const extractParamsFromJwt = (
   try {
     decoded = jwtUtils.verify(transactionId)
   } catch (err) {
-    logger.error(`${err.stack}`)
     throw new Error('Invalid transactionId provided')
   }
   return typeof decoded === 'string'
@@ -118,9 +118,12 @@ const storeS3Error = async (
   try {
     await Campaign.updateS3ObjectKey(campaignId, { error })
   } catch (e) {
-    logger.error(
-      `Error storing error string in s3object for campaign ${campaignId}: ${e}`
-    )
+    logger.error({
+      message: 'Error storing error string in s3object for campaign',
+      campaignId,
+      error: e,
+      action: 'storeS3Error',
+    })
   }
 }
 

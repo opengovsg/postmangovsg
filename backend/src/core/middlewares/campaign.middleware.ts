@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
+import { createCustomLogger } from '@core/utils/logger'
 import { ChannelType } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
+
+const logger = createCustomLogger(module)
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -22,6 +25,11 @@ const canEditCampaign = async (
     if (!hasJob && !csvStatus?.isCsvProcessing) {
       return next()
     }
+    logger.error({
+      message: `Campaign cannot be edited`,
+      campaignId,
+      action: 'canEditCampaign',
+    })
     return res.sendStatus(403)
   } catch (err) {
     return next(err)
@@ -48,6 +56,11 @@ const createCampaign = async (
 
     // Check that protected campaign can only be created for emails
     if (protect && type !== ChannelType.Email) {
+      logger.error({
+        message: `Protected campaign cannot be created`,
+        campaignType: type,
+        action: 'createCampaign',
+      })
       return res.sendStatus(403)
     }
 
@@ -57,6 +70,12 @@ const createCampaign = async (
       type,
       userId,
       protect,
+    })
+    logger.info({
+      message: 'Successfully created new campaign',
+      id: userId,
+      campaignId: campaign.id,
+      action: 'createCampaign',
     })
     return res.status(201).json({
       id: campaign.id,
@@ -81,9 +100,9 @@ const listCampaigns = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
+  const { offset, limit } = req.query
+  const userId = req.session?.user?.id
   try {
-    const { offset, limit } = req.query
-    const userId = req.session?.user?.id
     const { rows, count } = await CampaignService.listCampaigns({
       offset,
       limit,
@@ -95,7 +114,7 @@ const listCampaigns = async (
       total_count: count,
     })
   } catch (err) {
-    return next(err)
+    return next({ err, userId })
   }
 }
 

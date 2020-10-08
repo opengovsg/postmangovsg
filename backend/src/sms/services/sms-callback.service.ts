@@ -1,8 +1,10 @@
 import { Request } from 'express'
 import bcrypt from 'bcrypt'
 import config from '@core/config'
-import logger from '@core/logger'
 import { SmsMessage } from '@sms/models'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
 const FINALIZED_STATUS = ['sent', 'delivered', 'undelivered', 'failed']
 
 const isAuthenticated = (
@@ -22,6 +24,7 @@ const isAuthenticated = (
     username + messageId + campaignId + config.get('smsCallback.callbackSecret')
   return bcrypt.compareSync(plainTextPassword, password)
 }
+
 const parseEvent = async (req: Request): Promise<void> => {
   const { messageId, campaignId } = req.params
   const {
@@ -32,7 +35,12 @@ const parseEvent = async (req: Request): Promise<void> => {
   if (FINALIZED_STATUS.indexOf(twilioMessageStatus as string) === -1) {
     return
   }
-  logger.info(`Updating messageId ${messageId} in sms_messages`)
+  logger.info({
+    message: 'Updating message in sms_messages',
+    messageId,
+    campaignId,
+    action: 'parseEvent',
+  })
   if (twilioErrorCode) {
     await SmsMessage.update(
       {

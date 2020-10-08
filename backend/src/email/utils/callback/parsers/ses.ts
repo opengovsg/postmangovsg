@@ -2,13 +2,14 @@ import { Request } from 'express'
 import url from 'url'
 import crypto, { Utf8AsciiLatin1Encoding } from 'crypto'
 import https from 'https'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
 } from '@email/utils/callback/update-status'
 
+const logger = createCustomLogger(module)
 const REFERENCE_ID_HEADER_V1 = 'X-Postman-ID' // Case sensitive
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
 const certCache: { [key: string]: string } = {}
@@ -109,13 +110,18 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   }
   const message = JSON.parse(record.Message)
   const messageId = message?.mail?.commonHeaders?.messageId
+  const logMeta = { messageId, action: 'parseRecord' }
   const id = getReferenceID(message)
   if (id === undefined) {
-    logger.info(`No reference message id found for ${messageId}`)
+    logger.info({ message: 'No reference message id found', ...logMeta })
     return
   }
   const notificationType = message?.notificationType
-  logger.info(`Update for notificationType = ${notificationType}`)
+  logger.info({
+    message: 'Update for notificationType',
+    notificationType,
+    ...logMeta,
+  })
   const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
   switch (notificationType) {
     case 'Delivery':
@@ -136,9 +142,11 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       })
       break
     default:
-      logger.error(
-        `Can't handle messages with this notification type. notificationType = ${notificationType}`
-      )
+      logger.error({
+        message: 'Unable handle messages with this notification type',
+        notificationType,
+        ...logMeta,
+      })
       return
   }
 }

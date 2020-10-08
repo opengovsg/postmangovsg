@@ -2,8 +2,9 @@ import { Application, Request, Response, NextFunction } from 'express'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 
+const logger = createCustomLogger(module)
 const options = {
   swaggerDefinition: {
     openapi: '3.0.0',

@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailService } from '@email/services'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
@@ -16,7 +19,17 @@ const isEmailCampaignOwnedByUser = async (
   const userId = req.session?.user?.id
   try {
     const campaign = await EmailService.findCampaign(+campaignId, +userId)
-    return campaign ? next() : res.sendStatus(403)
+    if (campaign) {
+      return next()
+    } else {
+      logger.error({
+        message: 'Campaign does not belong to user',
+        campaignId,
+        userId,
+        action: 'isEmailCampaignOwnedByUser',
+      })
+      return res.sendStatus(403)
+    }
   } catch (err) {
     return next(err)
   }
@@ -31,14 +44,25 @@ const validateAndStoreCredentials = async (
   req: Request,
   res: Response
 ): Promise<Response | void> => {
+  const { campaignId } = req.params
+  const { recipient } = req.body
+  const logMeta = {
+    campaignId,
+    recipient,
+    action: 'validateAndStoreCredentials',
+  }
   try {
-    const { campaignId } = req.params
-    const { recipient } = req.body
     await EmailService.sendCampaignMessage(+campaignId, recipient)
     await EmailService.setCampaignCredential(+campaignId)
   } catch (err) {
+    logger.error({
+      message: 'Failed to validate and store credentials',
+      error: err,
+      ...logMeta,
+    })
     return res.status(400).json({ message: `${err.message}` })
   }
+  logger.info({ message: 'Validated and stored credentials', ...logMeta })
   return res.json({ message: 'OK' })
 }
 
@@ -56,6 +80,11 @@ const getCampaignDetails = async (
   try {
     const { campaignId } = req.params
     const result = await EmailService.getCampaignDetails(+campaignId)
+    logger.info({
+      message: 'Retreived campaign details',
+      campaignId,
+      action: 'getCampaignDetails',
+    })
     return res.json(result)
   } catch (err) {
     return next(err)

@@ -1,9 +1,10 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message } from 'telegraf/typings/telegram-types'
 
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import config from '@core/config'
 
+const logger = createCustomLogger(module)
 const HELP_MESSAGE = `
 *Commands*
 /updatenumber - update your phone number
@@ -25,7 +26,10 @@ This bot is powered by Postman – a mass messaging platform used by the Governm
 export const helpCommandHandler = async (
   ctx: TelegrafContext
 ): Promise<Message> => {
-  logger.info(ctx.from?.id.toString() as string)
+  logger.info({
+    message: ctx.from?.id.toString() as string,
+    action: 'helpCommandHandler',
+  })
 
   return ctx.reply(HELP_MESSAGE, {
     parse_mode: 'Markdown',

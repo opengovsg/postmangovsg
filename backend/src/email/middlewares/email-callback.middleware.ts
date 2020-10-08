@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailCallbackService } from '@email/services'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
 
 const isAuthenticated = (
   req: Request,
@@ -9,13 +11,21 @@ const isAuthenticated = (
 ): Response | void => {
   const authHeader = req.get('authorization')
   if (!authHeader) {
+    logger.error({
+      message: 'Authorization headers not found',
+      action: 'isAuthenticated',
+    })
     res.set('WWW-Authenticate', 'Basic realm="Email"')
     return res.sendStatus(401)
   }
   if (EmailCallbackService.isAuthenticated(authHeader)) {
     return next()
   }
-  return res.sendStatus(401)
+  logger.error({
+    message: 'Failed to authenticate request',
+    action: 'isAuthenticated',
+  })
+  return res.sendStatus(403)
 }
 
 const parseEvent = async (
@@ -25,6 +35,7 @@ const parseEvent = async (
 ): Promise<Response | void> => {
   try {
     await EmailCallbackService.parseEvent(req)
+    logger.info({ message: 'Successfully parsed event', action: 'parseEvent' })
     return res.sendStatus(200)
   } catch (err) {
     next(err)
@@ -43,9 +54,12 @@ const printConfirmSubscription = (
       parsed.protocol === 'https:' &&
       /^sns\.[a-zA-Z0-9-]{3,}\.amazonaws\.com(\.cn)?$/.test(parsed.host)
     ) {
-      logger.info(
-        `To confirm the subscription, enter this url: ${subscribeUrl}`
-      )
+      logger.info({
+        message: 'Confirm the subscription',
+        type,
+        subscribeUrl,
+        action: 'printConfirmSubscription',
+      })
       return res.sendStatus(202)
     }
   }

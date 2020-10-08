@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { ProtectedService } from '@core/services'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
 
 /**
  * Limit certain routes for protected campaigns only
@@ -18,6 +20,11 @@ const isProtectedCampaign = async (
     if (await ProtectedService.isProtectedCampaign(+campaignId)) {
       return next()
     }
+    logger.error({
+      message: 'Campaign is not a protected campaign',
+      campaignId,
+      action: 'isProtectedCampaign',
+    })
     return res.sendStatus(403)
   } catch (err) {
     return next(err)
@@ -58,7 +65,11 @@ const verifyTemplate = async (
 
     return next()
   } catch (err) {
-    logger.error(`${err.message}`)
+    logger.error({
+      message: 'Failed to verify template',
+      error: err,
+      action: 'verifyTemplate',
+    })
     return res.status(500).json({ message: err.message })
   }
 }
@@ -81,12 +92,19 @@ const verifyPasswordHash = async (
       id,
       passwordHash
     )
+    const logMeta = { messageId: id, action: 'verifyPasswordHash' }
+
     if (!protectedMessage) {
       // Return 403 if nothing retrieved from db
+      logger.error({ message: 'Wrong password or message id', ...logMeta })
       return res
         .status(403)
         .json({ message: 'Wrong password or message id. Please try again.' })
     }
+    logger.info({
+      message: 'Successfully verified password for protected message',
+      ...logMeta,
+    })
     return res.json({ payload: protectedMessage.payload })
   } catch (err) {
     return next(err)

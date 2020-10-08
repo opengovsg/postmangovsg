@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import { SmsStatsService } from '@sms/services'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
+
 /**
  * Gets stats for sms campaign
  * @param req
@@ -14,6 +18,11 @@ const getStats = async (
   const { campaignId } = req.params
   try {
     const stats = await SmsStatsService.getStats(+campaignId)
+    logger.info({
+      message: 'Retreived sms stats',
+      campaignId,
+      action: 'getStats',
+    })
     return res.json(stats)
   } catch (err) {
     next(err)
@@ -35,6 +44,11 @@ const updateAndGetStats = async (
   try {
     await SmsStatsService.refreshStats(+campaignId)
     const stats = await SmsStatsService.getStats(+campaignId)
+    logger.info({
+      message: 'Refresh and retreived sms stats',
+      campaignId,
+      action: 'updateAndGetStats',
+    })
     return res.json(stats)
   } catch (err) {
     next(err)
@@ -55,6 +69,11 @@ const getFailedRecipients = async (
   const { campaignId } = req.params
   try {
     const recipients = await SmsStatsService.getFailedRecipients(+campaignId)
+    logger.info({
+      message: 'Retreived failed recipients',
+      campaignId,
+      action: 'getFailedRecipients',
+    })
     return res.json(recipients)
   } catch (err) {
     next(err)

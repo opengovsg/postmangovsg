@@ -1,16 +1,20 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message } from 'telegraf/typings/telegram-types'
 
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import { generatePadding } from '../generate-padding'
 
+const logger = createCustomLogger(module)
 /**
  * Handles updates for the /updatenumber command.
  */
 export const updatenumberCommandHandler = async (
   ctx: TelegrafContext
 ): Promise<Message> => {
-  logger.info(ctx.from?.id.toString() as string)
+  logger.info({
+    message: ctx.from?.id.toString() as string,
+    action: 'updatenumberCommandHandler',
+  })
 
   const REPLY =
     'Please send me your updated phone number by pressing the button below.'

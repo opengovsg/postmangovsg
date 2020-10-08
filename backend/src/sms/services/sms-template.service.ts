@@ -1,6 +1,5 @@
 import { difference, keys } from 'lodash'
 
-import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
@@ -128,7 +127,6 @@ const checkNewTemplateParams = async ({
         firstRecord.params as { [key: string]: string }
       )
     } catch (err) {
-      logger.error(`Hydration error: ${err.stack}`)
       throw new HydrationError()
     }
     // set campaign.valid to true since templating suceeded AND file has been uploaded

@@ -3,6 +3,9 @@ import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 import config from '@core/config'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'SMS' type, and belongs to the user
@@ -19,7 +22,17 @@ const isSmsCampaignOwnedByUser = async (
     const { campaignId } = req.params
     const userId = req.session?.user?.id
     const campaign = await SmsService.findCampaign(+campaignId, +userId)
-    return campaign ? next() : res.sendStatus(403)
+    if (campaign) {
+      return next()
+    } else {
+      logger.error({
+        message: 'Campaign does not belong to user',
+        campaignId,
+        userId,
+        action: 'isSmsCampaignOwnedByUser',
+      })
+      return res.sendStatus(403)
+    }
   } catch (err) {
     return next(err)
   }
@@ -70,6 +83,12 @@ const getCredentialsFromLabel = async (
     // if label provided, fetch from aws secrets
     const userCred = await CredentialService.getUserCredential(+userId, label)
     if (!userCred) {
+      logger.error({
+        message: 'User credentials not found',
+        userId,
+        label,
+        action: 'getCredentialsFromLabel',
+      })
       res.status(400).json({ message: 'User credentials cannot be found' })
       return
     }
@@ -99,6 +118,11 @@ const validateAndStoreCredentials = async (
   const { recipient } = req.body
   const { campaignId } = req.params
   const { credentials, credentialName } = res.locals
+  const logMeta = {
+    campaignId,
+    recipient,
+    action: 'validateAndStoreCredentials',
+  }
   try {
     if (campaignId) {
       // Sends first hydrated message from campaign
@@ -112,6 +136,11 @@ const validateAndStoreCredentials = async (
       return next()
     }
   } catch (err) {
+    logger.error({
+      message: 'Failed to validate and store credentials',
+      error: err,
+      ...logMeta,
+    })
     return res.status(400).json({ message: `${err}` })
   }
   try {
@@ -133,6 +162,11 @@ const validateAndStoreCredentials = async (
     res.locals.channelType = ChannelType.SMS
     next()
   } catch (err) {
+    logger.error({
+      message: 'Failed to store credentials in AWS secrets manager',
+      error: err,
+      ...logMeta,
+    })
     return res.status(400).json({ message: `${err.message}` })
   }
 }
@@ -155,6 +189,12 @@ const setCampaignCredential = async (
       throw new Error('Credential does not exist')
     }
     await SmsService.setCampaignCredential(+campaignId, credentialName)
+    logger.info({
+      message: 'Set credential associated to campaign',
+      campaignId,
+      credentialName,
+      action: 'setCampaignCredential',
+    })
     return res.json({ message: 'OK' })
   } catch (err) {
     next(err)
@@ -175,6 +215,11 @@ const getCampaignDetails = async (
   try {
     const { campaignId } = req.params
     const result = await SmsService.getCampaignDetails(+campaignId)
+    logger.info({
+      message: 'Retreived campaign details',
+      campaignId,
+      action: 'getCampaignDetails',
+    })
     return res.json(result)
   } catch (err) {
     return next(err)

@@ -1,9 +1,11 @@
 import { QueryTypes } from 'sequelize'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import { StatsService } from '@core/services'
 import { CampaignStats, CampaignInvalidRecipient } from '@core/interfaces'
 
 import { TelegramOp, TelegramMessage } from '@telegram/models'
+
+const logger = createCustomLogger(module)
 
 /**
  * Gets stats for telegram project
@@ -18,7 +20,11 @@ const getStats = async (campaignId: number): Promise<CampaignStats> => {
  * @param campaignId
  */
 const refreshStats = async (campaignId: number): Promise<void> => {
-  logger.info(`updateStats invoked for campaign ${campaignId}`)
+  logger.info({
+    message: 'Refresh stats for campaign',
+    campaignId,
+    action: 'refreshStats',
+  })
 
   await TelegramMessage.sequelize?.query(
     'SELECT update_stats_telegram(:campaign_id)',

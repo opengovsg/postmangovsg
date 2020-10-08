@@ -49,7 +49,9 @@ const startMultipartUpload = async (
 
   const { UploadId } = await s3.createMultipartUpload(params).promise()
 
-  if (!UploadId) throw new Error('no upload id')
+  if (!UploadId) {
+    throw new Error('No upload id')
+  }
 
   const transactionId = jwtUtils.sign({
     uploadId: UploadId,

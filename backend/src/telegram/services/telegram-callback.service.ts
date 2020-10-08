@@ -2,7 +2,7 @@ import Telegraf from 'telegraf'
 import { Update } from 'telegraf/typings/telegram-types'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Credential } from '@core/models'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import {
   startCommandHandler,
   contactMessageHandler,
@@ -10,6 +10,8 @@ import {
   updatenumberCommandHandler,
 } from '@telegram/utils/callback/handlers'
 import { PostmanTelegramError } from '@telegram/utils/callback/PostmanTelegramError'
+
+const logger = createCustomLogger(module)
 
 /**
  * Verifies that the given bot id is registered
@@ -27,7 +29,11 @@ const verifyBotToken = async (
 ): Promise<void> => {
   try {
     await bot.telegram.getMe()
-    logger.info('Bot token verified.')
+    logger.info({
+      message: 'Bot token verified',
+      bot,
+      action: 'verifyBotToken',
+    })
   } catch (err) {
     throw new Error('Bot token invalid.')
   }

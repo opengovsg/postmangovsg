@@ -2,12 +2,13 @@ import { authenticator } from 'otplib'
 import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import config from '@core/config'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import { User } from '@core/models'
 import { validateDomain } from '@core/utils/validate-domain'
 import { RedisService, ApiKeyService, MailService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 
+const logger = createCustomLogger(module)
 const SALT_ROUNDS = 10 // bcrypt default
 const {
   retries: OTP_RETRIES,
@@ -39,7 +40,12 @@ const saveHashedOtp = (
       OTP_EXPIRY,
       (error) => {
         if (error) {
-          logger.error(`Failed to save hashed otp: ${error}`)
+          logger.error({
+            message: 'Failed to save hashed otp',
+            email,
+            error,
+            action: 'saveHashedOtp',
+          })
           reject(error)
         }
         resolve(true)
@@ -53,13 +59,15 @@ const saveHashedOtp = (
  * @param email
  */
 const getHashedOtp = (email: string): Promise<HashedOtp> => {
+  const logMeta = { email, action: 'getHashedOtp' }
   return new Promise((resolve, reject) => {
     RedisService.otpClient.get(email, (error, value) => {
       if (error) {
-        logger.error(`Failed to get hashed otp: ${error}`)
+        logger.error({ message: 'Failed to get hashed otp', error, ...logMeta })
         reject(new Error('Internal server error - request for otp again'))
       }
       if (value === null) {
+        logger.error({ message: 'No otp found', ...logMeta })
         reject(new Error('No otp found - request for otp again'))
       }
       resolve(JSON.parse(value))
@@ -75,7 +83,13 @@ const deleteHashedOtp = async (email: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     RedisService.otpClient.del(email, (error, response) => {
       if (error || response !== 1) {
-        logger.error(`Failed to delete hashed otp: ${error}`)
+        logger.error({
+          message: 'Failed to delete hashed otp',
+          email,
+          error,
+          response,
+          action: 'deleteHashedOtp',
+        })
         reject(error)
       }
       resolve(true)
@@ -211,6 +225,7 @@ const sendOtp = async (
  * @param input
  */
 const verifyOtp = async (input: VerifyOtpInput): Promise<boolean> => {
+  const logMeta = { email: input.email, action: 'verifyOtp' }
   try {
     const hashedOtp: HashedOtp = await getHashedOtp(input.email)
     const authorized: boolean = await bcrypt.compare(input.otp, hashedOtp.hash)
@@ -224,10 +239,18 @@ const verifyOtp = async (input: VerifyOtpInput): Promise<boolean> => {
       await saveHashedOtp(input.email, hashedOtp)
     } else {
       await deleteHashedOtp(input.email)
+      logger.info({
+        message: 'No otp retries left, deleting otp',
+        ...logMeta,
+      })
     }
     return false
   } catch (e) {
-    logger.error(e)
+    logger.error({
+      message: 'Error occured while verifying otp',
+      error: e,
+      ...logMeta,
+    })
     return false
   }
 }

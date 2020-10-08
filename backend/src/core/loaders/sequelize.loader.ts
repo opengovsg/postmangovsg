@@ -28,9 +28,10 @@ import {
   TelegramTemplate,
 } from '@telegram/models'
 
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
 
+const logger = createCustomLogger(module)
 const DB_URI = config.get('database.databaseUri')
 const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
 
@@ -104,12 +105,17 @@ const sequelizeLoader = async (): Promise<void> => {
   try {
     await sequelize.sync()
     logger.info({ message: 'Database loaded.' })
-  } catch (err) {
-    logger.error(`Unable to connect to database: ${err}`)
+  } catch (error) {
+    logger.error({ message: 'Unable to connect to database', error })
     process.exit(1)
   }
 
-  await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
+  try {
+    await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
+    logger.info({ message: 'Default email credential loaded' })
+  } catch (error) {
+    logger.error({ message: 'Unable to load default email credential', error })
+  }
 }
 
 export default sequelizeLoader

@@ -120,8 +120,9 @@ const getCurrentStats = async (
     ],
   })
 
-  if (job == null)
+  if (job == null) {
     throw new Error('Unable to find campaign in job queue table.')
+  }
 
   // Get stats from statistics table
   const archivedStats = await getStatsFromArchive(campaignId)

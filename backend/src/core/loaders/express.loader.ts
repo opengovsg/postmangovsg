@@ -7,9 +7,10 @@ import * as Sentry from '@sentry/node'
 
 import config from '@core/config'
 import v1Router from '@core/routes'
-import logger from '@core/logger'
+import { createCustomLogger, setRequestMetadata } from '@core/utils/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
+const logger = createCustomLogger(module)
 const FRONTEND_URL = config.get('frontendUrl')
 
 /**
@@ -46,6 +47,15 @@ const sentrySessionMiddleware = (
   next()
 }
 
+const loggerMetadataMiddleware = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): void => {
+  setRequestMetadata(req, _res)
+  next()
+}
+
 Sentry.init({
   dsn: config.get('sentryDsn'),
   environment: config.get('env'),
@@ -72,6 +82,7 @@ const overrideContentTypeHeaderMiddleware = (
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
   app.use(loggerMiddleware)
+  app.use(loggerMetadataMiddleware)
 
   app.use(overrideContentTypeHeaderMiddleware)
   app.use(bodyParser.json())
@@ -116,7 +127,11 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       res: express.Response,
       _next: express.NextFunction
     ) => {
-      logger.error(`${JSON.stringify(err.stack, null, 4)}`)
+      logger.error({
+        message: 'Unexpected error occured',
+        error: err,
+        // ...getRequestMetadata(_req, res),
+      })
       return res.sendStatus(500)
     }
   )

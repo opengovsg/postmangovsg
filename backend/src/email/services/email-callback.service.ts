@@ -1,7 +1,10 @@
 import { Request } from 'express'
 import { ses, sendgrid } from '@email/utils/callback/parsers'
 import config from '@core/config'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
+
 const isAuthenticated = (authHeader?: string): boolean => {
   const headerKey = 'Basic'
   if (!authHeader) return false
@@ -12,7 +15,10 @@ const isAuthenticated = (authHeader?: string): boolean => {
   const decoded = Buffer.from(secret, 'base64').toString('utf8')
   const authorized = decoded === config.get('emailCallback.callbackSecret')
   if (!authorized)
-    logger.info(`Request made with incorrect credential ${decoded}`)
+    logger.info({
+      message: 'Request made with incorrect credential',
+      action: 'isAuthenticated',
+    })
   return authorized
 }
 

@@ -3,12 +3,14 @@ import { Request } from 'express'
 // @ts-ignore
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa'
 import config from '@core/config'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
 } from '@email/utils/callback/update-status'
+
+const logger = createCustomLogger(module)
 const PUBLIC_KEY = PublicKey.fromPem(
   config.get('emailCallback.sendgridPublicKey')
 )
@@ -43,7 +45,11 @@ const isEvent = (req: Request): boolean => {
 
 const parseRecord = async (record: SendgridRecord): Promise<void> => {
   if (record.message_id === undefined) {
-    logger.info(`No reference message id found for ${record['smtp-id']}`)
+    logger.info({
+      message: 'No reference message id found',
+      smptpId: record['smtp-id'],
+      action: 'parseRecord',
+    })
     return
   }
   const metadata = {
@@ -77,9 +83,11 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
       })
       break
     default:
-      logger.error(
-        `Can't handle messages with this notification type. notificationType = ${record.event}`
-      )
+      logger.error({
+        message: 'Unable handle messages with this notification type',
+        notificationType: record.event,
+        action: 'parseRecord',
+      })
       return
   }
 }

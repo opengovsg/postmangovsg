@@ -1,7 +1,6 @@
 import { difference, keys } from 'lodash'
 
 import config from '@core/config'
-import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
@@ -101,7 +100,6 @@ const checkNewTemplateParams = async ({
         firstRecord.params as { [key: string]: string }
       )
     } catch (err) {
-      logger.error(`Hydration error: ${err.stack}`)
       throw new HydrationError()
     }
 

@@ -16,7 +16,9 @@ import { TelegramTemplateService } from '@telegram/services'
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
 import { PhoneNumberService, UploadService } from '@core/services'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
+
+const logger = createCustomLogger(module)
 
 /**
  * Gets a message's parameters
@@ -283,7 +285,12 @@ const uploadCompleteOnChunk = ({
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
-          logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          logger.info({
+            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+            benchmark,
+            campaignId,
+            action: 'uploadCompleteOnChunk',
+          })
         }
       },
       benchmark: true,

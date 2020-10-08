@@ -3,6 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { AuthMiddleware } from '@core/middlewares'
+import { createCustomLogger } from '@core/utils/logger'
 
 // Core routes
 import authenticationRoutes from './auth.routes'
@@ -29,6 +30,8 @@ import {
   telegramCallbackRoutes,
 } from '@telegram/routes'
 
+const logger = createCustomLogger(module)
+
 const CHANNEL_ROUTES = Object.values(ChannelType).map(
   (route) => `/${route.toLowerCase()}`
 )
@@ -52,6 +55,11 @@ const redirectToChannelRoute = async (
   const resource = originalUrl.substring(campaignUrl.length) // Anything after /campaign/:campaignId
   if (CHANNEL_ROUTES.some((route) => resource.startsWith(route))) {
     // Fall through from missing channel route, which means that the route doesn't exist
+    logger.error({
+      message: 'Channel does not exist',
+      originalUrl,
+      action: 'redirectToChannelRoute',
+    })
     return res.sendStatus(404)
   }
 
@@ -63,10 +71,21 @@ const redirectToChannelRoute = async (
   })
   if (!campaign) {
     // This campaign doesn't exist
+    logger.error({
+      message: 'Campaign does not exist',
+      campaignId,
+      action: 'redirectToChannelRoute',
+    })
     return res.sendStatus(404)
   }
 
   const redirectTo = `${campaignUrl}/${campaign?.type.toLowerCase()}${resource}`
+  logger.info({
+    message: 'Redirect to channel routes',
+    redirectTo,
+    campaignId,
+    action: 'redirectToChannelRoute',
+  })
   return res.redirect(307, redirectTo)
 }
 

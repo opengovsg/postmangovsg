@@ -5,8 +5,10 @@ import {
 } from '@email/interfaces/callback.interface'
 import { EmailBlacklist, EmailMessage } from '@email/models'
 import config from '@core/config'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import { Campaign } from '@core/models'
+
+const logger = createCustomLogger(module)
 
 /**
  * Adds email to blacklist table if it does not exist
@@ -15,7 +17,11 @@ import { Campaign } from '@core/models'
 export const addToBlacklist = (
   recipientEmail: string
 ): Promise<any> | undefined => {
-  logger.info(`Updating blacklist table with ${recipientEmail}`)
+  logger.info({
+    message: 'Updating blacklist table',
+    recipientEmail,
+    action: 'addToBlacklist',
+  })
   return EmailBlacklist.findOrCreate({ where: { recipient: recipientEmail } })
 }
 
@@ -28,7 +34,11 @@ export const updateMessageWithError = async (
 ): Promise<number | undefined> => {
   const { errorCode, timestamp, id } = opts
 
-  logger.info(`Updating email_messages table. ${JSON.stringify(opts)}`)
+  logger.info({
+    message: 'Updating email_messages table',
+    opts,
+    action: 'updateMessageWithError',
+  })
   const [, result] = await EmailMessage.update(
     {
       errorCode: errorCode,
@@ -60,7 +70,11 @@ export const updateMessageWithError = async (
 export const updateMessageWithSuccess = async (
   metadata: Metadata
 ): Promise<number | undefined> => {
-  logger.info(`Updating email_messages table. ${JSON.stringify(metadata)}`)
+  logger.info({
+    message: 'Updating email_messages table',
+    metadata,
+    action: 'updateMessageWithSuccess',
+  })
   const { timestamp, id } = metadata
   // Since notifications for the same messageId can be interleaved, we only update that message if this notification is newer than the previous.
   const [, result] = await EmailMessage.update(
@@ -125,6 +139,18 @@ export const haltCampaignIfThresholdExceeded = async (
         exceedsHaltNumber=${exceedsHaltNumber}
         exceedsHaltPercentage=${exceedsHaltPercentage}`
     )
+    logger.info({
+      message: 'Campaign status',
+      campaignId,
+      invalid,
+      runningTotal,
+      percentageInvalid,
+      minHaltNumber: config.get('emailCallback.minHaltNumber'),
+      minHaltPercentage: config.get('emailCallback.minHaltPercentage'),
+      exceedsHaltNumber,
+      exceedsHaltPercentage,
+      action: 'haltCampaignIfThresholdExceeded',
+    })
     /* With default MIN_HALT_NUMBER=10, MIN_HALT_PERCENTAGE=0.1, 
       it means that 
       - if there were 11 messages sent thus far, and 11 invalid recipients, the campaign would halt immediately since 11/11 > MIN_HALT_PERCENTAGE
@@ -139,14 +165,22 @@ export const haltCampaignIfThresholdExceeded = async (
             { where: { id: campaignId, halted: false }, transaction }
           )
           if (numUpdated !== 1) {
-            logger.info(
-              'Campaign has already been halted, or forcefully overridden with null to prevent halting.'
-            )
+            logger.info({
+              message:
+                'Campaign has already been halted, or forcefully overridden with null to prevent halting',
+              campaignId,
+              action: 'haltCampaignIfThresholdExceeded',
+            })
             return
           } else {
-            logger.info(
-              `Successfully halted campaign_id=${campaignId} invalid=${invalid} running_total=${runningTotal} percentageInvalid=${percentageInvalid}`
-            )
+            logger.info({
+              message: 'Successfully halted campaign',
+              campaignId,
+              invalid,
+              runningTotal,
+              percentageInvalid,
+              action: 'haltCampaignIfThresholdExceeded',
+            })
           }
 
           await EmailBlacklist?.sequelize?.query(
@@ -159,7 +193,12 @@ export const haltCampaignIfThresholdExceeded = async (
           )
         })
       } catch (err) {
-        logger.error(`Could not halt campaign_id=${campaignId} ${err.stack}`)
+        logger.error({
+          message: 'Failed to halt campaign',
+          campaignId,
+          error: err,
+          action: 'haltCampaignIfThresholdExceeded',
+        })
       }
     }
   }
