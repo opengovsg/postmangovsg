@@ -54,6 +54,7 @@
     margin-top: 0.5rem;
     box-shadow: 0.2rem 0.2rem 1rem 0 $light-grey;
     overflow: hidden;
+    z-index: 10;
 
     .item {
       padding: 1rem $border-radius;

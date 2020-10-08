@@ -4,13 +4,20 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 
 import { ModalContext } from 'contexts/modal.context'
 import { SideNav, TitleBar } from 'components/common'
-import { UserCredential, getUserSettings } from 'services/settings.service'
+import {
+  UserCredential,
+  getUserSettings,
+  getCustomFromAddresses,
+} from 'services/settings.service'
 import { ChannelType, channelIcons } from 'classes'
 
 import ApiKey from './api-key'
 import Credentials from './credentials'
+import CustomFromAddress from './custom-from-address'
 import AddCredentialModal from './add-credential-modal'
 import AddApiKeyModal from './add-api-key-modal'
+import AddCustomFromAddress from './add-custom-from-address-modal'
+
 import CredentialsImage from 'assets/img/credentials.svg'
 import styles from './Settings.module.scss'
 
@@ -19,6 +26,11 @@ const SETTINGS_LINKS = [
     label: 'API Keys',
     location: '/settings/api',
     icon: 'bx-key',
+  },
+  {
+    label: 'Email',
+    location: '/settings/email',
+    icon: channelIcons[ChannelType.Email],
   },
   {
     label: 'SMS',
@@ -35,10 +47,13 @@ const SETTINGS_LINKS = [
 const Settings = () => {
   const modalContext = useContext(ModalContext)
   const [hasApiKey, setHasApiKey] = useState(false)
+  const [hasCustomFromAddresses, setHasCustomFromAddresses] = useState(false)
+  const [customFromAddresses, setCustomFromAddresses] = useState([] as string[])
   const [creds, setCreds] = useState([] as UserCredential[])
 
   useEffect(() => {
     fetchUserSettings()
+    fetchCustomFromAddresses()
   }, [])
 
   function onAddCredentialClicked() {
@@ -56,10 +71,25 @@ const Settings = () => {
     )
   }
 
+  function onAddCustomFromAddressClicked() {
+    modalContext.setModalContent(
+      <AddCustomFromAddress
+        customFromAddresses={customFromAddresses}
+        onSuccess={fetchCustomFromAddresses}
+      />
+    )
+  }
+
   async function fetchUserSettings() {
     const { hasApiKey, creds } = await getUserSettings()
     setCreds(creds)
     setHasApiKey(hasApiKey)
+  }
+
+  async function fetchCustomFromAddresses() {
+    const customFromAddresses = await getCustomFromAddresses()
+    setCustomFromAddresses(customFromAddresses)
+    setHasCustomFromAddresses(customFromAddresses.length > 1)
   }
 
   function renderEmptySettings() {
@@ -85,6 +115,10 @@ const Settings = () => {
               Generate API key
               <i className={cx('bx', 'bx-key')}></i>
             </button>
+            <button onClick={onAddCustomFromAddressClicked}>
+              Add From Address
+              <i className={cx('bx', 'bx-mail-send')}></i>
+            </button>
           </div>
         </div>
       </div>
@@ -99,6 +133,12 @@ const Settings = () => {
           <Switch>
             <Route exact path="/settings/api">
               <ApiKey hasApiKey={hasApiKey} />
+            </Route>
+            <Route exact path="/settings/email">
+              <CustomFromAddress
+                customFromAddresses={customFromAddresses}
+                onSuccess={fetchCustomFromAddresses}
+              />
             </Route>
             <Route exact path="/settings/sms">
               <Credentials
@@ -126,7 +166,7 @@ const Settings = () => {
   return (
     <>
       <TitleBar title="Settings"> </TitleBar>
-      {!hasApiKey && creds.length < 1
+      {!hasApiKey && creds.length < 1 && !hasCustomFromAddresses
         ? renderEmptySettings()
         : renderSettings()}
     </>

@@ -11,6 +11,7 @@ export interface EmailPreview {
   body: string
   subject: string
   replyTo: string | null
+  from: string
 }
 
 export class EmailCampaign extends Campaign {
@@ -18,6 +19,7 @@ export class EmailCampaign extends Campaign {
   params: Array<string>
   subject: string
   replyTo: string | null
+  from: string
   csvFilename: string
   numRecipients: number
   hasCredential: boolean
@@ -29,6 +31,7 @@ export class EmailCampaign extends Campaign {
     this.params = input['email_templates']?.params
     this.subject = input['email_templates']?.subject
     this.replyTo = input['email_templates']?.reply_to
+    this.from = input['email_templates']?.from
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
     this.hasCredential = input['has_credential']

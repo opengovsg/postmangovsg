@@ -164,7 +164,7 @@ const getUserForApiKey = async (req: Request): Promise<User | null> => {
     const hash = await ApiKeyService.getApiKeyHash(apiKey)
     const user = await User.findOne({
       where: { apiKey: hash },
-      attributes: ['id'],
+      attributes: ['id', 'email'],
     })
     return user
   }
@@ -209,6 +209,7 @@ const sendOtp = async (
 
   const appName = config.get('APP_NAME')
   return MailService.mailClient.sendMail({
+    from: config.get('mailFrom'),
     recipients: [email],
     subject: `One-Time Password (OTP) for ${appName}`,
     body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(

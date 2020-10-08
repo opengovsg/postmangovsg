@@ -70,6 +70,7 @@ const verifyOtp = async (
         id: user.id,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
+        email: user.email,
       }
       logger.info({
         message: 'User session saved successfully',

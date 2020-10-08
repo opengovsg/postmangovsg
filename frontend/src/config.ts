@@ -37,7 +37,9 @@ export const LINKS = {
   tncUrl: t('link.tncUrl')``,
   privacyUrl: t('link.privacyUrl')``,
   reportBugUrl: t('link.reportBugUrl')``,
+  customFromAddressRequestUrl: t('link.customFromAddressRequestUrl')``,
 }
+export const DEFAULT_MAIL_FROM = t('defaultMailFrom')``
 //#endregion
 
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { cloneDeep } from 'lodash'
 
-import { Campaign, EmailCampaign, EmailProgress } from 'classes'
+import { Campaign, EmailCampaign, EmailProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import EmailTemplate from './EmailTemplate'
 import EmailRecipients from './EmailRecipients'
@@ -11,7 +11,6 @@ import EmailDetail from './EmailDetail'
 import EmailCredentials from './EmailCredentials'
 
 import styles from '../Create.module.scss'
-import { Status } from 'classes'
 
 const EMAIL_PROGRESS_STEPS = [
   'Create message',
@@ -63,6 +62,7 @@ const CreateEmail = ({
       case EmailProgress.CreateTemplate:
         return (
           <EmailTemplate
+            from={campaign.from}
             subject={campaign.subject}
             body={campaign.body}
             replyTo={campaign.replyTo}
