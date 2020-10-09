@@ -1,10 +1,12 @@
 import twilio from 'twilio'
 import bcrypt from 'bcrypt'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
 
+const logger = createCustomLogger(module)
 const SALT_ROUNDS = 10
+
 export default class TwilioClient {
   private client: any
   private messagingServiceSid: string
@@ -80,7 +82,11 @@ export default class TwilioClient {
     // encode password as the hash contains special characters
     callbackUrl.password = encodeURIComponent(hashedPwd)
     callbackUrl.pathname = `${callbackUrl.pathname}/${campaignId}/${messageId}`
-    logger.info(`Status callback url for ${messageId}: ${callbackUrl}`)
+    logger.info({
+      message: 'Generate status callback url',
+      messageId,
+      callbackUrl,
+    })
     return callbackUrl.toString()
   }
 

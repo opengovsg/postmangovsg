@@ -7,11 +7,13 @@
  */
 
 import { QueryTypes } from 'sequelize'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import { Sequelize } from 'sequelize-typescript'
 import difference from 'lodash/difference'
 import config from '@core/config'
 import ECSLoader from './ecs'
+
+const logger = createCustomLogger(module)
 
 const getWorkersInDatabase = (connection: Sequelize): Promise<string[]> => {
   return connection.query('SELECT id FROM workers;').then((results: any[]) => {
@@ -24,12 +26,25 @@ const getDeadWorkers = async (
   connection: Sequelize,
   workerId: string
 ): Promise<string[]> => {
+  const logMeta = { workerId, action: 'getDeadWorkers' }
   const serviceWorkers = await ECSLoader.getWorkersInService()
-  logger.info(`${workerId}: Workers in ECS - ${serviceWorkers}`)
+  logger.info({
+    message: 'Workers in ECS',
+    serviceWorkers,
+    ...logMeta,
+  })
   const jobWorkers = await getWorkersInDatabase(connection)
-  logger.info(`${workerId}: Workers in database - ${jobWorkers}`)
+  logger.info({
+    message: 'Workers in database',
+    jobWorkers,
+    ...logMeta,
+  })
   const deadWorkers = difference(jobWorkers, serviceWorkers)
-  logger.info(`${workerId}: Dead workers -  ${deadWorkers}`)
+  logger.info({
+    message: 'Dead workers',
+    deadWorkers,
+    ...logMeta,
+  })
 
   return deadWorkers
 }
@@ -42,7 +57,8 @@ const replaceDeadWorker = (
   workerId: string,
   deadWorker: string
 ): Promise<boolean> => {
-  logger.info(`${workerId}: Replacing deadWorker ${deadWorker}`)
+  const logMeta = { workerId, deadWorker, action: 'replaceDeadWorker' }
+  logger.info({ message: 'Replacing deadWorker', ...logMeta })
   // The update of worker's id will cascade to the job queue
   return connection
     .query(
@@ -55,14 +71,18 @@ const replaceDeadWorker = (
     .then(([_results, rowCount]: [any, number]) => {
       const success = rowCount === 1 // Managed to replace a worker
       if (success) {
-        logger.info(`${workerId}: Replaced deadWorker ${deadWorker}`)
+        logger.info({ message: 'Replaced deadWorker', ...logMeta })
       } else {
-        logger.info(`${workerId}: Failed to replace deadWorker ${deadWorker}`)
+        logger.error({ message: 'Failed to replace deadWorker', ...logMeta })
       }
       return success
     })
     .catch((err: Error) => {
-      logger.error(err)
+      logger.error({
+        message: 'Failed to replace deadWorker',
+        error: err,
+        ...logMeta,
+      })
       return false
     })
 }
@@ -71,7 +91,8 @@ const insertNewWorker = (
   connection: Sequelize,
   workerId: string
 ): Promise<boolean> => {
-  logger.info(`${workerId}: Inserting new worker`)
+  const logMeta = { workerId, action: 'insertNewWorker' }
+  logger.info({ message: 'Inserting new worker', ...logMeta })
   return connection
     .query(
       'INSERT INTO workers (id, created_at, updated_at) VALUES (:workerId, clock_timestamp(), clock_timestamp()) ON CONFLICT (id) DO NOTHING;',
@@ -81,11 +102,15 @@ const insertNewWorker = (
       }
     )
     .then(() => {
-      logger.info(`${workerId}: Inserted new worker`)
+      logger.info({ message: 'Inserted new worker', ...logMeta })
       return true
     })
     .catch((err: Error) => {
-      logger.error(err)
+      logger.error({
+        message: 'Failed to insert new worker',
+        error: err,
+        ...logMeta,
+      })
       return false
     })
 }
@@ -99,7 +124,11 @@ const assignment = async (
     if (config.get('env') !== 'development') {
       deadWorkers = await getDeadWorkers(connection, workerId)
     } else {
-      logger.info(`${workerId}: Dev env - assignment - assumed no dead workers`)
+      logger.info({
+        message: 'Dev env - assignment - assumed no dead workers',
+        workerId,
+        action: 'assignment',
+      })
     }
     if (deadWorkers.length === 0) {
       return insertNewWorker(connection, workerId)

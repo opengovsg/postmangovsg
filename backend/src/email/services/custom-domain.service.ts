@@ -5,9 +5,10 @@ import config from '@core/config'
 
 import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import { formatFromAddress } from '@core/utils/from-address'
 
+const logger = createCustomLogger(module)
 const [, region] = config.get('mailOptions.host').split('.')
 const ses = new AWS.SES({ region: region })
 /**
@@ -29,7 +30,12 @@ const verifyCnames = async (
       }
     }
   } catch (e) {
-    logger.error(`Verification of dkim records failed. email=${email}`)
+    logger.error({
+      message: 'Verification of dkim records failed',
+      email,
+      error: e,
+      action: 'verifyCnames',
+    })
     throw new Error(
       `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
     )
@@ -55,7 +61,11 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 
   // Check verification status & make sure dkim tokens are present
   if (!verificationStatus || verificationStatus !== 'Success' || !dkimTokens) {
-    logger.error(`Verification on AWS failed. email=${email}`)
+    logger.error({
+      message: 'Verification on AWS failed',
+      email,
+      action: 'verifyEmailWithAWS',
+    })
     throw new Error(
       `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
     )
@@ -106,7 +116,12 @@ const storeFromAddress = async (
       email,
     })
   } catch (err) {
-    logger.error(`${err.stack}`)
+    logger.error({
+      message: 'Failed to store email address in EmailFromAddress table',
+      email,
+      error: err,
+      action: 'verifyEmailstoreFromAddressWithAWS',
+    })
     throw new Error(`Failed to store verified email for ${email}`)
   }
 }

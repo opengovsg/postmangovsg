@@ -59,9 +59,15 @@ const getNextJob = (): Promise<{
       } = nextJob
       currentCampaignType = campaignType
       if (jobId)
-        logger.info(
-          `${workerId}:  get_next_job job_id=${jobId} campaign_id=${campaignId} campaign_type=${campaignType} cred_name=${credName}`
-        )
+        logger.info({
+          message: 'Get next job',
+          workerId,
+          jobId,
+          campaignId,
+          campaignType,
+          credName,
+          action: 'getNextJob',
+        })
       return { jobId, campaignId, campaignType, rate, credName }
     })
 }
@@ -83,27 +89,36 @@ const finalize = (): Promise<void> => {
     .query('SELECT log_next_job_email();')
     .then(([result]) => get(result, '[0].log_next_job_email', ''))
     .catch((err) => {
-      logger.error(err)
+      logger.error({ message: 'Log email job', error: err, action: 'finalize' })
     })
 
   const logSmsJob = connection
     .query('SELECT log_next_job_sms();')
     .then(([result]) => get(result, '[0].log_next_job_sms', ''))
     .catch((err) => {
-      logger.error(err)
+      logger.error({ message: 'Log sms job', error: err, action: 'finalize' })
     })
 
   const logTelegramJob = connection
     .query('SELECT log_next_job_telegram();')
     .then(([result]) => get(result, '[0].log_next_job_telegram', ''))
     .catch((err) => {
-      logger.error(err)
+      logger.error({
+        message: 'Log telegram job',
+        error: err,
+        action: 'finalize',
+      })
     })
 
   return Promise.all([logEmailJob, logSmsJob, logTelegramJob]).then(
     (campaignIds) => {
       campaignIds.filter(Boolean).forEach((campaignId) => {
-        logger.info(`${workerId}: finalized campaignId=${campaignId}`)
+        logger.info({
+          message: 'Logging finalized',
+          workerId,
+          campaignId,
+          action: 'finalize',
+        })
       })
     }
   )
@@ -150,9 +165,15 @@ const enqueueAndSend = async (): Promise<void> => {
         // Make sure at least 1 second has elapsed
         const wait = Math.max(0, 1000 - (Date.now() - start))
         await waitForMs(wait)
-        logger.info(
-          `${workerId}: jobId=${jobId} rate=${rate} numMessages=${messages.length} wait=${wait}`
-        )
+        logger.info({
+          message: 'Sending messages',
+          workerId,
+          jobId,
+          rate,
+          numMessages: messages.length,
+          wait,
+          action: 'enqueueAndSend',
+        })
       }
     }
     await service().destroySendingService()
@@ -172,7 +193,11 @@ const createAndResumeWorker = (): Promise<void> => {
       })
     })
     .then(() => {
-      logger.info(`${workerId}: Resumed`)
+      logger.info({
+        message: 'Resumed worker',
+        workerId,
+        action: 'createAndResumeWorker',
+      })
     })
 }
 

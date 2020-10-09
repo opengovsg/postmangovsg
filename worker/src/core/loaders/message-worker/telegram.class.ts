@@ -3,10 +3,11 @@ import { QueryTypes, Transaction } from 'sequelize'
 import { map } from 'lodash'
 
 import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
-import logger from '@core/logger'
+import { createCustomLogger } from '@core/utils/logger'
 import TelegramClient from '@telegram/services/telegram-client.class'
 import { CredentialService } from '@core/services/credential.service'
 
+const logger = createCustomLogger(module)
 const templateClient = new TemplateClient(XSS_TELEGRAM_OPTION)
 
 class Telegram {
@@ -57,7 +58,12 @@ class Telegram {
         }
       )
 
-      logger.info(`${this.workerId}: s_enqueueMessagesTelegram job_id=${jobId}`)
+      logger.info({
+        message: 'Enqueued telegram messages',
+        workerId: this.workerId,
+        jobId,
+        action: 'enqueueMessages',
+      })
     })
   }
 
@@ -140,7 +146,12 @@ class Telegram {
       )
     }
 
-    logger.info(`${this.workerId}: sendMessageTelegram id=${id}`)
+    logger.info({
+      message: 'Sent telegram message',
+      workerId: this.workerId,
+      id,
+      action: 'sendMessage',
+    })
   }
 }
 

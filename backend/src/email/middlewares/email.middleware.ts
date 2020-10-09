@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { EmailService, CustomDomainService } from '@email/services'
 import { parseFromAddress } from '@core/utils/from-address'
 import { AuthService } from '@core/services'
+import config from '@core/config'
 import { createCustomLogger } from '@core/utils/logger'
 
 const logger = createCustomLogger(module)
@@ -142,6 +143,14 @@ const isFromAddressAccepted = async (
   const { name, fromAddress } = parseFromAddress(from)
 
   if (fromAddress !== userEmail && from !== defaultEmail) {
+    logger.error({
+      message: "Invalid 'from' email address",
+      from,
+      userEmail,
+      defaultEmail,
+      fromAddress,
+      action: 'isFromAddressAccepted',
+    })
     return res.status(400).json({ message: "Invalid 'from' email address." })
   }
   res.locals.fromName = name
@@ -161,15 +170,24 @@ const existsFromAddress = async (
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
   if (from === defaultEmail) return next()
+  const { fromName, from: fromAddress } = res.locals
 
   try {
-    const { fromName, from: fromAddress } = res.locals
     const exists = await CustomDomainService.existsFromAddress(
       fromName,
       fromAddress
     )
     if (!exists) throw new Error('From Address has not been verified.')
   } catch (err) {
+    logger.error({
+      message: "Invalid 'from' email address",
+      from,
+      defaultEmail,
+      fromName,
+      fromAddress,
+      error: err,
+      action: 'existsFromAddress',
+    })
     return res.status(400).json({ message: err.message })
   }
   return next()
@@ -186,11 +204,19 @@ const verifyFromAddress = async (
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
   if (from === defaultEmail) return next()
+  const { from: fromAddress } = res.locals
 
   try {
-    const { from: fromAddress } = res.locals
     await CustomDomainService.verifyFromAddress(fromAddress)
   } catch (err) {
+    logger.error({
+      message: "Failed to verify 'from' email address",
+      from,
+      defaultEmail,
+      fromAddress,
+      error: err,
+      action: 'verifyFromAddress',
+    })
     return res.status(400).json({ message: err.message })
   }
   return next()
@@ -206,14 +232,30 @@ const storeFromAddress = async (
 ): Promise<Response | void> => {
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
-  if (from === defaultEmail) return res.sendStatus(200)
+  if (from === defaultEmail) {
+    logger.info({
+      message: "Stored verified 'from' email address",
+      from,
+      defaultEmail,
+      action: 'storeFromAddress',
+    })
+    return res.sendStatus(200)
+  }
+  const { fromName, from: fromAddress } = res.locals
 
   try {
-    const { fromName, from: fromAddress } = res.locals
     await CustomDomainService.storeFromAddress(fromName, fromAddress)
   } catch (err) {
     return next(err)
   }
+  logger.info({
+    message: "Stored verified 'from' email address",
+    from,
+    defaultEmail,
+    fromAddress,
+    fromName,
+    action: 'storeFromAddress',
+  })
   return res.status(200).json({ email: from })
 }
 
@@ -239,6 +281,12 @@ const getCustomFromAddress = async (
     return next(err)
   }
 
+  logger.info({
+    message: "Verified custom 'from' email address",
+    email,
+    defaultEmail,
+    action: 'getCustomFromAddress',
+  })
   return res.status(200).json({ from: result })
 }
 
@@ -254,6 +302,14 @@ const sendValidationMessage = async (
   try {
     await CustomDomainService.sendValidationMessage(recipient, from)
   } catch (err) {
+    logger.info({
+      message:
+        "Failed to send validation email from the specified 'from' email address",
+      recipient,
+      from,
+      error: err,
+      action: 'sendValidationMessage',
+    })
     return res.status(400).json({ message: err.message })
   }
   return next()

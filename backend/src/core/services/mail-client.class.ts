@@ -15,7 +15,7 @@ export default class MailClient {
     const { host, port, auth } = credentials
 
     if (!host) {
-      logger.info({ message: 'Mailer: Using direct transport', email })
+      logger.info({ message: 'Mailer: Using direct transport', host, port })
       this.mailer = nodemailer.createTransport(directTransport({ debug: true }))
       return
     }
@@ -24,7 +24,7 @@ export default class MailClient {
       throw new Error('Missing credentials while constructing MailService')
     }
 
-    logger.info({ message: 'Mailer: Using SMTP transport', email, host, port })
+    logger.info({ message: 'Mailer: Using SMTP transport', host, port })
     this.mailer = nodemailer.createTransport({
       host: host,
       port: +port,
