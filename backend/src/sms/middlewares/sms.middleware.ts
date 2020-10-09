@@ -3,9 +3,9 @@ import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 import config from '@core/config'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'SMS' type, and belongs to the user

@@ -3,7 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { AuthMiddleware } from '@core/middlewares'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 
 // Core routes
 import authenticationRoutes from './auth.routes'
@@ -30,7 +30,7 @@ import {
   telegramCallbackRoutes,
 } from '@telegram/routes'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 const CHANNEL_ROUTES = Object.values(ChannelType).map(
   (route) => `/${route.toLowerCase()}`

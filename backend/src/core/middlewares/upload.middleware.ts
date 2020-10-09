@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import { UploadService, MultipartUploadService } from '@core/services'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  * Start an upload by returning a presigned url to the user to upload file to s3 bucket
@@ -62,7 +62,7 @@ const startMultipartUpload = async (
       presigned_urls: data.presignedUrls,
     })
   } catch (err) {
-    return next({ err, ...logMeta })
+    return next(err)
   }
 }
 
@@ -95,7 +95,7 @@ const completeMultipart = async (
     logger.info({ message: 'Multipart file upload completed', ...logMeta })
     next()
   } catch (err) {
-    next({ err, ...logMeta })
+    next(err)
   }
 }
 

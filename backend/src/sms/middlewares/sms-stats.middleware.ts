@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { SmsStatsService } from '@sms/services'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  * Gets stats for sms campaign

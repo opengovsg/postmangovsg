@@ -1,8 +1,8 @@
 import validator from 'validator'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import config from '@core/config'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 type ValidateDomainFunction = (email: string) => boolean
 const getValidateDomain = (domains: string): ValidateDomainFunction => {

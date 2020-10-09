@@ -3,9 +3,9 @@ import { EmailService, CustomDomainService } from '@email/services'
 import { parseFromAddress } from '@core/utils/from-address'
 import { AuthService } from '@core/services'
 import config from '@core/config'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user

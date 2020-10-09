@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -109,12 +109,13 @@ const listCampaigns = async (
       userId,
     })
 
+    logger.info('yoyo')
     return res.json({
       campaigns: rows,
       total_count: count,
     })
   } catch (err) {
-    return next({ err, userId })
+    return next(err)
   }
 }
 

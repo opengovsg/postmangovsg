@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { SmsCallbackService } from '@sms/services'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 const isAuthenticated = (
   req: Request,

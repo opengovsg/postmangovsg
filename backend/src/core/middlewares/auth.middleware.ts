@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import config from '@core/config'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  *  Determines if an email is whitelisted / enough time has elapsed since the last otp request,

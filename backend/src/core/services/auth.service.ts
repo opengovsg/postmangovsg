@@ -2,13 +2,13 @@ import { authenticator } from 'otplib'
 import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import config from '@core/config'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import { User } from '@core/models'
 import { validateDomain } from '@core/utils/validate-domain'
 import { RedisService, ApiKeyService, MailService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 const SALT_ROUNDS = 10 // bcrypt default
 const {
   retries: OTP_RETRIES,

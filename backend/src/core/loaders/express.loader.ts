@@ -7,10 +7,10 @@ import * as Sentry from '@sentry/node'
 
 import config from '@core/config'
 import v1Router from '@core/routes'
-import { createCustomLogger, setRequestMetadata } from '@core/utils/logger'
+import { createLoggerWithLabel, setRequestMetadata } from '@core/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
 
 /**

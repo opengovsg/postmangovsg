@@ -2,14 +2,14 @@ import { Request } from 'express'
 import url from 'url'
 import crypto, { Utf8AsciiLatin1Encoding } from 'crypto'
 import https from 'https'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
 } from '@email/utils/callback/update-status'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 const REFERENCE_ID_HEADER_V1 = 'X-Postman-ID' // Case sensitive
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
 const certCache: { [key: string]: string } = {}

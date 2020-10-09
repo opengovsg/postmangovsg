@@ -5,10 +5,10 @@ import config from '@core/config'
 
 import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import { formatFromAddress } from '@core/utils/from-address'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 const [, region] = config.get('mailOptions.host').split('.')
 const ses = new AWS.SES({ region: region })
 /**

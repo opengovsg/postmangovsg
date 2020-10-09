@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { ProtectedService } from '@core/services'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  * Limit certain routes for protected campaigns only

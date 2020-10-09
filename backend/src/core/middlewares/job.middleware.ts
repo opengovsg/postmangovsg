@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { JobService } from '@core/services'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  * If the campaign has an associated credential, a template and valid csv uploaded,

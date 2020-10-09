@@ -1,10 +1,10 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message } from 'telegraf/typings/telegram-types'
 
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import config from '@core/config'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 const HELP_MESSAGE = `
 *Commands*
 /updatenumber - update your phone number

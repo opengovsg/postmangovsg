@@ -3,14 +3,14 @@ import { Request } from 'express'
 // @ts-ignore
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa'
 import config from '@core/config'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
 } from '@email/utils/callback/update-status'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 const PUBLIC_KEY = PublicKey.fromPem(
   config.get('emailCallback.sendgridPublicKey')
 )

@@ -1,12 +1,12 @@
 import { QueryTypes } from 'sequelize'
 
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import { StatsService } from '@core/services'
 import { CampaignStats, CampaignInvalidRecipient } from '@core/interfaces'
 
 import { EmailOp, EmailMessage } from '@email/models'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 /**
  * Gets stats for email project

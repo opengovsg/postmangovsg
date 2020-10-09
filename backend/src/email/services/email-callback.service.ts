@@ -1,9 +1,9 @@
 import { Request } from 'express'
 import { ses, sendgrid } from '@email/utils/callback/parsers'
 import config from '@core/config'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 const isAuthenticated = (authHeader?: string): boolean => {
   const headerKey = 'Basic'
