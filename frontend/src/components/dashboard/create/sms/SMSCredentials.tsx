@@ -13,6 +13,7 @@ import {
   ErrorBlock,
   Dropdown,
   CredLabelInput,
+  Checkbox,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
@@ -35,11 +36,12 @@ const SMSCredentials = ({
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as TwilioCredentials | null)
   const [label, setLabel] = useState('')
+  const [saveCredentialWithLabel, setSaveCredentialWithLabel] = useState(false)
   const [showCredentialFields, setShowCredentialFields] = useState(
     !hasCredential
   )
   const [isManual, setIsManual] = useState(false)
-  const [errorMessazge, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
   const { id: campaignId } = useParams()
 
   useEffect(() => {
@@ -66,6 +68,7 @@ const SMSCredentials = ({
     setIsManual((m) => !m)
     setCreds(null)
     setLabel('')
+    setSaveCredentialWithLabel(false)
     setSelectedCredential('')
   }
 
@@ -106,10 +109,26 @@ const SMSCredentials = ({
           <>
             <h2>Insert your Twilio credentials</h2>
             <CredLabelInput
+              className={{
+                [styles.credentialLabelInputError]:
+                  saveCredentialWithLabel && !label,
+              }}
               value={label}
               onChange={setLabel}
               labels={credLabels}
             />
+            {saveCredentialWithLabel && !label && (
+              <span className={styles.credentialLabelError}>
+                Please enter a credential name
+              </span>
+            )}
+            <Checkbox
+              checked={saveCredentialWithLabel}
+              onChange={setSaveCredentialWithLabel}
+            >
+              Save this credential for future use. If unchecked, nothing is
+              saved.
+            </Checkbox>
             <TwilioCredentialsInput
               onFilled={setCreds}
             ></TwilioCredentialsInput>
@@ -140,9 +159,13 @@ const SMSCredentials = ({
         </p>
         <SMSValidationInput
           onClick={handleValidateCredentials}
-          buttonDisabled={isManual ? !creds : !selectedCredential}
+          buttonDisabled={
+            isManual
+              ? !creds || (saveCredentialWithLabel && !label)
+              : !selectedCredential
+          }
         />
-        <ErrorBlock>{errorMessazge}</ErrorBlock>
+        <ErrorBlock>{errorMessage}</ErrorBlock>
       </>
     )
   }

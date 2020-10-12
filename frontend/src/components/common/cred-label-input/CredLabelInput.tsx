@@ -7,10 +7,12 @@ const CredLabelInput = ({
   value,
   onChange,
   labels,
+  className,
 }: {
   value: string
   onChange: (newValue: string) => any
   labels: string[]
+  className?: any
 }) => {
   function onLabelChange(value: string) {
     if (value) {
@@ -31,11 +33,8 @@ const CredLabelInput = ({
   return (
     <>
       <h5>Credential Label</h5>
-      <p>
-        (Optional) Provide a name for your credential to save it for future
-        uses.
-      </p>
       <TextInput
+        className={className}
         placeholder="Enter a label (e.g. default-cred-1)"
         value={value}
         maxLength="50"

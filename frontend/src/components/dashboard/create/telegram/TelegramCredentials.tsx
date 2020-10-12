@@ -17,6 +17,7 @@ import {
   ErrorBlock,
   Dropdown,
   CredLabelInput,
+  Checkbox,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -38,6 +39,7 @@ const TelegramCredentials = ({
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as any)
   const [label, setLabel] = useState('')
+  const [saveCredentialWithLabel, setSaveCredentialWithLabel] = useState(false)
   const [showCredentialFields, setShowCredentialFields] = useState(
     !hasCredential
   )
@@ -71,6 +73,7 @@ const TelegramCredentials = ({
     setIsManual((m) => !m)
     setCreds(null)
     setLabel('')
+    setSaveCredentialWithLabel(false)
     setSelectedCredential('')
   }
 
@@ -181,16 +184,35 @@ const TelegramCredentials = ({
 
             <div className={styles.validateCredentialsInfo}>
               <CredLabelInput
+                className={{
+                  [styles.credentialLabelInputError]:
+                    saveCredentialWithLabel && !label,
+                }}
                 value={label}
                 onChange={setLabel}
                 labels={credLabels}
               />
+              {saveCredentialWithLabel && !label && (
+                <span className={styles.credentialLabelError}>
+                  Please enter a credential name
+                </span>
+              )}
+              <Checkbox
+                checked={saveCredentialWithLabel}
+                onChange={setSaveCredentialWithLabel}
+              >
+                Save this credential for future use. If unchecked, nothing is
+                saved.
+              </Checkbox>
               <TelegramCredentialsInput onFilled={setCreds} />
             </div>
             <ErrorBlock>{errorMessage}</ErrorBlock>
 
             <div className="progress-button">
-              <PrimaryButton disabled={!creds} onClick={handleNewCredentials}>
+              <PrimaryButton
+                disabled={!creds || (saveCredentialWithLabel && !label)}
+                onClick={handleNewCredentials}
+              >
                 {isValidating ? (
                   <>
                     Validating<i className="bx bx-loader-alt bx-spin"></i>
