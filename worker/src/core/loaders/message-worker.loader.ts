@@ -1,9 +1,9 @@
 import { Worker, spawn, ModuleThread } from 'threads'
 import MessageWorker from './message-worker'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import config from '@core/config'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 const createMessageWorker = async (
   workerId: string,

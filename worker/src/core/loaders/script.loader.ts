@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { Sequelize } from 'sequelize-typescript'
-import { createCustomLogger } from '@core/utils/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
 import { sqlFilePaths } from '@core/resources/sql'
@@ -8,7 +8,7 @@ import { sqlFilePaths as emailSqlFilePaths } from '@email/resources/sql'
 import { sqlFilePaths as smsSqlFilePaths } from '@sms/resources/sql'
 import { sqlFilePaths as telegramSqlFilePaths } from '@telegram/resources/sql'
 
-const logger = createCustomLogger(module)
+const logger = createLoggerWithLabel(module)
 
 const scriptLoader = async (): Promise<void> => {
   const dialectOptions =
