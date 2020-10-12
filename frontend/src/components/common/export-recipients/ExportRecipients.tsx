@@ -12,6 +12,7 @@ export enum CampaignExportStatus {
   Unavailable = 'Unavailable',
   Loading = 'Loading',
   Ready = 'Ready',
+  Exporting = 'Exporting',
 }
 
 const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
@@ -54,7 +55,9 @@ const ExportRecipients = ({
         return setExportStatus(CampaignExportStatus.Loading)
       }
 
-      return setExportStatus(CampaignExportStatus.Ready)
+      if (exportStatus !== CampaignExportStatus.Exporting) {
+        setExportStatus(CampaignExportStatus.Ready)
+      }
     }
 
     getExportStatus()
@@ -69,6 +72,7 @@ const ExportRecipients = ({
     try {
       event.stopPropagation()
       setDisabled(true)
+      setExportStatus(CampaignExportStatus.Exporting)
 
       const list = await exportCampaignStats(campaignId)
 
@@ -101,6 +105,8 @@ const ExportRecipients = ({
         `${campaignName}_${sentAtTime.toLocaleDateString()}_${sentAtTime.toLocaleTimeString()}.csv`,
         'text/csv'
       )
+
+      setExportStatus(CampaignExportStatus.Ready)
     } catch (error) {
       console.error(error)
     } finally {
@@ -114,6 +120,8 @@ const ExportRecipients = ({
         return 'The delivery report would be available for download after sending is complete'
       case CampaignExportStatus.Loading:
         return 'The delivery report is being generated and would be available in a few minutes'
+      case CampaignExportStatus.Exporting:
+        return 'The delivery report is being exported and the download will begin shortly'
       case CampaignExportStatus.Ready:
         return 'Download delivery report'
     }
@@ -122,6 +130,7 @@ const ExportRecipients = ({
   function renderExportButtonContent() {
     switch (exportStatus) {
       case CampaignExportStatus.Loading:
+      case CampaignExportStatus.Exporting:
         return (
           <>
             <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
