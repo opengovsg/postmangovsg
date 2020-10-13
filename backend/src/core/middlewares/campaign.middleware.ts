@@ -109,7 +109,6 @@ const listCampaigns = async (
       userId,
     })
 
-    logger.info('yoyo')
     return res.json({
       campaigns: rows,
       total_count: count,

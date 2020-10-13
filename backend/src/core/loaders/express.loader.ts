@@ -4,10 +4,11 @@ import bodyParser from 'body-parser'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
 import morgan from 'morgan'
 import * as Sentry from '@sentry/node'
+import requestTracer from 'cls-rtracer'
 
 import config from '@core/config'
 import v1Router from '@core/routes'
-import { createLoggerWithLabel, setRequestMetadata } from '@core/logger'
+import { createLoggerWithLabel } from '@core/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
 const logger = createLoggerWithLabel(module)
@@ -33,6 +34,23 @@ const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
   stream: logger.stream,
 })
 
+const requestTracerMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const customRequestTracerMiddleware = requestTracer.expressMiddleware({
+    requestIdFactory: () => ({
+      ip: clientIp(req, res),
+      userId: userId(req, res),
+    }),
+  })
+  customRequestTracerMiddleware(req, res, next)
+}
+
+// const requestTracerMiddleware = requestTracer.expressMiddleware({requestIdFactory: (req: IncomingMessage, res: serverresponse) => { return { ip: clientIp(req, res), userId: userId(req, res) } }})
+// const requestTracerMiddleware2 = requestTracer.expressMiddleware()
+
 const sentrySessionMiddleware = (
   req: Request,
   _res: Response,
@@ -44,15 +62,6 @@ const sentrySessionMiddleware = (
   if (req.session?.apiKey) {
     Sentry.setTag('usesApiKey', 'true')
   }
-  next()
-}
-
-const loggerMetadataMiddleware = (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): void => {
-  setRequestMetadata(req, _res)
   next()
 }
 
@@ -82,7 +91,7 @@ const overrideContentTypeHeaderMiddleware = (
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
   app.use(loggerMiddleware)
-  app.use(loggerMetadataMiddleware)
+  app.use(requestTracerMiddleware)
 
   app.use(overrideContentTypeHeaderMiddleware)
   app.use(bodyParser.json())

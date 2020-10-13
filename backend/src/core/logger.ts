@@ -1,7 +1,6 @@
 import path from 'path'
 import winston from 'winston'
-import { Request, Response } from 'express'
-import { clientIp, userId } from '@core/utils/morgan'
+import requestTracer from 'cls-rtracer'
 
 const getModuleLabel = (callingModule: NodeModule): string => {
   // Remove the file extension from the filename and split with path separator.
@@ -11,9 +10,6 @@ const getModuleLabel = (callingModule: NodeModule): string => {
 }
 
 class Logger {
-  ip: string | undefined
-  userId: string | undefined
-
   createLoggerWithLabel(module: NodeModule): winston.Logger {
     const label = getModuleLabel(module)
     const logger = winston.loggers.add(label, {
@@ -21,7 +17,8 @@ class Logger {
       levels: winston.config.npm.levels,
       format: winston.format.combine(
         winston.format((info) => {
-          return { ip: this.ip, userId: this.userId, ...info }
+          const requestTracerMeta = requestTracer.id() as any
+          return { ...requestTracerMeta, ...info }
         })(),
         winston.format.timestamp(),
         winston.format.errors({ stack: true }),
@@ -43,12 +40,7 @@ class Logger {
     }
     return logger
   }
-
-  setRequestMetadata(req: Request, _res: Response): void {
-    this.ip = clientIp(req, _res)
-    this.userId = userId(req, _res)
-  }
 }
 
-const { createLoggerWithLabel, setRequestMetadata } = new Logger()
-export { createLoggerWithLabel, setRequestMetadata }
+const { createLoggerWithLabel } = new Logger()
+export { createLoggerWithLabel }
