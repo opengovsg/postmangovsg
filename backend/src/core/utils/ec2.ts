@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import axios, { AxiosResponse } from 'axios'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Gets metadata for ec2 instance

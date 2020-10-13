@@ -1,9 +1,9 @@
 import Papa, { ParseResult } from 'papaparse'
 import { RecipientColumnMissing, UserError } from '@core/errors/s3.errors'
 import { CSVParams } from '@core/types'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * This chunk size was intentionally chosen to be larger than a typical file because multiple inserts to the db slows the process down.

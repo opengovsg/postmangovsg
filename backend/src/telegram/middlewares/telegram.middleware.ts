@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { TelegramService } from '@telegram/services'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Parse telegram credentials from request body, setting it to res.locals.credentials to be passed downstream

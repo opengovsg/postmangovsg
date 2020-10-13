@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /*
  * Retrieves API key and stored credentials of the user

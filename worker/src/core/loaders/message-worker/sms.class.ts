@@ -1,14 +1,14 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import map from 'lodash/map'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 import config from '@core/config'
 import { CredentialService } from '@core/services/credential.service'
 import { PhoneNumberService } from '@core/services/phone-number.service'
 import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 const templateClient = new TemplateClient(XSS_SMS_OPTION)
 class SMS {

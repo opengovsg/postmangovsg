@@ -1,8 +1,8 @@
 import redis from 'redis'
 import config from '@core/config'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 if (!config.get('redisOtpUri')) {
   throw new Error('otpClient: redisOtpUri not found')

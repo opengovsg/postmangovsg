@@ -5,13 +5,13 @@ import config from '@core/config'
 import { ChannelType } from '@core/constants'
 import { Credential, UserCredential, User } from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
 import { TwilioCredentials } from '@sms/interfaces'
 import { UserSettings } from '@core/interfaces'
 
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Upserts credential into AWS SecretsManager

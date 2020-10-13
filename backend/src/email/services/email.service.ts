@@ -1,7 +1,7 @@
 import { Transaction } from 'sequelize'
 import { CSVParams } from '@core/types'
 
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { Campaign, ProtectedMessage } from '@core/models'
 import {
@@ -17,7 +17,7 @@ import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
 import config from '@core/config'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Gets a message's parameters

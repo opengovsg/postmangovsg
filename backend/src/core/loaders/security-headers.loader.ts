@@ -1,8 +1,8 @@
 import express from 'express'
 import helmet from 'helmet'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 const securityHeadersLoader = ({ app }: { app: express.Application }): void => {
   app.use(helmet.xssFilter())

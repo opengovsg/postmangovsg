@@ -1,12 +1,12 @@
 import { QueryTypes } from 'sequelize'
 
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 import { StatsService } from '@core/services'
 import { CampaignStats, CampaignInvalidRecipient } from '@core/interfaces'
 
 import { SmsOp, SmsMessage } from '@sms/models'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Gets stats for sms project

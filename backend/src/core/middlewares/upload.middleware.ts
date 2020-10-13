@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 import { UploadService, MultipartUploadService } from '@core/services'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Start an upload by returning a presigned url to the user to upload file to s3 bucket

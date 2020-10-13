@@ -8,10 +8,10 @@ import requestTracer from 'cls-rtracer'
 
 import config from '@core/config'
 import v1Router from '@core/routes'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
 
 /**

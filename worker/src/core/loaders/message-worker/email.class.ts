@@ -4,12 +4,12 @@ import map from 'lodash/map'
 import crypto from 'crypto'
 import validator from 'validator'
 
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
 class Email {
   private workerId: string

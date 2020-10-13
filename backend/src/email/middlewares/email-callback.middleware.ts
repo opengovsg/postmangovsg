@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailCallbackService } from '@email/services'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 const isAuthenticated = (
   req: Request,

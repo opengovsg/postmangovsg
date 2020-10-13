@@ -5,7 +5,7 @@ import S3 from 'aws-sdk/clients/s3'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { MissingTemplateKeysError } from '@core/errors/template.errors'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
@@ -15,7 +15,7 @@ import { CsvStatusInterface } from '@core/interfaces'
 import { CSVParams } from '@core/types'
 import { StatsService, CampaignService } from '.'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')

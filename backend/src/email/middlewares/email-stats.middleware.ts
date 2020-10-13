@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailStatsService } from '@email/services'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Gets stats for email campaign

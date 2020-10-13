@@ -2,9 +2,9 @@ import { Request } from 'express'
 import bcrypt from 'bcrypt'
 import config from '@core/config'
 import { SmsMessage } from '@sms/models'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 const FINALIZED_STATUS = ['sent', 'delivered', 'undelivered', 'failed']
 
 const isAuthenticated = (

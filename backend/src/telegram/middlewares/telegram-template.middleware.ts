@@ -13,9 +13,9 @@ import { TemplateError } from 'postman-templating'
 import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { Campaign } from '@core/models'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 const RETRY_CONFIG = {
   retries: 3,
   minTimeout: 1000,

@@ -1,11 +1,11 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 import { PostmanTelegramError } from '../PostmanTelegramError'
 import { TelegramSubscriber, BotSubscriber } from '@telegram/models'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Upserts a Telegram subscriber.

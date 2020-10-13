@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 
 import { CampaignService, UnsubscriberService } from '@core/services'
-import { createLoggerWithLabel } from '@core/logger'
+import Logger from '@core/logger'
 
-const logger = createLoggerWithLabel(module)
+const logger = Logger.loggerWithLabel(module)
 
 /**
  * Validate and check if params for unsubscribe request are valid
