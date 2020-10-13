@@ -1,7 +1,7 @@
 import { QueryTypes } from 'sequelize'
 import logger from '@core/logger'
 import { StatsService } from '@core/services'
-import { CampaignStats, CampaignInvalidRecipient } from '@core/interfaces'
+import { CampaignStats, CampaignRecipient } from '@core/interfaces'
 
 import { TelegramOp, TelegramMessage } from '@telegram/models'
 
@@ -30,18 +30,18 @@ const refreshStats = async (campaignId: number): Promise<void> => {
 }
 
 /**
- * Gets failed recipients for Telegram project
+ * Gets delivered recipients for Telegram campaign
  * @param campaignId
  */
-const getFailedRecipients = async (
+const getDeliveredRecipients = async (
   campaignId: number
-): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+): Promise<Array<CampaignRecipient>> => {
   await refreshStats(+campaignId)
-  return StatsService.getFailedRecipients(campaignId, TelegramMessage)
+  return StatsService.getDeliveredRecipients(campaignId, TelegramMessage)
 }
 
 export const TelegramStatsService = {
   getStats,
-  getFailedRecipients,
+  getDeliveredRecipients,
   refreshStats,
 }

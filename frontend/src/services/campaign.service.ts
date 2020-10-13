@@ -7,7 +7,7 @@ import {
   SMSCampaign,
   EmailCampaign,
   TelegramCampaign,
-  CampaignInvalidRecipient,
+  CampaignRecipient,
 } from 'classes'
 import moment from 'moment'
 
@@ -141,16 +141,16 @@ export async function retryCampaign(campaignId: number): Promise<void> {
 
 export async function exportCampaignStats(
   campaignId: number
-): Promise<Array<CampaignInvalidRecipient>> {
+): Promise<Array<CampaignRecipient>> {
   return axios.get(`/campaign/${campaignId}/export`).then((response) => {
-    const invalidRecipients = response.data?.map(
-      (record: any) => new CampaignInvalidRecipient(record)
+    const campaignRecipients = response.data?.map(
+      (record: any) => new CampaignRecipient(record)
     )
-    for (const invalidRecipient of invalidRecipients) {
-      invalidRecipient.updatedAt = moment(invalidRecipient.updatedAt)
+    for (const campaignRecipient of campaignRecipients) {
+      campaignRecipient.updatedAt = moment(campaignRecipient.updatedAt)
         .format('LLL')
         .replace(',', '')
     }
-    return invalidRecipients
+    return campaignRecipients
   })
 }
