@@ -26,6 +26,7 @@ const cloudwatchLoader = async (): Promise<void> => {
           logGroupName: config.get('aws.logGroupName'),
           logStreamName: instanceId,
           awsOptions: configureEndpoint(config),
+          jsonMessage: true,
         })
       )
     }
