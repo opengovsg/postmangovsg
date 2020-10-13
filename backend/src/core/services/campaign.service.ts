@@ -73,12 +73,6 @@ const listCampaigns = ({
           ['updated_at', 'status_updated_at'],
         ],
       },
-      {
-        model: Statistic,
-        attributes: [
-          [literal('(errored + invalid) > 0'), 'has_failed_recipients'],
-        ],
-      },
     ],
   }
   if (offset) {

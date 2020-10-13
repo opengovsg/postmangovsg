@@ -92,9 +92,8 @@ const EmailDetail = ({
             to send again.
           </p>
           <p>
-            If you encounter failed deliveries, you can download the error list
-            from this page or the dashboard few minutes after sending has
-            completed.
+            An export button will appear for you to download a report with the
+            recipient’s mobile number and delivery status when it is ready.
           </p>
         </>
       )}

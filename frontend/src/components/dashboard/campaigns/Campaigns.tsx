@@ -115,7 +115,6 @@ const Campaigns = () => {
             sentAt={campaign.sentAt}
             status={campaign.status}
             statusUpdatedAt={campaign.statusUpdatedAt}
-            hasFailedRecipients={campaign.hasFailedRecipients}
           />
         )
       },

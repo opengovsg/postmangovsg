@@ -12,7 +12,7 @@ export enum CampaignExportStatus {
   Unavailable = 'Unavailable',
   Loading = 'Loading',
   Ready = 'Ready',
-  NoError = 'No Error',
+  Exporting = 'Exporting',
 }
 
 const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
@@ -23,7 +23,6 @@ const ExportRecipients = ({
   sentAt,
   status,
   statusUpdatedAt,
-  hasFailedRecipients,
   iconPosition,
   isButton = false,
 }: {
@@ -32,7 +31,6 @@ const ExportRecipients = ({
   sentAt: Date
   status: Status
   statusUpdatedAt: Date
-  hasFailedRecipients: boolean
   iconPosition: 'left' | 'right'
   isButton?: boolean
 }) => {
@@ -52,16 +50,14 @@ const ExportRecipients = ({
       const updatedAtTimestamp = +new Date(statusUpdatedAt)
       const campaignAge = Date.now() - updatedAtTimestamp
       if (campaignAge <= EXPORT_LINK_DISPLAY_WAIT_TIME) {
-        // poll export status until it has reached finalised status (Ready or No Error)
+        // poll export status until it has reached finalised status (Ready)
         timeoutId = setTimeout(getExportStatus, 2000)
         return setExportStatus(CampaignExportStatus.Loading)
       }
 
-      return setExportStatus(
-        hasFailedRecipients
-          ? CampaignExportStatus.Ready
-          : CampaignExportStatus.NoError
-      )
+      if (exportStatus !== CampaignExportStatus.Exporting) {
+        setExportStatus(CampaignExportStatus.Ready)
+      }
     }
 
     getExportStatus()
@@ -76,27 +72,41 @@ const ExportRecipients = ({
     try {
       event.stopPropagation()
       setDisabled(true)
+      setExportStatus(CampaignExportStatus.Exporting)
+
       const list = await exportCampaignStats(campaignId)
-      const headers = Object.keys(list[0]).map((key) => `"${key}"`)
-      const sentAtTime = new Date(sentAt)
-      const explanation = `"This report was exported on ${moment()
-        .format('LLL')
-        .replace(
-          ',',
-          ''
-        )} and can change in the future when Postman receives notifications about the sent messages."\n`
-      const content = [explanation, `${headers.join(',')}\n`].concat(
-        list.map((row) => {
+
+      const exportedAt = moment().format('LLL').replace(',', '')
+      const explanation = `"This report was exported on ${exportedAt} and can change in the future when Postman receives notifications about the sent messages."\n`
+
+      let content = [explanation]
+
+      // Handle the edge case where the display wait time is reached but none of the status are updated yet in the message table.
+      if (list.length > 0) {
+        const headers = Object.keys(list[0])
+          .map((key) => `"${key}"`)
+          .join(',')
+          .concat('\n')
+
+        const recipients = list.map((row) => {
           const values = Object.values(row)
           return `${values.map((value) => `"${value}"`).join(',')}\n`
         })
-      )
 
+        content = content.concat(headers, recipients)
+      } else {
+        const emptyExplaination = `"Finalised delivery statuses for your messages are not yet available, try exporting again later."\n`
+        content = content.concat(emptyExplaination)
+      }
+
+      const sentAtTime = new Date(sentAt)
       download(
         new Blob(content),
         `${campaignName}_${sentAtTime.toLocaleDateString()}_${sentAtTime.toLocaleTimeString()}.csv`,
         'text/csv'
       )
+
+      setExportStatus(CampaignExportStatus.Ready)
     } catch (error) {
       console.error(error)
     } finally {
@@ -107,33 +117,32 @@ const ExportRecipients = ({
   function renderTitle() {
     switch (exportStatus) {
       case CampaignExportStatus.Unavailable:
-        return 'The error list would be available for download after sending is complete'
+        return 'The delivery report would be available for download after sending is complete'
       case CampaignExportStatus.Loading:
-        return 'The error list is being generated and would be available in a few minutes'
+        return 'The delivery report is being generated and would be available in a few minutes'
+      case CampaignExportStatus.Exporting:
+        return 'The delivery report is being exported and the download will begin shortly'
       case CampaignExportStatus.Ready:
-        return 'Download list of recipients with failed deliveries'
-      case CampaignExportStatus.NoError:
-        return 'There are no failed deliveries for this campaign'
+        return 'Download delivery report'
     }
   }
 
   function renderExportButtonContent() {
     switch (exportStatus) {
       case CampaignExportStatus.Loading:
+      case CampaignExportStatus.Exporting:
         return (
           <>
             <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
-            <span>Error list</span>
+            <span>Delivery report</span>
           </>
         )
-      case CampaignExportStatus.NoError:
-        return <span>No error</span>
       case CampaignExportStatus.Unavailable:
       case CampaignExportStatus.Ready:
         return (
           <>
             <i className={cx(styles.icon, 'bx bx-download')}></i>
-            <span>Error list</span>
+            <span>Delivery report</span>
           </>
         )
     }
