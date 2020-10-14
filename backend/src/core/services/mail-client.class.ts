@@ -45,6 +45,8 @@ export default class MailClient {
         html: input.body,
         headers: {},
       }
+      const logMeta = { to: options.to, from: options.from, action: 'sendMail' }
+
       if (input.referenceId !== undefined) {
         // Signature expected by Sendgrid
         // https://sendgrid.com/docs/for-developers/tracking-events/event/#unique-arguments
@@ -58,14 +60,14 @@ export default class MailClient {
           logger.error({
             message: 'Failed to send email',
             error: err,
-            action: 'sendMail',
+            ...logMeta,
           })
           reject(new Error(`${err}`))
         } else {
           logger.info({
             message: 'Successfully sent email',
             messageId: info.messageId,
-            action: 'sendMail',
+            ...logMeta,
           })
           resolve(info.messageId)
         }
