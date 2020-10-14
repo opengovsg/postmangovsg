@@ -8,6 +8,7 @@ import {
 } from 'services/campaign.service'
 import { ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+import { i18n } from 'locales'
 
 const SMSDetail = ({
   id,
@@ -73,45 +74,77 @@ const SMSDetail = ({
     }
   }, [id, stats.status])
 
-  return (
-    <>
-      {stats.status === Status.Sending ? (
+  function renderProgressHeader() {
+    if (stats.waitTime && stats.waitTime > 0) {
+      return (
+        <>
+          <h2>Other campaigns are queued ahead of this campaign.</h2>
+          <p>
+            Your campaign should start in approximately{' '}
+            <b>
+              {i18n.plural({
+                value: Math.ceil(stats.waitTime / 60),
+                one: '# minute',
+                other: '# minutes',
+              })}
+            </b>
+            . You can leave this page in the meantime, and check on the progress
+            by returning to this page from the Campaigns tab.
+          </p>
+        </>
+      )
+    } else if (stats.status === Status.Sending) {
+      return (
         <>
           <h2>Your campaign is being sent out now!</h2>
           <p>
-            It may take a few minutes to complete. You can leave this page in
-            the meantime, and check on the progress by returning to this page
-            from the Campaigns tab.
+            It may take some time to complete. You can leave this page in the
+            meantime, and check on the progress by returning to this page from
+            the Campaigns tab.
           </p>
         </>
-      ) : (
+      )
+    } else {
+      return (
         <>
           <h2>Your campaign has been sent!</h2>
           <p>
             If there are errors with sending your messages, you can click Retry
             to send again.
-            <br />
+          </p>
+          <p>
             If you encounter failed deliveries, you can download the error list
             from this page or the dashboard few minutes after sending has
             completed.
           </p>
         </>
-      )}
+      )
+    }
+  }
 
-      <div className="separator"></div>
-
-      {stats.status && (
-        <ProgressDetails
-          campaignId={id}
-          campaignName={name}
-          sentAt={sentAt}
-          numRecipients={numRecipients}
-          stats={stats}
-          handlePause={handlePause}
-          handleRetry={handleRetry}
-          handleRefreshStats={handleRefreshStats}
-        />
-      )}
+  function renderProgressDetails() {
+    return (
+      <>
+        <div className="separator"></div>
+        {stats.status && (
+          <ProgressDetails
+            campaignId={id}
+            campaignName={name}
+            sentAt={sentAt}
+            numRecipients={numRecipients}
+            stats={stats}
+            handlePause={handlePause}
+            handleRetry={handleRetry}
+            handleRefreshStats={handleRefreshStats}
+          />
+        )}
+      </>
+    )
+  }
+  return (
+    <>
+      {renderProgressHeader()}
+      {renderProgressDetails()}
     </>
   )
 }
