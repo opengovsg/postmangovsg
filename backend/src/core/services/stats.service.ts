@@ -115,7 +115,7 @@ const getCurrentStats = async (
     include: [
       {
         model: Campaign,
-        attributes: ['halted'],
+        attributes: ['halted', ['cred_name', 'credName']],
       },
     ],
   })
@@ -148,13 +148,8 @@ const getCurrentStats = async (
   }
 
   const stats = {
-    error: archivedStats.error,
-    unsent: archivedStats.unsent,
-    sent: archivedStats.sent,
-    invalid: archivedStats.invalid,
+    ...archivedStats,
     status: job.status,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    updated_at: archivedStats.updated_at,
     halted: job.campaign.halted,
     status_updated_at: job.updatedAt, // Timestamp when job was logged
   }
@@ -164,15 +159,13 @@ const getCurrentStats = async (
     return stats
   }
 
-  const campaign = await Campaign.findByPk(campaignId)
-  if (!campaign || !campaign.credName) {
-    throw new Error('Unable to find campaign in campaigns table.')
+  if (!job.campaign.credName) {
+    throw new Error('Missing credential for campaign')
   }
-
   // get send time of all campaigns using this credential that are queued before this campaign
   const data = await JobQueue.findAll({
     where: {
-      updated_at: { [Op.lt]: job.updatedAt },
+      id: { [Op.lt]: job.id },
       status: {
         [Op.or]: [JobStatus.Enqueued, JobStatus.Ready, JobStatus.Sending],
       },
@@ -180,22 +173,22 @@ const getCurrentStats = async (
     include: [
       {
         model: Campaign,
-        where: { credName: campaign.credName },
+        where: { credName: job.campaign.credName },
         include: [Statistic],
       },
     ],
-    attributes: [[literal('unsent / send_rate'), 'send_time']],
+    attributes: [[literal('unsent / send_rate'), 'wait_time']],
     raw: true,
   })
 
-  const totalWaitTime = data.reduce(function (time, job) {
-    const { send_time: sendTime } = job as any
-    return time + sendTime
+  const totalWaitTime = data.reduce((time: number, job: any) => {
+    const { wait_time: waitTime } = job
+    return time + waitTime
   }, 0)
 
   return {
     ...stats,
-    queue_time: totalWaitTime,
+    wait_time: totalWaitTime,
   }
 }
 
