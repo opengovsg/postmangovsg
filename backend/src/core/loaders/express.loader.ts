@@ -12,6 +12,7 @@ import Logger from '@core/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
 const logger = Logger.loggerWithLabel(module)
+const loggerInstamce = Logger.logger
 const FRONTEND_URL = config.get('frontendUrl')
 
 /**
@@ -31,14 +32,14 @@ morgan.token('user-id', userId)
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
-  stream: logger.stream,
+  stream: loggerInstamce.stream,
 })
 
 const requestTracerMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const customRequestTracerMiddleware = requestTracer.expressMiddleware({
     requestIdFactory: () => ({
       ip: clientIp(req, res),
@@ -47,9 +48,6 @@ const requestTracerMiddleware = (
   })
   customRequestTracerMiddleware(req, res, next)
 }
-
-// const requestTracerMiddleware = requestTracer.expressMiddleware({requestIdFactory: (req: IncomingMessage, res: serverresponse) => { return { ip: clientIp(req, res), userId: userId(req, res) } }})
-// const requestTracerMiddleware2 = requestTracer.expressMiddleware()
 
 const sentrySessionMiddleware = (
   req: Request,
