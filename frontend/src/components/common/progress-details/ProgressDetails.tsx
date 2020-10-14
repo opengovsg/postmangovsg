@@ -2,7 +2,7 @@ import React from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
-import { CampaignStats, Status } from 'classes/Campaign'
+import { ChannelType, CampaignStats, Status } from 'classes/Campaign'
 import { ProgressBar, PrimaryButton, ExportRecipients } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
@@ -11,6 +11,7 @@ import { i18n } from 'locales'
 const ProgressDetails = ({
   campaignId,
   campaignName,
+  campaignType,
   sentAt,
   numRecipients,
   stats,
@@ -20,6 +21,7 @@ const ProgressDetails = ({
 }: {
   campaignId: number
   campaignName: string
+  campaignType: ChannelType
   sentAt: Date
   numRecipients: number
   stats: CampaignStats
@@ -141,6 +143,7 @@ const ProgressDetails = ({
         iconPosition="right"
         campaignId={campaignId}
         campaignName={campaignName}
+        campaignType={campaignType}
         sentAt={sentAt}
         status={status}
         statusUpdatedAt={statusUpdatedAt}

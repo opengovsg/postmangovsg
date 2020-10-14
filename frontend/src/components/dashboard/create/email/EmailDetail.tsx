@@ -102,6 +102,7 @@ const EmailDetail = ({
         <ProgressDetails
           campaignId={id}
           campaignName={name}
+          campaignType={ChannelType.Email}
           sentAt={sentAt}
           numRecipients={numRecipients}
           stats={stats}

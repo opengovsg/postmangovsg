@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
@@ -81,7 +83,7 @@ export class CampaignStats {
   }
 }
 
-export class CampaignRecipient {
+export abstract class CampaignRecipient {
   recipient: string
   status: string
   errorCode: string
@@ -90,7 +92,9 @@ export class CampaignRecipient {
   constructor(input: any) {
     this.recipient = input['recipient']
     this.status = input['status']
-    this.errorCode = input['error_code']
-    this.updatedAt = input['updated_at']
+    this.errorCode = this.formatErrorCode(input['error_code'])
+    this.updatedAt = moment(input['updated_at']).format('LLL').replace(',', '')
   }
+
+  protected abstract formatErrorCode(errorCode: string): string
 }

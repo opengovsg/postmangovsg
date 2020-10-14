@@ -57,7 +57,7 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:58
+#: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:71
 #: src/config.ts:42
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
@@ -65,6 +65,42 @@ msgstr "donotreply@mail.postman.gov.sg"
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
+
+#: src/classes/EmailCampaign.ts:51
+msgid "errors.email.blacklist"
+msgstr "Blacklisted: The email recipient is not valid and might not exist. You have sent to this invalid email address before and we have added this email address to postman's blocklist given that the email address is invalid."
+
+#: src/classes/EmailCampaign.ts:50
+msgid "errors.email.complaint"
+msgstr "Hard bounce: Your email has been delivered. The recipient decides that your message is unsolicited and clicks \"Mark as Spam\" in his or her email client."
+
+#: src/classes/EmailCampaign.ts:6
+msgid "errors.email.hardBounce"
+msgstr "Hard bounce: The email recipient is not valid and might not exist. We will be adding this recipient to our blacklist and we will not send to this recipient again for future campaign."
+
+#: src/classes/EmailCampaign.ts:8
+msgid "errors.email.invalidFormat"
+msgstr "Error: Incorrect email formatting. Please check for typo, space, and symbols and amend this email address."
+
+#: src/classes/EmailCampaign.ts:7
+msgid "errors.email.softBounce"
+msgstr "Soft bounce: The email inbox might be full or the person might have an out-of-office message."
+
+#: src/classes/SMSCampaign.ts:44
+msgid "errors.sms.invalidFormat"
+msgstr "Error: Incorrect phone number formatting. Please check for typo, space, and symbols and amend this phone number."
+
+#: src/classes/SMSCampaign.ts:41
+msgid "errors.sms.invalidPhoneNumber"
+msgstr "Invalid phone number in the recipient column."
+
+#: src/classes/TelegramCampaign.ts:49
+msgid "errors.telegram.blocked"
+msgstr "Bot has been blocked by the user. Please contact your user to reverse the action."
+
+#: src/classes/TelegramCampaign.ts:47
+msgid "errors.telegram.notSubscribed"
+msgstr "User has not subscribe to your agency's bot, please ask them to subscribe before sending a message."
 
 #: src/config.ts:35
 msgid "link.contactUsUrl"

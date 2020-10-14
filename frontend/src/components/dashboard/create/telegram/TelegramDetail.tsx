@@ -104,6 +104,7 @@ const TelegramDetail = ({
         <ProgressDetails
           campaignId={id}
           campaignName={name}
+          campaignType={ChannelType.Telegram}
           sentAt={sentAt}
           numRecipients={numRecipients}
           stats={stats}

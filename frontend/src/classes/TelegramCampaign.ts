@@ -1,4 +1,6 @@
-import { Campaign } from './Campaign'
+import { t } from '@lingui/macro'
+import { i18n } from 'locales'
+import { Campaign, CampaignRecipient } from './Campaign'
 
 export enum TelegramProgress {
   CreateTemplate,
@@ -41,5 +43,23 @@ export class TelegramCampaign extends Campaign {
     } else {
       this.progress = TelegramProgress.Send
     }
+  }
+}
+
+export class TelegramCampaignRecipient extends CampaignRecipient {
+  formatErrorCode(errorCode: string): string {
+    if (errorCode) {
+      // Telegram errors has the following format: [code]: [error message]
+      const code = +errorCode.split(':')[0]
+      switch (code) {
+        case 1:
+        case 2:
+          return i18n._(t('errors.telegram.notSubscribed')``)
+        case 403:
+          return i18n._(t('errors.telegram.blocked')``)
+      }
+    }
+
+    return errorCode
   }
 }

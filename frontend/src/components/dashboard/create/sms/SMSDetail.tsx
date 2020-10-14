@@ -104,6 +104,7 @@ const SMSDetail = ({
         <ProgressDetails
           campaignId={id}
           campaignName={name}
+          campaignType={ChannelType.SMS}
           sentAt={sentAt}
           numRecipients={numRecipients}
           stats={stats}
