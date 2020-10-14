@@ -12,14 +12,14 @@ jobs:
   include:
     - name: backend
       before_install:
-        - cd backend
+        - cd $TRAVIS_BUILD_DIR/backend
       install:
         - npm ci
       script:
         - npm run lint-no-fix
         - npm run test
       before_deploy:
-        - ./before-deploy.sh
+        - cd $TRAVIS_BUILD_DIR/backend && ./before-deploy.sh
       deploy:
         - provider: elasticbeanstalk
           edge: true
@@ -56,7 +56,7 @@ jobs:
             branch: $PRODUCTION_02_BRANCH
     - name: worker
       before_install:
-        - cd worker
+        - cd $TRAVIS_BUILD_DIR/worker
       install:
         - npm ci
       script:
@@ -84,7 +84,7 @@ jobs:
             condition: "$DEPLOY_WORKER = true"
     - name: frontend
       before_install:
-        - cd frontend
+        - cd $TRAVIS_BUILD_DIR/frontend
       install:
         - npm install
       script:
