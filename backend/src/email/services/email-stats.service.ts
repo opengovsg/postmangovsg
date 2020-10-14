@@ -2,7 +2,7 @@ import { QueryTypes } from 'sequelize'
 
 import Logger from '@core/logger'
 import { StatsService } from '@core/services'
-import { CampaignStats, CampaignInvalidRecipient } from '@core/interfaces'
+import { CampaignStats, CampaignRecipient } from '@core/interfaces'
 
 import { EmailOp, EmailMessage } from '@email/models'
 
@@ -37,18 +37,18 @@ const refreshStats = async (campaignId: number): Promise<void> => {
 }
 
 /**
- * Gets failed recipients for email project
+ * Gets delivered recipients for email campaign
  * @param campaignId
  */
-const getFailedRecipients = async (
+const getDeliveredRecipients = async (
   campaignId: number
-): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+): Promise<Array<CampaignRecipient>> => {
   await refreshStats(+campaignId)
-  return StatsService.getFailedRecipients(campaignId, EmailMessage)
+  return StatsService.getDeliveredRecipients(campaignId, EmailMessage)
 }
 
 export const EmailStatsService = {
   getStats,
-  getFailedRecipients,
+  getDeliveredRecipients,
   refreshStats,
 }

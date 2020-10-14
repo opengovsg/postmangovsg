@@ -90,10 +90,10 @@ const SMSDetail = ({
           <p>
             If there are errors with sending your messages, you can click Retry
             to send again.
-            <br />
-            If you encounter failed deliveries, you can download the error list
-            from this page or the dashboard few minutes after sending has
-            completed.
+          </p>
+          <p>
+            An export button will appear for you to download a report with the
+            recipient’s mobile number and delivery status when it is ready.
           </p>
         </>
       )}
