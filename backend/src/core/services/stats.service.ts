@@ -181,7 +181,7 @@ const getDeliveredRecipients = async (
     where: {
       campaignId,
       status: {
-        [Op.not]: MessageStatus.Sending,
+        [Op.ne]: null,
       },
     },
     attributes: ['recipient', 'status', 'error_code', 'updated_at'],
