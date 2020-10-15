@@ -60,6 +60,6 @@ export class TelegramCampaignRecipient extends CampaignRecipient {
       }
     }
 
-    return errorCode
+    return errorCode || ''
   }
 }

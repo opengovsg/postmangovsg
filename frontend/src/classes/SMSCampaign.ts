@@ -46,12 +46,13 @@ export class SMSCampaign extends Campaign {
 
 export class SMSCampaignRecipient extends CampaignRecipient {
   formatErrorCode(errorCode: string): string {
-    if (errorCode && errorCode.startsWith("The 'To'")) {
-      return i18n._(t('errors.sms.invalidPhoneNumber')``)
-    } else if (errorCode === 'Recipient is incorrectly formatted') {
-      return i18n._(t('errors.sms.invalidFormat')``)
+    if (errorCode) {
+      if (errorCode.startsWith("The 'To'")) {
+        return i18n._(t('errors.sms.invalidPhoneNumber')``)
+      } else if (errorCode === 'Recipient is incorrectly formatted') {
+        return i18n._(t('errors.sms.invalidFormat')``)
+      }
     }
-
-    return errorCode
+    return errorCode || ''
   }
 }
