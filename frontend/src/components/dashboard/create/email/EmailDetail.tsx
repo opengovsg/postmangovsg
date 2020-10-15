@@ -9,7 +9,7 @@ import {
 import { ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import { i18n } from 'locales'
-
+import { plural } from '@lingui/macro'
 const EmailDetail = ({
   id,
   name,
@@ -82,11 +82,13 @@ const EmailDetail = ({
           <p>
             Your campaign should start in approximately{' '}
             <b>
-              {i18n.plural({
-                value: Math.ceil(stats.waitTime / 60),
-                one: '# minute',
-                other: '# minutes',
-              })}
+              {i18n._(
+                plural({
+                  value: Math.ceil(stats.waitTime / 60),
+                  one: '# minute',
+                  other: '# minutes',
+                })
+              )}
             </b>
             . You can leave this page in the meantime, and check on the progress
             by returning to this page from the Campaigns tab.
