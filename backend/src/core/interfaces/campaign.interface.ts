@@ -52,6 +52,7 @@ export interface CampaignStats extends CampaignStatsCount {
   status: string
   halted?: boolean
   status_updated_at?: Date
+  wait_time?: number
 }
 
 export interface CampaignStatsCount {
@@ -62,10 +63,11 @@ export interface CampaignStatsCount {
   updated_at: Date
 }
 
-export interface CampaignInvalidRecipient {
+export interface CampaignRecipient {
   recipient: string
   status: string
   updated_at: Date
+  error_code?: string
 }
 
 /**

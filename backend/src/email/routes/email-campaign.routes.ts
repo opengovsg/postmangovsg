@@ -764,7 +764,7 @@ router.post('/refresh-stats', EmailStatsMiddleware.updateAndGetStats)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/export', EmailStatsMiddleware.getFailedRecipients)
+router.get('/export', EmailStatsMiddleware.getDeliveredRecipients)
 
 /**
  * @swagger
