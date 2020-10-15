@@ -8,8 +8,6 @@ import {
 } from 'services/campaign.service'
 import { ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import { i18n } from 'locales'
-import { plural } from '@lingui/macro'
 
 const TelegramDetail = ({
   id,
@@ -77,21 +75,14 @@ const TelegramDetail = ({
 
   function renderProgressHeader() {
     if (stats.waitTime && stats.waitTime > 0) {
+      const waitMin = Math.ceil(stats.waitTime / 60)
       return (
         <>
           <h2>Other campaigns are queued ahead of this campaign.</h2>
           <p>
             Your campaign should start in approximately{' '}
-            <b>
-              {i18n._(
-                plural({
-                  value: Math.ceil(stats.waitTime / 60),
-                  one: '# minute',
-                  other: '# minutes',
-                })
-              )}
-            </b>
-            . You can leave this page in the meantime, and check on the progress
+            <b>{waitMin > 1 ? `${waitMin} minutes` : `${waitMin} minute`}</b>.
+            You can leave this page in the meantime, and check on the progress
             by returning to this page from the Campaigns tab.
           </p>
         </>
