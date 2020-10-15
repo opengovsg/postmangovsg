@@ -108,7 +108,7 @@ const EmailDetail = ({
           </p>
           <p>
             An export button will appear for you to download a report with the
-            recipient’s mobile number and delivery status when it is ready.
+            recipient’s email address and delivery status when it is ready.
           </p>
         </>
       )
@@ -123,6 +123,7 @@ const EmailDetail = ({
           <ProgressDetails
             campaignId={id}
             campaignName={name}
+            campaignType={ChannelType.Email}
             sentAt={sentAt}
             numRecipients={numRecipients}
             stats={stats}
