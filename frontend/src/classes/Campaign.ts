@@ -70,6 +70,7 @@ export class CampaignStats {
   statusUpdatedAt: Date // Timestamp when job's status was changed to this status
   updatedAt: Date // Timestamp when statistic was updated
   halted?: boolean
+  waitTime?: number
 
   constructor(input: any) {
     this.error = +input['error']
@@ -80,6 +81,7 @@ export class CampaignStats {
     this.statusUpdatedAt = input['status_updated_at']
     this.updatedAt = input['updated_at']
     this.halted = input['halted']
+    this.waitTime = input['wait_time']
   }
 }
 
