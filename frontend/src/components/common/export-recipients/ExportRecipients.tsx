@@ -79,7 +79,7 @@ const ExportRecipients = ({
       const list = await exportCampaignStats(campaignId, campaignType)
 
       const exportedAt = moment().format('LLL').replace(',', '')
-      const explanation = `"This report was exported on ${exportedAt} and can change in the future when Postman receives notifications about the sent messages."\n`
+      const explanation = `"This report was exported on ${exportedAt} and can change in the future when Postman.gov.sg receives notifications about the sent messages. "\n`
 
       let content = [explanation]
 
@@ -97,8 +97,8 @@ const ExportRecipients = ({
 
         content = content.concat(headers, recipients)
       } else {
-        const emptyExplaination = `"Finalised delivery statuses for your messages are not yet available, try exporting again later."\n`
-        content = content.concat(emptyExplaination)
+        const emptyExplanation = `"Finalised delivery statuses for your messages are not yet available, try exporting again later."\n`
+        content = content.concat(emptyExplanation)
       }
 
       const sentAtTime = new Date(sentAt)
@@ -119,9 +119,9 @@ const ExportRecipients = ({
   function renderTitle() {
     switch (exportStatus) {
       case CampaignExportStatus.Unavailable:
-        return 'The delivery report would be available for download after sending is complete'
+        return 'The delivery report will be available for download after sending is complete'
       case CampaignExportStatus.Loading:
-        return 'The delivery report is being generated and would be available in a few minutes'
+        return 'The delivery report is being generated and will be available in a few minutes'
       case CampaignExportStatus.Exporting:
         return 'The delivery report is being exported and the download will begin shortly'
       case CampaignExportStatus.Ready:
