@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.15.1",
+  "version": "1.15.2",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
