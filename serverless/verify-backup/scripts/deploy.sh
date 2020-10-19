@@ -9,7 +9,7 @@
 
 
 echo 'Submitting build to Cloud Build...'
-gcloud builds submit --tag gcr.io/postmangovsg/verify-backup
+gcloud builds submit --tag gcr.io/postmangovsg/verify-backup --gcs-log-dir gs://postmangovsg-cloudbuild-logs/logs
 
 echo 'Deploying build to Cloud Run...'
 # --set-env-vars `cat .env | awk -v ORS=, '{ print $1 }'`pulls env vars from .env file and formats as args
@@ -20,4 +20,4 @@ gcloud run deploy verify-backup \
   --service-account $GCLOUD_RUN_SERVICE_ACCOUNT \
   --platform managed \
   --set-env-vars `cat .env | awk -v ORS=, '{ print $1 }'` \
-  --memory 512Mi
+  --memory 4G

@@ -61,6 +61,12 @@ const config = convict({
     default: '',
     env: 'GCLOUD_PRIVATE_KEY_RESOURCE_ID',
     format: 'required-string'
+  },
+  gcloudBackupKeyResourceId: {
+    doc: 'Resource id of the backup service account key in Google Cloud Secrets Manager',
+    default: '',
+    env: 'GCLOUD_BACKUP_KEY_RESOURCE_ID',
+    format: 'required-string'
   }
 })
 
