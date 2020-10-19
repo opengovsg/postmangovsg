@@ -8,7 +8,7 @@ import { PhoneNumberService } from '@core/services/phone-number.service'
 import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 
-const templateClient = new TemplateClient(XSS_SMS_OPTION)
+const templateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 class SMS {
   private workerId: string
   private connection: Sequelize

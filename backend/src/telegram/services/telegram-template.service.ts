@@ -11,7 +11,10 @@ import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(XSS_TELEGRAM_OPTION, '\n')
+const client = new TemplateClient({
+  xssOptions: XSS_TELEGRAM_OPTION,
+  lineBreak: '\n',
+})
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,

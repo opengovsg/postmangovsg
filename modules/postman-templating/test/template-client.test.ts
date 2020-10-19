@@ -10,7 +10,7 @@ import {
 describe('template', () => {
   let templateClient: TemplateClient
   beforeAll(() => {
-    templateClient = new TemplateClient()
+    templateClient = new TemplateClient({})
   })
   describe('basic', () => {
     test('no params', () => {
@@ -137,7 +137,9 @@ describe('template', () => {
 
   describe('xss', () => {
     describe('email', () => {
-      const client: TemplateClient = new TemplateClient(XSS_EMAIL_OPTION)
+      const client: TemplateClient = new TemplateClient({
+        xssOptions: XSS_EMAIL_OPTION,
+      })
 
       test('email template should allow b, i, u, br, a, img tags', () => {
         const body =
@@ -167,7 +169,9 @@ describe('template', () => {
       })
     })
     describe('sms', () => {
-      const client: TemplateClient = new TemplateClient(XSS_SMS_OPTION)
+      const client: TemplateClient = new TemplateClient({
+        xssOptions: XSS_SMS_OPTION,
+      })
 
       test('sms template should not allow any html tags except br', () => {
         const body =
@@ -187,10 +191,10 @@ describe('template', () => {
       })
     })
     describe('telegram', () => {
-      const client: TemplateClient = new TemplateClient(
-        XSS_TELEGRAM_OPTION,
-        '\n'
-      )
+      const client: TemplateClient = new TemplateClient({
+        xssOptions: XSS_TELEGRAM_OPTION,
+        lineBreak: '\n',
+      })
       test('Telegram should support b i u s strike del p code pre a', () => {
         const body =
           '<b>bold</b>' +
@@ -233,7 +237,9 @@ describe('template', () => {
 
 describe('replaceNewLinesAndSanitize', () => {
   describe('email', () => {
-    const client: TemplateClient = new TemplateClient(XSS_EMAIL_OPTION)
+    const client: TemplateClient = new TemplateClient({
+      xssOptions: XSS_EMAIL_OPTION,
+    })
 
     test('Should not sanitize keyword in a href', () => {
       const body = '<a href="{{protectedlink}}">link</a>'
@@ -253,7 +259,9 @@ describe('replaceNewLinesAndSanitize', () => {
   })
 
   describe('telegram', () => {
-    const client: TemplateClient = new TemplateClient(XSS_TELEGRAM_OPTION)
+    const client: TemplateClient = new TemplateClient({
+      xssOptions: XSS_TELEGRAM_OPTION,
+    })
 
     test('Should not sanitize tg:// telegram links', () => {
       const body = '<a href="tg://join?invite=">link</a>'

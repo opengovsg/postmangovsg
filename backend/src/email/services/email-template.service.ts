@@ -9,7 +9,7 @@ import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
-const client = new TemplateClient(XSS_EMAIL_OPTION)
+const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,

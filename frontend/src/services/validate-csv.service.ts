@@ -11,7 +11,7 @@ export interface ProtectedCsvInfo {
 export const PROTECTED_CSV_HEADERS = ['recipient', 'password']
 
 // Using default xss options for registered mail
-const templateClient = new TemplateClient()
+const templateClient = new TemplateClient({})
 
 export function extractParams(template: string): string[] {
   return templateClient.parseTemplate(template).variables

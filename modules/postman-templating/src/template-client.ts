@@ -9,9 +9,15 @@ export class TemplateClient {
   xssOptions: xss.IFilterXSSOptions | undefined
   lineBreak: string
 
-  constructor(xssOptions?: xss.IFilterXSSOptions, lineBreak = '<br />') {
+  constructor({
+    xssOptions,
+    lineBreak,
+  }: {
+    xssOptions?: xss.IFilterXSSOptions
+    lineBreak?: string
+  }) {
     this.xssOptions = xssOptions
-    this.lineBreak = lineBreak
+    this.lineBreak = lineBreak || '<br />'
   }
 
   /**
