@@ -24,7 +24,8 @@ const parseAndProcessCsv = async (
   readStream: NodeJS.ReadableStream,
   onPreview: (data: CSVParams[]) => Promise<void>,
   onChunk: (data: CSVParams[]) => Promise<void>,
-  onComplete: (numRecords: number) => Promise<void>
+  onComplete: (numRecords: number) => Promise<void>,
+  numRecordLimit: number = Number.MAX_SAFE_INTEGER
 ): Promise<void> => {
   let previewed = false
   let numRecords = 0
@@ -64,6 +65,13 @@ const parseAndProcessCsv = async (
             // Compute the number of rows  the buffer should hold before processing a chunk
             approxRowSize = JSON.stringify(data[0]).length * 4
             batchSize = Math.ceil(DEFAULT_CHUNK_SIZE / approxRowSize)
+          }
+
+          if (numRecords > numRecordLimit) {
+            throw new UserError(
+              'ExceedNumRecordLimit',
+              `Error: The number of records uploaded is larger than the limit (${numRecordLimit}). Please upload fewer records.`
+            )
           }
 
           // If there are more or fewer headers than values in a row
@@ -113,7 +121,13 @@ const parseAndProcessCsv = async (
                 'NoRowsFound',
                 'Error: No rows were found in the uploaded recipient file. Please make sure you uploaded the correct file before sending.'
               )
+            } else if (numRecords > numRecordLimit) {
+              throw new UserError(
+                'ExceedNumRecordLimit',
+                `Error: The number of records uploaded is larger than the limit (${numRecordLimit}). Please upload fewer records.`
+              )
             }
+
             await onComplete(numRecords)
             logger.info({ message: 'Parsing complete', ...logMeta })
           } catch (err) {
