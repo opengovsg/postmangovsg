@@ -1,6 +1,6 @@
 import { Op, literal, Transaction, Includeable } from 'sequelize'
-import { JobStatus } from '@core/constants'
-import { Campaign, JobQueue, Statistic } from '@core/models'
+import { ChannelType, JobStatus } from '@core/constants'
+import { Campaign, JobQueue, Statistic, UserTrial } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
 
 /**
@@ -21,13 +21,60 @@ const createCampaign = ({
   type,
   userId,
   protect,
+  trial,
 }: {
   name: string
   type: string
   userId: number
   protect: boolean
-}): Promise<Campaign> => {
-  return Campaign.create({ name, type, userId, valid: false, protect })
+  trial: boolean
+}): Promise<Campaign> | undefined => {
+  const result = Campaign.sequelize?.transaction(async (transaction) => {
+    let campaign
+    if (trial) {
+      let numTrialsColumn: any = ''
+      switch (type) {
+        case ChannelType.SMS:
+          numTrialsColumn = 'num_trials_sms'
+          break
+        default:
+          throw new Error(`Channel type not supported for trial mode ${type}`)
+      }
+
+      const userTrial = await UserTrial.findOne({
+        where: { userId, [numTrialsColumn]: { $gt: 0 } },
+        transaction,
+      })
+      if (userTrial)
+        campaign = await Campaign.create(
+          {
+            name,
+            type,
+            userId,
+            valid: false,
+            protect,
+            trial,
+          },
+          { transaction }
+        )
+      await userTrial?.decrement(numTrialsColumn, { transaction })
+    } else {
+      {
+        campaign = await Campaign.create(
+          {
+            name,
+            type,
+            userId,
+            valid: false,
+            protect,
+          },
+          { transaction }
+        )
+      }
+    }
+    return campaign
+  })
+  return result
 }
 
 /**
