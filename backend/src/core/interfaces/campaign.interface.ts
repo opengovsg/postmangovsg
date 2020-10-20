@@ -34,6 +34,7 @@ export interface CampaignDetails {
   csv_filename: string
   is_csv_processing: boolean
   protect: boolean
+  trial: boolean
   num_recipients: number
   email_templates?: {
     body: string

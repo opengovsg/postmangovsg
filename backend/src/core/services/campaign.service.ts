@@ -115,6 +115,7 @@ const listCampaigns = ({
       [literal('"cred_name" IS NOT NULL'), 'has_credential'],
       'halted',
       'protect',
+      'trial',
     ],
     order: [['created_at', 'DESC']],
     include: [
@@ -156,6 +157,7 @@ const getCampaignDetails = async (
       'created_at',
       'valid',
       'protect',
+      'trial',
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
       [
