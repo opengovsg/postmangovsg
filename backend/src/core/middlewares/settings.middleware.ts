@@ -19,7 +19,13 @@ const getUserSettings = async (
     if (!userSettings) {
       throw new Error('User not found')
     }
-    res.json({ has_api_key: userSettings.hasApiKey, creds: userSettings.creds })
+    res.json({
+      has_api_key: userSettings.hasApiKey,
+      creds: userSettings.creds,
+      trial: {
+        num_trials_sms: userSettings.trial.numTrialsSms,
+      },
+    })
   } catch (err) {
     next(err)
   }

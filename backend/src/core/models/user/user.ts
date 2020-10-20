@@ -5,8 +5,10 @@ import {
   Table,
   BeforeCreate,
   HasMany,
+  HasOne,
 } from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
+import { UserTrial } from './user-trial'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 
@@ -27,6 +29,9 @@ export class User extends Model<User> {
 
   @HasMany(() => UserCredential)
   creds!: UserCredential[]
+
+  @HasOne(() => UserTrial)
+  trial!: UserTrial
 
   // During programmatic creation of users (users signing up by themselves), emails must end in a whitelisted domain
   // If we manually insert the user into the database, then this hook is bypassed.

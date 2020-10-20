@@ -3,7 +3,7 @@ import { get } from 'lodash'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
-import { Credential, UserCredential, User } from '@core/models'
+import { Credential, UserCredential, User, UserTrial } from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { loggerWithLabel } from '@core/logger'
 
@@ -234,11 +234,19 @@ const getUserSettings = async (
         model: UserCredential,
         attributes: ['label', 'type'],
       },
+      {
+        model: UserTrial,
+        attributes: [['num_trials_sms', 'numTrialsSms']],
+      },
     ],
     plain: true,
   })
   if (user) {
-    return { hasApiKey: !!user.apiKey, creds: user.creds }
+    return {
+      hasApiKey: !!user.apiKey,
+      creds: user.creds,
+      trial: user.trial,
+    }
   } else {
     return null
   }
