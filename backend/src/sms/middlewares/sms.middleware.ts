@@ -71,25 +71,46 @@ const getCredentialsFromLabel = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  const { campaignId } = req.params
   const { label } = req.body
   const userId = req.session?.user?.id
+
   try {
-    // if label provided, fetch from aws secrets
-    const userCred = await CredentialService.getUserCredential(+userId, label)
-    if (!userCred) {
-      logger.error({
-        message: 'User credentials not found',
-        label,
-        action: 'getCredentialsFromLabel',
-      })
-      res.status(400).json({ message: 'User credentials cannot be found' })
-      return
+    /* Determine if credential name can be used */
+    let credentialName
+    if (label === 'SMS_DEFAULT') {
+      const campaign = await SmsService.findCampaign(+campaignId, userId) // TODO: refactor this into res.locals
+      if (campaign.trial) {
+        credentialName = label
+      } else {
+        throw new Error(
+          `Campaign ${campaignId} is not allowed to use trial credentials`
+        )
+      }
+    } else {
+      // if label provided, fetch from aws secrets
+      const userCred = await CredentialService.getUserCredential(+userId, label)
+
+      if (!userCred) {
+        logger.error({
+          message: 'User credentials not found',
+          label,
+          action: 'getCredentialsFromLabel',
+        })
+        res.status(400).json({ message: 'User credentials cannot be found' })
+        return
+      }
+
+      credentialName = userCred.credName
     }
+
+    /* Get credential from the name */
     const credentials = await CredentialService.getTwilioCredentials(
-      userCred.credName
+      credentialName
     )
+
     res.locals.credentials = credentials
-    res.locals.credentialName = userCred.credName
+    res.locals.credentialName = credentialName
     return next()
   } catch (err) {
     return next(err)
