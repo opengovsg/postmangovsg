@@ -29,6 +29,7 @@ export class Campaign {
   isCsvProcessing: boolean
   statusUpdatedAt: Date
   protect: boolean
+  trialMessageLimit: number | null
 
   constructor(input: any) {
     this.id = input['id']
@@ -42,6 +43,7 @@ export class Campaign {
     this.sentAt = input['sentAt']
     this.statusUpdatedAt = input['statusUpdatedAt']
     this.protect = input['protect']
+    this.trialMessageLimit = input['trial_message_limit']
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {
