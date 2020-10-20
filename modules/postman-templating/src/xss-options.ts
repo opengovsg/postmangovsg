@@ -79,7 +79,7 @@ export const filterImageSources = (
       const hostname = new URL(value).hostname
       if (allowedImageSources.indexOf(hostname) < 0) {
         throw new TemplateError(
-          `${hostname} is not a valid image host. Allowed image source(s): ${allowedImageSources.join(
+          `${hostname} is not a valid image source. Allowed image source(s): ${allowedImageSources.join(
             ', '
           )}`
         )
