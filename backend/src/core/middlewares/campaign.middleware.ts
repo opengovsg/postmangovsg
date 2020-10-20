@@ -68,7 +68,9 @@ const createCampaign = async (
       trial,
     })
     if (!campaign) {
-      throw new Error('Unable to create campaign')
+      return res.status(400).json({
+        message: `Unable to create campaign with these parameters`,
+      })
     }
     logger.info({
       message: 'Successfully created new campaign',

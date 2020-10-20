@@ -19,6 +19,7 @@ const createCampaignValidator = {
       .required(),
     name: Joi.string().max(255).trim().required(),
     protect: Joi.boolean().default(false),
+    trial: Joi.boolean().default(false),
   }),
 }
 

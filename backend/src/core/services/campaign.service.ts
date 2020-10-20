@@ -2,6 +2,7 @@ import { Op, literal, Transaction, Includeable } from 'sequelize'
 import { ChannelType, JobStatus } from '@core/constants'
 import { Campaign, JobQueue, Statistic, UserTrial } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
+import logger from '@core/logger'
 
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress
@@ -35,17 +36,18 @@ const createCampaign = ({
       let numTrialsColumn: any = ''
       switch (type) {
         case ChannelType.SMS:
-          numTrialsColumn = 'num_trials_sms'
+          numTrialsColumn = 'numTrialsSms'
           break
         default:
-          throw new Error(`Channel type not supported for trial mode ${type}`)
+          logger.error(`Channel type not supported for trial mode ${type}`)
+          return
       }
 
       const userTrial = await UserTrial.findOne({
-        where: { userId, [numTrialsColumn]: { $gt: 0 } },
+        where: { userId, [numTrialsColumn]: { [Op.gt]: 0 } },
         transaction,
       })
-      if (userTrial)
+      if (userTrial) {
         campaign = await Campaign.create(
           {
             name,
@@ -57,7 +59,11 @@ const createCampaign = ({
           },
           { transaction }
         )
-      await userTrial?.decrement(numTrialsColumn, { transaction })
+        await userTrial?.decrement(numTrialsColumn, { transaction })
+      } else {
+        logger.error(`No trials left for user=${userId} type=${type}`)
+        return
+      }
     } else {
       {
         campaign = await Campaign.create(

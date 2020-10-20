@@ -23,5 +23,5 @@ export class UserTrial extends Model<UserTrial> {
     type: DataType.INTEGER,
     allowNull: false,
   })
-  numTrialsSms!: string
+  numTrialsSms!: number
 }
