@@ -5,6 +5,7 @@ import {
   XSS_EMAIL_OPTION,
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
+  filterImageSources,
 } from '../src/xss-options'
 
 describe('template', () => {
@@ -267,5 +268,24 @@ describe('replaceNewLinesAndSanitize', () => {
       const body = '<a href="tg://join?invite=">link</a>'
       expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
     })
+  })
+})
+
+describe('filterXSS', () => {
+  const xssOptions = filterImageSources({}, ['valid.com', 'valid2.com'])
+  const templateClient: TemplateClient = new TemplateClient({ xssOptions })
+
+  test('should not throw an error if image source is valid', () => {
+    const body = '<img src="https://valid.com/image.jpg" />'
+    expect(() => {
+      templateClient.template(body, {})
+    }).not.toThrow()
+  })
+
+  test('should throw an error if image source is not valid', () => {
+    const body = '<img src="https://invalid.com/image.jpg" />'
+    expect(() => {
+      templateClient.template(body, {})
+    }).toThrow(TemplateError)
   })
 })

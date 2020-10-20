@@ -1,4 +1,8 @@
-import xss from 'xss'
+import xss, { IFilterXSSOptions } from 'xss'
+import { TemplateError } from './errors'
+
+const URL =
+  typeof window !== 'undefined' && window.URL ? window.URL : require('url').URL
 
 const KEYWORD_REGEX = /^{{\s*?\w+\s*?}}$/
 
@@ -58,3 +62,34 @@ export const XSS_TELEGRAM_OPTION = {
   },
   stripIgnoreTag: true,
 }
+
+/**
+ * Extend XSS options with image source filtering
+ * @param baseOptions Options to be extended from
+ * @param allowedImageSources Array of allowed image source hostnames
+ */
+export const filterImageSources = (
+  baseOptions: IFilterXSSOptions,
+  allowedImageSources: Array<string>
+): IFilterXSSOptions => ({
+  ...baseOptions,
+  safeAttrValue: (tag: string, name: string, value: string): string => {
+    // Check that the image source is from an allowed host
+    if (allowedImageSources && tag === 'img' && name === 'src') {
+      const hostname = new URL(value).hostname
+      if (allowedImageSources.indexOf(hostname) < 0) {
+        throw new TemplateError(
+          `${hostname} is not a valid image host. Allowed image source(s): ${allowedImageSources.join(
+            ', '
+          )}`
+        )
+      }
+    }
+
+    const defaultSafeAttrValue = baseOptions?.safeAttrValue
+      ? baseOptions.safeAttrValue
+      : xss.safeAttrValue
+
+    return defaultSafeAttrValue(tag, name, value, xss.cssFilter)
+  },
+})
