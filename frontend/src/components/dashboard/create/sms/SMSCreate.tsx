@@ -84,6 +84,7 @@ const CreateSMS = ({
         return (
           <SMSCredentials
             hasCredential={campaign.hasCredential}
+            isTrial={!!campaign.trialMessageLimit}
             onNext={onNext}
             onPrevious={onPrevious}
           />

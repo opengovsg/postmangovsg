@@ -27,10 +27,12 @@ import styles from '../Create.module.scss'
 
 const SMSCredentials = ({
   hasCredential: initialHasCredential,
+  isTrial,
   onNext,
   onPrevious,
 }: {
   hasCredential: boolean
+  isTrial: boolean
   onNext: (changes: any, next?: boolean) => void
   onPrevious: () => void
 }) => {
@@ -51,24 +53,23 @@ const SMSCredentials = ({
   const { id: campaignId } = useParams()
 
   useEffect(() => {
-    populateStoredCredentials()
-  }, [])
-
-  async function populateStoredCredentials() {
-    try {
-      const storedCredLabels = await getStoredCredentials()
-      setCredLabels(storedCredLabels)
-      setStoredCredentials(
-        storedCredLabels.map((c) => ({ label: c, value: c }))
-      )
-      if (!storedCredLabels.length) {
-        setIsManual(true)
+    async function populateStoredCredentials(defaultLabels: string[]) {
+      try {
+        const labels = await getStoredCredentials()
+        const allLabels = defaultLabels.concat(labels)
+        setCredLabels(allLabels)
+        setStoredCredentials(allLabels.map((c) => ({ label: c, value: c })))
+        if (!allLabels.length) {
+          setIsManual(true)
+        }
+      } catch (e) {
+        console.error(e)
+        setErrorMessage(e.message)
       }
-    } catch (e) {
-      console.error(e)
-      setErrorMessage(e.message)
     }
-  }
+    const defaultLabels = isTrial ? ['SMS_DEFAULT'] : []
+    populateStoredCredentials(defaultLabels)
+  }, [isTrial, storedCredentials.length])
 
   function toggleInputMode() {
     setIsManual((m) => !m)
@@ -160,6 +161,7 @@ const SMSCredentials = ({
               <Dropdown
                 onSelect={setSelectedCredential}
                 options={storedCredentials}
+                defaultLabel={storedCredentials[0]?.label}
               ></Dropdown>
               <p className="clickable" onClick={() => setIsManual(true)}>
                 Input credentials manually
