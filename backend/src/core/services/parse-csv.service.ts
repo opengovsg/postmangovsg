@@ -25,10 +25,11 @@ const parseAndProcessCsv = async (
   onPreview: (data: CSVParams[]) => Promise<void>,
   onChunk: (data: CSVParams[]) => Promise<void>,
   onComplete: (numRecords: number) => Promise<void>,
-  numRecordLimit: number = Number.MAX_SAFE_INTEGER
+  messageLimit: number = Number.MAX_SAFE_INTEGER
 ): Promise<void> => {
+  console.log(`messageLimit ${messageLimit}`)
   let previewed = false
-  let numRecords = 0
+  let numMessages = 0
 
   let buffer: CSVParams[] = []
   let approxRowSize = 0
@@ -67,10 +68,10 @@ const parseAndProcessCsv = async (
             batchSize = Math.ceil(DEFAULT_CHUNK_SIZE / approxRowSize)
           }
 
-          if (numRecords > numRecordLimit) {
+          if (numMessages > messageLimit) {
             throw new UserError(
               'ExceedNumRecordLimit',
-              `Error: The number of records uploaded is larger than the limit (${numRecordLimit}). Please upload fewer records.`
+              `Error: The number of records uploaded is larger than the limit (${messageLimit}). Please upload fewer records.`
             )
           }
 
@@ -91,7 +92,7 @@ const parseAndProcessCsv = async (
           buffer.push(...data) // Pushes pointers to objects, does not create a new array.
           if (buffer.length >= batchSize) {
             await onChunk(buffer)
-            numRecords += buffer.length
+            numMessages += buffer.length
             buffer = []
           }
           parser.resume()
@@ -113,22 +114,22 @@ const parseAndProcessCsv = async (
             // Process any remaining chunks
             if (buffer.length > 0) {
               await onChunk(buffer)
-              numRecords += buffer.length
+              numMessages += buffer.length
               buffer = []
             }
-            if (numRecords === 0) {
+            if (numMessages === 0) {
               throw new UserError(
                 'NoRowsFound',
                 'Error: No rows were found in the uploaded recipient file. Please make sure you uploaded the correct file before sending.'
               )
-            } else if (numRecords > numRecordLimit) {
+            } else if (numMessages > messageLimit) {
               throw new UserError(
                 'ExceedNumRecordLimit',
-                `Error: The number of records uploaded is larger than the limit (${numRecordLimit}). Please upload fewer records.`
+                `Error: The number of records uploaded is larger than the limit (${messageLimit}). Please upload fewer records.`
               )
             }
 
-            await onComplete(numRecords)
+            await onComplete(numMessages)
             logger.info({ message: 'Parsing complete', ...logMeta })
           } catch (err) {
             logger.error({ message: 'Parsing failed', error: err, ...logMeta })

@@ -84,7 +84,10 @@ const getCredentialsFromLabel = async (
     let credentialName
     if (label === DefaultCredentialName.SMS) {
       const campaign = await SmsService.findCampaign(+campaignId, userId) // TODO: refactor this into res.locals
-      if (campaign.trial) {
+      if (
+        campaign.trialMessageLimit !== null &&
+        campaign.trialMessageLimit > 0
+      ) {
         credentialName = label
       } else {
         logger.error({

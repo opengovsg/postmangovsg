@@ -85,12 +85,12 @@ export class Campaign extends Model<Campaign> {
   })
   halted?: boolean
 
-  @Default(false)
+  @Default(null)
   @Column({
-    type: DataType.BOOLEAN,
+    type: DataType.INTEGER,
     allowNull: true,
   })
-  trial?: boolean
+  trialMessageLimit!: number
 
   // Sets key in s3Object json
   static async updateS3ObjectKey(

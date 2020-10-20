@@ -23,17 +23,17 @@ const createCampaign = ({
   type,
   userId,
   protect,
-  trial,
+  trialMessageLimit,
 }: {
   name: string
   type: string
   userId: number
   protect: boolean
-  trial: boolean
+  trialMessageLimit: number | null
 }): Promise<Campaign> | undefined => {
   const result = Campaign.sequelize?.transaction(async (transaction) => {
     let campaign
-    if (trial) {
+    if (trialMessageLimit !== null && trialMessageLimit > 0) {
       let numTrialsColumn: any = ''
       switch (type) {
         case ChannelType.SMS:
@@ -59,7 +59,7 @@ const createCampaign = ({
             userId,
             valid: false,
             protect,
-            trial,
+            trialMessageLimit,
           },
           { transaction }
         )
@@ -119,7 +119,7 @@ const listCampaigns = ({
       [literal('"cred_name" IS NOT NULL'), 'has_credential'],
       'halted',
       'protect',
-      'trial',
+      'trial_message_limit',
     ],
     order: [['created_at', 'DESC']],
     include: [
@@ -161,7 +161,7 @@ const getCampaignDetails = async (
       'created_at',
       'valid',
       'protect',
-      'trial',
+      'trial_message_limit',
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
       [

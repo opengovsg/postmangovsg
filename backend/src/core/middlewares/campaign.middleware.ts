@@ -47,12 +47,12 @@ const createCampaign = async (
       name,
       type,
       protect,
-      trial,
+      trial_message_limit: trialMessageLimit,
     }: {
       name: string
       type: string
       protect: boolean
-      trial: boolean
+      trial_message_limit: number | null
     } = req.body
 
     // Check that protected campaign can only be created for emails
@@ -65,7 +65,7 @@ const createCampaign = async (
       type,
       userId,
       protect,
-      trial,
+      trialMessageLimit,
     })
     if (!campaign) {
       return res.status(400).json({
@@ -84,7 +84,7 @@ const createCampaign = async (
       created_at: campaign.createdAt,
       type: campaign.type,
       protect: campaign.protect,
-      trial: campaign.trial,
+      trial_message_limit: campaign.trialMessageLimit,
     })
   } catch (err) {
     return next(err)
