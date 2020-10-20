@@ -2,6 +2,9 @@ import Papa from 'papaparse'
 import { keys, difference, uniq } from 'lodash'
 import { TemplateClient } from 'postman-templating'
 
+import { i18n } from 'locales'
+import { ALLOWED_IMAGE_SOURCES } from 'config'
+
 export interface ProtectedCsvInfo {
   csvFilename: string
   numRecipients: number
@@ -11,7 +14,9 @@ export interface ProtectedCsvInfo {
 export const PROTECTED_CSV_HEADERS = ['recipient', 'password']
 
 // Using default xss options for registered mail
-const templateClient = new TemplateClient({})
+const templateClient = new TemplateClient({
+  allowedImageSources: i18n._(ALLOWED_IMAGE_SOURCES).split(';'),
+})
 
 export function extractParams(template: string): string[] {
   return templateClient.parseTemplate(template).variables
