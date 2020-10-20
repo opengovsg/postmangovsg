@@ -157,7 +157,7 @@ const uploadCompleteHandler = async (
             key: s3Key,
             filename,
           }),
-          campaign?.trialMessageLimit
+          campaign?.trialMessageLimit ? campaign.trialMessageLimit : undefined
         ).catch((e) => {
           transaction.rollback()
           if (e.code !== 'NoSuchKey') {

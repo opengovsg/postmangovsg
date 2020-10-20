@@ -27,7 +27,6 @@ const parseAndProcessCsv = async (
   onComplete: (numRecords: number) => Promise<void>,
   messageLimit: number = Number.MAX_SAFE_INTEGER
 ): Promise<void> => {
-  console.log(`messageLimit ${messageLimit}`)
   let previewed = false
   let numMessages = 0
 
