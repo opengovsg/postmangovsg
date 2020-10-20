@@ -1,0 +1,36 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.section {
+  margin-bottom: 2rem;
+  @include flex-vertical;
+}
+.title {
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 2.5rem;
+}
+
+.actions {
+  @include flex-horizontal;
+  justify-content: flex-end;
+  button {
+    margin: 0 20px;
+  }
+  button:last-child {
+    margin-right: 0px;
+  }
+
+  @include mobile() {
+    @include flex-vertical;
+    align-items: center;
+    width: 100%;
+  }
+}

@@ -11,8 +11,10 @@ import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
 import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
+import CreateTrialModal from 'components/dashboard/create/create-trial-modal'
 
 import { i18n } from 'locales'
+import { getUserSettings } from 'services/settings.service'
 
 const CreateModal = ({
   name = '',
@@ -26,6 +28,16 @@ const CreateModal = ({
   const [selectedChannel, setSelectedChannel] = useState(channelType)
   const [selectedName, setSelectedName] = useState(name)
   const [protect, setProtected] = useState(false)
+  const [numTrialsSms, setNumTrialsSms] = useState(0)
+
+  useEffect(() => {
+    async function getNumTrials() {
+      // TRIAL: check for number of trials
+      const { trial } = await getUserSettings()
+      setNumTrialsSms(trial.numTrialsSms)
+    }
+    getNumTrials()
+  }, [])
 
   modalContext.setModalContentClass(styles.content)
 
@@ -33,12 +45,13 @@ const CreateModal = ({
     setProtected(false)
   }, [selectedChannel])
 
-  async function handleCreateCampaign() {
+  async function handleCreateCampaign(useTrial = false): Promise<void> {
     try {
       const campaign: Campaign = await createCampaign(
         selectedName,
         selectedChannel,
-        protect
+        protect,
+        useTrial
       )
       // close modal and go to create view
       modalContext.close()
@@ -46,6 +59,29 @@ const CreateModal = ({
     } catch (err) {
       console.error(err)
     }
+  }
+
+  function generateHandleCreateTrial(numTrials: number): () => void {
+    return function handleCreateTrial() {
+      modalContext.setModalContent(
+        <CreateTrialModal
+          channelType={channelType}
+          numTrials={numTrials}
+          onSuccess={(useTrial: boolean) => handleCreateCampaign(useTrial)}
+        ></CreateTrialModal>
+      )
+    }
+  }
+
+  function onCreate(): (args: any) => void | Promise<void> {
+    switch (selectedChannel) {
+      case ChannelType.SMS:
+        if (numTrialsSms > 0) {
+          return generateHandleCreateTrial(numTrialsSms)
+        }
+        break
+    }
+    return handleCreateCampaign
   }
 
   function handleAddCredentials(channelType: ChannelType) {
@@ -183,7 +219,7 @@ const CreateModal = ({
       <div className="progress-button">
         <PrimaryButton
           className={styles.bottomButton}
-          onClick={handleCreateCampaign}
+          onClick={onCreate()}
           disabled={!selectedName}
         >
           Create campaign
