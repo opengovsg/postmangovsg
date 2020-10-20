@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { ChannelType } from '@core/constants'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 import config from '@core/config'
@@ -78,7 +78,7 @@ const getCredentialsFromLabel = async (
   try {
     /* Determine if credential name can be used */
     let credentialName
-    if (label === 'SMS_DEFAULT') {
+    if (label === DefaultCredentialName.SMS) {
       const campaign = await SmsService.findCampaign(+campaignId, userId) // TODO: refactor this into res.locals
       if (campaign.trial) {
         credentialName = label

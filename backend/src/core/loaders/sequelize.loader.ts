@@ -32,6 +32,7 @@ import {
 
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
+import { DefaultCredentialName } from '@core/constants'
 
 const logger = loggerWithLabel(module)
 const DB_URI = config.get('database.databaseUri')
@@ -113,12 +114,12 @@ const sequelizeLoader = async (): Promise<void> => {
     logger.error({ message: 'Unable to connect to database', error })
     process.exit(1)
   }
-
-  try {
-    await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
-    logger.info({ message: 'Default email credential loaded' })
-  } catch (error) {
-    logger.error({ message: 'Unable to load default email credential', error })
+  // Create the default credential names in the credentials table
+  // Each name should be accompanied by an entry in Secrets Manager
+  for (const key of Object.keys(DefaultCredentialName)) {
+    await Credential.upsert({
+      name: DefaultCredentialName[key as keyof typeof DefaultCredentialName],
+    })
   }
 }
 

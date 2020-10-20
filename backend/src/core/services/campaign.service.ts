@@ -2,8 +2,9 @@ import { Op, literal, Transaction, Includeable } from 'sequelize'
 import { ChannelType, JobStatus } from '@core/constants'
 import { Campaign, JobQueue, Statistic, UserTrial } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 
+const logger = loggerWithLabel(module)
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress
  * @param campaignId
@@ -39,7 +40,10 @@ const createCampaign = ({
           numTrialsColumn = 'numTrialsSms'
           break
         default:
-          logger.error(`Channel type not supported for trial mode ${type}`)
+          logger.error({
+            message: `Channel type not supported for trial mode`,
+            type,
+          })
           return
       }
 
@@ -61,7 +65,7 @@ const createCampaign = ({
         )
         await userTrial?.decrement(numTrialsColumn, { transaction })
       } else {
-        logger.error(`No trials left for user=${userId} type=${type}`)
+        logger.error({ message: `No trials left`, userId, type })
         return
       }
     } else {

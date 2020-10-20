@@ -2,7 +2,7 @@ import { Transaction } from 'sequelize'
 import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
-import { ChannelType } from '@core/constants'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { Campaign, ProtectedMessage } from '@core/models'
 import {
   MailService,
@@ -153,7 +153,7 @@ const setCampaignCredential = (
   campaignId: number
 ): Promise<[number, Campaign[]]> => {
   return Campaign.update(
-    { credName: 'EMAIL_DEFAULT' },
+    { credName: DefaultCredentialName.Email },
     { where: { id: campaignId } }
   )
 }
