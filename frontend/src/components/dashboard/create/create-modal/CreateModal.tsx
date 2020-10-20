@@ -5,7 +5,12 @@ import cx from 'classnames'
 
 import { LINKS } from 'config'
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
-import { TextInput, PrimaryButton, Checkbox } from 'components/common'
+import {
+  TextInput,
+  PrimaryButton,
+  Checkbox,
+  ErrorBlock,
+} from 'components/common'
 import styles from './CreateModal.module.scss'
 import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
@@ -25,6 +30,7 @@ const CreateModal = ({
 }) => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()
+  const [errorMessage, setErrorMessage] = useState('')
   const [selectedChannel, setSelectedChannel] = useState(channelType)
   const [selectedName, setSelectedName] = useState(name)
   const [protect, setProtected] = useState(false)
@@ -45,20 +51,16 @@ const CreateModal = ({
     setProtected(false)
   }, [selectedChannel])
 
-  async function handleCreateCampaign(useTrial = false): Promise<void> {
-    try {
-      const campaign: Campaign = await createCampaign(
-        selectedName,
-        selectedChannel,
-        protect,
-        useTrial
-      )
-      // close modal and go to create view
-      modalContext.close()
-      history.push(`/campaigns/${campaign.id}`)
-    } catch (err) {
-      console.error(err)
-    }
+  async function create(useTrial: boolean) {
+    const campaign: Campaign = await createCampaign(
+      selectedName,
+      selectedChannel,
+      protect,
+      useTrial
+    )
+    // close modal and go to create view
+    modalContext.close()
+    history.push(`/campaigns/${campaign.id}`)
   }
 
   function generateHandleCreateTrial(numTrials: number): () => void {
@@ -67,7 +69,7 @@ const CreateModal = ({
         <CreateTrialModal
           channelType={channelType}
           numTrials={numTrials}
-          onSuccess={(useTrial: boolean) => handleCreateCampaign(useTrial)}
+          onSuccess={(useTrial: boolean) => create(useTrial)}
         ></CreateTrialModal>
       )
     }
@@ -81,7 +83,15 @@ const CreateModal = ({
         }
         break
     }
-    return handleCreateCampaign
+
+    return async function handleCreateCampaign() {
+      try {
+        create(false)
+      } catch (err) {
+        console.error(err)
+        setErrorMessage(err.message)
+      }
+    }
   }
 
   function handleAddCredentials(channelType: ChannelType) {
@@ -226,6 +236,7 @@ const CreateModal = ({
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
         </PrimaryButton>
       </div>
+      <ErrorBlock>{errorMessage}</ErrorBlock>
     </>
   )
 }
