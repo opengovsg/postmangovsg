@@ -121,16 +121,23 @@ export async function createCampaign(
   protect: boolean,
   useTrial: boolean
 ): Promise<Campaign> {
-  return axios
-    .post('/campaigns', {
-      name,
-      type,
-      protect,
-      ...(useTrial ? { trial_message_limit: 20 } : {}),
-    })
-    .then((response) => {
-      return new Campaign(response.data)
-    })
+  const params: {
+    name: string
+    type: ChannelType
+    protect: boolean
+    trial_message_limit?: number
+  } = {
+    type,
+    protect,
+    name,
+  }
+  if (useTrial) {
+    params.name = `(TRIAL) ${name}`
+    params.trial_message_limit = 20
+  }
+  return axios.post('/campaigns', params).then((response) => {
+    return new Campaign(response.data)
+  })
 }
 
 export async function sendCampaign(
