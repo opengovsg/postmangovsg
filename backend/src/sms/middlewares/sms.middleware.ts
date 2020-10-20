@@ -70,12 +70,16 @@ const getCredentialsFromLabel = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<void | Response> => {
   const { campaignId } = req.params
   const { label } = req.body
   const userId = req.session?.user?.id
 
   try {
+    const logMeta = {
+      label,
+      action: 'getCredentialsFromLabel',
+    }
     /* Determine if credential name can be used */
     let credentialName
     if (label === DefaultCredentialName.SMS) {
@@ -83,9 +87,13 @@ const getCredentialsFromLabel = async (
       if (campaign.trial) {
         credentialName = label
       } else {
-        throw new Error(
-          `Campaign ${campaignId} is not allowed to use trial credentials`
-        )
+        logger.error({
+          message: `Campaign not allowed to use label`,
+          ...logMeta,
+        })
+        return res.status(400).json({
+          message: `Campaign ${campaignId} is not allowed to use default credentials`,
+        })
       }
     } else {
       // if label provided, fetch from aws secrets
@@ -94,11 +102,11 @@ const getCredentialsFromLabel = async (
       if (!userCred) {
         logger.error({
           message: 'User credentials not found',
-          label,
-          action: 'getCredentialsFromLabel',
+          ...logMeta,
         })
-        res.status(400).json({ message: 'User credentials cannot be found' })
-        return
+        return res
+          .status(400)
+          .json({ message: 'User credentials cannot be found' })
       }
 
       credentialName = userCred.credName
