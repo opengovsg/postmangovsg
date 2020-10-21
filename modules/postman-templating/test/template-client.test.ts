@@ -268,6 +268,11 @@ describe('replaceNewLinesAndSanitize', () => {
       const body = '<a href="tg://join?invite=">link</a>'
       expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
     })
+
+    test('Should not sanitize keyword in a href', () => {
+      const body = '<a href="{{link}}">link</a>'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
+    })
   })
 })
 

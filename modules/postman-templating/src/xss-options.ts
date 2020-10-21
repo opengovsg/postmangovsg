@@ -68,7 +68,11 @@ export const XSS_TELEGRAM_OPTION = {
   },
   safeAttrValue: (tag: string, name: string, value: string): string => {
     // Handle Telegram mention as xss-js does not recognize it as a valid url.
-    if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+    if (
+      tag === 'a' &&
+      name === 'href' &&
+      (value.startsWith('tg://') || value.match(KEYWORD_REGEX))
+    ) {
       return value
     }
     return xss.safeAttrValue(tag, name, value, xss.cssFilter)
