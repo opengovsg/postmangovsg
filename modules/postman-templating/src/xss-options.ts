@@ -6,6 +6,19 @@ const URL =
 
 const KEYWORD_REGEX = /^{{\s*?\w+\s*?}}$/
 
+/**
+ * Helper method to determine if a string is a HTTP URL
+ * @param urlStr
+ */
+const isValidHttpUrl = (urlStr: string): boolean => {
+  try {
+    const url = new URL(urlStr)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch (_) {
+    return false
+  }
+}
+
 export const XSS_EMAIL_OPTION = {
   whiteList: {
     b: [],
@@ -74,8 +87,8 @@ export const filterImageSources = (
 ): IFilterXSSOptions => ({
   ...baseOptions,
   safeAttrValue: (tag: string, name: string, value: string): string => {
-    // Check that the image source is from an allowed host
-    if (allowedImageSources && tag === 'img' && name === 'src') {
+    // Check that the image source is from an allowed host only if it is an URL (to account for base64 encoded images).
+    if (tag === 'img' && name === 'src' && isValidHttpUrl(value)) {
       const hostname = new URL(value).hostname
       if (allowedImageSources.indexOf(hostname) < 0) {
         throw new TemplateError(
