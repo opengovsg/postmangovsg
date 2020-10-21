@@ -16,6 +16,7 @@ const SMSTemplate = ({
   onNext: (changes: any, next?: boolean) => void
   finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
+  console.log('SMSTemplate')
   const modalContext = useContext(ModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)

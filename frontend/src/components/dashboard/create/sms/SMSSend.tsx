@@ -22,6 +22,7 @@ const SMSSend = ({
   numRecipients: number
   onNext: Function
 }) => {
+  console.log('SMSSend')
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')

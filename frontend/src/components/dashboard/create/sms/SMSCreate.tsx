@@ -1,6 +1,14 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { cloneDeep } from 'lodash'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import { Campaign, SMSCampaign, SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import SMSTemplate from './SMSTemplate'
@@ -18,36 +26,28 @@ const SMS_PROGRESS_STEPS = [
   'Preview and send',
 ]
 
-const CreateSMS = ({
-  campaign: initialCampaign,
-  onCampaignChange,
-  finishLaterCallbackRef,
-}: {
-  campaign: SMSCampaign
-  onCampaignChange: (c: Campaign) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
-}) => {
-  const [activeStep, setActiveStep] = useState(initialCampaign.progress)
-  const [campaign, setCampaign] = useState(initialCampaign)
-
-  useEffect(() => {
-    onCampaignChange(campaign)
-  }, [campaign, onCampaignChange])
+const CreateSMS = () => {
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const [activeStep, setActiveStep] = useState(campaign.progress)
+  console.log('SMSCreate')
 
   // Modifies campaign object in state and navigates to next step
-  const onNext = useCallback((changes: any, next = true) => {
-    setCampaign((c) => {
-      const updatedCampaign = Object.assign(
-        cloneDeep(c),
-        changes
-      ) as SMSCampaign
-      updatedCampaign.setProgress()
-      return updatedCampaign
-    })
-    if (next) {
-      setActiveStep((s) => s + 1)
-    }
-  }, [])
+  const onNext = useCallback(
+    (changes: any, next = true) => {
+      setCampaign((c) => {
+        const updatedCampaign = Object.assign(
+          cloneDeep(c),
+          changes
+        ) as SMSCampaign
+        updatedCampaign.setProgress()
+        return updatedCampaign
+      })
+      if (next) {
+        setActiveStep((s) => s + 1)
+      }
+    },
+    [setCampaign]
+  )
 
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {

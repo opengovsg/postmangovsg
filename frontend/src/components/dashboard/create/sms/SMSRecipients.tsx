@@ -33,6 +33,7 @@ const SMSRecipients = ({
   isProcessing: boolean
   onNext: (changes: Partial<SMSCampaign>, next?: boolean) => void
 }) => {
+  console.log('SMSRecipients')
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)

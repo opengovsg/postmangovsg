@@ -20,6 +20,7 @@ const SMSDetail = ({
   sentAt: Date
   numRecipients: number
 }) => {
+  console.log('SMSDetail')
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number, forceRefresh = false) {

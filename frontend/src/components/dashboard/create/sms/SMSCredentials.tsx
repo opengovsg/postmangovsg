@@ -26,6 +26,7 @@ const SMSCredentials = ({
   hasCredential: boolean
   onNext: (changes: any, next?: boolean) => void
 }) => {
+  console.log('SMSCredentials')
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
