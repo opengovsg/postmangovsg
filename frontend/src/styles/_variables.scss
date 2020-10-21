@@ -1,3 +1,5 @@
+@import 'base';
+
 // Colours
 $dark-blue: #100c55;
 $indigo-blue: #2c2cdc;
@@ -24,10 +26,6 @@ $site-padding: 4vw;
 $mobile-site-padding: 5vw;
 $content-top-padding: 4vh;
 $content-bottom-padding: 15vh;
-
-// Fonts
-$font-stack: 'Noto Sans JP', sans-serif;
-$monospace-font-stack: 'Roboto Mono', monospace;
 
 // Layout
 $landing-max-width: 1000px;
