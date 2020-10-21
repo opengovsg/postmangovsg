@@ -33,13 +33,17 @@ const PreviewBlock: React.FunctionComponent<PreviewBlockProps> = ({
   }
 
   function constructHtml() {
-    function h(name: string, value?: string | null) {
-      if (value) return `<h5>${name}</h5><p>${escapeHTML(value)}</p>`
+    function h(name: string, value?: string | null, escapeValue = true) {
+      if (value)
+        return `<h5>${name}</h5><p>${
+          escapeValue ? escapeHTML(value) : value
+        }</p>`
       return ''
     }
+
     const html = `${h('From', from)}
     ${h('Subject', subject)}
-    ${h('Body', body)}
+    ${h('Body', body, false)}
     ${h('Replies', replyTo)}`
     return html
   }
