@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
@@ -27,7 +29,6 @@ export class Campaign {
   isCsvProcessing: boolean
   statusUpdatedAt: Date
   protect: boolean
-  hasFailedRecipients: boolean
 
   constructor(input: any) {
     this.id = input['id']
@@ -41,7 +42,6 @@ export class Campaign {
     this.sentAt = input['sentAt']
     this.statusUpdatedAt = input['statusUpdatedAt']
     this.protect = input['protect']
-    this.hasFailedRecipients = this.getFailedRecipients(input['statistic'])
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {
@@ -59,10 +59,6 @@ export class Campaign {
     }
     return Status.Draft
   }
-
-  getFailedRecipients(statistic: { has_failed_recipients: boolean }): boolean {
-    return statistic && statistic.has_failed_recipients
-  }
 }
 
 export class CampaignStats {
@@ -74,6 +70,7 @@ export class CampaignStats {
   statusUpdatedAt: Date // Timestamp when job's status was changed to this status
   updatedAt: Date // Timestamp when statistic was updated
   halted?: boolean
+  waitTime?: number
 
   constructor(input: any) {
     this.error = +input['error']
@@ -84,10 +81,11 @@ export class CampaignStats {
     this.statusUpdatedAt = input['status_updated_at']
     this.updatedAt = input['updated_at']
     this.halted = input['halted']
+    this.waitTime = input['wait_time']
   }
 }
 
-export class CampaignInvalidRecipient {
+export abstract class CampaignRecipient {
   recipient: string
   status: string
   errorCode: string
@@ -96,7 +94,9 @@ export class CampaignInvalidRecipient {
   constructor(input: any) {
     this.recipient = input['recipient']
     this.status = input['status']
-    this.errorCode = input['error_code']
-    this.updatedAt = input['updated_at']
+    this.errorCode = this.formatErrorCode(input['error_code'])
+    this.updatedAt = moment(input['updated_at']).format('LLL').replace(',', '')
   }
+
+  protected abstract formatErrorCode(errorCode: string): string
 }

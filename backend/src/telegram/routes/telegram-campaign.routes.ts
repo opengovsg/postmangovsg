@@ -865,6 +865,6 @@ router.post('/refresh-stats', TelegramStatsMiddleware.updateAndGetStats)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/export', TelegramStatsMiddleware.getFailedRecipients)
+router.get('/export', TelegramStatsMiddleware.getDeliveredRecipients)
 
 export default router

@@ -106,7 +106,9 @@ const uploadCompleteHandler = async (
     // check if template exists
     const template = await EmailTemplateService.getFilledTemplate(+campaignId)
     if (template === null) {
-      throw new Error('Template does not exist, please create a template')
+      throw new Error(
+        'Error: No message template found. Please create a message template before uploading a recipient file.'
+      )
     }
 
     // Store temp filename
@@ -261,7 +263,9 @@ const uploadProtectedCompleteHandler = async (
     // check if template exists
     const template = await EmailTemplateService.getFilledTemplate(+campaignId)
     if (template === null) {
-      throw new Error('Template does not exist, please create a template')
+      throw new Error(
+        'Error: No message template found. Please create a message template before uploading a recipient file.'
+      )
     }
 
     // Store temp filename

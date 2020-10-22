@@ -791,6 +791,6 @@ router.post('/refresh-stats', SmsStatsMiddleware.updateAndGetStats)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/export', SmsStatsMiddleware.getFailedRecipients)
+router.get('/export', SmsStatsMiddleware.getDeliveredRecipients)
 
 export default router
