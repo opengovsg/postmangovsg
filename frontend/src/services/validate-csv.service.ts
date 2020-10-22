@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import { keys, difference, uniq } from 'lodash'
-import { TemplateClient } from 'postman-templating'
+import { TemplateClient, TemplateError } from 'postman-templating'
 
 import { i18n } from 'locales'
 import { ALLOWED_IMAGE_SOURCES } from 'config'
@@ -62,8 +62,18 @@ export async function validateCsv({
             preview = hydrateTemplate(template, row, removeEmptyLines)
           }
         } catch (e) {
+          // Exit early if it is a templating error. This can be caused by either the template or first row having invalid values.
+          if (e instanceof TemplateError) {
+            return reject(
+              new Error(
+                `The following error occured while generating the message preview. ` +
+                  `Please check your template and the first row of your recipient list.\n\n${e}`
+              )
+            )
+          }
+
           // If there is errors, append to the errors array
-          errors.push(`${count}: ${e.message}`)
+          errors.push(`Line ${count}: ${e.message}`)
           if (errors.length === 3) {
             // abort when there are 3 errors
             parser.abort()
@@ -72,7 +82,7 @@ export async function validateCsv({
       },
       complete: function () {
         if (errors.length) {
-          reject(new Error(`Errors found in csv: \n${errors.join('\n')}`))
+          reject(new Error(`Errors found in CSV: \n${errors.join('\n')}`))
         } else {
           resolve({
             numRecipients: count,
