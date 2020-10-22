@@ -287,13 +287,6 @@ describe('filterXSS', () => {
     }).not.toThrow()
   })
 
-  test('should not throw an error if src value is a base64 encoded image', () => {
-    const body = '<img src="data:image/png;base64,AAAAAA" />'
-    expect(() => {
-      templateClient.template(body, {})
-    }).not.toThrow()
-  })
-
   test('should throw an error if image source is not valid', () => {
     const body = '<img src="https://invalid.com/image.jpg" />'
     expect(() => {

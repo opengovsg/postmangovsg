@@ -91,7 +91,7 @@ export const filterImageSources = (
 ): IFilterXSSOptions => ({
   ...baseOptions,
   safeAttrValue: (tag: string, name: string, value: string): string => {
-    // Check that the image source is from an allowed host only if it is an URL (to account for base64 encoded images).
+    // Check that the image source is from an allowed host only if it is an URL (to account for variable value).
     if (tag === 'img' && name === 'src' && isValidHttpUrl(value)) {
       const hostname = new URL(value).hostname
       if (allowedImageSources.indexOf(hostname) < 0) {
