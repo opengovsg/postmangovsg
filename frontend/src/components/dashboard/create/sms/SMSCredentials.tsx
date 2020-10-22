@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   validateStoredCredentials,
   validateNewCredentials,
@@ -18,15 +19,12 @@ import TwilioCredentialsInput, {
   TwilioCredentials,
 } from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
+import { SMSCampaign } from 'classes'
 
-const SMSCredentials = ({
-  hasCredential: initialHasCredential,
-  onNext,
-}: {
-  hasCredential: boolean
-  onNext: (changes: any, next?: boolean) => void
-}) => {
+const SMSCredentials = () => {
   console.log('SMSCredentials')
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { hasCredential: initialHasCredential, progress } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
@@ -89,7 +87,9 @@ const SMSCredentials = ({
       setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
-      onNext({ hasCredential: true }, false)
+      setCampaign(
+        (campaign) => ({ ...campaign, hasCredential: true } as SMSCampaign)
+      )
     } catch (err) {
       setErrorMessage(err.message)
     }
@@ -161,7 +161,18 @@ const SMSCredentials = ({
 
           <div className="separator"></div>
 
-          <NextButton disabled={!hasCredential} onClick={onNext} />
+          <NextButton
+            disabled={!hasCredential}
+            onClick={() =>
+              setCampaign(
+                (campaign) =>
+                  ({
+                    ...campaign,
+                    progress: progress + 1,
+                  } as SMSCampaign)
+              )
+            }
+          />
         </>
       ) : (
         <>{renderCredentialFields()}</>

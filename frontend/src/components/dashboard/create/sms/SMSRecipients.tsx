@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -20,20 +21,16 @@ import { sendTiming } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
-const SMSRecipients = ({
-  csvFilename: initialCsvFilename,
-  numRecipients: initialNumRecipients,
-  params,
-  isProcessing: initialIsProcessing,
-  onNext,
-}: {
-  csvFilename: string
-  numRecipients: number
-  params: Array<string>
-  isProcessing: boolean
-  onNext: (changes: Partial<SMSCampaign>, next?: boolean) => void
-}) => {
+const SMSRecipients = () => {
   console.log('SMSRecipients')
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const {
+    isCsvProcessing: initialIsProcessing,
+    numRecipients: initialNumRecipients,
+    csvFilename: initialCsvFilename,
+    progress,
+    params,
+  } = campaign as SMSCampaign
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
@@ -80,8 +77,16 @@ const SMSRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
-  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
+    setCampaign(
+      (campaign) =>
+        ({
+          ...campaign,
+          isCsvProcessing,
+          csvFilename,
+          numRecipients,
+        } as SMSCampaign)
+    )
+  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign])
 
   // Handle file upload
   async function uploadFile(files: File[]) {
@@ -156,7 +161,15 @@ const SMSRecipients = ({
         </>
       )}
 
-      <NextButton disabled={!numRecipients || !csvFilename} onClick={onNext} />
+      <NextButton
+        disabled={!numRecipients || !csvFilename}
+        onClick={() =>
+          setCampaign(
+            (campaign) =>
+              ({ ...campaign, progress: progress + 1 } as SMSCampaign)
+          )
+        }
+      />
     </>
   )
 }

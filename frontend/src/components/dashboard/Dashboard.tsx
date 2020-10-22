@@ -16,9 +16,11 @@ const Dashboard = () => {
       <NavBar></NavBar>
       <Switch>
         <Route exact path="/campaigns" component={Campaigns}></Route>
-        <CampaignContextProvider>
-          <Route path="/campaigns/:id" component={Create}></Route>
-        </CampaignContextProvider>
+        <Route path="/campaigns/:id">
+          <CampaignContextProvider>
+            <Create />
+          </CampaignContextProvider>
+        </Route>
         <Route path="/settings" component={Settings}></Route>
         <Route component={Error} />
       </Switch>

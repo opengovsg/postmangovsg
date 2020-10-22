@@ -8,30 +8,28 @@ import {
   Dropdown,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/email.service'
 
 import styles from './EmailTemplate.module.scss'
 import { getCustomFromAddresses } from 'services/settings.service'
+import { EmailCampaign } from 'classes'
 
-const EmailTemplate = ({
-  from: initialFrom,
-  subject: initialSubject,
-  body: initialBody,
-  replyTo: initialReplyTo,
-  protect,
-  onNext,
-  finishLaterCallbackRef,
-}: {
-  from: string
-  subject: string
-  body: string
-  replyTo: string | null
-  protect: boolean
-  onNext: (changes: any, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
-}) => {
+const EmailTemplate = () => {
+  console.log('EmailTemplate')
+  const { campaign, setCampaign, setFinishLaterCallback } = useContext(
+    CampaignContext
+  )
+  const {
+    body: initialBody,
+    subject: initialSubject,
+    replyTo: initialReplyTo,
+    from: initialFrom,
+    protect,
+    progress,
+  } = campaign as EmailCampaign
   const modalContext = useContext(ModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
@@ -62,20 +60,27 @@ const EmailTemplate = ({
           replyTo,
           from
         )
-        onNext({
-          from: updatedTemplate?.from,
-          subject: updatedTemplate?.subject,
-          body: updatedTemplate?.body,
-          replyTo: updatedTemplate?.reply_to,
-          params: updatedTemplate?.params,
-          numRecipients,
-        })
+        if (updatedTemplate) {
+          setCampaign(
+            (campaign) =>
+              ({
+                ...campaign,
+                from: updatedTemplate.from,
+                subject: updatedTemplate.subject,
+                body: updatedTemplate.body,
+                replyTo: updatedTemplate.reply_to,
+                params: updatedTemplate.params,
+                numRecipients,
+                progress: progress + 1,
+              } as EmailCampaign)
+          )
+        }
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, from, onNext, replyTo, subject]
+    [body, campaignId, from, progress, replyTo, setCampaign, subject]
   )
 
   async function populateFromAddresses() {
@@ -91,7 +96,7 @@ const EmailTemplate = ({
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
+    setFinishLaterCallback(() => () => {
       modalContext.setModalContent(
         <SaveDraftModal
           saveable
@@ -102,17 +107,17 @@ const EmailTemplate = ({
           }}
         />
       )
-    }
+    })
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterCallback(null)
     }
   }, [
     body,
-    finishLaterCallbackRef,
     handleSaveTemplate,
     modalContext,
     subject,
     from,
+    setFinishLaterCallback,
   ])
 
   function replaceNewLines(body: string): string {

@@ -12,6 +12,7 @@ import {
   Checkbox,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 import EmailRecipients from './EmailRecipients'
 import { EmailCampaign } from 'classes'
@@ -29,19 +30,15 @@ enum ProtectPhase {
   DONE,
 }
 
-const ProtectedEmailRecipients = ({
-  csvFilename,
-  numRecipients,
-  isProcessing,
-  onNext,
-  finishLaterCallbackRef,
-}: {
-  csvFilename: string
-  numRecipients: number
-  isProcessing: boolean
-  onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
-}) => {
+const ProtectedEmailRecipients = () => {
+  const { campaign, setCampaign, setFinishLaterCallback } = useContext(
+    CampaignContext
+  )
+  const {
+    csvFilename,
+    numRecipients,
+    isCsvProcessing: isProcessing,
+  } = campaign as EmailCampaign
   const modalContext = useContext(ModalContext)
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -56,17 +53,17 @@ const ProtectedEmailRecipients = ({
 
   useEffect(() => {
     setPhase(computePhase(numRecipients, isProcessing))
-  }, [numRecipients, isProcessing])
+  }, [isProcessing, numRecipients])
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
+    setFinishLaterCallback(() => () => {
       modalContext.setModalContent(<SaveDraftModal />)
-    }
+    })
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterCallback(null)
     }
-  }, [template, finishLaterCallbackRef, modalContext])
+  }, [template, modalContext, setFinishLaterCallback])
 
   function computePhase(
     numRecipients: number,
@@ -225,15 +222,9 @@ const ProtectedEmailRecipients = ({
   const uploadRecipients = (
     <>
       <EmailRecipients
-        csvFilename={csvFilename}
-        numRecipients={numRecipients}
-        params={[]}
-        isProcessing={isProcessing}
-        protect={true}
         template={template}
         onFileSelected={onFileSelected}
         forceReset={phase === ProtectPhase.READY}
-        onNext={onNext}
       ></EmailRecipients>
       {phase === ProtectPhase.READY && csvFilename && (
         <div className="progress-button">
@@ -257,7 +248,17 @@ const ProtectedEmailRecipients = ({
       >
         Edit Message
       </TextButton>
-      <PrimaryButton onClick={onNext}>
+      <PrimaryButton
+        onClick={() =>
+          setCampaign(
+            (campaign) =>
+              ({
+                ...campaign,
+                progress: campaign.progress + 1,
+              } as EmailCampaign)
+          )
+        }
+      >
         Next <i className="bx bx-right-arrow-alt"></i>
       </PrimaryButton>
     </div>

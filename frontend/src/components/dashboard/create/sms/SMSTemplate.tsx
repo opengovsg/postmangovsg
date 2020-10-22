@@ -3,22 +3,19 @@ import React, { useState, useCallback, useEffect, useContext } from 'react'
 import { TextArea, NextButton, ErrorBlock } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { ModalContext } from 'contexts/modal.context'
+import { CampaignContext } from 'contexts/campaign.context'
 import { useParams } from 'react-router-dom'
 import { exceedsCharacterThreshold, saveTemplate } from 'services/sms.service'
 import styles from '../Create.module.scss'
+import { SMSCampaign } from 'classes'
 
-const SMSTemplate = ({
-  body: initialBody,
-  onNext,
-  finishLaterCallbackRef,
-}: {
-  body: string
-  onNext: (changes: any, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
-}) => {
+const SMSTemplate = () => {
   console.log('SMSTemplate')
+  const { campaign, setCampaign, setFinishLaterCallback } = useContext(
+    CampaignContext
+  )
   const modalContext = useContext(ModalContext)
-  const [body, setBody] = useState(replaceNewLines(initialBody))
+  const [body, setBody] = useState(replaceNewLines(campaign.body))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
 
@@ -50,22 +47,30 @@ const SMSTemplate = ({
           +campaignId,
           body
         )
-        onNext({
-          body: updatedTemplate?.body,
-          params: updatedTemplate?.params,
-          numRecipients,
-        })
+        if (updatedTemplate) {
+          setCampaign(
+            (campaign) =>
+              ({
+                ...campaign,
+                body: updatedTemplate.body,
+                params: updatedTemplate.params,
+                numRecipients,
+                progress: campaign.progress + 1,
+              } as SMSCampaign)
+          )
+        }
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, onNext]
+    [body, campaignId, setCampaign]
   )
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
+    console.log('updated')
+    setFinishLaterCallback(() => () => {
       modalContext.setModalContent(
         <SaveDraftModal
           saveable
@@ -74,11 +79,11 @@ const SMSTemplate = ({
           }}
         />
       )
-    }
+    })
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterCallback(null)
     }
-  }, [body, finishLaterCallbackRef, handleSaveTemplate, modalContext])
+  }, [body, handleSaveTemplate, modalContext, setFinishLaterCallback])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')

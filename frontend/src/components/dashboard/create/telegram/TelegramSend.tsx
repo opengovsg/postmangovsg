@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Status, ChannelType } from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import { Status, ChannelType, SMSCampaign } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -15,13 +16,9 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
-const TelegramSend = ({
-  numRecipients,
-  onNext,
-}: {
-  numRecipients: number
-  onNext: Function
-}) => {
+const TelegramSend = () => {
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')
@@ -51,7 +48,9 @@ const TelegramSend = ({
     if (sendRate) {
       sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, ChannelType.Telegram)
     }
-    onNext({ status: Status.Sending }, false)
+    setCampaign(
+      (campaign) => ({ ...campaign, status: Status.Sending } as SMSCampaign)
+    )
   }
 
   const openModal = () => {

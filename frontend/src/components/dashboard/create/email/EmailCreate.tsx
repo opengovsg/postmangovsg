@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { cloneDeep } from 'lodash'
+import React, { useState, useEffect, useContext } from 'react'
 
-import { Campaign, EmailCampaign, EmailProgress, Status } from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import { EmailProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import EmailTemplate from './EmailTemplate'
 import EmailRecipients from './EmailRecipients'
@@ -19,36 +19,10 @@ const EMAIL_PROGRESS_STEPS = [
   'Preview and send',
 ]
 
-const CreateEmail = ({
-  campaign: initialCampaign,
-  onCampaignChange,
-  finishLaterCallbackRef,
-}: {
-  campaign: EmailCampaign
-  onCampaignChange: (c: Campaign) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
-}) => {
-  const [activeStep, setActiveStep] = useState(initialCampaign.progress)
-  const [campaign, setCampaign] = useState(initialCampaign)
-
-  useEffect(() => {
-    onCampaignChange(campaign)
-  }, [campaign, onCampaignChange])
-
-  // Modifies campaign object in state and navigates to next step
-  const onNext = useCallback((changes: any, next = true) => {
-    setCampaign((c) => {
-      const updatedCampaign = Object.assign(
-        cloneDeep(c),
-        changes
-      ) as EmailCampaign
-      updatedCampaign.setProgress()
-      return updatedCampaign
-    })
-    if (next) {
-      setActiveStep((s) => s + 1)
-    }
-  }, [])
+const CreateEmail = () => {
+  console.log('EmailCreate')
+  const { campaign } = useContext(CampaignContext)
+  const [activeStep, setActiveStep] = useState(campaign.progress)
 
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
@@ -60,50 +34,16 @@ const CreateEmail = ({
   function renderStep() {
     switch (activeStep) {
       case EmailProgress.CreateTemplate:
-        return (
-          <EmailTemplate
-            from={campaign.from}
-            subject={campaign.subject}
-            body={campaign.body}
-            replyTo={campaign.replyTo}
-            protect={campaign.protect}
-            onNext={onNext}
-            finishLaterCallbackRef={finishLaterCallbackRef}
-          />
-        )
+        return <EmailTemplate />
       case EmailProgress.UploadRecipients:
         if (campaign.protect) {
-          return (
-            <ProtectedEmailRecipients
-              csvFilename={campaign.csvFilename}
-              numRecipients={campaign.numRecipients}
-              isProcessing={campaign.isCsvProcessing}
-              onNext={onNext}
-              finishLaterCallbackRef={finishLaterCallbackRef}
-            />
-          )
+          return <ProtectedEmailRecipients />
         }
-        return (
-          <EmailRecipients
-            params={campaign.params}
-            csvFilename={campaign.csvFilename}
-            numRecipients={campaign.numRecipients}
-            isProcessing={campaign.isCsvProcessing}
-            onNext={onNext}
-          />
-        )
+        return <EmailRecipients />
       case EmailProgress.SendTestMessage:
-        return (
-          <EmailCredentials
-            hasCredential={campaign.hasCredential}
-            protect={campaign.protect}
-            onNext={onNext}
-          />
-        )
+        return <EmailCredentials />
       case EmailProgress.Send:
-        return (
-          <EmailSend numRecipients={campaign.numRecipients} onNext={onNext} />
-        )
+        return <EmailSend />
       default:
         return <p>Invalid step</p>
     }
@@ -113,12 +53,7 @@ const CreateEmail = ({
     <div className={styles.createContainer}>
       {campaign.status !== Status.Draft ? (
         <div className={styles.stepContainer}>
-          <EmailDetail
-            id={campaign.id}
-            name={campaign.name}
-            sentAt={campaign.sentAt}
-            numRecipients={campaign.numRecipients}
-          ></EmailDetail>
+          <EmailDetail></EmailDetail>
         </div>
       ) : (
         <>

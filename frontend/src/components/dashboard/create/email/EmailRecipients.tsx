@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -21,26 +22,23 @@ import { sendTiming } from 'services/ga.service'
 import styles from '../Create.module.scss'
 
 const EmailRecipients = ({
-  csvFilename: initialCsvFilename,
-  numRecipients: initialNumRecipients,
-  params,
-  isProcessing: initialIsProcessing,
-  protect,
   onFileSelected,
   template,
   forceReset,
-  onNext,
 }: {
-  csvFilename: string
-  numRecipients: number
-  params: Array<string>
-  isProcessing: boolean
-  protect?: boolean
   onFileSelected?: (campaignId: number, file: File) => Promise<any>
   template?: string
   forceReset?: boolean // this forces upload button to show without csv info and preview
-  onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
 }) => {
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const {
+    csvFilename: initialCsvFilename,
+    isCsvProcessing: initialIsProcessing,
+    numRecipients: initialNumRecipients,
+    params,
+    protect,
+    progress,
+  } = campaign
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
@@ -100,8 +98,16 @@ const EmailRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
-  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
+    setCampaign(
+      (campaign) =>
+        ({
+          ...campaign,
+          isCsvProcessing,
+          csvFilename,
+          numRecipients,
+        } as EmailCampaign)
+    )
+  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign, campaign])
 
   // Handle file upload
   async function uploadFile(files: File[]) {
@@ -181,7 +187,7 @@ const EmailRecipients = ({
             />
             <p>or</p>
             <SampleCsv
-              params={params}
+              params={protect ? [] : params}
               protect={protect}
               template={template}
               defaultRecipient="user@email.com"
@@ -210,7 +216,15 @@ const EmailRecipients = ({
       {!protect && (
         <NextButton
           disabled={!numRecipients || isCsvProcessing}
-          onClick={onNext}
+          onClick={() =>
+            setCampaign(
+              (campaign) =>
+                ({
+                  ...campaign,
+                  progress: progress + 1,
+                } as EmailCampaign)
+            )
+          }
         />
       )}
     </>

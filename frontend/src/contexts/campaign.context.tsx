@@ -7,7 +7,7 @@ interface ContextProps {
     SetStateAction<SMSCampaign | EmailCampaign | TelegramCampaign>
   >
   finishLaterCallback: (() => void) | null
-  setFinishLaterCallback: Dispatch<SetStateAction<null>>
+  setFinishLaterCallback: Dispatch<SetStateAction<any>>
 }
 
 export const CampaignContext = createContext({} as ContextProps)

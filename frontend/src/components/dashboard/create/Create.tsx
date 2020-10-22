@@ -1,16 +1,9 @@
-import React, { useEffect, useState, useRef, useContext } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import {
-  Campaign,
-  ChannelType,
-  SMSCampaign,
-  EmailCampaign,
-  TelegramCampaign,
-  Status,
-} from 'classes'
+import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'

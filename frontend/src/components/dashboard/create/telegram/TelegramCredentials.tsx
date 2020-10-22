@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import { LINKS } from 'config'
 import {
   validateStoredCredentials,
@@ -21,14 +22,11 @@ import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
 import { i18n } from 'locales'
+import { TelegramCampaign } from 'classes'
 
-const TelegramCredentials = ({
-  hasCredential: initialHasCredential,
-  onNext,
-}: {
-  hasCredential: boolean
-  onNext: (changes: any, next?: boolean) => void
-}) => {
+const TelegramCredentials = () => {
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { hasCredential: initialHasCredential, progress } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
@@ -75,7 +73,7 @@ const TelegramCredentials = ({
     setShowCredentialFields(true)
   }
 
-  async function handleSelectStoredCredentials() {
+  async function handleValidateCredentials() {
     setErrorMessage(null)
     setIsValidating(true)
 
@@ -84,40 +82,26 @@ const TelegramCredentials = ({
         throw new Error('Invalid campaign id')
       }
 
-      await validateStoredCredentials({
-        campaignId: +campaignId,
-        label: selectedCredential,
-      })
-
-      setHasCredential(true)
-      setShowCredentialFields(false)
-      // Saves hasCredential property but do not advance to next step
-      onNext({ hasCredential: true }, false)
-    } catch (e) {
-      setErrorMessage(e.message)
-    }
-
-    setIsValidating(false)
-  }
-
-  async function handleNewCredentials() {
-    setErrorMessage(null)
-    setIsValidating(true)
-
-    try {
-      if (!campaignId) {
-        throw new Error('Invalid campaign id')
+      if (isManual && creds) {
+        await validateNewCredentials({
+          campaignId: +campaignId,
+          ...creds,
+        })
+      } else if (!isManual && selectedCredential) {
+        await validateStoredCredentials({
+          campaignId: +campaignId,
+          label: selectedCredential,
+        })
+      } else {
+        throw new Error('Missing credentials')
       }
 
-      await validateNewCredentials({
-        campaignId: +campaignId,
-        ...creds,
-      })
-
       setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
-      onNext({ hasCredential: true }, false)
+      setCampaign(
+        (campaign) => ({ ...campaign, hasCredential: true } as TelegramCampaign)
+      )
     } catch (e) {
       setErrorMessage(e.message)
     }
@@ -180,7 +164,10 @@ const TelegramCredentials = ({
             <ErrorBlock>{errorMessage}</ErrorBlock>
 
             <div className="progress-button">
-              <PrimaryButton disabled={!creds} onClick={handleNewCredentials}>
+              <PrimaryButton
+                disabled={!creds}
+                onClick={handleValidateCredentials}
+              >
                 {isValidating ? (
                   <>
                     Validating<i className="bx bx-loader-alt bx-spin"></i>
@@ -209,7 +196,7 @@ const TelegramCredentials = ({
             <div className="progress-button">
               <PrimaryButton
                 disabled={!selectedCredential}
-                onClick={handleSelectStoredCredentials}
+                onClick={handleValidateCredentials}
               >
                 {isValidating ? (
                   <>
@@ -269,7 +256,18 @@ const TelegramCredentials = ({
               <ErrorBlock>{errorMessage}</ErrorBlock>
               <div className="separator"></div>
 
-              <NextButton disabled={!hasCredential} onClick={onNext} />
+              <NextButton
+                disabled={!hasCredential}
+                onClick={() =>
+                  setCampaign(
+                    (campaign) =>
+                      ({
+                        ...campaign,
+                        progress: progress + 1,
+                      } as TelegramCampaign)
+                  )
+                }
+              />
             </>
           )}
         </>

@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Status } from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import { EmailCampaign, Status } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import { PreviewBlock, PrimaryButton, ConfirmModal } from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
@@ -9,13 +10,9 @@ import { sendCampaign } from 'services/campaign.service'
 
 import styles from '../Create.module.scss'
 
-const EmailSend = ({
-  numRecipients,
-  onNext,
-}: {
-  numRecipients: number
-  onNext: Function
-}) => {
+const EmailSend = () => {
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState(
     {} as {
@@ -48,7 +45,9 @@ const EmailSend = ({
 
   const onModalConfirm = async () => {
     await sendCampaign(+campaignId, 0)
-    onNext({ status: Status.Sending }, false)
+    setCampaign(
+      (campaign) => ({ ...campaign, status: Status.Sending } as EmailCampaign)
+    )
   }
 
   const openModal = () => {

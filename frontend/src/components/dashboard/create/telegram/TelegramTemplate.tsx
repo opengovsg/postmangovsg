@@ -1,21 +1,19 @@
 import React, { useState, useCallback, useEffect, useContext } from 'react'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import { TextArea, NextButton, ErrorBlock } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/telegram.service'
+import { TelegramCampaign } from 'classes'
 
-const TelegramTemplate = ({
-  body: initialBody,
-  onNext,
-  finishLaterCallbackRef,
-}: {
-  body: string
-  onNext: (changes: any, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
-}) => {
+const TelegramTemplate = () => {
+  const { campaign, setCampaign, setFinishLaterCallback } = useContext(
+    CampaignContext
+  )
   const modalContext = useContext(ModalContext)
+  const { body: initialBody, progress } = campaign as TelegramCampaign
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
@@ -31,22 +29,28 @@ const TelegramTemplate = ({
           +campaignId,
           body
         )
-        onNext({
-          body: updatedTemplate?.body,
-          params: updatedTemplate?.params,
-          numRecipients,
-        })
+        if (!updatedTemplate) return
+        setCampaign(
+          (campaign) =>
+            ({
+              ...campaign,
+              body: updatedTemplate?.body,
+              params: updatedTemplate?.params,
+              numRecipients,
+              progress: progress + 1,
+            } as TelegramCampaign)
+        )
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, onNext]
+    [body, campaignId, progress, setCampaign]
   )
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
+    setFinishLaterCallback(() => () => {
       modalContext.setModalContent(
         <SaveDraftModal
           saveable
@@ -55,11 +59,11 @@ const TelegramTemplate = ({
           }}
         />
       )
-    }
+    })
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterCallback(null)
     }
-  }, [body, finishLaterCallbackRef, handleSaveTemplate, modalContext])
+  }, [body, handleSaveTemplate, modalContext, setFinishLaterCallback])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')
