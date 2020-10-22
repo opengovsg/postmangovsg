@@ -1,19 +1,17 @@
 import React, { useState, useCallback, useEffect, useContext } from 'react'
+import { useParams } from 'react-router-dom'
 
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { TextArea, NextButton, ErrorBlock } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { ModalContext } from 'contexts/modal.context'
-import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/telegram.service'
 import { TelegramCampaign } from 'classes'
 
 const TelegramTemplate = () => {
-  const { campaign, setCampaign, setFinishLaterCallback } = useContext(
-    CampaignContext
-  )
-  const modalContext = useContext(ModalContext)
+  const { campaign, setCampaign } = useContext(CampaignContext)
   const { body: initialBody, progress } = campaign as TelegramCampaign
+  const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
@@ -50,20 +48,18 @@ const TelegramTemplate = () => {
 
   // Set callback for finish later button
   useEffect(() => {
-    setFinishLaterCallback(() => () => {
-      modalContext.setModalContent(
-        <SaveDraftModal
-          saveable
-          onSave={async () => {
-            if (body) await handleSaveTemplate(true)
-          }}
-        />
-      )
-    })
+    setFinishLaterContent(
+      <SaveDraftModal
+        saveable
+        onSave={async () => {
+          if (body) await handleSaveTemplate(true)
+        }}
+      />
+    )
     return () => {
-      setFinishLaterCallback(null)
+      setFinishLaterContent(null)
     }
-  }, [body, handleSaveTemplate, modalContext, setFinishLaterCallback])
+  }, [body, handleSaveTemplate, setFinishLaterContent])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')

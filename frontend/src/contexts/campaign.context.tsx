@@ -6,8 +6,6 @@ interface ContextProps {
   setCampaign: Dispatch<
     SetStateAction<SMSCampaign | EmailCampaign | TelegramCampaign>
   >
-  finishLaterCallback: (() => void) | null
-  setFinishLaterCallback: Dispatch<SetStateAction<any>>
 }
 
 export const CampaignContext = createContext({} as ContextProps)
@@ -20,15 +18,12 @@ const CampaignContextProvider = ({
   const [campaign, setCampaign] = useState(
     new Campaign({}) as SMSCampaign | EmailCampaign | TelegramCampaign
   )
-  const [finishLaterCallback, setFinishLaterCallback] = useState(null)
 
   return (
     <CampaignContext.Provider
       value={{
         campaign,
         setCampaign,
-        finishLaterCallback,
-        setFinishLaterCallback,
       }}
     >
       {children}

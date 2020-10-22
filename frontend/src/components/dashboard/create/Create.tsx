@@ -3,6 +3,7 @@ import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
 import { CampaignContext } from 'contexts/campaign.context'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import { getCampaignDetails } from 'services/campaign.service'
@@ -13,14 +14,16 @@ import TelegramCreate from './telegram/TelegramCreate'
 import styles from './Create.module.scss'
 
 const Create = () => {
-  console.log('Create')
   const { id } = useParams()
   const history = useHistory()
 
-  const { campaign, setCampaign, finishLaterCallback } = useContext(
-    CampaignContext
-  )
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const {
+    handleFinishLater: finishLaterContextHandler,
+    finishLaterContent,
+  } = useContext(FinishLaterModalContext)
   const [isLoading, setLoading] = useState(true)
+  console.log('Create', id, isLoading, campaign)
 
   useEffect(() => {
     if (!id) return
@@ -34,8 +37,8 @@ const Create = () => {
 
   async function handleFinishLater() {
     sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
-    if (campaign.status === Status.Draft && finishLaterCallback) {
-      finishLaterCallback()
+    if (campaign.status === Status.Draft && finishLaterContent) {
+      finishLaterContextHandler()
     }
     history.push('/campaigns')
   }

@@ -21,7 +21,7 @@ const SMS_PROGRESS_STEPS = [
 const CreateSMS = () => {
   const { campaign } = useContext(CampaignContext)
   const [activeStep, setActiveStep] = useState(campaign.progress)
-  console.log('SMSCreate')
+  console.log('SMSCreate', activeStep)
 
   useEffect(() => {
     setActiveStep(campaign.progress)

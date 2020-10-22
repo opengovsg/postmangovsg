@@ -12,8 +12,8 @@ import {
   Checkbox,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { CampaignContext } from 'contexts/campaign.context'
-import { ModalContext } from 'contexts/modal.context'
 import EmailRecipients from './EmailRecipients'
 import { EmailCampaign } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -31,15 +31,13 @@ enum ProtectPhase {
 }
 
 const ProtectedEmailRecipients = () => {
-  const { campaign, setCampaign, setFinishLaterCallback } = useContext(
-    CampaignContext
-  )
+  const { campaign, setCampaign } = useContext(CampaignContext)
   const {
     csvFilename,
     numRecipients,
     isCsvProcessing: isProcessing,
   } = campaign as EmailCampaign
-  const modalContext = useContext(ModalContext)
+  const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState<File>()
@@ -57,13 +55,11 @@ const ProtectedEmailRecipients = () => {
 
   // Set callback for finish later button
   useEffect(() => {
-    setFinishLaterCallback(() => () => {
-      modalContext.setModalContent(<SaveDraftModal />)
-    })
+    setFinishLaterContent(<SaveDraftModal />)
     return () => {
-      setFinishLaterCallback(null)
+      setFinishLaterContent(null)
     }
-  }, [template, modalContext, setFinishLaterCallback])
+  }, [setFinishLaterContent])
 
   function computePhase(
     numRecipients: number,

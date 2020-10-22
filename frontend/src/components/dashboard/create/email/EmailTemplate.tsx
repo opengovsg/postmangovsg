@@ -8,20 +8,19 @@ import {
   Dropdown,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
+import { getCustomFromAddresses } from 'services/settings.service'
 import { saveTemplate } from 'services/email.service'
+import { EmailCampaign } from 'classes'
 
 import styles from './EmailTemplate.module.scss'
-import { getCustomFromAddresses } from 'services/settings.service'
-import { EmailCampaign } from 'classes'
 
 const EmailTemplate = () => {
   console.log('EmailTemplate')
-  const { campaign, setCampaign, setFinishLaterCallback } = useContext(
-    CampaignContext
-  )
+  const { campaign, setCampaign } = useContext(CampaignContext)
   const {
     body: initialBody,
     subject: initialSubject,
@@ -30,6 +29,7 @@ const EmailTemplate = () => {
     protect,
     progress,
   } = campaign as EmailCampaign
+  const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const modalContext = useContext(ModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
@@ -96,28 +96,26 @@ const EmailTemplate = () => {
 
   // Set callback for finish later button
   useEffect(() => {
-    setFinishLaterCallback(() => () => {
-      modalContext.setModalContent(
-        <SaveDraftModal
-          saveable
-          onSave={async () => {
-            if (subject && body && from) {
-              await handleSaveTemplate(true)
-            }
-          }}
-        />
-      )
-    })
+    setFinishLaterContent(
+      <SaveDraftModal
+        saveable
+        onSave={async () => {
+          if (subject && body && from) {
+            await handleSaveTemplate(true)
+          }
+        }}
+      />
+    )
     return () => {
-      setFinishLaterCallback(null)
+      setFinishLaterContent(null)
     }
   }, [
     body,
-    handleSaveTemplate,
     modalContext,
     subject,
     from,
-    setFinishLaterCallback,
+    handleSaveTemplate,
+    setFinishLaterContent,
   ])
 
   function replaceNewLines(body: string): string {
