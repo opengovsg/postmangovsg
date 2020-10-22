@@ -23,8 +23,25 @@ export class TemplateClient {
     this.lineBreak = lineBreak || '<br />'
 
     if (allowedImageSources) {
+      this.validateImageSources(allowedImageSources)
       this.xssOptions = filterImageSources(this.xssOptions, allowedImageSources)
     }
+  }
+
+  /**
+   * Validate image sources
+   * @param sources
+   */
+  validateImageSources(sources: Array<string>): void {
+    // If specified, allowedImageSources should at least have one value. If no image sources should be allowed,
+    // it should be achieved through the whitelist instead.
+    if (sources.length < 1) {
+      throw new Error('allowedImageSrcs cannot be empty.')
+    }
+
+    sources.forEach((src, i) => {
+      if (!src) throw new Error(`Invalid source at index ${i}`)
+    })
   }
 
   /**
