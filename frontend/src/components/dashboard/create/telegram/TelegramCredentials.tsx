@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
@@ -22,9 +28,13 @@ import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
 import { i18n } from 'locales'
-import { TelegramCampaign } from 'classes'
+import { TelegramCampaign, TelegramProgress } from 'classes'
 
-const TelegramCredentials = () => {
+const TelegramCredentials = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
+}) => {
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { hasCredential: initialHasCredential, progress } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
@@ -258,15 +268,7 @@ const TelegramCredentials = () => {
 
               <NextButton
                 disabled={!hasCredential}
-                onClick={() =>
-                  setCampaign(
-                    (campaign) =>
-                      ({
-                        ...campaign,
-                        progress: progress + 1,
-                      } as TelegramCampaign)
-                  )
-                }
+                onClick={() => setActiveStep((s) => s + 1)}
               />
             </>
           )}

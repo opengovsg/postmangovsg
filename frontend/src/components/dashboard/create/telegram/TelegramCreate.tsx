@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { TelegramProgress, Status } from 'classes'
+import { TelegramProgress, Status, TelegramCampaign } from 'classes'
 import { ProgressPane } from 'components/common'
 import TelegramTemplate from './TelegramTemplate'
 import TelegramRecipients from './TelegramRecipients'
@@ -20,23 +20,24 @@ const TELEGRAM_PROGRESS_STEPS = [
 
 const CreateTelegram = () => {
   const { campaign } = useContext(CampaignContext)
-  const [activeStep, setActiveStep] = useState(campaign.progress)
+  const { progress, isCsvProcessing, status } = campaign as TelegramCampaign
+  const [activeStep, setActiveStep] = useState(progress)
 
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
-    if (campaign.isCsvProcessing) {
+    if (isCsvProcessing) {
       setActiveStep(TelegramProgress.UploadRecipients)
     }
-  }, [campaign.isCsvProcessing])
+  }, [isCsvProcessing])
 
   function renderStep() {
     switch (activeStep) {
       case TelegramProgress.CreateTemplate:
-        return <TelegramTemplate />
+        return <TelegramTemplate setActiveStep={setActiveStep} />
       case TelegramProgress.UploadRecipients:
-        return <TelegramRecipients />
+        return <TelegramRecipients setActiveStep={setActiveStep} />
       case TelegramProgress.InsertCredentials:
-        return <TelegramCredentials />
+        return <TelegramCredentials setActiveStep={setActiveStep} />
       case TelegramProgress.Send:
         return <TelegramSend />
       default:
@@ -46,7 +47,7 @@ const CreateTelegram = () => {
 
   return (
     <div className={styles.createContainer}>
-      {campaign.status !== Status.Draft ? (
+      {status !== Status.Draft ? (
         <div className={styles.stepContainer}>
           <TelegramDetail></TelegramDetail>
         </div>
@@ -56,7 +57,7 @@ const CreateTelegram = () => {
             steps={TELEGRAM_PROGRESS_STEPS}
             activeStep={activeStep}
             setActiveStep={setActiveStep}
-            progress={campaign.progress}
+            progress={progress}
           />
           <div className={styles.stepContainer}>{renderStep()}</div>
         </>

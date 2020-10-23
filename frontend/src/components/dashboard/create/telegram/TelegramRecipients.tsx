@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -16,12 +22,16 @@ import {
   NextButton,
   SampleCsv,
 } from 'components/common'
-import { TelegramCampaign, TelegramPreview } from 'classes'
+import { TelegramCampaign, TelegramPreview, TelegramProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
-const TelegramRecipients = () => {
+const TelegramRecipients = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
+}) => {
   const { campaign, setCampaign } = useContext(CampaignContext)
   const {
     isCsvProcessing: initialIsProcessing,
@@ -163,15 +173,7 @@ const TelegramRecipients = () => {
 
       <NextButton
         disabled={!numRecipients || !csvFilename}
-        onClick={() =>
-          setCampaign(
-            (campaign) =>
-              ({
-                ...campaign,
-                progress: progress + 1,
-              } as TelegramCampaign)
-          )
-        }
+        onClick={() => setActiveStep((s) => s + 1)}
       />
     </>
   )

@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 
 import {
   TextArea,
@@ -14,11 +21,15 @@ import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
 import { getCustomFromAddresses } from 'services/settings.service'
 import { saveTemplate } from 'services/email.service'
-import { EmailCampaign } from 'classes'
+import { EmailCampaign, EmailProgress } from 'classes'
 
 import styles from './EmailTemplate.module.scss'
 
-const EmailTemplate = () => {
+const EmailTemplate = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
+}) => {
   console.log('EmailTemplate')
   const { campaign, setCampaign } = useContext(CampaignContext)
   const {
@@ -71,16 +82,16 @@ const EmailTemplate = () => {
                 replyTo: updatedTemplate.reply_to,
                 params: updatedTemplate.params,
                 numRecipients,
-                progress: progress + 1,
               } as EmailCampaign)
           )
+          setActiveStep((s) => s + 1)
         }
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, from, progress, replyTo, setCampaign, subject]
+    [body, campaignId, from, replyTo, setActiveStep, setCampaign, subject]
   )
 
   async function populateFromAddresses() {

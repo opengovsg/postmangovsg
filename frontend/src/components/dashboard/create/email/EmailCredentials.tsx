@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, Dispatch, SetStateAction } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendPreviewMessage } from 'services/email.service'
@@ -6,11 +6,15 @@ import { NextButton, InfoBlock, ErrorBlock } from 'components/common'
 import { useParams } from 'react-router-dom'
 
 import EmailValidationInput from './EmailValidationInput'
-import { EmailCampaign } from 'classes'
+import { EmailCampaign, EmailProgress } from 'classes'
 
-const EmailCredentials = () => {
+const EmailCredentials = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
+}) => {
   const { campaign, setCampaign } = useContext(CampaignContext)
-  const { hasCredential: initialHasCredential, progress, protect } = campaign
+  const { hasCredential: initialHasCredential, protect } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
@@ -70,15 +74,7 @@ const EmailCredentials = () => {
 
           <NextButton
             disabled={!hasCredential}
-            onClick={() =>
-              setCampaign(
-                (campaign) =>
-                  ({
-                    ...campaign,
-                    progress: progress + 1,
-                  } as EmailCampaign)
-              )
-            }
+            onClick={() => setActiveStep((s) => s + 1)}
           />
         </>
       }

@@ -1,4 +1,11 @@
-import React, { useState, useCallback, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
@@ -6,11 +13,15 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { TextArea, NextButton, ErrorBlock } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { saveTemplate } from 'services/telegram.service'
-import { TelegramCampaign } from 'classes'
+import { TelegramCampaign, TelegramProgress } from 'classes'
 
-const TelegramTemplate = () => {
+const TelegramTemplate = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
+}) => {
   const { campaign, setCampaign } = useContext(CampaignContext)
-  const { body: initialBody, progress } = campaign as TelegramCampaign
+  const { body: initialBody } = campaign as TelegramCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
@@ -35,15 +46,15 @@ const TelegramTemplate = () => {
               body: updatedTemplate?.body,
               params: updatedTemplate?.params,
               numRecipients,
-              progress: progress + 1,
             } as TelegramCampaign)
         )
+        setActiveStep((s) => s + 1)
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, progress, setCampaign]
+    [body, campaignId, setActiveStep, setCampaign]
   )
 
   // Set callback for finish later button

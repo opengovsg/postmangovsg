@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { SMSProgress, Status } from 'classes'
+import { SMSCampaign, SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import SMSTemplate from './SMSTemplate'
 import SMSRecipients from './SMSRecipients'
@@ -20,28 +20,29 @@ const SMS_PROGRESS_STEPS = [
 
 const CreateSMS = () => {
   const { campaign } = useContext(CampaignContext)
-  const [activeStep, setActiveStep] = useState(campaign.progress)
+  const { progress, isCsvProcessing, status } = campaign as SMSCampaign
+  const [activeStep, setActiveStep] = useState(progress)
   console.log('SMSCreate', activeStep)
 
   useEffect(() => {
-    setActiveStep(campaign.progress)
-  }, [campaign.progress])
+    setActiveStep(progress)
+  }, [progress])
 
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
-    if (campaign.isCsvProcessing) {
+    if (isCsvProcessing) {
       setActiveStep(SMSProgress.UploadRecipients)
     }
-  }, [campaign.isCsvProcessing])
+  }, [isCsvProcessing])
 
   function renderStep() {
     switch (activeStep) {
       case SMSProgress.CreateTemplate:
-        return <SMSTemplate />
+        return <SMSTemplate setActiveStep={setActiveStep} />
       case SMSProgress.UploadRecipients:
-        return <SMSRecipients />
+        return <SMSRecipients setActiveStep={setActiveStep} />
       case SMSProgress.InsertCredentials:
-        return <SMSCredentials />
+        return <SMSCredentials setActiveStep={setActiveStep} />
       case SMSProgress.Send:
         return <SMSSend />
       default:
@@ -51,7 +52,7 @@ const CreateSMS = () => {
 
   return (
     <div className={styles.createContainer}>
-      {campaign.status !== Status.Draft ? (
+      {status !== Status.Draft ? (
         <div className={styles.stepContainer}>
           <SMSDetail></SMSDetail>
         </div>
@@ -61,8 +62,8 @@ const CreateSMS = () => {
             steps={SMS_PROGRESS_STEPS}
             activeStep={activeStep}
             setActiveStep={setActiveStep}
-            progress={campaign.progress}
-            disabled={campaign.isCsvProcessing}
+            progress={progress}
+            disabled={isCsvProcessing}
           />
           <div className={styles.stepContainer}>{renderStep()}</div>
         </>

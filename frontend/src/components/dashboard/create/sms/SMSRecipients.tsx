@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -16,19 +22,22 @@ import {
   NextButton,
   SampleCsv,
 } from 'components/common'
-import { SMSCampaign, SMSPreview } from 'classes'
+import { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
-const SMSRecipients = () => {
+const SMSRecipients = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<SMSProgress>>
+}) => {
   console.log('SMSRecipients')
   const { campaign, setCampaign } = useContext(CampaignContext)
   const {
     isCsvProcessing: initialIsProcessing,
     numRecipients: initialNumRecipients,
     csvFilename: initialCsvFilename,
-    progress,
     params,
   } = campaign as SMSCampaign
   const [errorMessage, setErrorMessage] = useState(null)
@@ -163,12 +172,7 @@ const SMSRecipients = () => {
 
       <NextButton
         disabled={!numRecipients || !csvFilename}
-        onClick={() =>
-          setCampaign(
-            (campaign) =>
-              ({ ...campaign, progress: progress + 1 } as SMSCampaign)
-          )
-        }
+        onClick={() => setActiveStep((s) => s + 1)}
       />
     </>
   )

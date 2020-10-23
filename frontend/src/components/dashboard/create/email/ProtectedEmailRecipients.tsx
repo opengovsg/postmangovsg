@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 import isEmail from 'validator/lib/isEmail'
 
@@ -15,7 +21,7 @@ import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import EmailRecipients from './EmailRecipients'
-import { EmailCampaign } from 'classes'
+import { EmailCampaign, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 import { protectAndUploadCsv } from 'services/protect-csv.service'
@@ -30,8 +36,12 @@ enum ProtectPhase {
   DONE,
 }
 
-const ProtectedEmailRecipients = () => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+const ProtectedEmailRecipients = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
+}) => {
+  const { campaign } = useContext(CampaignContext)
   const {
     csvFilename,
     numRecipients,
@@ -218,6 +228,7 @@ const ProtectedEmailRecipients = () => {
   const uploadRecipients = (
     <>
       <EmailRecipients
+        setActiveStep={setActiveStep}
         template={template}
         onFileSelected={onFileSelected}
         forceReset={phase === ProtectPhase.READY}
@@ -244,17 +255,7 @@ const ProtectedEmailRecipients = () => {
       >
         Edit Message
       </TextButton>
-      <PrimaryButton
-        onClick={() =>
-          setCampaign(
-            (campaign) =>
-              ({
-                ...campaign,
-                progress: campaign.progress + 1,
-              } as EmailCampaign)
-          )
-        }
-      >
+      <PrimaryButton onClick={() => setActiveStep((s) => s + 1)}>
         Next <i className="bx bx-right-arrow-alt"></i>
       </PrimaryButton>
     </div>

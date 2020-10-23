@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -19,12 +25,16 @@ import TwilioCredentialsInput, {
   TwilioCredentials,
 } from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
-import { SMSCampaign } from 'classes'
+import { SMSCampaign, SMSProgress } from 'classes'
 
-const SMSCredentials = () => {
+const SMSCredentials = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<SMSProgress>>
+}) => {
   console.log('SMSCredentials')
   const { campaign, setCampaign } = useContext(CampaignContext)
-  const { hasCredential: initialHasCredential, progress } = campaign
+  const { hasCredential: initialHasCredential } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
@@ -163,15 +173,7 @@ const SMSCredentials = () => {
 
           <NextButton
             disabled={!hasCredential}
-            onClick={() =>
-              setCampaign(
-                (campaign) =>
-                  ({
-                    ...campaign,
-                    progress: progress + 1,
-                  } as SMSCampaign)
-              )
-            }
+            onClick={() => setActiveStep((s) => s + 1)}
           />
         </>
       ) : (

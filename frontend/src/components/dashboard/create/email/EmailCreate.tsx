@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { EmailProgress, Status } from 'classes'
+import { EmailCampaign, EmailProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import EmailTemplate from './EmailTemplate'
 import EmailRecipients from './EmailRecipients'
@@ -22,26 +22,32 @@ const EMAIL_PROGRESS_STEPS = [
 const CreateEmail = () => {
   console.log('EmailCreate')
   const { campaign } = useContext(CampaignContext)
-  const [activeStep, setActiveStep] = useState(campaign.progress)
+  const {
+    progress,
+    isCsvProcessing,
+    status,
+    protect,
+  } = campaign as EmailCampaign
+  const [activeStep, setActiveStep] = useState(progress)
 
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
-    if (campaign.isCsvProcessing) {
+    if (isCsvProcessing) {
       setActiveStep(EmailProgress.UploadRecipients)
     }
-  }, [campaign.isCsvProcessing])
+  }, [isCsvProcessing])
 
   function renderStep() {
     switch (activeStep) {
       case EmailProgress.CreateTemplate:
-        return <EmailTemplate />
+        return <EmailTemplate setActiveStep={setActiveStep} />
       case EmailProgress.UploadRecipients:
-        if (campaign.protect) {
-          return <ProtectedEmailRecipients />
+        if (protect) {
+          return <ProtectedEmailRecipients setActiveStep={setActiveStep} />
         }
-        return <EmailRecipients />
+        return <EmailRecipients setActiveStep={setActiveStep} />
       case EmailProgress.SendTestMessage:
-        return <EmailCredentials />
+        return <EmailCredentials setActiveStep={setActiveStep} />
       case EmailProgress.Send:
         return <EmailSend />
       default:
@@ -51,7 +57,7 @@ const CreateEmail = () => {
 
   return (
     <div className={styles.createContainer}>
-      {campaign.status !== Status.Draft ? (
+      {status !== Status.Draft ? (
         <div className={styles.stepContainer}>
           <EmailDetail></EmailDetail>
         </div>
@@ -61,8 +67,8 @@ const CreateEmail = () => {
             steps={EMAIL_PROGRESS_STEPS}
             activeStep={activeStep}
             setActiveStep={setActiveStep}
-            progress={campaign.progress}
-            disabled={campaign.isCsvProcessing}
+            progress={progress}
+            disabled={isCsvProcessing}
           />
           <div className={styles.stepContainer}>{renderStep()}</div>
         </>

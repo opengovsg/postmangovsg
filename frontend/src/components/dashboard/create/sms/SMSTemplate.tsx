@@ -1,4 +1,11 @@
-import React, { useState, useCallback, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
@@ -6,11 +13,15 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { TextArea, NextButton, ErrorBlock } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { exceedsCharacterThreshold, saveTemplate } from 'services/sms.service'
-import { SMSCampaign } from 'classes'
+import { SMSCampaign, SMSProgress } from 'classes'
 
 import styles from '../Create.module.scss'
 
-const SMSTemplate = () => {
+const SMSTemplate = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<SMSProgress>>
+}) => {
   console.log('SMSTemplate')
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
@@ -54,16 +65,16 @@ const SMSTemplate = () => {
                 body: updatedTemplate.body,
                 params: updatedTemplate.params,
                 numRecipients,
-                progress: campaign.progress + 1,
               } as SMSCampaign)
           )
+          setActiveStep((s) => s + 1)
         }
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, setCampaign]
+    [body, campaignId, setActiveStep, setCampaign]
   )
 
   // Set callback for finish later button

@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useRef, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -16,16 +23,18 @@ import {
   NextButton,
   SampleCsv,
 } from 'components/common'
-import { EmailCampaign, EmailPreview } from 'classes'
+import { EmailCampaign, EmailPreview, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
 const EmailRecipients = ({
+  setActiveStep,
   onFileSelected,
   template,
   forceReset,
 }: {
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
   onFileSelected?: (campaignId: number, file: File) => Promise<any>
   template?: string
   forceReset?: boolean // this forces upload button to show without csv info and preview
@@ -37,7 +46,6 @@ const EmailRecipients = ({
     numRecipients: initialNumRecipients,
     params,
     protect,
-    progress,
   } = campaign
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
@@ -216,15 +224,7 @@ const EmailRecipients = ({
       {!protect && (
         <NextButton
           disabled={!numRecipients || isCsvProcessing}
-          onClick={() =>
-            setCampaign(
-              (campaign) =>
-                ({
-                  ...campaign,
-                  progress: progress + 1,
-                } as EmailCampaign)
-            )
-          }
+          onClick={() => setActiveStep((s) => s + 1)}
         />
       )}
     </>
