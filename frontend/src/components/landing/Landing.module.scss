@@ -114,6 +114,7 @@ $section-vertical-padding: 4rem;
       }
 
       .headerText {
+        @extend .display-2;
         color: $primary;
         margin-bottom: 0;
         @include overflowHeaderText();
@@ -132,8 +133,8 @@ $section-vertical-padding: 4rem;
         }
 
         .numOfMessages {
-          font-size: 4rem;
-          font-weight: 200;
+          @extend .display-1;
+
           margin-top: 1.5rem;
           margin-bottom: 2rem;
           margin-right: 1rem;

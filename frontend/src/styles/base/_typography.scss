@@ -96,6 +96,7 @@ h1 {
 
 h2 {
   @extend .heading-2;
+  margin-top: $spacing-1;
   margin-bottom: $spacing-3;
 }
 

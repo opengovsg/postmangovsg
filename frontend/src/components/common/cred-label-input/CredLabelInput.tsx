@@ -1,6 +1,7 @@
 import React from 'react'
 
 import TextInput from '../text-input'
+import LabelWithExternalLink from '../label-with-external-link'
 
 const CredLabelInput = ({
   value,
@@ -23,7 +24,7 @@ const CredLabelInput = ({
 
   return (
     <>
-      <h5>Credential Label</h5>
+      <LabelWithExternalLink label="Credential Label" />
       <TextInput
         placeholder="Enter a label (e.g. default-cred-1)"
         value={value}

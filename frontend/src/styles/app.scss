@@ -105,7 +105,8 @@ mark {
 }
 
 sub {
-  color: $light-grey;
+  @extend .caption;
+  color: $grey-700;
 }
 
 .separator {

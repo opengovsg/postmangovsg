@@ -46,9 +46,8 @@ $navbar-mobile-height: 4rem;
     }
 
     .link {
-      font-size: 0.9rem;
+      @extend .body-1;
       color: $secondary;
-      font-weight: 500;
       cursor: pointer;
       margin-right: $navbar-link-margin;
 
