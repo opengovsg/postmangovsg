@@ -47,13 +47,13 @@ $navbar-mobile-height: 4rem;
 
     .link {
       font-size: 0.9rem;
-      color: $dark-blue;
+      color: $secondary;
       font-weight: 500;
       cursor: pointer;
       margin-right: $navbar-link-margin;
 
       &:hover {
-        color: $indigo-blue;
+        color: $primary;
       }
     }
 
@@ -68,16 +68,16 @@ $navbar-mobile-height: 4rem;
     .signInButton {
       min-width: 7.5rem;
       background-color: transparent;
-      border: 1px solid $indigo-blue;
-      color: $indigo-blue;
+      border: 1px solid $primary;
+      color: $primary;
 
       @include mobile() {
         display: none;
       }
 
       &:hover {
-        background-color: $indigo-blue;
-        color: $light-blue;
+        background-color: $primary;
+        color: $neutral-light;
       }
     }
   }

@@ -13,7 +13,7 @@ $progress-item-height: 5rem;
 .progressPane {
   width: $progress-pane-width;
   min-width: $progress-pane-width;
-  border-right: 1px solid $indigo-blue;
+  border-right: 1px solid $primary;
   min-height: calc(100vh - #{$navbar-height} - #{$title-bar-height});
 
   @include mobile() {
@@ -50,15 +50,15 @@ $progress-item-height: 5rem;
 
   &.active {
     $border-left: 0.5rem;
-    border-left: $border-left solid $indigo-blue;
-    background-color: $light-blue;
+    border-left: $border-left solid $primary;
+    background-color: $neutral-light;
     padding-left: calc(4rem - #{$border-left});
 
     @include mobile() {
       padding-left: 3vw;
       height: calc(#{$progress-item-height} + #{$border-left});
       border-left: none;
-      border-bottom: $border-left solid $indigo-blue;
+      border-bottom: $border-left solid $primary;
       background-color: transparent;
     }
 
@@ -87,10 +87,10 @@ $progress-item-height: 5rem;
     height: $number-size;
     width: $number-size;
     min-width: $number-size;
-    background-color: $indigo-blue;
+    background-color: $primary;
     font-size: 0.8rem;
     border-radius: 50%;
-    color: $light-blue;
+    color: $neutral-light;
     @include flex-horizontal;
     justify-content: center;
   }

@@ -35,19 +35,19 @@
   margin-right: 0.5rem;
 
   &.red {
-    color: $red;
+    color: $error;
   }
 
   &.blue {
-    color: $indigo-blue;
+    color: $primary;
   }
 
   &.green {
-    color: $turquoise-green;
+    color: $success;
   }
 
   &.grey {
-    color: $grey;
+    color: $grey-700;
   }
 }
 
@@ -63,15 +63,15 @@
   }
 
   .pause {
-    @include button($red);
+    @include button($error);
   }
 
   .retry {
-    @include button($dark-blue);
+    @include button($secondary);
   }
 
   .complete {
-    @include button($turquoise-green);
+    @include button($success);
     pointer-events: none;
   }
 

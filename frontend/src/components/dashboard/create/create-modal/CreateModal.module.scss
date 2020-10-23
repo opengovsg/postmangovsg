@@ -33,15 +33,15 @@
       @include flex-horizontal;
       justify-content: space-between;
       height: 4.5rem;
-      border: 1px solid $indigo-blue;
+      border: 1px solid $primary;
       font-size: 1.3rem;
 
       &:not(.active) {
-        color: $indigo-blue;
-        background: $light-blue;
+        color: $primary;
+        background: $neutral-light;
 
         &:hover {
-          background: $indigo-blue;
+          background: $primary;
           color: white;
         }
       }
@@ -67,7 +67,7 @@
 }
 
 .input {
-  background-color: $light-blue;
+  background-color: $neutral-light;
 }
 
 .icon {
@@ -96,7 +96,7 @@
   .link {
     font-size: 0.8rem;
     font-style: italic;
-    color: $dark-blue;
+    color: $secondary;
     line-height: 1.5rem;
     text-decoration: underline;
     margin-left: 0.2rem;

@@ -12,7 +12,7 @@
       right: 0;
     }
     white-space: pre-wrap;
-    @include block($light-red, $red);
+    @include block($error-light, $error);
 
     &.withClose {
       padding-right: 4rem;
@@ -24,7 +24,7 @@
       right: 1rem;
       &:hover,
       &:active {
-        color: $red;
+        color: $error;
       }
     }
   }

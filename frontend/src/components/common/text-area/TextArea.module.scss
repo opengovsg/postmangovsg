@@ -10,7 +10,7 @@
     border: 1px solid $light-grey;
     border-radius: $border-radius;
     padding: $border-radius;
-    color: $dark-blue;
+    color: $secondary;
     font-size: 1rem;
     line-height: 150%;
     resize: none;
@@ -24,11 +24,11 @@
 
     &:focus {
       outline: none;
-      border-color: $indigo-blue;
+      border-color: $primary;
     }
 
     &::placeholder {
-      color: $placeholder-grey;
+      color: $neutral;
     }
   }
 
@@ -46,10 +46,5 @@
       font-size: 1rem;
       margin: 0; // fix for ie: highlight appearing lower than text
     }
-  }
-
-  .instructions {
-    color: $grey;
-    font-size: 0.8rem;
   }
 }

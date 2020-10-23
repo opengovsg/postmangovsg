@@ -3,14 +3,14 @@
 
 .textButton {
   @include button(transparent);
-  color: $indigo-blue;
+  color: $primary;
   font-weight: 500;
   display: inline-block;
   padding: 0;
   border-radius: 0;
 
   &:hover {
-    color: $dark-blue;
+    color: $secondary;
   }
 
   &.noMinWidth {

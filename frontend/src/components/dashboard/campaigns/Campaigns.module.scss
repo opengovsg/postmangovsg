@@ -31,7 +31,7 @@
     tbody tr {
       &:hover {
         cursor: pointer;
-        background-color: $transparent-blue;
+        background-color: $neutral-light;
       }
 
       &:active {
@@ -55,7 +55,7 @@
   position: absolute;
   bottom: 0.2rem;
   right: -0.5rem;
-  color: $pastel-blue;
+  color: $blue-300;
 }
 
 .spinner {
@@ -78,6 +78,6 @@
   }
 
   .darkBlueButton {
-    @include button($dark-blue);
+    @include button($secondary);
   }
 }

@@ -2,7 +2,7 @@
 @import 'styles/_mixins';
 
 .topContainer {
-  background-color: $light-blue;
+  background-color: $neutral-light;
   height: 100vh;
   @include flex-center;
 

@@ -2,15 +2,15 @@
 @import 'styles/_mixins';
 
 .blueButton {
-  @include button($dark-blue);
+  @include button($secondary);
 }
 
 .greenButton {
-  @include button($turquoise-green);
+  @include button($success);
 }
 
 .redButton {
-  @include button($red);
+  @include button($error);
 }
 
 .helpText {

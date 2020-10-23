@@ -7,7 +7,7 @@ $nav-item-height: 5rem;
 .sideNav {
   width: $side-nav-width;
   min-width: $side-nav-width;
-  border-right: 1px solid $indigo-blue;
+  border-right: 1px solid $primary;
   min-height: calc(100vh - 4rem - 5rem);
 
   @include mobile() {
@@ -27,7 +27,7 @@ $nav-item-height: 5rem;
 .navItem {
   @include flex-horizontal;
   justify-content: space-between;
-  color: $dark-blue;
+  color: $secondary;
   font-size: 1rem;
   padding: 0 2.5rem 0 4rem;
   user-select: none;
@@ -36,13 +36,13 @@ $nav-item-height: 5rem;
 
   &.active {
     $border-left: 0.5rem;
-    border-left: $border-left solid $indigo-blue;
-    background-color: $light-blue;
+    border-left: $border-left solid $primary;
+    background-color: $neutral-light;
     padding-left: calc(4rem - #{$border-left});
   }
 
   &:hover {
-    background: $light-blue;
+    background: $neutral-light;
   }
 
   span {
@@ -51,7 +51,7 @@ $nav-item-height: 5rem;
 
     .icon {
       margin-right: 0.7rem;
-      color: $indigo-blue;
+      color: $primary;
     }
   }
 }

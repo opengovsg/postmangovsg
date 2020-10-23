@@ -29,14 +29,14 @@
 
     .status {
       @include button(white);
-      border: 1px solid $indigo-blue;
-      color: $indigo-blue;
+      border: 1px solid $primary;
+      color: $primary;
       &:hover {
-        background: $light-blue;
+        background: $neutral-light;
       }
     }
     .request {
-      @include button($dark-blue) @include mobile() {
+      @include button($secondary) @include mobile() {
         width: 100%;
       }
     }

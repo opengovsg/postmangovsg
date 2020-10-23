@@ -2,7 +2,7 @@
 
 .export {
   @include flex-horizontal;
-  color: $indigo-blue;
+  color: $primary;
   padding: 0.5rem;
 
   &.unavailable {
@@ -44,7 +44,7 @@
     &:active {
       span,
       i {
-        color: $indigo-blue;
+        color: $primary;
       }
     }
 

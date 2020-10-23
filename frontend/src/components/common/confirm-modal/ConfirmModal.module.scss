@@ -16,11 +16,11 @@
 }
 
 .greenButton {
-  @include button($turquoise-green);
+  @include button($success);
 }
 
 .redButton {
-  @include button($red);
+  @include button($error);
 }
 
 .title {

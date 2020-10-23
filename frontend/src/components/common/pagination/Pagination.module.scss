@@ -10,7 +10,7 @@
 
 .icon {
   @include icon;
-  color: $dark-blue;
+  color: $secondary;
   vertical-align: middle;
   cursor: pointer;
 }
@@ -21,7 +21,7 @@
 }
 
 .break a {
-  color: $dark-blue;
+  color: $secondary;
 }
 
 .pageNumber {
@@ -34,7 +34,7 @@
   cursor: pointer;
 
   a {
-    color: $dark-blue;
+    color: $secondary;
     font-size: 0.8rem;
     line-height: 1rem;
     padding: 0.5rem;
@@ -42,12 +42,12 @@
 }
 
 .active {
-  background-color: $indigo-blue;
+  background-color: $primary;
   border-radius: 1rem;
   cursor: default;
 
   a,
   a:hover {
-    color: $light-blue;
+    color: $neutral-light;
   }
 }

@@ -7,16 +7,16 @@
 
 .actionButton {
   @include button(white);
-  border: 1px solid $indigo-blue;
-  color: $indigo-blue;
+  border: 1px solid $primary;
+  color: $primary;
 
   &:hover {
     border-width: 1.5px;
-    background-color: #f5f6fc;
+    background-color: $neutral-light;
   }
 
   &:active {
-    background-color: $indigo-blue;
+    background-color: $primary;
 
     i,
     span {
@@ -58,7 +58,7 @@
   border-bottom-right-radius: $border-radius;
   min-width: $button-min-width / 4;
   height: $button-height;
-  background-color: $indigo-blue;
+  background-color: $primary;
 
   .icon {
     @include icon;
@@ -74,7 +74,7 @@
   top: $button-height + 1rem;
   right: 0;
   box-shadow: 0.1rem 0.1rem 1rem 0 lighten($light-grey, 20%);
-  color: $indigo-blue;
+  color: $primary;
 
   > div {
     @include flex-horizontal;
@@ -82,7 +82,7 @@
     cursor: pointer;
 
     &:hover {
-      background: $light-blue;
+      background: $neutral-light;
     }
 
     i {
