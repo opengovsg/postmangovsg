@@ -1,12 +1,13 @@
-import path from 'path'
 import winston from 'winston'
 import requestTracer from 'cls-rtracer'
 
 const getModuleLabel = (callingModule: NodeModule): string => {
-  // Remove the file extension from the filename and split with path separator.
-  const parts = callingModule.filename.replace(/\.[^/.]+$/, '').split(path.sep)
-  // Join the parts of the file path after build directory together
-  return path.join(...parts.slice(parts.lastIndexOf('build') + 1))
+  const moduleName = callingModule.filename
+  // Get the subpath after the build dir without the file extension
+  return moduleName.substring(
+    moduleName.lastIndexOf('build') + 6,
+    moduleName.lastIndexOf('.')
+  )
 }
 
 interface LoggerInterface {
@@ -42,6 +43,10 @@ class Logger implements LoggerInterface {
         this.logger.info(message)
       },
     }
+  }
+
+  getStream() {
+    return this.logger.stream
   }
 
   loggerWithLabel(module: NodeModule): any {

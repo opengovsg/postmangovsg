@@ -12,7 +12,6 @@ import Logger from '@core/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
 const logger = Logger.loggerWithLabel(module)
-const loggerInstamce = Logger.logger
 const FRONTEND_URL = config.get('frontendUrl')
 
 /**
@@ -32,7 +31,7 @@ morgan.token('user-id', userId)
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
-  stream: loggerInstamce.stream,
+  stream: Logger.getStream(),
 })
 
 const requestTracerMiddleware = (
