@@ -31,7 +31,7 @@
 
     .button {
       @include flex-horizontal;
-      @extend .heading-3;
+      @extend %heading-3;
       justify-content: space-between;
       height: 4.5rem;
       border: 1px solid $primary;

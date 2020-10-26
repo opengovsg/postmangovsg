@@ -46,7 +46,7 @@ $navbar-mobile-height: 4rem;
     }
 
     .link {
-      @extend .body-1;
+      @extend %body-1;
       color: $secondary;
       cursor: pointer;
       margin-right: $spacing-7;

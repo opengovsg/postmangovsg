@@ -19,7 +19,7 @@
       }
 
       th {
-        @extend .caption;
+        @extend %caption;
         text-transform: capitalize;
       }
     }

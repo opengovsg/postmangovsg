@@ -3,7 +3,7 @@ $button-min-width: 10rem;
 $border-radius: $button-height / 2;
 
 @mixin button($bg-color, $hover-bg-color, $pressed-bg-color) {
-  @extend .button-text;
+  @extend %button-text;
 
   background-color: $bg-color;
   display: inline-flex;

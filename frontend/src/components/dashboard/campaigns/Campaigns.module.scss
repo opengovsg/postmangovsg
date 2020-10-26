@@ -30,7 +30,7 @@
 
     thead tr {
       th {
-        @extend .caption;
+        @extend %caption;
         text-transform: capitalize;
       }
     }
@@ -46,7 +46,7 @@
       }
 
       td {
-        @extend .body-2;
+        @extend %body-2;
       }
     }
   }

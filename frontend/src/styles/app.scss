@@ -105,7 +105,7 @@ mark {
 }
 
 sub {
-  @extend .caption;
+  @extend %caption;
   color: $grey-700;
 }
 

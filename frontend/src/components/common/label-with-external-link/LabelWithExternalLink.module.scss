@@ -1,7 +1,7 @@
 @import 'styles/_variables';
 
 .label {
-  @extend .body-1;
+  @extend %body-1;
   margin-bottom: $spacing-3;
   margin-top: $spacing-5;
 
