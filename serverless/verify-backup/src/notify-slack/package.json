@@ -14,7 +14,9 @@
     "url": "https://github.com/datagovsg/postmangovsg/issues"
   },
   "dependencies": {
+    "@sentry/node": "^5.27.1",
     "@slack/webhook": "^5.0.3",
+    "convict": "^6.0.0",
     "dotenv": "^8.2.0"
   }
 }
