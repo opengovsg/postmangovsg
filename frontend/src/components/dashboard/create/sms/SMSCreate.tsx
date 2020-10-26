@@ -22,7 +22,6 @@ const CreateSMS = () => {
   const { campaign } = useContext(CampaignContext)
   const { progress, isCsvProcessing, status } = campaign as SMSCampaign
   const [activeStep, setActiveStep] = useState(progress)
-  console.log('SMSCreate', activeStep)
 
   useEffect(() => {
     setActiveStep(progress)

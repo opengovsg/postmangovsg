@@ -32,7 +32,6 @@ const SMSCredentials = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
-  console.log('SMSCredentials')
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { hasCredential: initialHasCredential } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)

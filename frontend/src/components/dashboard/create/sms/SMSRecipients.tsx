@@ -32,7 +32,6 @@ const SMSRecipients = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
-  console.log('SMSRecipients')
   const { campaign, setCampaign } = useContext(CampaignContext)
   const {
     isCsvProcessing: initialIsProcessing,

@@ -11,7 +11,6 @@ import Create from './create'
 import Settings from './settings'
 
 const Dashboard = () => {
-  console.log('Dashboard')
   return (
     <ModalContextProvider>
       <NavBar></NavBar>

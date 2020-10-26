@@ -22,7 +22,6 @@ const SMSTemplate = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
-  console.log('SMSTemplate')
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(campaign.body))
@@ -79,7 +78,6 @@ const SMSTemplate = ({
 
   // Set callback for finish later button
   useEffect(() => {
-    console.log('updated')
     setFinishLaterContent(
       <SaveDraftModal
         saveable

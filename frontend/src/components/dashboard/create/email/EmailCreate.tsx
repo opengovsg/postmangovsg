@@ -20,7 +20,6 @@ const EMAIL_PROGRESS_STEPS = [
 ]
 
 const CreateEmail = () => {
-  console.log('EmailCreate')
   const { campaign } = useContext(CampaignContext)
   const {
     progress,

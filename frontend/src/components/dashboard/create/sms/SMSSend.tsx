@@ -17,7 +17,6 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import styles from '../Create.module.scss'
 
 const SMSSend = () => {
-  console.log('SMSSend')
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)

@@ -30,7 +30,6 @@ const EmailTemplate = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
-  console.log('EmailTemplate')
   const { campaign, setCampaign } = useContext(CampaignContext)
   const {
     body: initialBody,

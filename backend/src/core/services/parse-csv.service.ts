@@ -45,7 +45,6 @@ const parseAndProcessCsv = async (
         parser.pause()
         const { data, meta, errors } = rows
         try {
-          console.log(meta)
           // `rows` can have no data, but just the meta
           if (!previewed && data.length > 0) {
             if (

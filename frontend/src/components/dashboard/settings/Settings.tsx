@@ -45,7 +45,6 @@ const SETTINGS_LINKS = [
 ]
 
 const Settings = () => {
-  console.log('settings')
   const modalContext = useContext(ModalContext)
   const [hasApiKey, setHasApiKey] = useState(false)
   const [hasCustomFromAddresses, setHasCustomFromAddresses] = useState(false)

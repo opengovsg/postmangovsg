@@ -23,7 +23,6 @@ const Create = () => {
     finishLaterContent,
   } = useContext(FinishLaterModalContext)
   const [isLoading, setLoading] = useState(true)
-  console.log('Create', id, isLoading, campaign)
 
   useEffect(() => {
     if (!id) return

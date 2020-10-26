@@ -11,7 +11,6 @@ import { ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const SMSDetail = () => {
-  console.log('SMSDetail')
   const { campaign } = useContext(CampaignContext)
   const { id } = campaign
   const [stats, setStats] = useState(new CampaignStats({}))
