@@ -96,7 +96,7 @@ const TelegramRecipients = ({
           numRecipients,
         } as TelegramCampaign)
     )
-  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign, campaign])
+  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign])
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)

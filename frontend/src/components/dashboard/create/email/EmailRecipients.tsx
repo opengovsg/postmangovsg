@@ -115,7 +115,7 @@ const EmailRecipients = ({
           numRecipients,
         } as EmailCampaign)
     )
-  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign, campaign])
+  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign])
 
   // Handle file upload
   async function uploadFile(files: File[]) {
