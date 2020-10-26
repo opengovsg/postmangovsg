@@ -78,8 +78,10 @@ const Campaigns = () => {
     },
     {
       name: 'Name',
-      render: (campaign: Campaign) => campaign.name,
-      width: 'md',
+      render: (campaign: Campaign) => (
+        <span title={campaign.name}>{campaign.name}</span>
+      ),
+      width: 'md ellipsis',
     },
     {
       name: 'Created At',

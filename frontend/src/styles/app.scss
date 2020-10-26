@@ -124,10 +124,10 @@ table {
   tr {
     @include flex-horizontal;
     border-bottom: 1px solid adjust-color($primary-light, $alpha: -0.5);
+    height: $height-3;
 
     td,
     th {
-      height: $height-3;
       display: flex;
       align-items: center;
 
@@ -149,6 +149,14 @@ table {
 
       &.center {
         justify-content: center;
+      }
+
+      &.ellipsis {
+        text-overflow: ellipsis;
+        // Pre-requisites for ellipsis to work
+        overflow: hidden;
+        white-space: nowrap;
+        display: inline-block;
       }
     }
   }
