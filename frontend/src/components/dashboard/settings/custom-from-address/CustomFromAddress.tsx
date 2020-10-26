@@ -8,7 +8,6 @@ import { i18n } from 'locales'
 
 import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
-import { PrimaryButton } from 'components/common'
 import styles from './CustomFromAddress.module.scss'
 import VerifyCustomFromAddressModal from '../verify-custom-from-address-modal'
 import UpdateCustomFromAddressModal from '../update-custom-from-address-modal'
@@ -122,16 +121,16 @@ const CustomFromAddress = ({
             to={i18n._(LINKS.customFromAddressRequestUrl)}
             target="_blank"
           >
-            <PrimaryButton className={styles.request}>
+            <button className={styles.request}>
               Fill in request form <i className="bx bx-right-arrow-alt"></i>
-            </PrimaryButton>
+            </button>
           </OutboundLink>
-          <PrimaryButton
+          <button
             className={styles.status}
             onClick={() => onVerifyFromAddressClicked(email)}
           >
             Check verification status <i className="bx bx-refresh"></i>
-          </PrimaryButton>
+          </button>
         </div>
       </>
     )

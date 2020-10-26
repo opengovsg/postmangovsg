@@ -47,11 +47,11 @@
 }
 
 .darkBlueBtn {
-  @include button($secondary);
+  @extend %secondary-btn;
 }
 
 .turquoiseGreenBtn {
-  @include button($success);
+  @extend %success-btn;
 }
 
 .sendRateContainer {

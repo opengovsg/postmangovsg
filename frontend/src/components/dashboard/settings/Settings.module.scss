@@ -41,7 +41,7 @@
   }
 
   .darkBlueButton {
-    @include button($secondary);
+    @extend %secondary-btn;
   }
 }
 
@@ -54,7 +54,7 @@
   }
 
   button {
-    @include button(white);
+    @extend %outline-btn;
     @include flex-horizontal;
 
     flex: 1;
@@ -63,12 +63,6 @@
     font-size: 1rem;
     height: 4.6rem;
     margin-right: 1.5rem;
-    border: 1px solid $primary;
-    color: $primary;
-
-    &:hover {
-      background: $neutral-light;
-    }
 
     &:last-child {
       margin-right: 0;

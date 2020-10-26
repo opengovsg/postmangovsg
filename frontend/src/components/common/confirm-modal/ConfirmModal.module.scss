@@ -16,11 +16,11 @@
 }
 
 .greenButton {
-  @include button($success);
+  @extend %success-btn;
 }
 
 .redButton {
-  @include button($error);
+  @extend %error-btn;
 }
 
 .title {

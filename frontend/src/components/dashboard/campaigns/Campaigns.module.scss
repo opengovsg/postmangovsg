@@ -89,6 +89,6 @@
   }
 
   .darkBlueButton {
-    @include button($secondary);
+    @extend %secondary-btn;
   }
 }

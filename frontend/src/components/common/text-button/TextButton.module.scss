@@ -2,7 +2,7 @@
 @import 'styles/_mixins';
 
 .textButton {
-  @include button(transparent);
+  @include button(transparent, transparent, transparent);
   color: $primary;
   display: inline-block;
   padding: 0;

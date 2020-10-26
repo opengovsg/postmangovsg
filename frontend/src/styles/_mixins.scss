@@ -1,33 +1,5 @@
 @import 'styles/_variables';
 
-$tablet: 769px;
-$desktop: 1024px;
-$widescreen: 1216px;
-
-@mixin mobile {
-  @media (max-width: $tablet - 0.1px) {
-    @content;
-  }
-}
-
-@mixin tablet {
-  @media (min-width: $tablet) and (max-width: $desktop - 0.1px) {
-    @content;
-  }
-}
-
-@mixin desktop {
-  @media (min-width: $desktop) and (max-width: $widescreen - 0.1px) {
-    @content;
-  }
-}
-
-@mixin widescreen {
-  @media (min-width: $widescreen) {
-    @content;
-  }
-}
-
 @mixin flex-horizontal {
   display: flex;
   align-items: center;
@@ -43,72 +15,6 @@ $widescreen: 1216px;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-@mixin icon {
-  align-items: center;
-  display: inline-flex;
-  justify-content: center;
-  font-size: 1.5rem;
-  line-height: 1.5rem;
-}
-
-@mixin spinner {
-  position: absolute;
-  width: 3rem;
-  font-size: 3rem;
-  margin-top: 4rem;
-  left: calc(50vw - 1.5rem);
-}
-
-@mixin button($background-color) {
-  @extend .button-text;
-
-  background-color: $background-color;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  height: $button-height;
-  min-width: $button-min-width;
-  border: 0;
-  color: white;
-  text-align: center;
-  padding: $spacing-2 $spacing-4;
-  border-radius: $border-radius;
-  cursor: pointer;
-  user-select: none;
-
-  // unset min width on mobile, it's taking too much space
-  @include mobile() {
-    min-width: unset;
-    white-space: nowrap;
-  }
-
-  &:hover {
-    background-color: darken($background-color, 10%);
-    outline: none;
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:active {
-    background-color: darken($background-color, 18%);
-  }
-
-  &:disabled {
-    background-color: $light-grey;
-    cursor: not-allowed;
-  }
-
-  i {
-    @include icon;
-    height: 20px;
-    width: 20px;
-    margin-top: 0.15rem;
-    margin-left: $spacing-2;
-  }
 }
 
 @mixin block($backgroundColor, $color) {

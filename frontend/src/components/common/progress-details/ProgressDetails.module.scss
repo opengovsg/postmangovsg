@@ -63,15 +63,15 @@
   }
 
   .pause {
-    @include button($error);
+    @extend %error-btn;
   }
 
   .retry {
-    @include button($secondary);
+    @extend %secondary-btn;
   }
 
   .complete {
-    @include button($success);
+    @extend %success-btn;
     pointer-events: none;
   }
 

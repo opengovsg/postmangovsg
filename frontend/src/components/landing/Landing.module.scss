@@ -160,10 +160,6 @@ $section-vertical-padding: 4rem;
           margin-right: 2rem;
 
           @include mobileButton();
-
-          &:hover {
-            background-color: $secondary-light;
-          }
         }
 
         .arrowRight {

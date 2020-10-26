@@ -6,23 +6,7 @@
 }
 
 .actionButton {
-  @include button(white);
-  border: 1px solid $primary;
-  color: $primary;
-
-  &:hover {
-    border-width: 1.5px;
-    background-color: $neutral-light;
-  }
-
-  &:active {
-    background-color: $primary;
-
-    i,
-    span {
-      color: white;
-    }
-  }
+  @extend %outline-btn;
 
   &.dropdown {
     justify-content: space-between;
