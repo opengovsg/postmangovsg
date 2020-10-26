@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { SmsCallbackService } from '@sms/services'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 const isAuthenticated = (
   req: Request,

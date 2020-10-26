@@ -1,12 +1,12 @@
 import AWS from 'aws-sdk'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
 import { TelegramCredentials } from '@telegram/interfaces'
 import { get } from 'lodash'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 
 const getCredentialsFromSecretsManager = async (name: string): Promise<any> => {

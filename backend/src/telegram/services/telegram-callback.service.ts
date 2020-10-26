@@ -2,7 +2,7 @@ import Telegraf from 'telegraf'
 import { Update } from 'telegraf/typings/telegram-types'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Credential } from '@core/models'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import {
   startCommandHandler,
   contactMessageHandler,
@@ -11,7 +11,7 @@ import {
 } from '@telegram/utils/callback/handlers'
 import { PostmanTelegramError } from '@telegram/utils/callback/PostmanTelegramError'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 /**
  * Verifies that the given bot id is registered

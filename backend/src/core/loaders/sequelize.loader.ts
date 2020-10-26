@@ -29,10 +29,10 @@ import {
   TelegramTemplate,
 } from '@telegram/models'
 
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 const DB_URI = config.get('database.databaseUri')
 const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
 

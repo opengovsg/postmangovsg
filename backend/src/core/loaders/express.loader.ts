@@ -8,10 +8,10 @@ import requestTracer from 'cls-rtracer'
 
 import config from '@core/config'
 import v1Router from '@core/routes'
-import Logger from '@core/logger'
+import { getStream, loggerWithLabel } from '@core/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
 
 /**
@@ -31,7 +31,7 @@ morgan.token('user-id', userId)
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
-  stream: Logger.getStream(),
+  stream: getStream(),
 })
 
 const requestTracerMiddleware = (

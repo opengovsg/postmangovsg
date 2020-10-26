@@ -1,11 +1,11 @@
 import { QueryTypes } from 'sequelize'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { StatsService } from '@core/services'
 import { CampaignStats, CampaignRecipient } from '@core/interfaces'
 
 import { TelegramOp, TelegramMessage } from '@telegram/models'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 /**
  * Gets stats for telegram project

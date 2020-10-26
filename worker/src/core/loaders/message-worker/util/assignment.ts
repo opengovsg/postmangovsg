@@ -7,13 +7,13 @@
  */
 
 import { QueryTypes } from 'sequelize'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { Sequelize } from 'sequelize-typescript'
 import difference from 'lodash/difference'
 import config from '@core/config'
 import ECSLoader from './ecs'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 const getWorkersInDatabase = (connection: Sequelize): Promise<string[]> => {
   return connection.query('SELECT id FROM workers;').then((results: any[]) => {

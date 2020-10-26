@@ -16,9 +16,9 @@ import { TelegramTemplateService } from '@telegram/services'
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
 import { PhoneNumberService, UploadService } from '@core/services'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 /**
  * Gets a message's parameters

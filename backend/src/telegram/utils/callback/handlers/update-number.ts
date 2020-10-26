@@ -1,10 +1,10 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message } from 'telegraf/typings/telegram-types'
 
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { generatePadding } from '../generate-padding'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 /**
  * Handles updates for the /updatenumber command.
  */

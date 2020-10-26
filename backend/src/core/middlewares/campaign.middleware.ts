@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.

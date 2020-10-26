@@ -5,10 +5,10 @@ import {
 } from '@email/interfaces/callback.interface'
 import { EmailBlacklist, EmailMessage } from '@email/models'
 import config from '@core/config'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 /**
  * Adds email to blacklist table if it does not exist

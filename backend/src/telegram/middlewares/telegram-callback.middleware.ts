@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { TelegramCallbackService } from '@telegram/services'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 const verifyBotIdRegistered = async (
   req: Request,

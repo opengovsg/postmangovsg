@@ -10,59 +10,50 @@ const getModuleLabel = (callingModule: NodeModule): string => {
   )
 }
 
-interface LoggerInterface {
-  logger: winston.Logger
+const logger = winston.createLogger({
+  level: 'debug',
+  levels: winston.config.npm.levels,
+  format: winston.format.combine(
+    winston.format((info) => {
+      const requestTracerMeta = requestTracer.id() as any
+      return { ...requestTracerMeta, ...info }
+    })(),
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.splat(),
+    winston.format.metadata(),
+    winston.format.json()
+  ),
+  transports: [new winston.transports.Console()],
+})
+
+logger.stream = {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  write: (message: string, _encoding: any): void => {
+    // use the 'info' log level so the output will be picked up by both transports
+    logger.info(message)
+  },
 }
 
-class Logger implements LoggerInterface {
-  logger: winston.Logger
+const getStream = () => {
+  return logger.stream
+}
 
-  constructor() {
-    this.logger = winston.createLogger({
-      level: 'debug',
-      levels: winston.config.npm.levels,
-      format: winston.format.combine(
-        winston.format((info) => {
-          const requestTracerMeta = requestTracer.id() as any
-          return { ...requestTracerMeta, ...info }
-        })(),
-        winston.format.timestamp(),
-        winston.format.errors({ stack: true }),
-        winston.format.splat(),
-        winston.format.metadata(),
-        winston.format.json()
-      ),
-      transports: [new winston.transports.Console()],
-    })
+const addTransport = (transport: any) => {
+  logger.add(transport)
+}
 
-    this.logger.stream = {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      write: (message: string, _encoding: any): void => {
-        // use the 'info' log level so the output will be picked up by both transports
-        this.logger.info(message)
-      },
-    }
-  }
-
-  getStream() {
-    return this.logger.stream
-  }
-
-  loggerWithLabel(module: NodeModule): any {
-    const label = getModuleLabel(module)
-    return {
-      info: (logMeta: any): winston.Logger =>
-        this.logger.info({ label, ...logMeta }),
-      error: (logMeta: any): winston.Logger =>
-        this.logger.error({ label, ...logMeta }),
-      debug: (logMeta: any): winston.Logger =>
-        this.logger.debug({ label, ...logMeta }),
-      warn: (logMeta: any): winston.Logger =>
-        this.logger.warn({ label, ...logMeta }),
-    }
+const loggerWithLabel = (module: NodeModule): any => {
+  const label = getModuleLabel(module)
+  return {
+    info: (logMeta: any): winston.Logger => logger.info({ label, ...logMeta }),
+    error: (logMeta: any): winston.Logger =>
+      logger.error({ label, ...logMeta }),
+    debug: (logMeta: any): winston.Logger =>
+      logger.debug({ label, ...logMeta }),
+    warn: (logMeta: any): winston.Logger => logger.warn({ label, ...logMeta }),
   }
 }
 
-const logger = new Logger()
-export default logger
+export { getStream, addTransport, loggerWithLabel }

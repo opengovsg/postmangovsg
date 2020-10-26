@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { CSVParams } from '@core/types'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
@@ -16,7 +16,7 @@ import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 /**
  * Gets a message's parameters

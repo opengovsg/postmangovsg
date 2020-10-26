@@ -4,7 +4,7 @@ import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 import config from '@core/config'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
 import Email from './email.class'
 import SMS from './sms.class'
@@ -13,7 +13,7 @@ import ECSUtil from './util/ecs'
 import assignment from './util/assignment'
 import { Message } from './interface'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 let connection: Sequelize,
   workerId: string,
   currentCampaignType: string,

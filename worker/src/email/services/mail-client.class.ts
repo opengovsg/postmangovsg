@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer'
 import directTransport from 'nodemailer-direct-transport'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { MailToSend, MailCredentials } from '@email/interfaces'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
 
 export default class MailClient {

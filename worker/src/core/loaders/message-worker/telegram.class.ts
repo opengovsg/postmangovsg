@@ -3,11 +3,11 @@ import { QueryTypes, Transaction } from 'sequelize'
 import { map } from 'lodash'
 
 import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import TelegramClient from '@telegram/services/telegram-client.class'
 import { CredentialService } from '@core/services/credential.service'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 const templateClient = new TemplateClient(XSS_TELEGRAM_OPTION)
 
 class Telegram {

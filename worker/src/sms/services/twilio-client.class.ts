@@ -1,10 +1,10 @@
 import twilio from 'twilio'
 import bcrypt from 'bcrypt'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 const SALT_ROUNDS = 10
 
 export default class TwilioClient {

@@ -2,9 +2,9 @@ import config from '@core/config'
 import ECS from 'aws-sdk/clients/ecs'
 import { AWSError } from 'aws-sdk/lib/error'
 import axios from 'axios'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 const ECSClient = new ECS({ region: config.get('aws.awsRegion') })
 const taskKeyword = ':task/'
 const clusterKeyword = ':cluster/'

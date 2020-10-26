@@ -5,9 +5,9 @@ import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 import { ProtectedMessage, Campaign } from '@core/models'
 import config from '@core/config'
 import { CSVParams } from '@core/types'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 const PROTECTED_URL = config.get('protectedUrl')
 const PROTECT_METHOD_VERSION = 1
 const templateClient = new TemplateClient(XSS_EMAIL_OPTION)

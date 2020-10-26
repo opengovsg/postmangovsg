@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { TelegramStatsService } from '@telegram/services'
-import Logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 
-const logger = Logger.loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 /**
  * Gets stats for sms campaign
