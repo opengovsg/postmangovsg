@@ -14,5 +14,6 @@ pg_restore --no-owner -h localhost -p 5432 -U postgres -d postmangovsg_dev postm
 { echo 'Data dump restoration failed!' && exit 1; }
 
 echo 'Making simple query on db'
-su - postgres -c "psql -d postmangovsg_dev -c 'SELECT 1+1'"
+su - postgres -c "psql -d postmangovsg_dev -c 'SELECT 1+1'" || \
+{ echo 'Data dump restoration failed!' && exit 1; }
 echo "Successfully restored data dump"
