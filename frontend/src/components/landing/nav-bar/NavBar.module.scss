@@ -49,7 +49,7 @@ $navbar-mobile-height: 4rem;
       @extend .body-1;
       color: $secondary;
       cursor: pointer;
-      margin-right: $navbar-link-margin;
+      margin-right: $spacing-7;
 
       &:hover {
         color: $primary;

@@ -31,10 +31,10 @@
 
     .button {
       @include flex-horizontal;
+      @extend .heading-3;
       justify-content: space-between;
       height: 4.5rem;
       border: 1px solid $primary;
-      font-size: 1.3rem;
 
       &:not(.active) {
         color: $primary;

@@ -62,17 +62,18 @@ $widescreen: 1216px;
 }
 
 @mixin button($background-color) {
+  @extend .button-text;
+
   background-color: $background-color;
   display: inline-flex;
   justify-content: center;
   align-items: center;
   height: $button-height;
   min-width: $button-min-width;
-  font-size: 0.8rem;
   border: 0;
   color: white;
   text-align: center;
-  padding: 1px $border-radius 2px;
+  padding: $spacing-2 $spacing-4;
   border-radius: $border-radius;
   cursor: pointer;
   user-select: none;
@@ -103,9 +104,10 @@ $widescreen: 1216px;
 
   i {
     @include icon;
-    font-size: 1.2rem;
-    margin-top: 0.1rem;
-    margin-left: 0.5rem;
+    height: 20px;
+    width: 20px;
+    margin-top: 0.15rem;
+    margin-left: $spacing-2;
   }
 }
 

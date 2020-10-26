@@ -15,7 +15,6 @@ import { getLandingStats } from 'services/stats.service'
 import styles from './Landing.module.scss'
 import companyLogo from 'assets/img/brand/company-logo.svg'
 
-import arrowRight from 'assets/img/landing/arrow-right.svg'
 import mohAgencyImg from 'assets/img/landing/moh-gray.png'
 import moeAgencyImg from 'assets/img/landing/moe-gray.png'
 import momAgencyImg from 'assets/img/landing/mom-gray.png'
@@ -171,11 +170,6 @@ const Landing = () => {
                 onClick={directToSignIn}
               >
                 Sign in
-                <img
-                  className={styles.arrowRight}
-                  src={arrowRight}
-                  alt="Right arrow"
-                />
               </PrimaryButton>
               <OutboundLink
                 className={styles.contactUs}
@@ -285,11 +279,6 @@ const Landing = () => {
                 onClick={directToSignIn}
               >
                 <span>Get started</span>
-                <img
-                  className={styles.arrowRight}
-                  src={arrowRight}
-                  alt="Right arrow"
-                />
               </PrimaryButton>
               <OutboundLink
                 eventLabel={i18n._(LINKS.contactUsUrl)}
