@@ -7,7 +7,6 @@
 
     tr {
       @include flex-horizontal;
-      border-bottom: none;
 
       .icon {
         @include icon;
@@ -20,6 +19,7 @@
       }
 
       th {
+        @extend .caption;
         text-transform: capitalize;
       }
     }
