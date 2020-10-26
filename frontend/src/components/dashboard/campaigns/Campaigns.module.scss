@@ -28,6 +28,13 @@
     );
     width: 100%;
 
+    thead tr {
+      th {
+        @extend .caption;
+        text-transform: capitalize;
+      }
+    }
+
     tbody tr {
       &:hover {
         cursor: pointer;
@@ -36,6 +43,10 @@
 
       &:active {
         opacity: 0.5;
+      }
+
+      td {
+        @extend .body-2;
       }
     }
   }

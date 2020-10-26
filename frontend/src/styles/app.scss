@@ -127,8 +127,9 @@ table {
 
     td,
     th {
-      padding: 1rem 0.25rem;
+      height: $height-3;
       display: flex;
+      align-items: center;
 
       &.xs {
         flex: 1.2;
