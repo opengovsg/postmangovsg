@@ -73,18 +73,33 @@ const SMSDetail = ({
     }
   }, [id, stats.status])
 
-  return (
-    <>
-      {stats.status === Status.Sending ? (
+  function renderProgressHeader() {
+    if (stats.waitTime && stats.waitTime > 0) {
+      const waitMin = Math.ceil(stats.waitTime / 60)
+      return (
+        <>
+          <h2>Other campaigns are queued ahead of this campaign.</h2>
+          <p>
+            Your campaign should start in approximately{' '}
+            <b>{waitMin > 1 ? `${waitMin} minutes` : `${waitMin} minute`}</b>.
+            You can leave this page in the meantime, and check on the progress
+            by returning to this page from the Campaigns tab.
+          </p>
+        </>
+      )
+    } else if (stats.status === Status.Sending) {
+      return (
         <>
           <h2>Your campaign is being sent out now!</h2>
           <p>
-            It may take a few minutes to complete. You can leave this page in
-            the meantime, and check on the progress by returning to this page
-            from the Campaigns tab.
+            It may take some time to complete. You can leave this page in the
+            meantime, and check on the progress by returning to this page from
+            the Campaigns tab.
           </p>
         </>
-      ) : (
+      )
+    } else {
+      return (
         <>
           <h2>Your campaign has been sent!</h2>
           <p>
@@ -96,22 +111,34 @@ const SMSDetail = ({
             recipient’s mobile number and delivery status when it is ready.
           </p>
         </>
-      )}
+      )
+    }
+  }
 
-      <div className="separator"></div>
-
-      {stats.status && (
-        <ProgressDetails
-          campaignId={id}
-          campaignName={name}
-          sentAt={sentAt}
-          numRecipients={numRecipients}
-          stats={stats}
-          handlePause={handlePause}
-          handleRetry={handleRetry}
-          handleRefreshStats={handleRefreshStats}
-        />
-      )}
+  function renderProgressDetails() {
+    return (
+      <>
+        <div className="separator"></div>
+        {stats.status && (
+          <ProgressDetails
+            campaignId={id}
+            campaignName={name}
+            campaignType={ChannelType.SMS}
+            sentAt={sentAt}
+            numRecipients={numRecipients}
+            stats={stats}
+            handlePause={handlePause}
+            handleRetry={handleRetry}
+            handleRefreshStats={handleRefreshStats}
+          />
+        )}
+      </>
+    )
+  }
+  return (
+    <>
+      {renderProgressHeader()}
+      {renderProgressDetails()}
     </>
   )
 }

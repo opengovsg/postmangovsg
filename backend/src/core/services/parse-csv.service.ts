@@ -69,7 +69,11 @@ const parseAndProcessCsv = async (
           // If there are more or fewer headers than values in a row
           if (errors[0]?.type === 'FieldMismatch') {
             // Ignore other parsing errors https://www.papaparse.com/docs#errors
-            throw new UserError(errors[0].code, errors[0].message)
+            const { code, message, row } = errors[0]
+            throw new UserError(
+              code,
+              `Error: Invalid row detected at line ${row}. ${message}. Please fix the number of fields and try again.`
+            )
           }
 
           // Manually hold a number of rows in a buffer, because the config
@@ -107,7 +111,7 @@ const parseAndProcessCsv = async (
             if (numRecords === 0) {
               throw new UserError(
                 'NoRowsFound',
-                'No rows were found in the uploaded file.'
+                'Error: No rows were found in the uploaded recipient file. Please make sure you uploaded the correct file before sending.'
               )
             }
             await onComplete(numRecords)

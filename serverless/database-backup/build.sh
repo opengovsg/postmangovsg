@@ -21,7 +21,7 @@ cp /lib64/{libldap_r-2.4.so.2,liblber-2.4.so.2,libsasl2.so.3,libssl3.so,libsmime
 cp /usr/pgsql-11/lib/libpq.so.5 $LAMBDA_TASK_ROOT/lib
 
 # Build and install code
-npm install && npm run build
+npm install && npm run build && npm prune --production
 
 echo "Creating lambda deployment zip"
 rm -rf code.zip

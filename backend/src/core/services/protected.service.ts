@@ -38,7 +38,7 @@ const checkTemplateVariables = (
   // Makes sure that all the required keywords are inside the template
   if (missing.length !== 0) {
     throw new Error(
-      `Required keywords are missing from the template: ${missing}`
+      `Error: There are missing keywords in the message template: ${missing}. Please return to the previous step to add in the keywords.`
     )
   }
 
@@ -47,7 +47,7 @@ const checkTemplateVariables = (
   // Should only contain the whitelisted keywords
   if (forbidden.length > 0) {
     throw new Error(
-      `Only these keywords are allowed: ${whitelist}.\nRemove the other keywords from the template: ${forbidden}`
+      `Error: Only these keywords are allowed in the template: ${whitelist}.\nRemove the other keywords from the template: ${forbidden}.`
     )
   }
 }

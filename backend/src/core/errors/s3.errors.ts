@@ -1,6 +1,9 @@
 export class RecipientColumnMissing extends Error {
   constructor() {
-    super("Column labelled 'recipient' is missing from uploaded file")
+    super(
+      "Error: 'recipient' column is missing from the uploaded recipient file. Please check the cell in your uploaded CSV file to ensure " +
+        "the recipient's contact info is correctly labelled as 'recipient'."
+    )
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
     Error.captureStackTrace(this)
   }

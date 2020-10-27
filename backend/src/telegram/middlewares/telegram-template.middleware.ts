@@ -110,7 +110,9 @@ const uploadCompleteHandler = async (
       +campaignId
     )
     if (template === null) {
-      throw new Error('Template does not exist, please create a template')
+      throw new Error(
+        'Error: No message template found. Please create a message template before uploading a recipient file.'
+      )
     }
 
     // Store temp filename

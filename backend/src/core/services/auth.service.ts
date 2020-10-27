@@ -67,8 +67,7 @@ const getHashedOtp = (email: string): Promise<HashedOtp> => {
         reject(new Error('Internal server error - request for otp again'))
       }
       if (value === null) {
-        logger.info({ message: 'No otp found', ...logMeta })
-        reject(new Error('No otp found - request for otp again'))
+        reject(new Error('OTP has expired. Please request for a new OTP.'))
       }
       resolve(JSON.parse(value))
     })

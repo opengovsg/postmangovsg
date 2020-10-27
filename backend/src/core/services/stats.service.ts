@@ -1,4 +1,4 @@
-import { fn, cast, Transaction, Op } from 'sequelize'
+import { fn, cast, Transaction, Op, literal } from 'sequelize'
 import { Statistic, JobQueue, Campaign } from '@core/models'
 import {
   CampaignStats,
@@ -115,14 +115,13 @@ const getCurrentStats = async (
     include: [
       {
         model: Campaign,
-        attributes: ['halted'],
+        attributes: ['halted', ['cred_name', 'credName']],
       },
     ],
   })
 
-  if (job == null) {
+  if (job === null)
     throw new Error('Unable to find campaign in job queue table.')
-  }
 
   // Get stats from statistics table
   const archivedStats = await getStatsFromArchive(campaignId)
@@ -147,17 +146,49 @@ const getCurrentStats = async (
       halted: job.campaign.halted,
     }
   }
-  // else, return archived stats
-  return {
-    error: archivedStats.error,
-    unsent: archivedStats.unsent,
-    sent: archivedStats.sent,
-    invalid: archivedStats.invalid,
+
+  const stats = {
+    ...archivedStats,
     status: job.status,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    updated_at: archivedStats.updated_at,
     halted: job.campaign.halted,
     status_updated_at: job.updatedAt, // Timestamp when job was logged
+  }
+
+  // If job is not in send queue, return archived stats
+  if (job.status !== JobStatus.Ready) {
+    return stats
+  }
+
+  if (!job.campaign.credName) {
+    throw new Error('Missing credential for campaign')
+  }
+  // get send time of all campaigns using this credential that are queued before this campaign
+  const data = await JobQueue.findAll({
+    where: {
+      id: { [Op.lt]: job.id },
+      status: {
+        [Op.or]: [JobStatus.Enqueued, JobStatus.Ready, JobStatus.Sending],
+      },
+    },
+    include: [
+      {
+        model: Campaign,
+        where: { credName: job.campaign.credName },
+        include: [Statistic],
+      },
+    ],
+    attributes: [[literal('unsent / send_rate'), 'wait_time']],
+    raw: true,
+  })
+
+  const totalWaitTime = data.reduce((time: number, job: any) => {
+    const { wait_time: waitTime } = job
+    return time + waitTime
+  }, 0)
+
+  return {
+    ...stats,
+    wait_time: totalWaitTime,
   }
 }
 
@@ -182,7 +213,7 @@ const getDeliveredRecipients = async (
     where: {
       campaignId,
       status: {
-        [Op.not]: MessageStatus.Sending,
+        [Op.ne]: null,
       },
     },
     attributes: ['recipient', 'status', 'error_code', 'updated_at'],

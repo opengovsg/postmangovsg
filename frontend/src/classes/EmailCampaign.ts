@@ -1,4 +1,14 @@
-import { Campaign } from './Campaign'
+import { get } from 'lodash'
+import { t } from '@lingui/macro'
+import { i18n } from 'locales'
+import { Campaign, CampaignRecipient } from './Campaign'
+
+const emailErrors = {
+  'Hard bounce': t('errors.email.hardBounce')``,
+  'Soft bounce': t('errors.email.softBounce')``,
+  'Recipient is incorrectly formatted': t('errors.email.invalidFormat')``,
+  abuse: t('errors.email.complaint')``,
+}
 
 export enum EmailProgress {
   CreateTemplate,
@@ -48,5 +58,26 @@ export class EmailCampaign extends Campaign {
     } else {
       this.progress = EmailProgress.Send
     }
+  }
+}
+
+export class EmailCampaignRecipient extends CampaignRecipient {
+  formatErrorCode(errorCode: string): string {
+    const blacklistMsg = t('errors.email.blacklist')``
+    let formatted = ''
+    switch (this.status) {
+      case 'SENDING':
+      case 'SUCCESS':
+        return ''
+      case 'INVALID_RECIPIENT':
+        // If error code is null and status is invalid, the email has been blacklisted. Otherwise, the error has not been mapped.
+        formatted =
+          errorCode !== null
+            ? get(emailErrors, errorCode, errorCode)
+            : blacklistMsg
+        return i18n._(formatted)
+    }
+
+    return errorCode
   }
 }
