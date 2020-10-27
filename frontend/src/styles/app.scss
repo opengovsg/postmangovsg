@@ -70,6 +70,11 @@ p {
   font-size: 0.9rem;
 }
 
+.formInputLabel {
+  display: block;
+  margin-bottom: 1rem;
+}
+
 .clickable {
   color: $primary;
   cursor: pointer;
