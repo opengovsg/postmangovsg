@@ -83,6 +83,7 @@ const SMSCredentials = ({
           campaignId: +campaignId,
           ...creds,
           recipient,
+          ...(saveCredentialWithLabel && { label }),
         })
       } else if (!isManual && selectedCredential) {
         await validateStoredCredentials({
