@@ -1,6 +1,6 @@
 {
   "name": "worker",
-  "version": "1.14.0",
+  "version": "1.15.2",
   "description": "Workers for Postman",
   "main": "build/server.js",
   "scripts": {

@@ -95,14 +95,16 @@ const uploadCompleteHandler = async (
     const { campaignId } = req.params
 
     // extract s3Key from transactionId
-    const { transaction_id: transactionId, filename } = req.body
+    const { transaction_id: transactionId, filename, etag } = req.body
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
     const template = await TelegramTemplateService.getFilledTemplate(
       +campaignId
     )
     if (template === null) {
-      throw new Error('Template does not exist, please create a template')
+      throw new Error(
+        'Error: No message template found. Please create a message template before uploading a recipient file.'
+      )
     }
 
     // Store temp filename
@@ -118,7 +120,7 @@ const uploadCompleteHandler = async (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 
-        const downloadStream = s3Client.download(s3Key)
+        const downloadStream = s3Client.download(s3Key, etag)
         const params = {
           transaction,
           template,
@@ -147,6 +149,13 @@ const uploadCompleteHandler = async (
       logger.error(
         `Error storing messages for campaign ${campaignId}. ${err.stack}`
       )
+
+      // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
+      if (err.code === 'PreconditionFailed') {
+        err.message =
+          'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
+      }
+
       // Store error to return on poll
       UploadService.storeS3Error(+campaignId, err.message)
     }

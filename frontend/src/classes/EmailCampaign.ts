@@ -1,4 +1,14 @@
-import { Campaign } from './Campaign'
+import { get } from 'lodash'
+import { t } from '@lingui/macro'
+import { i18n } from 'locales'
+import { Campaign, CampaignRecipient } from './Campaign'
+
+const emailErrors = {
+  'Hard bounce': t('errors.email.hardBounce')``,
+  'Soft bounce': t('errors.email.softBounce')``,
+  'Recipient is incorrectly formatted': t('errors.email.invalidFormat')``,
+  abuse: t('errors.email.complaint')``,
+}
 
 export enum EmailProgress {
   CreateTemplate,
@@ -11,6 +21,7 @@ export interface EmailPreview {
   body: string
   subject: string
   replyTo: string | null
+  from: string
 }
 
 export class EmailCampaign extends Campaign {
@@ -18,6 +29,7 @@ export class EmailCampaign extends Campaign {
   params: Array<string>
   subject: string
   replyTo: string | null
+  from: string
   csvFilename: string
   numRecipients: number
   hasCredential: boolean
@@ -29,6 +41,7 @@ export class EmailCampaign extends Campaign {
     this.params = input['email_templates']?.params
     this.subject = input['email_templates']?.subject
     this.replyTo = input['email_templates']?.reply_to
+    this.from = input['email_templates']?.from
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
     this.hasCredential = input['has_credential']
@@ -45,5 +58,26 @@ export class EmailCampaign extends Campaign {
     } else {
       this.progress = EmailProgress.Send
     }
+  }
+}
+
+export class EmailCampaignRecipient extends CampaignRecipient {
+  formatErrorCode(errorCode: string): string {
+    const blacklistMsg = t('errors.email.blacklist')``
+    let formatted = ''
+    switch (this.status) {
+      case 'SENDING':
+      case 'SUCCESS':
+        return ''
+      case 'INVALID_RECIPIENT':
+        // If error code is null and status is invalid, the email has been blacklisted. Otherwise, the error has not been mapped.
+        formatted =
+          errorCode !== null
+            ? get(emailErrors, errorCode, errorCode)
+            : blacklistMsg
+        return i18n._(formatted)
+    }
+
+    return errorCode
   }
 }

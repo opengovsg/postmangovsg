@@ -12,6 +12,7 @@ import {
   EmailMiddleware,
 } from '@email/middlewares'
 import config from '@core/config'
+import { fromAddressValidator } from '@core/utils/from-address'
 
 const router = Router({ mergeParams: true })
 
@@ -27,20 +28,38 @@ const storeTemplateValidator = {
       .lowercase()
       .allow(null)
       .required(),
+    from: fromAddressValidator,
   }),
 }
 
 const uploadStartValidator = {
-  [Segments.QUERY]: Joi.object({
-    mime_type: Joi.string().required(),
-  }),
+  v1: {
+    [Segments.QUERY]: Joi.object({
+      mime_type: Joi.string().required(),
+    }),
+  },
+  v2: {
+    [Segments.QUERY]: Joi.object({
+      mime_type: Joi.string().required(),
+      md5: Joi.string().required(),
+    }),
+  },
 }
 
 const uploadCompleteValidator = {
-  [Segments.BODY]: Joi.object({
-    transaction_id: Joi.string().required(),
-    filename: Joi.string().required(),
-  }),
+  v1: {
+    [Segments.BODY]: Joi.object({
+      transaction_id: Joi.string().required(),
+      filename: Joi.string().required(),
+    }),
+  },
+  v2: {
+    [Segments.BODY]: Joi.object({
+      transaction_id: Joi.string().required(),
+      filename: Joi.string().required(),
+      etag: Joi.string().required(),
+    }),
+  },
 }
 
 const storeCredentialsValidator = {
@@ -144,7 +163,8 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                 reply_to:
  *                   type: string
  *                   nullable: true
- *
+ *                 from:
+ *                   type: string
  *       responses:
  *         200:
  *           description: Success
@@ -180,6 +200,8 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *                         type: array
  *                         items:
  *                           type: string
+ *                       from:
+ *                         type: string
  *
  *         "400":
  *           description: Bad Request
@@ -194,6 +216,9 @@ router.put(
   '/template',
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
+  EmailMiddleware.isFromAddressAccepted,
+  EmailMiddleware.existsFromAddress,
+  EmailMiddleware.verifyFromAddress,
   ProtectedMiddleware.verifyTemplate,
   EmailTemplateMiddleware.storeTemplate
 )
@@ -240,7 +265,59 @@ router.put(
  */
 router.get(
   '/upload/start',
-  celebrate(uploadStartValidator),
+  celebrate(uploadStartValidator.v1),
+  CampaignMiddleware.canEditCampaign,
+  UploadMiddleware.uploadStartHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/upload/start-v2:
+ *     get:
+ *       description: "Get a presigned URL for upload with Content-MD5 header"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: mime_type
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: md5
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   presigned_url:
+ *                     type: string
+ *                   transaction_id:
+ *                     type: string
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.get(
+  '/upload/start-v2',
+  celebrate(uploadStartValidator.v2),
   CampaignMiddleware.canEditCampaign,
   UploadMiddleware.uploadStartHandler
 )
@@ -285,7 +362,54 @@ router.get(
  */
 router.post(
   '/upload/complete',
-  celebrate(uploadCompleteValidator),
+  celebrate(uploadCompleteValidator.v1),
+  CampaignMiddleware.canEditCampaign,
+  EmailTemplateMiddleware.uploadCompleteHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/upload/complete-v2:
+ *     post:
+ *       description: "Complete upload session with ETag verification"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - transaction_id
+ *                 - filename
+ *               properties:
+ *                 transaction_id:
+ *                   type: string
+ *                 filename:
+ *                   type: string
+ *                 etag:
+ *                   type: string
+ *       responses:
+ *         "202" :
+ *           description: Accepted. The uploaded file is being processed.
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/upload/complete-v2',
+  celebrate(uploadCompleteValidator.v2),
   CampaignMiddleware.canEditCampaign,
   EmailTemplateMiddleware.uploadCompleteHandler
 )
@@ -640,7 +764,7 @@ router.post('/refresh-stats', EmailStatsMiddleware.updateAndGetStats)
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/export', EmailStatsMiddleware.getFailedRecipients)
+router.get('/export', EmailStatsMiddleware.getDeliveredRecipients)
 
 /**
  * @swagger

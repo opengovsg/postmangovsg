@@ -7,9 +7,11 @@ import {
   SMSCampaign,
   EmailCampaign,
   TelegramCampaign,
-  CampaignInvalidRecipient,
+  CampaignRecipient,
+  EmailCampaignRecipient,
+  SMSCampaignRecipient,
+  TelegramCampaignRecipient,
 } from 'classes'
-import moment from 'moment'
 
 function getJobTimestamps(
   jobs: Array<{ sent_at: Date; status_updated_at: Date }>
@@ -140,17 +142,23 @@ export async function retryCampaign(campaignId: number): Promise<void> {
 }
 
 export async function exportCampaignStats(
-  campaignId: number
-): Promise<Array<CampaignInvalidRecipient>> {
+  campaignId: number,
+  type: ChannelType
+): Promise<Array<CampaignRecipient>> {
   return axios.get(`/campaign/${campaignId}/export`).then((response) => {
-    const invalidRecipients = response.data?.map(
-      (record: any) => new CampaignInvalidRecipient(record)
-    )
-    for (const invalidRecipient of invalidRecipients) {
-      invalidRecipient.updatedAt = moment(invalidRecipient.updatedAt)
-        .format('LLL')
-        .replace(',', '')
-    }
-    return invalidRecipients
+    const campaignRecipients = response.data?.map((record: any) => {
+      switch (type) {
+        case ChannelType.Email:
+          return new EmailCampaignRecipient(record)
+        case ChannelType.SMS:
+          return new SMSCampaignRecipient(record)
+        case ChannelType.Telegram:
+          return new TelegramCampaignRecipient(record)
+        default:
+          throw new Error('Invalid channel type')
+      }
+    })
+
+    return campaignRecipients
   })
 }

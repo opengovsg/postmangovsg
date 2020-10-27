@@ -21,7 +21,7 @@ msgstr "Enter OTP"
 msgid "Get OTP"
 msgstr "Get OTP"
 
-#: src/components/unsubscribe/Unsubscribe.tsx:84
+#: src/components/unsubscribe/Unsubscribe.tsx:87
 msgid "I'd rather stay"
 msgstr "I'd rather stay"
 
@@ -49,7 +49,7 @@ msgstr "Sign In"
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
 
-#: src/components/unsubscribe/Unsubscribe.tsx:87
+#: src/components/unsubscribe/Unsubscribe.tsx:90
 msgid "Unsubscribe me"
 msgstr "Unsubscribe me"
 
@@ -57,9 +57,50 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
+#: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:71
+#: src/config.ts:42
+msgid "defaultMailFrom"
+msgstr "donotreply@mail.postman.gov.sg"
+
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
+
+#: src/classes/EmailCampaign.ts:51
+msgid "errors.email.blacklist"
+msgstr "Blacklisted: Your email will not be delivered to this recipient because Postman.gov.sg has determined that this recipient is not valid and might not exist."
+
+#: src/classes/EmailCampaign.ts:9
+msgid "errors.email.complaint"
+msgstr "Hard bounce: Your email has been delivered, but the recipient marked it as spam."
+
+#: src/classes/EmailCampaign.ts:6
+msgid "errors.email.hardBounce"
+msgstr "Hard bounce: The email recipient is not valid and might not exist. Postman.gov.sg will not send to this recipient again for future campaigns."
+
+#: src/classes/EmailCampaign.ts:8
+msgid "errors.email.invalidFormat"
+msgstr "Error: Incorrect email formatting. Please check for typos, spaces, and symbols and amend this email address."
+
+#: src/classes/EmailCampaign.ts:7
+msgid "errors.email.softBounce"
+msgstr "Soft bounce: The email inbox might be full or the recipient might have an out-of-office message."
+
+#: src/classes/SMSCampaign.ts:44
+msgid "errors.sms.invalidFormat"
+msgstr "Error: Incorrect phone number format. Please check for typos, spaces, and symbols and amend this phone number."
+
+#: src/classes/SMSCampaign.ts:41
+msgid "errors.sms.invalidPhoneNumber"
+msgstr "Invalid phone number in the recipient column."
+
+#: src/classes/TelegramCampaign.ts:49
+msgid "errors.telegram.blocked"
+msgstr "Bot has been blocked by the recipient. Please contact the recipient via other means to reverse the action."
+
+#: src/classes/TelegramCampaign.ts:47
+msgid "errors.telegram.notSubscribed"
+msgstr "Recipient has not subscribed to your agency's bot - please ask them to subscribe before sending a message."
 
 #: src/config.ts:35
 msgid "link.contactUsUrl"
@@ -68,6 +109,10 @@ msgstr "https://go.gov.sg/postman-contact-us"
 #: src/config.ts:36
 msgid "link.contributeUrl"
 msgstr "https://github.com/opengovsg/postmangovsg"
+
+#: src/config.ts:40
+msgid "link.customFromAddressRequestUrl"
+msgstr "https://go.gov.sg/postman-custom-from"
 
 #: src/config.ts:28
 msgid "link.guideEmailPasswordProtectedUrl"
