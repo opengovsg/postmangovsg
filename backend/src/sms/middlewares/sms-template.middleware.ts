@@ -69,7 +69,6 @@ const storeTemplate = async (
       })
     } else {
       const numRecipients = await StatsService.getNumRecipients(+campaignId)
-      logger.info({ message: 'SMS template updated', ...logMeta })
       return res.status(200).json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,

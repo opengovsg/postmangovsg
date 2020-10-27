@@ -19,7 +19,7 @@ export default class TwilioClient {
     this.hasCallback =
       config.get('callbackSecret') !== '' && config.get('backendUrl') !== ''
     if (!this.hasCallback) {
-      logger.info(
+      logger.error(
         'Missing callback parameters. No status callback will be provided'
       )
     }

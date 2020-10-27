@@ -20,11 +20,6 @@ const isProtectedCampaign = async (
     if (await ProtectedService.isProtectedCampaign(+campaignId)) {
       return next()
     }
-    logger.error({
-      message: 'Campaign is not a protected campaign',
-      campaignId,
-      action: 'isProtectedCampaign',
-    })
     return res.sendStatus(403)
   } catch (err) {
     return next(err)
@@ -101,10 +96,6 @@ const verifyPasswordHash = async (
         .status(403)
         .json({ message: 'Wrong password or message id. Please try again.' })
     }
-    logger.info({
-      message: 'Successfully verified password for protected message',
-      ...logMeta,
-    })
     return res.json({ payload: protectedMessage.payload })
   } catch (err) {
     return next(err)

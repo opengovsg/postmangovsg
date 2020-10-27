@@ -25,11 +25,6 @@ const canEditCampaign = async (
     if (!hasJob && !csvStatus?.isCsvProcessing) {
       return next()
     }
-    logger.error({
-      message: `Campaign cannot be edited`,
-      campaignId,
-      action: 'canEditCampaign',
-    })
     return res.sendStatus(403)
   } catch (err) {
     return next(err)
@@ -56,11 +51,6 @@ const createCampaign = async (
 
     // Check that protected campaign can only be created for emails
     if (protect && type !== ChannelType.Email) {
-      logger.error({
-        message: `Protected campaign cannot be created`,
-        campaignType: type,
-        action: 'createCampaign',
-      })
       return res.sendStatus(403)
     }
 
@@ -73,7 +63,6 @@ const createCampaign = async (
     })
     logger.info({
       message: 'Successfully created new campaign',
-      id: userId,
       campaignId: campaign.id,
       action: 'createCampaign',
     })

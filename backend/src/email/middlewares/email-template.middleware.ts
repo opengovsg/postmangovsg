@@ -75,7 +75,6 @@ const storeTemplate = async (
       })
     } else {
       const numRecipients = await StatsService.getNumRecipients(+campaignId)
-      logger.info({ message: 'Email template updated', ...logMeta })
       return res.json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
@@ -126,7 +125,6 @@ const uploadCompleteHandler = async (
     // Store temp filename
     await UploadService.storeS3TempFilename(+campaignId, filename)
 
-    logger.info({ message: 'Stored temporary S3 filename', ...logMeta })
     // Return early because bulk insert is slow
     res.sendStatus(202)
 
@@ -136,10 +134,6 @@ const uploadCompleteHandler = async (
       // - download from s3
       const s3Client = new S3Client()
       await retry(async (bail) => {
-        logger.info({
-          message: 'Start to parse and process s3 file',
-          ...logMeta,
-        })
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 
@@ -261,11 +255,6 @@ const deleteCsvErrorHandler = async (
   try {
     const { campaignId } = req.params
     await UploadService.deleteS3TempKeys(+campaignId)
-    logger.info({
-      message: 'Deleted csv error and temp filename from db',
-      campaignId,
-      action: 'deleteCsvErrorHandler',
-    })
     res.sendStatus(200)
   } catch (e) {
     next(e)
@@ -305,7 +294,6 @@ const uploadProtectedCompleteHandler = async (
 
     // Store temp filename
     await UploadService.storeS3TempFilename(+campaignId, filename)
-    logger.info({ message: 'Stored temporary S3 filename', ...logMeta })
     // Return early because bulk insert is slow
     res.sendStatus(202)
 
@@ -314,10 +302,6 @@ const uploadProtectedCompleteHandler = async (
       //Download from s3
       const s3Client = new S3Client()
       await retry(async (bail) => {
-        logger.info({
-          message: 'Start to parse and process s3 file',
-          ...logMeta,
-        })
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 

@@ -47,7 +47,7 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
   if (record.message_id === undefined) {
     logger.info({
       message: 'No reference message id found',
-      smptpId: record['smtp-id'],
+      smtpId: record['smtp-id'],
       action: 'parseRecord',
     })
     return

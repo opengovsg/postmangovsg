@@ -129,18 +129,9 @@ export const haltCampaignIfThresholdExceeded = async (
       invalid > config.get('emailCallback.minHaltNumber')
     const exceedsHaltPercentage =
       percentageInvalid > config.get('emailCallback.minHaltPercentage')
-    logger.info(
-      `Current campaign_id=${campaignId} invalid=${invalid} running_total=${runningTotal} 
-        percentageInvalid=${percentageInvalid} 
-        config.minHaltNumber=${config.get('emailCallback.minHaltNumber')}
-        config.minHaltPercentage=${config.get(
-          'emailCallback.minHaltPercentage'
-        )}
-        exceedsHaltNumber=${exceedsHaltNumber}
-        exceedsHaltPercentage=${exceedsHaltPercentage}`
-    )
+
     logger.info({
-      message: 'Campaign status',
+      message: 'Current campaign status',
       campaignId,
       invalid,
       runningTotal,

@@ -80,12 +80,6 @@ const redirectToChannelRoute = async (
   }
 
   const redirectTo = `${campaignUrl}/${campaign?.type.toLowerCase()}${resource}`
-  logger.info({
-    message: 'Redirect to channel routes',
-    redirectTo,
-    campaignId,
-    action: 'redirectToChannelRoute',
-  })
   return res.redirect(307, redirectTo)
 }
 

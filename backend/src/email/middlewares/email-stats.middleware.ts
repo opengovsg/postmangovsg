@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailStatsService } from '@email/services'
-import { loggerWithLabel } from '@core/logger'
-
-const logger = loggerWithLabel(module)
 
 /**
  * Gets stats for email campaign
@@ -18,11 +15,6 @@ const getStats = async (
   const { campaignId } = req.params
   try {
     const stats = await EmailStatsService.getStats(+campaignId)
-    logger.info({
-      message: 'Retreived email stats',
-      campaignId,
-      action: 'getStats',
-    })
     return res.json(stats)
   } catch (err) {
     next(err)
@@ -44,11 +36,6 @@ const updateAndGetStats = async (
   try {
     await EmailStatsService.refreshStats(+campaignId)
     const stats = await EmailStatsService.getStats(+campaignId)
-    logger.info({
-      message: 'Refresh and retreived email stats',
-      campaignId,
-      action: 'updateAndGetStats',
-    })
     return res.json(stats)
   } catch (err) {
     next(err)
@@ -71,11 +58,6 @@ const getDeliveredRecipients = async (
     const recipients = await EmailStatsService.getDeliveredRecipients(
       +campaignId
     )
-    logger.info({
-      message: 'Retreived delivered recipients',
-      campaignId,
-      action: 'getDeliveredRecipients',
-    })
     return res.json(recipients)
   } catch (err) {
     next(err)

@@ -75,7 +75,6 @@ const verifyOtp = async (
       logger.info({
         message: 'User session saved successfully',
         ...logMeta,
-        id: user.id,
       })
       return res.sendStatus(200)
     }
@@ -99,8 +98,6 @@ const getUser = async (
     const user = await AuthService.findUser(req?.session?.user?.id)
     logger.info({
       message: 'Existing user session found',
-      email: user.email,
-      id: user.id,
       action: 'getUser',
     })
     return res.json({ email: user?.email, id: user?.id })
@@ -134,17 +131,11 @@ const isCookieOrApiKeyAuthenticated = async (
       req.session.apiKey = true
       logger.info({
         message: 'User authenticated by API key',
-        email: user.email,
-        id: user.id,
         action: 'isCookieOrApiKeyAuthenticated',
       })
       return next()
     }
 
-    logger.error({
-      message: 'Invalid API key provided!',
-      action: 'isCookieOrApiKeyAuthenticated',
-    })
     return res.sendStatus(401)
   } catch (err) {
     return next(err)
@@ -166,11 +157,10 @@ const logout = async (
     req.session?.destroy((err) => {
       res.cookie(config.get('session.cookieName'), '', { expires: new Date() }) // Makes cookie expire immediately
       if (!err) {
-        resolve(res.sendStatus(200))
+        return resolve(res.sendStatus(200))
       }
       logger.error({
         message: 'Failed to destroy session',
-        id: req?.session?.user.id,
         error: err,
         action: 'logout',
       })

@@ -43,7 +43,6 @@ const getCredentialsFromLabel = async (
     if (!userCred) {
       logger.error({
         message: 'User credentials not found',
-        userId,
         label,
         action: 'getCredentialsFromLabel',
       })
@@ -81,7 +80,6 @@ const getCampaignCredential = async (
     logger.error({
       message: 'Credential not found for this campaign',
       campaignId,
-      id: userId,
       credName,
       action: 'getCampaignCredential',
     })
@@ -219,7 +217,6 @@ const isTelegramCampaignOwnedByUser = async (
       logger.error({
         message: 'Campaign does not belong to user',
         campaignId,
-        userId,
         action: 'isTelegramCampaignOwnedByUser',
       })
       return res.sendStatus(403)
@@ -243,11 +240,6 @@ const getCampaignDetails = async (
   try {
     const { campaignId } = req.params
     const result = await TelegramService.getCampaignDetails(+campaignId)
-    logger.info({
-      message: 'Retreived campaign details',
-      campaignId,
-      action: 'getCampaignDetails',
-    })
     return res.json(result)
   } catch (err) {
     return next(err)
@@ -293,12 +285,6 @@ const setCampaignCredential = async (
       throw new Error('Credential does not exist')
     }
     await TelegramService.setCampaignCredential(+campaignId, credentialName)
-    logger.info({
-      message: 'Set credential associated to campaign',
-      campaignId,
-      credentialName,
-      action: 'setCampaignCredential',
-    })
     return res.json({ message: 'OK' })
   } catch (err) {
     next(err)

@@ -45,7 +45,6 @@ const parseAndProcessCsv = async (
       },
 
       chunk: async (rows: ParseResult<CSVParams>, parser: Papa.Parser) => {
-        const logMeta = { readStream, action: 'parseAndProcessCsv.chunk' }
         parser.pause()
         const { data, meta, errors } = rows
         try {
@@ -85,13 +84,17 @@ const parseAndProcessCsv = async (
           }
           parser.resume()
         } catch (error) {
-          logger.error({ message: 'Failed to chunk data', error, ...logMeta })
+          logger.error({
+            message: 'Failed to chunk data',
+            error,
+            action: 'parseAndProcessCsv.chunk',
+          })
           reject(error)
           parser.abort()
         }
       },
       complete: async (rows: ParseResult<any>) => {
-        const logMeta = { readStream, action: 'parseAndProcessCsv.complete' }
+        const logMeta = { action: 'parseAndProcessCsv.complete' }
         const { meta } = rows
         if (!meta.aborted) {
           try {

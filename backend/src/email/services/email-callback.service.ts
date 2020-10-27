@@ -17,6 +17,7 @@ const isAuthenticated = (authHeader?: string): boolean => {
   if (!authorized)
     logger.info({
       message: 'Request made with incorrect credential',
+      decoded,
       action: 'isAuthenticated',
     })
   return authorized

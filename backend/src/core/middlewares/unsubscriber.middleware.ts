@@ -67,12 +67,6 @@ const findOrCreateUnsubscriber = async (
     recipient,
   })
 
-  logger.info({
-    message: 'Create unsubscriber record',
-    campaignId,
-    recipient,
-    action: 'findOrCreateUnsubscriber',
-  })
   const statusCode = created ? 201 : 200
   return res.sendStatus(statusCode)
 }

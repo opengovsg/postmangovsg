@@ -27,7 +27,6 @@ const upsertTelegramSubscriber = async (
     phoneNumber = `+${phoneNumber}`
   }
 
-  logger.info({ message: 'Upserting Telegram subscriber', ...logMeta })
   /**
    * Insert a telegram id and phone number, if that telegram id doesn't exist.
    * Otherwise, if the new phone number does not exist,
@@ -70,7 +69,6 @@ const addBotSubscriber = async (
   telegramId: number
 ): Promise<boolean> => {
   const logMeta = { botId, telegramId, action: 'addBotSubscriber' }
-  logger.info({ message: 'Upserting bot subscriber', ...logMeta })
   const [, created] = await BotSubscriber.findOrCreate({
     where: { botId, telegramId },
   })

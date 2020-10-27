@@ -68,7 +68,6 @@ const storeTemplate = async (
         },
       })
     } else {
-      logger.info({ message: 'Telegram template updated', ...logMeta })
       return res.status(200).json({
         message: `Template for campaign ${campaignId} updated`,
         valid: valid,
@@ -117,7 +116,6 @@ const uploadCompleteHandler = async (
     // Store temp filename
     await UploadService.storeS3TempFilename(+campaignId, filename)
 
-    logger.info({ message: 'Stored temporary S3 filename', ...logMeta })
     // Return early because bulk insert is slow
     res.sendStatus(202)
 
@@ -125,10 +123,6 @@ const uploadCompleteHandler = async (
       // - download from s3
       const s3Client = new S3Client()
       await retry(async (bail) => {
-        logger.info({
-          message: 'Start to parse and process s3 file',
-          ...logMeta,
-        })
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 

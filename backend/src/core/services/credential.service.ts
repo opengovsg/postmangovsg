@@ -28,10 +28,6 @@ const upsertCredential = async (
   const logMeta = { name, action: 'upsertCredential' }
   // If credential doesn't exist, upload credential to secret manager
   try {
-    logger.info({
-      message: 'Storing credential in AWS secrets manager',
-      ...logMeta,
-    })
     await secretsManager
       .createSecret({
         Name: name,
@@ -47,11 +43,6 @@ const upsertCredential = async (
     })
   } catch (err) {
     if (err.name === 'ResourceExistsException') {
-      logger.info({
-        message: 'Updating credential in AWS secrets manager',
-        error: err,
-        ...logMeta,
-      })
       await secretsManager
         .putSecretValue({
           SecretId: name,
@@ -91,7 +82,6 @@ const storeCredential = async (
   // If adding a credential to secrets manager succeeds, but the db call fails, it is ok because the credential will not be associated with a campaign
   // It results in orphan secrets manager credentials, which is acceptable.
   await upsertCredential(name, secret, restrictEnvironment)
-  logger.info({ message: 'Storing credential in DB', ...logMeta })
   await Credential.findCreateFind({
     where: { name },
   })
@@ -106,12 +96,11 @@ const getTwilioCredentials = async (
   name: string
 ): Promise<TwilioCredentials> => {
   const logMeta = { name, action: 'getTwilioCredentials' }
+  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   logger.info({
-    message: 'Getting secret from AWS secrets manager.',
+    messge: 'Retrieved secret from AWS secrets manager.',
     ...logMeta,
   })
-  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
-  logger.info({ messge: 'Gotten secret from AWS secrets manager.', ...logMeta })
   const secretString = get(data, 'SecretString', '')
   if (!secretString) {
     throw new Error('Missing secret string from AWS secrets manager.')
@@ -125,12 +114,11 @@ const getTwilioCredentials = async (
  */
 const getTelegramCredential = async (name: string): Promise<string> => {
   const logMeta = { name, action: 'getTelegramCredential' }
+  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   logger.info({
-    message: 'Getting secret from AWS secrets manager.',
+    messge: 'Retrieved secret from AWS secrets manager.',
     ...logMeta,
   })
-  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
-  logger.info({ messge: 'Gotten secret from AWS secrets manager.', ...logMeta })
   const secretString = get(data, 'SecretString', '')
   if (!secretString) {
     throw new Error('Missing secret string from AWS secrets manager.')

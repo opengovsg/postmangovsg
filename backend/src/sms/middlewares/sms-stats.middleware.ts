@@ -18,11 +18,6 @@ const getStats = async (
   const { campaignId } = req.params
   try {
     const stats = await SmsStatsService.getStats(+campaignId)
-    logger.info({
-      message: 'Retreived sms stats',
-      campaignId,
-      action: 'getStats',
-    })
     return res.json(stats)
   } catch (err) {
     next(err)
@@ -69,11 +64,6 @@ const getDeliveredRecipients = async (
   const { campaignId } = req.params
   try {
     const recipients = await SmsStatsService.getDeliveredRecipients(+campaignId)
-    logger.info({
-      message: 'Retreived delivered recipients',
-      campaignId,
-      action: 'getDeliveredRecipients',
-    })
     return res.json(recipients)
   } catch (err) {
     next(err)

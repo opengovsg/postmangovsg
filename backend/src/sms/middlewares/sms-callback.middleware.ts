@@ -27,10 +27,6 @@ const isAuthenticated = (
   ) {
     return next()
   }
-  logger.error({
-    message: 'Failed to authenticate request',
-    action: 'isAuthenticated',
-  })
   return res.sendStatus(403)
 }
 

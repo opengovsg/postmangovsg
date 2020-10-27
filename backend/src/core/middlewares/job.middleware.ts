@@ -56,7 +56,7 @@ const stopCampaign = async (
     const { campaignId } = req.params
     await JobService.stopCampaign(+campaignId)
     logger.info({
-      message: 'Successfully stopped campaign',
+      message: 'Stopped campaign',
       campaignId,
       action: 'stopCampaign',
     })
@@ -82,7 +82,7 @@ const retryCampaign = async (
     const logMeta = { campaignId, action: 'retryCampaign' }
     if (await JobService.canSendCampaign(+campaignId)) {
       await JobService.retryCampaign(+campaignId)
-      logger.info({ message: 'Sucessfully retry campaign', ...logMeta })
+      logger.info({ message: 'Retry campaign', ...logMeta })
       return res.status(200).json({ campaign_id: campaignId })
     }
     const errorMessage =

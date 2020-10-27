@@ -28,7 +28,6 @@ const isSmsCampaignOwnedByUser = async (
       logger.error({
         message: 'Campaign does not belong to user',
         campaignId,
-        userId,
         action: 'isSmsCampaignOwnedByUser',
       })
       return res.sendStatus(403)
@@ -85,7 +84,6 @@ const getCredentialsFromLabel = async (
     if (!userCred) {
       logger.error({
         message: 'User credentials not found',
-        userId,
         label,
         action: 'getCredentialsFromLabel',
       })
@@ -189,12 +187,6 @@ const setCampaignCredential = async (
       throw new Error('Credential does not exist')
     }
     await SmsService.setCampaignCredential(+campaignId, credentialName)
-    logger.info({
-      message: 'Set credential associated to campaign',
-      campaignId,
-      credentialName,
-      action: 'setCampaignCredential',
-    })
     return res.json({ message: 'OK' })
   } catch (err) {
     next(err)
@@ -215,11 +207,6 @@ const getCampaignDetails = async (
   try {
     const { campaignId } = req.params
     const result = await SmsService.getCampaignDetails(+campaignId)
-    logger.info({
-      message: 'Retreived campaign details',
-      campaignId,
-      action: 'getCampaignDetails',
-    })
     return res.json(result)
   } catch (err) {
     return next(err)

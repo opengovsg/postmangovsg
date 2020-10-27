@@ -28,7 +28,6 @@ const isEmailCampaignOwnedByUser = async (
       logger.error({
         message: 'Campaign does not belong to user',
         campaignId,
-        userId,
         action: 'isEmailCampaignOwnedByUser',
       })
       return res.sendStatus(403)
@@ -65,7 +64,6 @@ const validateAndStoreCredentials = async (
     })
     return res.status(400).json({ message: `${err.message}` })
   }
-  logger.info({ message: 'Validated and stored credentials', ...logMeta })
   return res.json({ message: 'OK' })
 }
 
@@ -83,11 +81,6 @@ const getCampaignDetails = async (
   try {
     const { campaignId } = req.params
     const result = await EmailService.getCampaignDetails(+campaignId)
-    logger.info({
-      message: 'Retreived campaign details',
-      campaignId,
-      action: 'getCampaignDetails',
-    })
     return res.json(result)
   } catch (err) {
     return next(err)
@@ -233,12 +226,6 @@ const storeFromAddress = async (
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
   if (from === defaultEmail) {
-    logger.info({
-      message: "Stored verified 'from' email address",
-      from,
-      defaultEmail,
-      action: 'storeFromAddress',
-    })
     return res.sendStatus(200)
   }
   const { fromName, from: fromAddress } = res.locals
@@ -248,14 +235,6 @@ const storeFromAddress = async (
   } catch (err) {
     return next(err)
   }
-  logger.info({
-    message: "Stored verified 'from' email address",
-    from,
-    defaultEmail,
-    fromAddress,
-    fromName,
-    action: 'storeFromAddress',
-  })
   return res.status(200).json({ email: from })
 }
 
@@ -281,12 +260,6 @@ const getCustomFromAddress = async (
     return next(err)
   }
 
-  logger.info({
-    message: "Verified custom 'from' email address",
-    email,
-    defaultEmail,
-    action: 'getCustomFromAddress',
-  })
   return res.status(200).json({ from: result })
 }
 
@@ -302,7 +275,7 @@ const sendValidationMessage = async (
   try {
     await CustomDomainService.sendValidationMessage(recipient, from)
   } catch (err) {
-    logger.info({
+    logger.error({
       message:
         "Failed to send validation email from the specified 'from' email address",
       recipient,

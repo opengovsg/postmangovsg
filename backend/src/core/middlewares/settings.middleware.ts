@@ -16,14 +16,9 @@ const getUserSettings = async (
   try {
     const userId = req.session?.user?.id
     const userSettings = await CredentialService.getUserSettings(userId)
-    const logMeta = { id: userId, action: 'getUserSettings' }
     if (!userSettings) {
       throw new Error('User not found')
     }
-    logger.info({
-      message: 'Successfully retreived user settings',
-      ...logMeta,
-    })
     res.json({ has_api_key: userSettings.hasApiKey, creds: userSettings.creds })
   } catch (err) {
     next(err)
@@ -49,7 +44,6 @@ const checkUserCredentialLabel = async (
     if (result) {
       logger.error({
         message: errorMessage,
-        id: userId,
         label,
         action: 'checkUserCredentialLabel',
       })
@@ -76,7 +70,6 @@ const storeUserCredential = async (
   const userId = req.session?.user?.id
   const { credentialName, channelType } = res.locals
   const logMeta = {
-    id: userId,
     action: 'storeUserCredential',
     credentialName,
     channelType,
@@ -92,7 +85,7 @@ const storeUserCredential = async (
       credentialName,
       +userId
     )
-    logger.info({ message: 'Successfully stored user credential', ...logMeta })
+    logger.info({ message: 'Stored user credential', ...logMeta })
     return res.json({ message: 'OK' })
   } catch (e) {
     next(e)
@@ -147,7 +140,7 @@ const deleteUserCredential = async (
     const { label } = req.body
     const userId = req.session?.user?.id
     const count = await CredentialService.deleteUserCredential(+userId, label)
-    const logMeta = { id: userId, label, action: 'deleteUserCredential' }
+    const logMeta = { label, action: 'deleteUserCredential' }
     if (count) {
       logger.info({ message: 'User credential deleted', ...logMeta })
       return res.json({ message: 'OK' })
@@ -176,7 +169,6 @@ const regenerateApiKey = async (
     const apiKey = await CredentialService.regenerateApiKey(+userId)
     logger.info({
       message: 'Generate api key for user',
-      id: userId,
       action: 'Credential not found',
     })
     return res.json({ api_key: apiKey })
