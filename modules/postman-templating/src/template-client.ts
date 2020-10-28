@@ -9,6 +9,7 @@ import mustache from 'mustache'
 export class TemplateClient {
   xssOptions: xss.IFilterXSSOptions
   lineBreak: string
+  allowedImageSources?: Array<string>
 
   constructor({
     xssOptions,
@@ -21,27 +22,14 @@ export class TemplateClient {
   }) {
     this.xssOptions = xssOptions || {}
     this.lineBreak = lineBreak || '<br />'
+    this.allowedImageSources = allowedImageSources?.filter((source) => source)
 
-    if (allowedImageSources) {
-      this.validateImageSources(allowedImageSources)
-      this.xssOptions = filterImageSources(this.xssOptions, allowedImageSources)
+    if (this.allowedImageSources && this.allowedImageSources.length > 0) {
+      this.xssOptions = filterImageSources(
+        this.xssOptions,
+        this.allowedImageSources
+      )
     }
-  }
-
-  /**
-   * Validate image sources
-   * @param sources
-   */
-  validateImageSources(sources: Array<string>): void {
-    // If specified, allowedImageSources should at least have one value. If no image sources should be allowed,
-    // it should be achieved through the whitelist instead.
-    if (sources.length < 1) {
-      throw new Error('allowedImageSrcs cannot be empty.')
-    }
-
-    sources.forEach((src, i) => {
-      if (!src) throw new Error(`Invalid source at index ${i}`)
-    })
   }
 
   /**
