@@ -145,12 +145,6 @@ const uploadCompleteHandler = async (
           })
         ).catch((e) => {
           transaction.rollback()
-          logger.error({
-            message: 'Failed to process S3 file',
-            s3Key,
-            error: e,
-            ...logMeta,
-          })
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
