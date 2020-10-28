@@ -5,12 +5,13 @@ import {
   XSS_EMAIL_OPTION,
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
+  filterImageSources,
 } from '../src/xss-options'
 
 describe('template', () => {
   let templateClient: TemplateClient
   beforeAll(() => {
-    templateClient = new TemplateClient()
+    templateClient = new TemplateClient({})
   })
   describe('basic', () => {
     test('no params', () => {
@@ -137,7 +138,9 @@ describe('template', () => {
 
   describe('xss', () => {
     describe('email', () => {
-      const client: TemplateClient = new TemplateClient(XSS_EMAIL_OPTION)
+      const client: TemplateClient = new TemplateClient({
+        xssOptions: XSS_EMAIL_OPTION,
+      })
 
       test('email template should allow b, i, u, br, a, img tags', () => {
         const body =
@@ -167,7 +170,9 @@ describe('template', () => {
       })
     })
     describe('sms', () => {
-      const client: TemplateClient = new TemplateClient(XSS_SMS_OPTION)
+      const client: TemplateClient = new TemplateClient({
+        xssOptions: XSS_SMS_OPTION,
+      })
 
       test('sms template should not allow any html tags except br', () => {
         const body =
@@ -187,10 +192,10 @@ describe('template', () => {
       })
     })
     describe('telegram', () => {
-      const client: TemplateClient = new TemplateClient(
-        XSS_TELEGRAM_OPTION,
-        '\n'
-      )
+      const client: TemplateClient = new TemplateClient({
+        xssOptions: XSS_TELEGRAM_OPTION,
+        lineBreak: '\n',
+      })
       test('Telegram should support b i u s strike del p code pre a', () => {
         const body =
           '<b>bold</b>' +
@@ -233,7 +238,9 @@ describe('template', () => {
 
 describe('replaceNewLinesAndSanitize', () => {
   describe('email', () => {
-    const client: TemplateClient = new TemplateClient(XSS_EMAIL_OPTION)
+    const client: TemplateClient = new TemplateClient({
+      xssOptions: XSS_EMAIL_OPTION,
+    })
 
     test('Should not sanitize keyword in a href', () => {
       const body = '<a href="{{protectedlink}}">link</a>'
@@ -253,11 +260,37 @@ describe('replaceNewLinesAndSanitize', () => {
   })
 
   describe('telegram', () => {
-    const client: TemplateClient = new TemplateClient(XSS_TELEGRAM_OPTION)
+    const client: TemplateClient = new TemplateClient({
+      xssOptions: XSS_TELEGRAM_OPTION,
+    })
 
     test('Should not sanitize tg:// telegram links', () => {
       const body = '<a href="tg://join?invite=">link</a>'
       expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
     })
+
+    test('Should not sanitize keyword in a href', () => {
+      const body = '<a href="{{link}}">link</a>'
+      expect(client.replaceNewLinesAndSanitize(body)).toEqual(body)
+    })
+  })
+})
+
+describe('filterXSS', () => {
+  const xssOptions = filterImageSources({}, ['valid.com', 'valid2.com'])
+  const templateClient: TemplateClient = new TemplateClient({ xssOptions })
+
+  test('should not throw an error if image source is valid', () => {
+    const body = '<img src="https://valid.com/image.jpg" />'
+    expect(() => {
+      templateClient.template(body, {})
+    }).not.toThrow()
+  })
+
+  test('should throw an error if image source is not valid', () => {
+    const body = '<img src="https://invalid.com/image.jpg" />'
+    expect(() => {
+      templateClient.template(body, {})
+    }).toThrow(TemplateError)
   })
 })

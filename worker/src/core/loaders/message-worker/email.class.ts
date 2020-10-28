@@ -9,8 +9,9 @@ import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
+const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 const logger = loggerWithLabel(module)
-const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
+
 class Email {
   private workerId: string
   private connection: Sequelize

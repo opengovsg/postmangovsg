@@ -10,7 +10,7 @@ import { loggerWithLabel } from '@core/logger'
 const logger = loggerWithLabel(module)
 const PROTECTED_URL = config.get('protectedUrl')
 const PROTECT_METHOD_VERSION = 1
-const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
+const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 /**
  * Whether a campaign is protected or not
  */

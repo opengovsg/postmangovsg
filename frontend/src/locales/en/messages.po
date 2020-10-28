@@ -57,6 +57,10 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
+#: src/config.ts:44
+msgid "allowedImageSources"
+msgstr "file.go.gov.sg"
+
 #: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:71
 #: src/config.ts:42
 msgid "defaultMailFrom"
@@ -66,7 +70,7 @@ msgstr "donotreply@mail.postman.gov.sg"
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
 
-#: src/classes/EmailCampaign.ts:51
+#: src/classes/EmailCampaign.ts:50
 msgid "errors.email.blacklist"
 msgstr "Blacklisted: Your email will not be delivered to this recipient because Postman.gov.sg has determined that this recipient is not valid and might not exist."
 
@@ -86,11 +90,11 @@ msgstr "Error: Incorrect email formatting. Please check for typos, spaces, and s
 msgid "errors.email.softBounce"
 msgstr "Soft bounce: The email inbox might be full or the recipient might have an out-of-office message."
 
-#: src/classes/SMSCampaign.ts:44
+#: src/classes/SMSCampaign.ts:45
 msgid "errors.sms.invalidFormat"
 msgstr "Error: Incorrect phone number format. Please check for typos, spaces, and symbols and amend this phone number."
 
-#: src/classes/SMSCampaign.ts:41
+#: src/classes/SMSCampaign.ts:42
 msgid "errors.sms.invalidPhoneNumber"
 msgstr "Invalid phone number in the recipient column."
 

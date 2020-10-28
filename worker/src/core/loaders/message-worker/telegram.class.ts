@@ -7,9 +7,8 @@ import { loggerWithLabel } from '@core/logger'
 import TelegramClient from '@telegram/services/telegram-client.class'
 import { CredentialService } from '@core/services/credential.service'
 
+const templateClient = new TemplateClient({ xssOptions: XSS_TELEGRAM_OPTION })
 const logger = loggerWithLabel(module)
-const templateClient = new TemplateClient(XSS_TELEGRAM_OPTION)
-
 class Telegram {
   private workerId: string
   private connection: Sequelize
