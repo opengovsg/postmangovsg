@@ -1,17 +1,26 @@
 import AWS from 'aws-sdk'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
 import { TelegramCredentials } from '@telegram/interfaces'
 import { get } from 'lodash'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 
+const logger = loggerWithLabel(module)
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 
 const getCredentialsFromSecretsManager = async (name: string): Promise<any> => {
-  logger.info('Getting secret from AWS secrets manager.')
+  logger.info({
+    message: 'Getting secret from AWS secrets manager.',
+    name,
+    action: getCredentialsFromSecretsManager,
+  })
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
-  logger.info('Gotten secret from AWS secrets manager.')
+  logger.info({
+    message: 'Retreived secret from AWS secrets manager.',
+    name,
+    action: getCredentialsFromSecretsManager,
+  })
   const secretString = get(data, 'SecretString', '')
   if (!secretString)
     throw new Error('Missing secret string from AWS secrets manager.')

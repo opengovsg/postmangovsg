@@ -5,9 +5,12 @@ import config from './config'
 import { PgDump, SecretsManagerDump } from './dumps'
 import Encryptor from './encryptor'
 import Backup from './backup'
+import {Logger} from './utils/logger'
 
 import { EncryptionConfig, DatabaseConfig } from './interfaces'
 import { parseRdsEvents, RDS_EVENTS } from './utils/event'
+
+const logger = new Logger('db-backup')
 
 Sentry.init({
   dsn: config.get('sentryDsn'),
@@ -43,7 +46,7 @@ const handler = async (event: any) => {
         })
         const backupLocation = await backup.upload()
 
-        console.log(`Database backup uploaded to ${backupLocation}`)
+        logger.log(`Database backup uploaded to ${backupLocation}`)
       }
     }
     return { statusCode: 200 }
