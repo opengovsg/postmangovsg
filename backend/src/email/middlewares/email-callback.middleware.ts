@@ -31,7 +31,6 @@ const parseEvent = async (
 ): Promise<Response | void> => {
   try {
     await EmailCallbackService.parseEvent(req)
-    logger.info({ message: 'Successfully parsed event', action: 'parseEvent' })
     return res.sendStatus(200)
   } catch (err) {
     next(err)
