@@ -214,11 +214,6 @@ const isTelegramCampaignOwnedByUser = async (
     if (campaign) {
       return next()
     } else {
-      logger.error({
-        message: 'Campaign does not belong to user',
-        campaignId,
-        action: 'isTelegramCampaignOwnedByUser',
-      })
       return res.sendStatus(403)
     }
   } catch (err) {

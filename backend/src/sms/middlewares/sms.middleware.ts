@@ -25,11 +25,6 @@ const isSmsCampaignOwnedByUser = async (
     if (campaign) {
       return next()
     } else {
-      logger.error({
-        message: 'Campaign does not belong to user',
-        campaignId,
-        action: 'isSmsCampaignOwnedByUser',
-      })
       return res.sendStatus(403)
     }
   } catch (err) {

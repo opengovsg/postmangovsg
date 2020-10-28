@@ -25,11 +25,6 @@ const isEmailCampaignOwnedByUser = async (
     if (campaign) {
       return next()
     } else {
-      logger.error({
-        message: 'Campaign does not belong to user',
-        campaignId,
-        action: 'isEmailCampaignOwnedByUser',
-      })
       return res.sendStatus(403)
     }
   } catch (err) {
