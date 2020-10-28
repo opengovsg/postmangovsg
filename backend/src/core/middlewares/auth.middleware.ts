@@ -37,11 +37,6 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
     })
     return res.sendStatus(500)
   }
-
-  logger.info({
-    message: 'Login OTP sent successfully',
-    ...logMeta,
-  })
   return res.sendStatus(200)
 }
 
@@ -72,10 +67,6 @@ const verifyOtp = async (
         updatedAt: user.updatedAt,
         email: user.email,
       }
-      logger.info({
-        message: 'User session saved successfully',
-        ...logMeta,
-      })
       return res.sendStatus(200)
     }
     logger.error({ message: 'Session object not found!', ...logMeta })
