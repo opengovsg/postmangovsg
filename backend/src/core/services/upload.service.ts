@@ -164,6 +164,11 @@ const getCsvStatus = async (
   ) {
     isCsvProcessing = false
     error = 'Csv processing timeout. Please contact us if this persists.'
+    logger.info({
+      message: error,
+      campaignId,
+      action: 'getCsvStatus',
+    })
     await storeS3Error(campaignId, error)
   }
   return {
