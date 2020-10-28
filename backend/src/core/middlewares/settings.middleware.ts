@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 
 /*
  * Retrieves API key and stored credentials of the user
@@ -37,10 +40,14 @@ const checkUserCredentialLabel = async (
     const userId = req.session?.user?.id
     const { label } = req.body
     const result = await CredentialService.getUserCredential(userId, label)
+    const errorMessage = 'User credential with the same label already exists.'
     if (result) {
-      return res.status(400).json({
-        message: 'User credential with the same label already exists.',
+      logger.error({
+        message: errorMessage,
+        label,
+        action: 'checkUserCredentialLabel',
       })
+      return res.status(400).json({ message: errorMessage })
     }
     next()
   } catch (e) {
@@ -62,9 +69,15 @@ const storeUserCredential = async (
   const { label } = req.body
   const userId = req.session?.user?.id
   const { credentialName, channelType } = res.locals
+  const logMeta = {
+    action: 'storeUserCredential',
+    credentialName,
+    channelType,
+  }
   try {
     if (!credentialName || !channelType) {
-      throw new Error('Credential or credential type does not exist')
+      const errorMessage = 'Credential or credential type does not exist'
+      throw new Error(errorMessage)
     }
     await CredentialService.createUserCredential(
       label,
@@ -72,6 +85,7 @@ const storeUserCredential = async (
       credentialName,
       +userId
     )
+    logger.info({ message: 'Stored user credential', ...logMeta })
     return res.json({ message: 'OK' })
   } catch (e) {
     next(e)
@@ -113,7 +127,7 @@ const checkAndStoreLabelIfExists = async (
 }
 
 /**
- * Get only labels for SMS credentials for that user
+ * Get only labels for SMS and Telegram credentials for that user
  * @param req
  * @param res
  * @param next
@@ -141,6 +155,10 @@ const getChannelSpecificCredentials = async (
     }
     return res.json(result)
   } catch (e) {
+    logger.error({
+      message: `${e.stack}`,
+      action: 'getChannelSpecificCredentials',
+    })
     return res.status(400).json({ message: `${e.message}` })
   }
 }
@@ -160,9 +178,12 @@ const deleteUserCredential = async (
     const { label } = req.body
     const userId = req.session?.user?.id
     const count = await CredentialService.deleteUserCredential(+userId, label)
+    const logMeta = { label, action: 'deleteUserCredential' }
     if (count) {
+      logger.info({ message: 'User credential deleted', ...logMeta })
       return res.json({ message: 'OK' })
     } else {
+      logger.error({ message: 'Credential not found', ...logMeta })
       res.status(400).json({ message: 'Credential not found' })
     }
   } catch (e) {
@@ -184,6 +205,10 @@ const regenerateApiKey = async (
   try {
     const userId = req.session?.user?.id
     const apiKey = await CredentialService.regenerateApiKey(+userId)
+    logger.info({
+      message: 'Generate api key for user',
+      action: 'Credential not found',
+    })
     return res.json({ api_key: apiKey })
   } catch (e) {
     next(e)

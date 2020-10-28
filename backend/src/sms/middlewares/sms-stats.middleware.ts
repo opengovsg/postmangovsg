@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import { SmsStatsService } from '@sms/services'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
+
 /**
  * Gets stats for sms campaign
  * @param req
@@ -35,6 +39,11 @@ const updateAndGetStats = async (
   try {
     await SmsStatsService.refreshStats(+campaignId)
     const stats = await SmsStatsService.getStats(+campaignId)
+    logger.info({
+      message: 'Refresh and retreived sms stats',
+      campaignId,
+      action: 'updateAndGetStats',
+    })
     return res.json(stats)
   } catch (err) {
     next(err)

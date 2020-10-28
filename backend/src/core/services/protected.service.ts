@@ -3,10 +3,11 @@ import { difference } from 'lodash'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
 import { ProtectedMessage, Campaign } from '@core/models'
-import logger from '@core/logger'
 import config from '@core/config'
 import { CSVParams } from '@core/types'
+import { loggerWithLabel } from '@core/logger'
 
+const logger = loggerWithLabel(module)
 const PROTECTED_URL = config.get('protectedUrl')
 const PROTECT_METHOD_VERSION = 1
 const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
@@ -95,9 +96,12 @@ const storeProtectedMessages = async ({
     transaction,
     logging: (_message, benchmark) => {
       if (benchmark) {
-        logger.info(
-          `uploadProtectedCompleteOnChunk - ProtectedMessage: ElapsedTime ${benchmark} ms`
-        )
+        logger.info({
+          message:
+            'uploadProtectedCompleteOnChunk - ElapsedTime for ProtectedMessage in ms',
+          benchmark,
+          action: 'storeProtectedMessages',
+        })
       }
     },
     benchmark: true,

@@ -1,7 +1,10 @@
 import Papa, { ParseResult } from 'papaparse'
 import { RecipientColumnMissing, UserError } from '@core/errors/s3.errors'
-import logger from '@core/logger'
 import { CSVParams } from '@core/types'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
+
 /**
  * This chunk size was intentionally chosen to be larger than a typical file because multiple inserts to the db slows the process down.
  * For a typical upload, the file will not be chunked.
@@ -85,11 +88,17 @@ const parseAndProcessCsv = async (
           }
           parser.resume()
         } catch (error) {
+          logger.error({
+            message: 'Failed to chunk data',
+            error,
+            action: 'parseAndProcessCsv.chunk',
+          })
           reject(error)
           parser.abort()
         }
       },
       complete: async (rows: ParseResult<any>) => {
+        const logMeta = { action: 'parseAndProcessCsv.complete' }
         const { meta } = rows
         if (!meta.aborted) {
           try {
@@ -106,12 +115,13 @@ const parseAndProcessCsv = async (
               )
             }
             await onComplete(numRecords)
-            logger.info({ message: 'Parsing complete' })
+            logger.info({ message: 'Parsing complete', ...logMeta })
           } catch (err) {
+            logger.error({ message: 'Parsing failed', error: err, ...logMeta })
             reject(err)
           }
         } else {
-          logger.info({ message: 'Parsing aborted' })
+          logger.info({ message: 'Parsing aborted', ...logMeta })
         }
         resolve()
       },

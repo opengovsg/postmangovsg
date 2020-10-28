@@ -1,12 +1,14 @@
 import fs from 'fs'
 import { Sequelize } from 'sequelize-typescript'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
 import { sqlFilePaths } from '@core/resources/sql'
 import { sqlFilePaths as emailSqlFilePaths } from '@email/resources/sql'
 import { sqlFilePaths as smsSqlFilePaths } from '@sms/resources/sql'
 import { sqlFilePaths as telegramSqlFilePaths } from '@telegram/resources/sql'
+
+const logger = loggerWithLabel(module)
 
 const scriptLoader = async (): Promise<void> => {
   const dialectOptions =
@@ -47,12 +49,13 @@ const scriptLoader = async (): Promise<void> => {
   })
   return Promise.all(scripts)
     .then(() => {
-      logger.info('Sql scripts loaded')
+      logger.info({ message: 'Sql scripts loaded' })
     })
     .catch((err) => {
-      logger.error(
-        `Could not load sql scripts from ${scriptsFilePaths} \t ${err}`
-      )
+      logger.error({
+        message: `Could not load sql scripts from ${scriptsFilePaths}`,
+        error: err,
+      })
       process.exit(1)
     })
 }
