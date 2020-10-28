@@ -246,11 +246,6 @@ const deleteCsvErrorHandler = async (
   try {
     const { campaignId } = req.params
     await UploadService.deleteS3TempKeys(+campaignId)
-    logger.info({
-      message: 'Deleted csv error and temp filename from db',
-      campaignId,
-      action: 'deleteCsvErrorHandler',
-    })
     res.sendStatus(200)
   } catch (e) {
     next(e)
