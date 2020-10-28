@@ -51,9 +51,7 @@ async function downloadFile(srcFilename: string): Promise<void> {
 async function getLatestBackup(files: Array<File>) {
   // get last three files in list which is in lexicographic order
   // db dump, secrets dump and params json
-  files.slice(-3).forEach(async (file) => {
-    await downloadFile(file.name)
-  })
+  await Promise.all(files.slice(-3).map((file) => downloadFile(file.name)))
 }
 
 async function run(): Promise<void> {
