@@ -120,6 +120,7 @@ const TelegramCredentials = ({
       await validateNewCredentials({
         campaignId: +campaignId,
         ...creds,
+        ...(saveCredentialWithLabel && { label }),
       })
 
       setHasCredential(true)
