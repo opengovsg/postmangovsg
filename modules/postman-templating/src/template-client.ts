@@ -2,16 +2,42 @@ import { mapKeys } from 'lodash'
 import xss from 'xss'
 import { TemplateError } from './errors'
 import { TemplatingConfig, TemplatingConfigDefault } from './interfaces'
+import { filterImageSources } from './xss-options'
 
 import mustache from 'mustache'
 
 export class TemplateClient {
-  xssOptions: xss.IFilterXSSOptions | undefined
+  xssOptions: xss.IFilterXSSOptions
   lineBreak: string
+  allowedImageSources?: Array<string>
 
-  constructor(xssOptions?: xss.IFilterXSSOptions, lineBreak = '<br />') {
-    this.xssOptions = xssOptions
-    this.lineBreak = lineBreak
+  constructor({
+    xssOptions,
+    lineBreak,
+    allowedImageSources,
+  }: {
+    xssOptions?: xss.IFilterXSSOptions
+    lineBreak?: string
+    allowedImageSources?: Array<string>
+  }) {
+    this.xssOptions = xssOptions || {}
+    this.lineBreak = lineBreak || '<br />'
+    const imageSources = allowedImageSources?.filter((source) => source)
+
+    if (imageSources && imageSources.length > 0) {
+      this.xssOptions = filterImageSources(
+        this.xssOptions,
+        imageSources
+      )
+    }
+  }
+
+  /**
+   * Filter XSS
+   * @param value Input to be filtered
+   */
+  filterXSS(value: string): string {
+    return xss.filterXSS(value, this.xssOptions)
   }
 
   /**
@@ -20,10 +46,7 @@ export class TemplateClient {
    * @param value
    */
   replaceNewLinesAndSanitize(value: string): string {
-    return xss.filterXSS(
-      value.replace(/(\n|\r\n)/g, this.lineBreak),
-      this.xssOptions
-    )
+    return this.filterXSS(value.replace(/(\n|\r\n)/g, this.lineBreak))
   }
 
   /**
@@ -136,7 +159,7 @@ export class TemplateClient {
       .join('')
       .replace(/\\([\\'])/g, '$1')
       .replace(/\\n/g, '\n')
-    const filtered = xss.filterXSS(templated, this.xssOptions)
+    const filtered = this.filterXSS(templated)
     return this.postProcessTemplate(filtered, configWithDefaults)
   }
 

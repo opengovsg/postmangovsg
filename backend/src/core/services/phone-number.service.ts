@@ -19,7 +19,9 @@ const normalisePhoneNumber = (
     // If parsing fails with default country code and does not match a Singaporean number format,
     // we retry by prepending a + sign.
     normalised = parsePhoneNumber(`+${phoneNumber}`)
-    if (!normalised.isValid()) throw new Error('Phone number is invalid')
+    if (!normalised.isValid()) {
+      throw new Error('Phone number is invalid')
+    }
   }
 
   return normalised.number.toString()

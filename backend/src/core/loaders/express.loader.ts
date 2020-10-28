@@ -4,12 +4,14 @@ import bodyParser from 'body-parser'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
 import morgan from 'morgan'
 import * as Sentry from '@sentry/node'
+import requestTracer from 'cls-rtracer'
 
 import config from '@core/config'
 import v1Router from '@core/routes'
-import logger from '@core/logger'
+import { getStream, loggerWithLabel } from '@core/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
+const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
 
 /**
@@ -29,8 +31,22 @@ morgan.token('user-id', userId)
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
-  stream: logger.stream,
+  stream: getStream(),
 })
+
+const requestTracerMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const customRequestTracerMiddleware = requestTracer.expressMiddleware({
+    requestIdFactory: () => ({
+      ip: clientIp(req, res),
+      userId: userId(req, res),
+    }),
+  })
+  customRequestTracerMiddleware(req, res, next)
+}
 
 const sentrySessionMiddleware = (
   req: Request,
@@ -72,6 +88,7 @@ const overrideContentTypeHeaderMiddleware = (
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
   app.use(loggerMiddleware)
+  app.use(requestTracerMiddleware)
 
   app.use(overrideContentTypeHeaderMiddleware)
   app.use(bodyParser.json())
@@ -116,7 +133,10 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       res: express.Response,
       _next: express.NextFunction
     ) => {
-      logger.error(`${JSON.stringify(err.stack, null, 4)}`)
+      logger.error({
+        message: 'Unexpected error occured',
+        error: err,
+      })
       return res.sendStatus(500)
     }
   )

@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 
 import { CampaignService, UnsubscriberService } from '@core/services'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Validate and check if params for unsubscribe request are valid
@@ -13,10 +16,15 @@ const isUnsubscribeRequestValid = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  try {
-    const { campaignId, recipient } = req.params
-    const { v: version, h: hash } = req.body
+  const { campaignId, recipient } = req.params
+  const { v: version, h: hash } = req.body
+  const logMeta = {
+    campaignId,
+    recipient,
+    action: 'isUnsubscribeRequestValid',
+  }
 
+  try {
     UnsubscriberService.validateHash({
       campaignId: +campaignId,
       recipient,
@@ -36,6 +44,7 @@ const isUnsubscribeRequestValid = async (
 
     next()
   } catch (err) {
+    logger.error({ message: 'Invalid unsubscribe request', ...logMeta })
     return res.status(400).json({
       message: 'Invalid unsubscribe request',
     })

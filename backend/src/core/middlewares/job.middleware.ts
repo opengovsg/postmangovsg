@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { JobService } from '@core/services'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 
 /**
  * If the campaign has an associated credential, a template and valid csv uploaded,
@@ -16,16 +19,22 @@ const sendCampaign = async (
   try {
     const { campaignId } = req.params
     const { rate } = req.body
+    const logMeta = { action: 'sendCampaign', campaignId }
+
     if (await JobService.canSendCampaign(+campaignId)) {
       const jobIds = await JobService.sendCampaign({
         campaignId: +campaignId,
         rate: +rate,
       })
+      logger.info({ message: 'Sending campaign', jobIds, ...logMeta })
       return res.status(200).json({ campaign_id: campaignId, job_id: jobIds })
     }
+
+    const errorMessage =
+      'Unable to send campaign due to invalid template, recipients, missing credentials, or campaign has been forcibly halted.'
+    logger.error({ message: errorMessage, ...logMeta })
     return res.status(400).json({
-      message:
-        'Unable to send campaign due to invalid template, recipients, missing credentials, or campaign has been forcibly halted.',
+      message: errorMessage,
     })
   } catch (err) {
     return next(err)
@@ -46,6 +55,11 @@ const stopCampaign = async (
   try {
     const { campaignId } = req.params
     await JobService.stopCampaign(+campaignId)
+    logger.info({
+      message: 'Stopped campaign',
+      campaignId,
+      action: 'stopCampaign',
+    })
     return res.status(200).json({ campaign_id: campaignId })
   } catch (err) {
     return next(err)
@@ -65,13 +79,17 @@ const retryCampaign = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
+    const logMeta = { campaignId, action: 'retryCampaign' }
     if (await JobService.canSendCampaign(+campaignId)) {
       await JobService.retryCampaign(+campaignId)
+      logger.info({ message: 'Retry campaign', ...logMeta })
       return res.status(200).json({ campaign_id: campaignId })
     }
+    const errorMessage =
+      'Unable to send campaign due to invalid template, recipients, missing credentials, or campaign has been forcibly halted.'
+    logger.error({ message: errorMessage, ...logMeta })
     return res.status(400).json({
-      message:
-        'Unable to send campaign due to invalid template, recipients, missing credentials, or campaign has been forcibly halted.',
+      message: errorMessage,
     })
   } catch (err) {
     return next(err)

@@ -1,6 +1,5 @@
 import { difference, keys } from 'lodash'
 
-import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
@@ -9,7 +8,7 @@ import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
-const client = new TemplateClient(XSS_EMAIL_OPTION)
+const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,
@@ -137,7 +136,6 @@ const checkNewTemplateParams = async ({
         firstRecord.params as { [key: string]: string }
       )
     } catch (err) {
-      logger.error(`Hydration error: ${err.stack}`)
       throw new HydrationError()
     }
     // set campaign.valid to true since templating suceeded AND file has been uploaded

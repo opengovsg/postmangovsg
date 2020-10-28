@@ -77,11 +77,6 @@ const config = convict({
       default: null,
       env: 'AWS_ENDPOINT',
     },
-    backupBucket: {
-      doc: 'Name of the S3 bucket to store backups to',
-      default: 'postmangovsg-rds-backup-production',
-      env: 'BACKUP_BUCKET_NAME',
-    },
   },
   encryption: {
     algorithm: {
@@ -104,6 +99,23 @@ const config = convict({
       env: 'KEY_ENCRYPTION_PUBLIC_KEY',
     },
   },
+  gcp: {
+    appCredentials: {
+      doc: 'Path to GCP service account credentials key file',
+      default: '',
+      env: 'GOOGLE_APPLICATION_CREDENTIALS',
+    },
+    backupBucket: {
+      doc: 'Name of the S3 bucket to store backups to',
+      default: 'ogp-postman-production',
+      env: 'BACKUP_BUCKET_NAME',
+    },
+    secretName: {
+      doc: 'Name of secret holding GCP credentials in SecretManager',
+      default: 'BackupGcpCredentials-production',
+      env: 'GCP_SECRET_NAME',
+    },
+  },
   sentryDsn: {
     doc: 'Sentry DSN for serverless',
     default: '',
@@ -114,15 +126,16 @@ const config = convict({
 switch (config.get('env')) {
   case 'staging':
     config.load({
-      aws: {
-        backupBucket: 'postmangovsg-rds-backup-staging',
+      gcp: {
+        backupBucket: 'ogp-postman-staging',
+        secretName: 'BackupGcpCredentials-staging',
       },
     })
     break
   case 'development':
     config.load({
-      aws: {
-        backupBucket: 'postmangovsg-rds-backup-dev',
+      gcp: {
+        secretName: 'BackupGcpCredentials-development',
       },
       database: {
         ssl: {
