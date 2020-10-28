@@ -22,12 +22,12 @@ export class TemplateClient {
   }) {
     this.xssOptions = xssOptions || {}
     this.lineBreak = lineBreak || '<br />'
-    this.allowedImageSources = allowedImageSources?.filter((source) => source)
+    const imageSources = allowedImageSources?.filter((source) => source)
 
-    if (this.allowedImageSources && this.allowedImageSources.length > 0) {
+    if (imageSources && imageSources.length > 0) {
       this.xssOptions = filterImageSources(
         this.xssOptions,
-        this.allowedImageSources
+        imageSources
       )
     }
   }

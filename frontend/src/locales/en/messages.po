@@ -57,7 +57,7 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: src/config.ts:43
+#: src/config.ts:44
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
