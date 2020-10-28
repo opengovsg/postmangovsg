@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
+import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
+
+const logger = loggerWithLabel(module)
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -58,6 +61,11 @@ const createCampaign = async (
       userId,
       protect,
     })
+    logger.info({
+      message: 'Successfully created new campaign',
+      campaignId: campaign.id,
+      action: 'createCampaign',
+    })
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
@@ -81,9 +89,9 @@ const listCampaigns = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
+  const { offset, limit } = req.query
+  const userId = req.session?.user?.id
   try {
-    const { offset, limit } = req.query
-    const userId = req.session?.user?.id
     const { rows, count } = await CampaignService.listCampaigns({
       offset,
       limit,

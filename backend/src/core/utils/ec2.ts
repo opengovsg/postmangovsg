@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
 import axios, { AxiosResponse } from 'axios'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Gets metadata for ec2 instance
@@ -28,10 +31,12 @@ const getInstanceId = async (): Promise<string | void> => {
     const resp = await queryAwsMetadata()
     return resp.data
   } catch (err) {
-    console.log(err)
-    console.log(
-      'Unable to retrieve instanceId, is this running in an EC2 instance?'
-    )
+    logger.error({
+      message:
+        'Unable to retrieve instanceId, is this running in an EC2 instance?',
+      error: err,
+      action: 'getInstanceId',
+    })
   }
 }
 

@@ -1,10 +1,12 @@
 import { QueryTypes } from 'sequelize'
 
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { StatsService } from '@core/services'
 import { CampaignStats, CampaignRecipient } from '@core/interfaces'
 
 import { EmailOp, EmailMessage } from '@email/models'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Gets stats for email project
@@ -19,7 +21,11 @@ const getStats = (campaignId: number): Promise<CampaignStats> => {
  * @param campaignId
  */
 const refreshStats = async (campaignId: number): Promise<void> => {
-  logger.info(`updateStats invoked for campaign ${campaignId}`)
+  logger.info({
+    message: 'Refresh stats for campaign',
+    campaignId,
+    action: 'refreshStats',
+  })
 
   await EmailMessage.sequelize?.query(
     'SELECT update_stats_email(:campaign_id)',

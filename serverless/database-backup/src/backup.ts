@@ -1,15 +1,10 @@
+import { Readable } from 'stream'
 import path from 'path'
-import AWS from 'aws-sdk'
 
 import config from './config'
 import Encryptor from './encryptor'
 import { PgDump, SecretsManagerDump } from './dumps'
-import { configureEndpoint } from './utils/aws-endpoint'
-
-const S3 = new AWS.S3({
-  ...configureEndpoint(config),
-  computeChecksums: true,
-})
+import { getStorage } from './utils/gcs'
 
 class Backup {
   pgDump: PgDump
@@ -27,66 +22,106 @@ class Backup {
     this.secretsDump = secretsDump
   }
 
-  async upload(): Promise<string> {
+  private async createGcsUploadStream(
+    location: string
+  ): Promise<NodeJS.WritableStream> {
+    const storage = await getStorage()
+
+    const bucket = storage.bucket(config.get('gcp.backupBucket'))
+    const file = bucket.file(location)
+    return file.createWriteStream({ gzip: 'auto', validation: true })
+  }
+
+  private async uploadPgDump(
+    folder: string
+  ): Promise<{ filename: string; authTag: string | undefined }> {
     const { database } = this.pgDump
-    const bucket = config.get('aws.backupBucket')
+
+    const data = await this.pgDump.run()
+    const filepath = `${database}.dump`
+    const upload = await this.createGcsUploadStream(path.join(folder, filepath))
+
+    await new Promise((resolve, reject) => {
+      this.pgDump.on('error', (err: Error) => reject(err))
+      this.encryptor.on('error', (err: Error) => reject(err))
+
+      this.encryptor
+        .encrypt(data)
+        .pipe(upload)
+        .on('finish', () => resolve())
+        .on('error', (err: Error) => reject(err))
+    })
+
+    const authTag = this.encryptor.authTag
+    return {
+      filename: filepath,
+      authTag: authTag?.toString('base64'),
+    }
+  }
+
+  private async uploadSecretsDump(
+    folder: string
+  ): Promise<{ filename: string; authTag: string | undefined }> {
+    const data = await this.secretsDump.run()
+    const filepath = 'secrets.dump'
+    const upload = await this.createGcsUploadStream(path.join(folder, filepath))
+
+    await new Promise((resolve, reject) => {
+      this.encryptor.on('error', (err: Error) => reject(err))
+
+      this.encryptor
+        .encrypt(data)
+        .pipe(upload)
+        .on('finish', () => resolve())
+        .on('error', (err: Error) => reject(err))
+    })
+
+    const authTag = this.encryptor.authTag
+    return {
+      filename: filepath,
+      authTag: authTag?.toString('base64'),
+    }
+  }
+
+  private async uploadEncryptionParams(
+    folder: string,
+    params: any
+  ): Promise<void> {
+    const { database } = this.pgDump
+
+    const filepath = path.join(folder, `${database}.json`)
+    const upload = await this.createGcsUploadStream(filepath)
+
+    await new Promise((resolve, reject) => {
+      const inputStream = Readable.from(JSON.stringify(params))
+
+      inputStream
+        .pipe(upload)
+        .on('finish', () => resolve())
+        .on('error', (err: Error) => reject(err))
+    })
+  }
+
+  async upload(): Promise<string> {
+    const bucket = config.get('gcp.backupBucket')
     const folder = new Date().toISOString().substring(0, 10)
 
     const dumpParams = []
 
-    const pgDumpBody = await this.pgDump.run()
-    const pgDumpFilename = `${database}.dump`
-    await new Promise((resolve, reject) => {
-      const params = {
-        Bucket: bucket,
-        Key: path.join(folder, pgDumpFilename),
-        Body: this.encryptor.encrypt(pgDumpBody),
-      }
-      this.pgDump.on('error', (err: Error) => reject(err))
-      this.encryptor.on('error', (err: Error) => reject(err))
+    const pgDumpParams = await this.uploadPgDump(folder)
+    dumpParams.push(pgDumpParams)
 
-      S3.upload(params, (err: Error) => {
-        if (err) reject(err)
-        resolve()
-      })
-    })
-    const pgDumpAuthTag = this.encryptor.authTag
-    dumpParams.push({
-      filename: pgDumpFilename,
-      authTag: pgDumpAuthTag?.toString('base64'),
-    })
+    const secretsDumpParams = await this.uploadSecretsDump(folder)
+    dumpParams.push(secretsDumpParams)
 
-    const secretsDumpBody = await this.secretsDump.run()
-    const secretsDumpFilename = 'secrets.dump'
-    await new Promise((resolve, reject) => {
-      const params = {
-        Bucket: bucket,
-        Key: path.join(folder, secretsDumpFilename),
-        Body: this.encryptor.encrypt(secretsDumpBody),
-      }
-      this.encryptor.on('error', (err: Error) => reject(err))
-
-      S3.upload(params, (err: Error) => {
-        if (err) reject(err)
-        resolve()
-      })
-    })
-    const secretsDumpAuthTag = this.encryptor.authTag
-    dumpParams.push({
-      filename: secretsDumpFilename,
-      authTag: secretsDumpAuthTag?.toString('base64'),
-    })
-
-    // We need to wait for upload to complete before authTag is available when the cipher is finalised.
     const encryptionParams = this.encryptor.getEncryptionParams()
-    const encryptionParamsPath = path.join(folder, `${database}.json`)
-    await S3.upload({
-      Bucket: bucket,
-      Key: encryptionParamsPath,
-      Body: JSON.stringify({ encryption: encryptionParams, dumps: dumpParams }),
-    }).promise()
+    const backupParams = {
+      encryption: encryptionParams,
+      dumps: dumpParams,
+    }
+    await this.uploadEncryptionParams(folder, backupParams)
 
-    return `s3://${bucket}/${folder}/`
+    return `gcs://${bucket}/${folder}/`
   }
 }
 

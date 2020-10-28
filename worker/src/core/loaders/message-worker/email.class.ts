@@ -4,12 +4,14 @@ import map from 'lodash/map'
 import crypto from 'crypto'
 import validator from 'validator'
 
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
+const logger = loggerWithLabel(module)
+
 class Email {
   private workerId: string
   private connection: Sequelize
@@ -40,7 +42,12 @@ class Email {
         )
       })
       .then(() => {
-        logger.info(`${this.workerId}: s_enqueueMessagesEmail job_id=${jobId}`)
+        logger.info({
+          message: 'Enqueued email messages',
+          workerId: this.workerId,
+          jobId,
+          action: 'enqueueMessages',
+        })
       })
   }
 
@@ -181,7 +188,12 @@ class Email {
         )
       })
       .then(() => {
-        logger.info(`${this.workerId}: sendMessage id=${id}`)
+        logger.info({
+          message: 'Sent email message',
+          workerId: this.workerId,
+          id,
+          action: 'sendMessage',
+        })
       })
   }
 
