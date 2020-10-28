@@ -1,6 +1,5 @@
 import { difference, keys } from 'lodash'
 
-import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
@@ -9,7 +8,7 @@ import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
-const client = new TemplateClient(XSS_EMAIL_OPTION)
+const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,
@@ -20,12 +19,8 @@ const upsertEmailTemplate = async ({
   body,
   replyTo,
   campaignId,
-}: {
-  subject: string
-  body: string
-  replyTo: string | null
-  campaignId: number
-}): Promise<EmailTemplate> => {
+  from,
+}: StoreTemplateInput): Promise<EmailTemplate> => {
   let transaction
   try {
     transaction = await EmailTemplate.sequelize?.transaction()
@@ -44,6 +39,7 @@ const upsertEmailTemplate = async ({
           subject,
           body,
           replyTo,
+          from,
         },
         {
           where: { campaignId },
@@ -63,6 +59,7 @@ const upsertEmailTemplate = async ({
         body,
         subject,
         replyTo,
+        from,
       },
       {
         transaction,
@@ -139,7 +136,6 @@ const checkNewTemplateParams = async ({
         firstRecord.params as { [key: string]: string }
       )
     } catch (err) {
-      logger.error(`Hydration error: ${err.stack}`)
       throw new HydrationError()
     }
     // set campaign.valid to true since templating suceeded AND file has been uploaded
@@ -163,6 +159,7 @@ const storeTemplate = async ({
   subject,
   body,
   replyTo,
+  from,
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const updatedTemplate = await upsertEmailTemplate({
@@ -170,6 +167,7 @@ const storeTemplate = async ({
     body: client.replaceNewLinesAndSanitize(body),
     replyTo,
     campaignId,
+    from,
   })
 
   // TODO: this is slow when table is large

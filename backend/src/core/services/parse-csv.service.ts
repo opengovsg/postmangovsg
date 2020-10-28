@@ -1,7 +1,10 @@
 import Papa, { ParseResult } from 'papaparse'
 import { RecipientColumnMissing, UserError } from '@core/errors/s3.errors'
-import logger from '@core/logger'
 import { CSVParams } from '@core/types'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
+
 /**
  * This chunk size was intentionally chosen to be larger than a typical file because multiple inserts to the db slows the process down.
  * For a typical upload, the file will not be chunked.
@@ -66,7 +69,11 @@ const parseAndProcessCsv = async (
           // If there are more or fewer headers than values in a row
           if (errors[0]?.type === 'FieldMismatch') {
             // Ignore other parsing errors https://www.papaparse.com/docs#errors
-            throw new UserError(errors[0].code, errors[0].message)
+            const { code, message, row } = errors[0]
+            throw new UserError(
+              code,
+              `Error: Invalid row detected at line ${row}. ${message}. Please fix the number of fields and try again.`
+            )
           }
 
           // Manually hold a number of rows in a buffer, because the config
@@ -81,11 +88,17 @@ const parseAndProcessCsv = async (
           }
           parser.resume()
         } catch (error) {
+          logger.error({
+            message: 'Failed to chunk data',
+            error,
+            action: 'parseAndProcessCsv.chunk',
+          })
           reject(error)
           parser.abort()
         }
       },
       complete: async (rows: ParseResult<any>) => {
+        const logMeta = { action: 'parseAndProcessCsv.complete' }
         const { meta } = rows
         if (!meta.aborted) {
           try {
@@ -98,16 +111,17 @@ const parseAndProcessCsv = async (
             if (numRecords === 0) {
               throw new UserError(
                 'NoRowsFound',
-                'No rows were found in the uploaded file.'
+                'Error: No rows were found in the uploaded recipient file. Please make sure you uploaded the correct file before sending.'
               )
             }
             await onComplete(numRecords)
-            logger.info({ message: 'Parsing complete' })
+            logger.info({ message: 'Parsing complete', ...logMeta })
           } catch (err) {
+            logger.error({ message: 'Parsing failed', error: err, ...logMeta })
             reject(err)
           }
         } else {
-          logger.info({ message: 'Parsing aborted' })
+          logger.info({ message: 'Parsing aborted', ...logMeta })
         }
         resolve()
       },

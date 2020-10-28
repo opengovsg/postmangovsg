@@ -1,35 +1,30 @@
 import nodemailer from 'nodemailer'
 import directTransport from 'nodemailer-direct-transport'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { MailToSend, MailCredentials } from '@core/interfaces'
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
+const logger = loggerWithLabel(module)
+
 export default class MailClient {
-  private email: string
   private mailer: nodemailer.Transporter
   /**
    * Constructs a node mailer instance if SES credentials are provided; otherwise uses local transport
-   * @param email email address that will be set in the From: field
    * @param credentials
    */
-  constructor(email: string, credentials: MailCredentials) {
+  constructor(credentials: MailCredentials) {
     const { host, port, auth } = credentials
 
-    if (!email)
-      throw new Error(
-        'Missing email from credentials while constructing MailService.'
-      )
-    this.email = email
-
     if (!host) {
-      logger.info('Mailer: Using direct transport')
+      logger.info({ message: 'Mailer: Using direct transport', host, port })
       this.mailer = nodemailer.createTransport(directTransport({ debug: true }))
       return
     }
 
-    if (!port || !auth.user || !auth.pass)
+    if (!port || !auth.user || !auth.pass) {
       throw new Error('Missing credentials while constructing MailService')
+    }
 
-    logger.info('Mailer: Using SMTP transport')
+    logger.info({ message: 'Mailer: Using SMTP transport', host, port })
     this.mailer = nodemailer.createTransport({
       host: host,
       port: +port,
@@ -43,13 +38,15 @@ export default class MailClient {
   public sendMail(input: MailToSend): Promise<string | void> {
     return new Promise<string | void>((resolve, reject) => {
       const options = {
-        from: this.email,
+        from: input.from,
         to: input.recipients,
         subject: input.subject,
         replyTo: input.replyTo,
         html: input.body,
         headers: {},
       }
+      const logMeta = { to: options.to, from: options.from, action: 'sendMail' }
+
       if (input.referenceId !== undefined) {
         // Signature expected by Sendgrid
         // https://sendgrid.com/docs/for-developers/tracking-events/event/#unique-arguments
@@ -60,6 +57,11 @@ export default class MailClient {
       }
       this.mailer.sendMail(options, (err, info) => {
         if (err !== null) {
+          logger.error({
+            message: 'Failed to send email',
+            error: err,
+            ...logMeta,
+          })
           reject(new Error(`${err}`))
         } else {
           resolve(info.messageId)

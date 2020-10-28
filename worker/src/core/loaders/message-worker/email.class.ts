@@ -4,12 +4,14 @@ import map from 'lodash/map'
 import crypto from 'crypto'
 import validator from 'validator'
 
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
-const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
+const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
+const logger = loggerWithLabel(module)
+
 class Email {
   private workerId: string
   private connection: Sequelize
@@ -17,10 +19,7 @@ class Email {
   constructor(workerId: string, connection: Sequelize) {
     this.workerId = workerId
     this.connection = connection
-    this.mailService = new MailClient(
-      config.get('mailFrom'),
-      config.get('mailOptions')
-    )
+    this.mailService = new MailClient(config.get('mailOptions'))
   }
 
   enqueueMessages(jobId: number, campaignId: number): Promise<void> {
@@ -43,7 +42,12 @@ class Email {
         )
       })
       .then(() => {
-        logger.info(`${this.workerId}: s_enqueueMessagesEmail job_id=${jobId}`)
+        logger.info({
+          message: 'Enqueued email messages',
+          workerId: this.workerId,
+          jobId,
+          action: 'enqueueMessages',
+        })
       })
   }
 
@@ -58,6 +62,7 @@ class Email {
       body: string
       subject: string
       replyTo: string | null
+      from: string
       campaignId: number
     }[]
   > {
@@ -116,6 +121,7 @@ class Email {
     body,
     subject,
     replyTo,
+    from,
     campaignId,
   }: {
     id: number
@@ -124,6 +130,7 @@ class Email {
     body: string
     subject?: string
     replyTo?: string | null
+    from?: string
     campaignId?: number
   }): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -156,6 +163,7 @@ class Email {
             unsubUrl
           )
           return this.mailService.sendMail({
+            from: from || config.get('mailFrom'),
             recipients: [recipient],
             subject,
             body: bodyWithUnsub,
@@ -180,7 +188,12 @@ class Email {
         )
       })
       .then(() => {
-        logger.info(`${this.workerId}: sendMessage id=${id}`)
+        logger.info({
+          message: 'Sent email message',
+          workerId: this.workerId,
+          id,
+          action: 'sendMessage',
+        })
       })
   }
 

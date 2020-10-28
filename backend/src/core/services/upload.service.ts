@@ -5,7 +5,7 @@ import S3 from 'aws-sdk/clients/s3'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { MissingTemplateKeysError } from '@core/errors/template.errors'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
@@ -15,6 +15,7 @@ import { CsvStatusInterface } from '@core/interfaces'
 import { CSVParams } from '@core/types'
 import { StatsService, CampaignService } from '.'
 
+const logger = loggerWithLabel(module)
 const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
@@ -28,7 +29,8 @@ const s3 = new S3({
  * @param contentType
  */
 const getUploadParameters = async (
-  contentType: string
+  contentType: string,
+  md5?: string
 ): Promise<{ presignedUrl: string; signedKey: string }> => {
   const s3Key = uuid()
 
@@ -37,6 +39,7 @@ const getUploadParameters = async (
     Key: s3Key,
     ContentType: contentType,
     Expires: 180, // seconds
+    ...(md5 ? { ContentMD5: md5 } : {}),
   }
 
   const signedKey = jwtUtils.sign(s3Key)
@@ -57,7 +60,6 @@ const extractParamsFromJwt = (
   try {
     decoded = jwtUtils.verify(transactionId)
   } catch (err) {
-    logger.error(`${err.stack}`)
     throw new Error('Invalid transactionId provided')
   }
   return typeof decoded === 'string'
@@ -116,9 +118,12 @@ const storeS3Error = async (
   try {
     await Campaign.updateS3ObjectKey(campaignId, { error })
   } catch (e) {
-    logger.error(
-      `Error storing error string in s3object for campaign ${campaignId}: ${e}`
-    )
+    logger.error({
+      message: 'Error storing error string in s3object for campaign',
+      campaignId,
+      error: e,
+      action: 'storeS3Error',
+    })
   }
 }
 
@@ -159,6 +164,11 @@ const getCsvStatus = async (
   ) {
     isCsvProcessing = false
     error = 'Csv processing timeout. Please contact us if this persists.'
+    logger.info({
+      message: error,
+      campaignId,
+      action: 'getCsvStatus',
+    })
     await storeS3Error(campaignId, error)
   }
   return {

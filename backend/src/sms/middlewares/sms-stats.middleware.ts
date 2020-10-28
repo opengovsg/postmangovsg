@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import { SmsStatsService } from '@sms/services'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
+
 /**
  * Gets stats for sms campaign
  * @param req
@@ -35,6 +39,11 @@ const updateAndGetStats = async (
   try {
     await SmsStatsService.refreshStats(+campaignId)
     const stats = await SmsStatsService.getStats(+campaignId)
+    logger.info({
+      message: 'Refresh and retreived sms stats',
+      campaignId,
+      action: 'updateAndGetStats',
+    })
     return res.json(stats)
   } catch (err) {
     next(err)
@@ -42,19 +51,19 @@ const updateAndGetStats = async (
 }
 
 /**
- * Gets invalid recipients for sms campaign
+ * Get delivered recipients for sms campaign
  * @param req
  * @param res
  * @param next
  */
-const getFailedRecipients = async (
+const getDeliveredRecipients = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   const { campaignId } = req.params
   try {
-    const recipients = await SmsStatsService.getFailedRecipients(+campaignId)
+    const recipients = await SmsStatsService.getDeliveredRecipients(+campaignId)
     return res.json(recipients)
   } catch (err) {
     next(err)
@@ -63,6 +72,6 @@ const getFailedRecipients = async (
 
 export const SmsStatsMiddleware = {
   getStats,
-  getFailedRecipients,
+  getDeliveredRecipients,
   updateAndGetStats,
 }

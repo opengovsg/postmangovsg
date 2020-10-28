@@ -10,6 +10,8 @@ export const GA_USER_EVENTS = {
   FINISH_CAMPAIGN_LATER: 'Finish campaign later',
   PAUSE_SENDING: 'Pause sending',
   RETRY_RESUME_SENDING: 'Retry/Resume sending',
+  ADD_FROM_ADDRESS: 'Add From Address',
+  UPDATE_FROM_ADDRESS: 'Update From Address',
 }
 
 export function initializeGA() {

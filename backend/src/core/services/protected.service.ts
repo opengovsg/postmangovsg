@@ -3,13 +3,14 @@ import { difference } from 'lodash'
 import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
 
 import { ProtectedMessage, Campaign } from '@core/models'
-import logger from '@core/logger'
 import config from '@core/config'
 import { CSVParams } from '@core/types'
+import { loggerWithLabel } from '@core/logger'
 
+const logger = loggerWithLabel(module)
 const PROTECTED_URL = config.get('protectedUrl')
 const PROTECT_METHOD_VERSION = 1
-const templateClient = new TemplateClient(XSS_EMAIL_OPTION)
+const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 /**
  * Whether a campaign is protected or not
  */
@@ -37,7 +38,7 @@ const checkTemplateVariables = (
   // Makes sure that all the required keywords are inside the template
   if (missing.length !== 0) {
     throw new Error(
-      `Required keywords are missing from the template: ${missing}`
+      `Error: There are missing keywords in the message template: ${missing}. Please return to the previous step to add in the keywords.`
     )
   }
 
@@ -46,7 +47,7 @@ const checkTemplateVariables = (
   // Should only contain the whitelisted keywords
   if (forbidden.length > 0) {
     throw new Error(
-      `Only these keywords are allowed: ${whitelist}.\nRemove the other keywords from the template: ${forbidden}`
+      `Error: Only these keywords are allowed in the template: ${whitelist}.\nRemove the other keywords from the template: ${forbidden}.`
     )
   }
 }
@@ -95,9 +96,12 @@ const storeProtectedMessages = async ({
     transaction,
     logging: (_message, benchmark) => {
       if (benchmark) {
-        logger.info(
-          `uploadProtectedCompleteOnChunk - ProtectedMessage: ElapsedTime ${benchmark} ms`
-        )
+        logger.info({
+          message:
+            'uploadProtectedCompleteOnChunk - ElapsedTime for ProtectedMessage in ms',
+          benchmark,
+          action: 'storeProtectedMessages',
+        })
       }
     },
     benchmark: true,

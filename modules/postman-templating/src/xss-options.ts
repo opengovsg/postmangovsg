@@ -1,6 +1,23 @@
-import xss from 'xss'
+import xss, { IFilterXSSOptions } from 'xss'
+import { TemplateError } from './errors'
+
+const URL =
+  typeof window !== 'undefined' && window.URL ? window.URL : require('url').URL
 
 const KEYWORD_REGEX = /^{{\s*?\w+\s*?}}$/
+
+/**
+ * Helper method to determine if a string is a HTTP URL
+ * @param urlStr
+ */
+const isValidHttpUrl = (urlStr: string): boolean => {
+  try {
+    const url = new URL(urlStr)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch (_) {
+    return false
+  }
+}
 
 export const XSS_EMAIL_OPTION = {
   whiteList: {
@@ -51,10 +68,45 @@ export const XSS_TELEGRAM_OPTION = {
   },
   safeAttrValue: (tag: string, name: string, value: string): string => {
     // Handle Telegram mention as xss-js does not recognize it as a valid url.
-    if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+    if (
+      tag === 'a' &&
+      name === 'href' &&
+      (value.startsWith('tg://') || value.match(KEYWORD_REGEX))
+    ) {
       return value
     }
     return xss.safeAttrValue(tag, name, value, xss.cssFilter)
   },
   stripIgnoreTag: true,
 }
+
+/**
+ * Extend XSS options with image source filtering
+ * @param baseOptions Options to be extended from
+ * @param allowedImageSources Array of allowed image source hostnames
+ */
+export const filterImageSources = (
+  baseOptions: IFilterXSSOptions,
+  allowedImageSources: Array<string>
+): IFilterXSSOptions => ({
+  ...baseOptions,
+  safeAttrValue: (tag: string, name: string, value: string): string => {
+    // Check that the image source is from an allowed host only if it is an URL (to account for variable value).
+    if (tag === 'img' && name === 'src' && isValidHttpUrl(value)) {
+      const hostname = new URL(value).hostname
+      if (allowedImageSources.indexOf(hostname) < 0) {
+        throw new TemplateError(
+          `${hostname} is not a valid image source. Allowed image source(s): ${allowedImageSources.join(
+            ', '
+          )}`
+        )
+      }
+    }
+
+    const defaultSafeAttrValue = baseOptions?.safeAttrValue
+      ? baseOptions.safeAttrValue
+      : xss.safeAttrValue
+
+    return defaultSafeAttrValue(tag, name, value, xss.cssFilter)
+  },
+})

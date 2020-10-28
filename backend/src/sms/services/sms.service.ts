@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { CSVParams } from '@core/types'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
@@ -15,6 +15,8 @@ import { TwilioCredentials } from '@sms/interfaces'
 import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Gets a message's parameters
@@ -200,7 +202,12 @@ const uploadCompleteOnChunk = ({
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
-          logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          logger.info({
+            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+            benchmark,
+            campaignId,
+            action: 'uploadCompleteOnChunk',
+          })
         }
       },
       benchmark: true,

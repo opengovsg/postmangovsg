@@ -1,4 +1,3 @@
-import logger from '@core/logger'
 import retry from 'async-retry'
 import S3Client from '@core/services/s3-client.class'
 
@@ -14,6 +13,9 @@ import { TemplateError } from 'postman-templating'
 import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { Campaign } from '@core/models'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 const RETRY_CONFIG = {
   retries: 3,
   minTimeout: 1000,
@@ -34,10 +36,10 @@ const storeTemplate = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
+  const { campaignId } = req.params
+  const { body } = req.body
+  const logMeta = { campaignId, action: 'storeTemplate' }
   try {
-    const { campaignId } = req.params
-    const { body } = req.body
-
     const {
       check,
       valid,
@@ -48,6 +50,11 @@ const storeTemplate = async (
     })
 
     if (check?.reupload) {
+      logger.info({
+        message:
+          'Telegram template has changed, required to re-upload recipient list',
+        ...logMeta,
+      })
       return res.status(200).json({
         message:
           'Please re-upload your recipient list as template has changed.',
@@ -91,18 +98,21 @@ const uploadCompleteHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
+  const { campaignId } = req.params
+  // extract s3Key from transactionId
+  const { transaction_id: transactionId, filename, etag } = req.body
+  const logMeta = { campaignId, action: 'uploadCompleteHandler' }
 
-    // extract s3Key from transactionId
-    const { transaction_id: transactionId, filename } = req.body
+  try {
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
     const template = await TelegramTemplateService.getFilledTemplate(
       +campaignId
     )
     if (template === null) {
-      throw new Error('Template does not exist, please create a template')
+      throw new Error(
+        'Error: No message template found. Please create a message template before uploading a recipient file.'
+      )
     }
 
     // Store temp filename
@@ -118,7 +128,7 @@ const uploadCompleteHandler = async (
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 
-        const downloadStream = s3Client.download(s3Key)
+        const downloadStream = s3Client.download(s3Key, etag)
         const params = {
           transaction,
           template,
@@ -144,13 +154,28 @@ const uploadCompleteHandler = async (
       }, RETRY_CONFIG)
     } catch (err) {
       // Do not return any response since it has already been sent
-      logger.error(
-        `Error storing messages for campaign ${campaignId}. ${err.stack}`
-      )
+      logger.error({
+        message: 'Error storing messages for campaign',
+        s3Key,
+        error: err,
+        ...logMeta,
+      })
+
+      // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
+      if (err.code === 'PreconditionFailed') {
+        err.message =
+          'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
+      }
+
       // Store error to return on poll
       UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
+    logger.error({
+      message: 'Failed to complete upload to s3',
+      error: err,
+      ...logMeta,
+    })
     const userErrors = [
       UserError,
       RecipientColumnMissing,

@@ -112,10 +112,10 @@ const Campaigns = () => {
             iconPosition="left"
             campaignId={campaign.id}
             campaignName={campaign.name}
+            campaignType={campaign.type}
             sentAt={campaign.sentAt}
             status={campaign.status}
             statusUpdatedAt={campaign.statusUpdatedAt}
-            hasFailedRecipients={campaign.hasFailedRecipients}
           />
         )
       },

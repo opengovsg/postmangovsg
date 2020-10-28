@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import config from '@core/config'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
+
+const logger = loggerWithLabel(module)
 
 /**
  *  Determines if an email is whitelisted / enough time has elapsed since the last otp request,
@@ -12,20 +14,29 @@ import { getRequestIp } from '@core/utils/request'
  */
 const getOtp = async (req: Request, res: Response): Promise<Response> => {
   const email = req.body.email
+  const logMeta = { email, action: 'getOTP' }
+
   try {
     await AuthService.canSendOtp(email)
   } catch (e) {
-    logger.error(`Not allowed to send OTP to email=${email}`)
+    logger.error({
+      message: 'Not allowed to send OTP',
+      ...logMeta,
+      error: e,
+    })
     return res.status(401).json({ message: e.message })
   }
   try {
     const ipAddress = getRequestIp(req)
     await AuthService.sendOtp(email, ipAddress)
   } catch (e) {
-    logger.error(`Error sending OTP: ${e}. email=${email}`)
+    logger.error({
+      message: 'Error sending OTP',
+      ...logMeta,
+      error: e,
+    })
     return res.sendStatus(500)
   }
-
   return res.sendStatus(200)
 }
 
@@ -41,8 +52,10 @@ const verifyOtp = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { email, otp } = req.body
+  const logMeta = { email, action: 'verifyOTP' }
   const authorized = await AuthService.verifyOtp({ email, otp })
   if (!authorized) {
+    logger.error({ message: 'Failed to verify OTP for email', ...logMeta })
     return res.sendStatus(401)
   }
   try {
@@ -52,9 +65,11 @@ const verifyOtp = async (
         id: user.id,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
+        email: user.email,
       }
       return res.sendStatus(200)
     }
+    logger.error({ message: 'Session object not found!', ...logMeta })
     return res.sendStatus(401)
   } catch (err) {
     return next(err)
@@ -72,8 +87,13 @@ const getUser = async (
 ): Promise<Response | void> => {
   if (req?.session?.user?.id) {
     const user = await AuthService.findUser(req?.session?.user?.id)
+    logger.info({
+      message: 'Existing user session found',
+      action: 'getUser',
+    })
     return res.json({ email: user?.email, id: user?.id })
   }
+  logger.info({ message: 'No existing user session found!', action: 'getUser' })
   return res.json({})
 }
 
@@ -100,6 +120,10 @@ const isCookieOrApiKeyAuthenticated = async (
       // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
       req.session.user = user
       req.session.apiKey = true
+      logger.info({
+        message: 'User authenticated by API key',
+        action: 'isCookieOrApiKeyAuthenticated',
+      })
       return next()
     }
 
@@ -124,8 +148,13 @@ const logout = async (
     req.session?.destroy((err) => {
       res.cookie(config.get('session.cookieName'), '', { expires: new Date() }) // Makes cookie expire immediately
       if (!err) {
-        resolve(res.sendStatus(200))
+        return resolve(res.sendStatus(200))
       }
+      logger.error({
+        message: 'Failed to destroy session',
+        error: err,
+        action: 'logout',
+      })
       reject(err)
     })
   }).catch((err) => next(err))

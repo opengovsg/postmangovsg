@@ -1,10 +1,12 @@
 import { QueryTypes } from 'sequelize'
 
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { StatsService } from '@core/services'
-import { CampaignStats, CampaignInvalidRecipient } from '@core/interfaces'
+import { CampaignStats, CampaignRecipient } from '@core/interfaces'
 
 import { SmsOp, SmsMessage } from '@sms/models'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Gets stats for sms project
@@ -19,7 +21,11 @@ const getStats = async (campaignId: number): Promise<CampaignStats> => {
  * @param campaignId
  */
 const refreshStats = async (campaignId: number): Promise<void> => {
-  logger.info(`updateStats invoked for campaign ${campaignId}`)
+  logger.info({
+    message: 'Refresh stats for campaign',
+    campaignId,
+    action: 'refreshStats',
+  })
 
   await SmsMessage.sequelize?.query('SELECT update_stats_sms(:campaign_id)', {
     replacements: { campaign_id: campaignId },
@@ -28,18 +34,18 @@ const refreshStats = async (campaignId: number): Promise<void> => {
 }
 
 /**
- * Gets failed recipients for sms project
+ * Gets delivered recipients for sms campaign
  * @param campaignId
  */
-const getFailedRecipients = async (
+const getDeliveredRecipients = async (
   campaignId: number
-): Promise<Array<CampaignInvalidRecipient> | undefined> => {
+): Promise<Array<CampaignRecipient>> => {
   await refreshStats(+campaignId)
-  return StatsService.getFailedRecipients(campaignId, SmsMessage)
+  return StatsService.getDeliveredRecipients(campaignId, SmsMessage)
 }
 
 export const SmsStatsService = {
   getStats,
-  getFailedRecipients,
+  getDeliveredRecipients,
   refreshStats,
 }

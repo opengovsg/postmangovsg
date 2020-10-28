@@ -49,7 +49,9 @@ const startMultipartUpload = async (
 
   const { UploadId } = await s3.createMultipartUpload(params).promise()
 
-  if (!UploadId) throw new Error('no upload id')
+  if (!UploadId) {
+    throw new Error('No upload id')
+  }
 
   const transactionId = jwtUtils.sign({
     uploadId: UploadId,
@@ -82,7 +84,7 @@ const completeMultipartUpload = async ({
   transactionId: string
   partCount: number
   etags: Array<string>
-}): Promise<string> => {
+}): Promise<{ s3Key: string; etag?: string }> => {
   const parts = []
   for (let i = 0; i < partCount; i++) {
     parts.push({
@@ -106,8 +108,8 @@ const completeMultipartUpload = async ({
     UploadId: uploadId,
   }
 
-  await s3.completeMultipartUpload(params).promise()
-  return s3Key
+  const { ETag: etag } = await s3.completeMultipartUpload(params).promise()
+  return { s3Key, etag }
 }
 
 export const MultipartUploadService = {

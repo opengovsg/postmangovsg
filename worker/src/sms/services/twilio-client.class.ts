@@ -1,10 +1,12 @@
 import twilio from 'twilio'
 import bcrypt from 'bcrypt'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
 
+const logger = loggerWithLabel(module)
 const SALT_ROUNDS = 10
+
 export default class TwilioClient {
   private client: any
   private messagingServiceSid: string
@@ -17,9 +19,10 @@ export default class TwilioClient {
     this.hasCallback =
       config.get('callbackSecret') !== '' && config.get('backendUrl') !== ''
     if (!this.hasCallback) {
-      logger.info(
-        'Missing callback parameters. No status callback will be provided'
-      )
+      logger.error({
+        message:
+          'Missing callback parameters. No status callback will be provided',
+      })
     }
   }
 
@@ -79,8 +82,12 @@ export default class TwilioClient {
     callbackUrl.username = username
     // encode password as the hash contains special characters
     callbackUrl.password = encodeURIComponent(hashedPwd)
-    callbackUrl.pathname = `${callbackUrl.pathname}/campaign/${campaignId}/message/${messageId}`
-    logger.info(`Status callback url for ${messageId}: ${callbackUrl}`)
+    callbackUrl.pathname = `${callbackUrl.pathname}/${campaignId}/${messageId}`
+    logger.info({
+      message: 'Generate status callback url',
+      messageId,
+      callbackUrl,
+    })
     return callbackUrl.toString()
   }
 

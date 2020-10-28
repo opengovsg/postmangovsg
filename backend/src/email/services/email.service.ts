@@ -1,7 +1,7 @@
 import { Transaction } from 'sequelize'
-import logger from '@core/logger'
 import { CSVParams } from '@core/types'
 
+import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { Campaign, ProtectedMessage } from '@core/models'
 import {
@@ -15,6 +15,9 @@ import { MailToSend, CampaignDetails } from '@core/interfaces'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
+import config from '@core/config'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Gets a message's parameters
@@ -41,6 +44,7 @@ const getHydratedMessage = async (
   body: string
   subject: string
   replyTo: string | null
+  from: string
 } | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
@@ -57,7 +61,12 @@ const getHydratedMessage = async (
   )
   const body = EmailTemplateService.client.template(template?.body!, params)
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
-  return { body, subject, replyTo: template.replyTo || null }
+  return {
+    body,
+    subject,
+    replyTo: template.replyTo || null,
+    from: template?.from!,
+  }
 }
 
 /**
@@ -72,8 +81,9 @@ const getCampaignMessage = async (
   // get the body and subject
   const message = await getHydratedMessage(campaignId)
   if (message) {
-    const { body, subject, replyTo } = message
+    const { body, subject, replyTo, from } = message
     const mailToSend: MailToSend = {
+      from: from || config.get('mailFrom'),
       recipients: [recipient],
       body: UnsubscriberService.appendTestEmailUnsubLink(body),
       subject,
@@ -92,7 +102,11 @@ const sendEmail = async (mail: MailToSend): Promise<string | void> => {
   try {
     return MailService.mailClient.sendMail(mail)
   } catch (e) {
-    logger.error(`Error while sending test email. error=${e}`)
+    logger.error({
+      message: 'Error while sending test email',
+      error: e,
+      action: 'sendEmail',
+    })
     return
   }
 }
@@ -122,7 +136,9 @@ const sendCampaignMessage = async (
   recipient: string
 ): Promise<void> => {
   const mail = await getCampaignMessage(+campaignId, recipient)
-  if (!mail) throw new Error('No message to send')
+  if (!mail) {
+    throw new Error('No message to send')
+  }
   // Send email using node mailer
   const isEmailSent = await sendEmail(mail)
   if (!isEmailSent) throw new Error(`Could not send test email to ${recipient}`)
@@ -152,7 +168,7 @@ const getCampaignDetails = async (
   return await CampaignService.getCampaignDetails(campaignId, [
     {
       model: EmailTemplate,
-      attributes: ['body', 'subject', 'params', 'reply_to'],
+      attributes: ['body', 'subject', 'params', 'reply_to', 'from'],
     },
   ])
 }
@@ -204,7 +220,12 @@ const uploadCompleteOnChunk = ({
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
-          logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          logger.info({
+            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+            benchmark,
+            campaignId,
+            action: 'uploadCompleteOnChunk',
+          })
         }
       },
       benchmark: true,
@@ -262,9 +283,12 @@ const uploadProtectedCompleteOnChunk = ({
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
-          logger.info(
-            `uploadProtectedCompleteOnChunk - EmailMessage: ElapsedTime ${benchmark} ms`
-          )
+          logger.info({
+            message: 'uploadProtectedCompleteOnChunk: ElapsedTime in ms',
+            benchmark,
+            campaignId,
+            action: 'uploadProtectedCompleteOnChunk',
+          })
         }
       },
       benchmark: true,
