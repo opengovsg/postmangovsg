@@ -64,11 +64,6 @@ export default class MailClient {
           })
           reject(new Error(`${err}`))
         } else {
-          logger.info({
-            message: 'Successfully sent email',
-            messageId: info.messageId,
-            ...logMeta,
-          })
           resolve(info.messageId)
         }
       })
