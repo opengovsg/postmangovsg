@@ -92,6 +92,40 @@ const storeUserCredential = async (
   }
 }
 
+const checkAndStoreLabelIfExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { label } = req.body
+  if (!label) {
+    return next()
+  }
+  const userId = req.session?.user?.id
+  const { credentialName, channelType } = res.locals
+
+  try {
+    const result = await CredentialService.getUserCredential(userId, label)
+    if (result) {
+      return res.status(400).json({
+        message: 'User credential with the same label already exists.',
+      })
+    }
+    if (!credentialName || !channelType) {
+      throw new Error('Credential or credential type does not exist')
+    }
+    await CredentialService.createUserCredential(
+      label,
+      channelType,
+      credentialName,
+      +userId
+    )
+    next()
+  } catch (e) {
+    next(e)
+  }
+}
+
 /**
  * Get only labels for SMS and Telegram credentials for that user
  * @param req
@@ -185,6 +219,7 @@ export const SettingsMiddleware = {
   getUserSettings,
   checkUserCredentialLabel,
   storeUserCredential,
+  checkAndStoreLabelIfExists,
   getChannelSpecificCredentials,
   deleteUserCredential,
   regenerateApiKey,

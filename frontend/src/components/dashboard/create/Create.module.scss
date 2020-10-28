@@ -96,6 +96,16 @@
   margin-bottom: 2.5rem;
 }
 
+.credentialLabelError {
+  color: $red;
+  font-size: 0.8rem;
+  padding-left: 1.4rem;
+}
+
+.credentialLabelInputError {
+  border-color: $red;
+}
+
 .newCredentialsButton {
   margin-top: 2rem;
 }
