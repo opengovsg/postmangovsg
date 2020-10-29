@@ -161,3 +161,11 @@ msgstr "https://guide.postman.gov.sg/contact-us"
 #: src/config.ts:37
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
+
+#: src/components/dashboard/trial/trial-info-banner/TrialInfoBanner.tsx:9
+msgid "trialMessage"
+msgstr "This demo campaign will be sent to a maximum of 20 recipients."
+
+#: src/components/dashboard/trial/trial-info-banner/TrialInfoBanner.tsx:8
+msgid "trialMessageLabel"
+msgstr "DEMO"
