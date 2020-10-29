@@ -3,7 +3,11 @@ import { difference, keys } from 'lodash'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
+import {
+  TemplateClient,
+  XSS_SMS_OPTION,
+  TemplateError,
+} from 'postman-templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
@@ -149,8 +153,12 @@ const storeTemplate = async ({
   campaignId,
   body,
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
+  const sanitizedBody = client.replaceNewLinesAndSanitize(body)
+  if (!sanitizedBody) {
+    throw new TemplateError('Message template is empty!')
+  }
   const updatedTemplate = await upsertSmsTemplate({
-    body: client.replaceNewLinesAndSanitize(body),
+    body: sanitizedBody,
     campaignId,
   })
 
