@@ -16,7 +16,7 @@ import { createCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
 import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
-import CreateTrialModal from 'components/dashboard/create/create-trial-modal'
+import CreateTrialModal from 'components/dashboard/trial/create-trial-modal'
 
 import { i18n } from 'locales'
 import { getUserSettings } from 'services/settings.service'
