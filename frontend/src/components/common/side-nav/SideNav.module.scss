@@ -1,8 +1,7 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-$side-nav-width: 25rem;
-$nav-item-height: 5rem;
+$nav-item-height: 88px;
 
 .sideNav {
   width: $side-nav-width;
@@ -26,9 +25,10 @@ $nav-item-height: 5rem;
 
 .navItem {
   @include flex-horizontal;
+  @extend %body-1;
+
   justify-content: space-between;
   color: $secondary;
-  font-size: 1rem;
   padding: 0 2.5rem 0 4rem;
   user-select: none;
   height: $nav-item-height;

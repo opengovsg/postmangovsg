@@ -15,7 +15,7 @@
 .stepContainer {
   display: block;
   max-width: $content-max-width;
-  width: calc(100% - #{$progress-pane-width} - 2 * #{$site-padding});
+  width: calc(100% - #{$side-nav-width} - 2 * #{$site-padding});
   padding: $content-top-padding 0 $content-bottom-padding;
   margin: 0 auto;
 
