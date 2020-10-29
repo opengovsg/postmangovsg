@@ -15,6 +15,14 @@
   cursor: pointer;
 }
 
+.navIcon:first-child {
+  margin-right: $spacing-5 - ($spacing-2 / 2);
+}
+
+.navIcon:last-child {
+  margin-left: $spacing-5 - ($spacing-2 / 2);
+}
+
 .navIconDisabled span {
   color: $light-grey;
   cursor: default;
@@ -25,18 +33,18 @@
 }
 
 .pageNumber {
+  @include flex-horizontal;
+
   width: 2rem;
   height: 2rem;
-  margin-right: 0.5rem;
-  margin-left: 0.5rem;
-  @include flex-horizontal;
+  margin-right: $spacing-2 / 2;
+  margin-left: $spacing-2 / 2;
   justify-content: center;
   cursor: pointer;
 
   a {
+    @extend %button-text;
     color: $secondary;
-    font-size: 0.8rem;
-    line-height: 1rem;
     padding: 0.5rem;
   }
 }
