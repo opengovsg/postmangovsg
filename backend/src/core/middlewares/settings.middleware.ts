@@ -12,18 +12,18 @@ const getUserSettings = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<void | Response> => {
   try {
     const userId = req.session?.user?.id
     const userSettings = await CredentialService.getUserSettings(userId)
     if (!userSettings) {
       throw new Error('User not found')
     }
-    res.json({
+    return res.json({
       has_api_key: userSettings.hasApiKey,
       creds: userSettings.creds,
       trial: {
-        num_trials_sms: userSettings.trial.numTrialsSms,
+        num_trials_sms: userSettings.trial?.numTrialsSms,
       },
     })
   } catch (err) {
