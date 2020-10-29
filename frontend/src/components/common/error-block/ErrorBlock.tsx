@@ -32,7 +32,7 @@ const ErrorBlock = ({
         {...otherProps}
       >
         <li>
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-x-circle"></i>
           <p>{children}</p>
         </li>
         {onClose && <CloseButton onClick={onClose} className={styles.close} />}

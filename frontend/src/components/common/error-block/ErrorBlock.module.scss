@@ -6,13 +6,15 @@
   width: 100%;
 
   .errorBlock {
+    white-space: pre-wrap;
+    @include block($error-light, $error);
+    padding: 1rem;
+
     &.absolute {
       position: absolute;
       left: 0;
       right: 0;
     }
-    white-space: pre-wrap;
-    @include block($error-light, $error);
 
     &.withClose {
       padding-right: 4rem;
