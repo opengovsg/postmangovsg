@@ -93,9 +93,7 @@ const Create = () => {
                 : 'Back to campaigns'}
             </PrimaryButton>
           </TitleBar>
-          {campaign.trialMessageLimit !== null && (
-            <TrialInfoBanner></TrialInfoBanner>
-          )}
+          {!!campaign.trialMessageLimit && <TrialInfoBanner></TrialInfoBanner>}
           {isLoading ? (
             <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
           ) : (

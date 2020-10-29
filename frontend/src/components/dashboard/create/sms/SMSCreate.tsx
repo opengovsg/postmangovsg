@@ -76,6 +76,7 @@ const CreateSMS = ({
             csvFilename={campaign.csvFilename}
             numRecipients={campaign.numRecipients}
             isProcessing={campaign.isCsvProcessing}
+            isTrial={!!campaign.trialMessageLimit}
             onNext={onNext}
             onPrevious={onPrevious}
           />

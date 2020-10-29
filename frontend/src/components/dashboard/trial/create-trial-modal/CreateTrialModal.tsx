@@ -24,7 +24,6 @@ const CreateTrialModal = ({
     try {
       await onSuccess(true)
     } catch (err) {
-      console.log('error', err)
       setErrorMessage(err.message)
     }
   }

@@ -1,0 +1,35 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.relativeContainer {
+  position: relative;
+  width: 100%;
+
+  .primaryInfoBlock {
+    h4 {
+      margin-top: 0px;
+    }
+
+    &.absolute {
+      position: absolute;
+      left: 0;
+      right: 0;
+    }
+    white-space: pre-wrap;
+    @include block($neutral-light, $primary);
+
+    &.withClose {
+      padding-right: 4rem;
+    }
+
+    .close {
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      &:hover,
+      &:active {
+        color: $primary;
+      }
+    }
+  }
+}

@@ -1,10 +1,10 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
-$pale-green: #B3D8DD;
+$pale-green: #b3d8dd;
 .infoBanner {
-    background-color: $pale-green;
-    color: darken($pale-green, 50%);
-    padding: 8px 0px;
-    text-align: center;
-    font-size: 0.9rem;
+  background-color: $pale-green;
+  color: darken($pale-green, 50%);
+  padding: 8px 0px;
+  text-align: center;
+  font-size: 0.9rem;
 }
