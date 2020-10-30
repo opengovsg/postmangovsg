@@ -1,6 +1,11 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+.content {
+  padding-left: 78px;
+  padding-right: 78px;
+}
+
 .section {
   margin-bottom: 2rem;
   @include flex-vertical;
@@ -76,7 +81,7 @@
 
 .title {
   font-weight: 500;
-  margin-top: 0;
+  margin-top: 20px;
   margin-bottom: 0.65rem;
 }
 

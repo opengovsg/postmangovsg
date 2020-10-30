@@ -158,7 +158,7 @@ const AddCredentialModal = ({
             Next <i className="bx bx-right-arrow-alt"></i>
           </PrimaryButton>
           <TextButton
-            onClick={() => modalContext.setModalContent(null)}
+            onClick={() => modalContext.close()}
             className={styles.cancel}
           >
             Cancel
@@ -322,7 +322,7 @@ const AddCredentialModal = ({
             <h3>Your credentials are working well.</h3>
             <PrimaryButton
               className={styles.padTop}
-              onClick={() => modalContext.setModalContent(null)}
+              onClick={() => modalContext.close()}
             >
               Done
             </PrimaryButton>

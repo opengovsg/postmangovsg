@@ -33,7 +33,7 @@ const ConfirmModal = ({
     try {
       await onConfirm()
       // Closes the modal
-      modalContext.setModalContent(null)
+      modalContext.close()
     } catch (err) {
       setErrorMessage(err.message)
     }
@@ -43,7 +43,7 @@ const ConfirmModal = ({
     try {
       if (onCancel) await onCancel()
       // Closes the modal
-      modalContext.setModalContent(null)
+      modalContext.close()
     } catch (err) {
       setErrorMessage(err.message)
     }
