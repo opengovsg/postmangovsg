@@ -22,6 +22,7 @@ import styles from './Campaigns.module.scss'
 
 import { i18n } from 'locales'
 import { LINKS } from 'config'
+import TrialBar from '../trial/trial-bar/TrialBar'
 
 const ITEMS_PER_PAGE = 10
 
@@ -213,6 +214,7 @@ const Campaigns = () => {
           Create new campaign
         </PrimaryButton>
       </TitleBar>
+      <TrialBar isVisible={true}></TrialBar>
       <div className={styles.content}>
         {isLoading ? (
           <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>

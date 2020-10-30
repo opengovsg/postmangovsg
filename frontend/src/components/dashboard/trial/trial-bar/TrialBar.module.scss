@@ -1,0 +1,77 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+$pale-green: #b3d8dd;
+$dark-green: darken($pale-green, 50%);
+$trial-bar-height: 3.2rem;
+.trialBar {
+  position: sticky;
+  z-index:10;
+  display:flex;
+  flex-direction: row;
+  height: $trial-bar-height;
+
+ .trialButton {
+  background-color: $dark-green;
+  color: white;
+  min-height: auto;
+  width: $trial-bar-height;
+  padding: 4px 0px;
+  border: 0;
+
+  font-weight: 700;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+
+
+  &:hover,&:focus {
+    background-color:darken($pale-green, 60%);
+    outline: none;
+  }
+ }
+ .menuContainer{
+  position: sticky;
+  z-index:-1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: $pale-green;
+  color: $dark-green;
+  font-size:0.8rem;
+  height: auto;
+  width: 280px;
+  padding:4px 8px;
+  margin-left: -100vw; /*Off the screen*/
+  transition: 0.3s;
+  overflow: hidden;
+
+  @include mobile() {
+    width:100%;
+    margin-left: -100vw;
+  }
+  &.show {
+    margin-left: 0;
+  }
+
+  
+  .message {
+
+    text-align: left;
+    .text{
+      height: auto;
+    }
+    .action {
+      height:auto;
+    }
+  }
+  .closeButton {
+    height: 2rem;
+    width: 2rem;
+  }
+  
+ }
+ 
+ 
+}
