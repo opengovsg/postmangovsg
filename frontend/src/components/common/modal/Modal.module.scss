@@ -1,6 +1,8 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+$modal-width: $tablet;
+
 .modalBg {
   @include flex-center();
   background: adjust-color($secondary, $alpha: -0.05);
@@ -11,7 +13,7 @@
 }
 
 .modal {
-  width: $tablet;
+  width: $modal-width;
   max-width: 100vw;
   border-radius: 0.6rem;
   background-color: $neutral-light;
@@ -28,7 +30,7 @@
 
   .content {
     max-width: 100vw;
-    padding: 3rem 4.5rem;
+    padding: 3rem ($modal-width - 528px) / 2;
     margin: auto;
   }
 
