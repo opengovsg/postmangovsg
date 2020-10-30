@@ -110,6 +110,7 @@ const Login = () => {
           onClick={sendOtp}
           buttonLabel={<Trans>Get OTP</Trans>}
           loadingButtonLabel={<Trans>Sending OTP...</Trans>}
+          errorMessage={errorMsg}
         />
       ) : (
         <TextInputWithButton
@@ -121,9 +122,9 @@ const Login = () => {
           onClick={login}
           buttonLabel={<Trans>Sign In</Trans>}
           loadingButtonLabel={<Trans>Verifying OTP...</Trans>}
+          errorMessage={errorMsg}
         />
       )}
-      <ErrorBlock absolute={true}>{errorMsg}</ErrorBlock>
     </div>
   )
 }

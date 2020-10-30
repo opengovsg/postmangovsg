@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, MutableRefObject } from 'react'
 import cx from 'classnames'
 import styles from './TextInputWithButton.module.scss'
 import { PrimaryButton, TextInput } from '../'
+import InputError from './InputError'
 
 interface TextInputWithButtonProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
@@ -12,6 +13,7 @@ interface TextInputWithButtonProps
   textRef?: MutableRefObject<HTMLInputElement | undefined>
   buttonLabel?: React.ReactNode
   loadingButtonLabel?: React.ReactNode
+  errorMessage?: string | null
 }
 
 const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = ({
@@ -26,6 +28,7 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   textRef,
   buttonLabel,
   loadingButtonLabel,
+  errorMessage
 }) => {
   const [asyncLoading, setAsyncLoading] = useState(false)
   const isMounted = useRef(true)
@@ -51,7 +54,8 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   }
 
   return (
-    <form className={styles.inputWithButton} onSubmit={asyncSubmit}>
+    <form className={styles.textInPutForm} onSubmit={asyncSubmit}>
+      <div className={styles.inputWithButton}>
       <TextInput
         className={styles.textInput}
         value={value}
@@ -68,6 +72,13 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
       >
         {asyncLoading ? loadingButtonLabel : buttonLabel}
       </PrimaryButton>
+      </div>
+      {
+        errorMessage ?
+          <InputError errorMessage={errorMessage}></InputError>
+          :
+          <></>
+      }
     </form>
   )
 }
