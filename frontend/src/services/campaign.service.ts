@@ -115,29 +115,27 @@ export async function getCampaignDetails(
   })
 }
 
-export async function createCampaign(
-  name: string,
-  type: ChannelType,
-  protect: boolean,
-  useTrial: boolean
-): Promise<Campaign> {
-  const params: {
-    name: string
-    type: ChannelType
-    protect: boolean
-    trial_message_limit?: number
-  } = {
-    type,
-    protect,
-    name,
-  }
-  if (useTrial) {
-    params.name = `(TRIAL) ${name}`
-    params.trial_message_limit = 20
-  }
-  return axios.post('/campaigns', params).then((response) => {
-    return new Campaign(response.data)
-  })
+export async function createCampaign({
+  name,
+  type,
+  protect = false,
+  trialMessageLimit,
+}: {
+  name: string
+  type: ChannelType
+  protect: boolean
+  trialMessageLimit?: number
+}): Promise<Campaign> {
+  return axios
+    .post('/campaigns', {
+      type,
+      protect,
+      name,
+      ...(trialMessageLimit ? { trial_message_limit: trialMessageLimit } : {}),
+    })
+    .then((response) => {
+      return new Campaign(response.data)
+    })
 }
 
 export async function sendCampaign(
