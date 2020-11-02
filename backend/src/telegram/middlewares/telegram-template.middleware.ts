@@ -127,7 +127,9 @@ const uploadCompleteHandler = async (
       await retry(async (bail) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
-
+        const campaign = await Campaign.findByPk(campaignId, {
+          attributes: [['trial_message_limit', 'trialMessageLimit']],
+        })
         const downloadStream = s3Client.download(s3Key, etag)
         const params = {
           transaction,
@@ -142,7 +144,8 @@ const uploadCompleteHandler = async (
             ...params,
             key: s3Key,
             filename,
-          })
+          }),
+          campaign?.trialMessageLimit ? campaign.trialMessageLimit : undefined
         ).catch((e) => {
           transaction.rollback()
           if (e.code !== 'NoSuchKey') {
