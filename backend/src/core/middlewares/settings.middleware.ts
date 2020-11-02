@@ -25,6 +25,7 @@ const getUserSettings = async (
       trial: {
         num_trials_sms: userSettings.trial?.numTrialsSms,
         num_trials_telegram: userSettings.trial?.numTrialsTelegram,
+        is_displayed: userSettings.trial?.isDisplayed,
       },
     })
   } catch (err) {
@@ -212,11 +213,28 @@ const regenerateApiKey = async (
   try {
     const userId = req.session?.user?.id
     const apiKey = await CredentialService.regenerateApiKey(+userId)
-    logger.info({
-      message: 'Generate api key for user',
-      action: 'Credential not found',
-    })
     return res.json({ api_key: apiKey })
+  } catch (e) {
+    next(e)
+  }
+}
+
+/**
+ * Update whether trials should be displayed for user
+ * @param req
+ * @param res
+ * @param next
+ */
+const updateTrialDisplayed = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const userId = req.session?.user?.id
+    const { is_displayed: isDisplayed } = req.body
+    await CredentialService.updateTrialDisplayed(+userId, isDisplayed)
+    return res.sendStatus(200)
   } catch (e) {
     next(e)
   }
@@ -230,4 +248,5 @@ export const SettingsMiddleware = {
   getChannelSpecificCredentials,
   deleteUserCredential,
   regenerateApiKey,
+  updateTrialDisplayed,
 }

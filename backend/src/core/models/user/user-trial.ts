@@ -31,4 +31,11 @@ export class UserTrial extends Model<UserTrial> {
     allowNull: false,
   })
   numTrialsTelegram!: number
+
+  @Default(true)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+  isDisplayed!: boolean
 }

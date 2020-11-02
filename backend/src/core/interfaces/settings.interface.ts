@@ -6,5 +6,9 @@ export interface CredentialLabel {
 export interface UserSettings {
   hasApiKey: boolean
   creds: Array<CredentialLabel>
-  trial: { numTrialsSms: number; numTrialsTelegram: number }
+  trial: {
+    numTrialsSms: number
+    numTrialsTelegram: number
+    isDisplayed: boolean
+  }
 }

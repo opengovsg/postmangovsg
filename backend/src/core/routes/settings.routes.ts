@@ -21,6 +21,12 @@ const getCredentialsValidator = {
   }),
 }
 
+const trialDisplayedValidator = {
+  [Segments.BODY]: Joi.object({
+    is_displayed: Joi.boolean().required(),
+  }),
+}
+
 /**
  * @swagger
  * path:
@@ -136,6 +142,46 @@ router.get(
   '/:channelType/credentials',
   celebrate(getCredentialsValidator),
   SettingsMiddleware.getChannelSpecificCredentials
+)
+
+/**
+ * @swagger
+ * path:
+ *  /settings/trial:
+ *    put:
+ *       tags:
+ *         - Settings
+ *       summary: Update whether to display trials
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 is_displayed:
+ *                   type: boolean
+ *       responses:
+ *         "200":
+ *           description: Success
+ *           content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  is_displayed:
+ *                    type: boolean
+ *         "400":
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.put(
+  '/trial',
+  celebrate(trialDisplayedValidator),
+  SettingsMiddleware.updateTrialDisplayed
 )
 
 export default router

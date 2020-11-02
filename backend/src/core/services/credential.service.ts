@@ -239,6 +239,7 @@ const getUserSettings = async (
         attributes: [
           ['num_trials_sms', 'numTrialsSms'],
           ['num_trials_telegram', 'numTrialsTelegram'],
+          ['is_displayed', 'isDisplayed'],
         ],
       },
     ],
@@ -268,6 +269,29 @@ const regenerateApiKey = async (userId: number): Promise<string> => {
   return user.regenerateAndSaveApiKey()
 }
 
+const updateTrialDisplayed = async (
+  userId: number,
+  isDisplayed: boolean
+): Promise<{ isDisplayed: boolean }> => {
+  const [numUpdated, userTrial] = await UserTrial.update(
+    { isDisplayed },
+    {
+      where: { userId },
+      returning: true,
+    }
+  )
+  if (numUpdated !== 1) {
+    logger.error({
+      message: 'Incorrect number of records updated',
+      numUpdated,
+      action: 'updateTrialDisplayed',
+    })
+    throw new Error('Could not update trial displayed')
+  }
+  return {
+    isDisplayed: userTrial[0].isDisplayed,
+  }
+}
 export const CredentialService = {
   // Credentials (cred_name)
   storeCredential,
@@ -282,4 +306,5 @@ export const CredentialService = {
   getUserSettings,
   // Api Key
   regenerateApiKey,
+  updateTrialDisplayed,
 }
