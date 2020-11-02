@@ -30,7 +30,7 @@ const TelegramRecipients = ({
   numRecipients: initialNumRecipients,
   params,
   isProcessing: initialIsProcessing,
-  isTrial,
+  isDemo,
   onNext,
   onPrevious,
 }: {
@@ -38,7 +38,7 @@ const TelegramRecipients = ({
   numRecipients: number
   params: Array<string>
   isProcessing: boolean
-  isTrial: boolean
+  isDemo: boolean
   onNext: (changes: Partial<TelegramCampaign>, next?: boolean) => void
   onPrevious: () => void
 }) => {
@@ -155,7 +155,7 @@ const TelegramRecipients = ({
           />
         </CsvUpload>
 
-        {isTrial && (
+        {isDemo && (
           <PrimaryInfoBlock>
             <h4>Limited to 20 recipients</h4>
             <span>
@@ -164,7 +164,6 @@ const TelegramRecipients = ({
             </span>
           </PrimaryInfoBlock>
         )}
-
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 

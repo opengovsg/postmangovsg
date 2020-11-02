@@ -1,52 +1,49 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import styles from './TrialBar.module.scss'
+import styles from './DemoBar.module.scss'
 import cx from 'classnames'
 import { CloseButton, TextButton } from 'components/common'
-import {
-  getUserSettings,
-  updateTrialDisplayed,
-} from 'services/settings.service'
+import { getUserSettings, updateDemoDisplayed } from 'services/settings.service'
 import { ModalContext } from 'contexts/modal.context'
-import CreateTrialModal from '../create-trial-modal'
-const TrialBar = () => {
+import CreateDemoModal from '../create-demo-modal'
+const DemoBar = () => {
   const modalContext = useContext(ModalContext)
   const [isMenuVisible, setIsMenuVisible] = useState(false)
   const toggleMenu = useCallback(() => {
-    updateTrialDisplayed(!isMenuVisible)
+    updateDemoDisplayed(!isMenuVisible)
     setIsMenuVisible((state) => !state)
   }, [isMenuVisible])
-  const [numTrialsSms, setNumTrialsSms] = useState(0)
-  const [numTrialsTelegram, setNumTrialsTelegram] = useState(0)
-  const [hasTrial, setHasTrial] = useState(false)
+  const [numDemosSms, setNumDemosSms] = useState(0)
+  const [numDemosTelegram, setNumDemosTelegram] = useState(0)
+  const [hasDemo, setHasDemo] = useState(false)
 
   useEffect(() => {
-    async function getNumTrials() {
-      // TRIAL: check for number of trials
-      const { trial } = await getUserSettings()
-      setIsMenuVisible(trial.isDisplayed)
-      setNumTrialsSms(trial?.numTrialsSms)
-      setNumTrialsTelegram(trial?.numTrialsTelegram)
+    async function getNumDemos() {
+      // TRIAL: check for number of demos
+      const { demo } = await getUserSettings()
+      setIsMenuVisible(demo.isDisplayed)
+      setNumDemosSms(demo?.numDemosSms)
+      setNumDemosTelegram(demo?.numDemosTelegram)
     }
-    getNumTrials()
+    getNumDemos()
   }, [])
 
   useEffect(() => {
-    setHasTrial(!!numTrialsTelegram || !!numTrialsSms)
-  }, [numTrialsSms, numTrialsTelegram])
+    setHasDemo(!!numDemosTelegram || !!numDemosSms)
+  }, [numDemosSms, numDemosTelegram])
 
   function onCreate(): void {
-    if (hasTrial) {
+    if (hasDemo) {
       modalContext.setModalContent(
-        <CreateTrialModal
-          trialInfo={{ numTrialsSms, numTrialsTelegram }}
-        ></CreateTrialModal>
+        <CreateDemoModal
+          demoInfo={{ numDemosSms, numDemosTelegram }}
+        ></CreateDemoModal>
       )
     }
   }
 
   return (
-    <div className={styles.trialBar}>
-      <button className={styles.trialButton} onClick={toggleMenu}>
+    <div className={styles.demoBar}>
+      <button className={styles.demoButton} onClick={toggleMenu}>
         DEMO
       </button>
       <div
@@ -55,11 +52,11 @@ const TrialBar = () => {
         })}
       >
         <div className={styles.message}>
-          {hasTrial ? (
+          {hasDemo ? (
             <>
               <div className={styles.text}>
-                SMS: {numTrialsSms || 0}/3 left. Telegram:{' '}
-                {numTrialsTelegram || 0}/3 left.
+                SMS: {numDemosSms || 0}/3 left. Telegram:{' '}
+                {numDemosTelegram || 0}/3 left.
               </div>
               <TextButton
                 className={styles.action}
@@ -83,4 +80,4 @@ const TrialBar = () => {
   )
 }
 
-export default TrialBar
+export default DemoBar

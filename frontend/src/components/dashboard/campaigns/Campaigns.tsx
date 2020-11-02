@@ -22,7 +22,7 @@ import styles from './Campaigns.module.scss'
 
 import { i18n } from 'locales'
 import { LINKS } from 'config'
-import TrialBar from '../trial/trial-bar/TrialBar'
+import DemoBar from '../demo/demo-bar/DemoBar'
 
 const ITEMS_PER_PAGE = 10
 
@@ -82,7 +82,7 @@ const Campaigns = () => {
       render: (campaign: Campaign) => (
         <span
           className={cx({
-            [styles.trial]: !!campaign.trialMessageLimit,
+            [styles.demo]: !!campaign.demoMessageLimit,
           })}
         >
           {campaign.name}
@@ -216,7 +216,7 @@ const Campaigns = () => {
           Create new campaign
         </PrimaryButton>
       </TitleBar>
-      <TrialBar />
+      <DemoBar />
       <div className={styles.content}>
         {isLoading ? (
           <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>

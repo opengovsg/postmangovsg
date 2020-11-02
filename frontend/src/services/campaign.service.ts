@@ -119,19 +119,19 @@ export async function createCampaign({
   name,
   type,
   protect = false,
-  trialMessageLimit,
+  demoMessageLimit,
 }: {
   name: string
   type: ChannelType
   protect?: boolean
-  trialMessageLimit?: number
+  demoMessageLimit?: number
 }): Promise<Campaign> {
   return axios
     .post('/campaigns', {
       type,
       protect,
       name,
-      ...(trialMessageLimit ? { trial_message_limit: trialMessageLimit } : {}),
+      ...(demoMessageLimit ? { demo_message_limit: demoMessageLimit } : {}),
     })
     .then((response) => {
       return new Campaign(response.data)

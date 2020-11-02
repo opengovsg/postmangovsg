@@ -17,7 +17,7 @@ import SMSCreate from './sms/SMSCreate'
 import EmailCreate from './email/EmailCreate'
 import TelegramCreate from './telegram/TelegramCreate'
 import styles from './Create.module.scss'
-import TrialInfoBanner from '../trial/trial-info-banner/TrialInfoBanner'
+import DemoInfoBanner from '../demo/demo-info-banner/DemoInfoBanner'
 
 const Create = () => {
   const { id } = useParams()
@@ -93,7 +93,7 @@ const Create = () => {
                 : 'Back to campaigns'}
             </PrimaryButton>
           </TitleBar>
-          {!!campaign.trialMessageLimit && <TrialInfoBanner></TrialInfoBanner>}
+          {!!campaign.demoMessageLimit && <DemoInfoBanner></DemoInfoBanner>}
           {isLoading ? (
             <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
           ) : (

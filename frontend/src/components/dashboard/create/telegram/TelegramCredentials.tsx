@@ -31,12 +31,12 @@ import { i18n } from 'locales'
 
 const TelegramCredentials = ({
   hasCredential: initialHasCredential,
-  isTrial,
+  isDemo,
   onNext,
   onPrevious,
 }: {
   hasCredential: boolean
-  isTrial: boolean
+  isDemo: boolean
   onNext: (changes: any, next?: boolean) => void
   onPrevious: () => void
 }) => {
@@ -73,9 +73,9 @@ const TelegramCredentials = ({
         setErrorMessage(e.message)
       }
     }
-    const defaultLabels = isTrial ? [DEMO_CREDENTIAL] : []
+    const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
     populateStoredCredentials(defaultLabels)
-  }, [isTrial, storedCredentials.length])
+  }, [isDemo, storedCredentials.length])
 
   function toggleInputMode() {
     setIsManual((m) => !m)
@@ -257,7 +257,7 @@ const TelegramCredentials = ({
                 Add new credentials
               </p>
 
-              {isTrial && selectedCredential === DEMO_CREDENTIAL && (
+              {isDemo && selectedCredential === DEMO_CREDENTIAL && (
                 <PrimaryInfoBlock>
                   <h4>Using the default Telegram credentials?</h4>
                   <p>

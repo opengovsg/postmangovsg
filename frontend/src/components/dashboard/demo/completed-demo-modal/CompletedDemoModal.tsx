@@ -1,43 +1,43 @@
 import React, { useEffect, useState } from 'react'
-import styles from './CompletedTrialModal.module.scss'
-import CongratsImage from 'assets/img/trial/congrats.png'
-import EndDemoImage from 'assets/img/trial/end-demo.png'
+import styles from './CompletedDemoModal.module.scss'
+import CongratsImage from 'assets/img/demo/congrats.png'
+import EndDemoImage from 'assets/img/demo/end-demo.png'
 import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
 import { OutboundLink } from 'react-ga'
 import { ChannelType } from 'classes'
 import { getUserSettings } from 'services/settings.service'
-const CompletedTrialModal = ({
+const CompletedDemoModal = ({
   selectedChannel,
 }: {
   selectedChannel: ChannelType
 }) => {
-  const [trialInfo, setTrialInfo] = useState({
-    numTrialsSms: 0,
-    numTrialsTelegram: 0,
+  const [demoInfo, setDemoInfo] = useState({
+    numDemosSms: 0,
+    numDemosTelegram: 0,
   })
 
   useEffect(() => {
-    async function getNumTrials() {
-      // TRIAL: check for number of trials
-      const { trial } = await getUserSettings()
-      setTrialInfo(trial)
+    async function getNumDemos() {
+      // TRIAL: check for number of demos
+      const { demo } = await getUserSettings()
+      setDemoInfo(demo)
     }
-    getNumTrials()
+    getNumDemos()
   }, [])
 
-  function numTrialsLeft() {
+  function numDemosLeft() {
     switch (selectedChannel) {
       case ChannelType.SMS:
-        return trialInfo.numTrialsSms
+        return demoInfo.numDemosSms
       case ChannelType.Telegram:
-        return trialInfo.numTrialsTelegram
+        return demoInfo.numDemosTelegram
       default:
         return 0
     }
   }
 
-  function renderRemainingTrials() {
+  function renderRemainingDemos() {
     return (
       <>
         <div className={styles.modalImg}>
@@ -45,7 +45,7 @@ const CompletedTrialModal = ({
         </div>
         <h2>
           Congrats, you’ve sent a demo {selectedChannel} campaign! You have{' '}
-          {numTrialsLeft()} remaining.
+          {numDemosLeft()} remaining.
         </h2>
         <p>
           Thanks for trying Postman! Learn how to setup your own Twilio accoun
@@ -56,7 +56,7 @@ const CompletedTrialModal = ({
     )
   }
 
-  function renderNoTrials() {
+  function renderNoDemos() {
     return (
       <>
         <div className={styles.modalImg}>
@@ -77,7 +77,7 @@ const CompletedTrialModal = ({
 
   return (
     <div className={styles.content}>
-      {numTrialsLeft() > 0 ? renderRemainingTrials() : renderNoTrials()}
+      {numDemosLeft() > 0 ? renderRemainingDemos() : renderNoDemos()}
       <div className="separator"></div>
       <div className={styles.options}>
         <OutboundLink
@@ -92,4 +92,4 @@ const CompletedTrialModal = ({
   )
 }
 
-export default CompletedTrialModal
+export default CompletedDemoModal

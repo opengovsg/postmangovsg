@@ -30,7 +30,7 @@ const SMSRecipients = ({
   numRecipients: initialNumRecipients,
   params,
   isProcessing: initialIsProcessing,
-  isTrial,
+  isDemo,
   onNext,
   onPrevious,
 }: {
@@ -38,7 +38,7 @@ const SMSRecipients = ({
   numRecipients: number
   params: Array<string>
   isProcessing: boolean
-  isTrial: boolean
+  isDemo: boolean
   onNext: (changes: Partial<SMSCampaign>, next?: boolean) => void
   onPrevious: () => void
 }) => {
@@ -155,7 +155,7 @@ const SMSRecipients = ({
             setErrorMsg={setErrorMessage}
           />
         </CsvUpload>
-        {isTrial && (
+        {isDemo && (
           <PrimaryInfoBlock>
             <h4>Limited to 20 recipients</h4>
             <span>

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import cx from 'classnames'
-import styles from './CreateTrialModal.module.scss'
+import styles from './CreateDemoModal.module.scss'
 import { Campaign, channelIcons, ChannelType } from 'classes/Campaign'
 import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
@@ -9,10 +9,10 @@ import { createCampaign } from 'services/campaign.service'
 import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
 import { OutboundLink } from 'react-ga'
-const CreateTrialModal = ({
-  trialInfo,
+const CreateDemoModal = ({
+  demoInfo,
 }: {
-  trialInfo: { numTrialsSms: number; numTrialsTelegram: number }
+  demoInfo: { numDemosSms: number; numDemosTelegram: number }
 }) => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()
@@ -22,45 +22,45 @@ const CreateTrialModal = ({
   const [demoCampaignMessage, setDemoCampaignMessage] = useState('')
   const [isCreateEnabled, setIsCreateEnabled] = useState(true)
   useEffect(() => {
-    // Handle case where one of the channels does not have any trials left
-    // Set the default selected channel to the channel that still has trials left
-    if (trialInfo.numTrialsSms) {
+    // Handle case where one of the channels does not have any demos left
+    // Set the default selected channel to the channel that still has demos left
+    if (demoInfo.numDemosSms) {
       setSelectedChannel(ChannelType.SMS)
     } else {
       setSelectedChannel(ChannelType.Telegram)
     }
-  }, [trialInfo.numTrialsSms])
+  }, [demoInfo.numDemosSms])
 
   useEffect(() => {
-    let numTrialsChannel
+    let numDemosChannel
     let message
     switch (selectedChannel) {
       case ChannelType.SMS:
-        numTrialsChannel = trialInfo.numTrialsSms
-        message = `You have ${numTrialsChannel}/3 SMS demo campaigns left`
+        numDemosChannel = demoInfo.numDemosSms
+        message = `You have ${numDemosChannel}/3 SMS demo campaigns left`
         break
       case ChannelType.Telegram:
-        numTrialsChannel = trialInfo.numTrialsTelegram
-        message = `You have ${numTrialsChannel}/3 Telegram demo campaigns left`
+        numDemosChannel = demoInfo.numDemosTelegram
+        message = `You have ${numDemosChannel}/3 Telegram demo campaigns left`
         break
       default:
         message = `Demo campaigns are not supported for campaign type ${selectedChannel} `
     }
     setSelectedName(
       `${selectedChannel} Demo ${
-        (numTrialsChannel && 4 - numTrialsChannel) || ''
+        (numDemosChannel && 4 - numDemosChannel) || ''
       }`
     )
     setDemoCampaignMessage(message)
-    setIsCreateEnabled(!!numTrialsChannel)
-  }, [selectedChannel, trialInfo.numTrialsSms, trialInfo.numTrialsTelegram])
+    setIsCreateEnabled(!!numDemosChannel)
+  }, [selectedChannel, demoInfo.numDemosSms, demoInfo.numDemosTelegram])
 
-  async function createTrial() {
+  async function createDemo() {
     try {
       const campaign: Campaign = await createCampaign({
         name: selectedName,
         type: selectedChannel,
-        trialMessageLimit: 20,
+        demoMessageLimit: 20,
       })
       // close modal and go to create view
       modalContext.setModalContent(null)
@@ -143,7 +143,7 @@ const CreateTrialModal = ({
         >
           Learn more about demos
         </TextButton> */}
-        <PrimaryButton onClick={createTrial} disabled={!isCreateEnabled}>
+        <PrimaryButton onClick={createDemo} disabled={!isCreateEnabled}>
           Create demo campaign
         </PrimaryButton>
       </div>
@@ -152,4 +152,4 @@ const CreateTrialModal = ({
   )
 }
 
-export default CreateTrialModal
+export default CreateDemoModal

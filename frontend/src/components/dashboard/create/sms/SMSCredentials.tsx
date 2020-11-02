@@ -31,12 +31,12 @@ import { LINKS } from 'config'
 
 const SMSCredentials = ({
   hasCredential: initialHasCredential,
-  isTrial,
+  isDemo,
   onNext,
   onPrevious,
 }: {
   hasCredential: boolean
-  isTrial: boolean
+  isDemo: boolean
   onNext: (changes: any, next?: boolean) => void
   onPrevious: () => void
 }) => {
@@ -72,9 +72,9 @@ const SMSCredentials = ({
         setErrorMessage(e.message)
       }
     }
-    const defaultLabels = isTrial ? [DEMO_CREDENTIAL] : []
+    const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
     populateStoredCredentials(defaultLabels)
-  }, [isTrial, storedCredentials.length])
+  }, [isDemo, storedCredentials.length])
 
   function toggleInputMode() {
     setIsManual((m) => !m)
@@ -171,7 +171,7 @@ const SMSCredentials = ({
               <p className="clickable" onClick={() => setIsManual(true)}>
                 Input credentials manually
               </p>
-              {isTrial && selectedCredential === DEMO_CREDENTIAL && (
+              {isDemo && selectedCredential === DEMO_CREDENTIAL && (
                 <PrimaryInfoBlock>
                   <h4>Using the default credentials?</h4>
                   <span>

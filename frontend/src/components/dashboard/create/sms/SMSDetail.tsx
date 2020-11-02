@@ -9,20 +9,20 @@ import {
 import { StepHeader, ProgressDetails } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import CompletedTrialModal from 'components/dashboard/trial/completed-trial-modal'
+import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 
 const SMSDetail = ({
   id,
   name,
   sentAt,
   numRecipients,
-  isTrial,
+  isDemo,
 }: {
   id: number
   name: string
   sentAt: Date
   numRecipients: number
-  isTrial: boolean
+  isDemo: boolean
 }) => {
   const modalContext = useContext(ModalContext)
   const [stats, setStats] = useState(new CampaignStats({}))
@@ -79,17 +79,17 @@ const SMSDetail = ({
   }, [id, stats.status])
 
   useEffect(() => {
-    function renderCompletedTrialModal() {
+    function renderCompletedDemoModal() {
       modalContext.setModalContent(
-        <CompletedTrialModal
+        <CompletedDemoModal
           selectedChannel={ChannelType.SMS}
-        ></CompletedTrialModal>
+        ></CompletedDemoModal>
       )
     }
-    if (isTrial && stats.status === Status.Sent) renderCompletedTrialModal()
+    if (isDemo && stats.status === Status.Sent) renderCompletedDemoModal()
     // Prevent modalContext from being added to dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isTrial, stats.status])
+  }, [isDemo, stats.status])
 
   function renderProgressHeader() {
     if (stats.waitTime && stats.waitTime > 0) {
