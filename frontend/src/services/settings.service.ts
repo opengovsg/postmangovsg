@@ -14,7 +14,7 @@ async function getUserSettings(): Promise<{
   try {
     const response = await axios.get('/settings')
     const { has_api_key: hasApiKey, creds, trial } = response.data
-    return { hasApiKey, creds, trial: { numTrialsSms: trial.num_trials_sms } }
+    return { hasApiKey, creds, trial: { numTrialsSms: trial?.num_trials_sms } }
   } catch (e) {
     errorHandler(e, 'Error fetching credentials')
   }
