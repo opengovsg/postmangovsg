@@ -8,6 +8,8 @@ import {
   PrimaryButton,
   SendRate,
   ConfirmModal,
+  ButtonGroup,
+  TextButton,
 } from 'components/common'
 import { getPreviewMessage } from 'services/sms.service'
 import { sendCampaign } from 'services/campaign.service'
@@ -18,9 +20,11 @@ import styles from '../Create.module.scss'
 const SMSSend = ({
   numRecipients,
   onNext,
+  onPrevious,
 }: {
   numRecipients: number
   onNext: Function
+  onPrevious: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
@@ -88,12 +92,13 @@ const SMSSend = ({
 
       <div className="separator"></div>
 
-      <div className="progress-button">
+      <ButtonGroup>
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-      </div>
+        <TextButton onClick={onPrevious}>Previous</TextButton>
+      </ButtonGroup>
     </>
   )
 }

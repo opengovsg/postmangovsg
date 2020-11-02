@@ -34,12 +34,14 @@ const ProtectedEmailRecipients = ({
   numRecipients,
   isProcessing,
   onNext,
+  onPrevious,
   finishLaterCallbackRef,
 }: {
   csvFilename: string
   numRecipients: number
   isProcessing: boolean
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
+  onPrevious: () => void
   finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
   const modalContext = useContext(ModalContext)
@@ -203,7 +205,7 @@ const ProtectedEmailRecipients = ({
 
       <div className="progress-button">
         <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
-          Back
+          Previous
         </TextButton>
         <PrimaryButton
           onClick={onFileUpload}
@@ -234,6 +236,7 @@ const ProtectedEmailRecipients = ({
         onFileSelected={onFileSelected}
         forceReset={phase === ProtectPhase.READY}
         onNext={onNext}
+        onPrevious={onPrevious}
       ></EmailRecipients>
       {phase === ProtectPhase.READY && csvFilename && (
         <div className="progress-button">

@@ -14,6 +14,8 @@ import {
   PreviewBlock,
   NextButton,
   SampleCsv,
+  ButtonGroup,
+  TextButton,
 } from 'components/common'
 import { EmailCampaign, EmailPreview } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -30,6 +32,7 @@ const EmailRecipients = ({
   template,
   forceReset,
   onNext,
+  onPrevious,
 }: {
   csvFilename: string
   numRecipients: number
@@ -40,6 +43,7 @@ const EmailRecipients = ({
   template?: string
   forceReset?: boolean // this forces upload button to show without csv info and preview
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
+  onPrevious: () => void
 }) => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
@@ -208,10 +212,13 @@ const EmailRecipients = ({
         </>
       )}
       {!protect && (
-        <NextButton
-          disabled={!numRecipients || isCsvProcessing}
-          onClick={onNext}
-        />
+        <ButtonGroup>
+          <NextButton
+            disabled={!numRecipients || isCsvProcessing}
+            onClick={onNext}
+          />
+          <TextButton onClick={onPrevious}>Previous</TextButton>
+        </ButtonGroup>
       )}
     </>
   )

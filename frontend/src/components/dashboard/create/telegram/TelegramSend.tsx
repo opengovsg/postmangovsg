@@ -8,6 +8,8 @@ import {
   PrimaryButton,
   SendRate,
   ConfirmModal,
+  ButtonGroup,
+  TextButton,
 } from 'components/common'
 import { getPreviewMessage } from 'services/telegram.service'
 import { sendCampaign } from 'services/campaign.service'
@@ -18,9 +20,11 @@ import styles from '../Create.module.scss'
 const TelegramSend = ({
   numRecipients,
   onNext,
+  onPrevious,
 }: {
   numRecipients: number
   onNext: Function
+  onPrevious: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
@@ -82,20 +86,21 @@ const TelegramSend = ({
         ></PreviewBlock>
       </div>
 
-      <div className="separator"></div>
-
       <SendRate
         sendRate={sendRate}
         setSendRate={setSendRate}
         channelType={ChannelType.Telegram}
       />
 
-      <div className="progress-button">
+      <div className="separator"></div>
+
+      <ButtonGroup>
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-      </div>
+        <TextButton onClick={onPrevious}>Previous</TextButton>
+      </ButtonGroup>
     </>
   )
 }

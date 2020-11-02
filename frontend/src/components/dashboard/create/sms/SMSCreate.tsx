@@ -50,6 +50,8 @@ const CreateSMS = ({
     }
   }, [])
 
+  const onPrevious = () => setActiveStep((s) => Math.max(s - 1, 0))
+
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
     if (campaign.isCsvProcessing) {
@@ -75,6 +77,7 @@ const CreateSMS = ({
             numRecipients={campaign.numRecipients}
             isProcessing={campaign.isCsvProcessing}
             onNext={onNext}
+            onPrevious={onPrevious}
           />
         )
       case SMSProgress.InsertCredentials:
@@ -82,11 +85,16 @@ const CreateSMS = ({
           <SMSCredentials
             hasCredential={campaign.hasCredential}
             onNext={onNext}
+            onPrevious={onPrevious}
           />
         )
       case SMSProgress.Send:
         return (
-          <SMSSend numRecipients={campaign.numRecipients} onNext={onNext} />
+          <SMSSend
+            numRecipients={campaign.numRecipients}
+            onNext={onNext}
+            onPrevious={onPrevious}
+          />
         )
       default:
         return <p>Invalid step</p>

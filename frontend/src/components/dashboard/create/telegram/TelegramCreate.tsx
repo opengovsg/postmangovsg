@@ -50,6 +50,8 @@ const CreateTelegram = ({
     }
   }, [])
 
+  const onPrevious = () => setActiveStep((s) => Math.max(s - 1, 0))
+
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
     if (campaign.isCsvProcessing) {
@@ -75,6 +77,7 @@ const CreateTelegram = ({
             numRecipients={campaign.numRecipients}
             isProcessing={campaign.isCsvProcessing}
             onNext={onNext}
+            onPrevious={onPrevious}
           />
         )
       case TelegramProgress.InsertCredentials:
@@ -82,6 +85,7 @@ const CreateTelegram = ({
           <TelegramCredentials
             hasCredential={campaign.hasCredential}
             onNext={onNext}
+            onPrevious={onPrevious}
           />
         )
       case TelegramProgress.Send:
@@ -89,6 +93,7 @@ const CreateTelegram = ({
           <TelegramSend
             numRecipients={campaign.numRecipients}
             onNext={onNext}
+            onPrevious={onPrevious}
           />
         )
       default:

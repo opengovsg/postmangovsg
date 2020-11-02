@@ -1,7 +1,13 @@
 import React, { useState } from 'react'
 
 import { sendPreviewMessage } from 'services/email.service'
-import { NextButton, InfoBlock, ErrorBlock } from 'components/common'
+import {
+  NextButton,
+  InfoBlock,
+  ErrorBlock,
+  ButtonGroup,
+  TextButton,
+} from 'components/common'
 import { useParams } from 'react-router-dom'
 
 import EmailValidationInput from './EmailValidationInput'
@@ -10,10 +16,12 @@ const EmailCredentials = ({
   hasCredential: initialHasCredential,
   protect,
   onNext,
+  onPrevious,
 }: {
   hasCredential: boolean
   protect: boolean
   onNext: (changes: any, next?: boolean) => void
+  onPrevious: () => void
 }) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [errorMsg, setErrorMsg] = useState(null)
@@ -70,7 +78,10 @@ const EmailCredentials = ({
 
           <div className="separator"></div>
 
-          <NextButton disabled={!hasCredential} onClick={onNext} />
+          <ButtonGroup>
+            <NextButton disabled={!hasCredential} onClick={onNext} />
+            <TextButton onClick={onPrevious}>Previous</TextButton>
+          </ButtonGroup>
         </>
       }
     </>

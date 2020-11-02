@@ -13,7 +13,9 @@ import {
   ErrorBlock,
   PreviewBlock,
   NextButton,
+  TextButton,
   SampleCsv,
+  ButtonGroup,
 } from 'components/common'
 import { TelegramCampaign, TelegramPreview } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -26,12 +28,14 @@ const TelegramRecipients = ({
   params,
   isProcessing: initialIsProcessing,
   onNext,
+  onPrevious,
 }: {
   csvFilename: string
   numRecipients: number
   params: Array<string>
   isProcessing: boolean
   onNext: (changes: Partial<TelegramCampaign>, next?: boolean) => void
+  onPrevious: () => void
 }) => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
@@ -155,7 +159,13 @@ const TelegramRecipients = ({
         </>
       )}
 
-      <NextButton disabled={!numRecipients || !csvFilename} onClick={onNext} />
+      <ButtonGroup>
+        <NextButton
+          disabled={!numRecipients || !csvFilename}
+          onClick={onNext}
+        />
+        <TextButton onClick={onPrevious}>Previous</TextButton>
+      </ButtonGroup>
     </>
   )
 }

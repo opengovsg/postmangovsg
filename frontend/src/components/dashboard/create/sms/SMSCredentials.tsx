@@ -12,6 +12,8 @@ import {
   NextButton,
   ErrorBlock,
   Dropdown,
+  ButtonGroup,
+  TextButton,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
@@ -22,9 +24,11 @@ import styles from '../Create.module.scss'
 const SMSCredentials = ({
   hasCredential: initialHasCredential,
   onNext,
+  onPrevious,
 }: {
   hasCredential: boolean
   onNext: (changes: any, next?: boolean) => void
+  onPrevious: () => void
 }) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [storedCredentials, setStoredCredentials] = useState(
@@ -160,7 +164,10 @@ const SMSCredentials = ({
 
           <div className="separator"></div>
 
-          <NextButton disabled={!hasCredential} onClick={onNext} />
+          <ButtonGroup>
+            <NextButton disabled={!hasCredential} onClick={onNext} />
+            <TextButton onClick={onPrevious}>Previous</TextButton>
+          </ButtonGroup>
         </>
       ) : (
         <>{renderCredentialFields()}</>

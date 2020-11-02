@@ -16,6 +16,8 @@ import {
   InfoBlock,
   ErrorBlock,
   Dropdown,
+  ButtonGroup,
+  TextButton,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -25,9 +27,11 @@ import { i18n } from 'locales'
 const TelegramCredentials = ({
   hasCredential: initialHasCredential,
   onNext,
+  onPrevious,
 }: {
   hasCredential: boolean
   onNext: (changes: any, next?: boolean) => void
+  onPrevious: () => void
 }) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [storedCredentials, setStoredCredentials] = useState(
@@ -179,7 +183,7 @@ const TelegramCredentials = ({
             </div>
             <ErrorBlock>{errorMessage}</ErrorBlock>
 
-            <div className="progress-button">
+            <ButtonGroup>
               <PrimaryButton disabled={!creds} onClick={handleNewCredentials}>
                 {isValidating ? (
                   <>
@@ -192,7 +196,8 @@ const TelegramCredentials = ({
                   </>
                 )}
               </PrimaryButton>
-            </div>
+              <TextButton onClick={onPrevious}>Previous</TextButton>
+            </ButtonGroup>
           </>
         ) : (
           <>
@@ -206,7 +211,7 @@ const TelegramCredentials = ({
               Add new credentials
             </p>
 
-            <div className="progress-button">
+            <ButtonGroup>
               <PrimaryButton
                 disabled={!selectedCredential}
                 onClick={handleSelectStoredCredentials}
@@ -221,7 +226,8 @@ const TelegramCredentials = ({
                   </>
                 )}
               </PrimaryButton>
-            </div>
+              <TextButton onClick={onPrevious}>Previous</TextButton>
+            </ButtonGroup>
           </>
         )}
       </>
@@ -269,7 +275,10 @@ const TelegramCredentials = ({
               <ErrorBlock>{errorMessage}</ErrorBlock>
               <div className="separator"></div>
 
-              <NextButton disabled={!hasCredential} onClick={onNext} />
+              <ButtonGroup>
+                <NextButton disabled={!hasCredential} onClick={onNext} />
+                <TextButton onClick={onPrevious}>Previous</TextButton>
+              </ButtonGroup>
             </>
           )}
         </>

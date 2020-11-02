@@ -3,7 +3,13 @@ import { useParams } from 'react-router-dom'
 
 import { Status } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
-import { PreviewBlock, PrimaryButton, ConfirmModal } from 'components/common'
+import {
+  PreviewBlock,
+  PrimaryButton,
+  ConfirmModal,
+  ButtonGroup,
+  TextButton,
+} from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
 import { sendCampaign } from 'services/campaign.service'
 
@@ -12,9 +18,11 @@ import styles from '../Create.module.scss'
 const EmailSend = ({
   numRecipients,
   onNext,
+  onPrevious,
 }: {
   numRecipients: number
   onNext: Function
+  onPrevious: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState(
@@ -84,12 +92,13 @@ const EmailSend = ({
 
       <div className="separator"></div>
 
-      <div className="progress-button">
+      <ButtonGroup>
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-      </div>
+        <TextButton onClick={onPrevious}>Previous</TextButton>
+      </ButtonGroup>
     </>
   )
 }

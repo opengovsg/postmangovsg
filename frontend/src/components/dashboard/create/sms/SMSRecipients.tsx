@@ -14,6 +14,8 @@ import {
   PreviewBlock,
   NextButton,
   SampleCsv,
+  ButtonGroup,
+  TextButton,
 } from 'components/common'
 import { SMSCampaign, SMSPreview } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -26,12 +28,14 @@ const SMSRecipients = ({
   params,
   isProcessing: initialIsProcessing,
   onNext,
+  onPrevious,
 }: {
   csvFilename: string
   numRecipients: number
   params: Array<string>
   isProcessing: boolean
   onNext: (changes: Partial<SMSCampaign>, next?: boolean) => void
+  onPrevious: () => void
 }) => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
@@ -155,7 +159,13 @@ const SMSRecipients = ({
         </>
       )}
 
-      <NextButton disabled={!numRecipients || !csvFilename} onClick={onNext} />
+      <ButtonGroup>
+        <NextButton
+          disabled={!numRecipients || !csvFilename}
+          onClick={onNext}
+        />
+        <TextButton onClick={onPrevious}>Previous</TextButton>
+      </ButtonGroup>
     </>
   )
 }
