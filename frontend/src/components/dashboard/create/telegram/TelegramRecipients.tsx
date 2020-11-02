@@ -18,6 +18,7 @@ import {
   ButtonGroup,
   StepHeader,
   StepSection,
+  PrimaryInfoBlock,
 } from 'components/common'
 import { TelegramCampaign, TelegramPreview } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -29,6 +30,7 @@ const TelegramRecipients = ({
   numRecipients: initialNumRecipients,
   params,
   isProcessing: initialIsProcessing,
+  isTrial,
   onNext,
   onPrevious,
 }: {
@@ -36,6 +38,7 @@ const TelegramRecipients = ({
   numRecipients: number
   params: Array<string>
   isProcessing: boolean
+  isTrial: boolean
   onNext: (changes: Partial<TelegramCampaign>, next?: boolean) => void
   onPrevious: () => void
 }) => {
@@ -151,6 +154,16 @@ const TelegramRecipients = ({
             setErrorMsg={setErrorMessage}
           />
         </CsvUpload>
+
+        {isTrial && (
+          <PrimaryInfoBlock>
+            <h4>Limited to 20 recipients</h4>
+            <span>
+              You can only send out to 20 recipients per test campaign. Only the
+              first 20 rows in your CSV file will be taken.
+            </span>
+          </PrimaryInfoBlock>
+        )}
 
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>

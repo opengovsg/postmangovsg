@@ -12,24 +12,48 @@ import { OutboundLink } from 'react-ga'
 const CreateTrialModal = ({
   trialInfo,
 }: {
-  trialInfo: { numTrialsSms: number }
+  trialInfo: { numTrialsSms: number; numTrialsTelegram: number }
 }) => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
   const [selectedName, setSelectedName] = useState('')
+  const [demoCampaignMessage, setDemoCampaignMessage] = useState('')
+  const [isCreateEnabled, setIsCreateEnabled] = useState(true)
   useEffect(() => {
-    let index
+    // Handle case where one of the channels does not have any trials left
+    // Set the default selected channel to the channel that still has trials left
+    if (trialInfo.numTrialsSms) {
+      setSelectedChannel(ChannelType.SMS)
+    } else {
+      setSelectedChannel(ChannelType.Telegram)
+    }
+  }, [trialInfo.numTrialsSms])
+
+  useEffect(() => {
+    let numTrialsChannel
+    let message
     switch (selectedChannel) {
       case ChannelType.SMS:
-        index = 4 - trialInfo.numTrialsSms
+        numTrialsChannel = trialInfo.numTrialsSms
+        message = `You have ${numTrialsChannel}/3 SMS demo campaigns left`
+        break
+      case ChannelType.Telegram:
+        numTrialsChannel = trialInfo.numTrialsTelegram
+        message = `You have ${numTrialsChannel}/3 Telegram demo campaigns left`
         break
       default:
-        index = 1
+        message = `Demo campaigns are not supported for campaign type ${selectedChannel} `
     }
-    setSelectedName(`${selectedChannel} Demo ${index}`)
-  }, [selectedChannel, trialInfo.numTrialsSms])
+    setSelectedName(
+      `${selectedChannel} Demo ${
+        (numTrialsChannel && 4 - numTrialsChannel) || ''
+      }`
+    )
+    setDemoCampaignMessage(message)
+    setIsCreateEnabled(!!numTrialsChannel)
+  }, [selectedChannel, trialInfo.numTrialsSms, trialInfo.numTrialsTelegram])
 
   async function createTrial() {
     try {
@@ -45,11 +69,10 @@ const CreateTrialModal = ({
       setErrorMessage(err.message)
     }
   }
+
   return (
     <>
-      <div className={styles.modalHeader}>
-        You have {trialInfo.numTrialsSms}/3 SMS demo campaigns left
-      </div>
+      <div className={styles.modalHeader}>{demoCampaignMessage}</div>
       <div className={styles.section}>
         <h5 className={styles.subtitle}>
           The demo campaign has been named for you
@@ -85,7 +108,7 @@ const CreateTrialModal = ({
             ></i>
           </PrimaryButton>
         </div>
-        {/* <div className={styles.channelContainer}>
+        <div className={styles.channelContainer}>
           <PrimaryButton
             className={cx(styles.button, {
               [styles.active]: selectedChannel === ChannelType.Telegram,
@@ -101,7 +124,7 @@ const CreateTrialModal = ({
               )}
             ></i>
           </PrimaryButton>
-        </div> */}
+        </div>
       </div>
       <div className="separator"></div>
       <div className={styles.actions}>
@@ -120,7 +143,7 @@ const CreateTrialModal = ({
         >
           Learn more about demos
         </TextButton> */}
-        <PrimaryButton onClick={createTrial}>
+        <PrimaryButton onClick={createTrial} disabled={!isCreateEnabled}>
           Create demo campaign
         </PrimaryButton>
       </div>

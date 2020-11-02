@@ -9,12 +9,19 @@ export interface UserCredential {
 async function getUserSettings(): Promise<{
   hasApiKey: boolean
   creds: UserCredential[]
-  trial: { numTrialsSms: number }
+  trial: { numTrialsSms: number; numTrialsTelegram: number }
 }> {
   try {
     const response = await axios.get('/settings')
     const { has_api_key: hasApiKey, creds, trial } = response.data
-    return { hasApiKey, creds, trial: { numTrialsSms: trial?.num_trials_sms } }
+    return {
+      hasApiKey,
+      creds,
+      trial: {
+        numTrialsSms: trial?.num_trials_sms,
+        numTrialsTelegram: trial?.num_trials_telegram,
+      },
+    }
   } catch (e) {
     errorHandler(e, 'Error fetching credentials')
   }

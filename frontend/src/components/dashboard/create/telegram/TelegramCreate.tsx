@@ -76,6 +76,7 @@ const CreateTelegram = ({
             csvFilename={campaign.csvFilename}
             numRecipients={campaign.numRecipients}
             isProcessing={campaign.isCsvProcessing}
+            isTrial={!!campaign.trialMessageLimit}
             onNext={onNext}
             onPrevious={onPrevious}
           />
@@ -84,6 +85,7 @@ const CreateTelegram = ({
         return (
           <TelegramCredentials
             hasCredential={campaign.hasCredential}
+            isTrial={!!campaign.trialMessageLimit}
             onNext={onNext}
             onPrevious={onPrevious}
           />

@@ -30,10 +30,12 @@ import { i18n } from 'locales'
 
 const TelegramCredentials = ({
   hasCredential: initialHasCredential,
+  isTrial,
   onNext,
   onPrevious,
 }: {
   hasCredential: boolean
+  isTrial: boolean
   onNext: (changes: any, next?: boolean) => void
   onPrevious: () => void
 }) => {
@@ -54,26 +56,24 @@ const TelegramCredentials = ({
   const [sendSuccess, setSendSuccess] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
   const { id: campaignId } = useParams()
-
   useEffect(() => {
-    populateStoredCredentials()
-  }, [])
-
-  async function populateStoredCredentials() {
-    try {
-      const storedCredLabels = await getStoredCredentials()
-      setCredLabels(storedCredLabels)
-      setStoredCredentials(
-        storedCredLabels.map((c) => ({ label: c, value: c }))
-      )
-      if (!storedCredLabels.length) {
-        setIsManual(true)
+    async function populateStoredCredentials(defaultLabels: string[]) {
+      try {
+        const labels = await getStoredCredentials()
+        const allLabels = defaultLabels.concat(labels)
+        setCredLabels(allLabels)
+        setStoredCredentials(allLabels.map((c) => ({ label: c, value: c })))
+        if (!allLabels.length) {
+          setIsManual(true)
+        }
+      } catch (e) {
+        console.error(e)
+        setErrorMessage(e.message)
       }
-    } catch (e) {
-      console.error(e)
-      setErrorMessage(e.message)
     }
-  }
+    const defaultLabels = isTrial ? ['TELEGRAM_DEFAULT'] : []
+    populateStoredCredentials(defaultLabels)
+  }, [isTrial, storedCredentials.length])
 
   function toggleInputMode() {
     setIsManual((m) => !m)

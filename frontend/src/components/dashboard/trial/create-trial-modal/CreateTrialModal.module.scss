@@ -126,6 +126,9 @@
     @include flex-vertical;
     align-items: center;
     width: 100%;
+    a {
+      margin-bottom: 1rem;
+    }
     button:last-child,
     a:last-child {
       margin-left: 0px;

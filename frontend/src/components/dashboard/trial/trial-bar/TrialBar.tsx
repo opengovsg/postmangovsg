@@ -10,21 +10,30 @@ const TrialBar = ({ isVisible: initialIsVisible }: { isVisible: boolean }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(initialIsVisible)
   const toggleMenu = useCallback(() => setIsMenuVisible((state) => !state), [])
   const [numTrialsSms, setNumTrialsSms] = useState(0)
+  const [numTrialsTelegram, setNumTrialsTelegram] = useState(0)
+  const [hasTrial, setHasTrial] = useState(false)
 
   useEffect(() => {
     async function getNumTrials() {
       // TRIAL: check for number of trials
       const { trial } = await getUserSettings()
-      setIsMenuVisible(!!trial.numTrialsSms)
-      setNumTrialsSms(trial.numTrialsSms)
+      setIsMenuVisible(!!trial?.numTrialsSms || !!trial?.numTrialsTelegram)
+      setNumTrialsSms(trial?.numTrialsSms)
+      setNumTrialsTelegram(trial?.numTrialsTelegram)
     }
     getNumTrials()
   }, [])
 
+  useEffect(() => {
+    setHasTrial(!!numTrialsTelegram || !!numTrialsSms)
+  }, [numTrialsSms, numTrialsTelegram])
+
   function onCreate(): void {
-    if (numTrialsSms) {
+    if (hasTrial) {
       modalContext.setModalContent(
-        <CreateTrialModal trialInfo={{ numTrialsSms }}></CreateTrialModal>
+        <CreateTrialModal
+          trialInfo={{ numTrialsSms, numTrialsTelegram }}
+        ></CreateTrialModal>
       )
     }
   }
@@ -40,9 +49,12 @@ const TrialBar = ({ isVisible: initialIsVisible }: { isVisible: boolean }) => {
         })}
       >
         <div className={styles.message}>
-          {numTrialsSms ? (
+          {hasTrial ? (
             <>
-              <div className={styles.text}>SMS: {numTrialsSms}/3 left.</div>
+              <div className={styles.text}>
+                SMS: {numTrialsSms || 0}/3 left. Telegram:{' '}
+                {numTrialsTelegram || 0}/3 left.
+              </div>
               <TextButton
                 className={styles.action}
                 minButtonWidth
