@@ -18,6 +18,7 @@ import {
   Dropdown,
   ButtonGroup,
   TextButton,
+  StepHeader,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -147,13 +148,17 @@ const TelegramCredentials = ({
     }
   }
 
-  function renderCredentialFields() {
+  function renderCredentialFields(isEmbedded = false) {
     return (
       <>
-        <h2>Insert your Telegram credentials</h2>
-        <p className={styles.validateCredentialsInfo}>
-          Select from your stored credentials or add new ones.
-        </p>
+        <StepHeader
+          title="Insert your Telegram credentials"
+          subtitle={isEmbedded ? '' : 'Step 3'}
+        >
+          <p className={styles.validateCredentialsInfo}>
+            Select from your stored credentials or add new ones.
+          </p>
+        </StepHeader>
 
         {isManual ? (
           <>
@@ -236,33 +241,40 @@ const TelegramCredentials = ({
 
   return (
     <>
-      <sub>Step 3</sub>
       {hasCredential ? (
         <>
-          <h2>Your current credentials have already been validated.</h2>
-          <p>
-            Entering new credentials will overwrite the previous validated one.
-            This action is irreversible. Please proceed with caution.
-          </p>
+          <StepHeader
+            title="Your current credentials have already been validated."
+            subtitle="Step 3"
+          >
+            <p>
+              Entering new credentials will overwrite the previous validated
+              one. This action is irreversible. Please proceed with caution.
+            </p>
+          </StepHeader>
           {showCredentialFields ? (
-            renderCredentialFields()
+            <>
+              <div className="separator"></div>
+              {renderCredentialFields(true)}
+            </>
           ) : (
             <>
               <PrimaryButton
-                className={cx(styles.darkBlueBtn, styles.newCredentialsButton)}
+                className={cx(styles.darkBlueBtn)}
                 onClick={toggleReplaceCredentials}
               >
                 Enter new credentials
               </PrimaryButton>
               <div className="separator"></div>
 
-              <h2>Optional: Send a test message</h2>
-              <p className={styles.validateCredentialsInfo}>
-                To ensure everything is working perfectly, please send a test
-                message to receive a preview of your message. Do note that the
-                phone number you are testing with must already be{' '}
-                <b>subscribed to the bot</b>.
-              </p>
+              <StepHeader title="Optional: Send a test message">
+                <p className={styles.validateCredentialsInfo}>
+                  To ensure everything is working perfectly, please send a test
+                  message to receive a preview of your message. Do note that the
+                  phone number you are testing with must already be{' '}
+                  <b>subscribed to the bot</b>.
+                </p>
+              </StepHeader>
               <TelegramValidationInput onClick={handleSendValidationMessage} />
               {sendSuccess && (
                 <InfoBlock>

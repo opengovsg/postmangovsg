@@ -10,6 +10,7 @@ import {
   ErrorBlock,
   ProtectedPreview,
   Checkbox,
+  StepHeader,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { ModalContext } from 'contexts/modal.context'
@@ -134,7 +135,7 @@ const ProtectedEmailRecipients = ({
 
   const messageBInput = (
     <>
-      <h2>Create password protected message</h2>
+      <StepHeader title="Create password protected message" subtitle="Step 2" />
       <h4>Message B</h4>
       <p>
         The content below is what your recipients see after opening their
@@ -168,16 +169,17 @@ const ProtectedEmailRecipients = ({
 
   const messageBPreview = (
     <>
-      <h2>Confirm password protected message</h2>
-      <p>
-        If you choose to edit your message, do note that you will have to
-        re-upload your recipients list.
-      </p>
-      <p>
-        <b>Note:</b> For security reasons, we do not store password protected
-        messages. You will lose the content below if you refresh your tab or go
-        back to Step 1 to edit.
-      </p>
+      <StepHeader title="Confirm password protected message" subtitle="Step 2">
+        <p>
+          If you choose to edit your message, do note that you will have to
+          re-upload your recipients list.
+        </p>
+        <p>
+          <b>Note:</b> For security reasons, we do not store password protected
+          messages. You will lose the content below if you refresh your tab or
+          go back to Step 1 to edit.
+        </p>
+      </StepHeader>
       <InfoBlock>
         <li>
           <i className="bx bx-user-check"></i>
@@ -202,7 +204,6 @@ const ProtectedEmailRecipients = ({
           </InfoBlock>
         </>
       )}
-
       <div className="progress-button">
         <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
           Previous
@@ -294,7 +295,6 @@ const ProtectedEmailRecipients = ({
 
   return (
     <>
-      <sub>Step 2</sub>
       {render()}
       <ErrorBlock>{errorMessage}</ErrorBlock>
     </>

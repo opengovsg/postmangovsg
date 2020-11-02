@@ -9,6 +9,7 @@ import {
   ConfirmModal,
   ButtonGroup,
   TextButton,
+  StepHeader,
 } from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
 import { sendCampaign } from 'services/campaign.service'
@@ -73,8 +74,10 @@ const EmailSend = ({
 
   return (
     <>
-      <sub>Step 4</sub>
-      <h2>Your campaign is ready to be sent!</h2>
+      <StepHeader
+        title="Your campaign is ready to be sent!"
+        subtitle="Step 4"
+      />
       <div className="separator"></div>
 
       <div className={styles.sendInfo}>

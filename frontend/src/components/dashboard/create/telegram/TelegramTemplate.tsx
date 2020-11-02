@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useContext } from 'react'
 
-import { TextArea, NextButton, ErrorBlock } from 'components/common'
+import { TextArea, NextButton, ErrorBlock, StepHeader } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { ModalContext } from 'contexts/modal.context'
 import { useParams } from 'react-router-dom'
@@ -67,8 +67,7 @@ const TelegramTemplate = ({
 
   return (
     <>
-      <sub>Step 1</sub>
-      <h2>Create message template</h2>
+      <StepHeader title="Create message template" subtitle="Step 1" />
       <h4>Message</h4>
       <p>
         To personalise your message, include keywords that are surrounded by

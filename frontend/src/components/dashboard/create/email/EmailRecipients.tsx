@@ -16,6 +16,7 @@ import {
   SampleCsv,
   ButtonGroup,
   TextButton,
+  StepHeader,
 } from 'components/common'
 import { EmailCampaign, EmailPreview } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -148,27 +149,30 @@ const EmailRecipients = ({
 
   return (
     <>
-      {!protect && <sub>Step 2</sub>}
-      <h2>Upload recipient list in CSV format</h2>
-      <p>
-        Only CSV format files are allowed. If you have an Excel file, please
-        convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
-      </p>
-      <p>
-        CSV file must include:
-        <li>
-          a <b>recipient</b> column with recipients&apos; email addresses
-        </li>
-        {protect && (
-          <>
-            <li>
-              a <b>password</b> column with the password to access the protected
-              message
-            </li>
-            <li>all other keywords in the template</li>
-          </>
-        )}
-      </p>
+      <StepHeader
+        title="Upload recipient list in CSV format"
+        subtitle={protect ? '' : 'Step 2'}
+      >
+        <p>
+          Only CSV format files are allowed. If you have an Excel file, please
+          convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
+        </p>
+        <p>
+          CSV file must include:
+          <li>
+            a <b>recipient</b> column with recipients&apos; email addresses
+          </li>
+          {protect && (
+            <>
+              <li>
+                a <b>password</b> column with the password to access the
+                protected message
+              </li>
+              <li>all other keywords in the template</li>
+            </>
+          )}
+        </p>
+      </StepHeader>
 
       <CsvUpload
         isCsvProcessing={isCsvProcessing}

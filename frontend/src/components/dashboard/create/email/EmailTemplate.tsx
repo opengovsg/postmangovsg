@@ -6,6 +6,7 @@ import {
   ErrorBlock,
   TextInput,
   Dropdown,
+  StepHeader,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { ModalContext } from 'contexts/modal.context'
@@ -121,8 +122,7 @@ const EmailTemplate = ({
 
   return (
     <>
-      <sub>Step 1</sub>
-      <h2>Create email message</h2>
+      <StepHeader title="Create email message" subtitle="Step 1" />
 
       <h4>From</h4>
       <p>Emails will be sent from this address</p>

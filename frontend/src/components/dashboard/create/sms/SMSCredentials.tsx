@@ -14,6 +14,7 @@ import {
   Dropdown,
   ButtonGroup,
   TextButton,
+  StepHeader,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
@@ -98,12 +99,15 @@ const SMSCredentials = ({
     }
   }
 
-  function renderCredentialFields() {
+  function renderCredentialFields(isEmbedded = false) {
     return (
       <>
         {isManual ? (
           <>
-            <h2>Insert your Twilio credentials</h2>
+            <StepHeader
+              title="Insert your Twilio credentials"
+              subtitle="Step 3"
+            />
             <TwilioCredentialsInput
               onFilled={setCreds}
             ></TwilioCredentialsInput>
@@ -115,7 +119,11 @@ const SMSCredentials = ({
           </>
         ) : (
           <>
-            <h2>Select your Twilio credentials</h2>
+            <div className="separator"></div>
+            <StepHeader
+              title="Select your Twilio credentials"
+              subtitle={isEmbedded ? '' : 'Step 3'}
+            />
             <Dropdown
               onSelect={setSelectedCredential}
               options={storedCredentials}
@@ -127,11 +135,13 @@ const SMSCredentials = ({
         )}
         <div className="separator"></div>
 
-        <h2>Validate your credentials by doing a test send</h2>
-        <p className={styles.validateCredentialsInfo}>
-          To ensure your credentials are working perfectly, please send a test
-          SMS to an available phone number to receive a preview of your message.
-        </p>
+        <StepHeader title="Validate your credentials by doing a test send">
+          <p className={styles.validateCredentialsInfo}>
+            To ensure your credentials are working perfectly, please send a test
+            SMS to an available phone number to receive a preview of your
+            message.
+          </p>
+        </StepHeader>
         <SMSValidationInput
           onClick={handleValidateCredentials}
           buttonDisabled={isManual ? !creds : !selectedCredential}
@@ -143,19 +153,22 @@ const SMSCredentials = ({
 
   return (
     <>
-      <sub>Step 3</sub>
       {hasCredential ? (
         <>
-          <h2>Your current credentials have already been validated.</h2>
-          <p>
-            Entering new credentials will overwrite the previous validated one.
-            This action is irreversible. Please proceed with caution.
-          </p>
+          <StepHeader
+            title="Your current credentials have already been validated."
+            subtitle="Step 3"
+          >
+            <p>
+              Entering new credentials will overwrite the previous validated
+              one. This action is irreversible. Please proceed with caution.
+            </p>
+          </StepHeader>
           {showCredentialFields ? (
-            renderCredentialFields()
+            renderCredentialFields(true)
           ) : (
             <PrimaryButton
-              className={cx(styles.darkBlueBtn, styles.newCredentialsButton)}
+              className={cx(styles.darkBlueBtn)}
               onClick={() => setShowCredentialFields(true)}
             >
               Enter new credentials

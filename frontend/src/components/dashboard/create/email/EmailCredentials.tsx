@@ -7,6 +7,7 @@ import {
   ErrorBlock,
   ButtonGroup,
   TextButton,
+  StepHeader,
 } from 'components/common'
 import { useParams } from 'react-router-dom'
 
@@ -47,20 +48,22 @@ const EmailCredentials = ({
 
   return (
     <>
-      <sub>Step 3</sub>
       {
         <>
-          <h2>Send a test email</h2>
-          <p>You can preview your message by sending an email to yourself. </p>
-          {protect && (
+          <StepHeader title="Send a test email" subtitle="Step 3">
             <p>
-              You will receive an email from postman.gov.sg showing the email
-              that the recipient would receive once you click send campaign. You
-              can click on the unique link and unlock the password protected
-              page using the corresponding recipient password in your uploaded
-              csv.
+              You can preview your message by sending an email to yourself.{' '}
             </p>
-          )}
+            {protect && (
+              <p>
+                You will receive an email from postman.gov.sg showing the email
+                that the recipient would receive once you click send campaign.
+                You can click on the unique link and unlock the password
+                protected page using the corresponding recipient password in
+                your uploaded csv.
+              </p>
+            )}
+          </StepHeader>
           <EmailValidationInput onClick={handleTestSend} />
           <ErrorBlock>{errorMsg}</ErrorBlock>
 
