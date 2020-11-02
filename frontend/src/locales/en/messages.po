@@ -57,7 +57,7 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: src/config.ts:45
+#: src/config.ts:46
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
@@ -117,6 +117,10 @@ msgstr "https://github.com/opengovsg/postmangovsg"
 #: src/config.ts:41
 msgid "link.customFromAddressRequestUrl"
 msgstr "https://go.gov.sg/postman-custom-from"
+
+#: src/config.ts:42
+msgid "link.demoTelegramBotUrl"
+msgstr "https://guide.postman.gov.sg"
 
 #: src/config.ts:35
 msgid "link.guideDemoUrl"

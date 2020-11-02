@@ -22,6 +22,7 @@ import {
   StepSection,
   CredLabelInput,
   Checkbox,
+  PrimaryInfoBlock,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -39,6 +40,7 @@ const TelegramCredentials = ({
   onNext: (changes: any, next?: boolean) => void
   onPrevious: () => void
 }) => {
+  const DEMO_CREDENTIAL = 'TELEGRAM_DEFAULT'
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
@@ -71,7 +73,7 @@ const TelegramCredentials = ({
         setErrorMessage(e.message)
       }
     }
-    const defaultLabels = isTrial ? ['TELEGRAM_DEFAULT'] : []
+    const defaultLabels = isTrial ? [DEMO_CREDENTIAL] : []
     populateStoredCredentials(defaultLabels)
   }, [isTrial, storedCredentials.length])
 
@@ -247,12 +249,47 @@ const TelegramCredentials = ({
               <Dropdown
                 onSelect={setSelectedCredential}
                 options={storedCredentials}
+                defaultLabel={storedCredentials[0]?.label}
               ></Dropdown>
               <ErrorBlock>{errorMessage}</ErrorBlock>
 
               <p className="clickable" onClick={() => setIsManual(true)}>
                 Add new credentials
               </p>
+
+              {isTrial && selectedCredential === DEMO_CREDENTIAL && (
+                <PrimaryInfoBlock>
+                  <h4>Using the default Telegram credentials?</h4>
+                  <p>
+                    Be sure to{' '}
+                    <b>
+                      subscribe to this Telegram bot at{' '}
+                      <OutboundLink
+                        eventLabel={i18n._(LINKS.demoTelegramBotUrl)}
+                        to={i18n._(LINKS.demoTelegramBotUrl)}
+                        target="_blank"
+                      >
+                        {i18n._(LINKS.demoTelegramBotUrl)}
+                      </OutboundLink>
+                    </b>{' '}
+                    first!
+                  </p>
+
+                  <p>
+                    In demo mode, you can use Postman&apos;s default Telegram
+                    bot to try sending Telegram messages. In a normal campaign,
+                    you’d have to set up your own Telegram bot.{' '}
+                    <OutboundLink
+                      className={styles.inputLabelHelpLink}
+                      eventLabel={i18n._(LINKS.guideTelegramUrl)}
+                      to={i18n._(LINKS.guideTelegramUrl)}
+                      target="_blank"
+                    >
+                      Learn more
+                    </OutboundLink>
+                  </p>
+                </PrimaryInfoBlock>
+              )}
             </StepSection>
 
             <ButtonGroup>
