@@ -40,14 +40,20 @@ const TrialBar = ({ isVisible: initialIsVisible }: { isVisible: boolean }) => {
         })}
       >
         <div className={styles.message}>
-          <div className={styles.text}>SMS: {numTrialsSms}/3 left.</div>
-          <TextButton
-            className={styles.action}
-            minButtonWidth
-            onClick={onCreate}
-          >
-            Create a demo campaign now
-          </TextButton>
+          {numTrialsSms ? (
+            <>
+              <div className={styles.text}>SMS: {numTrialsSms}/3 left.</div>
+              <TextButton
+                className={styles.action}
+                minButtonWidth
+                onClick={onCreate}
+              >
+                Create a demo campaign now
+              </TextButton>
+            </>
+          ) : (
+            <div className={styles.text}>You have no demo campaigns left.</div>
+          )}
         </div>
 
         <CloseButton
