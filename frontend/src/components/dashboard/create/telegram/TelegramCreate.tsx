@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, { useState, useCallback, useEffect } from 'react'
 import { cloneDeep } from 'lodash'
 
@@ -98,7 +99,7 @@ const CreateTelegram = ({
   return (
     <div className={styles.createContainer}>
       {campaign.status !== Status.Draft ? (
-        <div className={styles.stepContainer}>
+        <div className={cx(styles.stepContainer, styles.detailContainer)}>
           <TelegramDetail
             id={campaign.id}
             name={campaign.name}

@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, { useState, useEffect, useCallback } from 'react'
 import { cloneDeep } from 'lodash'
 
@@ -112,7 +113,7 @@ const CreateEmail = ({
   return (
     <div className={styles.createContainer}>
       {campaign.status !== Status.Draft ? (
-        <div className={styles.stepContainer}>
+        <div className={cx(styles.stepContainer, styles.detailContainer)}>
           <EmailDetail
             id={campaign.id}
             name={campaign.name}

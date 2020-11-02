@@ -30,7 +30,9 @@
 
     .status {
       @extend %outline-btn;
+      margin-right: 0px;
     }
+
     .request {
       @extend %secondary-btn;
       @include mobile() {
