@@ -18,12 +18,16 @@ import {
   StepSection,
   CredLabelInput,
   Checkbox,
+  PrimaryInfoBlock,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
   TwilioCredentials,
 } from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
+import { OutboundLink } from 'react-ga'
+import { i18n } from 'locales'
+import { LINKS } from 'config'
 
 const SMSCredentials = ({
   hasCredential: initialHasCredential,
@@ -36,6 +40,7 @@ const SMSCredentials = ({
   onNext: (changes: any, next?: boolean) => void
   onPrevious: () => void
 }) => {
+  const DEMO_CREDENTIAL = 'SMS_DEFAULT'
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
@@ -67,7 +72,7 @@ const SMSCredentials = ({
         setErrorMessage(e.message)
       }
     }
-    const defaultLabels = isTrial ? ['SMS_DEFAULT'] : []
+    const defaultLabels = isTrial ? [DEMO_CREDENTIAL] : []
     populateStoredCredentials(defaultLabels)
   }, [isTrial, storedCredentials.length])
 
@@ -166,6 +171,25 @@ const SMSCredentials = ({
               <p className="clickable" onClick={() => setIsManual(true)}>
                 Input credentials manually
               </p>
+              {isTrial && selectedCredential === DEMO_CREDENTIAL && (
+                <PrimaryInfoBlock>
+                  <h4>Using the default credentials?</h4>
+                  <span>
+                    In demo mode, you can use Postman&apos;s SMS credentials to
+                    try sending SMS messages for free. In a normal campaign,
+                    you’d have to add your own credentials by setting up your
+                    own Twilio account.{' '}
+                    <OutboundLink
+                      className={styles.inputLabelHelpLink}
+                      eventLabel={i18n._(LINKS.guideSmsUrl)}
+                      to={i18n._(LINKS.guideSmsUrl)}
+                      target="_blank"
+                    >
+                      Learn more
+                    </OutboundLink>
+                  </span>
+                </PrimaryInfoBlock>
+              )}
             </>
           )}
         </StepSection>
