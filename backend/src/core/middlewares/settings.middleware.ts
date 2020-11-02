@@ -22,10 +22,10 @@ const getUserSettings = async (
     return res.json({
       has_api_key: userSettings.hasApiKey,
       creds: userSettings.creds,
-      trial: {
-        num_trials_sms: userSettings.trial?.numTrialsSms,
-        num_trials_telegram: userSettings.trial?.numTrialsTelegram,
-        is_displayed: userSettings.trial?.isDisplayed,
+      demo: {
+        num_demos_sms: userSettings.demo?.numDemosSms,
+        num_demos_telegram: userSettings.demo?.numDemosTelegram,
+        is_displayed: userSettings.demo?.isDisplayed,
       },
     })
   } catch (err) {
@@ -220,12 +220,12 @@ const regenerateApiKey = async (
 }
 
 /**
- * Update whether trials should be displayed for user
+ * Update whether demos should be displayed for user
  * @param req
  * @param res
  * @param next
  */
-const updateTrialDisplayed = async (
+const updateDemoDisplayed = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -233,7 +233,7 @@ const updateTrialDisplayed = async (
   try {
     const userId = req.session?.user?.id
     const { is_displayed: isDisplayed } = req.body
-    await CredentialService.updateTrialDisplayed(+userId, isDisplayed)
+    await CredentialService.updateDemoDisplayed(+userId, isDisplayed)
     return res.sendStatus(200)
   } catch (e) {
     next(e)
@@ -248,5 +248,5 @@ export const SettingsMiddleware = {
   getChannelSpecificCredentials,
   deleteUserCredential,
   regenerateApiKey,
-  updateTrialDisplayed,
+  updateDemoDisplayed,
 }

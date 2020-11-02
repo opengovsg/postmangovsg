@@ -8,8 +8,8 @@ import {
 } from 'sequelize-typescript'
 import { User } from './user'
 
-@Table({ tableName: 'user_trials', underscored: true, timestamps: true })
-export class UserTrial extends Model<UserTrial> {
+@Table({ tableName: 'user_demos', underscored: true, timestamps: true })
+export class UserDemo extends Model<UserDemo> {
   @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,
@@ -23,14 +23,14 @@ export class UserTrial extends Model<UserTrial> {
     type: DataType.INTEGER,
     allowNull: false,
   })
-  numTrialsSms!: number
+  numDemosSms!: number
 
   @Default(3)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  numTrialsTelegram!: number
+  numDemosTelegram!: number
 
   @Default(true)
   @Column({

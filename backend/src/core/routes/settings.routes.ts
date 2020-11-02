@@ -21,7 +21,7 @@ const getCredentialsValidator = {
   }),
 }
 
-const trialDisplayedValidator = {
+const demoDisplayedValidator = {
   [Segments.BODY]: Joi.object({
     is_displayed: Joi.boolean().required(),
   }),
@@ -147,11 +147,11 @@ router.get(
 /**
  * @swagger
  * path:
- *  /settings/trial:
+ *  /settings/demo:
  *    put:
  *       tags:
  *         - Settings
- *       summary: Update whether to display trials
+ *       summary: Update whether to display demos
  *       requestBody:
  *         required: true
  *         content:
@@ -179,9 +179,9 @@ router.get(
  *           description: Internal Server Error
  */
 router.put(
-  '/trial',
-  celebrate(trialDisplayedValidator),
-  SettingsMiddleware.updateTrialDisplayed
+  '/demo',
+  celebrate(demoDisplayedValidator),
+  SettingsMiddleware.updateDemoDisplayed
 )
 
 export default router

@@ -9,7 +9,7 @@ import {
   Worker,
   User,
   UserCredential,
-  UserTrial,
+  UserDemo,
   Statistic,
   ProtectedMessage,
   Unsubscriber,
@@ -80,7 +80,7 @@ const sequelizeLoader = async (): Promise<void> => {
     Worker,
     User,
     UserCredential,
-    UserTrial,
+    UserDemo,
     Statistic,
     Unsubscriber,
   ]

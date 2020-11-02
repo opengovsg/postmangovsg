@@ -3,7 +3,7 @@ import { get } from 'lodash'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
-import { Credential, UserCredential, User, UserTrial } from '@core/models'
+import { Credential, UserCredential, User, UserDemo } from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { loggerWithLabel } from '@core/logger'
 
@@ -235,10 +235,10 @@ const getUserSettings = async (
         attributes: ['label', 'type'],
       },
       {
-        model: UserTrial,
+        model: UserDemo,
         attributes: [
-          ['num_trials_sms', 'numTrialsSms'],
-          ['num_trials_telegram', 'numTrialsTelegram'],
+          ['num_demos_sms', 'numDemosSms'],
+          ['num_demos_telegram', 'numDemosTelegram'],
           ['is_displayed', 'isDisplayed'],
         ],
       },
@@ -249,7 +249,7 @@ const getUserSettings = async (
     return {
       hasApiKey: !!user.apiKey,
       creds: user.creds,
-      trial: user.trial,
+      demo: user.demo,
     }
   } else {
     return null
@@ -269,11 +269,11 @@ const regenerateApiKey = async (userId: number): Promise<string> => {
   return user.regenerateAndSaveApiKey()
 }
 
-const updateTrialDisplayed = async (
+const updateDemoDisplayed = async (
   userId: number,
   isDisplayed: boolean
 ): Promise<{ isDisplayed: boolean }> => {
-  const [numUpdated, userTrial] = await UserTrial.update(
+  const [numUpdated, userDemo] = await UserDemo.update(
     { isDisplayed },
     {
       where: { userId },
@@ -284,12 +284,12 @@ const updateTrialDisplayed = async (
     logger.error({
       message: 'Incorrect number of records updated',
       numUpdated,
-      action: 'updateTrialDisplayed',
+      action: 'updateDemoDisplayed',
     })
-    throw new Error('Could not update trial displayed')
+    throw new Error('Could not update demo displayed')
   }
   return {
-    isDisplayed: userTrial[0].isDisplayed,
+    isDisplayed: userDemo[0].isDisplayed,
   }
 }
 export const CredentialService = {
@@ -306,5 +306,5 @@ export const CredentialService = {
   getUserSettings,
   // Api Key
   regenerateApiKey,
-  updateTrialDisplayed,
+  updateDemoDisplayed,
 }

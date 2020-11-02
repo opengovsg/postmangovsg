@@ -1,6 +1,6 @@
 import { Op, literal, Transaction, Includeable } from 'sequelize'
 import { ChannelType, JobStatus } from '@core/constants'
-import { Campaign, JobQueue, Statistic, UserTrial } from '@core/models'
+import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
 
@@ -23,35 +23,35 @@ const createCampaign = ({
   type,
   userId,
   protect,
-  trialMessageLimit,
+  demoMessageLimit,
 }: {
   name: string
   type: string
   userId: number
   protect: boolean
-  trialMessageLimit: number | null
+  demoMessageLimit: number | null
 }): Promise<Campaign> | undefined => {
   const mapping: { [k: string]: string } = {
-    [ChannelType.SMS]: 'numTrialsSms',
-    [ChannelType.Telegram]: 'numTrialsTelegram',
+    [ChannelType.SMS]: 'numDemosSms',
+    [ChannelType.Telegram]: 'numDemosTelegram',
   }
   const result = Campaign.sequelize?.transaction(async (transaction) => {
     let campaign
-    if (trialMessageLimit !== null && trialMessageLimit > 0) {
-      const numTrialsColumn: any = mapping[type]
-      if (!numTrialsColumn) {
+    if (demoMessageLimit !== null && demoMessageLimit > 0) {
+      const numDemosColumn: any = mapping[type]
+      if (!numDemosColumn) {
         logger.error({
-          message: `Channel type not supported for trial mode`,
+          message: `Channel type not supported for demo mode`,
           type,
         })
         return
       }
 
-      const userTrial = await UserTrial.findOne({
-        where: { userId, [numTrialsColumn]: { [Op.gt]: 0 } },
+      const userDemo = await UserDemo.findOne({
+        where: { userId, [numDemosColumn]: { [Op.gt]: 0 } },
         transaction,
       })
-      if (userTrial) {
+      if (userDemo) {
         campaign = await Campaign.create(
           {
             name,
@@ -59,13 +59,13 @@ const createCampaign = ({
             userId,
             valid: false,
             protect,
-            trialMessageLimit,
+            demoMessageLimit,
           },
           { transaction }
         )
-        await userTrial?.decrement(numTrialsColumn, { transaction })
+        await userDemo?.decrement(numDemosColumn, { transaction })
       } else {
-        logger.error({ message: `No trials left`, userId, type })
+        logger.error({ message: `No demos left`, userId, type })
         return
       }
     } else {
@@ -119,7 +119,7 @@ const listCampaigns = ({
       [literal('"cred_name" IS NOT NULL'), 'has_credential'],
       'halted',
       'protect',
-      'trial_message_limit',
+      'demo_message_limit',
     ],
     order: [['created_at', 'DESC']],
     include: [
@@ -161,7 +161,7 @@ const getCampaignDetails = async (
       'created_at',
       'valid',
       'protect',
-      'trial_message_limit',
+      'demo_message_limit',
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
       [

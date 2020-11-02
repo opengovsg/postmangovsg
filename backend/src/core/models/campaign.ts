@@ -90,7 +90,7 @@ export class Campaign extends Model<Campaign> {
     type: DataType.INTEGER,
     allowNull: true,
   })
-  trialMessageLimit!: number
+  demoMessageLimit!: number
 
   // Sets key in s3Object json
   static async updateS3ObjectKey(
