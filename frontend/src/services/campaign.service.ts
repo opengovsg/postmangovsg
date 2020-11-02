@@ -123,7 +123,7 @@ export async function createCampaign({
 }: {
   name: string
   type: ChannelType
-  protect: boolean
+  protect?: boolean
   trialMessageLimit?: number
 }): Promise<Campaign> {
   return axios

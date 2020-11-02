@@ -32,6 +32,7 @@ export const LINKS = {
   guideSmsMessagingServiceUrl: t('link.guideSmsMessagingServiceUrl')``,
   guideTelegramUrl: t('link.guideTelegramUrl')``,
   guidePowerUserUrl: t('link.guidePowerUserUrl')``,
+  guideDemoUrl: t('link.guideDemoUrl')`https://guide.postman.gov.sg`,
   contactUsUrl: t('link.contactUsUrl')``,
   contributeUrl: t('link.contributeUrl')``,
   tncUrl: t('link.tncUrl')``,

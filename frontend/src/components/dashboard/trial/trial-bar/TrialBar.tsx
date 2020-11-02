@@ -1,10 +1,34 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import styles from './TrialBar.module.scss'
 import cx from 'classnames'
 import { CloseButton, TextButton } from 'components/common'
+import { getUserSettings } from 'services/settings.service'
+import { ModalContext } from 'contexts/modal.context'
+import CreateTrialModal from '../create-trial-modal'
 const TrialBar = ({ isVisible: initialIsVisible }: { isVisible: boolean }) => {
+  const modalContext = useContext(ModalContext)
   const [isMenuVisible, setIsMenuVisible] = useState(initialIsVisible)
   const toggleMenu = useCallback(() => setIsMenuVisible((state) => !state), [])
+  const [numTrialsSms, setNumTrialsSms] = useState(0)
+
+  useEffect(() => {
+    async function getNumTrials() {
+      // TRIAL: check for number of trials
+      const { trial } = await getUserSettings()
+      setIsMenuVisible(!!trial.numTrialsSms)
+      setNumTrialsSms(trial.numTrialsSms)
+    }
+    getNumTrials()
+  }, [])
+
+  function onCreate(): void {
+    if (numTrialsSms) {
+      modalContext.setModalContent(
+        <CreateTrialModal trialInfo={{ numTrialsSms }}></CreateTrialModal>
+      )
+    }
+  }
+
   return (
     <div className={styles.trialBar}>
       <button className={styles.trialButton} onClick={toggleMenu}>
@@ -16,11 +40,11 @@ const TrialBar = ({ isVisible: initialIsVisible }: { isVisible: boolean }) => {
         })}
       >
         <div className={styles.message}>
-          <div className={styles.text}>SMS: 2/3 left. Telegram: 3/3 left.</div>
+          <div className={styles.text}>SMS: {numTrialsSms}/3 left.</div>
           <TextButton
             className={styles.action}
             minButtonWidth
-            onClick={toggleMenu}
+            onClick={onCreate}
           >
             Create a demo campaign now
           </TextButton>
