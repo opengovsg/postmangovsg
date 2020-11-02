@@ -24,6 +24,7 @@ const getUserSettings = async (
       creds: userSettings.creds,
       trial: {
         num_trials_sms: userSettings.trial?.numTrialsSms,
+        num_trials_telegram: userSettings.trial?.numTrialsTelegram,
       },
     })
   } catch (err) {

@@ -203,6 +203,7 @@ const getCampaignDetails = async (
         'type',
         'created_at',
         'valid',
+        'trial_message_limit',
         [
           literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
           'has_credential',

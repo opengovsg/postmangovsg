@@ -236,7 +236,10 @@ const getUserSettings = async (
       },
       {
         model: UserTrial,
-        attributes: [['num_trials_sms', 'numTrialsSms']],
+        attributes: [
+          ['num_trials_sms', 'numTrialsSms'],
+          ['num_trials_telegram', 'numTrialsTelegram'],
+        ],
       },
     ],
     plain: true,

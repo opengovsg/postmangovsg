@@ -31,20 +31,20 @@ const createCampaign = ({
   protect: boolean
   trialMessageLimit: number | null
 }): Promise<Campaign> | undefined => {
+  const mapping: { [k: string]: string } = {
+    [ChannelType.SMS]: 'numTrialsSms',
+    [ChannelType.Telegram]: 'numTrialsTelegram',
+  }
   const result = Campaign.sequelize?.transaction(async (transaction) => {
     let campaign
     if (trialMessageLimit !== null && trialMessageLimit > 0) {
-      let numTrialsColumn: any = ''
-      switch (type) {
-        case ChannelType.SMS:
-          numTrialsColumn = 'numTrialsSms'
-          break
-        default:
-          logger.error({
-            message: `Channel type not supported for trial mode`,
-            type,
-          })
-          return
+      const numTrialsColumn: any = mapping[type]
+      if (!numTrialsColumn) {
+        logger.error({
+          message: `Channel type not supported for trial mode`,
+          type,
+        })
+        return
       }
 
       const userTrial = await UserTrial.findOne({

@@ -24,4 +24,11 @@ export class UserTrial extends Model<UserTrial> {
     allowNull: false,
   })
   numTrialsSms!: number
+
+  @Default(3)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  numTrialsTelegram!: number
 }

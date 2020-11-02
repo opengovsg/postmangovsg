@@ -23,6 +23,7 @@ export enum MessageStatus {
 export enum DefaultCredentialName {
   Email = 'EMAIL_DEFAULT',
   SMS = 'SMS_DEFAULT',
+  Telegram = 'TELEGRAM_DEFAULT',
 }
 
 /**
