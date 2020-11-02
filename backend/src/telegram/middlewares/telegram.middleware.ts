@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { ChannelType } from '@core/constants'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { TelegramService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
@@ -34,26 +34,52 @@ const getCredentialsFromLabel = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<Response | void> => {
+  const { campaignId } = req.params
   const { label } = req.body
   const userId = req.session?.user?.id
   try {
-    // if label provided, fetch from aws secrets
-    const userCred = await CredentialService.getUserCredential(+userId, label)
-    if (!userCred) {
-      logger.error({
-        message: 'User credentials not found',
-        label,
-        action: 'getCredentialsFromLabel',
-      })
-      res.status(400).json({ message: 'User credentials cannot be found' })
-      return
+    const logMeta = {
+      label,
+      action: 'getCredentialsFromLabel',
     }
+    /* Determine if credential name can be used */
+    let credentialName
+    if (label === DefaultCredentialName.Telegram) {
+      const campaign = await TelegramService.findCampaign(+campaignId, userId) // TODO: refactor this into res.locals
+      if (campaign.demoMessageLimit !== null && campaign.demoMessageLimit > 0) {
+        credentialName = label
+      } else {
+        logger.error({
+          message: `Campaign not allowed to use label`,
+          ...logMeta,
+        })
+        return res.status(400).json({
+          message: `Campaign ${campaignId} is not allowed to use default credentials`,
+        })
+      }
+    } else {
+      // if label provided, fetch from aws secrets
+      const userCred = await CredentialService.getUserCredential(+userId, label)
+
+      if (!userCred) {
+        logger.error({
+          message: 'User credentials not found',
+          ...logMeta,
+        })
+        return res
+          .status(400)
+          .json({ message: 'User credentials cannot be found' })
+      }
+
+      credentialName = userCred.credName
+    }
+
     const telegramBotToken = await CredentialService.getTelegramCredential(
-      userCred.credName
+      credentialName
     )
     res.locals.credentials = { telegramBotToken }
-    res.locals.credentialName = userCred.credName
+    res.locals.credentialName = credentialName
     return next()
   } catch (err) {
     return next(err)
