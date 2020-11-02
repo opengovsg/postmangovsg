@@ -216,7 +216,7 @@ const Campaigns = () => {
           Create new campaign
         </PrimaryButton>
       </TitleBar>
-      <TrialBar isVisible={false}></TrialBar>
+      <TrialBar />
       <div className={styles.content}>
         {isLoading ? (
           <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>

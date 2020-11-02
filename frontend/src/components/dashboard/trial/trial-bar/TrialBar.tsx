@@ -2,13 +2,19 @@ import React, { useCallback, useContext, useEffect, useState } from 'react'
 import styles from './TrialBar.module.scss'
 import cx from 'classnames'
 import { CloseButton, TextButton } from 'components/common'
-import { getUserSettings } from 'services/settings.service'
+import {
+  getUserSettings,
+  updateTrialDisplayed,
+} from 'services/settings.service'
 import { ModalContext } from 'contexts/modal.context'
 import CreateTrialModal from '../create-trial-modal'
-const TrialBar = ({ isVisible: initialIsVisible }: { isVisible: boolean }) => {
+const TrialBar = () => {
   const modalContext = useContext(ModalContext)
-  const [isMenuVisible, setIsMenuVisible] = useState(initialIsVisible)
-  const toggleMenu = useCallback(() => setIsMenuVisible((state) => !state), [])
+  const [isMenuVisible, setIsMenuVisible] = useState(false)
+  const toggleMenu = useCallback(() => {
+    updateTrialDisplayed(!isMenuVisible)
+    setIsMenuVisible((state) => !state)
+  }, [isMenuVisible])
   const [numTrialsSms, setNumTrialsSms] = useState(0)
   const [numTrialsTelegram, setNumTrialsTelegram] = useState(0)
   const [hasTrial, setHasTrial] = useState(false)
@@ -17,7 +23,7 @@ const TrialBar = ({ isVisible: initialIsVisible }: { isVisible: boolean }) => {
     async function getNumTrials() {
       // TRIAL: check for number of trials
       const { trial } = await getUserSettings()
-      setIsMenuVisible(!!trial?.numTrialsSms || !!trial?.numTrialsTelegram)
+      setIsMenuVisible(trial.isDisplayed)
       setNumTrialsSms(trial?.numTrialsSms)
       setNumTrialsTelegram(trial?.numTrialsTelegram)
     }

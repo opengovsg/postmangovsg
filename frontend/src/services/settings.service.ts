@@ -9,7 +9,11 @@ export interface UserCredential {
 async function getUserSettings(): Promise<{
   hasApiKey: boolean
   creds: UserCredential[]
-  trial: { numTrialsSms: number; numTrialsTelegram: number }
+  trial: {
+    numTrialsSms: number
+    numTrialsTelegram: number
+    isDisplayed: boolean
+  }
 }> {
   try {
     const response = await axios.get('/settings')
@@ -20,6 +24,7 @@ async function getUserSettings(): Promise<{
       trial: {
         numTrialsSms: trial?.num_trials_sms,
         numTrialsTelegram: trial?.num_trials_telegram,
+        isDisplayed: trial?.is_displayed,
       },
     }
   } catch (e) {
@@ -60,6 +65,14 @@ async function getCustomFromAddresses(): Promise<string[]> {
   }
 }
 
+async function updateTrialDisplayed(isDisplayed: boolean): Promise<void> {
+  try {
+    await axios.put('/settings/trial', { is_displayed: isDisplayed })
+  } catch (e) {
+    errorHandler(e, 'Error updating state of trial displayed')
+  }
+}
+
 function errorHandler(e: AxiosError, defaultMsg: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {
@@ -73,4 +86,5 @@ export {
   getUserSettings,
   deleteCredential,
   getCustomFromAddresses,
+  updateTrialDisplayed,
 }
