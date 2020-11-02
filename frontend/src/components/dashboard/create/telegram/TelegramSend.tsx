@@ -11,6 +11,7 @@ import {
   ButtonGroup,
   TextButton,
   StepHeader,
+  StepSection,
 } from 'components/common'
 import { getPreviewMessage } from 'services/telegram.service'
 import { sendCampaign } from 'services/campaign.service'
@@ -73,29 +74,34 @@ const TelegramSend = ({
 
   return (
     <>
-      <StepHeader
-        title="Your campaign is ready to be sent!"
-        subtitle="Step 4"
-      />
-      <div className="separator"></div>
+      <StepSection>
+        <StepHeader
+          title="Your campaign is ready to be sent!"
+          subtitle="Step 4"
+        />
+      </StepSection>
 
-      <div className={styles.sendInfo}>
-        <p className={styles.greyText}>Number of recipients</p>
-        <h4>{numRecipients}</h4>
+      <StepSection>
+        <div>
+          <p className={styles.greyText}>Number of recipients</p>
+          <h4>{numRecipients}</h4>
+        </div>
 
-        <p className={styles.greyText}>Message</p>
-        <PreviewBlock
-          body={preview.body?.replace(/\n/g, '<br />')}
-        ></PreviewBlock>
-      </div>
+        <div>
+          <p className={styles.greyText}>Message</p>
+          <PreviewBlock
+            body={preview.body?.replace(/\n/g, '<br />')}
+          ></PreviewBlock>
+        </div>
 
-      <SendRate
-        sendRate={sendRate}
-        setSendRate={setSendRate}
-        channelType={ChannelType.Telegram}
-      />
-
-      <div className="separator"></div>
+        <div>
+          <SendRate
+            sendRate={sendRate}
+            setSendRate={setSendRate}
+            channelType={ChannelType.Telegram}
+          />
+        </div>
+      </StepSection>
 
       <ButtonGroup>
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>

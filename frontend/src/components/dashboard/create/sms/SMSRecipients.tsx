@@ -17,6 +17,7 @@ import {
   ButtonGroup,
   TextButton,
   StepHeader,
+  StepSection,
 } from 'components/common'
 import { SMSCampaign, SMSPreview } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -123,41 +124,43 @@ const SMSRecipients = ({
 
   return (
     <>
-      <StepHeader title="Upload recipient list in CSV format" subtitle="Step 2">
-        <p>
-          Only CSV format files are allowed. If you have an Excel file, please
-          convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
-        </p>
-        <p>
-          CSV file must include a <b>recipient</b> column with recipients&apos;
-          mobile numbers
-        </p>
-      </StepHeader>
+      <StepSection>
+        <StepHeader
+          title="Upload recipient list in CSV format"
+          subtitle="Step 2"
+        >
+          <p>
+            Only CSV format files are allowed. If you have an Excel file, please
+            convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
+          </p>
+          <p>
+            CSV file must include a <b>recipient</b> column with
+            recipients&apos; mobile numbers
+          </p>
+        </StepHeader>
 
-      <CsvUpload
-        isCsvProcessing={isCsvProcessing}
-        csvInfo={csvInfo}
-        onErrorClose={clearCsvStatus}
-      >
-        <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
-        <p>or</p>
-        <SampleCsv
-          params={params}
-          defaultRecipient="81234567"
-          setErrorMsg={setErrorMessage}
-        />
-      </CsvUpload>
+        <CsvUpload
+          isCsvProcessing={isCsvProcessing}
+          csvInfo={csvInfo}
+          onErrorClose={clearCsvStatus}
+        >
+          <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+          <p>or</p>
+          <SampleCsv
+            params={params}
+            defaultRecipient="81234567"
+            setErrorMsg={setErrorMessage}
+          />
+        </CsvUpload>
 
-      <ErrorBlock>{errorMessage}</ErrorBlock>
-
-      <div className="separator"></div>
+        <ErrorBlock>{errorMessage}</ErrorBlock>
+      </StepSection>
 
       {!isCsvProcessing && numRecipients > 0 && (
-        <>
+        <StepSection>
           <p className={styles.greyText}>Message preview</p>
           <PreviewBlock body={preview.body}></PreviewBlock>
-          <div className="separator"></div>
-        </>
+        </StepSection>
       )}
 
       <ButtonGroup>

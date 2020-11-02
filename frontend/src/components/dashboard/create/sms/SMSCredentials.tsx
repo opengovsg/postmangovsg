@@ -15,6 +15,7 @@ import {
   ButtonGroup,
   TextButton,
   StepHeader,
+  StepSection,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
@@ -102,51 +103,53 @@ const SMSCredentials = ({
   function renderCredentialFields(isEmbedded = false) {
     return (
       <>
-        {isManual ? (
-          <>
-            <StepHeader
-              title="Insert your Twilio credentials"
-              subtitle="Step 3"
-            />
-            <TwilioCredentialsInput
-              onFilled={setCreds}
-            ></TwilioCredentialsInput>
-            {storedCredentials.length ? (
-              <p className="clickable" onClick={toggleInputMode}>
-                Select from stored credentials
+        <StepSection>
+          {isManual ? (
+            <>
+              <StepHeader
+                title="Insert your Twilio credentials"
+                subtitle="Step 3"
+              />
+              <div>
+                <TwilioCredentialsInput onFilled={setCreds} />
+              </div>
+              {storedCredentials.length ? (
+                <p className="clickable" onClick={toggleInputMode}>
+                  Select from stored credentials
+                </p>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <StepHeader
+                title="Select your Twilio credentials"
+                subtitle={isEmbedded ? '' : 'Step 3'}
+              />
+              <Dropdown
+                onSelect={setSelectedCredential}
+                options={storedCredentials}
+              ></Dropdown>
+              <p className="clickable" onClick={() => setIsManual(true)}>
+                Input credentials manually
               </p>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <div className="separator"></div>
-            <StepHeader
-              title="Select your Twilio credentials"
-              subtitle={isEmbedded ? '' : 'Step 3'}
-            />
-            <Dropdown
-              onSelect={setSelectedCredential}
-              options={storedCredentials}
-            ></Dropdown>
-            <p className="clickable" onClick={() => setIsManual(true)}>
-              Input credentials manually
-            </p>
-          </>
-        )}
-        <div className="separator"></div>
+            </>
+          )}
+        </StepSection>
 
-        <StepHeader title="Validate your credentials by doing a test send">
-          <p className={styles.validateCredentialsInfo}>
-            To ensure your credentials are working perfectly, please send a test
-            SMS to an available phone number to receive a preview of your
-            message.
-          </p>
-        </StepHeader>
-        <SMSValidationInput
-          onClick={handleValidateCredentials}
-          buttonDisabled={isManual ? !creds : !selectedCredential}
-        />
-        <ErrorBlock>{errorMessazge}</ErrorBlock>
+        <StepSection separator={false}>
+          <StepHeader title="Validate your credentials by doing a test send">
+            <p className={styles.validateCredentialsInfo}>
+              To ensure your credentials are working perfectly, please send a
+              test SMS to an available phone number to receive a preview of your
+              message.
+            </p>
+          </StepHeader>
+          <SMSValidationInput
+            onClick={handleValidateCredentials}
+            buttonDisabled={isManual ? !creds : !selectedCredential}
+          />
+          <ErrorBlock>{errorMessazge}</ErrorBlock>
+        </StepSection>
       </>
     )
   }
@@ -155,27 +158,27 @@ const SMSCredentials = ({
     <>
       {hasCredential ? (
         <>
-          <StepHeader
-            title="Your current credentials have already been validated."
-            subtitle="Step 3"
-          >
-            <p>
-              Entering new credentials will overwrite the previous validated
-              one. This action is irreversible. Please proceed with caution.
-            </p>
-          </StepHeader>
-          {showCredentialFields ? (
-            renderCredentialFields(true)
-          ) : (
-            <PrimaryButton
-              className={cx(styles.darkBlueBtn)}
-              onClick={() => setShowCredentialFields(true)}
+          <StepSection>
+            <StepHeader
+              title="Your current credentials have already been validated."
+              subtitle="Step 3"
             >
-              Enter new credentials
-            </PrimaryButton>
-          )}
-
-          <div className="separator"></div>
+              <p>
+                Entering new credentials will overwrite the previous validated
+                one. This action is irreversible. Please proceed with caution.
+              </p>
+            </StepHeader>
+            {showCredentialFields ? (
+              renderCredentialFields(true)
+            ) : (
+              <PrimaryButton
+                className={cx(styles.darkBlueBtn)}
+                onClick={() => setShowCredentialFields(true)}
+              >
+                Enter new credentials
+              </PrimaryButton>
+            )}
+          </StepSection>
 
           <ButtonGroup>
             <NextButton disabled={!hasCredential} onClick={onNext} />

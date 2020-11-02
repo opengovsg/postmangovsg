@@ -1,9 +1,8 @@
 @import 'styles/_mixins';
 
 .container {
-  margin-top: 2rem;
-
   .uploadActions {
+    margin: $spacing-5 0;
     @include flex-horizontal;
 
     p {

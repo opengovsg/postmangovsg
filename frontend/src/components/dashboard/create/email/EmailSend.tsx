@@ -10,6 +10,7 @@ import {
   ButtonGroup,
   TextButton,
   StepHeader,
+  StepSection,
 } from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
 import { sendCampaign } from 'services/campaign.service'
@@ -74,26 +75,28 @@ const EmailSend = ({
 
   return (
     <>
-      <StepHeader
-        title="Your campaign is ready to be sent!"
-        subtitle="Step 4"
-      />
-      <div className="separator"></div>
-
-      <div className={styles.sendInfo}>
-        <p className={styles.greyText}>Number of recipients</p>
-        <h4>{numRecipients}</h4>
-
-        <p className={styles.greyText}>Message</p>
-        <PreviewBlock
-          body={preview.body}
-          subject={preview.subject}
-          replyTo={preview.replyTo}
-          from={preview.from}
+      <StepSection>
+        <StepHeader
+          title="Your campaign is ready to be sent!"
+          subtitle="Step 4"
         />
-      </div>
+        <div className="separator"></div>
 
-      <div className="separator"></div>
+        <div>
+          <p className={styles.greyText}>Number of recipients</p>
+          <h4>{numRecipients}</h4>
+        </div>
+
+        <div>
+          <p className={styles.greyText}>Message</p>
+          <PreviewBlock
+            body={preview.body}
+            subject={preview.subject}
+            replyTo={preview.replyTo}
+            from={preview.from}
+          />
+        </div>
+      </StepSection>
 
       <ButtonGroup>
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>

@@ -1,0 +1,17 @@
+@import 'styles/_variables';
+
+.stepSection {
+  h4 {
+    margin: 0;
+    margin-bottom: $spacing-1;
+  }
+
+  p {
+    margin: 0;
+    margin-bottom: $spacing-3;
+  }
+}
+
+.stepSection > div {
+  margin-bottom: $layout-3;
+}

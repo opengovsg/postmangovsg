@@ -22,26 +22,6 @@
   @include mobile() {
     width: calc(100% - 2 * #{$mobile-site-padding});
   }
-
-  sub {
-    display: block;
-    margin-bottom: $spacing-1;
-  }
-
-  h2 {
-    margin: 0;
-    margin-bottom: $spacing-3;
-  }
-
-  h4 {
-    margin: 0;
-    margin-bottom: $spacing-3;
-  }
-
-  p {
-    margin: 0;
-    margin-bottom: $spacing-3;
-  }
 }
 
 .detailContainer {

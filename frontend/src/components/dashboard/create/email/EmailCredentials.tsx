@@ -8,6 +8,7 @@ import {
   ButtonGroup,
   TextButton,
   StepHeader,
+  StepSection,
 } from 'components/common'
 import { useParams } from 'react-router-dom'
 
@@ -50,36 +51,36 @@ const EmailCredentials = ({
     <>
       {
         <>
-          <StepHeader title="Send a test email" subtitle="Step 3">
-            <p>
-              You can preview your message by sending an email to yourself.{' '}
-            </p>
-            {protect && (
+          <StepSection>
+            <StepHeader title="Send a test email" subtitle="Step 3">
               <p>
-                You will receive an email from postman.gov.sg showing the email
-                that the recipient would receive once you click send campaign.
-                You can click on the unique link and unlock the password
-                protected page using the corresponding recipient password in
-                your uploaded csv.
+                You can preview your message by sending an email to yourself.{' '}
               </p>
+              {protect && (
+                <p>
+                  You will receive an email from postman.gov.sg showing the
+                  email that the recipient would receive once you click send
+                  campaign. You can click on the unique link and unlock the
+                  password protected page using the corresponding recipient
+                  password in your uploaded csv.
+                </p>
+              )}
+            </StepHeader>
+            <EmailValidationInput onClick={handleTestSend} />
+            <ErrorBlock>{errorMsg}</ErrorBlock>
+
+            {hasCredential && (
+              <InfoBlock>
+                <li>
+                  <i className="bx bx-check-circle"></i>
+                  <span>
+                    Email credentials have been validated but you may continue
+                    to send test messages.
+                  </span>
+                </li>
+              </InfoBlock>
             )}
-          </StepHeader>
-          <EmailValidationInput onClick={handleTestSend} />
-          <ErrorBlock>{errorMsg}</ErrorBlock>
-
-          {hasCredential && (
-            <InfoBlock>
-              <li>
-                <i className="bx bx-check-circle"></i>
-                <span>
-                  Email credentials have been validated but you may continue to
-                  send test messages.
-                </span>
-              </li>
-            </InfoBlock>
-          )}
-
-          <div className="separator"></div>
+          </StepSection>
 
           <ButtonGroup>
             <NextButton disabled={!hasCredential} onClick={onNext} />

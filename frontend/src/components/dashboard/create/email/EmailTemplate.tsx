@@ -7,6 +7,7 @@ import {
   TextInput,
   Dropdown,
   StepHeader,
+  StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { ModalContext } from 'contexts/modal.context'
@@ -122,69 +123,88 @@ const EmailTemplate = ({
 
   return (
     <>
-      <StepHeader title="Create email message" subtitle="Step 1" />
+      <StepSection>
+        <StepHeader title="Create email message" subtitle="Step 1" />
 
-      <h4>From</h4>
-      <p>Emails will be sent from this address</p>
-      <Dropdown
-        onSelect={setFrom}
-        options={customFromAddresses}
-        defaultLabel={from || customFromAddresses[0]?.label}
-      ></Dropdown>
+        <div>
+          <h4>From</h4>
+          <p>Emails will be sent from this address</p>
+          <Dropdown
+            onSelect={setFrom}
+            options={customFromAddresses}
+            defaultLabel={from || customFromAddresses[0]?.label}
+          ></Dropdown>
+        </div>
 
-      <h4>Subject</h4>
-      <p>Enter subject of the email</p>
-      <TextArea
-        highlight={true}
-        singleRow={true}
-        placeholder="Enter subject"
-        value={subject}
-        onChange={setSubject}
-      />
-      <h4>{protect ? 'Message A' : 'Message'}</h4>
-      {protect ? (
-        <>
-          <p>Please use the following keywords to personalise your message.</p>
+        <div>
+          <h4>Subject</h4>
+          <p>Enter subject of the email</p>
+          <TextArea
+            highlight={true}
+            singleRow={true}
+            placeholder="Enter subject"
+            value={subject}
+            onChange={setSubject}
+          />
+        </div>
+
+        <div>
+          <h4>{protect ? 'Message A' : 'Message'}</h4>
+          {protect ? (
+            <>
+              <p>
+                Please use the following keywords to personalise your message.
+              </p>
+              <p>
+                <b>{'{{ recipient }}'}</b> - <i>Optional</i>
+                <br />
+                This keyword will be replaced by recipient’s email address.
+              </p>
+              <p>
+                <b>{'{{ protectedlink }}'}</b> - <i>Required</i>
+                <br />
+                Include this keyword in Message A template, but not in the CSV
+                file. It will be automatically generated for password protected
+                emails.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                To personalise your message, include keywords that are
+                surrounded by double curly braces. The keywords in your message
+                template should match the headers in your recipients CSV file.
+              </p>
+              <p>
+                <b>Note:</b> Recipient (email address) is a required column in
+                the CSV file.
+              </p>
+            </>
+          )}
+
+          <TextArea
+            highlight={true}
+            placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
+            value={body}
+            onChange={setBody}
+          />
+        </div>
+
+        <div>
+          <h4 className={styles.replyToHeader}>
+            Replies <em>optional</em>
+          </h4>
           <p>
-            <b>{'{{ recipient }}'}</b> - <i>Optional</i>
-            <br />
-            This keyword will be replaced by recipient’s email address.
+            All replies will be directed to the email address indicated below
           </p>
-          <p>
-            <b>{'{{ protectedlink }}'}</b> - <i>Required</i>
-            <br />
-            Include this keyword in Message A template, but not in the CSV file.
-            It will be automatically generated for password protected emails.
-          </p>
-        </>
-      ) : (
-        <p>
-          To personalise your message, include keywords that are surrounded by
-          double curly braces. The keywords in your message template should
-          match the headers in your recipients CSV file.
-          <br />
-          <b>Note:</b> Recipient (email address) is a required column in the CSV
-          file.
-        </p>
-      )}
-      <TextArea
-        highlight={true}
-        placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
-        value={body}
-        onChange={setBody}
-      />
-      <h4 className={styles.replyToHeader}>
-        Replies <em>optional</em>
-      </h4>
-      <p className={styles.replyToInfo}>
-        All replies will be directed to the email address indicated below
-      </p>
-      <TextInput
-        placeholder="Enter reply-to email address"
-        value={replyTo || ''}
-        onChange={setReplyTo}
-      />
-      <div className="separator"></div>
+          <TextInput
+            placeholder="Enter reply-to email address"
+            value={replyTo || ''}
+            onChange={setReplyTo}
+          />
+        </div>
+      </StepSection>
+
       <NextButton disabled={!body || !subject} onClick={handleSaveTemplate} />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
