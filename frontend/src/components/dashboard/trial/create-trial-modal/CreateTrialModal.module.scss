@@ -1,9 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-@import 'styles/_variables';
-@import 'styles/_mixins';
-
 .section {
   margin-bottom: 2rem;
   @include flex-vertical;
