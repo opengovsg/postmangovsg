@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 
 import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
 import {
@@ -7,19 +7,24 @@ import {
   retryCampaign,
 } from 'services/campaign.service'
 import { StepHeader, ProgressDetails } from 'components/common'
+import { ModalContext } from 'contexts/modal.context'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+import CompletedTrialModal from 'components/dashboard/trial/completed-trial-modal'
 
 const SMSDetail = ({
   id,
   name,
   sentAt,
   numRecipients,
+  isTrial,
 }: {
   id: number
   name: string
   sentAt: Date
   numRecipients: number
+  isTrial: boolean
 }) => {
+  const modalContext = useContext(ModalContext)
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number, forceRefresh = false) {
@@ -72,6 +77,19 @@ const SMSDetail = ({
       timeoutId && clearTimeout(timeoutId)
     }
   }, [id, stats.status])
+
+  useEffect(() => {
+    function renderCompletedTrialModal() {
+      modalContext.setModalContent(
+        <CompletedTrialModal
+          selectedChannel={ChannelType.SMS}
+        ></CompletedTrialModal>
+      )
+    }
+    if (isTrial && stats.status === Status.Sent) renderCompletedTrialModal()
+    // Prevent modalContext from being added to dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTrial, stats.status])
 
   function renderProgressHeader() {
     if (stats.waitTime && stats.waitTime > 0) {
@@ -132,6 +150,7 @@ const SMSDetail = ({
       </>
     )
   }
+
   return (
     <>
       {renderProgressHeader()}

@@ -112,6 +112,7 @@ const CreateTelegram = ({
             name={campaign.name}
             sentAt={campaign.sentAt}
             numRecipients={campaign.numRecipients}
+            isTrial={!!campaign.trialMessageLimit}
           ></TelegramDetail>
         </div>
       ) : (
