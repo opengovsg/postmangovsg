@@ -33,6 +33,7 @@ import {
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
 import { DefaultCredentialName } from '@core/constants'
+import { formatDefaultCredentialName } from '@core/utils'
 
 const logger = loggerWithLabel(module)
 const DB_URI = config.get('database.databaseUri')
@@ -116,11 +117,13 @@ const sequelizeLoader = async (): Promise<void> => {
   }
   // Create the default credential names in the credentials table
   // Each name should be accompanied by an entry in Secrets Manager
-  for (const key of Object.keys(DefaultCredentialName)) {
-    await Credential.upsert({
-      name: DefaultCredentialName[key as keyof typeof DefaultCredentialName],
-    })
-  }
+  await Promise.all(
+    [
+      DefaultCredentialName.Email,
+      formatDefaultCredentialName(DefaultCredentialName.SMS),
+      formatDefaultCredentialName(DefaultCredentialName.Telegram),
+    ].map((name) => Credential.upsert({ name }))
+  )
 }
 
 export default sequelizeLoader

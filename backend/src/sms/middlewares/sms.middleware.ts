@@ -4,6 +4,7 @@ import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
+import { formatDefaultCredentialName } from '@core/utils'
 
 const logger = loggerWithLabel(module)
 
@@ -84,8 +85,8 @@ const getCredentialsFromLabel = async (
     let credentialName
     if (label === DefaultCredentialName.SMS) {
       const campaign = await SmsService.findCampaign(+campaignId, userId) // TODO: refactor this into res.locals
-      if (campaign.demoMessageLimit !== null && campaign.demoMessageLimit > 0) {
-        credentialName = label
+      if (campaign.demoMessageLimit) {
+        credentialName = formatDefaultCredentialName(label)
       } else {
         logger.error({
           message: `Campaign not allowed to use label`,
@@ -111,12 +112,10 @@ const getCredentialsFromLabel = async (
 
       credentialName = userCred.credName
     }
-
     /* Get credential from the name */
     const credentials = await CredentialService.getTwilioCredentials(
       credentialName
     )
-
     res.locals.credentials = credentials
     res.locals.credentialName = credentialName
     return next()
