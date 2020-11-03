@@ -66,6 +66,14 @@ msgstr "file.go.gov.sg"
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
 
+#: src/components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:8
+msgid "demoMessage"
+msgstr "This demo campaign will be sent to a maximum of 20 recipients."
+
+#: src/components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:7
+msgid "demoMessageLabel"
+msgstr "DEMO"
+
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
@@ -120,11 +128,11 @@ msgstr "https://go.gov.sg/postman-custom-from"
 
 #: src/config.ts:42
 msgid "link.demoTelegramBotUrl"
-msgstr "https://guide.postman.gov.sg"
+msgstr "https://go.gov.sg/postmangovsgbot"
 
 #: src/config.ts:35
 msgid "link.guideDemoUrl"
-msgstr "https://guide.postman.gov.sg"
+msgstr "https://guide.postman.gov.sg/before-you-start/demo-mode"
 
 #: src/config.ts:28
 msgid "link.guideEmailPasswordProtectedUrl"
@@ -169,11 +177,3 @@ msgstr "https://guide.postman.gov.sg/contact-us"
 #: src/config.ts:38
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
-
-#: src/components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:8
-msgid "demoMessage"
-msgstr "This demo campaign will be sent to a maximum of 20 recipients."
-
-#: src/components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:7
-msgid "demoMessageLabel"
-msgstr "DEMO"

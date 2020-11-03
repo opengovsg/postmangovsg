@@ -6,7 +6,7 @@ import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { useHistory } from 'react-router-dom'
 import { createCampaign } from 'services/campaign.service'
-import { i18n } from '@lingui/core'
+import { i18n } from 'locales'
 import { LINKS } from 'config'
 import { OutboundLink } from 'react-ga'
 const CreateDemoModal = ({
