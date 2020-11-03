@@ -6,11 +6,13 @@ import {
   BeforeCreate,
   HasMany,
   HasOne,
+  AfterCreate,
 } from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
 import { UserDemo } from './user-demo'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
+import { CreateOptions } from 'sequelize/types'
 
 @Table({ tableName: 'users', underscored: true, timestamps: true })
 export class User extends Model<User> {
@@ -46,6 +48,16 @@ export class User extends Model<User> {
     }
   }
 
+  @AfterCreate
+  static addUserDemo(
+    instance: User,
+    options: CreateOptions
+  ): Promise<[UserDemo, boolean]> {
+    return UserDemo.findOrCreate({
+      where: { userId: instance.id },
+      transaction: options.transaction,
+    })
+  }
   async regenerateAndSaveApiKey(): Promise<string> {
     const name = this.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
     const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
