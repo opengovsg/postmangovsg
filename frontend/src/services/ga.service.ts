@@ -12,6 +12,7 @@ export const GA_USER_EVENTS = {
   RETRY_RESUME_SENDING: 'Retry/Resume sending',
   ADD_FROM_ADDRESS: 'Add From Address',
   UPDATE_FROM_ADDRESS: 'Update From Address',
+  DOWNLOAD_DELIVERY_REPORT: 'Download delivery report',
 }
 
 export function initializeGA() {
@@ -28,11 +29,12 @@ export function sendPageView(path: string) {
   ReactGA.pageview(path)
 }
 
-export function sendUserEvent(action: string, label?: string) {
+export function sendUserEvent(action: string, label?: string, value?: number) {
   ReactGA.event({
     category: 'User',
     action,
     label,
+    value,
   })
 }
 
