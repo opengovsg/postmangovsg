@@ -43,13 +43,6 @@ const config = convict({
     env: 'SECRET_ID',
     format: 'required-string',
   },
-  aws: {
-    awsRegion: {
-      doc: 'Region for where the lambda will be deployed in.',
-      default: 'ap-southeast-1',
-      env: 'AWS_REGION',
-    },
-  },
   sentryDsn: {
     doc: 'Sentry DSN for serverless',
     default: '',
