@@ -177,9 +177,13 @@ const ExportRecipients = ({
     <>
       {isButton ? (
         <div className={styles.actionButton}>
+          <span className={styles.description}>
+            The delivery report will only be available for 7 days after
+            post-campaign sending.
+          </span>
           <ActionButton
             disabled={exportStatus !== CampaignExportStatus.Ready}
-            className={cx({
+            className={cx(styles.exportButton, {
               [styles.disableActiveState]:
                 exportStatus === CampaignExportStatus.Loading,
             })}

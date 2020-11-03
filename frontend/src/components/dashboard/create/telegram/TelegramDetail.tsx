@@ -14,11 +14,13 @@ const TelegramDetail = ({
   name,
   sentAt,
   numRecipients,
+  redacted,
 }: {
   id: number
   name: string
   sentAt: Date
   numRecipients: number
+  redacted: boolean
 }) => {
   const [stats, setStats] = useState(new CampaignStats({}))
 
@@ -127,6 +129,7 @@ const TelegramDetail = ({
             sentAt={sentAt}
             numRecipients={numRecipients}
             stats={stats}
+            redacted={redacted}
             handlePause={handlePause}
             handleRetry={handleRetry}
             handleRefreshStats={handleRefreshStats}

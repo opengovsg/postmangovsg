@@ -15,6 +15,7 @@ const ProgressDetails = ({
   sentAt,
   numRecipients,
   stats,
+  redacted,
   handlePause,
   handleRetry,
   handleRefreshStats,
@@ -25,6 +26,7 @@ const ProgressDetails = ({
   sentAt: Date
   numRecipients: number
   stats: CampaignStats
+  redacted: boolean
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
   handleRefreshStats: () => Promise<void>
@@ -139,16 +141,23 @@ const ProgressDetails = ({
         isComplete={isComplete}
       />
 
-      <ExportRecipients
-        iconPosition="right"
-        campaignId={campaignId}
-        campaignName={campaignName}
-        campaignType={campaignType}
-        sentAt={sentAt}
-        status={status}
-        statusUpdatedAt={statusUpdatedAt}
-        isButton
-      />
+      {!redacted ? (
+        <ExportRecipients
+          iconPosition="right"
+          campaignId={campaignId}
+          campaignName={campaignName}
+          campaignType={campaignType}
+          sentAt={sentAt}
+          status={status}
+          statusUpdatedAt={statusUpdatedAt}
+          isButton
+        />
+      ) : (
+        <div className={styles.redactedNotice}>
+          The delivery report has been redacted and is no longer available for
+          download.
+        </div>
+      )}
 
       <table className={styles.stats}>
         <thead>

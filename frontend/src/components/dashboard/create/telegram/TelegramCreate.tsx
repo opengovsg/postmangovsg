@@ -104,6 +104,7 @@ const CreateTelegram = ({
             name={campaign.name}
             sentAt={campaign.sentAt}
             numRecipients={campaign.numRecipients}
+            redacted={campaign.redacted}
           ></TelegramDetail>
         </div>
       ) : (
