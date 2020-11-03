@@ -7,6 +7,8 @@ import { formatDefaultCredentialName } from '@core/utils'
 
 const logger = loggerWithLabel(module)
 
+const botId = (telegramBotToken: string): string =>
+  telegramBotToken.split(':')[0]
 /**
  * Parse telegram credentials from request body, setting it to res.locals.credentials to be passed downstream
  * @param req
@@ -26,7 +28,7 @@ const getCredentialsFromBody = async (
 
 /**
  * Parse label from request body. Retrieve credentials associated with this label,
- * and set the credentials to res.locals.credentials, credName to res.locals.credentialName, to be passed downstream
+ * and set the credentials to res.locals.credentials to be passed downstream
  * @param req
  * @param res
  * @param next
@@ -80,7 +82,6 @@ const getCredentialsFromLabel = async (
       credentialName
     )
     res.locals.credentials = { telegramBotToken }
-    res.locals.credentialName = credentialName
     return next()
   } catch (err) {
     return next(err)
@@ -120,7 +121,6 @@ const getCampaignCredential = async (
   )
 
   res.locals.credentials = { telegramBotToken }
-  res.locals.credentialName = credName
   next()
 }
 
@@ -137,51 +137,44 @@ const validateAndStoreCredentials = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  let { credentialName } = res.locals
   const { telegramBotToken } = res.locals.credentials
+  const credentialName = botId(telegramBotToken)
   const logMeta = {
     credentialName,
     action: 'validateAndStoreCredentials',
   }
+  try {
+    await TelegramService.validateAndConfigureBot(telegramBotToken)
+  } catch (err) {
+    logger.error({
+      message: 'Failed to validate and store credentials',
+      error: err,
+      ...logMeta,
+    })
+    return res.status(400).json({ message: `${err}` })
+  }
 
-  // If credentialName is provided, the credential has already been saved and we
-  // do not need to re-validate it.
-  if (!credentialName) {
-    try {
-      await TelegramService.validateAndConfigureBot(telegramBotToken)
-    } catch (err) {
-      logger.error({
-        message: 'Failed to validate and store credentials',
-        error: err,
-        ...logMeta,
-      })
-      return res.status(400).json({ message: `${err}` })
-    }
+  try {
+    // Credential name will be raw botId. The botId will not be hashed as we
+    // want to preserve the mapping between botId and token even in the event
+    // of a change in salt for future token revocations/updates for the given
+    // botId.
 
-    try {
-      // Credential name will be raw botId. The botId will not be hashed as we
-      // want to preserve the mapping between botId and token even in the event
-      // of a change in salt for future token revocations/updates for the given
-      // botId.
-      credentialName = telegramBotToken.split(':')[0]
-
-      await CredentialService.storeCredential(
-        credentialName,
-        telegramBotToken,
-        true
-      )
-    } catch (err) {
-      logger.error({
-        message: 'Failed to validate and store credentials',
-        error: err,
-        ...logMeta,
-      })
-      return res.status(400).json({ message: 'Error storing credentials' })
-    }
+    await CredentialService.storeCredential(
+      credentialName,
+      telegramBotToken,
+      true
+    )
+  } catch (err) {
+    logger.error({
+      message: 'Failed to validate and store credentials',
+      error: err,
+      ...logMeta,
+    })
+    return res.status(400).json({ message: 'Error storing credentials' })
   }
 
   // Pass on to next middleware/handler
-  res.locals.credentialName = credentialName
   res.locals.channelType = ChannelType.Telegram
   next()
 }
@@ -302,10 +295,12 @@ const setCampaignCredential = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { credentialName } = res.locals
-    if (!credentialName) {
+    const { telegramBotToken } = res.locals.credentials
+    if (!telegramBotToken) {
       throw new Error('Credential does not exist')
     }
+
+    const credentialName = botId(telegramBotToken)
     await TelegramService.setCampaignCredential(+campaignId, credentialName)
     return res.json({ message: 'OK' })
   } catch (err) {
