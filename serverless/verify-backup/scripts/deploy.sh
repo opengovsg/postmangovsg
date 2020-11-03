@@ -1,11 +1,9 @@
 #!/bin/bash
 
+# Before running script:
 # 1. Ensure that gcloud is in PATH, or use path-to-google-cloud-sdk/bin/gcloud
 # https://cloud.google.com/sdk/docs/install#mac
-# 2. Use a service account key to authenticate to gcloud
-# set $GOOGLE_APPLICATION_CREDENTIALS='path-to-key-file'
-# https://cloud.google.com/docs/authentication/production
-# 3. Set GCLOUD_RUN_SERVICE_ACCOUNT env var to service account
+# 2. Ensure instructions in Pre-requisites to run scripts section in readme are fulfilled
 
 echo 'Setting up service account...'
 gcloud auth activate-service-account $GCLOUD_SERVICE_ACCOUNT --key-file=$GOOGLE_APPLICATION_CREDENTIALS
@@ -15,7 +13,7 @@ gcloud builds submit --tag gcr.io/postmangovsg/verify-backup --gcs-log-dir gs://
 
 echo 'Deploying build to Cloud Run...'
 # --set-env-vars `grep -v '^#' .env | awk -v ORS=, 'NF { print $1 }'`pulls env vars from .env file and formats as args
-gcloud run deploy verify-backup \
+gcloud run deploy $GCLOUD_RUN_SERVICE_NAME \
   --region asia-southeast1 \
   --no-allow-unauthenticated  \
   --image gcr.io/postmangovsg/verify-backup \
