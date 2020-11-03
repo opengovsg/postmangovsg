@@ -88,6 +88,8 @@
 
 .emptyDashboard {
   text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
 
   .image {
     width: 350px;
@@ -103,5 +105,18 @@
 
   .darkBlueButton {
     @extend %secondary-btn;
+  }
+  .darkGreenButton {
+    @include button($green-500, $green-300, $grey-900);
+  }
+  .actions {
+    @include flex-horizontal;
+    justify-content: space-evenly;
+    button {
+      margin-bottom: 1rem;
+    }
+    @include mobile() {
+      @include flex-vertical;
+    }
   }
 }

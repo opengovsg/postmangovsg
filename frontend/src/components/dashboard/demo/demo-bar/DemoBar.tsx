@@ -2,40 +2,39 @@ import React, { useCallback, useContext, useEffect, useState } from 'react'
 import styles from './DemoBar.module.scss'
 import cx from 'classnames'
 import { CloseButton, TextButton } from 'components/common'
-import { getUserSettings, updateDemoDisplayed } from 'services/settings.service'
+import { updateDemoDisplayed } from 'services/settings.service'
 import { ModalContext } from 'contexts/modal.context'
 import CreateDemoModal from '../create-demo-modal'
-const DemoBar = () => {
+const DemoBar = ({
+  numDemosSms,
+  numDemosTelegram,
+  isDisplayed,
+}: {
+  numDemosSms: number
+  numDemosTelegram: number
+  isDisplayed: boolean
+}) => {
   const modalContext = useContext(ModalContext)
-  const [isMenuVisible, setIsMenuVisible] = useState(false)
+  const [isMenuVisible, setIsMenuVisible] = useState(isDisplayed)
+  const [hasDemo, setHasDemo] = useState(false)
   const toggleMenu = useCallback(() => {
     updateDemoDisplayed(!isMenuVisible)
     setIsMenuVisible((state) => !state)
   }, [isMenuVisible])
-  const [numDemosSms, setNumDemosSms] = useState(0)
-  const [numDemosTelegram, setNumDemosTelegram] = useState(0)
-  const [hasDemo, setHasDemo] = useState(false)
-
-  useEffect(() => {
-    async function getNumDemos() {
-      // TRIAL: check for number of demos
-      const { demo } = await getUserSettings()
-      setIsMenuVisible(demo.isDisplayed)
-      setNumDemosSms(demo?.numDemosSms)
-      setNumDemosTelegram(demo?.numDemosTelegram)
-    }
-    getNumDemos()
-  }, [])
 
   useEffect(() => {
     setHasDemo(!!numDemosTelegram || !!numDemosSms)
   }, [numDemosSms, numDemosTelegram])
+  useEffect(() => {
+    setIsMenuVisible(isDisplayed)
+  }, [isDisplayed])
 
   function onCreate(): void {
     if (hasDemo) {
       modalContext.setModalContent(
         <CreateDemoModal
-          demoInfo={{ numDemosSms, numDemosTelegram }}
+          numDemosSms={numDemosSms}
+          numDemosTelegram={numDemosTelegram}
         ></CreateDemoModal>
       )
     }

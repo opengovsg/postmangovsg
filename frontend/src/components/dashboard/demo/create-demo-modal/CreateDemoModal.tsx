@@ -10,9 +10,11 @@ import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
 import { OutboundLink } from 'react-ga'
 const CreateDemoModal = ({
-  demoInfo,
+  numDemosSms,
+  numDemosTelegram,
 }: {
-  demoInfo: { numDemosSms: number; numDemosTelegram: number }
+  numDemosSms: number
+  numDemosTelegram: number
 }) => {
   const modalContext = useContext(ModalContext)
   const history = useHistory()
@@ -24,23 +26,23 @@ const CreateDemoModal = ({
   useEffect(() => {
     // Handle case where one of the channels does not have any demos left
     // Set the default selected channel to the channel that still has demos left
-    if (demoInfo.numDemosSms) {
+    if (numDemosSms) {
       setSelectedChannel(ChannelType.SMS)
     } else {
       setSelectedChannel(ChannelType.Telegram)
     }
-  }, [demoInfo.numDemosSms])
+  }, [numDemosSms])
 
   useEffect(() => {
     let numDemosChannel
     let message
     switch (selectedChannel) {
       case ChannelType.SMS:
-        numDemosChannel = demoInfo.numDemosSms
+        numDemosChannel = numDemosSms
         message = `You have ${numDemosChannel}/3 SMS demo campaigns left`
         break
       case ChannelType.Telegram:
-        numDemosChannel = demoInfo.numDemosTelegram
+        numDemosChannel = numDemosTelegram
         message = `You have ${numDemosChannel}/3 Telegram demo campaigns left`
         break
       default:
@@ -53,7 +55,7 @@ const CreateDemoModal = ({
     )
     setDemoCampaignMessage(message)
     setIsCreateEnabled(!!numDemosChannel)
-  }, [selectedChannel, demoInfo.numDemosSms, demoInfo.numDemosTelegram])
+  }, [numDemosSms, numDemosTelegram, selectedChannel])
 
   async function createDemo() {
     try {
