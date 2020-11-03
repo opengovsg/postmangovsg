@@ -35,6 +35,7 @@ export interface CampaignDetails {
   is_csv_processing: boolean
   protect: boolean
   num_recipients: number
+  redacted?: boolean
   email_templates?: {
     body: string
     subject: string
@@ -86,6 +87,8 @@ export interface CampaignRecipient {
  *          invalid:
  *            type: number
  *          halted:
+ *            type: boolean
+ *          redacted:
  *            type: boolean
  *          status:
  *            $ref: '#/components/schemas/JobStatus'

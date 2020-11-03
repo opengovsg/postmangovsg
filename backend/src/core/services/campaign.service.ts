@@ -1,4 +1,5 @@
 import { Op, literal, Transaction, Includeable } from 'sequelize'
+import config from '@core/config'
 import { JobStatus } from '@core/constants'
 import { Campaign, JobQueue, Statistic } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
@@ -47,6 +48,7 @@ const listCampaigns = ({
     attributes: any
     order: any
     include: any
+    subQuery: boolean
     offset?: number
     limit?: number
   } = {
@@ -62,8 +64,18 @@ const listCampaigns = ({
       [literal('"cred_name" IS NOT NULL'), 'has_credential'],
       'halted',
       'protect',
+      [
+        literal(
+          `COALESCE(DATE_PART('days', NOW() - MIN("job_queue"."updated_at") OVER (PARTITION BY "job_queue"."campaign_id")) > ${config.get(
+            'redaction.maxAge'
+          )}, FALSE)`
+        ),
+        'redacted',
+      ],
     ],
     order: [['created_at', 'DESC']],
+    // Set limit and offset at the end of the main query so that the window function will have access to the job_queue table
+    subQuery: false,
     include: [
       {
         model: JobQueue,
@@ -116,6 +128,14 @@ const getCampaignDetails = async (
           'Statistic.unsent + Statistic.sent + Statistic.errored + Statistic.invalid'
         ),
         'num_recipients',
+      ],
+      [
+        literal(
+          `COALESCE(DATE_PART('days', NOW() - MIN("job_queue"."updated_at") OVER (PARTITION BY "job_queue"."campaign_id")) > ${config.get(
+            'redaction.maxAge'
+          )}, FALSE)`
+        ),
+        'redacted',
       ],
     ],
     include: [

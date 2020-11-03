@@ -423,6 +423,14 @@ const config = convict({
       format: 'required-string',
     },
   },
+  redaction: {
+    maxAge: {
+      doc: 'Maximum age before campaign is redacted',
+      default: 7,
+      env: 'REDACTION_MAXIMUM_AGE',
+      format: Number,
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
