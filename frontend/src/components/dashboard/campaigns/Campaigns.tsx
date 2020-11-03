@@ -147,7 +147,7 @@ const Campaigns = () => {
         <h2>We are excited to have you here!</h2>
         <h5>To get you started, we have prepared a guide for your reference</h5>
         <OutboundLink
-          eventLabel={i18n._(LINKS.guideUrl)}
+          eventLabel={`Get started / ${i18n._(LINKS.guideUrl)}`}
           to={i18n._(LINKS.guideUrl)}
           target="_blank"
         >
