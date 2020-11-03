@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
 import { capitalize } from 'lodash'
+import { Trans } from '@lingui/macro'
 
 import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
@@ -107,6 +108,7 @@ const Campaigns = () => {
       name: 'Export',
       render: (campaign: Campaign) => {
         if (campaign.status === Status.Draft) return
+        if (campaign.redacted) return <Trans>Report redacted</Trans>
         return (
           <ExportRecipients
             iconPosition="left"

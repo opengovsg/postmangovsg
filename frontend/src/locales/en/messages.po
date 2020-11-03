@@ -29,6 +29,10 @@ msgstr "I'd rather stay"
 msgid "One-Time Password"
 msgstr "One-Time Password"
 
+#: src/components/dashboard/campaigns/Campaigns.tsx:97
+msgid "Report redacted"
+msgstr "Report redacted"
+
 #: src/components/login/login-input/LoginInput.tsx:82
 msgid "Resend?"
 msgstr "Resend?"
