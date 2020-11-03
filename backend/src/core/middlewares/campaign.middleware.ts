@@ -107,8 +107,40 @@ const listCampaigns = async (
   }
 }
 
+/**
+ * If a campaign has been redacted, it can no longer be exported
+ * @param req
+ * @param res
+ * @param next
+ */
+const isCampaignRedacted = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { campaignId } = req.params
+  try {
+    const campaign = await CampaignService.getCampaignDetails(+campaignId, [])
+    if (campaign.redacted) {
+      logger.error({
+        message: 'Campaign has been redacted',
+        campaignId: campaign.id,
+        action: 'isCampaignRedacted',
+      })
+
+      return res.status(410).json({
+        message: 'Campaign has been redacted',
+      })
+    }
+    next()
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const CampaignMiddleware = {
   canEditCampaign,
   createCampaign,
   listCampaigns,
+  isCampaignRedacted,
 }

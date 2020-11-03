@@ -929,9 +929,15 @@ router.post('/refresh-stats', TelegramStatsMiddleware.updateAndGetStats)
  *           description: Unauthorized
  *        "403":
  *           description: Forbidden, campaign not owned by user
+ *        "410":
+ *           description: Campaign has been redacted
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/export', TelegramStatsMiddleware.getDeliveredRecipients)
+router.get(
+  '/export',
+  CampaignMiddleware.isCampaignRedacted,
+  TelegramStatsMiddleware.getDeliveredRecipients
+)
 
 export default router
