@@ -26,6 +26,12 @@ convict.addFormats({
 })
 
 const config = convict({
+  env: {
+    doc: 'The application environment',
+    format: ['production', 'staging', 'development'],
+    default: 'production',
+    env: 'NODE_ENV',
+  },
   prefix: {
     doc: 'prefix of secret id',
     default: 'env/eb/',
@@ -43,6 +49,11 @@ const config = convict({
       default: 'ap-southeast-1',
       env: 'AWS_REGION',
     },
+  },
+  sentryDsn: {
+    doc: 'Sentry DSN for serverless',
+    default: '',
+    env: 'SENTRY_DSN',
   },
 })
 

@@ -1,33 +1,54 @@
 import AWS from 'aws-sdk'
+import * as Sentry from '@sentry/node'
 import config from './config'
+Sentry.init({
+  dsn: config.get('sentryDsn'),
+  environment: config.get('env'),
+})
+Sentry.configureScope((scope) => {
+  const functionName =
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    `eb-env-update-${config.get('env')}`
+  scope.setTag('lambda-function-name', functionName)
+})
+
 const eb = new AWS.ElasticBeanstalk()
 exports.handler = async (event : any, context: any) => {
-  const { detail } = event
-  if (
-    detail &&
-    detail.eventSource === 'secretsmanager.amazonaws.com' &&
-    detail.eventName === 'PutSecretValue'
-  ) {
-    const { requestParameters } = detail
+  try{
+    const { detail } = event
     if (
-      requestParameters &&
-      requestParameters.secretId === config.get('secretId')
+      detail &&
+      detail.eventSource === 'secretsmanager.amazonaws.com' &&
+      detail.eventName === 'PutSecretValue'
     ) {
-      const environmentName = config.get('secretId').substring(config.get('prefix').length)
-      console.log(`Updating config for environmentName ${environmentName}`)
-      await eb
-        .updateEnvironment({
-          EnvironmentName: environmentName,
-          OptionSettings: [
-            {
-              Namespace: 'aws:elasticbeanstalk:application:environment',
-              OptionName: 'awsRequestId',
-              Value: context.awsRequestId,
-            },
-          ],
-        })
-        .promise()
+      const { requestParameters } = detail
+      if (
+        requestParameters &&
+        requestParameters.secretId === config.get('secretId')
+      ) {
+        const environmentName = config.get('secretId').substring(config.get('prefix').length)
+        console.log(`Updating config for environmentName ${environmentName}`)
+        await eb
+          .updateEnvironment({
+            EnvironmentName: environmentName,
+            OptionSettings: [
+              {
+                Namespace: 'aws:elasticbeanstalk:application:environment',
+                OptionName: 'awsRequestId',
+                Value: context.awsRequestId,
+              },
+            ],
+          })
+          .promise()
+      }
     }
+    return
+  } catch (err) {
+    console.error(err)
+
+    Sentry.captureException(err)
+    await Sentry.flush(2000)
+
+    throw err
   }
-  return
 }

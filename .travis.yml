@@ -198,7 +198,9 @@ jobs:
           on:
             branch: $PRODUCTION_BRANCH
           environment_variables:
+            - NODE_ENV=production
             - SECRET_ID=$PRODUCTION_SECRET_ID
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
         - provider: lambda
           edge: true
           function_name: eb-env-update-staging
@@ -214,7 +216,9 @@ jobs:
           on:
             branch: $STAGING_BRANCH
           environment_variables:
+            - NODE_ENV=staging
             - SECRET_ID=$STAGING_SECRET_ID
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
     - name: root
       install:
         - npm install --ignore-scripts
