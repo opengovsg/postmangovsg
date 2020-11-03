@@ -2,7 +2,7 @@
 The following steps describe the setup process for services required for the verifying backups workflow on Google Cloud Platform.
 
 ### Service account
-There are dedicated service accounts for staging and production associated to the services required for the verify backup workflow. It contains all the required permissions to execute this workflow. All required permissions are encapsulated in two roles: custom role `verify-backup` and `Cloud Run Invoker` role. 
+There are dedicated service accounts for staging and production associated to the services required for the verify backup workflow. It contains all the required permissions to execute this workflow. All required permissions are encapsulated in two roles: custom role `verify-backup` and `Cloud Run Invoker` role. Learn more details about [permissions](#permissions-required).
 
 ### Authentication
 The service account key for the separate offline backup gcloud account is stored in GCP Secret Manager and 1Password. This is required for the verification script to pull the encrypted db dumps from the offline gcp account.
@@ -36,3 +36,9 @@ The pre-built images submitted by Cloud Build are stored in the container regist
 
 1. Sentry cli has been integrated with the verification scripts
 2. In `serverless/verify-backup/scripts/verify-backup.sh`, a sentry event is created when the restore is successful or fails
+
+### Permissions required
+
+Service accounts require the user-defined custom role `verify-backup` and google cloud predefined `Cloud Run Invoker` role.
+
+Permissions included in `verify-backup` role are in 1Password.
