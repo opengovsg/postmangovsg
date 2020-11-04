@@ -33,7 +33,7 @@ const PrimaryInfoBlock = ({
       >
         <li>
           <i className="bx bx-error-circle"></i>
-          <p>{children}</p>
+          <div>{children}</div>
         </li>
         {onClose && <CloseButton onClick={onClose} className={styles.close} />}
       </div>
