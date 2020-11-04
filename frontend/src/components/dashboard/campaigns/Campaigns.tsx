@@ -78,13 +78,15 @@ const Campaigns = () => {
     },
     {
       name: 'Name',
-      render: (campaign: Campaign) => campaign.name,
-      width: 'md',
+      render: (campaign: Campaign) => (
+        <span title={campaign.name}>{campaign.name}</span>
+      ),
+      width: 'md ellipsis',
     },
     {
       name: 'Created At',
       render: (campaign: Campaign) => (
-        <Moment format="LLL">{campaign.createdAt}</Moment>
+        <Moment format="MMM DD YYYY, HH:mm">{campaign.createdAt}</Moment>
       ),
       width: 'md',
     },
@@ -92,7 +94,7 @@ const Campaigns = () => {
       name: 'Sent At',
       render: (campaign: Campaign) =>
         campaign.sentAt ? (
-          <Moment format="LLL">{campaign.sentAt}</Moment>
+          <Moment format="MMM DD YYYY, HH:mm">{campaign.sentAt}</Moment>
         ) : (
           <span></span>
         ),

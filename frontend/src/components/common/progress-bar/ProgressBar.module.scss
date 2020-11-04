@@ -2,17 +2,17 @@
 @import 'styles/_mixins';
 
 .bar {
-  background-color: $light-blue;
+  background-color: $neutral-light;
   border-radius: $border-radius;
   height: 10px;
 }
 
 .progress {
-  background-color: $indigo-blue;
+  background-color: $primary;
   border-radius: $border-radius;
   height: 100%;
   transition: all 1s;
   &.complete {
-    background-color: $turquoise-green;
+    background-color: $success;
   }
 }

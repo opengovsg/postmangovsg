@@ -16,6 +16,10 @@ import {
   InfoBlock,
   ErrorBlock,
   Dropdown,
+  ButtonGroup,
+  TextButton,
+  StepHeader,
+  StepSection,
   CredLabelInput,
   Checkbox,
 } from 'components/common'
@@ -27,9 +31,11 @@ import { i18n } from 'locales'
 const TelegramCredentials = ({
   hasCredential: initialHasCredential,
   onNext,
+  onPrevious,
 }: {
   hasCredential: boolean
   onNext: (changes: any, next?: boolean) => void
+  onPrevious: () => void
 }) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [credLabels, setCredLabels] = useState([] as string[])
@@ -152,68 +158,75 @@ const TelegramCredentials = ({
     }
   }
 
-  function renderCredentialFields() {
+  function renderCredentialFields(isEmbedded = false) {
     return (
       <>
-        <h2>Insert your Telegram credentials</h2>
-        <p className={styles.validateCredentialsInfo}>
-          Select from your stored credentials or add new ones.
-        </p>
+        <StepHeader
+          title="Insert your Telegram credentials"
+          subtitle={isEmbedded ? '' : 'Step 3'}
+        >
+          <p className={styles.validateCredentialsInfo}>
+            Select from your stored credentials or add new ones.
+          </p>
+        </StepHeader>
 
         {isManual ? (
           <>
             {storedCredentials.length ? (
-              <p className="clickable" onClick={toggleInputMode}>
-                Select from stored credentials
-              </p>
+              <StepSection>
+                <p className="clickable" onClick={toggleInputMode}>
+                  Select from stored credentials
+                </p>
+              </StepSection>
             ) : null}
-            <div className="separator"></div>
 
-            <h2>Add new credentials</h2>
-            <p className={styles.validateCredentialsInfo}>
-              Please provide your Telegram bot token for validation. If you are
-              unsure about how to retrieve your bot token, please follow the
-              instructions provided&nbsp;
-              <OutboundLink
-                eventLabel={i18n._(LINKS.guideTelegramUrl)}
-                to={i18n._(LINKS.guideTelegramUrl)}
-                target="_blank"
-              >
-                here.
-              </OutboundLink>
-            </p>
+            <StepSection>
+              <StepHeader title="Add new credentials">
+                <p className={styles.validateCredentialsInfo}>
+                  Please provide your Telegram bot token for validation. If you
+                  are unsure about how to retrieve your bot token, please follow
+                  the instructions provided&nbsp;
+                  <OutboundLink
+                    eventLabel={i18n._(LINKS.guideTelegramUrl)}
+                    to={i18n._(LINKS.guideTelegramUrl)}
+                    target="_blank"
+                  >
+                    here.
+                  </OutboundLink>
+                </p>
+              </StepHeader>
 
-            <div className={styles.validateCredentialsInfo}>
-              <CredLabelInput
-                className={{
-                  [styles.credentialLabelInputError]:
-                    saveCredentialWithLabel && !label,
-                }}
-                value={label}
-                onChange={setLabel}
-                labels={credLabels}
-              />
-              {saveCredentialWithLabel && !label && (
-                <span className={styles.credentialLabelError}>
-                  Please enter a credential name
-                </span>
-              )}
-              <Checkbox
-                checked={saveCredentialWithLabel}
-                onChange={setSaveCredentialWithLabel}
-              >
-                Save this credential for future use. If unchecked, nothing is
-                saved.
-              </Checkbox>
-              <TelegramCredentialsInput onFilled={setCreds} />
-            </div>
-            <ErrorBlock>{errorMessage}</ErrorBlock>
+              <div>
+                <CredLabelInput
+                  className={{
+                    [styles.credentialLabelInputError]:
+                      saveCredentialWithLabel && !label,
+                  }}
+                  value={label}
+                  onChange={setLabel}
+                  labels={credLabels}
+                />
+                {saveCredentialWithLabel && !label && (
+                  <span className={styles.credentialLabelError}>
+                    Please enter a credential name
+                  </span>
+                )}
+                <Checkbox
+                  checked={saveCredentialWithLabel}
+                  onChange={setSaveCredentialWithLabel}
+                >
+                  Save this credential for future use. If unchecked, nothing is
+                  saved.
+                </Checkbox>
+              </div>
+              <div className={styles.validateCredentialsInfo}>
+                <TelegramCredentialsInput onFilled={setCreds} />
+              </div>
+              <ErrorBlock>{errorMessage}</ErrorBlock>
+            </StepSection>
 
-            <div className="progress-button">
-              <PrimaryButton
-                disabled={!creds || (saveCredentialWithLabel && !label)}
-                onClick={handleNewCredentials}
-              >
+            <ButtonGroup>
+              <PrimaryButton disabled={!creds} onClick={handleNewCredentials}>
                 {isValidating ? (
                   <>
                     Validating<i className="bx bx-loader-alt bx-spin"></i>
@@ -225,21 +238,24 @@ const TelegramCredentials = ({
                   </>
                 )}
               </PrimaryButton>
-            </div>
+              <TextButton onClick={onPrevious}>Previous</TextButton>
+            </ButtonGroup>
           </>
         ) : (
           <>
-            <Dropdown
-              onSelect={setSelectedCredential}
-              options={storedCredentials}
-            ></Dropdown>
-            <ErrorBlock>{errorMessage}</ErrorBlock>
+            <StepSection>
+              <Dropdown
+                onSelect={setSelectedCredential}
+                options={storedCredentials}
+              ></Dropdown>
+              <ErrorBlock>{errorMessage}</ErrorBlock>
 
-            <p className="clickable" onClick={() => setIsManual(true)}>
-              Add new credentials
-            </p>
+              <p className="clickable" onClick={() => setIsManual(true)}>
+                Add new credentials
+              </p>
+            </StepSection>
 
-            <div className="progress-button">
+            <ButtonGroup>
               <PrimaryButton
                 disabled={!selectedCredential}
                 onClick={handleSelectStoredCredentials}
@@ -254,7 +270,8 @@ const TelegramCredentials = ({
                   </>
                 )}
               </PrimaryButton>
-            </div>
+              <TextButton onClick={onPrevious}>Previous</TextButton>
+            </ButtonGroup>
           </>
         )}
       </>
@@ -263,46 +280,60 @@ const TelegramCredentials = ({
 
   return (
     <>
-      <sub>Step 3</sub>
       {hasCredential ? (
         <>
-          <h2>Your current credentials have already been validated.</h2>
-          <p>
-            Entering new credentials will overwrite the previous validated one.
-            This action is irreversible. Please proceed with caution.
-          </p>
+          <StepHeader
+            title="Your current credentials have already been validated."
+            subtitle="Step 3"
+          >
+            <p>
+              Entering new credentials will overwrite the previous validated
+              one. This action is irreversible. Please proceed with caution.
+            </p>
+          </StepHeader>
           {showCredentialFields ? (
-            renderCredentialFields()
+            <>
+              <div className="separator"></div>
+              {renderCredentialFields(true)}
+            </>
           ) : (
             <>
-              <PrimaryButton
-                className={cx(styles.darkBlueBtn, styles.newCredentialsButton)}
-                onClick={toggleReplaceCredentials}
-              >
-                Enter new credentials
-              </PrimaryButton>
-              <div className="separator"></div>
+              <StepSection>
+                <PrimaryButton
+                  className={cx(styles.darkBlueBtn)}
+                  onClick={toggleReplaceCredentials}
+                >
+                  Enter new credentials
+                </PrimaryButton>
+              </StepSection>
 
-              <h2>Optional: Send a test message</h2>
-              <p className={styles.validateCredentialsInfo}>
-                To ensure everything is working perfectly, please send a test
-                message to receive a preview of your message. Do note that the
-                phone number you are testing with must already be{' '}
-                <b>subscribed to the bot</b>.
-              </p>
-              <TelegramValidationInput onClick={handleSendValidationMessage} />
-              {sendSuccess && (
-                <InfoBlock>
-                  <li>
-                    <i className="bx bx-check-circle"></i>
-                    <span>Message sent successfully.</span>
-                  </li>
-                </InfoBlock>
-              )}
-              <ErrorBlock>{errorMessage}</ErrorBlock>
-              <div className="separator"></div>
+              <StepSection>
+                <StepHeader title="Optional: Send a test message">
+                  <p className={styles.validateCredentialsInfo}>
+                    To ensure everything is working perfectly, please send a
+                    test message to receive a preview of your message. Do note
+                    that the phone number you are testing with must already be{' '}
+                    <b>subscribed to the bot</b>.
+                  </p>
+                </StepHeader>
+                <TelegramValidationInput
+                  onClick={handleSendValidationMessage}
+                />
+                {sendSuccess && (
+                  <InfoBlock>
+                    <li>
+                      <i className="bx bx-check-circle"></i>
+                      <span>Message sent successfully.</span>
+                    </li>
+                  </InfoBlock>
+                )}
+                <ErrorBlock>{errorMessage}</ErrorBlock>
+              </StepSection>
 
-              <NextButton disabled={!hasCredential} onClick={onNext} />
+              <ButtonGroup>
+                <NextButton disabled={!hasCredential} onClick={onNext} />
+                <TextButton onClick={onPrevious}>Previous</TextButton>
+              </ButtonGroup>
             </>
           )}
         </>

@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React from 'react'
 
 import { CloseButton } from 'components/common'
@@ -6,9 +7,11 @@ import styles from './Modal.module.scss'
 const Modal = ({
   onClose,
   children,
+  contentClassName,
 }: {
   onClose: any
   children: React.ReactNode
+  contentClassName?: string
 }) => {
   const modalBackgroundId = 'modal-background'
 
@@ -26,7 +29,7 @@ const Modal = ({
       >
         <div className={styles.modal}>
           <CloseButton onClick={onClose} className={styles.close} />
-          <div className={styles.content}>{children}</div>
+          <div className={cx(styles.content, contentClassName)}>{children}</div>
         </div>
       </div>
     )
