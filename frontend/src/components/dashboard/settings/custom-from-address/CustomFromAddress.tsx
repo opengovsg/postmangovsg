@@ -6,6 +6,7 @@ import { Trans } from '@lingui/macro'
 import { LINKS } from 'config'
 import { i18n } from 'locales'
 
+import { StepHeader } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
 import styles from './CustomFromAddress.module.scss'
@@ -49,7 +50,9 @@ const CustomFromAddress = ({
     }
     return (
       <>
-        <p>You can now send emails from the following email addresses: </p>
+        <StepHeader title={title}>
+          <p>You can now send emails from the following email addresses: </p>
+        </StepHeader>
         <table className={styles.credTable}>
           <tbody>
             <tr>
@@ -94,26 +97,28 @@ const CustomFromAddress = ({
   function renderRequestForm() {
     return (
       <>
-        <p>
-          You can now add your email address <b>{email}</b> as the From Address.
-          Recipients will receive emails from this address, instead of the
-          default{' '}
-          <b>
-            <Trans id="defaultMailFrom" />
-          </b>
-          .
-        </p>
-        <p>
-          The process requires correspondence with your agency&apos;s IT team,
-          and is manual at the moment, so please follow the steps below.
-        </p>
-        <p>
-          <b>How to proceed</b>:
-        </p>
-        <ol>
-          <li>Fill in request form on FormSG</li>
-          <li>Wait for us to contact you within 5 working days</li>
-        </ol>
+        <StepHeader title={title}>
+          <p>
+            You can now add your email address <b>{email}</b> as the From
+            Address. Recipients will receive emails from this address, instead
+            of the default{' '}
+            <b>
+              <Trans id="defaultMailFrom" />
+            </b>
+            .
+          </p>
+          <p>
+            The process requires correspondence with your agency&apos;s IT team,
+            and is manual at the moment, so please follow the steps below.
+          </p>
+          <p>
+            <b>How to proceed</b>:
+            <ol>
+              <li>Fill in request form on FormSG</li>
+              <li>Wait for us to contact you within 5 working days</li>
+            </ol>
+          </p>
+        </StepHeader>
 
         <div className={styles.actionButtons}>
           <OutboundLink
@@ -137,9 +142,6 @@ const CustomFromAddress = ({
   }
   return (
     <div className={styles.fromAddressContainer}>
-      <div>
-        <h2>{title}</h2>
-      </div>
       {customFromAddresses.length > 1
         ? renderFromAddresses()
         : renderRequestForm()}
