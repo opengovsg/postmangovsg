@@ -19,8 +19,8 @@ import CreateCampaign from 'components/dashboard/create/create-modal'
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
 
-import DemoBar from '../demo/demo-bar/DemoBar'
-import CreateDemoModal from '../demo/create-demo-modal'
+import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
+import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
 
 const ITEMS_PER_PAGE = 10

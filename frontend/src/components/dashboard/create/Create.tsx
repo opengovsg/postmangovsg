@@ -11,13 +11,13 @@ import {
   Status,
 } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
+import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import SMSCreate from './sms/SMSCreate'
 import EmailCreate from './email/EmailCreate'
 import TelegramCreate from './telegram/TelegramCreate'
 import styles from './Create.module.scss'
-import DemoInfoBanner from '../demo/demo-info-banner/DemoInfoBanner'
 
 const Create = () => {
   const { id } = useParams()
