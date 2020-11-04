@@ -24,7 +24,7 @@ const TelegramDetail = ({
   numRecipients: number
   isDemo: boolean
 }) => {
-  const modalContext = useContext(ModalContext)
+  const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number, forceRefresh = false) {
@@ -80,16 +80,14 @@ const TelegramDetail = ({
 
   useEffect(() => {
     function renderCompletedDemoModal() {
-      modalContext.setModalContent(
+      setModalContent(
         <CompletedDemoModal
           selectedChannel={ChannelType.Telegram}
         ></CompletedDemoModal>
       )
     }
     if (isDemo && stats.status === Status.Sent) renderCompletedDemoModal()
-    // Prevent modalContext from being added to dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDemo, stats.status])
+  }, [isDemo, setModalContent, stats.status])
 
   function renderProgressHeader() {
     if (stats.waitTime && stats.waitTime > 0) {
