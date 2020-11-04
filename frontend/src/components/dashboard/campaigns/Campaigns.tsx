@@ -68,11 +68,7 @@ const Campaigns = () => {
     {
       name: 'Mode',
       render: (campaign: Campaign) => (
-        <div
-          className={cx(styles.iconContainer, {
-            [styles.trial]: !!campaign.trialMessageLimit,
-          })}
-        >
+        <div className={styles.iconContainer}>
           <i className={cx('bx', styles.icon, channelIcons[campaign.type])}></i>
           {campaign.protect && (
             <i className={cx('bx bxs-lock-alt', styles.lockIcon)}></i>
@@ -84,7 +80,13 @@ const Campaigns = () => {
     {
       name: 'Name',
       render: (campaign: Campaign) => (
-        <span title={campaign.name}>{campaign.name}</span>
+        <span
+          className={cx({
+            [styles.trial]: !!campaign.trialMessageLimit,
+          })}
+        >
+          {campaign.name}
+        </span>
       ),
       width: 'md ellipsis',
     },

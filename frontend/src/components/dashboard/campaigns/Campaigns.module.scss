@@ -56,8 +56,17 @@
   position: relative;
 }
 
-.trial {
-  color: $red;
+.trial::before {
+  content: 'DEMO';
+  background: $green-900;
+  color: white;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.3rem;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 500;
+  float: right;
+  margin-right: 8px;
 }
 
 .icon {
