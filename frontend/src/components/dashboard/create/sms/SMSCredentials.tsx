@@ -74,7 +74,7 @@ const SMSCredentials = ({
     }
     const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
     populateStoredCredentials(defaultLabels)
-  }, [isDemo, storedCredentials.length])
+  }, [isDemo])
 
   function toggleInputMode() {
     setIsManual((m) => !m)
