@@ -1,11 +1,12 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.content {
-  padding-left: 78px;
-  padding-right: 78px;
-}
+$modal-width: $tablet;
 
+.content {
+  margin-left: calc(78px - (#{$modal-width} - 528px) / 2);
+  margin-right: calc(78px - (#{$modal-width} - 528px) / 2);
+}
 .section {
   margin-bottom: 2rem;
   @include flex-vertical;
