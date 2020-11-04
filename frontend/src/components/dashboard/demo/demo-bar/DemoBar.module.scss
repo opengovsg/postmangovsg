@@ -1,6 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
-$demo-bar-height: 3.2rem;
+$demo-bar-height: $height-3;
 .demoBar {
   position: sticky;
   z-index: 10;
@@ -9,11 +9,11 @@ $demo-bar-height: 3.2rem;
   height: $demo-bar-height;
 
   .demoButton {
+    @extend %caption;
     background-color: $green-500;
     color: white;
     min-height: auto;
     width: $demo-bar-height;
-    padding: 4px 0px;
     border: 0;
 
     font-weight: 700;
@@ -28,6 +28,7 @@ $demo-bar-height: 3.2rem;
     }
   }
   .menuContainer {
+    @extend %body-2;
     position: sticky;
     z-index: -1;
     display: flex;
@@ -37,7 +38,6 @@ $demo-bar-height: 3.2rem;
 
     background-color: $green-100;
     color: $green-900;
-    font-size: 0.8rem;
     height: auto;
     width: 280px;
     padding: 4px 8px;
@@ -60,6 +60,8 @@ $demo-bar-height: 3.2rem;
       }
       .action {
         height: auto;
+        color: $green-900;
+        font-style: italic;
       }
     }
     .closeButton {
