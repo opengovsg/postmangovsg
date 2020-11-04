@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react'
 import styles from './CompletedDemoModal.module.scss'
 import CongratsImage from 'assets/img/demo/congrats.png'
 import EndDemoImage from 'assets/img/demo/end-demo.png'
-import { i18n } from '@lingui/core'
+import { i18n } from 'locales'
 import { LINKS } from 'config'
 import { OutboundLink } from 'react-ga'
 import { ChannelType } from 'classes'
 import { getUserSettings } from 'services/settings.service'
+import { PrimaryButton } from 'components/common'
+
 const CompletedDemoModal = ({
   selectedChannel,
 }: {
@@ -16,7 +18,6 @@ const CompletedDemoModal = ({
     numDemosSms: 0,
     numDemosTelegram: 0,
   })
-
   useEffect(() => {
     async function getNumDemos() {
       // TRIAL: check for number of demos
@@ -48,7 +49,7 @@ const CompletedDemoModal = ({
           {numDemosLeft()} remaining.
         </h2>
         <p>
-          Thanks for trying Postman! Learn how to setup your own Twilio accoun
+          Thanks for trying Postman! Learn how to setup your own Twilio account
           or Telegram bot by following our guide. If you need further
           assistance, please contact us.
         </p>
@@ -78,14 +79,22 @@ const CompletedDemoModal = ({
   return (
     <div className={styles.content}>
       {numDemosLeft() > 0 ? renderRemainingDemos() : renderNoDemos()}
-      <div className="separator"></div>
       <div className={styles.options}>
         <OutboundLink
           eventLabel={i18n._(LINKS.guideDemoUrl)}
           to={i18n._(LINKS.guideDemoUrl)}
           target="_blank"
         >
-          Learn more about demos
+          <PrimaryButton>Learn more about demos</PrimaryButton>
+        </OutboundLink>
+        <OutboundLink
+          eventLabel={i18n._(LINKS.contactUsUrl)}
+          to={i18n._(LINKS.contactUsUrl)}
+          target="_blank"
+        >
+          <PrimaryButton className={styles.outlineBtn}>
+            I need help
+          </PrimaryButton>
         </OutboundLink>
       </div>
     </div>

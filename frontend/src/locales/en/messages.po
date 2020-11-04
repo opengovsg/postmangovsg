@@ -62,7 +62,7 @@ msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
 #: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
-#: src/config.ts:43
+#: src/config.ts:44
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
 

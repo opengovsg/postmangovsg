@@ -9,7 +9,7 @@
 
 .modalImg {
   width: 16rem;
-  margin-bottom: 2rem;
+  margin-bottom: $spacing-5;
 }
 
 .icon {
@@ -19,16 +19,32 @@
 .title {
   font-weight: 500;
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: $spacing-3;
 }
 
 .subtitle {
   font-weight: normal;
   margin-top: 0;
-  margin-bottom: 3rem;
+  margin-bottom: $spacing-7;
   text-align: center;
 }
 
 .options {
-  display: flex;
+  @include flex-horizontal;
+  @include mobile() {
+    @include flex-vertical;
+  }
+  a {
+    margin-top: $spacing-4;
+    margin-right: $spacing-4;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  .outlineBtn {
+    @extend %outline-btn;
+    &:hover {
+      background-color: $neutral;
+    }
+  }
 }
