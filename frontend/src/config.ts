@@ -40,6 +40,8 @@ export const LINKS = {
   customFromAddressRequestUrl: t('link.customFromAddressRequestUrl')``,
 }
 export const DEFAULT_MAIL_FROM = t('defaultMailFrom')``
+// Semi-colon separated list of allowed image source hostnames
+export const ALLOWED_IMAGE_SOURCES = t('allowedImageSources')``
 //#endregion
 
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string

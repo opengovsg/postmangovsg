@@ -2,13 +2,18 @@ import React from 'react'
 
 import TextInput from '../text-input'
 import LabelWithExternalLink from '../label-with-external-link'
+import ErrorBlock from '../error-block'
 
 const CredLabelInput = ({
   value,
   onChange,
+  labels,
+  className,
 }: {
   value: string
   onChange: (newValue: string) => any
+  labels: string[]
+  className?: any
 }) => {
   function onLabelChange(value: string) {
     if (value) {
@@ -22,15 +27,25 @@ const CredLabelInput = ({
     }
   }
 
+  function isValidLabel() {
+    return value && !labels.includes(value)
+  }
+
   return (
     <>
       <LabelWithExternalLink label="Credential Label" />
       <TextInput
+        className={className}
         placeholder="Enter a label (e.g. default-cred-1)"
         value={value}
         maxLength="50"
         onChange={onLabelChange}
       />
+      {value && !isValidLabel() && (
+        <ErrorBlock>
+          Label already exists. Please use a different one.
+        </ErrorBlock>
+      )}
     </>
   )
 }

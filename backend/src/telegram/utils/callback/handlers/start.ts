@@ -1,8 +1,10 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message } from 'telegraf/typings/telegram-types'
 
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { generatePadding } from '../generate-padding'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Handles updates for the /start command.
@@ -10,7 +12,10 @@ import { generatePadding } from '../generate-padding'
 export const startCommandHandler = async (
   ctx: TelegrafContext
 ): Promise<Message> => {
-  logger.info(ctx.from?.id.toString() as string)
+  logger.info({
+    message: ctx.from?.id.toString() as string,
+    action: 'startCommandHandler',
+  })
 
   const REPLY =
     'Hello! To complete the subscription, please send me your phone number by pressing the button below.'

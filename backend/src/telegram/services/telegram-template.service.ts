@@ -1,7 +1,6 @@
 import { difference, keys } from 'lodash'
 
 import config from '@core/config'
-import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign } from '@core/models'
@@ -11,7 +10,10 @@ import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(XSS_TELEGRAM_OPTION, '\n')
+const client = new TemplateClient({
+  xssOptions: XSS_TELEGRAM_OPTION,
+  lineBreak: '\n',
+})
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,
@@ -101,7 +103,6 @@ const checkNewTemplateParams = async ({
         firstRecord.params as { [key: string]: string }
       )
     } catch (err) {
-      logger.error(`Hydration error: ${err.stack}`)
       throw new HydrationError()
     }
 

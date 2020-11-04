@@ -1,9 +1,12 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { PostmanTelegramError } from '../PostmanTelegramError'
 import { TelegramSubscriber, BotSubscriber } from '@telegram/models'
+
+const logger = loggerWithLabel(module)
+
 /**
  * Upserts a Telegram subscriber.
  *
@@ -14,12 +17,16 @@ const upsertTelegramSubscriber = async (
   phoneNumber: string,
   telegramId: number
 ): Promise<boolean> => {
+  const logMeta = {
+    phoneNumber,
+    telegramId,
+    action: 'upsertTelegramSubscriber',
+  }
   // Some Telegram clients send pre-prefixed phone numbers
   if (!phoneNumber.startsWith('+')) {
     phoneNumber = `+${phoneNumber}`
   }
 
-  logger.info(`Upserting Telegram subscriber: ${phoneNumber} -> ${telegramId}`)
   /**
    * Insert a telegram id and phone number, if that telegram id doesn't exist.
    * Otherwise, if the new phone number does not exist,
@@ -42,7 +49,11 @@ const upsertTelegramSubscriber = async (
     }
   )
   const affectedRows = result ? (result[1] as number) : 0
-  logger.info(`Upserted ${affectedRows} Telegram subscriber`)
+  logger.info({
+    message: 'Upserted Telegram subscribesr',
+    affectedRows,
+    ...logMeta,
+  })
 
   return affectedRows > 0
 }
@@ -57,13 +68,16 @@ const addBotSubscriber = async (
   botId: string,
   telegramId: number
 ): Promise<boolean> => {
-  logger.info(`Upserting bot subscriber: ${telegramId} -> bot ${botId}`)
+  const logMeta = { botId, telegramId, action: 'addBotSubscriber' }
   const [, created] = await BotSubscriber.findOrCreate({
     where: { botId, telegramId },
   })
-  logger.info(
-    created ? `Upserted Bot subscriber` : `Bot subscriber already exists`
-  )
+  logger.info({
+    message: created
+      ? `Upserted Bot subscriber`
+      : `Bot subscriber already exists`,
+    ...logMeta,
+  })
   return created
 }
 
@@ -73,7 +87,11 @@ const addBotSubscriber = async (
 export const contactMessageHandler = (botId: string) => async (
   ctx: TelegrafContext
 ): Promise<Message> => {
-  logger.info(ctx.from?.id.toString() as string)
+  logger.info({
+    message: ctx.from?.id.toString() as string,
+    botId,
+    action: 'contactMessageHandler',
+  })
 
   // Parse contact data
   const contact = ctx.message?.contact

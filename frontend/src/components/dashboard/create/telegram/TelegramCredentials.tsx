@@ -20,6 +20,8 @@ import {
   TextButton,
   StepHeader,
   StepSection,
+  CredLabelInput,
+  Checkbox,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -36,11 +38,14 @@ const TelegramCredentials = ({
   onPrevious: () => void
 }) => {
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
+  const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
   )
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as any)
+  const [label, setLabel] = useState('')
+  const [saveCredentialWithLabel, setSaveCredentialWithLabel] = useState(false)
   const [showCredentialFields, setShowCredentialFields] = useState(
     !hasCredential
   )
@@ -57,6 +62,7 @@ const TelegramCredentials = ({
   async function populateStoredCredentials() {
     try {
       const storedCredLabels = await getStoredCredentials()
+      setCredLabels(storedCredLabels)
       setStoredCredentials(
         storedCredLabels.map((c) => ({ label: c, value: c }))
       )
@@ -72,6 +78,8 @@ const TelegramCredentials = ({
   function toggleInputMode() {
     setIsManual((m) => !m)
     setCreds(null)
+    setLabel('')
+    setSaveCredentialWithLabel(false)
     setSelectedCredential('')
   }
 
@@ -118,6 +126,7 @@ const TelegramCredentials = ({
       await validateNewCredentials({
         campaignId: +campaignId,
         ...creds,
+        ...(saveCredentialWithLabel && { label }),
       })
 
       setHasCredential(true)
@@ -187,6 +196,29 @@ const TelegramCredentials = ({
                 </p>
               </StepHeader>
 
+              <div>
+                <CredLabelInput
+                  className={{
+                    [styles.credentialLabelInputError]:
+                      saveCredentialWithLabel && !label,
+                  }}
+                  value={label}
+                  onChange={setLabel}
+                  labels={credLabels}
+                />
+                {saveCredentialWithLabel && !label && (
+                  <span className={styles.credentialLabelError}>
+                    Please enter a credential name
+                  </span>
+                )}
+                <Checkbox
+                  checked={saveCredentialWithLabel}
+                  onChange={setSaveCredentialWithLabel}
+                >
+                  Save this credential for future use. If unchecked, nothing is
+                  saved.
+                </Checkbox>
+              </div>
               <div className={styles.validateCredentialsInfo}>
                 <TelegramCredentialsInput onFilled={setCreds} />
               </div>
