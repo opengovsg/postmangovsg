@@ -15,6 +15,57 @@ const hasJobInProgress = (campaignId: number): Promise<JobQueue | null> => {
   })
 }
 
+const createDemoCampaign = async ({
+  name,
+  type,
+  userId,
+  protect,
+  demoMessageLimit,
+  transaction,
+}: {
+  name: string
+  type: string
+  userId: number
+  protect: boolean
+  demoMessageLimit: number | null
+  transaction: Transaction
+}): Promise<Campaign | void> => {
+  const mapping: { [k: string]: string } = {
+    [ChannelType.SMS]: 'numDemosSms',
+    [ChannelType.Telegram]: 'numDemosTelegram',
+  }
+  const numDemosColumn: any = mapping[type]
+  if (!numDemosColumn) {
+    logger.error({
+      message: `Channel type not supported for demo mode`,
+      type,
+    })
+    return
+  }
+  const userDemo = await UserDemo.findOne({
+    where: { userId, [numDemosColumn]: { [Op.gt]: 0 } },
+    transaction,
+  })
+  if (userDemo) {
+    const campaign = await Campaign.create(
+      {
+        name,
+        type,
+        userId,
+        valid: false,
+        protect,
+        demoMessageLimit,
+      },
+      { transaction }
+    )
+    await userDemo?.decrement(numDemosColumn, { transaction })
+    return campaign
+  } else {
+    logger.error({ message: `No demos left`, userId, type })
+    return
+  }
+}
+
 /**
  * Helper method to create a campaign
  */
@@ -30,47 +81,19 @@ const createCampaign = ({
   userId: number
   protect: boolean
   demoMessageLimit: number | null
-}): Promise<Campaign> | undefined => {
-  const mapping: { [k: string]: string } = {
-    [ChannelType.SMS]: 'numDemosSms',
-    [ChannelType.Telegram]: 'numDemosTelegram',
-  }
+}): Promise<Campaign | void> | undefined => {
   const result = Campaign.sequelize?.transaction(async (transaction) => {
-    let campaign
-    if (demoMessageLimit !== null && demoMessageLimit > 0) {
-      const numDemosColumn: any = mapping[type]
-      if (!numDemosColumn) {
-        logger.error({
-          message: `Channel type not supported for demo mode`,
+    const isDemo = Boolean(demoMessageLimit) // demoMessageLimit is not null, undefined, or 0
+    return isDemo
+      ? createDemoCampaign({
+          transaction,
+          name,
           type,
+          userId,
+          protect,
+          demoMessageLimit,
         })
-        return
-      }
-
-      const userDemo = await UserDemo.findOne({
-        where: { userId, [numDemosColumn]: { [Op.gt]: 0 } },
-        transaction,
-      })
-      if (userDemo) {
-        campaign = await Campaign.create(
-          {
-            name,
-            type,
-            userId,
-            valid: false,
-            protect,
-            demoMessageLimit,
-          },
-          { transaction }
-        )
-        await userDemo?.decrement(numDemosColumn, { transaction })
-      } else {
-        logger.error({ message: `No demos left`, userId, type })
-        return
-      }
-    } else {
-      {
-        campaign = await Campaign.create(
+      : Campaign.create(
           {
             name,
             type,
@@ -80,9 +103,6 @@ const createCampaign = ({
           },
           { transaction }
         )
-      }
-    }
-    return campaign
   })
   return result
 }
