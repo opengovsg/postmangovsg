@@ -13,7 +13,7 @@ import {
 import {
   PrimaryButton,
   NextButton,
-  InfoBlock,
+  DetailBlock,
   ErrorBlock,
   Dropdown,
   ButtonGroup,
@@ -357,12 +357,12 @@ const TelegramCredentials = ({
                   onClick={handleSendValidationMessage}
                 />
                 {sendSuccess && (
-                  <InfoBlock>
+                  <DetailBlock>
                     <li>
                       <i className="bx bx-check-circle"></i>
                       <span>Message sent successfully.</span>
                     </li>
-                  </InfoBlock>
+                  </DetailBlock>
                 )}
                 <ErrorBlock>{errorMessage}</ErrorBlock>
               </StepSection>

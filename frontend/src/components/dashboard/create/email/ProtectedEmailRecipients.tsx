@@ -6,7 +6,7 @@ import {
   PrimaryButton,
   TextButton,
   TextArea,
-  InfoBlock,
+  DetailBlock,
   ErrorBlock,
   ProtectedPreview,
   Checkbox,
@@ -191,7 +191,7 @@ const ProtectedEmailRecipients = ({
             your tab or go back to Step 1 to edit.
           </p>
         </StepHeader>
-        <InfoBlock>
+        <DetailBlock>
           <li>
             <i className="bx bx-user-check"></i>
             <p>{protectedCsvInfo?.numRecipients} recipients</p>
@@ -200,21 +200,21 @@ const ProtectedEmailRecipients = ({
             <i className="bx bx-file"></i>
             <p>{protectedCsvInfo?.csvFilename}</p>
           </li>
-        </InfoBlock>
+        </DetailBlock>
       </StepSection>
       {protectedCsvInfo?.preview && (
         <StepSection>
           <div>
             <h4>Message B</h4>
           </div>
-          <InfoBlock className={styles.protectedPreview}>
+          <DetailBlock className={styles.protectedPreview}>
             <li>
               <b>Results</b>
             </li>
             <li>
               <ProtectedPreview html={protectedCsvInfo?.preview} />
             </li>
-          </InfoBlock>
+          </DetailBlock>
         </StepSection>
       )}
       <div className="progress-button">

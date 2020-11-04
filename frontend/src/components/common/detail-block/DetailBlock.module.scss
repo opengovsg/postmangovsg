@@ -1,7 +1,7 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.infoBlock {
+.detailBlock {
   @include block($neutral-light, $secondary);
   border-left: none;
   margin: 0;

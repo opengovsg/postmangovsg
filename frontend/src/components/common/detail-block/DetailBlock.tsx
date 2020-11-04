@@ -1,13 +1,13 @@
 import React from 'react'
 import cx from 'classnames'
 
-import styles from './InfoBlock.module.scss'
+import styles from './DetailBlock.module.scss'
 
-const InfoBlock = (props: any) => {
+const DetailBlock = (props: any) => {
   const { className, children, ...otherProps } = props
 
   return (
-    <div className={cx(styles.infoBlock, className)} {...otherProps}>
+    <div className={cx(styles.detailBlock, className)} {...otherProps}>
       {children}
     </div>
   )
@@ -19,4 +19,4 @@ const InfoBlock = (props: any) => {
  * <li><i className="bx"></i><p>text goes here...</p></li>
  */
 
-export default InfoBlock
+export default DetailBlock
