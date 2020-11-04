@@ -61,7 +61,7 @@ msgstr "Verifying OTP..."
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
-#: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:71
+#: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
 #: src/config.ts:42
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
