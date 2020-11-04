@@ -46,7 +46,7 @@ const ProtectedEmailRecipients = ({
   onPrevious: () => void
   finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
-  const modalContext = useContext(ModalContext)
+  const { setModalContent } = useContext(ModalContext)
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState<File>()
@@ -65,12 +65,12 @@ const ProtectedEmailRecipients = ({
   // Set callback for finish later button
   useEffect(() => {
     finishLaterCallbackRef.current = () => {
-      modalContext.setModalContent(<SaveDraftModal />)
+      setModalContent(<SaveDraftModal />)
     }
     return () => {
       finishLaterCallbackRef.current = undefined
     }
-  }, [template, finishLaterCallbackRef, modalContext])
+  }, [template, finishLaterCallbackRef, setModalContent])
 
   function computePhase(
     numRecipients: number,

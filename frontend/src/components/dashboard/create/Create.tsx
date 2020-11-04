@@ -43,7 +43,6 @@ const Create = () => {
   async function handleFinishLater() {
     if (campaign.status === Status.Draft) {
       sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
-
       if (finishLaterCallbackRef.current) {
         return finishLaterCallbackRef.current()
       }
