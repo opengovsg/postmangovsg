@@ -20,6 +20,12 @@ export enum MessageStatus {
   InvalidRecipient = 'INVALID_RECIPIENT',
 }
 
+export enum DefaultCredentialName {
+  Email = 'EMAIL_DEFAULT',
+  SMS = 'SMS_DEFAULT',
+  Telegram = 'TELEGRAM_DEFAULT',
+}
+
 /**
  * @swagger
  * components:
