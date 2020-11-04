@@ -1,6 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.errorBlock {
-  @include block($error-light, $error);
+.infoBlock {
+  @include block($neutral-light, $primary);
 }

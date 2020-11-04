@@ -64,14 +64,8 @@ const CsvUpload = ({
   return (
     <div className={styles.container}>
       {renderFileUploadInput()}
-      <ErrorBlock onClose={onErrorClose}>
-        {csvError && (
-          <>
-            <b>{tempCsvFilename}</b>
-            <br />
-            {csvError}
-          </>
-        )}
+      <ErrorBlock onClose={onErrorClose} title={tempCsvFilename}>
+        {csvError && <span>{csvError}</span>}
       </ErrorBlock>
     </div>
   )

@@ -18,7 +18,7 @@ import {
   StepSection,
   CredLabelInput,
   Checkbox,
-  PrimaryInfoBlock,
+  InfoBlock,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
@@ -172,8 +172,7 @@ const SMSCredentials = ({
                 Input credentials manually
               </p>
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
-                <PrimaryInfoBlock>
-                  <h4>Using the default credentials?</h4>
+                <InfoBlock title="Using the default credentials?">
                   <span>
                     In demo mode, you can use Postman&apos;s SMS credentials to
                     try sending SMS messages for free. In a normal campaign,
@@ -188,7 +187,7 @@ const SMSCredentials = ({
                       Learn more
                     </OutboundLink>
                   </span>
-                </PrimaryInfoBlock>
+                </InfoBlock>
               )}
             </>
           )}

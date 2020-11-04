@@ -22,7 +22,7 @@ import {
   StepSection,
   CredLabelInput,
   Checkbox,
-  PrimaryInfoBlock,
+  InfoBlock,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -258,8 +258,7 @@ const TelegramCredentials = ({
               </p>
 
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
-                <PrimaryInfoBlock>
-                  <h4>Using the default Telegram credentials?</h4>
+                <InfoBlock title="Using the default Telegram credentials?">
                   <p>
                     Be sure to{' '}
                     <b>
@@ -288,7 +287,7 @@ const TelegramCredentials = ({
                       Learn more
                     </OutboundLink>
                   </p>
-                </PrimaryInfoBlock>
+                </InfoBlock>
               )}
             </StepSection>
 

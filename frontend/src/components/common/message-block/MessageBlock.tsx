@@ -3,16 +3,20 @@ import cx from 'classnames'
 
 import { CloseButton } from 'components/common'
 
-import styles from './PrimaryInfoBlock.module.scss'
+import styles from './MessageBlock.module.scss'
 
-const PrimaryInfoBlock = ({
+const MessageBlock = ({
   className,
+  icon,
+  title,
   children,
   absolute,
   onClose,
   ...otherProps
 }: {
   className?: string
+  title?: string
+  icon?: string
   children?: React.ReactNode
   absolute?: boolean
   onClose?: Function
@@ -25,20 +29,24 @@ const PrimaryInfoBlock = ({
     <div className={styles.relativeContainer}>
       <div
         className={cx(
-          styles.primaryInfoBlock,
+          styles.content,
           { [styles.absolute]: absolute, [styles.withClose]: onClose },
           className
         )}
         {...otherProps}
       >
         <li>
-          <i className="bx bx-error-circle"></i>
-          <div>{children}</div>
+          {icon && <i className={icon}></i>}
+          <div>
+            {title && <h4>{title}</h4>}
+            {children}
+          </div>
         </li>
+
         {onClose && <CloseButton onClick={onClose} className={styles.close} />}
       </div>
     </div>
   )
 }
 
-export default PrimaryInfoBlock
+export default MessageBlock

@@ -1,9 +1,9 @@
 import React from 'react'
 import cx from 'classnames'
-import styles from './ErrorBlock.module.scss'
+import styles from './InfoBlock.module.scss'
 import MessageBlock from '../message-block'
 
-const ErrorBlock = ({
+const InfoBlock = ({
   className,
   children,
   absolute,
@@ -19,8 +19,8 @@ const ErrorBlock = ({
 }) => {
   return (
     <MessageBlock
-      className={cx(styles.errorBlock, className)}
-      icon="bx bx-x-circle"
+      className={cx(styles.infoBlock, className)}
+      icon="bx bx-error-circle"
       absolute={absolute}
       onClose={onClose}
       title={title}
@@ -31,4 +31,4 @@ const ErrorBlock = ({
   )
 }
 
-export default ErrorBlock
+export default InfoBlock

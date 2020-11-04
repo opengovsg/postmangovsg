@@ -4,19 +4,15 @@
 .relativeContainer {
   position: relative;
   width: 100%;
-
-  .primaryInfoBlock {
-    h4 {
-      margin-top: 0px;
-    }
+  .content {
+    padding: 1rem;
+    white-space: pre-wrap;
 
     &.absolute {
       position: absolute;
       left: 0;
       right: 0;
     }
-    white-space: pre-wrap;
-    @include block($neutral-light, $primary);
 
     &.withClose {
       padding-right: 4rem;
@@ -28,7 +24,7 @@
       right: 1rem;
       &:hover,
       &:active {
-        color: $primary;
+        color: $error;
       }
     }
   }
