@@ -8,7 +8,7 @@ html,
 body {
   font-size: 16px;
   font-family: $font-stack;
-  color: $dark-blue;
+  color: $secondary;
   font-weight: normal;
   margin: 0;
   overflow-x: hidden;
@@ -62,7 +62,7 @@ a {
 }
 
 p {
-  color: $dark-blue;
+  color: $secondary;
   margin-block-start: 0;
   margin-block-end: 1rem;
   margin-inline-start: 0;
@@ -71,7 +71,7 @@ p {
 }
 
 .clickable {
-  color: $indigo-blue;
+  color: $primary;
   cursor: pointer;
   margin-top: 2rem;
 
@@ -105,11 +105,12 @@ mark {
 }
 
 sub {
-  color: $light-grey;
+  @extend %caption;
+  color: $grey-700;
 }
 
 .separator {
-  border-bottom: 1px solid $transparent-blue;
+  border-bottom: 1px solid adjust-color($primary-light, $alpha: -0.5);
   margin: 3rem 0;
 }
 
@@ -122,12 +123,13 @@ table {
   width: 100%;
   tr {
     @include flex-horizontal;
-    border-bottom: 1px solid $transparent-blue;
+    border-bottom: 1px solid adjust-color($primary-light, $alpha: -0.5);
+    height: $height-3;
 
     td,
     th {
-      padding: 1rem 0.25rem;
       display: flex;
+      align-items: center;
 
       &.xs {
         flex: 1.2;
@@ -147,6 +149,14 @@ table {
 
       &.center {
         justify-content: center;
+      }
+
+      &.ellipsis {
+        text-overflow: ellipsis;
+        // Pre-requisites for ellipsis to work
+        overflow: hidden;
+        white-space: nowrap;
+        display: inline-block;
       }
     }
   }

@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, { useState, useEffect, useCallback } from 'react'
 import { cloneDeep } from 'lodash'
 
@@ -50,6 +51,8 @@ const CreateEmail = ({
     }
   }, [])
 
+  const onPrevious = () => setActiveStep((s) => Math.max(s - 1, 0))
+
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
     if (campaign.isCsvProcessing) {
@@ -79,6 +82,7 @@ const CreateEmail = ({
               numRecipients={campaign.numRecipients}
               isProcessing={campaign.isCsvProcessing}
               onNext={onNext}
+              onPrevious={onPrevious}
               finishLaterCallbackRef={finishLaterCallbackRef}
             />
           )
@@ -90,6 +94,7 @@ const CreateEmail = ({
             numRecipients={campaign.numRecipients}
             isProcessing={campaign.isCsvProcessing}
             onNext={onNext}
+            onPrevious={onPrevious}
           />
         )
       case EmailProgress.SendTestMessage:
@@ -98,11 +103,16 @@ const CreateEmail = ({
             hasCredential={campaign.hasCredential}
             protect={campaign.protect}
             onNext={onNext}
+            onPrevious={onPrevious}
           />
         )
       case EmailProgress.Send:
         return (
-          <EmailSend numRecipients={campaign.numRecipients} onNext={onNext} />
+          <EmailSend
+            numRecipients={campaign.numRecipients}
+            onNext={onNext}
+            onPrevious={onPrevious}
+          />
         )
       default:
         return <p>Invalid step</p>
@@ -112,7 +122,7 @@ const CreateEmail = ({
   return (
     <div className={styles.createContainer}>
       {campaign.status !== Status.Draft ? (
-        <div className={styles.stepContainer}>
+        <div className={cx(styles.stepContainer, styles.detailContainer)}>
           <EmailDetail
             id={campaign.id}
             name={campaign.name}

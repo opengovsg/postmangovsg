@@ -27,6 +27,8 @@ const CreateModal = ({
   const [selectedName, setSelectedName] = useState(name)
   const [protect, setProtected] = useState(false)
 
+  modalContext.setModalContentClass(styles.content)
+
   useEffect(() => {
     setProtected(false)
   }, [selectedChannel])
@@ -39,7 +41,7 @@ const CreateModal = ({
         protect
       )
       // close modal and go to create view
-      modalContext.setModalContent(null)
+      modalContext.close()
       history.push(`/campaigns/${campaign.id}`)
     } catch (err) {
       console.error(err)

@@ -1,0 +1,83 @@
+$button-height: $height-2;
+$button-min-width: 10rem;
+$border-radius: $button-height / 2;
+
+@mixin button($bg-color, $hover-bg-color, $pressed-bg-color) {
+  @extend %button-text;
+
+  background-color: $bg-color;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: $button-height;
+  min-width: $button-min-width;
+  border: 0;
+  color: white;
+  text-align: center;
+  padding: $spacing-2 $spacing-4;
+  border-radius: $border-radius;
+  cursor: pointer;
+  user-select: none;
+
+  // unset min width on mobile, it's taking too much space
+  @include mobile() {
+    min-width: unset;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    background-color: $hover-bg-color;
+    outline: none;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    background-color: $pressed-bg-color;
+  }
+
+  &:disabled {
+    background-color: $grey;
+    cursor: not-allowed;
+  }
+
+  i {
+    @include icon;
+    height: 20px;
+    width: 20px;
+    margin-top: 0.15rem;
+    margin-left: $spacing-2;
+  }
+}
+
+%primary-btn {
+  @include button($primary, $blue-300, $secondary);
+}
+
+%secondary-btn {
+  @include button($secondary, $blue-300, $grey-900);
+}
+
+%outline-btn {
+  @include button(transparent, $neutral-light, $primary);
+  border: 1px solid $primary;
+  color: $primary;
+
+  &:active {
+    color: $white;
+
+    * {
+      color: $white;
+    }
+  }
+}
+
+%success-btn {
+  @include button($success, $green-300, $green-700);
+}
+
+%error-btn {
+  @include button($error, $red-300, $red-700);
+}

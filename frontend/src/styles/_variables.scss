@@ -1,30 +1,17 @@
 @import 'base';
 
 // Colours
-$dark-blue: #100c55;
-$indigo-blue: #2c2cdc;
-$light-blue: #f5f6fc;
-$pastel-blue: #9dadf5;
-$turquoise-green: #0090a6;
-$transparent-dark-blue: rgba(16, 12, 85, 0.95);
-$transparent-blue: rgba(181, 196, 255, 0.3);
-$placeholder-grey: #c1c7cd;
+// TODO: Non-standard colour that's used in components. Remove after fixing components styles.
 $light-grey: #a2abb4;
-$grey: #878f96;
-$red: #db4f5d;
-$light-red: rgba(219, 79, 93, 0.1);
 
 // Dimensions
-$content-max-width: 700px;
-$button-min-width: 10rem;
-$button-height: 2.8rem;
-$border-radius: $button-height / 2;
-$progress-pane-width: 25rem;
+$content-max-width: 528px;
+$side-nav-width: 400px;
 
 // Paddings
 $site-padding: 4vw;
 $mobile-site-padding: 5vw;
-$content-top-padding: 4vh;
+$content-top-padding: $layout-5;
 $content-bottom-padding: 15vh;
 
 // Layout

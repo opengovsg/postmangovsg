@@ -15,7 +15,7 @@ export enum Status {
 
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
-  [ChannelType.Email]: 'bx-envelope',
+  [ChannelType.Email]: 'bx-envelope-open',
   [ChannelType.Telegram]: 'bxl-telegram',
 }
 

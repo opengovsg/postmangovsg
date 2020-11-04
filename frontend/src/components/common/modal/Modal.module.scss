@@ -1,9 +1,11 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+$modal-width: $tablet;
+
 .modalBg {
   @include flex-center();
-  background: $transparent-dark-blue;
+  background: adjust-color($secondary, $alpha: -0.05);
   position: fixed;
   width: 100vw;
   height: 100vh;
@@ -11,10 +13,10 @@
 }
 
 .modal {
-  width: $tablet;
+  width: $modal-width;
   max-width: 100vw;
   border-radius: 0.6rem;
-  background-color: $light-blue;
+  background-color: $neutral-light;
   height: auto;
   max-height: calc(100vh - 4rem);
   position: relative;
@@ -26,13 +28,13 @@
     min-height: 100vh;
   }
 
-  .content {
-    max-width: 100vw;
-    padding: 3rem 4.5rem;
-    margin: auto;
-  }
+  @include scrollbar($neutral-light, $neutral);
+}
 
-  @include scrollbar($light-blue, $grey);
+.content {
+  max-width: 100vw;
+  padding: 3rem ($modal-width - 528px) / 2;
+  margin: auto;
 }
 
 .close {

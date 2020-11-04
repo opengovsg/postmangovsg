@@ -7,7 +7,7 @@ $navbar-link-margin: calc(1rem + 1vw);
 .navBar {
   @include flex-horizontal;
   height: $navbar-height;
-  background-color: $dark-blue;
+  background-color: $secondary;
   z-index: 100;
   padding: 0 $site-padding;
 
@@ -49,7 +49,7 @@ $navbar-link-margin: calc(1rem + 1vw);
       }
 
       .burger {
-        @include burger(25px, 3px, 5px, $light-blue);
+        @include burger(25px, 3px, 5px, $neutral-light);
         &.isActive {
           @include burger-to-cross;
         }
@@ -70,18 +70,18 @@ $navbar-link-margin: calc(1rem + 1vw);
         flex-direction: column;
         align-items: flex-start;
         width: 100%;
-        background-color: $dark-blue;
+        background-color: $secondary;
         border-width: $site-padding $mobile-site-padding;
         border-style: solid;
-        border-color: $dark-blue;
+        border-color: $secondary;
       }
     }
 
     .link {
       opacity: 0.5;
       font-size: 0.9rem;
-      color: $light-blue;
-      margin-right: $navbar-link-margin;
+      color: $neutral-light;
+      margin-right: $spacing-7;
       font-weight: 500;
       cursor: pointer;
 

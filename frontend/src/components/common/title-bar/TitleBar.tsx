@@ -10,7 +10,7 @@ const TitleBar = ({
 }) => {
   return (
     <div className={styles.titleBar}>
-      <h1 className={styles.titleText}>{title}</h1>
+      <h2 className={styles.titleText}>{title}</h2>
       {children}
     </div>
   )
