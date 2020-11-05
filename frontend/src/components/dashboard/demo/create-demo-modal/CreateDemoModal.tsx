@@ -21,12 +21,12 @@ const CreateDemoModal = ({
   numDemosSms: number
   numDemosTelegram: number
 }) => {
-  const modalContext = useContext(ModalContext)
+  const { close, setModalTitle } = useContext(ModalContext)
   const history = useHistory()
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
   const [selectedName, setSelectedName] = useState('')
-  const [demoCampaignMessage, setDemoCampaignMessage] = useState('')
+  //const [demoCampaignMessage, setDemoCampaignMessage] = useState('')
   const [isCreateEnabled, setIsCreateEnabled] = useState(true)
 
   useEffect(() => {
@@ -59,9 +59,10 @@ const CreateDemoModal = ({
         (numDemosChannel && 4 - numDemosChannel) || ''
       }`
     )
-    setDemoCampaignMessage(message)
+    //setDemoCampaignMessage(message)
+    setModalTitle(message)
     setIsCreateEnabled(!!numDemosChannel)
-  }, [numDemosSms, numDemosTelegram, selectedChannel])
+  }, [numDemosSms, numDemosTelegram, selectedChannel, setModalTitle])
 
   async function createDemo() {
     try {
@@ -71,7 +72,7 @@ const CreateDemoModal = ({
         demoMessageLimit: 20,
       })
       // close modal and go to create view
-      modalContext.setModalContent(null)
+      close()
       history.push(`/campaigns/${campaign.id}`)
     } catch (err) {
       setErrorMessage(err.message)
@@ -81,9 +82,8 @@ const CreateDemoModal = ({
   return (
     <>
       <div className={styles.content}>
-        <div className={styles.modalHeader}>{demoCampaignMessage}</div>
         <div className={styles.section}>
-          <h5 className={styles.subtitle}>
+          <h5 className={cx(styles.subtitle, styles.inputLabel)}>
             The demo campaign has been named for you
           </h5>
           <TextInput
@@ -144,7 +144,7 @@ const CreateDemoModal = ({
             to={i18n._(LINKS.guideDemoUrl)}
             target="_blank"
           >
-            <TextButton minButtonWidth> Learn more about demos </TextButton>
+            <TextButton minButtonWidth>Watch the video</TextButton>
           </OutboundLink>
           <PrimaryButton onClick={createDemo} disabled={!isCreateEnabled}>
             Create demo campaign

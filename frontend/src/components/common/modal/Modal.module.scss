@@ -2,7 +2,7 @@
 @import 'styles/_mixins';
 
 $modal-width: $tablet;
-
+$title-height: $height-4;
 .modalBg {
   @include flex-center();
   background: adjust-color($secondary, $alpha: -0.05);
@@ -41,4 +41,16 @@ $modal-width: $tablet;
   position: absolute;
   top: 2rem;
   right: 2rem;
+  &.modalTitleClose {
+    color: $green-900;
+    top: calc(#{$title-height} / 2 - 1.5rem); // close button has height of 3rem
+  }
+}
+
+.modalTitle {
+  @extend %heading-3;
+  @include flex-center;
+  background: $green-100;
+  color: $green-900;
+  height: $title-height;
 }

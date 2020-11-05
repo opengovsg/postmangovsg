@@ -85,7 +85,7 @@ const CompletedDemoModal = ({
           to={i18n._(LINKS.guideDemoUrl)}
           target="_blank"
         >
-          <PrimaryButton>Learn more about demos</PrimaryButton>
+          <PrimaryButton>Watch the video</PrimaryButton>
         </OutboundLink>
         <OutboundLink
           eventLabel={i18n._(LINKS.contactUsUrl)}

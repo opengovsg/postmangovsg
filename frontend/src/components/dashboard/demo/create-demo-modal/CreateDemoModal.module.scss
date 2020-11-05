@@ -59,7 +59,9 @@ $modal-width: $tablet;
 .input {
   background-color: $neutral-light;
   &:disabled {
-    background-color: $neutral;
+    background-color: rgba($grey-500, 0.3);
+    border-color: rgba($grey-700, 0.3);
+    color: $grey-700;
   }
 }
 
@@ -78,6 +80,9 @@ $modal-width: $tablet;
   font-weight: normal;
   margin-top: 0;
   margin-bottom: 2.5rem;
+  &.inputLabel {
+    margin-bottom: 1rem;
+  }
 }
 
 .actions {
@@ -103,19 +108,4 @@ $modal-width: $tablet;
       margin-left: 0px;
     }
   }
-}
-
-.modalHeader {
-  @extend %heading-3;
-  background: $green-100;
-  // Overrides the parent modal's .content padding of 78px
-  margin-top: -3rem;
-  margin-left: -78px;
-  margin-right: -78px;
-  // Space between header and first section title
-  margin-bottom: $spacing-5;
-  // Padding for the text
-  padding: $spacing-5 0;
-  text-align: center;
-  color: $green-900;
 }

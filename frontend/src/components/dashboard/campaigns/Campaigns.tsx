@@ -180,14 +180,14 @@ const Campaigns = () => {
           </PrimaryButton>
           <PrimaryButton
             className={styles.darkGreenButton}
-            onClick={() =>
+            onClick={() => {
               modalContext.setModalContent(
                 <CreateDemoModal
                   numDemosSms={numDemosSms}
                   numDemosTelegram={numDemosTelegram}
                 />
               )
-            }
+            }}
           >
             Try demo SMS/Telegram
           </PrimaryButton>
