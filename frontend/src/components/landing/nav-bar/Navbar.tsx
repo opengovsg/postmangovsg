@@ -38,7 +38,7 @@ const NavBar = () => {
           </OutboundLink>
           <OutboundLink
             className={styles.link}
-            eventLabel={`Navbar / ${i18n._(LINKS.guideUrl)}`}
+            eventLabel={`Landing navbar / ${i18n._(LINKS.guideUrl)}`}
             to={i18n._(LINKS.guideUrl)}
             target="_blank"
           >
