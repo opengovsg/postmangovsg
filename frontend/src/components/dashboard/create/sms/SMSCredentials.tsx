@@ -172,14 +172,14 @@ const SMSCredentials = ({
                 Input credentials manually
               </p>
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
-                <InfoBlock title="Using the default credentials?">
+                <InfoBlock title="Use demo credentials">
                   <span>
                     In demo mode, you can use Postman&apos;s SMS credentials to
                     try sending SMS messages for free. In a normal campaign,
                     you’d have to add your own credentials by setting up your
                     own Twilio account.{' '}
                     <OutboundLink
-                      className={styles.inputLabelHelpLink}
+                      className={cx(styles.inputLabelHelpLink, styles.infoLink)}
                       eventLabel={i18n._(LINKS.guideSmsUrl)}
                       to={i18n._(LINKS.guideSmsUrl)}
                       target="_blank"

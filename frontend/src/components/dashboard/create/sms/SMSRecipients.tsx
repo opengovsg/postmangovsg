@@ -158,7 +158,7 @@ const SMSRecipients = ({
         {isDemo && (
           <InfoBlock title="Limited to 20 recipients">
             <span>
-              You can only send out to 20 recipients per test campaign. Only the
+              You can only send out to 20 recipients per demo campaign. Only the
               first 20 rows in your CSV file will be taken.
             </span>
           </InfoBlock>
