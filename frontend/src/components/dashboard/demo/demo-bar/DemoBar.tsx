@@ -35,7 +35,7 @@ const DemoBar = ({
         <CreateDemoModal
           numDemosSms={numDemosSms}
           numDemosTelegram={numDemosTelegram}
-        ></CreateDemoModal>
+        />
       )
     }
   }

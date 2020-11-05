@@ -258,34 +258,38 @@ const TelegramCredentials = ({
               </p>
 
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
-                <InfoBlock title="Using the default Telegram credentials?">
-                  <p>
-                    Be sure to{' '}
-                    <b>
-                      subscribe to this Telegram bot at{' '}
-                      <OutboundLink
-                        eventLabel={i18n._(LINKS.demoTelegramBotUrl)}
-                        to={i18n._(LINKS.demoTelegramBotUrl)}
-                        target="_blank"
-                      >
-                        {i18n._(LINKS.demoTelegramBotUrl)}
-                      </OutboundLink>
-                    </b>{' '}
-                    first!
-                  </p>
-
+                <InfoBlock title="Use demo credentials">
                   <p>
                     In demo mode, you can use Postman&apos;s default Telegram
                     bot to try sending Telegram messages. In a normal campaign,
                     you’d have to set up your own Telegram bot.{' '}
                     <OutboundLink
-                      className={styles.inputLabelHelpLink}
+                      className={cx(styles.inputLabelHelpLink, styles.infoLink)}
                       eventLabel={i18n._(LINKS.guideTelegramUrl)}
                       to={i18n._(LINKS.guideTelegramUrl)}
                       target="_blank"
                     >
                       Learn more
                     </OutboundLink>
+                  </p>
+                  <p>
+                    Make sure that you and your recipients are{' '}
+                    <b>
+                      subscribed to
+                      <OutboundLink
+                        className={cx(
+                          styles.inputLabelHelpLink,
+                          styles.infoLink
+                        )}
+                        eventLabel={i18n._(LINKS.demoTelegramBotUrl)}
+                        to={i18n._(LINKS.demoTelegramBotUrl)}
+                        target="_blank"
+                      >
+                        @postmangovsgbot
+                      </OutboundLink>
+                    </b>{' '}
+                    before proceeding. Unsubscribed recipients will not receive
+                    your message.
                   </p>
                 </InfoBlock>
               )}

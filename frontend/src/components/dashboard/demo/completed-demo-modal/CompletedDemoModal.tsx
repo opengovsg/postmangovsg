@@ -49,8 +49,8 @@ const CompletedDemoModal = ({
           {numDemosLeft()} remaining.
         </h2>
         <p>
-          Thanks for trying Postman! Learn how to setup your own Twilio account
-          or Telegram bot by following our guide. If you need further
+          Thanks for trying Postman! Learn how to setup your own Twilio or
+          Telegram credentials by following our guide. If you need further
           assistance, please contact us.
         </p>
       </>
@@ -68,8 +68,8 @@ const CompletedDemoModal = ({
           a great experience!
         </h2>
         <p>
-          Thanks for trying Postman! Learn how to setup your own Twilio account
-          or Telegram bot by following our guide. If you need further
+          Thanks for trying Postman! Learn how to setup your own Twilio or
+          Telegram credentials by following our guide. If you need further
           assistance, please contact us.
         </p>
       </>
@@ -85,7 +85,7 @@ const CompletedDemoModal = ({
           to={i18n._(LINKS.guideDemoUrl)}
           target="_blank"
         >
-          <PrimaryButton>Watch the video</PrimaryButton>
+          <PrimaryButton>Watch tutorial</PrimaryButton>
         </OutboundLink>
         <OutboundLink
           eventLabel={i18n._(LINKS.contactUsUrl)}
