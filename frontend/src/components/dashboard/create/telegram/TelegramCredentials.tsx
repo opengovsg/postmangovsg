@@ -302,7 +302,8 @@ const TelegramCredentials = ({
                   </>
                 ) : (
                   <>
-                    Select credentials <i className="bx bx-right-arrow-alt"></i>
+                    Validate credentials{' '}
+                    <i className="bx bx-right-arrow-alt"></i>
                   </>
                 )}
               </PrimaryButton>
