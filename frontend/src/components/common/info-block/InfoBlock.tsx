@@ -1,22 +1,34 @@
 import React from 'react'
 import cx from 'classnames'
-
 import styles from './InfoBlock.module.scss'
+import MessageBlock from '../message-block'
 
-const InfoBlock = (props: any) => {
-  const { className, children, ...otherProps } = props
-
+const InfoBlock = ({
+  className,
+  children,
+  absolute,
+  onClose,
+  title,
+  ...otherProps
+}: {
+  className?: string
+  children?: React.ReactNode
+  absolute?: boolean
+  onClose?: Function
+  title?: string
+}) => {
   return (
-    <div className={cx(styles.infoBlock, className)} {...otherProps}>
+    <MessageBlock
+      className={cx(styles.infoBlock, className)}
+      icon="bx bx-error-circle"
+      absolute={absolute}
+      onClose={onClose}
+      title={title}
+      {...otherProps}
+    >
       {children}
-    </div>
+    </MessageBlock>
   )
 }
-
-/* e.g. children
- * <li><i className="bx"></i><p>text goes here...</p></li>
- * <li><i className="bx"></i><p>text goes here...</p></li>
- * <li><i className="bx"></i><p>text goes here...</p></li>
- */
 
 export default InfoBlock

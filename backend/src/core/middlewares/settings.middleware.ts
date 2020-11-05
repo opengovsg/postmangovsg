@@ -12,14 +12,22 @@ const getUserSettings = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<void | Response> => {
   try {
     const userId = req.session?.user?.id
     const userSettings = await CredentialService.getUserSettings(userId)
     if (!userSettings) {
       throw new Error('User not found')
     }
-    res.json({ has_api_key: userSettings.hasApiKey, creds: userSettings.creds })
+    return res.json({
+      has_api_key: userSettings.hasApiKey,
+      creds: userSettings.creds,
+      demo: {
+        num_demos_sms: userSettings.demo?.numDemosSms,
+        num_demos_telegram: userSettings.demo?.numDemosTelegram,
+        is_displayed: userSettings.demo?.isDisplayed,
+      },
+    })
   } catch (err) {
     next(err)
   }
@@ -205,11 +213,28 @@ const regenerateApiKey = async (
   try {
     const userId = req.session?.user?.id
     const apiKey = await CredentialService.regenerateApiKey(+userId)
-    logger.info({
-      message: 'Generate api key for user',
-      action: 'Credential not found',
-    })
     return res.json({ api_key: apiKey })
+  } catch (e) {
+    next(e)
+  }
+}
+
+/**
+ * Update whether demos should be displayed for user
+ * @param req
+ * @param res
+ * @param next
+ */
+const updateDemoDisplayed = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const userId = req.session?.user?.id
+    const { is_displayed: isDisplayed } = req.body
+    await CredentialService.updateDemoDisplayed(+userId, isDisplayed)
+    return res.sendStatus(200)
   } catch (e) {
     next(e)
   }
@@ -223,4 +248,5 @@ export const SettingsMiddleware = {
   getChannelSpecificCredentials,
   deleteUserCredential,
   regenerateApiKey,
+  updateDemoDisplayed,
 }

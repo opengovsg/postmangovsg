@@ -1,0 +1,61 @@
+// Colours
+$white: #ffffff;
+$black: #000000;
+
+$blue-100: #b5c4ff;
+$blue-300: #9dadf5;
+$blue-500: #2c2cdc;
+$blue-700: #2121a5;
+$blue-900: #040651;
+$blue: $blue-500;
+
+$green-100: #b3d8dd;
+$green-300: #80bec7;
+$green-500: #007c8f;
+$green-700: #006372;
+$green-900: #004a56;
+$green: $green-500;
+
+$red-100: #fadddf;
+$red-300: #f19aa0;
+$red-500: #e75760;
+$red-700: #af3f4a;
+$red-900: #8b343a;
+$red: $red-500;
+
+$yellow-100: #fef8e3;
+$yellow-300: #fdebac;
+$yellow-500: #fbdd75;
+$yellow-700: #c9b15e;
+$yellow-900: #64582f;
+$yellow: $yellow-500;
+
+$grey-100: $white;
+$grey-300: #f5f6fc;
+$grey-500: #c1c7cd;
+$grey-700: #64707d;
+$grey-900: #020431;
+$grey: $grey-500;
+
+// Theme
+$primary: $blue;
+$primary-light: $blue-100;
+
+$secondary: $blue-900;
+$secondary-light: $blue-700;
+
+$success: $green;
+$success-light: $green-100;
+$success-dark: $green-900;
+
+$error: $red;
+$error-light: $red-100;
+$error-dark: $red-900;
+
+$warning: $yellow;
+$warning-light: $yellow-100;
+$warning-dark: $yellow-900;
+
+$neutral: $grey;
+$neutral-light: $grey-300;
+$neutral-dark: $grey-900;

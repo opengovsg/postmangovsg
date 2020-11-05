@@ -179,6 +179,48 @@ jobs:
             - GCP_SECRET_NAME=$STAGING_BACKUP_GCP_SECRET_NAME
             - KEY_ENCRYPTION_PUBLIC_KEY=$STAGING_BACKUP_PUBLIC_KEY
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+    - name: serverless-eb-env-update
+      before_deploy:
+        - cd $TRAVIS_BUILD_DIR/serverless/eb-env-update
+        - npm install && npm run build && npm prune --production
+        - zip -qr code.zip build package.json node_modules/
+      deploy:
+        - provider: lambda
+          edge: true
+          function_name: eb-env-update-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_EBENVUPDATE_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 10
+          memory_size: 128
+          publish: true
+          zip: "../eb-env-update/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - NODE_ENV=production
+            - SECRET_ID=$PRODUCTION_SECRET_ID
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+        - provider: lambda
+          edge: true
+          function_name: eb-env-update-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_EBENVUPDATE_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 10
+          memory_size: 128
+          publish: true
+          zip: "../eb-env-update/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - NODE_ENV=staging
+            - SECRET_ID=$STAGING_SECRET_ID
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
     - name: root
       install:
         - npm install --ignore-scripts

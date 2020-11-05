@@ -16,11 +16,7 @@ const ActionButton = (props: any) => {
 
   return (
     <div className={styles.activeButtonContainer}>
-      <button
-        type="button"
-        className={cx(styles.actionButton, styles.dropdown, className)}
-        {...otherProps}
-      >
+      <button type="button" className={cx(styles.actionButton)} {...otherProps}>
         <div className={styles.content}>{children[0] || children}</div>
         {children.length > 1 && (
           <div

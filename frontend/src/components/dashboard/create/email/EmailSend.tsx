@@ -3,7 +3,15 @@ import { useParams } from 'react-router-dom'
 
 import { Status } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
-import { PreviewBlock, PrimaryButton, ConfirmModal } from 'components/common'
+import {
+  PreviewBlock,
+  PrimaryButton,
+  ConfirmModal,
+  ButtonGroup,
+  TextButton,
+  StepHeader,
+  StepSection,
+} from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
 import { sendCampaign } from 'services/campaign.service'
 
@@ -12,9 +20,11 @@ import styles from '../Create.module.scss'
 const EmailSend = ({
   numRecipients,
   onNext,
+  onPrevious,
 }: {
   numRecipients: number
   onNext: Function
+  onPrevious: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState(
@@ -65,31 +75,36 @@ const EmailSend = ({
 
   return (
     <>
-      <sub>Step 4</sub>
-      <h2>Your campaign is ready to be sent!</h2>
-      <div className="separator"></div>
-
-      <div className={styles.sendInfo}>
-        <p className={styles.greyText}>Number of recipients</p>
-        <h4>{numRecipients}</h4>
-
-        <p className={styles.greyText}>Message</p>
-        <PreviewBlock
-          body={preview.body}
-          subject={preview.subject}
-          replyTo={preview.replyTo}
-          from={preview.from}
+      <StepSection>
+        <StepHeader
+          title="Your campaign is ready to be sent!"
+          subtitle="Step 4"
         />
-      </div>
+        <div className="separator"></div>
 
-      <div className="separator"></div>
+        <div>
+          <p className={styles.greyText}>Number of recipients</p>
+          <h4>{numRecipients}</h4>
+        </div>
 
-      <div className="progress-button">
+        <div>
+          <p className={styles.greyText}>Message</p>
+          <PreviewBlock
+            body={preview.body}
+            subject={preview.subject}
+            replyTo={preview.replyTo}
+            from={preview.from}
+          />
+        </div>
+      </StepSection>
+
+      <ButtonGroup>
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-      </div>
+        <TextButton onClick={onPrevious}>Previous</TextButton>
+      </ButtonGroup>
     </>
   )
 }
