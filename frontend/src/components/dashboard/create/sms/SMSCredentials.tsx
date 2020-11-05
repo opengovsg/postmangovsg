@@ -18,22 +18,29 @@ import {
   StepSection,
   CredLabelInput,
   Checkbox,
+  InfoBlock,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput, {
   TwilioCredentials,
 } from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
+import { OutboundLink } from 'react-ga'
+import { i18n } from 'locales'
+import { LINKS } from 'config'
 
 const SMSCredentials = ({
   hasCredential: initialHasCredential,
+  isDemo,
   onNext,
   onPrevious,
 }: {
   hasCredential: boolean
+  isDemo: boolean
   onNext: (changes: any, next?: boolean) => void
   onPrevious: () => void
 }) => {
+  const DEMO_CREDENTIAL = 'Postman_SMS_Demo'
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
@@ -51,24 +58,23 @@ const SMSCredentials = ({
   const { id: campaignId } = useParams()
 
   useEffect(() => {
-    populateStoredCredentials()
-  }, [])
-
-  async function populateStoredCredentials() {
-    try {
-      const storedCredLabels = await getStoredCredentials()
-      setCredLabels(storedCredLabels)
-      setStoredCredentials(
-        storedCredLabels.map((c) => ({ label: c, value: c }))
-      )
-      if (!storedCredLabels.length) {
-        setIsManual(true)
+    async function populateStoredCredentials(defaultLabels: string[]) {
+      try {
+        const labels = await getStoredCredentials()
+        const allLabels = defaultLabels.concat(labels)
+        setCredLabels(allLabels)
+        setStoredCredentials(allLabels.map((c) => ({ label: c, value: c })))
+        if (!allLabels.length) {
+          setIsManual(true)
+        }
+      } catch (e) {
+        console.error(e)
+        setErrorMessage(e.message)
       }
-    } catch (e) {
-      console.error(e)
-      setErrorMessage(e.message)
     }
-  }
+    const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
+    populateStoredCredentials(defaultLabels)
+  }, [isDemo])
 
   function toggleInputMode() {
     setIsManual((m) => !m)
@@ -160,10 +166,29 @@ const SMSCredentials = ({
               <Dropdown
                 onSelect={setSelectedCredential}
                 options={storedCredentials}
+                defaultLabel={storedCredentials[0]?.label}
               ></Dropdown>
               <p className="clickable" onClick={() => setIsManual(true)}>
                 Input credentials manually
               </p>
+              {isDemo && selectedCredential === DEMO_CREDENTIAL && (
+                <InfoBlock title="Use demo credentials">
+                  <span>
+                    In demo mode, you can use Postman&apos;s SMS credentials to
+                    try sending SMS messages for free. In a normal campaign,
+                    you’d have to add your own credentials by setting up your
+                    own Twilio account.{' '}
+                    <OutboundLink
+                      className={cx(styles.inputLabelHelpLink, styles.infoLink)}
+                      eventLabel={i18n._(LINKS.guideSmsUrl)}
+                      to={i18n._(LINKS.guideSmsUrl)}
+                      target="_blank"
+                    >
+                      Learn more
+                    </OutboundLink>
+                  </span>
+                </InfoBlock>
+              )}
             </>
           )}
         </StepSection>

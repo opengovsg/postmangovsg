@@ -1,0 +1,81 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+$demo-bar-height: $height-3;
+.demoBar {
+  position: sticky;
+  z-index: 10;
+  display: flex;
+  flex-direction: row;
+  height: $demo-bar-height;
+
+  .demoButton {
+    @extend %overline;
+    background-color: $green-500;
+    color: white;
+    min-height: auto;
+    width: $demo-bar-height;
+    border: 0;
+
+    font-weight: 700;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+
+    &:hover,
+    &:focus {
+      background-color: $green-700;
+      outline: none;
+    }
+  }
+  .menuContainer {
+    @extend %body-2;
+    position: sticky;
+    z-index: -1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: $green-100;
+    color: $green-900;
+    height: auto;
+    width: calc(24rem - #{$demo-bar-height});
+    padding: 0.5rem 1rem;
+    margin-left: -100vw; /*Off the screen*/
+    transition: 0.3s;
+    overflow: hidden;
+
+    @include mobile() {
+      width: 100%;
+      margin-left: -100vw;
+    }
+    &.show {
+      margin-left: 0;
+    }
+
+    .message {
+      width: 100%;
+      text-align: left;
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .text {
+        height: auto;
+      }
+      .action {
+        @extend %body-2;
+        height: auto;
+        color: $green-900;
+        font-style: italic;
+      }
+    }
+    .closeButton {
+      height: 1rem;
+      width: 1rem;
+      font-size: 1.5rem;
+      color: $green-900;
+    }
+  }
+}

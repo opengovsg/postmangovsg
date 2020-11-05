@@ -4,7 +4,7 @@ import BodyWrapper from 'components/common/body-wrapper'
 
 const defaultValue = {
   setModalContent: {} as Dispatch<SetStateAction<any>>,
-  setModalContentClass: {} as Dispatch<SetStateAction<string>>,
+  setModalTitle: {} as Dispatch<SetStateAction<any>>,
   close: {} as () => void,
 }
 
@@ -12,18 +12,17 @@ export const ModalContext = createContext(defaultValue)
 
 const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [modalContent, setModalContent] = useState(null)
-  const [modalContentClass, setModalContentClass] = useState('')
-
+  const [modalTitle, setModalTitle] = useState('')
   function handleClose() {
     setModalContent(null)
-    setModalContentClass('')
+    setModalTitle('')
   }
 
   return (
     <ModalContext.Provider
-      value={{ setModalContent, setModalContentClass, close: handleClose }}
+      value={{ setModalContent, close: handleClose, setModalTitle }}
     >
-      <Modal contentClassName={modalContentClass} onClose={handleClose}>
+      <Modal onClose={handleClose} modalTitle={modalTitle}>
         {modalContent}
       </Modal>
       <BodyWrapper wrap={!!modalContent}>{children}</BodyWrapper>

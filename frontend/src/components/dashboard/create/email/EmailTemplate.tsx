@@ -34,7 +34,7 @@ const EmailTemplate = ({
   onNext: (changes: any, next?: boolean) => void
   finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
-  const modalContext = useContext(ModalContext)
+  const { setModalContent } = useContext(ModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
@@ -94,7 +94,7 @@ const EmailTemplate = ({
   // Set callback for finish later button
   useEffect(() => {
     finishLaterCallbackRef.current = () => {
-      modalContext.setModalContent(
+      setModalContent(
         <SaveDraftModal
           saveable
           onSave={async () => {
@@ -112,9 +112,9 @@ const EmailTemplate = ({
     body,
     finishLaterCallbackRef,
     handleSaveTemplate,
-    modalContext,
     subject,
     from,
+    setModalContent,
   ])
 
   function replaceNewLines(body: string): string {

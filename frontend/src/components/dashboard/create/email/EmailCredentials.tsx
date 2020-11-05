@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { sendPreviewMessage } from 'services/email.service'
 import {
   NextButton,
-  InfoBlock,
+  DetailBlock,
   ErrorBlock,
   ButtonGroup,
   TextButton,
@@ -70,7 +70,7 @@ const EmailCredentials = ({
             <ErrorBlock>{errorMsg}</ErrorBlock>
 
             {hasCredential && (
-              <InfoBlock>
+              <DetailBlock>
                 <li>
                   <i className="bx bx-check-circle"></i>
                   <span>
@@ -78,7 +78,7 @@ const EmailCredentials = ({
                     to send test messages.
                   </span>
                 </li>
-              </InfoBlock>
+              </DetailBlock>
             )}
           </StepSection>
 

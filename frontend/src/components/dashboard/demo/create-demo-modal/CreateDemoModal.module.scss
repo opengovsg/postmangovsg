@@ -7,6 +7,7 @@ $modal-width: $tablet;
   margin-left: calc(78px - (#{$modal-width} - 528px) / 2);
   margin-right: calc(78px - (#{$modal-width} - 528px) / 2);
 }
+
 .section {
   margin-bottom: 2rem;
   @include flex-vertical;
@@ -52,28 +53,16 @@ $modal-width: $tablet;
         }
       }
     }
-
-    .subtext {
-      @include mobile() {
-        margin-bottom: 1rem;
-      }
-    }
-    .protectedOption {
-      i {
-        font-size: 1.3rem;
-        margin-top: 0.1rem;
-      }
-      .subtext {
-        user-select: none;
-        margin-top: 0;
-        margin-bottom: 0;
-      }
-    }
   }
 }
 
 .input {
   background-color: $neutral-light;
+  &:disabled {
+    background-color: rgba($grey-500, 0.3);
+    border-color: rgba($grey-700, 0.3);
+    color: $grey-700;
+  }
 }
 
 .icon {
@@ -91,21 +80,32 @@ $modal-width: $tablet;
   font-weight: normal;
   margin-top: 0;
   margin-bottom: 2.5rem;
+  &.inputLabel {
+    margin-bottom: 1rem;
+  }
 }
 
-.subtext {
-  height: 1.5rem;
-  font-size: 0.8rem;
-  margin-top: 1rem;
-  margin-bottom: 0;
+.actions {
+  @include flex-horizontal;
+  justify-content: flex-end;
+  button,
+  a {
+    margin: 0 20px;
+    &:last-child {
+      margin-right: 0px;
+    }
+  }
 
-  .link {
-    font-size: 0.8rem;
-    font-style: italic;
-    color: $secondary;
-    line-height: 1.5rem;
-    text-decoration: underline;
-    margin-left: 0.2rem;
-    cursor: pointer;
+  @include mobile() {
+    @include flex-vertical;
+    align-items: center;
+    width: 100%;
+    a {
+      margin-bottom: 1rem;
+    }
+    button:last-child,
+    a:last-child {
+      margin-left: 0px;
+    }
   }
 }

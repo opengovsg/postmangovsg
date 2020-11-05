@@ -21,7 +21,7 @@ const TelegramTemplate = ({
   onNext: (changes: any, next?: boolean) => void
   finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
-  const modalContext = useContext(ModalContext)
+  const { setModalContent } = useContext(ModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
@@ -53,7 +53,7 @@ const TelegramTemplate = ({
   // Set callback for finish later button
   useEffect(() => {
     finishLaterCallbackRef.current = () => {
-      modalContext.setModalContent(
+      setModalContent(
         <SaveDraftModal
           saveable
           onSave={async () => {
@@ -65,7 +65,7 @@ const TelegramTemplate = ({
     return () => {
       finishLaterCallbackRef.current = undefined
     }
-  }, [body, finishLaterCallbackRef, handleSaveTemplate, modalContext])
+  }, [body, finishLaterCallbackRef, handleSaveTemplate, setModalContent])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')

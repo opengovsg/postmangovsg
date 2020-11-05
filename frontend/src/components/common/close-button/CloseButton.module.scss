@@ -3,7 +3,7 @@
 
 .close {
   @include flex-center;
-  color: $neutral;
+  color: $primary;
   font-size: 2.5rem;
   line-height: 1;
   font-weight: 100;
@@ -16,6 +16,6 @@
 
   &:hover,
   &:active {
-    color: $primary;
+    color: $primary-light;
   }
 }

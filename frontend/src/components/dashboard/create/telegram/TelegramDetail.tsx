@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 
 import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
 import {
@@ -7,19 +7,24 @@ import {
   retryCampaign,
 } from 'services/campaign.service'
 import { StepHeader, ProgressDetails } from 'components/common'
+import { ModalContext } from 'contexts/modal.context'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 
 const TelegramDetail = ({
   id,
   name,
   sentAt,
   numRecipients,
+  isDemo,
 }: {
   id: number
   name: string
   sentAt: Date
   numRecipients: number
+  isDemo: boolean
 }) => {
+  const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number, forceRefresh = false) {
@@ -72,6 +77,17 @@ const TelegramDetail = ({
       timeoutId && clearTimeout(timeoutId)
     }
   }, [id, stats.status])
+
+  useEffect(() => {
+    function renderCompletedDemoModal() {
+      setModalContent(
+        <CompletedDemoModal
+          selectedChannel={ChannelType.Telegram}
+        ></CompletedDemoModal>
+      )
+    }
+    if (isDemo && stats.status === Status.Sent) renderCompletedDemoModal()
+  }, [isDemo, setModalContent, stats.status])
 
   function renderProgressHeader() {
     if (stats.waitTime && stats.waitTime > 0) {
@@ -132,6 +148,7 @@ const TelegramDetail = ({
       </>
     )
   }
+
   return (
     <>
       {renderProgressHeader()}

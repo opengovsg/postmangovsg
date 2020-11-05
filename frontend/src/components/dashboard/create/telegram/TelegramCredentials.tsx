@@ -13,7 +13,7 @@ import {
 import {
   PrimaryButton,
   NextButton,
-  InfoBlock,
+  DetailBlock,
   ErrorBlock,
   Dropdown,
   ButtonGroup,
@@ -22,6 +22,7 @@ import {
   StepSection,
   CredLabelInput,
   Checkbox,
+  InfoBlock,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -30,13 +31,16 @@ import { i18n } from 'locales'
 
 const TelegramCredentials = ({
   hasCredential: initialHasCredential,
+  isDemo,
   onNext,
   onPrevious,
 }: {
   hasCredential: boolean
+  isDemo: boolean
   onNext: (changes: any, next?: boolean) => void
   onPrevious: () => void
 }) => {
+  const DEMO_CREDENTIAL = 'Postman_Telegram_Demo'
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
@@ -54,26 +58,24 @@ const TelegramCredentials = ({
   const [sendSuccess, setSendSuccess] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
   const { id: campaignId } = useParams()
-
   useEffect(() => {
-    populateStoredCredentials()
-  }, [])
-
-  async function populateStoredCredentials() {
-    try {
-      const storedCredLabels = await getStoredCredentials()
-      setCredLabels(storedCredLabels)
-      setStoredCredentials(
-        storedCredLabels.map((c) => ({ label: c, value: c }))
-      )
-      if (!storedCredLabels.length) {
-        setIsManual(true)
+    async function populateStoredCredentials(defaultLabels: string[]) {
+      try {
+        const labels = await getStoredCredentials()
+        const allLabels = defaultLabels.concat(labels)
+        setCredLabels(allLabels)
+        setStoredCredentials(allLabels.map((c) => ({ label: c, value: c })))
+        if (!allLabels.length) {
+          setIsManual(true)
+        }
+      } catch (e) {
+        console.error(e)
+        setErrorMessage(e.message)
       }
-    } catch (e) {
-      console.error(e)
-      setErrorMessage(e.message)
     }
-  }
+    const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
+    populateStoredCredentials(defaultLabels)
+  }, [isDemo])
 
   function toggleInputMode() {
     setIsManual((m) => !m)
@@ -247,12 +249,50 @@ const TelegramCredentials = ({
               <Dropdown
                 onSelect={setSelectedCredential}
                 options={storedCredentials}
+                defaultLabel={storedCredentials[0]?.label}
               ></Dropdown>
               <ErrorBlock>{errorMessage}</ErrorBlock>
 
               <p className="clickable" onClick={() => setIsManual(true)}>
                 Add new credentials
               </p>
+
+              {isDemo && selectedCredential === DEMO_CREDENTIAL && (
+                <InfoBlock title="Use demo credentials">
+                  <p>
+                    In demo mode, you can use Postman&apos;s default Telegram
+                    bot to try sending Telegram messages. In a normal campaign,
+                    you’d have to set up your own Telegram bot.{' '}
+                    <OutboundLink
+                      className={cx(styles.inputLabelHelpLink, styles.infoLink)}
+                      eventLabel={i18n._(LINKS.guideTelegramUrl)}
+                      to={i18n._(LINKS.guideTelegramUrl)}
+                      target="_blank"
+                    >
+                      Learn more
+                    </OutboundLink>
+                  </p>
+                  <p>
+                    Make sure that you and your recipients are{' '}
+                    <b>
+                      subscribed to
+                      <OutboundLink
+                        className={cx(
+                          styles.inputLabelHelpLink,
+                          styles.infoLink
+                        )}
+                        eventLabel={i18n._(LINKS.demoTelegramBotUrl)}
+                        to={i18n._(LINKS.demoTelegramBotUrl)}
+                        target="_blank"
+                      >
+                        @postmangovsgbot
+                      </OutboundLink>
+                    </b>{' '}
+                    before proceeding. Unsubscribed recipients will not receive
+                    your message.
+                  </p>
+                </InfoBlock>
+              )}
             </StepSection>
 
             <ButtonGroup>
@@ -266,7 +306,8 @@ const TelegramCredentials = ({
                   </>
                 ) : (
                   <>
-                    Select credentials <i className="bx bx-right-arrow-alt"></i>
+                    Validate credentials{' '}
+                    <i className="bx bx-right-arrow-alt"></i>
                   </>
                 )}
               </PrimaryButton>
@@ -320,12 +361,12 @@ const TelegramCredentials = ({
                   onClick={handleSendValidationMessage}
                 />
                 {sendSuccess && (
-                  <InfoBlock>
+                  <DetailBlock>
                     <li>
                       <i className="bx bx-check-circle"></i>
                       <span>Message sent successfully.</span>
                     </li>
-                  </InfoBlock>
+                  </DetailBlock>
                 )}
                 <ErrorBlock>{errorMessage}</ErrorBlock>
               </StepSection>
