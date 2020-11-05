@@ -52,5 +52,9 @@ $title-height: $height-4;
   @include flex-center;
   background: $green-100;
   color: $green-900;
-  height: $title-height;
+  min-height: $title-height;
+  text-align: center;
+  @include mobile {
+    padding-right: 3rem;
+  }
 }
