@@ -2,7 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import escapeHTML from 'escape-html'
 
-import InfoBlock from '../info-block'
+import DetailBlock from '../detail-block'
 import styles from './PreviewBlock.module.scss'
 
 interface PreviewBlockProps {
@@ -23,12 +23,12 @@ const PreviewBlock: React.FunctionComponent<PreviewBlockProps> = ({
 }) => {
   if (!body && !subject) {
     return (
-      <InfoBlock>
+      <DetailBlock>
         <li>
           <i className="bx bx-loader-alt bx-spin"></i>
           <p>Loading preview...</p>
         </li>
-      </InfoBlock>
+      </DetailBlock>
     )
   }
 
@@ -49,11 +49,11 @@ const PreviewBlock: React.FunctionComponent<PreviewBlockProps> = ({
   }
 
   return (
-    <InfoBlock
+    <DetailBlock
       className={cx(styles.preview, className)}
       {...otherProps}
       dangerouslySetInnerHTML={{ __html: constructHtml() }}
-    ></InfoBlock>
+    ></DetailBlock>
   )
 }
 

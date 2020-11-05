@@ -7,11 +7,11 @@ import styles from './Modal.module.scss'
 const Modal = ({
   onClose,
   children,
-  contentClassName,
+  modalTitle,
 }: {
   onClose: any
   children: React.ReactNode
-  contentClassName?: string
+  modalTitle?: string
 }) => {
   const modalBackgroundId = 'modal-background'
 
@@ -28,8 +28,18 @@ const Modal = ({
         onClick={handleClickBackground}
       >
         <div className={styles.modal}>
-          <CloseButton onClick={onClose} className={styles.close} />
-          <div className={cx(styles.content, contentClassName)}>{children}</div>
+          {modalTitle ? (
+            <div className={styles.modalTitle}>{modalTitle}</div>
+          ) : (
+            <></>
+          )}
+          <CloseButton
+            onClick={onClose}
+            className={cx(styles.close, {
+              [styles.modalTitleClose]: !!modalTitle,
+            })}
+          />
+          <div className={styles.content}>{children}</div>
         </div>
       </div>
     )

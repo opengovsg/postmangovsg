@@ -130,6 +130,9 @@
   font-style: italic;
   color: $secondary;
   text-decoration: underline;
+  &.infoLink {
+    color: $primary;
+  }
 }
 
 .characterCount {

@@ -6,7 +6,7 @@ import {
   PrimaryButton,
   TextButton,
   TextArea,
-  InfoBlock,
+  DetailBlock,
   ErrorBlock,
   ProtectedPreview,
   Checkbox,
@@ -46,7 +46,7 @@ const ProtectedEmailRecipients = ({
   onPrevious: () => void
   finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
-  const modalContext = useContext(ModalContext)
+  const { setModalContent } = useContext(ModalContext)
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState<File>()
@@ -65,12 +65,12 @@ const ProtectedEmailRecipients = ({
   // Set callback for finish later button
   useEffect(() => {
     finishLaterCallbackRef.current = () => {
-      modalContext.setModalContent(<SaveDraftModal />)
+      setModalContent(<SaveDraftModal />)
     }
     return () => {
       finishLaterCallbackRef.current = undefined
     }
-  }, [template, finishLaterCallbackRef, modalContext])
+  }, [template, finishLaterCallbackRef, setModalContent])
 
   function computePhase(
     numRecipients: number,
@@ -191,7 +191,7 @@ const ProtectedEmailRecipients = ({
             your tab or go back to Step 1 to edit.
           </p>
         </StepHeader>
-        <InfoBlock>
+        <DetailBlock>
           <li>
             <i className="bx bx-user-check"></i>
             <p>{protectedCsvInfo?.numRecipients} recipients</p>
@@ -200,21 +200,21 @@ const ProtectedEmailRecipients = ({
             <i className="bx bx-file"></i>
             <p>{protectedCsvInfo?.csvFilename}</p>
           </li>
-        </InfoBlock>
+        </DetailBlock>
       </StepSection>
       {protectedCsvInfo?.preview && (
         <StepSection>
           <div>
             <h4>Message B</h4>
           </div>
-          <InfoBlock className={styles.protectedPreview}>
+          <DetailBlock className={styles.protectedPreview}>
             <li>
               <b>Results</b>
             </li>
             <li>
               <ProtectedPreview html={protectedCsvInfo?.preview} />
             </li>
-          </InfoBlock>
+          </DetailBlock>
         </StepSection>
       )}
       <div className="progress-button">

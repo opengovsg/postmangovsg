@@ -76,6 +76,7 @@ const CreateSMS = ({
             csvFilename={campaign.csvFilename}
             numRecipients={campaign.numRecipients}
             isProcessing={campaign.isCsvProcessing}
+            isDemo={!!campaign.demoMessageLimit}
             onNext={onNext}
             onPrevious={onPrevious}
           />
@@ -84,6 +85,7 @@ const CreateSMS = ({
         return (
           <SMSCredentials
             hasCredential={campaign.hasCredential}
+            isDemo={!!campaign.demoMessageLimit}
             onNext={onNext}
             onPrevious={onPrevious}
           />
@@ -110,6 +112,7 @@ const CreateSMS = ({
             name={campaign.name}
             sentAt={campaign.sentAt}
             numRecipients={campaign.numRecipients}
+            isDemo={!!campaign.demoMessageLimit}
           ></SMSDetail>
         </div>
       ) : (

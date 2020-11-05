@@ -18,6 +18,7 @@ import {
   TextButton,
   StepHeader,
   StepSection,
+  InfoBlock,
 } from 'components/common'
 import { SMSCampaign, SMSPreview } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -29,6 +30,7 @@ const SMSRecipients = ({
   numRecipients: initialNumRecipients,
   params,
   isProcessing: initialIsProcessing,
+  isDemo,
   onNext,
   onPrevious,
 }: {
@@ -36,6 +38,7 @@ const SMSRecipients = ({
   numRecipients: number
   params: Array<string>
   isProcessing: boolean
+  isDemo: boolean
   onNext: (changes: Partial<SMSCampaign>, next?: boolean) => void
   onPrevious: () => void
 }) => {
@@ -152,7 +155,14 @@ const SMSRecipients = ({
             setErrorMsg={setErrorMessage}
           />
         </CsvUpload>
-
+        {isDemo && (
+          <InfoBlock title="Limited to 20 recipients">
+            <span>
+              You can only send out to 20 recipients per demo campaign. Only the
+              first 20 rows in your CSV file will be taken.
+            </span>
+          </InfoBlock>
+        )}
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 

@@ -135,7 +135,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     ) => {
       logger.error({
         message: 'Unexpected error occured',
-        error: err,
+        error: `${err.stack}`,
       })
       return res.sendStatus(500)
     }

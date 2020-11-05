@@ -7,6 +7,7 @@ import { User } from '@core/models'
 import { validateDomain } from '@core/utils/validate-domain'
 import { RedisService, ApiKeyService, MailService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
+import { Transaction } from 'sequelize/types'
 
 const logger = loggerWithLabel(module)
 const SALT_ROUNDS = 10 // bcrypt default
@@ -260,8 +261,16 @@ const verifyOtp = async (input: VerifyOtpInput): Promise<boolean> => {
  * @param email
  */
 const findOrCreateUser = async (email: string): Promise<User> => {
-  const [user] = await User.findCreateFind({ where: { email: email } })
-  return user
+  const result = await User.sequelize?.transaction(async (t: Transaction) => {
+    const [user] = await User.findCreateFind({
+      where: { email: email },
+      transaction: t,
+    })
+    return user
+  })
+  if (!result) throw new Error('Unable to find or create user')
+
+  return result
 }
 
 /**

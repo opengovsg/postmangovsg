@@ -2,15 +2,5 @@
 @import 'styles/_mixins';
 
 .infoBlock {
-  @include block($neutral-light, $secondary);
-  border-left: none;
-  margin: 0;
-
-  li {
-    margin-bottom: $spacing-2;
-
-    p {
-      margin: 0;
-    }
-  }
+  @include block($neutral-light, $primary);
 }

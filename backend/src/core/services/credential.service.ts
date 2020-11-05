@@ -3,7 +3,7 @@ import { get } from 'lodash'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
-import { Credential, UserCredential, User } from '@core/models'
+import { Credential, UserCredential, User, UserDemo } from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { loggerWithLabel } from '@core/logger'
 
@@ -234,11 +234,23 @@ const getUserSettings = async (
         model: UserCredential,
         attributes: ['label', 'type'],
       },
+      {
+        model: UserDemo,
+        attributes: [
+          ['num_demos_sms', 'numDemosSms'],
+          ['num_demos_telegram', 'numDemosTelegram'],
+          ['is_displayed', 'isDisplayed'],
+        ],
+      },
     ],
     plain: true,
   })
   if (user) {
-    return { hasApiKey: !!user.apiKey, creds: user.creds }
+    return {
+      hasApiKey: !!user.apiKey,
+      creds: user.creds,
+      demo: user.demo,
+    }
   } else {
     return null
   }
@@ -257,6 +269,29 @@ const regenerateApiKey = async (userId: number): Promise<string> => {
   return user.regenerateAndSaveApiKey()
 }
 
+const updateDemoDisplayed = async (
+  userId: number,
+  isDisplayed: boolean
+): Promise<{ isDisplayed: boolean }> => {
+  const [numUpdated, userDemo] = await UserDemo.update(
+    { isDisplayed },
+    {
+      where: { userId },
+      returning: true,
+    }
+  )
+  if (numUpdated !== 1) {
+    logger.error({
+      message: 'Incorrect number of records updated',
+      numUpdated,
+      action: 'updateDemoDisplayed',
+    })
+    throw new Error('Could not update demo displayed')
+  }
+  return {
+    isDisplayed: userDemo[0].isDisplayed,
+  }
+}
 export const CredentialService = {
   // Credentials (cred_name)
   storeCredential,
@@ -271,4 +306,5 @@ export const CredentialService = {
   getUserSettings,
   // Api Key
   regenerateApiKey,
+  updateDemoDisplayed,
 }
