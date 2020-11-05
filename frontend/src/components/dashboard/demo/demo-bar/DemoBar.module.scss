@@ -9,7 +9,7 @@ $demo-bar-height: $height-3;
   height: $demo-bar-height;
 
   .demoButton {
-    @extend %caption;
+    @extend %overline;
     background-color: $green-500;
     color: white;
     min-height: auto;
@@ -39,8 +39,8 @@ $demo-bar-height: $height-3;
     background-color: $green-100;
     color: $green-900;
     height: auto;
-    width: 280px;
-    padding: 4px 8px;
+    width: calc(24rem - #{$demo-bar-height});
+    padding: 0.5rem 1rem;
     margin-left: -100vw; /*Off the screen*/
     transition: 0.3s;
     overflow: hidden;
@@ -54,19 +54,27 @@ $demo-bar-height: $height-3;
     }
 
     .message {
+      width: 100%;
       text-align: left;
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
       .text {
         height: auto;
       }
       .action {
+        @extend %body-2;
         height: auto;
         color: $green-900;
         font-style: italic;
       }
     }
     .closeButton {
-      height: 2rem;
-      width: 2rem;
+      height: 1rem;
+      width: 1rem;
+      font-size: 1.5rem;
       color: $green-900;
     }
   }
