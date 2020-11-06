@@ -8,22 +8,20 @@ const LabelWithExternalLink = ({
   link,
 }: {
   label: string
-  link?: string
+  link: string
 }) => {
   return (
-    <div className={styles.label}>
-      <label>{label}</label>
-      {link && (
-        <OutboundLink
-          className={styles.link}
-          eventLabel={link}
-          to={link}
-          target="_blank"
-        >
-          <i className="bx bx-link-external" />
-        </OutboundLink>
-      )}
-    </div>
+    <>
+      <h5 className={styles.label}>{label}</h5>
+      <OutboundLink
+        className={styles.link}
+        eventLabel={link}
+        to={link}
+        target="_blank"
+      >
+        <i className="bx bx-link-external" />
+      </OutboundLink>
+    </>
   )
 }
 

@@ -1,11 +1,9 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-$modal-width: $tablet;
-$title-height: $height-4;
 .modalBg {
   @include flex-center();
-  background: adjust-color($secondary, $alpha: -0.05);
+  background: $transparent-dark-blue;
   position: fixed;
   width: 100vw;
   height: 100vh;
@@ -13,10 +11,10 @@ $title-height: $height-4;
 }
 
 .modal {
-  width: $modal-width;
+  width: $tablet;
   max-width: 100vw;
   border-radius: 0.6rem;
-  background-color: $neutral-light;
+  background-color: $light-blue;
   height: auto;
   max-height: calc(100vh - 4rem);
   position: relative;
@@ -28,33 +26,17 @@ $title-height: $height-4;
     min-height: 100vh;
   }
 
-  @include scrollbar($neutral-light, $neutral);
-}
+  .content {
+    max-width: 100vw;
+    padding: 3rem 4.5rem;
+    margin: auto;
+  }
 
-.content {
-  max-width: 100vw;
-  padding: 3rem ($modal-width - 528px) / 2;
-  margin: auto;
+  @include scrollbar($light-blue, $grey);
 }
 
 .close {
   position: absolute;
   top: 2rem;
   right: 2rem;
-  &.modalTitleClose {
-    color: $green-900;
-    top: calc(#{$title-height} / 2 - 1.5rem); // close button has height of 3rem
-  }
-}
-
-.modalTitle {
-  @extend %heading-3;
-  @include flex-center;
-  background: $green-100;
-  color: $green-900;
-  min-height: $title-height;
-  text-align: center;
-  @include mobile {
-    padding-right: 3rem;
-  }
 }

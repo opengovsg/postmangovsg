@@ -6,7 +6,7 @@ import { LINKS } from 'config'
 import { ChannelType, channelIcons } from 'classes'
 import {
   PrimaryButton,
-  TextButton,
+  NextButton,
   ErrorBlock,
   CredLabelInput,
 } from 'components/common'
@@ -139,24 +139,14 @@ const AddCredentialModal = ({
       <>
         {credInput}
         <div className="separator"></div>
-        <div className={styles.actionButtons}>
-          <PrimaryButton
-            onClick={nextFunc}
-            loadingPlaceholder={
-              <>
-                Validating<i className="bx bx-loader-alt bx-spin"></i>
-              </>
-            }
-          >
-            Next <i className="bx bx-right-arrow-alt"></i>
-          </PrimaryButton>
-          <TextButton
-            onClick={() => modalContext.close()}
-            className={styles.cancel}
-          >
-            Cancel
-          </TextButton>
-        </div>
+        <NextButton
+          onClick={nextFunc}
+          loadingPlaceholder={
+            <>
+              Validating<i className="bx bx-loader-alt bx-spin"></i>
+            </>
+          }
+        />
       </>
     )
   }
@@ -315,7 +305,7 @@ const AddCredentialModal = ({
             <h3>Your credentials are working well.</h3>
             <PrimaryButton
               className={styles.padTop}
-              onClick={() => modalContext.close()}
+              onClick={() => modalContext.setModalContent(null)}
             >
               Done
             </PrimaryButton>

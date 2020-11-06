@@ -13,12 +13,7 @@ import {
   ErrorBlock,
   PreviewBlock,
   NextButton,
-  TextButton,
   SampleCsv,
-  ButtonGroup,
-  StepHeader,
-  StepSection,
-  InfoBlock,
 } from 'components/common'
 import { TelegramCampaign, TelegramPreview } from 'classes'
 import { sendTiming } from 'services/ga.service'
@@ -30,17 +25,13 @@ const TelegramRecipients = ({
   numRecipients: initialNumRecipients,
   params,
   isProcessing: initialIsProcessing,
-  isDemo,
   onNext,
-  onPrevious,
 }: {
   csvFilename: string
   numRecipients: number
   params: Array<string>
   isProcessing: boolean
-  isDemo: boolean
   onNext: (changes: Partial<TelegramCampaign>, next?: boolean) => void
-  onPrevious: () => void
 }) => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
@@ -126,64 +117,45 @@ const TelegramRecipients = ({
 
   return (
     <>
-      <StepSection>
-        <StepHeader
-          title="Upload recipient list in CSV format"
-          subtitle="Step 2"
-        >
-          <p>
-            Only CSV format files are allowed. If you have an Excel file, please
-            convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
-          </p>
-          <p>
-            CSV file must include a <b>recipient</b> column with
-            recipients&apos; mobile numbers
-          </p>
-        </StepHeader>
+      <sub>Step 2</sub>
+      <h2>Upload recipient list in CSV format</h2>
+      <p>
+        Only CSV format files are allowed. If you have an Excel file, please
+        convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
+      </p>
+      <p>
+        CSV file must include a <b>recipient</b> column with recipients&apos;
+        mobile numbers
+      </p>
 
-        <CsvUpload
-          isCsvProcessing={isCsvProcessing}
-          csvInfo={csvInfo}
-          onErrorClose={clearCsvStatus}
-        >
-          <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
-          <p>or</p>
-          <SampleCsv
-            params={params}
-            defaultRecipient="81234567"
-            setErrorMsg={setErrorMessage}
-          />
-        </CsvUpload>
+      <CsvUpload
+        isCsvProcessing={isCsvProcessing}
+        csvInfo={csvInfo}
+        onErrorClose={clearCsvStatus}
+      >
+        <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+        <p>or</p>
+        <SampleCsv
+          params={params}
+          defaultRecipient="81234567"
+          setErrorMsg={setErrorMessage}
+        />
+      </CsvUpload>
 
-        {isDemo && (
-          <InfoBlock title="Limited to 20 recipients">
-            <span>
-              You can only send out to 20 recipients per demo campaign. Only the
-              first 20 rows in your CSV file will be taken.
-            </span>
-          </InfoBlock>
-        )}
-        <ErrorBlock>{errorMessage}</ErrorBlock>
-      </StepSection>
+      <ErrorBlock>{errorMessage}</ErrorBlock>
 
+      <div className="separator"></div>
       {!isCsvProcessing && numRecipients > 0 && (
         <>
-          <StepSection>
-            <p className={styles.greyText}>Message preview</p>
-            <PreviewBlock
-              body={preview.body?.replace(/\n/g, '<br />')}
-            ></PreviewBlock>
-          </StepSection>
+          <p className={styles.greyText}>Message preview</p>
+          <PreviewBlock
+            body={preview.body?.replace(/\n/g, '<br />')}
+          ></PreviewBlock>
+          <div className="separator"></div>
         </>
       )}
 
-      <ButtonGroup>
-        <NextButton
-          disabled={!numRecipients || !csvFilename}
-          onClick={onNext}
-        />
-        <TextButton onClick={onPrevious}>Previous</TextButton>
-      </ButtonGroup>
+      <NextButton disabled={!numRecipients || !csvFilename} onClick={onNext} />
     </>
   )
 }

@@ -1,12 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-$modal-width: $tablet;
-
-.content {
-  margin-left: calc(78px - (#{$modal-width} - 528px) / 2);
-  margin-right: calc(78px - (#{$modal-width} - 528px) / 2);
-}
 .section {
   margin-bottom: 2rem;
   @include flex-vertical;
@@ -37,17 +31,17 @@ $modal-width: $tablet;
 
     .button {
       @include flex-horizontal;
-      @extend %heading-3;
       justify-content: space-between;
       height: 4.5rem;
-      border: 1px solid $primary;
+      border: 1px solid $indigo-blue;
+      font-size: 1.3rem;
 
       &:not(.active) {
-        color: $primary;
-        background: $neutral-light;
+        color: $indigo-blue;
+        background: $light-blue;
 
         &:hover {
-          background: $primary;
+          background: $indigo-blue;
           color: white;
         }
       }
@@ -73,7 +67,7 @@ $modal-width: $tablet;
 }
 
 .input {
-  background-color: $neutral-light;
+  background-color: $light-blue;
 }
 
 .icon {
@@ -82,7 +76,7 @@ $modal-width: $tablet;
 
 .title {
   font-weight: 500;
-  margin-top: 20px;
+  margin-top: 0;
   margin-bottom: 0.65rem;
 }
 
@@ -102,7 +96,7 @@ $modal-width: $tablet;
   .link {
     font-size: 0.8rem;
     font-style: italic;
-    color: $secondary;
+    color: $dark-blue;
     line-height: 1.5rem;
     text-decoration: underline;
     margin-left: 0.2rem;

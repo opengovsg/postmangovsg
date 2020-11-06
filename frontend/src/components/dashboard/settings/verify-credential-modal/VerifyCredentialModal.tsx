@@ -102,7 +102,7 @@ const VerifyCredentialModal = ({
             <h3>Your credentials are working well.</h3>
             <PrimaryButton
               className={styles.padTop}
-              onClick={() => modalContext.close()}
+              onClick={() => modalContext.setModalContent(null)}
             >
               Done
             </PrimaryButton>

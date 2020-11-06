@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
 @import '~boxicons/css/boxicons.min.css';
 
 @import 'styles/_variables';
@@ -8,7 +11,7 @@ html,
 body {
   font-size: 16px;
   font-family: $font-stack;
-  color: $secondary;
+  color: $dark-blue;
   font-weight: normal;
   margin: 0;
   overflow-x: hidden;
@@ -31,6 +34,26 @@ body {
   min-height: 100vh;
 }
 
+h1 {
+  font-size: 1.8rem;
+  margin-top: 0;
+  font-weight: normal;
+}
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: normal;
+}
+h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  font-weight: normal;
+}
+h4 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
 h5 {
   font-size: 1rem;
   font-weight: bold;
@@ -62,7 +85,7 @@ a {
 }
 
 p {
-  color: $secondary;
+  color: $dark-blue;
   margin-block-start: 0;
   margin-block-end: 1rem;
   margin-inline-start: 0;
@@ -71,7 +94,7 @@ p {
 }
 
 .clickable {
-  color: $primary;
+  color: $indigo-blue;
   cursor: pointer;
   margin-top: 2rem;
 
@@ -105,12 +128,11 @@ mark {
 }
 
 sub {
-  @extend %caption;
-  color: $grey-700;
+  color: $light-grey;
 }
 
 .separator {
-  border-bottom: 1px solid adjust-color($primary-light, $alpha: -0.5);
+  border-bottom: 1px solid $transparent-blue;
   margin: 3rem 0;
 }
 
@@ -123,13 +145,12 @@ table {
   width: 100%;
   tr {
     @include flex-horizontal;
-    border-bottom: 1px solid adjust-color($primary-light, $alpha: -0.5);
-    height: $height-3;
+    border-bottom: 1px solid $transparent-blue;
 
     td,
     th {
+      padding: 1rem 0.25rem;
       display: flex;
-      align-items: center;
 
       &.xs {
         flex: 1.2;
@@ -149,14 +170,6 @@ table {
 
       &.center {
         justify-content: center;
-      }
-
-      &.ellipsis {
-        text-overflow: ellipsis;
-        // Pre-requisites for ellipsis to work
-        overflow: hidden;
-        white-space: nowrap;
-        display: inline-block;
       }
     }
   }

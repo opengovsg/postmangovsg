@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
+import { OutboundLink } from 'react-ga'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -19,9 +20,8 @@ import CreateCampaign from 'components/dashboard/create/create-modal'
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import styles from './Campaigns.module.scss'
 
-import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
-import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
-import { getUserSettings } from 'services/settings.service'
+import { i18n } from 'locales'
+import { LINKS } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -34,9 +34,6 @@ const Campaigns = () => {
   )
   const [selectedPage, setSelectedPage] = useState(0)
   const [campaignCount, setCampaignCount] = useState(0)
-  const [isDemoDisplayed, setIsDemoDisplayed] = useState(false)
-  const [numDemosSms, setNumDemosSms] = useState(0)
-  const [numDemosTelegram, setNumDemosTelegram] = useState(0)
   const history = useHistory()
   const name = getNameFromEmail(email)
   const title = `Welcome, ${name}`
@@ -65,16 +62,6 @@ const Campaigns = () => {
     fetchCampaigns(selectedPage)
   }, [selectedPage])
 
-  useEffect(() => {
-    async function getNumDemos() {
-      const { demo } = await getUserSettings()
-      setIsDemoDisplayed(demo?.isDisplayed)
-      setNumDemosSms(demo?.numDemosSms)
-      setNumDemosTelegram(demo?.numDemosTelegram)
-    }
-    getNumDemos()
-  }, [])
-
   /* eslint-disable react/display-name */
   const headers = [
     {
@@ -91,21 +78,13 @@ const Campaigns = () => {
     },
     {
       name: 'Name',
-      render: (campaign: Campaign) => (
-        <span
-          className={cx({
-            [styles.demo]: !!campaign.demoMessageLimit,
-          })}
-        >
-          {campaign.name}
-        </span>
-      ),
-      width: 'md ellipsis',
+      render: (campaign: Campaign) => campaign.name,
+      width: 'md',
     },
     {
       name: 'Created At',
       render: (campaign: Campaign) => (
-        <Moment format="MMM DD YYYY, HH:mm">{campaign.createdAt}</Moment>
+        <Moment format="LLL">{campaign.createdAt}</Moment>
       ),
       width: 'md',
     },
@@ -113,7 +92,7 @@ const Campaigns = () => {
       name: 'Sent At',
       render: (campaign: Campaign) =>
         campaign.sentAt ? (
-          <Moment format="MMM DD YYYY, HH:mm">{campaign.sentAt}</Moment>
+          <Moment format="LLL">{campaign.sentAt}</Moment>
         ) : (
           <span></span>
         ),
@@ -166,32 +145,24 @@ const Campaigns = () => {
           alt="Empty dashboard graphic"
         />
         <h2>We are excited to have you here!</h2>
-        <p>There are 3 channels for you to try: Email, SMS and Telegram.</p>
-        <p>
-          Email is always free and no set up is required. Since Telegram and SMS
-          requires more set-up, you can now try them out using demo campaigns to
-          see how they work.
-        </p>
-        <div className={styles.actions}>
-          <PrimaryButton
-            onClick={() => modalContext.setModalContent(<CreateCampaign />)}
-          >
-            Try email campaign
+        <h5>To get you started, we have prepared a guide for your reference</h5>
+        <OutboundLink
+          eventLabel={i18n._(LINKS.guideUrl)}
+          to={i18n._(LINKS.guideUrl)}
+          target="_blank"
+        >
+          <PrimaryButton className={styles.darkBlueButton}>
+            Learn how to set up <i className="bx bx-right-arrow-alt"></i>
           </PrimaryButton>
-          <PrimaryButton
-            className={styles.darkGreenButton}
-            onClick={() => {
-              modalContext.setModalContent(
-                <CreateDemoModal
-                  numDemosSms={numDemosSms}
-                  numDemosTelegram={numDemosTelegram}
-                />
-              )
-            }}
-          >
-            Try demo SMS/Telegram
-          </PrimaryButton>
-        </div>
+        </OutboundLink>
+        <h5>Or you can begin creating your campaign here</h5>
+        <PrimaryButton
+          onClick={() =>
+            modalContext.setModalContent(<CreateCampaign></CreateCampaign>)
+          }
+        >
+          Let&apos;s begin
+        </PrimaryButton>
       </div>
     )
   }
@@ -236,11 +207,6 @@ const Campaigns = () => {
           Create new campaign
         </PrimaryButton>
       </TitleBar>
-      <DemoBar
-        numDemosSms={numDemosSms}
-        numDemosTelegram={numDemosTelegram}
-        isDisplayed={isDemoDisplayed}
-      />
       <div className={styles.content}>
         {isLoading ? (
           <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>

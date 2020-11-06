@@ -13,7 +13,7 @@ import {
 import { ChannelType } from '@core/constants'
 import { CampaignS3ObjectInterface } from '@core/interfaces'
 import { Credential } from './credential'
-import { User } from './user/user'
+import { User } from './user'
 import { JobQueue } from './job-queue'
 import { Statistic } from './statistic'
 import { EmailTemplate } from '@email/models'
@@ -84,13 +84,6 @@ export class Campaign extends Model<Campaign> {
     allowNull: true,
   })
   halted?: boolean
-
-  @Default(null)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true,
-  })
-  demoMessageLimit!: number
 
   // Sets key in s3Object json
   static async updateS3ObjectKey(

@@ -2,7 +2,7 @@
 @import 'styles/_mixins';
 
 .topContainer {
-  background-color: $neutral-light;
+  background-color: $light-blue;
   height: 70vh;
   min-height: 420px;
   display: flex;
@@ -49,7 +49,7 @@
 }
 
 .bottomContainer {
-  background-color: adjust-color($primary-light, $alpha: -0.7);
+  background-color: $transparent-blue;
 }
 
 .bottomContent {
@@ -75,7 +75,7 @@
     }
 
     .navLink {
-      color: $secondary;
+      color: $dark-blue;
       margin-left: 3vw;
       font-weight: bold;
       &:hover,

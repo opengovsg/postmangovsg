@@ -15,17 +15,13 @@
 .stepContainer {
   display: block;
   max-width: $content-max-width;
-  width: calc(100% - #{$side-nav-width} - 2 * #{$site-padding});
+  width: calc(100% - #{$progress-pane-width} - 2 * #{$site-padding});
   padding: $content-top-padding 0 $content-bottom-padding;
   margin: 0 auto;
 
   @include mobile() {
     width: calc(100% - 2 * #{$mobile-site-padding});
   }
-}
-
-.detailContainer {
-  max-width: 640px;
 }
 
 .sendInfo {
@@ -47,15 +43,15 @@
 }
 
 .darkBlueText {
-  color: $secondary;
+  color: $dark-blue;
 }
 
 .darkBlueBtn {
-  @extend %secondary-btn;
+  @include button($dark-blue);
 }
 
 .turquoiseGreenBtn {
-  @extend %success-btn;
+  @include button($turquoise-green);
 }
 
 .sendRateContainer {
@@ -115,7 +111,7 @@
 }
 
 .greenInfoBlock {
-  @include block(rgba($success, 0.2), $success);
+  @include block(rgba($turquoise-green, 0.2), $turquoise-green);
 }
 
 .editBtn {
@@ -128,11 +124,8 @@
   font-weight: normal;
   font-size: 0.75rem;
   font-style: italic;
-  color: $secondary;
+  color: $dark-blue;
   text-decoration: underline;
-  &.infoLink {
-    color: $primary;
-  }
 }
 
 .characterCount {

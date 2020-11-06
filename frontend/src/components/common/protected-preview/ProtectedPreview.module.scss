@@ -11,9 +11,6 @@
   * See ProtectedPreview.tsx for more info
   */
   &.style1 {
-    // TODO: Remove this if possible
-    $transparent-dark-blue: rgba(16, 12, 85, 0.95);
-
     img {
       display: block;
       margin: 0 auto;
@@ -62,7 +59,7 @@
       border-collapse: collapse;
       tr {
         display: table-row;
-        border-bottom: 1px solid $transparent-dark-blue;
+        border-bottom: 1px solid $transparent-blue;
 
         td,
         th {

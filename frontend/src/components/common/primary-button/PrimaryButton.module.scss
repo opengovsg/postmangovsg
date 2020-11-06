@@ -2,5 +2,5 @@
 @import 'styles/_mixins';
 
 .button {
-  @extend %primary-btn;
+  @include button($indigo-blue);
 }

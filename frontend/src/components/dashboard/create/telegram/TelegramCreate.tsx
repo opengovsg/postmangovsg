@@ -1,4 +1,3 @@
-import cx from 'classnames'
 import React, { useState, useCallback, useEffect } from 'react'
 import { cloneDeep } from 'lodash'
 
@@ -50,8 +49,6 @@ const CreateTelegram = ({
     }
   }, [])
 
-  const onPrevious = () => setActiveStep((s) => Math.max(s - 1, 0))
-
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
     if (campaign.isCsvProcessing) {
@@ -76,18 +73,14 @@ const CreateTelegram = ({
             csvFilename={campaign.csvFilename}
             numRecipients={campaign.numRecipients}
             isProcessing={campaign.isCsvProcessing}
-            isDemo={!!campaign.demoMessageLimit}
             onNext={onNext}
-            onPrevious={onPrevious}
           />
         )
       case TelegramProgress.InsertCredentials:
         return (
           <TelegramCredentials
             hasCredential={campaign.hasCredential}
-            isDemo={!!campaign.demoMessageLimit}
             onNext={onNext}
-            onPrevious={onPrevious}
           />
         )
       case TelegramProgress.Send:
@@ -95,7 +88,6 @@ const CreateTelegram = ({
           <TelegramSend
             numRecipients={campaign.numRecipients}
             onNext={onNext}
-            onPrevious={onPrevious}
           />
         )
       default:
@@ -106,13 +98,12 @@ const CreateTelegram = ({
   return (
     <div className={styles.createContainer}>
       {campaign.status !== Status.Draft ? (
-        <div className={cx(styles.stepContainer, styles.detailContainer)}>
+        <div className={styles.stepContainer}>
           <TelegramDetail
             id={campaign.id}
             name={campaign.name}
             sentAt={campaign.sentAt}
             numRecipients={campaign.numRecipients}
-            isDemo={!!campaign.demoMessageLimit}
           ></TelegramDetail>
         </div>
       ) : (

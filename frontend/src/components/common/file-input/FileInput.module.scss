@@ -11,6 +11,6 @@
   }
 
   label {
-    @extend %secondary-btn;
+    @include button($dark-blue);
   }
 }

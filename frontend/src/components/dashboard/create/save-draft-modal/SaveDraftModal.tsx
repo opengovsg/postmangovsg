@@ -27,7 +27,7 @@ const SaveDraftModal = ({
 
   function handleEditDraft(): void {
     // Dismiss modal
-    modalContext.close()
+    modalContext.setModalContent(null)
   }
 
   return saveable ? (

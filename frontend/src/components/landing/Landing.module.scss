@@ -48,7 +48,7 @@ $section-vertical-padding: 4rem;
 }
 
 .topContainer {
-  background-color: $neutral-light;
+  background-color: $light-blue;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -114,8 +114,7 @@ $section-vertical-padding: 4rem;
       }
 
       .headerText {
-        @extend %display-2;
-        color: $primary;
+        color: $indigo-blue;
         margin-bottom: 0;
         @include overflowHeaderText();
       }
@@ -133,8 +132,8 @@ $section-vertical-padding: 4rem;
         }
 
         .numOfMessages {
-          @extend %display-1;
-
+          font-size: 4rem;
+          font-weight: 200;
           margin-top: 1.5rem;
           margin-bottom: 2rem;
           margin-right: 1rem;
@@ -160,6 +159,10 @@ $section-vertical-padding: 4rem;
           margin-right: 2rem;
 
           @include mobileButton();
+
+          &:hover {
+            background-color: #2121a5;
+          }
         }
 
         .arrowRight {
@@ -173,7 +176,7 @@ $section-vertical-padding: 4rem;
         }
 
         .contactUs {
-          color: $primary;
+          color: $indigo-blue;
           font-size: 1rem;
 
           span {
@@ -184,7 +187,7 @@ $section-vertical-padding: 4rem;
           }
 
           &:hover {
-            color: $secondary;
+            color: $dark-blue;
           }
         }
       }
@@ -244,7 +247,7 @@ $section-vertical-padding: 4rem;
     align-items: center;
 
     h1 {
-      color: $primary;
+      color: $indigo-blue;
       font-weight: bold;
       font-size: 3rem;
 
@@ -258,12 +261,12 @@ $section-vertical-padding: 4rem;
 
     h3 {
       font-size: 1.6rem;
-      color: $primary;
+      color: $indigo-blue;
       font-weight: bold;
     }
 
     p {
-      color: $secondary;
+      color: $dark-blue;
       font-size: 1.1rem;
       line-height: 1.8rem;
     }
@@ -372,7 +375,7 @@ $section-vertical-padding: 4rem;
           }
 
           span {
-            color: $primary;
+            color: $indigo-blue;
             font-size: 1rem;
           }
 
@@ -410,7 +413,7 @@ $section-vertical-padding: 4rem;
 }
 
 .faq {
-  background-color: $neutral-light;
+  background-color: $light-blue;
   padding: $section-vertical-padding $site-padding;
   @include mobile() {
     padding: $section-vertical-padding $mobile-site-padding;
@@ -425,7 +428,7 @@ $section-vertical-padding: 4rem;
   }
 
   h1 {
-    color: $primary;
+    color: $indigo-blue;
     font-weight: bold;
     font-size: 3rem;
     width: 100%;
@@ -435,7 +438,7 @@ $section-vertical-padding: 4rem;
   .question {
     h3 {
       margin-top: 2rem;
-      color: $primary;
+      color: $indigo-blue;
       font-weight: bold;
       font-size: 1.5rem;
     }
@@ -457,7 +460,7 @@ $section-vertical-padding: 4rem;
 
 .onboarding {
   padding: $section-vertical-padding 0;
-  background-color: $primary;
+  background-color: $indigo-blue;
 
   .innerContainer {
     @include fixWidth();
@@ -489,7 +492,7 @@ $section-vertical-padding: 4rem;
     h2 {
       font-size: 2rem;
       font-weight: bold;
-      color: $neutral-light;
+      color: $light-blue;
 
       @include mobile() {
         font-size: 2.4rem;
@@ -498,7 +501,7 @@ $section-vertical-padding: 4rem;
 
     p {
       font-size: 1.1rem;
-      color: $neutral-light;
+      color: $light-blue;
 
       @include mobile() {
         margin-top: 2rem;
@@ -510,8 +513,8 @@ $section-vertical-padding: 4rem;
       margin-top: 3rem;
 
       .getStartedButton {
-        color: $neutral-light;
-        border: 1px solid $neutral-light;
+        color: $light-blue;
+        border: 1px solid $light-blue;
         min-width: 10rem;
 
         @include mobileButton();
@@ -519,7 +522,7 @@ $section-vertical-padding: 4rem;
 
       a {
         margin-left: 2rem;
-        color: $neutral-light;
+        color: $light-blue;
 
         @include mobile() {
           font-size: 1rem;
@@ -531,10 +534,10 @@ $section-vertical-padding: 4rem;
 }
 
 .bottomContainer {
-  background-color: $secondary;
+  background-color: $dark-blue;
   height: auto;
   padding: 3rem $site-padding;
-  color: $neutral-light;
+  color: $light-blue;
 
   .innerContainer {
     @include fixWidth($header-max-width);

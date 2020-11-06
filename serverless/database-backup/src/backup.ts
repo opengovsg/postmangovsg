@@ -104,12 +104,7 @@ class Backup {
 
   async upload(): Promise<string> {
     const bucket = config.get('gcp.backupBucket')
-    // Backup folder follows the following format: YYYY-MM-DD_HH-mm-ss
-    const folder = new Date()
-      .toISOString()
-      .substring(0, 19)
-      .replace(/:/g, '-')
-      .replace('T', '_')
+    const folder = new Date().toISOString().substring(0, 10)
 
     const dumpParams = []
 

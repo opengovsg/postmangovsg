@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DetailBlock, ErrorBlock } from 'components/common'
+import { InfoBlock, ErrorBlock } from 'components/common'
 
 import styles from './CsvUpload.module.scss'
 
@@ -29,7 +29,7 @@ const CsvUpload = ({
       return (
         <>
           {numRecipients > 0 && (
-            <DetailBlock>
+            <InfoBlock>
               <li>
                 <i className="bx bx-user-check"></i>
                 <p>{numRecipients} recipients</p>
@@ -40,7 +40,7 @@ const CsvUpload = ({
                   <p>{csvFilename}</p>
                 </li>
               )}
-            </DetailBlock>
+            </InfoBlock>
           )}
           <div className={styles.uploadActions}>{children}</div>
         </>
@@ -48,7 +48,7 @@ const CsvUpload = ({
     }
     if (isCsvProcessing) {
       return (
-        <DetailBlock>
+        <InfoBlock>
           <li>
             <i className="bx bx-loader-alt bx-spin"></i>
             <p>
@@ -56,7 +56,7 @@ const CsvUpload = ({
               may leave this page and check back later.
             </p>
           </li>
-        </DetailBlock>
+        </InfoBlock>
       )
     }
   }
@@ -64,8 +64,14 @@ const CsvUpload = ({
   return (
     <div className={styles.container}>
       {renderFileUploadInput()}
-      <ErrorBlock onClose={onErrorClose} title={tempCsvFilename}>
-        {csvError && <span>{csvError}</span>}
+      <ErrorBlock onClose={onErrorClose}>
+        {csvError && (
+          <>
+            <b>{tempCsvFilename}</b>
+            <br />
+            {csvError}
+          </>
+        )}
       </ErrorBlock>
     </div>
   )

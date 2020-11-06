@@ -10,17 +10,9 @@
 
 .icon {
   @include icon;
-  color: $secondary;
+  color: $dark-blue;
   vertical-align: middle;
   cursor: pointer;
-}
-
-.navIcon:first-child {
-  margin-right: $spacing-5 - ($spacing-2 / 2);
-}
-
-.navIcon:last-child {
-  margin-left: $spacing-5 - ($spacing-2 / 2);
 }
 
 .navIconDisabled span {
@@ -29,33 +21,33 @@
 }
 
 .break a {
-  color: $secondary;
+  color: $dark-blue;
 }
 
 .pageNumber {
-  @include flex-horizontal;
-
   width: 2rem;
   height: 2rem;
-  margin-right: $spacing-2 / 2;
-  margin-left: $spacing-2 / 2;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+  @include flex-horizontal;
   justify-content: center;
   cursor: pointer;
 
   a {
-    @extend %button-text;
-    color: $secondary;
+    color: $dark-blue;
+    font-size: 0.8rem;
+    line-height: 1rem;
     padding: 0.5rem;
   }
 }
 
 .active {
-  background-color: $primary;
+  background-color: $indigo-blue;
   border-radius: 1rem;
   cursor: default;
 
   a,
   a:hover {
-    color: $neutral-light;
+    color: $light-blue;
   }
 }

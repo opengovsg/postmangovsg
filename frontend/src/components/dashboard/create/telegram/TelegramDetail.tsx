@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
 import {
@@ -6,25 +6,20 @@ import {
   stopCampaign,
   retryCampaign,
 } from 'services/campaign.service'
-import { StepHeader, ProgressDetails } from 'components/common'
-import { ModalContext } from 'contexts/modal.context'
+import { ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 
 const TelegramDetail = ({
   id,
   name,
   sentAt,
   numRecipients,
-  isDemo,
 }: {
   id: number
   name: string
   sentAt: Date
   numRecipients: number
-  isDemo: boolean
 }) => {
-  const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number, forceRefresh = false) {
@@ -78,43 +73,35 @@ const TelegramDetail = ({
     }
   }, [id, stats.status])
 
-  useEffect(() => {
-    function renderCompletedDemoModal() {
-      setModalContent(
-        <CompletedDemoModal
-          selectedChannel={ChannelType.Telegram}
-        ></CompletedDemoModal>
-      )
-    }
-    if (isDemo && stats.status === Status.Sent) renderCompletedDemoModal()
-  }, [isDemo, setModalContent, stats.status])
-
   function renderProgressHeader() {
     if (stats.waitTime && stats.waitTime > 0) {
       const waitMin = Math.ceil(stats.waitTime / 60)
       return (
-        <StepHeader title="Other campaigns are queued ahead of this campaign.">
+        <>
+          <h2>Other campaigns are queued ahead of this campaign.</h2>
           <p>
             Your campaign should start in approximately{' '}
             <b>{waitMin > 1 ? `${waitMin} minutes` : `${waitMin} minute`}</b>.
             You can leave this page in the meantime, and check on the progress
             by returning to this page from the Campaigns tab.
           </p>
-        </StepHeader>
+        </>
       )
     } else if (stats.status === Status.Sending) {
       return (
-        <StepHeader title="Your campaign is being sent out now!">
+        <>
+          <h2>Your campaign is being sent out now!</h2>
           <p>
             It may take some time to complete. You can leave this page in the
             meantime, and check on the progress by returning to this page from
             the Campaigns tab.
           </p>
-        </StepHeader>
+        </>
       )
     } else {
       return (
-        <StepHeader title="Your campaign has been sent!">
+        <>
+          <h2>Your campaign has been sent!</h2>
           <p>
             If there are errors with sending your messages, you can click Retry
             to send again.
@@ -123,7 +110,7 @@ const TelegramDetail = ({
             An export button will appear for you to download a report with the
             recipient’s mobile number and delivery status when it is ready.
           </p>
-        </StepHeader>
+        </>
       )
     }
   }
@@ -148,7 +135,6 @@ const TelegramDetail = ({
       </>
     )
   }
-
   return (
     <>
       {renderProgressHeader()}

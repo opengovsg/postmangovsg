@@ -115,27 +115,14 @@ export async function getCampaignDetails(
   })
 }
 
-export async function createCampaign({
-  name,
-  type,
-  protect = false,
-  demoMessageLimit,
-}: {
-  name: string
-  type: ChannelType
-  protect?: boolean
-  demoMessageLimit?: number
-}): Promise<Campaign> {
-  return axios
-    .post('/campaigns', {
-      type,
-      protect,
-      name,
-      ...(demoMessageLimit ? { demo_message_limit: demoMessageLimit } : {}),
-    })
-    .then((response) => {
-      return new Campaign(response.data)
-    })
+export async function createCampaign(
+  name: string,
+  type: ChannelType,
+  protect: boolean
+): Promise<Campaign> {
+  return axios.post('/campaigns', { name, type, protect }).then((response) => {
+    return new Campaign(response.data)
+  })
 }
 
 export async function sendCampaign(

@@ -6,8 +6,7 @@
     font-size: 0.9rem;
   }
   .actionButtons {
-    @include flex-horizontal;
-    margin-top: $layout-4;
+    margin-top: 4rem;
 
     @include mobile() {
       @include flex-vertical;
@@ -15,6 +14,9 @@
 
     button {
       @include flex-horizontal;
+      justify-content: space-between;
+      padding: 1.5rem 2.5rem;
+      font-size: 1rem;
       margin-right: 1.5rem;
 
       @include mobile() {
@@ -26,13 +28,15 @@
     }
 
     .status {
-      @extend %outline-btn;
-      margin-right: 0px;
+      @include button(white);
+      border: 1px solid $indigo-blue;
+      color: $indigo-blue;
+      &:hover {
+        background: $light-blue;
+      }
     }
-
     .request {
-      @extend %secondary-btn;
-      @include mobile() {
+      @include button($dark-blue) @include mobile() {
         width: 100%;
       }
     }

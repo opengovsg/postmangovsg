@@ -1,6 +1,3 @@
-import config from '@core/config'
-import { DefaultCredentialName } from '@core/constants'
-
 /**
  * returns true if `_superset` is superset of `subset`
  * @param _superset
@@ -11,7 +8,4 @@ const isSuperSet = <T>(_superset: Array<T>, subset: Array<T>): boolean => {
   return subset.every((s) => superset.has(s))
 }
 
-const formatDefaultCredentialName = (name: DefaultCredentialName): string =>
-  `demo/${config.get('env')}/${name}`
-
-export { isSuperSet, formatDefaultCredentialName }
+export { isSuperSet }

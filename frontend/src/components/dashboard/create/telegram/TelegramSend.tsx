@@ -8,10 +8,6 @@ import {
   PrimaryButton,
   SendRate,
   ConfirmModal,
-  ButtonGroup,
-  TextButton,
-  StepHeader,
-  StepSection,
 } from 'components/common'
 import { getPreviewMessage } from 'services/telegram.service'
 import { sendCampaign } from 'services/campaign.service'
@@ -22,11 +18,9 @@ import styles from '../Create.module.scss'
 const TelegramSend = ({
   numRecipients,
   onNext,
-  onPrevious,
 }: {
   numRecipients: number
   onNext: Function
-  onPrevious: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
@@ -74,42 +68,34 @@ const TelegramSend = ({
 
   return (
     <>
-      <StepSection>
-        <StepHeader
-          title="Your campaign is ready to be sent!"
-          subtitle="Step 4"
-        />
-      </StepSection>
+      <sub>Step 4</sub>
+      <h2>Your campaign is ready to be sent!</h2>
+      <div className="separator"></div>
 
-      <StepSection>
-        <div>
-          <p className={styles.greyText}>Number of recipients</p>
-          <h4>{numRecipients}</h4>
-        </div>
+      <div className={styles.sendInfo}>
+        <p className={styles.greyText}>Number of recipients</p>
+        <h4>{numRecipients}</h4>
 
-        <div>
-          <p className={styles.greyText}>Message</p>
-          <PreviewBlock
-            body={preview.body?.replace(/\n/g, '<br />')}
-          ></PreviewBlock>
-        </div>
+        <p className={styles.greyText}>Message</p>
+        <PreviewBlock
+          body={preview.body?.replace(/\n/g, '<br />')}
+        ></PreviewBlock>
+      </div>
 
-        <div>
-          <SendRate
-            sendRate={sendRate}
-            setSendRate={setSendRate}
-            channelType={ChannelType.Telegram}
-          />
-        </div>
-      </StepSection>
+      <div className="separator"></div>
 
-      <ButtonGroup>
+      <SendRate
+        sendRate={sendRate}
+        setSendRate={setSendRate}
+        channelType={ChannelType.Telegram}
+      />
+
+      <div className="progress-button">
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-        <TextButton onClick={onPrevious}>Previous</TextButton>
-      </ButtonGroup>
+      </div>
     </>
   )
 }

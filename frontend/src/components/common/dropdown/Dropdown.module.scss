@@ -20,7 +20,7 @@
     cursor: pointer;
 
     &:hover {
-      border-color: $primary;
+      border-color: $indigo-blue;
     }
 
     .caret {
@@ -34,7 +34,7 @@
 
   &.open {
     .select {
-      border-color: $primary;
+      border-color: $indigo-blue;
 
       .caret {
         transform: rotate(180deg);
@@ -63,11 +63,11 @@
       user-select: none;
 
       &:hover {
-        background-color: $neutral-light;
+        background-color: $light-blue;
       }
 
       &:active {
-        background-color: darken($neutral-light, 5%);
+        background-color: darken($light-blue, 5%);
       }
     }
   }

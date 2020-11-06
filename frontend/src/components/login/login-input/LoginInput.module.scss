@@ -15,7 +15,7 @@
   }
 
   input {
-    background-color: $neutral-light;
+    background-color: $light-blue;
   }
 
   .resend {
@@ -25,7 +25,7 @@
 
     &.disabled {
       cursor: not-allowed;
-      color: $neutral;
+      color: $light-grey;
     }
   }
 }

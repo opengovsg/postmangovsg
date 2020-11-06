@@ -15,7 +15,7 @@ export enum Status {
 
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
-  [ChannelType.Email]: 'bx-envelope-open',
+  [ChannelType.Email]: 'bx-envelope',
   [ChannelType.Telegram]: 'bxl-telegram',
 }
 
@@ -29,7 +29,6 @@ export class Campaign {
   isCsvProcessing: boolean
   statusUpdatedAt: Date
   protect: boolean
-  demoMessageLimit: number | null
 
   constructor(input: any) {
     this.id = input['id']
@@ -43,7 +42,6 @@ export class Campaign {
     this.sentAt = input['sentAt']
     this.statusUpdatedAt = input['statusUpdatedAt']
     this.protect = input['protect']
-    this.demoMessageLimit = input['demo_message_limit']
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {

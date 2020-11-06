@@ -2,7 +2,7 @@
 
 .export {
   @include flex-horizontal;
-  color: $primary;
+  color: $indigo-blue;
   padding: 0.5rem;
 
   &.unavailable {
@@ -16,7 +16,6 @@
 
   .icon {
     @include icon;
-    font-size: 20px;
     margin-right: 0.5rem;
   }
 
@@ -45,7 +44,7 @@
     &:active {
       span,
       i {
-        color: $primary;
+        color: $indigo-blue;
       }
     }
 

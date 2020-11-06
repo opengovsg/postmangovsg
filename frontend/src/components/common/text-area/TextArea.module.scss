@@ -1,6 +1,7 @@
 @import 'styles/_variables';
 
 .textAreaContainer {
+  margin: 2rem 0;
   width: 100%;
   position: relative;
 
@@ -9,7 +10,7 @@
     border: 1px solid $light-grey;
     border-radius: $border-radius;
     padding: $border-radius;
-    color: $secondary;
+    color: $dark-blue;
     font-size: 1rem;
     line-height: 150%;
     resize: none;
@@ -23,11 +24,11 @@
 
     &:focus {
       outline: none;
-      border-color: $primary;
+      border-color: $indigo-blue;
     }
 
     &::placeholder {
-      color: $neutral;
+      color: $placeholder-grey;
     }
   }
 
@@ -45,5 +46,10 @@
       font-size: 1rem;
       margin: 0; // fix for ie: highlight appearing lower than text
     }
+  }
+
+  .instructions {
+    color: $grey;
+    font-size: 0.8rem;
   }
 }

@@ -4,7 +4,7 @@
 .container {
   display: flex;
   padding: 5vh 5vw;
-  background-color: $neutral-light;
+  background-color: $light-blue;
   min-height: 100vh;
 
   @include mobile() {

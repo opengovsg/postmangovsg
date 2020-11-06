@@ -1,33 +1,43 @@
 import React from 'react'
 import cx from 'classnames'
+
+import { CloseButton } from 'components/common'
+
 import styles from './ErrorBlock.module.scss'
-import MessageBlock from '../message-block'
 
 const ErrorBlock = ({
   className,
   children,
   absolute,
   onClose,
-  title,
   ...otherProps
 }: {
   className?: string
   children?: React.ReactNode
   absolute?: boolean
   onClose?: Function
-  title?: string
 }) => {
+  if (!children) {
+    return null
+  }
+
   return (
-    <MessageBlock
-      className={cx(styles.errorBlock, className)}
-      icon="bx bx-x-circle"
-      absolute={absolute}
-      onClose={onClose}
-      title={title}
-      {...otherProps}
-    >
-      {children}
-    </MessageBlock>
+    <div className={styles.relativeContainer}>
+      <div
+        className={cx(
+          styles.errorBlock,
+          { [styles.absolute]: absolute, [styles.withClose]: onClose },
+          className
+        )}
+        {...otherProps}
+      >
+        <li>
+          <i className="bx bx-error-circle"></i>
+          <p>{children}</p>
+        </li>
+        {onClose && <CloseButton onClick={onClose} className={styles.close} />}
+      </div>
+    </div>
   )
 }
 
