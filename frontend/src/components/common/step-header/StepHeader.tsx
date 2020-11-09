@@ -14,7 +14,7 @@ const StepHeader = ({
   return (
     <div className={styles.stepHeader}>
       {subtitle && <sub>{subtitle}</sub>}
-      <h2>{title}</h2>
+      <h3>{title}</h3>
       {children && <div className={styles.description}>{children}</div>}
     </div>
   )
