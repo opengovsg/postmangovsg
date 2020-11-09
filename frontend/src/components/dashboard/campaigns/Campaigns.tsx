@@ -13,6 +13,7 @@ import {
   ExportRecipients,
 } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import { Campaign, channelIcons, Status } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
@@ -174,13 +175,17 @@ const Campaigns = () => {
         </p>
         <div className={styles.actions}>
           <PrimaryButton
-            onClick={() => modalContext.setModalContent(<CreateCampaign />)}
+            onClick={() => {
+              sendUserEvent(GA_USER_EVENTS.NEW_USER_TRY_EMAIL)
+              modalContext.setModalContent(<CreateCampaign />)
+            }}
           >
             Try email campaign
           </PrimaryButton>
           <PrimaryButton
             className={styles.darkGreenButton}
             onClick={() => {
+              sendUserEvent(GA_USER_EVENTS.NEW_USER_TRY_SMS_TELEGRAM)
               modalContext.setModalContent(
                 <CreateDemoModal
                   numDemosSms={numDemosSms}

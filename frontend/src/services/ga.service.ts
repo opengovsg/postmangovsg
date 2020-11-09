@@ -13,6 +13,8 @@ export const GA_USER_EVENTS = {
   ADD_FROM_ADDRESS: 'Add From Address',
   UPDATE_FROM_ADDRESS: 'Update From Address',
   DOWNLOAD_DELIVERY_REPORT: 'Download delivery report',
+  NEW_USER_TRY_EMAIL: 'New user try email',
+  NEW_USER_TRY_SMS_TELEGRAM: 'New user try SMS or Telegram',
 }
 
 export function initializeGA() {
