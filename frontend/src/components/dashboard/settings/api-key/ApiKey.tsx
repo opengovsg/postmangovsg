@@ -5,6 +5,7 @@ import {
   TextInputWithButton,
   ConfirmModal,
   ErrorBlock,
+  StepHeader,
 } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { regenerateApiKey } from 'services/settings.service'
@@ -124,12 +125,13 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
 
   return (
     <>
-      <h2>API Key</h2>
-      <p className={styles.helpText}>
-        After generating your API key, please make a copy of it immediately as
-        it will only be shown once. Upon leaving or refreshing this page, the
-        key will be hidden.
-      </p>
+      <StepHeader title="API Key">
+        <p className={styles.helpText}>
+          After generating your API key, please make a copy of it immediately as
+          it will only be shown once. Upon leaving or refreshing this page, the
+          key will be hidden.
+        </p>
+      </StepHeader>
       <TextInputWithButton
         value={apiKey}
         onChange={() => {
