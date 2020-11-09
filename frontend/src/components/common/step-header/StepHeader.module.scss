@@ -1,0 +1,23 @@
+@import 'styles/_variables';
+
+.stepHeader {
+  margin-bottom: $layout-3;
+
+  sub {
+    display: block;
+    margin-bottom: $spacing-1;
+  }
+
+  h2 {
+    margin: 0;
+    margin-bottom: $spacing-3;
+  }
+
+  .description {
+    div,
+    p {
+      margin: 0;
+      margin-bottom: $spacing-3;
+    }
+  }
+}

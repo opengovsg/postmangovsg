@@ -11,6 +11,7 @@ import {
   Status,
 } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
+import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import SMSCreate from './sms/SMSCreate'
@@ -42,7 +43,6 @@ const Create = () => {
   async function handleFinishLater() {
     if (campaign.status === Status.Draft) {
       sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
-
       if (finishLaterCallbackRef.current) {
         return finishLaterCallbackRef.current()
       }
@@ -92,6 +92,7 @@ const Create = () => {
                 : 'Back to campaigns'}
             </PrimaryButton>
           </TitleBar>
+          {!!campaign.demoMessageLimit && <DemoInfoBanner></DemoInfoBanner>}
           {isLoading ? (
             <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
           ) : (

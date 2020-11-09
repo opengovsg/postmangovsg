@@ -57,14 +57,22 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: src/config.ts:44
+#: src/config.ts:46
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
-#: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:71
-#: src/config.ts:42
+#: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
+#: src/config.ts:44
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
+
+#: src/components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:8
+msgid "demoMessage"
+msgstr "This demo campaign will be sent to a maximum of 20 recipients."
+
+#: src/components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:7
+msgid "demoMessageLabel"
+msgstr "DEMO"
 
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "e.g. postman@agency.gov.sg"
@@ -106,17 +114,25 @@ msgstr "Bot has been blocked by the recipient. Please contact the recipient via 
 msgid "errors.telegram.notSubscribed"
 msgstr "Recipient has not subscribed to your agency's bot - please ask them to subscribe before sending a message."
 
-#: src/config.ts:35
+#: src/config.ts:36
 msgid "link.contactUsUrl"
 msgstr "https://go.gov.sg/postman-contact-us"
 
-#: src/config.ts:36
+#: src/config.ts:37
 msgid "link.contributeUrl"
 msgstr "https://github.com/opengovsg/postmangovsg"
 
-#: src/config.ts:40
+#: src/config.ts:41
 msgid "link.customFromAddressRequestUrl"
 msgstr "https://go.gov.sg/postman-custom-from"
+
+#: src/config.ts:42
+msgid "link.demoTelegramBotUrl"
+msgstr "https://go.gov.sg/postmangovsgbot"
+
+#: src/config.ts:35
+msgid "link.guideDemoUrl"
+msgstr "https://guide.postman.gov.sg/before-you-start/demo-mode"
 
 #: src/config.ts:28
 msgid "link.guideEmailPasswordProtectedUrl"
@@ -150,14 +166,14 @@ msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
 msgid "link.guideUrl"
 msgstr "https://guide.postman.gov.sg"
 
-#: src/config.ts:38
+#: src/config.ts:39
 msgid "link.privacyUrl"
 msgstr "https://guide.postman.gov.sg/legal/privacy"
 
-#: src/config.ts:39
+#: src/config.ts:40
 msgid "link.reportBugUrl"
 msgstr "https://guide.postman.gov.sg/contact-us"
 
-#: src/config.ts:37
+#: src/config.ts:38
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
