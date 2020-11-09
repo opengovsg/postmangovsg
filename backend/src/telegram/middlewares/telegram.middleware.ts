@@ -23,6 +23,7 @@ const getCredentialsFromBody = async (
   const { telegram_bot_token: telegramBotToken } = req.body
 
   res.locals.credentials = { telegramBotToken }
+  res.locals.credentialName = botId(telegramBotToken)
   return next()
 }
 
@@ -82,6 +83,7 @@ const getCredentialsFromLabel = async (
       credentialName
     )
     res.locals.credentials = { telegramBotToken }
+    res.locals.credentialName = botId(telegramBotToken)
     return next()
   } catch (err) {
     return next(err)
@@ -121,6 +123,7 @@ const getCampaignCredential = async (
   )
 
   res.locals.credentials = { telegramBotToken }
+  res.locals.credentialName = botId(telegramBotToken)
   next()
 }
 
@@ -138,7 +141,7 @@ const validateAndStoreCredentials = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { telegramBotToken } = res.locals.credentials
-  const credentialName = botId(telegramBotToken)
+  const { credentialName } = res.locals
   const logMeta = {
     credentialName,
     action: 'validateAndStoreCredentials',
@@ -295,12 +298,11 @@ const setCampaignCredential = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { telegramBotToken } = res.locals.credentials
-    if (!telegramBotToken) {
+    const { credentialName } = res.locals
+    if (!credentialName) {
       throw new Error('Credential does not exist')
     }
 
-    const credentialName = botId(telegramBotToken)
     await TelegramService.setCampaignCredential(+campaignId, credentialName)
     return res.json({ message: 'OK' })
   } catch (err) {
