@@ -1,0 +1,50 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.content {
+  @include flex-vertical;
+  align-items: center;
+  text-align: center;
+}
+
+.modalImg {
+  width: 16rem;
+  margin-bottom: $spacing-5;
+}
+
+.icon {
+  @include icon;
+}
+
+.title {
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: $spacing-3;
+}
+
+.subtitle {
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: $spacing-7;
+  text-align: center;
+}
+
+.options {
+  @include flex-horizontal;
+  @include mobile() {
+    @include flex-vertical;
+  }
+  a {
+    margin-top: $spacing-4;
+    margin-right: $spacing-4;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  .outlineBtn {
+    @extend %outline-btn;
+    &:hover {
+      background-color: $neutral;
+    }
+  }
+}

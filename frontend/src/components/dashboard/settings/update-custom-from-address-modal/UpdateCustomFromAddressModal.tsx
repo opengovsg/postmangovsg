@@ -156,7 +156,7 @@ const UpdateCustomFromAddressModal = ({
             </h3>
             <PrimaryButton
               className={styles.padTop}
-              onClick={() => modalContext.setModalContent(null)}
+              onClick={() => modalContext.close()}
             >
               Done
             </PrimaryButton>

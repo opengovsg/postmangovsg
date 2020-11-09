@@ -72,7 +72,7 @@ const NavBar = () => {
         </TextButton>
         <OutboundLink
           className={styles.link}
-          eventLabel={i18n._(LINKS.guideUrl)}
+          eventLabel={`Dashboard navbar / ${i18n._(LINKS.guideUrl)}`}
           to={i18n._(LINKS.guideUrl)}
           target="_blank"
         >

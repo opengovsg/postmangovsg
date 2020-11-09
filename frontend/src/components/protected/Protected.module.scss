@@ -3,7 +3,7 @@
 
 .outer {
   @include flex-center();
-  background-color: $light-blue;
+  background-color: $neutral-light;
   width: 100vw;
   min-height: 100vh;
   overflow: auto;

@@ -1,31 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.relativeContainer {
-  position: relative;
-  width: 100%;
-
-  .errorBlock {
-    &.absolute {
-      position: absolute;
-      left: 0;
-      right: 0;
-    }
-    white-space: pre-wrap;
-    @include block($light-red, $red);
-
-    &.withClose {
-      padding-right: 4rem;
-    }
-
-    .close {
-      position: absolute;
-      top: 0.5rem;
-      right: 1rem;
-      &:hover,
-      &:active {
-        color: $red;
-      }
-    }
-  }
+.errorBlock {
+  @include block($error-light, $error);
 }

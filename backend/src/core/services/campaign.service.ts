@@ -1,9 +1,11 @@
 import { Op, literal, Transaction, Includeable } from 'sequelize'
 import config from '@core/config'
-import { JobStatus } from '@core/constants'
-import { Campaign, JobQueue, Statistic } from '@core/models'
+import { ChannelType, JobStatus } from '@core/constants'
+import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
+import { loggerWithLabel } from '@core/logger'
 
+const logger = loggerWithLabel(module)
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress
  * @param campaignId
@@ -14,6 +16,57 @@ const hasJobInProgress = (campaignId: number): Promise<JobQueue | null> => {
   })
 }
 
+const createDemoCampaign = async ({
+  name,
+  type,
+  userId,
+  protect,
+  demoMessageLimit,
+  transaction,
+}: {
+  name: string
+  type: string
+  userId: number
+  protect: boolean
+  demoMessageLimit: number | null
+  transaction: Transaction
+}): Promise<Campaign | void> => {
+  const mapping: { [k: string]: string } = {
+    [ChannelType.SMS]: 'numDemosSms',
+    [ChannelType.Telegram]: 'numDemosTelegram',
+  }
+  const numDemosColumn: any = mapping[type]
+  if (!numDemosColumn) {
+    logger.error({
+      message: `Channel type not supported for demo mode`,
+      type,
+    })
+    return
+  }
+  const userDemo = await UserDemo.findOne({
+    where: { userId, [numDemosColumn]: { [Op.gt]: 0 } },
+    transaction,
+  })
+  if (userDemo) {
+    const campaign = await Campaign.create(
+      {
+        name,
+        type,
+        userId,
+        valid: false,
+        protect,
+        demoMessageLimit,
+      },
+      { transaction }
+    )
+    await userDemo?.decrement(numDemosColumn, { transaction })
+    return campaign
+  } else {
+    logger.error({ message: `No demos left`, userId, type })
+    return
+  }
+}
+
 /**
  * Helper method to create a campaign
  */
@@ -22,13 +75,37 @@ const createCampaign = ({
   type,
   userId,
   protect,
+  demoMessageLimit,
 }: {
   name: string
   type: string
   userId: number
   protect: boolean
-}): Promise<Campaign> => {
-  return Campaign.create({ name, type, userId, valid: false, protect })
+  demoMessageLimit: number | null
+}): Promise<Campaign | void> | undefined => {
+  const result = Campaign.sequelize?.transaction(async (transaction) => {
+    const isDemo = Boolean(demoMessageLimit) // demoMessageLimit is not null, undefined, or 0
+    return isDemo
+      ? createDemoCampaign({
+          transaction,
+          name,
+          type,
+          userId,
+          protect,
+          demoMessageLimit,
+        })
+      : Campaign.create(
+          {
+            name,
+            type,
+            userId,
+            valid: false,
+            protect,
+          },
+          { transaction }
+        )
+  })
+  return result
 }
 
 /**
@@ -72,6 +149,7 @@ const listCampaigns = ({
         ),
         'redacted',
       ],
+      'demo_message_limit',
     ],
     order: [['created_at', 'DESC']],
     // Set limit and offset at the end of the main query so that the window function will have access to the job_queue table
@@ -115,6 +193,7 @@ const getCampaignDetails = async (
       'created_at',
       'valid',
       'protect',
+      'demo_message_limit',
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
       [

@@ -6,10 +6,12 @@ import {
   PrimaryButton,
   TextButton,
   TextArea,
-  InfoBlock,
+  DetailBlock,
   ErrorBlock,
   ProtectedPreview,
   Checkbox,
+  StepHeader,
+  StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { ModalContext } from 'contexts/modal.context'
@@ -34,15 +36,17 @@ const ProtectedEmailRecipients = ({
   numRecipients,
   isProcessing,
   onNext,
+  onPrevious,
   finishLaterCallbackRef,
 }: {
   csvFilename: string
   numRecipients: number
   isProcessing: boolean
   onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
+  onPrevious: () => void
   finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
 }) => {
-  const modalContext = useContext(ModalContext)
+  const { setModalContent } = useContext(ModalContext)
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState<File>()
@@ -61,12 +65,12 @@ const ProtectedEmailRecipients = ({
   // Set callback for finish later button
   useEffect(() => {
     finishLaterCallbackRef.current = () => {
-      modalContext.setModalContent(<SaveDraftModal />)
+      setModalContent(<SaveDraftModal />)
     }
     return () => {
       finishLaterCallbackRef.current = undefined
     }
-  }, [template, finishLaterCallbackRef, modalContext])
+  }, [template, finishLaterCallbackRef, setModalContent])
 
   function computePhase(
     numRecipients: number,
@@ -132,78 +136,90 @@ const ProtectedEmailRecipients = ({
 
   const messageBInput = (
     <>
-      <h2>Create password protected message</h2>
-      <h4>Message B</h4>
-      <p>
-        The content below is what your recipients see after opening their
-        password protected mail using their unique password.
-        <br />
-        <br />
-        To personalise your message, include keywords that are surrounded by
-        double curly braces. The keywords in your message template should match
-        the headers in your recipients CSV file.
-      </p>
-      <p>
-        <b>Note:</b> For security reasons, we do not store password protected
-        messages. You will lose the content below if you refresh your tab or go
-        back to Step 1 to edit.
-      </p>
-      <TextArea
-        highlight={true}
-        placeholder="Enter password protected message here"
-        value={template}
-        onChange={setTemplate}
-      />
-      <Checkbox checked={removeEmptyLines} onChange={setRemoveEmptyLines}>
-        <p>
-          <b>Remove empty lines.</b> When checked, use {'<p></p>'} to preserve
-          empty lines.
-        </p>
-      </Checkbox>
-      <div className="separator"></div>
+      <StepSection>
+        <StepHeader
+          title="Create password protected message"
+          subtitle="Step 2"
+        />
+        <div>
+          <h4>Message B</h4>
+          <p>
+            The content below is what your recipients see after opening their
+            password protected mail using their unique password.
+            <br />
+            <br />
+            To personalise your message, include keywords that are surrounded by
+            double curly braces. The keywords in your message template should
+            match the headers in your recipients CSV file.
+          </p>
+          <p>
+            <b>Note:</b> For security reasons, we do not store password
+            protected messages. You will lose the content below if you refresh
+            your tab or go back to Step 1 to edit.
+          </p>
+          <TextArea
+            highlight={true}
+            placeholder="Enter password protected message here"
+            value={template}
+            onChange={setTemplate}
+          />
+          <Checkbox checked={removeEmptyLines} onChange={setRemoveEmptyLines}>
+            <p>
+              <b>Remove empty lines.</b> When checked, use {'<p></p>'} to
+              preserve empty lines.
+            </p>
+          </Checkbox>
+        </div>
+      </StepSection>
     </>
   )
 
   const messageBPreview = (
     <>
-      <h2>Confirm password protected message</h2>
-      <p>
-        If you choose to edit your message, do note that you will have to
-        re-upload your recipients list.
-      </p>
-      <p>
-        <b>Note:</b> For security reasons, we do not store password protected
-        messages. You will lose the content below if you refresh your tab or go
-        back to Step 1 to edit.
-      </p>
-      <InfoBlock>
-        <li>
-          <i className="bx bx-user-check"></i>
-          <p>{protectedCsvInfo?.numRecipients} recipients</p>
-        </li>
-        <li>
-          <i className="bx bx-file"></i>
-          <p>{protectedCsvInfo?.csvFilename}</p>
-        </li>
-      </InfoBlock>
-      <div className="separator"></div>
+      <StepSection>
+        <StepHeader
+          title="Confirm password protected message"
+          subtitle="Step 2"
+        >
+          <p>
+            If you choose to edit your message, do note that you will have to
+            re-upload your recipients list.
+          </p>
+          <p>
+            <b>Note:</b> For security reasons, we do not store password
+            protected messages. You will lose the content below if you refresh
+            your tab or go back to Step 1 to edit.
+          </p>
+        </StepHeader>
+        <DetailBlock>
+          <li>
+            <i className="bx bx-user-check"></i>
+            <p>{protectedCsvInfo?.numRecipients} recipients</p>
+          </li>
+          <li>
+            <i className="bx bx-file"></i>
+            <p>{protectedCsvInfo?.csvFilename}</p>
+          </li>
+        </DetailBlock>
+      </StepSection>
       {protectedCsvInfo?.preview && (
-        <>
-          <h4>Message B</h4>
-          <InfoBlock className={styles.protectedPreview}>
+        <StepSection>
+          <div>
+            <h4>Message B</h4>
+          </div>
+          <DetailBlock className={styles.protectedPreview}>
             <li>
               <b>Results</b>
             </li>
             <li>
               <ProtectedPreview html={protectedCsvInfo?.preview} />
             </li>
-          </InfoBlock>
-        </>
+          </DetailBlock>
+        </StepSection>
       )}
-
       <div className="progress-button">
         <TextButton minButtonWidth onClick={() => setPhase(ProtectPhase.READY)}>
-          Back
+          Previous
         </TextButton>
         <PrimaryButton
           onClick={onFileUpload}
@@ -234,6 +250,7 @@ const ProtectedEmailRecipients = ({
         onFileSelected={onFileSelected}
         forceReset={phase === ProtectPhase.READY}
         onNext={onNext}
+        onPrevious={onPrevious}
       ></EmailRecipients>
       {phase === ProtectPhase.READY && csvFilename && (
         <div className="progress-button">
@@ -291,7 +308,6 @@ const ProtectedEmailRecipients = ({
 
   return (
     <>
-      <sub>Step 2</sub>
       {render()}
       <ErrorBlock>{errorMessage}</ErrorBlock>
     </>

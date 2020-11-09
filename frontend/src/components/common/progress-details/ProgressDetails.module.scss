@@ -7,7 +7,6 @@
 
     tr {
       @include flex-horizontal;
-      border-bottom: none;
 
       .icon {
         @include icon;
@@ -20,6 +19,7 @@
       }
 
       th {
+        @extend %caption;
         text-transform: capitalize;
       }
     }
@@ -35,19 +35,19 @@
   margin-right: 0.5rem;
 
   &.red {
-    color: $red;
+    color: $error;
   }
 
   &.blue {
-    color: $indigo-blue;
+    color: $primary;
   }
 
   &.green {
-    color: $turquoise-green;
+    color: $success;
   }
 
   &.grey {
-    color: $grey;
+    color: $grey-700;
   }
 }
 
@@ -63,15 +63,15 @@
   }
 
   .pause {
-    @include button($red);
+    @extend %error-btn;
   }
 
   .retry {
-    @include button($dark-blue);
+    @extend %secondary-btn;
   }
 
   .complete {
-    @include button($turquoise-green);
+    @extend %success-btn;
     pointer-events: none;
   }
 

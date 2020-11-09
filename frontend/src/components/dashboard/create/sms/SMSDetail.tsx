@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 
 import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
 import {
@@ -6,8 +6,10 @@ import {
   stopCampaign,
   retryCampaign,
 } from 'services/campaign.service'
-import { ProgressDetails } from 'components/common'
+import { StepHeader, ProgressDetails } from 'components/common'
+import { ModalContext } from 'contexts/modal.context'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 
 const SMSDetail = ({
   id,
@@ -15,13 +17,16 @@ const SMSDetail = ({
   sentAt,
   numRecipients,
   redacted,
+  isDemo,
 }: {
   id: number
   name: string
   sentAt: Date
   numRecipients: number
   redacted: boolean
+  isDemo: boolean
 }) => {
+  const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number, forceRefresh = false) {
@@ -75,35 +80,43 @@ const SMSDetail = ({
     }
   }, [id, stats.status])
 
+  useEffect(() => {
+    function renderCompletedDemoModal() {
+      setModalContent(
+        <CompletedDemoModal
+          selectedChannel={ChannelType.SMS}
+        ></CompletedDemoModal>
+      )
+    }
+    if (isDemo && stats.status === Status.Sent) renderCompletedDemoModal()
+  }, [isDemo, setModalContent, stats.status])
+
   function renderProgressHeader() {
     if (stats.waitTime && stats.waitTime > 0) {
       const waitMin = Math.ceil(stats.waitTime / 60)
       return (
-        <>
-          <h2>Other campaigns are queued ahead of this campaign.</h2>
+        <StepHeader title="Other campaigns are queued ahead of this campaign.">
           <p>
             Your campaign should start in approximately{' '}
             <b>{waitMin > 1 ? `${waitMin} minutes` : `${waitMin} minute`}</b>.
             You can leave this page in the meantime, and check on the progress
             by returning to this page from the Campaigns tab.
           </p>
-        </>
+        </StepHeader>
       )
     } else if (stats.status === Status.Sending) {
       return (
-        <>
-          <h2>Your campaign is being sent out now!</h2>
+        <StepHeader title="Your campaign is being sent out now!">
           <p>
             It may take some time to complete. You can leave this page in the
             meantime, and check on the progress by returning to this page from
             the Campaigns tab.
           </p>
-        </>
+        </StepHeader>
       )
     } else {
       return (
-        <>
-          <h2>Your campaign has been sent!</h2>
+        <StepHeader title="Your campaign has been sent!">
           <p>
             If there are errors with sending your messages, you can click Retry
             to send again.
@@ -112,7 +125,7 @@ const SMSDetail = ({
             An export button will appear for you to download a report with the
             recipient’s mobile number and delivery status when it is ready.
           </p>
-        </>
+        </StepHeader>
       )
     }
   }
@@ -138,6 +151,7 @@ const SMSDetail = ({
       </>
     )
   }
+
   return (
     <>
       {renderProgressHeader()}

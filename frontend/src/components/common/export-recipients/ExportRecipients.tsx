@@ -4,6 +4,7 @@ import download from 'downloadjs'
 
 import { ChannelType, Status } from 'classes/Campaign'
 import { ActionButton } from 'components/common'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
 import moment from 'moment'
@@ -109,6 +110,13 @@ const ExportRecipients = ({
       )
 
       setExportStatus(CampaignExportStatus.Ready)
+
+      const campaignAgeInDays = moment().diff(sentAt, 'days')
+      sendUserEvent(
+        GA_USER_EVENTS.DOWNLOAD_DELIVERY_REPORT,
+        campaignType,
+        campaignAgeInDays
+      )
     } catch (error) {
       console.error(error)
     } finally {

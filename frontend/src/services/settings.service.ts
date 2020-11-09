@@ -9,11 +9,24 @@ export interface UserCredential {
 async function getUserSettings(): Promise<{
   hasApiKey: boolean
   creds: UserCredential[]
+  demo: {
+    numDemosSms: number
+    numDemosTelegram: number
+    isDisplayed: boolean
+  }
 }> {
   try {
     const response = await axios.get('/settings')
-    const { has_api_key: hasApiKey, creds } = response.data
-    return { hasApiKey, creds }
+    const { has_api_key: hasApiKey, creds, demo } = response.data
+    return {
+      hasApiKey,
+      creds,
+      demo: {
+        numDemosSms: demo?.num_demos_sms,
+        numDemosTelegram: demo?.num_demos_telegram,
+        isDisplayed: demo?.is_displayed,
+      },
+    }
   } catch (e) {
     errorHandler(e, 'Error fetching credentials')
   }
@@ -52,6 +65,14 @@ async function getCustomFromAddresses(): Promise<string[]> {
   }
 }
 
+async function updateDemoDisplayed(isDisplayed: boolean): Promise<void> {
+  try {
+    await axios.put('/settings/demo', { is_displayed: isDisplayed })
+  } catch (e) {
+    errorHandler(e, 'Error updating state of demo displayed')
+  }
+}
+
 function errorHandler(e: AxiosError, defaultMsg: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {
@@ -65,4 +86,5 @@ export {
   getUserSettings,
   deleteCredential,
   getCustomFromAddresses,
+  updateDemoDisplayed,
 }

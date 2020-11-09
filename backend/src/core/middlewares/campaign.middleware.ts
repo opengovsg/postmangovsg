@@ -47,31 +47,44 @@ const createCampaign = async (
       name,
       type,
       protect,
-    }: { name: string; type: string; protect: boolean } = req.body
+      demo_message_limit: demoMessageLimit,
+    }: {
+      name: string
+      type: string
+      protect: boolean
+      demo_message_limit: number | null
+    } = req.body
 
     // Check that protected campaign can only be created for emails
     if (protect && type !== ChannelType.Email) {
       return res.sendStatus(403)
     }
-
     const userId = req.session?.user?.id
     const campaign = await CampaignService.createCampaign({
       name,
       type,
       userId,
       protect,
+      demoMessageLimit,
     })
+    if (!campaign) {
+      return res.status(400).json({
+        message: `Unable to create campaign with these parameters`,
+      })
+    }
     logger.info({
       message: 'Successfully created new campaign',
       campaignId: campaign.id,
       action: 'createCampaign',
     })
+
     return res.status(201).json({
       id: campaign.id,
       name: campaign.name,
       created_at: campaign.createdAt,
       type: campaign.type,
       protect: campaign.protect,
+      demo_message_limit: campaign.demoMessageLimit,
     })
   } catch (err) {
     return next(err)
