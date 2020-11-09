@@ -37,7 +37,6 @@ const EmailTemplate = ({
     replyTo: initialReplyTo,
     from: initialFrom,
     protect,
-    progress,
   } = campaign as EmailCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const modalContext = useContext(ModalContext)

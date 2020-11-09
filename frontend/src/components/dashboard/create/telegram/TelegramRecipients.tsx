@@ -37,7 +37,6 @@ const TelegramRecipients = ({
     isCsvProcessing: initialIsProcessing,
     numRecipients: initialNumRecipients,
     csvFilename: initialCsvFilename,
-    progress,
     params,
   } = campaign
   const [errorMessage, setErrorMessage] = useState(null)

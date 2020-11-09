@@ -36,7 +36,7 @@ const TelegramCredentials = ({
   setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
   const { campaign, setCampaign } = useContext(CampaignContext)
-  const { hasCredential: initialHasCredential, progress } = campaign
+  const { hasCredential: initialHasCredential } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
