@@ -370,15 +370,10 @@ const TelegramCredentials = ({
                 <ErrorBlock>{errorMessage}</ErrorBlock>
               </StepSection>
 
-              <ButtonGroup>
-                <NextButton
-                  disabled={!hasCredential}
-                  onClick={() => setActiveStep((s) => s + 1)}
-                />
-                <TextButton onClick={() => setActiveStep((s) => s - 1)}>
-                  Previous
-                </TextButton>
-              </ButtonGroup>
+              <NextButton
+                disabled={!hasCredential}
+                onClick={() => setActiveStep((s) => s + 1)}
+              />
             </>
           )}
         </>
