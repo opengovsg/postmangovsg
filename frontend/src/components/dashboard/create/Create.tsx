@@ -36,8 +36,8 @@ const Create = () => {
   }, [id, setCampaign])
 
   async function handleFinishLater() {
-    sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
     if (campaign.status === Status.Draft && finishLaterContent) {
+      sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
       finishLaterContextHandler()
     }
     history.push('/campaigns')
