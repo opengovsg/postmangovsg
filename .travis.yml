@@ -17,8 +17,7 @@ jobs:
         - npm ci
       script:
         - npm run lint-no-fix
-        - npx lockfile-lint --type npm --path frontend/package-lock.json --validate-https --allowed-hosts npm
-        - npx lockfile-lint --type npm --path backend/package-lock.json --validate-https --allowed-hosts npm        
+        - npx lockfile-lint --type npm --path package-lock.json --validate-https --allowed-hosts npm        
         - npm run test
       before_deploy:
         - cd $TRAVIS_BUILD_DIR/backend && ./before-deploy.sh
@@ -74,6 +73,7 @@ jobs:
         - npm install
       script:
         - npm run compile
+        - npx lockfile-lint --type npm --path package-lock.json --validate-https --allowed-hosts npm
         - npm run lint-no-fix
         - CI=false npm run build
     - name: serverless-unsubscribe-digest
