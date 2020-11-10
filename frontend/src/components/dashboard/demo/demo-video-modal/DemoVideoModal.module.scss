@@ -7,42 +7,32 @@
   text-align: center;
 }
 
-.modalImg {
-  width: 16rem;
-  margin-bottom: $spacing-5;
-}
-
-.icon {
-  @include icon;
-}
-
 .title {
   font-weight: 500;
   margin-top: 0;
   margin-bottom: $spacing-3;
 }
 
-.subtitle {
-  font-weight: normal;
-  margin-top: 0;
-  margin-bottom: $spacing-7;
-  text-align: center;
+.helpText {
+  @extend %body-1;
+  margin-top: $spacing-5;
+  a {
+    font-size: inherit;
+    font-weight: 500;
+    color: $primary;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
-
 .options {
   @include flex-horizontal;
-  
+
   button {
     margin-top: $spacing-4;
     margin-right: $spacing-4;
     &:last-child {
       margin-right: 0;
-    }
-  }
-  .outlineBtn {
-    @extend %outline-btn;
-    &:hover {
-      background-color: $neutral;
     }
   }
   @include mobile() {
@@ -51,5 +41,4 @@
       margin-right: 0;
     }
   }
-  
 }
