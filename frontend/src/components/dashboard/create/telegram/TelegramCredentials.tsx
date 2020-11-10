@@ -250,10 +250,15 @@ const TelegramCredentials = ({
                 onSelect={setSelectedCredential}
                 options={storedCredentials}
                 defaultLabel={storedCredentials[0]?.label}
+                disabled={isDemo}
               ></Dropdown>
+
               <ErrorBlock>{errorMessage}</ErrorBlock>
 
-              <p className="clickable" onClick={() => setIsManual(true)}>
+              <p
+                className={cx('clickable', { disabled: isDemo })}
+                onClick={() => !isDemo && setIsManual(true)}
+              >
                 Add new credentials
               </p>
 

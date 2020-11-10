@@ -7,10 +7,12 @@ const Dropdown = ({
   options,
   onSelect,
   defaultLabel,
+  disabled,
 }: {
   options: { label: string; value: string }[]
   onSelect: (value: string) => any
   defaultLabel?: string
+  disabled?: boolean
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -51,10 +53,15 @@ const Dropdown = ({
 
   return (
     <div
-      className={cx(styles.container, { [styles.open]: isOpen })}
+      className={cx(styles.container, {
+        [styles.open]: isOpen,
+      })}
       ref={containerRef}
     >
-      <div className={styles.select} onClick={() => setIsOpen(!isOpen)}>
+      <div
+        className={cx(styles.select, { [styles.disabled]: disabled })}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+      >
         {selectedLabel}
         <i className={cx(styles.caret, 'bx bx-caret-down')}></i>
       </div>
