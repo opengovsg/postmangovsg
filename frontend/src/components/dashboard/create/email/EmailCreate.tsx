@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, { useState, useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -48,7 +49,7 @@ const CreateEmail = () => {
       case EmailProgress.SendTestMessage:
         return <EmailCredentials setActiveStep={setActiveStep} />
       case EmailProgress.Send:
-        return <EmailSend />
+        return <EmailSend setActiveStep={setActiveStep} />
       default:
         return <p>Invalid step</p>
     }
@@ -57,7 +58,7 @@ const CreateEmail = () => {
   return (
     <div className={styles.createContainer}>
       {status !== Status.Draft ? (
-        <div className={styles.stepContainer}>
+        <div className={cx(styles.stepContainer, styles.detailContainer)}>
           <EmailDetail></EmailDetail>
         </div>
       ) : (

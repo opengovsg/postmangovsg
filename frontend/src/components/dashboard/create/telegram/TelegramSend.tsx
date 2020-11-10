@@ -1,14 +1,24 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { Status, ChannelType, SMSCampaign } from 'classes'
+import { Status, ChannelType, SMSCampaign, TelegramProgress } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
   PrimaryButton,
   SendRate,
   ConfirmModal,
+  ButtonGroup,
+  TextButton,
+  StepHeader,
+  StepSection,
 } from 'components/common'
 import { getPreviewMessage } from 'services/telegram.service'
 import { sendCampaign } from 'services/campaign.service'
@@ -16,7 +26,11 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
 
-const TelegramSend = () => {
+const TelegramSend = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
+}) => {
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
@@ -67,34 +81,44 @@ const TelegramSend = () => {
 
   return (
     <>
-      <sub>Step 4</sub>
-      <h2>Your campaign is ready to be sent!</h2>
-      <div className="separator"></div>
+      <StepSection>
+        <StepHeader
+          title="Your campaign is ready to be sent!"
+          subtitle="Step 4"
+        />
+      </StepSection>
 
-      <div className={styles.sendInfo}>
-        <p className={styles.greyText}>Number of recipients</p>
-        <h4>{numRecipients}</h4>
+      <StepSection>
+        <div>
+          <p className={styles.greyText}>Number of recipients</p>
+          <h4>{numRecipients}</h4>
+        </div>
 
-        <p className={styles.greyText}>Message</p>
-        <PreviewBlock
-          body={preview.body?.replace(/\n/g, '<br />')}
-        ></PreviewBlock>
-      </div>
+        <div>
+          <p className={styles.greyText}>Message</p>
+          <PreviewBlock
+            body={preview.body?.replace(/\n/g, '<br />')}
+          ></PreviewBlock>
+        </div>
 
-      <div className="separator"></div>
+        <div>
+          <SendRate
+            sendRate={sendRate}
+            setSendRate={setSendRate}
+            channelType={ChannelType.Telegram}
+          />
+        </div>
+      </StepSection>
 
-      <SendRate
-        sendRate={sendRate}
-        setSendRate={setSendRate}
-        channelType={ChannelType.Telegram}
-      />
-
-      <div className="progress-button">
+      <ButtonGroup>
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-      </div>
+        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+          Previous
+        </TextButton>
+      </ButtonGroup>
     </>
   )
 }

@@ -1,14 +1,16 @@
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes, Transaction } from 'sequelize'
 import map from 'lodash/map'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { CredentialService } from '@core/services/credential.service'
 import { PhoneNumberService } from '@core/services/phone-number.service'
 import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 
-const templateClient = new TemplateClient(XSS_SMS_OPTION)
+const templateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
+const logger = loggerWithLabel(module)
+
 class SMS {
   private workerId: string
   private connection: Sequelize
@@ -36,7 +38,12 @@ class SMS {
         })
       })
       .then(() => {
-        logger.info(`${this.workerId}: s_enqueueMessagesSms job_id=${jobId}`)
+        logger.info({
+          message: 'Enqueued sms messages',
+          workerId: this.workerId,
+          jobId,
+          action: 'enqueueMessages',
+        })
       })
   }
 
@@ -108,7 +115,12 @@ class SMS {
         )
       })
       .then(() => {
-        logger.info(`${this.workerId}: sendMessage id=${id}`)
+        logger.info({
+          message: 'Sent sms message',
+          workerId: this.workerId,
+          id,
+          action: 'sendMessage',
+        })
       })
   }
 

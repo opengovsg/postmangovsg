@@ -1,14 +1,19 @@
 @import 'styles/_variables';
 
 .label {
-  display: inline-block;
-  margin-right: 0.6rem;
+  @extend %body-1;
+  margin-bottom: $spacing-3;
+  margin-top: $spacing-5;
+
+  label {
+    margin-right: $spacing-1;
+  }
 }
 
 .link {
   font-size: 1rem;
 
   &:visited {
-    color: $dark-blue;
+    color: $secondary;
   }
 }

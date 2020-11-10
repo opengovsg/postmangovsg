@@ -16,7 +16,9 @@ import { TelegramTemplateService } from '@telegram/services'
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
 import { PhoneNumberService, UploadService } from '@core/services'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Gets a message's parameters
@@ -201,6 +203,7 @@ const getCampaignDetails = async (
         'type',
         'created_at',
         'valid',
+        'demo_message_limit',
         [
           literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
           'has_credential',
@@ -283,7 +286,12 @@ const uploadCompleteOnChunk = ({
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
-          logger.info(`uploadCompleteOnChunk: ElapsedTime ${benchmark} ms`)
+          logger.info({
+            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+            benchmark,
+            campaignId,
+            action: 'uploadCompleteOnChunk',
+          })
         }
       },
       benchmark: true,

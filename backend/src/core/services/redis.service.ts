@@ -1,6 +1,8 @@
 import redis from 'redis'
 import config from '@core/config'
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 
 if (!config.get('redisOtpUri')) {
   throw new Error('otpClient: redisOtpUri not found')
@@ -12,10 +14,17 @@ if (!config.get('redisOtpUri')) {
 const otpClient = redis
   .createClient({ url: config.get('redisOtpUri') || undefined })
   .on('connect', () => {
-    logger.info('otpClient: Connected')
+    logger.info({
+      message: 'otpClient: Connected',
+      url: config.get('redisOtpUri'),
+    })
   })
   .on('error', (err: Error) => {
-    logger.error(String(err))
+    logger.error({
+      message: 'Failed to connect to otpClient',
+      url: config.get('redisOtpUri'),
+      error: String(err),
+    })
   })
 
 if (!config.get('redisSessionUri')) {
@@ -28,10 +37,17 @@ if (!config.get('redisSessionUri')) {
 const sessionClient = redis
   .createClient({ url: config.get('redisSessionUri') || undefined })
   .on('connect', () => {
-    logger.info('sessionClient: Connected')
+    logger.info({
+      message: 'sessionClient: Connected',
+      url: config.get('redisSessionUri'),
+    })
   })
   .on('error', (err: Error) => {
-    logger.error(String(err))
+    logger.error({
+      message: 'Failed to connect to sessionClient',
+      url: config.get('redisSessionUri'),
+      error: String(err),
+    })
   })
 
 export const RedisService = {

@@ -1,17 +1,19 @@
 import { difference, keys } from 'lodash'
 
 import config from '@core/config'
-import logger from '@core/logger'
 import { isSuperSet } from '@core/utils'
 import { InvalidRecipientError, HydrationError } from '@core/errors'
-import { Campaign } from '@core/models'
+import { Campaign, Statistic } from '@core/models'
 import { PhoneNumberService } from '@core/services'
 import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
-const client = new TemplateClient(XSS_TELEGRAM_OPTION, '\n')
+const client = new TemplateClient({
+  xssOptions: XSS_TELEGRAM_OPTION,
+  lineBreak: '\n',
+})
 
 /**
  * Create or replace a template. The mustached attributes are extracted in a sequelize hook,
@@ -87,9 +89,24 @@ const checkNewTemplateParams = async ({
     updatedTemplate.params
   )
   if (templateContainsExtraKeys) {
+    // warn if params from s3 file are not a superset of saved params, remind user to re-upload a new file
     const extraKeysInTemplate = difference(updatedTemplate.params, paramsFromS3)
 
-    await TelegramMessage.destroy({ where: { campaignId } })
+    // delete entries (message_logs) from the uploaded file and stored count since they are no longer valid,
+    await TelegramMessage.sequelize?.transaction(async (transaction) => {
+      await TelegramMessage.destroy({
+        where: {
+          campaignId,
+        },
+        transaction,
+      })
+      await Statistic.destroy({
+        where: {
+          campaignId,
+        },
+        transaction,
+      })
+    })
 
     return { reupload: true, extraKeys: extraKeysInTemplate }
   } else {
@@ -101,7 +118,6 @@ const checkNewTemplateParams = async ({
         firstRecord.params as { [key: string]: string }
       )
     } catch (err) {
-      logger.error(`Hydration error: ${err.stack}`)
       throw new HydrationError()
     }
 

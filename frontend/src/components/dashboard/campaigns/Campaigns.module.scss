@@ -28,14 +28,25 @@
     );
     width: 100%;
 
+    thead tr {
+      th {
+        @extend %caption;
+        text-transform: capitalize;
+      }
+    }
+
     tbody tr {
       &:hover {
         cursor: pointer;
-        background-color: $transparent-blue;
+        background-color: $neutral-light;
       }
 
       &:active {
         opacity: 0.5;
+      }
+
+      td {
+        @extend %body-2;
       }
     }
   }
@@ -43,6 +54,19 @@
 
 .iconContainer {
   position: relative;
+}
+
+.demo::before {
+  content: 'DEMO';
+  background: $green-900;
+  color: white;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.3rem;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 500;
+  float: right;
+  margin-right: 8px;
 }
 
 .icon {
@@ -55,7 +79,7 @@
   position: absolute;
   bottom: 0.2rem;
   right: -0.5rem;
-  color: $pastel-blue;
+  color: $blue-300;
 }
 
 .spinner {
@@ -63,21 +87,32 @@
 }
 
 .emptyDashboard {
+  @extend %body-1;
   text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
 
   .image {
     width: 350px;
-  }
-
-  h2 {
-    font-weight: 500;
-  }
-  h5 {
-    font-weight: normal;
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-7;
   }
 
   .darkBlueButton {
-    @include button($dark-blue);
+    @extend %secondary-btn;
+  }
+  .darkGreenButton {
+    @include button($green-500, $green-300, $grey-900);
+  }
+
+  .actions {
+    @include flex-horizontal;
+    justify-content: space-evenly;
+    margin-top: $spacing-7;
+    button {
+      margin-bottom: 1rem;
+    }
+    @include mobile() {
+      @include flex-vertical;
+    }
   }
 }

@@ -43,7 +43,7 @@ const CreateSMS = () => {
       case SMSProgress.InsertCredentials:
         return <SMSCredentials setActiveStep={setActiveStep} />
       case SMSProgress.Send:
-        return <SMSSend />
+        return <SMSSend setActiveStep={setActiveStep} />
       default:
         return <p>Invalid step</p>
     }

@@ -1,16 +1,34 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { EmailCampaign, Status } from 'classes'
+import { EmailCampaign, EmailProgress, Status } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
-import { PreviewBlock, PrimaryButton, ConfirmModal } from 'components/common'
+import {
+  PreviewBlock,
+  PrimaryButton,
+  ConfirmModal,
+  ButtonGroup,
+  TextButton,
+  StepHeader,
+  StepSection,
+} from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
 import { sendCampaign } from 'services/campaign.service'
 
 import styles from '../Create.module.scss'
 
-const EmailSend = () => {
+const EmailSend = ({
+  setActiveStep,
+}: {
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
+}) => {
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
@@ -64,31 +82,38 @@ const EmailSend = () => {
 
   return (
     <>
-      <sub>Step 4</sub>
-      <h2>Your campaign is ready to be sent!</h2>
-      <div className="separator"></div>
-
-      <div className={styles.sendInfo}>
-        <p className={styles.greyText}>Number of recipients</p>
-        <h4>{numRecipients}</h4>
-
-        <p className={styles.greyText}>Message</p>
-        <PreviewBlock
-          body={preview.body}
-          subject={preview.subject}
-          replyTo={preview.replyTo}
-          from={preview.from}
+      <StepSection>
+        <StepHeader
+          title="Your campaign is ready to be sent!"
+          subtitle="Step 4"
         />
-      </div>
+        <div className="separator"></div>
 
-      <div className="separator"></div>
+        <div>
+          <p className={styles.greyText}>Number of recipients</p>
+          <h4>{numRecipients}</h4>
+        </div>
 
-      <div className="progress-button">
+        <div>
+          <p className={styles.greyText}>Message</p>
+          <PreviewBlock
+            body={preview.body}
+            subject={preview.subject}
+            replyTo={preview.replyTo}
+            from={preview.from}
+          />
+        </div>
+      </StepSection>
+
+      <ButtonGroup>
         <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-      </div>
+        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+          Previous
+        </TextButton>
+      </ButtonGroup>
     </>
   )
 }

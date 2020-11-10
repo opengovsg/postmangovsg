@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
-import { ChannelType } from '@core/constants'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 import config from '@core/config'
+import { loggerWithLabel } from '@core/logger'
+import { formatDefaultCredentialName } from '@core/utils'
+
+const logger = loggerWithLabel(module)
 
 /**
  * Checks if the campaign id supplied is indeed a campaign of the 'SMS' type, and belongs to the user
@@ -19,7 +23,11 @@ const isSmsCampaignOwnedByUser = async (
     const { campaignId } = req.params
     const userId = req.session?.user?.id
     const campaign = await SmsService.findCampaign(+campaignId, +userId)
-    return campaign ? next() : res.sendStatus(403)
+    if (campaign) {
+      return next()
+    } else {
+      return res.sendStatus(403)
+    }
   } catch (err) {
     return next(err)
   }
@@ -63,21 +71,53 @@ const getCredentialsFromLabel = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<void | Response> => {
+  const { campaignId } = req.params
   const { label } = req.body
   const userId = req.session?.user?.id
+
   try {
-    // if label provided, fetch from aws secrets
-    const userCred = await CredentialService.getUserCredential(+userId, label)
-    if (!userCred) {
-      res.status(400).json({ message: 'User credentials cannot be found' })
-      return
+    const logMeta = {
+      label,
+      action: 'getCredentialsFromLabel',
     }
+    /* Determine if credential name can be used */
+    let credentialName
+    if (label === DefaultCredentialName.SMS) {
+      const campaign = await SmsService.findCampaign(+campaignId, userId) // TODO: refactor this into res.locals
+      if (campaign.demoMessageLimit) {
+        credentialName = formatDefaultCredentialName(label)
+      } else {
+        logger.error({
+          message: `Campaign not allowed to use label`,
+          ...logMeta,
+        })
+        return res.status(400).json({
+          message: `Campaign ${campaignId} is not allowed to use default credentials`,
+        })
+      }
+    } else {
+      // if label provided, fetch from aws secrets
+      const userCred = await CredentialService.getUserCredential(+userId, label)
+
+      if (!userCred) {
+        logger.error({
+          message: 'User credentials not found',
+          ...logMeta,
+        })
+        return res
+          .status(400)
+          .json({ message: 'User credentials cannot be found' })
+      }
+
+      credentialName = userCred.credName
+    }
+    /* Get credential from the name */
     const credentials = await CredentialService.getTwilioCredentials(
-      userCred.credName
+      credentialName
     )
     res.locals.credentials = credentials
-    res.locals.credentialName = userCred.credName
+    res.locals.credentialName = credentialName
     return next()
   } catch (err) {
     return next(err)
@@ -99,6 +139,11 @@ const validateAndStoreCredentials = async (
   const { recipient } = req.body
   const { campaignId } = req.params
   const { credentials, credentialName } = res.locals
+  const logMeta = {
+    campaignId,
+    recipient,
+    action: 'validateAndStoreCredentials',
+  }
   try {
     if (campaignId) {
       // Sends first hydrated message from campaign
@@ -112,6 +157,11 @@ const validateAndStoreCredentials = async (
       return next()
     }
   } catch (err) {
+    logger.error({
+      message: 'Failed to validate and store credentials',
+      error: err,
+      ...logMeta,
+    })
     return res.status(400).json({ message: `${err}` })
   }
   try {
@@ -133,6 +183,11 @@ const validateAndStoreCredentials = async (
     res.locals.channelType = ChannelType.SMS
     next()
   } catch (err) {
+    logger.error({
+      message: 'Failed to store credentials in AWS secrets manager',
+      error: err,
+      ...logMeta,
+    })
     return res.status(400).json({ message: `${err.message}` })
   }
 }

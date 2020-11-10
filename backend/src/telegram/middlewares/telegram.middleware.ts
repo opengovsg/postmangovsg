@@ -1,8 +1,14 @@
 import { Request, Response, NextFunction } from 'express'
-import { ChannelType } from '@core/constants'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { TelegramService } from '@telegram/services'
+import { loggerWithLabel } from '@core/logger'
+import { formatDefaultCredentialName } from '@core/utils'
 
+const logger = loggerWithLabel(module)
+
+const botId = (telegramBotToken: string): string =>
+  telegramBotToken.split(':')[0]
 /**
  * Parse telegram credentials from request body, setting it to res.locals.credentials to be passed downstream
  * @param req
@@ -17,12 +23,13 @@ const getCredentialsFromBody = async (
   const { telegram_bot_token: telegramBotToken } = req.body
 
   res.locals.credentials = { telegramBotToken }
+  res.locals.credentialName = botId(telegramBotToken)
   return next()
 }
 
 /**
  * Parse label from request body. Retrieve credentials associated with this label,
- * and set the credentials to res.locals.credentials, credName to res.locals.credentialName, to be passed downstream
+ * and set the credentials to res.locals.credentials to be passed downstream
  * @param req
  * @param res
  * @param next
@@ -31,21 +38,52 @@ const getCredentialsFromLabel = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<Response | void> => {
+  const { campaignId } = req.params
   const { label } = req.body
   const userId = req.session?.user?.id
   try {
-    // if label provided, fetch from aws secrets
-    const userCred = await CredentialService.getUserCredential(+userId, label)
-    if (!userCred) {
-      res.status(400).json({ message: 'User credentials cannot be found' })
-      return
+    const logMeta = {
+      label,
+      action: 'getCredentialsFromLabel',
     }
+    /* Determine if credential name can be used */
+    let credentialName
+    if (label === DefaultCredentialName.Telegram) {
+      const campaign = await TelegramService.findCampaign(+campaignId, userId) // TODO: refactor this into res.locals
+      if (campaign.demoMessageLimit) {
+        credentialName = formatDefaultCredentialName(label)
+      } else {
+        logger.error({
+          message: `Campaign not allowed to use label`,
+          ...logMeta,
+        })
+        return res.status(400).json({
+          message: `Campaign ${campaignId} is not allowed to use default credentials`,
+        })
+      }
+    } else {
+      // if label provided, fetch from aws secrets
+      const userCred = await CredentialService.getUserCredential(+userId, label)
+
+      if (!userCred) {
+        logger.error({
+          message: 'User credentials not found',
+          ...logMeta,
+        })
+        return res
+          .status(400)
+          .json({ message: 'User credentials cannot be found' })
+      }
+
+      credentialName = userCred.credName
+    }
+
     const telegramBotToken = await CredentialService.getTelegramCredential(
-      userCred.credName
+      credentialName
     )
     res.locals.credentials = { telegramBotToken }
-    res.locals.credentialName = userCred.credName
+    res.locals.credentialName = botId(telegramBotToken)
     return next()
   } catch (err) {
     return next(err)
@@ -69,6 +107,12 @@ const getCampaignCredential = async (
 
   const { credName } = campaign
   if (!credName) {
+    logger.error({
+      message: 'Credential not found for this campaign',
+      campaignId,
+      credName,
+      action: 'getCampaignCredential',
+    })
     return res
       .status(400)
       .json({ message: 'No credentials found for this campaign.' })
@@ -79,7 +123,7 @@ const getCampaignCredential = async (
   )
 
   res.locals.credentials = { telegramBotToken }
-  res.locals.credentialName = credName
+  res.locals.credentialName = botId(telegramBotToken)
   next()
 }
 
@@ -96,37 +140,44 @@ const validateAndStoreCredentials = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  let { credentialName } = res.locals
   const { telegramBotToken } = res.locals.credentials
+  const { credentialName } = res.locals
+  const logMeta = {
+    credentialName,
+    action: 'validateAndStoreCredentials',
+  }
+  try {
+    await TelegramService.validateAndConfigureBot(telegramBotToken)
+  } catch (err) {
+    logger.error({
+      message: 'Failed to validate and store credentials',
+      error: err,
+      ...logMeta,
+    })
+    return res.status(400).json({ message: `${err}` })
+  }
 
-  // If credentialName is provided, the credential has already been saved and we
-  // do not need to re-validate it.
-  if (!credentialName) {
-    try {
-      await TelegramService.validateAndConfigureBot(telegramBotToken)
-    } catch (err) {
-      return res.status(400).json({ message: `${err}` })
-    }
+  try {
+    // Credential name will be raw botId. The botId will not be hashed as we
+    // want to preserve the mapping between botId and token even in the event
+    // of a change in salt for future token revocations/updates for the given
+    // botId.
 
-    try {
-      // Credential name will be raw botId. The botId will not be hashed as we
-      // want to preserve the mapping between botId and token even in the event
-      // of a change in salt for future token revocations/updates for the given
-      // botId.
-      credentialName = telegramBotToken.split(':')[0]
-
-      await CredentialService.storeCredential(
-        credentialName,
-        telegramBotToken,
-        true
-      )
-    } catch (err) {
-      return res.status(400).json({ message: 'Error storing credentials' })
-    }
+    await CredentialService.storeCredential(
+      credentialName,
+      telegramBotToken,
+      true
+    )
+  } catch (err) {
+    logger.error({
+      message: 'Failed to validate and store credentials',
+      error: err,
+      ...logMeta,
+    })
+    return res.status(400).json({ message: 'Error storing credentials' })
   }
 
   // Pass on to next middleware/handler
-  res.locals.credentialName = credentialName
   res.locals.channelType = ChannelType.Telegram
   next()
 }
@@ -144,6 +195,7 @@ const sendValidationMessage = async (
   const { recipient } = req.body
   const { credentials } = res.locals
   const { telegramBotToken } = credentials
+  const logMeta = { campaignId, recipient, action: 'sendValidationMessage' }
 
   try {
     if (!campaignId) {
@@ -155,8 +207,14 @@ const sendValidationMessage = async (
         telegramBotToken
       )
     }
+    logger.info({ message: 'Sent validation message', ...logMeta })
     return res.json({ message: 'OK' })
   } catch (err) {
+    logger.info({
+      message: 'Failed to send validation message',
+      error: err,
+      ...logMeta,
+    })
     return res.status(400).json({ message: `${err.message}` })
   }
 }
@@ -176,7 +234,11 @@ const isTelegramCampaignOwnedByUser = async (
     const { campaignId } = req.params
     const userId = req.session?.user?.id
     const campaign = await TelegramService.findCampaign(+campaignId, userId)
-    return campaign ? next() : res.sendStatus(403)
+    if (campaign) {
+      return next()
+    } else {
+      return res.sendStatus(403)
+    }
   } catch (err) {
     return next(err)
   }
@@ -240,6 +302,7 @@ const setCampaignCredential = async (
     if (!credentialName) {
       throw new Error('Credential does not exist')
     }
+
     await TelegramService.setCampaignCredential(+campaignId, credentialName)
     return res.json({ message: 'OK' })
   } catch (err) {

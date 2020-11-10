@@ -8,16 +8,16 @@
   line-height: 1rem;
   font-size: 1rem;
   padding-left: $border-radius;
-  color: $dark-blue;
+  color: $secondary;
   width: 100%;
   background: transparent;
 
   &:focus {
     outline: none;
-    border-color: $indigo-blue;
+    border-color: $primary;
   }
 
   &::placeholder {
-    color: $placeholder-grey;
+    color: $neutral;
   }
 }

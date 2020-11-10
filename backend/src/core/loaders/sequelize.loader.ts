@@ -6,9 +6,10 @@ import {
   Credential,
   JobQueue,
   Campaign,
-  User,
   Worker,
+  User,
   UserCredential,
+  UserDemo,
   Statistic,
   ProtectedMessage,
   Unsubscriber,
@@ -29,9 +30,12 @@ import {
   TelegramTemplate,
 } from '@telegram/models'
 
-import logger from '@core/logger'
+import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
+import { DefaultCredentialName } from '@core/constants'
+import { formatDefaultCredentialName } from '@core/utils'
 
+const logger = loggerWithLabel(module)
 const DB_URI = config.get('database.databaseUri')
 const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
 
@@ -74,9 +78,10 @@ const sequelizeLoader = async (): Promise<void> => {
     Credential,
     JobQueue,
     Campaign,
-    User,
     Worker,
+    User,
     UserCredential,
+    UserDemo,
     Statistic,
     Unsubscriber,
   ]
@@ -106,12 +111,19 @@ const sequelizeLoader = async (): Promise<void> => {
   try {
     await sequelize.sync()
     logger.info({ message: 'Database loaded.' })
-  } catch (err) {
-    logger.error(`Unable to connect to database: ${err}`)
+  } catch (error) {
+    logger.error({ message: 'Unable to connect to database', error })
     process.exit(1)
   }
-
-  await Credential.findCreateFind({ where: { name: 'EMAIL_DEFAULT' } })
+  // Create the default credential names in the credentials table
+  // Each name should be accompanied by an entry in Secrets Manager
+  await Promise.all(
+    [
+      DefaultCredentialName.Email,
+      formatDefaultCredentialName(DefaultCredentialName.SMS),
+      formatDefaultCredentialName(DefaultCredentialName.Telegram),
+    ].map((name) => Credential.upsert({ name }))
+  )
 }
 
 export default sequelizeLoader

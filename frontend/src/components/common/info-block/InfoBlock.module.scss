@@ -2,6 +2,5 @@
 @import 'styles/_mixins';
 
 .infoBlock {
-  @include block($light-blue, $dark-blue);
-  border-left: none;
+  @include block($neutral-light, $primary);
 }

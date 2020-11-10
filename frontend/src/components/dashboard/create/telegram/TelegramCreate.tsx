@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, { useState, useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -39,7 +40,7 @@ const CreateTelegram = () => {
       case TelegramProgress.InsertCredentials:
         return <TelegramCredentials setActiveStep={setActiveStep} />
       case TelegramProgress.Send:
-        return <TelegramSend />
+        return <TelegramSend setActiveStep={setActiveStep} />
       default:
         return <p>Invalid step</p>
     }
@@ -48,7 +49,7 @@ const CreateTelegram = () => {
   return (
     <div className={styles.createContainer}>
       {status !== Status.Draft ? (
-        <div className={styles.stepContainer}>
+        <div className={cx(styles.stepContainer, styles.detailContainer)}>
           <TelegramDetail></TelegramDetail>
         </div>
       ) : (

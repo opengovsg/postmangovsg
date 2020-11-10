@@ -83,7 +83,7 @@ const ProgressDetails = ({
     } else {
       progressMessage = 'Progress'
     }
-    return <h2>{progressMessage}</h2>
+    return <h3>{progressMessage}</h3>
   }
 
   function renderUpdateStats() {

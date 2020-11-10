@@ -32,14 +32,18 @@ export const LINKS = {
   guideSmsMessagingServiceUrl: t('link.guideSmsMessagingServiceUrl')``,
   guideTelegramUrl: t('link.guideTelegramUrl')``,
   guidePowerUserUrl: t('link.guidePowerUserUrl')``,
+  guideDemoUrl: t('link.guideDemoUrl')``,
   contactUsUrl: t('link.contactUsUrl')``,
   contributeUrl: t('link.contributeUrl')``,
   tncUrl: t('link.tncUrl')``,
   privacyUrl: t('link.privacyUrl')``,
   reportBugUrl: t('link.reportBugUrl')``,
   customFromAddressRequestUrl: t('link.customFromAddressRequestUrl')``,
+  demoTelegramBotUrl: t('link.demoTelegramBotUrl')``,
 }
 export const DEFAULT_MAIL_FROM = t('defaultMailFrom')``
+// Semi-colon separated list of allowed image source hostnames
+export const ALLOWED_IMAGE_SOURCES = t('allowedImageSources')``
 //#endregion
 
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string

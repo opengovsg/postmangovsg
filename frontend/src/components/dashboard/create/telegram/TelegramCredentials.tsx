@@ -20,9 +20,16 @@ import {
 import {
   PrimaryButton,
   NextButton,
-  InfoBlock,
+  DetailBlock,
   ErrorBlock,
   Dropdown,
+  ButtonGroup,
+  TextButton,
+  StepHeader,
+  StepSection,
+  CredLabelInput,
+  Checkbox,
+  InfoBlock,
 } from 'components/common'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
@@ -35,14 +42,20 @@ const TelegramCredentials = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
+  const DEMO_CREDENTIAL = 'Postman_Telegram_Demo'
   const { campaign, setCampaign } = useContext(CampaignContext)
-  const { hasCredential: initialHasCredential } = campaign
+  const { hasCredential: initialHasCredential, demoMessageLimit } = campaign
+  const isDemo = !!demoMessageLimit
+
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
+  const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
     [] as { label: string; value: string }[]
   )
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as any)
+  const [label, setLabel] = useState('')
+  const [saveCredentialWithLabel, setSaveCredentialWithLabel] = useState(false)
   const [showCredentialFields, setShowCredentialFields] = useState(
     !hasCredential
   )
@@ -53,27 +66,29 @@ const TelegramCredentials = ({
   const { id: campaignId } = useParams()
 
   useEffect(() => {
-    populateStoredCredentials()
-  }, [])
-
-  async function populateStoredCredentials() {
-    try {
-      const storedCredLabels = await getStoredCredentials()
-      setStoredCredentials(
-        storedCredLabels.map((c) => ({ label: c, value: c }))
-      )
-      if (!storedCredLabels.length) {
-        setIsManual(true)
+    async function populateStoredCredentials(defaultLabels: string[]) {
+      try {
+        const labels = await getStoredCredentials()
+        const allLabels = defaultLabels.concat(labels)
+        setCredLabels(allLabels)
+        setStoredCredentials(allLabels.map((c) => ({ label: c, value: c })))
+        if (!allLabels.length) {
+          setIsManual(true)
+        }
+      } catch (e) {
+        console.error(e)
+        setErrorMessage(e.message)
       }
-    } catch (e) {
-      console.error(e)
-      setErrorMessage(e.message)
     }
-  }
+    const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
+    populateStoredCredentials(defaultLabels)
+  }, [isDemo])
 
   function toggleInputMode() {
     setIsManual((m) => !m)
     setCreds(null)
+    setLabel('')
+    setSaveCredentialWithLabel(false)
     setSelectedCredential('')
   }
 
@@ -137,43 +152,74 @@ const TelegramCredentials = ({
     }
   }
 
-  function renderCredentialFields() {
+  function renderCredentialFields(isEmbedded = false) {
     return (
       <>
-        <h2>Insert your Telegram credentials</h2>
-        <p className={styles.validateCredentialsInfo}>
-          Select from your stored credentials or add new ones.
-        </p>
+        <StepHeader
+          title="Insert your Telegram credentials"
+          subtitle={isEmbedded ? '' : 'Step 3'}
+        >
+          <p className={styles.validateCredentialsInfo}>
+            Select from your stored credentials or add new ones.
+          </p>
+        </StepHeader>
 
         {isManual ? (
           <>
             {storedCredentials.length ? (
-              <p className="clickable" onClick={toggleInputMode}>
-                Select from stored credentials
-              </p>
+              <StepSection>
+                <p className="clickable" onClick={toggleInputMode}>
+                  Select from stored credentials
+                </p>
+              </StepSection>
             ) : null}
-            <div className="separator"></div>
 
-            <h2>Add new credentials</h2>
-            <p className={styles.validateCredentialsInfo}>
-              Please provide your Telegram bot token for validation. If you are
-              unsure about how to retrieve your bot token, please follow the
-              instructions provided&nbsp;
-              <OutboundLink
-                eventLabel={i18n._(LINKS.guideTelegramUrl)}
-                to={i18n._(LINKS.guideTelegramUrl)}
-                target="_blank"
-              >
-                here.
-              </OutboundLink>
-            </p>
+            <StepSection>
+              <StepHeader title="Add new credentials">
+                <p className={styles.validateCredentialsInfo}>
+                  Please provide your Telegram bot token for validation. If you
+                  are unsure about how to retrieve your bot token, please follow
+                  the instructions provided&nbsp;
+                  <OutboundLink
+                    eventLabel={i18n._(LINKS.guideTelegramUrl)}
+                    to={i18n._(LINKS.guideTelegramUrl)}
+                    target="_blank"
+                  >
+                    here.
+                  </OutboundLink>
+                </p>
+              </StepHeader>
 
-            <div className={styles.validateCredentialsInfo}>
-              <TelegramCredentialsInput onFilled={setCreds} />
-            </div>
-            <ErrorBlock>{errorMessage}</ErrorBlock>
+              <div>
+                <CredLabelInput
+                  className={{
+                    [styles.credentialLabelInputError]:
+                      saveCredentialWithLabel && !label,
+                  }}
+                  value={label}
+                  onChange={setLabel}
+                  labels={credLabels}
+                />
+                {saveCredentialWithLabel && !label && (
+                  <span className={styles.credentialLabelError}>
+                    Please enter a credential name
+                  </span>
+                )}
+                <Checkbox
+                  checked={saveCredentialWithLabel}
+                  onChange={setSaveCredentialWithLabel}
+                >
+                  Save this credential for future use. If unchecked, nothing is
+                  saved.
+                </Checkbox>
+              </div>
+              <div className={styles.validateCredentialsInfo}>
+                <TelegramCredentialsInput onFilled={setCreds} />
+              </div>
+              <ErrorBlock>{errorMessage}</ErrorBlock>
+            </StepSection>
 
-            <div className="progress-button">
+            <ButtonGroup>
               <PrimaryButton
                 disabled={!creds}
                 onClick={handleValidateCredentials}
@@ -189,21 +235,64 @@ const TelegramCredentials = ({
                   </>
                 )}
               </PrimaryButton>
-            </div>
+              <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+                Previous
+              </TextButton>
+            </ButtonGroup>
           </>
         ) : (
           <>
-            <Dropdown
-              onSelect={setSelectedCredential}
-              options={storedCredentials}
-            ></Dropdown>
-            <ErrorBlock>{errorMessage}</ErrorBlock>
+            <StepSection>
+              <Dropdown
+                onSelect={setSelectedCredential}
+                options={storedCredentials}
+                defaultLabel={storedCredentials[0]?.label}
+              ></Dropdown>
+              <ErrorBlock>{errorMessage}</ErrorBlock>
 
-            <p className="clickable" onClick={() => setIsManual(true)}>
-              Add new credentials
-            </p>
+              <p className="clickable" onClick={() => setIsManual(true)}>
+                Add new credentials
+              </p>
 
-            <div className="progress-button">
+              {isDemo && selectedCredential === DEMO_CREDENTIAL && (
+                <InfoBlock title="Use demo credentials">
+                  <p>
+                    In demo mode, you can use Postman&apos;s default Telegram
+                    bot to try sending Telegram messages. In a normal campaign,
+                    you’d have to set up your own Telegram bot.{' '}
+                    <OutboundLink
+                      className={cx(styles.inputLabelHelpLink, styles.infoLink)}
+                      eventLabel={i18n._(LINKS.guideTelegramUrl)}
+                      to={i18n._(LINKS.guideTelegramUrl)}
+                      target="_blank"
+                    >
+                      Learn more
+                    </OutboundLink>
+                  </p>
+                  <p>
+                    Make sure that you and your recipients are{' '}
+                    <b>
+                      subscribed to
+                      <OutboundLink
+                        className={cx(
+                          styles.inputLabelHelpLink,
+                          styles.infoLink
+                        )}
+                        eventLabel={i18n._(LINKS.demoTelegramBotUrl)}
+                        to={i18n._(LINKS.demoTelegramBotUrl)}
+                        target="_blank"
+                      >
+                        @postmangovsgbot
+                      </OutboundLink>
+                    </b>{' '}
+                    before proceeding. Unsubscribed recipients will not receive
+                    your message.
+                  </p>
+                </InfoBlock>
+              )}
+            </StepSection>
+
+            <ButtonGroup>
               <PrimaryButton
                 disabled={!selectedCredential}
                 onClick={handleValidateCredentials}
@@ -214,11 +303,15 @@ const TelegramCredentials = ({
                   </>
                 ) : (
                   <>
-                    Select credentials <i className="bx bx-right-arrow-alt"></i>
+                    Validate credentials{' '}
+                    <i className="bx bx-right-arrow-alt"></i>
                   </>
                 )}
               </PrimaryButton>
-            </div>
+              <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+                Previous
+              </TextButton>
+            </ButtonGroup>
           </>
         )}
       </>
@@ -227,49 +320,65 @@ const TelegramCredentials = ({
 
   return (
     <>
-      <sub>Step 3</sub>
       {hasCredential ? (
         <>
-          <h2>Your current credentials have already been validated.</h2>
-          <p>
-            Entering new credentials will overwrite the previous validated one.
-            This action is irreversible. Please proceed with caution.
-          </p>
+          <StepHeader
+            title="Your current credentials have already been validated."
+            subtitle="Step 3"
+          >
+            <p>
+              Entering new credentials will overwrite the previous validated
+              one. This action is irreversible. Please proceed with caution.
+            </p>
+          </StepHeader>
           {showCredentialFields ? (
-            renderCredentialFields()
+            <>
+              <div className="separator"></div>
+              {renderCredentialFields(true)}
+            </>
           ) : (
             <>
-              <PrimaryButton
-                className={cx(styles.darkBlueBtn, styles.newCredentialsButton)}
-                onClick={toggleReplaceCredentials}
-              >
-                Enter new credentials
-              </PrimaryButton>
-              <div className="separator"></div>
+              <StepSection>
+                <PrimaryButton
+                  className={cx(styles.darkBlueBtn)}
+                  onClick={toggleReplaceCredentials}
+                >
+                  Enter new credentials
+                </PrimaryButton>
+              </StepSection>
 
-              <h2>Optional: Send a test message</h2>
-              <p className={styles.validateCredentialsInfo}>
-                To ensure everything is working perfectly, please send a test
-                message to receive a preview of your message. Do note that the
-                phone number you are testing with must already be{' '}
-                <b>subscribed to the bot</b>.
-              </p>
-              <TelegramValidationInput onClick={handleSendValidationMessage} />
-              {sendSuccess && (
-                <InfoBlock>
-                  <li>
-                    <i className="bx bx-check-circle"></i>
-                    <span>Message sent successfully.</span>
-                  </li>
-                </InfoBlock>
-              )}
-              <ErrorBlock>{errorMessage}</ErrorBlock>
-              <div className="separator"></div>
+              <StepSection>
+                <StepHeader title="Optional: Send a test message">
+                  <p className={styles.validateCredentialsInfo}>
+                    To ensure everything is working perfectly, please send a
+                    test message to receive a preview of your message. Do note
+                    that the phone number you are testing with must already be{' '}
+                    <b>subscribed to the bot</b>.
+                  </p>
+                </StepHeader>
+                <TelegramValidationInput
+                  onClick={handleSendValidationMessage}
+                />
+                {sendSuccess && (
+                  <DetailBlock>
+                    <li>
+                      <i className="bx bx-check-circle"></i>
+                      <span>Message sent successfully.</span>
+                    </li>
+                  </DetailBlock>
+                )}
+                <ErrorBlock>{errorMessage}</ErrorBlock>
+              </StepSection>
 
-              <NextButton
-                disabled={!hasCredential}
-                onClick={() => setActiveStep((s) => s + 1)}
-              />
+              <ButtonGroup>
+                <NextButton
+                  disabled={!hasCredential}
+                  onClick={() => setActiveStep((s) => s + 1)}
+                />
+                <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+                  Previous
+                </TextButton>
+              </ButtonGroup>
             </>
           )}
         </>

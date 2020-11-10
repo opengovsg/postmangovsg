@@ -6,6 +6,7 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
+import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import SMSCreate from './sms/SMSCreate'
@@ -66,6 +67,7 @@ const Create = () => {
                 : 'Back to campaigns'}
             </PrimaryButton>
           </TitleBar>
+          {!!campaign.demoMessageLimit && <DemoInfoBanner></DemoInfoBanner>}
           {isLoading ? (
             <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
           ) : (

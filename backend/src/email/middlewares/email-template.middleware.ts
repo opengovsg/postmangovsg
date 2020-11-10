@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import retry from 'async-retry'
-import logger from '@core/logger'
 import {
   MissingTemplateKeysError,
   HydrationError,
@@ -14,6 +13,9 @@ import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 const RETRY_CONFIG = {
   retries: 3,
   minTimeout: 1000,
@@ -33,10 +35,10 @@ const storeTemplate = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
+  const { campaignId } = req.params
+  const { subject, body, reply_to: replyTo, from } = req.body
+  const logMeta = { campaignId, action: 'storeTemplate' }
   try {
-    const { campaignId } = req.params
-    const { subject, body, reply_to: replyTo, from } = req.body
-
     const {
       check,
       valid,
@@ -58,6 +60,11 @@ const storeTemplate = async (
     }
 
     if (check?.reupload) {
+      logger.info({
+        message:
+          'Email template has changed, required to re-upload recipient list',
+        ...logMeta,
+      })
       return res.json({
         message:
           'Please re-upload your recipient list as template has changed.',
@@ -77,6 +84,11 @@ const storeTemplate = async (
     }
   } catch (err) {
     if (err instanceof HydrationError || err instanceof TemplateError) {
+      logger.error({
+        message: 'Failed to store template',
+        error: err,
+        ...logMeta,
+      })
       return res.status(400).json({ message: err.message })
     }
     return next(err)
@@ -96,11 +108,12 @@ const uploadCompleteHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
+  const { campaignId } = req.params
+  // extract s3Key from transactionId
+  const { transaction_id: transactionId, filename, etag } = req.body
+  const logMeta = { campaignId, action: 'uploadCompleteHandler' }
 
-    // extract s3Key from transactionId
-    const { transaction_id: transactionId, filename, etag } = req.body
+  try {
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
     // check if template exists
@@ -153,9 +166,12 @@ const uploadCompleteHandler = async (
       }, RETRY_CONFIG)
     } catch (err) {
       // Do not return any response since it has already been sent
-      logger.error(
-        `Error storing messages for campaign ${campaignId}. ${err.stack}`
-      )
+      logger.error({
+        message: 'Error storing messages for campaign',
+        s3Key,
+        error: err,
+        ...logMeta,
+      })
 
       // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
       if (err.code === 'PreconditionFailed') {
@@ -167,6 +183,11 @@ const uploadCompleteHandler = async (
       UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
+    logger.error({
+      message: 'Failed to complete upload to s3',
+      error: err,
+      ...logMeta,
+    })
     const userErrors = [
       UserError,
       RecipientColumnMissing,
@@ -250,11 +271,12 @@ const uploadProtectedCompleteHandler = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
+  const { campaignId } = req.params
+  // extract s3Key from transactionId
+  const { transaction_id: transactionId, filename } = req.body
+  const logMeta = { campaignId, action: 'uploadProtectedCompleteHandler' }
 
-    // extract s3Key from transactionId
-    const { transaction_id: transactionId, filename } = req.body
+  try {
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId) as {
       s3Key: string
       uploadId: string
@@ -299,6 +321,12 @@ const uploadProtectedCompleteHandler = async (
             filename,
           })
         ).catch((e) => {
+          logger.error({
+            message: 'Failed to process S3 file',
+            s3Key,
+            error: e,
+            ...logMeta,
+          })
           transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
@@ -309,9 +337,12 @@ const uploadProtectedCompleteHandler = async (
       }, RETRY_CONFIG)
     } catch (err) {
       // Do not return any response since it has already been sent
-      logger.error(
-        `Error storing messages for campaign ${campaignId}. ${err.stack}`
-      )
+      logger.error({
+        message: 'Error storing messages for campaign',
+        s3Key,
+        error: err,
+        ...logMeta,
+      })
 
       // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
       if (err.code === 'PreconditionFailed') {
@@ -323,6 +354,11 @@ const uploadProtectedCompleteHandler = async (
       UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
+    logger.error({
+      message: 'Failed to complete upload to s3',
+      error: err,
+      ...logMeta,
+    })
     const userErrors = [
       RecipientColumnMissing,
       MissingTemplateKeysError,

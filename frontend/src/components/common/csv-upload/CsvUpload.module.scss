@@ -1,15 +1,12 @@
 @import 'styles/_mixins';
 
 .container {
-  margin-top: 2rem;
-
   .uploadActions {
+    margin: $spacing-5 0;
     @include flex-horizontal;
-    justify-content: space-between;
-    width: 65%;
 
     p {
-      margin-bottom: 0;
+      margin: 0 $spacing-4;
     }
 
     @include mobile() {
@@ -19,7 +16,7 @@
       width: 100%;
 
       p {
-        margin-bottom: 2rem;
+        margin-top: $spacing-2;
       }
     }
   }
