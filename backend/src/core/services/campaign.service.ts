@@ -69,7 +69,7 @@ const createDemoCampaign = async ({
 /**
  * Helper method to create a campaign
  */
-const createCampaign = ({
+const createCampaign = async ({
   name,
   type,
   userId,
@@ -81,28 +81,32 @@ const createCampaign = ({
   userId: number
   protect: boolean
   demoMessageLimit: number | null
-}): Promise<Campaign | void> | undefined => {
-  const result = Campaign.sequelize?.transaction(async (transaction) => {
+}): Promise<Campaign | void> => {
+  const result = await Campaign.sequelize?.transaction(async (transaction) => {
     const isDemo = Boolean(demoMessageLimit) // demoMessageLimit is not null, undefined, or 0
-    return isDemo
-      ? createDemoCampaign({
-          transaction,
+    let campaign
+    if (isDemo) {
+      campaign = await createDemoCampaign({
+        transaction,
+        name,
+        type,
+        userId,
+        protect,
+        demoMessageLimit,
+      })
+    } else {
+      campaign = await Campaign.create(
+        {
           name,
           type,
           userId,
+          valid: false,
           protect,
-          demoMessageLimit,
-        })
-      : Campaign.create(
-          {
-            name,
-            type,
-            userId,
-            valid: false,
-            protect,
-          },
-          { transaction }
-        )
+        },
+        { transaction }
+      )
+    }
+    return campaign
   })
   return result
 }
