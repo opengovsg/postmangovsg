@@ -40,7 +40,11 @@
   margin: 3rem 0;
 
   .exportButton {
-    margin-left: 3rem;
+    margin-left: $spacing-5;
+  }
+
+  .notice {
+    margin: 0;
   }
 
   .disableActiveState {

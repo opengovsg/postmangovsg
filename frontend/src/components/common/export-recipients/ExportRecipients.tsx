@@ -3,7 +3,7 @@ import cx from 'classnames'
 import download from 'downloadjs'
 
 import { ChannelType, Status } from 'classes/Campaign'
-import { ActionButton } from 'components/common'
+import { ActionButton, InfoBlock } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
@@ -186,11 +186,11 @@ const ExportRecipients = ({
     <>
       {isButton ? (
         <div className={styles.actionButton}>
-          <span className={styles.description}>
+          <InfoBlock className={styles.notice}>
             <Trans>
               Delivery report will expire 7 days after sending is completed.
             </Trans>
-          </span>
+          </InfoBlock>
           <ActionButton
             disabled={exportStatus !== CampaignExportStatus.Ready}
             className={cx(styles.exportButton, {

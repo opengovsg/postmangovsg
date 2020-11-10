@@ -3,7 +3,12 @@ import Moment from 'react-moment'
 import cx from 'classnames'
 
 import { ChannelType, CampaignStats, Status } from 'classes/Campaign'
-import { ProgressBar, PrimaryButton, ExportRecipients } from 'components/common'
+import {
+  ProgressBar,
+  PrimaryButton,
+  ExportRecipients,
+  InfoBlock,
+} from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
 import { LINKS } from 'config'
@@ -155,11 +160,11 @@ const ProgressDetails = ({
           isButton
         />
       ) : (
-        <div className={styles.redactedNotice}>
+        <InfoBlock className={styles.notice}>
           <Trans>
             Delivery report has expired and is no longer available for download.
           </Trans>
-        </div>
+        </InfoBlock>
       )}
 
       <table className={styles.stats}>
