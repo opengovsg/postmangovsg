@@ -8,6 +8,8 @@ import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
 import { LINKS } from 'config'
 import { i18n } from 'locales'
+import { Trans } from '@lingui/macro'
+
 const ProgressDetails = ({
   campaignId,
   campaignName,
@@ -154,8 +156,9 @@ const ProgressDetails = ({
         />
       ) : (
         <div className={styles.redactedNotice}>
-          The delivery report has been redacted and is no longer available for
-          download.
+          <Trans>
+            Delivery report has expired and is no longer available for download.
+          </Trans>
         </div>
       )}
 

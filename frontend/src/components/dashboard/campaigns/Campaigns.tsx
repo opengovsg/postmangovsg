@@ -130,7 +130,14 @@ const Campaigns = () => {
       name: 'Export',
       render: (campaign: Campaign) => {
         if (campaign.status === Status.Draft) return
-        if (campaign.redacted) return <Trans>Report redacted</Trans>
+        if (campaign.redacted) {
+          return (
+            <span className={styles.expired}>
+              <Trans>Report expired</Trans>
+            </span>
+          )
+        }
+
         return (
           <ExportRecipients
             iconPosition="left"

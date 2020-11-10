@@ -13,6 +13,14 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/components/common/progress-details/ProgressDetails.tsx:92
+msgid "Delivery report has expired and is no longer available for download."
+msgstr "Delivery report has expired and is no longer available for download."
+
+#: src/components/common/export-recipients/ExportRecipients.tsx:133
+msgid "Delivery report will expire 7 days after sending is completed."
+msgstr "Delivery report will expire 7 days after sending is completed."
+
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "Enter OTP"
 msgstr "Enter OTP"
@@ -29,9 +37,9 @@ msgstr "I'd rather stay"
 msgid "One-Time Password"
 msgstr "One-Time Password"
 
-#: src/components/dashboard/campaigns/Campaigns.tsx:97
-msgid "Report redacted"
-msgstr "Report redacted"
+#: src/components/dashboard/campaigns/Campaigns.tsx:118
+msgid "Report expired"
+msgstr "Report expired"
 
 #: src/components/login/login-input/LoginInput.tsx:82
 msgid "Resend?"

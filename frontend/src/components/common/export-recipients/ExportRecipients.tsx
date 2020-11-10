@@ -7,6 +7,7 @@ import { ActionButton } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
+import { Trans } from '@lingui/macro'
 import moment from 'moment'
 
 export enum CampaignExportStatus {
@@ -186,8 +187,9 @@ const ExportRecipients = ({
       {isButton ? (
         <div className={styles.actionButton}>
           <span className={styles.description}>
-            The delivery report will only be available for 7 days after
-            post-campaign sending.
+            <Trans>
+              Delivery report will expire 7 days after sending is completed.
+            </Trans>
           </span>
           <ActionButton
             disabled={exportStatus !== CampaignExportStatus.Ready}
