@@ -146,8 +146,8 @@ const listCampaigns = ({
       'protect',
       [
         literal(
-          // Campaigns with all jobs logged and were sent more than maxAge days ago will be redacted.
-          `CASE WHEN EVERY("job_queue"."status" = 'LOGGED') OVER ${campaignJobs} ` +
+          // Campaigns with all messages sent and were sent more than maxAge days ago will be redacted.
+          `CASE WHEN Statistic.unsent = 0 ` +
             `THEN DATE_PART('days', NOW() - MAX("job_queue"."updated_at") OVER ${campaignJobs}) > ${maxAge} ` +
             `ELSE FALSE END`
         ),
@@ -166,6 +166,10 @@ const listCampaigns = ({
           ['created_at', 'sent_at'],
           ['updated_at', 'status_updated_at'],
         ],
+      },
+      {
+        model: Statistic,
+        attributes: [],
       },
     ],
   }
@@ -217,8 +221,8 @@ const getCampaignDetails = async (
       ],
       [
         literal(
-          // Campaigns with all jobs logged and were sent more than maxAge days ago will be redacted.
-          `CASE WHEN EVERY("job_queue"."status" = 'LOGGED') OVER ${campaignJobs} ` +
+          // Campaigns with all messages sent and were sent more than maxAge days ago will be redacted.
+          `CASE WHEN Statistic.unsent = 0 ` +
             `THEN DATE_PART('days', NOW() - MAX("job_queue"."updated_at") OVER ${campaignJobs}) > ${maxAge} ` +
             `ELSE FALSE END`
         ),
