@@ -31,7 +31,7 @@
 
 .options {
   @include flex-horizontal;
-  
+
   button {
     margin-top: $spacing-4;
     margin-right: $spacing-4;
@@ -51,5 +51,4 @@
       margin-right: 0;
     }
   }
-  
 }

@@ -6,6 +6,7 @@ import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { LINKS } from 'config'
 import { i18n } from 'locales'
 import { OutboundLink } from 'react-ga'
+import ReactPlayer from 'react-player/lazy'
 
 const DemoVideoModal = ({
   numDemosSms,
@@ -27,17 +28,22 @@ const DemoVideoModal = ({
   return (
     <div className={styles.content}>
       <h2 className={styles.title}>Send Demo SMS or Telegram Campaigns</h2>
-      <p className={styles.helpText}>
+      <ReactPlayer
+        playing
+        controls
+        url={i18n._(LINKS.demoVideoUrl)}
+      ></ReactPlayer>
+      <div className={styles.helpText}>
         Need more help?{' '}
         <OutboundLink
           eventLabel={i18n._(LINKS.guideDemoUrl)}
           to={i18n._(LINKS.guideDemoUrl)}
           target="_blank"
         >
-          Read the guide
+          Read the walkthrough tutorial
         </OutboundLink>
         .
-      </p>
+      </div>
       <div className={styles.options}>
         <TextButton minButtonWidth onClick={close}>
           Dismiss

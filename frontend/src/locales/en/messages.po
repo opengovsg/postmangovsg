@@ -57,12 +57,12 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: src/config.ts:46
+#: src/config.ts:47
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
 #: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
-#: src/config.ts:44
+#: src/config.ts:45
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
 
@@ -129,6 +129,10 @@ msgstr "https://go.gov.sg/postman-custom-from"
 #: src/config.ts:42
 msgid "link.demoTelegramBotUrl"
 msgstr "https://go.gov.sg/postmangovsgbot"
+
+#: src/config.ts:43
+msgid "link.demoVideoUrl"
+msgstr "https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/Demo+Campaign+Mode.mp4"
 
 #: src/config.ts:35
 msgid "link.guideDemoUrl"
