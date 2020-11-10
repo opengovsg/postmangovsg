@@ -120,6 +120,9 @@ const listCampaigns = ({
   offset: number
   limit: number
 }): Promise<{ rows: Array<Campaign>; count: number }> => {
+  const campaignJobs = '(PARTITION BY "job_queue"."campaign_id")'
+  const maxAge = config.get('redaction.maxAge')
+
   const options: {
     where: any
     attributes: any
@@ -143,9 +146,10 @@ const listCampaigns = ({
       'protect',
       [
         literal(
-          `COALESCE(DATE_PART('days', NOW() - MIN("job_queue"."updated_at") OVER (PARTITION BY "job_queue"."campaign_id")) > ${config.get(
-            'redaction.maxAge'
-          )}, FALSE)`
+          // Campaigns with all jobs logged and were sent more than maxAge days ago will be redacted.
+          `CASE WHEN EVERY("job_queue"."status" = 'LOGGED') OVER ${campaignJobs} ` +
+            `THEN DATE_PART('days', NOW() - MAX("job_queue"."updated_at") OVER ${campaignJobs}) > ${maxAge} ` +
+            `ELSE FALSE END`
         ),
         'redacted',
       ],
@@ -184,6 +188,9 @@ const getCampaignDetails = async (
   campaignId: number,
   includes: Includeable[]
 ): Promise<CampaignDetails> => {
+  const campaignJobs = '(PARTITION BY "job_queue"."campaign_id")'
+  const maxAge = config.get('redaction.maxAge')
+
   const campaignDetails = await Campaign.findOne({
     where: { id: campaignId },
     attributes: [
@@ -210,9 +217,10 @@ const getCampaignDetails = async (
       ],
       [
         literal(
-          `COALESCE(DATE_PART('days', NOW() - MIN("job_queue"."updated_at") OVER (PARTITION BY "job_queue"."campaign_id")) > ${config.get(
-            'redaction.maxAge'
-          )}, FALSE)`
+          // Campaigns with all jobs logged and were sent more than maxAge days ago will be redacted.
+          `CASE WHEN EVERY("job_queue"."status" = 'LOGGED') OVER ${campaignJobs} ` +
+            `THEN DATE_PART('days', NOW() - MAX("job_queue"."updated_at") OVER ${campaignJobs}) > ${maxAge} ` +
+            `ELSE FALSE END`
         ),
         'redacted',
       ],
