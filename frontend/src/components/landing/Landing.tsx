@@ -40,6 +40,12 @@ const Landing = () => {
   const history = useHistory()
 
   useEffect(() => {
+    async function getSentMessages() {
+      const stats = await getLandingStats()
+      if (stats) {
+        setSentMessages(stats.toLocaleString())
+      }
+    }
     getSentMessages()
   }, [])
 
@@ -137,13 +143,6 @@ const Landing = () => {
       ),
     },
   ]
-
-  async function getSentMessages() {
-    const stats = await getLandingStats()
-    if (stats) {
-      setSentMessages(stats.toLocaleString())
-    }
-  }
 
   return (
     <div className={styles.landing}>
