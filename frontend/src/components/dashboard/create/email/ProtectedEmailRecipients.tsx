@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 import isEmail from 'validator/lib/isEmail'
 
@@ -14,9 +20,10 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { ModalContext } from 'contexts/modal.context'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { CampaignContext } from 'contexts/campaign.context'
 import EmailRecipients from './EmailRecipients'
-import { EmailCampaign } from 'classes'
+import { EmailCampaign, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 import { protectAndUploadCsv } from 'services/protect-csv.service'
@@ -32,21 +39,17 @@ enum ProtectPhase {
 }
 
 const ProtectedEmailRecipients = ({
-  csvFilename,
-  numRecipients,
-  isProcessing,
-  onNext,
-  onPrevious,
-  finishLaterCallbackRef,
+  setActiveStep,
 }: {
-  csvFilename: string
-  numRecipients: number
-  isProcessing: boolean
-  onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
-  onPrevious: () => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
-  const { setModalContent } = useContext(ModalContext)
+  const { campaign } = useContext(CampaignContext)
+  const {
+    csvFilename,
+    numRecipients,
+    isCsvProcessing: isProcessing,
+  } = campaign as EmailCampaign
+  const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [template, setTemplate] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedFile, setSelectedFile] = useState<File>()
@@ -60,17 +63,15 @@ const ProtectedEmailRecipients = ({
 
   useEffect(() => {
     setPhase(computePhase(numRecipients, isProcessing))
-  }, [numRecipients, isProcessing])
+  }, [isProcessing, numRecipients])
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
-      setModalContent(<SaveDraftModal />)
-    }
+    setFinishLaterContent(<SaveDraftModal />)
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterContent(null)
     }
-  }, [template, finishLaterCallbackRef, setModalContent])
+  }, [setFinishLaterContent])
 
   function computePhase(
     numRecipients: number,
@@ -241,16 +242,10 @@ const ProtectedEmailRecipients = ({
   const uploadRecipients = (
     <>
       <EmailRecipients
-        csvFilename={csvFilename}
-        numRecipients={numRecipients}
-        params={[]}
-        isProcessing={isProcessing}
-        protect={true}
+        setActiveStep={setActiveStep}
         template={template}
         onFileSelected={onFileSelected}
         forceReset={phase === ProtectPhase.READY}
-        onNext={onNext}
-        onPrevious={onPrevious}
       ></EmailRecipients>
       {phase === ProtectPhase.READY && csvFilename && (
         <div className="progress-button">
@@ -274,7 +269,7 @@ const ProtectedEmailRecipients = ({
       >
         Edit Message
       </TextButton>
-      <PrimaryButton onClick={onNext}>
+      <PrimaryButton onClick={() => setActiveStep((s) => s + 1)}>
         Next <i className="bx bx-right-arrow-alt"></i>
       </PrimaryButton>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
 import {
   getCampaignStats,
@@ -11,20 +12,11 @@ import { ModalContext } from 'contexts/modal.context'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 
-const TelegramDetail = ({
-  id,
-  name,
-  sentAt,
-  numRecipients,
-  isDemo,
-}: {
-  id: number
-  name: string
-  sentAt: Date
-  numRecipients: number
-  isDemo: boolean
-}) => {
+const TelegramDetail = () => {
   const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies
+  const { campaign } = useContext(CampaignContext)
+  const { id, demoMessageLimit } = campaign
+  const isDemo = !!demoMessageLimit
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number, forceRefresh = false) {
@@ -134,11 +126,6 @@ const TelegramDetail = ({
         <div className="separator"></div>
         {stats.status && (
           <ProgressDetails
-            campaignId={id}
-            campaignName={name}
-            campaignType={ChannelType.Telegram}
-            sentAt={sentAt}
-            numRecipients={numRecipients}
             stats={stats}
             handlePause={handlePause}
             handleRetry={handleRetry}

@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   validateStoredCredentials,
   validateNewCredentials,
@@ -25,22 +32,21 @@ import TwilioCredentialsInput, {
   TwilioCredentials,
 } from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
+import { SMSCampaign, SMSProgress } from 'classes'
 import { OutboundLink } from 'react-ga'
 import { i18n } from 'locales'
 import { LINKS } from 'config'
 
 const SMSCredentials = ({
-  hasCredential: initialHasCredential,
-  isDemo,
-  onNext,
-  onPrevious,
+  setActiveStep,
 }: {
-  hasCredential: boolean
-  isDemo: boolean
-  onNext: (changes: any, next?: boolean) => void
-  onPrevious: () => void
+  setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
   const DEMO_CREDENTIAL = 'Postman_SMS_Demo'
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { hasCredential: initialHasCredential, demoMessageLimit } = campaign
+  const isDemo = !!demoMessageLimit
+
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
@@ -109,7 +115,9 @@ const SMSCredentials = ({
       setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
-      onNext({ hasCredential: true }, false)
+      setCampaign(
+        (campaign) => ({ ...campaign, hasCredential: true } as SMSCampaign)
+      )
     } catch (err) {
       setErrorMessage(err.message)
     }
@@ -242,8 +250,13 @@ const SMSCredentials = ({
           </StepSection>
 
           <ButtonGroup>
-            <NextButton disabled={!hasCredential} onClick={onNext} />
-            <TextButton onClick={onPrevious}>Previous</TextButton>
+            <NextButton
+              disabled={!hasCredential}
+              onClick={() => setActiveStep((s) => s + 1)}
+            />
+            <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+              Previous
+            </TextButton>
           </ButtonGroup>
         </>
       ) : (

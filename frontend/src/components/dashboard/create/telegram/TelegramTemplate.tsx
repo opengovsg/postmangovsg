@@ -1,5 +1,15 @@
-import React, { useState, useCallback, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
+import { useParams } from 'react-router-dom'
 
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   TextArea,
   NextButton,
@@ -8,20 +18,17 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { ModalContext } from 'contexts/modal.context'
-import { useParams } from 'react-router-dom'
 import { saveTemplate } from 'services/telegram.service'
+import { TelegramCampaign, TelegramProgress } from 'classes'
 
 const TelegramTemplate = ({
-  body: initialBody,
-  onNext,
-  finishLaterCallbackRef,
+  setActiveStep,
 }: {
-  body: string
-  onNext: (changes: any, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
+  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
-  const { setModalContent } = useContext(ModalContext)
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { body: initialBody } = campaign as TelegramCampaign
+  const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
@@ -37,35 +44,39 @@ const TelegramTemplate = ({
           +campaignId,
           body
         )
-        onNext({
-          body: updatedTemplate?.body,
-          params: updatedTemplate?.params,
-          numRecipients,
-        })
+        if (!updatedTemplate) return
+        setCampaign(
+          (campaign) =>
+            ({
+              ...campaign,
+              body: updatedTemplate?.body,
+              params: updatedTemplate?.params,
+              numRecipients,
+            } as TelegramCampaign)
+        )
+        setActiveStep((s) => s + 1)
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, onNext]
+    [body, campaignId, setActiveStep, setCampaign]
   )
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
-      setModalContent(
-        <SaveDraftModal
-          saveable
-          onSave={async () => {
-            if (body) await handleSaveTemplate(true)
-          }}
-        />
-      )
-    }
+    setFinishLaterContent(
+      <SaveDraftModal
+        saveable
+        onSave={async () => {
+          if (body) await handleSaveTemplate(true)
+        }}
+      />
+    )
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterContent(null)
     }
-  }, [body, finishLaterCallbackRef, handleSaveTemplate, setModalContent])
+  }, [body, handleSaveTemplate, setFinishLaterContent])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')

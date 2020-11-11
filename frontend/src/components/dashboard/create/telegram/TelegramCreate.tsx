@@ -1,8 +1,8 @@
 import cx from 'classnames'
-import React, { useState, useCallback, useEffect } from 'react'
-import { cloneDeep } from 'lodash'
+import React, { useState, useEffect, useContext } from 'react'
 
-import { Campaign, TelegramCampaign, TelegramProgress, Status } from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import { TelegramProgress, Status, TelegramCampaign } from 'classes'
 import { ProgressPane } from 'components/common'
 import TelegramTemplate from './TelegramTemplate'
 import TelegramRecipients from './TelegramRecipients'
@@ -19,85 +19,28 @@ const TELEGRAM_PROGRESS_STEPS = [
   'Preview and send',
 ]
 
-const CreateTelegram = ({
-  campaign: initialCampaign,
-  onCampaignChange,
-  finishLaterCallbackRef,
-}: {
-  campaign: TelegramCampaign
-  onCampaignChange: (c: Campaign) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
-}) => {
-  const [activeStep, setActiveStep] = useState(initialCampaign.progress)
-  const [campaign, setCampaign] = useState(initialCampaign)
-
-  useEffect(() => {
-    onCampaignChange(campaign)
-  }, [campaign, onCampaignChange])
-
-  // Modifies campaign object in state and navigates to next step
-  const onNext = useCallback((changes: any, next = true) => {
-    setCampaign((c) => {
-      const updatedCampaign = Object.assign(
-        cloneDeep(c),
-        changes
-      ) as TelegramCampaign
-      updatedCampaign.setProgress()
-      return updatedCampaign
-    })
-    if (next) {
-      setActiveStep((s) => s + 1)
-    }
-  }, [])
-
-  const onPrevious = () => setActiveStep((s) => Math.max(s - 1, 0))
+const CreateTelegram = () => {
+  const { campaign } = useContext(CampaignContext)
+  const { progress, isCsvProcessing, status } = campaign as TelegramCampaign
+  const [activeStep, setActiveStep] = useState(progress)
 
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
-    if (campaign.isCsvProcessing) {
+    if (isCsvProcessing) {
       setActiveStep(TelegramProgress.UploadRecipients)
     }
-  }, [campaign.isCsvProcessing])
+  }, [isCsvProcessing])
 
   function renderStep() {
     switch (activeStep) {
       case TelegramProgress.CreateTemplate:
-        return (
-          <TelegramTemplate
-            body={campaign.body}
-            onNext={onNext}
-            finishLaterCallbackRef={finishLaterCallbackRef}
-          />
-        )
+        return <TelegramTemplate setActiveStep={setActiveStep} />
       case TelegramProgress.UploadRecipients:
-        return (
-          <TelegramRecipients
-            params={campaign.params}
-            csvFilename={campaign.csvFilename}
-            numRecipients={campaign.numRecipients}
-            isProcessing={campaign.isCsvProcessing}
-            isDemo={!!campaign.demoMessageLimit}
-            onNext={onNext}
-            onPrevious={onPrevious}
-          />
-        )
+        return <TelegramRecipients setActiveStep={setActiveStep} />
       case TelegramProgress.InsertCredentials:
-        return (
-          <TelegramCredentials
-            hasCredential={campaign.hasCredential}
-            isDemo={!!campaign.demoMessageLimit}
-            onNext={onNext}
-            onPrevious={onPrevious}
-          />
-        )
+        return <TelegramCredentials setActiveStep={setActiveStep} />
       case TelegramProgress.Send:
-        return (
-          <TelegramSend
-            numRecipients={campaign.numRecipients}
-            onNext={onNext}
-            onPrevious={onPrevious}
-          />
-        )
+        return <TelegramSend setActiveStep={setActiveStep} />
       default:
         return <p>Invalid step</p>
     }
@@ -105,15 +48,9 @@ const CreateTelegram = ({
 
   return (
     <div className={styles.createContainer}>
-      {campaign.status !== Status.Draft ? (
+      {status !== Status.Draft ? (
         <div className={cx(styles.stepContainer, styles.detailContainer)}>
-          <TelegramDetail
-            id={campaign.id}
-            name={campaign.name}
-            sentAt={campaign.sentAt}
-            numRecipients={campaign.numRecipients}
-            isDemo={!!campaign.demoMessageLimit}
-          ></TelegramDetail>
+          <TelegramDetail></TelegramDetail>
         </div>
       ) : (
         <>
@@ -121,7 +58,7 @@ const CreateTelegram = ({
             steps={TELEGRAM_PROGRESS_STEPS}
             activeStep={activeStep}
             setActiveStep={setActiveStep}
-            progress={campaign.progress}
+            progress={progress}
           />
           <div className={styles.stepContainer}>{renderStep()}</div>
         </>
