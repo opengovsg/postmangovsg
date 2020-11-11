@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import { LINKS } from 'config'
 import {
   validateStoredCredentials,
@@ -28,19 +35,18 @@ import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
 import { i18n } from 'locales'
+import { TelegramCampaign, TelegramProgress } from 'classes'
 
 const TelegramCredentials = ({
-  hasCredential: initialHasCredential,
-  isDemo,
-  onNext,
-  onPrevious,
+  setActiveStep,
 }: {
-  hasCredential: boolean
-  isDemo: boolean
-  onNext: (changes: any, next?: boolean) => void
-  onPrevious: () => void
+  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
   const DEMO_CREDENTIAL = 'Postman_Telegram_Demo'
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { hasCredential: initialHasCredential, demoMessageLimit } = campaign
+  const isDemo = !!demoMessageLimit
+
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [credLabels, setCredLabels] = useState([] as string[])
   const [storedCredentials, setStoredCredentials] = useState(
@@ -58,6 +64,7 @@ const TelegramCredentials = ({
   const [sendSuccess, setSendSuccess] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
   const { id: campaignId } = useParams()
+
   useEffect(() => {
     async function populateStoredCredentials(defaultLabels: string[]) {
       try {
@@ -91,7 +98,7 @@ const TelegramCredentials = ({
     setShowCredentialFields(true)
   }
 
-  async function handleSelectStoredCredentials() {
+  async function handleValidateCredentials() {
     setErrorMessage(null)
     setIsValidating(true)
 
@@ -100,41 +107,26 @@ const TelegramCredentials = ({
         throw new Error('Invalid campaign id')
       }
 
-      await validateStoredCredentials({
-        campaignId: +campaignId,
-        label: selectedCredential,
-      })
-
-      setHasCredential(true)
-      setShowCredentialFields(false)
-      // Saves hasCredential property but do not advance to next step
-      onNext({ hasCredential: true }, false)
-    } catch (e) {
-      setErrorMessage(e.message)
-    }
-
-    setIsValidating(false)
-  }
-
-  async function handleNewCredentials() {
-    setErrorMessage(null)
-    setIsValidating(true)
-
-    try {
-      if (!campaignId) {
-        throw new Error('Invalid campaign id')
+      if (isManual && creds) {
+        await validateNewCredentials({
+          campaignId: +campaignId,
+          ...creds,
+        })
+      } else if (!isManual && selectedCredential) {
+        await validateStoredCredentials({
+          campaignId: +campaignId,
+          label: selectedCredential,
+        })
+      } else {
+        throw new Error('Missing credentials')
       }
 
-      await validateNewCredentials({
-        campaignId: +campaignId,
-        ...creds,
-        ...(saveCredentialWithLabel && { label }),
-      })
-
       setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
-      onNext({ hasCredential: true }, false)
+      setCampaign(
+        (campaign) => ({ ...campaign, hasCredential: true } as TelegramCampaign)
+      )
     } catch (e) {
       setErrorMessage(e.message)
     }
@@ -228,7 +220,10 @@ const TelegramCredentials = ({
             </StepSection>
 
             <ButtonGroup>
-              <PrimaryButton disabled={!creds} onClick={handleNewCredentials}>
+              <PrimaryButton
+                disabled={!creds}
+                onClick={handleValidateCredentials}
+              >
                 {isValidating ? (
                   <>
                     Validating<i className="bx bx-loader-alt bx-spin"></i>
@@ -240,7 +235,9 @@ const TelegramCredentials = ({
                   </>
                 )}
               </PrimaryButton>
-              <TextButton onClick={onPrevious}>Previous</TextButton>
+              <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+                Previous
+              </TextButton>
             </ButtonGroup>
           </>
         ) : (
@@ -250,10 +247,15 @@ const TelegramCredentials = ({
                 onSelect={setSelectedCredential}
                 options={storedCredentials}
                 defaultLabel={storedCredentials[0]?.label}
+                disabled={isDemo}
               ></Dropdown>
+
               <ErrorBlock>{errorMessage}</ErrorBlock>
 
-              <p className="clickable" onClick={() => setIsManual(true)}>
+              <p
+                className={cx('clickable', { disabled: isDemo })}
+                onClick={() => !isDemo && setIsManual(true)}
+              >
                 Add new credentials
               </p>
 
@@ -298,7 +300,7 @@ const TelegramCredentials = ({
             <ButtonGroup>
               <PrimaryButton
                 disabled={!selectedCredential}
-                onClick={handleSelectStoredCredentials}
+                onClick={handleValidateCredentials}
               >
                 {isValidating ? (
                   <>
@@ -311,7 +313,9 @@ const TelegramCredentials = ({
                   </>
                 )}
               </PrimaryButton>
-              <TextButton onClick={onPrevious}>Previous</TextButton>
+              <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+                Previous
+              </TextButton>
             </ButtonGroup>
           </>
         )}
@@ -370,10 +374,14 @@ const TelegramCredentials = ({
                 )}
                 <ErrorBlock>{errorMessage}</ErrorBlock>
               </StepSection>
-
               <ButtonGroup>
-                <NextButton disabled={!hasCredential} onClick={onNext} />
-                <TextButton onClick={onPrevious}>Previous</TextButton>
+                <NextButton
+                  disabled={!hasCredential}
+                  onClick={() => setActiveStep((s) => s + 1)}
+                />
+                <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+                  Previous
+                </TextButton>
               </ButtonGroup>
             </>
           )}

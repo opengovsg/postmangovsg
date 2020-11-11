@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 
 import {
   TextArea,
@@ -10,31 +17,29 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { ModalContext } from 'contexts/modal.context'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { CampaignContext } from 'contexts/campaign.context'
 import { useParams } from 'react-router-dom'
+import { getCustomFromAddresses } from 'services/settings.service'
 import { saveTemplate } from 'services/email.service'
+import { EmailCampaign, EmailProgress } from 'classes'
 
 import styles from './EmailTemplate.module.scss'
-import { getCustomFromAddresses } from 'services/settings.service'
 
 const EmailTemplate = ({
-  from: initialFrom,
-  subject: initialSubject,
-  body: initialBody,
-  replyTo: initialReplyTo,
-  protect,
-  onNext,
-  finishLaterCallbackRef,
+  setActiveStep,
 }: {
-  from: string
-  subject: string
-  body: string
-  replyTo: string | null
-  protect: boolean
-  onNext: (changes: any, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
-  const { setModalContent } = useContext(ModalContext)
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const {
+    body: initialBody,
+    subject: initialSubject,
+    replyTo: initialReplyTo,
+    from: initialFrom,
+    protect,
+  } = campaign as EmailCampaign
+  const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
@@ -64,20 +69,27 @@ const EmailTemplate = ({
           replyTo,
           from
         )
-        onNext({
-          from: updatedTemplate?.from,
-          subject: updatedTemplate?.subject,
-          body: updatedTemplate?.body,
-          replyTo: updatedTemplate?.reply_to,
-          params: updatedTemplate?.params,
-          numRecipients,
-        })
+        if (updatedTemplate) {
+          setCampaign(
+            (campaign) =>
+              ({
+                ...campaign,
+                from: updatedTemplate.from,
+                subject: updatedTemplate.subject,
+                body: updatedTemplate.body,
+                replyTo: updatedTemplate.reply_to,
+                params: updatedTemplate.params,
+                numRecipients,
+              } as EmailCampaign)
+          )
+          setActiveStep((s) => s + 1)
+        }
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, from, onNext, replyTo, subject]
+    [body, campaignId, from, replyTo, setActiveStep, setCampaign, subject]
   )
 
   async function populateFromAddresses() {
@@ -93,29 +105,20 @@ const EmailTemplate = ({
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
-      setModalContent(
-        <SaveDraftModal
-          saveable
-          onSave={async () => {
-            if (subject && body && from) {
-              await handleSaveTemplate(true)
-            }
-          }}
-        />
-      )
-    }
+    setFinishLaterContent(
+      <SaveDraftModal
+        saveable
+        onSave={async () => {
+          if (subject && body && from) {
+            await handleSaveTemplate(true)
+          }
+        }}
+      />
+    )
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterContent(null)
     }
-  }, [
-    body,
-    finishLaterCallbackRef,
-    handleSaveTemplate,
-    subject,
-    from,
-    setModalContent,
-  ])
+  }, [body, subject, from, handleSaveTemplate, setFinishLaterContent])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''

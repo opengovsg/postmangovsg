@@ -30,6 +30,13 @@
       font-size: 1.4rem;
       transition: transform 100ms ease-out;
     }
+
+    &.disabled {
+      opacity: 0.3;
+      background-color: $grey-500;
+      border-color: $light-grey;
+      cursor: not-allowed;
+    }
   }
 
   &.open {

@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, {
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  useContext,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
 import {
@@ -16,32 +22,31 @@ import {
   SampleCsv,
   ButtonGroup,
   TextButton,
-  StepHeader,
   StepSection,
+  StepHeader,
   InfoBlock,
 } from 'components/common'
-import { SMSCampaign, SMSPreview } from 'classes'
+import { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
+import { CampaignContext } from 'contexts/campaign.context'
 
 import styles from '../Create.module.scss'
 
 const SMSRecipients = ({
-  csvFilename: initialCsvFilename,
-  numRecipients: initialNumRecipients,
-  params,
-  isProcessing: initialIsProcessing,
-  isDemo,
-  onNext,
-  onPrevious,
+  setActiveStep,
 }: {
-  csvFilename: string
-  numRecipients: number
-  params: Array<string>
-  isProcessing: boolean
-  isDemo: boolean
-  onNext: (changes: Partial<SMSCampaign>, next?: boolean) => void
-  onPrevious: () => void
+  setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const {
+    isCsvProcessing: initialIsProcessing,
+    numRecipients: initialNumRecipients,
+    csvFilename: initialCsvFilename,
+    demoMessageLimit,
+    params,
+  } = campaign as SMSCampaign
+  const isDemo = !!demoMessageLimit
+
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
@@ -88,8 +93,16 @@ const SMSRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
-  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
+    setCampaign(
+      (campaign) =>
+        ({
+          ...campaign,
+          isCsvProcessing,
+          csvFilename,
+          numRecipients,
+        } as SMSCampaign)
+    )
+  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign])
 
   // Handle file upload
   async function uploadFile(files: File[]) {
@@ -176,9 +189,11 @@ const SMSRecipients = ({
       <ButtonGroup>
         <NextButton
           disabled={!numRecipients || !csvFilename}
-          onClick={onNext}
+          onClick={() => setActiveStep((s) => s + 1)}
         />
-        <TextButton onClick={onPrevious}>Previous</TextButton>
+        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+          Previous
+        </TextButton>
       </ButtonGroup>
     </>
   )

@@ -1,8 +1,7 @@
-import cx from 'classnames'
-import React, { useState, useCallback, useEffect } from 'react'
-import { cloneDeep } from 'lodash'
+import React, { useState, useEffect, useContext } from 'react'
 
-import { Campaign, SMSCampaign, SMSProgress, Status } from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import { SMSCampaign, SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import SMSTemplate from './SMSTemplate'
 import SMSRecipients from './SMSRecipients'
@@ -19,85 +18,32 @@ const SMS_PROGRESS_STEPS = [
   'Preview and send',
 ]
 
-const CreateSMS = ({
-  campaign: initialCampaign,
-  onCampaignChange,
-  finishLaterCallbackRef,
-}: {
-  campaign: SMSCampaign
-  onCampaignChange: (c: Campaign) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
-}) => {
-  const [activeStep, setActiveStep] = useState(initialCampaign.progress)
-  const [campaign, setCampaign] = useState(initialCampaign)
+const CreateSMS = () => {
+  const { campaign } = useContext(CampaignContext)
+  const { progress, isCsvProcessing, status } = campaign as SMSCampaign
+  const [activeStep, setActiveStep] = useState(progress)
 
   useEffect(() => {
-    onCampaignChange(campaign)
-  }, [campaign, onCampaignChange])
-
-  // Modifies campaign object in state and navigates to next step
-  const onNext = useCallback((changes: any, next = true) => {
-    setCampaign((c) => {
-      const updatedCampaign = Object.assign(
-        cloneDeep(c),
-        changes
-      ) as SMSCampaign
-      updatedCampaign.setProgress()
-      return updatedCampaign
-    })
-    if (next) {
-      setActiveStep((s) => s + 1)
-    }
-  }, [])
-
-  const onPrevious = () => setActiveStep((s) => Math.max(s - 1, 0))
+    setActiveStep(progress)
+  }, [progress])
 
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
-    if (campaign.isCsvProcessing) {
+    if (isCsvProcessing) {
       setActiveStep(SMSProgress.UploadRecipients)
     }
-  }, [campaign.isCsvProcessing])
+  }, [isCsvProcessing])
 
   function renderStep() {
     switch (activeStep) {
       case SMSProgress.CreateTemplate:
-        return (
-          <SMSTemplate
-            body={campaign.body}
-            onNext={onNext}
-            finishLaterCallbackRef={finishLaterCallbackRef}
-          />
-        )
+        return <SMSTemplate setActiveStep={setActiveStep} />
       case SMSProgress.UploadRecipients:
-        return (
-          <SMSRecipients
-            params={campaign.params}
-            csvFilename={campaign.csvFilename}
-            numRecipients={campaign.numRecipients}
-            isProcessing={campaign.isCsvProcessing}
-            isDemo={!!campaign.demoMessageLimit}
-            onNext={onNext}
-            onPrevious={onPrevious}
-          />
-        )
+        return <SMSRecipients setActiveStep={setActiveStep} />
       case SMSProgress.InsertCredentials:
-        return (
-          <SMSCredentials
-            hasCredential={campaign.hasCredential}
-            isDemo={!!campaign.demoMessageLimit}
-            onNext={onNext}
-            onPrevious={onPrevious}
-          />
-        )
+        return <SMSCredentials setActiveStep={setActiveStep} />
       case SMSProgress.Send:
-        return (
-          <SMSSend
-            numRecipients={campaign.numRecipients}
-            onNext={onNext}
-            onPrevious={onPrevious}
-          />
-        )
+        return <SMSSend setActiveStep={setActiveStep} />
       default:
         return <p>Invalid step</p>
     }
@@ -105,15 +51,9 @@ const CreateSMS = ({
 
   return (
     <div className={styles.createContainer}>
-      {campaign.status !== Status.Draft ? (
-        <div className={cx(styles.stepContainer, styles.detailContainer)}>
-          <SMSDetail
-            id={campaign.id}
-            name={campaign.name}
-            sentAt={campaign.sentAt}
-            numRecipients={campaign.numRecipients}
-            isDemo={!!campaign.demoMessageLimit}
-          ></SMSDetail>
+      {status !== Status.Draft ? (
+        <div className={styles.stepContainer}>
+          <SMSDetail></SMSDetail>
         </div>
       ) : (
         <>
@@ -121,8 +61,8 @@ const CreateSMS = ({
             steps={SMS_PROGRESS_STEPS}
             activeStep={activeStep}
             setActiveStep={setActiveStep}
-            progress={campaign.progress}
-            disabled={campaign.isCsvProcessing}
+            progress={progress}
+            disabled={isCsvProcessing}
           />
           <div className={styles.stepContainer}>{renderStep()}</div>
         </>

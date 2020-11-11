@@ -78,6 +78,13 @@ p {
   &:hover {
     text-decoration: underline;
   }
+
+  &.disabled {
+    color: $grey-500;
+    opacity: 0.7;
+    text-decoration: none;
+    cursor: not-allowed;
+  }
 }
 
 img {

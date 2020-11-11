@@ -1,34 +1,27 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
-import { ChannelType, CampaignStats, Status } from 'classes/Campaign'
+import { CampaignContext } from 'contexts/campaign.context'
+import { CampaignStats, Status } from 'classes/Campaign'
 import { ProgressBar, PrimaryButton, ExportRecipients } from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
 import { LINKS } from 'config'
 import { i18n } from 'locales'
 const ProgressDetails = ({
-  campaignId,
-  campaignName,
-  campaignType,
-  sentAt,
-  numRecipients,
   stats,
   handlePause,
   handleRetry,
   handleRefreshStats,
 }: {
-  campaignId: number
-  campaignName: string
-  campaignType: ChannelType
-  sentAt: Date
-  numRecipients: number
   stats: CampaignStats
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
   handleRefreshStats: () => Promise<void>
 }) => {
+  const { campaign } = useContext(CampaignContext)
+  const { id, name, type, sentAt, numRecipients } = campaign
   const {
     status,
     statusUpdatedAt,
@@ -140,11 +133,11 @@ const ProgressDetails = ({
       />
 
       <ExportRecipients
-        iconPosition="right"
-        campaignId={campaignId}
-        campaignName={campaignName}
-        campaignType={campaignType}
+        campaignId={id}
+        campaignName={name}
+        campaignType={type}
         sentAt={sentAt}
+        iconPosition="right"
         status={status}
         statusUpdatedAt={statusUpdatedAt}
         isButton

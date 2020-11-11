@@ -514,6 +514,7 @@ router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
+  SmsMiddleware.disabledForDemoCampaign,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
   SmsMiddleware.setCampaignCredential
@@ -571,6 +572,7 @@ router.post(
   '/new-credentials/v2',
   celebrate(storeCredentialsValidatorV2),
   CampaignMiddleware.canEditCampaign,
+  SmsMiddleware.disabledForDemoCampaign,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
   SettingsMiddleware.checkAndStoreLabelIfExists,
