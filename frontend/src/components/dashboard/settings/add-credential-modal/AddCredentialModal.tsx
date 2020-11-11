@@ -142,6 +142,7 @@ const AddCredentialModal = ({
         <div className={styles.actionButtons}>
           <PrimaryButton
             onClick={nextFunc}
+            disabled={!(credentials && label)}
             loadingPlaceholder={
               <>
                 Validating<i className="bx bx-loader-alt bx-spin"></i>
