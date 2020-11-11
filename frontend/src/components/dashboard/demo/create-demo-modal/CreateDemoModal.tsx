@@ -11,9 +11,7 @@ import {
 import { ModalContext } from 'contexts/modal.context'
 import { useHistory } from 'react-router-dom'
 import { createCampaign } from 'services/campaign.service'
-import { i18n } from 'locales'
-import { LINKS } from 'config'
-import { OutboundLink } from 'react-ga'
+import DemoVideoModal from 'components/dashboard/demo/demo-video-modal'
 const CreateDemoModal = ({
   numDemosSms,
   numDemosTelegram,
@@ -21,7 +19,7 @@ const CreateDemoModal = ({
   numDemosSms: number
   numDemosTelegram: number
 }) => {
-  const { close, setModalTitle } = useContext(ModalContext)
+  const { close, setModalTitle, setModalContent } = useContext(ModalContext)
   const history = useHistory()
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
@@ -59,7 +57,6 @@ const CreateDemoModal = ({
         (numDemosChannel && 4 - numDemosChannel) || ''
       }`
     )
-    //setDemoCampaignMessage(message)
     setModalTitle(message)
     setIsCreateEnabled(!!numDemosChannel)
   }, [numDemosSms, numDemosTelegram, selectedChannel, setModalTitle])
@@ -79,6 +76,15 @@ const CreateDemoModal = ({
     }
   }
 
+  function showDemoVideoModal() {
+    setModalTitle(null)
+    setModalContent(
+      <DemoVideoModal
+        numDemosSms={numDemosSms}
+        numDemosTelegram={numDemosTelegram}
+      />
+    )
+  }
   return (
     <>
       <div className={styles.content}>
@@ -139,13 +145,10 @@ const CreateDemoModal = ({
         </div>
         <div className="separator"></div>
         <div className={styles.actions}>
-          <OutboundLink
-            eventLabel={i18n._(LINKS.guideDemoUrl)}
-            to={i18n._(LINKS.guideDemoUrl)}
-            target="_blank"
-          >
-            <TextButton minButtonWidth>Watch the video</TextButton>
-          </OutboundLink>
+          <TextButton minButtonWidth onClick={showDemoVideoModal}>
+            Watch the video
+          </TextButton>
+
           <PrimaryButton onClick={createDemo} disabled={!isCreateEnabled}>
             Create demo campaign
           </PrimaryButton>

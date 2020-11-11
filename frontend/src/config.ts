@@ -40,6 +40,7 @@ export const LINKS = {
   reportBugUrl: t('link.reportBugUrl')``,
   customFromAddressRequestUrl: t('link.customFromAddressRequestUrl')``,
   demoTelegramBotUrl: t('link.demoTelegramBotUrl')``,
+  demoVideoUrl: t('link.demoVideoUrl')``,
 }
 export const DEFAULT_MAIL_FROM = t('defaultMailFrom')``
 // Semi-colon separated list of allowed image source hostnames

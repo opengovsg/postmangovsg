@@ -571,6 +571,7 @@ router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
+  TelegramMiddleware.disabledForDemoCampaign,
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
   TelegramMiddleware.setCampaignCredential
@@ -625,6 +626,7 @@ router.post(
   '/new-credentials/v2',
   celebrate(storeCredentialsValidatorV2),
   CampaignMiddleware.canEditCampaign,
+  TelegramMiddleware.disabledForDemoCampaign,
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
   SettingsMiddleware.checkAndStoreLabelIfExists,

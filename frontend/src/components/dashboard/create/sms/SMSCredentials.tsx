@@ -175,8 +175,12 @@ const SMSCredentials = ({
                 onSelect={setSelectedCredential}
                 options={storedCredentials}
                 defaultLabel={storedCredentials[0]?.label}
+                disabled={isDemo}
               ></Dropdown>
-              <p className="clickable" onClick={() => setIsManual(true)}>
+              <p
+                className={cx('clickable', { disabled: isDemo })}
+                onClick={() => !isDemo && setIsManual(true)}
+              >
                 Input credentials manually
               </p>
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
