@@ -111,13 +111,13 @@ const CustomFromAddress = ({
             The process requires correspondence with your agency&apos;s IT team,
             and is manual at the moment, so please follow the steps below.
           </p>
-          <p>
+          <div>
             <b>How to proceed</b>:
             <ol>
               <li>Fill in request form on FormSG</li>
               <li>Wait for us to contact you within 5 working days</li>
             </ol>
-          </p>
+          </div>
         </StepHeader>
 
         <div className={styles.actionButtons}>
