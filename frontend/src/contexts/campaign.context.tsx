@@ -10,7 +10,9 @@ import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
 
 interface ContextProps {
   campaign: SMSCampaign | EmailCampaign | TelegramCampaign
-  updateCampaign: any
+  updateCampaign: (
+    changes: Partial<SMSCampaign | EmailCampaign | TelegramCampaign>
+  ) => void
   setCampaign: Dispatch<
     SetStateAction<SMSCampaign | EmailCampaign | TelegramCampaign>
   >
