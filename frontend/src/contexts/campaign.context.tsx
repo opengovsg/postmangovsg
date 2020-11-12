@@ -46,6 +46,9 @@ const CampaignContextProvider = ({
     <CampaignContext.Provider
       value={{
         campaign,
+        // updateCampaign is re-created for every re-render of CampaignContextProvider
+        // Memoise updateCampaign to prevent unnecessary renders in subscribers when
+        // defined as dependencies in useEffect
         updateCampaign: useCallback(updateCampaign, []),
         setCampaign,
       }}
