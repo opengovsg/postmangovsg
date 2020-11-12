@@ -111,6 +111,7 @@ const TelegramCredentials = ({
         await validateNewCredentials({
           campaignId: +campaignId,
           ...creds,
+          ...(saveCredentialWithLabel && { label }),
         })
       } else if (!isManual && selectedCredential) {
         await validateStoredCredentials({
