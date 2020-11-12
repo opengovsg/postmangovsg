@@ -1,8 +1,16 @@
-import React, { createContext, useState, SetStateAction, Dispatch } from 'react'
+import React, {
+  createContext,
+  useState,
+  useCallback,
+  Dispatch,
+  SetStateAction,
+} from 'react'
+import { cloneDeep } from 'lodash'
 import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
 
 interface ContextProps {
   campaign: SMSCampaign | EmailCampaign | TelegramCampaign
+  updateCampaign: any
   setCampaign: Dispatch<
     SetStateAction<SMSCampaign | EmailCampaign | TelegramCampaign>
   >
@@ -19,10 +27,24 @@ const CampaignContextProvider = ({
     new Campaign({}) as SMSCampaign | EmailCampaign | TelegramCampaign
   )
 
+  function updateCampaign(
+    changes: Partial<SMSCampaign | EmailCampaign | TelegramCampaign>
+  ) {
+    setCampaign((c) => {
+      const updatedCampaign = Object.assign(cloneDeep(c), changes) as
+        | SMSCampaign
+        | EmailCampaign
+        | TelegramCampaign
+      updatedCampaign.setProgress()
+      return updatedCampaign
+    })
+  }
+
   return (
     <CampaignContext.Provider
       value={{
         campaign,
+        updateCampaign: useCallback(updateCampaign, []),
         setCampaign,
       }}
     >

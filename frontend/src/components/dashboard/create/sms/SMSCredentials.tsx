@@ -32,7 +32,7 @@ import TwilioCredentialsInput, {
   TwilioCredentials,
 } from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
-import { SMSCampaign, SMSProgress } from 'classes'
+import { SMSProgress } from 'classes'
 import { OutboundLink } from 'react-ga'
 import { i18n } from 'locales'
 import { LINKS } from 'config'
@@ -43,7 +43,7 @@ const SMSCredentials = ({
   setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
   const DEMO_CREDENTIAL = 'Postman_SMS_Demo'
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { hasCredential: initialHasCredential, demoMessageLimit } = campaign
   const isDemo = !!demoMessageLimit
 
@@ -115,9 +115,7 @@ const SMSCredentials = ({
       setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
-      setCampaign(
-        (campaign) => ({ ...campaign, hasCredential: true } as SMSCampaign)
-      )
+      updateCampaign({ hasCredential: true })
     } catch (err) {
       setErrorMessage(err.message)
     }

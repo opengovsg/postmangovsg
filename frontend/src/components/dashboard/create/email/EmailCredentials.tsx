@@ -14,14 +14,14 @@ import {
 import { useParams } from 'react-router-dom'
 
 import EmailValidationInput from './EmailValidationInput'
-import { EmailCampaign, EmailProgress } from 'classes'
+import { EmailProgress } from 'classes'
 
 const EmailCredentials = ({
   setActiveStep,
 }: {
   setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { hasCredential: initialHasCredential, protect } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [errorMsg, setErrorMsg] = useState(null)
@@ -39,9 +39,7 @@ const EmailCredentials = ({
       })
       setHasCredential(true)
       // Saves hasCredential property but do not advance to next step
-      setCampaign(
-        (campaign) => ({ ...campaign, hasCredential: true } as EmailCampaign)
-      )
+      updateCampaign({ hasCredential: true })
     } catch (err) {
       setErrorMsg(err.message)
     }
