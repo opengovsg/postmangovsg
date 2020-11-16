@@ -37,7 +37,7 @@ const SMSRecipients = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const {
     isCsvProcessing: initialIsProcessing,
     numRecipients: initialNumRecipients,
@@ -93,16 +93,8 @@ const SMSRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    setCampaign(
-      (campaign) =>
-        ({
-          ...campaign,
-          isCsvProcessing,
-          csvFilename,
-          numRecipients,
-        } as SMSCampaign)
-    )
-  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign])
+    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
+  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
   // Handle file upload
   async function uploadFile(files: File[]) {

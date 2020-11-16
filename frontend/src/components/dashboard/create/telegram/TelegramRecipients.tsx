@@ -27,7 +27,7 @@ import {
   StepSection,
   InfoBlock,
 } from 'components/common'
-import { TelegramCampaign, TelegramPreview, TelegramProgress } from 'classes'
+import { TelegramPreview, TelegramProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
@@ -37,7 +37,7 @@ const TelegramRecipients = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const {
     isCsvProcessing: initialIsProcessing,
     numRecipients: initialNumRecipients,
@@ -93,16 +93,8 @@ const TelegramRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    setCampaign(
-      (campaign) =>
-        ({
-          ...campaign,
-          isCsvProcessing,
-          csvFilename,
-          numRecipients,
-        } as TelegramCampaign)
-    )
-  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign])
+    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
+  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
   async function uploadFile(files: File[]) {
     setIsUploading(true)
