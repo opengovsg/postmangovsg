@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
@@ -22,33 +22,18 @@ const storeTemplateValidator = {
 }
 
 const uploadStartValidator = {
-  v1: {
-    [Segments.QUERY]: Joi.object({
-      mime_type: Joi.string().required(),
-    }),
-  },
-  v2: {
-    [Segments.QUERY]: Joi.object({
-      mime_type: Joi.string().required(),
-      md5: Joi.string().required(),
-    }),
-  },
+  [Segments.QUERY]: Joi.object({
+    mime_type: Joi.string().required(),
+    md5: Joi.string().required(),
+  }),
 }
 
 const uploadCompleteValidator = {
-  v1: {
-    [Segments.BODY]: Joi.object({
-      transaction_id: Joi.string().required(),
-      filename: Joi.string().required(),
-    }),
-  },
-  v2: {
-    [Segments.BODY]: Joi.object({
-      transaction_id: Joi.string().required(),
-      filename: Joi.string().required(),
-      etag: Joi.string().required(),
-    }),
-  },
+  [Segments.BODY]: Joi.object({
+    transaction_id: Joi.string().required(),
+    filename: Joi.string().required(),
+    etag: Joi.string().required(),
+  }),
 }
 
 const storeCredentialsValidator = {
@@ -218,6 +203,11 @@ router.put(
  *           required: true
  *           schema:
  *             type: string
+ *         - name: md5
+ *           required: true
+ *           in: query
+ *           schema:
+ *             type: string
  *       responses:
  *         200:
  *           description: Success
@@ -241,7 +231,7 @@ router.put(
  */
 router.get(
   '/upload/start',
-  celebrate(uploadStartValidator.v1),
+  celebrate(uploadStartValidator),
   CampaignMiddleware.canEditCampaign,
   UploadMiddleware.uploadStartHandler
 )
@@ -291,11 +281,8 @@ router.get(
  *         "500":
  *           description: Internal Server Error
  */
-router.get(
-  '/upload/start-v2',
-  celebrate(uploadStartValidator.v2),
-  CampaignMiddleware.canEditCampaign,
-  UploadMiddleware.uploadStartHandler
+router.get('/upload/start-v2', (_req: Request, res: Response) =>
+  res.redirect('/upload/start')
 )
 
 /**
@@ -324,6 +311,8 @@ router.get(
  *                   type: string
  *                 filename:
  *                   type: string
+ *                 etag:
+ *                   type: string
  *       responses:
  *         200:
  *           description: Success
@@ -350,7 +339,7 @@ router.get(
  */
 router.post(
   '/upload/complete',
-  celebrate(uploadCompleteValidator.v1),
+  celebrate(uploadCompleteValidator),
   CampaignMiddleware.canEditCampaign,
   TelegramTemplateMiddleware.uploadCompleteHandler
 )
@@ -407,11 +396,8 @@ router.post(
  *         "500":
  *           description: Internal Server Error
  */
-router.post(
-  '/upload/complete-v2',
-  celebrate(uploadCompleteValidator.v2),
-  CampaignMiddleware.canEditCampaign,
-  TelegramTemplateMiddleware.uploadCompleteHandler
+router.post('/upload/complete-v2', (_req: Request, res: Response) =>
+  res.redirect('/upload/complete')
 )
 
 /**
