@@ -1,5 +1,6 @@
 import { Storage, File } from '@google-cloud/storage'
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
+import fs from 'fs'
 import config from './config'
 import { decrypt } from './decrypt-dump'
 
@@ -33,10 +34,13 @@ async function init() {
 }
 
 async function downloadFile(srcFilename: string): Promise<void> {
+  const [dumpVersion, dumpFilename] = srcFilename.split('/')
+  // Save dump timestamp version to file, to be used by scripts/verify-backup.sh
+  fs.writeFileSync('dump-version.txt', dumpVersion)
   const options = {
     // The path to which the file should be downloaded
     // remove date prefix
-    destination: srcFilename.split('/')[1],
+    destination: dumpFilename,
   };
 
   console.log('Downloading file', srcFilename)
