@@ -31,7 +31,7 @@ const EmailTemplate = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const {
     body: initialBody,
     subject: initialSubject,
@@ -70,18 +70,14 @@ const EmailTemplate = ({
           from
         )
         if (updatedTemplate) {
-          setCampaign(
-            (campaign) =>
-              ({
-                ...campaign,
-                from: updatedTemplate.from,
-                subject: updatedTemplate.subject,
-                body: updatedTemplate.body,
-                replyTo: updatedTemplate.reply_to,
-                params: updatedTemplate.params,
-                numRecipients,
-              } as EmailCampaign)
-          )
+          updateCampaign({
+            from: updatedTemplate.from,
+            subject: updatedTemplate.subject,
+            body: updatedTemplate.body,
+            replyTo: updatedTemplate.reply_to,
+            params: updatedTemplate.params,
+            numRecipients,
+          })
           setActiveStep((s) => s + 1)
         }
       } catch (err) {
@@ -89,7 +85,7 @@ const EmailTemplate = ({
         if (propagateError) throw err
       }
     },
-    [body, campaignId, from, replyTo, setActiveStep, setCampaign, subject]
+    [body, campaignId, from, replyTo, setActiveStep, subject, updateCampaign]
   )
 
   async function populateFromAddresses() {

@@ -26,7 +26,7 @@ const TelegramTemplate = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { body: initialBody } = campaign as TelegramCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
@@ -45,22 +45,18 @@ const TelegramTemplate = ({
           body
         )
         if (!updatedTemplate) return
-        setCampaign(
-          (campaign) =>
-            ({
-              ...campaign,
-              body: updatedTemplate?.body,
-              params: updatedTemplate?.params,
-              numRecipients,
-            } as TelegramCampaign)
-        )
+        updateCampaign({
+          body: updatedTemplate?.body,
+          params: updatedTemplate?.params,
+          numRecipients,
+        })
         setActiveStep((s) => s + 1)
       } catch (err) {
         setErrorMsg(err.message)
         if (propagateError) throw err
       }
     },
-    [body, campaignId, setActiveStep, setCampaign]
+    [body, campaignId, setActiveStep, updateCampaign]
   )
 
   // Set callback for finish later button

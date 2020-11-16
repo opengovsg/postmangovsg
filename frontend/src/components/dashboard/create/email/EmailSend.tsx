@@ -8,7 +8,7 @@ import React, {
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { EmailCampaign, EmailProgress, Status } from 'classes'
+import { EmailProgress, Status } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -29,7 +29,7 @@ const EmailSend = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState(
@@ -63,9 +63,7 @@ const EmailSend = ({
 
   const onModalConfirm = async () => {
     await sendCampaign(+campaignId, 0)
-    setCampaign(
-      (campaign) => ({ ...campaign, status: Status.Sending } as EmailCampaign)
-    )
+    updateCampaign({ status: Status.Sending })
   }
 
   const openModal = () => {

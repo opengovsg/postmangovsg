@@ -70,22 +70,6 @@ const config = convict({
   }
 })
 
-// Only development is a non-production environment
-// Override with local config
-if (config.get('env') === 'development') {
-  config.load({
-    database: {
-      dialectOptions: {
-        ssl: {
-          require: false, // No ssl connection needed
-          rejectUnauthorized: true,
-          ca: false,
-        },
-      },
-    },
-  })
-}
-
 config.validate({ allowed: 'strict' })
 
 export default config

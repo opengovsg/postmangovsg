@@ -19,7 +19,7 @@ import {
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { exceedsCharacterThreshold, saveTemplate } from 'services/sms.service'
-import { SMSCampaign, SMSProgress } from 'classes'
+import { SMSProgress } from 'classes'
 
 import styles from '../Create.module.scss'
 
@@ -28,7 +28,7 @@ const SMSTemplate = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(campaign.body))
   const [errorMsg, setErrorMsg] = useState(null)
@@ -63,15 +63,11 @@ const SMSTemplate = ({
           body
         )
         if (updatedTemplate) {
-          setCampaign(
-            (campaign) =>
-              ({
-                ...campaign,
-                body: updatedTemplate.body,
-                params: updatedTemplate.params,
-                numRecipients,
-              } as SMSCampaign)
-          )
+          updateCampaign({
+            body: updatedTemplate.body,
+            params: updatedTemplate.params,
+            numRecipients,
+          })
           setActiveStep((s) => s + 1)
         }
       } catch (err) {
@@ -79,7 +75,7 @@ const SMSTemplate = ({
         if (propagateError) throw err
       }
     },
-    [body, campaignId, setActiveStep, setCampaign]
+    [body, campaignId, setActiveStep, updateCampaign]
   )
 
   // Set callback for finish later button

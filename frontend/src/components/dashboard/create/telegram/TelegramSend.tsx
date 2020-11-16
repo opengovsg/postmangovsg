@@ -8,7 +8,7 @@ import React, {
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { Status, ChannelType, SMSCampaign, TelegramProgress } from 'classes'
+import { Status, ChannelType, TelegramProgress } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -31,7 +31,7 @@ const TelegramSend = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
@@ -62,9 +62,7 @@ const TelegramSend = ({
     if (sendRate) {
       sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, ChannelType.Telegram)
     }
-    setCampaign(
-      (campaign) => ({ ...campaign, status: Status.Sending } as SMSCampaign)
-    )
+    updateCampaign({ status: Status.Sending })
   }
 
   const openModal = () => {

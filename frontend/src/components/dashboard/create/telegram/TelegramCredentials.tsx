@@ -35,7 +35,7 @@ import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
 import { i18n } from 'locales'
-import { TelegramCampaign, TelegramProgress } from 'classes'
+import { TelegramProgress } from 'classes'
 
 const TelegramCredentials = ({
   setActiveStep,
@@ -43,7 +43,7 @@ const TelegramCredentials = ({
   setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
   const DEMO_CREDENTIAL = 'Postman_Telegram_Demo'
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { hasCredential: initialHasCredential, demoMessageLimit } = campaign
   const isDemo = !!demoMessageLimit
 
@@ -111,6 +111,7 @@ const TelegramCredentials = ({
         await validateNewCredentials({
           campaignId: +campaignId,
           ...creds,
+          ...(saveCredentialWithLabel && { label }),
         })
       } else if (!isManual && selectedCredential) {
         await validateStoredCredentials({
@@ -124,9 +125,7 @@ const TelegramCredentials = ({
       setHasCredential(true)
       setShowCredentialFields(false)
       // Saves hasCredential property but do not advance to next step
-      setCampaign(
-        (campaign) => ({ ...campaign, hasCredential: true } as TelegramCampaign)
-      )
+      updateCampaign({ hasCredential: true })
     } catch (e) {
       setErrorMessage(e.message)
     }
