@@ -4,10 +4,12 @@ import * as Sentry from '@sentry/node'
 import config from './config'
 import { init, getUserRedactedCampaigns } from './redaction'
 import { mailClient } from './mail-client.class'
+import { getCronitor } from './utils/cronitor'
 import { Logger } from './utils/logger'
 import { createEmailBody } from './utils/generate-digest-mail'
 
 const logger = new Logger('redaction-digest')
+const cronitor = getCronitor()
 
 Sentry.init({
   dsn: config.get('sentryDsn'),
@@ -24,6 +26,7 @@ Sentry.configureScope((scope) => {
  * Lambda handler to send redaction digest
  */
 const handler = async (): Promise<{ statusCode: number }> => {
+  await cronitor?.run()
   await init()
 
   const userRedactedCampaigns = await getUserRedactedCampaigns()
@@ -55,13 +58,16 @@ const handler = async (): Promise<{ statusCode: number }> => {
   }
 
   if (failedRecipients.length > 0) {
-    logger.log(
-      `Failed to send redaction reminder emails to ${failedRecipients.join(
-        ', '
-      )}`
-    )
+    const errorMessage = `Failed to send redaction reminder emails to ${failedRecipients.join(
+      ', '
+    )}`
+
+    logger.log(errorMessage)
+    cronitor?.fail(errorMessage)
+    throw new Error(errorMessage)
   }
 
+  await cronitor?.complete()
   return { statusCode: 200 }
 }
 

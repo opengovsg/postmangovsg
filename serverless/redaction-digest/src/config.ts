@@ -140,6 +140,13 @@ const config = convict({
     env: 'SENTRY_DSN',
     format: 'required-string',
   },
+  cronitor: {
+    code: {
+      doc: 'Unique cronitor code',
+      default: '',
+      env: 'CRONITOR_CODE',
+    },
+  },
   aws: {
     awsRegion: {
       doc: 'Region for where the lambda will be deployed in.',
