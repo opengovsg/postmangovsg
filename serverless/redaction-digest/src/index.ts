@@ -25,50 +25,61 @@ Sentry.configureScope((scope) => {
 /**
  * Lambda handler to send redaction digest
  */
-const handler = async (): Promise<{ statusCode: number }> => {
-  await cronitor?.run()
-  await init()
+const handler = async (event: any): Promise<{ statusCode: number }> => {
+  try {
+    await cronitor?.run()
+    await init()
 
-  const userRedactedCampaigns = await getUserRedactedCampaigns()
+    const { selectedRecipients } = event
+    const userRedactedCampaigns = await getUserRedactedCampaigns(
+      selectedRecipients
+    )
 
-  const failedRecipients = []
-  for (const userCampaigns of userRedactedCampaigns) {
-    const { email, campaigns } = userCampaigns
+    const failedRecipients = []
+    for (const userCampaigns of userRedactedCampaigns) {
+      const { email, campaigns } = userCampaigns
 
-    try {
-      const emailBody = createEmailBody(campaigns)
+      try {
+        const emailBody = createEmailBody(campaigns)
 
-      await mailClient.sendMail({
-        recipients: [email],
-        subject:
-          'Postman.gov.sg: Reminder for expiring campaign delivery reports',
-        body: emailBody,
-      })
+        await mailClient.sendMail({
+          recipients: [email],
+          subject:
+            'Postman.gov.sg: Reminder for expiring campaign delivery reports',
+          body: emailBody,
+        })
 
-      logger.log(`Redaction reminder sent to ${email}`)
-    } catch (err) {
-      logger.log(
-        `Failed to send redaction reminder to ${email}. Error: ${err.message}`
-      )
+        logger.log(`Redaction reminder sent to ${email}`)
+      } catch (err) {
+        logger.log(
+          `Failed to send redaction reminder to ${email}. Error: ${err.message}`
+        )
 
-      failedRecipients.push(email)
-      Sentry.captureException(err)
-      await Sentry.flush(2000)
+        failedRecipients.push(email)
+        Sentry.captureException(err)
+        await Sentry.flush(2000)
+      }
     }
+
+    if (failedRecipients.length > 0) {
+      throw new Error(
+        `Failed to send redaction reminders to ${failedRecipients.join(', ')}`
+      )
+    }
+
+    await cronitor?.complete()
+    return { statusCode: 200 }
+  } catch (err) {
+    logger.log(err)
+
+    Sentry.captureException(err)
+    await Sentry.flush(2000)
+
+    cronitor?.fail(err.message)
+
+    // Rethrow error to signal a lambda failure
+    throw err
   }
-
-  if (failedRecipients.length > 0) {
-    const errorMessage = `Failed to send redaction reminder emails to ${failedRecipients.join(
-      ', '
-    )}`
-
-    logger.log(errorMessage)
-    cronitor?.fail(errorMessage)
-    throw new Error(errorMessage)
-  }
-
-  await cronitor?.complete()
-  return { statusCode: 200 }
 }
 
 export { handler }

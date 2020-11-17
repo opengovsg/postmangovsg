@@ -21,15 +21,20 @@ export const init = async (): Promise<void> => {
 /**
  * Retrieve redacted campaigns for each user
  */
-export const getUserRedactedCampaigns = async (): Promise<
-  Array<UserRedactedCampaigns>
-> => {
+export const getUserRedactedCampaigns = async (
+  selectedRecipients?: Array<string>
+): Promise<Array<UserRedactedCampaigns>> => {
+  if (selectedRecipients && selectedRecipients.length < 1) {
+    throw new Error('If specified, selectedRecipients cannot be empty')
+  }
+
   const options = {
     useMaster: false,
     replacements: {
       start: NOTICE_PERIOD,
       end: NOTICE_PERIOD * 2,
       retentionPeriod: RETENTION_PERIOD,
+      ...(selectedRecipients ? { selectedRecipients } : {}),
     },
   }
 
@@ -63,6 +68,7 @@ export const getUserRedactedCampaigns = async (): Promise<
       json_agg(campaign_json) AS campaigns
     FROM
       redacted_campaigns
+    ${selectedRecipients ? 'WHERE email IN (:selectedRecipients)' : ''}
     GROUP BY
       email;`,
       options
