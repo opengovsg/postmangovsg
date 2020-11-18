@@ -188,7 +188,7 @@ router.put(
  * path:
  *   /campaign/{campaignId}/sms/upload/start:
  *     get:
- *       description: "Get a presigned URL for upload"
+ *       description: "Get a presigned URL for upload with Content-MD5 header"
  *       tags:
  *         - SMS
  *       parameters:
@@ -289,7 +289,7 @@ router.get('/upload/start-v2', (_req: Request, res: Response) =>
  * path:
  *   /campaign/{campaignId}/sms/upload/complete:
  *     post:
- *       description: "Complete upload session"
+ *       description: "Complete upload session with ETag verification"
  *       tags:
  *         - SMS
  *       parameters:
