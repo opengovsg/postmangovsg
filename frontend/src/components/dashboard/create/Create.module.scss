@@ -130,8 +130,12 @@
   font-style: italic;
   color: $secondary;
   text-decoration: underline;
-  &.infoLink {
-    color: $primary;
+  color: $primary;
+  &.botLink {
+    font-weight: bold;
+    &:active {
+      color: $red;
+    }
   }
 }
 
