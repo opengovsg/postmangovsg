@@ -251,6 +251,7 @@ jobs:
             - SES_PASS=$PRODUCTION_REDACTION_DIGEST_SES_PASS
             - SES_USER=$PRODUCTION_REDACTION_DIGEST_SES_USER
             - SES_PORT=$PRODUCTION_REDACTION_DIGEST_SES_PORT
+            - CRONITOR_CODE=$PRODUCTION_REDACTION_CRONITOR
         - provider: lambda
           edge: true
           function_name: redaction-digest-staging
@@ -276,6 +277,7 @@ jobs:
             - SES_PASS=$STAGING_REDACTION_DIGEST_SES_PASS
             - SES_USER=$STAGING_REDACTION_DIGEST_SES_USER
             - SES_PORT=$STAGING_REDACTION_DIGEST_SES_PORT
+            - CRONITOR_CODE=$STAGING_REDACTION_CRONITOR
     - name: root
       install:
         - npm install --ignore-scripts
