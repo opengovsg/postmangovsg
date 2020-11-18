@@ -213,7 +213,7 @@ router.put(
  * path:
  *   /campaign/{campaignId}/email/upload/start:
  *     get:
- *       description: "Get a presigned URL for upload with Content-MD5 header"
+ *       summary: "Get a presigned URL for upload with Content-MD5 header"
  *       tags:
  *         - Email
  *       parameters:
@@ -265,7 +265,7 @@ router.get(
  * path:
  *   /campaign/{campaignId}/email/upload/start-v2:
  *     get:
- *       description: "Get a presigned URL for upload with Content-MD5 header"
+ *       summary: "Get a presigned URL for upload with Content-MD5 header"
  *       tags:
  *         - Email
  *       parameters:
@@ -314,7 +314,7 @@ router.get('/upload/start-v2', (_req: Request, res: Response) =>
  * path:
  *   /campaign/{campaignId}/email/upload/complete:
  *     post:
- *       description: "Complete upload session with ETag verification"
+ *       summary: "Complete upload session with ETag verification"
  *       tags:
  *         - Email
  *       parameters:
@@ -361,7 +361,7 @@ router.post(
  * path:
  *   /campaign/{campaignId}/email/upload/complete-v2:
  *     post:
- *       description: "Complete upload session with ETag verification"
+ *       summary: "Complete upload session with ETag verification"
  *       tags:
  *         - Email
  *       parameters:
@@ -405,7 +405,7 @@ router.post('/upload/complete-v2', (_req: Request, res: Response) =>
  * path:
  *   /campaign/{campaignId}/email/upload/status:
  *     get:
- *       description: "Get csv processing status"
+ *       summary: "Get csv processing status"
  *       tags:
  *         - Email
  *       parameters:
@@ -813,7 +813,7 @@ router.get(
  * path:
  *   /campaign/{campaignId}/email/protect/upload/complete:
  *     post:
- *       description: Complete multipart upload
+ *       summary: Complete multipart upload
  *       tags:
  *         - Email
  *       parameters:

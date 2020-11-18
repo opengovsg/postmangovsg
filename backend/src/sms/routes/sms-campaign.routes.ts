@@ -188,7 +188,7 @@ router.put(
  * path:
  *   /campaign/{campaignId}/sms/upload/start:
  *     get:
- *       description: "Get a presigned URL for upload with Content-MD5 header"
+ *       summary: "Get a presigned URL for upload with Content-MD5 header"
  *       tags:
  *         - SMS
  *       parameters:
@@ -240,7 +240,7 @@ router.get(
  * path:
  *   /campaign/{campaignId}/sms/upload/start-v2:
  *     get:
- *       description: "Get a presigned URL for upload with Content-MD5 header"
+ *       summary: "Get a presigned URL for upload with Content-MD5 header"
  *       tags:
  *         - SMS
  *       parameters:
@@ -289,7 +289,7 @@ router.get('/upload/start-v2', (_req: Request, res: Response) =>
  * path:
  *   /campaign/{campaignId}/sms/upload/complete:
  *     post:
- *       description: "Complete upload session with ETag verification"
+ *       summary: "Complete upload session with ETag verification"
  *       tags:
  *         - SMS
  *       parameters:
@@ -336,7 +336,7 @@ router.post(
  * path:
  *   /campaign/{campaignId}/sms/upload/complete-v2:
  *     post:
- *       description: "Complete upload session with ETag verification"
+ *       summary: "Complete upload session with ETag verification"
  *       tags:
  *         - SMS
  *       parameters:
@@ -380,7 +380,7 @@ router.post('/upload/complete-v2', (_req: Request, res: Response) =>
  * path:
  *   /campaign/{campaignId}/sms/upload/status:
  *     get:
- *       description: "Get csv processing status"
+ *       summary: "Get csv processing status"
  *       tags:
  *         - SMS
  *       parameters:
