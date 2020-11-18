@@ -13,6 +13,7 @@ jobs:
     - name: backend
       before_install:
         - cd $TRAVIS_BUILD_DIR/backend
+        - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       install:
         - npm ci
       script:
@@ -46,6 +47,7 @@ jobs:
     - name: worker
       before_install:
         - cd $TRAVIS_BUILD_DIR/worker
+        - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       install:
         - npm ci
       script:
@@ -71,13 +73,19 @@ jobs:
       install:
         - npm install
       script:
+        - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
         - npm run compile
         - npm run lint-no-fix
         - CI=false npm run build
     - name: serverless-unsubscribe-digest
-      before_deploy:
+      before_install:
         - cd $TRAVIS_BUILD_DIR/serverless/unsubscribe-digest
-        - npm install && npm run build
+      install:
+        - npm install
+      before_deploy:
+        - npx lockfile-lint --type npm --path package-lock.json --validate-https --allowed-hosts npm
+        - npm run build
+        - npm prune --production
         - zip -qr code.zip build src package.json node_modules/
       deploy:
         - provider: lambda
@@ -132,8 +140,11 @@ jobs:
             - SES_PORT=$STAGING_UNSUBSCRIBE_DIGEST_SES_PORT
             - UNSUBSCRIBE_GUIDE_URL=$UNSUBSCRIBE_GUIDE_URL
     - name: serverless-database-backup
-      before_deploy:
+      before_install:
         - cd $TRAVIS_BUILD_DIR/serverless/database-backup
+      script:
+        - npx lockfile-lint --type npm --path package-lock.json --validate-https --allowed-hosts npm
+      before_deploy:
         - npm run build:docker
       deploy:
         - provider: lambda
@@ -225,4 +236,5 @@ jobs:
       install:
         - npm install --ignore-scripts
       script:
+        - npx lockfile-lint --type npm --path package-lock.json --validate-https --allowed-hosts npm
         - npm run lint-no-fix
