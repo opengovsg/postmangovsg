@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
@@ -38,12 +38,6 @@ const uploadCompleteValidator = {
 }
 
 const storeCredentialsValidator = {
-  [Segments.BODY]: Joi.object({
-    telegram_bot_token: Joi.string().trim().required(),
-  }),
-}
-
-const storeCredentialsValidatorV2 = {
   [Segments.BODY]: Joi.object({
     telegram_bot_token: Joi.string().trim().required(),
     label: Joi.string()
@@ -516,7 +510,7 @@ router.get('/preview', TelegramMiddleware.previewFirstMessage)
  *    post:
  *      tags:
  *        - Telegram
- *      summary: Validate Telegram bot token and assign to campaign
+ *      summary: Validate Telegram bot token and assign to campaign, if label is provided store new telegram credentials for user
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -532,6 +526,12 @@ router.get('/preview', TelegramMiddleware.previewFirstMessage)
  *              properties:
  *                telegram_bot_token:
  *                  type: string
+ *                label:
+ *                      type: string
+ *                      pattern: '/^[a-z0-9-]+$/'
+ *                      minLength: 1
+ *                      maxLength: 50
+ *                      description: should only consist of lowercase alphanumeric characters and dashes
  *
  *      responses:
  *        200:
@@ -556,6 +556,7 @@ router.post(
   TelegramMiddleware.disabledForDemoCampaign,
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
+  SettingsMiddleware.checkAndStoreLabelIfExists,
   TelegramMiddleware.setCampaignCredential
 )
 /**
@@ -604,15 +605,8 @@ router.post(
  *        "500":
  *           description: Internal Server Error
  */
-router.post(
-  '/new-credentials/v2',
-  celebrate(storeCredentialsValidatorV2),
-  CampaignMiddleware.canEditCampaign,
-  TelegramMiddleware.disabledForDemoCampaign,
-  TelegramMiddleware.getCredentialsFromBody,
-  TelegramMiddleware.validateAndStoreCredentials,
-  SettingsMiddleware.checkAndStoreLabelIfExists,
-  TelegramMiddleware.setCampaignCredential
+router.post('/new-credentials/v2', (_req: Request, res: Response) =>
+  res.redirect('/new-credentials')
 )
 
 /**
