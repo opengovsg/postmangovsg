@@ -188,7 +188,7 @@ const ExportRecipients = ({
         <div className={styles.actionButton}>
           <InfoBlock className={styles.notice}>
             <Trans>
-              Delivery report will expire 7 days after sending is completed.
+              Delivery report will expire 14 days after sending is completed.
             </Trans>
           </InfoBlock>
           <ActionButton

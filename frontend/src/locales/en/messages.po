@@ -18,8 +18,8 @@ msgid "Delivery report has expired and is no longer available for download."
 msgstr "Delivery report has expired and is no longer available for download."
 
 #: src/components/common/export-recipients/ExportRecipients.tsx:133
-msgid "Delivery report will expire 7 days after sending is completed."
-msgstr "Delivery report will expire 7 days after sending is completed."
+msgid "Delivery report will expire 14 days after sending is completed."
+msgstr "Delivery report will expire 14 days after sending is completed."
 
 #: src/components/login/login-input/LoginInput.tsx:86
 msgid "Enter OTP"
