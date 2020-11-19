@@ -11,7 +11,7 @@ export const createEmailBody = (
   redactedCampaigns: Array<RedactedCampaign>
 ): string => {
   const intro = `
-    Greetings,<br><br>
+    Greetings,<br>
 
     <p>
       This is a gentle reminder that our post-campaign report will only be available for download for
@@ -19,6 +19,34 @@ export const createEmailBody = (
       security measure to prevent access to the entire contact list used in the campaign.
     </p>
 
+    <p>
+      <b>List of delivery reports expiring in the next ${NOTICE_PERIOD} days</b>
+    </p>
+  `
+
+  const dailyCampaigns = groupBy(redactedCampaigns, (c) =>
+    moment(c.expiry_date).format('DD-MM-YYYY')
+  )
+  const digest = Object.keys(dailyCampaigns)
+    .sort()
+    .reduce((body: string, date: string) => {
+      const campaigns = dailyCampaigns[date]
+      body += `
+        <ul>
+          <li><b>Expiring on ${date}</b></li>
+          <ul>
+            ${campaigns.reduce(
+              (list, c) => list.concat(`<li>${c.name}</li>`),
+              ''
+            )}
+          </ul>
+        </ul>
+      `
+
+      return body
+    }, '')
+
+  const footer = `
     <p>
       <b>Best Practices</b><br>
       <ol>
@@ -34,43 +62,13 @@ export const createEmailBody = (
     </p>
 
     <p>
-      The downloads of delivery reports for the following campaigns will be expiring ${NOTICE_PERIOD} or more days later:
-    </p>
-  `
-
-  const dailyCampaigns = groupBy(redactedCampaigns, (c) =>
-    moment(c.expiry_date).format('DD-MM-YYYY')
-  )
-  const digest = Object.keys(dailyCampaigns)
-    .sort()
-    .reduce((body: string, date: string) => {
-      const campaigns = dailyCampaigns[date]
-      body += `
-        <p>
-          <u><b>Expiring on ${date}</b></u><br>
-          <ul>
-            ${campaigns.reduce(
-              (list, c) => list.concat(`<li>${c.name}</li>`),
-              ''
-            )}
-          </ul>
-        </p>
-      `
-
-      return body
-    }, '')
-
-  const footer = `
-    <p>
       Please log in to <a href="https://postman.gov.sg">postman.gov.sg</a> and navigate to your campaign
       landing page to download your report if you wish to keep it for audit purpose.
     </p>
 
     <p>
-      Please visit our <a href="https://guide.postman.gov.sg" target=_blank>guide</a> if you have
-      additional questions on the unsubscribe feature for the recipient.<br><br>
       Thank you,<br>
-      Postman.gov.sg
+      <a href="https://postman.gov.sg">Postman.gov.sg</a> &bull; Open Government Products &bull; <a href="https://open.gov.sg">open.gov.sg</a>
     </p>
   `
 
