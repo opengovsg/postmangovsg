@@ -1,16 +1,23 @@
+import { URL } from 'url'
 import axios from 'axios'
 import { Cronitor } from '../interface'
 import config from '../config'
 import { Logger } from './logger'
 
 const logger = new Logger('db-backup')
-
-const CRONITOR_PING_URL = `https://cronitor.link`
 const CRONITOR_CODE = config.get('cronitor.code')
 
+/**
+ * Utility method to build Cronitor ping url
+ * @param action Type of ping action
+ * @param message Optional message for Cronitor ping
+ */
 const buildUrl = (action: string, message?: string): string => {
-  const url = `${CRONITOR_PING_URL}/${CRONITOR_CODE}/${action}`
-  return message ? `${url}?msg=${message}` : url
+  const url = new URL(`${CRONITOR_CODE}/${action}`, 'https://cronitor.link')
+  if (message) {
+    url.searchParams.append('message', message)
+  }
+  return url.toString()
 }
 
 /**
