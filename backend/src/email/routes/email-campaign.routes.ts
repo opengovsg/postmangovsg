@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
@@ -13,6 +13,7 @@ import {
 } from '@email/middlewares'
 import config from '@core/config'
 import { fromAddressValidator } from '@core/utils/from-address'
+import { redirectTo } from '@core/utils/request'
 
 const router = Router({ mergeParams: true })
 
@@ -305,9 +306,7 @@ router.get(
  *         "500":
  *           description: Internal Server Error
  */
-router.get('/upload/start-v2', (_req: Request, res: Response) =>
-  res.redirect('/upload/start')
-)
+router.get('/upload/start-v2', redirectTo('/upload/start'))
 
 /**
  * @swagger
@@ -396,9 +395,7 @@ router.post(
  *         "500":
  *           description: Internal Server Error
  */
-router.post('/upload/complete-v2', (_req: Request, res: Response) =>
-  res.redirect('/upload/complete')
-)
+router.post('/upload/complete-v2', redirectTo('/upload/complete'))
 
 /**
  * @swagger
