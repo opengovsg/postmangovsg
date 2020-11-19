@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, MutableRefObject } from 'react'
 import cx from 'classnames'
 import styles from './TextInputWithButton.module.scss'
 import { PrimaryButton, TextInput } from '../'
-import InputError from './InputError'
 
 interface TextInputWithButtonProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
@@ -54,10 +53,10 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   }
 
   return (
-    <form className={styles.textInPutForm} onSubmit={asyncSubmit}>
+    <form className={styles.textInputForm} onSubmit={asyncSubmit}>
       <div className={styles.inputWithButton}>
         <TextInput
-          className={styles.textInput}
+          className={cx(styles.textInput, { [styles.error]: errorMessage })}
           value={value}
           onChange={onChange}
           type={type}
@@ -73,10 +72,8 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
           {asyncLoading ? loadingButtonLabel : buttonLabel}
         </PrimaryButton>
       </div>
-      {errorMessage ? (
-        <InputError errorMessage={errorMessage}></InputError>
-      ) : (
-        <></>
+      {errorMessage && (
+        <span className={styles.errorMessage}>{errorMessage}</span>
       )}
     </form>
   )

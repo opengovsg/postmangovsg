@@ -30,9 +30,7 @@ const Login = () => {
               src={appLogo}
               alt="Postman logo"
             ></img>
-            start
             <LoginInput></LoginInput>
-            end
           </div>
           <div className={styles.landingImg}>
             <img src={loginImg} alt="Landing page graphic"></img>

@@ -2,21 +2,20 @@
 
 $button-width: 7rem;
 
-// .textInputForm {
-//   margin: 2rem 0;
-// }
-
 .inputWithButton {
   width: 100%;
   box-sizing: border-box;
   display: flex;
-  margin: 2rem 0;
 
   input.textInput {
     width: 100%;
     flex-shrink: 1;
     margin-right: -$button-height;
     padding-right: $button-height + 0.5rem;
+  }
+
+  input.textInput.error {
+    border-color: $error;
   }
 }
 
@@ -27,7 +26,7 @@ $button-width: 7rem;
 }
 
 .errorMessage {
-  color: #db4f5d; // TODO: change to var
-  font-size: 0.75rem;
-  margin: 0 1.4rem;
+  @extend %caption;
+  padding-left: $border-radius;
+  color: $error;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import cx from 'classnames'
 import { noop } from 'lodash'
-import { TextInputWithButton, ErrorBlock, TextButton } from 'components/common'
+import { TextInputWithButton, TextButton } from 'components/common'
 import {
   getOtpWithEmail,
   loginWithOtp,
@@ -79,7 +79,7 @@ const Login = () => {
 
   return (
     <div className={styles.container}>
-      <h4 className={styles.text}>
+      <h3 className={styles.text}>
         {!otpSent ? (
           <Trans>Sign in with your gov.sg email</Trans>
         ) : (
@@ -98,7 +98,7 @@ const Login = () => {
             )}
           </TextButton>
         )}
-      </h4>
+      </h3>
 
       {!otpSent ? (
         <TextInputWithButton
