@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express'
+import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
@@ -605,9 +605,7 @@ router.post(
  *        "500":
  *           description: Internal Server Error
  */
-router.post('/new-credentials/v2', (_req: Request, res: Response) =>
-  res.redirect('/new-credentials')
-)
+router.post('/new-credentials/v2', redirectTo('/new-credentials'))
 
 /**
  * @swagger
