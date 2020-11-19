@@ -6,11 +6,7 @@ type Props = {
 }
 
 const InputError: React.FC<Props> = (props) => {
-  return (
-    <div className={styles.errorMessage}>
-      {props.errorMessage}
-    </div>
-  )
+  return <div className={styles.errorMessage}>{props.errorMessage}</div>
 }
 
 export default InputError

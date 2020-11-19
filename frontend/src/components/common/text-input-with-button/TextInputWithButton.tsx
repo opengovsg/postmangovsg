@@ -28,7 +28,7 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   textRef,
   buttonLabel,
   loadingButtonLabel,
-  errorMessage
+  errorMessage,
 }) => {
   const [asyncLoading, setAsyncLoading] = useState(false)
   const isMounted = useRef(true)
@@ -56,29 +56,28 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   return (
     <form className={styles.textInPutForm} onSubmit={asyncSubmit}>
       <div className={styles.inputWithButton}>
-      <TextInput
-        className={styles.textInput}
-        value={value}
-        onChange={onChange}
-        type={type}
-        disabled={inputDisabled || asyncLoading}
-        placeholder={placeholder}
-        ref={textRef}
-      />
-      <PrimaryButton
-        className={cx(styles.inputButton, className)}
-        disabled={buttonDisabled || asyncLoading}
-        type="submit"
-      >
-        {asyncLoading ? loadingButtonLabel : buttonLabel}
-      </PrimaryButton>
+        <TextInput
+          className={styles.textInput}
+          value={value}
+          onChange={onChange}
+          type={type}
+          disabled={inputDisabled || asyncLoading}
+          placeholder={placeholder}
+          ref={textRef}
+        />
+        <PrimaryButton
+          className={cx(styles.inputButton, className)}
+          disabled={buttonDisabled || asyncLoading}
+          type="submit"
+        >
+          {asyncLoading ? loadingButtonLabel : buttonLabel}
+        </PrimaryButton>
       </div>
-      {
-        errorMessage ?
-          <InputError errorMessage={errorMessage}></InputError>
-          :
-          <></>
-      }
+      {errorMessage ? (
+        <InputError errorMessage={errorMessage}></InputError>
+      ) : (
+        <></>
+      )}
     </form>
   )
 }
