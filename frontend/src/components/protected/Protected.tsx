@@ -2,11 +2,7 @@ import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { fetchMessage } from 'services/decrypt-mail.service'
-import {
-  TextInputWithButton,
-  ErrorBlock,
-  ProtectedPreview,
-} from 'components/common'
+import { TextInputWithButton, ProtectedPreview } from 'components/common'
 
 import styles from './Protected.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
@@ -34,22 +30,24 @@ const Protected = () => {
         {decryptedMessage ? (
           <ProtectedPreview html={decryptedMessage} />
         ) : (
-          <>
-            <img src={appLogo} alt="" />
+          <div className={styles.verification}>
+            <img src={appLogo} className={styles.appLogo} alt="" />
             <img src={landingHero} className={styles.landingHero} alt="" />
-            <h2>You&apos;ve got mail</h2>
-            <TextInputWithButton
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={setPassword}
-              buttonDisabled={!password}
-              onClick={onAccessMail}
-              buttonLabel="Access Mail"
-              loadingButtonLabel="Decrypting your mail"
-            ></TextInputWithButton>
-            <ErrorBlock>{errorMsg}</ErrorBlock>
-          </>
+            <h3 className={styles.title}>You&apos;ve got mail</h3>
+            <div className={styles.passwordInput}>
+              <TextInputWithButton
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={setPassword}
+                buttonDisabled={!password}
+                onClick={onAccessMail}
+                buttonLabel="Access Mail"
+                loadingButtonLabel="Decrypting your mail"
+                errorMessage={errorMsg}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>
