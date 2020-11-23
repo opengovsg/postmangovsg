@@ -4,7 +4,6 @@ import cx from 'classnames'
 import {
   TextInputWithButton,
   ConfirmModal,
-  ErrorBlock,
   StepHeader,
 } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
@@ -140,6 +139,7 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
         onClick={onButtonClick}
         className={buttonClass}
         textRef={apiKeyRef}
+        errorMessage={errorMsg}
         buttonLabel={
           <>
             {buttonLabel} API key
@@ -147,7 +147,6 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
           </>
         }
       />
-      <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )
 }
