@@ -11,6 +11,7 @@ import {
   TelegramStatsMiddleware,
   TelegramTemplateMiddleware,
 } from '@telegram/middlewares'
+import { redirectTo } from '@core/utils/request'
 
 const router = Router({ mergeParams: true })
 
@@ -22,42 +23,21 @@ const storeTemplateValidator = {
 }
 
 const uploadStartValidator = {
-  v1: {
-    [Segments.QUERY]: Joi.object({
-      mime_type: Joi.string().required(),
-    }),
-  },
-  v2: {
-    [Segments.QUERY]: Joi.object({
-      mime_type: Joi.string().required(),
-      md5: Joi.string().required(),
-    }),
-  },
-}
-
-const uploadCompleteValidator = {
-  v1: {
-    [Segments.BODY]: Joi.object({
-      transaction_id: Joi.string().required(),
-      filename: Joi.string().required(),
-    }),
-  },
-  v2: {
-    [Segments.BODY]: Joi.object({
-      transaction_id: Joi.string().required(),
-      filename: Joi.string().required(),
-      etag: Joi.string().required(),
-    }),
-  },
-}
-
-const storeCredentialsValidator = {
-  [Segments.BODY]: Joi.object({
-    telegram_bot_token: Joi.string().trim().required(),
+  [Segments.QUERY]: Joi.object({
+    mime_type: Joi.string().required(),
+    md5: Joi.string().required(),
   }),
 }
 
-const storeCredentialsValidatorV2 = {
+const uploadCompleteValidator = {
+  [Segments.BODY]: Joi.object({
+    transaction_id: Joi.string().required(),
+    filename: Joi.string().required(),
+    etag: Joi.string().required(),
+  }),
+}
+
+const storeCredentialsValidator = {
   [Segments.BODY]: Joi.object({
     telegram_bot_token: Joi.string().trim().required(),
     label: Joi.string()
@@ -204,54 +184,7 @@ router.put(
  * path:
  *   /campaign/{campaignId}/telegram/upload/start:
  *     get:
- *       description: "Get a presigned URL for upload"
- *       tags:
- *         - Telegram
- *       parameters:
- *         - name: campaignId
- *           in: path
- *           required: true
- *           schema:
- *             type: string
- *         - name: mime_type
- *           in: query
- *           required: true
- *           schema:
- *             type: string
- *       responses:
- *         200:
- *           description: Success
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   presigned_url:
- *                     type: string
- *                   transaction_id:
- *                     type: string
- *         "400":
- *           description: Bad Request
- *         "401":
- *           description: Unauthorized
- *         "403":
- *           description: Forbidden, campaign not owned by user or job in progress
- *         "500":
- *           description: Internal Server Error
- */
-router.get(
-  '/upload/start',
-  celebrate(uploadStartValidator.v1),
-  CampaignMiddleware.canEditCampaign,
-  UploadMiddleware.uploadStartHandler
-)
-
-/**
- * @swagger
- * path:
- *   /campaign/{campaignId}/telegram/upload/start-v2:
- *     get:
- *       description: "Get a presigned URL for upload with Content-MD5 header"
+ *       summary: "Get a presigned URL for upload with Content-MD5 header"
  *       tags:
  *         - Telegram
  *       parameters:
@@ -292,8 +225,8 @@ router.get(
  *           description: Internal Server Error
  */
 router.get(
-  '/upload/start-v2',
-  celebrate(uploadStartValidator.v2),
+  '/upload/start',
+  celebrate(uploadStartValidator),
   CampaignMiddleware.canEditCampaign,
   UploadMiddleware.uploadStartHandler
 )
@@ -301,9 +234,9 @@ router.get(
 /**
  * @swagger
  * path:
- *   /campaign/{campaignId}/telegram/upload/complete:
- *     post:
- *       description: "Complete upload session"
+ *   /campaign/{campaignId}/telegram/upload/start-v2:
+ *     get:
+ *       summary: "Get a presigned URL for upload with Content-MD5 header"
  *       tags:
  *         - Telegram
  *       parameters:
@@ -312,55 +245,44 @@ router.get(
  *           required: true
  *           schema:
  *             type: string
- *       requestBody:
- *         content:
- *           application/json:
- *             schema:
- *               required:
- *                 - transaction_id
- *                 - filename
- *               properties:
- *                 transaction_id:
- *                   type: string
- *                 filename:
- *                   type: string
+ *         - name: mime_type
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: md5
+ *           required: true
+ *           in: query
+ *           schema:
+ *             type: string
  *       responses:
  *         200:
  *           description: Success
  *           content:
  *             application/json:
  *               schema:
+ *                 type: object
  *                 properties:
- *                   num_recipients:
- *                     type: number
- *                   preview:
- *                     type: object
- *                     properties:
- *                       body:
- *                         type: string
- *
- *         "400" :
+ *                   presigned_url:
+ *                     type: string
+ *                   transaction_id:
+ *                     type: string
+ *         "400":
  *           description: Bad Request
  *         "401":
  *           description: Unauthorized
  *         "403":
- *          description: Forbidden, campaign not owned by user or job in progress
+ *           description: Forbidden, campaign not owned by user or job in progress
  *         "500":
  *           description: Internal Server Error
  */
-router.post(
-  '/upload/complete',
-  celebrate(uploadCompleteValidator.v1),
-  CampaignMiddleware.canEditCampaign,
-  TelegramTemplateMiddleware.uploadCompleteHandler
-)
-
+router.get('/upload/start-v2', redirectTo('/upload/start'))
 /**
  * @swagger
  * path:
- *   /campaign/{campaignId}/telegram/upload/complete-v2:
+ *   /campaign/{campaignId}/telegram/upload/complete:
  *     post:
- *       description: "Complete upload session with ETag verification"
+ *       summary: "Complete upload session with ETag verification"
  *       tags:
  *         - Telegram
  *       parameters:
@@ -408,8 +330,8 @@ router.post(
  *           description: Internal Server Error
  */
 router.post(
-  '/upload/complete-v2',
-  celebrate(uploadCompleteValidator.v2),
+  '/upload/complete',
+  celebrate(uploadCompleteValidator),
   CampaignMiddleware.canEditCampaign,
   TelegramTemplateMiddleware.uploadCompleteHandler
 )
@@ -417,9 +339,63 @@ router.post(
 /**
  * @swagger
  * path:
+ *   /campaign/{campaignId}/telegram/upload/complete-v2:
+ *     post:
+ *       summary: "Complete upload session with ETag verification"
+ *       tags:
+ *         - Telegram
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - transaction_id
+ *                 - filename
+ *               properties:
+ *                 transaction_id:
+ *                   type: string
+ *                 filename:
+ *                   type: string
+ *                 etag:
+ *                   type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 properties:
+ *                   num_recipients:
+ *                     type: number
+ *                   preview:
+ *                     type: object
+ *                     properties:
+ *                       body:
+ *                         type: string
+ *
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *          description: Forbidden, campaign not owned by user or job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post('/upload/complete-v2', redirectTo('/upload/complete'))
+
+/**
+ * @swagger
+ * path:
  *   /campaign/{campaignId}/telegram/upload/status:
  *     get:
- *       description: "Get csv processing status"
+ *       summary: "Get csv processing status"
  *       tags:
  *         - Telegram
  *       parameters:
@@ -534,7 +510,7 @@ router.get('/preview', TelegramMiddleware.previewFirstMessage)
  *    post:
  *      tags:
  *        - Telegram
- *      summary: Validate Telegram bot token and assign to campaign
+ *      summary: Validate Telegram bot token and assign to campaign, if label is provided store new telegram credentials for user
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -550,6 +526,12 @@ router.get('/preview', TelegramMiddleware.previewFirstMessage)
  *              properties:
  *                telegram_bot_token:
  *                  type: string
+ *                label:
+ *                      type: string
+ *                      pattern: '/^[a-z0-9-]+$/'
+ *                      minLength: 1
+ *                      maxLength: 50
+ *                      description: should only consist of lowercase alphanumeric characters and dashes
  *
  *      responses:
  *        200:
@@ -574,6 +556,7 @@ router.post(
   TelegramMiddleware.disabledForDemoCampaign,
   TelegramMiddleware.getCredentialsFromBody,
   TelegramMiddleware.validateAndStoreCredentials,
+  SettingsMiddleware.checkAndStoreLabelIfExists,
   TelegramMiddleware.setCampaignCredential
 )
 /**
@@ -622,16 +605,7 @@ router.post(
  *        "500":
  *           description: Internal Server Error
  */
-router.post(
-  '/new-credentials/v2',
-  celebrate(storeCredentialsValidatorV2),
-  CampaignMiddleware.canEditCampaign,
-  TelegramMiddleware.disabledForDemoCampaign,
-  TelegramMiddleware.getCredentialsFromBody,
-  TelegramMiddleware.validateAndStoreCredentials,
-  SettingsMiddleware.checkAndStoreLabelIfExists,
-  TelegramMiddleware.setCampaignCredential
-)
+router.post('/new-credentials/v2', redirectTo('/new-credentials'))
 
 /**
  * @swagger

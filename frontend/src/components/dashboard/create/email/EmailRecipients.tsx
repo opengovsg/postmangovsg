@@ -27,7 +27,7 @@ import {
   StepHeader,
   StepSection,
 } from 'components/common'
-import { EmailCampaign, EmailPreview, EmailProgress } from 'classes'
+import { EmailPreview, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 
 import styles from '../Create.module.scss'
@@ -43,7 +43,7 @@ const EmailRecipients = ({
   template?: string
   forceReset?: boolean // this forces upload button to show without csv info and preview
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const {
     csvFilename: initialCsvFilename,
     isCsvProcessing: initialIsProcessing,
@@ -110,16 +110,8 @@ const EmailRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    setCampaign(
-      (campaign) =>
-        ({
-          ...campaign,
-          isCsvProcessing,
-          csvFilename,
-          numRecipients,
-        } as EmailCampaign)
-    )
-  }, [isCsvProcessing, csvFilename, numRecipients, setCampaign])
+    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
+  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
   // Handle file upload
   async function uploadFile(files: File[]) {

@@ -8,7 +8,7 @@ import React, {
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { Status, ChannelType, SMSCampaign, SMSProgress } from 'classes'
+import { Status, ChannelType, SMSProgress } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -31,7 +31,7 @@ const SMSSend = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
-  const { campaign, setCampaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
@@ -62,9 +62,7 @@ const SMSSend = ({
     if (sendRate) {
       sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, ChannelType.SMS)
     }
-    setCampaign(
-      (campaign) => ({ ...campaign, status: Status.Sending } as SMSCampaign)
-    )
+    updateCampaign({ status: Status.Sending })
   }
 
   const openModal = () => {

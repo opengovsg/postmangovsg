@@ -48,7 +48,7 @@ export async function validateNewCredentials({
   label?: string
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/sms/new-credentials/v2`, {
+    await axios.post(`/campaign/${campaignId}/sms/new-credentials`, {
       recipient,
       label,
       twilio_account_sid: accountSid,
