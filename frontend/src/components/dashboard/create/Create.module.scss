@@ -136,9 +136,8 @@
 }
 
 .characterCount {
-  margin-top: -1rem;
+  @extend %body-2;
   text-align: right;
-  font-size: 0.85rem;
   color: $light-grey;
 }
 

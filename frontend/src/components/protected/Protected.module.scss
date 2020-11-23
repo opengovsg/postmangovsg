@@ -9,25 +9,45 @@
   overflow: auto;
 }
 
-.landingHero {
-  margin: 2rem 0;
-  width: 500px;
-  max-width: 70%;
-}
-
 .inner {
-  @include flex-center();
-  flex-direction: column;
-  max-width: $content-max-width;
+  width: 800px;
+  margin: $layout-3 0;
   background-color: white;
-  padding: 5vw;
-  margin: 2rem 0;
   border-radius: $border-radius;
   box-shadow: 0.2rem 0.2rem 1rem 0 lighten($light-grey, 20%);
 
   @include mobile() {
+    width: 100%;
     min-height: 100vh;
     border-radius: 0;
     margin: 0;
+  }
+}
+
+.verification {
+  @include flex-center();
+  flex-direction: column;
+  margin: $layout-5 0;
+
+  .appLogo {
+    width: 200px;
+  }
+
+  .landingHero {
+    margin: $layout-4 0;
+    width: 236px;
+  }
+
+  .title {
+    margin: 0;
+    margin-bottom: $spacing-5;
+  }
+
+  .passwordInput {
+    width: 475px;
+
+    @include mobile() {
+      max-width: 70%;
+    }
   }
 }

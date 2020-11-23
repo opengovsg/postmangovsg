@@ -360,9 +360,11 @@ const TelegramCredentials = ({
                     <b>subscribed to the bot</b>.
                   </p>
                 </StepHeader>
-                <TelegramValidationInput
-                  onClick={handleSendValidationMessage}
-                />
+                <div>
+                  <TelegramValidationInput
+                    onClick={handleSendValidationMessage}
+                  />
+                </div>
                 {sendSuccess && (
                   <DetailBlock>
                     <li>

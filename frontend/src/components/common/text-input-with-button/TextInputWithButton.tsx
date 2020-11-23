@@ -12,6 +12,7 @@ interface TextInputWithButtonProps
   textRef?: MutableRefObject<HTMLInputElement | undefined>
   buttonLabel?: React.ReactNode
   loadingButtonLabel?: React.ReactNode
+  errorMessage?: string | null
 }
 
 const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = ({
@@ -26,6 +27,7 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   textRef,
   buttonLabel,
   loadingButtonLabel,
+  errorMessage,
 }) => {
   const [asyncLoading, setAsyncLoading] = useState(false)
   const isMounted = useRef(true)
@@ -51,23 +53,28 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   }
 
   return (
-    <form className={styles.inputWithButton} onSubmit={asyncSubmit}>
-      <TextInput
-        className={styles.textInput}
-        value={value}
-        onChange={onChange}
-        type={type}
-        disabled={inputDisabled || asyncLoading}
-        placeholder={placeholder}
-        ref={textRef}
-      />
-      <PrimaryButton
-        className={cx(styles.inputButton, className)}
-        disabled={buttonDisabled || asyncLoading}
-        type="submit"
-      >
-        {asyncLoading ? loadingButtonLabel : buttonLabel}
-      </PrimaryButton>
+    <form className={styles.textInputForm} onSubmit={asyncSubmit}>
+      <div className={styles.inputWithButton}>
+        <TextInput
+          className={cx(styles.textInput, { [styles.error]: errorMessage })}
+          value={value}
+          onChange={onChange}
+          type={type}
+          disabled={inputDisabled || asyncLoading}
+          placeholder={placeholder}
+          ref={textRef}
+        />
+        <PrimaryButton
+          className={cx(styles.inputButton, className)}
+          disabled={buttonDisabled || asyncLoading}
+          type="submit"
+        >
+          {asyncLoading ? loadingButtonLabel : buttonLabel}
+        </PrimaryButton>
+      </div>
+      {errorMessage && (
+        <span className={styles.errorMessage}>{errorMessage}</span>
+      )}
     </form>
   )
 }

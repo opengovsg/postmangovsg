@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, { useState, useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -52,7 +53,7 @@ const CreateSMS = () => {
   return (
     <div className={styles.createContainer}>
       {status !== Status.Draft ? (
-        <div className={styles.stepContainer}>
+        <div className={cx(styles.stepContainer, styles.detailContainer)}>
           <SMSDetail></SMSDetail>
         </div>
       ) : (
