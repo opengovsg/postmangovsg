@@ -113,6 +113,7 @@ jobs:
             - SES_USER=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_USER
             - SES_PORT=$PRODUCTION_UNSUBSCRIBE_DIGEST_SES_PORT
             - UNSUBSCRIBE_GUIDE_URL=$UNSUBSCRIBE_GUIDE_URL
+            - CRONITOR_CODE=$PRODUCTION_UNSUBSCRIBE_CRONITOR_CODE
         - provider: lambda
           edge: true
           function_name: unsubscribe-digest-staging
@@ -139,6 +140,7 @@ jobs:
             - SES_USER=$STAGING_UNSUBSCRIBE_DIGEST_SES_USER
             - SES_PORT=$STAGING_UNSUBSCRIBE_DIGEST_SES_PORT
             - UNSUBSCRIBE_GUIDE_URL=$UNSUBSCRIBE_GUIDE_URL
+            - CRONITOR_CODE=$STAGING_UNSUBSCRIBE_CRONITOR_CODE
     - name: serverless-database-backup
       before_install:
         - cd $TRAVIS_BUILD_DIR/serverless/database-backup
@@ -168,6 +170,7 @@ jobs:
             - GCP_SECRET_NAME=$PRODUCTION_BACKUP_GCP_SECRET_NAME
             - KEY_ENCRYPTION_PUBLIC_KEY=$PRODUCTION_BACKUP_PUBLIC_KEY
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - CRONITOR_CODE=$PRODUCTION_BACKUP_CRONITOR_CODE
         - provider: lambda
           edge: true
           function_name: database-backup-staging
@@ -190,6 +193,7 @@ jobs:
             - GCP_SECRET_NAME=$STAGING_BACKUP_GCP_SECRET_NAME
             - KEY_ENCRYPTION_PUBLIC_KEY=$STAGING_BACKUP_PUBLIC_KEY
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - CRONITOR_CODE=$STAGING_BACKUP_CRONITOR_CODE
     - name: serverless-eb-env-update
       before_deploy:
         - cd $TRAVIS_BUILD_DIR/serverless/eb-env-update
