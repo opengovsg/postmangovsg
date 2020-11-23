@@ -112,6 +112,7 @@ const CreateSMS = ({
             name={campaign.name}
             sentAt={campaign.sentAt}
             numRecipients={campaign.numRecipients}
+            redacted={campaign.redacted}
             isDemo={!!campaign.demoMessageLimit}
           ></SMSDetail>
         </div>

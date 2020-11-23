@@ -3,11 +3,18 @@ import Moment from 'react-moment'
 import cx from 'classnames'
 
 import { ChannelType, CampaignStats, Status } from 'classes/Campaign'
-import { ProgressBar, PrimaryButton, ExportRecipients } from 'components/common'
+import {
+  ProgressBar,
+  PrimaryButton,
+  ExportRecipients,
+  InfoBlock,
+} from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
 import { LINKS } from 'config'
 import { i18n } from 'locales'
+import { Trans } from '@lingui/macro'
+
 const ProgressDetails = ({
   campaignId,
   campaignName,
@@ -15,6 +22,7 @@ const ProgressDetails = ({
   sentAt,
   numRecipients,
   stats,
+  redacted,
   handlePause,
   handleRetry,
   handleRefreshStats,
@@ -25,6 +33,7 @@ const ProgressDetails = ({
   sentAt: Date
   numRecipients: number
   stats: CampaignStats
+  redacted: boolean
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
   handleRefreshStats: () => Promise<void>
@@ -139,16 +148,24 @@ const ProgressDetails = ({
         isComplete={isComplete}
       />
 
-      <ExportRecipients
-        iconPosition="right"
-        campaignId={campaignId}
-        campaignName={campaignName}
-        campaignType={campaignType}
-        sentAt={sentAt}
-        status={status}
-        statusUpdatedAt={statusUpdatedAt}
-        isButton
-      />
+      {!redacted ? (
+        <ExportRecipients
+          iconPosition="right"
+          campaignId={campaignId}
+          campaignName={campaignName}
+          campaignType={campaignType}
+          sentAt={sentAt}
+          status={status}
+          statusUpdatedAt={statusUpdatedAt}
+          isButton
+        />
+      ) : (
+        <InfoBlock className={styles.notice}>
+          <Trans>
+            Delivery report has expired and is no longer available for download.
+          </Trans>
+        </InfoBlock>
+      )}
 
       <table className={styles.stats}>
         <thead>

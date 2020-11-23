@@ -1,8 +1,8 @@
-import { literal, Transaction } from 'sequelize'
+import { Transaction } from 'sequelize'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
-import { Campaign, JobQueue } from '@core/models'
+import { Campaign } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
 
 import {
@@ -15,7 +15,11 @@ import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
-import { PhoneNumberService, UploadService } from '@core/services'
+import {
+  CampaignService,
+  PhoneNumberService,
+  UploadService,
+} from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
@@ -194,42 +198,12 @@ const setCampaignCredential = (
 const getCampaignDetails = async (
   campaignId: number
 ): Promise<CampaignDetails> => {
-  const [campaignDetails, numRecipients] = await Promise.all([
-    Campaign.findOne({
-      where: { id: +campaignId },
-      attributes: [
-        'id',
-        'name',
-        'type',
-        'created_at',
-        'valid',
-        'demo_message_limit',
-        [
-          literal('CASE WHEN "cred_name" IS NULL THEN False ELSE True END'),
-          'has_credential',
-        ],
-        [literal("s3_object -> 'filename'"), 'csv_filename'],
-      ],
-      include: [
-        {
-          model: JobQueue,
-          attributes: ['status', ['created_at', 'sent_at']],
-        },
-        {
-          model: TelegramTemplate,
-          attributes: ['body', 'params'],
-        },
-      ],
-    }),
-    TelegramMessage.count({
-      where: { campaignId },
-    }),
+  return await CampaignService.getCampaignDetails(campaignId, [
+    {
+      model: TelegramTemplate,
+      attributes: ['body', 'params'],
+    },
   ])
-
-  return {
-    ...campaignDetails?.get({ plain: true }),
-    num_recipients: numRecipients,
-  } as CampaignDetails
 }
 
 const uploadCompleteOnPreview = ({

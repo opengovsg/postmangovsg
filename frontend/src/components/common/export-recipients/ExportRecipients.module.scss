@@ -36,8 +36,16 @@
 
 .actionButton {
   @include flex-horizontal;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin: 3rem 0;
+
+  .exportButton {
+    margin-left: $spacing-5;
+  }
+
+  .notice {
+    margin: 0;
+  }
 
   .disableActiveState {
     cursor: not-allowed;

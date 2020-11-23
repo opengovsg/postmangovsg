@@ -17,6 +17,8 @@
  *           type: boolean
  *         valid:
  *           type: boolean
+ *         redacted:
+ *           type: boolean
  *         csv_filename:
  *           type: string
  *         type:

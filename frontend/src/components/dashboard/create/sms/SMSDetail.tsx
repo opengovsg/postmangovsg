@@ -16,12 +16,14 @@ const SMSDetail = ({
   name,
   sentAt,
   numRecipients,
+  redacted,
   isDemo,
 }: {
   id: number
   name: string
   sentAt: Date
   numRecipients: number
+  redacted: boolean
   isDemo: boolean
 }) => {
   const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies
@@ -140,6 +142,7 @@ const SMSDetail = ({
             sentAt={sentAt}
             numRecipients={numRecipients}
             stats={stats}
+            redacted={redacted}
             handlePause={handlePause}
             handleRetry={handleRetry}
             handleRefreshStats={handleRefreshStats}

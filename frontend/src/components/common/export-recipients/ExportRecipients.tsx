@@ -3,10 +3,11 @@ import cx from 'classnames'
 import download from 'downloadjs'
 
 import { ChannelType, Status } from 'classes/Campaign'
-import { ActionButton } from 'components/common'
+import { ActionButton, InfoBlock } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
+import { Trans } from '@lingui/macro'
 import moment from 'moment'
 
 export enum CampaignExportStatus {
@@ -185,9 +186,14 @@ const ExportRecipients = ({
     <>
       {isButton ? (
         <div className={styles.actionButton}>
+          <InfoBlock className={styles.notice}>
+            <Trans>
+              Delivery report will expire 14 days after sending is completed.
+            </Trans>
+          </InfoBlock>
           <ActionButton
             disabled={exportStatus !== CampaignExportStatus.Ready}
-            className={cx({
+            className={cx(styles.exportButton, {
               [styles.disableActiveState]:
                 exportStatus === CampaignExportStatus.Loading,
             })}

@@ -36,6 +36,7 @@ export interface CampaignDetails {
   protect: boolean
   demo_message_limit: number | null
   num_recipients: number
+  redacted?: boolean
   email_templates?: {
     body: string
     subject: string
@@ -87,6 +88,8 @@ export interface CampaignRecipient {
  *          invalid:
  *            type: number
  *          halted:
+ *            type: boolean
+ *          redacted:
  *            type: boolean
  *          status:
  *            $ref: '#/components/schemas/JobStatus'
