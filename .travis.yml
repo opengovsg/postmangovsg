@@ -77,7 +77,7 @@ jobs:
     - name: serverless-unsubscribe-digest
       before_deploy:
         - cd $TRAVIS_BUILD_DIR/serverless/unsubscribe-digest
-        - npm install && npm run build
+        - npm install && npm run build && npm prune --production
         - zip -qr code.zip build src package.json node_modules/
       deploy:
         - provider: lambda
