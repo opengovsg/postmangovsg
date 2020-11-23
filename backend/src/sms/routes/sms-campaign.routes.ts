@@ -44,16 +44,6 @@ const storeCredentialsValidator = {
     twilio_api_key: Joi.string().trim().required(),
     twilio_messaging_service_sid: Joi.string().trim().required(),
     recipient: Joi.string().trim().required(),
-  }),
-}
-
-const storeCredentialsValidatorV2 = {
-  [Segments.BODY]: Joi.object({
-    twilio_account_sid: Joi.string().trim().required(),
-    twilio_api_secret: Joi.string().trim().required(),
-    twilio_api_key: Joi.string().trim().required(),
-    twilio_messaging_service_sid: Joi.string().trim().required(),
-    recipient: Joi.string().trim().required(),
     label: Joi.string()
       .min(1)
       .max(50)
@@ -458,7 +448,7 @@ router.delete(
  *    post:
  *      tags:
  *        - SMS
- *      summary: Validate twilio credentials and assign to campaign
+ *      summary: Validate twilio credentials and assign to campaign, if label is provided - store credentials for user
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -476,6 +466,12 @@ router.delete(
  *                  properties:
  *                    recipient:
  *                      type: string
+ *                    label:
+ *                      type: string
+ *                      pattern: '/^[a-z0-9-]+$/'
+ *                      minLength: 1
+ *                      maxLength: 50
+ *                      description: should only consist of lowercase alphanumeric characters and dashes
  *
  *      responses:
  *        200:
@@ -500,6 +496,7 @@ router.post(
   SmsMiddleware.disabledForDemoCampaign,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
+  SettingsMiddleware.checkAndStoreLabelIfExists,
   SmsMiddleware.setCampaignCredential
 )
 
@@ -551,16 +548,7 @@ router.post(
  *        "500":
  *           description: Internal Server Error
  */
-router.post(
-  '/new-credentials/v2',
-  celebrate(storeCredentialsValidatorV2),
-  CampaignMiddleware.canEditCampaign,
-  SmsMiddleware.disabledForDemoCampaign,
-  SmsMiddleware.getCredentialsFromBody,
-  SmsMiddleware.validateAndStoreCredentials,
-  SettingsMiddleware.checkAndStoreLabelIfExists,
-  SmsMiddleware.setCampaignCredential
-)
+router.post('/new-credentials/v2', redirectTo('/new-credentials'))
 
 /**
  * @swagger
