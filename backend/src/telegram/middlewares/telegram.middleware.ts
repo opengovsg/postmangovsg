@@ -364,8 +364,28 @@ const copyCampaign = async (
   try {
     const { campaignId } = req.params
     const { name } = req.body
-    await TelegramService.copyCampaign({ campaignId: +campaignId, name })
-    return res.sendStatus(201)
+    const campaign = await TelegramService.copyCampaign({
+      campaignId: +campaignId,
+      name,
+    })
+    if (!campaign) {
+      return res.status(400).json({
+        message: `Unable to copy campaign with these parameters`,
+      })
+    }
+    logger.info({
+      message: 'Successfully copied campaign',
+      campaignId: campaign.id,
+      action: 'copyCampaign',
+    })
+    return res.status(201).json({
+      id: campaign.id,
+      name: campaign.name,
+      created_at: campaign.createdAt,
+      type: campaign.type,
+      protect: campaign.protect,
+      demo_message_limit: campaign.demoMessageLimit,
+    })
   } catch (err) {
     return next(err)
   }

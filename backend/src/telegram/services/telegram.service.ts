@@ -15,7 +15,11 @@ import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
-import { PhoneNumberService, UploadService } from '@core/services'
+import {
+  CampaignService,
+  PhoneNumberService,
+  UploadService,
+} from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
@@ -305,8 +309,32 @@ const copyCampaign = async ({
 }: {
   campaignId: number
   name: string
-}): Promise<void> => {
-  console.log(`Do something with ${campaignId} and ${name} `)
+}): Promise<Campaign | void> => {
+  const campaign = await Campaign.findByPk(campaignId)
+  if (campaign) {
+    const copy = await CampaignService.createCampaign({
+      name,
+      type: campaign.type,
+      userId: campaign.userId,
+      protect: campaign.protect,
+      demoMessageLimit: campaign.demoMessageLimit,
+    })
+
+    if (copy) {
+      const template = await TelegramTemplate.findOne({ where: { campaignId } })
+      // Even if a campaign did not have an associated saved template, it can still be duplicated
+      if (template) {
+        await TelegramTemplateService.storeTemplate({
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          body: template.body!,
+          campaignId: copy.id,
+        })
+      }
+
+      return copy
+    }
+  }
+  return
 }
 
 export const TelegramService = {
