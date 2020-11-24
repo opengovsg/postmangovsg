@@ -292,6 +292,12 @@ const config = convict({
     env: 'EMAIL_DEFAULT_RATE',
     format: 'int',
   },
+  sesNotificationTopic: {
+    doc: 'The SNS topic to send SES notifications to',
+    default: '',
+    env: 'SES_NOTIFICATION_TOPIC',
+    format: 'required-string',
+  },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
     default: 'SG',

@@ -75,6 +75,75 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 }
 
 /**
+ * Check that the verified email has the correct SNS topics attached to it.
+ * @param email Email address to verify
+ * @throws Error if the SES notification settings are not configured correctly
+ */
+const verifyNotificationSettings = async (email: string): Promise<void> => {
+  try {
+    const params = {
+      Identities: [email],
+    }
+    const {
+      NotificationAttributes,
+    } = await ses.getIdentityNotificationAttributes(params).promise()
+
+    const notificationAttrs = NotificationAttributes[email]
+    if (!notificationAttrs) {
+      throw new Error(
+        'Invalid email address. Make sure that the email has been added to SES.'
+      )
+    }
+
+    const {
+      BounceTopic,
+      ComplaintTopic,
+      DeliveryTopic,
+      ForwardingEnabled,
+      HeadersInBounceNotificationsEnabled,
+      HeadersInComplaintNotificationsEnabled,
+      HeadersInDeliveryNotificationsEnabled,
+    } = notificationAttrs
+
+    if (ForwardingEnabled) {
+      throw new Error(
+        'Bounce and complaint notifications should not be forwarded as email.'
+      )
+    }
+
+    if (
+      !HeadersInBounceNotificationsEnabled ||
+      !HeadersInComplaintNotificationsEnabled ||
+      !HeadersInDeliveryNotificationsEnabled
+    ) {
+      throw new Error(
+        'Original email headers are not included in notifications. Please include them by ' +
+          'enabling it in SES.'
+      )
+    }
+
+    const sesNotificationTopic = config.get('sesNotificationTopic')
+    const allTopicsValid = [BounceTopic, ComplaintTopic, DeliveryTopic].every(
+      (topic) => topic === sesNotificationTopic
+    )
+    if (!allTopicsValid) {
+      throw new Error(
+        'Invalid notification topics. Make sure that the correct SNS topics are set for ' +
+          'bounce, complaint and delivery notifications'
+      )
+    }
+  } catch (err) {
+    logger.error({
+      message: 'Invalid SES notification settings',
+      email,
+      error: err,
+      action: 'verifyNotificationSettings',
+    })
+    throw err
+  }
+}
+
+/**
  *  Returns true if the supplied name and email exist in email_from_address
  */
 
@@ -130,11 +199,13 @@ const storeFromAddress = async (
  * 1. Checks if email is already verified
  * 2. With AWS to ensure that we can use the email address to send
  * 3. Checks the domain's dns to ensure that the cnames are there
+ * 4. Checks that the correct notification settings are set
  */
 const verifyFromAddress = async (email: string): Promise<void> => {
   const dkimTokens = await verifyEmailWithAWS(email)
 
   await verifyCnames(dkimTokens, email)
+  await verifyNotificationSettings(email)
 }
 
 const sendValidationMessage = async (
