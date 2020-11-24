@@ -147,7 +147,9 @@ const storeTemplate = async ({
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   const sanitizedBody = client.replaceNewLinesAndSanitize(body)
   if (!sanitizedBody) {
-    throw new TemplateError('Message template is empty!')
+    throw new TemplateError(
+      'Message template is invalid as it only contains invalid HTML tags!'
+    )
   }
   const updatedTemplate = await upsertTelegramTemplate({
     campaignId,

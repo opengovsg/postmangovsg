@@ -169,7 +169,9 @@ const storeTemplate = async ({
   const sanitizedSubject = client.replaceNewLinesAndSanitize(subject)
   const sanitizedBody = client.replaceNewLinesAndSanitize(body)
   if (!sanitizedSubject || !sanitizedBody) {
-    throw new TemplateError('Message template is empty!')
+    throw new TemplateError(
+      'Message template is invalid as it only contains invalid HTML tags!'
+    )
   }
   const updatedTemplate = await upsertEmailTemplate({
     subject: sanitizedSubject,
