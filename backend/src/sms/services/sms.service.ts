@@ -215,6 +215,16 @@ const uploadCompleteOnChunk = ({
   }
 }
 
+const copyCampaign = async ({
+  campaignId,
+  name,
+}: {
+  campaignId: number
+  name: string
+}): Promise<void> => {
+  console.log(`Do something with ${campaignId} and ${name} `)
+}
+
 export const SmsService = {
   getEncodedHash,
   findCampaign,
@@ -225,4 +235,5 @@ export const SmsService = {
   setCampaignCredential,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
+  copyCampaign,
 }

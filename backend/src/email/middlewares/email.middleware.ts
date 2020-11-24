@@ -283,6 +283,27 @@ const sendValidationMessage = async (
   return next()
 }
 
+/**
+ *  Copy a campaign and its template
+ * @param req
+ * @param res
+ * @param next
+ */
+const copyCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const { name } = req.body
+    await EmailService.copyCampaign({ campaignId: +campaignId, name })
+    return res.sendStatus(201)
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const EmailMiddleware = {
   isEmailCampaignOwnedByUser,
   validateAndStoreCredentials,
@@ -294,4 +315,5 @@ export const EmailMiddleware = {
   existsFromAddress,
   isFromAddressAccepted,
   sendValidationMessage,
+  copyCampaign,
 }

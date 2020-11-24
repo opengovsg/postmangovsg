@@ -296,6 +296,16 @@ const uploadProtectedCompleteOnChunk = ({
   }
 }
 
+const copyCampaign = async ({
+  campaignId,
+  name,
+}: {
+  campaignId: number
+  name: string
+}): Promise<void> => {
+  console.log(`Do something with ${campaignId} and ${name} `)
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
@@ -306,4 +316,5 @@ export const EmailService = {
   uploadCompleteOnChunk,
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
+  copyCampaign,
 }

@@ -299,6 +299,16 @@ const uploadCompleteOnChunk = ({
   }
 }
 
+const copyCampaign = async ({
+  campaignId,
+  name,
+}: {
+  campaignId: number
+  name: string
+}): Promise<void> => {
+  console.log(`Do something with ${campaignId} and ${name} `)
+}
+
 export const TelegramService = {
   findCampaign,
   getCampaignDetails,
@@ -309,4 +319,5 @@ export const TelegramService = {
   validateAndConfigureBot,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
+  copyCampaign,
 }

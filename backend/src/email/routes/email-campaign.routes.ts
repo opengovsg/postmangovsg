@@ -83,6 +83,12 @@ const completeMultipartValidator = {
   }),
 }
 
+const copyCampaignValidator = {
+  [Segments.BODY]: Joi.object({
+    name: Joi.string().max(255).trim().required(),
+  }),
+}
+
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -862,6 +868,46 @@ router.post(
   ProtectedMiddleware.isProtectedCampaign,
   UploadMiddleware.completeMultipart,
   EmailTemplateMiddleware.uploadProtectedCompleteHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *  /campaign/{campaignId}/email/copy:
+ *    post:
+ *      tags:
+ *        - Email
+ *      summary: Copy the campaign and its template
+ *      parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                name:
+ *                  type: string
+ *
+ *      responses:
+ *        "201":
+ *           description: A copy of the campaign was created
+ *        "401":
+ *           description: Unauthorized
+ *        "403":
+ *           description: Forbidden, campaign not owned by user
+ *        "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/copy',
+  celebrate(copyCampaignValidator),
+  EmailMiddleware.copyCampaign
 )
 
 export default router

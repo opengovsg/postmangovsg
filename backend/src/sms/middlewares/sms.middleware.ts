@@ -297,6 +297,27 @@ const previewFirstMessage = async (
   }
 }
 
+/**
+ *  Copy a campaign and its template
+ * @param req
+ * @param res
+ * @param next
+ */
+const copyCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const { name } = req.body
+    await SmsService.copyCampaign({ campaignId: +campaignId, name })
+    return res.sendStatus(201)
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const SmsMiddleware = {
   getCredentialsFromBody,
   getCredentialsFromLabel,
@@ -306,4 +327,5 @@ export const SmsMiddleware = {
   getCampaignDetails,
   previewFirstMessage,
   disabledForDemoCampaign,
+  copyCampaign,
 }

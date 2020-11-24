@@ -350,6 +350,27 @@ const setCampaignCredential = async (
   }
 }
 
+/**
+ *  Copy a campaign and its template
+ * @param req
+ * @param res
+ * @param next
+ */
+const copyCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const { name } = req.body
+    await TelegramService.copyCampaign({ campaignId: +campaignId, name })
+    return res.sendStatus(201)
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const TelegramMiddleware = {
   getCredentialsFromBody,
   getCredentialsFromLabel,
@@ -361,4 +382,5 @@ export const TelegramMiddleware = {
   setCampaignCredential,
   sendValidationMessage,
   disabledForDemoCampaign,
+  copyCampaign,
 }
