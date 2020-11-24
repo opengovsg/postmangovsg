@@ -302,8 +302,36 @@ const copyCampaign = async ({
 }: {
   campaignId: number
   name: string
-}): Promise<void> => {
-  console.log(`Do something with ${campaignId} and ${name} `)
+}): Promise<Campaign | void> => {
+  const campaign = await Campaign.findByPk(campaignId)
+  if (campaign) {
+    const copy = await CampaignService.createCampaign({
+      name,
+      type: campaign.type,
+      userId: campaign.userId,
+      protect: campaign.protect,
+      demoMessageLimit: campaign.demoMessageLimit,
+    })
+
+    if (copy) {
+      const template = await EmailTemplate.findOne({ where: { campaignId } })
+      // Even if a campaign did not have an associated saved template, it can still be duplicated
+      if (template) {
+        await EmailTemplateService.storeTemplate({
+          /* eslint-disable @typescript-eslint/no-non-null-assertion*/
+          body: template.body!,
+          subject: template.subject!,
+          from: template.from!,
+          /* eslint-enable @typescript-eslint/no-non-null-assertion */
+          replyTo: template.replyTo || null,
+          campaignId: copy.id,
+        })
+      }
+
+      return copy
+    }
+  }
+  return
 }
 
 export const EmailService = {
