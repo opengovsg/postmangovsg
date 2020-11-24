@@ -37,6 +37,11 @@ const config = convict({
     default: 'production',
     env: 'NODE_ENV',
   },
+  frontendUrl: {
+    doc: 'Frontend base URL for links to campaigns',
+    default: 'https://postman.gov.sg', // prod only
+    env: 'FRONTEND_URL',
+  },
   database: {
     databaseUri: {
       doc: 'URI to the postgres database',
@@ -172,23 +177,28 @@ const config = convict({
 const defaultMailFrom = 'Postman.gov.sg <donotreply@mail.postman.gov.sg>'
 config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 
-// Only development is a non-production environment
-// Override with local config
-if (config.get('env') === 'development') {
-  config.load({
-    database: {
-      useIam: false,
-      dialectOptions: {
-        ssl: {
-          require: false, // No ssl connection needed
-          rejectUnauthorized: true,
-          ca: false,
+// Override config for staging and development
+switch (config.get('env')) {
+  case 'staging':
+    config.load({
+      frontendUrl: 'https://staging.postman.gov.sg',
+    })
+    break
+  case 'development':
+    config.load({
+      frontendUrl: 'http://localhost:3000',
+      database: {
+        useIam: false,
+        dialectOptions: {
+          ssl: {
+            require: false, // No ssl connection needed
+            rejectUnauthorized: true,
+            ca: false,
+          },
         },
       },
-    },
-  })
+    })
 }
-
 config.validate({ allowed: 'strict' })
 
 export default config

@@ -44,6 +44,7 @@ export const getUserRedactedCampaigns = async (
       SELECT
         users.email,
         json_build_object(
+          'id', campaigns.id,
           'name', campaigns.name,
           'expiry_date', max(job_queue.updated_at) + interval ':retentionPeriod days'
         ) AS campaign_json

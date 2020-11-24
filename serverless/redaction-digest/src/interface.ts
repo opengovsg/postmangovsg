@@ -16,6 +16,7 @@ export interface MailCredentials {
 }
 
 export interface RedactedCampaign {
+  id: number
   name: string
   expiry_date: Date
 }

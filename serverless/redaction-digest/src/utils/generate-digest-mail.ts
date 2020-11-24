@@ -6,6 +6,7 @@ import { RedactedCampaign } from '../interface'
 
 const NOTICE_PERIOD = config.get('noticePeriod')
 const RETENTION_PERIOD = config.get('retentionPeriod')
+const FRONTEND_URL = config.get('frontendUrl')
 
 export const createEmailBody = (
   redactedCampaigns: Array<RedactedCampaign>
@@ -36,7 +37,12 @@ export const createEmailBody = (
           <li><b>Expiring on ${date}</b></li>
           <ul>
             ${campaigns.reduce(
-              (list, c) => list.concat(`<li>${c.name}</li>`),
+              (list, c) =>
+                list.concat(
+                  `<li>
+                    <a href="${FRONTEND_URL}/campaigns/${c.id}">${c.name}</a> (ID: ${c.id})
+                  </li>`
+                ),
               ''
             )}
           </ul>
