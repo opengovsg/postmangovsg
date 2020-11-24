@@ -147,13 +147,12 @@ const Campaigns = () => {
     {
       name: '',
       render: (campaign: Campaign) => {
-        if (campaign.demoMessageLimit) {
-          if (
-            (numDemosSms === 0 && campaign.type === ChannelType.SMS) ||
-            (numDemosTelegram === 0 && campaign.type === ChannelType.Telegram)
-          ) {
-            return
-          }
+        if (
+          campaign.demoMessageLimit &&
+          ((numDemosSms === 0 && campaign.type === ChannelType.SMS) ||
+            (numDemosTelegram === 0 && campaign.type === ChannelType.Telegram))
+        ) {
+          return
         }
         return (
           <div
