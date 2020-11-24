@@ -23,7 +23,7 @@ import styles from './Campaigns.module.scss'
 import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
-import CopyCampaignModal from '../create/copy-campaign-modal'
+import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 
 const ITEMS_PER_PAGE = 10
 
@@ -157,11 +157,11 @@ const Campaigns = () => {
         }
         return (
           <div
-            className={cx(styles.iconContainer, styles.copy)}
+            className={cx(styles.iconContainer, styles.duplicate)}
             onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               event.stopPropagation()
               modalContext.setModalContent(
-                <CopyCampaignModal campaign={campaign} />
+                <DuplicateCampaignModal campaign={campaign} />
               )
             }}
           >

@@ -11,27 +11,27 @@ import {
   Checkbox,
   ErrorBlock,
 } from 'components/common'
-import styles from './CopyCampaignModal.module.scss'
-import { copyCampaign } from 'services/campaign.service'
+import styles from './DuplicateCampaignModal.module.scss'
+import { duplicateCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
 import { i18n } from 'locales'
 
-const CopyCampaignModal = ({ campaign }: { campaign: Campaign }) => {
+const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   const { close } = useContext(ModalContext)
   const history = useHistory()
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedName, setSelectedName] = useState(`Copy of ${campaign.name}`)
 
-  async function handleCopyCampaign() {
+  async function handleDuplicateCampaign() {
     try {
-      const copy: Campaign = await copyCampaign({
+      const duplicate: Campaign = await duplicateCampaign({
         name: selectedName,
         campaignId: campaign.id,
       })
       // close modal and go to create view
       close()
-      history.push(`/campaigns/${copy.id}`)
+      history.push(`/campaigns/${duplicate.id}`)
     } catch (err) {
       console.error(err)
       setErrorMessage(err.message)
@@ -142,10 +142,10 @@ const CopyCampaignModal = ({ campaign }: { campaign: Campaign }) => {
         <div className="progress-button">
           <PrimaryButton
             className={styles.bottomButton}
-            onClick={handleCopyCampaign}
+            onClick={handleDuplicateCampaign}
             disabled={!selectedName}
           >
-            Copy campaign
+            Duplicate campaign
             <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
           </PrimaryButton>
         </div>
@@ -155,4 +155,4 @@ const CopyCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   )
 }
 
-export default CopyCampaignModal
+export default DuplicateCampaignModal

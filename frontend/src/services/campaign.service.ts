@@ -138,7 +138,7 @@ export async function createCampaign({
     })
 }
 
-export async function copyCampaign({
+export async function duplicateCampaign({
   name,
   campaignId,
 }: {
@@ -146,7 +146,7 @@ export async function copyCampaign({
   campaignId: number
 }): Promise<Campaign> {
   return axios
-    .post(`/campaign/${campaignId}/copy`, {
+    .post(`/campaign/${campaignId}/duplicate`, {
       name,
     })
     .then((response) => {
