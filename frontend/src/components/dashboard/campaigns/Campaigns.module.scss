@@ -56,8 +56,10 @@
   position: relative;
 }
 
-.copyIcon {
+.copy {
+  @include flex-horizontal;
   color: $primary;
+  padding: 0.5rem;
   &:hover {
     color: $blue-300;
   }
@@ -67,8 +69,11 @@
   &:disabled {
     color: $grey-500;
   }
- }
- 
+  i {
+    margin-right: 0.5rem;
+  }
+}
+
 .demo::before {
   content: 'DEMO';
   background: $green-900;

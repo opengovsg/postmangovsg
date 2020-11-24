@@ -23,6 +23,7 @@ import styles from './Campaigns.module.scss'
 import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
+import CopyCampaignModal from '../create/copy-campaign-modal'
 
 const ITEMS_PER_PAGE = 10
 
@@ -126,7 +127,7 @@ const Campaigns = () => {
       width: 'xs center',
     },
     {
-      name: 'Export',
+      name: '',
       render: (campaign: Campaign) => {
         if (campaign.status === Status.Draft) return
         return (
@@ -141,18 +142,27 @@ const Campaigns = () => {
           />
         )
       },
-      width: 'md center',
+      width: 'md',
     },
     {
-      name: 'Copy',
+      name: '',
       render: (campaign: Campaign) => {
         return (
-          <div className={cx(styles.iconContainer, styles.copyIcon)}>
-            <i className={cx('bx bx-duplicate', styles.icon)}></i>
+          <div
+            className={cx(styles.iconContainer, styles.copy)}
+            onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+              event.stopPropagation()
+              modalContext.setModalContent(
+                <CopyCampaignModal campaign={campaign} />
+              )
+            }}
+          >
+            <i className={cx('bx bx-duplicate', styles.icon)}></i>{' '}
+            <span>Duplicate</span>
           </div>
         )
       },
-      width: 'xs center',
+      width: 'md',
     },
   ]
   /* eslint-enable react/display-name */
