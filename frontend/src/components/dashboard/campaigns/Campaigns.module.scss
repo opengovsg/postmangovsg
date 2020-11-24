@@ -56,6 +56,19 @@
   position: relative;
 }
 
+.copyIcon {
+  color: $primary;
+  &:hover {
+    color: $blue-300;
+  }
+  &:active {
+    color: $blue-700;
+  }
+  &:disabled {
+    color: $grey-500;
+  }
+ }
+ 
 .demo::before {
   content: 'DEMO';
   background: $green-900;

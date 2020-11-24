@@ -143,6 +143,17 @@ const Campaigns = () => {
       },
       width: 'md center',
     },
+    {
+      name: 'Copy',
+      render: (campaign: Campaign) => {
+        return (
+          <div className={cx(styles.iconContainer, styles.copyIcon)}>
+            <i className={cx('bx bx-duplicate', styles.icon)}></i>
+          </div>
+        )
+      },
+      width: 'xs center',
+    },
   ]
   /* eslint-enable react/display-name */
 

@@ -138,6 +138,22 @@ export async function createCampaign({
     })
 }
 
+export async function copyCampaign({
+  name,
+  campaignId,
+}: {
+  name: string
+  campaignId: number
+}): Promise<Campaign> {
+  return axios
+    .post(`/campaign/${campaignId}/copy`, {
+      name,
+    })
+    .then((response) => {
+      return new Campaign(response.data)
+    })
+}
+
 export async function sendCampaign(
   campaignId: number,
   sendRate: number
