@@ -4,7 +4,7 @@ import { Cronitor } from '../interface'
 import config from '../config'
 import { Logger } from './logger'
 
-const logger = new Logger('db-backup')
+const logger = new Logger('redaction-digest')
 const CRONITOR_CODE = config.get('cronitor.code')
 
 /**
