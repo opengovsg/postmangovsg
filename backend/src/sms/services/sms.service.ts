@@ -215,7 +215,7 @@ const uploadCompleteOnChunk = ({
   }
 }
 
-const copyCampaign = async ({
+const duplicateCampaign = async ({
   campaignId,
   name,
 }: {
@@ -224,7 +224,7 @@ const copyCampaign = async ({
 }): Promise<Campaign | void> => {
   const campaign = await Campaign.findByPk(campaignId)
   if (campaign) {
-    const copy = await CampaignService.createCampaign({
+    const duplicate = await CampaignService.createCampaign({
       name,
       type: campaign.type,
       userId: campaign.userId,
@@ -232,18 +232,18 @@ const copyCampaign = async ({
       demoMessageLimit: campaign.demoMessageLimit,
     })
 
-    if (copy) {
+    if (duplicate) {
       const template = await SmsTemplate.findOne({ where: { campaignId } })
       // Even if a campaign did not have an associated saved template, it can still be duplicated
       if (template) {
         await SmsTemplateService.storeTemplate({
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           body: template.body!,
-          campaignId: copy.id,
+          campaignId: duplicate.id,
         })
       }
 
-      return copy
+      return duplicate
     }
   }
   return
@@ -259,5 +259,5 @@ export const SmsService = {
   setCampaignCredential,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
-  copyCampaign,
+  duplicateCampaign,
 }

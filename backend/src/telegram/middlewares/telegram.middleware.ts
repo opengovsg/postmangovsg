@@ -351,12 +351,12 @@ const setCampaignCredential = async (
 }
 
 /**
- *  Copy a campaign and its template
+ *  Duplicate a campaign and its template
  * @param req
  * @param res
  * @param next
  */
-const copyCampaign = async (
+const duplicateCampaign = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -364,19 +364,19 @@ const copyCampaign = async (
   try {
     const { campaignId } = req.params
     const { name } = req.body
-    const campaign = await TelegramService.copyCampaign({
+    const campaign = await TelegramService.duplicateCampaign({
       campaignId: +campaignId,
       name,
     })
     if (!campaign) {
       return res.status(400).json({
-        message: `Unable to copy campaign with these parameters`,
+        message: `Unable to duplicate campaign with these parameters`,
       })
     }
     logger.info({
       message: 'Successfully copied campaign',
       campaignId: campaign.id,
-      action: 'copyCampaign',
+      action: 'duplicateCampaign',
     })
     return res.status(201).json({
       id: campaign.id,
@@ -402,5 +402,5 @@ export const TelegramMiddleware = {
   setCampaignCredential,
   sendValidationMessage,
   disabledForDemoCampaign,
-  copyCampaign,
+  duplicateCampaign,
 }

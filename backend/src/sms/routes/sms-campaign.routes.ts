@@ -65,7 +65,7 @@ const sendCampaignValidator = {
   }),
 }
 
-const copyCampaignValidator = {
+const duplicateCampaignValidator = {
   [Segments.BODY]: Joi.object({
     name: Joi.string().max(255).trim().required(),
   }),
@@ -849,11 +849,11 @@ router.get('/export', SmsStatsMiddleware.getDeliveredRecipients)
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/sms/copy:
+ *  /campaign/{campaignId}/sms/duplicate:
  *    post:
  *      tags:
  *        - SMS
- *      summary: Copy the campaign and its template
+ *      summary: Duplicate the campaign and its template
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -871,7 +871,7 @@ router.get('/export', SmsStatsMiddleware.getDeliveredRecipients)
  *                  type: string
  *      responses:
  *        "201":
- *           description: A copy of the campaign was created
+ *           description: A duplicate of the campaign was created
  *        "401":
  *           description: Unauthorized
  *        "403":
@@ -880,9 +880,9 @@ router.get('/export', SmsStatsMiddleware.getDeliveredRecipients)
  *           description: Internal Server Error
  */
 router.post(
-  '/copy',
-  celebrate(copyCampaignValidator),
-  SmsMiddleware.copyCampaign
+  '/duplicate',
+  celebrate(duplicateCampaignValidator),
+  SmsMiddleware.duplicateCampaign
 )
 
 export default router

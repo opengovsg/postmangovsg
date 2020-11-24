@@ -83,7 +83,7 @@ const completeMultipartValidator = {
   }),
 }
 
-const copyCampaignValidator = {
+const duplicateCampaignValidator = {
   [Segments.BODY]: Joi.object({
     name: Joi.string().max(255).trim().required(),
   }),
@@ -873,11 +873,11 @@ router.post(
 /**
  * @swagger
  * path:
- *  /campaign/{campaignId}/email/copy:
+ *  /campaign/{campaignId}/email/duplicate:
  *    post:
  *      tags:
  *        - Email
- *      summary: Copy the campaign and its template
+ *      summary: Duplicate the campaign and its template
  *      parameters:
  *        - name: campaignId
  *          in: path
@@ -896,7 +896,7 @@ router.post(
  *
  *      responses:
  *        "201":
- *           description: A copy of the campaign was created
+ *           description: A duplicate of the campaign was created
  *        "401":
  *           description: Unauthorized
  *        "403":
@@ -905,9 +905,9 @@ router.post(
  *           description: Internal Server Error
  */
 router.post(
-  '/copy',
-  celebrate(copyCampaignValidator),
-  EmailMiddleware.copyCampaign
+  '/duplicate',
+  celebrate(duplicateCampaignValidator),
+  EmailMiddleware.duplicateCampaign
 )
 
 export default router

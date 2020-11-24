@@ -284,12 +284,12 @@ const sendValidationMessage = async (
 }
 
 /**
- *  Copy a campaign and its template
+ *  duplicate a campaign and its template
  * @param req
  * @param res
  * @param next
  */
-const copyCampaign = async (
+const duplicateCampaign = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -297,19 +297,19 @@ const copyCampaign = async (
   try {
     const { campaignId } = req.params
     const { name } = req.body
-    const campaign = await EmailService.copyCampaign({
+    const campaign = await EmailService.duplicateCampaign({
       campaignId: +campaignId,
       name,
     })
     if (!campaign) {
       return res.status(400).json({
-        message: `Unable to copy campaign with these parameters`,
+        message: `Unable to duplicate campaign with these parameters`,
       })
     }
     logger.info({
       message: 'Successfully copied campaign',
       campaignId: campaign.id,
-      action: 'copyCampaign',
+      action: 'duplicateCampaign',
     })
     return res.status(201).json({
       id: campaign.id,
@@ -335,5 +335,5 @@ export const EmailMiddleware = {
   existsFromAddress,
   isFromAddressAccepted,
   sendValidationMessage,
-  copyCampaign,
+  duplicateCampaign,
 }
