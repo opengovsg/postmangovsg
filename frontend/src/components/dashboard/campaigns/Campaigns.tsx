@@ -14,7 +14,7 @@ import {
 } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import { Campaign, channelIcons, Status } from 'classes'
+import { Campaign, channelIcons, ChannelType, Status } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
@@ -147,6 +147,14 @@ const Campaigns = () => {
     {
       name: '',
       render: (campaign: Campaign) => {
+        if (campaign.demoMessageLimit) {
+          if (
+            (numDemosSms === 0 && campaign.type === ChannelType.SMS) ||
+            (numDemosTelegram === 0 && campaign.type === ChannelType.Telegram)
+          ) {
+            return
+          }
+        }
         return (
           <div
             className={cx(styles.iconContainer, styles.copy)}
