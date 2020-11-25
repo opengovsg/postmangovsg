@@ -177,8 +177,8 @@ const Campaigns = () => {
   function renderRow(campaign: Campaign, key: number) {
     return (
       <tr key={key} onClick={() => history.push(`/campaigns/${campaign.id}`)}>
-        {headers.map(({ render, width, name }) => (
-          <td className={width} key={name}>
+        {headers.map(({ render, width }, key) => (
+          <td className={width} key={key}>
             {render(campaign)}
           </td>
         ))}
@@ -237,8 +237,8 @@ const Campaigns = () => {
           <table className={styles.campaignTable}>
             <thead>
               <tr>
-                {headers.map(({ name, width }) => (
-                  <th className={width} key={name}>
+                {headers.map(({ name, width }, key) => (
+                  <th className={width} key={key}>
                     {name}
                   </th>
                 ))}
