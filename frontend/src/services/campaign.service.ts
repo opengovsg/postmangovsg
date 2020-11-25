@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import {
   Campaign,
   CampaignStats,
@@ -158,8 +158,15 @@ export async function sendCampaign(
   campaignId: number,
   sendRate: number
 ): Promise<void> {
-  const body = sendRate ? { rate: sendRate } : null
-  await axios.post(`/campaign/${campaignId}/send`, body)
+  try {
+    const body = sendRate ? { rate: sendRate } : null
+    await axios.post(`/campaign/${campaignId}/send`, body)
+  } catch (err) {
+    errorHandler(
+      err,
+      'An error occured while sending the campaign. Please try again.'
+    )
+  }
 }
 
 export async function stopCampaign(campaignId: number): Promise<void> {
@@ -190,4 +197,12 @@ export async function exportCampaignStats(
 
     return campaignRecipients
   })
+}
+
+function errorHandler(e: AxiosError, defaultMsg: string): never {
+  console.error(e)
+  if (e.response && e.response.data && e.response.data.message) {
+    throw new Error(e.response.data.message)
+  }
+  throw new Error(defaultMsg)
 }
