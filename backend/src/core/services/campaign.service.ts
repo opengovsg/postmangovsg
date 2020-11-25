@@ -75,6 +75,47 @@ const createCampaign = async ({
   userId,
   protect,
   demoMessageLimit,
+  transaction,
+}: {
+  name: string
+  type: string
+  userId: number
+  protect: boolean
+  demoMessageLimit: number | null
+  transaction: Transaction
+}): Promise<Campaign | void> => {
+  const isDemo = Boolean(demoMessageLimit) // demoMessageLimit is not null, undefined, or 0
+  let campaign
+  if (isDemo) {
+    campaign = await createDemoCampaign({
+      name,
+      type,
+      userId,
+      protect,
+      demoMessageLimit,
+      transaction,
+    })
+  } else {
+    campaign = await Campaign.create(
+      {
+        name,
+        type,
+        userId,
+        valid: false,
+        protect,
+      },
+      { transaction }
+    )
+  }
+  return campaign
+}
+
+const createCampaignWithTransaction = async ({
+  name,
+  type,
+  userId,
+  protect,
+  demoMessageLimit,
 }: {
   name: string
   type: string
@@ -82,33 +123,17 @@ const createCampaign = async ({
   protect: boolean
   demoMessageLimit: number | null
 }): Promise<Campaign | void> => {
-  const result = await Campaign.sequelize?.transaction(async (transaction) => {
-    const isDemo = Boolean(demoMessageLimit) // demoMessageLimit is not null, undefined, or 0
-    let campaign
-    if (isDemo) {
-      campaign = await createDemoCampaign({
-        transaction,
-        name,
-        type,
-        userId,
-        protect,
-        demoMessageLimit,
-      })
-    } else {
-      campaign = await Campaign.create(
-        {
-          name,
-          type,
-          userId,
-          valid: false,
-          protect,
-        },
-        { transaction }
-      )
-    }
+  return Campaign.sequelize?.transaction(async (transaction) => {
+    const campaign = await createCampaign({
+      name,
+      type,
+      userId,
+      protect,
+      demoMessageLimit,
+      transaction,
+    })
     return campaign
   })
-  return result
 }
 
 /**
@@ -254,6 +279,7 @@ const setValid = (
 export const CampaignService = {
   hasJobInProgress,
   createCampaign,
+  createCampaignWithTransaction,
   listCampaigns,
   getCampaignDetails,
   setInvalid,
