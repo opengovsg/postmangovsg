@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import { EmailService, CustomDomainService } from '@email/services'
+import {
+  EmailService,
+  EmailTemplateService,
+  CustomDomainService,
+} from '@email/services'
 import { parseFromAddress } from '@core/utils/from-address'
 import { AuthService } from '@core/services'
 import config from '@core/config'
@@ -258,6 +262,40 @@ const getCustomFromAddress = async (
   return res.status(200).json({ from: result })
 }
 
+/*
+ * Get email template's From address for specific campaign
+ */
+const getCampaignFromAddress = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const template = await EmailTemplateService.getFilledTemplate(+campaignId)
+
+    if (!template) {
+      const message = `No template associated with campaign ${campaignId}`
+      logger.error({
+        message,
+        campaignId,
+        action: 'getCampaignFromAddress',
+      })
+
+      return res.status(400).json({ message })
+    }
+
+    /* eslint-disable @typescript-eslint/no-non-null-assertion*/
+    const { name, fromAddress } = parseFromAddress(template?.from!)
+    res.locals.fromName = name
+    res.locals.from = fromAddress
+
+    next()
+  } catch (err) {
+    next(err)
+  }
+}
+
 /**
  * Sends a test email from the specified from address
  */
@@ -332,6 +370,7 @@ export const EmailMiddleware = {
   verifyFromAddress,
   storeFromAddress,
   getCustomFromAddress,
+  getCampaignFromAddress,
   existsFromAddress,
   isFromAddressAccepted,
   sendValidationMessage,

@@ -521,6 +521,9 @@ router.post(
   '/credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
+  EmailMiddleware.getCampaignFromAddress,
+  EmailMiddleware.existsFromAddress,
+  EmailMiddleware.verifyFromAddress,
   EmailMiddleware.validateAndStoreCredentials
 )
 
@@ -608,6 +611,9 @@ router.post(
   '/send',
   celebrate(sendCampaignValidator),
   CampaignMiddleware.canEditCampaign,
+  EmailMiddleware.getCampaignFromAddress,
+  EmailMiddleware.existsFromAddress,
+  EmailMiddleware.verifyFromAddress,
   JobMiddleware.sendCampaign
 )
 
