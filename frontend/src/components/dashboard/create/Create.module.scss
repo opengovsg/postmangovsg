@@ -124,14 +124,13 @@
 }
 
 .inputLabelHelpLink {
-  margin-left: 0.5rem;
-  font-weight: normal;
-  font-size: 0.75rem;
   font-style: italic;
-  color: $secondary;
-  text-decoration: underline;
-  &.infoLink {
-    color: $primary;
+  color: $primary;
+  &:hover {
+    text-decoration: underline;
+  }
+  &:active {
+    color: $secondary;
   }
 }
 

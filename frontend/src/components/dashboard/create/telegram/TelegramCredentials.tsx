@@ -265,7 +265,7 @@ const TelegramCredentials = ({
                     bot to try sending Telegram messages. In a normal campaign,
                     you’d have to set up your own Telegram bot.{' '}
                     <OutboundLink
-                      className={cx(styles.inputLabelHelpLink, styles.infoLink)}
+                      className={styles.inputLabelHelpLink}
                       eventLabel={i18n._(LINKS.guideTelegramUrl)}
                       to={i18n._(LINKS.guideTelegramUrl)}
                       target="_blank"
@@ -276,12 +276,9 @@ const TelegramCredentials = ({
                   <p>
                     Make sure that you and your recipients are{' '}
                     <b>
-                      subscribed to
+                      subscribed to{' '}
                       <OutboundLink
-                        className={cx(
-                          styles.inputLabelHelpLink,
-                          styles.infoLink
-                        )}
+                        className={styles.inputLabelHelpLink}
                         eventLabel={i18n._(LINKS.demoTelegramBotUrl)}
                         to={i18n._(LINKS.demoTelegramBotUrl)}
                         target="_blank"

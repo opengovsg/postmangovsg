@@ -241,11 +241,13 @@ const Campaigns = () => {
           Create new campaign
         </PrimaryButton>
       </TitleBar>
-      <DemoBar
-        numDemosSms={numDemosSms}
-        numDemosTelegram={numDemosTelegram}
-        isDisplayed={isDemoDisplayed}
-      />
+      {campaignCount > 0 && (
+        <DemoBar
+          numDemosSms={numDemosSms}
+          numDemosTelegram={numDemosTelegram}
+          isDisplayed={isDemoDisplayed}
+        />
+      )}
       <div className={styles.content}>
         {isLoading ? (
           <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
