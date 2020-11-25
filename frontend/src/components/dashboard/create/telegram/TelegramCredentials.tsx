@@ -276,12 +276,9 @@ const TelegramCredentials = ({
                   <p>
                     Make sure that you and your recipients are{' '}
                     <b>
-                      subscribed to
+                      subscribed to{' '}
                       <OutboundLink
-                        className={cx(
-                          styles.inputLabelHelpLink,
-                          styles.botLink
-                        )}
+                        className={styles.inputLabelHelpLink}
                         eventLabel={i18n._(LINKS.demoTelegramBotUrl)}
                         to={i18n._(LINKS.demoTelegramBotUrl)}
                         target="_blank"
