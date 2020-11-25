@@ -1,12 +1,12 @@
 import { DuplicateCampaignDetails } from '@core/interfaces/campaign.interface'
-import { SmsTemplate } from '@sms/models'
+import { TelegramTemplate } from '@telegram/models'
 
 export interface StoreTemplateInput {
   campaignId: number
   body: string
 }
 export interface StoreTemplateOutput {
-  updatedTemplate: SmsTemplate
+  updatedTemplate: TelegramTemplate
   check?: {
     reupload: boolean
     extraKeys?: string[]
@@ -14,18 +14,18 @@ export interface StoreTemplateOutput {
   valid?: boolean
 }
 
-export interface SmsDuplicateCampaignDetails extends DuplicateCampaignDetails {
-  sms_templates: {
+export interface TelegramDuplicateCampaignDetails
+  extends DuplicateCampaignDetails {
+  telegram_templates: {
     body: string
   }
 }
-
 /**
  * @swagger
  *  components:
  *    schemas:
  *
- *      SMSCampaign:
+ *      TelegramCampaign:
  *       type: object
  *       properties:
  *         id:
@@ -41,18 +41,14 @@ export interface SmsDuplicateCampaignDetails extends DuplicateCampaignDetails {
  *           type: boolean
  *         csv_filename:
  *           type: string
- *         is_csv_processing:
- *           type: boolean
- *         num_recipients:
- *           type: number
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
- *           default: 'SMS'
+ *           default: 'TELEGRAM'
  *         job_queue:
  *           type: array
  *           items:
  *            $ref: '#/components/schemas/JobQueue'
- *         sms_templates:
+ *         telegram_templates:
  *           type: object
  *           properties:
  *            body:

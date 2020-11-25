@@ -8,8 +8,7 @@ import { PhoneNumberService } from '@core/services'
 import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
-import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
-
+import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
 const client = new TemplateClient({
   xssOptions: XSS_TELEGRAM_OPTION,
   lineBreak: '\n',
