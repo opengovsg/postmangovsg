@@ -111,17 +111,6 @@ const verifyNotificationSettings = async (email: string): Promise<void> => {
       )
     }
 
-    if (
-      !HeadersInBounceNotificationsEnabled ||
-      !HeadersInComplaintNotificationsEnabled ||
-      !HeadersInDeliveryNotificationsEnabled
-    ) {
-      throw new Error(
-        'Original email headers are not included in notifications. Please include them by ' +
-          'enabling it in SES.'
-      )
-    }
-
     const sesNotificationTopic = config.get('sesNotificationTopic')
     const allTopicsValid = [BounceTopic, ComplaintTopic, DeliveryTopic].every(
       (topic) => topic === sesNotificationTopic
@@ -132,6 +121,16 @@ const verifyNotificationSettings = async (email: string): Promise<void> => {
           'bounce, complaint and delivery notifications'
       )
     }
+    if (
+      !HeadersInBounceNotificationsEnabled ||
+      !HeadersInComplaintNotificationsEnabled ||
+      !HeadersInDeliveryNotificationsEnabled
+    ) {
+      throw new Error(
+        'Original email headers are not included in notifications. Please include them by ' +
+          'enabling it in SES.'
+      )
+    }
   } catch (err) {
     logger.error({
       message: 'Invalid SES notification settings',
@@ -139,7 +138,9 @@ const verifyNotificationSettings = async (email: string): Promise<void> => {
       error: err,
       action: 'verifyNotificationSettings',
     })
-    throw err
+    throw new Error(
+      `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
+    )
   }
 }
 
