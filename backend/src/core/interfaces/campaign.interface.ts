@@ -71,6 +71,14 @@ export interface CampaignRecipient {
   error_code?: string
 }
 
+export interface DuplicateCampaignDetails {
+  name: string
+  type: string
+  user_id: number
+  protect: boolean
+  demo_message_limit: number | null
+}
+
 /**
  * @swagger
  *  components:

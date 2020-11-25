@@ -5,11 +5,14 @@ import { isSuperSet } from '@core/utils'
 import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
 import { PhoneNumberService } from '@core/services'
-import { TemplateClient, XSS_TELEGRAM_OPTION } from 'postman-templating'
+import {
+  TemplateClient,
+  XSS_TELEGRAM_OPTION,
+  TemplateError,
+} from 'postman-templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
-import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
-
+import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
 const client = new TemplateClient({
   xssOptions: XSS_TELEGRAM_OPTION,
   lineBreak: '\n',
@@ -141,9 +144,15 @@ const storeTemplate = async ({
   campaignId,
   body,
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
+  const sanitizedBody = client.replaceNewLinesAndSanitize(body)
+  if (!sanitizedBody) {
+    throw new TemplateError(
+      'Message template is invalid as it only contains invalid HTML tags!'
+    )
+  }
   const updatedTemplate = await upsertTelegramTemplate({
     campaignId,
-    body: client.replaceNewLinesAndSanitize(body),
+    body: sanitizedBody,
   })
 
   const firstRecord = await TelegramMessage.findOne({

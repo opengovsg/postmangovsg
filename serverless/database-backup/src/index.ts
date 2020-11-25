@@ -5,12 +5,15 @@ import config from './config'
 import { PgDump, SecretsManagerDump } from './dumps'
 import Encryptor from './encryptor'
 import Backup from './backup'
-import {Logger} from './utils/logger'
+import { Logger } from './utils/logger'
+import { getCronitor } from './utils/cronitor'
 
 import { EncryptionConfig, DatabaseConfig } from './interfaces'
 import { parseRdsEvents, RDS_EVENTS } from './utils/event'
 
 const logger = new Logger('db-backup')
+// If cronitor is null, monitoring is not enabled for this environment
+const cronitor = getCronitor()
 
 Sentry.init({
   dsn: config.get('sentryDsn'),
@@ -32,6 +35,8 @@ const handler = async (event: any) => {
     const events = parseRdsEvents(event)
     for (const ev of events) {
       if (ev.eventId === RDS_EVENTS.BACKUP_COMPLETE) {
+        await cronitor?.run()
+
         const dbConfig = config.get('database') as DatabaseConfig
         const encryptionConfig = config.get('encryption') as EncryptionConfig
 
@@ -47,6 +52,7 @@ const handler = async (event: any) => {
         const backupLocation = await backup.upload()
 
         logger.log(`Database backup uploaded to ${backupLocation}`)
+        await cronitor?.complete()
       }
     }
     return { statusCode: 200 }
@@ -55,6 +61,8 @@ const handler = async (event: any) => {
 
     Sentry.captureException(err)
     await Sentry.flush(2000)
+
+    await cronitor?.fail(err.message)
 
     throw err
   }

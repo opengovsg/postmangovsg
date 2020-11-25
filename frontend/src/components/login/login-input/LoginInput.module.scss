@@ -2,16 +2,17 @@
 @import 'styles/_mixins';
 
 .container {
-  width: 80%;
+  width: 448px;
   display: flex;
   flex-direction: column;
 
   @include mobile() {
+    width: 80%;
     align-items: center;
   }
 
   .text {
-    font-weight: 500;
+    margin-bottom: $spacing-4;
   }
 
   input {

@@ -189,7 +189,7 @@ const SMSCredentials = ({
                     you’d have to add your own credentials by setting up your
                     own Twilio account.{' '}
                     <OutboundLink
-                      className={cx(styles.inputLabelHelpLink, styles.infoLink)}
+                      className={styles.inputLabelHelpLink}
                       eventLabel={i18n._(LINKS.guideSmsUrl)}
                       to={i18n._(LINKS.guideSmsUrl)}
                       target="_blank"

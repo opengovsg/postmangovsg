@@ -11,7 +11,7 @@ import { CampaignService, UploadService } from '@core/services'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
-import { TwilioCredentials } from '@sms/interfaces'
+import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
 import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
@@ -215,6 +215,56 @@ const uploadCompleteOnChunk = ({
   }
 }
 
+const duplicateCampaign = async ({
+  campaignId,
+  name,
+}: {
+  campaignId: number
+  name: string
+}): Promise<Campaign | void> => {
+  const campaign = (
+    await Campaign.findByPk(campaignId, {
+      attributes: ['type', 'user_id', 'protect', 'demo_message_limit'],
+      include: [
+        {
+          model: SmsTemplate,
+          attributes: ['body'],
+        },
+      ],
+    })
+  )?.get({ plain: true }) as SmsDuplicateCampaignDetails
+
+  if (campaign) {
+    const duplicatedCampaign = await Campaign.sequelize?.transaction(
+      async (transaction) => {
+        const duplicate = await CampaignService.createCampaign({
+          name,
+          type: campaign.type,
+          userId: campaign.user_id,
+          protect: campaign.protect,
+          demoMessageLimit: campaign.demo_message_limit,
+          transaction,
+        })
+        if (duplicate && campaign.sms_templates) {
+          const template = campaign.sms_templates
+          // Even if a campaign did not have an associated saved template, it can still be duplicated
+          await SmsTemplate.create(
+            {
+              campaignId: duplicate.id,
+              body: template.body,
+            },
+            { transaction }
+          )
+        }
+        return duplicate
+      }
+    )
+    return duplicatedCampaign
+  }
+
+  return
+}
+
 export const SmsService = {
   getEncodedHash,
   findCampaign,
@@ -225,4 +275,5 @@ export const SmsService = {
   setCampaignCredential,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
+  duplicateCampaign,
 }

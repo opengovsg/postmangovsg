@@ -15,8 +15,13 @@ import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
-import { PhoneNumberService, UploadService } from '@core/services'
+import {
+  CampaignService,
+  PhoneNumberService,
+  UploadService,
+} from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { TelegramDuplicateCampaignDetails } from '@telegram/interfaces'
 
 const logger = loggerWithLabel(module)
 
@@ -299,6 +304,56 @@ const uploadCompleteOnChunk = ({
   }
 }
 
+const duplicateCampaign = async ({
+  campaignId,
+  name,
+}: {
+  campaignId: number
+  name: string
+}): Promise<Campaign | void> => {
+  const campaign = (
+    await Campaign.findByPk(campaignId, {
+      attributes: ['type', 'user_id', 'protect', 'demo_message_limit'],
+      include: [
+        {
+          model: TelegramTemplate,
+          attributes: ['body'],
+        },
+      ],
+    })
+  )?.get({ plain: true }) as TelegramDuplicateCampaignDetails
+
+  if (campaign) {
+    const duplicatedCampaign = await Campaign.sequelize?.transaction(
+      async (transaction) => {
+        const duplicate = await CampaignService.createCampaign({
+          name,
+          type: campaign.type,
+          userId: campaign.user_id,
+          protect: campaign.protect,
+          demoMessageLimit: campaign.demo_message_limit,
+          transaction,
+        })
+        if (duplicate && campaign.telegram_templates) {
+          const template = campaign.telegram_templates
+          // Even if a campaign did not have an associated saved template, it can still be duplicated
+          await TelegramTemplate.create(
+            {
+              campaignId: duplicate.id,
+              body: template.body,
+            },
+            { transaction }
+          )
+        }
+        return duplicate
+      }
+    )
+    return duplicatedCampaign
+  }
+
+  return
+}
+
 export const TelegramService = {
   findCampaign,
   getCampaignDetails,
@@ -309,4 +364,5 @@ export const TelegramService = {
   validateAndConfigureBot,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
+  duplicateCampaign,
 }

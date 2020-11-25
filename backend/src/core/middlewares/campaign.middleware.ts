@@ -60,7 +60,7 @@ const createCampaign = async (
       return res.sendStatus(403)
     }
     const userId = req.session?.user?.id
-    const campaign = await CampaignService.createCampaign({
+    const campaign = await CampaignService.createCampaignWithTransaction({
       name,
       type,
       userId,

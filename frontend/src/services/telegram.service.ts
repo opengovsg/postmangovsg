@@ -206,7 +206,7 @@ export async function validateNewCredentials({
   label?: string
 }): Promise<void> {
   try {
-    await axios.post(`/campaign/${campaignId}/telegram/new-credentials/v2`, {
+    await axios.post(`/campaign/${campaignId}/telegram/new-credentials`, {
       telegram_bot_token: telegramBotToken,
       label,
     })

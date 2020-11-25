@@ -14,7 +14,7 @@ import {
 } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import { Campaign, channelIcons, Status } from 'classes'
+import { Campaign, channelIcons, ChannelType, Status } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
@@ -23,6 +23,7 @@ import styles from './Campaigns.module.scss'
 import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
+import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 
 const ITEMS_PER_PAGE = 10
 
@@ -101,7 +102,7 @@ const Campaigns = () => {
           {campaign.name}
         </span>
       ),
-      width: 'md ellipsis',
+      width: 'lg ellipsis',
     },
     {
       name: 'Created At',
@@ -126,7 +127,7 @@ const Campaigns = () => {
       width: 'xs center',
     },
     {
-      name: 'Export',
+      name: '',
       render: (campaign: Campaign) => {
         if (campaign.status === Status.Draft) return
         return (
@@ -141,7 +142,34 @@ const Campaigns = () => {
           />
         )
       },
-      width: 'md center',
+      width: 'sm center',
+    },
+    {
+      name: '',
+      render: (campaign: Campaign) => {
+        if (
+          campaign.demoMessageLimit &&
+          ((numDemosSms === 0 && campaign.type === ChannelType.SMS) ||
+            (numDemosTelegram === 0 && campaign.type === ChannelType.Telegram))
+        ) {
+          return
+        }
+        return (
+          <div
+            className={cx(styles.iconContainer, styles.duplicate)}
+            onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+              event.stopPropagation()
+              modalContext.setModalContent(
+                <DuplicateCampaignModal campaign={campaign} />
+              )
+            }}
+          >
+            <i className={cx('bx bx-duplicate', styles.icon)}></i>{' '}
+            <span>Duplicate</span>
+          </div>
+        )
+      },
+      width: 'sm center',
     },
   ]
   /* eslint-enable react/display-name */
@@ -149,8 +177,8 @@ const Campaigns = () => {
   function renderRow(campaign: Campaign, key: number) {
     return (
       <tr key={key} onClick={() => history.push(`/campaigns/${campaign.id}`)}>
-        {headers.map(({ render, width, name }) => (
-          <td className={width} key={name}>
+        {headers.map(({ render, width }, key) => (
+          <td className={width} key={key}>
             {render(campaign)}
           </td>
         ))}
@@ -209,8 +237,8 @@ const Campaigns = () => {
           <table className={styles.campaignTable}>
             <thead>
               <tr>
-                {headers.map(({ name, width }) => (
-                  <th className={width} key={name}>
+                {headers.map(({ name, width }, key) => (
+                  <th className={width} key={key}>
                     {name}
                   </th>
                 ))}
@@ -241,11 +269,13 @@ const Campaigns = () => {
           Create new campaign
         </PrimaryButton>
       </TitleBar>
-      <DemoBar
-        numDemosSms={numDemosSms}
-        numDemosTelegram={numDemosTelegram}
-        isDisplayed={isDemoDisplayed}
-      />
+      {campaignCount > 0 && (
+        <DemoBar
+          numDemosSms={numDemosSms}
+          numDemosTelegram={numDemosTelegram}
+          isDisplayed={isDemoDisplayed}
+        />
+      )}
       <div className={styles.content}>
         {isLoading ? (
           <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>

@@ -64,7 +64,9 @@ const EmailCredentials = ({
                 </p>
               )}
             </StepHeader>
-            <EmailValidationInput onClick={handleTestSend} />
+            <div>
+              <EmailValidationInput onClick={handleTestSend} />
+            </div>
             <ErrorBlock>{errorMsg}</ErrorBlock>
 
             {hasCredential && (
