@@ -102,7 +102,7 @@ const Campaigns = () => {
           {campaign.name}
         </span>
       ),
-      width: 'md ellipsis',
+      width: 'lg ellipsis',
     },
     {
       name: 'Created At',
@@ -142,7 +142,7 @@ const Campaigns = () => {
           />
         )
       },
-      width: 'md',
+      width: 'sm center',
     },
     {
       name: '',
@@ -169,7 +169,7 @@ const Campaigns = () => {
           </div>
         )
       },
-      width: 'md',
+      width: 'sm center',
     },
   ]
   /* eslint-enable react/display-name */

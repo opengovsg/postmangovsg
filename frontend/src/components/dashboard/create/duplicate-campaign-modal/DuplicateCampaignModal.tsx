@@ -121,10 +121,10 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
                   // eslint-disable-next-line @typescript-eslint/no-empty-function
                   onChange={() => {}}
                 >
-                  <p className={styles.subtext}>
+                  <p className={cx(styles.subtext, styles.disabled)}>
                     Password protected.
                     <OutboundLink
-                      className={styles.link}
+                      className={cx(styles.link, styles.disabled)}
                       eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
                       to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
                       target="_blank"
