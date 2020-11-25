@@ -84,14 +84,14 @@ const SMSTemplate = ({
       <SaveDraftModal
         saveable
         onSave={async () => {
-          if (body) await handleSaveTemplate(true)
+          if (body && campaignId) await saveTemplate(+campaignId, body)
         }}
       />
     )
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, handleSaveTemplate, setFinishLaterContent])
+  }, [body, campaignId, handleSaveTemplate, setFinishLaterContent])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')
