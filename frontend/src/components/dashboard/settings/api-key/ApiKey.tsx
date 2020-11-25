@@ -46,12 +46,14 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
   useEffect(() => {
     if (apiKeyState !== ApiKeyState.COPIED) return
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setApiKeyState(ApiKeyState.COPY)
 
       if (!apiKeyRef.current) return
       apiKeyRef.current.blur()
     }, RESET_COPY_TIMEOUT)
+
+    return () => clearTimeout(timeoutId)
   }, [apiKeyState])
 
   async function onButtonClick() {
