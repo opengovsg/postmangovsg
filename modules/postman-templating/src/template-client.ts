@@ -188,6 +188,8 @@ export class TemplateClient {
      */
     if (options.removeEmptyLines) {
       // Remove empty tags so that collapsing of line breaks will work even if line contains empty tags
+      // Trim all empty spaces between tags so that they can be recognised as empty. E.g. <b> </b>
+      result = result.replace(/>\s+</g, '><')
       const $ = cheerio.load(result, { xmlMode: true })
       const emptyElements = (): cheerio.Cheerio =>
         $(':empty').not('br, hr, img')

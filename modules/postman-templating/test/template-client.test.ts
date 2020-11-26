@@ -123,6 +123,18 @@ describe('template', () => {
           )
         ).toEqual(expected)
       })
+      test('empty lines with tags containing only spaces should be removed', () => {
+        const template = '<b> </b>\n<b> </b>\n'
+        const expected = '<br />'
+
+        expect(
+          templateClient.template(
+            template,
+            {},
+            { replaceNewLines: true, removeEmptyLines: true }
+          )
+        ).toEqual(expected)
+      })
       test('empty lines with empty img, hr and br tags should not be removed', () => {
         const template =
           '<br/><hr/>' +
