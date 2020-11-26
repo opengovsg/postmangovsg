@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect, MutableRefObject } from 'react'
+import React, { useState, MutableRefObject } from 'react'
 import cx from 'classnames'
+
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { PrimaryButton, TextInput } from 'components/common'
 import styles from './TextInputWithButton.module.scss'
-import { PrimaryButton, TextInput } from '../'
 
 interface TextInputWithButtonProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
@@ -30,13 +32,7 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   errorMessage,
 }) => {
   const [asyncLoading, setAsyncLoading] = useState(false)
-  const isMounted = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
+  const isMounted = useIsMounted()
 
   const asyncSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
