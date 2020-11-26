@@ -106,7 +106,7 @@ const EmailTemplate = ({
         saveable
         onSave={async () => {
           if (subject && body && from) {
-            await handleSaveTemplate(true)
+            await saveTemplate(+campaignId, subject, body, replyTo, from)
           }
         }}
       />
@@ -114,7 +114,15 @@ const EmailTemplate = ({
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, subject, from, handleSaveTemplate, setFinishLaterContent])
+  }, [
+    body,
+    subject,
+    from,
+    handleSaveTemplate,
+    setFinishLaterContent,
+    campaignId,
+    replyTo,
+  ])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
