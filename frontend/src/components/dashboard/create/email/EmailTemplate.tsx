@@ -45,7 +45,9 @@ const EmailTemplate = ({
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
-  const [replyTo, setReplyTo] = useState(initialReplyTo || userEmail)
+  const [replyTo, setReplyTo] = useState(
+    initialReplyTo === userEmail ? null : initialReplyTo
+  )
   const [from, setFrom] = useState(initialFrom)
   const [customFromAddresses, setCustomFromAddresses] = useState(
     [] as { label: string; value: string }[]
@@ -107,7 +109,7 @@ const EmailTemplate = ({
       <SaveDraftModal
         saveable
         onSave={async () => {
-          if (subject && body && from && replyTo) {
+          if (subject && body && from) {
             await handleSaveTemplate(true)
           }
         }}
@@ -116,7 +118,7 @@ const EmailTemplate = ({
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, subject, from, replyTo, handleSaveTemplate, setFinishLaterContent])
+  }, [body, subject, from, handleSaveTemplate, setFinishLaterContent])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
@@ -193,9 +195,7 @@ const EmailTemplate = ({
 
         <div>
           <h4 className={styles.replyToHeader}>Replies</h4>
-          <p>
-            All replies will be directed to the email address indicated below
-          </p>
+          <p>If left blank, replies will be directed to {userEmail}</p>
           <TextInput
             placeholder="Enter reply-to email address"
             value={replyTo || ''}
@@ -204,10 +204,7 @@ const EmailTemplate = ({
         </div>
       </StepSection>
 
-      <NextButton
-        disabled={!body || !subject || !replyTo}
-        onClick={handleSaveTemplate}
-      />
+      <NextButton disabled={!body || !subject} onClick={handleSaveTemplate} />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )
