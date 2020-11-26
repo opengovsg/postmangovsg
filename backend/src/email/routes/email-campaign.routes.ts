@@ -27,6 +27,7 @@ const storeTemplateValidator = {
       .email()
       .options({ convert: true })
       .lowercase()
+      .allow(null)
       .required(),
     from: fromAddressValidator,
   }),
