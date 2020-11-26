@@ -59,6 +59,7 @@ const CreateTelegram = () => {
             activeStep={activeStep}
             setActiveStep={setActiveStep}
             progress={progress}
+            disabled={isCsvProcessing}
           />
           <div className={styles.stepContainer}>{renderStep()}</div>
         </>
