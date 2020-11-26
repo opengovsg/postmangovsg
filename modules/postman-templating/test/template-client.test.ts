@@ -99,6 +99,30 @@ describe('template', () => {
           )
         ).toEqual(expected)
       })
+      test('empty lines with empty tags should be removed', () => {
+        const template = '<b></b>\n<b></b>\n'
+        const expected = '<br />'
+
+        expect(
+          templateClient.template(
+            template,
+            {},
+            { replaceNewLines: true, removeEmptyLines: true }
+          )
+        ).toEqual(expected)
+      })
+      test('empty lines with nested empty tags should be removed', () => {
+        const template = '<b><i></i></b>\n<b></b>\n'
+        const expected = '<br />'
+
+        expect(
+          templateClient.template(
+            template,
+            {},
+            { replaceNewLines: true, removeEmptyLines: true }
+          )
+        ).toEqual(expected)
+      })
     })
     describe('removeEmptyLinesFromTables', () => {
       const body = `<table>\n<tr>\n<th>Firstname</th>\n</tr>\n\n</table>`
