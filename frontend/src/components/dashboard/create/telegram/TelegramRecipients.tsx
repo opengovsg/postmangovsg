@@ -184,10 +184,13 @@ const TelegramRecipients = ({
 
       <ButtonGroup>
         <NextButton
-          disabled={!numRecipients || !csvFilename}
+          disabled={!numRecipients || !isCsvProcessing}
           onClick={() => setActiveStep((s) => s + 1)}
         />
-        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+        <TextButton
+          disabled={isCsvProcessing}
+          onClick={() => setActiveStep((s) => s - 1)}
+        >
           Previous
         </TextButton>
       </ButtonGroup>

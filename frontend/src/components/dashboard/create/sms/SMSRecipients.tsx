@@ -183,7 +183,10 @@ const SMSRecipients = ({
           disabled={!numRecipients || !csvFilename}
           onClick={() => setActiveStep((s) => s + 1)}
         />
-        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+        <TextButton
+          disabled={!csvFilename}
+          onClick={() => setActiveStep((s) => s - 1)}
+        >
           Previous
         </TextButton>
       </ButtonGroup>
