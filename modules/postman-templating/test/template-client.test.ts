@@ -123,6 +123,19 @@ describe('template', () => {
           )
         ).toEqual(expected)
       })
+      test('empty lines with empty img, hr and br tags should not be removed', () => {
+        const template =
+          '<br/><hr/>' +
+          '<img src="https://postman.gov.sg/static/media/ogp-logo.7ea2980a.svg"/>'
+
+        expect(
+          templateClient.template(
+            template,
+            {},
+            { replaceNewLines: true, removeEmptyLines: true }
+          )
+        ).toEqual(template)
+      })
     })
     describe('removeEmptyLinesFromTables', () => {
       const body = `<table>\n<tr>\n<th>Firstname</th>\n</tr>\n\n</table>`

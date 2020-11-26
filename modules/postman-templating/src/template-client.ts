@@ -189,7 +189,8 @@ export class TemplateClient {
     if (options.removeEmptyLines) {
       // Remove empty tags so that collapsing of line breaks will work even if line contains empty tags
       const $ = cheerio.load(result, { xmlMode: true })
-      const emptyElements = (): cheerio.Cheerio => $(':empty').not('br, hr')
+      const emptyElements = (): cheerio.Cheerio =>
+        $(':empty').not('br, hr, img')
 
       // Repeatedly remove until there are no more empty elements (maximum of 5 levels).
       // E.g. After first pass <b><i></i><b> will become <b></b>.Therefore we will need another pass.
