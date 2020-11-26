@@ -105,7 +105,7 @@ const EmailTemplate = ({
       <SaveDraftModal
         saveable
         onSave={async () => {
-          if (subject && body && from) {
+          if (campaignId && subject && body && from) {
             await saveTemplate(+campaignId, subject, body, replyTo, from)
           }
         }}

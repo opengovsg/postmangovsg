@@ -84,7 +84,7 @@ const SMSTemplate = ({
       <SaveDraftModal
         saveable
         onSave={async () => {
-          if (body) await saveTemplate(+campaignId, body)
+          if (campaignId && body) await saveTemplate(+campaignId, body)
         }}
       />
     )
