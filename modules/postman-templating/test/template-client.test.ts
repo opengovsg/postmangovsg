@@ -124,7 +124,7 @@ describe('template', () => {
         ).toEqual(expected)
       })
       test('empty lines with tags containing only spaces should be removed', () => {
-        const template = '<b> </b>\n<b> </b>\n'
+        const template = '<b>\t\t</b>\n<b> </b>\n<b>\f</b>'
         const expected = '<br />'
 
         expect(

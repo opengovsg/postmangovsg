@@ -187,20 +187,27 @@ export class TemplateClient {
      * removeEmptyLines
      */
     if (options.removeEmptyLines) {
-      // Remove empty tags so that collapsing of line breaks will work even if line contains empty tags
-      // Trim all empty spaces between tags so that they can be recognised as empty. E.g. <b> </b>
-      result = result.replace(/>\s+</g, '><')
+      // Recursively remove empty tags so that collapsing of line breaks will work even if line contains empty tags
       const $ = cheerio.load(result, { xmlMode: true })
-      const emptyElements = (): cheerio.Cheerio =>
-        $(':empty').not('br, hr, img')
+      const removeEmpty = (el: cheerio.Element): void => {
+        // Base case 1: Element is null or undefined
+        if (!el) return
 
-      // Repeatedly remove until there are no more empty elements (maximum of 5 levels).
-      // E.g. After first pass <b><i></i><b> will become <b></b>.Therefore we will need another pass.
-      let levels = 1
-      while (emptyElements().length > 0 && levels <= 5) {
-        emptyElements().remove()
-        levels++
+        // Base case 2: Element has child that is not empty
+        const nonEmptyChildren = el.children.filter(
+          (c) => c.type !== 'text' || c.data?.trim()
+        )
+        if (nonEmptyChildren.length > 0) return
+
+        const parent = el.parent
+        $(el).remove()
+        return removeEmpty(parent)
       }
+
+      $('*')
+        .not('br, hr, img')
+        .each((_, el) => removeEmpty(el))
+
       result = $.html()
 
       // Looks for 2 or more consecutive <br>, <br/> or <br />
