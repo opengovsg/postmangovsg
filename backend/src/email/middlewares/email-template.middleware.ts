@@ -8,7 +8,12 @@ import {
   UserError,
 } from '@core/errors'
 import { TemplateError } from 'postman-templating'
-import { UploadService, StatsService, ParseCsvService } from '@core/services'
+import {
+  AuthService,
+  UploadService,
+  StatsService,
+  ParseCsvService,
+} from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
@@ -47,7 +52,8 @@ const storeTemplate = async (
       campaignId: +campaignId,
       subject,
       body,
-      replyTo,
+      replyTo:
+        replyTo || (await AuthService.findUser(req.session?.user?.id))?.email,
       from,
     })
 
