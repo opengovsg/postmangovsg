@@ -33,6 +33,7 @@ export const LINKS = {
   guideTelegramUrl: t('link.guideTelegramUrl')``,
   guidePowerUserUrl: t('link.guidePowerUserUrl')``,
   guideDemoUrl: t('link.guideDemoUrl')``,
+  guideRemoveDuplicatesUrl: t('link.guideRemoveDuplicatesUrl')``,
   contactUsUrl: t('link.contactUsUrl')``,
   contributeUrl: t('link.contributeUrl')``,
   tncUrl: t('link.tncUrl')``,
