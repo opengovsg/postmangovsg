@@ -1,9 +1,23 @@
-@mixin icon {
+%icon {
   align-items: center;
   display: inline-flex;
   justify-content: center;
-  font-size: 1.5rem;
+}
+
+@mixin icon {
+  @extend %icon;
+  line-height: 1.25rem;
+  font-size: 1.25rem;
+  width: 20px;
+  height: 20px;
+}
+
+@mixin icon-large {
+  @extend %icon;
   line-height: 1.5rem;
+  font-size: 1.5rem;
+  width: 24px;
+  height: 24px;
 }
 
 @mixin spinner {

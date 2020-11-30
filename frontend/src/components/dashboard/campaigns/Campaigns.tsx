@@ -83,7 +83,14 @@ const Campaigns = () => {
       name: 'Mode',
       render: (campaign: Campaign) => (
         <div className={styles.iconContainer}>
-          <i className={cx('bx', styles.icon, channelIcons[campaign.type])}></i>
+          <i
+            className={cx(
+              'bx',
+              styles.icon,
+              styles.mode,
+              channelIcons[campaign.type]
+            )}
+          ></i>
           {campaign.protect && (
             <i className={cx('bx bxs-lock-alt', styles.lockIcon)}></i>
           )}

@@ -42,6 +42,10 @@ $modal-width: $tablet;
       height: 4.5rem;
       border: 1px solid $primary;
 
+      .icon {
+        @include icon-large;
+      }
+
       &:not(.active) {
         color: $primary;
         background: $neutral-light;

@@ -9,7 +9,7 @@
       @include flex-horizontal;
 
       .icon {
-        @include icon;
+        @include icon-large;
       }
 
       td.status {
