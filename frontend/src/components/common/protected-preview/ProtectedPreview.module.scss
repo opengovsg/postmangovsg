@@ -48,11 +48,12 @@
       border-collapse: collapse;
 
       tr {
-        display: table-row;
+        @include flex-horizontal;
 
         td,
         th {
-          display: table-cell;
+          display: flex;
+          flex: 1;
         }
 
         th {
