@@ -1,3 +1,4 @@
+import cheerio from 'cheerio'
 import { mapKeys } from 'lodash'
 import xss from 'xss'
 import { TemplateError } from './errors'
@@ -25,10 +26,7 @@ export class TemplateClient {
     const imageSources = allowedImageSources?.filter((source) => source)
 
     if (imageSources && imageSources.length > 0) {
-      this.xssOptions = filterImageSources(
-        this.xssOptions,
-        imageSources
-      )
+      this.xssOptions = filterImageSources(this.xssOptions, imageSources)
     }
   }
 
@@ -189,6 +187,29 @@ export class TemplateClient {
      * removeEmptyLines
      */
     if (options.removeEmptyLines) {
+      // Recursively remove empty tags so that collapsing of line breaks will work even if line contains empty tags
+      const $ = cheerio.load(result, { xmlMode: true })
+      const removeEmpty = (el: cheerio.Element): void => {
+        // Base case 1: Element is null or undefined
+        if (!el) return
+
+        // Base case 2: Element has child that is not empty
+        const nonEmptyChildren = el.children.filter(
+          (c) => c.type !== 'text' || c.data?.trim()
+        )
+        if (nonEmptyChildren.length > 0) return
+
+        const parent = el.parent
+        $(el).remove()
+        return removeEmpty(parent)
+      }
+
+      $('*')
+        .not('br, hr, img')
+        .each((_, el) => removeEmpty(el))
+
+      result = $.html()
+
       // Looks for 2 or more consecutive <br>, <br/> or <br />
       const CONSECUTIVE_LINEBREAK_REGEX = /(\s)*(<br\s*\/?>(\s)*(\n|\r\n)?){2,}/g
       result = result.replace(CONSECUTIVE_LINEBREAK_REGEX, this.lineBreak)

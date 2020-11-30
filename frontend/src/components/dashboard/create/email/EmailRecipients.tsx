@@ -7,6 +7,7 @@ import React, {
   SetStateAction,
 } from 'react'
 import { useParams } from 'react-router-dom'
+import { OutboundLink } from 'react-ga'
 
 import { CampaignContext } from 'contexts/campaign.context'
 import {
@@ -26,7 +27,10 @@ import {
   TextButton,
   StepHeader,
   StepSection,
+  WarningBlock,
 } from 'components/common'
+import { LINKS } from 'config'
+import { i18n } from 'locales'
 import { EmailPreview, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 
@@ -179,6 +183,19 @@ const EmailRecipients = ({
             )}
           </p>
         </StepHeader>
+
+        {!csvFilename && (
+          <WarningBlock title={'We do not remove duplicate recipients'}>
+            <OutboundLink
+              className={styles.warningHelpLink}
+              eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              target="_blank"
+            >
+              Learn how to remove duplicates in your excel from our guide.
+            </OutboundLink>
+          </WarningBlock>
+        )}
 
         <CsvUpload
           isCsvProcessing={isCsvProcessing}

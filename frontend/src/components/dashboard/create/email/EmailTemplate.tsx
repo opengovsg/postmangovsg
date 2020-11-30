@@ -18,6 +18,7 @@ import {
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { useParams } from 'react-router-dom'
 import { getCustomFromAddresses } from 'services/settings.service'
@@ -32,6 +33,7 @@ const EmailTemplate = ({
   setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
+  const { email: userEmail } = useContext(AuthContext)
   const {
     body: initialBody,
     subject: initialSubject,
@@ -43,7 +45,9 @@ const EmailTemplate = ({
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
-  const [replyTo, setReplyTo] = useState(initialReplyTo)
+  const [replyTo, setReplyTo] = useState(
+    initialReplyTo === userEmail ? null : initialReplyTo
+  )
   const [from, setFrom] = useState(initialFrom)
   const [customFromAddresses, setCustomFromAddresses] = useState(
     [] as { label: string; value: string }[]
@@ -190,12 +194,8 @@ const EmailTemplate = ({
         </div>
 
         <div>
-          <h4 className={styles.replyToHeader}>
-            Replies <em>optional</em>
-          </h4>
-          <p>
-            All replies will be directed to the email address indicated below
-          </p>
+          <h4 className={styles.replyToHeader}>Replies</h4>
+          <p>If left blank, replies will be directed to {userEmail}</p>
           <TextInput
             placeholder="Enter reply-to email address"
             value={replyTo || ''}
