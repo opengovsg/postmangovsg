@@ -134,6 +134,14 @@
   }
 }
 
+.warningHelpLink {
+  font-style: italic;
+  color: inherit;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .characterCount {
   @extend %body-2;
   text-align: right;
