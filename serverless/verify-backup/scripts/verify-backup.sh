@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Whether to send notification to Sentry
-SEND_NOTIFICATION=${SEND_NOTIFICATION:-true}
+export SEND_NOTIFICATION=${SEND_NOTIFICATION:-true}
 
 # Set Postgres environment variables to define connection parameters.
 # See https://www.postgresql.org/docs/11/libpq-envars.html
-PGHOST=${PGHOST:-localhost}
-PGPORT=${PGPORT:-5432}
-PGUSER=${PGUSER:-postgres}
-PGDATABASE=${PGDATABASE:-postmangovsg_dev}
+export PGHOST=${PGHOST:-localhost}
+export PGPORT=${PGPORT:-5432}
+export PGUSER=${PGUSER:-postgres}
+export PGDATABASE=${PGDATABASE:-postmangovsg_dev}
 
 notify() {
   echo $1
