@@ -16,7 +16,6 @@ const SMSValidationInput = ({
   }
 
   async function onClickHandler() {
-    setRecipient('')
     await onClick(recipient)
   }
 

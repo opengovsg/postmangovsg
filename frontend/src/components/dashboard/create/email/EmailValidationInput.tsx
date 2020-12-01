@@ -15,7 +15,6 @@ const EmailValidationInput = ({
   }
 
   async function onClickHandler() {
-    setRecipient('')
     await onClick(recipient)
   }
 
