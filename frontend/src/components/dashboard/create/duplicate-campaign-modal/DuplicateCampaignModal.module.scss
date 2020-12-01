@@ -81,7 +81,7 @@ $modal-width: $tablet;
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
   font-size: 20px;
 }
 

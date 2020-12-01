@@ -9,7 +9,7 @@
       @include flex-horizontal;
 
       .icon {
-        @include icon-large;
+        @extend %icon-large;
       }
 
       td.status {
@@ -31,7 +31,7 @@
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
   margin-right: 0.5rem;
 
   &.red {

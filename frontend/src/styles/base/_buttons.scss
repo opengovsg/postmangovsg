@@ -44,7 +44,7 @@ $border-radius: $button-height / 2;
   }
 
   i {
-    @include icon;
+    @extend %icon;
     margin-top: 0.15rem;
     margin-left: $spacing-2;
   }

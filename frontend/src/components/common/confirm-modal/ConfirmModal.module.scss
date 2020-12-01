@@ -12,7 +12,7 @@
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
 }
 
 .greenButton {

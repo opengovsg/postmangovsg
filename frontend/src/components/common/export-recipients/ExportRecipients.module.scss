@@ -25,7 +25,7 @@
   }
 
   .icon {
-    @include icon;
+    @extend %icon;
     margin-right: 0.5rem;
   }
 

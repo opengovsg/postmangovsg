@@ -88,9 +88,9 @@
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
   &.mode {
-    @include icon-large;
+    @extend %icon-large;
   }
 }
 
