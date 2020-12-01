@@ -66,7 +66,7 @@ $modal-width: $tablet;
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
 }
 
 .title {

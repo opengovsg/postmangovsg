@@ -109,7 +109,7 @@ $navbar-link-margin: calc(1rem + 1vw);
       @include flex-horizontal;
 
       .icon {
-        font-size: 1.3rem;
+        @extend %icon-large;
         margin-left: 0.5rem;
       }
     }

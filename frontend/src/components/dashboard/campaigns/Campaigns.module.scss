@@ -88,7 +88,10 @@
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
+  &.mode {
+    @extend %icon-large;
+  }
 }
 
 .lockIcon {
