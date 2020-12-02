@@ -1,0 +1,22 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.wrapper {
+  @extend %body-1;
+  border: 1px solid $light-grey;
+  border-radius: $border-radius;
+  color: $secondary;
+}
+
+.toolbar {
+  border-top-left-radius: $border-radius;
+  border-top-right-radius: $border-radius;
+  padding: $spacing-2;
+}
+
+.editor {
+  padding: 0 $border-radius $spacing-3 $border-radius;
+  border-bottom-left-radius: $border-radius;
+  border-bottom-right-radius: $border-radius;
+  min-height: 250px;
+}
