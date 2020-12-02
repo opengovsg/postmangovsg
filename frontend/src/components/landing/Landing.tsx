@@ -239,9 +239,16 @@ const Landing = () => {
               appointments. The possibilities are endless.
             </p>
 
-            <PrimaryButton className={styles.button}>
-              Learn More <i className="bx bx-right-arrow-alt"></i>
-            </PrimaryButton>
+            <OutboundLink
+              className={styles.link}
+              eventLabel={i18n._(LINKS.guideUrl)}
+              to={i18n._(LINKS.guideUrl)}
+              target="_blank"
+            >
+              <PrimaryButton className={styles.button}>
+                Learn More <i className="bx bx-right-arrow-alt"></i>
+              </PrimaryButton>
+            </OutboundLink>
           </div>
         </div>
       </div>

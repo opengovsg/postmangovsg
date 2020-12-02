@@ -285,8 +285,17 @@ $section-vertical-padding: 4rem;
         color: $white;
         margin-top: $layout-5;
 
-        i {
-          color: $primary;
+        &:hover {
+          background-color: $transparent-white;
+        }
+
+        &:active {
+          background-color: $white;
+          color: $secondary;
+
+          i {
+            color: $secondary;
+          }
         }
       }
     }
