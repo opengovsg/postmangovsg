@@ -1,6 +1,12 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+%toolbar-modal-base {
+  height: auto;
+  border-radius: 5px;
+  box-shadow: none;
+}
+
 .wrapper {
   @extend %body-1;
   border: 1px solid $light-grey;
@@ -9,9 +15,65 @@
 }
 
 .toolbar {
-  border-top-left-radius: $border-radius;
-  border-top-right-radius: $border-radius;
-  padding: $spacing-2;
+  border-top-left-radius: $border-radius !important;
+  border-top-right-radius: $border-radius !important;
+  padding: $spacing-2 !important;
+
+  :global {
+    .rdw-link-modal,
+    .rdw-image-modal {
+      @extend %toolbar-modal-base;
+    }
+
+    .rdw-image-modal-header {
+      display: none;
+    }
+  }
+
+  .form {
+    z-index: 999;
+    position: absolute;
+    top: 35px;
+    left: 5px;
+    background: $white;
+    border: solid 1px $neutral;
+    padding: $spacing-1;
+    border-radius: 5px;
+
+    .item {
+      @include flex-horizontal;
+      margin-bottom: $spacing-1;
+
+      label {
+        flex: 1;
+        padding-right: $spacing-1;
+        @extend %caption;
+      }
+
+      .control {
+        @include flex-horizontal;
+        justify-content: space-between;
+      }
+
+      input.sm {
+        width: 4rem;
+      }
+    }
+
+    .submit {
+      @extend .item;
+      flex-direction: row-reverse;
+    }
+  }
+
+  .imageControl,
+  .linkControl {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    position: relative;
+    flex-wrap: wrap;
+  }
 }
 
 .editor {
@@ -19,4 +81,35 @@
   border-bottom-left-radius: $border-radius;
   border-bottom-right-radius: $border-radius;
   min-height: 250px;
+
+  .link {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+
+    .title {
+      text-decoration: underline;
+      color: $primary;
+    }
+
+    .popover {
+      @extend %caption;
+      position: absolute;
+      z-index: 999;
+      background: white;
+      width: max-content;
+      border: solid 1px $neutral;
+      border-radius: 5px;
+      padding: $spacing-1;
+
+      &.right {
+        right: 0;
+      }
+
+      .divider {
+        border-left: solid 1px $neutral;
+        margin: 0 $spacing-1;
+      }
+    }
+  }
 }
