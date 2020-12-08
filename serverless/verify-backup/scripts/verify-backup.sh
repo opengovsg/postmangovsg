@@ -30,11 +30,11 @@ DUMP_VERSION=$(cat dump-version.txt)
 # Restore dump; On error, print error message and exit script
 echo 'Restoring data dump'
 RESTORE_LOG="$DUMP_VERSION Data dump restoration failed!"
-pg_restore --no-owner --dbname $PGDATABASE postman.decrypted.dump || (notify "$RESTORE_LOG" && exit 1)
+pg_restore --no-owner --dbname $PGDATABASE postman.decrypted.dump || { notify "$RESTORE_LOG" && exit 1; }
 
 echo 'Making simple query on db'
 RESTORE_LOG="$DUMP_VERSION Verification query on restored db failed!"
-psql -c 'SELECT 1+1' || (notify "$RESTORE_LOG" && exit 1)
+psql -c 'SELECT 1+1' || { notify "$RESTORE_LOG" && exit 1; }
 
 # Get key metrics from restored db and set to env var
 DUMP_USERS=$(psql -qAt -c 'select count(*) from users;')
