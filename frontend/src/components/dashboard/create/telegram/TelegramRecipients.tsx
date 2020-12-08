@@ -29,6 +29,7 @@ import {
 } from 'components/common'
 import { TelegramPreview, TelegramProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
 import styles from '../Create.module.scss'
 
@@ -60,6 +61,7 @@ const TelegramRecipients = ({
   const { id: campaignId } = useParams()
 
   const { csvFilename, numRecipients = 0 } = csvInfo
+  const isMounted = useIsMounted()
 
   // Poll csv status
   useEffect(() => {
@@ -71,6 +73,9 @@ const TelegramRecipients = ({
         const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
           +campaignId
         )
+        // Prevent setting state if unmounted
+        if (!isMounted.current) return
+
         setIsCsvProcessing(isCsvProcessing)
         setCsvInfo(newCsvInfo)
         if (preview) {
@@ -89,7 +94,7 @@ const TelegramRecipients = ({
     pollStatus()
 
     return () => clearTimeout(timeoutId)
-  }, [campaignId, isCsvProcessing])
+  }, [campaignId, isCsvProcessing, isMounted])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
@@ -111,6 +116,9 @@ const TelegramRecipients = ({
 
       const uploadTimeEnd = performance.now()
       sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
+
+      // Prevent setting state if unmounted
+      if (!isMounted.current) return
 
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename }))
