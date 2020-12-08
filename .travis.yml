@@ -40,7 +40,7 @@ jobs:
           secret_access_key: $AWS_SECRET_ACCESS_KEY
           region: $AWS_DEFAULT_REGION
           app: "postmangovsg"
-          env: "postmangovsg-production-4d26c37"
+          env: "postmangovsg-production-amz2"
           bucket_name: "postmangovsg-elasticbeanstalk-appversion"
           on:
             branch: $PRODUCTION_BRANCH
