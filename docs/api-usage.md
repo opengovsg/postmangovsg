@@ -136,7 +136,7 @@ curl --location --request GET 'https://api.postman.gov.sg/v1/campaign/100/upload
 --header 'Authorization: Bearer your_api_key'
 ```
 
-While the csv is being processed, `is_csv_processing` would be `true`. When `is_csv_processing` is`false`, this indicates that the csv processing is complete. You can poll the `/upload/status` endpoint to refresh the file processing status.
+While the csv is being processed, `is_csv_processing` would be `true`. When `is_csv_processing` is`false`, this indicates that the csv processing is complete or an error has occurred. You can poll the `/upload/status` endpoint to refresh the file processing status.
 
 **Sample response**
 
