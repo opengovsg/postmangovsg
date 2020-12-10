@@ -166,6 +166,7 @@ const Campaigns = () => {
             className={cx(styles.iconContainer, styles.duplicate)}
             onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               event.stopPropagation()
+              sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
               modalContext.setModalContent(
                 <DuplicateCampaignModal campaign={campaign} />
               )
