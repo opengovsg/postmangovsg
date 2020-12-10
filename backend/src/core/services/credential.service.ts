@@ -3,7 +3,13 @@ import { get } from 'lodash'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
-import { Credential, UserCredential, User, UserDemo } from '@core/models'
+import {
+  Credential,
+  UserCredential,
+  User,
+  UserDemo,
+  UserFeature,
+} from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { loggerWithLabel } from '@core/logger'
 
@@ -220,6 +226,7 @@ const getTelegramUserCredentialLabels = async (
  * Gets api keys and credential labels for that user
  * @param userId
  */
+// TODO: refactor demo and announcement version features out
 const getUserSettings = async (
   userId: number
 ): Promise<UserSettings | null> => {
@@ -242,6 +249,10 @@ const getUserSettings = async (
           ['is_displayed', 'isDisplayed'],
         ],
       },
+      {
+        model: UserFeature,
+        attributes: [['announcement_version', 'announcementVersion']],
+      },
     ],
     plain: true,
   })
@@ -250,6 +261,7 @@ const getUserSettings = async (
       hasApiKey: !!user.apiKey,
       creds: user.creds,
       demo: user.demo,
+      userFeature: user.userFeature,
     }
   } else {
     return null
@@ -292,6 +304,37 @@ const updateDemoDisplayed = async (
     isDisplayed: userDemo[0].isDisplayed,
   }
 }
+
+/**
+ * Updates the announcement version for the specified user
+ * @param userId
+ * @param announcementVersion
+ * @throws Error if user is not found
+ */
+const updateAnnouncementVersion = async (
+  userId: number,
+  announcementVersion: string
+): Promise<{ announcementVersion: string }> => {
+  const [numUpdated, userFeature] = await UserFeature.update(
+    { announcementVersion },
+    {
+      where: { userId },
+      returning: true,
+    }
+  )
+  if (numUpdated !== 1) {
+    logger.error({
+      message: 'Incorrect number of records updated',
+      numUpdated,
+      action: 'updateAnnouncementVersion',
+    })
+    throw new Error('Could not update announcement version')
+  }
+  return {
+    announcementVersion: userFeature[0].announcementVersion,
+  }
+}
+
 export const CredentialService = {
   // Credentials (cred_name)
   storeCredential,
@@ -306,5 +349,7 @@ export const CredentialService = {
   getUserSettings,
   // Api Key
   regenerateApiKey,
+  // User metadata
   updateDemoDisplayed,
+  updateAnnouncementVersion,
 }
