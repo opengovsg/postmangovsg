@@ -87,11 +87,18 @@ const getUser = async (
 ): Promise<Response | void> => {
   if (req?.session?.user?.id) {
     const user = await AuthService.findUser(req?.session?.user?.id)
+    const userFeatures = await AuthService.findUserFeatures(
+      req?.session?.user?.id
+    )
     logger.info({
       message: 'Existing user session found',
       action: 'getUser',
     })
-    return res.json({ email: user?.email, id: user?.id })
+    return res.json({
+      email: user?.email,
+      id: user?.id,
+      announcementVersion: userFeatures?.announcementVersion,
+    })
   }
   logger.info({ message: 'No existing user session found!', action: 'getUser' })
   return res.json({})
