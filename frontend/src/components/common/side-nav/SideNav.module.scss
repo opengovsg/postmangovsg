@@ -57,5 +57,5 @@ $nav-item-height: 88px;
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
 }

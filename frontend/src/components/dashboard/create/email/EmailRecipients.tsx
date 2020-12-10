@@ -1,7 +1,6 @@
 import React, {
   useState,
   useEffect,
-  useRef,
   useContext,
   Dispatch,
   SetStateAction,
@@ -33,6 +32,7 @@ import { LINKS } from 'config'
 import { i18n } from 'locales'
 import { EmailPreview, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
 import styles from '../Create.module.scss'
 
@@ -67,13 +67,7 @@ const EmailRecipients = ({
   const [preview, setPreview] = useState({} as EmailPreview)
   const { id: campaignId } = useParams()
   const { csvFilename, numRecipients = 0 } = csvInfo
-  const isMounted = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
+  const isMounted = useIsMounted()
 
   // Poll csv status
   useEffect(() => {
@@ -97,6 +91,7 @@ const EmailRecipients = ({
         if (preview) {
           setPreview(preview as EmailPreview)
         }
+
         if (isCsvProcessing) {
           timeoutId = setTimeout(pollStatus, 2000)
         }
@@ -110,7 +105,7 @@ const EmailRecipients = ({
     pollStatus()
 
     return () => clearTimeout(timeoutId)
-  }, [campaignId, csvFilename, forceReset, isCsvProcessing])
+  }, [campaignId, csvFilename, forceReset, isCsvProcessing, isMounted])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
@@ -242,7 +237,10 @@ const EmailRecipients = ({
             disabled={!numRecipients || isCsvProcessing}
             onClick={() => setActiveStep((s) => s + 1)}
           />
-          <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+          <TextButton
+            disabled={isCsvProcessing}
+            onClick={() => setActiveStep((s) => s - 1)}
+          >
             Previous
           </TextButton>
         </ButtonGroup>

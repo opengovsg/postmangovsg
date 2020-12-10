@@ -42,6 +42,10 @@ $modal-width: $tablet;
       height: 4.5rem;
       border: 1px solid $primary;
 
+      .icon {
+        @extend %icon-large;
+      }
+
       &:not(.active) {
         color: $primary;
         background: $neutral-light;
@@ -77,7 +81,7 @@ $modal-width: $tablet;
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
 }
 
 .title {

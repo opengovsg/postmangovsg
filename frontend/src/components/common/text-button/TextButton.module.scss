@@ -22,4 +22,14 @@
       text-decoration: underline;
     }
   }
+
+  &:disabled {
+    background-color: unset;
+    color: $grey;
+    cursor: not-allowed;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
 }

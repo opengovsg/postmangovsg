@@ -47,7 +47,7 @@
     }
 
     .icon {
-      @include icon;
+      @extend %icon;
       margin-right: 2rem;
 
       &:last-child {

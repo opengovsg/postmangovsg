@@ -59,38 +59,34 @@ const EmailTemplate = ({
   const bodyPlaceholder =
     'Dear {{ name }}, your next appointment at {{ clinic }} is on {{ date }} at {{ time }}'
 
-  const handleSaveTemplate = useCallback(
-    async (propagateError = false): Promise<void> => {
-      setErrorMsg(null)
-      try {
-        if (!campaignId) {
-          throw new Error('Invalid campaign id')
-        }
-        const { updatedTemplate, numRecipients } = await saveTemplate(
-          +campaignId,
-          subject,
-          body,
-          replyTo,
-          from
-        )
-        if (updatedTemplate) {
-          updateCampaign({
-            from: updatedTemplate.from,
-            subject: updatedTemplate.subject,
-            body: updatedTemplate.body,
-            replyTo: updatedTemplate.reply_to,
-            params: updatedTemplate.params,
-            numRecipients,
-          })
-          setActiveStep((s) => s + 1)
-        }
-      } catch (err) {
-        setErrorMsg(err.message)
-        if (propagateError) throw err
+  const handleSaveTemplate = useCallback(async (): Promise<void> => {
+    setErrorMsg(null)
+    try {
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
       }
-    },
-    [body, campaignId, from, replyTo, setActiveStep, subject, updateCampaign]
-  )
+      const { updatedTemplate, numRecipients } = await saveTemplate(
+        +campaignId,
+        subject,
+        body,
+        replyTo,
+        from
+      )
+      if (updatedTemplate) {
+        updateCampaign({
+          from: updatedTemplate.from,
+          subject: updatedTemplate.subject,
+          body: updatedTemplate.body,
+          replyTo: updatedTemplate.reply_to,
+          params: updatedTemplate.params,
+          numRecipients,
+        })
+        setActiveStep((s) => s + 1)
+      }
+    } catch (err) {
+      setErrorMsg(err.message)
+    }
+  }, [body, campaignId, from, replyTo, setActiveStep, subject, updateCampaign])
 
   async function populateFromAddresses() {
     const fromAddresses = await getCustomFromAddresses()
@@ -109,8 +105,13 @@ const EmailTemplate = ({
       <SaveDraftModal
         saveable
         onSave={async () => {
-          if (subject && body && from) {
-            await handleSaveTemplate(true)
+          if (campaignId && subject && body && from) {
+            try {
+              await saveTemplate(+campaignId, subject, body, replyTo, from)
+            } catch (err) {
+              setErrorMsg(err.message)
+              throw err
+            }
           }
         }}
       />
@@ -118,7 +119,7 @@ const EmailTemplate = ({
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, subject, from, handleSaveTemplate, setFinishLaterContent])
+  }, [body, subject, from, setFinishLaterContent, campaignId, replyTo])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
