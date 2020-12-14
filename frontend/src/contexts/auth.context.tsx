@@ -15,8 +15,6 @@ interface ContextProps {
   setAuthenticated: Dispatch<SetStateAction<boolean>>
   email: string
   setEmail: Dispatch<SetStateAction<string>>
-  announcementVersion: number | null | undefined
-  setAnnouncementVersion: Dispatch<SetStateAction<number | null | undefined>>
 }
 
 export const AuthContext = createContext({} as ContextProps)
@@ -25,9 +23,6 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setAuthenticated] = useState(false)
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')
-  const [announcementVersion, setAnnouncementVersion] = useState<
-    number | null | undefined
-  >(null)
 
   const location = useLocation()
 
@@ -41,7 +36,6 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       const user = await getUser()
       setAuthenticated(!!user?.email)
       setEmail(user?.email || '')
-      setAnnouncementVersion(user?.announcementVersion)
 
       initializeGA()
       setUserAnalytics(user)
@@ -76,8 +70,6 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
         setAuthenticated,
         email,
         setEmail,
-        announcementVersion,
-        setAnnouncementVersion,
       }}
     >
       {isLoaded && children}

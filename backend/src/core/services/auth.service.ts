@@ -8,7 +8,6 @@ import { validateDomain } from '@core/utils/validate-domain'
 import { RedisService, ApiKeyService, MailService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import { Transaction } from 'sequelize/types'
-import { UserFeatures } from '@core/models/user/user-features'
 
 const logger = loggerWithLabel(module)
 const SALT_ROUNDS = 10 // bcrypt default
@@ -284,23 +283,12 @@ const findUser = (id: number): Promise<User> => {
   })
 }
 
-/**
- * Helper method to fetch user_features by their id
- * @param userId
- */
-const findUserFeatures = (userId: number): Promise<UserFeatures> => {
-  return UserFeatures.findOne({
-    where: { userId },
-  })
-}
-
 export const AuthService = {
   canSendOtp,
   sendOtp,
   verifyOtp,
   findOrCreateUser,
   findUser,
-  findUserFeatures,
   checkCookie,
   getUserForApiKey,
 }
