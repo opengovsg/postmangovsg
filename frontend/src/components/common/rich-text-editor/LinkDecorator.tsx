@@ -40,12 +40,10 @@ const LinkSpan = (props: {
   const { blockKey, children, entityKey, contentState, start, end } = props
   const { url, targetOption } = contentState.getEntity(entityKey).getData()
 
-  function openLink(e: React.MouseEvent<HTMLElement>) {
-    e.preventDefault()
-    e.stopPropagation()
-
+  function openLink() {
     const linkTab = window.open(url, '_blank')
     if (linkTab) linkTab.focus()
+    hidePopover()
   }
 
   function removeLink(e: React.MouseEvent<HTMLElement>) {
@@ -76,14 +74,16 @@ const LinkSpan = (props: {
   }
 
   function handleClick() {
-    setShowPopover(true)
-    // Set listener only after event has completed bubbling to prevent the current event
-    // from closing the popover.
-    setTimeout(() => {
-      window.addEventListener('click', hidePopover, {
-        once: true,
+    if (!showPopover) {
+      setShowPopover(true)
+      // Set listener only after event has completed bubbling to prevent the current event
+      // from closing the popover.
+      setTimeout(() => {
+        window.addEventListener('click', hidePopover, {
+          once: true,
+        })
       })
-    })
+    }
   }
 
   return (
