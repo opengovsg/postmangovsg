@@ -1,5 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { EditorState, ContentState, convertToRaw } from 'draft-js'
+import {
+  EditorState,
+  ContentBlock,
+  ContentState,
+  convertToRaw,
+  RawDraftEntity,
+} from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 import draftToHtml from 'draftjs-to-html'
 import htmlToDraft from 'html-to-draftjs'
@@ -7,6 +13,8 @@ import htmlToDraft from 'html-to-draftjs'
 import { VariableDecorator } from './VariableDecorator'
 import { LinkDecorator } from './LinkDecorator'
 import { LinkControl } from './LinkControl'
+import { ImageBlock } from './ImageBlock'
+import { ImageControl } from './ImageControl'
 
 import 'draft-js/dist/Draft.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
@@ -36,6 +44,7 @@ const TOOLBAR_OPTIONS = {
   },
   image: {
     uploadEnabled: false,
+    component: ImageControl,
   },
   link: {
     defaultTargetOption: '_blank',
@@ -66,6 +75,23 @@ const RichTextEditor = ({
     onChange(html)
   }, [editorState, onChange])
 
+  function renderBlock(block: ContentBlock): any | void {
+    if (block.getType() === 'atomic') {
+      const contentState = editorState.getCurrentContent()
+      const entityKey = block.getEntityAt(0)
+
+      if (entityKey) {
+        const entity = contentState.getEntity(entityKey)
+        if (entity?.getType() === 'IMAGE') {
+          return {
+            component: ImageBlock,
+            editable: false,
+          }
+        }
+      }
+    }
+  }
+
   return (
     <Editor
       wrapperClassName={styles.wrapper}
@@ -76,6 +102,7 @@ const RichTextEditor = ({
       onEditorStateChange={setEditorState}
       toolbar={TOOLBAR_OPTIONS}
       customDecorators={[VariableDecorator, LinkDecorator]}
+      customBlockRenderFunc={renderBlock}
     />
   )
 }
