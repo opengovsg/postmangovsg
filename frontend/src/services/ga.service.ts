@@ -15,6 +15,8 @@ export const GA_USER_EVENTS = {
   DOWNLOAD_DELIVERY_REPORT: 'Download delivery report',
   NEW_USER_TRY_EMAIL: 'New user try email',
   NEW_USER_TRY_SMS_TELEGRAM: 'New user try SMS or Telegram',
+  OPEN_DUPLICATE_MODAL: 'Open duplicate modal',
+  COMPLETE_DUPLICATE: 'Complete campaign duplication',
 }
 
 export function initializeGA() {
