@@ -10,6 +10,7 @@ import {
 } from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
 import { UserDemo } from './user-demo'
+import { UserFeatures } from './user-features'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
@@ -34,6 +35,9 @@ export class User extends Model<User> {
 
   @HasOne(() => UserDemo)
   demo!: UserDemo
+
+  @HasOne(() => UserFeatures)
+  userFeatures!: UserFeatures
 
   // During programmatic creation of users (users signing up by themselves), emails must end in a whitelisted domain
   // If we manually insert the user into the database, then this hook is bypassed.
