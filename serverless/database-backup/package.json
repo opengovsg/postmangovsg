@@ -45,6 +45,6 @@
     "pg-connection-string": "^2.3.0",
     "pg": "^8.5.1",
     "source-map-support": "^0.5.19",
-    "yargs": "^16.0.3"
+    "yargs": "^16.1.1"
   }
 }
