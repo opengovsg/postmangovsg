@@ -193,11 +193,11 @@ router.put(
 /**
  * @swagger
  * path:
- *  /settings/demo:
+ *  /settings/announcement-version:
  *    put:
  *       tags:
  *         - Settings
- *       summary: Update announcementVersion for this user
+ *       summary: Update announcement version for this user
  *       requestBody:
  *         required: true
  *         content:
