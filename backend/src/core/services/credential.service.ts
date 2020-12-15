@@ -313,8 +313,8 @@ const updateDemoDisplayed = async (
  */
 const updateAnnouncementVersion = async (
   userId: number,
-  announcementVersion: number
-): Promise<{ announcementVersion: number }> => {
+  announcementVersion: string
+): Promise<{ announcementVersion: string }> => {
   const [numUpdated, userFeature] = await UserFeature.update(
     { announcementVersion },
     {

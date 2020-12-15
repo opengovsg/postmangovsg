@@ -29,7 +29,7 @@ const demoDisplayedValidator = {
 
 const updateAnnouncementVersionValidator = {
   [Segments.BODY]: Joi.object({
-    announcement_version: Joi.number().required(),
+    announcement_version: Joi.string().default(null),
   }),
 }
 

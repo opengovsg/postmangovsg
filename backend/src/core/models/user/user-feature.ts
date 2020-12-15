@@ -20,8 +20,8 @@ export class UserFeature extends Model<UserFeature> {
 
   @Default(null)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
     allowNull: true,
   })
-  announcementVersion!: number
+  announcementVersion!: string
 }
