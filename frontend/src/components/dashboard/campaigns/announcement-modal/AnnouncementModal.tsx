@@ -10,6 +10,8 @@ import styles from './AnnouncementModal.module.scss'
 const AnnouncementModal = ({
   title,
   subtitle,
+  subtext,
+  imageUrl,
   buttonText,
   buttonIcon,
   destructive,
@@ -18,6 +20,8 @@ const AnnouncementModal = ({
 }: {
   title: string
   subtitle: string
+  subtext: string
+  imageUrl: string
   buttonText: string
   buttonIcon?: string
   destructive?: boolean
@@ -52,11 +56,11 @@ const AnnouncementModal = ({
     >
       <div className={styles.modal}>
         <div className={styles.modalImg}>
-          // Templating for linqui should go here?
-          <img src={ConfirmImage} alt="Modal graphic"></img>
+          <img src={imageUrl} alt="Modal graphic"></img>
         </div>
         <h2 className={styles.title}>{title}</h2>
         <h4 className={styles.subtitle}>{subtitle}</h4>
+        <div className={styles.content}>{subtext}</div>
         <div className={styles.options}>
           <PrimaryButton
             className={destructive ? styles.redButton : styles.greenButton}
