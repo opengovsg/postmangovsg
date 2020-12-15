@@ -226,6 +226,7 @@ const getTelegramUserCredentialLabels = async (
  * Gets api keys and credential labels for that user
  * @param userId
  */
+// TODO: refactor demo and announcement version features out
 const getUserSettings = async (
   userId: number
 ): Promise<UserSettings | null> => {
@@ -248,6 +249,10 @@ const getUserSettings = async (
           ['is_displayed', 'isDisplayed'],
         ],
       },
+      {
+        model: UserFeatures,
+        attributes: [['announcement_version', 'announcementVersion']],
+      },
     ],
     plain: true,
   })
@@ -256,6 +261,7 @@ const getUserSettings = async (
       hasApiKey: !!user.apiKey,
       creds: user.creds,
       demo: user.demo,
+      userFeatures: user.userFeatures,
     }
   } else {
     return null
