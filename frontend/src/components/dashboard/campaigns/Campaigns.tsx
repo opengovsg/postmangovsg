@@ -292,6 +292,7 @@ const Campaigns = () => {
             imageUrl={i18n._(ANNOUNCEMENT.imageUrl)}
             buttonText={'Read more'}
             onReadMore={() => {
+              // TODO: direct user to readmore link....
               updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
               setDisplayAnnouncement(false)
             }}

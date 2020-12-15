@@ -25,8 +25,8 @@ const AnnouncementModal = ({
   buttonText: string
   buttonIcon?: string
   destructive?: boolean
-  onReadMore: () => Promise<any> | any
-  onClose: any
+  onReadMore: () => void
+  onClose: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const [errorMessage, setErrorMessage] = useState('')
