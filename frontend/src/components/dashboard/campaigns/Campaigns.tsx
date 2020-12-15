@@ -28,6 +28,8 @@ import {
 } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 import AnnouncementModal from './announcement-modal'
+import { ANNOUNCEMENT } from 'config'
+import { i18n } from '@lingui/core'
 
 const ITEMS_PER_PAGE = 10
 
@@ -69,7 +71,7 @@ const Campaigns = () => {
   }
 
   function processAnnouncementVersion(announcementVersion: number) {
-    if (announcementVersion < 5) {
+    if (announcementVersion < +ANNOUNCEMENT.version) {
       setDisplayAnnouncement(true)
     }
   }
@@ -282,15 +284,17 @@ const Campaigns = () => {
     return (
       <>
         <AnnouncementModal
-          title={'some announcement'}
-          subtitle={'announcement things'}
+          title={i18n._(ANNOUNCEMENT.title)}
+          subtitle={i18n._(ANNOUNCEMENT.subtitle)}
+          subtext={i18n._(ANNOUNCEMENT.subtext)}
+          imageUrl={i18n._(ANNOUNCEMENT.imageUrl)}
           buttonText={'Read more'}
           onReadMore={() => {
-            updateAnnouncementVersion(10)
+            updateAnnouncementVersion(+ANNOUNCEMENT.version)
             setDisplayAnnouncement(false)
           }}
           onClose={() => {
-            updateAnnouncementVersion(10)
+            updateAnnouncementVersion(+ANNOUNCEMENT.version)
             setDisplayAnnouncement(false)
           }}
         />
