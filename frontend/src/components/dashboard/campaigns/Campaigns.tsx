@@ -22,8 +22,12 @@ import styles from './Campaigns.module.scss'
 
 import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
-import { getUserSettings } from 'services/settings.service'
+import {
+  getUserSettings,
+  updateAnnouncementVersion,
+} from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
+import AnnouncementModal from './announcement-modal'
 
 const ITEMS_PER_PAGE = 10
 
@@ -39,6 +43,7 @@ const Campaigns = () => {
   const [isDemoDisplayed, setIsDemoDisplayed] = useState(false)
   const [numDemosSms, setNumDemosSms] = useState(0)
   const [numDemosTelegram, setNumDemosTelegram] = useState(0)
+  const [displayAnnouncement, setDisplayAnnouncement] = useState(false)
   const history = useHistory()
   const name = getNameFromEmail(email)
   const title = `Welcome, ${name}`
@@ -63,18 +68,26 @@ const Campaigns = () => {
     setLoading(false)
   }
 
+  function processAnnouncementVersion(announcementVersion: number) {
+    if (announcementVersion < 5) {
+      setDisplayAnnouncement(true)
+    }
+  }
+
   useEffect(() => {
     fetchCampaigns(selectedPage)
   }, [selectedPage])
 
   useEffect(() => {
-    async function getNumDemos() {
-      const { demo } = await getUserSettings()
+    // TODO: refactor out num demos processing
+    async function getNumDemosAndAnnouncementVersion() {
+      const { demo, announcementVersion } = await getUserSettings()
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
+      processAnnouncementVersion(announcementVersion)
     }
-    getNumDemos()
+    getNumDemosAndAnnouncementVersion()
   }, [])
 
   /* eslint-disable react/display-name */
@@ -265,8 +278,29 @@ const Campaigns = () => {
     )
   }
 
+  function renderAnnouncementModal() {
+    return (
+      <>
+        <AnnouncementModal
+          title={'some announcement'}
+          subtitle={'announcement things'}
+          buttonText={'Read more'}
+          onReadMore={() => {
+            updateAnnouncementVersion(10)
+            setDisplayAnnouncement(false)
+          }}
+          onClose={() => {
+            updateAnnouncementVersion(10)
+            setDisplayAnnouncement(false)
+          }}
+        />
+      </>
+    )
+  }
+
   return (
     <>
+      {displayAnnouncement ? renderAnnouncementModal() : null}
       <TitleBar title={title}>
         <PrimaryButton
           onClick={() =>
