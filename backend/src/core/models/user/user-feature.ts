@@ -9,7 +9,7 @@ import {
 import { User } from './user'
 
 @Table({ tableName: 'user_features', underscored: true, timestamps: true })
-export class UserFeatures extends Model<UserFeatures> {
+export class UserFeature extends Model<UserFeature> {
   @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,

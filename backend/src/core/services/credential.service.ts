@@ -8,7 +8,7 @@ import {
   UserCredential,
   User,
   UserDemo,
-  UserFeatures,
+  UserFeature,
 } from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { loggerWithLabel } from '@core/logger'
@@ -250,7 +250,7 @@ const getUserSettings = async (
         ],
       },
       {
-        model: UserFeatures,
+        model: UserFeature,
         attributes: [['announcement_version', 'announcementVersion']],
       },
     ],
@@ -261,7 +261,7 @@ const getUserSettings = async (
       hasApiKey: !!user.apiKey,
       creds: user.creds,
       demo: user.demo,
-      userFeatures: user.userFeatures,
+      userFeature: user.userFeature,
     }
   } else {
     return null
@@ -315,7 +315,7 @@ const updateAnnouncementVersion = async (
   userId: number,
   announcementVersion: number
 ): Promise<{ announcementVersion: number }> => {
-  const [numUpdated, userFeatures] = await UserFeatures.update(
+  const [numUpdated, userFeature] = await UserFeature.update(
     { announcementVersion },
     {
       where: { userId },
@@ -331,7 +331,7 @@ const updateAnnouncementVersion = async (
     throw new Error('Could not update announcement version')
   }
   return {
-    announcementVersion: userFeatures[0].announcementVersion,
+    announcementVersion: userFeature[0].announcementVersion,
   }
 }
 
