@@ -70,7 +70,7 @@ const Campaigns = () => {
     setLoading(false)
   }
 
-  function processAnnouncementVersion(announcementVersion: string) {
+  function displayNewAnnouncement(announcementVersion: string) {
     // TODO: find correct way to compare version numbers (semvar package?)
     if (announcementVersion < i18n._(ANNOUNCEMENT.version)) {
       setDisplayAnnouncement(true)
@@ -88,7 +88,7 @@ const Campaigns = () => {
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
-      processAnnouncementVersion(announcementVersion)
+      displayNewAnnouncement(announcementVersion)
     }
     getNumDemosAndAnnouncementVersion()
   }, [])
