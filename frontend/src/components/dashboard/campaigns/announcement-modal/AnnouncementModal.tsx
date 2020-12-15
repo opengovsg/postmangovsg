@@ -14,7 +14,6 @@ const AnnouncementModal = ({
   imageUrl,
   buttonText,
   buttonIcon,
-  destructive,
   onReadMore,
   onClose,
 }: {
@@ -24,7 +23,6 @@ const AnnouncementModal = ({
   imageUrl: string
   buttonText: string
   buttonIcon?: string
-  destructive?: boolean
   onReadMore: () => void
   onClose: () => void
 }) => {
@@ -62,14 +60,9 @@ const AnnouncementModal = ({
         <h4 className={styles.subtitle}>{subtitle}</h4>
         <div className={styles.content}>{subtext}</div>
         <div className={styles.options}>
-          <PrimaryButton
-            className={destructive ? styles.redButton : styles.greenButton}
-            onClick={onReadMoreClicked}
-          >
+          <PrimaryButton onClick={onReadMoreClicked}>
             {buttonText}
-            {buttonIcon && (
-              <i className={cx('bx', styles.icon, buttonIcon)}></i>
-            )}
+            <i className={cx('bx', styles.icon, buttonIcon)}></i>
           </PrimaryButton>
         </div>
         <ErrorBlock>{errorMessage}</ErrorBlock>
