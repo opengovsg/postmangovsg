@@ -283,29 +283,31 @@ const Campaigns = () => {
 
   function renderAnnouncementModal() {
     return (
-      <>
-        <AnnouncementModal
-          title={i18n._(ANNOUNCEMENT.title)}
-          subtitle={i18n._(ANNOUNCEMENT.subtitle)}
-          subtext={i18n._(ANNOUNCEMENT.subtext)}
-          imageUrl={i18n._(ANNOUNCEMENT.imageUrl)}
-          buttonText={'Read more'}
-          onReadMore={() => {
-            updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
-            setDisplayAnnouncement(false)
-          }}
-          onClose={() => {
-            updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
-            setDisplayAnnouncement(false)
-          }}
-        />
-      </>
+      displayAnnouncement && (
+        <>
+          <AnnouncementModal
+            title={i18n._(ANNOUNCEMENT.title)}
+            subtitle={i18n._(ANNOUNCEMENT.subtitle)}
+            subtext={i18n._(ANNOUNCEMENT.subtext)}
+            imageUrl={i18n._(ANNOUNCEMENT.imageUrl)}
+            buttonText={'Read more'}
+            onReadMore={() => {
+              updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
+              setDisplayAnnouncement(false)
+            }}
+            onClose={() => {
+              updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
+              setDisplayAnnouncement(false)
+            }}
+          />
+        </>
+      )
     )
   }
 
   return (
     <>
-      {displayAnnouncement ? renderAnnouncementModal() : null}
+      {renderAnnouncementModal()}
       <TitleBar title={title}>
         <PrimaryButton
           onClick={() =>
