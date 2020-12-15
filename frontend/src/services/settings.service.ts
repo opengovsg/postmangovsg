@@ -14,7 +14,7 @@ async function getUserSettings(): Promise<{
     numDemosTelegram: number
     isDisplayed: boolean
   }
-  announcementVersion: number
+  announcementVersion: string
 }> {
   try {
     const response = await axios.get('/settings')
@@ -81,7 +81,7 @@ async function updateDemoDisplayed(isDisplayed: boolean): Promise<void> {
 }
 
 async function updateAnnouncementVersion(
-  announcementVersion: number
+  announcementVersion: string
 ): Promise<void> {
   try {
     await axios.put('/settings/announcement-version', {

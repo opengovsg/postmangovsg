@@ -70,8 +70,9 @@ const Campaigns = () => {
     setLoading(false)
   }
 
-  function processAnnouncementVersion(announcementVersion: number) {
-    if (announcementVersion < +ANNOUNCEMENT.version) {
+  function processAnnouncementVersion(announcementVersion: string) {
+    // TODO: find correct way to compare version numbers (semvar package?)
+    if (announcementVersion < i18n._(ANNOUNCEMENT.version)) {
       setDisplayAnnouncement(true)
     }
   }
@@ -290,11 +291,11 @@ const Campaigns = () => {
           imageUrl={i18n._(ANNOUNCEMENT.imageUrl)}
           buttonText={'Read more'}
           onReadMore={() => {
-            updateAnnouncementVersion(+ANNOUNCEMENT.version)
+            updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
             setDisplayAnnouncement(false)
           }}
           onClose={() => {
-            updateAnnouncementVersion(+ANNOUNCEMENT.version)
+            updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
             setDisplayAnnouncement(false)
           }}
         />
