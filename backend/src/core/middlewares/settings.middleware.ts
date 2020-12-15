@@ -27,6 +27,7 @@ const getUserSettings = async (
         num_demos_telegram: userSettings.demo?.numDemosTelegram,
         is_displayed: userSettings.demo?.isDisplayed,
       },
+      announcement_version: userSettings.userFeatures?.announcementVersion,
     })
   } catch (err) {
     next(err)
