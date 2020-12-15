@@ -61,6 +61,26 @@ msgstr "Verifying OTP..."
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
+#: src/config.ts:61
+msgid "announcement.imageUrl"
+msgstr "some.image.url.sg"
+
+#: src/config.ts:60
+msgid "announcement.subtext"
+msgstr "subtextsubtextsubtext"
+
+#: src/config.ts:59
+msgid "announcement.subtitle"
+msgstr "subtitle"
+
+#: src/config.ts:58
+msgid "announcement.title"
+msgstr "title"
+
+#: src/config.ts:57
+msgid "announcement.version"
+msgstr "10"
+
 #: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
 #: src/config.ts:46
 msgid "defaultMailFrom"
