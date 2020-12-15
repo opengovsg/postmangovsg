@@ -36,7 +36,7 @@
   "dependencies": {
     "@google-cloud/kms": "^2.1.2",
     "@google-cloud/storage": "^5.5.0",
-    "@sentry/node": "^5.22.3",
+    "@sentry/node": "^5.27.6",
     "aws-sdk": "^2.798.0",
     "axios": "^0.21.0",
     "convict": "^6.0.0",
