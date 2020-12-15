@@ -28,8 +28,8 @@ import {
 } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 import AnnouncementModal from './announcement-modal'
-import { ANNOUNCEMENT } from 'config'
 import { i18n } from '@lingui/core'
+import { ANNOUNCEMENT } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -286,11 +286,6 @@ const Campaigns = () => {
       displayAnnouncement && (
         <>
           <AnnouncementModal
-            title={i18n._(ANNOUNCEMENT.title)}
-            subtitle={i18n._(ANNOUNCEMENT.subtitle)}
-            subtext={i18n._(ANNOUNCEMENT.subtext)}
-            imageUrl={i18n._(ANNOUNCEMENT.imageUrl)}
-            buttonText={'Read more'}
             onReadMore={() => {
               // TODO: direct user to readmore link....
               updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))

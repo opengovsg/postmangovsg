@@ -4,25 +4,14 @@ import cx from 'classnames'
 import { PrimaryButton, ErrorBlock } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 
-import ConfirmImage from 'assets/img/confirm-modal.svg'
 import styles from './AnnouncementModal.module.scss'
+import { i18n } from '@lingui/core'
+import { ANNOUNCEMENT } from 'config'
 
 const AnnouncementModal = ({
-  title,
-  subtitle,
-  subtext,
-  imageUrl,
-  buttonText,
-  buttonIcon,
   onReadMore,
   onClose,
 }: {
-  title: string
-  subtitle: string
-  subtext: string
-  imageUrl: string
-  buttonText: string
-  buttonIcon?: string
   onReadMore: () => void
   onClose: () => void
 }) => {
@@ -54,15 +43,15 @@ const AnnouncementModal = ({
     >
       <div className={styles.modal}>
         <div className={styles.modalImg}>
-          <img src={imageUrl} alt="Modal graphic"></img>
+          <img src={i18n._(ANNOUNCEMENT.imageUrl)} alt="Modal graphic"></img>
         </div>
-        <h2 className={styles.title}>{title}</h2>
-        <h4 className={styles.subtitle}>{subtitle}</h4>
-        <div className={styles.content}>{subtext}</div>
+        <h2 className={styles.title}>{i18n._(ANNOUNCEMENT.title)}</h2>
+        <h4 className={styles.subtitle}>{i18n._(ANNOUNCEMENT.subtitle)}</h4>
+        <div className={styles.content}>{i18n._(ANNOUNCEMENT.subtext)}</div>
         <div className={styles.options}>
           <PrimaryButton onClick={onReadMoreClicked}>
-            {buttonText}
-            <i className={cx('bx', styles.icon, buttonIcon)}></i>
+            <span>Read guide</span>
+            <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
           </PrimaryButton>
         </div>
         <ErrorBlock>{errorMessage}</ErrorBlock>
