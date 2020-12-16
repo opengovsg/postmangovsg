@@ -66,7 +66,6 @@ const LinkForm = ({
 
 export const LinkControl = (props: LinkControlProps) => {
   const { currentState, expanded, onChange, onExpandEvent } = props
-  const { link } = currentState
   function showPopover() {
     onExpandEvent()
   }
@@ -75,21 +74,10 @@ export const LinkControl = (props: LinkControlProps) => {
     onChange('link', title, url, '_blank')
   }
 
-  function removeLink() {
-    onChange('unlink')
-  }
-
   return (
     <div className={styles.linkControl}>
       <button onClick={showPopover} className="rdw-option-wrapper">
         <i className="bx bx-link"></i>
-      </button>
-      <button
-        className="rdw-option-wrapper"
-        onClick={removeLink}
-        disabled={!link}
-      >
-        <i className="bx bx-unlink"></i>
       </button>
       {expanded && <LinkForm initialState={currentState} onSubmit={addLink} />}
     </div>
