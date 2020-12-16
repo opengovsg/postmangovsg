@@ -161,8 +161,10 @@ const existsFromAddress = async (
 ): Promise<Response | void> => {
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
-  if (from === defaultEmail) return next()
-  const { fromName, from: fromAddress } = res.locals
+  const { fromName, from: fromAddress, templateFrom } = res.locals
+  // Skip check if either the provided from address or the template's from address is the same
+  // as the configured default mail from.
+  if (from === defaultEmail || templateFrom === defaultEmail) return next()
 
   try {
     const exists = await CustomDomainService.existsFromAddress(
@@ -195,8 +197,10 @@ const verifyFromAddress = async (
 ): Promise<Response | void> => {
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
-  if (from === defaultEmail) return next()
-  const { from: fromAddress } = res.locals
+  const { from: fromAddress, templateFrom } = res.locals
+  // Skip check if either the provided from address or the template's from address is the same
+  // as the configured default mail from.
+  if (from === defaultEmail || templateFrom === defaultEmail) return next()
 
   try {
     await CustomDomainService.verifyFromAddress(fromAddress)
@@ -287,6 +291,7 @@ const getCampaignFromAddress = async (
 
     /* eslint-disable @typescript-eslint/no-non-null-assertion*/
     const { name, fromAddress } = parseFromAddress(template?.from!)
+    res.locals.templateFrom = template?.from
     res.locals.fromName = name
     res.locals.from = fromAddress
 
