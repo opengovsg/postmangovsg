@@ -135,7 +135,7 @@ const verifyNotificationSettings = async (email: string): Promise<void> => {
     logger.error({
       message: 'Invalid SES notification settings',
       email,
-      error: err,
+      error: err.message,
       action: 'verifyNotificationSettings',
     })
     throw new Error(
