@@ -164,7 +164,7 @@ export async function sendCampaign(
   } catch (err) {
     errorHandler(
       err,
-      'An error occured while sending the campaign. Please try again.'
+      'An error occurred while sending the campaign. Please try again.'
     )
   }
 }
