@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -22,20 +22,17 @@ import styles from './Campaigns.module.scss'
 
 import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
-import {
-  getUserSettings,
-  updateAnnouncementVersion,
-} from 'services/settings.service'
+import { getUserSettings } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 import AnnouncementModal from './announcement-modal'
-import { i18n } from '@lingui/core'
+import { i18n } from 'locales'
 import { ANNOUNCEMENT } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
 const Campaigns = () => {
   const { email } = useContext(AuthContext)
-  const modalContext = useContext(ModalContext)
+  const { setModalContent } = useContext(ModalContext)
   const [isLoading, setLoading] = useState(true)
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(
     new Array<Campaign>()
@@ -45,7 +42,6 @@ const Campaigns = () => {
   const [isDemoDisplayed, setIsDemoDisplayed] = useState(false)
   const [numDemosSms, setNumDemosSms] = useState(0)
   const [numDemosTelegram, setNumDemosTelegram] = useState(0)
-  const [displayAnnouncement, setDisplayAnnouncement] = useState(false)
   const history = useHistory()
   const name = getNameFromEmail(email)
   const title = `Welcome, ${name}`
@@ -70,12 +66,20 @@ const Campaigns = () => {
     setLoading(false)
   }
 
-  function displayNewAnnouncement(announcementVersion: string) {
-    // TODO: find correct way to compare version numbers (semvar package?)
-    if (announcementVersion < i18n._(ANNOUNCEMENT.version)) {
-      setDisplayAnnouncement(true)
-    }
-  }
+  // displayNewAnnouncement is re-created for every re-render of ModalContextProvider
+  // Memoise displayNewAnnouncement to prevent unnecessary renders in subscribers when
+  // defined as dependencies in useEffect
+  const displayNewAnnouncement = useCallback(
+    (announcementVersion: string) => {
+      // TODO: find correct way to compare version numbers (semvar package?)
+      // if (announcementVersion < i18n._(ANNOUNCEMENT.version)) {
+      if (announcementVersion < '99999') {
+        console.log('evaluated version comparison')
+        setModalContent(<AnnouncementModal />)
+      }
+    },
+    [setModalContent]
+  )
 
   useEffect(() => {
     fetchCampaigns(selectedPage)
@@ -85,13 +89,14 @@ const Campaigns = () => {
     // TODO: refactor out num demos processing
     async function getNumDemosAndAnnouncementVersion() {
       const { demo, announcementVersion } = await getUserSettings()
+      console.log('announcementVersion', announcementVersion)
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
       displayNewAnnouncement(announcementVersion)
     }
     getNumDemosAndAnnouncementVersion()
-  }, [])
+  }, [displayNewAnnouncement])
 
   /* eslint-disable react/display-name */
   const headers = [
@@ -182,9 +187,7 @@ const Campaigns = () => {
             className={cx(styles.iconContainer, styles.duplicate)}
             onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               event.stopPropagation()
-              modalContext.setModalContent(
-                <DuplicateCampaignModal campaign={campaign} />
-              )
+              setModalContent(<DuplicateCampaignModal campaign={campaign} />)
             }}
           >
             <i className={cx('bx bx-duplicate', styles.icon)}></i>{' '}
@@ -228,7 +231,7 @@ const Campaigns = () => {
           <PrimaryButton
             onClick={() => {
               sendUserEvent(GA_USER_EVENTS.NEW_USER_TRY_EMAIL)
-              modalContext.setModalContent(<CreateCampaign />)
+              setModalContent(<CreateCampaign />)
             }}
           >
             Try email campaign
@@ -237,7 +240,7 @@ const Campaigns = () => {
             className={styles.darkGreenButton}
             onClick={() => {
               sendUserEvent(GA_USER_EVENTS.NEW_USER_TRY_SMS_TELEGRAM)
-              modalContext.setModalContent(
+              setModalContent(
                 <CreateDemoModal
                   numDemosSms={numDemosSms}
                   numDemosTelegram={numDemosTelegram}
@@ -281,34 +284,11 @@ const Campaigns = () => {
     )
   }
 
-  function renderAnnouncementModal() {
-    return (
-      displayAnnouncement && (
-        <>
-          <AnnouncementModal
-            onReadMore={() => {
-              // TODO: direct user to readmore link....
-              updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
-              setDisplayAnnouncement(false)
-            }}
-            onClose={() => {
-              updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
-              setDisplayAnnouncement(false)
-            }}
-          />
-        </>
-      )
-    )
-  }
-
   return (
     <>
-      {renderAnnouncementModal()}
       <TitleBar title={title}>
         <PrimaryButton
-          onClick={() =>
-            modalContext.setModalContent(<CreateCampaign></CreateCampaign>)
-          }
+          onClick={() => setModalContent(<CreateCampaign></CreateCampaign>)}
         >
           Create new campaign
         </PrimaryButton>

@@ -5,6 +5,7 @@ import BodyWrapper from 'components/common/body-wrapper'
 const defaultValue = {
   setModalContent: {} as Dispatch<SetStateAction<any>>,
   setModalTitle: {} as Dispatch<SetStateAction<any>>,
+  setCustomClose: {} as Dispatch<SetStateAction<any>>,
   close: {} as () => void,
 }
 
@@ -13,14 +14,26 @@ export const ModalContext = createContext(defaultValue)
 const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [modalContent, setModalContent] = useState(null)
   const [modalTitle, setModalTitle] = useState('')
+  const [customClose, setCustomClose] = useState<(() => {}) | null>(null)
+
   function handleClose() {
+    if (customClose) {
+      customClose()
+      setCustomClose(null)
+    }
+    console.log('modal context handle close')
     setModalContent(null)
     setModalTitle('')
   }
 
   return (
     <ModalContext.Provider
-      value={{ setModalContent, close: handleClose, setModalTitle }}
+      value={{
+        setModalContent,
+        close: handleClose,
+        setModalTitle,
+        setCustomClose,
+      }}
     >
       <Modal onClose={handleClose} modalTitle={modalTitle}>
         {modalContent}
