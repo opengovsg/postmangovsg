@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import { EmailService, CustomDomainService } from '@email/services'
+import {
+  EmailService,
+  EmailTemplateService,
+  CustomDomainService,
+} from '@email/services'
 import { parseFromAddress } from '@core/utils/from-address'
 import { AuthService } from '@core/services'
 import config from '@core/config'
@@ -157,8 +161,10 @@ const existsFromAddress = async (
 ): Promise<Response | void> => {
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
-  if (from === defaultEmail) return next()
-  const { fromName, from: fromAddress } = res.locals
+  const { fromName, from: fromAddress, templateFrom } = res.locals
+  // Skip check if either the provided from address or the template's from address is the same
+  // as the configured default mail from.
+  if (from === defaultEmail || templateFrom === defaultEmail) return next()
 
   try {
     const exists = await CustomDomainService.existsFromAddress(
@@ -191,8 +197,10 @@ const verifyFromAddress = async (
 ): Promise<Response | void> => {
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
-  if (from === defaultEmail) return next()
-  const { from: fromAddress } = res.locals
+  const { from: fromAddress, templateFrom } = res.locals
+  // Skip check if either the provided from address or the template's from address is the same
+  // as the configured default mail from.
+  if (from === defaultEmail || templateFrom === defaultEmail) return next()
 
   try {
     await CustomDomainService.verifyFromAddress(fromAddress)
@@ -256,6 +264,41 @@ const getCustomFromAddress = async (
   }
 
   return res.status(200).json({ from: result })
+}
+
+/*
+ * Get email template's From address for specific campaign
+ */
+const getCampaignFromAddress = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const template = await EmailTemplateService.getFilledTemplate(+campaignId)
+
+    if (!template) {
+      const message = `No template associated with campaign ${campaignId}`
+      logger.error({
+        message,
+        campaignId,
+        action: 'getCampaignFromAddress',
+      })
+
+      return res.status(400).json({ message })
+    }
+
+    /* eslint-disable @typescript-eslint/no-non-null-assertion*/
+    const { name, fromAddress } = parseFromAddress(template?.from!)
+    res.locals.templateFrom = template?.from
+    res.locals.fromName = name
+    res.locals.from = fromAddress
+
+    next()
+  } catch (err) {
+    next(err)
+  }
 }
 
 /**
@@ -332,6 +375,7 @@ export const EmailMiddleware = {
   verifyFromAddress,
   storeFromAddress,
   getCustomFromAddress,
+  getCampaignFromAddress,
   existsFromAddress,
   isFromAddressAccepted,
   sendValidationMessage,
