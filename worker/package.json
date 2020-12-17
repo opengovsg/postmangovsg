@@ -18,7 +18,6 @@
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/convict": "^5.2.1",
-    "@types/nodemailer": "^6.4.0",
     "@types/nodemailer-direct-transport": "^1.0.31",
     "@types/validator": "^13.0.0",
     "aws-sdk": "^2.799.0",
@@ -29,7 +28,7 @@
     "libphonenumber-js": "^1.7.55",
     "lodash": "^4.17.19",
     "module-alias": "^2.2.2",
-    "nodemailer": "^6.4.6",
+    "nodemailer": "^6.4.17",
     "nodemailer-direct-transport": "^3.3.2",
     "pg": "^8.2.1",
     "postman-templating": "file:../modules/postman-templating",
@@ -46,6 +45,7 @@
   "devDependencies": {
     "@types/bluebird": "^3.5.30",
     "@types/lodash": "^4.14.149",
+    "@types/nodemailer": "^6.4.0",
     "@types/uuid": "^7.0.2",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
