@@ -21,7 +21,7 @@
     "@types/nodemailer-direct-transport": "^1.0.31",
     "@types/validator": "^13.0.0",
     "aws-sdk": "^2.799.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.0",
     "bcrypt": "^5.0.0",
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
@@ -39,7 +39,7 @@
     "telegraf": "^3.38.0",
     "threads": "^1.4.0",
     "tiny-worker": "^2.3.0",
-    "twilio": "^3.42.1",
+    "twilio": "^3.42.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {
