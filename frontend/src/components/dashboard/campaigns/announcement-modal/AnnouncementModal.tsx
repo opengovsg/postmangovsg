@@ -8,18 +8,18 @@ import { ModalContext } from 'contexts/modal.context'
 import styles from './AnnouncementModal.module.scss'
 import { i18n } from 'locales'
 import { ANNOUNCEMENT } from 'config'
+import { OutboundLink } from 'react-ga'
 
 const AnnouncementModal = () => {
   const { close, setCustomClose } = useContext(ModalContext)
   const [errorMessage, setErrorMessage] = useState('')
-  const modalBackgroundId = 'modal-background'
 
   useEffect(() => {
-    console.log('setting custom close')
-    setCustomClose(() => {
-      updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
+    setCustomClose(() => () => {
+      updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version) + '1')
     })
-  }, [setCustomClose])
+    // eslint-disable-next-line
+  }, [])
 
   async function onReadMoreClicked(): Promise<void> {
     try {

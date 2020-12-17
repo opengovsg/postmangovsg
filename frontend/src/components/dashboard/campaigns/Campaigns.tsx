@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -66,20 +66,11 @@ const Campaigns = () => {
     setLoading(false)
   }
 
-  // displayNewAnnouncement is re-created for every re-render of ModalContextProvider
-  // Memoise displayNewAnnouncement to prevent unnecessary renders in subscribers when
-  // defined as dependencies in useEffect
-  const displayNewAnnouncement = useCallback(
-    (announcementVersion: string) => {
-      // TODO: find correct way to compare version numbers (semvar package?)
-      // if (announcementVersion < i18n._(ANNOUNCEMENT.version)) {
-      if (announcementVersion < '99999') {
-        console.log('evaluated version comparison')
-        setModalContent(<AnnouncementModal />)
-      }
-    },
-    [setModalContent]
-  )
+  function displayNewAnnouncement(announcementVersion: string) {
+    if (announcementVersion < i18n._(ANNOUNCEMENT.version)) {
+      setModalContent(<AnnouncementModal />)
+    }
+  }
 
   useEffect(() => {
     fetchCampaigns(selectedPage)
@@ -89,14 +80,14 @@ const Campaigns = () => {
     // TODO: refactor out num demos processing
     async function getNumDemosAndAnnouncementVersion() {
       const { demo, announcementVersion } = await getUserSettings()
-      console.log('announcementVersion', announcementVersion)
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
       displayNewAnnouncement(announcementVersion)
     }
     getNumDemosAndAnnouncementVersion()
-  }, [displayNewAnnouncement])
+    // eslint-disable-next-line
+  }, [])
 
   /* eslint-disable react/display-name */
   const headers = [
