@@ -62,4 +62,5 @@ export const ANNOUNCEMENT = {
   subtitle: t('announcement.subtitle')``,
   subtext: t('announcement.subtext')``,
   imageUrl: t('announcement.imageUrl')``,
+  readGuideUrl: t('announcement.readGuideUrl')``,
 }

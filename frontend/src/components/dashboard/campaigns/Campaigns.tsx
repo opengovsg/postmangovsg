@@ -32,7 +32,7 @@ const ITEMS_PER_PAGE = 10
 
 const Campaigns = () => {
   const { email } = useContext(AuthContext)
-  const { setModalContent } = useContext(ModalContext)
+  const modalContext = useContext(ModalContext)
   const [isLoading, setLoading] = useState(true)
   const [campaignsDisplayed, setCampaignsDisplayed] = useState(
     new Array<Campaign>()
@@ -68,7 +68,7 @@ const Campaigns = () => {
 
   function displayNewAnnouncement(announcementVersion: string) {
     if (announcementVersion < i18n._(ANNOUNCEMENT.version)) {
-      setModalContent(<AnnouncementModal />)
+      modalContext.setModalContent(<AnnouncementModal />)
     }
   }
 
@@ -178,7 +178,9 @@ const Campaigns = () => {
             className={cx(styles.iconContainer, styles.duplicate)}
             onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               event.stopPropagation()
-              setModalContent(<DuplicateCampaignModal campaign={campaign} />)
+              modalContext.setModalContent(
+                <DuplicateCampaignModal campaign={campaign} />
+              )
             }}
           >
             <i className={cx('bx bx-duplicate', styles.icon)}></i>{' '}
@@ -222,7 +224,7 @@ const Campaigns = () => {
           <PrimaryButton
             onClick={() => {
               sendUserEvent(GA_USER_EVENTS.NEW_USER_TRY_EMAIL)
-              setModalContent(<CreateCampaign />)
+              modalContext.setModalContent(<CreateCampaign />)
             }}
           >
             Try email campaign
@@ -231,7 +233,7 @@ const Campaigns = () => {
             className={styles.darkGreenButton}
             onClick={() => {
               sendUserEvent(GA_USER_EVENTS.NEW_USER_TRY_SMS_TELEGRAM)
-              setModalContent(
+              modalContext.setModalContent(
                 <CreateDemoModal
                   numDemosSms={numDemosSms}
                   numDemosTelegram={numDemosTelegram}
@@ -279,7 +281,9 @@ const Campaigns = () => {
     <>
       <TitleBar title={title}>
         <PrimaryButton
-          onClick={() => setModalContent(<CreateCampaign></CreateCampaign>)}
+          onClick={() =>
+            modalContext.setModalContent(<CreateCampaign></CreateCampaign>)
+          }
         >
           Create new campaign
         </PrimaryButton>

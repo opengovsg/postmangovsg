@@ -65,6 +65,10 @@ msgstr "file.go.gov.sg"
 msgid "announcement.imageUrl"
 msgstr "file.go.gov.sg"
 
+#: src/config.ts:62
+msgid "announcement.readGuideUrl"
+msgstr "https://guide.postman.gov.sg/release-notes#2020-11-05-or-demo-campaigns-for-sms-and-telegram"
+
 #: src/config.ts:60
 msgid "announcement.subtext"
 msgstr "subtextsubtextsubtext"

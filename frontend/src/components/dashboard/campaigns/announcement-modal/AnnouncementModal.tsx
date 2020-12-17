@@ -23,7 +23,6 @@ const AnnouncementModal = () => {
 
   async function onReadMoreClicked(): Promise<void> {
     try {
-      // await onReadMore()
       // Closes the modal
       close()
     } catch (err) {
@@ -40,10 +39,15 @@ const AnnouncementModal = () => {
       <h4 className={styles.subtitle}>{i18n._(ANNOUNCEMENT.subtitle)}</h4>
       <div className={styles.content}>{i18n._(ANNOUNCEMENT.subtext)}</div>
       <div className={styles.options}>
-        <PrimaryButton onClick={onReadMoreClicked}>
-          <span>Read guide</span>
-          <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
-        </PrimaryButton>
+        <OutboundLink
+          eventLabel={i18n._(ANNOUNCEMENT.readGuideUrl)}
+          to={i18n._(ANNOUNCEMENT.readGuideUrl)}
+        >
+          <PrimaryButton onClick={onReadMoreClicked}>
+            <span>Read guide</span>
+            <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
+          </PrimaryButton>
+        </OutboundLink>{' '}
       </div>
       <ErrorBlock>{errorMessage}</ErrorBlock>
     </div>
