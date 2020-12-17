@@ -26,7 +26,7 @@
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
     "libphonenumber-js": "^1.7.55",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.20",
     "module-alias": "^2.2.2",
     "nodemailer": "^6.4.17",
     "nodemailer-direct-transport": "^3.3.2",
@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.30",
-    "@types/lodash": "^4.14.149",
+    "@types/lodash": "^4.14.165",
     "@types/nodemailer": "^6.4.0",
     "@types/uuid": "^7.0.2",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
