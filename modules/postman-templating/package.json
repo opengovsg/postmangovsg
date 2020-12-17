@@ -36,11 +36,11 @@
   },
   "dependencies": {
     "@types/cheerio": "^0.22.22",
-    "@types/lodash": "^4.14.155",
+    "@types/lodash": "^4.14.165",
     "@types/mustache": "^4.0.1",
     "@types/node": "^14.0.13",
     "cheerio": "^1.0.0-rc.3",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.20",
     "mustache": "^4.0.1",
     "rimraf": "^3.0.2",
     "typescript": "^3.9.5",
