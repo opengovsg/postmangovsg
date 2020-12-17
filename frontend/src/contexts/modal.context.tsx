@@ -14,14 +14,17 @@ export const ModalContext = createContext(defaultValue)
 const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [modalContent, setModalContent] = useState(null)
   const [modalTitle, setModalTitle] = useState('')
-  const [customClose, setCustomClose] = useState<(() => {}) | null>(null)
+
+  // Important: to pass a function into setCustomClose, you must anonymize it twice
+  // i.e `() => () => { some function }
+  // see: https://medium.com/swlh/how-to-store-a-function-with-the-usestate-hook-in-react-8a88dd4eede1
+  const [customClose, setCustomClose] = useState<(() => void) | null>(null)
 
   function handleClose() {
     if (customClose) {
       customClose()
       setCustomClose(null)
     }
-    console.log('modal context handle close')
     setModalContent(null)
     setModalTitle('')
   }
