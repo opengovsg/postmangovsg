@@ -66,8 +66,26 @@ const Campaigns = () => {
     setLoading(false)
   }
 
+  // Returns true if A < B, else false
+  function compareSemver(A: string, B: string) {
+    if (A == null) {
+      return true
+    }
+    const ASplit = A.split('.').map((num) => parseInt(num, 10))
+    const BSplit = B.split('.').map((num) => parseInt(num, 10))
+    for (let i = 0; i < 3; i++) {
+      if (ASplit[i] < BSplit[i]) {
+        return true
+      }
+      if (ASplit[i] > BSplit[i]) {
+        return false
+      }
+    }
+    return false
+  }
+
   function displayNewAnnouncement(announcementVersion: string) {
-    if (announcementVersion < i18n._(ANNOUNCEMENT.version)) {
+    if (compareSemver(announcementVersion, i18n._(ANNOUNCEMENT.version))) {
       modalContext.setModalContent(<AnnouncementModal />)
     }
   }
