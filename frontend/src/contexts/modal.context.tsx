@@ -5,7 +5,7 @@ import BodyWrapper from 'components/common/body-wrapper'
 const defaultValue = {
   setModalContent: {} as Dispatch<SetStateAction<any>>,
   setModalTitle: {} as Dispatch<SetStateAction<any>>,
-  setCustomClose: {} as Dispatch<SetStateAction<any>>,
+  setBeforeClose: {} as Dispatch<SetStateAction<any>>,
   close: {} as () => void,
 }
 
@@ -18,12 +18,12 @@ const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
   // Important: to pass a function into setCustomClose, you must anonymize it twice
   // i.e `() => () => { some function }
   // see: https://medium.com/swlh/how-to-store-a-function-with-the-usestate-hook-in-react-8a88dd4eede1
-  const [customClose, setCustomClose] = useState<(() => void) | null>(null)
+  const [beforeClose, setBeforeClose] = useState<(() => void) | null>(null)
 
   function handleClose() {
-    if (customClose) {
-      customClose()
-      setCustomClose(null)
+    if (beforeClose) {
+      beforeClose()
+      setBeforeClose(null)
     }
     setModalContent(null)
     setModalTitle('')
@@ -35,7 +35,7 @@ const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
         setModalContent,
         close: handleClose,
         setModalTitle,
-        setCustomClose,
+        setBeforeClose: setBeforeClose,
       }}
     >
       <Modal onClose={handleClose} modalTitle={modalTitle}>

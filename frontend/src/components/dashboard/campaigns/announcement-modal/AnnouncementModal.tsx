@@ -11,12 +11,12 @@ import { ANNOUNCEMENT } from 'config'
 import { OutboundLink } from 'react-ga'
 
 const AnnouncementModal = () => {
-  const { close, setCustomClose } = useContext(ModalContext)
+  const { close, setBeforeClose } = useContext(ModalContext)
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    setCustomClose(() => () => {
-      updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version) + '1')
+    setBeforeClose(() => () => {
+      updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
     })
     // eslint-disable-next-line
   }, [])
