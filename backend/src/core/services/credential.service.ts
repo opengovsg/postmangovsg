@@ -315,23 +315,22 @@ const updateAnnouncementVersion = async (
   userId: number,
   announcementVersion: string
 ): Promise<{ announcementVersion: string }> => {
-  const [numUpdated, userFeature] = await UserFeature.update(
-    { announcementVersion },
-    {
-      where: { userId },
-      returning: true,
-    }
+  const [rowUpserted] = await UserFeature.upsert(
+    { userId: userId, announcementVersion: announcementVersion },
+    { returning: true }
   )
-  if (numUpdated !== 1) {
+
+  console.log(rowUpserted)
+  if (rowUpserted.userId !== userId) {
     logger.error({
-      message: 'Incorrect number of records updated',
-      numUpdated,
+      message: 'Updated incorrect user',
       action: 'updateAnnouncementVersion',
     })
     throw new Error('Could not update announcement version')
   }
+
   return {
-    announcementVersion: userFeature[0].announcementVersion,
+    announcementVersion: rowUpserted.announcementVersion,
   }
 }
 
