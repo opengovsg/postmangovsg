@@ -320,7 +320,6 @@ const updateAnnouncementVersion = async (
     { returning: true }
   )
 
-  console.log(rowUpserted)
   if (rowUpserted.userId !== userId) {
     logger.error({
       message: 'Updated incorrect user',
