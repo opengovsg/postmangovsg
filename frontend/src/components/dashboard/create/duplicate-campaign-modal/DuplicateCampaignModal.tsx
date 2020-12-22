@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -29,6 +30,7 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
         name: selectedName,
         campaignId: campaign.id,
       })
+      sendUserEvent(GA_USER_EVENTS.COMPLETE_DUPLICATE, campaign.type)
       // close modal and go to create view
       close()
       history.push(`/campaigns/${duplicate.id}`)

@@ -80,13 +80,13 @@ const SMSTemplate = ({
       <SaveDraftModal
         saveable
         onSave={async () => {
-          if (campaignId && body) {
-            try {
-              await saveTemplate(+campaignId, body)
-            } catch (err) {
-              setErrorMsg(err.message)
-              throw err
-            }
+          if (!campaignId) return
+          try {
+            if (!body) throw new Error('Message template cannot be empty!')
+            await saveTemplate(+campaignId, body)
+          } catch (err) {
+            setErrorMsg(err.message)
+            throw err
           }
         }}
       />
