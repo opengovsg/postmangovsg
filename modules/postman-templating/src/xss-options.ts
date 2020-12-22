@@ -42,6 +42,11 @@ export const XSS_EMAIL_OPTION = {
     h6: DEFAULT_EMAIL_ATTRS,
     a: ['href', 'title', 'target', ...DEFAULT_EMAIL_ATTRS],
     img: ['src', 'alt', 'title', 'width', 'height', ...DEFAULT_EMAIL_ATTRS],
+    div: [],
+    tbody: [],
+    table: [],
+    tr: [],
+    td: [],
   },
   safeAttrValue: (tag: string, name: string, value: string): string => {
     // Note: value has already been auto-trimmed of whitespaces
