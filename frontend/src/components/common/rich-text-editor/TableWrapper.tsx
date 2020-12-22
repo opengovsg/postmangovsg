@@ -7,8 +7,8 @@ export const TableWrapper = (props: any) => {
   const block = editorState.getCurrentContent().getBlockForKey(key)
 
   function renderTable() {
-    const rows = block.getData().get('rows', 0) + 1
-    const cols = block.getData().get('cols', 0) + 1
+    const rows = block.getData().get('rows', 0)
+    const cols = block.getData().get('cols', 0)
 
     const renderRow = (rowIdx: number) => {
       return Array(cols)

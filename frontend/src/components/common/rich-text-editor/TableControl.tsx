@@ -101,7 +101,7 @@ export const TableControl = ({
             key: genKey(),
             type: 'table-cell',
             text: '',
-            data: Map({ rows, cols, row, col }),
+            data: Map({ rows: rows + 1, cols: cols + 1, row, col }),
           })
 
           const blockMap = currentContentState
