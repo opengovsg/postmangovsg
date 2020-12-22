@@ -24,6 +24,9 @@ import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
+import AnnouncementModal from './announcement-modal'
+import { i18n } from 'locales'
+import { ANNOUNCEMENT } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -63,18 +66,45 @@ const Campaigns = () => {
     setLoading(false)
   }
 
+  // Returns true if A < B, else false
+  function compareSemver(A: string, B: string) {
+    if (A == null) {
+      return true
+    }
+    const ASplit = A.split('.').map((num) => parseInt(num, 10))
+    const BSplit = B.split('.').map((num) => parseInt(num, 10))
+    for (let i = 0; i < 3; i++) {
+      if (ASplit[i] < BSplit[i]) {
+        return true
+      }
+      if (ASplit[i] > BSplit[i]) {
+        return false
+      }
+    }
+    return false
+  }
+
+  function displayNewAnnouncement(announcementVersion: string) {
+    if (compareSemver(announcementVersion, i18n._(ANNOUNCEMENT.version))) {
+      modalContext.setModalContent(<AnnouncementModal />)
+    }
+  }
+
   useEffect(() => {
     fetchCampaigns(selectedPage)
   }, [selectedPage])
 
   useEffect(() => {
-    async function getNumDemos() {
-      const { demo } = await getUserSettings()
+    // TODO: refactor out num demos processing
+    async function getNumDemosAndAnnouncementVersion() {
+      const { demo, announcementVersion } = await getUserSettings()
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
+      displayNewAnnouncement(announcementVersion)
     }
-    getNumDemos()
+    getNumDemosAndAnnouncementVersion()
+    // eslint-disable-next-line
   }, [])
 
   /* eslint-disable react/display-name */

@@ -14,10 +14,16 @@ async function getUserSettings(): Promise<{
     numDemosTelegram: number
     isDisplayed: boolean
   }
+  announcementVersion: string
 }> {
   try {
     const response = await axios.get('/settings')
-    const { has_api_key: hasApiKey, creds, demo } = response.data
+    const {
+      has_api_key: hasApiKey,
+      creds,
+      demo,
+      announcement_version: announcementVersion,
+    } = response.data
     return {
       hasApiKey,
       creds,
@@ -26,6 +32,7 @@ async function getUserSettings(): Promise<{
         numDemosTelegram: demo?.num_demos_telegram,
         isDisplayed: demo?.is_displayed,
       },
+      announcementVersion,
     }
   } catch (e) {
     errorHandler(e, 'Error fetching credentials')
@@ -73,6 +80,18 @@ async function updateDemoDisplayed(isDisplayed: boolean): Promise<void> {
   }
 }
 
+async function updateAnnouncementVersion(
+  announcementVersion: string
+): Promise<void> {
+  try {
+    await axios.put('/settings/announcement-version', {
+      announcement_version: announcementVersion,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error updating announcement version for user')
+  }
+}
+
 function errorHandler(e: AxiosError, defaultMsg: string): never {
   console.error(e)
   if (e.response && e.response.data && e.response.data.message) {
@@ -87,4 +106,5 @@ export {
   deleteCredential,
   getCustomFromAddresses,
   updateDemoDisplayed,
+  updateAnnouncementVersion,
 }

@@ -54,3 +54,13 @@ export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
 export const SENTRY_ENVIRONMENT =
   (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
+
+// Feature Launch Announcements
+export const ANNOUNCEMENT = {
+  version: t('announcement.version')``,
+  title: t('announcement.title')``,
+  subtitle: t('announcement.subtitle')``,
+  subtext: t('announcement.subtext')``,
+  imageUrl: t('announcement.imageUrl')``,
+  readGuideUrl: t('announcement.readGuideUrl')``,
+}

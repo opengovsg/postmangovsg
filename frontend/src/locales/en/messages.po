@@ -61,6 +61,30 @@ msgstr "Verifying OTP..."
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
+#: src/config.ts:61
+msgid "announcement.imageUrl"
+msgstr "file.go.gov.sg"
+
+#: src/config.ts:62
+msgid "announcement.readGuideUrl"
+msgstr "https://guide.postman.gov.sg/release-notes#2020-11-05-or-demo-campaigns-for-sms-and-telegram"
+
+#: src/config.ts:60
+msgid "announcement.subtext"
+msgstr "We've heard your requests to cater to more channels. Good news, Postman is now supporting agencies to utilise their Telegram bots!  We have chosen to work with Telegram as it is a messaging app with  a focus on speed and security. It's super-fast, simple and free."
+
+#: src/config.ts:59
+msgid "announcement.subtitle"
+msgstr "It's official, Telegram is here!"
+
+#: src/config.ts:58
+msgid "announcement.title"
+msgstr "title"
+
+#: src/config.ts:57
+msgid "announcement.version"
+msgstr "1.1.1"
+
 #: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
 #: src/config.ts:46
 msgid "defaultMailFrom"
