@@ -11,7 +11,4 @@ export interface UserSettings {
     numDemosTelegram: number
     isDisplayed: boolean
   }
-  userFeature: {
-    announcementVersion: string
-  }
 }

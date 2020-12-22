@@ -27,12 +27,6 @@ const demoDisplayedValidator = {
   }),
 }
 
-const updateAnnouncementVersionValidator = {
-  [Segments.BODY]: Joi.object({
-    announcement_version: Joi.string().default(null),
-  }),
-}
-
 /**
  * @swagger
  * path:
@@ -188,46 +182,6 @@ router.put(
   '/demo',
   celebrate(demoDisplayedValidator),
   SettingsMiddleware.updateDemoDisplayed
-)
-
-/**
- * @swagger
- * path:
- *  /settings/announcement-version:
- *    put:
- *       tags:
- *         - Settings
- *       summary: Update announcement version for this user
- *       requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 announcement_version:
- *                   type: number
- *       responses:
- *         "200":
- *           description: Success
- *           content:
- *            application/json:
- *              schema:
- *                type: object
- *                properties:
- *                  announcement_version:
- *                    type: number
- *         "400":
- *           description: Bad Request
- *         "401":
- *           description: Unauthorized
- *         "500":
- *           description: Internal Server Error
- */
-router.put(
-  '/announcement-version',
-  celebrate(updateAnnouncementVersionValidator),
-  SettingsMiddleware.updateAnnouncementVersion
 )
 
 export default router
