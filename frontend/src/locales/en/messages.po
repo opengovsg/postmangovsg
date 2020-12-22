@@ -71,11 +71,11 @@ msgstr "https://guide.postman.gov.sg/release-notes#2020-11-05-or-demo-campaigns-
 
 #: src/config.ts:60
 msgid "announcement.subtext"
-msgstr "subtextsubtextsubtext"
+msgstr "We've heard your requests to cater to more channels. Good news, Postman is now supporting agencies to utilise their Telegram bots!  We have chosen to work with Telegram as it is a messaging app with  a focus on speed and security. It's super-fast, simple and free."
 
 #: src/config.ts:59
 msgid "announcement.subtitle"
-msgstr "subtitle"
+msgstr "It's official, Telegram is here!"
 
 #: src/config.ts:58
 msgid "announcement.title"
