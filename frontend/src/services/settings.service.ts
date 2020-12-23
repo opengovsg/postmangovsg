@@ -88,7 +88,7 @@ async function updateAnnouncementVersion(
       announcement_version: announcementVersion,
     })
   } catch (e) {
-    errorHandler(e, 'Error updating announcement version for user')
+    errorHandler(e, 'Error updating announcement version')
   }
 }
 
