@@ -465,7 +465,7 @@ const getSafeHtmlBody = (htmlStr: string): HTMLElement => {
 }
 
 class ContentBlocksBuilder {
-  currentBlockType = 'unstyled'
+  currentBlockType?: string
   currentEntity: string | null = null
   currentDepth = 0
   currentText = ''
@@ -538,7 +538,6 @@ class ContentBlocksBuilder {
 
       const blockType = TAG_BLOCK_TYPE_MAPPING[nodeName]
       if (blockType) {
-        // TODO: Prevent unstyled blocks from being entered when currentText is empty but yet allow empty blocks before and after for images and tables
         this.flush()
         this.currentBlockType = blockType
       }
@@ -555,7 +554,7 @@ class ContentBlocksBuilder {
   }
 
   private clear() {
-    this.currentBlockType = 'unstyled'
+    this.currentBlockType = undefined
     this.currentEntity = null
     this.currentText = ''
     this.characterList = immutable.List<CharacterMetadata>()
@@ -563,13 +562,8 @@ class ContentBlocksBuilder {
   }
 
   private flush() {
-    // We always insert table-cell and list-item even if they have no content to preserve structure.
-    if (
-      this.currentText !== '' ||
-      ['table-cell', 'list-item'].includes(this.currentBlockType)
-    ) {
-      this.makeContentBlock()
-    }
+    // We create a new block if there is already valid block type set
+    if (this.currentBlockType) this.makeContentBlock()
   }
 
   private makeContentBlock(data = {}) {
@@ -694,7 +688,6 @@ class ContentBlocksBuilder {
     this.currentBlockType = 'table-cell'
     const children = Array.from(cell.childNodes)
     this.createContentBlocks(children, immutable.OrderedSet())
-    // this.makeContentBlock(this.tableData)
   }
 
   private addList(list: ChildNode) {
@@ -705,8 +698,6 @@ class ContentBlocksBuilder {
     // Close off previous block first if there was text. This deals with the case when parsing nested list.
     // For example for <li>text<ul>...</ul></li>, we will need to close off the list item holding "text"
     // first before starting the nested list.
-
-    // TODO: How to deal with empty list item
     this.flush()
 
     if (prevWrapper === 'ul' || prevWrapper === 'ol') {
