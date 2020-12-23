@@ -720,10 +720,9 @@ class ContentBlocksBuilder {
   ): DraftInlineStyle {
     const { style: cssStyle } = node as HTMLElement
     if (cssStyle) {
-      const { color, background } = cssStyle
-      // TODO: Set style to style set
-      if (color) console.log('color', color)
-      if (background) console.log('background', background)
+      const { color, backgroundColor } = cssStyle
+      if (color) style = style.add(`color-${color}`)
+      if (backgroundColor) style = style.add(`bgcolor-${backgroundColor}`)
     }
 
     return style
