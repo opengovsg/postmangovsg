@@ -29,7 +29,9 @@ const demoDisplayedValidator = {
 
 const updateAnnouncementVersionValidator = {
   [Segments.BODY]: Joi.object({
-    announcement_version: Joi.string().default(null),
+    announcement_version: Joi.string()
+      .pattern(new RegExp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}'))
+      .required(),
   }),
 }
 
