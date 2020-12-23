@@ -15,8 +15,12 @@ const AnnouncementModal = () => {
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    setBeforeClose(() => () => {
-      updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
+    setBeforeClose(() => async () => {
+      try {
+        await updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
+      } catch (err) {
+        setErrorMessage(err.message)
+      }
     })
     // eslint-disable-next-line
   }, [])
@@ -24,7 +28,7 @@ const AnnouncementModal = () => {
   async function onReadMoreClicked(): Promise<void> {
     try {
       // Closes the modal
-      close()
+      await close()
     } catch (err) {
       setErrorMessage(err.message)
     }

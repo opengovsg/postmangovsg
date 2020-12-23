@@ -15,14 +15,18 @@ const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [modalContent, setModalContent] = useState(null)
   const [modalTitle, setModalTitle] = useState('')
 
-  // Important: to pass a function into setCustomClose, you must anonymize it twice
+  // Important: to pass a function into setBeforeClose, you must anonymize it twice
   // i.e `() => () => { some function }
   // see: https://medium.com/swlh/how-to-store-a-function-with-the-usestate-hook-in-react-8a88dd4eede1
   const [beforeClose, setBeforeClose] = useState<(() => void) | null>(null)
 
-  function handleClose() {
+  async function handleClose() {
     if (beforeClose) {
-      beforeClose()
+      try {
+        await beforeClose()
+      } catch (e) {
+        console.error(e)
+      }
       setBeforeClose(null)
     }
     setModalContent(null)
