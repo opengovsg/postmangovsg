@@ -59,7 +59,6 @@ export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
 export const ANNOUNCEMENT = {
   version: t('announcement.version')``,
   title: t('announcement.title')``,
-  subtitle: t('announcement.subtitle')``,
   subtext: t('announcement.subtext')``,
   imageUrl: t('announcement.imageUrl')``,
   readGuideUrl: t('announcement.readGuideUrl')``,

@@ -35,8 +35,7 @@ const AnnouncementModal = () => {
       <div className={styles.modalImg}>
         <img src={i18n._(ANNOUNCEMENT.imageUrl)} alt="Modal graphic"></img>
       </div>
-      <h2 className={styles.title}>{i18n._(ANNOUNCEMENT.title)}</h2>
-      <h4 className={styles.subtitle}>{i18n._(ANNOUNCEMENT.subtitle)}</h4>
+      <h4 className={styles.title}>{i18n._(ANNOUNCEMENT.title)}</h4>
       <div className={styles.content}>{i18n._(ANNOUNCEMENT.subtext)}</div>
       <div className={styles.options}>
         <OutboundLink
