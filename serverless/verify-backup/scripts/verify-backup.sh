@@ -17,6 +17,13 @@ notify() {
   fi
 }
 
+notifyAndExit() {
+  notify "$RESTORE_LOG"
+  # Cronitor job failed
+  curl "https://cronitor.link/$CRONITOR_CODE/fail" -m 10 || true
+  exit 1
+}
+
 # Downloads latest backup dump and decrypts it
 npm run decrypt-dump
 
@@ -30,11 +37,11 @@ DUMP_VERSION=$(cat dump-version.txt)
 # Restore dump; On error, print error message and exit script
 echo 'Restoring data dump'
 RESTORE_LOG="$DUMP_VERSION Data dump restoration failed!"
-pg_restore --no-owner --dbname $PGDATABASE postman.decrypted.dump || { notify "$RESTORE_LOG" && exit 1; }
+pg_restore --no-owner --dbname $PGDATABASE postman.decrypted.dump || notifyAndExit
 
 echo 'Making simple query on db'
 RESTORE_LOG="$DUMP_VERSION Verification query on restored db failed!"
-psql -c 'SELECT 1+1' || { notify "$RESTORE_LOG" && exit 1; }
+psql -c 'SELECT 1+1' || notifyAndExit
 
 # Get key metrics from restored db and set to env var
 DUMP_USERS=$(psql -qAt -c 'select count(*) from users;')
@@ -44,3 +51,6 @@ RESTORE_LOG="Successfully restored $DUMP_VERSION db dump! \
   The restored db has $DUMP_USERS users, $DUMP_CAMPAIGNS campaigns and $DUMP_MESSAGES sent messages."
 
 notify "$RESTORE_LOG"
+
+# Completed Cronitor job
+curl "https://cronitor.link/$CRONITOR_CODE/complete" -m 10 || true
