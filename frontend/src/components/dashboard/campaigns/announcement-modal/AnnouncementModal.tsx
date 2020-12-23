@@ -41,6 +41,7 @@ const AnnouncementModal = () => {
         <OutboundLink
           eventLabel={i18n._(ANNOUNCEMENT.readGuideUrl)}
           to={i18n._(ANNOUNCEMENT.readGuideUrl)}
+          target="_blank"
         >
           <PrimaryButton onClick={onReadMoreClicked}>
             <span>Read guide</span>
