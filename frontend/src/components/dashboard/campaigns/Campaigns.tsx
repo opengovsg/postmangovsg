@@ -66,18 +66,20 @@ const Campaigns = () => {
     setLoading(false)
   }
 
-  // Returns true if A < B, else false
-  function compareSemver(A: string, B: string) {
-    if (A == null) {
+  // Returns true if lastSeenVersion < currentVersion, else false
+  function compareSemver(currentVersion: string, lastSeenVersion: string) {
+    if (!currentVersion) {
       return true
     }
-    const ASplit = A.split('.').map((num) => parseInt(num, 10))
-    const BSplit = B.split('.').map((num) => parseInt(num, 10))
+    const currentSplit = currentVersion
+      .split('.')
+      .map((num) => parseInt(num, 10))
+    const lastSplit = lastSeenVersion.split('.').map((num) => parseInt(num, 10))
     for (let i = 0; i < 3; i++) {
-      if (ASplit[i] < BSplit[i]) {
+      if (currentSplit[i] < lastSplit[i]) {
         return true
       }
-      if (ASplit[i] > BSplit[i]) {
+      if (currentSplit[i] > lastSplit[i]) {
         return false
       }
     }
