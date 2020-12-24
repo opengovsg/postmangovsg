@@ -131,8 +131,12 @@ const parseAndProcessCsv = async (
             await onComplete(numMessages)
             logger.info({ message: 'Parsing complete', ...logMeta })
           } catch (err) {
-            logger.error({ message: 'Parsing failed', error: err, ...logMeta })
-            reject(err)
+            logger.error({
+              message: 'Parsing failed',
+              error: err.message,
+              ...logMeta,
+            })
+            reject(err.message)
           }
         } else {
           logger.info({ message: 'Parsing aborted', ...logMeta })
