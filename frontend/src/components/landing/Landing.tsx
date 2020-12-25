@@ -36,11 +36,12 @@ import { i18n } from 'locales'
 const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 
 const Landing = () => {
-  const authContext = useContext(AuthContext)
+  const { isAuthenticated } = useContext(AuthContext)
   const [sentMessages, setSentMessages] = useState('0')
   const history = useHistory()
 
   useEffect(() => {
+    if (isAuthenticated) return
     async function getSentMessages() {
       const stats = await getLandingStats()
       if (stats) {
@@ -48,9 +49,9 @@ const Landing = () => {
       }
     }
     getSentMessages()
-  }, [])
+  }, [isAuthenticated])
 
-  if (authContext.isAuthenticated) {
+  if (isAuthenticated) {
     return <Redirect to="/campaigns"></Redirect>
   }
 

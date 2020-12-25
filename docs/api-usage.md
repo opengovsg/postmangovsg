@@ -129,6 +129,54 @@ curl --location --request POST 'https://api.postman.gov.sg/v1/campaign/100/uploa
 }'
 ```
 
+#### 3.4 Check processing status of uploaded file
+
+```bash
+curl --location --request GET 'https://api.postman.gov.sg/v1/campaign/100/upload/status' \
+--header 'Authorization: Bearer your_api_key'
+```
+
+While the csv is being processed, `is_csv_processing` would be `true`. When `is_csv_processing` is`false`, this indicates that the csv processing is complete or an error has occurred. You can poll the `/upload/status` endpoint to refresh the file processing status.
+
+**Sample response**
+
+```json
+{
+  "is_csv_processing": true,
+  "temp_csv_filename": "postman-sample.csv"
+}
+```
+
+On successful file upload, `csv_filename` will reflect the uploaded file name. You can now proceed to the next step to validate your credentials.
+
+**Sample response of successful file upload**
+
+```json
+{
+  "csv_filename": "postman-sample.csv",
+  "is_csv_processing": false,
+  "num_recipients": 10,
+  "preview": {
+    "body": "Dear abc, this is the content of my template.",
+    "subject": "My template subject for abc",
+    "reply_to": "youremail@gmail.com"
+  }
+}
+```
+
+However if the file upload fails, `csv_error` will reflect the error message and you would need to repeat steps 3.1 - 3.4 again with a correct file. For example, the follwing response is returned if you uploaded an empty file.
+
+**Sample response of failed file upload**
+
+```json
+{
+  "csv_error": "Error: No rows were found in the uploaded recipient file. Please make sure you uploaded the correct file before sending.",
+  "is_csv_processing": false,
+  "num_recipients": 0,
+  "temp_csv_filename": "postman-sample.csv"
+}
+```
+
 ### 4. Validate and assign campaign credentials
 
 #### 4.1 Email campaigns

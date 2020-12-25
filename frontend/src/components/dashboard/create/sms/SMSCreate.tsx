@@ -24,10 +24,6 @@ const CreateSMS = () => {
   const { progress, isCsvProcessing, status } = campaign as SMSCampaign
   const [activeStep, setActiveStep] = useState(progress)
 
-  useEffect(() => {
-    setActiveStep(progress)
-  }, [progress])
-
   // If isCsvProcessing, user can only access UploadRecipients tab
   useEffect(() => {
     if (isCsvProcessing) {

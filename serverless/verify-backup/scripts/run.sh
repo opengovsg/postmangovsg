@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Started Cronitor job
+curl "https://cronitor.link/$CRONITOR_CODE/run"  -m 10 || true
+
 # Initialise and start postgres
 mkdir -p /run/postgresql/
 chown -R postgres:postgres /run/postgresql/

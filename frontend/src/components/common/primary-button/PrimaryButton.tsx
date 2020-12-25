@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import cx from 'classnames'
 
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import styles from './PrimaryButton.module.scss'
 
 interface PrimaryButtonProps
@@ -20,13 +21,7 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
   ...otherProps
 }) => {
   const [asyncLoading, setAsyncLoading] = useState(false)
-  const isMounted = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
+  const isMounted = useIsMounted()
 
   const asyncOnClick = useMemo(
     () =>
@@ -43,7 +38,7 @@ const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
             }
           }
         : undefined,
-    [onClick]
+    [isMounted, onClick]
   )
 
   return (
