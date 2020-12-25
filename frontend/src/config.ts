@@ -56,7 +56,9 @@ export const SENTRY_ENVIRONMENT =
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
 
 // Feature Launch Announcements
+// If `isActive` is false, the modal will not proc for ANY user
 export const ANNOUNCEMENT = {
+  isActive: true,
   version: t('announcement.version')``,
   title: t('announcement.title')``,
   subtext: t('announcement.subtext')``,

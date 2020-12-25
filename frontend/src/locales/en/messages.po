@@ -61,27 +61,27 @@ msgstr "Verifying OTP..."
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
-#: src/config.ts:62
+#: src/config.ts:63
 msgid "announcement.buttonText"
 msgstr "Send campaign"
 
-#: src/config.ts:61
+#: src/config.ts:62
 msgid "announcement.buttonUrl"
 msgstr "announcement.buttonUrl"
 
-#: src/config.ts:60
+#: src/config.ts:61
 msgid "announcement.imageUrl"
 msgstr "/static/media/congrats.78d7803a.png"
 
-#: src/config.ts:59
+#: src/config.ts:60
 msgid "announcement.subtext"
 msgstr "Thanks for using Postman and joining us every step of the way while we mature as a product. We'll be releasing exciting new features this year. For instance, this is an announcement modal that will keep you up-to-date about our new features! Watch this space for things that are brewing. Send your first campaign of the year by clicking on the button below."
 
-#: src/config.ts:58
+#: src/config.ts:59
 msgid "announcement.title"
 msgstr "Happy New Year! Congrats for making it through 2020."
 
-#: src/config.ts:57
+#: src/config.ts:58
 msgid "announcement.version"
 msgstr "1.1.1"
 

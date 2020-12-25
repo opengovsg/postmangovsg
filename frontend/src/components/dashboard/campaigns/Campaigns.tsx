@@ -87,7 +87,10 @@ const Campaigns = () => {
   }
 
   function displayNewAnnouncement(announcementVersion: string) {
-    if (compareSemver(announcementVersion, i18n._(ANNOUNCEMENT.version))) {
+    if (
+      ANNOUNCEMENT.isActive &&
+      compareSemver(announcementVersion, i18n._(ANNOUNCEMENT.version))
+    ) {
       modalContext.setModalContent(<AnnouncementModal />)
     }
   }
