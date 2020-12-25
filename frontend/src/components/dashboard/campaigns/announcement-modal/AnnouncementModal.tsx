@@ -36,9 +36,11 @@ const AnnouncementModal = () => {
 
   return (
     <div className={styles.modal}>
-      <div className={styles.modalImg}>
-        <img src={i18n._(ANNOUNCEMENT.imageUrl)} alt="Modal graphic"></img>
-      </div>
+      <img
+        className={styles.modalImg}
+        src={i18n._(ANNOUNCEMENT.imageUrl)}
+        alt="Modal graphic"
+      ></img>
       <h4 className={styles.title}>{i18n._(ANNOUNCEMENT.title)}</h4>
       <div className={styles.content}>{i18n._(ANNOUNCEMENT.subtext)}</div>
       <div className={styles.options}>
