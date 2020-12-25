@@ -208,7 +208,7 @@ router.put(
  *               type: object
  *               properties:
  *                 announcement_version:
- *                   type: number
+ *                   type: string
  *       responses:
  *         "200":
  *           description: Success
