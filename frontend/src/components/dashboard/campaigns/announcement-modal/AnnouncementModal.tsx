@@ -43,12 +43,12 @@ const AnnouncementModal = () => {
       <div className={styles.content}>{i18n._(ANNOUNCEMENT.subtext)}</div>
       <div className={styles.options}>
         <OutboundLink
-          eventLabel={i18n._(ANNOUNCEMENT.readGuideUrl)}
-          to={i18n._(ANNOUNCEMENT.readGuideUrl)}
+          eventLabel={i18n._(ANNOUNCEMENT.buttonUrl)}
+          to={i18n._(ANNOUNCEMENT.buttonUrl)}
           target="_blank"
         >
           <PrimaryButton onClick={onReadMoreClicked}>
-            <span>Read guide</span>
+            <span>{i18n._(ANNOUNCEMENT.buttonText)}</span>
             <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
           </PrimaryButton>
         </OutboundLink>{' '}

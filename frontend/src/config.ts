@@ -61,5 +61,6 @@ export const ANNOUNCEMENT = {
   title: t('announcement.title')``,
   subtext: t('announcement.subtext')``,
   imageUrl: t('announcement.imageUrl')``,
-  readGuideUrl: t('announcement.readGuideUrl')``,
+  buttonUrl: t('announcement.buttonUrl')``,
+  buttonText: t('announcement.buttonText')``,
 }
