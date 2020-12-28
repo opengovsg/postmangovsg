@@ -55,10 +55,16 @@ export const SENTRY_ENVIRONMENT =
   (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
 
+// `REACT_APP_ANNOUNCEMENT_ACTIVE` must be set to `true` in Amplify if we want the modal to display
+function getAnnouncementActive() {
+  const envVar = process.env.REACT_APP_ANNOUNCEMENT_ACTIVE as string
+  return envVar === 'true'
+}
+
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user
 export const ANNOUNCEMENT = {
-  isActive: process.env.REACT_APP_ANNOUNCEMENT_ACTIVE || false,
+  isActive: getAnnouncementActive(),
   version: t('announcement.version')``,
   title: t('announcement.title')``,
   subtext: t('announcement.subtext')``,
