@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -86,14 +86,20 @@ const Campaigns = () => {
     return false
   }
 
-  function displayNewAnnouncement(announcementVersion: string) {
-    if (
-      ANNOUNCEMENT.isActive &&
-      compareSemver(announcementVersion, i18n._(ANNOUNCEMENT.version))
-    ) {
-      modalContext.setModalContent(<AnnouncementModal />)
-    }
-  }
+  // Only call the modalContext if content is currently null - prevents infinite re-rendering
+  // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
+  const displayNewAnnouncement = useCallback(
+    (announcementVersion: string) => {
+      if (
+        ANNOUNCEMENT.isActive &&
+        compareSemver(announcementVersion, i18n._(ANNOUNCEMENT.version)) &&
+        modalContext.modalContent === null
+      ) {
+        modalContext.setModalContent(<AnnouncementModal />)
+      }
+    },
+    [modalContext]
+  )
 
   useEffect(() => {
     fetchCampaigns(selectedPage)
@@ -109,10 +115,7 @@ const Campaigns = () => {
       displayNewAnnouncement(announcementVersion)
     }
     getNumDemosAndAnnouncementVersion()
-    // Need to use an empty dep array here because `displayNewAnnouncement`
-    // has `modalContext` as a dependency, which causes an infinite re-render loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [displayNewAnnouncement])
 
   /* eslint-disable react/display-name */
   const headers = [
