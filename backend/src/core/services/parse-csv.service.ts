@@ -133,10 +133,10 @@ const parseAndProcessCsv = async (
           } catch (err) {
             logger.error({
               message: 'Parsing failed',
-              error: err.message,
+              error: err,
               ...logMeta,
             })
-            reject(err.message)
+            reject(err)
           }
         } else {
           logger.info({ message: 'Parsing aborted', ...logMeta })
