@@ -58,7 +58,7 @@ export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user
 export const ANNOUNCEMENT = {
-  isActive: true,
+  isActive: process.env.REACT_APP_ANNOUNCEMENT_ACTIVE || false,
   version: t('announcement.version')``,
   title: t('announcement.title')``,
   subtext: t('announcement.subtext')``,
