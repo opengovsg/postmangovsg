@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -24,6 +24,9 @@ import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
+import AnnouncementModal from './announcement-modal'
+import { i18n } from 'locales'
+import { ANNOUNCEMENT } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -63,19 +66,61 @@ const Campaigns = () => {
     setLoading(false)
   }
 
+  // Returns true if lastSeenVersion < currentPackageVersion, else false
+  function compareSemver(
+    lastSeenVersion: string,
+    currentPackageVersion: string
+  ) {
+    if (!lastSeenVersion) {
+      return true
+    }
+    const lastSeenSplit = lastSeenVersion
+      .split('.')
+      .map((num) => parseInt(num, 10))
+    const currentSplit = currentPackageVersion
+      .split('.')
+      .map((num) => parseInt(num, 10))
+    for (let i = 0; i < 3; i++) {
+      if (lastSeenSplit[i] < currentSplit[i]) {
+        return true
+      }
+      if (lastSeenSplit[i] > currentSplit[i]) {
+        return false
+      }
+    }
+    return false
+  }
+
+  // Only call the modalContext if content is currently null - prevents infinite re-rendering
+  // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
+  const displayNewAnnouncement = useCallback(
+    (userAnnouncementVersion: string) => {
+      if (
+        ANNOUNCEMENT.isActive &&
+        compareSemver(userAnnouncementVersion, i18n._(ANNOUNCEMENT.version)) &&
+        modalContext.modalContent === null
+      ) {
+        modalContext.setModalContent(<AnnouncementModal />)
+      }
+    },
+    [modalContext]
+  )
+
   useEffect(() => {
     fetchCampaigns(selectedPage)
   }, [selectedPage])
 
   useEffect(() => {
-    async function getNumDemos() {
-      const { demo } = await getUserSettings()
+    // TODO: refactor out num demos processing
+    async function getNumDemosAndAnnouncementVersion() {
+      const { demo, announcementVersion } = await getUserSettings()
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
+      displayNewAnnouncement(announcementVersion)
     }
-    getNumDemos()
-  }, [])
+    getNumDemosAndAnnouncementVersion()
+  }, [displayNewAnnouncement])
 
   /* eslint-disable react/display-name */
   const headers = [
@@ -166,6 +211,7 @@ const Campaigns = () => {
             className={cx(styles.iconContainer, styles.duplicate)}
             onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               event.stopPropagation()
+              sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
               modalContext.setModalContent(
                 <DuplicateCampaignModal campaign={campaign} />
               )
