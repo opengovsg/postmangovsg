@@ -41,6 +41,10 @@ $title-height: $height-4;
 
 .modalImg {
   max-height: 250px;
+
+  @include mobile() {
+    max-height: 20vh;
+  }
 }
 
 .content {

@@ -35,6 +35,9 @@ $title-height: $height-4;
   max-width: 100vw;
   padding: 3rem ($modal-width - 528px) / 2;
   margin: auto;
+  @include mobile() {
+    padding: 6rem 3rem; // Need additional top padding to clear the close button
+  }
 }
 
 .close {
