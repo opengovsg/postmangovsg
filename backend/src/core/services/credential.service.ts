@@ -320,9 +320,9 @@ const updateAnnouncementVersion = async (
     { returning: true }
   )
 
-  if (rowUpserted.userId !== userId) {
+  if (!rowUpserted) {
     logger.error({
-      message: 'Updated incorrect user',
+      message: 'No upserted row returned',
       action: 'updateAnnouncementVersion',
     })
     throw new Error('Could not update announcement version')
