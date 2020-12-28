@@ -27,7 +27,7 @@ const demoDisplayedValidator = {
   }),
 }
 
-// Only allow updating with versions less than the current package version
+// Only allow updating with versions less than or equal to the current package version
 const compareSemverMethod = (value: string, helpers: any) => {
   const currentPackageVersion = process.env.npm_package_version
   const updatingVersion = value
