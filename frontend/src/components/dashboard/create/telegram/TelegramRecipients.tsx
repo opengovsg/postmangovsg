@@ -209,7 +209,7 @@ const TelegramRecipients = ({
 
       <ButtonGroup>
         <NextButton
-          disabled={!numRecipients || !isCsvProcessing}
+          disabled={!numRecipients || isCsvProcessing}
           onClick={() => setActiveStep((s) => s + 1)}
         />
         <TextButton
