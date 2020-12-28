@@ -66,20 +66,25 @@ const Campaigns = () => {
     setLoading(false)
   }
 
-  // Returns true if lastSeenVersion < currentVersion, else false
-  function compareSemver(currentVersion: string, lastSeenVersion: string) {
-    if (!currentVersion) {
+  // Returns true if lastSeenVersion < currentPackageVersion, else false
+  function compareSemver(
+    lastSeenVersion: string,
+    currentPackageVersion: string
+  ) {
+    if (!lastSeenVersion) {
       return true
     }
-    const currentSplit = currentVersion
+    const lastSeenSplit = lastSeenVersion
       .split('.')
       .map((num) => parseInt(num, 10))
-    const lastSplit = lastSeenVersion.split('.').map((num) => parseInt(num, 10))
+    const currentSplit = currentPackageVersion
+      .split('.')
+      .map((num) => parseInt(num, 10))
     for (let i = 0; i < 3; i++) {
-      if (currentSplit[i] < lastSplit[i]) {
+      if (lastSeenSplit[i] < currentSplit[i]) {
         return true
       }
-      if (currentSplit[i] > lastSplit[i]) {
+      if (lastSeenSplit[i] > currentSplit[i]) {
         return false
       }
     }
@@ -89,10 +94,10 @@ const Campaigns = () => {
   // Only call the modalContext if content is currently null - prevents infinite re-rendering
   // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
   const displayNewAnnouncement = useCallback(
-    (announcementVersion: string) => {
+    (userAnnouncementVersion: string) => {
       if (
         ANNOUNCEMENT.isActive &&
-        compareSemver(announcementVersion, i18n._(ANNOUNCEMENT.version)) &&
+        compareSemver(userAnnouncementVersion, i18n._(ANNOUNCEMENT.version)) &&
         modalContext.modalContent === null
       ) {
         modalContext.setModalContent(<AnnouncementModal />)
