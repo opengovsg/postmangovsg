@@ -109,7 +109,9 @@ const Campaigns = () => {
       displayNewAnnouncement(announcementVersion)
     }
     getNumDemosAndAnnouncementVersion()
-    // eslint-disable-next-line
+    // Need to use an empty dep array here because `displayNewAnnouncement`
+    // has `modalContext` as a dependency, which causes an infinite re-render loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /* eslint-disable react/display-name */
