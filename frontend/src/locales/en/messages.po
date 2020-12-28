@@ -83,7 +83,7 @@ msgstr "Happy New Year! Congrats on making it through 2020."
 
 #: src/config.ts:58
 msgid "announcement.version"
-msgstr "1.1.1"
+msgstr "1.17.2"
 
 #: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
 #: src/config.ts:46
