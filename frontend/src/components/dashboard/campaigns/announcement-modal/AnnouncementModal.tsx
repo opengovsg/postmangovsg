@@ -22,8 +22,7 @@ const AnnouncementModal = () => {
         setErrorMessage(err.message)
       }
     })
-    // eslint-disable-next-line
-  }, [])
+  }, [setBeforeClose])
 
   async function onReadMoreClicked(): Promise<void> {
     try {
