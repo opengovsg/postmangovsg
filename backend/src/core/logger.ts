@@ -44,12 +44,25 @@ const addTransport = (transport: any) => {
   logger.add(transport)
 }
 
+const truncate = (message: string, length: number, suffix = true): string => {
+  if (!message) {
+    return ''
+  }
+  return message.length > length
+    ? `${message.substring(0, length)}${suffix ? '...<TRUNCATED>' : ''}`
+    : message
+}
 const loggerWithLabel = (module: NodeModule): any => {
   const label = getModuleLabel(module)
   return {
     info: (logMeta: any): winston.Logger => logger.info({ label, ...logMeta }),
-    error: (logMeta: any): winston.Logger =>
-      logger.error({ label, ...logMeta }),
+    error: (logMeta: any): winston.Logger => {
+      if (logMeta.error && logMeta.error instanceof Error) {
+        logMeta.error = truncate(logMeta.error.stack, 400)
+      }
+      return logger.error({ label, ...logMeta })
+    },
+
     debug: (logMeta: any): winston.Logger =>
       logger.debug({ label, ...logMeta }),
     warn: (logMeta: any): winston.Logger => logger.warn({ label, ...logMeta }),
