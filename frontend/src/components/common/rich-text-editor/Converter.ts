@@ -406,6 +406,20 @@ const handleTable = (
   }
 }
 
+const getBlockStyle = (
+  currBlock: RawDraftContentBlock
+): Record<string, string> | undefined => {
+  let style = {}
+  if (currBlock.data) {
+    const textAlignment = currBlock.data['text-align']
+    if (textAlignment) {
+      style = { ...style, 'text-align': textAlignment }
+    }
+  }
+
+  if (Object.keys(style).length > 0) return style
+}
+
 const convertToHTML = (contentState: RawDraftContentState): string => {
   const { blocks, entityMap } = contentState
 
@@ -425,11 +439,12 @@ const convertToHTML = (contentState: RawDraftContentState): string => {
 
     const tag = BLOCK_TYPE_MAPPPING[currBlock.type] || 'div'
     const content = getBlockContent(currBlock, entityMap)
+    const style = getBlockStyle(currBlock)
 
     if (isListItem(currBlock) || isTableCell(currBlock)) {
-      tree.insertChild({ tag, content })
+      tree.insertChild({ tag, content, style })
     } else {
-      tree.insert({ tag, content })
+      tree.insert({ tag, content, style })
     }
 
     prevBlock = currBlock
@@ -470,6 +485,7 @@ class ContentBlocksBuilder {
   currentDepth = 0
   currentText = ''
   characterList = immutable.List<CharacterMetadata>()
+  currentBlockStyle = immutable.Map<string, string | number>()
 
   wrapper?: string
 
@@ -538,6 +554,7 @@ class ContentBlocksBuilder {
 
       const blockType = TAG_BLOCK_TYPE_MAPPING[nodeName]
       if (blockType) {
+        this.currentBlockStyle = this.getBlockStyle(node)
         this.flush()
         this.currentBlockType = blockType
       }
@@ -557,6 +574,7 @@ class ContentBlocksBuilder {
     this.currentBlockType = undefined
     this.currentEntity = null
     this.currentText = ''
+    this.currentBlockStyle = immutable.Map()
     this.characterList = immutable.List<CharacterMetadata>()
     this.contentState = ContentState.createFromText('')
   }
@@ -566,7 +584,7 @@ class ContentBlocksBuilder {
     if (this.currentBlockType) this.makeContentBlock()
   }
 
-  private makeContentBlock(data = {}) {
+  private makeContentBlock(blockData = {}) {
     const key = genKey()
     let type = this.currentBlockType
 
@@ -575,14 +593,18 @@ class ContentBlocksBuilder {
       type = this.wrapper === 'ul' ? 'unordered-list-item' : 'ordered-list-item'
     }
 
-    data = type === 'table-cell' && this.tableData ? this.tableData : data
+    blockData =
+      type === 'table-cell' && this.tableData ? this.tableData : blockData
+    const data = immutable
+      .Map<string, string | number>(blockData)
+      .merge(this.currentBlockStyle)
 
     const contentBlock = new ContentBlock({
       key,
       type,
       text: this.currentText,
       characterList: this.characterList,
-      data: immutable.Map(data),
+      data,
       depth: this.currentDepth,
     })
 
@@ -726,6 +748,18 @@ class ContentBlocksBuilder {
     }
 
     return style
+  }
+
+  private getBlockStyle(node: ChildNode): immutable.Map<string, string> {
+    let blockStyle = immutable.Map<string, string>()
+    const { style } = node as HTMLElement
+    for (let i = 0; i < style.length; i++) {
+      const property = style.item(i)
+      const value = style.getPropertyValue(property)
+      blockStyle = blockStyle.set(property, value)
+    }
+
+    return blockStyle
   }
 }
 

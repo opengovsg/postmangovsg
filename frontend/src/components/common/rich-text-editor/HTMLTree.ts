@@ -4,6 +4,7 @@ interface HTMLNode {
   children?: HTMLNode
   sibling?: HTMLNode
   parent?: HTMLNode
+  style?: Record<string, string>
 }
 
 export class HTMLTree {
@@ -81,9 +82,18 @@ export class HTMLTree {
    */
   renderNode(node: HTMLNode): string {
     let html = ''
-    const { tag, content, children, sibling } = node
+    const { tag, content, children, sibling, style } = node
 
-    html += `<${tag}>`
+    if (style) {
+      const css = Object.keys(style).reduce(
+        (cssStr, property) => `${cssStr} ${property}: ${style[property]};`,
+        ''
+      )
+      html += `<${tag} style="${css.trim()}">`
+    } else {
+      html += `<${tag}>`
+    }
+
     if (content) html += `${content}`
     if (children) {
       html += this.renderNode(children)
