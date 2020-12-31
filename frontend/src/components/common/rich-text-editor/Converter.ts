@@ -388,9 +388,9 @@ const handleTable = (
       const { cols, row, col } = currBlock.data as Record<string, number>
       const startRow = (row * cols + col) % cols === 0
       if (startRow) {
-        const parent = tree.active?.parent
-        if (parent) {
-          tree.select(parent)
+        const table = tree.active?.parent
+        if (table) {
+          tree.select(table)
           const tr = tree.insertChild({ tag: 'tr' })
           tree.select(tr)
         }
