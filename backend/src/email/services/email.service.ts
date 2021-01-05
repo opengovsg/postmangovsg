@@ -16,6 +16,7 @@ import { MailToSend, CampaignDetails } from '@core/interfaces'
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
 import config from '@core/config'
+import { EmailDuplicateCampaignDetails } from '@email/interfaces'
 
 const logger = loggerWithLabel(module)
 
@@ -60,13 +61,13 @@ const getHydratedMessage = async (
     params
   )
   const body = EmailTemplateService.client.template(template?.body!, params)
-  /* eslint-enable @typescript-eslint/no-non-null-assertion */
   return {
     body,
     subject,
     replyTo: template.replyTo || null,
     from: template?.from!,
   }
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
 }
 
 /**
@@ -296,6 +297,59 @@ const uploadProtectedCompleteOnChunk = ({
   }
 }
 
+const duplicateCampaign = async ({
+  campaignId,
+  name,
+}: {
+  campaignId: number
+  name: string
+}): Promise<Campaign | void> => {
+  const campaign = (
+    await Campaign.findByPk(campaignId, {
+      attributes: ['type', 'user_id', 'protect', 'demo_message_limit'],
+      include: [
+        {
+          model: EmailTemplate,
+          attributes: ['body', 'subject', 'reply_to', 'from'],
+        },
+      ],
+    })
+  )?.get({ plain: true }) as EmailDuplicateCampaignDetails
+
+  if (campaign) {
+    const duplicatedCampaign = await Campaign.sequelize?.transaction(
+      async (transaction) => {
+        const duplicate = await CampaignService.createCampaign({
+          name,
+          type: campaign.type,
+          userId: campaign.user_id,
+          protect: campaign.protect,
+          demoMessageLimit: campaign.demo_message_limit,
+          transaction,
+        })
+        if (duplicate && campaign.email_templates) {
+          const template = campaign.email_templates
+          // Even if a campaign did not have an associated saved template, it can still be duplicated
+          await EmailTemplate.create(
+            {
+              campaignId: duplicate.id,
+              body: template.body,
+              subject: template.subject,
+              from: template.from,
+              replyTo: template.reply_to,
+            },
+            { transaction }
+          )
+        }
+        return duplicate
+      }
+    )
+    return duplicatedCampaign
+  }
+
+  return
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
@@ -306,4 +360,5 @@ export const EmailService = {
   uploadCompleteOnChunk,
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
+  duplicateCampaign,
 }

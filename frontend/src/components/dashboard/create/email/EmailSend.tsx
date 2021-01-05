@@ -1,7 +1,14 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Status } from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import { EmailProgress, Status } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -18,14 +25,12 @@ import { sendCampaign } from 'services/campaign.service'
 import styles from '../Create.module.scss'
 
 const EmailSend = ({
-  numRecipients,
-  onNext,
-  onPrevious,
+  setActiveStep,
 }: {
-  numRecipients: number
-  onNext: Function
-  onPrevious: () => void
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
+  const { campaign, updateCampaign } = useContext(CampaignContext)
+  const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState(
     {} as {
@@ -58,7 +63,7 @@ const EmailSend = ({
 
   const onModalConfirm = async () => {
     await sendCampaign(+campaignId, 0)
-    onNext({ status: Status.Sending }, false)
+    updateCampaign({ status: Status.Sending })
   }
 
   const openModal = () => {
@@ -103,7 +108,9 @@ const EmailSend = ({
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-        <TextButton onClick={onPrevious}>Previous</TextButton>
+        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+          Previous
+        </TextButton>
       </ButtonGroup>
     </>
   )

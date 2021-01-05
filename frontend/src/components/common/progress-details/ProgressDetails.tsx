@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 
-import { ChannelType, CampaignStats, Status } from 'classes/Campaign'
+import { CampaignContext } from 'contexts/campaign.context'
+import { CampaignStats, Status } from 'classes/Campaign'
 import {
   ProgressBar,
   PrimaryButton,
@@ -16,28 +17,20 @@ import { i18n } from 'locales'
 import { Trans } from '@lingui/macro'
 
 const ProgressDetails = ({
-  campaignId,
-  campaignName,
-  campaignType,
-  sentAt,
-  numRecipients,
   stats,
   redacted,
   handlePause,
   handleRetry,
   handleRefreshStats,
 }: {
-  campaignId: number
-  campaignName: string
-  campaignType: ChannelType
-  sentAt: Date
-  numRecipients: number
   stats: CampaignStats
   redacted: boolean
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
   handleRefreshStats: () => Promise<void>
 }) => {
+  const { campaign } = useContext(CampaignContext)
+  const { id, name, type, sentAt, numRecipients } = campaign
   const {
     status,
     statusUpdatedAt,
@@ -99,7 +92,7 @@ const ProgressDetails = ({
     } else {
       progressMessage = 'Progress'
     }
-    return <h2>{progressMessage}</h2>
+    return <h3>{progressMessage}</h3>
   }
 
   function renderUpdateStats() {
@@ -150,11 +143,11 @@ const ProgressDetails = ({
 
       {!redacted ? (
         <ExportRecipients
-          iconPosition="right"
-          campaignId={campaignId}
-          campaignName={campaignName}
-          campaignType={campaignType}
+          campaignId={id}
+          campaignName={name}
+          campaignType={type}
           sentAt={sentAt}
+          iconPosition="right"
           status={status}
           statusUpdatedAt={statusUpdatedAt}
           isButton

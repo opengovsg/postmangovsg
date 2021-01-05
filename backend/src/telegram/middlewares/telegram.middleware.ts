@@ -9,6 +9,34 @@ const logger = loggerWithLabel(module)
 
 const botId = (telegramBotToken: string): string =>
   telegramBotToken.split(':')[0]
+
+/**
+ * Disable a request made for a demo campaign
+ * @param req
+ * @param res
+ * @param next
+ */
+const disabledForDemoCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const userId = req.session?.user?.id
+    const campaign = await TelegramService.findCampaign(
+      +req.params.campaignId,
+      userId
+    )
+    if (campaign.demoMessageLimit) {
+      return res.status(400).json({
+        message: `Action disabled for demo campaign`,
+      })
+    }
+    return next()
+  } catch (err) {
+    return next(err)
+  }
+}
 /**
  * Parse telegram credentials from request body, setting it to res.locals.credentials to be passed downstream
  * @param req
@@ -19,12 +47,43 @@ const getCredentialsFromBody = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<void | Response> => {
   const { telegram_bot_token: telegramBotToken } = req.body
 
   res.locals.credentials = { telegramBotToken }
   res.locals.credentialName = botId(telegramBotToken)
   return next()
+}
+
+const getDemoCredentialName = (label: string): string => {
+  // Demo campaigns can only use default credentials
+  if (label === DefaultCredentialName.Telegram) {
+    return formatDefaultCredentialName(label)
+  } else {
+    throw new Error(
+      `Demo campaign must use demo credentials. ${label} is not allowed.`
+    )
+  }
+}
+const getCredentialName = async (
+  label: string,
+  userId: number
+): Promise<string> => {
+  // Non-demo campaigns cannot use default credentials
+  if (label === DefaultCredentialName.Telegram) {
+    throw new Error(
+      `Campaign cannot use demo credentials. ${label} is not allowed.`
+    )
+  } else {
+    // if label provided, fetch from aws secrets
+    const userCred = await CredentialService.getUserCredential(userId, label)
+
+    if (!userCred) {
+      throw new Error('User credential cannot be found')
+    }
+
+    return userCred.credName
+  }
 }
 
 /**
@@ -39,45 +98,22 @@ const getCredentialsFromLabel = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { campaignId } = req.params
+  const { campaignId } = req.params // May be undefined if invoked from settings page
   const { label } = req.body
   const userId = req.session?.user?.id
+  const logMeta = {
+    campaignId,
+    label,
+    action: 'getCredentialsFromLabel',
+  }
   try {
-    const logMeta = {
-      label,
-      action: 'getCredentialsFromLabel',
-    }
     /* Determine if credential name can be used */
-    let credentialName
-    if (label === DefaultCredentialName.Telegram) {
-      const campaign = await TelegramService.findCampaign(+campaignId, userId) // TODO: refactor this into res.locals
-      if (campaign.demoMessageLimit) {
-        credentialName = formatDefaultCredentialName(label)
-      } else {
-        logger.error({
-          message: `Campaign not allowed to use label`,
-          ...logMeta,
-        })
-        return res.status(400).json({
-          message: `Campaign ${campaignId} is not allowed to use default credentials`,
-        })
-      }
-    } else {
-      // if label provided, fetch from aws secrets
-      const userCred = await CredentialService.getUserCredential(+userId, label)
-
-      if (!userCred) {
-        logger.error({
-          message: 'User credentials not found',
-          ...logMeta,
-        })
-        return res
-          .status(400)
-          .json({ message: 'User credentials cannot be found' })
-      }
-
-      credentialName = userCred.credName
-    }
+    const campaign = campaignId
+      ? await TelegramService.findCampaign(+campaignId, userId)
+      : null
+    const credentialName = campaign?.demoMessageLimit
+      ? getDemoCredentialName(label)
+      : await getCredentialName(label, +userId)
 
     const telegramBotToken = await CredentialService.getTelegramCredential(
       credentialName
@@ -86,7 +122,11 @@ const getCredentialsFromLabel = async (
     res.locals.credentialName = botId(telegramBotToken)
     return next()
   } catch (err) {
-    return next(err)
+    logger.error({
+      ...logMeta,
+      message: `${err.stack}`,
+    })
+    return res.status(400).json({ message: `${err.message}` })
   }
 }
 
@@ -310,6 +350,47 @@ const setCampaignCredential = async (
   }
 }
 
+/**
+ *  Duplicate a campaign and its template
+ * @param req
+ * @param res
+ * @param next
+ */
+const duplicateCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const { name } = req.body
+    const campaign = await TelegramService.duplicateCampaign({
+      campaignId: +campaignId,
+      name,
+    })
+    if (!campaign) {
+      return res.status(400).json({
+        message: `Unable to duplicate campaign with these parameters`,
+      })
+    }
+    logger.info({
+      message: 'Successfully copied campaign',
+      campaignId: campaign.id,
+      action: 'duplicateCampaign',
+    })
+    return res.status(201).json({
+      id: campaign.id,
+      name: campaign.name,
+      created_at: campaign.createdAt,
+      type: campaign.type,
+      protect: campaign.protect,
+      demo_message_limit: campaign.demoMessageLimit,
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const TelegramMiddleware = {
   getCredentialsFromBody,
   getCredentialsFromLabel,
@@ -320,4 +401,6 @@ export const TelegramMiddleware = {
   validateAndStoreCredentials,
   setCampaignCredential,
   sendValidationMessage,
+  disabledForDemoCampaign,
+  duplicateCampaign,
 }

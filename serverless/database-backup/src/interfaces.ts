@@ -17,3 +17,9 @@ export interface RdsEvent {
   eventId: string
   message: string
 }
+
+export interface Cronitor {
+  run: () => Promise<void>
+  complete: () => Promise<void>
+  fail: (message?: string) => Promise<void>
+}

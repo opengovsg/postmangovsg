@@ -45,7 +45,7 @@
   background-color: $primary;
 
   .icon {
-    @include icon;
+    @extend %icon;
     color: white;
     margin-left: 0;
   }
@@ -70,7 +70,7 @@
     }
 
     i {
-      @include icon;
+      @extend %icon;
       font-size: 1.2rem;
       margin-top: 0.1rem;
       margin-left: 0.5rem;

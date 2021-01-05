@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 
 import {
   TextArea,
@@ -10,35 +17,37 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { ModalContext } from 'contexts/modal.context'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { AuthContext } from 'contexts/auth.context'
+import { CampaignContext } from 'contexts/campaign.context'
 import { useParams } from 'react-router-dom'
+import { getCustomFromAddresses } from 'services/settings.service'
 import { saveTemplate } from 'services/email.service'
+import { EmailCampaign, EmailProgress } from 'classes'
 
 import styles from './EmailTemplate.module.scss'
-import { getCustomFromAddresses } from 'services/settings.service'
 
 const EmailTemplate = ({
-  from: initialFrom,
-  subject: initialSubject,
-  body: initialBody,
-  replyTo: initialReplyTo,
-  protect,
-  onNext,
-  finishLaterCallbackRef,
+  setActiveStep,
 }: {
-  from: string
-  subject: string
-  body: string
-  replyTo: string | null
-  protect: boolean
-  onNext: (changes: any, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
-  const { setModalContent } = useContext(ModalContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
+  const { email: userEmail } = useContext(AuthContext)
+  const {
+    body: initialBody,
+    subject: initialSubject,
+    replyTo: initialReplyTo,
+    from: initialFrom,
+    protect,
+  } = campaign as EmailCampaign
+  const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
   const [subject, setSubject] = useState(initialSubject)
-  const [replyTo, setReplyTo] = useState(initialReplyTo)
+  const [replyTo, setReplyTo] = useState(
+    initialReplyTo === userEmail ? null : initialReplyTo
+  )
   const [from, setFrom] = useState(initialFrom)
   const [customFromAddresses, setCustomFromAddresses] = useState(
     [] as { label: string; value: string }[]
@@ -50,35 +59,34 @@ const EmailTemplate = ({
   const bodyPlaceholder =
     'Dear {{ name }}, your next appointment at {{ clinic }} is on {{ date }} at {{ time }}'
 
-  const handleSaveTemplate = useCallback(
-    async (propagateError = false): Promise<void> => {
-      setErrorMsg(null)
-      try {
-        if (!campaignId) {
-          throw new Error('Invalid campaign id')
-        }
-        const { updatedTemplate, numRecipients } = await saveTemplate(
-          +campaignId,
-          subject,
-          body,
-          replyTo,
-          from
-        )
-        onNext({
-          from: updatedTemplate?.from,
-          subject: updatedTemplate?.subject,
-          body: updatedTemplate?.body,
-          replyTo: updatedTemplate?.reply_to,
-          params: updatedTemplate?.params,
+  const handleSaveTemplate = useCallback(async (): Promise<void> => {
+    setErrorMsg(null)
+    try {
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
+      }
+      const { updatedTemplate, numRecipients } = await saveTemplate(
+        +campaignId,
+        subject,
+        body,
+        replyTo,
+        from
+      )
+      if (updatedTemplate) {
+        updateCampaign({
+          from: updatedTemplate.from,
+          subject: updatedTemplate.subject,
+          body: updatedTemplate.body,
+          replyTo: updatedTemplate.reply_to,
+          params: updatedTemplate.params,
           numRecipients,
         })
-      } catch (err) {
-        setErrorMsg(err.message)
-        if (propagateError) throw err
+        setActiveStep((s) => s + 1)
       }
-    },
-    [body, campaignId, from, onNext, replyTo, subject]
-  )
+    } catch (err) {
+      setErrorMsg(err.message)
+    }
+  }, [body, campaignId, from, replyTo, setActiveStep, subject, updateCampaign])
 
   async function populateFromAddresses() {
     const fromAddresses = await getCustomFromAddresses()
@@ -93,29 +101,26 @@ const EmailTemplate = ({
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
-      setModalContent(
-        <SaveDraftModal
-          saveable
-          onSave={async () => {
-            if (subject && body && from) {
-              await handleSaveTemplate(true)
-            }
-          }}
-        />
-      )
-    }
+    setFinishLaterContent(
+      <SaveDraftModal
+        saveable
+        onSave={async () => {
+          if (!campaignId) return
+          try {
+            if (!subject || !body)
+              throw new Error('Message subject or template cannot be empty!')
+            await saveTemplate(+campaignId, subject, body, replyTo, from)
+          } catch (err) {
+            setErrorMsg(err.message)
+            throw err
+          }
+        }}
+      />
+    )
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterContent(null)
     }
-  }, [
-    body,
-    finishLaterCallbackRef,
-    handleSaveTemplate,
-    subject,
-    from,
-    setModalContent,
-  ])
+  }, [body, subject, from, setFinishLaterContent, campaignId, replyTo])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
@@ -191,12 +196,8 @@ const EmailTemplate = ({
         </div>
 
         <div>
-          <h4 className={styles.replyToHeader}>
-            Replies <em>optional</em>
-          </h4>
-          <p>
-            All replies will be directed to the email address indicated below
-          </p>
+          <h4 className={styles.replyToHeader}>Replies</h4>
+          <p>If left blank, replies will be directed to {userEmail}</p>
           <TextInput
             placeholder="Enter reply-to email address"
             value={replyTo || ''}

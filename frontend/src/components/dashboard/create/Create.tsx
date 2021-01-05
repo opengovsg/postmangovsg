@@ -1,15 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import {
-  Campaign,
-  ChannelType,
-  SMSCampaign,
-  EmailCampaign,
-  TelegramCampaign,
-  Status,
-} from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import { getCampaignDetails } from 'services/campaign.service'
@@ -23,29 +18,27 @@ const Create = () => {
   const { id } = useParams()
   const history = useHistory()
 
-  const [campaign, setCampaign] = useState(new Campaign({}))
+  const { campaign, setCampaign } = useContext(CampaignContext)
+  const {
+    handleFinishLater: finishLaterContextHandler,
+    finishLaterContent,
+  } = useContext(FinishLaterModalContext)
   const [isLoading, setLoading] = useState(true)
-  const finishLaterCallbackRef: React.MutableRefObject<
-    (() => void) | undefined
-  > = useRef()
-
-  async function loadProject(id: string) {
-    const campaign = await getCampaignDetails(+id)
-    setCampaign(campaign)
-    setLoading(false)
-  }
 
   useEffect(() => {
     if (!id) return
+    async function loadProject(id: string) {
+      const campaign = await getCampaignDetails(+id)
+      setCampaign(campaign)
+      setLoading(false)
+    }
     loadProject(id)
-  }, [id])
+  }, [id, setCampaign])
 
   async function handleFinishLater() {
     if (campaign.status === Status.Draft) {
       sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
-      if (finishLaterCallbackRef.current) {
-        return finishLaterCallbackRef.current()
-      }
+      if (finishLaterContent) return finishLaterContextHandler()
     }
     history.push('/campaigns')
   }
@@ -53,29 +46,11 @@ const Create = () => {
   function renderCreateChannel() {
     switch (campaign.type) {
       case ChannelType.SMS:
-        return (
-          <SMSCreate
-            campaign={campaign as SMSCampaign}
-            onCampaignChange={setCampaign}
-            finishLaterCallbackRef={finishLaterCallbackRef}
-          />
-        )
+        return <SMSCreate />
       case ChannelType.Email:
-        return (
-          <EmailCreate
-            campaign={campaign as EmailCampaign}
-            onCampaignChange={setCampaign}
-            finishLaterCallbackRef={finishLaterCallbackRef}
-          />
-        )
+        return <EmailCreate />
       case ChannelType.Telegram:
-        return (
-          <TelegramCreate
-            campaign={campaign as TelegramCampaign}
-            onCampaignChange={setCampaign}
-            finishLaterCallbackRef={finishLaterCallbackRef}
-          />
-        )
+        return <TelegramCreate />
       default:
         return <p>Invalid Channel Type</p>
     }

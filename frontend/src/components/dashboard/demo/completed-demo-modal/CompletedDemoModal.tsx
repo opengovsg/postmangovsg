@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styles from './CompletedDemoModal.module.scss'
 import CongratsImage from 'assets/img/demo/congrats.png'
 import EndDemoImage from 'assets/img/demo/end-demo.png'
@@ -8,12 +8,15 @@ import { OutboundLink } from 'react-ga'
 import { ChannelType } from 'classes'
 import { getUserSettings } from 'services/settings.service'
 import { PrimaryButton } from 'components/common'
+import DemoVideoModal from 'components/dashboard/demo/demo-video-modal'
+import { ModalContext } from 'contexts/modal.context'
 
 const CompletedDemoModal = ({
   selectedChannel,
 }: {
   selectedChannel: ChannelType
 }) => {
+  const { setModalContent } = useContext(ModalContext)
   const [demoInfo, setDemoInfo] = useState({
     numDemosSms: 0,
     numDemosTelegram: 0,
@@ -76,17 +79,23 @@ const CompletedDemoModal = ({
     )
   }
 
+  function showDemoVideoModal() {
+    setModalContent(
+      <DemoVideoModal
+        numDemosSms={demoInfo.numDemosSms}
+        numDemosTelegram={demoInfo.numDemosTelegram}
+      />
+    )
+  }
+
   return (
     <div className={styles.content}>
       {numDemosLeft() > 0 ? renderRemainingDemos() : renderNoDemos()}
       <div className={styles.options}>
-        <OutboundLink
-          eventLabel={i18n._(LINKS.guideDemoUrl)}
-          to={i18n._(LINKS.guideDemoUrl)}
-          target="_blank"
-        >
-          <PrimaryButton>Watch tutorial</PrimaryButton>
-        </OutboundLink>
+        <PrimaryButton onClick={showDemoVideoModal}>
+          Watch tutorial
+        </PrimaryButton>
+
         <OutboundLink
           eventLabel={i18n._(LINKS.contactUsUrl)}
           to={i18n._(LINKS.contactUsUrl)}

@@ -33,6 +33,7 @@ export const LINKS = {
   guideTelegramUrl: t('link.guideTelegramUrl')``,
   guidePowerUserUrl: t('link.guidePowerUserUrl')``,
   guideDemoUrl: t('link.guideDemoUrl')``,
+  guideRemoveDuplicatesUrl: t('link.guideRemoveDuplicatesUrl')``,
   contactUsUrl: t('link.contactUsUrl')``,
   contributeUrl: t('link.contributeUrl')``,
   tncUrl: t('link.tncUrl')``,
@@ -40,6 +41,7 @@ export const LINKS = {
   reportBugUrl: t('link.reportBugUrl')``,
   customFromAddressRequestUrl: t('link.customFromAddressRequestUrl')``,
   demoTelegramBotUrl: t('link.demoTelegramBotUrl')``,
+  demoVideoUrl: t('link.demoVideoUrl')``,
 }
 export const DEFAULT_MAIL_FROM = t('defaultMailFrom')``
 // Semi-colon separated list of allowed image source hostnames
@@ -52,3 +54,21 @@ export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
 export const SENTRY_ENVIRONMENT =
   (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
+
+// `REACT_APP_ANNOUNCEMENT_ACTIVE` must be set to `true` in Amplify if we want the modal to display
+function getAnnouncementActive() {
+  const envVar = process.env.REACT_APP_ANNOUNCEMENT_ACTIVE as string
+  return envVar === 'true'
+}
+
+// Feature Launch Announcements
+// If `isActive` is false, the modal will not proc for ANY user
+export const ANNOUNCEMENT = {
+  isActive: getAnnouncementActive(),
+  version: t('announcement.version')``,
+  title: t('announcement.title')``,
+  subtext: t('announcement.subtext')``,
+  imageUrl: t('announcement.imageUrl')``,
+  buttonUrl: t('announcement.buttonUrl')``,
+  buttonText: t('announcement.buttonText')``,
+}

@@ -1,3 +1,4 @@
+import { DuplicateCampaignDetails } from '@core/interfaces/campaign.interface'
 import { EmailTemplate } from '@email/models'
 
 export interface StoreTemplateInput {
@@ -15,6 +16,17 @@ export interface StoreTemplateOutput {
   }
   valid?: boolean
 }
+
+export interface EmailDuplicateCampaignDetails
+  extends DuplicateCampaignDetails {
+  email_templates: {
+    body: string
+    subject: string
+    reply_to: string | null
+    from: string
+  }
+}
+
 /**
  * @swagger
  *  components:

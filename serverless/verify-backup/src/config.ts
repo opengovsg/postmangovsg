@@ -48,43 +48,29 @@ const config = convict({
     doc: 'Project id of the current Google Cloud Project',
     default: '',
     env: 'GCLOUD_PROJECT_ID',
-    format: 'required-string'
+    format: 'required-string',
   },
   gcloudLocationId: {
     doc: 'Location id of where the Google Cloud Bucket is hosted',
     default: '',
     env: 'GCLOUD_LOCATION_ID',
-    format: 'required-string'
+    format: 'required-string',
   },
   gcloudPrivateKeyResourceId: {
-    doc: 'Resource id of the private key from Google Cloud KMS used to decrypt db dumps',
+    doc:
+      'Resource id of the private key from Google Cloud KMS used to decrypt db dumps',
     default: '',
     env: 'GCLOUD_PRIVATE_KEY_RESOURCE_ID',
-    format: 'required-string'
+    format: 'required-string',
   },
   gcloudBackupKeyResourceId: {
-    doc: 'Resource id of the backup service account key in Google Cloud Secrets Manager',
+    doc:
+      'Resource id of the backup service account key in Google Cloud Secrets Manager',
     default: '',
     env: 'GCLOUD_BACKUP_KEY_RESOURCE_ID',
-    format: 'required-string'
-  }
+    format: 'required-string',
+  },
 })
-
-// Only development is a non-production environment
-// Override with local config
-if (config.get('env') === 'development') {
-  config.load({
-    database: {
-      dialectOptions: {
-        ssl: {
-          require: false, // No ssl connection needed
-          rejectUnauthorized: true,
-          ca: false,
-        },
-      },
-    },
-  })
-}
 
 config.validate({ allowed: 'strict' })
 

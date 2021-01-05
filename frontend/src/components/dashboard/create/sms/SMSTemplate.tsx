@@ -1,5 +1,15 @@
-import React, { useState, useCallback, useEffect, useContext } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
+import { useParams } from 'react-router-dom'
 
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   TextArea,
   NextButton,
@@ -8,22 +18,19 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { ModalContext } from 'contexts/modal.context'
-import { useParams } from 'react-router-dom'
 import { exceedsCharacterThreshold, saveTemplate } from 'services/sms.service'
+import { SMSProgress } from 'classes'
+
 import styles from '../Create.module.scss'
 
 const SMSTemplate = ({
-  body: initialBody,
-  onNext,
-  finishLaterCallbackRef,
+  setActiveStep,
 }: {
-  body: string
-  onNext: (changes: any, next?: boolean) => void
-  finishLaterCallbackRef: React.MutableRefObject<(() => void) | undefined>
+  setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
-  const { setModalContent } = useContext(ModalContext)
-  const [body, setBody] = useState(replaceNewLines(initialBody))
+  const { campaign, updateCampaign } = useContext(CampaignContext)
+  const { setFinishLaterContent } = useContext(FinishLaterModalContext)
+  const [body, setBody] = useState(replaceNewLines(campaign.body))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams()
 
@@ -44,46 +51,50 @@ const SMSTemplate = ({
     }
   }, [body])
 
-  const handleSaveTemplate = useCallback(
-    async (propagateError = false): Promise<void> => {
-      setErrorMsg(null)
-      try {
-        if (!campaignId) {
-          throw new Error('Invalid campaign id')
-        }
-        const { updatedTemplate, numRecipients } = await saveTemplate(
-          +campaignId,
-          body
-        )
-        onNext({
-          body: updatedTemplate?.body,
-          params: updatedTemplate?.params,
+  const handleSaveTemplate = useCallback(async (): Promise<void> => {
+    setErrorMsg(null)
+    try {
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
+      }
+      const { updatedTemplate, numRecipients } = await saveTemplate(
+        +campaignId,
+        body
+      )
+      if (updatedTemplate) {
+        updateCampaign({
+          body: updatedTemplate.body,
+          params: updatedTemplate.params,
           numRecipients,
         })
-      } catch (err) {
-        setErrorMsg(err.message)
-        if (propagateError) throw err
+        setActiveStep((s) => s + 1)
       }
-    },
-    [body, campaignId, onNext]
-  )
+    } catch (err) {
+      setErrorMsg(err.message)
+    }
+  }, [body, campaignId, setActiveStep, updateCampaign])
 
   // Set callback for finish later button
   useEffect(() => {
-    finishLaterCallbackRef.current = () => {
-      setModalContent(
-        <SaveDraftModal
-          saveable
-          onSave={async () => {
-            if (body) await handleSaveTemplate(true)
-          }}
-        />
-      )
-    }
+    setFinishLaterContent(
+      <SaveDraftModal
+        saveable
+        onSave={async () => {
+          if (!campaignId) return
+          try {
+            if (!body) throw new Error('Message template cannot be empty!')
+            await saveTemplate(+campaignId, body)
+          } catch (err) {
+            setErrorMsg(err.message)
+            throw err
+          }
+        }}
+      />
+    )
     return () => {
-      finishLaterCallbackRef.current = undefined
+      setFinishLaterContent(null)
     }
-  }, [body, finishLaterCallbackRef, handleSaveTemplate, setModalContent])
+  }, [body, campaignId, setFinishLaterContent])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')

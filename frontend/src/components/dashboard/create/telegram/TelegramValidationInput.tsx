@@ -17,7 +17,6 @@ const TelegramValidationInput = ({
 
   async function onClickHandler() {
     await onClick(recipient)
-    setRecipient('')
   }
 
   return (

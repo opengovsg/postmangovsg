@@ -1,7 +1,14 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Status, ChannelType } from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import { Status, ChannelType, SMSProgress } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -20,14 +27,12 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import styles from '../Create.module.scss'
 
 const SMSSend = ({
-  numRecipients,
-  onNext,
-  onPrevious,
+  setActiveStep,
 }: {
-  numRecipients: number
-  onNext: Function
-  onPrevious: () => void
+  setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
+  const { campaign, updateCampaign } = useContext(CampaignContext)
+  const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')
@@ -57,7 +62,7 @@ const SMSSend = ({
     if (sendRate) {
       sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, ChannelType.SMS)
     }
-    onNext({ status: Status.Sending }, false)
+    updateCampaign({ status: Status.Sending })
   }
 
   const openModal = () => {
@@ -106,7 +111,9 @@ const SMSSend = ({
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-        <TextButton onClick={onPrevious}>Previous</TextButton>
+        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
+          Previous
+        </TextButton>
       </ButtonGroup>
     </>
   )

@@ -20,6 +20,7 @@ import moeAgencyImg from 'assets/img/landing/moe-gray.png'
 import momAgencyImg from 'assets/img/landing/mom-gray.png'
 
 import userImg from 'assets/img/landing/moe-circle.png'
+import channelsImg from 'assets/img/landing/channels.png'
 
 import onboardingImg from 'assets/img/landing/onboard.svg'
 import landingHeroImg from 'assets/img/landing/landing-hero.png'
@@ -35,15 +36,22 @@ import { i18n } from 'locales'
 const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 
 const Landing = () => {
-  const authContext = useContext(AuthContext)
+  const { isAuthenticated } = useContext(AuthContext)
   const [sentMessages, setSentMessages] = useState('0')
   const history = useHistory()
 
   useEffect(() => {
+    if (isAuthenticated) return
+    async function getSentMessages() {
+      const stats = await getLandingStats()
+      if (stats) {
+        setSentMessages(stats.toLocaleString())
+      }
+    }
     getSentMessages()
-  }, [])
+  }, [isAuthenticated])
 
-  if (authContext.isAuthenticated) {
+  if (isAuthenticated) {
     return <Redirect to="/campaigns"></Redirect>
   }
 
@@ -138,13 +146,6 @@ const Landing = () => {
     },
   ]
 
-  async function getSentMessages() {
-    const stats = await getLandingStats()
-    if (stats) {
-      setSentMessages(stats.toLocaleString())
-    }
-  }
-
   return (
     <div className={styles.landing}>
       <Banner></Banner>
@@ -204,6 +205,51 @@ const Landing = () => {
             {trustedAgencies.map((agency) => (
               <img src={agency.img} alt={agency.alt} key={agency.img} />
             ))}
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.channelContainer}>
+        <div className={styles.innerContainer}>
+          <div className={styles.channelImg}>
+            <img src={channelsImg} alt="Channels" />
+          </div>
+          <div className={styles.channelDescription}>
+            <span>CHANNELS</span>
+
+            <h4 className={styles.new}>Telegram</h4>
+            <p>
+              Telegram is the #1 messaging app for Singaporeans aged 35 and
+              under. Engage your subscribers regularly through our Telegram bot
+              broadcasting feature. You can easily send private messages to your
+              agency employees for a fitness event or engage citizens for a
+              donation drive.
+            </p>
+
+            <h4>Email</h4>
+            <p>
+              Go digital and send personalized emails. No more letterheads and
+              stamps. Use our password-protected feature to send sensitive
+              information like a payslip or personal PIN to your recipients.
+            </p>
+
+            <h4>SMS</h4>
+            <p>
+              Move away from calling. Send transactional SMS easily through our
+              Twilio integration. Remind citizens to come for their
+              appointments. The possibilities are endless.
+            </p>
+
+            <OutboundLink
+              className={styles.link}
+              eventLabel={i18n._(LINKS.guideUrl)}
+              to={i18n._(LINKS.guideUrl)}
+              target="_blank"
+            >
+              <PrimaryButton className={styles.button}>
+                Learn More <i className="bx bx-right-arrow-alt"></i>
+              </PrimaryButton>
+            </OutboundLink>
           </div>
         </div>
       </div>

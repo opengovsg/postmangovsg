@@ -1,0 +1,44 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.content {
+  @include flex-vertical;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: $spacing-3;
+}
+
+.helpText {
+  @extend %body-1;
+  margin-top: $spacing-5;
+  a {
+    font-size: inherit;
+    font-weight: 500;
+    color: $primary;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+.options {
+  @include flex-horizontal;
+
+  button {
+    margin-top: $spacing-4;
+    margin-right: $spacing-4;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  @include mobile() {
+    @include flex-vertical;
+    button {
+      margin-right: 0;
+    }
+  }
+}

@@ -20,7 +20,7 @@ const InfoBlock = ({
   return (
     <MessageBlock
       className={cx(styles.infoBlock, className)}
-      icon="bx bx-error-circle"
+      icon="bx bx-info-circle"
       absolute={absolute}
       onClose={onClose}
       title={title}

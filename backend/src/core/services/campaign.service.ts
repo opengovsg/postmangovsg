@@ -70,7 +70,48 @@ const createDemoCampaign = async ({
 /**
  * Helper method to create a campaign
  */
-const createCampaign = ({
+const createCampaign = async ({
+  name,
+  type,
+  userId,
+  protect,
+  demoMessageLimit,
+  transaction,
+}: {
+  name: string
+  type: string
+  userId: number
+  protect: boolean
+  demoMessageLimit: number | null
+  transaction: Transaction
+}): Promise<Campaign | void> => {
+  const isDemo = Boolean(demoMessageLimit) // demoMessageLimit is not null, undefined, or 0
+  let campaign
+  if (isDemo) {
+    campaign = await createDemoCampaign({
+      name,
+      type,
+      userId,
+      protect,
+      demoMessageLimit,
+      transaction,
+    })
+  } else {
+    campaign = await Campaign.create(
+      {
+        name,
+        type,
+        userId,
+        valid: false,
+        protect,
+      },
+      { transaction }
+    )
+  }
+  return campaign
+}
+
+const createCampaignWithTransaction = async ({
   name,
   type,
   userId,
@@ -82,30 +123,18 @@ const createCampaign = ({
   userId: number
   protect: boolean
   demoMessageLimit: number | null
-}): Promise<Campaign | void> | undefined => {
-  const result = Campaign.sequelize?.transaction(async (transaction) => {
-    const isDemo = Boolean(demoMessageLimit) // demoMessageLimit is not null, undefined, or 0
-    return isDemo
-      ? createDemoCampaign({
-          transaction,
-          name,
-          type,
-          userId,
-          protect,
-          demoMessageLimit,
-        })
-      : Campaign.create(
-          {
-            name,
-            type,
-            userId,
-            valid: false,
-            protect,
-          },
-          { transaction }
-        )
+}): Promise<Campaign | void> => {
+  return Campaign.sequelize?.transaction(async (transaction) => {
+    const campaign = await createCampaign({
+      name,
+      type,
+      userId,
+      protect,
+      demoMessageLimit,
+      transaction,
+    })
+    return campaign
   })
-  return result
 }
 
 /**
@@ -282,6 +311,7 @@ const setValid = (
 export const CampaignService = {
   hasJobInProgress,
   createCampaign,
+  createCampaignWithTransaction,
   listCampaigns,
   getCampaignDetails,
   setInvalid,

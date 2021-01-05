@@ -258,25 +258,25 @@ const config = convict({
     host: {
       doc: 'Amazon SES SMTP endpoint.',
       default: '',
-      env: 'SES_HOST',
+      env: 'BACKEND_SES_HOST',
     },
     port: {
       doc: 'Amazon SES SMTP port, defaults to 465',
       default: 465,
-      env: 'SES_PORT',
+      env: 'BACKEND_SES_PORT',
       format: 'int',
     },
     auth: {
       user: {
         doc: 'SMTP username',
         default: '',
-        env: 'SES_USER',
+        env: 'BACKEND_SES_USER',
         sensitive: true,
       },
       pass: {
         doc: 'SMTP password',
         default: '',
-        env: 'SES_PASS',
+        env: 'BACKEND_SES_PASS',
         sensitive: true,
       },
     },
@@ -284,7 +284,7 @@ const config = convict({
   mailFrom: {
     doc: 'The email address that appears in the From field of an email',
     default: '',
-    env: 'SES_FROM',
+    env: 'BACKEND_SES_FROM',
   },
   mailDefaultRate: {
     doc: 'The default rate at which an email campaign will be sent',

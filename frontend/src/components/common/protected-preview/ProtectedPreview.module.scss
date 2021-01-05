@@ -1,9 +1,13 @@
+@import 'styles/_mixins';
 @import 'styles/_variables';
 
+.container {
+  padding: $spacing-6;
+}
+
 .preview {
-  display: block;
-  width: 500px;
-  max-width: 90vw;
+  @extend %body-2;
+  width: 100%;
 
   /**
   * IMPORTANT!!!
@@ -26,53 +30,45 @@
     h5,
     h6 {
       margin: 0;
-      margin-block-start: 0;
-      margin-block-end: 0;
-      font-weight: normal;
     }
 
-    h1 {
-      font-size: 1.5rem;
-    }
-
-    h2 {
-      font-size: 1.25rem;
+    hr {
+      border: none;
+      border-bottom: 1px solid adjust-color($primary-light, $alpha: -0.5);
+      margin: $layout-3 0;
     }
 
     code {
       font-family: $monospace-font-stack;
     }
 
-    hr {
-      display: block;
-      height: 1px;
-      border: 0;
-      padding: 0;
-      margin: 0;
-      border-top: 1px solid $transparent-dark-blue;
-    }
-
-    a {
-      font-size: 1rem;
-    }
-
     // Override table css from app.scss
     table {
       width: 100%;
       border-collapse: collapse;
+
       tr {
-        display: table-row;
-        border-bottom: 1px solid $transparent-dark-blue;
+        @include flex-horizontal;
 
         td,
         th {
-          display: table-cell;
+          display: flex;
+          flex: 1;
         }
 
-        &:last-child {
-          border-bottom: none;
+        th {
+          @extend %caption;
         }
       }
+
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+    }
+
+    // Override app.scss
+    ul {
+      list-style: disc;
     }
 
     // Remove bottom margin from p tags
@@ -80,5 +76,18 @@
       margin-block-end: 0;
       margin-bottom: 0;
     }
+  }
+}
+
+.footer {
+  @include flex-horizontal;
+  @extend %body-2;
+  color: $neutral;
+  justify-content: center;
+  width: 100%;
+  padding: $layout-5 0 $spacing-6 0;
+
+  .caption {
+    margin-right: $spacing-3;
   }
 }

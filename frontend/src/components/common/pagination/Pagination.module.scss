@@ -9,7 +9,7 @@
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
   color: $secondary;
   vertical-align: middle;
   cursor: pointer;

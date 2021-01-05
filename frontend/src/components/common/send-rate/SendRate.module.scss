@@ -7,7 +7,7 @@
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
   font-size: 0.8rem;
   margin-left: 0.5rem;
   transition: transform 0.3s ease-out;

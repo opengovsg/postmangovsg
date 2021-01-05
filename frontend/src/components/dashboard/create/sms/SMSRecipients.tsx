@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, {
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  useContext,
+} from 'react'
 import { useParams } from 'react-router-dom'
+import { OutboundLink } from 'react-ga'
 
 import {
   uploadFileToS3,
@@ -16,32 +23,35 @@ import {
   SampleCsv,
   ButtonGroup,
   TextButton,
-  StepHeader,
   StepSection,
+  StepHeader,
   InfoBlock,
+  WarningBlock,
 } from 'components/common'
-import { SMSCampaign, SMSPreview } from 'classes'
+import { LINKS } from 'config'
+import { i18n } from 'locales'
+import { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
+import { CampaignContext } from 'contexts/campaign.context'
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
 import styles from '../Create.module.scss'
 
 const SMSRecipients = ({
-  csvFilename: initialCsvFilename,
-  numRecipients: initialNumRecipients,
-  params,
-  isProcessing: initialIsProcessing,
-  isDemo,
-  onNext,
-  onPrevious,
+  setActiveStep,
 }: {
-  csvFilename: string
-  numRecipients: number
-  params: Array<string>
-  isProcessing: boolean
-  isDemo: boolean
-  onNext: (changes: Partial<SMSCampaign>, next?: boolean) => void
-  onPrevious: () => void
+  setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
+  const { campaign, updateCampaign } = useContext(CampaignContext)
+  const {
+    isCsvProcessing: initialIsProcessing,
+    numRecipients: initialNumRecipients,
+    csvFilename: initialCsvFilename,
+    demoMessageLimit,
+    params,
+  } = campaign as SMSCampaign
+  const isDemo = !!demoMessageLimit
+
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
@@ -55,6 +65,7 @@ const SMSRecipients = ({
   const { id: campaignId } = useParams()
 
   const { csvFilename, numRecipients = 0 } = csvInfo
+  const isMounted = useIsMounted()
 
   // Poll csv status
   useEffect(() => {
@@ -66,6 +77,9 @@ const SMSRecipients = ({
         const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
           +campaignId
         )
+        // Prevent setting state if unmounted
+        if (!isMounted.current) return
+
         setIsCsvProcessing(isCsvProcessing)
         setCsvInfo(newCsvInfo)
         if (preview) {
@@ -84,12 +98,12 @@ const SMSRecipients = ({
     pollStatus()
 
     return () => clearTimeout(timeoutId)
-  }, [campaignId, isCsvProcessing])
+  }, [campaignId, isCsvProcessing, isMounted])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
-  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
+    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
+  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
   // Handle file upload
   async function uploadFile(files: File[]) {
@@ -107,6 +121,11 @@ const SMSRecipients = ({
 
       const uploadTimeEnd = performance.now()
       sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
+
+      // Prevent setting state if unmounted
+      if (!isMounted.current) {
+        return
+      }
 
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename }))
@@ -142,6 +161,19 @@ const SMSRecipients = ({
           </p>
         </StepHeader>
 
+        {!csvFilename && (
+          <WarningBlock title={'We do not remove duplicate recipients'}>
+            <OutboundLink
+              className={styles.warningHelpLink}
+              eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              target="_blank"
+            >
+              Learn how to remove duplicates in your excel from our guide.
+            </OutboundLink>
+          </WarningBlock>
+        )}
+
         <CsvUpload
           isCsvProcessing={isCsvProcessing}
           csvInfo={csvInfo}
@@ -176,9 +208,14 @@ const SMSRecipients = ({
       <ButtonGroup>
         <NextButton
           disabled={!numRecipients || !csvFilename}
-          onClick={onNext}
+          onClick={() => setActiveStep((s) => s + 1)}
         />
-        <TextButton onClick={onPrevious}>Previous</TextButton>
+        <TextButton
+          disabled={isCsvProcessing}
+          onClick={() => setActiveStep((s) => s - 1)}
+        >
+          Previous
+        </TextButton>
       </ButtonGroup>
     </>
   )

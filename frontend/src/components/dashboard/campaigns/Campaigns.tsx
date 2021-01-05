@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -15,7 +15,7 @@ import {
 } from 'components/common'
 import { getCampaigns } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import { Campaign, channelIcons, Status } from 'classes'
+import { Campaign, channelIcons, ChannelType, Status } from 'classes'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
@@ -24,6 +24,10 @@ import styles from './Campaigns.module.scss'
 import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
+import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
+import AnnouncementModal from './announcement-modal'
+import { i18n } from 'locales'
+import { ANNOUNCEMENT } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -63,19 +67,61 @@ const Campaigns = () => {
     setLoading(false)
   }
 
+  // Returns true if lastSeenVersion < currentPackageVersion, else false
+  function compareSemver(
+    lastSeenVersion: string,
+    currentPackageVersion: string
+  ) {
+    if (!lastSeenVersion) {
+      return true
+    }
+    const lastSeenSplit = lastSeenVersion
+      .split('.')
+      .map((num) => parseInt(num, 10))
+    const currentSplit = currentPackageVersion
+      .split('.')
+      .map((num) => parseInt(num, 10))
+    for (let i = 0; i < 3; i++) {
+      if (lastSeenSplit[i] < currentSplit[i]) {
+        return true
+      }
+      if (lastSeenSplit[i] > currentSplit[i]) {
+        return false
+      }
+    }
+    return false
+  }
+
+  // Only call the modalContext if content is currently null - prevents infinite re-rendering
+  // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
+  const displayNewAnnouncement = useCallback(
+    (userAnnouncementVersion: string) => {
+      if (
+        ANNOUNCEMENT.isActive &&
+        compareSemver(userAnnouncementVersion, i18n._(ANNOUNCEMENT.version)) &&
+        modalContext.modalContent === null
+      ) {
+        modalContext.setModalContent(<AnnouncementModal />)
+      }
+    },
+    [modalContext]
+  )
+
   useEffect(() => {
     fetchCampaigns(selectedPage)
   }, [selectedPage])
 
   useEffect(() => {
-    async function getNumDemos() {
-      const { demo } = await getUserSettings()
+    // TODO: refactor out num demos processing
+    async function getNumDemosAndAnnouncementVersion() {
+      const { demo, announcementVersion } = await getUserSettings()
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
+      displayNewAnnouncement(announcementVersion)
     }
-    getNumDemos()
-  }, [])
+    getNumDemosAndAnnouncementVersion()
+  }, [displayNewAnnouncement])
 
   /* eslint-disable react/display-name */
   const headers = [
@@ -83,7 +129,14 @@ const Campaigns = () => {
       name: 'Mode',
       render: (campaign: Campaign) => (
         <div className={styles.iconContainer}>
-          <i className={cx('bx', styles.icon, channelIcons[campaign.type])}></i>
+          <i
+            className={cx(
+              'bx',
+              styles.icon,
+              styles.mode,
+              channelIcons[campaign.type]
+            )}
+          ></i>
           {campaign.protect && (
             <i className={cx('bx bxs-lock-alt', styles.lockIcon)}></i>
           )}
@@ -102,7 +155,7 @@ const Campaigns = () => {
           {campaign.name}
         </span>
       ),
-      width: 'md ellipsis',
+      width: 'lg ellipsis',
     },
     {
       name: 'Created At',
@@ -127,7 +180,7 @@ const Campaigns = () => {
       width: 'xs center',
     },
     {
-      name: 'Export',
+      name: '',
       render: (campaign: Campaign) => {
         if (campaign.status === Status.Draft) return
         if (campaign.redacted) {
@@ -150,7 +203,35 @@ const Campaigns = () => {
           />
         )
       },
-      width: 'md center',
+      width: 'sm center',
+    },
+    {
+      name: '',
+      render: (campaign: Campaign) => {
+        if (
+          campaign.demoMessageLimit &&
+          ((numDemosSms === 0 && campaign.type === ChannelType.SMS) ||
+            (numDemosTelegram === 0 && campaign.type === ChannelType.Telegram))
+        ) {
+          return
+        }
+        return (
+          <div
+            className={cx(styles.iconContainer, styles.duplicate)}
+            onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+              event.stopPropagation()
+              sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
+              modalContext.setModalContent(
+                <DuplicateCampaignModal campaign={campaign} />
+              )
+            }}
+          >
+            <i className={cx('bx bx-duplicate', styles.icon)}></i>{' '}
+            <span>Duplicate</span>
+          </div>
+        )
+      },
+      width: 'sm center',
     },
   ]
   /* eslint-enable react/display-name */
@@ -158,8 +239,8 @@ const Campaigns = () => {
   function renderRow(campaign: Campaign, key: number) {
     return (
       <tr key={key} onClick={() => history.push(`/campaigns/${campaign.id}`)}>
-        {headers.map(({ render, width, name }) => (
-          <td className={width} key={name}>
+        {headers.map(({ render, width }, key) => (
+          <td className={width} key={key}>
             {render(campaign)}
           </td>
         ))}
@@ -218,8 +299,8 @@ const Campaigns = () => {
           <table className={styles.campaignTable}>
             <thead>
               <tr>
-                {headers.map(({ name, width }) => (
-                  <th className={width} key={name}>
+                {headers.map(({ name, width }, key) => (
+                  <th className={width} key={key}>
                     {name}
                   </th>
                 ))}
@@ -250,11 +331,13 @@ const Campaigns = () => {
           Create new campaign
         </PrimaryButton>
       </TitleBar>
-      <DemoBar
-        numDemosSms={numDemosSms}
-        numDemosTelegram={numDemosTelegram}
-        isDisplayed={isDemoDisplayed}
-      />
+      {campaignCount > 0 && (
+        <DemoBar
+          numDemosSms={numDemosSms}
+          numDemosTelegram={numDemosTelegram}
+          isDisplayed={isDemoDisplayed}
+        />
+      )}
       <div className={styles.content}>
         {isLoading ? (
           <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>

@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 
 import styles from './ProtectedPreview.module.scss'
+import appLogo from 'assets/img/brand/app-logo-grey.svg'
 
 /**
  * For breaking changes to styles, a new css class must be
@@ -17,10 +18,16 @@ const ProtectedPreview = ({
   style?: string
 }) => {
   return (
-    <div
-      className={cx(styles.preview, styles[style])}
-      dangerouslySetInnerHTML={{ __html: html }}
-    ></div>
+    <div className={styles.container}>
+      <div
+        className={cx(styles.preview, styles[style])}
+        dangerouslySetInnerHTML={{ __html: html }}
+      ></div>
+      <div className={styles.footer}>
+        <span className={styles.caption}>Delivered by</span>
+        <img src={appLogo} alt="Postman logo" />
+      </div>
+    </div>
   )
 }
 

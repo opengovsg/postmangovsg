@@ -232,6 +232,84 @@ $section-vertical-padding: 4rem;
   }
 }
 
+.channelContainer {
+  @include flex-horizontal;
+  background-color: $secondary;
+  height: auto;
+  padding: $layout-6;
+  min-height: 100vh;
+  margin: auto;
+
+  @include mobile() {
+    padding: $section-vertical-padding $layout-3;
+  }
+
+  .innerContainer {
+    @include fixWidth(1100px);
+    @include flex-horizontal;
+
+    .channelDescription {
+      span {
+        @extend %caption;
+        display: block;
+        color: $white;
+        letter-spacing: 1.5px;
+        margin-bottom: $spacing-7;
+      }
+
+      p {
+        @extend %subtitle-1;
+        color: $neutral-light;
+      }
+      h4 {
+        color: $primary-light;
+        margin-bottom: $spacing-3;
+      }
+
+      .new::after {
+        content: 'NEW';
+        background: $red;
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 0.3rem;
+        text-align: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-left: $spacing-3;
+        letter-spacing: 1.5px;
+      }
+
+      .button {
+        @extend %outline-btn;
+        border-color: $white;
+        color: $white;
+        margin-top: $layout-5;
+
+        &:hover {
+          background-color: $transparent-white;
+        }
+
+        &:active {
+          background-color: $white;
+          color: $secondary;
+
+          i {
+            color: $secondary;
+          }
+        }
+      }
+    }
+
+    .channelImg {
+      margin-right: $layout-6;
+
+      @include mobile() {
+        display: none;
+      }
+    }
+  }
+}
+
 .whyUsePostman {
   padding: $section-vertical-padding $site-padding;
   @include mobile() {

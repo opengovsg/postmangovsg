@@ -82,7 +82,6 @@ export async function decrypt() {
   )
   decipher.setAuthTag(Buffer.from(dumpParams.authTag, 'base64'))
 
-
   await pipeline(inputFileStream, decipher, outputFileStream)
   console.log(`Success: ${encryptedDumpFile} decrypted to ${decryptedDumpFile}`)
 }

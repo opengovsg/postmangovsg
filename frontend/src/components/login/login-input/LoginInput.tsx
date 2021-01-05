@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import cx from 'classnames'
 import { noop } from 'lodash'
-import { TextInputWithButton, ErrorBlock, TextButton } from 'components/common'
+import { TextInputWithButton, TextButton } from 'components/common'
 import {
   getOtpWithEmail,
   loginWithOtp,
@@ -33,6 +33,11 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState(null)
   const [canResend, setCanResend] = useState(false)
   const [isResending, setIsResending] = useState(false)
+  let timeoutId: NodeJS.Timeout
+
+  useEffect(() => {
+    return () => timeoutId && clearTimeout(timeoutId)
+  })
 
   async function sendOtp() {
     resetButton()
@@ -40,7 +45,7 @@ const Login = () => {
       await getOtpWithEmail(email)
       setOtpSent(true)
       // Show resend button after wait time
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setCanResend(true)
       }, RESEND_WAIT_TIME)
     } catch (err) {
@@ -79,7 +84,7 @@ const Login = () => {
 
   return (
     <div className={styles.container}>
-      <h4 className={styles.text}>
+      <h3 className={styles.text}>
         {!otpSent ? (
           <Trans>Sign in with your gov.sg email</Trans>
         ) : (
@@ -98,7 +103,7 @@ const Login = () => {
             )}
           </TextButton>
         )}
-      </h4>
+      </h3>
 
       {!otpSent ? (
         <TextInputWithButton
@@ -110,6 +115,7 @@ const Login = () => {
           onClick={sendOtp}
           buttonLabel={<Trans>Get OTP</Trans>}
           loadingButtonLabel={<Trans>Sending OTP...</Trans>}
+          errorMessage={errorMsg}
         />
       ) : (
         <TextInputWithButton
@@ -121,9 +127,9 @@ const Login = () => {
           onClick={login}
           buttonLabel={<Trans>Sign In</Trans>}
           loadingButtonLabel={<Trans>Verifying OTP...</Trans>}
+          errorMessage={errorMsg}
         />
       )}
-      <ErrorBlock absolute={true}>{errorMsg}</ErrorBlock>
     </div>
   )
 }

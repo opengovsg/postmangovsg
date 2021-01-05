@@ -1,4 +1,6 @@
 # Serverless
+See [verify-backup-docs](verify-backup/README.md) for details on `verify-backup`
+
 The serverless functions are deployed onto Lambda, and called via API Gateway. 
 
 * [Postman API Gateway Authorizer](#postman-api-gateway-authorizer)

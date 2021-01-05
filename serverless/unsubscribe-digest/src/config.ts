@@ -153,6 +153,13 @@ const config = convict({
       env: 'AWS_REGION',
     },
   },
+  cronitor: {
+    code: {
+      doc: 'Unique cronitor code',
+      default: '',
+      env: 'CRONITOR_CODE',
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name

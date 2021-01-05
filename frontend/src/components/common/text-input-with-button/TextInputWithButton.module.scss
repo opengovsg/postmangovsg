@@ -6,7 +6,6 @@ $button-width: 7rem;
   width: 100%;
   box-sizing: border-box;
   display: flex;
-  margin: 2rem 0;
 
   input.textInput {
     width: 100%;
@@ -14,10 +13,20 @@ $button-width: 7rem;
     margin-right: -$button-height;
     padding-right: $button-height + 0.5rem;
   }
+
+  input.textInput.error {
+    border-color: $error;
+  }
 }
 
 .inputButton {
   min-width: $button-width;
   flex-grow: 1;
   flex-shrink: 0;
+}
+
+.errorMessage {
+  @extend %caption;
+  padding-left: $border-radius;
+  color: $error;
 }

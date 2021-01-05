@@ -13,7 +13,7 @@
 }
 
 .icon {
-  @include icon;
+  @extend %icon;
 }
 
 .title {
@@ -31,10 +31,8 @@
 
 .options {
   @include flex-horizontal;
-  @include mobile() {
-    @include flex-vertical;
-  }
-  a {
+
+  button {
     margin-top: $spacing-4;
     margin-right: $spacing-4;
     &:last-child {
@@ -45,6 +43,12 @@
     @extend %outline-btn;
     &:hover {
       background-color: $neutral;
+    }
+  }
+  @include mobile() {
+    @include flex-vertical;
+    button {
+      margin-right: 0;
     }
   }
 }

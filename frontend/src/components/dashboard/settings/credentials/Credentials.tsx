@@ -96,7 +96,7 @@ const Credentials = ({
   return (
     <>
       <div className={styles.credHeader}>
-        <h2>{title}</h2>
+        <h3>{title}</h3>
         <PrimaryButton
           className={styles.blueButton}
           onClick={onAddCredentialClicked}

@@ -145,7 +145,7 @@ const ExportRecipients = ({
         return (
           <>
             <i className={cx(styles.icon, 'bx bx-loader-alt bx-spin')}></i>
-            <span>Delivery report</span>
+            <span>Report</span>
           </>
         )
       case CampaignExportStatus.Unavailable:
@@ -153,7 +153,7 @@ const ExportRecipients = ({
         return (
           <>
             <i className={cx(styles.icon, 'bx bx-download')}></i>
-            <span>Delivery report</span>
+            <span>Report</span>
           </>
         )
     }

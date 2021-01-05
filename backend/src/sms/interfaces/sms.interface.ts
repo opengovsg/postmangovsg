@@ -1,3 +1,4 @@
+import { DuplicateCampaignDetails } from '@core/interfaces/campaign.interface'
 import { SmsTemplate } from '@sms/models'
 
 export interface StoreTemplateInput {
@@ -11,6 +12,12 @@ export interface StoreTemplateOutput {
     extraKeys?: string[]
   }
   valid?: boolean
+}
+
+export interface SmsDuplicateCampaignDetails extends DuplicateCampaignDetails {
+  sms_templates: {
+    body: string
+  }
 }
 
 /**

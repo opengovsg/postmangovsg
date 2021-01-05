@@ -27,6 +27,34 @@ const demoDisplayedValidator = {
   }),
 }
 
+// Only allow updating with versions less than or equal to the current package version
+const compareSemverMethod = (value: string, helpers: any) => {
+  const currentPackageVersion = process.env.npm_package_version
+  const updatingVersion = value
+
+  const currentSplit = currentPackageVersion
+    ?.split('.')
+    .map((num) => parseInt(num, 10))
+  const updatingSplit = updatingVersion
+    .split('.')
+    .map((num) => parseInt(num, 10))
+  for (let i = 0; i < 3; i++) {
+    if ((!currentSplit || currentSplit[i]) < updatingSplit[i]) {
+      return helpers.error('any.invalid')
+    }
+  }
+  return value
+}
+
+const updateAnnouncementVersionValidator = {
+  [Segments.BODY]: Joi.object({
+    announcement_version: Joi.string()
+      .pattern(new RegExp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}'))
+      .custom(compareSemverMethod)
+      .required(),
+  }),
+}
+
 /**
  * @swagger
  * path:
@@ -182,6 +210,46 @@ router.put(
   '/demo',
   celebrate(demoDisplayedValidator),
   SettingsMiddleware.updateDemoDisplayed
+)
+
+/**
+ * @swagger
+ * path:
+ *  /settings/announcement-version:
+ *    put:
+ *       tags:
+ *         - Settings
+ *       summary: Update announcement version for this user
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 announcement_version:
+ *                   type: string
+ *       responses:
+ *         "200":
+ *           description: Success
+ *           content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  announcement_version:
+ *                    type: number
+ *         "400":
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.put(
+  '/announcement-version',
+  celebrate(updateAnnouncementVersionValidator),
+  SettingsMiddleware.updateAnnouncementVersion
 )
 
 export default router

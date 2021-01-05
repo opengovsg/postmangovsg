@@ -4,7 +4,7 @@ import cx from 'classnames'
 import {
   TextInputWithButton,
   ConfirmModal,
-  ErrorBlock,
+  StepHeader,
 } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { regenerateApiKey } from 'services/settings.service'
@@ -46,12 +46,14 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
   useEffect(() => {
     if (apiKeyState !== ApiKeyState.COPIED) return
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setApiKeyState(ApiKeyState.COPY)
 
       if (!apiKeyRef.current) return
       apiKeyRef.current.blur()
     }, RESET_COPY_TIMEOUT)
+
+    return () => clearTimeout(timeoutId)
   }, [apiKeyState])
 
   async function onButtonClick() {
@@ -124,12 +126,13 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
 
   return (
     <>
-      <h2>API Key</h2>
-      <p className={styles.helpText}>
-        After generating your API key, please make a copy of it immediately as
-        it will only be shown once. Upon leaving or refreshing this page, the
-        key will be hidden.
-      </p>
+      <StepHeader title="API Key">
+        <p className={styles.helpText}>
+          After generating your API key, please make a copy of it immediately as
+          it will only be shown once. Upon leaving or refreshing this page, the
+          key will be hidden.
+        </p>
+      </StepHeader>
       <TextInputWithButton
         value={apiKey}
         onChange={() => {
@@ -138,6 +141,7 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
         onClick={onButtonClick}
         className={buttonClass}
         textRef={apiKeyRef}
+        errorMessage={errorMsg}
         buttonLabel={
           <>
             {buttonLabel} API key
@@ -145,7 +149,6 @@ const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
           </>
         }
       />
-      <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )
 }

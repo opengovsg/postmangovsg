@@ -3,7 +3,11 @@ import { difference, keys } from 'lodash'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
+import {
+  TemplateClient,
+  XSS_EMAIL_OPTION,
+  TemplateError,
+} from 'postman-templating'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
@@ -162,9 +166,16 @@ const storeTemplate = async ({
   from,
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
+  const sanitizedSubject = client.replaceNewLinesAndSanitize(subject)
+  const sanitizedBody = client.replaceNewLinesAndSanitize(body)
+  if (!sanitizedSubject || !sanitizedBody) {
+    throw new TemplateError(
+      'Message template is invalid as it only contains invalid HTML tags!'
+    )
+  }
   const updatedTemplate = await upsertEmailTemplate({
-    subject: client.replaceNewLinesAndSanitize(subject),
-    body: client.replaceNewLinesAndSanitize(body),
+    subject: sanitizedSubject,
+    body: sanitizedBody,
     replyTo,
     campaignId,
     from,

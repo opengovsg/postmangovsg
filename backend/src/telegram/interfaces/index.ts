@@ -38,3 +38,4 @@
  *              items:
  *                type: string
  */
+export * from './telegram.interface'

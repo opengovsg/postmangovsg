@@ -121,6 +121,13 @@ const config = convict({
     default: '',
     env: 'SENTRY_DSN',
   },
+  cronitor: {
+    code: {
+      doc: 'Unique cronitor code',
+      default: '',
+      env: 'CRONITOR_CODE',
+    },
+  },
 })
 
 switch (config.get('env')) {

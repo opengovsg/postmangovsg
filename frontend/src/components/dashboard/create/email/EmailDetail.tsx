@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
 import {
   getCampaignStats,
@@ -9,19 +10,9 @@ import {
 import { StepHeader, ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
-const EmailDetail = ({
-  id,
-  name,
-  sentAt,
-  numRecipients,
-  redacted,
-}: {
-  id: number
-  name: string
-  sentAt: Date
-  numRecipients: number
-  redacted: boolean
-}) => {
+const EmailDetail = () => {
+  const { campaign } = useContext(CampaignContext)
+  const { id } = campaign
   const [stats, setStats] = useState(new CampaignStats({}))
 
   async function refreshCampaignStats(id: number, forceRefresh = false) {
@@ -120,13 +111,8 @@ const EmailDetail = ({
         <div className="separator"></div>
         {stats.status && (
           <ProgressDetails
-            campaignId={id}
-            campaignName={name}
-            campaignType={ChannelType.Email}
-            sentAt={sentAt}
-            numRecipients={numRecipients}
             stats={stats}
-            redacted={redacted}
+            redacted={campaign.redacted}
             handlePause={handlePause}
             handleRetry={handleRetry}
             handleRefreshStats={handleRefreshStats}

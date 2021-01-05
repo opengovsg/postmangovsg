@@ -1,6 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { useParams } from 'react-router-dom'
+import { OutboundLink } from 'react-ga'
 
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -18,35 +26,35 @@ import {
   TextButton,
   StepHeader,
   StepSection,
+  WarningBlock,
 } from 'components/common'
-import { EmailCampaign, EmailPreview } from 'classes'
+import { LINKS } from 'config'
+import { i18n } from 'locales'
+import { EmailPreview, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
 import styles from '../Create.module.scss'
 
 const EmailRecipients = ({
-  csvFilename: initialCsvFilename,
-  numRecipients: initialNumRecipients,
-  params,
-  isProcessing: initialIsProcessing,
-  protect,
+  setActiveStep,
   onFileSelected,
   template,
   forceReset,
-  onNext,
-  onPrevious,
 }: {
-  csvFilename: string
-  numRecipients: number
-  params: Array<string>
-  isProcessing: boolean
-  protect?: boolean
+  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
   onFileSelected?: (campaignId: number, file: File) => Promise<any>
   template?: string
   forceReset?: boolean // this forces upload button to show without csv info and preview
-  onNext: (changes: Partial<EmailCampaign>, next?: boolean) => void
-  onPrevious: () => void
 }) => {
+  const { campaign, updateCampaign } = useContext(CampaignContext)
+  const {
+    csvFilename: initialCsvFilename,
+    isCsvProcessing: initialIsProcessing,
+    numRecipients: initialNumRecipients,
+    params,
+    protect,
+  } = campaign
   const [errorMessage, setErrorMessage] = useState(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
@@ -59,13 +67,7 @@ const EmailRecipients = ({
   const [preview, setPreview] = useState({} as EmailPreview)
   const { id: campaignId } = useParams()
   const { csvFilename, numRecipients = 0 } = csvInfo
-  const isMounted = useRef(true)
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
+  const isMounted = useIsMounted()
 
   // Poll csv status
   useEffect(() => {
@@ -89,6 +91,7 @@ const EmailRecipients = ({
         if (preview) {
           setPreview(preview as EmailPreview)
         }
+
         if (isCsvProcessing) {
           timeoutId = setTimeout(pollStatus, 2000)
         }
@@ -102,12 +105,12 @@ const EmailRecipients = ({
     pollStatus()
 
     return () => clearTimeout(timeoutId)
-  }, [campaignId, csvFilename, forceReset, isCsvProcessing])
+  }, [campaignId, csvFilename, forceReset, isCsvProcessing, isMounted])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    onNext({ isCsvProcessing, csvFilename, numRecipients }, false)
-  }, [isCsvProcessing, csvFilename, numRecipients, onNext])
+    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
+  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
   // Handle file upload
   async function uploadFile(files: File[]) {
@@ -176,6 +179,19 @@ const EmailRecipients = ({
           </p>
         </StepHeader>
 
+        {!csvFilename && (
+          <WarningBlock title={'We do not remove duplicate recipients'}>
+            <OutboundLink
+              className={styles.warningHelpLink}
+              eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              target="_blank"
+            >
+              Learn how to remove duplicates in your excel from our guide.
+            </OutboundLink>
+          </WarningBlock>
+        )}
+
         <CsvUpload
           isCsvProcessing={isCsvProcessing}
           csvInfo={csvInfo}
@@ -191,7 +207,7 @@ const EmailRecipients = ({
               />
               <p>or</p>
               <SampleCsv
-                params={params}
+                params={protect ? [] : params}
                 protect={protect}
                 template={template}
                 defaultRecipient="user@email.com"
@@ -219,9 +235,14 @@ const EmailRecipients = ({
         <ButtonGroup>
           <NextButton
             disabled={!numRecipients || isCsvProcessing}
-            onClick={onNext}
+            onClick={() => setActiveStep((s) => s + 1)}
           />
-          <TextButton onClick={onPrevious}>Previous</TextButton>
+          <TextButton
+            disabled={isCsvProcessing}
+            onClick={() => setActiveStep((s) => s - 1)}
+          >
+            Previous
+          </TextButton>
         </ButtonGroup>
       )}
     </>

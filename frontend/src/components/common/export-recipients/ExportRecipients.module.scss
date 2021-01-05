@@ -14,9 +14,18 @@
     cursor: pointer;
   }
 
+  &:hover {
+    color: $blue-300;
+  }
+  &:active {
+    color: $blue-700;
+  }
+  &:disabled {
+    color: $grey-500;
+  }
+
   .icon {
-    @include icon;
-    font-size: 20px;
+    @extend %icon;
     margin-right: 0.5rem;
   }
 
