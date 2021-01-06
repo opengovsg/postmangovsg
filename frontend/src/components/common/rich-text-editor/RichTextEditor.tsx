@@ -8,12 +8,11 @@ import {
   RichUtils,
 } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
-import draftToHtml from 'draftjs-to-html'
-import htmlToDraft from 'html-to-draftjs'
 
 import { VariableDecorator } from './VariableDecorator'
 import { LinkDecorator } from './LinkDecorator'
 import { LinkControl } from './LinkControl'
+import { Converter } from './utils'
 import { ImageBlock } from './ImageBlock'
 import { ImageControl } from './ImageControl'
 
@@ -72,7 +71,7 @@ const RichTextEditor = ({
   useEffect(() => {
     // Normalise HTML whenever editor state is initialised or updated
     const currentContent = editorState.getCurrentContent()
-    const html = draftToHtml(convertToRaw(currentContent))
+    const html = Converter.convertToHTML(convertToRaw(currentContent))
     onChange(html)
   }, [editorState, onChange])
 
@@ -185,10 +184,10 @@ const WrappedRichTextEditor = (props: any) => {
   })
 
   function createEditorStateFromHTML(html: string) {
-    const blocksFromHTML = htmlToDraft(html)
+    const { contentBlocks, entityMap } = Converter.convertFromHTML(html)
     const contentState = ContentState.createFromBlockArray(
-      blocksFromHTML.contentBlocks,
-      blocksFromHTML.entityMap
+      contentBlocks,
+      entityMap
     )
     return EditorState.createWithContent(contentState)
   }
