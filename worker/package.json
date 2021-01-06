@@ -22,7 +22,7 @@
     "@types/nodemailer-direct-transport": "^1.0.31",
     "@types/validator": "^13.0.0",
     "aws-sdk": "^2.660.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
