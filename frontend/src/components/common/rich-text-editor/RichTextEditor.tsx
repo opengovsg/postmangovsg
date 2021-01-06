@@ -4,17 +4,23 @@ import {
   ContentBlock,
   ContentState,
   convertToRaw,
-  RawDraftEntity,
   RichUtils,
 } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 
-import { VariableDecorator } from './VariableDecorator'
-import { LinkDecorator } from './LinkDecorator'
-import { LinkControl } from './LinkControl'
+import {
+  LinkControl,
+  ImageControl,
+  TableControl,
+  ListControl,
+  BlockTypeControl,
+  TextAlignControl,
+  InlineControl,
+  FontColorControl,
+} from './controls'
+import { VariableDecorator, LinkDecorator } from './decorators'
 import { Converter } from './utils'
 import { ImageBlock } from './ImageBlock'
-import { ImageControl } from './ImageControl'
 
 import 'draft-js/dist/Draft.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
@@ -23,24 +29,39 @@ import styles from './RichTextEditor.module.scss'
 const TOOLBAR_OPTIONS = {
   options: [
     'inline',
-    'blockType',
     'colorPicker',
+    'blockType',
     'textAlign',
     'list',
-    'image',
     'link',
+    'image',
   ],
   inline: {
     options: ['bold', 'italic', 'underline'],
+    component: InlineControl,
   },
   blockType: {
-    options: ['Normal', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'],
+    options: ['Normal', 'H1', 'H2', 'H4'],
+    component: BlockTypeControl,
+  },
+  colorPicker: {
+    component: FontColorControl,
+    colors: [
+      /* eslint-disable */
+      'rgb(0,0,0)', 'rgb(100,112,125)', 'rgb(193,199,205)',
+      'rgb(44,44,220)', 'rgb(0,124,143)', 'rgb(231,87,96)',
+      'rgb(181,196,255)', 'rgb(179,216,221,1)', 'rgb(250,221,223,1)',
+      'rgb(157,173,245)', 'rgb(128,190,199)', 'rgb(241,154,160)',
+      'rgb(33,33,165)', 'rgb(0,99,114)', 'rgb(175,63,74)',
+      'rgb(4,6,81)', 'rgb(0,74,86)', 'rgb(139,52,58)',
+      /* eslint-enable */
+    ],
   },
   textAlign: {
-    inDropdown: true,
+    component: TextAlignControl,
   },
   list: {
-    inDropdown: true,
+    component: ListControl,
   },
   image: {
     uploadEnabled: false,
