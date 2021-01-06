@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
+import Immutable from 'immutable'
 import {
   EditorState,
   ContentBlock,
   ContentState,
   convertToRaw,
+  DefaultDraftBlockRenderMap,
   RichUtils,
 } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
@@ -21,10 +23,13 @@ import {
 import { VariableDecorator, LinkDecorator } from './decorators'
 import { Converter } from './utils'
 import { ImageBlock } from './ImageBlock'
+import { TableWrapper } from './TableWrapper'
 
 import 'draft-js/dist/Draft.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import styles from './RichTextEditor.module.scss'
+
+const ExtendedEditor = (props: any) => <Editor {...props} />
 
 const TOOLBAR_OPTIONS = {
   options: [
@@ -74,6 +79,8 @@ const TOOLBAR_OPTIONS = {
   },
 }
 
+const TOOLBAR_CUSTOM_BUTTONS = [<TableControl key="tableOption" />]
+
 const defaultValue = {
   editorState: EditorState.createEmpty(),
   setEditorState: {} as React.Dispatch<React.SetStateAction<EditorState>>,
@@ -88,6 +95,15 @@ const RichTextEditor = ({
   placeholder?: string
 }) => {
   const { editorState, setEditorState } = useContext(EditorContext)
+  const blockRenderMap = Immutable.Map({
+    'table-cell': {
+      element: 'td',
+      wrapper: <TableWrapper />,
+    },
+  })
+  const extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(
+    blockRenderMap
+  )
 
   useEffect(() => {
     // Normalise HTML whenever editor state is initialised or updated
@@ -181,7 +197,7 @@ const RichTextEditor = ({
   }
 
   return (
-    <Editor
+    <ExtendedEditor
       wrapperClassName={styles.wrapper}
       toolbarClassName={styles.toolbar}
       editorClassName={styles.editor}
@@ -189,8 +205,10 @@ const RichTextEditor = ({
       editorState={editorState}
       onEditorStateChange={setEditorState}
       toolbar={TOOLBAR_OPTIONS}
+      toolbarCustomButtons={TOOLBAR_CUSTOM_BUTTONS}
       customDecorators={[VariableDecorator, LinkDecorator]}
       customBlockRenderFunc={renderBlock}
+      blockRenderMap={extendedBlockRenderMap}
       handleKeyCommand={handleKeyCommand}
       handleReturn={handleReturn}
     />
