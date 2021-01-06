@@ -211,6 +211,7 @@ const RichTextEditor = ({
       blockRenderMap={extendedBlockRenderMap}
       handleKeyCommand={handleKeyCommand}
       handleReturn={handleReturn}
+      stripPastedStyles
     />
   )
 }
