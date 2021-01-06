@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
-import styles from './RichTextEditor.module.scss'
+import cx from 'classnames'
+import React, { useContext, useState } from 'react'
+import { EditorContext } from '../RichTextEditor'
+
+import styles from '../RichTextEditor.module.scss'
 
 interface ImageControlProps {
   currentState: any
@@ -51,13 +54,27 @@ const ImageForm = ({ onChange }: { onChange: Function }) => {
 
 export const ImageControl = (props: ImageControlProps) => {
   const { expanded, onChange, onExpandEvent } = props
+  const { editorState } = useContext(EditorContext)
+
+  function isDisabled(): boolean {
+    const selection = editorState.getSelection()
+    const anchorKey = selection.getAnchorKey()
+    const anchor = editorState.getCurrentContent().getBlockForKey(anchorKey)
+    return anchor.getType() === 'table-cell'
+  }
+
   function showPopover() {
-    onExpandEvent()
+    if (!isDisabled()) onExpandEvent()
   }
 
   return (
     <div className={styles.imageControl}>
-      <div onClick={showPopover} className="rdw-option-wrapper">
+      <div
+        onClick={showPopover}
+        className={cx('rdw-option-wrapper', {
+          'rdw-option-disabled': isDisabled(),
+        })}
+      >
         <i className="bx bx-image"></i>
       </div>
       {expanded && <ImageForm onChange={onChange} />}

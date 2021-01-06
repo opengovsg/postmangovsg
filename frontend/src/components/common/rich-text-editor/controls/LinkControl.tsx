@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import styles from './RichTextEditor.module.scss'
+import styles from '../RichTextEditor.module.scss'
 
 interface LinkControlProps {
   currentState: any
@@ -76,9 +76,9 @@ export const LinkControl = (props: LinkControlProps) => {
 
   return (
     <div className={styles.linkControl}>
-      <button onClick={showPopover} className="rdw-option-wrapper">
+      <div onClick={showPopover} className="rdw-option-wrapper">
         <i className="bx bx-link"></i>
-      </button>
+      </div>
       {expanded && <LinkForm initialState={currentState} onSubmit={addLink} />}
     </div>
   )

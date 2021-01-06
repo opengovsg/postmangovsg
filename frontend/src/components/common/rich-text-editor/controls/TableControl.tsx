@@ -8,7 +8,7 @@ import {
   genKey,
   SelectionState,
 } from 'draft-js'
-import styles from './RichTextEditor.module.scss'
+import styles from '../RichTextEditor.module.scss'
 
 const MIN_GRID_SIZE = 5
 const MAX_GRID_SIZE = 20
@@ -88,7 +88,7 @@ export const TableControl = ({
 
   function handleClick(e: React.MouseEvent<HTMLElement>) {
     e.stopPropagation()
-    setShowPopover(() => !showPopover)
+    if (!isDisabled()) setShowPopover(() => !showPopover)
   }
 
   function handleGridSelect(rows: number, cols: number) {
@@ -141,11 +141,29 @@ export const TableControl = ({
     hidePopover()
   }
 
+  function isDisabled(): boolean {
+    let disabled = false
+
+    if (editorState) {
+      const selection = editorState.getSelection()
+      const anchorKey = selection.getAnchorKey()
+      const anchor = editorState.getCurrentContent().getBlockForKey(anchorKey)
+      disabled = anchor.getType() === 'table-cell'
+    }
+
+    return disabled
+  }
+
   return (
     <div className={styles.tableControl}>
-      <button className="rdw-option-wrapper" onClick={handleClick}>
+      <div
+        className={cx('rdw-option-wrapper', {
+          'rdw-option-disabled': isDisabled(),
+        })}
+        onClick={handleClick}
+      >
         <i className="bx bx-table"></i>
-      </button>
+      </div>
       {showPopover && (
         <TableSelector
           onGridSelect={handleGridSelect}
