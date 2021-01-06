@@ -8,9 +8,9 @@ import {
   RichUtils,
 } from 'draft-js'
 
-import { EditorContext } from './RichTextEditor'
+import { EditorContext } from '../RichTextEditor'
 
-import styles from './RichTextEditor.module.scss'
+import styles from '../RichTextEditor.module.scss'
 
 const linkStrategy = (
   contentBlock: ContentBlock,
