@@ -5,6 +5,7 @@ import {
   ContentState,
   convertToRaw,
   RawDraftEntity,
+  RichUtils,
 } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 import draftToHtml from 'draftjs-to-html'
@@ -92,6 +93,73 @@ const RichTextEditor = ({
     }
   }
 
+  function handleKeyCommand(command: string): 'handled' | 'not-handled' {
+    if (command === 'backspace') {
+      const selection = editorState.getSelection()
+      const anchorKey = selection.getAnchorKey()
+      const anchor = editorState
+        .getCurrentContent()
+        .getBlockForKey(selection.getAnchorKey())
+
+      const focusKey = selection.getFocusKey()
+      const focus = editorState
+        .getCurrentContent()
+        .getBlockForKey(selection.getFocusKey())
+
+      // Prevent delete when selection is within a single emtpy cell
+      if (
+        anchorKey === focusKey &&
+        anchor.getType() === 'table-cell' &&
+        anchor.getText() === ''
+      ) {
+        return 'handled'
+      }
+
+      // TODO: Handle clearing text by selecting multiple cells
+
+      // Prevent deleting subset of table cells. In order to delete entire table, user must select
+      // outside of table.
+      if (
+        anchorKey !== focusKey &&
+        (anchor.getType() === 'table-cell' || focus.getType() === 'table-cell')
+      ) {
+        return 'handled'
+      }
+    }
+
+    // Manually handle inline edit commands since we are overwriting handleKeyCommand
+    if (TOOLBAR_OPTIONS.inline.options.indexOf(command) >= 0) {
+      const updated: null | EditorState = RichUtils.handleKeyCommand(
+        editorState,
+        command
+      )
+      if (updated) setEditorState(updated)
+      return 'handled'
+    }
+
+    return 'not-handled'
+  }
+
+  function handleReturn(
+    _e: React.KeyboardEvent,
+    state: EditorState
+  ): 'handled' | 'not-handled' {
+    const selection = state.getSelection()
+    const blockKey = selection.getAnchorKey()
+    const block = state.getCurrentContent().getBlockForKey(blockKey)
+
+    // Prevent splitting block by hitting return key
+    if (block.getType() === 'table-cell') {
+      // If selection is collapsed, we insert a line break
+      if (selection.isCollapsed()) {
+        setEditorState(RichUtils.insertSoftNewline(state))
+      }
+      return 'handled'
+    }
+
+    return 'not-handled'
+  }
+
   return (
     <Editor
       wrapperClassName={styles.wrapper}
@@ -103,6 +171,8 @@ const RichTextEditor = ({
       toolbar={TOOLBAR_OPTIONS}
       customDecorators={[VariableDecorator, LinkDecorator]}
       customBlockRenderFunc={renderBlock}
+      handleKeyCommand={handleKeyCommand}
+      handleReturn={handleReturn}
     />
   )
 }
