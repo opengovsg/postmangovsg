@@ -4,7 +4,7 @@
   "description": "Backend / API server for Postman",
   "main": "build/server.js",
   "scripts": {
-    "build": "rimraf build && tsc",
+    "build": "rimraf build && tsc -p tsconfig.build.json",
     "dev": "npm run postbuild && tsc-watch --onSuccess \"node ./build/server.js\"",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
@@ -82,6 +82,8 @@
     "@types/nodemailer-direct-transport": "^1.0.31",
     "@types/papaparse": "^5.0.4",
     "@types/redis": "^2.8.17",
+    "@types/redis-mock": "^0.17.0",
+    "@types/supertest": "^2.0.10",
     "@types/swagger-jsdoc": "^3.0.2",
     "@types/swagger-ui-express": "^4.1.2",
     "@types/uuid": "^7.0.2",
@@ -95,7 +97,10 @@
     "jest": "^25.5.2",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
+    "redis-mock": "^0.56.3",
     "rimraf": "^3.0.2",
+    "sequelize-mock": "^0.10.2",
+    "supertest": "^6.0.1",
     "ts-jest": "^25.4.0",
     "tsc-watch": "^4.2.3",
     "typescript": "^3.8.3"
