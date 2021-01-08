@@ -51,32 +51,28 @@ const SMSTemplate = ({
     }
   }, [body])
 
-  const handleSaveTemplate = useCallback(
-    async (propagateError = false): Promise<void> => {
-      setErrorMsg(null)
-      try {
-        if (!campaignId) {
-          throw new Error('Invalid campaign id')
-        }
-        const { updatedTemplate, numRecipients } = await saveTemplate(
-          +campaignId,
-          body
-        )
-        if (updatedTemplate) {
-          updateCampaign({
-            body: updatedTemplate.body,
-            params: updatedTemplate.params,
-            numRecipients,
-          })
-          setActiveStep((s) => s + 1)
-        }
-      } catch (err) {
-        setErrorMsg(err.message)
-        if (propagateError) throw err
+  const handleSaveTemplate = useCallback(async (): Promise<void> => {
+    setErrorMsg(null)
+    try {
+      if (!campaignId) {
+        throw new Error('Invalid campaign id')
       }
-    },
-    [body, campaignId, setActiveStep, updateCampaign]
-  )
+      const { updatedTemplate, numRecipients } = await saveTemplate(
+        +campaignId,
+        body
+      )
+      if (updatedTemplate) {
+        updateCampaign({
+          body: updatedTemplate.body,
+          params: updatedTemplate.params,
+          numRecipients,
+        })
+        setActiveStep((s) => s + 1)
+      }
+    } catch (err) {
+      setErrorMsg(err.message)
+    }
+  }, [body, campaignId, setActiveStep, updateCampaign])
 
   // Set callback for finish later button
   useEffect(() => {
@@ -84,14 +80,21 @@ const SMSTemplate = ({
       <SaveDraftModal
         saveable
         onSave={async () => {
-          if (body) await handleSaveTemplate(true)
+          if (!campaignId) return
+          try {
+            if (!body) throw new Error('Message template cannot be empty!')
+            await saveTemplate(+campaignId, body)
+          } catch (err) {
+            setErrorMsg(err.message)
+            throw err
+          }
         }}
       />
     )
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, handleSaveTemplate, setFinishLaterContent])
+  }, [body, campaignId, setFinishLaterContent])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')

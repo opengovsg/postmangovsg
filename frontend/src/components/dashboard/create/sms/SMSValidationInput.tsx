@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { TextInputWithButton } from 'components/common'
 
-const EmailValidationInput = ({
+const SMSValidationInput = ({
   onClick,
   buttonDisabled,
 }: {
@@ -17,7 +17,6 @@ const EmailValidationInput = ({
 
   async function onClickHandler() {
     await onClick(recipient)
-    setRecipient('')
   }
 
   return (
@@ -39,4 +38,4 @@ const EmailValidationInput = ({
   )
 }
 
-export default EmailValidationInput
+export default SMSValidationInput

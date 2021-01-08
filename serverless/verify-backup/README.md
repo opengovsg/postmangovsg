@@ -1,4 +1,7 @@
-# Setup GCP services for verifying backups
+# Backup Verification Service
+A Google Cloud Run service is deployed in GCP to verify the integrity of the backups being transferred from AWS every night. In addition, the `verify-backup.sh` script can also be used independently to decrypt and restore backups to any PosgreSQL database instance.
+
+## Setup GCP services for verifying backups
 The following steps describe the setup process for services required for the verifying backups workflow on Google Cloud Platform.
 
 ### Service account
@@ -42,3 +45,44 @@ The pre-built images submitted by Cloud Build are stored in the container regist
 Service accounts require the user-defined custom role `verify-backup` and google cloud predefined `Cloud Run Invoker` role.
 
 Permissions included in `verify-backup` role are in 1Password.
+
+## Running the restoration script outside of GCP
+The `verify-backup.sh` script can also be used outside of GCP to download and restore a database backup to any PostgreSQL database instance.
+
+### Pre-requisites
+Before running the script, ensure the following pre-requisites are met:
+1. Download and install [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
+2. Ensure that the authenticated account has sufficient permissions. You may make use of the credentials in [Service account](#service-account). Set
+`GOOGLE_APPLICATION_CREDENTIALS` to point to the path where the credentials are stored.
+3. Download and save the appropriate set of environment variables from 1Password (GCP Verify Backup env vars - staging/production) into a `.env` file
+4. Ensure network connectivity to the target database
+
+### Set PostgreSQL connection environment variables
+Next, set the required PostgreSQL environment variables to establish a connection target database instance. Examples of common environment variables:
+| Variable | Description |
+| :------- | :---------- |
+| `PGUSER` | Database user used to establish connection |
+| `PGPASSWORD` | Password for database user |
+| `PGPORT` | Port which the database is listening on |
+| `PGHOST` | Host where the database is running at |
+| `PGDATABASE` | Name of the database. Note that this is [not used](https://www.postgresql.org/docs/11/app-pgrestore.html) by `pg_restore` |
+
+For a full list of available environment variables, refer to this [page](https://www.postgresql.org/docs/11/libpq-envars.html).
+
+### Run restoration script
+To run the script, run the following steps in the `serverless/verify-backup` folder:
+```bash
+# Install and build the node component of the restoration script
+$ npm install && npm run build
+
+# Set the environment variables listed in the previous section
+$ export PGUSER=testuser
+$ export PGHOST=localhost
+
+# Set to false if you do not want to send Sentry event to Slack
+$ export SEND_NOTIFICATION=false
+
+# Execute the restoration script
+$ ./scripts/verify-backup.sh
+Successfully restored 2020-11-30_12-34-56 db dump! The restored db has 10 users, 1000 campaigns and 1000000 sent messages.
+```

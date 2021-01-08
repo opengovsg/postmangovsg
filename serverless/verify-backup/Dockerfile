@@ -2,6 +2,7 @@ FROM node:12-alpine
 
 RUN apk update && apk upgrade
 RUN apk add postgresql
+RUN apk add curl
 
 WORKDIR /usr/home/postmangovsg
 

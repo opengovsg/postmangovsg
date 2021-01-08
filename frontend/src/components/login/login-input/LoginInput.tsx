@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import cx from 'classnames'
 import { noop } from 'lodash'
 import { TextInputWithButton, TextButton } from 'components/common'
@@ -33,6 +33,11 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState(null)
   const [canResend, setCanResend] = useState(false)
   const [isResending, setIsResending] = useState(false)
+  let timeoutId: NodeJS.Timeout
+
+  useEffect(() => {
+    return () => timeoutId && clearTimeout(timeoutId)
+  })
 
   async function sendOtp() {
     resetButton()
@@ -40,7 +45,7 @@ const Login = () => {
       await getOtpWithEmail(email)
       setOtpSent(true)
       // Show resend button after wait time
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setCanResend(true)
       }, RESEND_WAIT_TIME)
     } catch (err) {
