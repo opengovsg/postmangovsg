@@ -17,10 +17,14 @@ jest.mock('@core/services/mail-client.class')
 
 // Mock models
 const sequelizeMock = new SequelizeMock()
-const userModelMock = sequelizeMock.define('user')
+export const userModelMock = sequelizeMock.define('users')
 
 jest.mock('@core/models/user/user', () => ({
   User: userModelMock,
 }))
 
-export { userModelMock }
+export const campaignModelMock = sequelizeMock.define('campaigns')
+
+jest.mock('@core/models/campaign', () => ({
+  Campaign: campaignModelMock,
+}))

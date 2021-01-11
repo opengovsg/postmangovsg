@@ -1,17 +1,17 @@
 import request from 'supertest'
 import app from '../server'
+import { AuthService } from '@core/services'
 import { userModelMock } from '@tests/setup'
 
 describe('POST /auth/otp', () => {
-  test('Invalid email format', async (done) => {
+  test('Invalid email format', async () => {
     const res = await request(app)
       .post('/auth/otp')
       .send({ email: 'user!@open' })
     expect(res.status).toBe(400)
-    done()
   })
 
-  test('Non gov.sg and non-whitelisted email', async (done) => {
+  test('Non gov.sg and non-whitelisted email', async () => {
     // Mock db query to User table to return null to mock user who is not whitelisted
     userModelMock.$queueResult(null)
 
@@ -19,11 +19,10 @@ describe('POST /auth/otp', () => {
       .post('/auth/otp')
       .send({ email: 'user@agency.com.sg' })
     expect(res.status).toBe(401)
-    expect(res.body).toMatchObject({ message: 'User is not authorized' })
-    done()
+    expect(res.body).toEqual({ message: 'User is not authorized' })
   })
 
-  test('Non gov.sg and whitelisted email', async (done) => {
+  test('Non gov.sg and whitelisted email', async () => {
     // Mock db query to User table to return null to mock user who is not whitelisted
     userModelMock.$queueResult(
       userModelMock.build({ email: 'user@agency.com.sg' })
@@ -33,51 +32,62 @@ describe('POST /auth/otp', () => {
       .post('/auth/otp')
       .send({ email: 'user@agency.com.sg' })
     expect(res.status).toBe(200)
-    done()
   })
 })
 
 describe('POST /auth/login', () => {
-  test('Invalid otp format', async (done) => {
+  test('Invalid otp format', async () => {
     const res = await request(app)
       .post('/auth/login')
       .send({ email: 'user@agency.gov.sg', otp: '123' })
     expect(res.status).toBe(400)
-    done()
   })
 
-  test('Invalid otp', async (done) => {
+  test('Invalid otp', async () => {
     const res = await request(app)
       .post('/auth/login')
       .send({ email: 'user@agency.gov.sg', otp: '000000' })
     expect(res.status).toBe(401)
-    done()
   })
 
-  test('Valid otp', async (done) => {
-    // TODO
-    done()
+  test('Valid otp', async () => {
+    const email = 'user@agency.gov.sg'
+    // Mock verification of otp
+    AuthService.verifyOtp = jest.fn(async () => true)
+    // Mock user query
+    AuthService.findOrCreateUser = jest.fn(async () =>
+      userModelMock.build({ email })
+    )
+
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email, otp: '123456' })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({})
   })
 })
 
 describe('GET /auth/userinfo', () => {
-  test('No existing session', async (done) => {
-    const res = await request(app).get('/auth/userinfo')
+  test('No existing session', async () => {
+    const res = await request(app).get('/auth/userinfo').set('Cookies', '')
     expect(res.status).toBe(200)
-    expect(res.body).toMatchObject({})
-    done()
+    expect(res.body).toEqual({})
   })
 
-  test('Existing session found', async (done) => {
-    // TODO
-    done()
+  test('Existing session found', async () => {
+    // TODO - mock user session
+    // const email = 'user@agency.gov.sg'
+    // await request(app).post('/auth/login').send({ email, otp: '123456' })
+    // const res = await request(app).get('/auth/userinfo')
+    // expect(res.status).toBe(200)
+    // expect(res.body).toEqual({})
+    expect(true).toEqual(true)
   })
 })
 
 describe('GET /auth/logout', () => {
-  test('Successfully logged out', async (done) => {
+  test('Successfully logged out', async () => {
     const res = await request(app).get('/auth/logout')
     expect(res.status).toBe(200)
-    done()
   })
 })
