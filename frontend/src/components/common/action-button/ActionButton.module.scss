@@ -24,6 +24,7 @@
 
   .content {
     width: 100%;
+    white-space: nowrap;
 
     div {
       @include flex-center;

@@ -236,6 +236,63 @@ jobs:
             - NODE_ENV=staging
             - SECRET_ID=$STAGING_SECRET_ID
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+    - name: serverless-redaction-digest
+      before_deploy:
+        - cd $TRAVIS_BUILD_DIR/serverless/redaction-digest
+        - npm install && npm run build && npm prune --production
+        - zip -qr code.zip build src package.json node_modules/
+      deploy:
+        - provider: lambda
+          edge: true
+          function_name: redaction-digest-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_REDACTION_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 600
+          memory_size: 256
+          publish: true
+          zip: "../redaction-digest/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_REDACTION_DIGEST_DB_URI
+            - DB_READ_REPLICA_URI=$PRODUCTION_REDACTION_DIGEST_DB_READ_REPLICA_URI
+            - DB_USE_IAM=$PRODUCTION_DB_USE_IAM
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - SES_FROM=$PRODUCTION_REDACTION_DIGEST_SES_FROM
+            - SES_HOST=$PRODUCTION_REDACTION_DIGEST_SES_HOST
+            - SES_PASS=$PRODUCTION_REDACTION_DIGEST_SES_PASS
+            - SES_USER=$PRODUCTION_REDACTION_DIGEST_SES_USER
+            - SES_PORT=$PRODUCTION_REDACTION_DIGEST_SES_PORT
+            - CRONITOR_CODE=$PRODUCTION_REDACTION_CRONITOR
+        - provider: lambda
+          edge: true
+          function_name: redaction-digest-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_REDACTION_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 600
+          memory_size: 256
+          publish: true
+          zip: "../redaction-digest/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - DB_URI=$STAGING_REDACTION_DIGEST_DB_URI
+            - DB_READ_REPLICA_URI=$STAGING_REDACTION_DIGEST_DB_READ_REPLICA_URI
+            - DB_USE_IAM=$STAGING_DB_USE_IAM
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - NODE_ENV=staging
+            - SES_FROM=$STAGING_REDACTION_DIGEST_SES_FROM
+            - SES_HOST=$STAGING_REDACTION_DIGEST_SES_HOST
+            - SES_PASS=$STAGING_REDACTION_DIGEST_SES_PASS
+            - SES_USER=$STAGING_REDACTION_DIGEST_SES_USER
+            - SES_PORT=$STAGING_REDACTION_DIGEST_SES_PORT
+            - CRONITOR_CODE=$STAGING_REDACTION_CRONITOR
     - name: root
       install:
         - npm install --ignore-scripts

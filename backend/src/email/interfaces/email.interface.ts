@@ -48,6 +48,8 @@ export interface EmailDuplicateCampaignDetails
  *           type: boolean
  *         protect:
  *           type: boolean
+ *         redacted:
+ *           type: boolean
  *         csv_filename:
  *           type: string
  *         is_csv_processing:
