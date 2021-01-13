@@ -1,13 +1,13 @@
 import request from 'supertest'
 import app from '../server'
-import { campaignModelMock } from '@tests/setup'
+import { CampaignMock } from '@tests/setup'
 import { CampaignService } from '@core/services'
 import { Campaign } from '@core/models'
 
 describe('GET /campaigns', () => {
   test('List campaigns with default limit and offset', async () => {
-    campaignModelMock.$queueResult({
-      rows: [campaignModelMock.build(), campaignModelMock.build()],
+    CampaignMock.$queueResult({
+      rows: [CampaignMock.build(), CampaignMock.build()],
       count: 2,
     })
     const res = await request(app).get('/campaigns')
@@ -21,8 +21,8 @@ describe('GET /campaigns', () => {
   })
 
   test('List campaigns with defined limit and offset', async () => {
-    campaignModelMock.$queueResult({
-      rows: [campaignModelMock.build({ id: 5 })],
+    CampaignMock.$queueResult({
+      rows: [CampaignMock.build({ id: 5 })],
       count: 1,
     })
     const res = await request(app)
@@ -56,7 +56,7 @@ describe('POST /campaigns', () => {
     // Create campaign returns void when campaign creation fails
     CampaignService.createCampaignWithTransaction = jest.fn(
       async () =>
-        new Promise<Campaign>((resolve) => resolve(campaignModelMock.build()))
+        new Promise<Campaign>((resolve) => resolve(CampaignMock.build()))
     )
     const res = await request(app).post('/campaigns').send({
       name: 'test',

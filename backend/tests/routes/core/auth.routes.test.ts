@@ -1,7 +1,7 @@
 import request from 'supertest'
 import app from '../server'
 import { AuthService } from '@core/services'
-import { userModelMock } from '@tests/setup'
+import { UserMock } from '@tests/setup'
 
 describe('POST /auth/otp', () => {
   test('Invalid email format', async () => {
@@ -13,7 +13,7 @@ describe('POST /auth/otp', () => {
 
   test('Non gov.sg and non-whitelisted email', async () => {
     // Mock db query to User table to return null to mock user who is not whitelisted
-    userModelMock.$queueResult(null)
+    UserMock.$queueResult(null)
 
     const res = await request(app)
       .post('/auth/otp')
@@ -24,9 +24,7 @@ describe('POST /auth/otp', () => {
 
   test('Non gov.sg and whitelisted email', async () => {
     // Mock db query to User table to return null to mock user who is not whitelisted
-    userModelMock.$queueResult(
-      userModelMock.build({ email: 'user@agency.com.sg' })
-    )
+    UserMock.$queueResult(UserMock.build({ email: 'user@agency.com.sg' }))
 
     const res = await request(app)
       .post('/auth/otp')
@@ -56,7 +54,7 @@ describe('POST /auth/login', () => {
     AuthService.verifyOtp = jest.fn(async () => true)
     // Mock user query
     AuthService.findOrCreateUser = jest.fn(async () =>
-      userModelMock.build({ email })
+      UserMock.build({ email })
     )
 
     const res = await request(app)
