@@ -121,6 +121,7 @@ export const ImageBlock = ({
         src={src}
         width={width}
         height={height}
+        alt=""
       />
       {showPopover && (
         <div contentEditable={false} className={styles.popover}>
