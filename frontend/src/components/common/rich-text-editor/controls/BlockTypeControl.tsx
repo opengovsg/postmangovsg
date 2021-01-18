@@ -5,10 +5,9 @@ import { EditorContext } from '../RichTextEditor'
 
 const BLOCK_TYPE_DESCRIPTION: Record<string, string> = {
   unstyled: 'Normal',
-  'header-one': 'Heading 1',
-  'header-two': 'Heading 2',
-  'header-three': 'Heading 3',
-  'header-four': 'Heading 4',
+  'header-one': 'Title',
+  'header-two': 'Subtitle',
+  'header-four': 'Header',
 }
 
 const TAG_DESCRIPTION: Record<string, string> = {
