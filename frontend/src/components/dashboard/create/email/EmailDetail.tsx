@@ -112,6 +112,7 @@ const EmailDetail = () => {
         {stats.status && (
           <ProgressDetails
             stats={stats}
+            redacted={campaign.redacted}
             handlePause={handlePause}
             handleRetry={handleRetry}
             handleRefreshStats={handleRefreshStats}

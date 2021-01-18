@@ -750,10 +750,16 @@ router.post('/refresh-stats', EmailStatsMiddleware.updateAndGetStats)
  *           description: Unauthorized
  *        "403":
  *           description: Forbidden, campaign not owned by user
+ *        "410":
+ *           description: Campaign has been redacted
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/export', EmailStatsMiddleware.getDeliveredRecipients)
+router.get(
+  '/export',
+  CampaignMiddleware.isCampaignRedacted,
+  EmailStatsMiddleware.getDeliveredRecipients
+)
 
 /**
  * @swagger
