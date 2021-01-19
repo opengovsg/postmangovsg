@@ -27,6 +27,7 @@ const getUserSettings = async (
         num_demos_telegram: userSettings.demo?.numDemosTelegram,
         is_displayed: userSettings.demo?.isDisplayed,
       },
+      announcement_version: userSettings.userFeature?.announcementVersion,
     })
   } catch (err) {
     next(err)
@@ -240,6 +241,30 @@ const updateDemoDisplayed = async (
   }
 }
 
+/**
+ * Update the announcement version for user
+ * @param req
+ * @param res
+ * @param next
+ */
+const updateAnnouncementVersion = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const userId = req.session?.user?.id
+    const { announcement_version: announcementVersion } = req.body
+    await CredentialService.updateAnnouncementVersion(
+      +userId,
+      announcementVersion
+    )
+    return res.sendStatus(200)
+  } catch (e) {
+    next(e)
+  }
+}
+
 export const SettingsMiddleware = {
   getUserSettings,
   checkUserCredentialLabel,
@@ -249,4 +274,5 @@ export const SettingsMiddleware = {
   deleteUserCredential,
   regenerateApiKey,
   updateDemoDisplayed,
+  updateAnnouncementVersion,
 }
