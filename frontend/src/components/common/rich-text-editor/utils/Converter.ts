@@ -68,6 +68,21 @@ const LIST_WRAPPER: Record<string, TagType> = {
   'ordered-list-item': 'ol',
 }
 
+const TABLE_STYLE = {
+  table: {
+    border: 'solid 1px rgba(181, 196, 255, 0.5)',
+    'border-collapse': 'collapse',
+    'min-width': '50%',
+  },
+  row: {
+    border: 'solid 1px rgba(181, 196, 255, 0.5)',
+  },
+  cell: {
+    border: 'solid 1px rgba(181, 196, 255, 0.5)',
+    padding: '0.5rem',
+  },
+}
+
 const getCSS = (style: string): string => {
   const [key, value] = style.split('-')
   let property
@@ -378,11 +393,11 @@ const handleTable = (
 ): void => {
   if (isTableCell(currBlock)) {
     if (tree.active?.tag !== 'tr') {
-      tree.insert({ tag: 'table' })
+      tree.insert({ tag: 'table', style: TABLE_STYLE.table })
       const tbody = tree.insertChild({ tag: 'tbody' })
       tree.select(tbody)
 
-      const tr = tree.insertChild({ tag: 'tr' })
+      const tr = tree.insertChild({ tag: 'tr', style: TABLE_STYLE.row })
       tree.select(tr)
     } else {
       const { cols, row, col } = currBlock.data as Record<string, number>
@@ -391,7 +406,7 @@ const handleTable = (
         const table = tree.active?.parent
         if (table) {
           tree.select(table)
-          const tr = tree.insertChild({ tag: 'tr' })
+          const tr = tree.insertChild({ tag: 'tr', style: TABLE_STYLE.row })
           tree.select(tr)
         }
       }
@@ -414,6 +429,17 @@ const getBlockStyle = (
     const textAlignment = currBlock.data['text-align']
     if (textAlignment) {
       style = { ...style, 'text-align': textAlignment }
+    }
+  }
+
+  // Apply default styles for table cells
+  if (currBlock.type === 'table-cell') {
+    style = { ...style, ...TABLE_STYLE.cell }
+
+    // Ensure that columns are all equally spaced out regardless of content.
+    if (currBlock.data && currBlock.data.cols) {
+      const width = `${(100 / currBlock.data.cols).toFixed(3)}%`
+      style = { ...style, width }
     }
   }
 
