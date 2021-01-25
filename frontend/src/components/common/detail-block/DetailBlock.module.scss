@@ -13,4 +13,19 @@
       margin: 0;
     }
   }
+
+  table {
+    border: none;
+
+    tr {
+      display: table-row;
+      height: auto;
+      border: none;
+    }
+
+    td {
+      display: table-cell;
+      border: none;
+    }
+  }
 }
