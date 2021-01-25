@@ -127,6 +127,9 @@
 
       input {
         width: 100%;
+        padding: 0.25rem $spacing-1;
+        border: solid 1px $neutral;
+        border-radius: 0.25rem;
       }
     }
 

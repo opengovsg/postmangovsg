@@ -33,11 +33,11 @@ const ImageForm = ({ onChange }: { onChange: Function }) => {
       className={styles.form}
     >
       <div className={styles.item}>
-        <label>URL</label>
         <div className={styles.control}>
           <input
             value={imgSrc}
             type="text"
+            placeholder="Enter file.go.gov.sg link"
             onChange={(e) => setImgSrc(e.target.value)}
           />
         </div>
