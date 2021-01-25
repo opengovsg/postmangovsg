@@ -22,8 +22,7 @@ import {
 } from './controls'
 import { VariableDecorator, LinkDecorator } from './decorators'
 import { Converter } from './utils'
-import { ImageBlock } from './ImageBlock'
-import { TableWrapper } from './TableWrapper'
+import { ImageBlock, TableWrapper } from './blocks'
 
 import 'draft-js/dist/Draft.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'

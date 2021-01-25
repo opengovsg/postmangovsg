@@ -8,8 +8,8 @@ import {
   Modifier,
 } from 'draft-js'
 
-import { EditorContext } from './RichTextEditor'
-import styles from './RichTextEditor.module.scss'
+import { EditorContext } from '../RichTextEditor'
+import styles from '../RichTextEditor.module.scss'
 
 export const ImageBlock = ({
   block,
