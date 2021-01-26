@@ -27,7 +27,7 @@
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
     "libphonenumber-js": "^1.7.55",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.20",
     "module-alias": "^2.2.2",
     "nodemailer": "^6.4.6",
     "nodemailer-direct-transport": "^3.3.2",
