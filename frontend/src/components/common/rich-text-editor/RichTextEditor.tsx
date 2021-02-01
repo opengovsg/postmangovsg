@@ -136,14 +136,10 @@ const RichTextEditor = ({
     if (command === 'backspace') {
       const selection = editorState.getSelection()
       const anchorKey = selection.getAnchorKey()
-      const anchor = editorState
-        .getCurrentContent()
-        .getBlockForKey(selection.getAnchorKey())
+      const anchor = editorState.getCurrentContent().getBlockForKey(anchorKey)
 
       const focusKey = selection.getFocusKey()
-      const focus = editorState
-        .getCurrentContent()
-        .getBlockForKey(selection.getFocusKey())
+      const focus = editorState.getCurrentContent().getBlockForKey(focusKey)
 
       // Prevent delete when selection is within a single emtpy cell
       if (
@@ -164,6 +160,29 @@ const RichTextEditor = ({
       ) {
         return 'handled'
       }
+
+      // Prevent clearing line after table to ensure that table can be deleted by selecting line before or after table.
+      const blockBefore = editorState
+        .getCurrentContent()
+        .getBlockBefore(anchorKey)
+      if (
+        anchorKey === focusKey &&
+        selection.getAnchorOffset() === 0 &&
+        blockBefore?.getType() === 'table-cell'
+      ) {
+        return 'handled'
+      }
+    }
+
+    if (command === 'delete') {
+      // Prevent clearing line before table to ensure that table can be deleted by selecting line before and after table.
+      const selection = editorState.getSelection()
+      const anchorKey = selection.getAnchorKey()
+      const blockAfter = editorState
+        .getCurrentContent()
+        .getBlockAfter(anchorKey)
+
+      if (blockAfter?.getType() === 'table-cell') return 'handled'
     }
 
     // Manually handle inline edit commands since we are overwriting handleKeyCommand
