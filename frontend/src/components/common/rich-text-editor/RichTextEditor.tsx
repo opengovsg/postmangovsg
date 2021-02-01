@@ -178,11 +178,17 @@ const RichTextEditor = ({
       // Prevent clearing line before table to ensure that table can be deleted by selecting line before and after table.
       const selection = editorState.getSelection()
       const anchorKey = selection.getAnchorKey()
+      const anchor = editorState.getCurrentContent().getBlockForKey(anchorKey)
       const blockAfter = editorState
         .getCurrentContent()
         .getBlockAfter(anchorKey)
 
-      if (blockAfter?.getType() === 'table-cell') return 'handled'
+      if (
+        anchor?.getType() === 'table-cell' ||
+        blockAfter?.getType() === 'table-cell'
+      ) {
+        return 'handled'
+      }
     }
 
     // Manually handle inline edit commands since we are overwriting handleKeyCommand
