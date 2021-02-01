@@ -27,7 +27,6 @@ const LinkForm = ({
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    // TODO: Validate URL
     onSubmit({ title, url })
   }
 

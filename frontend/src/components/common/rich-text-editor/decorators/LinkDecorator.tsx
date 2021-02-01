@@ -60,7 +60,6 @@ const LinkSpan = (props: {
   }
 
   function flipPopover() {
-    // TODO: Set a max width for popover and use that instead to decided whether to flip.
     if (linkRef.current && linkRef.current.parentElement) {
       const { offsetLeft, parentElement } = linkRef.current
       return offsetLeft / parentElement.offsetWidth > 0.7

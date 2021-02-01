@@ -22,7 +22,6 @@ const ImageForm = ({ onChange }: { onChange: Function }) => {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    // TODO: Validate that url is valid or if it contains a variable
     onChange(imgSrc, 'auto', '100%', '')
   }
 
