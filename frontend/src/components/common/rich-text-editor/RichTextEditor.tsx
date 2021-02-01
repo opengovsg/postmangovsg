@@ -51,12 +51,18 @@ const TOOLBAR_OPTIONS = {
   colorPicker: {
     component: FontColorControl,
     colors: [
-      /* eslint-disable */
-      'rgb(0,0,0)', 'rgb(100,112,125)', 'rgb(193,199,205)',
-      'rgb(44,44,220)', 'rgb(0,124,143)', 'rgb(231,87,96)',
-      'rgb(33,33,165)', 'rgb(0,99,114)', 'rgb(175,63,74)',
-      'rgb(4,6,81)', 'rgb(0,74,86)', 'rgb(139,52,58)',
-      /* eslint-enable */
+      'rgb(0,0,0)',
+      'rgb(100,112,125)',
+      'rgb(193,199,205)',
+      'rgb(44,44,220)',
+      'rgb(0,124,143)',
+      'rgb(231,87,96)',
+      'rgb(33,33,165)',
+      'rgb(0,99,114)',
+      'rgb(175,63,74)',
+      'rgb(4,6,81)',
+      'rgb(0,74,86)',
+      'rgb(139,52,58)',
     ],
   },
   textAlign: {
