@@ -3,6 +3,7 @@
 
 .detailBlock {
   @include block($neutral-light, $secondary);
+  overflow-wrap: anywhere;
   border-left: none;
   margin: 0;
 
