@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { Map } from 'immutable'
 import cx from 'classnames'
 import {
+  Modifier,
   EditorState,
   ContentState,
   ContentBlock,
   genKey,
-  SelectionState,
 } from 'draft-js'
 import styles from '../RichTextEditor.module.scss'
 
@@ -93,8 +93,30 @@ export const TableControl = ({
 
   function handleGridSelect(rows: number, cols: number) {
     if (editorState && onChange) {
-      let currentContentState = editorState.getCurrentContent()
+      let contentState = editorState.getCurrentContent()
+      const selectionState = editorState.getSelection()
 
+      // Clear off existing selection
+      contentState = Modifier.removeRange(
+        contentState,
+        selectionState,
+        'backward'
+      )
+
+      // Split existing block to create insertion point
+      const targetSelection = contentState.getSelectionAfter()
+      contentState = Modifier.splitBlock(contentState, targetSelection)
+
+      // Set insertion target to unstyled block to standardize
+      const insertionTarget = contentState.getSelectionAfter()
+      contentState = Modifier.setBlockType(
+        contentState,
+        insertionTarget,
+        'unstyled'
+      )
+
+      // Create array of table cell blocks
+      const fragmentArray: ContentBlock[] = []
       for (let row = 0; row <= rows; row++) {
         for (let col = 0; col <= cols; col++) {
           const tableCell = new ContentBlock({
@@ -104,36 +126,41 @@ export const TableControl = ({
             data: Map({ rows: rows + 1, cols: cols + 1, row, col }),
           })
 
-          const blockMap = currentContentState
-            .getBlockMap()
-            .set(tableCell.getKey(), tableCell)
-          currentContentState = currentContentState.merge({
-            blockMap,
-          }) as ContentState
+          fragmentArray.push(tableCell)
         }
       }
 
-      // Insert empty block after
-      const emptyKey = genKey()
+      // Create empty block to be placed after table
       const empty = new ContentBlock({
-        key: emptyKey,
+        key: genKey(),
         type: 'unstyled',
         text: '',
       })
-      const blockMap = currentContentState.getBlockMap().set(emptyKey, empty)
-      currentContentState = currentContentState.merge({
-        blockMap,
-      }) as ContentState
+      fragmentArray.push(empty)
 
-      let updated = EditorState.push(
-        editorState,
-        currentContentState,
-        'insert-fragment'
+      // Create block map to be inserted
+      const fragment = ContentState.createFromBlockArray(
+        fragmentArray
+      ).getBlockMap()
+
+      // Replace existing selection with the fragment containing table cells and empty block
+      contentState = Modifier.replaceWithFragment(
+        contentState,
+        insertionTarget,
+        fragment
       )
 
-      // Set cursor to the empty block
-      const selection = SelectionState.createEmpty(emptyKey)
-      updated = EditorState.forceSelection(updated, selection)
+      // Select the empty block after insertion
+      contentState = contentState.merge({
+        selectionBefore: selectionState,
+        selectionAfter: contentState.getSelectionAfter().set('hasFocus', true),
+      }) as ContentState
+
+      const updated = EditorState.push(
+        editorState,
+        contentState,
+        'insert-fragment'
+      )
 
       onChange(updated)
     }
