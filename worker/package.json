@@ -39,7 +39,7 @@
     "telegraf": "^3.38.0",
     "threads": "^1.4.0",
     "tiny-worker": "^2.3.0",
-    "twilio": "^4.6.0",
+    "twilio": "^3.42.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {
