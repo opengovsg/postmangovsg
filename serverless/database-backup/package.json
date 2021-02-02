@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@google-cloud/kms": "^2.1.2",
-    "@google-cloud/storage": "^5.5.0",
+    "@google-cloud/storage": "^5.7.2",
     "@sentry/node": "^5.27.6",
     "aws-sdk": "^2.801.0",
     "axios": "^0.21.0",
