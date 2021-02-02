@@ -29,7 +29,7 @@
     "libphonenumber-js": "^1.7.55",
     "lodash": "^4.17.19",
     "module-alias": "^2.2.2",
-    "nodemailer": "^6.4.6",
+    "nodemailer": "^6.4.16",
     "nodemailer-direct-transport": "^3.3.2",
     "pg": "^8.2.1",
     "postman-templating": "file:../modules/postman-templating",
