@@ -108,7 +108,32 @@ const LinkSpan = (props: {
   )
 }
 
+const PreviewLinkSpan = ({
+  children,
+  contentState,
+  entityKey,
+}: {
+  children: React.ReactChildren
+  contentState: ContentState
+  entityKey: string
+}) => {
+  const { url, targetOption } = contentState.getEntity(entityKey).getData()
+
+  return (
+    <span className={styles.link}>
+      <a href={url} className={styles.title} target={targetOption}>
+        {children}
+      </a>
+    </span>
+  )
+}
+
 export const LinkDecorator: DraftDecorator = {
   strategy: linkStrategy,
   component: LinkSpan,
+}
+
+export const PreviewLinkDecorator: DraftDecorator = {
+  strategy: linkStrategy,
+  component: PreviewLinkSpan,
 }

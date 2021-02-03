@@ -21,7 +21,11 @@ import {
   InlineControl,
   FontColorControl,
 } from './controls'
-import { VariableDecorator, LinkDecorator } from './decorators'
+import {
+  VariableDecorator,
+  LinkDecorator,
+  PreviewLinkDecorator,
+} from './decorators'
 import { Converter } from './utils'
 import { ImageBlock, TableWrapper } from './blocks'
 
@@ -287,6 +291,7 @@ const RichTextPreview = ({ placeholder }: { placeholder: string }) => {
       onEditorStateChange={setEditorState}
       customBlockRenderFunc={renderBlock}
       blockRenderMap={extendedBlockRenderMap}
+      customDecorators={[PreviewLinkDecorator]}
       readOnly
       toolbarHidden
     />

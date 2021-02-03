@@ -237,6 +237,10 @@
   &.preview {
     padding: 0;
     min-height: 0px;
+
+    a {
+      font-size: inherit;
+    }
   }
 
   .link {
