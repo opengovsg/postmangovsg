@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, { useContext, useEffect, useState } from 'react'
 import Immutable from 'immutable'
 import {
@@ -244,8 +245,56 @@ const RichTextEditor = ({
   )
 }
 
+const RichTextPreview = ({ placeholder }: { placeholder: string }) => {
+  const { editorState, setEditorState } = useContext(EditorContext)
+
+  const blockRenderMap = Immutable.Map({
+    'table-cell': {
+      element: 'td',
+      wrapper: <TableWrapper />,
+    },
+  })
+  const extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(
+    blockRenderMap
+  )
+
+  function renderBlock(block: ContentBlock): any | void {
+    if (block.getType() === 'atomic') {
+      const contentState = editorState.getCurrentContent()
+      const entityKey = block.getEntityAt(0)
+
+      if (entityKey) {
+        const entity = contentState.getEntity(entityKey)
+        if (entity?.getType() === 'IMAGE') {
+          return {
+            component: ImageBlock,
+            editable: false,
+            props: {
+              readOnly: true,
+            },
+          }
+        }
+      }
+    }
+  }
+
+  return (
+    <ExtendedEditor
+      wrapperClassName={cx(styles.wrapper, styles.preview)}
+      editorClassName={cx(styles.editor, styles.preview)}
+      placeholder={placeholder}
+      editorState={editorState}
+      onEditorStateChange={setEditorState}
+      customBlockRenderFunc={renderBlock}
+      blockRenderMap={extendedBlockRenderMap}
+      readOnly
+      toolbarHidden
+    />
+  )
+}
+
 const WrappedRichTextEditor = (props: any) => {
-  const { value } = props
+  const { value, preview } = props
   const [editorState, setEditorState] = useState(() => {
     if (value) return createEditorStateFromHTML(value)
     return EditorState.createEmpty()
@@ -262,7 +311,11 @@ const WrappedRichTextEditor = (props: any) => {
 
   return (
     <EditorContext.Provider value={{ editorState, setEditorState }}>
-      <RichTextEditor {...props} />
+      {!preview ? (
+        <RichTextEditor {...props} />
+      ) : (
+        <RichTextPreview {...props} />
+      )}
     </EditorContext.Provider>
   )
 }

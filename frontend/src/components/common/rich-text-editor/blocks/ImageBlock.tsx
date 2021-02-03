@@ -14,11 +14,14 @@ import styles from '../RichTextEditor.module.scss'
 export const ImageBlock = ({
   block,
   contentState,
+  blockProps,
 }: {
   block: ContentBlock
   contentState: ContentState
+  blockProps: any
 }) => {
   const { editorState, setEditorState } = useContext(EditorContext)
+  const readOnly = blockProps?.readOnly
   const imageRef = useRef<HTMLImageElement>(null)
   const [showPopover, setShowPopover] = useState(false)
   const entity = contentState.getEntity(block.getEntityAt(0))
@@ -113,7 +116,9 @@ export const ImageBlock = ({
     }
   }
 
-  return (
+  return readOnly ? (
+    <img ref={imageRef} src={src} width={width} height={height} alt="" />
+  ) : (
     <span>
       <img
         ref={imageRef}

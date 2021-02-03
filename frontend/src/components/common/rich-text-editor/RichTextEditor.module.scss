@@ -13,6 +13,12 @@
   border-radius: $border-radius;
   color: $secondary;
 
+  &.preview {
+    border: none;
+    background: transparent;
+    border-radius: 0;
+  }
+
   :global {
     .rdw-editor-toolbar {
       border-top-left-radius: $border-radius;
@@ -227,6 +233,11 @@
   border-bottom-left-radius: $border-radius;
   border-bottom-right-radius: $border-radius;
   min-height: 250px;
+
+  &.preview {
+    padding: 0;
+    min-height: 0px;
+  }
 
   .link {
     display: inline-block;

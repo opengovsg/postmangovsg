@@ -19,6 +19,7 @@ import {
   FileInput,
   CsvUpload,
   ErrorBlock,
+  EmailPreviewBlock,
   PreviewBlock,
   NextButton,
   SampleCsv,
@@ -223,7 +224,7 @@ const EmailRecipients = ({
       {!isCsvProcessing && numRecipients > 0 && (
         <StepSection>
           <p className={styles.greyText}>Message preview</p>
-          <PreviewBlock
+          <EmailPreviewBlock
             body={preview?.body}
             subject={preview?.subject}
             replyTo={preview?.replyTo}
