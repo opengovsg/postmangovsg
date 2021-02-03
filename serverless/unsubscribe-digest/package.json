@@ -20,7 +20,7 @@
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
     "nodemailer-direct-transport": "^3.3.2",
-    "nodemailer": "^6.4.10",
+    "nodemailer": "^6.4.17",
     "pg-connection-string": "^2.3.0",
     "pg": "^8.3.0",
     "reflect-metadata": "^0.1.13",
