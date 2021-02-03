@@ -530,7 +530,11 @@ class ContentBlocksBuilder {
     }
   }
 
-  createContentBlocks(nodes: ChildNode[], style: DraftInlineStyle) {
+  createContentBlocks(
+    nodes: ChildNode[],
+    style: DraftInlineStyle,
+    shouldFlush = true
+  ) {
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]
       const nodeName = node.nodeName.toLowerCase()
@@ -550,13 +554,13 @@ class ContentBlocksBuilder {
         continue
       }
 
-      if (nodeName === 'a') {
-        this.addLink(node, style)
+      if (nodeName === 'img') {
+        this.addImage(node, style)
         continue
       }
 
-      if (nodeName === 'img') {
-        this.addImage(node, style)
+      if (nodeName === 'a') {
+        this.addLink(node, style)
         continue
       }
 
@@ -566,7 +570,7 @@ class ContentBlocksBuilder {
       }
 
       if (nodeName === '#text') {
-        const text = node.textContent?.trim()
+        const text = node.textContent
         if (text) this.appendText(text, style)
         continue
       }
@@ -586,14 +590,21 @@ class ContentBlocksBuilder {
       }
 
       const children = Array.from(node.childNodes)
-      this.createContentBlocks(children, newStyle)
+      // Because styles are applied as either a span, b, i or u tag, we don't want to flush at the end of
+      // an active style. Otherwise a line break is introduced.
+      this.createContentBlocks(children, newStyle, newStyle.isEmpty())
     }
 
     // Flush remaining data to a new block. table-cells and list-items are typically inserted here since
     // there are no nested blocks within them.
-    this.flush()
+    if (shouldFlush) this.flush()
 
     return this
+  }
+
+  flush() {
+    // We create a new block if there is already valid block type set
+    if (this.currentBlockType) this.makeContentBlock()
   }
 
   private clear() {
@@ -603,11 +614,6 @@ class ContentBlocksBuilder {
     this.currentBlockStyle = immutable.Map()
     this.characterList = immutable.List<CharacterMetadata>()
     this.contentState = ContentState.createFromText('')
-  }
-
-  private flush() {
-    // We create a new block if there is already valid block type set
-    if (this.currentBlockType) this.makeContentBlock()
   }
 
   private makeContentBlock(blockData = {}) {
@@ -666,7 +672,9 @@ class ContentBlocksBuilder {
     // Process child nodes with entity set as inserted link
     this.currentEntity = this.contentState.getLastCreatedEntityKey()
     const children = Array.from(node.childNodes)
-    this.createContentBlocks(children, style)
+    // We don't want to flush at the end because that will prevent text after the link from being
+    // rendered as the currentBlockType will be set to undefined.
+    this.createContentBlocks(children, style, false)
 
     // Reset entity
     this.currentEntity = null
@@ -796,11 +804,18 @@ const convertFromHTML = (
   entityMap: immutable.OrderedMap<string, any>
 } => {
   const root = getSafeHtmlBody(html)
-  const builder = new ContentBlocksBuilder()
+  let builder = new ContentBlocksBuilder()
 
-  return builder
-    .createContentBlocks([root], immutable.OrderedSet())
-    .getContentBlocks()
+  builder = builder.createContentBlocks([root], immutable.OrderedSet())
+
+  // For compatibility with previous templates with text not wrapped in p tags, we flush the text as
+  // an unstyled block.
+  if (builder.currentText) {
+    builder.currentBlockType = 'unstyled'
+    builder.flush()
+  }
+
+  return builder.getContentBlocks()
 }
 
 export const Converter = { convertToHTML, convertFromHTML }
