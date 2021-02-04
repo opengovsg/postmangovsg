@@ -14,7 +14,6 @@ import { Editor } from 'react-draft-wysiwyg'
 import {
   LinkControl,
   ImageControl,
-  TableControl,
   ListControl,
   BlockTypeControl,
   TextAlignControl,
@@ -36,15 +35,7 @@ import styles from './RichTextEditor.module.scss'
 const ExtendedEditor = (props: any) => <Editor {...props} />
 
 const TOOLBAR_OPTIONS = {
-  options: [
-    'inline',
-    'colorPicker',
-    'blockType',
-    'textAlign',
-    'list',
-    'link',
-    'image',
-  ],
+  options: ['inline', 'blockType', 'list', 'link', 'image'],
   inline: {
     options: ['bold', 'italic', 'underline'],
     component: InlineControl,
@@ -86,8 +77,6 @@ const TOOLBAR_OPTIONS = {
     component: LinkControl,
   },
 }
-
-const TOOLBAR_CUSTOM_BUTTONS = [<TableControl key="tableOption" />]
 
 const defaultValue = {
   editorState: EditorState.createEmpty(),
@@ -238,7 +227,6 @@ const RichTextEditor = ({
       editorState={editorState}
       onEditorStateChange={setEditorState}
       toolbar={TOOLBAR_OPTIONS}
-      toolbarCustomButtons={TOOLBAR_CUSTOM_BUTTONS}
       customDecorators={[VariableDecorator, LinkDecorator]}
       customBlockRenderFunc={renderBlock}
       blockRenderMap={extendedBlockRenderMap}
