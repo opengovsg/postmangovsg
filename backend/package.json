@@ -64,7 +64,7 @@
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4",
     "telegraf": "^3.38.0",
-    "threads": "^1.4.0",
+    "threads": "^1.6.3",
     "tiny-worker": "^2.3.0",
     "twilio": "^3.42.1",
     "uuid": "^7.0.3",
