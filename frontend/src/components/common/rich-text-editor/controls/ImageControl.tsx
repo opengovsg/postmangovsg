@@ -59,7 +59,13 @@ export const ImageControl = (props: ImageControlProps) => {
     const selection = editorState.getSelection()
     const anchorKey = selection.getAnchorKey()
     const anchor = editorState.getCurrentContent().getBlockForKey(anchorKey)
-    return anchor.getType() === 'table-cell'
+
+    const anchorType = anchor.getType()
+    return (
+      anchorType === 'table-cell' ||
+      anchorType === 'unordered-list-item' ||
+      anchorType === 'ordered-list-item'
+    )
   }
 
   function showPopover() {

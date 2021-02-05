@@ -175,7 +175,12 @@ export const TableControl = ({
       const selection = editorState.getSelection()
       const anchorKey = selection.getAnchorKey()
       const anchor = editorState.getCurrentContent().getBlockForKey(anchorKey)
-      disabled = anchor.getType() === 'table-cell'
+
+      const anchorType = anchor.getType()
+      disabled =
+        anchorType === 'table-cell' ||
+        anchorType === 'unordered-list-item' ||
+        anchorType === 'ordered-list-item'
     }
 
     return disabled
