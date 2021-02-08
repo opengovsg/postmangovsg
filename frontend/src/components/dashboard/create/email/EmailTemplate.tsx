@@ -15,6 +15,7 @@ import {
   Dropdown,
   StepHeader,
   StepSection,
+  RichTextEditor,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
@@ -187,11 +188,10 @@ const EmailTemplate = ({
             </>
           )}
 
-          <TextArea
-            highlight={true}
-            placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
+          <RichTextEditor
             value={body}
             onChange={setBody}
+            placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
           />
         </div>
 

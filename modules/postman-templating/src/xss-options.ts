@@ -19,15 +19,34 @@ const isValidHttpUrl = (urlStr: string): boolean => {
   }
 }
 
+const DEFAULT_EMAIL_ATTRS = ['style']
 export const XSS_EMAIL_OPTION = {
   whiteList: {
-    b: [],
-    i: [],
-    u: [],
-    br: [],
-    p: [],
-    a: ['href', 'title', 'target'],
-    img: ['src', 'alt', 'title', 'width', 'height'],
+    span: DEFAULT_EMAIL_ATTRS,
+    b: DEFAULT_EMAIL_ATTRS,
+    strong: DEFAULT_EMAIL_ATTRS,
+    i: DEFAULT_EMAIL_ATTRS,
+    em: DEFAULT_EMAIL_ATTRS,
+    u: DEFAULT_EMAIL_ATTRS,
+    ins: DEFAULT_EMAIL_ATTRS,
+    br: DEFAULT_EMAIL_ATTRS,
+    p: DEFAULT_EMAIL_ATTRS,
+    ul: DEFAULT_EMAIL_ATTRS,
+    ol: DEFAULT_EMAIL_ATTRS,
+    li: DEFAULT_EMAIL_ATTRS,
+    h1: DEFAULT_EMAIL_ATTRS,
+    h2: DEFAULT_EMAIL_ATTRS,
+    h3: DEFAULT_EMAIL_ATTRS,
+    h4: DEFAULT_EMAIL_ATTRS,
+    h5: DEFAULT_EMAIL_ATTRS,
+    h6: DEFAULT_EMAIL_ATTRS,
+    a: ['href', 'title', 'target', ...DEFAULT_EMAIL_ATTRS],
+    img: ['src', 'alt', 'title', 'width', 'height', ...DEFAULT_EMAIL_ATTRS],
+    div: [],
+    tbody: [],
+    table: DEFAULT_EMAIL_ATTRS,
+    tr: DEFAULT_EMAIL_ATTRS,
+    td: DEFAULT_EMAIL_ATTRS,
   },
   safeAttrValue: (tag: string, name: string, value: string): string => {
     // Note: value has already been auto-trimmed of whitespaces

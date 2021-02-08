@@ -34,7 +34,7 @@ const verifyBotIdRegistered = async (
 const handleUpdate = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): Promise<Response | void> => {
   const { botId, botToken } = res.locals
   try {
@@ -42,7 +42,12 @@ const handleUpdate = async (
     logger.info({ message: 'Update bot', botId, action: 'handleUpdate' })
     return res.sendStatus(200)
   } catch (err) {
-    return next(err)
+    logger.error({
+      error: err,
+      botId,
+      action: 'handleUpdate',
+    })
+    return res.sendStatus(200) // On errors, Do not trigger retries by Telegram API
   }
 }
 export const TelegramCallbackMiddleware = {
