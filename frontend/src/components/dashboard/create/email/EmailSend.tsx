@@ -11,7 +11,7 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { EmailProgress, Status } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
-  PreviewBlock,
+  EmailPreviewBlock,
   PrimaryButton,
   ConfirmModal,
   ButtonGroup,
@@ -94,7 +94,7 @@ const EmailSend = ({
 
         <div>
           <p className={styles.greyText}>Message</p>
-          <PreviewBlock
+          <EmailPreviewBlock
             body={preview.body}
             subject={preview.subject}
             replyTo={preview.replyTo}

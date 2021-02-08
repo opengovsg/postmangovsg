@@ -53,6 +53,7 @@ frontend:
         - key: "Referrer-Policy"
           value: "same-origin"
         - key: "Content-Security-Policy"
+          # unsafe-inline added to style-src to allow for inline styles
           value: "connect-src 'self'
             https://*.postman.gov.sg https://postmangovsg-dev-upload.s3.ap-northeast-1.amazonaws.com/
             https://postmangovsg-prod-upload.s3.ap-northeast-1.amazonaws.com
@@ -60,7 +61,7 @@ frontend:
             https://s3.ap-southeast-1.amazonaws.com/file-production.postman.gov.sg/
             https://o399364.ingest.sentry.io/
             https://www.google-analytics.com;
-            style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com;
+            style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com 'unsafe-inline';
             font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
             default-src 'self' https://*.postman.gov.sg;
             object-src 'none';
