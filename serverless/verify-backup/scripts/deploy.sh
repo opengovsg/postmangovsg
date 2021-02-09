@@ -6,18 +6,20 @@
 # 2. Ensure instructions in Pre-requisites to run scripts section in readme are fulfilled
 
 echo 'Setting up service account...'
-gcloud auth activate-service-account $GCLOUD_SERVICE_ACCOUNT --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+./google-cloud-sdk/bin/gcloud auth activate-service-account $GCLOUD_SERVICE_ACCOUNT --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
 echo 'Submitting build to Cloud Build...'
-gcloud builds submit --tag gcr.io/postmangovsg/verify-backup --gcs-log-dir gs://postmangovsg-cloudbuild-logs/logs
+./google-cloud-sdk/bin/gcloud builds submit --tag gcr.io/postmangovsg/verify-backup --gcs-log-dir gs://postmangovsg-cloudbuild-logs/logs
 
 echo 'Deploying build to Cloud Run...'
 # --set-env-vars `grep -v '^#' .env | awk -v ORS=, 'NF { print $1 }'`pulls env vars from .env file and formats as args
-gcloud run deploy $GCLOUD_RUN_SERVICE_NAME \
+./google-cloud-sdk/bin/gcloud run deploy $GCLOUD_RUN_SERVICE_NAME \
   --region asia-southeast1 \
-  --no-allow-unauthenticated  \
+  --no-allow-unauthenticated \
   --image gcr.io/postmangovsg/verify-backup \
   --service-account $GCLOUD_SERVICE_ACCOUNT \
   --platform managed \
   --set-env-vars `grep -v '^#' .env | awk -v ORS=, 'NF { print $1 }'` \
-  --memory 4G
+  --timeout 15m \
+  --cpu 1 \
+  --memory 4Gi

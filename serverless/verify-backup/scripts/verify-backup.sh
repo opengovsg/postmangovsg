@@ -37,7 +37,7 @@ DUMP_VERSION=$(cat dump-version.txt)
 # Restore dump; On error, print error message and exit script
 echo 'Restoring data dump'
 RESTORE_LOG="$DUMP_VERSION Data dump restoration failed!"
-pg_restore --no-owner --dbname $PGDATABASE postman.decrypted.dump || notifyAndExit
+pg_restore -v --no-owner --dbname $PGDATABASE postman.decrypted.dump || notifyAndExit
 
 echo 'Making simple query on db'
 RESTORE_LOG="$DUMP_VERSION Verification query on restored db failed!"
