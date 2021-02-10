@@ -17,7 +17,7 @@ const AnnouncementModal = () => {
   useEffect(() => {
     setBeforeClose(() => async () => {
       try {
-        await updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
+        await updateAnnouncementVersion(await ANNOUNCEMENT.version)
       } catch (err) {
         setErrorMessage(err.message)
       }

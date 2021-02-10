@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/common/progress-details/ProgressDetails.tsx:92
+#: src/components/common/progress-details/ProgressDetails.tsx:95
 msgid "Delivery report has expired and is no longer available for download."
 msgstr "Delivery report has expired and is no longer available for download."
 
@@ -21,11 +21,11 @@ msgstr "Delivery report has expired and is no longer available for download."
 msgid "Delivery report will expire 14 days after sending is completed."
 msgstr "Delivery report will expire 14 days after sending is completed."
 
-#: src/components/login/login-input/LoginInput.tsx:86
+#: src/components/login/login-input/LoginInput.tsx:90
 msgid "Enter OTP"
 msgstr "Enter OTP"
 
-#: src/components/login/login-input/LoginInput.tsx:86
+#: src/components/login/login-input/LoginInput.tsx:90
 msgid "Get OTP"
 msgstr "Get OTP"
 
@@ -33,31 +33,31 @@ msgstr "Get OTP"
 msgid "I'd rather stay"
 msgstr "I'd rather stay"
 
-#: src/components/login/login-input/LoginInput.tsx:79
+#: src/components/login/login-input/LoginInput.tsx:83
 msgid "One-Time Password"
 msgstr "One-Time Password"
 
-#: src/components/dashboard/campaigns/Campaigns.tsx:118
+#: src/components/dashboard/campaigns/Campaigns.tsx:138
 msgid "Report expired"
 msgstr "Report expired"
 
-#: src/components/login/login-input/LoginInput.tsx:82
+#: src/components/login/login-input/LoginInput.tsx:86
 msgid "Resend?"
 msgstr "Resend?"
 
-#: src/components/login/login-input/LoginInput.tsx:82
+#: src/components/login/login-input/LoginInput.tsx:86
 msgid "Resending OTP..."
 msgstr "Resending OTP..."
 
-#: src/components/login/login-input/LoginInput.tsx:86
+#: src/components/login/login-input/LoginInput.tsx:90
 msgid "Sending OTP..."
 msgstr "Sending OTP..."
 
-#: src/components/login/login-input/LoginInput.tsx:86
+#: src/components/login/login-input/LoginInput.tsx:90
 msgid "Sign In"
 msgstr "Sign In"
 
-#: src/components/login/login-input/LoginInput.tsx:79
+#: src/components/login/login-input/LoginInput.tsx:83
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
 
@@ -65,40 +65,36 @@ msgstr "Sign in with your gov.sg email"
 msgid "Unsubscribe me"
 msgstr "Unsubscribe me"
 
-#: src/components/login/login-input/LoginInput.tsx:86
+#: src/components/login/login-input/LoginInput.tsx:90
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: src/config.ts:48
+#: src/config.ts:59
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
-#: src/config.ts:63
+#: src/config.ts:79
 msgid "announcement.buttonText"
 msgstr "Read guide"
 
-#: src/config.ts:62
+#: src/config.ts:78
 msgid "announcement.buttonUrl"
 msgstr "https://guide.postman.gov.sg/release-notes"
 
-#: src/config.ts:61
+#: src/config.ts:77
 msgid "announcement.imageUrl"
 msgstr "https://file.go.gov.sg/dz52q4.png"
 
-#: src/config.ts:60
+#: src/config.ts:76
 msgid "announcement.subtext"
 msgstr "Thanks for using Postman and joining us every step of the way while we mature as a product. We'll be releasing exciting new features this year. For instance, this is an announcement modal that will keep you up-to-date about our new features! Watch this space for things that are brewing. Learn more about Postman's releases by reading our guide."
 
-#: src/config.ts:59
+#: src/config.ts:75
 msgid "announcement.title"
 msgstr "Happy New Year! Congrats on making it through 2020."
 
-#: src/config.ts:58
-msgid "announcement.version"
-msgstr "1.17.2"
-
 #: src/components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
-#: src/config.ts:46
+#: src/config.ts:57
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
 
@@ -110,7 +106,7 @@ msgstr "This demo campaign will be sent to a maximum of 20 recipients."
 msgid "demoMessageLabel"
 msgstr "DEMO"
 
-#: src/components/login/login-input/LoginInput.tsx:86
+#: src/components/login/login-input/LoginInput.tsx:90
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
 
@@ -150,74 +146,74 @@ msgstr "Bot has been blocked by the recipient. Please contact the recipient via 
 msgid "errors.telegram.notSubscribed"
 msgstr "Recipient has not subscribed to your agency's bot - please ask them to subscribe before sending a message."
 
-#: src/config.ts:37
+#: src/config.ts:48
 msgid "link.contactUsUrl"
 msgstr "https://go.gov.sg/postman-contact-us"
 
-#: src/config.ts:38
+#: src/config.ts:49
 msgid "link.contributeUrl"
 msgstr "https://github.com/opengovsg/postmangovsg"
 
-#: src/config.ts:42
+#: src/config.ts:53
 msgid "link.customFromAddressRequestUrl"
 msgstr "https://go.gov.sg/postman-custom-from"
 
-#: src/config.ts:43
+#: src/config.ts:54
 msgid "link.demoTelegramBotUrl"
 msgstr "https://go.gov.sg/postmangovsgbot"
 
-#: src/config.ts:44
+#: src/config.ts:55
 msgid "link.demoVideoUrl"
 msgstr "https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/Demo+Campaign+Mode.mp4"
 
-#: src/config.ts:35
+#: src/config.ts:46
 msgid "link.guideDemoUrl"
 msgstr "https://guide.postman.gov.sg/before-you-start/demo-mode"
 
-#: src/config.ts:28
+#: src/config.ts:39
 msgid "link.guideEmailPasswordProtectedUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/password-protected-email"
 
-#: src/config.ts:34
+#: src/config.ts:45
 msgid "link.guidePowerUserUrl"
 msgstr "https://guide.postman.gov.sg/guide/power-users"
 
-#: src/config.ts:36
+#: src/config.ts:47
 msgid "link.guideRemoveDuplicatesUrl"
 msgstr "https://guide.postman.gov.sg/quick-start#remove-duplicates-in-excel"
 
-#: src/config.ts:30
+#: src/config.ts:41
 msgid "link.guideSmsAccountSidUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-1-account-sid-and-auth-token"
 
-#: src/config.ts:31
+#: src/config.ts:42
 msgid "link.guideSmsApiKeyUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-2-set-up-a-standard-api-key"
 
-#: src/config.ts:32
+#: src/config.ts:43
 msgid "link.guideSmsMessagingServiceUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-3-set-up-your-messaging-service"
 
-#: src/config.ts:29
+#: src/config.ts:40
 msgid "link.guideSmsUrl"
 msgstr "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
 
-#: src/config.ts:33
+#: src/config.ts:44
 msgid "link.guideTelegramUrl"
 msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
 
-#: src/config.ts:27
+#: src/config.ts:38
 msgid "link.guideUrl"
 msgstr "https://guide.postman.gov.sg"
 
-#: src/config.ts:40
+#: src/config.ts:51
 msgid "link.privacyUrl"
 msgstr "https://guide.postman.gov.sg/legal/privacy"
 
-#: src/config.ts:41
+#: src/config.ts:52
 msgid "link.reportBugUrl"
 msgstr "https://guide.postman.gov.sg/contact-us"
 
-#: src/config.ts:39
+#: src/config.ts:50
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"

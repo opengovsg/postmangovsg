@@ -26,7 +26,6 @@ import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 import AnnouncementModal from './announcement-modal'
-import { i18n } from 'locales'
 import { ANNOUNCEMENT } from 'config'
 
 const ITEMS_PER_PAGE = 10
@@ -67,38 +66,18 @@ const Campaigns = () => {
     setLoading(false)
   }
 
-  // Returns true if lastSeenVersion < currentPackageVersion, else false
-  function compareSemver(
-    lastSeenVersion: string,
-    currentPackageVersion: string
-  ) {
-    if (!lastSeenVersion) {
-      return true
-    }
-    const lastSeenSplit = lastSeenVersion
-      .split('.')
-      .map((num) => parseInt(num, 10))
-    const currentSplit = currentPackageVersion
-      .split('.')
-      .map((num) => parseInt(num, 10))
-    for (let i = 0; i < 3; i++) {
-      if (lastSeenSplit[i] < currentSplit[i]) {
-        return true
-      }
-      if (lastSeenSplit[i] > currentSplit[i]) {
-        return false
-      }
-    }
-    return false
+  // Returns true if the current version is different from the last seen version
+  function compareVersions(lastSeenVersion: string, currentVersion: string) {
+    return lastSeenVersion !== currentVersion
   }
 
   // Only call the modalContext if content is currently null - prevents infinite re-rendering
   // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
   const displayNewAnnouncement = useCallback(
-    (userAnnouncementVersion: string) => {
+    (userAnnouncementVersion: string, latestAnnouncementVersion: string) => {
       if (
         ANNOUNCEMENT.isActive &&
-        compareSemver(userAnnouncementVersion, i18n._(ANNOUNCEMENT.version)) &&
+        compareVersions(userAnnouncementVersion, latestAnnouncementVersion) &&
         modalContext.modalContent === null
       ) {
         modalContext.setModalContent(<AnnouncementModal />)
@@ -115,10 +94,11 @@ const Campaigns = () => {
     // TODO: refactor out num demos processing
     async function getNumDemosAndAnnouncementVersion() {
       const { demo, announcementVersion } = await getUserSettings()
+      const latestAnnouncementVersion = await ANNOUNCEMENT.version
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
-      displayNewAnnouncement(announcementVersion)
+      displayNewAnnouncement(announcementVersion, latestAnnouncementVersion)
     }
     getNumDemosAndAnnouncementVersion()
   }, [displayNewAnnouncement])

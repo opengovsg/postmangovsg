@@ -1,5 +1,9 @@
 import axios from 'axios'
 import { t } from '@lingui/macro'
+import { i18n } from 'locales'
+
+import { sha256 } from './services/crypto.service'
+
 /**
  * React env vars are used for injecting variables at build time
  * https://create-react-app.dev/docs/adding-custom-environment-variables/#referencing-environment-variables-in-the-html
@@ -63,12 +67,32 @@ function getAnnouncementActive() {
 
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user
-export const ANNOUNCEMENT = {
+export const ANNOUNCEMENT: any = {
   isActive: getAnnouncementActive(),
-  version: t('announcement.version')``,
   title: t('announcement.title')``,
   subtext: t('announcement.subtext')``,
   imageUrl: t('announcement.imageUrl')``,
   buttonUrl: t('announcement.buttonUrl')``,
   buttonText: t('announcement.buttonText')``,
 }
+
+// Lazily compute the announcement version and memoize it for future use.
+let memoizedVersion: string | null = null
+export async function getAnnouncementVersion(): Promise<string> {
+  if (memoizedVersion !== null) {
+    return memoizedVersion
+  }
+  const HASHABLE_KEYS = [
+    'title',
+    'subtext',
+    'imageUrl',
+    'buttonUrl',
+    'buttonText',
+  ]
+  const translations = HASHABLE_KEYS.map((key) => i18n._(ANNOUNCEMENT[key]))
+  const concatenatedStr = translations.join(';')
+  memoizedVersion = await sha256(concatenatedStr)
+  return memoizedVersion
+}
+// Users of ANNOUNCEMENT.version have to await it.
+ANNOUNCEMENT.version = getAnnouncementVersion()
