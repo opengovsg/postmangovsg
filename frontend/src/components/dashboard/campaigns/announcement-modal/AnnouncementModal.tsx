@@ -9,6 +9,13 @@ import styles from './AnnouncementModal.module.scss'
 import { i18n } from 'locales'
 import { ANNOUNCEMENT } from 'config'
 import { OutboundLink } from 'react-ga'
+import ReactPlayer from 'react-player/lazy'
+
+function isVideoUrl(url: string) {
+  url = url.toLowerCase()
+  const VIDEO_EXTENSIONS = ['mp4']
+  return VIDEO_EXTENSIONS.some((extension) => url.endsWith(`.${extension}`))
+}
 
 const AnnouncementModal = () => {
   const { close, setBeforeClose } = useContext(ModalContext)
@@ -33,13 +40,30 @@ const AnnouncementModal = () => {
     }
   }
 
-  return (
-    <div className={styles.modal}>
+  const mediaUrl = i18n._(ANNOUNCEMENT.mediaUrl)
+  let mediaContent = null
+  if (isVideoUrl(mediaUrl)) {
+    mediaContent = (
+      <ReactPlayer
+        url={mediaUrl}
+        className={styles.modalMedia}
+        controls
+        playing
+      />
+    )
+  } else {
+    mediaContent = (
       <img
-        className={styles.modalImg}
-        src={i18n._(ANNOUNCEMENT.imageUrl)}
+        className={styles.modalMedia}
+        src={mediaUrl}
         alt="Modal graphic"
       ></img>
+    )
+  }
+
+  return (
+    <div className={styles.modal}>
+      {mediaContent}
       <h4 className={styles.title}>{i18n._(ANNOUNCEMENT.title)}</h4>
       <div className={styles.content}>{i18n._(ANNOUNCEMENT.subtext)}</div>
       <div className={styles.options}>

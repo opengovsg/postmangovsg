@@ -37,7 +37,7 @@ msgstr "I'd rather stay"
 msgid "One-Time Password"
 msgstr "One-Time Password"
 
-#: src/components/dashboard/campaigns/Campaigns.tsx:138
+#: src/components/dashboard/campaigns/Campaigns.tsx:137
 msgid "Report expired"
 msgstr "Report expired"
 
@@ -82,7 +82,7 @@ msgid "announcement.buttonUrl"
 msgstr "https://guide.postman.gov.sg/release-notes"
 
 #: src/config.ts:77
-msgid "announcement.imageUrl"
+msgid "announcement.mediaUrl"
 msgstr "https://file.go.gov.sg/dz52q4.png"
 
 #: src/config.ts:76

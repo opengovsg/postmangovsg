@@ -39,8 +39,9 @@ $title-height: $height-4;
   margin-top: 25px;
 }
 
-.modalImg {
+.modalMedia {
   max-height: 250px;
+  max-width: 100%;
 
   @include mobile() {
     max-height: 20vh;

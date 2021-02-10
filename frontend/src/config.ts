@@ -71,7 +71,7 @@ export const ANNOUNCEMENT: any = {
   isActive: getAnnouncementActive(),
   title: t('announcement.title')``,
   subtext: t('announcement.subtext')``,
-  imageUrl: t('announcement.imageUrl')``,
+  mediaUrl: t('announcement.mediaUrl')``,
   buttonUrl: t('announcement.buttonUrl')``,
   buttonText: t('announcement.buttonText')``,
 }
@@ -85,7 +85,7 @@ export async function getAnnouncementVersion(): Promise<string> {
   const HASHABLE_KEYS = [
     'title',
     'subtext',
-    'imageUrl',
+    'mediaUrl',
     'buttonUrl',
     'buttonText',
   ]
