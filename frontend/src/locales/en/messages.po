@@ -73,17 +73,25 @@ msgstr "Verifying OTP..."
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
-#: src/config.ts:79
-msgid "announcement.buttonText"
-msgstr "Read guide"
-
-#: src/config.ts:78
-msgid "announcement.buttonUrl"
-msgstr "https://guide.postman.gov.sg/release-notes"
-
 #: src/config.ts:77
 msgid "announcement.mediaUrl"
 msgstr "https://file.go.gov.sg/dz52q4.png"
+
+#: src/config.ts:79
+msgid "announcement.primaryButtonText"
+msgstr "Read guide"
+
+#: src/config.ts:78
+msgid "announcement.primaryButtonUrl"
+msgstr "https://guide.postman.gov.sg/release-notes"
+
+#: src/config.ts:81
+msgid "announcement.secondaryButtonText"
+msgstr "null"
+
+#: src/config.ts:80
+msgid "announcement.secondaryButtonUrl"
+msgstr "null"
 
 #: src/config.ts:76
 msgid "announcement.subtext"

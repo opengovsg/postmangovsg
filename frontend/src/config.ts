@@ -72,8 +72,10 @@ export const ANNOUNCEMENT: any = {
   title: t('announcement.title')``,
   subtext: t('announcement.subtext')``,
   mediaUrl: t('announcement.mediaUrl')``,
-  buttonUrl: t('announcement.buttonUrl')``,
-  buttonText: t('announcement.buttonText')``,
+  primaryButtonUrl: t('announcement.primaryButtonUrl')``,
+  primaryButtonText: t('announcement.primaryButtonText')``,
+  secondaryButtonUrl: t('announcement.secondaryButtonUrl')``,
+  secondaryButtonText: t('announcement.secondaryButtonText')``,
 }
 
 // Lazily compute the announcement version and memoize it for future use.
@@ -86,8 +88,10 @@ export async function getAnnouncementVersion(): Promise<string> {
     'title',
     'subtext',
     'mediaUrl',
-    'buttonUrl',
-    'buttonText',
+    'primaryButtonUrl',
+    'primaryButtonText',
+    'secondaryButtonUrl',
+    'secondaryButtonText',
   ]
   const translations = HASHABLE_KEYS.map((key) => i18n._(ANNOUNCEMENT[key]))
   const concatenatedStr = translations.join(';')
