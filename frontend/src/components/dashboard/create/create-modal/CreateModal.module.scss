@@ -3,10 +3,6 @@
 
 $modal-width: $tablet;
 
-.content {
-  margin-left: calc(78px - (#{$modal-width} - 528px) / 2);
-  margin-right: calc(78px - (#{$modal-width} - 528px) / 2);
-}
 .section {
   margin-bottom: 2rem;
   @include flex-vertical;
