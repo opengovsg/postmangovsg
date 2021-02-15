@@ -86,7 +86,10 @@ export const getDbCredentialsWithoutUsers = async (): Promise<
 > => {
   const sequelize = await getSequelize()
 
-  // Select credentials that are not associated to a user and is not a demo/default credential
+  // Select credentials that are are:
+  // 1. Not a demo/default credential
+  // 2. Does not belong to an user
+  // 3. Not used in an unsent campaign
   const results = await sequelize.query(`
     SELECT
       name
@@ -96,6 +99,16 @@ export const getDbCredentialsWithoutUsers = async (): Promise<
     WHERE
       LOWER(credentials.name) NOT SIMILAR TO '%_(default|demo)'
       AND user_id IS NULL
+      AND name NOT IN (
+        SELECT DISTINCT
+          cred_name
+        FROM
+          campaigns, statistics
+        WHERE
+          campaigns.id = statistics.campaign_id
+          AND unsent > 0
+          AND cred_name IS NOT NULL
+      )
   `)
 
   const credentials = results[0]
