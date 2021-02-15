@@ -70,11 +70,11 @@ export const removeCredentials = async (
   dryRun: boolean
 ): Promise<void> => {
   for (const secretId of secretIds) {
+    // Remove from secrets manager first. If an error occurs, skip trying to remove from database
+    // to facilitate retry.
+    await deleteFromSecretManager(secretId, dryRun)
     // Remove from database
     await deleteFromDb(secretId, dryRun)
-
-    // Remove from secrets manager
-    await deleteFromSecretManager(secretId, dryRun)
   }
 }
 
