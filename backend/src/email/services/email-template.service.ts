@@ -167,7 +167,7 @@ const storeTemplate = async ({
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const sanitizedSubject = client.replaceNewLinesAndSanitize(subject)
-  const sanitizedBody = client.replaceNewLinesAndSanitize(body)
+  const sanitizedBody = client.filterXSS(body)
   if (!sanitizedSubject || !sanitizedBody) {
     throw new TemplateError(
       'Message template is invalid as it only contains invalid HTML tags!'

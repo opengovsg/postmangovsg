@@ -3,6 +3,7 @@
 
 .detailBlock {
   @include block($neutral-light, $secondary);
+  overflow-wrap: anywhere;
   border-left: none;
   margin: 0;
 
@@ -11,6 +12,21 @@
 
     p {
       margin: 0;
+    }
+  }
+
+  table {
+    border: none;
+
+    tr {
+      display: table-row;
+      height: auto;
+      border: none;
+    }
+
+    td {
+      display: table-cell;
+      border: none;
     }
   }
 }
