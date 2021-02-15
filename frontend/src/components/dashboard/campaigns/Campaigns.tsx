@@ -66,18 +66,13 @@ const Campaigns = () => {
     setLoading(false)
   }
 
-  // Returns true if the current version is different from the last seen version
-  function compareVersions(lastSeenVersion: string, currentVersion: string) {
-    return lastSeenVersion !== currentVersion
-  }
-
   // Only call the modalContext if content is currently null - prevents infinite re-rendering
   // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
   const displayNewAnnouncement = useCallback(
-    (userAnnouncementVersion: string, latestAnnouncementVersion: string) => {
+    (lastSeenVersion: string, currentVersion: string) => {
       if (
         ANNOUNCEMENT.isActive &&
-        compareVersions(userAnnouncementVersion, latestAnnouncementVersion) &&
+        lastSeenVersion !== currentVersion &&
         modalContext.modalContent === null
       ) {
         modalContext.setModalContent(<AnnouncementModal />)
