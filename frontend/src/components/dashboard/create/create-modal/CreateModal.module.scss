@@ -37,9 +37,14 @@ $modal-width: $tablet;
       justify-content: space-between;
       height: 4.5rem;
       border: 1px solid $primary;
+      cursor: default;
 
       .icon {
         @extend %icon-large;
+      }
+
+      &.active:hover {
+        background: $primary;
       }
 
       &:not(.active) {
@@ -49,6 +54,7 @@ $modal-width: $tablet;
         &:hover {
           background: $primary;
           color: white;
+          cursor: pointer;
         }
       }
     }
