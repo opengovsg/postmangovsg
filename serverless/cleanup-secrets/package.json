@@ -1,0 +1,39 @@
+{
+  "name": "cleanup-secrets",
+  "version": "1.0.0",
+  "description": "Clean up orphaned secrets in Secrets Manager",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "rm -rf build && tsc && cp -r src/assets build/assets",
+    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h handler -e examples/event-dry-run.js\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/convict": "^5.2.2",
+    "@types/node": "^14.14.7",
+    "@types/bluebird": "^3.5.33",
+    "@types/validator": "^13.1.0",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
+    "eslint": "^7.13.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "lambda-local": "^1.7.4",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^4.0.5"
+  },
+  "dependencies": {
+    "@sentry/node": "^5.27.4",
+    "aws-sdk": "^2.814.0",
+    "axios": "^0.21.0",
+    "convict": "^6.0.0",
+    "dotenv": "^8.2.0",
+    "pg": "^8.5.1",
+    "pg-connection-string": "^2.4.0",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^5.22.3",
+    "sequelize-typescript": "^1.1.0",
+    "source-map-support": "^0.5.19"
+  }
+}
