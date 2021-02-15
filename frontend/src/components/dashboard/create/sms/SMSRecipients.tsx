@@ -29,7 +29,7 @@ import {
   WarningBlock,
 } from 'components/common'
 import { LINKS } from 'config'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import { CampaignContext } from 'contexts/campaign.context'

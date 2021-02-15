@@ -1,5 +1,4 @@
 import { t } from '@lingui/macro'
-import { i18n } from 'locales'
 import { Campaign, CampaignRecipient } from './Campaign'
 
 export enum TelegramProgress {
@@ -54,9 +53,9 @@ export class TelegramCampaignRecipient extends CampaignRecipient {
       switch (code) {
         case 1:
         case 2:
-          return i18n._(t('errors.telegram.notSubscribed')``)
+          return t`errors.telegram.notSubscribed`
         case 403:
-          return i18n._(t('errors.telegram.blocked')``)
+          return t`errors.telegram.blocked`
       }
     }
 

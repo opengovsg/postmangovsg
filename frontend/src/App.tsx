@@ -9,7 +9,8 @@ import TestUtils from 'components/test-utils'
 import Unsubscribe from 'components/unsubscribe'
 
 // Locales
-import { i18n } from 'locales'
+import 'locales'
+import { i18n } from '@lingui/core'
 
 // Contexts
 import AuthContextProvider from 'contexts/auth.context'
@@ -25,7 +26,7 @@ const Dashboard = lazy(() => import('components/dashboard'))
 
 const App = () => {
   return (
-    <I18nProvider language={i18n.language} i18n={i18n}>
+    <I18nProvider i18n={i18n}>
       <Router>
         <AuthContextProvider>
           <Switch>

@@ -17,7 +17,7 @@ import { ModalContext } from 'contexts/modal.context'
 
 import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 const CreateModal = ({
   name = '',
