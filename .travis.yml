@@ -4,6 +4,7 @@ node_js:
 
 services:
   - docker
+  - postgresql
 
 cache: npm
 
@@ -16,6 +17,8 @@ jobs:
         - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       install:
         - npm ci
+      before-script:
+        - psql -c 'create database postmangovsg_test;' -U postgres
       script:
         - npm run lint-no-fix
         - npm run test

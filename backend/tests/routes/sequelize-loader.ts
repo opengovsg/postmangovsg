@@ -33,7 +33,7 @@ import {
 import { DefaultCredentialName } from '@core/constants'
 import { formatDefaultCredentialName } from '@core/utils'
 
-const DB_TEST_URI = config.get('database.databaseTestUri')
+const DB_TEST_URI = config.get('database.databaseUri')
 
 const sequelizeLoader = async (): Promise<void> => {
   const sequelize = new Sequelize(DB_TEST_URI, {
