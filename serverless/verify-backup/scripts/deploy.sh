@@ -20,6 +20,6 @@ gcloud run deploy $GCLOUD_RUN_SERVICE_NAME \
   --service-account $GCLOUD_SERVICE_ACCOUNT \
   --platform managed \
   --set-env-vars `grep -v '^#' .env | awk -v ORS=, 'NF { print $1 }'` \
-  --timeout 15m \
+  --timeout 5m \
   --cpu 1 \
   --memory 4Gi
