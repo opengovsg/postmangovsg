@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express'
+import { errors as celebrateErrorMiddleware } from 'celebrate'
 import bodyParser from 'body-parser'
 import sessionLoader from '@core/loaders/session.loader'
-import { errors as celebrateErrorMiddleware } from 'celebrate'
 import routes from '@core/routes'
 
 const unAuthenticatedRoutes = ['auth', 'stats', 'protect', 'unsubscribe']

@@ -1,15 +1,36 @@
 import request from 'supertest'
 import app from '../server'
-import { CampaignMock } from '@tests/setup'
-import { CampaignService } from '@core/services'
-import { Campaign } from '@core/models'
+import { Campaign, User, UserDemo } from '@core/models'
+import sequelizeLoader from '../sequelize-loader'
+
+beforeAll(async () => {
+  await sequelizeLoader()
+  await User.destroy({ where: {} })
+  await UserDemo.destroy({ where: {} })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+})
+
+afterEach(async () => {
+  await Campaign.destroy({ where: {} })
+})
 
 describe('GET /campaigns', () => {
   test('List campaigns with default limit and offset', async () => {
-    CampaignMock.$queueResult({
-      rows: [CampaignMock.build(), CampaignMock.build()],
-      count: 2,
+    await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: 'SMS',
+      valid: false,
+      protect: false,
     })
+    await Campaign.create({
+      name: 'campaign-2',
+      userId: 1,
+      type: 'SMS',
+      valid: false,
+      protect: false,
+    })
+
     const res = await request(app).get('/campaigns')
     expect(res.status).toBe(200)
     expect(res.body).toEqual({
@@ -21,43 +42,31 @@ describe('GET /campaigns', () => {
   })
 
   test('List campaigns with defined limit and offset', async () => {
-    CampaignMock.$queueResult({
-      rows: [CampaignMock.build({ id: 5 })],
-      count: 1,
-    })
+    for (let i = 1; i <= 3; i++) {
+      await Campaign.create({
+        name: `campaign-${i}`,
+        userId: 1,
+        type: 'SMS',
+        valid: false,
+        protect: false,
+      })
+    }
+
     const res = await request(app)
       .get('/campaigns')
       .query({ limit: 1, offset: 2 })
     expect(res.status).toBe(200)
     expect(res.body).toEqual({
-      total_count: 1,
-      campaigns: expect.arrayContaining([expect.objectContaining({ id: 5 })]),
+      total_count: 3,
+      campaigns: expect.arrayContaining([
+        expect.objectContaining({ name: 'campaign-1' }),
+      ]),
     })
   })
 })
 
 describe('POST /campaigns', () => {
-  test('Fail to create campaign', async () => {
-    // Create campaign returns void when campaign creation fails
-    CampaignService.createCampaignWithTransaction = jest.fn(
-      async () => new Promise<void>((resolve) => resolve())
-    )
-    const res = await request(app).post('/campaigns').send({
-      name: 'test',
-      type: 'SMS',
-    })
-    expect(res.status).toBe(400)
-    expect(res.body).toEqual({
-      message: 'Unable to create campaign with these parameters',
-    })
-  })
-
   test('Successfully create SMS campaign', async () => {
-    // Create campaign returns void when campaign creation fails
-    CampaignService.createCampaignWithTransaction = jest.fn(
-      async () =>
-        new Promise<Campaign>((resolve) => resolve(CampaignMock.build()))
-    )
     const res = await request(app).post('/campaigns').send({
       name: 'test',
       type: 'SMS',
@@ -65,10 +74,29 @@ describe('POST /campaigns', () => {
     expect(res.status).toBe(201)
     expect(res.body).toEqual(
       expect.objectContaining({
-        id: expect.any(Number),
-        created_at: expect.any(String),
+        name: 'test',
+        protect: false,
       })
     )
+  })
+
+  test('Successfully create demo SMS campaign', async () => {
+    const res = await request(app).post('/campaigns').send({
+      name: 'demo',
+      type: 'SMS',
+      demo_message_limit: 10,
+    })
+    expect(res.status).toBe(201)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        name: 'demo',
+        protect: false,
+        demo_message_limit: 10,
+      })
+    )
+
+    const demo = await UserDemo.findOne({ where: { userId: 1 } })
+    expect(demo?.numDemosSms).toEqual(2)
   })
 
   test('Create protected campaign for unsupported channel', async () => {

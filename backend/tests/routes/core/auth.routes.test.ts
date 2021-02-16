@@ -1,7 +1,11 @@
 import request from 'supertest'
 import app from '../server'
+import sequelizeLoader from '../sequelize-loader'
 import { AuthService } from '@core/services'
-import { UserMock } from '@tests/setup'
+
+beforeAll(async () => {
+  await sequelizeLoader()
+})
 
 describe('POST /auth/otp', () => {
   test('Invalid email format', async () => {
@@ -12,24 +16,12 @@ describe('POST /auth/otp', () => {
   })
 
   test('Non gov.sg and non-whitelisted email', async () => {
-    // Mock db query to User table to return null to mock user who is not whitelisted
-    UserMock.$queueResult(null)
-
+    // There are no users in the db
     const res = await request(app)
       .post('/auth/otp')
       .send({ email: 'user@agency.com.sg' })
     expect(res.status).toBe(401)
     expect(res.body).toEqual({ message: 'User is not authorized' })
-  })
-
-  test('Non gov.sg and whitelisted email', async () => {
-    // Mock db query to User table to return null to mock user who is not whitelisted
-    UserMock.$queueResult(UserMock.build({ email: 'user@agency.com.sg' }))
-
-    const res = await request(app)
-      .post('/auth/otp')
-      .send({ email: 'user@agency.com.sg' })
-    expect(res.status).toBe(200)
   })
 })
 
@@ -52,10 +44,6 @@ describe('POST /auth/login', () => {
     const email = 'user@agency.gov.sg'
     // Mock verification of otp
     AuthService.verifyOtp = jest.fn(async () => true)
-    // Mock user query
-    AuthService.findOrCreateUser = jest.fn(async () =>
-      UserMock.build({ email })
-    )
 
     const res = await request(app)
       .post('/auth/login')
@@ -67,20 +55,20 @@ describe('POST /auth/login', () => {
 
 describe('GET /auth/userinfo', () => {
   test('No existing session', async () => {
-    const res = await request(app).get('/auth/userinfo').set('Cookies', '')
+    const res = await request(app).get('/auth/userinfo')
     expect(res.status).toBe(200)
     expect(res.body).toEqual({})
   })
 
-  test('Existing session found', async () => {
-    // TODO - mock user session
-    // const email = 'user@agency.gov.sg'
-    // await request(app).post('/auth/login').send({ email, otp: '123456' })
-    // const res = await request(app).get('/auth/userinfo')
-    // expect(res.status).toBe(200)
-    // expect(res.body).toEqual({})
-    expect(true).toEqual(true)
-  })
+  // test('Existing session found', async () => {
+  //   // Mock verification of otp
+  //   AuthService.verifyOtp = jest.fn(async () => true)
+  //   const email = 'user@agency.gov.sg'
+  //   await request(app).post('/auth/login').send({ email, otp: '123456' })
+  //   const res = await request(app).get('/auth/userinfo')
+  //   expect(res.status).toBe(200)
+  //   expect(res.body).toEqual({})
+  // })
 })
 
 describe('GET /auth/logout', () => {
