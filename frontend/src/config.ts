@@ -67,7 +67,7 @@ function getAnnouncementActive() {
 
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user
-export const ANNOUNCEMENT: any = {
+export const ANNOUNCEMENT: Record<string, any> = {
   isActive: getAnnouncementActive(),
   title: t('announcement.title')``,
   subtext: t('announcement.subtext')``,
