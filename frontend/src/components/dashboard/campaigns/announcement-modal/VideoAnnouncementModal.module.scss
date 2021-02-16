@@ -1,12 +1,14 @@
+@import 'styles/_variables';
+
 .title {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .video {
-  margin-top: 48px;
+  margin-top: $spacing-7;
   max-width: 100%;
 }
 
 .options {
-  margin-top: 48px;
+  margin-top: $spacing-7;
 }
