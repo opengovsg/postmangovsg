@@ -153,11 +153,15 @@ const CreateDemoModal = ({
         </div>
         <div className="separator"></div>
         <div className={styles.actions}>
-          <TextButton minButtonWidth onClick={showDemoVideoModal}>
+          <TextButton className={styles.action} onClick={showDemoVideoModal}>
             Watch the video
           </TextButton>
 
-          <PrimaryButton onClick={createDemo} disabled={!isCreateEnabled}>
+          <PrimaryButton
+            className={styles.action}
+            onClick={createDemo}
+            disabled={!isCreateEnabled}
+          >
             Create demo campaign
           </PrimaryButton>
         </div>
