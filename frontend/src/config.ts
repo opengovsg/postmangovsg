@@ -78,6 +78,7 @@ export const ANNOUNCEMENT: any = {
   secondaryButtonText: t('announcement.secondaryButtonText')``,
 }
 
+// Users of getAnnouncementVersion have to await it.
 // Lazily compute the announcement version and memoize it for future use.
 let memoizedVersion: string | null = null
 export async function getAnnouncementVersion(): Promise<string> {
@@ -98,5 +99,3 @@ export async function getAnnouncementVersion(): Promise<string> {
   memoizedVersion = await sha256(concatenatedStr)
   return memoizedVersion
 }
-// Users of ANNOUNCEMENT.version have to await it.
-ANNOUNCEMENT.version = getAnnouncementVersion()

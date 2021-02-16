@@ -7,7 +7,7 @@ import { ModalContext } from 'contexts/modal.context'
 
 import styles from './AnnouncementModal.module.scss'
 import { i18n } from 'locales'
-import { ANNOUNCEMENT } from 'config'
+import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import { OutboundLink } from 'react-ga'
 import ReactPlayer from 'react-player/lazy'
 
@@ -24,7 +24,7 @@ const AnnouncementModal = () => {
   useEffect(() => {
     setBeforeClose(() => async () => {
       try {
-        await updateAnnouncementVersion(await ANNOUNCEMENT.version)
+        await updateAnnouncementVersion(await getAnnouncementVersion())
       } catch (err) {
         setErrorMessage(err.message)
       }

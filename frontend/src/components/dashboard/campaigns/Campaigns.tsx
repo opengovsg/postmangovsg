@@ -26,7 +26,7 @@ import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 import AnnouncementModal from './announcement-modal'
-import { ANNOUNCEMENT } from 'config'
+import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -89,7 +89,7 @@ const Campaigns = () => {
     // TODO: refactor out num demos processing
     async function getNumDemosAndAnnouncementVersion() {
       const { demo, announcementVersion } = await getUserSettings()
-      const latestAnnouncementVersion = await ANNOUNCEMENT.version
+      const latestAnnouncementVersion = await getAnnouncementVersion()
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)

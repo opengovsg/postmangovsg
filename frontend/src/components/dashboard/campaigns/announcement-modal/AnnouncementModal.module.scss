@@ -40,12 +40,12 @@ $title-height: $height-4;
 }
 
 .titleCentered {
-  margin-top: 25px;
+  margin-top: 24px;
   text-align: center;
 }
 
 .modalMedia {
-  margin-top: 25px;
+  margin-top: 24px;
   max-width: 100%;
 }
 
@@ -59,7 +59,7 @@ $title-height: $height-4;
 
 .content {
   max-width: 100vw;
-  margin-top: 25px;
+  margin-top: 24px;
   text-align: center;
 }
 
@@ -74,10 +74,10 @@ $title-height: $height-4;
 }
 
 .options {
-  margin-top: 25px;
+  margin-top: 24px;
 
   @include mobile {
-    padding-bottom: 25px;
+    padding-bottom: 24px;
   }
 
   & > *:not(:first-child) {
