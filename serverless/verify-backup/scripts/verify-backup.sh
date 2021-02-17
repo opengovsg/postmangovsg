@@ -24,6 +24,9 @@ notifyAndExit() {
   exit 1
 }
 
+# Started Cronitor job
+curl "https://cronitor.link/$CRONITOR_CODE/run"  -m 10 || true
+
 # Downloads latest backup dump and decrypts it
 npm run decrypt-dump
 
