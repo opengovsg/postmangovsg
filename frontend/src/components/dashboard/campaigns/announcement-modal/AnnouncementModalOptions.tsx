@@ -3,15 +3,16 @@ import { TextButton, PrimaryButton } from 'components/common'
 import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 
-import { Translation } from './AnnouncementModal'
 import styles from './AnnouncementModalOptions.module.scss'
 
 interface AnnouncementModalOptionsProps {
-  primaryButtonUrl: Translation
-  primaryButtonText: Translation
-  secondaryButtonUrl: Translation
-  secondaryButtonText: Translation
+  primaryButtonUrl: string
+  primaryButtonText: string
   handleReadMoreClicked: () => Promise<void>
+
+  // Optional parameters
+  secondaryButtonUrl?: string
+  secondaryButtonText?: string
 }
 
 const AnnouncementModalOptions = ({
@@ -21,17 +22,17 @@ const AnnouncementModalOptions = ({
   secondaryButtonText,
   handleReadMoreClicked,
 }: AnnouncementModalOptionsProps) => {
+  // The secondary button closes the modal.
+  // If the secondary URL is defined, the button also navigates to the specified URL.
   let secondaryLink = null
-  if (secondaryButtonText !== undefined) {
-    // If the URL is non-empty, the secondary button is an external link.
-    // Otherwise, it is just a button to close the modal.
+  if (secondaryButtonText) {
     secondaryLink = (
       <TextButton className={styles.option} onClick={handleReadMoreClicked}>
         {secondaryButtonText}
       </TextButton>
     )
 
-    if (secondaryButtonUrl !== undefined) {
+    if (secondaryButtonUrl) {
       secondaryLink = (
         <OutboundLink
           className={styles.option}
@@ -50,12 +51,12 @@ const AnnouncementModalOptions = ({
       {secondaryLink}
       <OutboundLink
         className={styles.option}
-        eventLabel={primaryButtonUrl!}
-        to={primaryButtonUrl!}
+        eventLabel={primaryButtonUrl}
+        to={primaryButtonUrl}
         target="_blank"
       >
         <PrimaryButton onClick={handleReadMoreClicked}>
-          <span>{primaryButtonText!}</span>
+          <span>{primaryButtonText}</span>
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
         </PrimaryButton>
       </OutboundLink>{' '}

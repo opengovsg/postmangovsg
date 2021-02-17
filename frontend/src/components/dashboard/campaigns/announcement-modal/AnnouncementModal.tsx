@@ -10,26 +10,27 @@ import GraphicAnnouncementModal from './GraphicAnnouncementModal'
 import VideoAnnouncementModal from './VideoAnnouncementModal'
 import styles from './AnnouncementModal.module.scss'
 
-export type Translation = string | undefined
-
 export type AnnouncementModalProps = {
-  title: Translation
-  mediaUrl: Translation
-  subtext: Translation
-  primaryButtonUrl: Translation
-  primaryButtonText: Translation
-  secondaryButtonUrl: Translation
-  secondaryButtonText: Translation
+  title: string
+  primaryButtonUrl: string
+  primaryButtonText: string
   handleReadMoreClicked: () => Promise<void>
+
+  // Optional parameters
+  mediaUrl?: string
+  subtext?: string
+  secondaryButtonUrl?: string
+  secondaryButtonText?: string
 }
 
-type Translations = Omit<AnnouncementModalProps, 'handleReadMoreClicked'>
+type AnnouncementContent = Omit<AnnouncementModalProps, 'handleReadMoreClicked'>
 
-function getTranslations(): Translations {
-  // In lingui, we can't simply leave a translation empty as a default will be used during compilation.
+function getAnnouncementContent(): AnnouncementContent {
+  // In lingui, we can't simply leave a translation empty as it will be replaced
+  // by a default value during compilation.
   // Instead, mark it as "null" to indicate that it is empty.
   const EMPTY_TRANSLATION = 'null'
-  const KEYS = [
+  const KEYS: Array<keyof AnnouncementContent> = [
     'title',
     'subtext',
     'mediaUrl',
@@ -38,15 +39,15 @@ function getTranslations(): Translations {
     'secondaryButtonUrl',
     'secondaryButtonText',
   ]
-  return KEYS.reduce((acc: Record<string, Translation>, cur) => {
-    let translation: Translation = i18n._(ANNOUNCEMENT[cur])
-    // Convert any "null" translations to undefined to make it simpler to parse
-    if (translation === EMPTY_TRANSLATION) {
-      translation = undefined
+  const content: Partial<AnnouncementContent> = {}
+  for (const key of KEYS) {
+    const translation = i18n._(ANNOUNCEMENT[key])
+    // Omit "null"/empty translations
+    if (translation !== EMPTY_TRANSLATION) {
+      content[key] = translation
     }
-    acc[cur] = translation
-    return acc
-  }, {}) as Translations
+  }
+  return content as AnnouncementContent
 }
 
 function isVideoUrl(url: string) {
@@ -79,19 +80,19 @@ const AnnouncementModal = () => {
   }
 
   // Render the appropriate modal based on the type of content
-  const translations = getTranslations()
+  const content = getAnnouncementContent()
   let specificAnnouncementModal = null
-  if (isVideoUrl(translations.mediaUrl!)) {
+  if (content.mediaUrl && isVideoUrl(content.mediaUrl)) {
     specificAnnouncementModal = (
       <VideoAnnouncementModal
-        {...translations}
+        {...content}
         handleReadMoreClicked={onReadMoreClicked}
       />
     )
   } else {
     specificAnnouncementModal = (
       <GraphicAnnouncementModal
-        {...translations}
+        {...content}
         handleReadMoreClicked={onReadMoreClicked}
       />
     )
