@@ -11,7 +11,6 @@ import {
   SmsStatsMiddleware,
   SmsTemplateMiddleware,
 } from '@sms/middlewares'
-import { redirectTo } from '@core/utils/request'
 
 const router = Router({ mergeParams: true })
 
@@ -235,53 +234,6 @@ router.get(
 /**
  * @swagger
  * path:
- *   /campaign/{campaignId}/sms/upload/start-v2:
- *     get:
- *       summary: "Get a presigned URL for upload with Content-MD5 header"
- *       tags:
- *         - SMS
- *       parameters:
- *         - name: campaignId
- *           in: path
- *           required: true
- *           schema:
- *             type: string
- *         - name: mime_type
- *           in: query
- *           required: true
- *           schema:
- *             type: string
- *         - name: md5
- *           required: true
- *           in: query
- *           schema:
- *             type: string
- *       responses:
- *         200:
- *           description: Success
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   presigned_url:
- *                     type: string
- *                   transaction_id:
- *                     type: string
- *         "400":
- *           description: Bad Request
- *         "401":
- *           description: Unauthorized
- *         "403":
- *           description: Forbidden, campaign not owned by user or job in progress
- *         "500":
- *           description: Internal Server Error
- */
-router.get('/upload/start-v2', redirectTo('/upload/start'))
-
-/**
- * @swagger
- * path:
  *   /campaign/{campaignId}/sms/upload/complete:
  *     post:
  *       summary: "Complete upload session with ETag verification"
@@ -325,48 +277,6 @@ router.post(
   CampaignMiddleware.canEditCampaign,
   SmsTemplateMiddleware.uploadCompleteHandler
 )
-
-/**
- * @swagger
- * path:
- *   /campaign/{campaignId}/sms/upload/complete-v2:
- *     post:
- *       summary: "Complete upload session with ETag verification"
- *       tags:
- *         - SMS
- *       parameters:
- *         - name: campaignId
- *           in: path
- *           required: true
- *           schema:
- *             type: string
- *       requestBody:
- *         content:
- *           application/json:
- *             schema:
- *               required:
- *                 - transaction_id
- *                 - filename
- *               properties:
- *                 transaction_id:
- *                   type: string
- *                 filename:
- *                   type: string
- *                 etag:
- *                   type: string
- *       responses:
- *         "202" :
- *           description: Accepted. The uploaded file is being processed.
- *         "400" :
- *           description: Bad Request
- *         "401":
- *           description: Unauthorized
- *         "403":
- *          description: Forbidden, campaign not owned by user or job in progress
- *         "500":
- *           description: Internal Server Error
- */
-router.post('/upload/complete-v2', redirectTo('/upload/complete'))
 
 /**
  * @swagger
@@ -505,56 +415,6 @@ router.post(
   SettingsMiddleware.checkAndStoreLabelIfExists,
   SmsMiddleware.setCampaignCredential
 )
-
-/**
- * @swagger
- * path:
- *  /campaign/{campaignId}/sms/new-credentials/v2:
- *    post:
- *      tags:
- *        - SMS
- *      summary: Validate twilio credentials and assign to campaign, if label is provided - store credentials for user
- *      parameters:
- *        - name: campaignId
- *          in: path
- *          required: true
- *          schema:
- *            type: string
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              allOf:
- *                - $ref: '#/components/schemas/TwilioCredentials'
- *                - type: object
- *                  properties:
- *                    recipient:
- *                      type: string
- *                    label:
- *                      type: string
- *                      pattern: '/^[a-z0-9-]+$/'
- *                      minLength: 1
- *                      maxLength: 50
- *                      description: should only consist of lowercase alphanumeric characters and dashes
- *
- *      responses:
- *        200:
- *          description: OK
- *          content:
- *            application/json:
- *              schema:
- *                type: object
- *        "400" :
- *           description: Bad Request
- *        "401":
- *           description: Unauthorized
- *        "403":
- *           description: Forbidden, campaign not owned by user or job in progress
- *        "500":
- *           description: Internal Server Error
- */
-router.post('/new-credentials/v2', redirectTo('/new-credentials'))
 
 /**
  * @swagger
