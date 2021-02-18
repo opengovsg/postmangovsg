@@ -1,0 +1,25 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.graphic {
+  max-height: 250px;
+
+  @include mobile() {
+    max-height: 20vh;
+  }
+}
+
+.title {
+  text-align: center;
+  margin-top: $spacing-5;
+  margin-bottom: 0px;
+}
+
+.subtext {
+  margin-top: $spacing-5;
+  text-align: center;
+}
+
+.options {
+  margin-top: $spacing-7;
+}

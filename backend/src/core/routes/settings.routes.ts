@@ -27,31 +27,10 @@ const demoDisplayedValidator = {
   }),
 }
 
-// Only allow updating with versions less than or equal to the current package version
-const compareSemverMethod = (value: string, helpers: any) => {
-  const currentPackageVersion = process.env.npm_package_version
-  const updatingVersion = value
-
-  const currentSplit = currentPackageVersion
-    ?.split('.')
-    .map((num) => parseInt(num, 10))
-  const updatingSplit = updatingVersion
-    .split('.')
-    .map((num) => parseInt(num, 10))
-  for (let i = 0; i < 3; i++) {
-    if ((!currentSplit || currentSplit[i]) < updatingSplit[i]) {
-      return helpers.error('any.invalid')
-    }
-  }
-  return value
-}
-
+// The version has to be a SHA-256 hash written in base64.
 const updateAnnouncementVersionValidator = {
   [Segments.BODY]: Joi.object({
-    announcement_version: Joi.string()
-      .pattern(new RegExp('[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}'))
-      .custom(compareSemverMethod)
-      .required(),
+    announcement_version: Joi.string().base64().length(44).required(),
   }),
 }
 

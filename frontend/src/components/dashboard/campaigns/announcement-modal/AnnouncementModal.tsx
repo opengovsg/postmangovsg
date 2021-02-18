@@ -1,14 +1,60 @@
 import React, { useContext, useState, useEffect } from 'react'
-import cx from 'classnames'
 import { updateAnnouncementVersion } from 'services/settings.service'
 
-import { PrimaryButton, ErrorBlock } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 
-import styles from './AnnouncementModal.module.scss'
 import { i18n } from 'locales'
-import { ANNOUNCEMENT } from 'config'
-import { OutboundLink } from 'react-ga'
+import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
+import { ErrorBlock } from 'components/common'
+import GraphicAnnouncementModal from './GraphicAnnouncementModal'
+import VideoAnnouncementModal from './VideoAnnouncementModal'
+import styles from './AnnouncementModal.module.scss'
+
+export type AnnouncementModalProps = {
+  title: string
+  primaryButtonUrl: string
+  primaryButtonText: string
+  handleReadMoreClicked: () => Promise<void>
+
+  // Optional parameters
+  mediaUrl?: string
+  subtext?: string
+  secondaryButtonUrl?: string
+  secondaryButtonText?: string
+}
+
+type AnnouncementContent = Omit<AnnouncementModalProps, 'handleReadMoreClicked'>
+
+function getAnnouncementContent(): AnnouncementContent {
+  // In lingui, we can't simply leave a translation empty as it will be replaced
+  // by a default value during compilation.
+  // Instead, mark it as "null" to indicate that it is empty.
+  const EMPTY_TRANSLATION = 'null'
+  const KEYS: Array<keyof AnnouncementContent> = [
+    'title',
+    'subtext',
+    'mediaUrl',
+    'primaryButtonUrl',
+    'primaryButtonText',
+    'secondaryButtonUrl',
+    'secondaryButtonText',
+  ]
+  const content: Partial<AnnouncementContent> = {}
+  for (const key of KEYS) {
+    const translation = i18n._(ANNOUNCEMENT[key])
+    // Omit "null"/empty translations
+    if (translation !== EMPTY_TRANSLATION) {
+      content[key] = translation
+    }
+  }
+  return content as AnnouncementContent
+}
+
+function isVideoUrl(url: string) {
+  url = url.toLowerCase()
+  const VIDEO_EXTENSIONS = ['mp4']
+  return VIDEO_EXTENSIONS.some((extension) => url.endsWith(`.${extension}`))
+}
 
 const AnnouncementModal = () => {
   const { close, setBeforeClose } = useContext(ModalContext)
@@ -17,7 +63,7 @@ const AnnouncementModal = () => {
   useEffect(() => {
     setBeforeClose(() => async () => {
       try {
-        await updateAnnouncementVersion(i18n._(ANNOUNCEMENT.version))
+        await updateAnnouncementVersion(await getAnnouncementVersion())
       } catch (err) {
         setErrorMessage(err.message)
       }
@@ -33,27 +79,28 @@ const AnnouncementModal = () => {
     }
   }
 
+  // Render the appropriate modal based on the type of content
+  const content = getAnnouncementContent()
+  let specificAnnouncementModal = null
+  if (content.mediaUrl && isVideoUrl(content.mediaUrl)) {
+    specificAnnouncementModal = (
+      <VideoAnnouncementModal
+        {...content}
+        handleReadMoreClicked={onReadMoreClicked}
+      />
+    )
+  } else {
+    specificAnnouncementModal = (
+      <GraphicAnnouncementModal
+        {...content}
+        handleReadMoreClicked={onReadMoreClicked}
+      />
+    )
+  }
+
   return (
     <div className={styles.modal}>
-      <img
-        className={styles.modalImg}
-        src={i18n._(ANNOUNCEMENT.imageUrl)}
-        alt="Modal graphic"
-      ></img>
-      <h4 className={styles.title}>{i18n._(ANNOUNCEMENT.title)}</h4>
-      <div className={styles.content}>{i18n._(ANNOUNCEMENT.subtext)}</div>
-      <div className={styles.options}>
-        <OutboundLink
-          eventLabel={i18n._(ANNOUNCEMENT.buttonUrl)}
-          to={i18n._(ANNOUNCEMENT.buttonUrl)}
-          target="_blank"
-        >
-          <PrimaryButton onClick={onReadMoreClicked}>
-            <span>{i18n._(ANNOUNCEMENT.buttonText)}</span>
-            <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
-          </PrimaryButton>
-        </OutboundLink>{' '}
-      </div>
+      {specificAnnouncementModal}
       <ErrorBlock>{errorMessage}</ErrorBlock>
     </div>
   )
