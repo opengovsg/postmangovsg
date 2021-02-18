@@ -3,14 +3,10 @@
 
 .textButton {
   @include button(transparent, transparent, transparent);
-  color: $primary;
+  color: $secondary;
   display: inline-block;
   padding: 0;
   border-radius: 0;
-
-  &:hover {
-    color: $secondary;
-  }
 
   &.noMinWidth {
     min-width: unset;

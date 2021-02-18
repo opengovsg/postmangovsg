@@ -12,7 +12,9 @@
   - [Install and run required services](#install-and-run-required-services)
   - [Secrets detection](#secrets-detection)
   - [Set environment variables](#set-environment-variables)
-  - [Install and run the app](#install-and-run-the-app)
+  - [Install dependencies](#install-dependencies)
+  - [Compile frontend translations](#compile-frontend-translations)
+  - [Run the app](#run-the-app)
 - [Deployment](#deployment)
 - [Releasing](#releasing)
 - [Serverless](#serverless)
@@ -114,11 +116,27 @@ Example environment variables can be found in
 
 Set the environment variables in a file named `.env` in each folder
 
-### Install and run the app
+### Install dependencies
 
 ```bash
 cd postmangovsg
 npm install
+```
+
+### Compile frontend translations
+
+[lingui](https://lingui.js.org/) is used for internationalization. Read [this](frontend/src/locales/README.md) for more info.
+
+```bash
+cd postmangovsg/frontend
+npm run extract
+npm run compile
+```
+
+### Run the app
+
+```bash
+cd postmangovsg
 npm run dev
 ```
 
