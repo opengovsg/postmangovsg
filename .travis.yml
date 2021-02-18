@@ -293,6 +293,53 @@ jobs:
             - SES_USER=$STAGING_REDACTION_DIGEST_SES_USER
             - SES_PORT=$STAGING_REDACTION_DIGEST_SES_PORT
             - CRONITOR_CODE=$STAGING_REDACTION_CRONITOR
+    - name: serverless-cleanup-secrets
+      before_install:
+        - cd $TRAVIS_BUILD_DIR/serverless/cleanup-secrets
+      script:
+        - npx lockfile-lint --type npm --path package-lock.json --validate-https --allowed-hosts npm
+      before_deploy:
+        - cd $TRAVIS_BUILD_DIR/serverless/cleanup-secrets
+        - npm install && npm run build && npm prune --production
+        - zip -qr code.zip build src package.json node_modules/
+      deploy:
+        - provider: lambda
+          edge: true
+          function_name: cleanup-secrets-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_CLEAN_SECRETS_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 300
+          memory_size: 128
+          publish: true
+          zip: "../cleanup-secrets/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_CLEAN_SECRETS_DB_URI
+            - DB_USE_IAM=$PRODUCTION_DB_USE_IAM
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+        - provider: lambda
+          edge: true
+          function_name: cleanup-secrets-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_CLEAN_SECRETS_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 300
+          memory_size: 128
+          publish: true
+          zip: "../cleanup-secrets/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - NODE_ENV=staging
+            - DB_URI=$STAGING_CLEAN_SECRETS_DB_URI
+            - DB_USE_IAM=$STAGING_DB_USE_IAM
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
     - name: root
       install:
         - npm install --ignore-scripts
