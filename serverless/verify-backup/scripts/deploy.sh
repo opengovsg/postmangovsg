@@ -15,9 +15,12 @@ echo 'Deploying build to Cloud Run...'
 # --set-env-vars `grep -v '^#' .env | awk -v ORS=, 'NF { print $1 }'`pulls env vars from .env file and formats as args
 gcloud run deploy $GCLOUD_RUN_SERVICE_NAME \
   --region asia-southeast1 \
-  --no-allow-unauthenticated  \
+  --no-allow-unauthenticated \
   --image gcr.io/postmangovsg/verify-backup \
   --service-account $GCLOUD_SERVICE_ACCOUNT \
   --platform managed \
   --set-env-vars `grep -v '^#' .env | awk -v ORS=, 'NF { print $1 }'` \
-  --memory 4G
+  --max-instances 1 \
+  --timeout 8m \
+  --cpu 1 \
+  --memory 4Gi

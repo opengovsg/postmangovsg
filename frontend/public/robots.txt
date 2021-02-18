@@ -1,0 +1,6 @@
+User-agent: NLB_archive_bot
+
+Allow: /
+Allow: /static/
+Allow: /*.png
+Disallow: *
