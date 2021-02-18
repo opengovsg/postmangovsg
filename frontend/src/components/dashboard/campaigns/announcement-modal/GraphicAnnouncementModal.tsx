@@ -16,7 +16,13 @@ const GraphicAnnouncementModal = ({
 }: AnnouncementModalProps) => {
   return (
     <>
-      <img className={styles.graphic} src={mediaUrl} alt="Modal graphic"></img>
+      {mediaUrl && (
+        <img
+          className={styles.graphic}
+          src={mediaUrl}
+          alt="Modal graphic"
+        ></img>
+      )}
       <h4 className={styles.title}>{title}</h4>
       <div className={styles.subtext}>{subtext}</div>
       <div className={styles.options}>
