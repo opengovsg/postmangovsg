@@ -10,7 +10,6 @@ let sequelize: Sequelize | undefined = undefined
 const logger = new Logger('db')
 
 const DB_URI = config.get('database.databaseUri')
-const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
 
 const parseDBUri = (uri: string): any => {
   const config = parse(uri)
@@ -26,10 +25,7 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
     dialect: 'postgres',
     logging: false,
     pool: config.get('database.poolOptions'),
-    replication: {
-      read: [parseDBUri(DB_READ_REPLICA_URI)],
-      write: parseDBUri(DB_URI),
-    },
+    ...parseDBUri(DB_URI),
     dialectOptions,
     query: {
       useMaster: true,
