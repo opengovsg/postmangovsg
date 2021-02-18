@@ -24,10 +24,12 @@ const deleteFromSecretManager = async (
       .promise()
 
     if (!dryRun) {
-      secretsManager.deleteSecret({
-        RecoveryWindowInDays: 7, // This is default.
-        SecretId: secretId,
-      })
+      await secretsManager
+        .deleteSecret({
+          RecoveryWindowInDays: 7, // This is default.
+          SecretId: secretId,
+        })
+        .promise()
     }
 
     logger.log(`[${secret.Name}] Sucessfully removed from Secret Manager.`)
@@ -54,10 +56,13 @@ const deleteFromDb = async (
   const sequelize = await getSequelize()
   // Remove from database
   if (!dryRun) {
-    sequelize.query(`DELETE FROM credentials WHERE name = :credentialName`, {
-      replacements: { credentialName },
-      type: QueryTypes.DELETE,
-    })
+    await sequelize.query(
+      `DELETE FROM credentials WHERE name = :credentialName`,
+      {
+        replacements: { credentialName },
+        type: QueryTypes.DELETE,
+      }
+    )
   }
   logger.log(`[${credentialName}] Successfully removed from credentials table.`)
 }
