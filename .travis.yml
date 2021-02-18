@@ -311,7 +311,7 @@ jobs:
           runtime: nodejs12.x
           module_name: build/index
           handler_name: handler
-          timeout: 300
+          timeout: 600
           memory_size: 128
           publish: true
           zip: "../cleanup-secrets/code.zip"
@@ -329,7 +329,7 @@ jobs:
           runtime: nodejs12.x
           module_name: build/index
           handler_name: handler
-          timeout: 300
+          timeout: 600
           memory_size: 128
           publish: true
           zip: "../cleanup-secrets/code.zip"
