@@ -43,11 +43,12 @@
 
       &:not(.active) {
         color: $primary;
-        background: $neutral-light;
+        background: transparent;
 
         &:hover {
-          background: $primary;
-          color: white;
+          background: $neutral;
+          border-width: 1.5px;
+          color: $primary;
           cursor: pointer;
         }
       }
