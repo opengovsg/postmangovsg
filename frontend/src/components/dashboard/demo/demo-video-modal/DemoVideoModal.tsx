@@ -4,7 +4,7 @@ import styles from './DemoVideoModal.module.scss'
 import { PrimaryButton, TextButton } from 'components/common'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { LINKS } from 'config'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { OutboundLink } from 'react-ga'
 import ReactPlayer from 'react-player/lazy'
 

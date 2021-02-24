@@ -34,7 +34,7 @@ import TwilioCredentialsInput, {
 import styles from '../Create.module.scss'
 import { SMSProgress } from 'classes'
 import { OutboundLink } from 'react-ga'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
 
 const SMSCredentials = ({
