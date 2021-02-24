@@ -13,6 +13,11 @@ export enum Status {
   Halted = 'Halted',
 }
 
+export enum RecipientListType {
+  Csv = 'Csv',
+  Vault = 'Vault',
+}
+
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
   [ChannelType.Email]: 'bx-envelope-open',
