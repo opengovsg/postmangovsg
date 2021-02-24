@@ -5,16 +5,9 @@ import React, {
   Dispatch,
   SetStateAction,
 } from 'react'
-import { useParams } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import {
-  uploadFileToS3,
-  deleteCsvStatus,
-  getCsvStatus,
-  CsvStatusResponse,
-} from 'services/upload.service'
 import {
   FileInput,
   CsvUpload,
@@ -31,8 +24,7 @@ import {
 import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
 import { EmailPreview, EmailProgress } from 'classes'
-import { sendTiming } from 'services/ga.service'
-import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import useUploadCsv from 'components/custom-hooks/use-upload-csv'
 
 import styles from '../Create.module.scss'
 
@@ -48,108 +40,28 @@ const EmailRecipients = ({
   forceReset?: boolean // this forces upload button to show without csv info and preview
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
+  const { params, protect } = campaign
+  const [sampleCsvError, setSampleCsvError] = useState(null)
+
   const {
-    csvFilename: initialCsvFilename,
-    isCsvProcessing: initialIsProcessing,
-    numRecipients: initialNumRecipients,
-    params,
-    protect,
-  } = campaign
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
-  const [isUploading, setIsUploading] = useState(false)
-  const [csvInfo, setCsvInfo] = useState<
-    Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
-  >({
-    numRecipients: initialNumRecipients,
-    csvFilename: initialCsvFilename,
-  })
-  const [preview, setPreview] = useState({} as EmailPreview)
-  const { id: campaignId } = useParams()
+    isProcessing,
+    isUploading,
+    error,
+    preview,
+    csvInfo,
+    uploadFile,
+    clearCsvStatus,
+  } = useUploadCsv<EmailPreview>(onFileSelected, forceReset)
   const { csvFilename, numRecipients = 0 } = csvInfo
-  const isMounted = useIsMounted()
-
-  // Poll csv status
-  useEffect(() => {
-    if (!campaignId) return
-
-    let timeoutId: NodeJS.Timeout
-    const pollStatus = async () => {
-      try {
-        if (forceReset) {
-          setCsvInfo({ csvFilename })
-          return
-        }
-        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
-          +campaignId
-        )
-        // Prevent setting state if unmounted
-        if (!isMounted.current) return
-
-        setIsCsvProcessing(isCsvProcessing)
-        setCsvInfo(newCsvInfo)
-        if (preview) {
-          setPreview(preview as EmailPreview)
-        }
-
-        if (isCsvProcessing) {
-          timeoutId = setTimeout(pollStatus, 2000)
-        }
-      } catch (e) {
-        setErrorMessage(e.message)
-      }
-    }
-
-    // Retrieve status regardless of isCsvProcessing to retrieve csvError if any
-    // If completed, it will only poll once
-    pollStatus()
-
-    return () => clearTimeout(timeoutId)
-  }, [campaignId, csvFilename, forceReset, isCsvProcessing, isMounted])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
-  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
-
-  // Handle file upload
-  async function uploadFile(files: File[]) {
-    setIsUploading(true)
-    setErrorMessage(null)
-    const uploadTimeStart = performance.now()
-
-    try {
-      // user did not select a file
-      if (!files[0] || !campaignId) {
-        return
-      }
-      clearCsvStatus()
-
-      await (onFileSelected || uploadFileToS3)(+campaignId, files[0])
-
-      const uploadTimeEnd = performance.now()
-      sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
-
-      // Prevent setting state if unmounted
-      if (!isMounted.current) {
-        return
-      }
-
-      setIsCsvProcessing(true)
-      setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
-    } catch (err) {
-      setErrorMessage(err.message)
-    }
-    setIsUploading(false)
-  }
-
-  // Hide csv error from previous upload and delete from db
-  function clearCsvStatus() {
-    if (campaignId) {
-      setCsvInfo((info) => ({ ...info, csvError: undefined }))
-      deleteCsvStatus(+campaignId)
-    }
-  }
+    updateCampaign({
+      isCsvProcessing: isProcessing,
+      csvFilename,
+      numRecipients,
+    })
+  }, [isProcessing, csvFilename, numRecipients, updateCampaign])
 
   return (
     <>
@@ -193,7 +105,7 @@ const EmailRecipients = ({
         )}
 
         <CsvUpload
-          isCsvProcessing={isCsvProcessing}
+          isCsvProcessing={isProcessing}
           csvInfo={csvInfo}
           onErrorClose={clearCsvStatus}
         >
@@ -211,16 +123,15 @@ const EmailRecipients = ({
                 protect={protect}
                 template={template}
                 defaultRecipient="user@email.com"
-                setErrorMsg={setErrorMessage}
+                setErrorMsg={setSampleCsvError}
               />
             </>
           )}
         </CsvUpload>
-
-        <ErrorBlock>{errorMessage}</ErrorBlock>
+        <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 
-      {!isCsvProcessing && numRecipients > 0 && (
+      {!isProcessing && numRecipients > 0 && (
         <StepSection>
           <p className={styles.greyText}>Message preview</p>
           <EmailPreviewBlock
@@ -231,14 +142,15 @@ const EmailRecipients = ({
           />
         </StepSection>
       )}
+
       {!protect && (
         <ButtonGroup>
           <NextButton
-            disabled={!numRecipients || isCsvProcessing}
+            disabled={!numRecipients || isProcessing}
             onClick={() => setActiveStep((s) => s + 1)}
           />
           <TextButton
-            disabled={isCsvProcessing}
+            disabled={isProcessing}
             onClick={() => setActiveStep((s) => s - 1)}
           >
             Previous
