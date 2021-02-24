@@ -32,7 +32,7 @@
     "draftjs-to-html": "^0.9.1",
     "escape-html": "^1.0.3",
     "html-to-draftjs": "^1.5.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "moment": "^2.24.0",
     "papaparse": "^5.2.0",
     "postman-templating": "file:../modules/postman-templating",
