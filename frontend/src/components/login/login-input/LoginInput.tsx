@@ -16,9 +16,7 @@ import {
   sendUserEvent,
   sendException,
 } from 'services/ga.service'
-import { i18n } from 'locales'
-import { t } from '@lingui/macro'
-import { Trans } from '@lingui/macro'
+import { Trans, t } from '@lingui/macro'
 
 const RESEND_WAIT_TIME = 30000
 
@@ -109,7 +107,7 @@ const Login = () => {
         <TextInputWithButton
           value={email}
           type={'email'}
-          placeholder={i18n._(t`e.g. postman@agency.gov.sg`)}
+          placeholder={t`e.g. postman@agency.gov.sg`}
           onChange={setEmail}
           buttonDisabled={!email}
           onClick={sendOtp}
@@ -121,7 +119,7 @@ const Login = () => {
         <TextInputWithButton
           value={otp}
           type={'tel'}
-          placeholder={i18n._(t`Enter OTP`)}
+          placeholder={t`Enter OTP`}
           onChange={setOtp}
           buttonDisabled={!otp}
           onClick={login}

@@ -12,7 +12,7 @@ import { AuthContext } from 'contexts/auth.context'
 import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
 
 const NavBar = () => {

@@ -10,7 +10,7 @@ import styles from './Login.module.scss'
 import loginImg from 'assets/img/landing/login.svg'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import companyLogo from 'assets/img/brand/company-logo-dark.svg'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 const Login = () => {
   const authContext = useContext(AuthContext)

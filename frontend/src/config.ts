@@ -1,6 +1,6 @@
 import axios from 'axios'
+import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
-import { i18n } from 'locales'
 
 import { sha256 } from './services/crypto.service'
 
@@ -28,28 +28,28 @@ axios.defaults.withCredentials = true
 axios.defaults.timeout = 100000 // 100 sec
 //#region Set up translations
 export const LINKS = {
-  guideUrl: t('link.guideUrl')``,
-  guideEmailPasswordProtectedUrl: t('link.guideEmailPasswordProtectedUrl')``,
-  guideSmsUrl: t('link.guideSmsUrl')``,
-  guideSmsAccountSidUrl: t('link.guideSmsAccountSidUrl')``,
-  guideSmsApiKeyUrl: t('link.guideSmsApiKeyUrl')``,
-  guideSmsMessagingServiceUrl: t('link.guideSmsMessagingServiceUrl')``,
-  guideTelegramUrl: t('link.guideTelegramUrl')``,
-  guidePowerUserUrl: t('link.guidePowerUserUrl')``,
-  guideDemoUrl: t('link.guideDemoUrl')``,
-  guideRemoveDuplicatesUrl: t('link.guideRemoveDuplicatesUrl')``,
-  contactUsUrl: t('link.contactUsUrl')``,
-  contributeUrl: t('link.contributeUrl')``,
-  tncUrl: t('link.tncUrl')``,
-  privacyUrl: t('link.privacyUrl')``,
-  reportBugUrl: t('link.reportBugUrl')``,
-  customFromAddressRequestUrl: t('link.customFromAddressRequestUrl')``,
-  demoTelegramBotUrl: t('link.demoTelegramBotUrl')``,
-  demoVideoUrl: t('link.demoVideoUrl')``,
+  guideUrl: t`link.guideUrl`,
+  guideEmailPasswordProtectedUrl: t`link.guideEmailPasswordProtectedUrl`,
+  guideSmsUrl: t`link.guideSmsUrl`,
+  guideSmsAccountSidUrl: t`link.guideSmsAccountSidUrl`,
+  guideSmsApiKeyUrl: t`link.guideSmsApiKeyUrl`,
+  guideSmsMessagingServiceUrl: t`link.guideSmsMessagingServiceUrl`,
+  guideTelegramUrl: t`link.guideTelegramUrl`,
+  guidePowerUserUrl: t`link.guidePowerUserUrl`,
+  guideDemoUrl: t`link.guideDemoUrl`,
+  guideRemoveDuplicatesUrl: t`link.guideRemoveDuplicatesUrl`,
+  contactUsUrl: t`link.contactUsUrl`,
+  contributeUrl: t`link.contributeUrl`,
+  tncUrl: t`link.tncUrl`,
+  privacyUrl: t`link.privacyUrl`,
+  reportBugUrl: t`link.reportBugUrl`,
+  customFromAddressRequestUrl: t`link.customFromAddressRequestUrl`,
+  demoTelegramBotUrl: t`link.demoTelegramBotUrl`,
+  demoVideoUrl: t`link.demoVideoUrl`,
 }
-export const DEFAULT_MAIL_FROM = t('defaultMailFrom')``
+export const DEFAULT_MAIL_FROM = t`defaultMailFrom`
 // Semi-colon separated list of allowed image source hostnames
-export const ALLOWED_IMAGE_SOURCES = t('allowedImageSources')``
+export const ALLOWED_IMAGE_SOURCES = t`allowedImageSources`
 //#endregion
 
 export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string
@@ -69,13 +69,13 @@ function getAnnouncementActive() {
 // If `isActive` is false, the modal will not proc for ANY user
 export const ANNOUNCEMENT: Record<string, any> = {
   isActive: getAnnouncementActive(),
-  title: t('announcement.title')``,
-  subtext: t('announcement.subtext')``,
-  mediaUrl: t('announcement.mediaUrl')``,
-  primaryButtonUrl: t('announcement.primaryButtonUrl')``,
-  primaryButtonText: t('announcement.primaryButtonText')``,
-  secondaryButtonUrl: t('announcement.secondaryButtonUrl')``,
-  secondaryButtonText: t('announcement.secondaryButtonText')``,
+  title: t`announcement.title`,
+  subtext: t`announcement.subtext`,
+  mediaUrl: t`announcement.mediaUrl`,
+  primaryButtonUrl: t`announcement.primaryButtonUrl`,
+  primaryButtonText: t`announcement.primaryButtonText`,
+  secondaryButtonUrl: t`announcement.secondaryButtonUrl`,
+  secondaryButtonText: t`announcement.secondaryButtonText`,
 }
 
 // Users of getAnnouncementVersion have to await it.

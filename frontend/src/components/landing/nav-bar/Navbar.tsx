@@ -7,7 +7,7 @@ import PrimaryButton from 'components/common/primary-button'
 import AppLogo from 'assets/img/brand/app-logo.svg'
 import AppBrandmark from 'assets/img/brand/app-brandmark.svg'
 import styles from './NavBar.module.scss'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 const NavBar = () => {
   const history = useHistory()

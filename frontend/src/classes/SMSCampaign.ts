@@ -1,5 +1,4 @@
 import { t } from '@lingui/macro'
-import { i18n } from 'locales'
 import { Campaign, CampaignRecipient } from './Campaign'
 
 export enum SMSProgress {
@@ -48,9 +47,9 @@ export class SMSCampaignRecipient extends CampaignRecipient {
   formatErrorCode(errorCode: string): string {
     if (errorCode) {
       if (errorCode.startsWith("The 'To'")) {
-        return i18n._(t('errors.sms.invalidPhoneNumber')``)
+        return t`errors.sms.invalidPhoneNumber`
       } else if (errorCode === 'Recipient is incorrectly formatted') {
-        return i18n._(t('errors.sms.invalidFormat')``)
+        return t`errors.sms.invalidFormat`
       }
     }
     return errorCode || ''
