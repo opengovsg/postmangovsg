@@ -94,7 +94,6 @@ export async function getAnnouncementVersion(): Promise<string> {
     'secondaryButtonUrl',
     'secondaryButtonText',
   ]
-  console.log(ANNOUNCEMENT.title, t`announcement.title`)
   const translations = HASHABLE_KEYS.map((key) => i18n._(ANNOUNCEMENT[key]))
   const concatenatedStr = translations.join(';')
   memoizedVersion = await sha256(concatenatedStr)
