@@ -25,7 +25,7 @@ import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
 import { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import { CampaignContext } from 'contexts/campaign.context'
-import useUploadCsv from 'components/custom-hooks/use-upload-csv'
+import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
 
 import styles from '../Create.module.scss'
 
@@ -46,9 +46,9 @@ const SMSRecipients = ({
     error,
     preview,
     csvInfo,
-    uploadFile,
+    uploadRecipients,
     clearCsvStatus,
-  } = useUploadCsv<SMSPreview>()
+  } = useUploadRecipients<SMSPreview>()
   const { csvFilename, numRecipients = 0 } = csvInfo
 
   // If campaign properties change, bubble up to root campaign object
@@ -59,6 +59,10 @@ const SMSRecipients = ({
       numRecipients,
     })
   }, [isProcessing, csvFilename, numRecipients, updateCampaign])
+
+  function handleFileSelected(files: File[]) {
+    if (files[0]) uploadRecipients(files[0])
+  }
 
   return (
     <>
@@ -95,7 +99,10 @@ const SMSRecipients = ({
           csvInfo={csvInfo}
           onErrorClose={clearCsvStatus}
         >
-          <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
+          <FileInput
+            isProcessing={isUploading}
+            onFileSelected={handleFileSelected}
+          />
           <p>or</p>
           <SampleCsv
             params={params}

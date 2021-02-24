@@ -10,12 +10,22 @@ import {
 } from 'services/upload.service'
 import { EmailPreview, SMSPreview, TelegramPreview } from 'classes'
 
-function useUploadCsv<
+type UploadFunction = (campaignId: number, file: any) => Promise<any>
+
+const uploadFileOrUrl = (
+  campaignId: number,
+  recipientList: string | File
+): Promise<any> => {
+  if (typeof recipientList !== 'string') {
+    return uploadFileToS3(campaignId, recipientList)
+  }
+
+  return Promise.resolve()
+}
+
+function useUploadRecipients<
   Preview extends EmailPreview | SMSPreview | TelegramPreview
->(
-  onFileSelected?: (campaignId: number, file: File) => Promise<any>,
-  forceReset?: boolean
-) {
+>(upload: UploadFunction = uploadFileOrUrl, forceReset?: boolean) {
   const { campaign } = useContext(CampaignContext)
   if (!campaign)
     throw new Error('useUploadCsv must be used within a CampaignProvider')
@@ -80,19 +90,16 @@ function useUploadCsv<
   }, [campaignId, csvFilename, forceReset, isProcessing, isMounted])
 
   // Handle file upload
-  async function uploadFile(files: File[]) {
+  async function uploadRecipients(recipientList: File | string) {
     setIsUploading(true)
     setError(null)
     const uploadTimeStart = performance.now()
 
     try {
-      // user did not select a file
-      if (!files[0] || !campaignId) {
-        return
-      }
+      if (!campaignId) return
       clearCsvStatus()
 
-      await (onFileSelected || uploadFileToS3)(+campaignId, files[0])
+      await upload(+campaignId, recipientList)
 
       const uploadTimeEnd = performance.now()
       sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
@@ -103,7 +110,9 @@ function useUploadCsv<
       }
 
       setIsProcessing(true)
-      setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
+      if (typeof recipientList !== 'string') {
+        setCsvInfo((info) => ({ ...info, tempCsvFilename: recipientList.name }))
+      }
     } catch (err) {
       setError(err.message)
     }
@@ -124,9 +133,9 @@ function useUploadCsv<
     error,
     preview,
     csvInfo,
-    uploadFile,
+    uploadRecipients,
     clearCsvStatus,
   }
 }
 
-export default useUploadCsv
+export default useUploadRecipients
