@@ -4,6 +4,7 @@ import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { sendTiming } from 'services/ga.service'
 import {
   uploadFileToS3,
+  uploadVaultLink,
   deleteCsvStatus,
   getCsvStatus,
   CsvStatusResponse,
@@ -12,20 +13,19 @@ import { EmailPreview, SMSPreview, TelegramPreview } from 'classes'
 
 type UploadFunction = (campaignId: number, file: any) => Promise<any>
 
-const uploadFileOrUrl = (
+const uploadFileOrVaultLink = (
   campaignId: number,
   recipientList: string | File
 ): Promise<any> => {
   if (typeof recipientList !== 'string') {
     return uploadFileToS3(campaignId, recipientList)
   }
-
-  return Promise.resolve()
+  return uploadVaultLink(campaignId, recipientList)
 }
 
 function useUploadRecipients<
   Preview extends EmailPreview | SMSPreview | TelegramPreview
->(upload: UploadFunction = uploadFileOrUrl, forceReset?: boolean) {
+>(upload: UploadFunction = uploadFileOrVaultLink, forceReset?: boolean) {
   const { campaign } = useContext(CampaignContext)
   if (!campaign)
     throw new Error('useUploadCsv must be used within a CampaignProvider')

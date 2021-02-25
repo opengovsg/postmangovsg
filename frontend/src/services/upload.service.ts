@@ -224,6 +224,14 @@ export async function uploadFileToS3(
   return file.name
 }
 
+export async function uploadVaultLink(
+  _campaignId: number,
+  url: string
+): Promise<string> {
+  // TODO: Implement with actual API call to backend to upload Vault link
+  return Promise.resolve(url)
+}
+
 export async function deleteCsvStatus(campaignId: number): Promise<void> {
   try {
     await axios.delete(`/campaign/${campaignId}/upload/status`)
