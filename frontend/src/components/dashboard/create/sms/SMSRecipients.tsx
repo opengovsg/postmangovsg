@@ -87,8 +87,16 @@ const SMSRecipients = ({
           <>
             <StepHeader title={<h4>Insert Vault link</h4>}>
               <p>
-                To use a dataset from Vault, copy and paste the link. Dataset
-                will not be used until you click “Use dataset”.
+                To use a dataset from{' '}
+                <OutboundLink
+                  eventLabel={i18n._(LINKS.vaultUrl)}
+                  to={i18n._(LINKS.vaultUrl)}
+                  target="_blank"
+                >
+                  Vault
+                </OutboundLink>
+                , copy and paste the link. Dataset will not be used until you
+                click “Use dataset”.
               </p>
             </StepHeader>
 

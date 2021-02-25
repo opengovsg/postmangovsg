@@ -69,40 +69,40 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: config.ts:59
+#: config.ts:60
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
-#: config.ts:77
+#: config.ts:78
 msgid "announcement.mediaUrl"
 msgstr "https://file.go.gov.sg/dz52q4.png"
 
-#: config.ts:79
+#: config.ts:80
 msgid "announcement.primaryButtonText"
 msgstr "Read guide"
 
-#: config.ts:78
+#: config.ts:79
 msgid "announcement.primaryButtonUrl"
 msgstr "https://guide.postman.gov.sg/release-notes"
 
-#: config.ts:81
+#: config.ts:82
 msgid "announcement.secondaryButtonText"
 msgstr "null"
 
-#: config.ts:80
+#: config.ts:81
 msgid "announcement.secondaryButtonUrl"
 msgstr "null"
 
-#: config.ts:76
+#: config.ts:77
 msgid "announcement.subtext"
 msgstr "Thanks for using Postman and joining us every step of the way while we mature as a product. We'll be releasing exciting new features this year. For instance, this is an announcement modal that will keep you up-to-date about our new features! Watch this space for things that are brewing. Learn more about Postman's releases by reading our guide."
 
-#: config.ts:75
+#: config.ts:76
 msgid "announcement.title"
 msgstr "Happy New Year! Congrats on making it through 2020."
 
 #: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
-#: config.ts:57
+#: config.ts:58
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
 
@@ -226,6 +226,10 @@ msgstr "https://guide.postman.gov.sg/contact-us"
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
 
-#: config.ts:83
+#: config.ts:56
+msgid "link.vaultUrl"
+msgstr "https://vault.gov.sg"
+
+#: config.ts:84
 msgid "vaultBucketName"
 msgstr "vault-bucket"
