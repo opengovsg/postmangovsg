@@ -889,7 +889,7 @@ router.get(
  * path:
  *   /campaign/{campaignId}/email/tesseract:
  *     post:
- *       summary: "Retrieve recipient file from vault url"
+ *       summary: "Retrieve and process recipient file from vault url"
  *       tags:
  *         - Email
  *       parameters:
