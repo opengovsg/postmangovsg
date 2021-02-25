@@ -227,19 +227,17 @@ const EmailRecipients = ({
         <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 
-      {!isProcessing &&
-        numRecipients > 0 &&
-        currentRecipientListType === recipientListType && (
-          <StepSection>
-            <p className={styles.greyText}>Message preview</p>
-            <EmailPreviewBlock
-              body={preview?.body}
-              subject={preview?.subject}
-              replyTo={preview?.replyTo}
-              from={preview?.from}
-            />
-          </StepSection>
-        )}
+      {!isProcessing && numRecipients > 0 && protect && (
+        <StepSection>
+          <p className={styles.greyText}>Message preview</p>
+          <EmailPreviewBlock
+            body={preview?.body}
+            subject={preview?.subject}
+            replyTo={preview?.replyTo}
+            from={preview?.from}
+          />
+        </StepSection>
+      )}
 
       {!protect && (
         <ButtonGroup>

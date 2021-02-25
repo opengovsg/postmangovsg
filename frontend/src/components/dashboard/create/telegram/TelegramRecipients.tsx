@@ -209,18 +209,16 @@ const TelegramRecipients = ({
         <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 
-      {!isProcessing &&
-        numRecipients > 0 &&
-        currentRecipientListType === recipientListType && (
-          <>
-            <StepSection>
-              <p className={styles.greyText}>Message preview</p>
-              <PreviewBlock
-                body={preview.body?.replace(/\n/g, '<br />')}
-              ></PreviewBlock>
-            </StepSection>
-          </>
-        )}
+      {!isProcessing && numRecipients > 0 && isDemo && (
+        <>
+          <StepSection>
+            <p className={styles.greyText}>Message preview</p>
+            <PreviewBlock
+              body={preview.body?.replace(/\n/g, '<br />')}
+            ></PreviewBlock>
+          </StepSection>
+        </>
+      )}
 
       <ButtonGroup>
         <NextButton
