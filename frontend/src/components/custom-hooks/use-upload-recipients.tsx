@@ -62,19 +62,22 @@ function useUploadRecipients<
           setCsvInfo({ csvFilename })
           return
         }
-        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
-          +campaignId
-        )
+        const {
+          isCsvProcessing: isProcessing,
+          preview,
+          ...newCsvInfo
+        } = await getCsvStatus(+campaignId)
+
         // Prevent setting state if unmounted
         if (!isMounted.current) return
 
-        setIsProcessing(isCsvProcessing)
+        setIsProcessing(isProcessing)
         setCsvInfo(newCsvInfo)
         if (preview) {
           setPreview(preview as Preview)
         }
 
-        if (isCsvProcessing) {
+        if (isProcessing) {
           timeoutId = setTimeout(pollStatus, 2000)
         }
       } catch (e) {
