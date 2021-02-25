@@ -12,6 +12,7 @@ export interface CsvStatusInterface {
   isCsvProcessing: boolean
   filename?: string
   tempFilename?: string
+  bucket?: string
   error?: string
 }
 

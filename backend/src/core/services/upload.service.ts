@@ -153,7 +153,8 @@ const getCsvStatus = async (
     throw new Error('Campaign does not exist')
   }
   // s3Object is nullable
-  const { filename, temp_filename: tempFilename } = campaign.s3Object || {}
+  const { filename, temp_filename: tempFilename, bucket } =
+    campaign.s3Object || {}
   let { error } = campaign.s3Object || {}
 
   let isCsvProcessing = !!tempFilename && !error
@@ -176,6 +177,7 @@ const getCsvStatus = async (
     isCsvProcessing,
     filename,
     tempFilename,
+    bucket,
     error,
   }
 }

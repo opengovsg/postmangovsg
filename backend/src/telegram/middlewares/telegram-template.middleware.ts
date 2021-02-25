@@ -216,6 +216,7 @@ const pollCsvStatusHandler = async (
       isCsvProcessing,
       filename,
       tempFilename,
+      bucket,
       error,
     } = await UploadService.getCsvStatus(+campaignId)
 
@@ -235,6 +236,7 @@ const pollCsvStatusHandler = async (
       csv_error: error,
       num_recipients: numRecipients,
       preview,
+      bucket,
     })
   } catch (err) {
     next(err)
