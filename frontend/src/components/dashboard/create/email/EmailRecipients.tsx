@@ -24,7 +24,7 @@ import {
   WarningBlock,
   PrimaryButton,
 } from 'components/common'
-import { LINKS } from 'config'
+import { VAULT_BUCKET_NAME, LINKS } from 'config'
 import { i18n } from '@lingui/core'
 import { RecipientListType, EmailPreview, EmailProgress } from 'classes'
 import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
@@ -45,10 +45,6 @@ const EmailRecipients = ({
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { params, protect } = campaign
   const [sampleCsvError, setSampleCsvError] = useState(null)
-  const [recipientListType, setRecipientListType] = useState(
-    RecipientListType.Csv
-  )
-
   const {
     isProcessing,
     isUploading,
@@ -58,7 +54,15 @@ const EmailRecipients = ({
     uploadRecipients,
     clearCsvStatus,
   } = useUploadRecipients<EmailPreview>(onFileSelected, forceReset)
-  const { csvFilename, numRecipients = 0 } = csvInfo
+  const { bucket, csvFilename, numRecipients = 0 } = csvInfo
+
+  const currentRecipientListType =
+    bucket === VAULT_BUCKET_NAME
+      ? RecipientListType.Vault
+      : RecipientListType.Csv
+  const [recipientListType, setRecipientListType] = useState(
+    currentRecipientListType
+  )
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
@@ -87,7 +91,9 @@ const EmailRecipients = ({
 
             <UrlUpload
               isProcessing={isProcessing}
-              csvInfo={csvInfo}
+              csvInfo={
+                currentRecipientListType === recipientListType ? csvInfo : {}
+              }
               onSubmit={(url) => uploadRecipients(url)}
               onErrorClose={clearCsvStatus}
             />
@@ -97,7 +103,13 @@ const EmailRecipients = ({
         return (
           <>
             <StepHeader
-              title={protect ? 'Upload CSV file' : <h4>Upload CSV file</h4>}
+              title={
+                protect ? (
+                  'Upload recipient list in CSV format'
+                ) : (
+                  <h4>Upload CSV file</h4>
+                )
+              }
             >
               <p>
                 Only CSV format files are allowed. If you have an Excel file,
@@ -138,7 +150,9 @@ const EmailRecipients = ({
 
             <CsvUpload
               isCsvProcessing={isProcessing}
-              csvInfo={csvInfo}
+              csvInfo={
+                currentRecipientListType === recipientListType ? csvInfo : {}
+              }
               onErrorClose={clearCsvStatus}
             >
               {/* Dont show upload button when upload completed for protected component */}
@@ -205,17 +219,19 @@ const EmailRecipients = ({
         <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 
-      {!isProcessing && numRecipients > 0 && (
-        <StepSection>
-          <p className={styles.greyText}>Message preview</p>
-          <EmailPreviewBlock
-            body={preview?.body}
-            subject={preview?.subject}
-            replyTo={preview?.replyTo}
-            from={preview?.from}
-          />
-        </StepSection>
-      )}
+      {!isProcessing &&
+        numRecipients > 0 &&
+        currentRecipientListType === recipientListType && (
+          <StepSection>
+            <p className={styles.greyText}>Message preview</p>
+            <EmailPreviewBlock
+              body={preview?.body}
+              subject={preview?.subject}
+              replyTo={preview?.replyTo}
+              from={preview?.from}
+            />
+          </StepSection>
+        )}
 
       {!protect && (
         <ButtonGroup>

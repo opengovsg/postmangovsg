@@ -17,6 +17,7 @@ export interface CsvStatusResponse {
   csvError?: string
   numRecipients?: number
   preview?: EmailPreview | SMSPreview
+  bucket?: string
 }
 
 async function getMd5(blob: Blob): Promise<string> {
@@ -139,6 +140,7 @@ export async function getCsvStatus(
       csv_error: csvError,
       num_recipients: numRecipients,
       preview,
+      bucket,
     } = response.data
     const result = {
       isCsvProcessing,
@@ -146,6 +148,7 @@ export async function getCsvStatus(
       tempCsvFilename,
       csvError,
       numRecipients,
+      bucket,
     } as CsvStatusResponse
     if (preview) {
       result.preview = preview
