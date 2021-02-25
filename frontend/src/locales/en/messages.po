@@ -69,40 +69,40 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: config.ts:58
+#: config.ts:59
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
-#: config.ts:76
+#: config.ts:77
 msgid "announcement.mediaUrl"
 msgstr "https://file.go.gov.sg/dz52q4.png"
 
-#: config.ts:78
+#: config.ts:79
 msgid "announcement.primaryButtonText"
 msgstr "Read guide"
 
-#: config.ts:77
+#: config.ts:78
 msgid "announcement.primaryButtonUrl"
 msgstr "https://guide.postman.gov.sg/release-notes"
 
-#: config.ts:80
+#: config.ts:81
 msgid "announcement.secondaryButtonText"
 msgstr "null"
 
-#: config.ts:79
+#: config.ts:80
 msgid "announcement.secondaryButtonUrl"
 msgstr "null"
 
-#: config.ts:75
+#: config.ts:76
 msgid "announcement.subtext"
 msgstr "Thanks for using Postman and joining us every step of the way while we mature as a product. We'll be releasing exciting new features this year. For instance, this is an announcement modal that will keep you up-to-date about our new features! Watch this space for things that are brewing. Learn more about Postman's releases by reading our guide."
 
-#: config.ts:74
+#: config.ts:75
 msgid "announcement.title"
 msgstr "Happy New Year! Congrats on making it through 2020."
 
 #: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
-#: config.ts:56
+#: config.ts:57
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
 
@@ -154,74 +154,78 @@ msgstr "Bot has been blocked by the recipient. Please contact the recipient via 
 msgid "errors.telegram.notSubscribed"
 msgstr "Recipient has not subscribed to your agency's bot - please ask them to subscribe before sending a message."
 
-#: config.ts:47
+#: config.ts:48
 msgid "link.contactUsUrl"
 msgstr "https://go.gov.sg/postman-contact-us"
 
-#: config.ts:48
+#: config.ts:49
 msgid "link.contributeUrl"
 msgstr "https://github.com/opengovsg/postmangovsg"
 
-#: config.ts:52
+#: config.ts:53
 msgid "link.customFromAddressRequestUrl"
 msgstr "https://go.gov.sg/postman-custom-from"
 
-#: config.ts:53
+#: config.ts:54
 msgid "link.demoTelegramBotUrl"
 msgstr "https://go.gov.sg/postmangovsgbot"
 
-#: config.ts:54
+#: config.ts:55
 msgid "link.demoVideoUrl"
 msgstr "https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/Demo+Campaign+Mode.mp4"
 
-#: config.ts:45
+#: config.ts:46
 msgid "link.guideDemoUrl"
 msgstr "https://guide.postman.gov.sg/before-you-start/demo-mode"
 
-#: config.ts:38
+#: config.ts:39
 msgid "link.guideEmailPasswordProtectedUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/password-protected-email"
 
-#: config.ts:44
+#: config.ts:45
 msgid "link.guidePowerUserUrl"
 msgstr "https://guide.postman.gov.sg/guide/power-users"
 
-#: config.ts:46
+#: config.ts:47
 msgid "link.guideRemoveDuplicatesUrl"
 msgstr "https://guide.postman.gov.sg/quick-start#remove-duplicates-in-excel"
 
-#: config.ts:40
+#: config.ts:41
 msgid "link.guideSmsAccountSidUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-1-account-sid-and-auth-token"
 
-#: config.ts:41
+#: config.ts:42
 msgid "link.guideSmsApiKeyUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-2-set-up-a-standard-api-key"
 
-#: config.ts:42
+#: config.ts:43
 msgid "link.guideSmsMessagingServiceUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-3-set-up-your-messaging-service"
 
-#: config.ts:39
+#: config.ts:40
 msgid "link.guideSmsUrl"
 msgstr "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
 
-#: config.ts:43
+#: config.ts:44
 msgid "link.guideTelegramUrl"
 msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
 
-#: config.ts:37
+#: config.ts:38
 msgid "link.guideUrl"
 msgstr "https://guide.postman.gov.sg"
 
-#: config.ts:50
+#: config.ts:51
 msgid "link.privacyUrl"
 msgstr "https://guide.postman.gov.sg/legal/privacy"
 
-#: config.ts:51
+#: config.ts:52
 msgid "link.reportBugUrl"
 msgstr "https://guide.postman.gov.sg/contact-us"
 
-#: config.ts:49
+#: config.ts:50
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
+
+#: config.ts:83
+msgid "vaultBucketName"
+msgstr "vault-bucket"

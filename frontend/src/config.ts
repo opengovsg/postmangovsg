@@ -78,6 +78,8 @@ export const ANNOUNCEMENT: Record<string, any> = {
   secondaryButtonText: t`announcement.secondaryButtonText`,
 }
 
+export const VAULT_BUCKET_NAME = t`vaultBucketName`
+
 // Users of getAnnouncementVersion have to await it.
 // Lazily compute the announcement version and memoize it for future use.
 let memoizedVersion: string | null = null
