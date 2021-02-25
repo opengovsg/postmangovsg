@@ -1,7 +1,9 @@
 import retry from 'async-retry'
-import S3Client from '@core/services/s3-client.class'
-
 import { Request, Response, NextFunction } from 'express'
+import axios from 'axios'
+
+import config from '@core/config'
+import S3Client from '@core/services/s3-client.class'
 import {
   MissingTemplateKeysError,
   HydrationError,
@@ -10,7 +12,12 @@ import {
   UserError,
 } from '@core/errors'
 import { TemplateError } from 'postman-templating'
-import { UploadService, StatsService, ParseCsvService } from '@core/services'
+import {
+  UploadService,
+  StatsService,
+  ParseCsvService,
+  TesseractService,
+} from '@core/services'
 import { Campaign } from '@core/models'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
@@ -22,6 +29,8 @@ const RETRY_CONFIG = {
   maxTimeout: 3 * 1000,
   factor: 1,
 }
+const VAULT_BUCKET_NAME = config.get('aws.vaultBucket')
+
 /**
  * Store template subject and body in Telegram template table.
  * If an existing csv has been uploaded for this campaign but whose columns do not match the
@@ -249,9 +258,111 @@ const deleteCsvErrorHandler = async (
   }
 }
 
+/**
+ * Downloads the file from the vault url and checks that its columns match the attributes provided in the template.
+ * If a template has not yet been uploaded, do not write to the message logs, but prompt the user to upload a template first.
+ * If the template and csv do not match, prompt the user to upload a new file.
+ * @param req
+ * @param res
+ * @param next
+ */
+const tesseractHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  const { campaignId } = req.params
+  const { url } = req.body
+  const logMeta = { campaignId, action: 'tesseractHandler' }
+
+  try {
+    // validate that url is from vault and is not expired
+    TesseractService.validateVaultUrl(url)
+
+    // check if template exists
+    const template = await TelegramTemplateService.getFilledTemplate(
+      +campaignId
+    )
+    if (template === null) {
+      throw new Error(
+        'Error: No message template found. Please create a message template before uploading a recipient file.'
+      )
+    }
+
+    // Return early because bulk insert is slow
+    res.sendStatus(202)
+
+    try {
+      await retry(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const transaction = await Campaign.sequelize!.transaction()
+        const campaign = await Campaign.findByPk(campaignId, {
+          attributes: [['demo_message_limit', 'demoMessageLimit']],
+        })
+
+        // stream response from s3 presigned url
+        const { data: vaultFile } = await axios({
+          method: 'get',
+          responseType: 'stream',
+          url,
+        })
+
+        const params = {
+          transaction,
+          template,
+          campaignId: +campaignId,
+        }
+
+        await ParseCsvService.parseAndProcessCsv(
+          vaultFile,
+          TelegramService.uploadCompleteOnPreview(params),
+          TelegramService.uploadCompleteOnChunk(params),
+          UploadService.uploadCompleteOnComplete({
+            ...params,
+            key: '',
+            filename: 'vault dataset', // TODO
+            bucket: VAULT_BUCKET_NAME,
+          }),
+          campaign?.demoMessageLimit ? campaign.demoMessageLimit : undefined
+        ).catch((err) => {
+          transaction.rollback()
+          throw err
+        })
+      }, RETRY_CONFIG)
+    } catch (err) {
+      // Do not return any response since it has already been sent
+      logger.error({
+        message: 'Error storing messages for campaign',
+        error: err,
+        ...logMeta,
+      })
+
+      // Store error to return on poll
+      UploadService.storeS3Error(+campaignId, err.message)
+    }
+  } catch (err) {
+    logger.error({
+      message: 'Failed to complete upload to s3',
+      error: err,
+      ...logMeta,
+    })
+    const userErrors = [
+      UserError,
+      RecipientColumnMissing,
+      MissingTemplateKeysError,
+      InvalidRecipientError,
+    ]
+    if (userErrors.some((errType) => err instanceof errType)) {
+      return res.status(400).json({ message: err.message })
+    }
+    return next(err)
+  }
+}
+
 export const TelegramTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
   pollCsvStatusHandler,
   deleteCsvErrorHandler,
+  tesseractHandler,
 }

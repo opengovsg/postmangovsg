@@ -445,8 +445,9 @@ const tesseractHandler = async (
             filename: 'vault dataset', // TODO
             bucket: VAULT_BUCKET_NAME,
           })
-        ).catch(() => {
+        ).catch((err) => {
           transaction.rollback()
+          throw err
         })
       }, RETRY_CONFIG)
     } catch (err) {

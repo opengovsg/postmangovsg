@@ -335,8 +335,9 @@ const tesseractHandler = async (
             bucket: VAULT_BUCKET_NAME,
           }),
           campaign?.demoMessageLimit ? campaign.demoMessageLimit : undefined
-        ).catch(() => {
+        ).catch((err) => {
           transaction.rollback()
+          throw err
         })
       }, RETRY_CONFIG)
     } catch (err) {
