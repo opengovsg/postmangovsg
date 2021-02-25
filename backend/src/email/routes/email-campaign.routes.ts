@@ -88,6 +88,12 @@ const duplicateCampaignValidator = {
   }),
 }
 
+const tesseractCampaignValidator = {
+  [Segments.BODY]: Joi.object({
+    url: Joi.string().trim().required(),
+  }),
+}
+
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -824,6 +830,100 @@ router.post(
   '/duplicate',
   celebrate(duplicateCampaignValidator),
   EmailMiddleware.duplicateCampaign
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/upload/start:
+ *     get:
+ *       summary: "Get a presigned URL for upload with Content-MD5 header"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: mime_type
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: md5
+ *           in: query
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         200:
+ *           description: Success
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   presigned_url:
+ *                     type: string
+ *                   transaction_id:
+ *                     type: string
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.get(
+  '/upload/start',
+  celebrate(uploadStartValidator),
+  CampaignMiddleware.canEditCampaign,
+  UploadMiddleware.uploadStartHandler
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/tesseract:
+ *     post:
+ *       summary: "Retrieve recipient file from vault url"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - url
+ *               properties:
+ *                 url:
+ *                   type: string
+ *       responses:
+ *         "202" :
+ *           description: Accepted. The uploaded file is being processed.
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/tesseract',
+  celebrate(tesseractCampaignValidator),
+  CampaignMiddleware.canEditCampaign,
+  EmailTemplateMiddleware.tesseractHandler
 )
 
 export default router

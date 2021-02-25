@@ -74,14 +74,15 @@ const replaceCampaignS3Metadata = (
   campaignId: number,
   key: string,
   filename: string,
-  transaction: Transaction | undefined
+  transaction: Transaction | undefined,
+  bucket?: string
 ): Promise<[number, Campaign[]]> => {
   return Campaign.update(
     {
       s3Object: {
         key,
         filename,
-        bucket: FILE_STORAGE_BUCKET_NAME,
+        bucket: bucket || FILE_STORAGE_BUCKET_NAME,
       },
     },
     {
@@ -207,15 +208,23 @@ const uploadCompleteOnComplete = ({
   campaignId,
   key,
   filename,
+  bucket,
 }: {
   transaction: Transaction
   campaignId: number
   key: string
   filename: string
+  bucket?: string
 }): ((numRecords: number) => Promise<void>) => {
   return async (numRecords: number): Promise<void> => {
     // Updates metadata in project
-    await replaceCampaignS3Metadata(campaignId, key, filename, transaction)
+    await replaceCampaignS3Metadata(
+      campaignId,
+      key,
+      filename,
+      transaction,
+      bucket
+    )
 
     await StatsService.setNumRecipients(campaignId, numRecords, transaction)
 

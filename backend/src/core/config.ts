@@ -76,6 +76,11 @@ const config = convict({
       default: 'postmangovsg-prod-upload',
       env: 'FILE_STORAGE_BUCKET_NAME',
     },
+    vaultBucket: {
+      doc: 'Value of bucket name attribute for Vault datasets',
+      default: 'vaultgovsg',
+      env: 'VAULT_BUCKET_NAME',
+    },
     secretManagerSalt: {
       doc:
         'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
