@@ -18,7 +18,7 @@ const UrlUpload = ({
   }
   onErrorClose: Function
 }) => {
-  const { numRecipients = 0, csvFilename, csvError } = csvInfo
+  const { numRecipients = 0, csvFilename, tempCsvFilename, csvError } = csvInfo
   const [url, setUrl] = useState('')
 
   function isValidUrl() {
@@ -46,8 +46,8 @@ const UrlUpload = ({
           <li>
             <i className="bx bx-loader-alt bx-spin"></i>
             <p>
-              <b>{csvFilename || 'Your file'}</b> is being processed. You may
-              leave this page and check back later.
+              <b>{tempCsvFilename || 'Your file'}</b> is being processed. You
+              may leave this page and check back later.
             </p>
           </li>
         </DetailBlock>
