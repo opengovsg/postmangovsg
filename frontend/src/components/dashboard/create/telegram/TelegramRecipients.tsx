@@ -129,7 +129,8 @@ const TelegramRecipients = ({
             </StepHeader>
 
             {!csvFilename && (
-              <WarningBlock title={'We do not remove duplicate recipients'}>
+              <WarningBlock>
+                We do not remove duplicate recipients.{' '}
                 <OutboundLink
                   className={styles.warningHelpLink}
                   eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}

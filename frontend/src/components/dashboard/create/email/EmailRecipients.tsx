@@ -144,14 +144,14 @@ const EmailRecipients = ({
 
             {!csvFilename && (
               <WarningBlock>
+                We do not remove duplicate recipients.{' '}
                 <OutboundLink
                   className={styles.warningHelpLink}
                   eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
                   to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
                   target="_blank"
                 >
-                  We do not remove duplicates in your CSV file. Learn how to
-                  remove duplicates in your excel from our guide.
+                  Learn how to remove duplicates in your excel from our guide.
                 </OutboundLink>
               </WarningBlock>
             )}
