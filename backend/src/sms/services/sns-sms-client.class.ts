@@ -5,15 +5,23 @@ const region = config.get('aws.awsRegion')
 
 export default class SnsSmsClient {
   private client: SNSClient
+  private senderId: string
 
-  constructor() {
+  constructor(senderId = 'postman') {
     this.client = new SNSClient({ region })
+    this.senderId = senderId
   }
 
   async send(recipient: string, message: string): Promise<string | void> {
     const params: PublishInput = {
       Message: this.replaceNewLines(message),
       PhoneNumber: recipient,
+      MessageAttributes: {
+        'AWS.SNS.SMS.SenderID': {
+          DataType: 'String',
+          StringValue: this.senderId,
+        },
+      },
     }
     const data = await this.client.send(new PublishCommand(params))
     return data.MessageId
