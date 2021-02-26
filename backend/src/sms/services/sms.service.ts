@@ -73,7 +73,7 @@ const sendCampaignMessage = async (
     recipient,
     config.get('defaultCountry')
   )
-  const client = config.get('useSmsFallback')
+  const client = config.get('smsFallback.activate')
     ? new SnsSmsClient()
     : new TwilioClient(credential)
 
@@ -93,7 +93,7 @@ const sendValidationMessage = async (
     recipient,
     config.get('defaultCountry')
   )
-  const client = config.get('useSmsFallback')
+  const client = config.get('smsFallback.activate')
     ? new SnsSmsClient()
     : new TwilioClient(credential)
 

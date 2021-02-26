@@ -7,12 +7,13 @@ import {
 import config from '@core/config'
 
 const region = config.get('aws.awsRegion')
+const DEFAULT_SENDER_ID = config.get('smsFallback.senderId')
 
 export default class SnsSmsClient {
   private client: SNSClient
   private messageAttrs: { [key: string]: MessageAttributeValue }
 
-  constructor(senderId = 'postman') {
+  constructor(senderId = DEFAULT_SENDER_ID) {
     this.client = new SNSClient({ region })
     this.messageAttrs = {
       'AWS.SNS.SMS.SenderID': {

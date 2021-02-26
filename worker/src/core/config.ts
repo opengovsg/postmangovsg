@@ -211,10 +211,17 @@ const config = convict({
     default: 'https://postman.gov.sg', // prod only
     env: 'UNSUBSCRIBE_URL',
   },
-  useSmsFallback: {
-    doc: 'Switch to true to use SNS fallback for all SMS campaigns',
-    default: false,
-    env: 'USE_SMS_FALLBACK',
+  smsFallback: {
+    activate: {
+      doc: 'Switch to true to use SNS fallback for all SMS campaigns',
+      default: false,
+      env: 'SMS_FALLBACK_ACTIVATE',
+    },
+    senderId: {
+      doc: 'Sender ID to use for all SNS SMS',
+      default: 'postman',
+      env: 'SMS_FALLBACK_SENDER_ID',
+    },
   },
 })
 

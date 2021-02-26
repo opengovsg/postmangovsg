@@ -129,7 +129,7 @@ class SMS {
     const credentials = await CredentialService.getTwilioCredentials(
       credentialName
     )
-    this.smsClient = config.get('useSmsFallback')
+    this.smsClient = config.get('smsFallback.activate')
       ? new SnsSmsClient()
       : new TwilioClient(credentials)
   }
