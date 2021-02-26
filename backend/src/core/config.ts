@@ -431,6 +431,11 @@ const config = convict({
       format: Number,
     },
   },
+  useSmsFallback: {
+    doc: 'Switch to true to use SNS fallback for all SMS campaigns',
+    default: false,
+    env: 'USE_SMS_FALLBACK',
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name

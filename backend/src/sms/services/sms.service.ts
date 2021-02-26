@@ -15,6 +15,7 @@ import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
 import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
+import SnsSmsClient from './sns-sms-client.class'
 
 const logger = loggerWithLabel(module)
 
@@ -68,12 +69,15 @@ const sendCampaignMessage = async (
   const msg = await getHydratedMessage(campaignId)
   if (!msg) throw new Error('No message to send')
 
-  const twilioService = new TwilioClient(credential)
   recipient = PhoneNumberService.normalisePhoneNumber(
     recipient,
     config.get('defaultCountry')
   )
-  return twilioService.send(recipient, msg?.body)
+  const client = config.get('useSmsFallback')
+    ? new SnsSmsClient()
+    : new TwilioClient(credential)
+
+  return client.send(recipient, msg?.body)
 }
 
 /**
@@ -85,15 +89,15 @@ const sendValidationMessage = async (
   recipient: string,
   credential: TwilioCredentials
 ): Promise<string | void> => {
-  const twilioService = new TwilioClient(credential)
   recipient = PhoneNumberService.normalisePhoneNumber(
     recipient,
     config.get('defaultCountry')
   )
-  return twilioService.send(
-    recipient,
-    'Your Twilio credential has been validated.'
-  )
+  const client = config.get('useSmsFallback')
+    ? new SnsSmsClient()
+    : new TwilioClient(credential)
+
+  return client.send(recipient, 'Your Twilio credential has been validated.')
 }
 
 /**
