@@ -1,5 +1,9 @@
 import type { Request, Response, NextFunction } from 'express'
+import expressRateLimit from 'express-rate-limit'
+import RedisStore from 'rate-limit-redis'
+import { RedisService } from '@core/services'
 import { EmailTransactionalService } from '@email/services'
+import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
 import { AuthService } from '@core/services'
@@ -41,6 +45,25 @@ async function sendMessage(
   }
 }
 
+const rateLimit = expressRateLimit({
+  store: new RedisStore({
+    prefix: 'email-single-send:',
+    client: RedisService.rateLimitClient,
+    expiry: 1,
+  }),
+  keyGenerator() {
+    return 'global'
+  },
+  windowMs: 1000,
+  max: config.get('singleSendMailRate'),
+  draft_polli_ratelimit_headers: true,
+  message: {
+    status: 429,
+    message: 'Too many requests. Please try again later.',
+  },
+})
+
 export const EmailTransactionalMiddleware = {
   sendMessage,
+  rateLimit,
 }

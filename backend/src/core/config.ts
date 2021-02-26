@@ -254,6 +254,13 @@ const config = convict({
     format: 'required-string',
     sensitive: true,
   },
+  redisRateLimitUri: {
+    doc: 'URI to redis cache for rate limiting single-send requests',
+    default: '',
+    env: 'REDIS_RATE_LIMIT_URI',
+    format: 'required-string',
+    sensitive: true,
+  },
   mailOptions: {
     host: {
       doc: 'Amazon SES SMTP endpoint.',
@@ -290,6 +297,18 @@ const config = convict({
     doc: 'The default rate at which an email campaign will be sent',
     default: 35,
     env: 'EMAIL_DEFAULT_RATE',
+    format: 'int',
+  },
+  singleSendMailRate: {
+    doc: 'The max rate at which single-send emails can be sent',
+    default: 10,
+    env: 'SINGLE_SEND_EMAIL_RATE',
+    format: 'int',
+  },
+  singleSendSmsRate: {
+    doc: 'The max rate at which single-send SMSes can be sent',
+    default: 10,
+    env: 'SINGLE_SEND_SMS_RATE',
     format: 'int',
   },
   defaultCountry: {

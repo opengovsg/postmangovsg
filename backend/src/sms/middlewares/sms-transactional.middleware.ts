@@ -1,4 +1,8 @@
 import type { Request, Response, NextFunction } from 'express'
+import expressRateLimit from 'express-rate-limit'
+import RedisStore from 'rate-limit-redis'
+import { RedisService } from '@core/services'
+import config from '@core/config'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
@@ -48,6 +52,25 @@ async function sendMessage(
   }
 }
 
+const rateLimit = expressRateLimit({
+  store: new RedisStore({
+    prefix: 'sms-single-send:',
+    client: RedisService.rateLimitClient,
+    expiry: 1,
+  }),
+  keyGenerator(_: Request, res: Response) {
+    return res.locals.credentials.accountSid
+  },
+  windowMs: 1000,
+  max: config.get('singleSendSmsRate'),
+  draft_polli_ratelimit_headers: true,
+  message: {
+    status: 429,
+    message: 'Too many requests. Please try again later.',
+  },
+})
+
 export const SmsTransactionalMiddleware = {
   sendMessage,
+  rateLimit,
 }
