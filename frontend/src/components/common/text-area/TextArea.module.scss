@@ -21,9 +21,18 @@
       padding-bottom: 0.7rem;
     }
 
+    &:hover,
     &:focus {
       outline: none;
       border-color: $primary;
+    }
+
+    &:hover {
+      border-width: 1.5px;
+    }
+
+    &:focus {
+      border-width: 1px;
     }
 
     &::placeholder {
