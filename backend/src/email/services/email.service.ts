@@ -361,4 +361,5 @@ export const EmailService = {
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
   duplicateCampaign,
+  sendEmail,
 }
