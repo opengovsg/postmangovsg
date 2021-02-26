@@ -1,27 +1,36 @@
-import { SNSClient, PublishCommand, PublishInput } from '@aws-sdk/client-sns'
+import {
+  SNSClient,
+  PublishCommand,
+  PublishInput,
+  MessageAttributeValue,
+} from '@aws-sdk/client-sns'
 import config from '@core/config'
 
 const region = config.get('aws.awsRegion')
 
 export default class SnsSmsClient {
   private client: SNSClient
-  private senderId: string
+  private messageAttrs: { [key: string]: MessageAttributeValue }
 
   constructor(senderId = 'postman') {
     this.client = new SNSClient({ region })
-    this.senderId = senderId
+    this.messageAttrs = {
+      'AWS.SNS.SMS.SenderID': {
+        DataType: 'String',
+        StringValue: senderId,
+      },
+      'AWS.SNS.SMS.SMSType': {
+        DataType: 'String',
+        StringValue: 'Transactional',
+      },
+    }
   }
 
   async send(recipient: string, message: string): Promise<string | void> {
     const params: PublishInput = {
       Message: this.replaceNewLines(message),
       PhoneNumber: recipient,
-      MessageAttributes: {
-        'AWS.SNS.SMS.SenderID': {
-          DataType: 'String',
-          StringValue: this.senderId,
-        },
-      },
+      MessageAttributes: this.messageAttrs,
     }
     const data = await this.client.send(new PublishCommand(params))
     return data.MessageId
