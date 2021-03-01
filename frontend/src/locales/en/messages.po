@@ -232,4 +232,4 @@ msgstr "https://vault.gov.sg"
 
 #: config.ts:84
 msgid "vaultBucketName"
-msgstr "vault-bucket"
+msgstr "vaultgovsg"
