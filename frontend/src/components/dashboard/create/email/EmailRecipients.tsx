@@ -150,7 +150,8 @@ const EmailRecipients = ({
               </p>
             </StepHeader>
 
-            {!csvFilename && (
+            {(currentRecipientListType !== RecipientListType.Csv ||
+              !csvFilename) && (
               <WarningBlock>
                 We do not remove duplicate recipients.{' '}
                 <OutboundLink

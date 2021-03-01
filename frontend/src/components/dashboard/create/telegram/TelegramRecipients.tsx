@@ -136,7 +136,8 @@ const TelegramRecipients = ({
               </p>
             </StepHeader>
 
-            {!csvFilename && (
+            {(currentRecipientListType !== RecipientListType.Csv ||
+              !csvFilename) && (
               <WarningBlock>
                 We do not remove duplicate recipients.{' '}
                 <OutboundLink
@@ -152,7 +153,9 @@ const TelegramRecipients = ({
 
             <CsvUpload
               isCsvProcessing={isProcessing}
-              csvInfo={csvInfo}
+              csvInfo={
+                currentRecipientListType === recipientListType ? csvInfo : {}
+              }
               onErrorClose={clearCsvStatus}
             >
               <FileInput
