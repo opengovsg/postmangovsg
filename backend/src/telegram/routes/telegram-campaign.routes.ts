@@ -332,6 +332,10 @@ router.post(
  *                     type: string
  *                   num_recipients:
  *                     type: number
+ *                   bucket:
+ *                     type: string
+ *                   is_vault_link:
+ *                     type: boolean
  *                   preview:
  *                     type: object
  *                     properties:
