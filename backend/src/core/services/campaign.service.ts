@@ -236,7 +236,10 @@ const getCampaignDetails = async (
       'demo_message_limit',
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
-      [literal("s3_object -> 'bucket'"), 'bucket'],
+      [
+        literal(`s3_object ->> 'bucket' = '${config.get('aws.vaultBucket')}'`),
+        'is_vault_link',
+      ],
       [
         literal(
           "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
