@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import Papa from 'papaparse'
 import SparkMD5 from 'spark-md5'
-import { EmailPreview, SMSPreview } from 'classes'
+import { RecipientListType, EmailPreview, SMSPreview } from 'classes'
 
 const MD5_CHUNK_SIZE = 5000000 // 5MB
 
@@ -17,7 +17,7 @@ export interface CsvStatusResponse {
   csvError?: string
   numRecipients?: number
   preview?: EmailPreview | SMSPreview
-  bucket?: string
+  recipientListType?: RecipientListType
 }
 
 async function getMd5(blob: Blob): Promise<string> {
@@ -140,7 +140,7 @@ export async function getCsvStatus(
       csv_error: csvError,
       num_recipients: numRecipients,
       preview,
-      bucket,
+      is_vault_link: isVaultLink,
     } = response.data
     const result = {
       isCsvProcessing,
@@ -148,7 +148,9 @@ export async function getCsvStatus(
       tempCsvFilename,
       csvError,
       numRecipients,
-      bucket,
+      recipientListType: isVaultLink
+        ? RecipientListType.Vault
+        : RecipientListType.Csv,
     } as CsvStatusResponse
     if (preview) {
       result.preview = preview

@@ -35,7 +35,7 @@ function useUploadRecipients<
     csvFilename: initialCsvFilename,
     isCsvProcessing: initialIsProcessing,
     numRecipients: initialNumRecipients,
-    bucket: initialBucket,
+    recipientListType: initialRecipientListType,
   } = campaign
 
   const isMounted = useIsMounted()
@@ -48,7 +48,7 @@ function useUploadRecipients<
   >({
     numRecipients: initialNumRecipients,
     csvFilename: initialCsvFilename,
-    bucket: initialBucket,
+    recipientListType: initialRecipientListType,
   })
   const [preview, setPreview] = useState({} as Preview)
   const { csvFilename } = csvInfo

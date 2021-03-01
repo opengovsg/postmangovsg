@@ -33,7 +33,7 @@ export class Campaign {
   status: Status
   isCsvProcessing: boolean
   statusUpdatedAt: Date
-  bucket: string
+  recipientListType: RecipientListType
   protect: boolean
   redacted: boolean
   demoMessageLimit: number | null
@@ -51,7 +51,9 @@ export class Campaign {
     this.statusUpdatedAt = input['statusUpdatedAt']
     this.protect = input['protect']
     this.redacted = input['redacted']
-    this.bucket = input['bucket']
+    this.recipientListType = input['is_vault_link']
+      ? RecipientListType.Vault
+      : RecipientListType.Csv
     this.demoMessageLimit = input['demo_message_limit']
   }
 

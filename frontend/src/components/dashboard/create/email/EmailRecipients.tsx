@@ -1,5 +1,4 @@
 import cx from 'classnames'
-import { t } from '@lingui/macro'
 import React, {
   useState,
   useEffect,
@@ -55,12 +54,11 @@ const EmailRecipients = ({
     uploadRecipients,
     clearCsvStatus,
   } = useUploadRecipients<EmailPreview>(onFileSelected, forceReset)
-  const { bucket, csvFilename, numRecipients = 0 } = csvInfo
-
-  const currentRecipientListType =
-    bucket === t`vaultBucketName`
-      ? RecipientListType.Vault
-      : RecipientListType.Csv
+  const {
+    recipientListType: currentRecipientListType,
+    csvFilename,
+    numRecipients = 0,
+  } = csvInfo
   const [recipientListType, setRecipientListType] = useState(
     currentRecipientListType
   )

@@ -230,6 +230,3 @@ msgstr "https://guide.postman.gov.sg/legal/t-and-c"
 msgid "link.vaultUrl"
 msgstr "https://vault.gov.sg"
 
-#: config.ts:84
-msgid "vaultBucketName"
-msgstr "vaultgovsg"
