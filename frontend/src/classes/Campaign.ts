@@ -33,6 +33,7 @@ export class Campaign {
   status: Status
   isCsvProcessing: boolean
   statusUpdatedAt: Date
+  bucket: string
   protect: boolean
   redacted: boolean
   demoMessageLimit: number | null
@@ -50,6 +51,7 @@ export class Campaign {
     this.statusUpdatedAt = input['statusUpdatedAt']
     this.protect = input['protect']
     this.redacted = input['redacted']
+    this.bucket = input['bucket']
     this.demoMessageLimit = input['demo_message_limit']
   }
 

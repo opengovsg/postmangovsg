@@ -225,11 +225,14 @@ export async function uploadFileToS3(
 }
 
 export async function uploadVaultLink(
-  _campaignId: number,
+  campaignId: number,
   url: string
-): Promise<string> {
-  // TODO: Implement with actual API call to backend to upload Vault link
-  return Promise.resolve(url)
+): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/tesseract`, { url })
+  } catch (e) {
+    errorHandler(e, 'Error uploading Vault link. Please try again.')
+  }
 }
 
 export async function deleteCsvStatus(campaignId: number): Promise<void> {

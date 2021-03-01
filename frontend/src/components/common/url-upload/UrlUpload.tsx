@@ -37,6 +37,7 @@ const UrlUpload = ({
 
   async function onClickHandler() {
     await onSubmit(url)
+    setUrl('')
   }
 
   function renderDetails() {
@@ -78,7 +79,7 @@ const UrlUpload = ({
     <>
       {renderDetails()}
       <TextInputWithButton
-        type="email"
+        type="url"
         value={url}
         onChange={setUrl}
         onClick={onClickHandler}

@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { t } from '@lingui/macro'
 import React, {
   useState,
   useEffect,
@@ -24,7 +25,7 @@ import {
   WarningBlock,
   PrimaryButton,
 } from 'components/common'
-import { VAULT_BUCKET_NAME, LINKS } from 'config'
+import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
 import { RecipientListType, EmailPreview, EmailProgress } from 'classes'
 import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
@@ -57,7 +58,7 @@ const EmailRecipients = ({
   const { bucket, csvFilename, numRecipients = 0 } = csvInfo
 
   const currentRecipientListType =
-    bucket === VAULT_BUCKET_NAME
+    bucket === t`vaultBucketName`
       ? RecipientListType.Vault
       : RecipientListType.Csv
   const [recipientListType, setRecipientListType] = useState(
