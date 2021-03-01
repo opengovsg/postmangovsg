@@ -4,40 +4,52 @@ import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 
+function errored({
+  next,
+  message,
+  action,
+  error,
+}: {
+  next: NextFunction
+  message: string
+  action: string
+  error?: Error
+}): void {
+  error = error ?? new Error(message)
+  logger.error({
+    message,
+    error,
+    action,
+  })
+  next(error)
+}
+
 async function sendMessage(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  const ACTION = 'sendMessage'
+  const ERR_MESSAGE = 'Failed to send email'
+
   try {
     const { subject, body, from, recipient, reply_to: replyTo } = req.body
 
-    logger.info({ message: 'Sending email', action: 'sendMessage' })
-    const success = await EmailSingleSendService.sendMessage({
+    logger.info({ message: 'Sending email', action: ACTION })
+    const messageId = await EmailSingleSendService.sendMessage({
       subject,
       body,
       from,
       recipient,
       replyTo,
     })
-    if (success) {
-      res.status(202).json({ message: 'Accepted' })
-    } else {
-      const err = new Error('Failed to send email')
-      logger.error({
-        message: 'Failed to send email',
-        error: err,
-        action: 'sendMessage',
-      })
-      next(err)
+    if (!messageId) {
+      errored({ next, action: ACTION, message: ERR_MESSAGE })
+      return
     }
-  } catch (err) {
-    logger.error({
-      message: 'Failed to send email',
-      error: err,
-      action: 'sendMessage',
-    })
-    next(err)
+    res.status(202).json({ message: 'Accepted' })
+  } catch (error) {
+    errored({ next, action: ACTION, message: ERR_MESSAGE, error })
   }
 }
 
