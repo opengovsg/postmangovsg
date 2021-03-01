@@ -48,6 +48,6 @@ async function sendMessage(
   }
 }
 
-export const SmsSingleSendMiddleware = {
+export const SmsTransactionalMiddleware = {
   sendMessage,
 }

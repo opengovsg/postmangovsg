@@ -1,12 +1,12 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { EmailSingleSendMiddleware } from '@email/middlewares'
+import { EmailTransactionalMiddleware } from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
 
 const router = Router({ mergeParams: true })
 
 // Validators
-const sendEmailValidator = {
+const sendValidator = {
   [Segments.BODY]: Joi.object({
     recipient: Joi.string()
       .email()
@@ -29,9 +29,9 @@ const sendEmailValidator = {
 /**
  * @swagger
  * path:
- *   /single/email/send:
+ *   /transactional/email/send:
  *     post:
- *       summary: "Send a single email"
+ *       summary: "Send a transactional email"
  *       tags:
  *         - Email
  *       requestBody:
@@ -68,8 +68,8 @@ const sendEmailValidator = {
  */
 router.use(
   '/send',
-  celebrate(sendEmailValidator),
-  EmailSingleSendMiddleware.sendMessage
+  celebrate(sendValidator),
+  EmailTransactionalMiddleware.sendMessage
 )
 
 export default router

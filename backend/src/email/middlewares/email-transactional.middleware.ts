@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import { EmailSingleSendService } from '@email/services'
+import { EmailTransactionalService } from '@email/services'
 import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
@@ -36,7 +36,7 @@ async function sendMessage(
     const { subject, body, from, recipient, reply_to: replyTo } = req.body
 
     logger.info({ message: 'Sending email', action: ACTION })
-    const messageId = await EmailSingleSendService.sendMessage({
+    const messageId = await EmailTransactionalService.sendMessage({
       subject,
       body,
       from,
@@ -53,6 +53,6 @@ async function sendMessage(
   }
 }
 
-export const EmailSingleSendMiddleware = {
+export const EmailTransactionalMiddleware = {
   sendMessage,
 }

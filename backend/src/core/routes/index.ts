@@ -18,13 +18,13 @@ import {
   smsCampaignRoutes,
   smsSettingsRoutes,
   smsCallbackRoutes,
-  smsSingleSendRoutes,
+  smsTransactionalRoutes,
 } from '@sms/routes'
 import {
   emailCampaignRoutes,
   emailSettingsRoutes,
   emailCallbackRoutes,
-  emailSingleSendRoutes,
+  emailTransactionalRoutes,
 } from '@email/routes'
 import {
   telegramCampaignRoutes,
@@ -163,15 +163,15 @@ router.use(
 )
 
 router.use(
-  '/single/sms',
+  '/transactional/sms',
   AuthMiddleware.isCookieOrApiKeyAuthenticated,
-  smsSingleSendRoutes
+  smsTransactionalRoutes
 )
 
 router.use(
-  '/single/email',
+  '/transactional/email',
   AuthMiddleware.isCookieOrApiKeyAuthenticated,
-  emailSingleSendRoutes
+  emailTransactionalRoutes
 )
 
 router.use('/callback/email', emailCallbackRoutes)

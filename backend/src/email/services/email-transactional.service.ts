@@ -34,17 +34,20 @@ async function sendMessage({
     recipients: [recipient],
     replyTo,
   }
-  logger.info({ message: 'Sending a single email', action: 'sendMessage' })
+  logger.info({
+    message: 'Sending a transactional email',
+    action: 'sendMessage',
+  })
   const messageId = await EmailService.sendEmail(mailToSend)
   if (!messageId) {
     logger.error({
-      error: new Error('Failed to send single email'),
+      error: new Error('Failed to send a transactional email'),
       action: 'sendMessage',
     })
   }
   return !!messageId
 }
 
-export const EmailSingleSendService = {
+export const EmailTransactionalService = {
   sendMessage,
 }

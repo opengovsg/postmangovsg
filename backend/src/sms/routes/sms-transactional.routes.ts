@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { SmsMiddleware, SmsSingleSendMiddleware } from '@sms/middlewares'
+import { SmsMiddleware, SmsTransactionalMiddleware } from '@sms/middlewares'
 
 const router = Router({ mergeParams: true })
 
 // Validators
-const sendSingleValidator = {
+const sendValidator = {
   [Segments.BODY]: {
     body: Joi.string().required(),
     recipient: Joi.string().trim().required(),
@@ -18,9 +18,9 @@ const sendSingleValidator = {
 /**
  * @swagger
  * path:
- *   /single/sms/send:
+ *   /transactional/sms/send:
  *     post:
- *       summary: "Send a single SMS"
+ *       summary: "Send a transactional SMS"
  *       tags:
  *         - SMS
  *       requestBody:
@@ -52,9 +52,9 @@ const sendSingleValidator = {
  */
 router.post(
   '/send',
-  celebrate(sendSingleValidator),
+  celebrate(sendValidator),
   SmsMiddleware.getCredentialsFromLabel,
-  SmsSingleSendMiddleware.sendMessage
+  SmsTransactionalMiddleware.sendMessage
 )
 
 export default router
