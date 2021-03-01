@@ -1,6 +1,6 @@
 {
   "name": "worker",
-  "version": "1.21.0",
+  "version": "1.21.1",
   "description": "Workers for Postman",
   "main": "build/server.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "convict": "^6.0.0",
     "dotenv": "^8.2.0",
     "libphonenumber-js": "^1.7.55",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
     "nodemailer": "^6.4.17",
     "nodemailer-direct-transport": "^3.3.2",

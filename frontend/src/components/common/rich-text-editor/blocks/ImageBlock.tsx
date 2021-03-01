@@ -1,6 +1,5 @@
 import React, { useRef, useState, useContext } from 'react'
 import {
-  CharacterMetadata,
   ContentBlock,
   ContentState,
   EditorState,
@@ -48,47 +47,31 @@ export const ImageBlock = ({
   async function handleRemove() {
     const blockKey = block.getKey()
 
-    // Determine and select the range for image
-    const { start, end } = await new Promise((resolve) => {
-      block.findEntityRanges(
-        (value: CharacterMetadata) => {
-          const entityKey = value.getEntity()
-          return (
-            entityKey !== null &&
-            contentState.getEntity(entityKey).getType() === 'IMAGE'
-          )
-        },
-        (start: number, end: number) => resolve({ start, end })
-      )
-    })
+    // Clear off the entire image block content (usually empty space)
     const rangeToRemove = SelectionState.createEmpty(blockKey).merge({
       anchorKey: blockKey,
       focusKey: blockKey,
-      anchorOffset: start,
-      focusOffset: end,
+      anchorOffset: 0,
+      focusOffset: block.getLength(),
     })
-
-    // Remove image
     let updatedContentState = Modifier.removeRange(
       contentState,
       rangeToRemove,
       'forward'
     )
 
-    // If the content block is empty after removing image, we also remove the block
-    const blockLength = updatedContentState.getBlockForKey(blockKey).getLength()
-    if (blockLength < 1) {
-      // Update selection to next block after deleting current block
-      const selectionAfter = SelectionState.createEmpty(
-        contentState.getBlockAfter(blockKey).getKey()
-      )
-      // Delete content block from block map
-      const blockMap = updatedContentState.getBlockMap().delete(block.getKey())
-      updatedContentState = updatedContentState.merge({
-        blockMap,
-        selectionAfter,
-      }) as ContentState
-    }
+    // Delete atomic block from block map
+    const blockMap = updatedContentState.getBlockMap().delete(block.getKey())
+
+    // Update selection to next block after deleting current block
+    const selectionAfter = SelectionState.createEmpty(
+      contentState.getBlockAfter(blockKey).getKey()
+    )
+
+    updatedContentState = updatedContentState.merge({
+      blockMap,
+      selectionAfter,
+    }) as ContentState
 
     // Push updated state to allow for undos
     const updated = EditorState.push(
@@ -96,6 +79,7 @@ export const ImageBlock = ({
       updatedContentState,
       'remove-range'
     )
+
     setEditorState(updated)
   }
 

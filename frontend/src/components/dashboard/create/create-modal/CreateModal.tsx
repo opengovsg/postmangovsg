@@ -17,7 +17,7 @@ import { ModalContext } from 'contexts/modal.context'
 
 import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 const CreateModal = ({
   name = '',
@@ -96,7 +96,11 @@ const CreateModal = ({
                 className={cx(styles.button, {
                   [styles.active]: selectedChannel === ChannelType.SMS,
                 })}
-                onClick={() => setSelectedChannel(ChannelType.SMS)}
+                onClick={
+                  selectedChannel === ChannelType.SMS
+                    ? undefined
+                    : () => setSelectedChannel(ChannelType.SMS)
+                }
               >
                 SMS
                 <i
@@ -127,7 +131,11 @@ const CreateModal = ({
                 className={cx(styles.button, {
                   [styles.active]: selectedChannel === ChannelType.Telegram,
                 })}
-                onClick={() => setSelectedChannel(ChannelType.Telegram)}
+                onClick={
+                  selectedChannel === ChannelType.Telegram
+                    ? undefined
+                    : () => setSelectedChannel(ChannelType.Telegram)
+                }
               >
                 Telegram
                 <i
@@ -156,7 +164,11 @@ const CreateModal = ({
                 className={cx(styles.button, {
                   [styles.active]: selectedChannel === ChannelType.Email,
                 })}
-                onClick={() => setSelectedChannel(ChannelType.Email)}
+                onClick={
+                  selectedChannel === ChannelType.Email
+                    ? undefined
+                    : () => setSelectedChannel(ChannelType.Email)
+                }
               >
                 Email
                 <i

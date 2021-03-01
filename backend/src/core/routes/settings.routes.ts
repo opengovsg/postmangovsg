@@ -128,7 +128,7 @@ router.delete(
  *      tags:
  *        - Settings
  *      parameters:
- *        - name: campaignId
+ *        - name: channelType
  *          in: path
  *          required: true
  *          schema:

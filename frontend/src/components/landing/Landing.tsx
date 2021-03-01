@@ -31,7 +31,7 @@ import whyUse3 from 'assets/mp4/why-use-3.mp4'
 
 import landingAnimation from 'assets/lottie/landing.json'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 
