@@ -78,21 +78,23 @@ const UrlUpload = ({
   return (
     <>
       {renderDetails()}
-      <TextInputWithButton
-        type="url"
-        value={url}
-        onChange={setUrl}
-        onClick={onClickHandler}
-        buttonDisabled={!isValidUrl()}
-        buttonLabel={
-          <>
-            Use dataset
-            <i className="bx bx-right-arrow-alt"></i>
-          </>
-        }
-        loadingButtonLabel="Sending..."
-        placeholder="Paste Vault link here"
-      />
+      {!isProcessing && (
+        <TextInputWithButton
+          type="url"
+          value={url}
+          onChange={setUrl}
+          onClick={onClickHandler}
+          buttonDisabled={!isValidUrl()}
+          buttonLabel={
+            <>
+              Use dataset
+              <i className="bx bx-right-arrow-alt"></i>
+            </>
+          }
+          loadingButtonLabel="Uploading..."
+          placeholder="Paste Vault link here"
+        />
+      )}
       <ErrorBlock onClose={onErrorClose} title={csvFilename}>
         {csvError && <span>{csvError}</span>}
       </ErrorBlock>
