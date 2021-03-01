@@ -4,6 +4,7 @@ import { ChannelType } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 
 const logger = loggerWithLabel(module)
+const VAULT_DOMAIN = 'storage.vault.gov.sg'
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -151,9 +152,28 @@ const isCampaignRedacted = async (
   }
 }
 
+/**
+ * Validate url origin is from Vault and check url expiry
+ */
+const isValidVaultUrl = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Response | void => {
+  const { url } = req.body
+  const vaultUrl = new URL(url)
+  if (vaultUrl.hostname !== VAULT_DOMAIN) {
+    // OR url has expired, check if url has expired using X-Amz-Expires header
+    return res.status(400).json({ message: 'This is not a valid Vault url' })
+  } else {
+    next()
+  }
+}
+
 export const CampaignMiddleware = {
   canEditCampaign,
   createCampaign,
   listCampaigns,
   isCampaignRedacted,
+  isValidVaultUrl,
 }

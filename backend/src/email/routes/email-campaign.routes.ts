@@ -871,6 +871,7 @@ router.post(
   '/tesseract',
   celebrate(tesseractCampaignValidator),
   CampaignMiddleware.canEditCampaign,
+  CampaignMiddleware.isValidVaultUrl,
   EmailTemplateMiddleware.tesseractHandler
 )
 

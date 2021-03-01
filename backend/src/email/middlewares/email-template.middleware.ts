@@ -16,7 +16,6 @@ import {
   UploadService,
   StatsService,
   ParseCsvService,
-  TesseractService,
 } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
@@ -405,9 +404,6 @@ const tesseractHandler = async (
   const logMeta = { campaignId, action: 'tesseractHandler' }
 
   try {
-    // validate that url is from vault and is not expired
-    TesseractService.validateVaultUrl(url)
-
     // check if template exists
     const template = await EmailTemplateService.getFilledTemplate(+campaignId)
     if (template === null) {

@@ -12,12 +12,7 @@ import {
   UserError,
 } from '@core/errors'
 import { TemplateError } from 'postman-templating'
-import {
-  UploadService,
-  StatsService,
-  ParseCsvService,
-  TesseractService,
-} from '@core/services'
+import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { Campaign } from '@core/models'
@@ -291,9 +286,6 @@ const tesseractHandler = async (
   const logMeta = { campaignId, action: 'tesseractHandler' }
 
   try {
-    // validate that url is from vault and is not expired
-    TesseractService.validateVaultUrl(url)
-
     // check if template exists
     const template = await SmsTemplateService.getFilledTemplate(+campaignId)
     if (template === null) {

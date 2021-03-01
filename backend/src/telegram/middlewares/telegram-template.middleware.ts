@@ -12,12 +12,7 @@ import {
   UserError,
 } from '@core/errors'
 import { TemplateError } from 'postman-templating'
-import {
-  UploadService,
-  StatsService,
-  ParseCsvService,
-  TesseractService,
-} from '@core/services'
+import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { Campaign } from '@core/models'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
@@ -278,9 +273,6 @@ const tesseractHandler = async (
   const logMeta = { campaignId, action: 'tesseractHandler' }
 
   try {
-    // validate that url is from vault and is not expired
-    TesseractService.validateVaultUrl(url)
-
     // check if template exists
     const template = await TelegramTemplateService.getFilledTemplate(
       +campaignId
