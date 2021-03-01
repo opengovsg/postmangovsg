@@ -77,6 +77,15 @@ const EmailRecipients = ({
     if (files[0]) uploadRecipients(files[0])
   }
 
+  function isNextDisabled() {
+    // Disable next if the current recipient list type is not the same as the selected one
+    return (
+      currentRecipientListType !== recipientListType ||
+      !numRecipients ||
+      isProcessing
+    )
+  }
+
   function renderUploadInput() {
     switch (recipientListType) {
       case RecipientListType.Vault:
@@ -242,7 +251,7 @@ const EmailRecipients = ({
       {!protect && (
         <ButtonGroup>
           <NextButton
-            disabled={!numRecipients || isProcessing}
+            disabled={isNextDisabled()}
             onClick={() => setActiveStep((s) => s + 1)}
           />
           <TextButton
