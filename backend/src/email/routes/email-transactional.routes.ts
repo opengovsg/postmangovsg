@@ -73,6 +73,7 @@ router.use(
   '/send',
   celebrate(sendValidator),
   EmailMiddleware.isFromAddressAccepted,
+  EmailTransactionalMiddleware.rateLimit,
   EmailTransactionalMiddleware.sendMessage
 )
 
