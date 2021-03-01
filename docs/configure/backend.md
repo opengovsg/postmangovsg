@@ -136,9 +136,9 @@ If not set, smses cannot be sent.
 
 Further reference: [Twilio API Key documentation](https://www.twilio.com/docs/iam/keys/api-key-resource?code-sample=code-authenticate-with-api-key-and-api-secret)
 
-#### Single-send messages
+#### Transactional messages
 
-| Name                     | Description                                                                                               |
-| ------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `SINGLE_SEND_EMAIL_RATE` | Specifies the rate limit threshold for single-send emails. All users share the same rate limit.           |
-| `SINGLE_SEND_SMS_RATE`   | Specifies the rate limit threshold for single-send SMSes. Unique account SIDs have their own rate limits. |
+| Name                       | Description                                                                                                      |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `TRANSACTIONAL_EMAIL_RATE` | The max number of transactional emails that can be requested per second. All users share the same limit.         |
+| `TRANSACTIONAL_SMS_RATE`   | The max number of transactional SMSes that can be requested per second. Unique account SIDs own separate limits. |

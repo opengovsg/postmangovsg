@@ -255,7 +255,7 @@ const config = convict({
     sensitive: true,
   },
   redisRateLimitUri: {
-    doc: 'URI to redis cache for rate limiting single-send requests',
+    doc: 'URI to redis cache for rate limiting transactional requests',
     default: '',
     env: 'REDIS_RATE_LIMIT_URI',
     format: 'required-string',
@@ -299,16 +299,18 @@ const config = convict({
     env: 'EMAIL_DEFAULT_RATE',
     format: 'int',
   },
-  singleSendMailRate: {
-    doc: 'The max rate at which single-send emails can be sent',
+  transactionalEmailRate: {
+    doc:
+      'The max number of transactional emails that can be requested per second',
     default: 10,
-    env: 'SINGLE_SEND_EMAIL_RATE',
+    env: 'TRANSACTIONAL_EMAIL_RATE',
     format: 'int',
   },
-  singleSendSmsRate: {
-    doc: 'The max rate at which single-send SMSes can be sent',
+  transactionalSmsRate: {
+    doc:
+      'The max number of transactional SMSes that can be requested per second',
     default: 10,
-    env: 'SINGLE_SEND_SMS_RATE',
+    env: 'TRANSACTIONAL_SMS_RATE',
     format: 'int',
   },
   defaultCountry: {

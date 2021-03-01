@@ -51,7 +51,7 @@ const sessionClient = redis
   })
 
 /**
- * Client to redis cache for rate limiting single-send requests
+ * Client to redis cache for rate limiting transactional requests
  */
 const rateLimitClient = redis
   .createClient({
