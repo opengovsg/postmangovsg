@@ -47,7 +47,7 @@ async function sendMessage(
 
 const rateLimit = expressRateLimit({
   store: new RedisStore({
-    prefix: 'email-single-send:',
+    prefix: 'email-transactional:',
     client: RedisService.rateLimitClient,
     expiry: 1,
   }),
@@ -55,7 +55,7 @@ const rateLimit = expressRateLimit({
     return 'global'
   },
   windowMs: 1000,
-  max: config.get('singleSendMailRate'),
+  max: config.get('transactionalEmailRate'),
   draft_polli_ratelimit_headers: true,
   message: {
     status: 429,
