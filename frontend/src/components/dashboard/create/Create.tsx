@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useHistory, Redirect } from 'react-router-dom'
 import cx from 'classnames'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -24,16 +24,27 @@ const Create = () => {
     finishLaterContent,
   } = useContext(FinishLaterModalContext)
   const [isLoading, setLoading] = useState(true)
+  const [isInvalid, setIsInvalid] = useState(false)
 
   useEffect(() => {
-    if (!id) return
+    // Campaign ID is invalid
+    if (!id || !/^[1-9]\d*$/.test(id)) {
+      setIsInvalid(true)
+      return
+    }
+
     async function loadProject(id: string) {
-      const campaign = await getCampaignDetails(+id)
-      setCampaign(campaign)
-      setLoading(false)
+      try {
+        const campaign = await getCampaignDetails(+id)
+        setCampaign(campaign)
+        setLoading(false)
+      } catch (err) {
+        // Campaign is invalid
+        setIsInvalid(true)
+      }
     }
     loadProject(id)
-  }, [id, setCampaign])
+  }, [id, setCampaign, setIsInvalid])
 
   async function handleFinishLater() {
     if (campaign.status === Status.Draft) {
@@ -54,6 +65,10 @@ const Create = () => {
       default:
         return <p>Invalid Channel Type</p>
     }
+  }
+
+  if (isInvalid) {
+    return <Redirect to="/campaigns" />
   }
 
   return (
