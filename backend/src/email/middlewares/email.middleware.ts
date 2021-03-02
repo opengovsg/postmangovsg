@@ -122,10 +122,18 @@ const isFromAddressAccepted = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { from } = req.body
+  const defaultEmail = config.get('mailFrom')
+
+  if (config.get('emailFallback.activate') && from !== defaultEmail) {
+    return res.set('Retry-After', '3600').status(503).json({
+      message:
+        'Unable to use a custom from address due to downtime. Please try again in 1 hour or use the default from address.',
+    })
+  }
+
   const userEmail =
     req.session?.user?.email ||
     (await AuthService.findUser(req.session?.user?.id))?.email
-  const defaultEmail = config.get('mailFrom')
 
   // Since from addresses with display name are accepted, we need to extract just the email address
   const { name, fromAddress } = parseFromAddress(from)
