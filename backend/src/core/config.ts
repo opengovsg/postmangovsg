@@ -439,7 +439,7 @@ const config = convict({
     },
     senderId: {
       doc: 'Sender ID to use for all SNS SMS',
-      default: 'postman',
+      default: 'GovSg',
       env: 'SMS_FALLBACK_SENDER_ID',
     },
   },
