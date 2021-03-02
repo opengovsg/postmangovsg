@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { useParams, useHistory, Redirect } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -7,6 +7,7 @@ import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
+import Error from 'components/error'
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import SMSCreate from './sms/SMSCreate'
@@ -68,7 +69,7 @@ const Create = () => {
   }
 
   if (isInvalid) {
-    return <Redirect to="/campaigns" />
+    return <Error />
   }
 
   return (
