@@ -1,6 +1,9 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { EmailTransactionalMiddleware } from '@email/middlewares'
+import {
+  EmailTransactionalMiddleware,
+  EmailMiddleware,
+} from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
 
 const router = Router({ mergeParams: true })
@@ -69,6 +72,7 @@ const sendValidator = {
 router.use(
   '/send',
   celebrate(sendValidator),
+  EmailMiddleware.isFromAddressAccepted,
   EmailTransactionalMiddleware.sendMessage
 )
 
