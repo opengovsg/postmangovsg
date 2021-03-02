@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk'
 import { get } from 'lodash'
+import LruCache from 'lru-cache'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
@@ -18,6 +19,14 @@ import { UserSettings } from '@core/interfaces'
 
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 const logger = loggerWithLabel(module)
+
+const twilioCredentialCache = new LruCache<string, string>({
+  max: 1000000, // 1M chars or ~2MB
+  length(n: string, _) {
+    return n.length
+  },
+  maxAge: 24 * 60 * 60 * 1000, // 1 day
+})
 
 /**
  * Upserts credential into AWS SecretsManager
@@ -95,22 +104,31 @@ const storeCredential = async (
 }
 
 /**
- * Retrieve a credential from secrets amanger
+ * Retrieve a credential from secrets manager
  * @param name
  */
 const getTwilioCredentials = async (
   name: string
 ): Promise<TwilioCredentials> => {
   const logMeta = { name, action: 'getTwilioCredentials' }
-  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
-  logger.info({
-    messge: 'Retrieved secret from AWS secrets manager.',
-    ...logMeta,
-  })
-  const secretString = get(data, 'SecretString', '')
+
+  let secretString = twilioCredentialCache.get(name)
+  if (!secretString) {
+    const data = await secretsManager
+      .getSecretValue({ SecretId: name })
+      .promise()
+    logger.info({
+      messge: 'Retrieved secret from AWS secrets manager.',
+      ...logMeta,
+    })
+
+    secretString = data?.SecretString ?? ''
+  }
+
   if (!secretString) {
     throw new Error('Missing secret string from AWS secrets manager.')
   }
+  twilioCredentialCache.set(name, secretString)
   return JSON.parse(secretString)
 }
 
