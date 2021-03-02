@@ -25,6 +25,24 @@
       flex-direction: column;
       align-items: center;
       flex: 1;
+      text-align: center;
+
+      .actions {
+        & > .action:not(:first-child) {
+          margin-left: $spacing-7;
+        }
+
+        @include mobile() {
+          @include flex-vertical;
+          align-items: center;
+          width: 100%;
+
+          & > .action:not(:first-child) {
+            margin-left: 0;
+            margin-top: $spacing-1;
+          }
+        }
+      }
     }
   }
 }
