@@ -159,17 +159,14 @@
 
   button {
     @extend %tall-outline-btn;
-
     cursor: default;
 
-    &:.active {
+    &.active {
       background-color: $primary;
       color: $white;
     }
 
     &:not(.active):hover {
-      background-color: $primary;
-      color: $white;
       cursor: pointer;
     }
   }
