@@ -2,9 +2,10 @@ import { Request, Response, NextFunction } from 'express'
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
+import config from '@core/config'
 
 const logger = loggerWithLabel(module)
-const VAULT_DOMAIN = 'storage.vault.gov.sg'
+const VAULT_DOMAIN = config.get('tesseract').vaultDomain
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -162,8 +163,10 @@ const isValidVaultUrl = (
 ): Response | void => {
   const { url } = req.body
   const vaultUrl = new URL(url)
-  if (vaultUrl.hostname !== VAULT_DOMAIN) {
-    // OR url has expired, check if url has expired using X-Amz-Expires header
+  const expiry = vaultUrl.searchParams.get('Expires') || '0'
+  const expiryTimestamp = parseInt(expiry) * 1000
+
+  if (vaultUrl.hostname !== VAULT_DOMAIN || expiryTimestamp > Date.now()) {
     return res.status(400).json({ message: 'This is not a valid Vault url' })
   } else {
     next()

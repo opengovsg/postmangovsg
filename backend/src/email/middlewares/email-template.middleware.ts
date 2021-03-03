@@ -30,7 +30,7 @@ const RETRY_CONFIG = {
   maxTimeout: 3 * 1000,
   factor: 1,
 }
-const VAULT_BUCKET_NAME = config.get('aws.vaultBucket')
+const VAULT_BUCKET_NAME = config.get('tesseract').vaultBucket
 
 /**
  * Store template subject and body in email template table.
@@ -401,6 +401,9 @@ const tesseractHandler = async (
 ): Promise<Response | void> => {
   const { campaignId } = req.params
   const { url } = req.body
+  const vaultUrl = new URL(url)
+  const datasetName =
+    vaultUrl.searchParams.get('datasetname') || 'vault dataset'
   const logMeta = { campaignId, action: 'tesseractHandler' }
 
   try {
@@ -440,7 +443,7 @@ const tesseractHandler = async (
           UploadService.uploadCompleteOnComplete({
             ...params,
             key: '',
-            filename: 'vault dataset', // TODO
+            filename: datasetName,
             bucket: VAULT_BUCKET_NAME,
           })
         ).catch((err) => {

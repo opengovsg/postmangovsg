@@ -76,11 +76,6 @@ const config = convict({
       default: 'postmangovsg-prod-upload',
       env: 'FILE_STORAGE_BUCKET_NAME',
     },
-    vaultBucket: {
-      doc: 'Value of bucket name attribute for Vault datasets',
-      default: 'vaultgovsg',
-      env: 'VAULT_BUCKET_NAME',
-    },
     secretManagerSalt: {
       doc:
         'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
@@ -436,6 +431,18 @@ const config = convict({
       format: Number,
     },
   },
+  tesseract: {
+    vaultBucket: {
+      doc: 'Value of bucket name attribute for Vault datasets',
+      default: 'vaultgovsg',
+      env: 'VAULT_BUCKET_NAME',
+    },
+    vaultDomain: {
+      doc: 'Domain name for s3 pre-signed url for Vault datasets',
+      default: 'storage.vault.gov.sg',
+      env: 'VAULT_DOMAIN_NAME',
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
@@ -464,6 +471,10 @@ switch (config.get('env')) {
           domain: '.postman.gov.sg', // all subdomains
           path: '/',
         },
+      },
+      tesseract: {
+        vaultBucket: 'vaultgovsg-staging',
+        vaultDomain: 'storage-test.vault.gov.sg',
       },
     })
     break
@@ -494,6 +505,10 @@ switch (config.get('env')) {
           domain: 'localhost',
           path: '/',
         },
+      },
+      tesseract: {
+        vaultBucket: 'vaultgovsg-staging',
+        vaultDomain: 'storage-test.vault.gov.sg',
       },
     })
     break
