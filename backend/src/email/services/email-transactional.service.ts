@@ -1,18 +1,14 @@
-import { EmailService } from '@email/services'
+import { EmailTemplateService, EmailService } from '@email/services'
 import { MailToSend } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
+import { TemplateError } from 'postman-templating'
 
 const logger = loggerWithLabel(module)
 
 /**
- * Sends an email message.
- * @param subject
- * @param body
- * @param from
- * @param recipient
- * @param replyTo
- *
- * @returns Promise<boolean> Resolves to true if the message was successfully sent.
+ * Sanitizes an email message and sends it.
+ * @throws TemplateError if the body or subject is invalid
+ * @throws Error if the message could not be sent.
  */
 async function sendMessage({
   subject,
@@ -26,7 +22,17 @@ async function sendMessage({
   from: string
   recipient: string
   replyTo?: string
-}): Promise<boolean> {
+}): Promise<void> {
+  const sanitizedSubject = EmailTemplateService.client.replaceNewLinesAndSanitize(
+    subject
+  )
+  const sanitizedBody = EmailTemplateService.client.filterXSS(body)
+  if (!sanitizedSubject || !sanitizedBody) {
+    throw new TemplateError(
+      'Message is invalid as the subject or body only contains invalid HTML tags.'
+    )
+  }
+
   const mailToSend: MailToSend = {
     subject,
     from: from,
@@ -35,17 +41,13 @@ async function sendMessage({
     replyTo,
   }
   logger.info({
-    message: 'Sending a transactional email',
+    message: 'Sending transactional email',
     action: 'sendMessage',
   })
   const messageId = await EmailService.sendEmail(mailToSend)
   if (!messageId) {
-    logger.error({
-      error: new Error('Failed to send a transactional email'),
-      action: 'sendMessage',
-    })
+    throw new Error('Failed to send transactional email')
   }
-  return !!messageId
 }
 
 export const EmailTransactionalService = {

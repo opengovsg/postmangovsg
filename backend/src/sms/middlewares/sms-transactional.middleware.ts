@@ -1,35 +1,15 @@
 import type { Request, Response, NextFunction } from 'express'
-import { SmsService } from '@sms/services'
+import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
+import { TemplateError } from 'postman-templating'
 
 const logger = loggerWithLabel(module)
-
-function errored({
-  next,
-  message,
-  action,
-  error,
-}: {
-  next: NextFunction
-  message: string
-  action: string
-  error?: Error
-}): void {
-  error = error ?? new Error(message)
-  logger.error({
-    message,
-    error,
-    action,
-  })
-  next(error)
-}
 
 async function sendMessage(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const ERR_MESSAGE = 'Failed to send SMS'
   const ACTION = 'sendMessage'
 
   try {
@@ -37,14 +17,24 @@ async function sendMessage(
     const { credentials } = res.locals
 
     logger.info({ message: 'Sending SMS', action: ACTION })
-    const sid = await SmsService.sendMessage(credentials, recipient, body)
-    if (!sid) {
-      errored({ next, message: ERR_MESSAGE, action: ACTION })
+    await SmsTransactionalService.sendMessage({
+      credentials,
+      recipient,
+      body,
+    })
+    res.sendStatus(202)
+  } catch (err) {
+    logger.error({
+      message: 'Failed to send SMS',
+      error: err,
+      action: ACTION,
+    })
+
+    if (err instanceof TemplateError) {
+      res.status(400).json({ message: err.message })
       return
     }
-    res.status(202).json({ message: 'Accepted' })
-  } catch (error) {
-    errored({ next, message: ERR_MESSAGE, action: ACTION, error })
+    next(err)
   }
 }
 
