@@ -56,13 +56,13 @@ const rateLimit = expressRateLimit({
   store: new RedisStore({
     prefix: 'sms-transactional:',
     client: RedisService.rateLimitClient,
-    expiry: 1,
+    expiry: config.get('transactionalSms.window'),
   }),
   keyGenerator(_: Request, res: Response) {
     return res.locals.credentials.accountSid
   },
-  windowMs: 1000,
-  max: config.get('transactionalSmsRate'),
+  windowMs: config.get('transactionalSms.window') * 1000,
+  max: config.get('transactionalSms.rate'),
   draft_polli_ratelimit_headers: true,
   message: {
     status: 429,

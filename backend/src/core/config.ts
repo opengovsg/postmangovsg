@@ -299,19 +299,35 @@ const config = convict({
     env: 'EMAIL_DEFAULT_RATE',
     format: 'int',
   },
-  transactionalEmailRate: {
-    doc:
-      'The max number of transactional emails that can be requested per second',
-    default: 10,
-    env: 'TRANSACTIONAL_EMAIL_RATE',
-    format: 'int',
+  transactionalEmail: {
+    rate: {
+      doc:
+        'The max number of transactional emails that can be requested per window',
+      default: 10,
+      env: 'TRANSACTIONAL_EMAIL_RATE',
+      format: 'int',
+    },
+    window: {
+      doc: 'The duration of each window in seconds.',
+      default: 1,
+      env: 'TRANSACTIONAL_EMAIL_WINDOW',
+      format: 'int',
+    },
   },
-  transactionalSmsRate: {
-    doc:
-      'The max number of transactional SMSes that can be requested per second',
-    default: 10,
-    env: 'TRANSACTIONAL_SMS_RATE',
-    format: 'int',
+  transactionalSms: {
+    rate: {
+      doc:
+        'The max number of transactional SMSes that can be requested per window per credential',
+      default: 10,
+      env: 'TRANSACTIONAL_SMS_RATE',
+      format: 'int',
+    },
+    window: {
+      doc: 'The duration of each window in seconds',
+      default: 1,
+      env: 'TRANSACTIONAL_SMS_WINDOW',
+      format: 'int',
+    },
   },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
