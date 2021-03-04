@@ -163,11 +163,16 @@ const isValidVaultUrl = (
 ): Response | void => {
   const { url } = req.body
   const vaultUrl = new URL(url)
-  const expiry = vaultUrl.searchParams.get('Expires') || '0'
-  const expiryTimestamp = parseInt(expiry) * 1000
+  const expiry = vaultUrl.searchParams.get('Expires')
+  const datasetName = vaultUrl.searchParams.get('datasetname')
 
-  if (vaultUrl.hostname !== VAULT_DOMAIN || expiryTimestamp > Date.now()) {
+  if (vaultUrl.hostname !== VAULT_DOMAIN || !expiry || !datasetName) {
     return res.status(400).json({ message: 'This is not a valid Vault url' })
+  }
+
+  const expiryTimestamp = parseInt(expiry) * 1000
+  if (expiryTimestamp > Date.now()) {
+    return res.status(400).json({ message: 'This is url has expired' })
   } else {
     next()
   }

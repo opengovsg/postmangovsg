@@ -271,6 +271,7 @@ const tesseractHandler = async (
   const { campaignId } = req.params
   const { url } = req.body
   const vaultUrl = new URL(url)
+  // check for datasetName is done in isValidVaultUrl middleware
   const datasetName =
     vaultUrl.searchParams.get('datasetname') || 'vault dataset'
   const logMeta = { campaignId, action: 'tesseractHandler' }
