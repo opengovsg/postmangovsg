@@ -441,6 +441,7 @@ const config = convict({
     maxAge: {
       doc: 'Maximum age of an item in milliseconds',
       default: 24 * 60 * 60 * 1000, // 1 day,
+      env: 'TWILIO_CREDENTIAL_CACHE_MAX_AGE',
       format: 'int',
     },
   },

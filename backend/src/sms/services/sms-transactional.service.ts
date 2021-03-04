@@ -29,7 +29,7 @@ async function sendMessage({
   }
 
   logger.info({
-    message: 'Sending a transactional email',
+    message: 'Sending transactional SMS',
     action: 'sendMessage',
   })
   const sid = await SmsService.sendMessage(credentials, recipient, body)
