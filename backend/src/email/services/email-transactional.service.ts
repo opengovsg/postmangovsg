@@ -34,9 +34,9 @@ async function sendMessage({
   }
 
   const mailToSend: MailToSend = {
-    subject,
+    subject: sanitizedSubject,
     from: from,
-    body,
+    body: sanitizedBody,
     recipients: [recipient],
     replyTo,
   }

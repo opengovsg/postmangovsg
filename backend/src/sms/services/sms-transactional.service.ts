@@ -32,7 +32,11 @@ async function sendMessage({
     message: 'Sending transactional SMS',
     action: 'sendMessage',
   })
-  const sid = await SmsService.sendMessage(credentials, recipient, body)
+  const sid = await SmsService.sendMessage(
+    credentials,
+    recipient,
+    sanitizedBody
+  )
   if (!sid) {
     throw new Error('Failed to send transactional SMS')
   }
