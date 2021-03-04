@@ -67,6 +67,12 @@ const rateLimit = expressRateLimit({
     status: 429,
     message: 'Too many requests. Please try again later.',
   },
+  handler: (_: Request, res: Response) => {
+    logger.warn({
+      message: 'Rate limited request to send transactional SMS',
+    })
+    res.sendStatus(429)
+  },
 })
 
 export const SmsTransactionalMiddleware = {
