@@ -47,7 +47,7 @@ async function sendMessage(
       errored({ next, action: ACTION, message: ERR_MESSAGE })
       return
     }
-    res.status(202).json({ message: 'Accepted' })
+    res.sendStatus(202)
   } catch (error) {
     errored({ next, action: ACTION, message: ERR_MESSAGE, error })
   }
