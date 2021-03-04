@@ -308,7 +308,7 @@ const config = convict({
       format: 'int',
     },
     window: {
-      doc: 'The duration of each window in seconds.',
+      doc: 'The duration of each window for transactional emails in seconds.',
       default: 1,
       env: 'TRANSACTIONAL_EMAIL_WINDOW',
       format: 'int',
@@ -323,7 +323,7 @@ const config = convict({
       format: 'int',
     },
     window: {
-      doc: 'The duration of each window in seconds',
+      doc: 'The duration of each window for transactional SMSes in seconds',
       default: 1,
       env: 'TRANSACTIONAL_SMS_WINDOW',
       format: 'int',
