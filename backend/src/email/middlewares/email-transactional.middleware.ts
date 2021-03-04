@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express'
 import { EmailTransactionalService } from '@email/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
+import { AuthService } from '@core/services'
 
 const logger = loggerWithLabel(module)
 
@@ -21,7 +22,8 @@ async function sendMessage(
       body,
       from,
       recipient,
-      replyTo,
+      replyTo:
+        replyTo ?? (await AuthService.findUser(req.session?.user?.id))?.email,
     })
     res.sendStatus(202)
   } catch (err) {
