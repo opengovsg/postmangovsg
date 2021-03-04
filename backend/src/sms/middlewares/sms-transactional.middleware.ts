@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
+import { RecipientError } from '@core/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -30,7 +31,8 @@ async function sendMessage(
       action: ACTION,
     })
 
-    if (err instanceof TemplateError) {
+    const BAD_REQUEST_ERRORS = [TemplateError, RecipientError]
+    if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
       res.status(400).json({ message: err.message })
       return
     }

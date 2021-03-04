@@ -15,6 +15,7 @@ import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
 import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
+import { RecipientError } from '@core/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -68,10 +69,14 @@ const sendMessage = (
   message: string
 ): Promise<string | void> => {
   const twilioService = new TwilioClient(credential)
-  recipient = PhoneNumberService.normalisePhoneNumber(
-    recipient,
-    config.get('defaultCountry')
-  )
+  try {
+    recipient = PhoneNumberService.normalisePhoneNumber(
+      recipient,
+      config.get('defaultCountry')
+    )
+  } catch (err) {
+    throw new RecipientError('Invalid phone number')
+  }
   return twilioService.send(recipient, message)
 }
 
