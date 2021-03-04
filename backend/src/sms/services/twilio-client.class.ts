@@ -1,5 +1,6 @@
 import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
+import { TwilioError } from '@sms/errors'
 
 export default class TwilioClient {
   private client: any
@@ -46,7 +47,10 @@ export default class TwilioClient {
       ) {
         return this.send(recipient, message, true)
       }
-      throw error
+      throw new TwilioError({
+        statusCode: error.status,
+        message: error.message,
+      })
     }
   }
 

@@ -3,6 +3,7 @@ import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
 import { RecipientError } from '@core/errors'
+import { TwilioError } from '@sms/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -36,6 +37,13 @@ async function sendMessage(
       res.status(400).json({ message: err.message })
       return
     }
+
+    if (err instanceof TwilioError) {
+      const { statusCode, message } = err
+      res.status(statusCode).json({ message })
+      return
+    }
+
     next(err)
   }
 }
