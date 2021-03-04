@@ -120,6 +120,11 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     return res.sendStatus(200)
   })
 
+  app.get('/robots.txt', (_req: Request, res: Response) => {
+    res.type('text/plain')
+    res.send('User-agent: *\nDisallow: /')
+  })
+
   app.use(sentrySessionMiddleware)
 
   app.use('/v1', v1Router)
