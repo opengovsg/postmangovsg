@@ -431,6 +431,19 @@ const config = convict({
       format: Number,
     },
   },
+  twilioCredentialCache: {
+    max: {
+      doc: 'Maximum size of the cache',
+      default: 1000000, // 1M chars or ~2MB
+      env: 'TWILIO_CREDENTIAL_CACHE_MAX',
+      format: 'int',
+    },
+    maxAge: {
+      doc: 'Maximum age of an item in milliseconds',
+      default: 24 * 60 * 60 * 1000, // 1 day,
+      format: 'int',
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name

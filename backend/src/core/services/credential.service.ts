@@ -21,11 +21,11 @@ const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 const logger = loggerWithLabel(module)
 
 const twilioCredentialCache = new LruCache<string, string>({
-  max: 1000000, // 1M chars or ~2MB
+  max: config.get('twilioCredentialCache.max'),
   length(n: string, _) {
     return n.length
   },
-  maxAge: 24 * 60 * 60 * 1000, // 1 day
+  maxAge: config.get('twilioCredentialCache.maxAge'),
 })
 
 /**
