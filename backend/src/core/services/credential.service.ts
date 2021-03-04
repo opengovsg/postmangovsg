@@ -22,9 +22,7 @@ const logger = loggerWithLabel(module)
 
 const twilioCredentialCache = new LruCache<string, string>({
   max: config.get('twilioCredentialCache.max'),
-  length(n: string, _) {
-    return n.length
-  },
+  length: (item: string) => item.length,
   maxAge: config.get('twilioCredentialCache.maxAge'),
 })
 
