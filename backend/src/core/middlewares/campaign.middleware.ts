@@ -172,7 +172,7 @@ const isValidVaultUrl = (
     }
 
     const expiryTimestamp = parseInt(expiry) * 1000
-    if (expiryTimestamp > Date.now()) {
+    if (expiryTimestamp < Date.now()) {
       return res.status(400).json({ message: 'This is url has expired' })
     } else {
       next()
