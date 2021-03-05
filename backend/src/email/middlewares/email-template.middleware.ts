@@ -16,6 +16,7 @@ import {
   UploadService,
   StatsService,
   ParseCsvService,
+  ProtectedService,
 } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
@@ -400,6 +401,10 @@ const tesseractHandler = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { campaignId } = req.params
+  if (ProtectedService.isProtectedCampaign(+campaignId)) {
+    return res.sendStatus(403)
+  }
+
   const { url } = req.body
   const vaultUrl = new URL(url)
   // check for datasetName is done in isValidVaultUrl middleware
