@@ -59,8 +59,11 @@ const rateLimit = expressRateLimit({
     status: 429,
     message: 'Too many requests. Please try again later.',
   },
-  handler: (_: Request, res: Response) => {
-    logger.warn({ message: 'Rate limited request to send transactional email' })
+  handler: (req: Request, res: Response) => {
+    logger.warn({
+      message: 'Rate limited request to send transactional email',
+      userId: req?.session?.user.id,
+    })
     res.sendStatus(429)
   },
 })
