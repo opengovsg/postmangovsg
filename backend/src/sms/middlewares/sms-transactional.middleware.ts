@@ -50,7 +50,7 @@ async function sendMessage(
 }
 
 async function rateLimit(
-  _: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
@@ -63,6 +63,7 @@ async function rateLimit(
     if (err instanceof RateLimitError) {
       logger.warn({
         message: 'Rate limited transactional SMS request',
+        userId: req?.session?.user?.id,
         accountSid: key,
       })
       res
