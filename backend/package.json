@@ -35,7 +35,7 @@
     "express-validator": "^6.4.0",
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
-    "libphonenumber-js": "^1.7.54",
+    "libphonenumber-js": "^1.9.9",
     "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
