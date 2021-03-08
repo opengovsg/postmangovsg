@@ -1,12 +1,9 @@
 import type { Request, Response, NextFunction } from 'express'
-import expressRateLimit from 'express-rate-limit'
-import RedisStore from 'rate-limit-redis'
-import { RedisService } from '@core/services'
 import config from '@core/config'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
-import { RecipientError } from '@core/errors'
+import { RecipientError, RateLimitError } from '@core/errors'
 import { TwilioError } from '@sms/errors'
 
 const logger = loggerWithLabel(module)
@@ -52,29 +49,36 @@ async function sendMessage(
   }
 }
 
-const rateLimit = expressRateLimit({
-  store: new RedisStore({
-    prefix: 'sms-transactional:',
-    client: RedisService.rateLimitClient,
-    expiry: config.get('transactionalSms.window'),
-  }),
-  keyGenerator: (_: Request, res: Response) =>
-    res.locals.credentials.accountSid,
-  windowMs: config.get('transactionalSms.window') * 1000,
-  max: config.get('transactionalSms.rate'),
-  draft_polli_ratelimit_headers: true,
-  message: {
-    status: 429,
-    message: 'Too many requests. Please try again later.',
-  },
-  handler: (req: Request, res: Response) => {
-    logger.warn({
-      message: 'Rate limited request to send transactional SMS',
-      userId: req?.session?.user.id,
+async function rateLimit(
+  _: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const ACTION = 'rateLimit'
+  const key = res.locals.credentials.accountSid
+  try {
+    await SmsTransactionalService.rateLimit(key)
+    next()
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      logger.warn({
+        message: 'Rate limited transactional SMS request',
+        accountSid: key,
+      })
+      res
+        .set('Retry-After', config.get('transactionalSms.window'))
+        .sendStatus(429)
+      return
+    }
+
+    logger.error({
+      error: err,
+      action: ACTION,
+      message: 'Failed to rate limit transactional SMS request',
     })
-    res.sendStatus(429)
-  },
-})
+    next(err)
+  }
+}
 
 export const SmsTransactionalMiddleware = {
   sendMessage,

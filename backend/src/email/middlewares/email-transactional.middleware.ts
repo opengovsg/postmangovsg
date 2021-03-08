@@ -1,12 +1,9 @@
 import type { Request, Response, NextFunction } from 'express'
-import expressRateLimit from 'express-rate-limit'
-import RedisStore from 'rate-limit-redis'
-import { RedisService } from '@core/services'
 import { EmailTransactionalService } from '@email/services'
-import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
 import { AuthService } from '@core/services'
+import { RateLimitError } from '@core/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -45,28 +42,35 @@ async function sendMessage(
   }
 }
 
-const rateLimit = expressRateLimit({
-  store: new RedisStore({
-    prefix: 'email-transactional:',
-    client: RedisService.rateLimitClient,
-    expiry: config.get('transactionalEmail.window'),
-  }),
-  keyGenerator: () => 'global',
-  windowMs: config.get('transactionalEmail.window') * 1000,
-  max: config.get('transactionalEmail.rate'),
-  draft_polli_ratelimit_headers: true,
-  message: {
-    status: 429,
-    message: 'Too many requests. Please try again later.',
-  },
-  handler: (req: Request, res: Response) => {
-    logger.warn({
-      message: 'Rate limited request to send transactional email',
-      userId: req?.session?.user.id,
+async function rateLimit(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const ACTION = 'rateLimit'
+  const userKey = req?.session?.user?.id
+  const globalKey = 'global'
+  try {
+    await EmailTransactionalService.rateLimit(userKey, globalKey)
+    next()
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      logger.warn({
+        message: 'Rate limited transactional email request',
+        userId: userKey,
+      })
+      res.set('Retry-After', '1').sendStatus(429)
+      return
+    }
+
+    logger.error({
+      error: err,
+      action: ACTION,
+      message: 'Failed to rate limit transactional email request',
     })
-    res.sendStatus(429)
-  },
-})
+    next(err)
+  }
+}
 
 export const EmailTransactionalMiddleware = {
   sendMessage,

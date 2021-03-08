@@ -2,6 +2,10 @@ import { TemplateError } from 'postman-templating'
 import { SmsService, SmsTemplateService } from '@sms/services'
 import { TwilioCredentials } from '@sms/interfaces'
 import { loggerWithLabel } from '@core/logger'
+import { RateLimiterRedis, RateLimiterRes } from 'rate-limiter-flexible'
+import { RedisService } from '@core/services'
+import config from '@core/config'
+import { RateLimitError } from '@core/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -42,6 +46,40 @@ async function sendMessage({
   }
 }
 
+const rateLimitClient = new RateLimiterRedis({
+  storeClient: RedisService.rateLimitClient,
+  keyPrefix: 'transactionalSms:',
+  points: config.get('transactionalSms.rate'),
+  duration: config.get('transactionalSms.window'),
+})
+
+async function rateLimit(key: string) {
+  const ACTION = 'rateLimit'
+
+  const rateLimiterRes = await rateLimitClient.get(key)
+  // If rateLimiterRes is null, the key hasn't been used before
+  const remainingTokens = rateLimiterRes?.remainingPoints ?? 1
+  if (!remainingTokens) {
+    throw new RateLimitError()
+  }
+
+  try {
+    await rateLimitClient.consume(key)
+  } catch (err) {
+    if (err instanceof RateLimiterRes) {
+      throw new RateLimitError()
+    }
+
+    logger.error({
+      message: 'Failed to consume transactional email rate limit tokens',
+      action: ACTION,
+      error: err,
+    })
+    throw err
+  }
+}
+
 export const SmsTransactionalService = {
   sendMessage,
+  rateLimit,
 }

@@ -1,7 +1,11 @@
+import { RateLimiterRedis, RateLimiterRes } from 'rate-limiter-flexible'
 import { EmailTemplateService, EmailService } from '@email/services'
 import { MailToSend } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
+import { RedisService } from '@core/services'
+import config from '@core/config'
+import { RateLimitError } from '@core/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -50,6 +54,53 @@ async function sendMessage({
   }
 }
 
+const rateLimitClients = {
+  user: new RateLimiterRedis({
+    storeClient: RedisService.rateLimitClient,
+    keyPrefix: 'transactionalEmail.user:',
+    points: config.get('transactionalEmail.userRate'),
+    duration: config.get('transactionalEmail.window'),
+  }),
+  global: new RateLimiterRedis({
+    storeClient: RedisService.rateLimitClient,
+    keyPrefix: 'transactionalEmail.global:',
+    points: config.get('transactionalEmail.globalRate'),
+    duration: config.get('transactionalEmail.window'),
+  }),
+}
+
+async function rateLimit(userKey: number, globalKey: string) {
+  const ACTION = 'rateLimit'
+
+  const userRateLimiterRes = await rateLimitClients.user.get(userKey)
+  const globalRateLimiterRes = await rateLimitClients.user.get(globalKey)
+  // If rateLimiterRes is null, the key has not been used before
+  const remainingUserTokens = userRateLimiterRes?.remainingPoints ?? 1
+  const remainingGlobalTokens = globalRateLimiterRes?.remainingPoints ?? 1
+  if (!remainingUserTokens || !remainingGlobalTokens) {
+    throw new RateLimitError()
+  }
+
+  try {
+    await Promise.all([
+      rateLimitClients.user.consume(userKey),
+      rateLimitClients.global.consume(globalKey),
+    ])
+  } catch (err) {
+    if (err instanceof RateLimiterRes) {
+      throw new RateLimitError()
+    }
+
+    logger.error({
+      message: 'Failed to consume transactional email rate limit tokens',
+      action: ACTION,
+      error: err,
+    })
+    throw err
+  }
+}
+
 export const EmailTransactionalService = {
   sendMessage,
+  rateLimit,
 }
