@@ -138,9 +138,10 @@ Further reference: [Twilio API Key documentation](https://www.twilio.com/docs/ia
 
 #### Transactional messages
 
-| Name                         | Description                                                                                                      |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `TRANSACTIONAL_EMAIL_RATE`   | The max number of transactional emails that can be requested per window. All users share the same limit.         |
-| `TRANSACTIONAL_EMAIL_WINDOW` | The duration of each window for transactional emails in seconds.                                                 |
-| `TRANSACTIONAL_SMS_RATE`     | The max number of transactional SMSes that can be requested per window. Unique account SIDs own separate limits. |
-| `TRANSACTIONAL_SMS_WINDOW`   | The duration of each window for transactional SMSes in seconds.                                                  |
+| Name                              | Description                                                                                                      |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `TRANSACTIONAL_EMAIL_USER_RATE`   | The max number of transactional emails that can be requested per window per user.                                |
+| `TRANSACTIONAL_EMAIL_GLOBAL_RATE` | The max number of transactional emails that can be requested per window.                                         |
+| `TRANSACTIONAL_EMAIL_WINDOW`      | The duration of each window for transactional emails in seconds.                                                 |
+| `TRANSACTIONAL_SMS_RATE`          | The max number of transactional SMSes that can be requested per window. Unique account SIDs own separate limits. |
+| `TRANSACTIONAL_SMS_WINDOW`        | The duration of each window for transactional SMSes in seconds.                                                  |
