@@ -5,7 +5,7 @@ import { LINKS } from 'config'
 import { TextInput } from 'components/common'
 import styles from './SendRate.module.scss'
 import { ChannelType } from 'classes'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 const SendRate = ({
   sendRate,

@@ -33,14 +33,17 @@ $title-height: $height-4;
 
 .content {
   max-width: 100vw;
-  padding: 3rem ($modal-width - 528px) / 2;
+  padding: 3rem ($modal-width - 600px) / 2;
   margin: auto;
+  @include mobile() {
+    padding: 6rem 3rem; // Need additional top padding to clear the close button
+  }
 }
 
 .close {
   position: absolute;
   top: 2rem;
-  right: 2rem;
+  right: $spacing-1;
   &.modalTitleClose {
     color: $green-900;
     top: calc(#{$title-height} / 2 - 1.5rem); // close button has height of 3rem
@@ -55,6 +58,6 @@ $title-height: $height-4;
   min-height: $title-height;
   text-align: center;
   @include mobile {
-    padding-right: 3rem;
+    padding-right: 3.5rem;
   }
 }

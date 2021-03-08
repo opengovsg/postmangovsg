@@ -4,18 +4,27 @@ import cx from 'classnames'
 
 import { CampaignContext } from 'contexts/campaign.context'
 import { CampaignStats, Status } from 'classes/Campaign'
-import { ProgressBar, PrimaryButton, ExportRecipients } from 'components/common'
+import {
+  ProgressBar,
+  PrimaryButton,
+  ExportRecipients,
+  InfoBlock,
+} from 'components/common'
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
 import { LINKS } from 'config'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
+import { Trans } from '@lingui/macro'
+
 const ProgressDetails = ({
   stats,
+  redacted,
   handlePause,
   handleRetry,
   handleRefreshStats,
 }: {
   stats: CampaignStats
+  redacted: boolean
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
   handleRefreshStats: () => Promise<void>
@@ -114,7 +123,7 @@ const ProgressDetails = ({
         <tbody>
           <tr>
             <td className={'md'}>
-              <Moment format="LLL">{sentAt}</Moment>
+              <Moment format="MMM DD YYYY, HH:mm">{sentAt}</Moment>
             </td>
 
             <td className={'md'}>{numRecipients}</td>
@@ -132,16 +141,24 @@ const ProgressDetails = ({
         isComplete={isComplete}
       />
 
-      <ExportRecipients
-        campaignId={id}
-        campaignName={name}
-        campaignType={type}
-        sentAt={sentAt}
-        iconPosition="right"
-        status={status}
-        statusUpdatedAt={statusUpdatedAt}
-        isButton
-      />
+      {!redacted ? (
+        <ExportRecipients
+          campaignId={id}
+          campaignName={name}
+          campaignType={type}
+          sentAt={sentAt}
+          iconPosition="right"
+          status={status}
+          statusUpdatedAt={statusUpdatedAt}
+          isButton
+        />
+      ) : (
+        <InfoBlock className={styles.notice}>
+          <Trans>
+            Delivery report has expired and is no longer available for download.
+          </Trans>
+        </InfoBlock>
+      )}
 
       <table className={styles.stats}>
         <thead>

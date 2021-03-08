@@ -13,7 +13,6 @@ import {
 } from '@email/middlewares'
 import config from '@core/config'
 import { fromAddressValidator } from '@core/utils/from-address'
-import { redirectTo } from '@core/utils/request'
 
 const router = Router({ mergeParams: true })
 
@@ -270,53 +269,6 @@ router.get(
 /**
  * @swagger
  * path:
- *   /campaign/{campaignId}/email/upload/start-v2:
- *     get:
- *       summary: "Get a presigned URL for upload with Content-MD5 header"
- *       tags:
- *         - Email
- *       parameters:
- *         - name: campaignId
- *           in: path
- *           required: true
- *           schema:
- *             type: string
- *         - name: mime_type
- *           in: query
- *           required: true
- *           schema:
- *             type: string
- *         - name: md5
- *           in: query
- *           required: true
- *           schema:
- *             type: string
- *       responses:
- *         200:
- *           description: Success
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   presigned_url:
- *                     type: string
- *                   transaction_id:
- *                     type: string
- *         "400" :
- *           description: Bad Request
- *         "401":
- *           description: Unauthorized
- *         "403":
- *           description: Forbidden as there is a job in progress
- *         "500":
- *           description: Internal Server Error
- */
-router.get('/upload/start-v2', redirectTo('/upload/start'))
-
-/**
- * @swagger
- * path:
  *   /campaign/{campaignId}/email/upload/complete:
  *     post:
  *       summary: "Complete upload session with ETag verification"
@@ -360,48 +312,6 @@ router.post(
   CampaignMiddleware.canEditCampaign,
   EmailTemplateMiddleware.uploadCompleteHandler
 )
-
-/**
- * @swagger
- * path:
- *   /campaign/{campaignId}/email/upload/complete-v2:
- *     post:
- *       summary: "Complete upload session with ETag verification"
- *       tags:
- *         - Email
- *       parameters:
- *         - name: campaignId
- *           in: path
- *           required: true
- *           schema:
- *             type: string
- *       requestBody:
- *         content:
- *           application/json:
- *             schema:
- *               required:
- *                 - transaction_id
- *                 - filename
- *               properties:
- *                 transaction_id:
- *                   type: string
- *                 filename:
- *                   type: string
- *                 etag:
- *                   type: string
- *       responses:
- *         "202" :
- *           description: Accepted. The uploaded file is being processed.
- *         "400" :
- *           description: Bad Request
- *         "401":
- *           description: Unauthorized
- *         "403":
- *           description: Forbidden as there is a job in progress
- *         "500":
- *           description: Internal Server Error
- */
-router.post('/upload/complete-v2', redirectTo('/upload/complete'))
 
 /**
  * @swagger
@@ -750,10 +660,16 @@ router.post('/refresh-stats', EmailStatsMiddleware.updateAndGetStats)
  *           description: Unauthorized
  *        "403":
  *           description: Forbidden, campaign not owned by user
+ *        "410":
+ *           description: Campaign has been redacted
  *        "500":
  *           description: Internal Server Error
  */
-router.get('/export', EmailStatsMiddleware.getDeliveredRecipients)
+router.get(
+  '/export',
+  CampaignMiddleware.isCampaignRedacted,
+  EmailStatsMiddleware.getDeliveredRecipients
+)
 
 /**
  * @swagger

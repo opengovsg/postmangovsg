@@ -56,6 +56,8 @@ export enum DefaultCredentialName {
  *           type: boolean
  *         protect:
  *           type: boolean
+ *         redacted:
+ *           type: boolean
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
  *         job_queue:

@@ -127,6 +127,7 @@ const TelegramDetail = () => {
         {stats.status && (
           <ProgressDetails
             stats={stats}
+            redacted={campaign.redacted}
             handlePause={handlePause}
             handleRetry={handleRetry}
             handleRefreshStats={handleRefreshStats}

@@ -88,7 +88,8 @@ export const contactMessageHandler = (botId: string) => async (
   ctx: TelegrafContext
 ): Promise<Message> => {
   logger.info({
-    message: ctx.from?.id.toString() as string,
+    from: ctx.from,
+    contact: ctx.message?.contact,
     botId,
     action: 'contactMessageHandler',
   })

@@ -1,0 +1,7 @@
+@import 'styles/_variables';
+
+.container {
+  & > .option:not(:first-child) {
+    margin-left: $spacing-7;
+  }
+}

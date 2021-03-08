@@ -117,7 +117,11 @@ const CreateDemoModal = ({
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.SMS,
               })}
-              onClick={() => setSelectedChannel(ChannelType.SMS)}
+              onClick={
+                selectedChannel === ChannelType.SMS
+                  ? undefined
+                  : () => setSelectedChannel(ChannelType.SMS)
+              }
             >
               SMS
               <i
@@ -130,7 +134,11 @@ const CreateDemoModal = ({
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.Telegram,
               })}
-              onClick={() => setSelectedChannel(ChannelType.Telegram)}
+              onClick={
+                selectedChannel === ChannelType.Telegram
+                  ? undefined
+                  : () => setSelectedChannel(ChannelType.Telegram)
+              }
             >
               Telegram
               <i
@@ -145,11 +153,15 @@ const CreateDemoModal = ({
         </div>
         <div className="separator"></div>
         <div className={styles.actions}>
-          <TextButton minButtonWidth onClick={showDemoVideoModal}>
+          <TextButton className={styles.action} onClick={showDemoVideoModal}>
             Watch the video
           </TextButton>
 
-          <PrimaryButton onClick={createDemo} disabled={!isCreateEnabled}>
+          <PrimaryButton
+            className={styles.action}
+            onClick={createDemo}
+            disabled={!isCreateEnabled}
+          >
             Create demo campaign
           </PrimaryButton>
         </div>

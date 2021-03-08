@@ -1,7 +1,4 @@
 import convict from 'convict'
-import dotenv from 'dotenv'
-
-dotenv.config()
 
 /**
  * To require an env var without setting a default,

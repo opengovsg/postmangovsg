@@ -27,18 +27,19 @@
 }
 .options {
   @include flex-horizontal;
+  margin-top: $spacing-4;
 
-  button {
-    margin-top: $spacing-4;
-    margin-right: $spacing-4;
-    &:last-child {
-      margin-right: 0;
-    }
+  & > .option:not(:first-child) {
+    margin-left: $spacing-7;
   }
+
   @include mobile() {
     @include flex-vertical;
-    button {
-      margin-right: 0;
+    align-items: center;
+
+    & > .option:not(:first-child) {
+      margin-left: 0;
+      margin-top: $spacing-1;
     }
   }
 }

@@ -4,7 +4,7 @@ import styles from './DemoVideoModal.module.scss'
 import { PrimaryButton, TextButton } from 'components/common'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { LINKS } from 'config'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { OutboundLink } from 'react-ga'
 import ReactPlayer from 'react-player/lazy'
 
@@ -45,11 +45,14 @@ const DemoVideoModal = ({
         .
       </div>
       <div className={styles.options}>
-        <TextButton minButtonWidth onClick={close}>
+        <TextButton className={styles.option} onClick={close}>
           Dismiss
         </TextButton>
         {!!numDemosSms || !!numDemosTelegram ? (
-          <PrimaryButton onClick={showCreateDemoModal}>
+          <PrimaryButton
+            className={styles.option}
+            onClick={showCreateDemoModal}
+          >
             Got it, I&apos;m ready to try
           </PrimaryButton>
         ) : (

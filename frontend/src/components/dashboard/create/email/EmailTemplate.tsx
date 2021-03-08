@@ -15,6 +15,7 @@ import {
   Dropdown,
   StepHeader,
   StepSection,
+  RichTextEditor,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
@@ -105,13 +106,14 @@ const EmailTemplate = ({
       <SaveDraftModal
         saveable
         onSave={async () => {
-          if (campaignId && subject && body && from) {
-            try {
-              await saveTemplate(+campaignId, subject, body, replyTo, from)
-            } catch (err) {
-              setErrorMsg(err.message)
-              throw err
-            }
+          if (!campaignId) return
+          try {
+            if (!subject || !body)
+              throw new Error('Message subject or template cannot be empty!')
+            await saveTemplate(+campaignId, subject, body, replyTo, from)
+          } catch (err) {
+            setErrorMsg(err.message)
+            throw err
           }
         }}
       />
@@ -186,11 +188,10 @@ const EmailTemplate = ({
             </>
           )}
 
-          <TextArea
-            highlight={true}
-            placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
+          <RichTextEditor
             value={body}
             onChange={setBody}
+            placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
           />
         </div>
 

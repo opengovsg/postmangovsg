@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
 import { capitalize } from 'lodash'
+import { Trans } from '@lingui/macro'
 
 import { ModalContext } from 'contexts/modal.context'
 import { AuthContext } from 'contexts/auth.context'
@@ -24,6 +25,8 @@ import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { getUserSettings } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
+import AnnouncementModal from './announcement-modal'
+import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 
 const ITEMS_PER_PAGE = 10
 
@@ -63,19 +66,37 @@ const Campaigns = () => {
     setLoading(false)
   }
 
+  // Only call the modalContext if content is currently null - prevents infinite re-rendering
+  // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
+  const displayNewAnnouncement = useCallback(
+    (lastSeenVersion: string, currentVersion: string) => {
+      if (
+        ANNOUNCEMENT.isActive &&
+        lastSeenVersion !== currentVersion &&
+        modalContext.modalContent === null
+      ) {
+        modalContext.setModalContent(<AnnouncementModal />)
+      }
+    },
+    [modalContext]
+  )
+
   useEffect(() => {
     fetchCampaigns(selectedPage)
   }, [selectedPage])
 
   useEffect(() => {
-    async function getNumDemos() {
-      const { demo } = await getUserSettings()
+    // TODO: refactor out num demos processing
+    async function getNumDemosAndAnnouncementVersion() {
+      const { demo, announcementVersion } = await getUserSettings()
+      const latestAnnouncementVersion = await getAnnouncementVersion()
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
+      displayNewAnnouncement(announcementVersion, latestAnnouncementVersion)
     }
-    getNumDemos()
-  }, [])
+    getNumDemosAndAnnouncementVersion()
+  }, [displayNewAnnouncement])
 
   /* eslint-disable react/display-name */
   const headers = [
@@ -137,6 +158,14 @@ const Campaigns = () => {
       name: '',
       render: (campaign: Campaign) => {
         if (campaign.status === Status.Draft) return
+        if (campaign.redacted) {
+          return (
+            <span className={styles.expired}>
+              <Trans>Report expired</Trans>
+            </span>
+          )
+        }
+
         return (
           <ExportRecipients
             iconPosition="left"
@@ -166,6 +195,7 @@ const Campaigns = () => {
             className={cx(styles.iconContainer, styles.duplicate)}
             onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               event.stopPropagation()
+              sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
               modalContext.setModalContent(
                 <DuplicateCampaignModal campaign={campaign} />
               )

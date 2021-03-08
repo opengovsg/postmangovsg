@@ -29,6 +29,7 @@ export class Campaign {
   isCsvProcessing: boolean
   statusUpdatedAt: Date
   protect: boolean
+  redacted: boolean
   demoMessageLimit: number | null
 
   constructor(input: any) {
@@ -43,6 +44,7 @@ export class Campaign {
     this.sentAt = input['sentAt']
     this.statusUpdatedAt = input['statusUpdatedAt']
     this.protect = input['protect']
+    this.redacted = input['redacted']
     this.demoMessageLimit = input['demo_message_limit']
   }
 
@@ -73,6 +75,7 @@ export class CampaignStats {
   updatedAt: Date // Timestamp when statistic was updated
   halted?: boolean
   waitTime?: number
+  redacted?: boolean
 
   constructor(input: any) {
     this.error = +input['error']

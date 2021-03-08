@@ -19,7 +19,7 @@ import {
   FileInput,
   CsvUpload,
   ErrorBlock,
-  PreviewBlock,
+  EmailPreviewBlock,
   NextButton,
   SampleCsv,
   ButtonGroup,
@@ -29,7 +29,7 @@ import {
   WarningBlock,
 } from 'components/common'
 import { LINKS } from 'config'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { EmailPreview, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
@@ -223,7 +223,7 @@ const EmailRecipients = ({
       {!isCsvProcessing && numRecipients > 0 && (
         <StepSection>
           <p className={styles.greyText}>Message preview</p>
-          <PreviewBlock
+          <EmailPreviewBlock
             body={preview?.body}
             subject={preview?.subject}
             replyTo={preview?.replyTo}
