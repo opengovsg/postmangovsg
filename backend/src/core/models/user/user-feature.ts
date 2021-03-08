@@ -24,4 +24,11 @@ export class UserFeature extends Model<UserFeature> {
     allowNull: true,
   })
   announcementVersion!: string
+
+  @Default(null)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+  })
+  tesseract!: string
 }
