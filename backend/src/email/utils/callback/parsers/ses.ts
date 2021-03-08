@@ -116,12 +116,16 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
     logger.info({ message: 'No reference message id found', ...logMeta })
     return
   }
+
+  const bounce = message?.bounce
   const notificationType = message?.notificationType
   logger.info({
     message: 'Update for notificationType',
     notificationType,
+    bounce,
     ...logMeta,
   })
+
   const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
   switch (notificationType) {
     case 'Delivery':
