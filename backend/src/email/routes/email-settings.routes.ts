@@ -43,6 +43,8 @@ const verifyValidator = {
  *          description: OK
  *        400:
  *          description: Bad Request (verification fails)
+ *        503:
+ *          description: Service Unavailable. Try using the default from address instead.
  *
  */
 router.post(
