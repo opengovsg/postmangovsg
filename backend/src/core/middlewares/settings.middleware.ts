@@ -28,7 +28,7 @@ const getUserSettings = async (
         is_displayed: userSettings.demo?.isDisplayed,
       },
       announcement_version: userSettings.userFeature?.announcementVersion,
-      tesseract: userSettings.userFeature.tesseract,
+      tesseract: userSettings.userFeature?.tesseract,
     })
   } catch (err) {
     next(err)
