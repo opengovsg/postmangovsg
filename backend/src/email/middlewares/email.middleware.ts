@@ -127,7 +127,7 @@ const isFromAddressAccepted = async (
   if (config.get('emailFallback.activate') && from !== defaultEmail) {
     return res.set('Retry-After', '3600').status(503).json({
       message:
-        'Unable to use a custom from address due to downtime. Please try again in 1 hour or use the default from address.',
+        'Unable to use a custom from address due to downtime. Please use the default from address instead.',
     })
   }
 
