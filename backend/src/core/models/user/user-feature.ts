@@ -30,5 +30,5 @@ export class UserFeature extends Model<UserFeature> {
     type: DataType.BOOLEAN,
     allowNull: true,
   })
-  tesseract!: string
+  tesseract!: boolean
 }

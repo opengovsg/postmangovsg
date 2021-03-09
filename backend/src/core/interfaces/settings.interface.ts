@@ -13,5 +13,6 @@ export interface UserSettings {
   }
   userFeature: {
     announcementVersion: string
+    tesseract: boolean
   }
 }
