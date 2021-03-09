@@ -50,6 +50,7 @@ const verifyValidator = {
 router.post(
   '/from/verify',
   celebrate(verifyValidator),
+  EmailMiddleware.isCustomFromAddressAllowed,
   EmailMiddleware.isFromAddressAccepted,
   EmailMiddleware.verifyFromAddress,
   EmailMiddleware.sendValidationMessage,

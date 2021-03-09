@@ -209,6 +209,7 @@ router.put(
   '/template',
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
+  EmailMiddleware.isCustomFromAddressAllowed,
   EmailMiddleware.isFromAddressAccepted,
   EmailMiddleware.existsFromAddress,
   EmailMiddleware.verifyFromAddress,
