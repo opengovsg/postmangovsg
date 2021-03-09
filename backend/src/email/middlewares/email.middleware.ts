@@ -249,18 +249,20 @@ const getCustomFromAddress = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const email =
-    req.session?.user?.email ||
-    (await AuthService.findUser(req.session?.user?.id))?.email
   const defaultEmail = config.get('mailFrom')
-  const result = []
+  const result = [defaultEmail]
 
-  try {
-    const fromAddress = await CustomDomainService.getCustomFromAddress(email)
-    if (fromAddress) result.push(fromAddress)
-    result.push(defaultEmail)
-  } catch (err) {
-    return next(err)
+  if (!config.get('emailFallback.activate')) {
+    const email =
+      req.session?.user?.email ||
+      (await AuthService.findUser(req.session?.user?.id))?.email
+    try {
+      const fromAddress = await CustomDomainService.getCustomFromAddress(email)
+      // Display the custom address first
+      if (fromAddress) result.unshift(fromAddress)
+    } catch (err) {
+      return next(err)
+    }
   }
 
   return res.status(200).json({ from: result })
