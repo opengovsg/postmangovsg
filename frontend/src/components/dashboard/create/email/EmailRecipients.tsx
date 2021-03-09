@@ -28,6 +28,7 @@ import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
 import { RecipientListType, EmailPreview, EmailProgress } from 'classes'
 import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
+import { getUserSettings } from 'services/settings.service'
 
 import styles from '../Create.module.scss'
 
@@ -63,9 +64,18 @@ const EmailRecipients = ({
     csvError,
     tempRecipientListType,
   } = csvInfo
+  const [isTesseractUser, setTesseractUser] = useState(false)
   const [recipientListType, setRecipientListType] = useState(
     currentRecipientListType
   )
+
+  useEffect(() => {
+    async function getUserFeatureSettings() {
+      const { tesseract } = await getUserSettings()
+      setTesseractUser(tesseract)
+    }
+    getUserFeatureSettings()
+  }, [setTesseractUser])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
@@ -127,7 +137,7 @@ const EmailRecipients = ({
           <>
             <StepHeader
               title={
-                protect ? (
+                protect || !isTesseractUser ? (
                   'Upload recipient list in CSV format'
                 ) : (
                   <h4>Upload CSV file</h4>
@@ -202,7 +212,7 @@ const EmailRecipients = ({
 
   return (
     <>
-      {!protect && (
+      {!protect && isTesseractUser && (
         <StepSection>
           <StepHeader
             title="Add recipient list"
@@ -245,7 +255,7 @@ const EmailRecipients = ({
         <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 
-      {!isProcessing && numRecipients > 0 && protect && (
+      {!isProcessing && numRecipients > 0 && (protect || !isTesseractUser) && (
         <StepSection>
           <p className={styles.greyText}>Message preview</p>
           <EmailPreviewBlock
