@@ -2,6 +2,8 @@ import { EmailTemplateService, EmailService } from '@email/services'
 import { MailToSend } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
+import { isBlacklisted } from '@email/utils/query'
+import { RecipientError } from '@core/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -31,6 +33,11 @@ async function sendMessage({
     throw new TemplateError(
       'Message is invalid as the subject or body only contains invalid HTML tags.'
     )
+  }
+
+  const blacklisted = await isBlacklisted(recipient)
+  if (blacklisted) {
+    throw new RecipientError('Recipient email is blacklisted')
   }
 
   const mailToSend: MailToSend = {
