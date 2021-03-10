@@ -447,7 +447,7 @@ const config = convict({
     activate: {
       doc:
         'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
-      default: true,
+      default: false,
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
   },
