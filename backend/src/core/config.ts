@@ -303,14 +303,14 @@ const config = convict({
     userRate: {
       doc:
         'The max number of transactional emails that can be requested per window per user',
-      default: 5,
+      default: 10,
       env: 'TRANSACTIONAL_EMAIL_USER_RATE',
       format: 'int',
     },
     globalRate: {
       doc:
         'The max number of transactional emails that can be requested per window',
-      default: 10,
+      default: 40,
       env: 'TRANSACTIONAL_EMAIL_GLOBAL_RATE',
       format: 'int',
     },
