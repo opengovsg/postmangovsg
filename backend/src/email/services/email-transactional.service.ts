@@ -73,7 +73,7 @@ async function rateLimit(userKey: number, globalKey: string) {
   const ACTION = 'rateLimit'
 
   const userRateLimiterRes = await rateLimitClients.user.get(userKey)
-  const globalRateLimiterRes = await rateLimitClients.user.get(globalKey)
+  const globalRateLimiterRes = await rateLimitClients.global.get(globalKey)
   // If rateLimiterRes is null, the key has not been used before
   const remainingUserTokens = userRateLimiterRes?.remainingPoints ?? 1
   const remainingGlobalTokens = globalRateLimiterRes?.remainingPoints ?? 1
