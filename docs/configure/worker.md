@@ -66,11 +66,11 @@ If not set, `nodemailer-direct-transport` will be used (for testing locally)
 
 | Name                      | Description                                                                                                                |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `SES_HOST`                | Amazon SES SMTP endpoint.                                                                                                  |
-| `SES_PORT`                | Amazon SES SMTP port, defaults to 465                                                                                      |
-| `SES_USER`                | SMTP username                                                                                                              |
-| `SES_PASS`                | SMTP password                                                                                                              |
-| `SES_FROM`                | The email address that appears in the From field of an email                                                               |
+| `WORKER_SES_HOST`         | Amazon SES SMTP endpoint.                                                                                                  |
+| `WORKER_SES_PORT`         | Amazon SES SMTP port, defaults to 465                                                                                      |
+| `WORKER_SES_USER`         | SMTP username                                                                                                              |
+| `WORKER_SES_PASS`         | SMTP password                                                                                                              |
+| `WORKER_SES_FROM`         | The email address that appears in the From field of an email                                                               |
 | `EMAIL_FALLBACK_ACTIVATE` | Switch to true to use the SendGrid fallback for all emails. Ensure that the SMTP settings are properly configured as well. |
 
 #### Sending smses
