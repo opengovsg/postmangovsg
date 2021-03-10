@@ -206,10 +206,10 @@ const config = convict({
       },
     },
   },
-  frontendUrl: {
+  unsubscribeUrl: {
     doc: 'Used to generate unsubscribe url',
     default: 'https://postman.gov.sg', // prod only
-    env: 'FRONTEND_URL',
+    env: 'UNSUBSCRIBE_URL',
   },
 })
 
@@ -221,7 +221,7 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 // Override with local config
 if (config.get('env') === 'development') {
   config.load({
-    frontendUrl: 'http://localhost:3000',
+    unsubscribeUrl: 'http://localhost:3000',
     database: {
       dialectOptions: {
         ssl: {
@@ -236,7 +236,7 @@ if (config.get('env') === 'development') {
 
 if (config.get('env') === 'staging') {
   config.load({
-    frontendUrl: 'https://staging.postman.gov.sg',
+    unsubscribeUrl: 'https://staging.postman.gov.sg',
   })
 }
 
