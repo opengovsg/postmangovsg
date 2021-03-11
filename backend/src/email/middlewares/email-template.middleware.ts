@@ -421,6 +421,9 @@ const tesseractHandler = async (
       )
     }
 
+    // Store temp filename
+    await UploadService.storeS3TempFilename(+campaignId, datasetName)
+
     // Return early because bulk insert is slow
     res.sendStatus(202)
 
