@@ -9,6 +9,7 @@ import {
   DefaultDraftBlockRenderMap,
   RichUtils,
   Modifier,
+  SelectionState,
 } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 
@@ -236,12 +237,23 @@ const RichTextEditor = ({
     editorState: EditorState
   ): boolean {
     let contentState = editorState.getCurrentContent()
-    const selection = editorState.getSelection()
+    let selection = editorState.getSelection()
     const anchorKey = selection.getAnchorKey()
+    const focusKey = selection.getFocusKey()
     const currentBlock = contentState.getBlockForKey(anchorKey)
 
     // Handle paste within table cells. We only paste as plain text and strip all HTML.
     if (currentBlock.getType() === 'table-cell') {
+      // If user tries to select across multiple cells/blocks, we will replace the selection to just
+      // the whole of the anchor block.
+      if (anchorKey !== focusKey) {
+        selection = SelectionState.createEmpty(anchorKey).merge({
+          focusKey: anchorKey,
+          anchorOffset: selection.getAnchorOffset(),
+          focusOffset: currentBlock.getLength(),
+        })
+      }
+
       if (selection.isCollapsed()) {
         contentState = Modifier.insertText(contentState, selection, text)
       } else {
