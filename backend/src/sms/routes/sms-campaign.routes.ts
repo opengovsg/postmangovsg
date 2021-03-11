@@ -5,6 +5,7 @@ import {
   UploadMiddleware,
   JobMiddleware,
   SettingsMiddleware,
+  UserFeatureMiddleware,
 } from '@core/middlewares'
 import {
   SmsMiddleware,
@@ -811,6 +812,7 @@ router.post(
 router.post(
   '/tesseract',
   celebrate(tesseractCampaignValidator),
+  UserFeatureMiddleware.isTesseractUser,
   CampaignMiddleware.canEditCampaign,
   SmsTemplateMiddleware.tesseractHandler
 )

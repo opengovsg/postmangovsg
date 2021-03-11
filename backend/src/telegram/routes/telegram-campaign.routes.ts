@@ -5,6 +5,7 @@ import {
   UploadMiddleware,
   JobMiddleware,
   SettingsMiddleware,
+  UserFeatureMiddleware,
 } from '@core/middlewares'
 import {
   TelegramMiddleware,
@@ -873,6 +874,7 @@ router.post(
 router.post(
   '/tesseract',
   celebrate(tesseractCampaignValidator),
+  UserFeatureMiddleware.isTesseractUser,
   CampaignMiddleware.canEditCampaign,
   TelegramTemplateMiddleware.tesseractHandler
 )
