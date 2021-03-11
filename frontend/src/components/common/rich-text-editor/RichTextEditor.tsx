@@ -8,6 +8,7 @@ import {
   convertToRaw,
   DefaultDraftBlockRenderMap,
   RichUtils,
+  Modifier,
 } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 
@@ -229,6 +230,37 @@ const RichTextEditor = ({
     return 'not-handled'
   }
 
+  function handlePastedText(
+    text: string,
+    _html: string,
+    editorState: EditorState
+  ): boolean {
+    let contentState = editorState.getCurrentContent()
+    const selection = editorState.getSelection()
+    const anchorKey = selection.getAnchorKey()
+    const currentBlock = contentState.getBlockForKey(anchorKey)
+
+    // Handle paste within table cells. We only paste as plain text and strip all HTML.
+    if (currentBlock.getType() === 'table-cell') {
+      if (selection.isCollapsed()) {
+        contentState = Modifier.insertText(contentState, selection, text)
+      } else {
+        contentState = Modifier.replaceText(contentState, selection, text)
+      }
+
+      const updated = EditorState.push(
+        editorState,
+        contentState,
+        'insert-characters'
+      )
+      setEditorState(updated)
+      return true
+    }
+
+    // Return false so that default behaviour will run
+    return false
+  }
+
   return (
     <ExtendedEditor
       wrapperClassName={styles.wrapper}
@@ -244,6 +276,7 @@ const RichTextEditor = ({
       blockRenderMap={extendedBlockRenderMap}
       handleKeyCommand={handleKeyCommand}
       handleReturn={handleReturn}
+      handlePastedText={handlePastedText}
       stripPastedStyles
     />
   )
