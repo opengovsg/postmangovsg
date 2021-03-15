@@ -4,6 +4,7 @@ import querystring from 'querystring'
 import { Trans } from '@lingui/macro'
 
 import { ErrorBlock, PrimaryButton, TextButton } from 'components/common'
+import Banner from 'components/landing/banner'
 
 import styles from './Unsubscribe.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
@@ -11,7 +12,6 @@ import landingHero from 'assets/img/unsubscribe/request-unsubscribe.png'
 import cancelRequestHero from 'assets/img/unsubscribe/cancel-request.png'
 
 import { unsubscribeRequest } from 'services/unsubscribe.service'
-import Banner from 'components/landing/banner'
 
 const Unsubscribe = () => {
   const { version } = useParams()

@@ -3,11 +3,11 @@ import { useParams } from 'react-router-dom'
 
 import { fetchMessage } from 'services/decrypt-mail.service'
 import { TextInputWithButton, ProtectedPreview } from 'components/common'
+import Banner from 'components/landing/banner'
 
 import styles from './Protected.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import landingHero from 'assets/img/landing/landing-hero.png'
-import Banner from 'components/landing/banner'
 
 const Protected = () => {
   const { id } = useParams()
