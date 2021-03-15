@@ -10,6 +10,7 @@ import {
   RichUtils,
   Modifier,
   SelectionState,
+  KeyBindingUtil,
 } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 
@@ -212,7 +213,7 @@ const RichTextEditor = ({
   }
 
   function handleReturn(
-    _e: React.KeyboardEvent,
+    e: React.KeyboardEvent,
     state: EditorState
   ): 'handled' | 'not-handled' {
     const selection = state.getSelection()
@@ -225,6 +226,12 @@ const RichTextEditor = ({
       if (selection.isCollapsed()) {
         setEditorState(RichUtils.insertSoftNewline(state))
       }
+      return 'handled'
+    }
+
+    // Insert soft new line if shift+enter is pressed.
+    if (KeyBindingUtil.isSoftNewlineEvent(e) && selection.isCollapsed()) {
+      setEditorState(RichUtils.insertSoftNewline(state))
       return 'handled'
     }
 
