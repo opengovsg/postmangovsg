@@ -13,12 +13,14 @@ export interface ProtectedCsvInfo {
 
 export const PROTECTED_CSV_HEADERS = ['recipient', 'password']
 
-// Using default xss options for registered mail
-const templateClient = new TemplateClient({
-  allowedImageSources: i18n._(ALLOWED_IMAGE_SOURCES).split(';'),
-})
+const getTemplateClient = (): TemplateClient => {
+  return new TemplateClient({
+    allowedImageSources: i18n._(ALLOWED_IMAGE_SOURCES).split(';'),
+  })
+}
 
 export function extractParams(template: string): string[] {
+  const templateClient = getTemplateClient()
   return templateClient.parseTemplate(template).variables
 }
 
@@ -100,6 +102,8 @@ export function hydrateTemplate(
   row: Record<string, any>,
   removeEmptyLines?: boolean
 ) {
+  // Using default xss options for registered mail
+  const templateClient = getTemplateClient()
   const hydrated = templateClient.template(template, row, {
     removeEmptyLines,
     replaceNewLines: true,
