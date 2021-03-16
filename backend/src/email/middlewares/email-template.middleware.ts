@@ -401,7 +401,7 @@ const tesseractHandler = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { campaignId } = req.params
-  if (ProtectedService.isProtectedCampaign(+campaignId)) {
+  if (await ProtectedService.isProtectedCampaign(+campaignId)) {
     return res.sendStatus(403)
   }
 

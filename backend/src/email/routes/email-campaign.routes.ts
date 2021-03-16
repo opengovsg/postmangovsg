@@ -90,7 +90,11 @@ const duplicateCampaignValidator = {
 
 const tesseractCampaignValidator = {
   [Segments.BODY]: Joi.object({
-    url: Joi.string().trim().required(),
+    url: Joi.string()
+      .pattern(/vault.gov.sg/)
+      .uri({ scheme: 'https' })
+      .trim()
+      .required(),
   }),
 }
 
