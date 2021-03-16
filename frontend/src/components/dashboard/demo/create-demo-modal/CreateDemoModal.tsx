@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import cx from 'classnames'
 import styles from './CreateDemoModal.module.scss'
-import { Campaign, channelIcons, ChannelType } from 'classes/Campaign'
+import { channelIcons, ChannelType } from 'classes/Campaign'
 import {
   ErrorBlock,
   PrimaryButton,
@@ -12,6 +12,9 @@ import { ModalContext } from 'contexts/modal.context'
 import { useHistory } from 'react-router-dom'
 import { createCampaign } from 'services/campaign.service'
 import DemoVideoModal from 'components/dashboard/demo/demo-video-modal'
+
+import type { Campaign } from 'classes/Campaign'
+
 const CreateDemoModal = ({
   numDemosSms,
   numDemosTelegram,

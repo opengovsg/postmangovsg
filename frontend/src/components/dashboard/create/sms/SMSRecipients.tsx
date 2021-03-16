@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-  useContext,
-} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 
@@ -12,7 +6,6 @@ import {
   uploadFileToS3,
   deleteCsvStatus,
   getCsvStatus,
-  CsvStatusResponse,
 } from 'services/upload.service'
 import {
   FileInput,
@@ -30,10 +23,13 @@ import {
 } from 'components/common'
 import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
-import { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import { CampaignContext } from 'contexts/campaign.context'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { CsvStatusResponse } from 'services/upload.service'
+import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 
 import styles from '../Create.module.scss'
 

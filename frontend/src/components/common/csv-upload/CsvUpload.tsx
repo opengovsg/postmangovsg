@@ -4,8 +4,6 @@ import { DetailBlock, ErrorBlock } from 'components/common'
 
 import styles from './CsvUpload.module.scss'
 
-type NullableString = string | null | undefined
-
 const CsvUpload = ({
   isCsvProcessing,
   csvInfo,

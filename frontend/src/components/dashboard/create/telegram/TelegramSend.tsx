@@ -1,14 +1,8 @@
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { Status, ChannelType, TelegramProgress } from 'classes'
+import { Status, ChannelType } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -23,6 +17,9 @@ import {
 import { getPreviewMessage } from 'services/telegram.service'
 import { sendCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+
+import type { TelegramProgress } from 'classes'
+import type { Dispatch, SetStateAction } from 'react'
 
 import styles from '../Create.module.scss'
 

@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
@@ -35,7 +29,9 @@ import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
 import { i18n } from '@lingui/core'
-import { TelegramProgress } from 'classes'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { TelegramProgress } from 'classes'
 
 const TelegramCredentials = ({
   setActiveStep,

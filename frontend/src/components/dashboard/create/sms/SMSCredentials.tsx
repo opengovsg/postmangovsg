@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -28,14 +22,15 @@ import {
   InfoBlock,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
-import TwilioCredentialsInput, {
-  TwilioCredentials,
-} from './TwilioCredentialsInput'
+import TwilioCredentialsInput from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
-import { SMSProgress } from 'classes'
 import { OutboundLink } from 'react-ga'
 import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { TwilioCredentials } from './TwilioCredentialsInput'
+import type { SMSProgress } from 'classes'
 
 const SMSCredentials = ({
   setActiveStep,
