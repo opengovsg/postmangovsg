@@ -17,7 +17,13 @@ module.exports = {
   parserOptions: {
     sourceType: 'module',
   },
-  ignorePatterns: ['build', 'dist', 'node_modules', 'locales/_build/', 'locales/**/*.js'],
+  ignorePatterns: [
+    'build',
+    'dist',
+    'node_modules',
+    'locales/_build/',
+    'locales/**/*.js',
+  ],
   rules: {
     'react/prop-types': 'off', // No need proptypes since we're using TypeScript
     'react-hooks/rules-of-hooks': 'error', // Checks rules of Hooks
@@ -27,6 +33,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 
     'no-console': [
       'warn',
