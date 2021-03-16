@@ -237,7 +237,9 @@ const getCampaignDetails = async (
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
       [
-        literal(`s3_object ->> 'bucket' = '${config.get('aws.vaultBucket')}'`),
+        literal(
+          `s3_object ->> 'bucket' = '${config.get('tesseract.vaultBucket')}'`
+        ),
         'is_vault_link',
       ],
       [
