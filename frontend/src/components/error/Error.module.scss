@@ -23,7 +23,17 @@
       flex: 1;
       text-align: center;
 
+      .title {
+        margin: 0;
+      }
+
+      .description {
+        margin: $spacing-3 0 0 0;
+      }
+
       .actions {
+        margin-top: $spacing-5;
+
         & > .action:not(:first-child) {
           margin-left: $spacing-7;
         }
