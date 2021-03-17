@@ -1,12 +1,8 @@
 import type { Request, Response, NextFunction } from 'express'
-import expressRateLimit from 'express-rate-limit'
-import RedisStore from 'rate-limit-redis'
-import { RedisService } from '@core/services'
-import config from '@core/config'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
-import { RecipientError } from '@core/errors'
+import { RecipientError, RateLimitError } from '@core/errors'
 import { TwilioError } from '@sms/errors'
 
 const logger = loggerWithLabel(module)
@@ -18,9 +14,9 @@ async function sendMessage(
 ): Promise<void> {
   const ACTION = 'sendMessage'
 
+  const { credentials } = res.locals
   try {
     const { recipient, body } = req.body
-    const { credentials } = res.locals
 
     logger.info({ message: 'Sending SMS', action: ACTION })
     await SmsTransactionalService.sendMessage({
@@ -42,6 +38,16 @@ async function sendMessage(
       return
     }
 
+    if (err instanceof RateLimitError) {
+      logger.warn({
+        message: 'Rate limited request to send transactional SMS',
+        userId: req?.session?.user.id,
+        accountSid: credentials.accountSid,
+      })
+      res.sendStatus(429)
+      return
+    }
+
     if (err instanceof TwilioError) {
       const { statusCode, message } = err
       res.status(statusCode).json({ message })
@@ -52,32 +58,6 @@ async function sendMessage(
   }
 }
 
-const rateLimit = expressRateLimit({
-  store: new RedisStore({
-    prefix: 'transactionalSms:',
-    client: RedisService.rateLimitClient,
-    expiry: config.get('transactionalSms.window'),
-  }),
-  keyGenerator: (_: Request, res: Response) =>
-    res.locals.credentials.messagingServiceSid,
-  windowMs: config.get('transactionalSms.window') * 1000,
-  max: config.get('transactionalSms.rate'),
-  draft_polli_ratelimit_headers: true,
-  message: {
-    status: 429,
-    message: 'Too many requests. Please try again later.',
-  },
-  handler: (req: Request, res: Response) => {
-    logger.warn({
-      message: 'Rate limited request to send transactional SMS',
-      userId: req?.session?.user.id,
-      accountSid: res.locals.credentials.accountSid,
-    })
-    res.sendStatus(429)
-  },
-})
-
 export const SmsTransactionalMiddleware = {
   sendMessage,
-  rateLimit,
 }

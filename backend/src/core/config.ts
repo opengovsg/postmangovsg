@@ -314,21 +314,6 @@ const config = convict({
       format: 'int',
     },
   },
-  transactionalSms: {
-    rate: {
-      doc:
-        'The max number of transactional SMSes that can be requested per window per credential',
-      default: 10,
-      env: 'TRANSACTIONAL_SMS_RATE',
-      format: 'int',
-    },
-    window: {
-      doc: 'The duration of each window for transactional SMSes in seconds',
-      default: 1,
-      env: 'TRANSACTIONAL_SMS_WINDOW',
-      format: 'int',
-    },
-  },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
     default: 'SG',

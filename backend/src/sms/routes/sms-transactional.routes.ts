@@ -54,7 +54,6 @@ router.post(
   '/send',
   celebrate(sendValidator),
   SmsMiddleware.getCredentialsFromLabel,
-  SmsTransactionalMiddleware.rateLimit,
   SmsTransactionalMiddleware.sendMessage
 )
 

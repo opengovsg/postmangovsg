@@ -1,6 +1,7 @@
 import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
 import { TwilioError } from '@sms/errors'
+import { RateLimitError } from '@core/errors'
 
 export default class TwilioClient {
   private client: any
@@ -47,6 +48,13 @@ export default class TwilioClient {
       ) {
         return this.send(recipient, message, true)
       }
+
+      // 20429 - REST API rate limit exceeded
+      // 21611 - Message queue limit exceeded
+      if ([20429, 21611].includes(error.code)) {
+        throw new RateLimitError()
+      }
+
       throw new TwilioError({
         statusCode: error.status,
         message: error.message,
