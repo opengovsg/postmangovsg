@@ -131,6 +131,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       await updateBouncedStatus({
         ...metadata,
         bounceType: message?.bounce?.bounceType,
+        bounceSubType: message?.bounce?.bounceSubType,
         to: message?.mail?.commonHeaders?.to,
       })
       break
@@ -138,6 +139,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       await updateComplaintStatus({
         ...metadata,
         complaintType: message?.complaint?.complaintFeedbackType,
+        complaintSubType: message?.complaint?.complaintSubType,
         to: message?.mail?.commonHeaders?.to,
       })
       break
