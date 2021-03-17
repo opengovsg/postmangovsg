@@ -4,7 +4,6 @@ module.exports = {
   plugins: ['@typescript-eslint', 'react-hooks'],
   extends: [
     'eslint:recommended', // Recommended ESLint rules
-    'plugin:@typescript-eslint/eslint-recommended', // Disables rules from `eslint:recommended` that are already covered by the TypeScript typechecker
     'plugin:@typescript-eslint/recommended', // Recommended TypeScript rules
     'plugin:react/recommended', // Recommended React rules
     'prettier/@typescript-eslint', // Disables rules from `@typescript-eslint/recommended` that are covered by Prettier
