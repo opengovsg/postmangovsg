@@ -59,7 +59,7 @@ const rateLimit = expressRateLimit({
     expiry: config.get('transactionalSms.window'),
   }),
   keyGenerator: (_: Request, res: Response) =>
-    res.locals.credentials.accountSid,
+    res.locals.credentials.messagingServiceSid,
   windowMs: config.get('transactionalSms.window') * 1000,
   max: config.get('transactionalSms.rate'),
   draft_polli_ratelimit_headers: true,
