@@ -19,7 +19,7 @@ const MessageBlock = ({
   icon?: string
   children?: React.ReactNode
   absolute?: boolean
-  onClose?: Function
+  onClose?: () => void
 }) => {
   if (!children) {
     return null

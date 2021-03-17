@@ -48,7 +48,7 @@ const TelegramRecipients = ({
   } = campaign
   const isDemo = !!demoMessageLimit
 
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
   const [csvInfo, setCsvInfo] = useState<

@@ -9,7 +9,7 @@ const FileInput = ({
   disabled,
 }: {
   isProcessing: boolean
-  onFileSelected: Function
+  onFileSelected: (files: File[]) => Promise<void>
   label?: string
   disabled?: boolean
 }) => {
@@ -22,7 +22,7 @@ const FileInput = ({
         accept=".csv"
         disabled={disabled || isProcessing}
         onClick={(e) => ((e.target as HTMLInputElement).value = '')} // reset target value to allow selecting of new files
-        onChange={(e) => onFileSelected(e.target.files)}
+        onChange={(e) => onFileSelected(Array.from(e.target.files ?? []))}
       />
       <label htmlFor="recipient-upload-input">
         {isProcessing ? (

@@ -17,7 +17,7 @@ const CsvUpload = ({
     tempCsvFilename?: string
     csvError?: string
   }
-  onErrorClose: Function
+  onErrorClose: () => void
   children: React.ReactNode
 }) => {
   const { numRecipients = 0, csvFilename, tempCsvFilename, csvError } = csvInfo

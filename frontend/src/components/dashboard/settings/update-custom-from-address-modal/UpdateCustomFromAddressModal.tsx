@@ -25,7 +25,7 @@ const UpdateCustomFromAddressModal = ({
   onSuccess,
 }: {
   label: string
-  onSuccess: Function
+  onSuccess: () => void
 }) => {
   const [step, setStep] = useState(UpdateFromAddressStep.Update)
   const [errorMessage, setErrorMessage] = useState('')

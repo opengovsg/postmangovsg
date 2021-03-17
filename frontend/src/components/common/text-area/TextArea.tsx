@@ -18,7 +18,7 @@ const TextArea = ({
   singleRow?: boolean
   placeholder?: string
   value: string
-  onChange: Function
+  onChange: (text: string) => void
 }) => {
   const minRows = singleRow ? 1 : 7
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)

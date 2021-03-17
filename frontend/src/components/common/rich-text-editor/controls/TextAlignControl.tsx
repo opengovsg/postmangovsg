@@ -7,10 +7,10 @@ interface TextAlignControlProps {
   config: any
   currentState: any
   expanded: boolean
-  onChange: Function
-  doExpand: Function
-  doCollapse: Function
-  onExpandEvent: Function
+  onChange: (alignment: string) => void
+  doExpand: () => void
+  doCollapse: () => void
+  onExpandEvent: () => void
 }
 
 const TextAlignOptions = ({
@@ -18,7 +18,7 @@ const TextAlignOptions = ({
   onChange,
 }: {
   options: string[]
-  onChange: Function
+  onChange: (alignment: string) => void
 }) => {
   return (
     <ul className="rdw-dropdown-optionwrapper">

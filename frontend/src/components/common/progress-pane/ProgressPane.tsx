@@ -40,7 +40,7 @@ const ProgressPane = ({
 }: {
   steps: string[]
   activeStep: number
-  setActiveStep: Function
+  setActiveStep: (step: number) => void
   progress: number
   disabled?: boolean
 }) => {

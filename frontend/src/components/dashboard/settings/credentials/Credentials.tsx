@@ -21,7 +21,7 @@ const Credentials = ({
 }: {
   creds: UserCredential[]
   credType: ChannelType
-  refresh: Function
+  refresh: () => void
   title: string
 }) => {
   const modalContext = useContext(ModalContext)

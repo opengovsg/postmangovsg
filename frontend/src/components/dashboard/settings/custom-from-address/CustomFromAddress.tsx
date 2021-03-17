@@ -18,7 +18,7 @@ const CustomFromAddress = ({
   onSuccess,
 }: {
   customFromAddresses: string[]
-  onSuccess: Function
+  onSuccess: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const { email } = useContext(AuthContext)
