@@ -88,7 +88,10 @@ class Email {
   generateUnsubLink(campaignId: number, recipient: string): URL {
     const version = config.get('unsubscribeHmac.version')
     const hmac = this.calculateHash(campaignId, recipient)
-    const link = new URL(`/unsubscribe/${version}`, config.get('frontendUrl'))
+    const link = new URL(
+      `/unsubscribe/${version}`,
+      config.get('unsubscribeUrl')
+    )
     link.searchParams.append('c', campaignId.toString())
     link.searchParams.append('r', recipient)
     link.searchParams.append('h', hmac)

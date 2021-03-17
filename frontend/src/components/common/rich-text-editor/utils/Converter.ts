@@ -263,7 +263,7 @@ const renderContent = (
   inlineStyles: HTMLTag[][],
   blockEntities: HTMLTag[][]
 ): string => {
-  const characters = text.split('')
+  const characters = text.split('').map((c) => (c === '\n' ? '<br />' : c))
   for (let i = 0; i < characters.length; i++) {
     const styles = inlineStyles[i]
     let tags = ''
