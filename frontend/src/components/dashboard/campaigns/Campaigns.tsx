@@ -196,9 +196,16 @@ const Campaigns = () => {
             onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
               event.stopPropagation()
               sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
-              modalContext.setModalContent(
+              const modal = campaign.demoMessageLimit ? (
+                <CreateDemoModal
+                  duplicateCampaignName={campaign.name}
+                  numDemosSms={numDemosSms}
+                  numDemosTelegram={numDemosTelegram}
+                />
+              ) : (
                 <DuplicateCampaignModal campaign={campaign} />
               )
+              modalContext.setModalContent(modal)
             }}
           >
             <i className={cx('bx bx-duplicate', styles.icon)}></i>{' '}

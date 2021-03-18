@@ -15,9 +15,11 @@ import DemoVideoModal from 'components/dashboard/demo/demo-video-modal'
 const CreateDemoModal = ({
   numDemosSms,
   numDemosTelegram,
+  duplicateCampaignName,
 }: {
   numDemosSms: number
   numDemosTelegram: number
+  duplicateCampaignName?: string
 }) => {
   const { close, setModalTitle, setModalContent } = useContext(ModalContext)
   const history = useHistory()
@@ -53,13 +55,20 @@ const CreateDemoModal = ({
         message = `Demo campaigns are not supported for campaign type ${selectedChannel} `
     }
     setSelectedName(
-      `${selectedChannel} Demo ${
-        (numDemosChannel && 4 - numDemosChannel) || ''
-      }`
+      (duplicateCampaignName && `Copy of ${duplicateCampaignName}`) ||
+        `${selectedChannel} Demo ${
+          (numDemosChannel && 4 - numDemosChannel) || ''
+        }`
     )
     setModalTitle(message)
     setIsCreateEnabled(!!numDemosChannel)
-  }, [numDemosSms, numDemosTelegram, selectedChannel, setModalTitle])
+  }, [
+    duplicateCampaignName,
+    numDemosSms,
+    numDemosTelegram,
+    selectedChannel,
+    setModalTitle,
+  ])
 
   async function createDemo() {
     try {
@@ -85,6 +94,7 @@ const CreateDemoModal = ({
       />
     )
   }
+
   return (
     <>
       <div className={styles.content}>
@@ -162,7 +172,7 @@ const CreateDemoModal = ({
             onClick={createDemo}
             disabled={!isCreateEnabled}
           >
-            Create demo campaign
+            {duplicateCampaignName ? 'Duplicate' : 'Create'} demo campaign
           </PrimaryButton>
         </div>
         <ErrorBlock>{errorMessage}</ErrorBlock>
