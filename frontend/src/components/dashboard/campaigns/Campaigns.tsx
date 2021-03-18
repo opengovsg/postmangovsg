@@ -198,7 +198,10 @@ const Campaigns = () => {
               sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
               const modal = campaign.demoMessageLimit ? (
                 <CreateDemoModal
-                  duplicateCampaignName={campaign.name}
+                  duplicateCampaign={{
+                    name: campaign.name,
+                    type: campaign.type,
+                  }}
                   numDemosSms={numDemosSms}
                   numDemosTelegram={numDemosTelegram}
                 />
