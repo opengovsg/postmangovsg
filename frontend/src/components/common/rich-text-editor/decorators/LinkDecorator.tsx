@@ -1,5 +1,6 @@
 import cx from 'classnames'
 import React, { useContext, useRef, useState } from 'react'
+import ReactDOM from 'react-dom'
 import {
   ContentBlock,
   ContentState,
@@ -37,6 +38,7 @@ const LinkSpan = (props: {
   const { editorState, setEditorState } = useContext(EditorContext)
   const linkRef = useRef<HTMLSpanElement>(null)
   const [showPopover, setShowPopover] = useState(false)
+  const [popoverStyle, setPopoverStyle] = useState({})
   const { blockKey, children, entityKey, contentState, start, end } = props
   const { url, targetOption } = contentState.getEntity(entityKey).getData()
 
@@ -70,10 +72,19 @@ const LinkSpan = (props: {
   function hidePopover() {
     // Do not setState if link is already removed
     if (linkRef.current) setShowPopover(false)
+    setPopoverStyle({})
   }
 
-  function handleClick() {
+  function handleClick(event: React.MouseEvent<HTMLSpanElement, MouseEvent>) {
     if (!showPopover) {
+      const linkElement: HTMLElement = event.currentTarget
+      const dimensions = linkElement.getBoundingClientRect()
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const style = {
+        left: dimensions.left,
+        top: dimensions.top + dimensions.height + scrollTop,
+      }
+      setPopoverStyle(style)
       setShowPopover(true)
       // Set listener only after event has completed bubbling to prevent the current event
       // from closing the popover.
@@ -87,23 +98,26 @@ const LinkSpan = (props: {
 
   return (
     <span ref={linkRef} className={styles.link}>
-      <span className={styles.title} onClick={handleClick}>
+      <span className={styles.title} onClick={(e) => handleClick(e)}>
         {children}
       </span>
-      {showPopover && (
-        <div
-          contentEditable={false}
-          className={cx(styles.popover, {
-            [styles.right]: flipPopover(),
-          })}
-        >
-          <a href={url} onClick={openLink} target={targetOption}>
-            {url} <i className="bx bx-link-external" />
-          </a>
-          <span className={styles.divider}></span>
-          <button onClick={removeLink}>Remove</button>
-        </div>
-      )}
+      {showPopover &&
+        ReactDOM.createPortal(
+          <div
+            contentEditable={false}
+            style={popoverStyle}
+            className={cx('popover', {
+              right: flipPopover(),
+            })}
+          >
+            <a href={url} onClick={openLink} target={targetOption}>
+              {url} <i className="bx bx-link-external" />
+            </a>
+            <span className={styles.divider}></span>
+            <button onClick={removeLink}>Remove</button>
+          </div>,
+          document.body
+        )}
     </span>
   )
 }
