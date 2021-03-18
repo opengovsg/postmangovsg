@@ -3,7 +3,6 @@ import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
 import { RecipientError, RateLimitError } from '@core/errors'
-import { TwilioError } from '@sms/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -45,12 +44,6 @@ async function sendMessage(
         accountSid: credentials.accountSid,
       })
       res.sendStatus(429)
-      return
-    }
-
-    if (err instanceof TwilioError) {
-      const { statusCode, message } = err
-      res.status(statusCode).json({ message })
       return
     }
 

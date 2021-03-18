@@ -1,6 +1,5 @@
 import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
-import { TwilioError } from '@sms/errors'
 import { RateLimitError } from '@core/errors'
 
 export default class TwilioClient {
@@ -55,10 +54,7 @@ export default class TwilioClient {
         throw new RateLimitError()
       }
 
-      throw new TwilioError({
-        statusCode: error.status,
-        message: error.message,
-      })
+      throw error
     }
   }
 
