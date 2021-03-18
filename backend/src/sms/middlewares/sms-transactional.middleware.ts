@@ -41,7 +41,7 @@ async function sendMessage(
       logger.warn({
         message: 'Rate limited request to send transactional SMS',
         userId: req?.session?.user.id,
-        accountSid: credentials.accountSid,
+        label: credentials.label,
       })
       res.sendStatus(429)
       return
