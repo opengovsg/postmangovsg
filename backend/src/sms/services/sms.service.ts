@@ -67,7 +67,7 @@ const sendMessage = (
   credential: TwilioCredentials,
   recipient: string,
   message: string
-): Promise<string | void> => {
+): Promise<string> => {
   const twilioService = new TwilioClient(credential)
   try {
     recipient = PhoneNumberService.normalisePhoneNumber(
@@ -91,7 +91,7 @@ const sendCampaignMessage = async (
   campaignId: number,
   recipient: string,
   credential: TwilioCredentials
-): Promise<string | void> => {
+): Promise<string> => {
   const msg = await getHydratedMessage(campaignId)
   if (!msg) throw new Error('No message to send')
   return sendMessage(credential, recipient, msg?.body)
@@ -105,7 +105,7 @@ const sendCampaignMessage = async (
 const sendValidationMessage = async (
   recipient: string,
   credential: TwilioCredentials
-): Promise<string | void> => {
+): Promise<string> => {
   return sendMessage(
     credential,
     recipient,

@@ -16,7 +16,7 @@ export default class TwilioClient {
     recipient: string,
     message: string,
     forceDelivery = false
-  ): Promise<string | void> {
+  ): Promise<string> {
     try {
       const {
         status,
