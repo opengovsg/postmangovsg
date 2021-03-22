@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react'
+import ReactGA from 'react-ga'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
@@ -15,7 +16,13 @@ interface ContextProps {
 
 export const AuthContext = createContext({} as ContextProps)
 
-const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthContextProvider = ({
+  gaOptions,
+  children,
+}: {
+  gaOptions?: ReactGA.InitializeOptions
+  children: React.ReactNode
+}) => {
   const [isAuthenticated, setAuthenticated] = useState(false)
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')
@@ -27,37 +34,36 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     isLoaded && sendPageView(location.pathname)
   }, [location, isLoaded])
 
-  async function initialChecks() {
-    try {
-      const user = await getUser()
-      setAuthenticated(!!user?.email)
-      setEmail(user?.email || '')
-
-      initializeGA()
-      setUserAnalytics(user)
-    } catch (err) {
-      // is unauthorized
-    }
-    setLoaded(true)
-
-    // Set up axios interceptor to redirect to login if any axios requests are unauthorized
-    axios.interceptors.response.use(
-      function (response) {
-        return response
-      },
-      async function (error) {
-        if (error.response && error.response.status === 401) {
-          await logout()
-          setAuthenticated(false)
-        }
-        return Promise.reject(error)
-      }
-    )
-  }
-
   useEffect(() => {
+    async function initialChecks() {
+      try {
+        const user = await getUser()
+        setAuthenticated(!!user?.email)
+        setEmail(user?.email || '')
+
+        initializeGA(gaOptions)
+        setUserAnalytics(user)
+      } catch (err) {
+        // is unauthorized
+      }
+      setLoaded(true)
+
+      // Set up axios interceptor to redirect to login if any axios requests are unauthorized
+      axios.interceptors.response.use(
+        function (response) {
+          return response
+        },
+        async function (error) {
+          if (error.response && error.response.status === 401) {
+            await logout()
+            setAuthenticated(false)
+          }
+          return Promise.reject(error)
+        }
+      )
+    }
     initialChecks()
-  }, [])
+  }, [gaOptions])
 
   return (
     <AuthContext.Provider

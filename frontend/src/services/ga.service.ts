@@ -19,9 +19,10 @@ export const GA_USER_EVENTS = {
   COMPLETE_DUPLICATE: 'Complete campaign duplication',
 }
 
-export function initializeGA() {
+export function initializeGA(options?: ReactGA.InitializeOptions) {
   ReactGA.initialize(GA_TRACKING_ID, {
     debug: false, // Set to true only on development
+    ...options,
   })
 }
 
