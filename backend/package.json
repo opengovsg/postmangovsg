@@ -33,7 +33,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "express-validator": "^6.4.0",
-    "helmet": "^3.22.0",
+    "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
     "libphonenumber-js": "^1.9.9",
     "lodash": "^4.17.21",
