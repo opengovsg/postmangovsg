@@ -7,6 +7,7 @@ import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
+import Error from 'components/error'
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import SMSCreate from './sms/SMSCreate'
@@ -24,16 +25,27 @@ const Create = () => {
     finishLaterContent,
   } = useContext(FinishLaterModalContext)
   const [isLoading, setLoading] = useState(true)
+  const [isInvalid, setIsInvalid] = useState(false)
 
   useEffect(() => {
-    if (!id) return
+    // Campaign ID is invalid
+    if (!id || !/^[1-9]\d*$/.test(id)) {
+      setIsInvalid(true)
+      return
+    }
+
     async function loadProject(id: string) {
-      const campaign = await getCampaignDetails(+id)
-      setCampaign(campaign)
-      setLoading(false)
+      try {
+        const campaign = await getCampaignDetails(+id)
+        setCampaign(campaign)
+        setLoading(false)
+      } catch (err) {
+        // Campaign is invalid
+        setIsInvalid(true)
+      }
     }
     loadProject(id)
-  }, [id, setCampaign])
+  }, [id, setCampaign, setIsInvalid])
 
   async function handleFinishLater() {
     if (campaign.status === Status.Draft) {
@@ -54,6 +66,10 @@ const Create = () => {
       default:
         return <p>Invalid Channel Type</p>
     }
+  }
+
+  if (isInvalid) {
+    return <Error />
   }
 
   return (
