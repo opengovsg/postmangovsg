@@ -61,7 +61,7 @@ const SMSCredentials = ({
   )
   const [isManual, setIsManual] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   useEffect(() => {
     async function populateStoredCredentials(defaultLabels: string[]) {

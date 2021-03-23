@@ -65,7 +65,7 @@ const EmailRecipients = ({
     csvFilename: initialCsvFilename,
   })
   const [preview, setPreview] = useState({} as EmailPreview)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
 

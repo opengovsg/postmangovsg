@@ -55,7 +55,7 @@ const ProtectedEmailRecipients = ({
   const [selectedFile, setSelectedFile] = useState<File>()
   const [removeEmptyLines, setRemoveEmptyLines] = useState(false)
   const [protectedCsvInfo, setProtectedCsvInfo] = useState<ProtectedCsvInfo>()
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   const [phase, setPhase] = useState<ProtectPhase>(
     computePhase(numRecipients, isProcessing)

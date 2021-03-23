@@ -63,7 +63,7 @@ const TelegramCredentials = ({
   const [errorMessage, setErrorMessage] = useState(null)
   const [sendSuccess, setSendSuccess] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   useEffect(() => {
     async function populateStoredCredentials(defaultLabels: string[]) {

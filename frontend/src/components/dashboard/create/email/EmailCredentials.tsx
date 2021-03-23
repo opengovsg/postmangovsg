@@ -25,7 +25,7 @@ const EmailCredentials = ({
   const { hasCredential: initialHasCredential, protect } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [errorMsg, setErrorMsg] = useState(null)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   async function handleTestSend(recipient: string) {
     setErrorMsg(null)

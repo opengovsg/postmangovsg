@@ -53,7 +53,7 @@ const EmailTemplate = ({
   const [customFromAddresses, setCustomFromAddresses] = useState(
     [] as { label: string; value: string }[]
   )
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   const protectedBodyPlaceholder =
     'Dear {{ recipient }}, \n\n You may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a> . \n\nPlease login with your birthday (DDMMYYYY) followed by the last 4 characters of your NRIC. E.g. 311290123A'

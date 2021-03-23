@@ -36,7 +36,7 @@ const TelegramSend = ({
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   if (!campaignId) {
     throw new Error('Invalid campaign id')
