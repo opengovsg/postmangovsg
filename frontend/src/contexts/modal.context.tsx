@@ -14,8 +14,14 @@ const defaultValue = {
 
 export const ModalContext = createContext(defaultValue)
 
-const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [modalContent, setModalContent] = useState(null)
+const ModalContextProvider = ({
+  initialModalContent = null,
+  children,
+}: {
+  initialModalContent?: React.ReactNode
+  children?: React.ReactNode
+}) => {
+  const [modalContent, setModalContent] = useState(initialModalContent)
   const [modalTitle, setModalTitle] = useState('')
 
   // Important: to pass a function into setBeforeClose, you must anonymize it twice
