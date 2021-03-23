@@ -184,12 +184,23 @@ table {
   border-radius: 5px;
   padding: $spacing-1;
   margin-top: 0.25rem;
-  max-width: 500px;
   word-break: break-all;
+  display: flex;
+  align-items: center;
+
+  a {
+    span {
+      display: inline-block;
+      max-width: 360px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-right: 0.25rem;
+    }
+  }
 
   button {
     display: block;
-    margin-top: 0.5rem;
   }
 
   &.right {
@@ -200,5 +211,6 @@ table {
   .divider {
     border-left: solid 1px $neutral;
     margin: 0 $spacing-1;
+    height: $height-1;
   }
 }

@@ -111,9 +111,10 @@ const LinkSpan = (props: {
             })}
           >
             <a href={url} onClick={openLink} target={targetOption}>
-              {url} <i className="bx bx-link-external" />
+              <span>{url}</span>
+              <i className="bx bx-link-external" />
             </a>
-            <span className={styles.divider}></span>
+            <span className="divider"></span>
             <button onClick={removeLink}>Remove</button>
           </div>,
           document.body
