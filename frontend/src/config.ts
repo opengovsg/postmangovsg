@@ -4,26 +4,28 @@ import { t } from '@lingui/macro'
 
 import { sha256 } from './services/crypto.service'
 
-/**
- * React env vars are used for injecting variables at build time
- * https://create-react-app.dev/docs/adding-custom-environment-variables/#referencing-environment-variables-in-the-html
- */
-const missingEnvVars = [
-  'REACT_APP_TITLE',
-  'REACT_APP_DESCRIPTION',
-  'REACT_APP_BACKEND_URL',
-  'REACT_APP_SENTRY_DSN',
-  'REACT_APP_SENTRY_RELEASE',
-].reduce(function (acc: string[], name: string) {
-  if (process.env[name] === undefined) acc.push(name)
-  return acc
-}, [])
-if (missingEnvVars.length > 0) {
-  throw new Error(`Missing required environment variables: ${missingEnvVars}`)
-}
+if (process.env.NODE_ENV !== 'test') {
+  /**
+   * React env vars are used for injecting variables at build time
+   * https://create-react-app.dev/docs/adding-custom-environment-variables/#referencing-environment-variables-in-the-html
+   */
+  const missingEnvVars = [
+    'REACT_APP_TITLE',
+    'REACT_APP_DESCRIPTION',
+    'REACT_APP_BACKEND_URL',
+    'REACT_APP_SENTRY_DSN',
+    'REACT_APP_SENTRY_RELEASE',
+  ].reduce(function (acc: string[], name: string) {
+    if (process.env[name] === undefined) acc.push(name)
+    return acc
+  }, [])
+  if (missingEnvVars.length > 0) {
+    throw new Error(`Missing required environment variables: ${missingEnvVars}`)
+  }
 
-// axios global defaults
-axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL as string
+  // axios global defaults
+  axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL as string
+}
 axios.defaults.withCredentials = true
 axios.defaults.timeout = 100000 // 100 sec
 //#region Set up translations
