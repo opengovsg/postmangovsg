@@ -24,7 +24,7 @@ const FileInput = ({
         onClick={(e) => ((e.target as HTMLInputElement).value = '')} // reset target value to allow selecting of new files
         onChange={(e) => onFileSelected(e.target.files)}
       />
-      <label htmlFor="recipient-upload-input">
+      <label role="button" htmlFor="recipient-upload-input">
         {isProcessing ? (
           <>
             {label}ing<i className="bx bx-loader-alt bx-spin"></i>
