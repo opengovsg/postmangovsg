@@ -31,7 +31,7 @@
     "@types/validator": "^13.1.0",
     "aws-sdk": "^2.844.0",
     "axios": "^0.21.1",
-    "convict": "^6.0.0",
+    "convict": "^6.0.1",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
