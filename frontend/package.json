@@ -13,7 +13,8 @@
     "get-sentry-release": "sentry-cli releases propose-version",
     "upload-source-map": "node sentry.js",
     "extract": "lingui extract",
-    "compile": "lingui compile"
+    "compile": "lingui compile",
+    "test": "react-scripts test"
   },
   "dependencies": {
     "@lingui/react": "^3.5.1",
