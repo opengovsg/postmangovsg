@@ -210,9 +210,11 @@ const SMSCredentials = ({
         <StepSection separator={false}>
           <StepHeader title="Validate your credentials by doing a test send">
             <p className={styles.validateCredentialsInfo}>
-              To ensure your credentials are working perfectly, please send a
-              test SMS to an available phone number to receive a preview of your
-              message.
+              <label htmlFor="validateSms">
+                To ensure your credentials are working perfectly, please send a
+                test SMS to an available phone number to receive a preview of
+                your message.
+              </label>
             </p>
           </StepHeader>
           <SMSValidationInput

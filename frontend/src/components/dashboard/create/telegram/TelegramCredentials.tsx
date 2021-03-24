@@ -355,10 +355,12 @@ const TelegramCredentials = ({
               <StepSection>
                 <StepHeader title="Optional: Send a test message">
                   <p className={styles.validateCredentialsInfo}>
-                    To ensure everything is working perfectly, please send a
-                    test message to receive a preview of your message. Do note
-                    that the phone number you are testing with must already be{' '}
-                    <b>subscribed to the bot</b>.
+                    <label htmlFor="validateTelegram">
+                      To ensure everything is working perfectly, please send a
+                      test message to receive a preview of your message. Do note
+                      that the phone number you are testing with must already be{' '}
+                      <b>subscribed to the bot</b>.
+                    </label>
                   </p>
                 </StepHeader>
                 <div>

@@ -143,9 +143,14 @@ const EmailTemplate = ({
         </div>
 
         <div>
-          <h4>Subject</h4>
-          <p>Enter subject of the email</p>
+          <h4>
+            <label htmlFor="subject">Subject</label>
+          </h4>
+          <p>
+            <label htmlFor="subject">Enter subject of the email</label>
+          </p>
           <TextArea
+            id="subject"
             highlight={true}
             singleRow={true}
             placeholder="Enter subject"
@@ -196,9 +201,16 @@ const EmailTemplate = ({
         </div>
 
         <div>
-          <h4 className={styles.replyToHeader}>Replies</h4>
-          <p>If left blank, replies will be directed to {userEmail}</p>
+          <h4 className={styles.replyToHeader}>
+            <label htmlFor="replyTo">Replies</label>
+          </h4>
+          <p>
+            <label htmlFor="replyTo">
+              If left blank, replies will be directed to {userEmail}
+            </label>
+          </p>
           <TextInput
+            id="replyTo"
             placeholder="Enter reply-to email address"
             value={replyTo || ''}
             onChange={setReplyTo}
