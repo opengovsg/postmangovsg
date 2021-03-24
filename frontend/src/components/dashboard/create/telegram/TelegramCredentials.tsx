@@ -167,9 +167,12 @@ const TelegramCredentials = ({
           <>
             {storedCredentials.length ? (
               <StepSection>
-                <p className="clickable" onClick={toggleInputMode}>
+                <TextButton
+                  className={styles.credentialInputButton}
+                  onClick={toggleInputMode}
+                >
                   Select from stored credentials
-                </p>
+                </TextButton>
               </StepSection>
             ) : null}
 
@@ -251,12 +254,13 @@ const TelegramCredentials = ({
 
               <ErrorBlock>{errorMessage}</ErrorBlock>
 
-              <p
-                className={cx('clickable', { disabled: isDemo })}
+              <TextButton
+                className={styles.credentialInputButton}
+                disabled={isDemo}
                 onClick={() => !isDemo && setIsManual(true)}
               >
                 Add new credentials
-              </p>
+              </TextButton>
 
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
                 <InfoBlock title="Use demo credentials">
