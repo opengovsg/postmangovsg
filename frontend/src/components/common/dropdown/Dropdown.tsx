@@ -8,11 +8,13 @@ const Dropdown = ({
   onSelect,
   defaultLabel,
   disabled,
+  'aria-label': ariaLabel,
 }: {
   options: { label: string; value: string }[]
   onSelect: (value: string) => any
   defaultLabel?: string
   disabled?: boolean
+  'aria-label'?: string
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -58,6 +60,7 @@ const Dropdown = ({
       })}
       ref={containerRef}
       role="listbox"
+      aria-label={ariaLabel}
     >
       <div
         className={cx(styles.select, { [styles.disabled]: disabled })}

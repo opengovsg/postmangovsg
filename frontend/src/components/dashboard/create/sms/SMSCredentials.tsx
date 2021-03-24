@@ -177,6 +177,7 @@ const SMSCredentials = ({
                 options={storedCredentials}
                 defaultLabel={storedCredentials[0]?.label}
                 disabled={isDemo}
+                aria-label="Twilio credentials"
               ></Dropdown>
               <TextButton
                 className={styles.credentialInputButton}

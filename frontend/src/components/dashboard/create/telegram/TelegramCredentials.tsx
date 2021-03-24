@@ -250,6 +250,7 @@ const TelegramCredentials = ({
                 options={storedCredentials}
                 defaultLabel={storedCredentials[0]?.label}
                 disabled={isDemo}
+                aria-label="Telegram credentials"
               ></Dropdown>
 
               <ErrorBlock>{errorMessage}</ErrorBlock>

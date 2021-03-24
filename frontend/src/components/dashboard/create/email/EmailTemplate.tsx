@@ -139,6 +139,7 @@ const EmailTemplate = ({
             onSelect={setFrom}
             options={customFromAddresses}
             defaultLabel={from || customFromAddresses[0]?.label}
+            aria-label="Custom from"
           ></Dropdown>
         </div>
 
