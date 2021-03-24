@@ -5,20 +5,32 @@ import { i18n } from '@lingui/core'
 import { MemoryRouter } from 'react-router-dom'
 import AuthContextProvider from 'contexts/auth.context'
 
-const AllProviders: React.FC = ({ children }) => (
+const CommonProviders: React.FC = ({ children }) => (
   <I18nProvider i18n={i18n}>
-    <MemoryRouter>
-      <AuthContextProvider gaOptions={{ testMode: true }}>
-        {children}
-      </AuthContextProvider>
-    </MemoryRouter>
+    <AuthContextProvider gaOptions={{ testMode: true }}>
+      {children}
+    </AuthContextProvider>
   </I18nProvider>
 )
 
+interface RouterOptions {
+  initialIndex?: number
+  initialEntries?: string[]
+}
+
 const render = (
   ui: React.ReactElement,
-  options?: Omit<RenderOptions, 'queries'>
-) => _render(ui, { wrapper: AllProviders, ...options })
+  options?: {
+    router?: RouterOptions
+    render?: Omit<RenderOptions, 'queries'>
+  }
+) =>
+  _render(
+    <MemoryRouter {...options?.router}>
+      <CommonProviders>{ui}</CommonProviders>
+    </MemoryRouter>,
+    options?.render
+  )
 
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
