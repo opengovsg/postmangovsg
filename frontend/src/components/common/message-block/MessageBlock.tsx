@@ -20,6 +20,7 @@ const MessageBlock = ({
   children?: React.ReactNode
   absolute?: boolean
   onClose?: Function
+  role?: string
 }) => {
   if (!children) {
     return null
