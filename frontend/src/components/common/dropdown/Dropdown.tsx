@@ -69,6 +69,7 @@ const Dropdown = ({
       <div className={styles.menu}>
         {options.map((o) => (
           <div
+            role="option"
             className={styles.item}
             key={o.value}
             onClick={() => onItemSelected(o)}
