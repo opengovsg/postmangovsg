@@ -57,6 +57,7 @@ const Dropdown = ({
         [styles.open]: isOpen,
       })}
       ref={containerRef}
+      role="listbox"
     >
       <div
         className={cx(styles.select, { [styles.disabled]: disabled })}
