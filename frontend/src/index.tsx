@@ -25,13 +25,13 @@ Sentry.init({
 
 ReactDOM.render(
   <React.StrictMode>
-    <I18nProvider i18n={i18n}>
-      <BrowserRouter>
+    <BrowserRouter>
+      <I18nProvider i18n={i18n}>
         <AuthContextProvider>
           <App />
         </AuthContextProvider>
-      </BrowserRouter>
-    </I18nProvider>
+      </I18nProvider>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 )
