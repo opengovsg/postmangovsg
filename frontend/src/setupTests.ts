@@ -18,8 +18,16 @@ import { Crypto } from '@peculiar/webcrypto'
 // import API mocking utilities from Mock Service Worker
 import { server } from './test-utils'
 
-// Enable API mocking before tests.
-beforeAll(() => server.listen())
+beforeAll(() => {
+  // Enable API mocking before tests.
+  server.listen()
+
+  // Workaround for issue with 'muted' property not being treated as a default attribute
+  // see: https://github.com/testing-library/react-testing-library/issues/470
+  Object.defineProperty(HTMLMediaElement.prototype, 'muted', {
+    set: jest.fn(),
+  })
+})
 
 // Fake timers using Jest
 beforeEach(() => jest.useFakeTimers())
