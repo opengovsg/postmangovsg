@@ -20,7 +20,7 @@ import { server } from './test-utils'
 
 beforeAll(() => {
   // Enable API mocking before tests.
-  server.listen()
+  server.listen({ onUnhandledRequest: 'error' })
 
   // Workaround for issue with 'muted' property not being treated as a default attribute
   // see: https://github.com/testing-library/react-testing-library/issues/470
