@@ -32,26 +32,10 @@ const render = (
     options?.render
   )
 
-import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 
-const server = setupServer(
-  rest.get('/auth/userinfo', (_req, res, ctx) => {
-    return res(ctx.status(200))
-  }),
-  rest.get('/campaigns', (_req, res, ctx) => {
-    return res(ctx.status(200))
-  }),
-  rest.post('/campaigns', (_req, res, ctx) => {
-    return res(ctx.status(201))
-  }),
-  rest.get('/settings', (_req, res, ctx) => {
-    return res(ctx.status(200))
-  }),
-  rest.put('/settings/announcement-version', (_req, res, ctx) => {
-    return res(ctx.status(200))
-  })
-)
+// Set up common endpoints
+const server = setupServer()
 
 export * from '@testing-library/react'
 export { rest } from 'msw'

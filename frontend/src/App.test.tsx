@@ -1,8 +1,20 @@
 import React from 'react'
-import { within, render, screen } from './test-utils'
+import { server, rest, within, render, screen } from './test-utils'
 import App from 'App'
 
 test('renders with no errors', async () => {
+  server.use(
+    // Landing page
+    rest.get('/stats', (_req, res, ctx) => {
+      return res(ctx.status(200), ctx.json({ sent: 0 }))
+    }),
+
+    // Authentication
+    rest.get('/auth/userinfo', (_req, res, ctx) => {
+      return res(ctx.status(200), ctx.json({}))
+    })
+  )
+
   render(<App />, { router: { initialIndex: 0, initialEntries: ['/'] } })
 
   // Wait for app the load and ensure that the necessary elements are present
