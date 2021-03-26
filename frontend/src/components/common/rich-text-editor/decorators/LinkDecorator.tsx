@@ -12,6 +12,8 @@ import { EditorContext } from '../RichTextEditor'
 
 import styles from '../RichTextEditor.module.scss'
 
+const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
+
 const linkStrategy = (
   contentBlock: ContentBlock,
   callback: (start: number, end: number) => void,
@@ -40,6 +42,10 @@ const LinkSpan = (props: {
   const [popoverStyle, setPopoverStyle] = useState({})
   const { blockKey, children, entityKey, contentState, start, end } = props
   const { url, targetOption } = contentState.getEntity(entityKey).getData()
+  const title = contentState
+    .getBlockForKey(blockKey)
+    .getText()
+    .substring(start, end)
 
   function openLink() {
     const linkTab = window.open(url, '_blank')
@@ -89,9 +95,17 @@ const LinkSpan = (props: {
 
   return (
     <span ref={linkRef} className={styles.link}>
-      <span className={styles.title} onClick={(e) => handleClick(e)}>
-        {children}
-      </span>
+      {VARIABLE_REGEX.test(title) ? (
+        <mark>
+          <span className={styles.title} onClick={(e) => handleClick(e)}>
+            {children}
+          </span>
+        </mark>
+      ) : (
+        <span className={styles.title} onClick={(e) => handleClick(e)}>
+          {children}
+        </span>
+      )}
       {showPopover &&
         ReactDOM.createPortal(
           <div contentEditable={false} style={popoverStyle} className="popover">
