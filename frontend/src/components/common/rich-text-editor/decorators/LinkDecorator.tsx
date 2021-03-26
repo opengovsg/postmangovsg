@@ -1,4 +1,3 @@
-import cx from 'classnames'
 import React, { useContext, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import {
@@ -61,14 +60,6 @@ const LinkSpan = (props: {
     setEditorState(updatedState)
   }
 
-  function flipPopover() {
-    if (linkRef.current && linkRef.current.parentElement) {
-      const { offsetLeft, parentElement } = linkRef.current
-      return offsetLeft / parentElement.offsetWidth > 0.7
-    }
-    return false
-  }
-
   function hidePopover() {
     // Do not setState if link is already removed
     if (linkRef.current) setShowPopover(false)
@@ -103,13 +94,7 @@ const LinkSpan = (props: {
       </span>
       {showPopover &&
         ReactDOM.createPortal(
-          <div
-            contentEditable={false}
-            style={popoverStyle}
-            className={cx('popover', {
-              right: flipPopover(),
-            })}
-          >
+          <div contentEditable={false} style={popoverStyle} className="popover">
             <a href={url} onClick={openLink} target={targetOption}>
               <span>{url}</span>
               <i className="bx bx-link-external" />
