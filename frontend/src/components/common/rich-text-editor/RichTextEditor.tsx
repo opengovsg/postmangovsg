@@ -96,7 +96,11 @@ const TOOLBAR_OPTIONS = {
     }) => {
       const { target } = link
       if (VARIABLE_REGEX.test(link.target)) return link
-      if (!target.startsWith('http://') && !target.startsWith('https://')) {
+      if (
+        !target.startsWith('http://') &&
+        !target.startsWith('https://') &&
+        !target.startsWith('mailto:')
+      ) {
         return {
           ...link,
           target: `http://${target}`,
