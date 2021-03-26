@@ -38,6 +38,7 @@ import styles from './RichTextEditor.module.scss'
 
 const ExtendedEditor = (props: any) => <Editor {...props} />
 
+const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
 const TOOLBAR_OPTIONS = {
   options: [
     'inline',
@@ -87,6 +88,23 @@ const TOOLBAR_OPTIONS = {
     defaultTargetOption: '_blank',
     showOpenOptionOnHover: false,
     component: LinkControl,
+    // Return link as-is to allow use of variables in links
+    linkCallback: (link: {
+      title: string
+      target: string
+      targetOption: string
+    }) => {
+      const { target } = link
+      if (VARIABLE_REGEX.test(link.target)) return link
+      if (!target.startsWith('http://') && !target.startsWith('https://')) {
+        return {
+          ...link,
+          target: `http://${target}`,
+        }
+      }
+
+      return link
+    },
   },
 }
 
