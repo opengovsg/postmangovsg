@@ -302,7 +302,7 @@ const tesseractHandler = async (
     res.sendStatus(202)
 
     try {
-      await retry(async () => {
+      await retry(async (bail) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
         const campaign = await Campaign.findByPk(campaignId, {
@@ -333,9 +333,13 @@ const tesseractHandler = async (
             bucket: VAULT_BUCKET_NAME,
           }),
           campaign?.demoMessageLimit ? campaign.demoMessageLimit : undefined
-        ).catch((err) => {
+        ).catch((e) => {
           transaction.rollback()
-          throw err
+          if (e.code !== 'NoSuchKey') {
+            bail(e)
+          } else {
+            throw e
+          }
         })
       }, RETRY_CONFIG)
     } catch (err) {
