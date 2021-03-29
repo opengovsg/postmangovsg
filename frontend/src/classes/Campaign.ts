@@ -13,6 +13,11 @@ export enum Status {
   Halted = 'Halted',
 }
 
+export enum RecipientListType {
+  Csv = 'Csv',
+  Vault = 'Vault',
+}
+
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
   [ChannelType.Email]: 'bx-envelope-open',
@@ -28,6 +33,7 @@ export class Campaign {
   status: Status
   isCsvProcessing: boolean
   statusUpdatedAt: Date
+  recipientListType: RecipientListType
   protect: boolean
   redacted: boolean
   demoMessageLimit: number | null
@@ -45,6 +51,9 @@ export class Campaign {
     this.statusUpdatedAt = input['statusUpdatedAt']
     this.protect = input['protect']
     this.redacted = input['redacted']
+    this.recipientListType = input['is_vault_link']
+      ? RecipientListType.Vault
+      : RecipientListType.Csv
     this.demoMessageLimit = input['demo_message_limit']
   }
 

@@ -74,14 +74,15 @@ const replaceCampaignS3Metadata = (
   campaignId: number,
   key: string,
   filename: string,
-  transaction: Transaction | undefined
+  transaction: Transaction | undefined,
+  bucket?: string
 ): Promise<[number, Campaign[]]> => {
   return Campaign.update(
     {
       s3Object: {
         key,
         filename,
-        bucket: FILE_STORAGE_BUCKET_NAME,
+        bucket: bucket || FILE_STORAGE_BUCKET_NAME,
       },
     },
     {
@@ -152,7 +153,8 @@ const getCsvStatus = async (
     throw new Error('Campaign does not exist')
   }
   // s3Object is nullable
-  const { filename, temp_filename: tempFilename } = campaign.s3Object || {}
+  const { filename, temp_filename: tempFilename, bucket } =
+    campaign.s3Object || {}
   let { error } = campaign.s3Object || {}
 
   let isCsvProcessing = !!tempFilename && !error
@@ -175,6 +177,7 @@ const getCsvStatus = async (
     isCsvProcessing,
     filename,
     tempFilename,
+    bucket,
     error,
   }
 }
@@ -207,15 +210,23 @@ const uploadCompleteOnComplete = ({
   campaignId,
   key,
   filename,
+  bucket,
 }: {
   transaction: Transaction
   campaignId: number
   key: string
   filename: string
+  bucket?: string
 }): ((numRecords: number) => Promise<void>) => {
   return async (numRecords: number): Promise<void> => {
     // Updates metadata in project
-    await replaceCampaignS3Metadata(campaignId, key, filename, transaction)
+    await replaceCampaignS3Metadata(
+      campaignId,
+      key,
+      filename,
+      transaction,
+      bucket
+    )
 
     await StatsService.setNumRecipients(campaignId, numRecords, transaction)
 

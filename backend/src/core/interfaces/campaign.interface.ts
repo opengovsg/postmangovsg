@@ -12,6 +12,7 @@ export interface CsvStatusInterface {
   isCsvProcessing: boolean
   filename?: string
   tempFilename?: string
+  bucket?: string
   error?: string
 }
 
@@ -32,6 +33,7 @@ export interface CampaignDetails {
   valid: boolean
   has_credential: boolean
   csv_filename: string
+  is_vault_link: boolean
   is_csv_processing: boolean
   protect: boolean
   demo_message_limit: number | null

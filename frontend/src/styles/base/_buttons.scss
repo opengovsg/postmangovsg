@@ -79,3 +79,20 @@ $border-radius: $button-height / 2;
 %error-btn {
   @include button($error, $red-300, $red-700);
 }
+
+%tall-btn {
+  height: 4.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 1.5rem;
+}
+
+%tall-outline-btn {
+  @extend %outline-btn;
+  @extend %tall-btn;
+
+  &:hover {
+    background: rgba(181, 196, 255, 0.5);
+  }
+}

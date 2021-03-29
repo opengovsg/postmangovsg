@@ -88,6 +88,21 @@ const duplicateCampaignValidator = {
   }),
 }
 
+const tesseractCampaignValidator = {
+  [Segments.BODY]: Joi.object({
+    url: Joi.string()
+      .trim()
+      .custom((value: string, helpers: any) => {
+        const url = value.match(/^https:\/\/storage(-test)?.vault.gov.sg\/.+$/g)
+        if (url === null) {
+          return helpers.error('string.uri')
+        }
+        return value
+      })
+      .required(),
+  }),
+}
+
 // Routes
 
 // Check if campaign belongs to user for this router
@@ -344,6 +359,10 @@ router.post(
  *                     type: string
  *                   num_recipients:
  *                     type: number
+ *                   bucket:
+ *                     type: string
+ *                   is_vault_link:
+ *                     type: boolean
  *                   preview:
  *                     type: object
  *                     properties:
@@ -824,6 +843,49 @@ router.post(
   '/duplicate',
   celebrate(duplicateCampaignValidator),
   EmailMiddleware.duplicateCampaign
+)
+
+/**
+ * @swagger
+ * path:
+ *   /campaign/{campaignId}/email/tesseract:
+ *     post:
+ *       summary: "Retrieve and process recipient file from vault url"
+ *       tags:
+ *         - Email
+ *       parameters:
+ *         - name: campaignId
+ *           in: path
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - url
+ *               properties:
+ *                 url:
+ *                   type: string
+ *       responses:
+ *         "202" :
+ *           description: Accepted. The uploaded file is being processed.
+ *         "400" :
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "403":
+ *           description: Forbidden as there is a job in progress
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/tesseract',
+  celebrate(tesseractCampaignValidator),
+  CampaignMiddleware.canEditCampaign,
+  CampaignMiddleware.isValidVaultUrl,
+  EmailTemplateMiddleware.tesseractHandler
 )
 
 export default router

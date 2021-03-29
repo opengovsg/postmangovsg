@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from 'express'
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
+import config from '@core/config'
 
 const logger = loggerWithLabel(module)
+const VAULT_DOMAIN = config.get('tesseract').vaultDomain
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
@@ -151,9 +153,39 @@ const isCampaignRedacted = async (
   }
 }
 
+/**
+ * Validate url origin is from Vault and check url expiry
+ */
+const isValidVaultUrl = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Response | void => {
+  try {
+    const { url } = req.body
+    const vaultUrl = new URL(url)
+    const expiry = vaultUrl.searchParams.get('Expires')
+    const datasetName = vaultUrl.searchParams.get('datasetname')
+
+    if (vaultUrl.hostname !== VAULT_DOMAIN || !expiry || !datasetName) {
+      return res.status(400).json({ message: 'This is not a valid Vault url' })
+    }
+
+    const expiryTimestamp = parseInt(expiry) * 1000
+    if (expiryTimestamp < Date.now()) {
+      return res.status(400).json({ message: 'This url has expired' })
+    } else {
+      next()
+    }
+  } catch (err) {
+    return res.status(400).json({ message: 'This is not a valid url' })
+  }
+}
+
 export const CampaignMiddleware = {
   canEditCampaign,
   createCampaign,
   listCampaigns,
   isCampaignRedacted,
+  isValidVaultUrl,
 }
