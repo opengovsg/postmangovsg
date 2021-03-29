@@ -32,6 +32,7 @@ import {
   SMSPreview,
   SMSProgress,
 } from 'classes'
+import { sendTiming } from 'services/ga.service'
 import { CampaignContext } from 'contexts/campaign.context'
 import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
 

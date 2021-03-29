@@ -1,13 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-$modal-width: $tablet;
-
-.content {
-  margin-left: calc(78px - (#{$modal-width} - 528px) / 2);
-  margin-right: calc(78px - (#{$modal-width} - 528px) / 2);
-}
-
 .section {
   margin-bottom: 2rem;
   @include flex-vertical;
@@ -42,15 +35,29 @@ $modal-width: $tablet;
       justify-content: space-between;
       height: 4.5rem;
       border: 1px solid $primary;
+      cursor: default;
+
+      &.active:hover {
+        background: $primary;
+      }
 
       &:not(.active) {
         color: $primary;
-        background: $neutral-light;
+        background: transparent;
 
         &:hover {
-          background: $primary;
-          color: white;
+          background: rgba($primary-light, 0.5);
+          border-width: 1.5px;
+          color: $primary;
+          cursor: pointer;
         }
+      }
+
+      &:not(.active):disabled {
+        background-color: transparent;
+        border: 1px solid $grey-500;
+        color: $grey-500;
+        cursor: not-allowed;
       }
     }
   }
@@ -88,24 +95,19 @@ $modal-width: $tablet;
 .actions {
   @include flex-horizontal;
   justify-content: flex-end;
-  button,
-  a {
-    margin: 0 20px;
-    &:last-child {
-      margin-right: 0px;
-    }
+
+  & > .action:not(:first-child) {
+    margin-left: $spacing-7;
   }
 
   @include mobile() {
     @include flex-vertical;
     align-items: center;
     width: 100%;
-    a {
-      margin-bottom: 1rem;
-    }
-    button:last-child,
-    a:last-child {
-      margin-left: 0px;
+
+    & > .action:not(:first-child) {
+      margin-top: $spacing-1;
+      margin-left: 0;
     }
   }
 }

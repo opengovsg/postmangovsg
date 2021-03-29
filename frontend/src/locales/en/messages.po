@@ -29,7 +29,7 @@ msgstr "Enter OTP"
 msgid "Get OTP"
 msgstr "Get OTP"
 
-#: components/unsubscribe/Unsubscribe.tsx:87
+#: components/unsubscribe/Unsubscribe.tsx:88
 msgid "I'd rather stay"
 msgstr "I'd rather stay"
 
@@ -61,7 +61,7 @@ msgstr "Sign In"
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
 
-#: components/unsubscribe/Unsubscribe.tsx:90
+#: components/unsubscribe/Unsubscribe.tsx:91
 msgid "Unsubscribe me"
 msgstr "Unsubscribe me"
 
@@ -173,6 +173,10 @@ msgstr "https://go.gov.sg/postmangovsgbot"
 #: config.ts:55
 msgid "link.demoVideoUrl"
 msgstr "https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/Demo+Campaign+Mode.mp4"
+
+#: config.ts:56
+msgid "link.featureRequestUrl"
+msgstr "https://go.gov.sg/postman-featurerequest"
 
 #: config.ts:46
 msgid "link.guideDemoUrl"

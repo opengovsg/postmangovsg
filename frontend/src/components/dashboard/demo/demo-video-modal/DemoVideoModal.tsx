@@ -45,11 +45,14 @@ const DemoVideoModal = ({
         .
       </div>
       <div className={styles.options}>
-        <TextButton minButtonWidth onClick={close}>
+        <TextButton className={styles.option} onClick={close}>
           Dismiss
         </TextButton>
         {!!numDemosSms || !!numDemosTelegram ? (
-          <PrimaryButton onClick={showCreateDemoModal}>
+          <PrimaryButton
+            className={styles.option}
+            onClick={showCreateDemoModal}
+          >
             Got it, I&apos;m ready to try
           </PrimaryButton>
         ) : (
