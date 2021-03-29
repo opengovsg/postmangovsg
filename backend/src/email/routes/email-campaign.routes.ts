@@ -91,9 +91,14 @@ const duplicateCampaignValidator = {
 const tesseractCampaignValidator = {
   [Segments.BODY]: Joi.object({
     url: Joi.string()
-      .pattern(/vault.gov.sg/)
-      .uri({ scheme: 'https' })
       .trim()
+      .custom((value: string, helpers: any) => {
+        const url = value.match(/^https:\/\/storage(-test)?.vault.gov.sg\/.+$/g)
+        if (url === null) {
+          return helpers.error('string.uri')
+        }
+        return value
+      })
       .required(),
   }),
 }
