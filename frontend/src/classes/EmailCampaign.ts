@@ -1,13 +1,13 @@
 import { get } from 'lodash'
+import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
-import { i18n } from 'locales'
 import { Campaign, CampaignRecipient } from './Campaign'
 
 const emailErrors = {
-  'Hard bounce': t('errors.email.hardBounce')``,
-  'Soft bounce': t('errors.email.softBounce')``,
-  'Recipient is incorrectly formatted': t('errors.email.invalidFormat')``,
-  abuse: t('errors.email.complaint')``,
+  'Hard bounce': t`errors.email.hardBounce`,
+  'Soft bounce': t`errors.email.softBounce`,
+  'Recipient is incorrectly formatted': t`errors.email.invalidFormat`,
+  abuse: t`errors.email.complaint`,
 }
 
 export enum EmailProgress {
@@ -63,7 +63,7 @@ export class EmailCampaign extends Campaign {
 
 export class EmailCampaignRecipient extends CampaignRecipient {
   formatErrorCode(errorCode: string): string {
-    const blacklistMsg = t('errors.email.blacklist')``
+    const blacklistMsg = t`errors.email.blacklist`
     let formatted = ''
     switch (this.status) {
       case 'SENDING':

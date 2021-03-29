@@ -238,6 +238,12 @@ const getCampaignDetails = async (
       [literal("s3_object -> 'filename'"), 'csv_filename'],
       [
         literal(
+          `s3_object ->> 'bucket' = '${config.get('tesseract.vaultBucket')}'`
+        ),
+        'is_vault_link',
+      ],
+      [
+        literal(
           "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"
         ),
         'is_csv_processing',

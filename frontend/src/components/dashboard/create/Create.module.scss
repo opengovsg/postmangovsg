@@ -151,3 +151,23 @@
 .protectedPreview {
   border-radius: 1.25rem;
 }
+
+.recipientTypeSelector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column-gap: $spacing-3;
+
+  button {
+    @extend %tall-outline-btn;
+    cursor: default;
+
+    &.active {
+      background-color: $primary;
+      color: $white;
+    }
+
+    &:not(.active):hover {
+      cursor: pointer;
+    }
+  }
+}

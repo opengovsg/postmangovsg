@@ -16,7 +16,7 @@ import styles from './DuplicateCampaignModal.module.scss'
 import { duplicateCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   const { close } = useContext(ModalContext)

@@ -2,7 +2,7 @@ import Papa from 'papaparse'
 import { keys, difference, uniq } from 'lodash'
 import { TemplateClient, TemplateError } from 'postman-templating'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { ALLOWED_IMAGE_SOURCES } from 'config'
 
 export interface ProtectedCsvInfo {

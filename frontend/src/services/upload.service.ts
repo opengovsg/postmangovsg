@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import Papa from 'papaparse'
 import SparkMD5 from 'spark-md5'
-import { EmailPreview, SMSPreview } from 'classes'
+import { RecipientListType, EmailPreview, SMSPreview } from 'classes'
 
 const MD5_CHUNK_SIZE = 5000000 // 5MB
 
@@ -17,6 +17,7 @@ export interface CsvStatusResponse {
   csvError?: string
   numRecipients?: number
   preview?: EmailPreview | SMSPreview
+  recipientListType?: RecipientListType
 }
 
 async function getMd5(blob: Blob): Promise<string> {
@@ -139,6 +140,7 @@ export async function getCsvStatus(
       csv_error: csvError,
       num_recipients: numRecipients,
       preview,
+      is_vault_link: isVaultLink,
     } = response.data
     const result = {
       isCsvProcessing,
@@ -146,6 +148,9 @@ export async function getCsvStatus(
       tempCsvFilename,
       csvError,
       numRecipients,
+      recipientListType: isVaultLink
+        ? RecipientListType.Vault
+        : RecipientListType.Csv,
     } as CsvStatusResponse
     if (preview) {
       result.preview = preview
@@ -219,6 +224,17 @@ export async function uploadFileToS3(
     etag,
   })
   return file.name
+}
+
+export async function uploadVaultLink(
+  campaignId: number,
+  url: string
+): Promise<void> {
+  try {
+    await axios.post(`/campaign/${campaignId}/tesseract`, { url })
+  } catch (e) {
+    errorHandler(e, 'Error uploading Vault link. Please try again.')
+  }
 }
 
 export async function deleteCsvStatus(campaignId: number): Promise<void> {

@@ -245,6 +245,7 @@ const pollCsvStatusHandler = async (
       num_recipients: numRecipients,
       preview,
       bucket,
+      is_vault_link: bucket === config.get('tesseract.vaultBucket'),
     })
   } catch (err) {
     next(err)

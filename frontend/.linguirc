@@ -1,6 +1,10 @@
 {
-   "localeDir": "src/locales/",
-   "srcPathDirs": ["src/"],
+   "catalogs": [{
+      "path": "<rootDir>/locales/{locale}/messages",
+      "include": ["<rootDir>"]
+   }],
+   "locales": ["en"],
+   "rootDir": "src",
    "format": "po",
    "sourceLocale": "en"
 }

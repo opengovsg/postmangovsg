@@ -34,7 +34,7 @@ import {
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { TelegramProgress } from 'classes'
 
 const TelegramCredentials = ({
