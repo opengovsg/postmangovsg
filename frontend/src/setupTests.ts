@@ -5,9 +5,13 @@ import { Crypto } from '@peculiar/webcrypto'
 import 'locales' // Locales necessary for I18nProvider
 import { server } from './test-utils'
 
-// Mock SubtleCrypto APIs
-// TODO: Avoid any
-;(global as any).crypto = new Crypto()
+// Mock WebCrypto APIs
+// Redeclare the type of `global` as it does not include the `crypto` prop
+interface Global extends NodeJS.Global {
+  crypto: Crypto
+}
+declare const global: Global
+global.crypto = new Crypto()
 
 beforeAll(() => {
   // Enable API mocking before tests
