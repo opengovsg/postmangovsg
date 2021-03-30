@@ -4,6 +4,7 @@ import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 import { MemoryRouter } from 'react-router-dom'
 import AuthContextProvider from 'contexts/auth.context'
+import { setupServer } from 'msw/node'
 
 const CommonProviders: React.FC = ({ children }) => (
   <I18nProvider i18n={i18n}>
@@ -32,9 +33,7 @@ const render = (
     options?.render
   )
 
-import { setupServer } from 'msw/node'
-
-// Set up common endpoints
+// Set up common API endpoints
 const server = setupServer()
 
 export * from '@testing-library/react'
