@@ -102,7 +102,7 @@ const SMSRecipients = ({
   }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
   // Handle file upload
-  async function uploadFile(files: File[]) {
+  async function uploadFile(files: FileList) {
     setIsUploading(true)
     setErrorMessage(null)
     const uploadTimeStart = performance.now()
