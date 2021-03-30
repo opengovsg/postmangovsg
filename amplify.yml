@@ -26,13 +26,10 @@ frontend:
         - cd frontend
         - npm ci
         - export REACT_APP_SENTRY_RELEASE=$(npm run --silent get-sentry-release)
-    test:
-      commands:
-        - npm run compile
-        - CI=true npm run test
     build:
       commands:
         - npm run build
+        - CI=true npm run test
         - npm run upload-source-map
   artifacts:
     # IMPORTANT - Please verify your build output directory
