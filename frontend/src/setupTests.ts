@@ -1,25 +1,16 @@
-// jest-dom adds custom jest matchers for asserting on DOM nodes.
-// allows you to do things like:
-// expect(element).toHaveTextContent(/react/i)
-// learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom' // Idiomatic DOM matchers for Jest
+import 'jest-canvas-mock' // Mock Canvas API
+import { Crypto } from '@peculiar/webcrypto'
 
-// Mock the Canvas API
-import 'jest-canvas-mock'
-
-// Import locales for I18nProvider
-import 'locales'
+import 'locales' // Locales necessary for I18nProvider
+import { server } from './test-utils'
 
 // Mock SubtleCrypto APIs
-import { Crypto } from '@peculiar/webcrypto'
 // TODO: Avoid any
 ;(global as any).crypto = new Crypto()
 
-// import API mocking utilities from Mock Service Worker
-import { server } from './test-utils'
-
 beforeAll(() => {
-  // Enable API mocking before tests.
+  // Enable API mocking before tests
   server.listen({ onUnhandledRequest: 'error' })
 
   // Workaround for issue with 'muted' property not being treated as a default attribute
@@ -29,17 +20,21 @@ beforeAll(() => {
   })
 })
 
-// Fake timers using Jest
-beforeEach(() => jest.useFakeTimers())
+beforeEach(() => {
+  // Fake timers using Jest
+  jest.useFakeTimers()
+})
 
 afterEach(() => {
-  // Running all pending timers and switching to real timers using Jest
+  // Run all pending timers and switch to real timers using Jest
   jest.runOnlyPendingTimers()
   jest.useRealTimers()
 
-  // Reset any runtime request handlers we may add during the tests.
+  // Reset any runtime request handlers added during tests
   server.resetHandlers()
 })
 
-// Disable API mocking after the tests are done.
-afterAll(() => server.close())
+afterAll(() => {
+  // Disable API mocking after the tests are done
+  server.close()
+})
