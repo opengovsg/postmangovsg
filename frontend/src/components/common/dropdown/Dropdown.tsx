@@ -73,6 +73,7 @@ const Dropdown = ({
         {options.map((o) => (
           <div
             role="option"
+            aria-selected={selectedLabel === o.label}
             className={styles.item}
             key={o.value}
             onClick={() => onItemSelected(o)}
