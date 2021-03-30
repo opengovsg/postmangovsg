@@ -33,12 +33,12 @@ beforeAll(() => {
 beforeEach(() => jest.useFakeTimers())
 
 afterEach(() => {
-  // Reset any runtime request handlers we may add during the tests.
-  server.resetHandlers()
-
   // Running all pending timers and switching to real timers using Jest
   jest.runOnlyPendingTimers()
   jest.useRealTimers()
+
+  // Reset any runtime request handlers we may add during the tests.
+  server.resetHandlers()
 })
 
 // Disable API mocking after the tests are done.
