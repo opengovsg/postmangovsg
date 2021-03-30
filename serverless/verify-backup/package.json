@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@google-cloud/kms": "^2.3.1",
-    "@google-cloud/secret-manager": "^3.2.0",
+    "@google-cloud/secret-manager": "^3.5.0",
     "@google-cloud/storage": "^5.8.0",
     "@sentry/cli": "^1.58.0",
     "@slack/webhook": "^5.0.3",
