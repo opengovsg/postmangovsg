@@ -35,6 +35,36 @@ const COMMON_API_ENDPOINTS = [
       })
     )
   }),
+  rest.get('/campaigns', (_req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        campaigns: [],
+        total_count: 0,
+      })
+    )
+  }),
+  rest.post('/campaigns', (req, res, ctx) => {
+    const { name, protect, type } = req.body as {
+      name?: string
+      protect?: boolean
+      type?: string
+    }
+    if (!name || protect === undefined || !type) {
+      return res(ctx.status(400))
+    }
+    return res(
+      ctx.status(201),
+      ctx.json({
+        created_at: '2021-01-01T00:00:00.000Z',
+        demo_message_limit: null,
+        id: 1,
+        name,
+        protect,
+        type,
+      })
+    )
+  }),
   rest.delete('/campaign/:campaignId/upload/status', (_req, res, ctx) => {
     return res(ctx.status(200))
   }),
@@ -93,29 +123,6 @@ test('creates and sends a new email campaign', async () => {
 
   server.use(
     ...COMMON_API_ENDPOINTS,
-    rest.get('/campaigns', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          campaigns: [
-            {
-              id: 1,
-              name: 'Name of campaign 1',
-              type: 'EMAIL',
-              created_at: '2021-01-01T00:00:00.000Z',
-              valid: false,
-              has_credential: false,
-              halted: false,
-              protect: false,
-              redacted: false,
-              demo_message_limit: null,
-              job_queue: [],
-            },
-          ],
-          total_count: 1,
-        })
-      )
-    }),
     rest.get('/campaign/:campaignId', (req, res, ctx) => {
       const { campaignId } = req.params
       return res(
@@ -245,19 +252,39 @@ test('creates and sends a new email campaign', async () => {
 
   renderDashboard()
 
-  // Wait for dashboard to load and ensure that the necessary elements are present
-  const campaignRow = await screen.findByRole('row', {
-    name: /name of campaign 1 jan 01 2021/i,
+  // Wait for the Dashboard to load
+  const newCampaignButton = await screen.findByRole('button', {
+    name: /create new campaign/i,
   })
-  expect(campaignRow).toBeInTheDocument()
-  expect(
-    screen.getByRole('heading', {
-      name: /1 past campaigns/i,
-    })
-  ).toBeInTheDocument()
 
-  // Click on the first campaign
-  userEvent.click(campaignRow)
+  // Click on the "Create new campaign" button
+  userEvent.click(newCampaignButton)
+
+  // Wait for the CreateModal to load
+  const campaignNameTextbox = await screen.findByRole('textbox', {
+    name: /name your campaign/i,
+  })
+
+  // Fill in the campaign title
+  const CAMPAIGN_NAME = 'Name of campaign 1'
+  userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
+  expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
+
+  // Click on the SMS channel button
+  const smsChannelButton = screen.getByRole('button', {
+    name: /^sms$/i,
+  })
+  userEvent.click(smsChannelButton)
+  expect(smsChannelButton).toHaveClass('active')
+  expect(screen.getByRole('button', { name: /^telegram$/i })).not.toHaveClass(
+    'active'
+  )
+  expect(screen.getByRole('button', { name: /^email$/i })).not.toHaveClass(
+    'active'
+  )
+
+  // Click on the "Create campaign" button
+  userEvent.click(screen.getByRole('button', { name: /create campaign/i }))
 
   // Wait for the message template to load
   expect(
@@ -434,29 +461,6 @@ test('creates and sends a new SMS campaign', async () => {
 
   server.use(
     ...COMMON_API_ENDPOINTS,
-    rest.get('/campaigns', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          campaigns: [
-            {
-              created_at: '2021-01-01T00:00:00.000Z',
-              demo_message_limit: null,
-              halted: false,
-              has_credential: false,
-              id: 1,
-              job_queue: [],
-              name: 'Name of campaign 1',
-              protect: false,
-              redacted: false,
-              type: 'SMS',
-              valid: false,
-            },
-          ],
-          total_count: 1,
-        })
-      )
-    }),
     rest.get('/campaign/:campaignId', (req, res, ctx) => {
       const { campaignId } = req.params
       return res(
@@ -580,19 +584,39 @@ test('creates and sends a new SMS campaign', async () => {
 
   renderDashboard()
 
-  // Wait for dashboard to load and ensure that the necessary elements are present
-  const campaignRow = await screen.findByRole('row', {
-    name: /name of campaign 1 jan 01 2021/i,
+  // Wait for the Dashboard to load
+  const newCampaignButton = await screen.findByRole('button', {
+    name: /create new campaign/i,
   })
-  expect(campaignRow).toBeInTheDocument()
-  expect(
-    screen.getByRole('heading', {
-      name: /1 past campaigns/i,
-    })
-  ).toBeInTheDocument()
 
-  // Click on the first campaign
-  userEvent.click(campaignRow)
+  // Click on the "Create new campaign" button
+  userEvent.click(newCampaignButton)
+
+  // Wait for the CreateModal to load
+  const campaignNameTextbox = await screen.findByRole('textbox', {
+    name: /name your campaign/i,
+  })
+
+  // Fill in the campaign title
+  const CAMPAIGN_NAME = 'Name of campaign 1'
+  userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
+  expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
+
+  // Click on the SMS channel button
+  const smsChannelButton = screen.getByRole('button', {
+    name: /^sms$/i,
+  })
+  userEvent.click(smsChannelButton)
+  expect(smsChannelButton).toHaveClass('active')
+  expect(screen.getByRole('button', { name: /^telegram$/i })).not.toHaveClass(
+    'active'
+  )
+  expect(screen.getByRole('button', { name: /^email$/i })).not.toHaveClass(
+    'active'
+  )
+
+  // Click on the "Create campaign" button
+  userEvent.click(screen.getByRole('button', { name: /create campaign/i }))
 
   // Wait for the message template to load
   expect(
