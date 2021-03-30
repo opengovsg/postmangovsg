@@ -31,7 +31,7 @@ const TelegramTemplate = ({
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
     setErrorMsg(null)

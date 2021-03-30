@@ -62,7 +62,7 @@ const TelegramRecipients = ({
     csvFilename: initialCsvFilename,
   })
   const [preview, setPreview] = useState({} as { body: string })
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()

@@ -14,7 +14,7 @@ import cancelRequestHero from 'assets/img/unsubscribe/cancel-request.png'
 import { unsubscribeRequest } from 'services/unsubscribe.service'
 
 const Unsubscribe = () => {
-  const { version } = useParams()
+  const { version } = useParams<{ version: string }>()
   const [errorMsg, setErrorMsg] = useState('')
   const [isUnsubscribed, setUnsubscribed] = useState(false)
   const [isStaying, setStaying] = useState(false)
