@@ -1,4 +1,3 @@
-import cx from 'classnames'
 import React, { useContext, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import {
@@ -12,6 +11,8 @@ import {
 import { EditorContext } from '../RichTextEditor'
 
 import styles from '../RichTextEditor.module.scss'
+
+const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
 
 const linkStrategy = (
   contentBlock: ContentBlock,
@@ -41,6 +42,10 @@ const LinkSpan = (props: {
   const [popoverStyle, setPopoverStyle] = useState({})
   const { blockKey, children, entityKey, contentState, start, end } = props
   const { url, targetOption } = contentState.getEntity(entityKey).getData()
+  const title = contentState
+    .getBlockForKey(blockKey)
+    .getText()
+    .substring(start, end)
 
   function openLink() {
     const linkTab = window.open(url, '_blank')
@@ -59,14 +64,6 @@ const LinkSpan = (props: {
 
     const updatedState = RichUtils.toggleLink(editorState, selection, null)
     setEditorState(updatedState)
-  }
-
-  function flipPopover() {
-    if (linkRef.current && linkRef.current.parentElement) {
-      const { offsetLeft, parentElement } = linkRef.current
-      return offsetLeft / parentElement.offsetWidth > 0.7
-    }
-    return false
   }
 
   function hidePopover() {
@@ -98,18 +95,20 @@ const LinkSpan = (props: {
 
   return (
     <span ref={linkRef} className={styles.link}>
-      <span className={styles.title} onClick={(e) => handleClick(e)}>
-        {children}
-      </span>
+      {VARIABLE_REGEX.test(title) ? (
+        <mark>
+          <span className={styles.title} onClick={(e) => handleClick(e)}>
+            {children}
+          </span>
+        </mark>
+      ) : (
+        <span className={styles.title} onClick={(e) => handleClick(e)}>
+          {children}
+        </span>
+      )}
       {showPopover &&
         ReactDOM.createPortal(
-          <div
-            contentEditable={false}
-            style={popoverStyle}
-            className={cx('popover', {
-              right: flipPopover(),
-            })}
-          >
+          <div contentEditable={false} style={popoverStyle} className="popover">
             <a href={url} onClick={openLink} target={targetOption}>
               <span>{url}</span>
               <i className="bx bx-link-external" />
