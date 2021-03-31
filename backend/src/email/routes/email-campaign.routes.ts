@@ -95,7 +95,7 @@ router.use(EmailMiddleware.isEmailCampaignOwnedByUser)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email:
  *    get:
  *      tags:
@@ -126,7 +126,7 @@ router.get('/', EmailMiddleware.getCampaignDetails)
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/email/template:
  *     put:
  *       tags:
@@ -216,7 +216,7 @@ router.put(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/email/upload/start:
  *     get:
  *       summary: "Get a presigned URL for upload with Content-MD5 header"
@@ -268,7 +268,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/email/upload/complete:
  *     post:
  *       summary: "Complete upload session with ETag verification"
@@ -315,7 +315,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/email/upload/status:
  *     get:
  *       summary: "Get csv processing status"
@@ -397,7 +397,7 @@ router.delete(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/credentials:
  *    post:
  *      tags:
@@ -436,7 +436,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/preview:
  *    get:
  *      tags:
@@ -475,7 +475,7 @@ router.get('/preview', EmailMiddleware.previewFirstMessage)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/send:
  *    post:
  *      tags:
@@ -523,7 +523,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/stop:
  *    post:
  *      tags:
@@ -548,7 +548,7 @@ router.post('/stop', JobMiddleware.stopCampaign)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/retry:
  *    post:
  *      tags:
@@ -579,7 +579,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/stats:
  *    get:
  *      tags:
@@ -607,7 +607,7 @@ router.get('/stats', EmailStatsMiddleware.getStats)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/refresh-stats:
  *    post:
  *      tags:
@@ -635,7 +635,7 @@ router.post('/refresh-stats', EmailStatsMiddleware.updateAndGetStats)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/export:
  *    get:
  *      tags:
@@ -673,7 +673,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/protect/upload/start:
  *    get:
  *      tags:
@@ -729,7 +729,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/email/protect/upload/complete:
  *     post:
  *       summary: Complete multipart upload
@@ -788,7 +788,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/email/duplicate:
  *    post:
  *      tags:

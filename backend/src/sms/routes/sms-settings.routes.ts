@@ -31,7 +31,7 @@ const verifyCredentialValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/sms/credentials:
  *    post:
  *      summary: Store new twilio credentials for user
@@ -73,7 +73,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/sms/credentials/verify:
  *    post:
  *      summary: Verify stored credential for user
