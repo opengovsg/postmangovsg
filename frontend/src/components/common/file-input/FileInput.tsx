@@ -26,7 +26,7 @@ const FileInput = ({
           if (e.target.files) onFileSelected(e.target.files)
         }}
       />
-      <label htmlFor="recipient-upload-input">
+      <label role="button" htmlFor="recipient-upload-input">
         {isProcessing ? (
           <>
             {label}ing<i className="bx bx-loader-alt bx-spin"></i>

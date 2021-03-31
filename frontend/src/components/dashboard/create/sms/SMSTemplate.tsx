@@ -100,7 +100,9 @@ const SMSTemplate = ({
       <StepSection>
         <StepHeader title="Create message template" subtitle="Step 1" />
         <div>
-          <h4>Message</h4>
+          <h4>
+            <label htmlFor="message">Message</label>
+          </h4>
           <p>
             To personalise your message, include keywords that are surrounded by
             double curly braces. The keywords in your message template should
@@ -118,6 +120,7 @@ const SMSTemplate = ({
           </p>
         </div>
         <TextArea
+          id="message"
           placeholder="Enter message"
           highlight={true}
           value={body}

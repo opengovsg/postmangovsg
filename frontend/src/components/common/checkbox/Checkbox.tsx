@@ -17,6 +17,8 @@ const Checkbox = ({
 }) => {
   return (
     <div
+      role="checkbox"
+      aria-checked={checked}
       className={cx(styles.container, className)}
       onClick={() => onChange((val) => !val)}
     >

@@ -72,6 +72,7 @@ const DemoBar = ({
             <CloseButton
               onClick={toggleMenu}
               className={styles.closeButton}
+              title="Close reminder"
             ></CloseButton>
           </div>
           {demoLink()}

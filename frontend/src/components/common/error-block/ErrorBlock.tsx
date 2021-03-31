@@ -24,6 +24,7 @@ const ErrorBlock = ({
       absolute={absolute}
       onClose={onClose}
       title={title}
+      role="alert"
       {...otherProps}
     >
       {children}

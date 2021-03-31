@@ -10,7 +10,7 @@ const Error = () => {
 
   return (
     <div className={styles.rootContainer}>
-      <img src={heroImg} className={styles.heroImg} alt="Hero image" />
+      <img src={heroImg} className={styles.heroImg} alt="Hero" />
       <h2 className={styles.title}>Page Not Found!</h2>
       <p className={styles.description}>
         The link you followed may be broken, or the page may not exist.

@@ -70,23 +70,6 @@ p {
   font-size: 0.9rem;
 }
 
-.clickable {
-  color: $primary;
-  cursor: pointer;
-  margin-top: 2rem;
-
-  &:hover {
-    text-decoration: underline;
-  }
-
-  &.disabled {
-    color: $grey-500;
-    opacity: 0.7;
-    text-decoration: none;
-    cursor: not-allowed;
-  }
-}
-
 img {
   height: auto;
   max-width: 100%;
