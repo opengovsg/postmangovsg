@@ -14,7 +14,7 @@
     "upload-source-map": "node sentry.js",
     "extract": "lingui extract",
     "compile": "lingui compile",
-    "test": "react-scripts test"
+    "test": "react-scripts test --passWithNoTests"
   },
   "dependencies": {
     "@lingui/react": "^3.5.1",
