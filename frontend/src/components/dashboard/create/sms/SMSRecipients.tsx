@@ -58,7 +58,7 @@ const SMSRecipients = ({
     csvFilename: initialCsvFilename,
   })
   const [preview, setPreview] = useState({} as SMSPreview)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()

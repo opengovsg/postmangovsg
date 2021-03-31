@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react'
 import { Redirect, useHistory } from 'react-router-dom'
 import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
-import Lottie from 'react-lottie'
+import Lottie from 'lottie-react'
 
 import { LINKS, INFO_BANNER } from 'config'
 
@@ -187,13 +187,11 @@ const Landing = () => {
               <img src={landingHeroImg} className={styles.landingHero} alt="" />
             ) : (
               <Lottie
-                options={{
-                  loop: false,
-                  autoplay: true,
-                  animationData: landingAnimation,
-                  rendererSettings: {
-                    preserveAspectRatio: 'xMidYMid slice',
-                  },
+                loop={false}
+                autoplay={true}
+                animationData={landingAnimation}
+                rendererSettings={{
+                  preserveAspectRatio: 'xMidYMid slice',
                 }}
               />
             )}

@@ -18,14 +18,18 @@ import type { Campaign } from 'classes/Campaign'
 const CreateDemoModal = ({
   numDemosSms,
   numDemosTelegram,
+  duplicateCampaign,
 }: {
   numDemosSms: number
   numDemosTelegram: number
+  duplicateCampaign?: { name: string; type: ChannelType }
 }) => {
   const { close, setModalTitle, setModalContent } = useContext(ModalContext)
   const history = useHistory()
   const [errorMessage, setErrorMessage] = useState('')
-  const [selectedChannel, setSelectedChannel] = useState(ChannelType.SMS)
+  const [selectedChannel, setSelectedChannel] = useState(
+    duplicateCampaign?.type || ChannelType.SMS
+  )
   const [selectedName, setSelectedName] = useState('')
   //const [demoCampaignMessage, setDemoCampaignMessage] = useState('')
   const [isCreateEnabled, setIsCreateEnabled] = useState(true)
@@ -34,11 +38,11 @@ const CreateDemoModal = ({
     // Handle case where one of the channels does not have any demos left
     // Set the default selected channel to the channel that still has demos left
     if (numDemosSms) {
-      setSelectedChannel(ChannelType.SMS)
+      setSelectedChannel(duplicateCampaign?.type || ChannelType.SMS)
     } else {
       setSelectedChannel(ChannelType.Telegram)
     }
-  }, [numDemosSms])
+  }, [duplicateCampaign, numDemosSms])
 
   useEffect(() => {
     let numDemosChannel
@@ -56,13 +60,20 @@ const CreateDemoModal = ({
         message = `Demo campaigns are not supported for campaign type ${selectedChannel} `
     }
     setSelectedName(
-      `${selectedChannel} Demo ${
-        (numDemosChannel && 4 - numDemosChannel) || ''
-      }`
+      (duplicateCampaign && `Copy of ${duplicateCampaign.name}`) ||
+        `${selectedChannel} Demo ${
+          (numDemosChannel && 4 - numDemosChannel) || ''
+        }`
     )
     setModalTitle(message)
     setIsCreateEnabled(!!numDemosChannel)
-  }, [numDemosSms, numDemosTelegram, selectedChannel, setModalTitle])
+  }, [
+    duplicateCampaign,
+    numDemosSms,
+    numDemosTelegram,
+    selectedChannel,
+    setModalTitle,
+  ])
 
   async function createDemo() {
     try {
@@ -88,6 +99,7 @@ const CreateDemoModal = ({
       />
     )
   }
+
   return (
     <>
       <div className={styles.content}>
@@ -120,6 +132,9 @@ const CreateDemoModal = ({
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.SMS,
               })}
+              disabled={
+                duplicateCampaign && duplicateCampaign.type !== ChannelType.SMS
+              }
               onClick={
                 selectedChannel === ChannelType.SMS
                   ? undefined
@@ -137,6 +152,10 @@ const CreateDemoModal = ({
               className={cx(styles.button, {
                 [styles.active]: selectedChannel === ChannelType.Telegram,
               })}
+              disabled={
+                duplicateCampaign &&
+                duplicateCampaign.type !== ChannelType.Telegram
+              }
               onClick={
                 selectedChannel === ChannelType.Telegram
                   ? undefined
@@ -165,7 +184,7 @@ const CreateDemoModal = ({
             onClick={createDemo}
             disabled={!isCreateEnabled}
           >
-            Create demo campaign
+            {duplicateCampaign ? 'Duplicate' : 'Create'} demo campaign
           </PrimaryButton>
         </div>
         <ErrorBlock>{errorMessage}</ErrorBlock>
