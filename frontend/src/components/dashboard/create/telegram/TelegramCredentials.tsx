@@ -167,9 +167,12 @@ const TelegramCredentials = ({
           <>
             {storedCredentials.length ? (
               <StepSection>
-                <p className="clickable" onClick={toggleInputMode}>
+                <TextButton
+                  className={styles.credentialInputButton}
+                  onClick={toggleInputMode}
+                >
                   Select from stored credentials
-                </p>
+                </TextButton>
               </StepSection>
             ) : null}
 
@@ -247,16 +250,18 @@ const TelegramCredentials = ({
                 options={storedCredentials}
                 defaultLabel={storedCredentials[0]?.label}
                 disabled={isDemo}
+                aria-label="Telegram credentials"
               ></Dropdown>
 
               <ErrorBlock>{errorMessage}</ErrorBlock>
 
-              <p
-                className={cx('clickable', { disabled: isDemo })}
+              <TextButton
+                className={styles.credentialInputButton}
+                disabled={isDemo}
                 onClick={() => !isDemo && setIsManual(true)}
               >
                 Add new credentials
-              </p>
+              </TextButton>
 
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
                 <InfoBlock title="Use demo credentials">
@@ -351,10 +356,12 @@ const TelegramCredentials = ({
               <StepSection>
                 <StepHeader title="Optional: Send a test message">
                   <p className={styles.validateCredentialsInfo}>
-                    To ensure everything is working perfectly, please send a
-                    test message to receive a preview of your message. Do note
-                    that the phone number you are testing with must already be{' '}
-                    <b>subscribed to the bot</b>.
+                    <label htmlFor="validateTelegram">
+                      To ensure everything is working perfectly, please send a
+                      test message to receive a preview of your message. Do note
+                      that the phone number you are testing with must already be{' '}
+                      <b>subscribed to the bot</b>.
+                    </label>
                   </p>
                 </StepHeader>
                 <div>

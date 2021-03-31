@@ -8,11 +8,13 @@ const Dropdown = ({
   onSelect,
   defaultLabel,
   disabled,
+  'aria-label': ariaLabel,
 }: {
   options: { label: string; value: string }[]
   onSelect: (value: string) => any
   defaultLabel?: string
   disabled?: boolean
+  'aria-label'?: string
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -61,6 +63,8 @@ const Dropdown = ({
       <div
         className={cx(styles.select, { [styles.disabled]: disabled })}
         onClick={() => !disabled && setIsOpen(!isOpen)}
+        role="listbox"
+        aria-label={ariaLabel}
       >
         {selectedLabel}
         <i className={cx(styles.caret, 'bx bx-caret-down')}></i>
@@ -68,6 +72,8 @@ const Dropdown = ({
       <div className={styles.menu}>
         {options.map((o) => (
           <div
+            role="option"
+            aria-selected={selectedLabel === o.label}
             className={styles.item}
             key={o.value}
             onClick={() => onItemSelected(o)}

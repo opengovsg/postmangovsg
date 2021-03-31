@@ -69,11 +69,16 @@ const CreateModal = ({
     <>
       <div className={styles.content}>
         <div className={styles.section}>
-          <h2 className={styles.title}>Name your campaign</h2>
+          <h2 className={styles.title}>
+            <label htmlFor="nameCampaign">Name your campaign</label>
+          </h2>
           <h5 className={styles.subtitle}>
-            Give your campaign a descriptive name
+            <label htmlFor="nameCampaign">
+              Give your campaign a descriptive name
+            </label>
           </h5>
           <TextInput
+            id="nameCampaign"
             className={styles.input}
             type="text"
             value={selectedName}

@@ -52,15 +52,19 @@ const EmailCredentials = ({
           <StepSection>
             <StepHeader title="Send a test email" subtitle="Step 3">
               <p>
-                You can preview your message by sending an email to yourself.{' '}
+                <label htmlFor="validateEmail">
+                  You can preview your message by sending an email to yourself.
+                </label>
               </p>
               {protect && (
                 <p>
-                  You will receive an email from postman.gov.sg showing the
-                  email that the recipient would receive once you click send
-                  campaign. You can click on the unique link and unlock the
-                  password protected page using the corresponding recipient
-                  password in your uploaded csv.
+                  <label htmlFor="validateEmail">
+                    You will receive an email from postman.gov.sg showing the
+                    email that the recipient would receive once you click send
+                    campaign. You can click on the unique link and unlock the
+                    password protected page using the corresponding recipient
+                    password in your uploaded csv.
+                  </label>
                 </p>
               )}
             </StepHeader>
