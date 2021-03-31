@@ -18,7 +18,12 @@
   padding: 0;
 
   &:hover,
-  &:active {
+  &:active,
+  &:focus {
     color: $primary-light;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 }
