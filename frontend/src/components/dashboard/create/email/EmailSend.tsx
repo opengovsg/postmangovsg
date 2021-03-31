@@ -40,7 +40,7 @@ const EmailSend = ({
       from: string
     }
   )
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   if (!campaignId) {
     throw new Error('Invalid campaign id')

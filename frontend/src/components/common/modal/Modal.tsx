@@ -38,6 +38,7 @@ const Modal = ({
             className={cx(styles.close, {
               [styles.modalTitleClose]: !!modalTitle,
             })}
+            title="Close modal"
           />
           <div className={styles.content}>{children}</div>
         </div>

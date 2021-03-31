@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useCallback, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
@@ -19,7 +12,9 @@ import {
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { exceedsCharacterThreshold, saveTemplate } from 'services/sms.service'
-import { SMSProgress } from 'classes'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { SMSProgress } from 'classes'
 
 import styles from '../Create.module.scss'
 
@@ -32,7 +27,7 @@ const SMSTemplate = ({
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(campaign.body))
   const [errorMsg, setErrorMsg] = useState(null)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   useEffect(() => {
     if (exceedsCharacterThreshold(body)) {
@@ -105,7 +100,9 @@ const SMSTemplate = ({
       <StepSection>
         <StepHeader title="Create message template" subtitle="Step 1" />
         <div>
-          <h4>Message</h4>
+          <h4>
+            <label htmlFor="message">Message</label>
+          </h4>
           <p>
             To personalise your message, include keywords that are surrounded by
             double curly braces. The keywords in your message template should
@@ -123,6 +120,7 @@ const SMSTemplate = ({
           </p>
         </div>
         <TextArea
+          id="message"
           placeholder="Enter message"
           highlight={true}
           value={body}

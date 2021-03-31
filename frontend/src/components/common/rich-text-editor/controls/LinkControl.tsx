@@ -4,10 +4,10 @@ import styles from '../RichTextEditor.module.scss'
 interface LinkControlProps {
   currentState: any
   expanded: boolean
-  onChange: Function
-  doExpand: Function
-  doCollapse: Function
-  onExpandEvent: Function
+  onChange: (key: string, ...vals: string[]) => void
+  doExpand: () => void
+  doCollapse: () => void
+  onExpandEvent: () => void
 }
 
 const LinkForm = ({
@@ -15,7 +15,7 @@ const LinkForm = ({
   onSubmit,
 }: {
   initialState: any
-  onSubmit: Function
+  onSubmit: ({ title, url }: { title: string; url: string }) => void
 }) => {
   const { link, selectionText } = initialState
   const [title, setTitle] = useState(link?.title || selectionText)

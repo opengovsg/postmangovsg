@@ -1,5 +1,7 @@
-import axios, { AxiosError } from 'axios'
-import { SMSPreview } from 'classes'
+import axios from 'axios'
+
+import type { AxiosError } from 'axios'
+import type { SMSPreview } from 'classes'
 
 // Twilio states that total character limit for sms is 1600 characters
 // this defines a threshold at which we warn the users on their template length
