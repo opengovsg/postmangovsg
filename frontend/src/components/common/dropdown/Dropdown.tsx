@@ -59,12 +59,12 @@ const Dropdown = ({
         [styles.open]: isOpen,
       })}
       ref={containerRef}
-      role="listbox"
-      aria-label={ariaLabel}
     >
       <div
         className={cx(styles.select, { [styles.disabled]: disabled })}
         onClick={() => !disabled && setIsOpen(!isOpen)}
+        role="listbox"
+        aria-label={ariaLabel}
       >
         {selectedLabel}
         <i className={cx(styles.caret, 'bx bx-caret-down')}></i>
