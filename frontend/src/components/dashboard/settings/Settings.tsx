@@ -5,7 +5,6 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import { ModalContext } from 'contexts/modal.context'
 import { SideNav, TitleBar } from 'components/common'
 import {
-  UserCredential,
   getUserSettings,
   getCustomFromAddresses,
 } from 'services/settings.service'
@@ -20,6 +19,8 @@ import AddCustomFromAddress from './add-custom-from-address-modal'
 
 import CredentialsImage from 'assets/img/credentials.svg'
 import styles from './Settings.module.scss'
+
+import type { UserCredential } from 'services/settings.service'
 
 const SETTINGS_LINKS = [
   {

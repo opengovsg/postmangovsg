@@ -1,5 +1,7 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import Papa from 'papaparse'
+
+import type { AxiosError } from 'axios'
 
 interface PresignedUrlResponse {
   presignedUrl: string

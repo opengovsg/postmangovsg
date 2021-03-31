@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useCallback, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
@@ -19,7 +12,9 @@ import {
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { saveTemplate } from 'services/telegram.service'
-import { TelegramCampaign, TelegramProgress } from 'classes'
+
+import type { TelegramCampaign, TelegramProgress } from 'classes'
+import type { Dispatch, SetStateAction } from 'react'
 
 const TelegramTemplate = ({
   setActiveStep,

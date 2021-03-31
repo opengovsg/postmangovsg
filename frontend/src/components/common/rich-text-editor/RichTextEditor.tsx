@@ -124,7 +124,7 @@ const RichTextEditor = ({
   onChange,
   placeholder,
 }: {
-  onChange: Function
+  onChange: (html: string) => void
   placeholder?: string
 }) => {
   const { editorState, setEditorState } = useContext(EditorContext)

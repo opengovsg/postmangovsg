@@ -4,8 +4,6 @@ import { DetailBlock, ErrorBlock } from 'components/common'
 
 import styles from './CsvUpload.module.scss'
 
-type NullableString = string | null | undefined
-
 const CsvUpload = ({
   isCsvProcessing,
   csvInfo,
@@ -19,7 +17,7 @@ const CsvUpload = ({
     tempCsvFilename?: string
     csvError?: string
   }
-  onErrorClose: Function
+  onErrorClose: () => void
   children: React.ReactNode
 }) => {
   const { numRecipients = 0, csvFilename, tempCsvFilename, csvError } = csvInfo

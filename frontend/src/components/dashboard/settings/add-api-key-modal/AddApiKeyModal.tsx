@@ -2,7 +2,7 @@ import React from 'react'
 import ApiKey from 'components/dashboard/settings/api-key'
 import styles from './AddApiKeyModal.module.scss'
 
-const AddApiKeyModal = ({ onSuccess }: { onSuccess: Function }) => {
+const AddApiKeyModal = ({ onSuccess }: { onSuccess: () => void }) => {
   return (
     <div className={styles.container}>
       <ApiKey hasApiKey={false} onGenerate={onSuccess} />
