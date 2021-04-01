@@ -12,141 +12,93 @@ import Dashboard from './Dashboard'
 
 const TWILIO_CREDENTIAL = 'test-twilio-cred'
 const TELEGRAM_CREDENTIAL = 'test-telegram-cred'
-const USER_CREDENTIALS = [
-  { label: TWILIO_CREDENTIAL, type: 'SMS' },
-  { label: TELEGRAM_CREDENTIAL, type: 'TELEGRAM' },
-]
+const REPLY_TO = 'testEmail@open.gov.sg'
 const USER_EMAIL = 'testEmail@open.gov.sg'
 const MESSAGE_TEXT = 'Test message'
 const CSV_FILENAME = 'test_email_recipients.csv'
 const PRESIGNED_URL =
   'https://s3.ap-southeast-1.amazonaws.com/file-test.postman.gov.sg/test_params'
+const DEFAULT_FROM = 'Postman Test <donotreply@test.postman.gov.sg>'
+const CAMPAIGN_NAME = 'Test campaign name'
 
-const COMMON_API_ENDPOINTS = [
-  rest.get('/auth/userinfo', (_req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({ email: USER_EMAIL, id: 1 }))
-  }),
-  rest.get('/settings', (_req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        creds: USER_CREDENTIALS,
-        demo: {
-          num_demo_sms: 0,
-          num_demos_telegram: 0,
-          is_displayed: false,
-        },
-        has_api_key: true,
-      })
-    )
-  }),
-  rest.get('/campaigns', (_req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        campaigns: [],
-        total_count: 0,
-      })
-    )
-  }),
-  rest.post('/campaigns', (req, res, ctx) => {
-    const { name, protect, type } = req.body as {
-      name?: string
-      protect?: boolean
-      type?: string
-    }
-    if (!name || protect === undefined || !type) {
-      return res(ctx.status(400))
-    }
-    return res(
-      ctx.status(201),
-      ctx.json({
-        created_at: '2021-01-01T00:00:00.000Z',
-        demo_message_limit: null,
-        id: 1,
-        name,
-        protect,
-        type,
-      })
-    )
-  }),
-  rest.delete('/campaign/:campaignId/upload/status', (_req, res, ctx) => {
-    return res(ctx.status(200))
-  }),
-  rest.post('/campaign/:campaignId/send', (req, res, ctx) => {
-    const { campaignId } = req.params
-    return res(
-      ctx.status(200),
-      ctx.json({ campaign_id: campaignId, job_id: [1] })
-    )
-  }),
-  rest.get('/campaign/:campaignId/stats', (_req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        error: 0,
-        sent: 1,
-        unsent: 0,
-        invalid: 0,
-        updated_at: new Date(),
-        status: 'LOGGED',
-        halted: false,
-        status_updated_at: new Date(),
-      })
-    )
-  }),
-  rest.post('/campaign/:campaignId/refresh-stats', (_req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        error: 0,
-        sent: 1,
-        unsent: 0,
-        invalid: 0,
-        updated_at: new Date(),
-        status: 'LOGGED',
-        halted: false,
-        status_updated_at: new Date(),
-      })
-    )
-  }),
-]
+interface Credential {
+  label: string
+  type: string
+}
 
-const renderDashboard = () =>
-  _render(<Dashboard />, {
-    router: { initialIndex: 0, initialEntries: ['/campaigns'] },
-  })
+interface User {
+  api_key: string
+  creds: Credential[]
+  demo: {
+    num_demo_sms: number
+    num_demo_telegram: number
+    is_displayed: boolean
+  }
+  email: string
+  id: number
+}
 
-test('creates and sends a new email campaign', async () => {
-  const SUBJECT_TEXT = 'Test subject'
-  const FROM = 'Postman Test <donotreply@test.postman.gov.sg>'
-  const REPLY_TO = USER_EMAIL
-  const RECIPIENT_EMAIL = 'testEmailRecipient@gmail.com'
-  const CSV_FILE = new File([`recipient\n${RECIPIENT_EMAIL}`], CSV_FILENAME, {
-    type: 'text/csv',
-  })
+interface Template {
+  body: string
+  subject?: string
+  from?: string
+  params: string
+  reply_to?: string
+}
 
-  server.use(
-    ...COMMON_API_ENDPOINTS,
-    rest.get('/campaign/:campaignId', (req, res, ctx) => {
-      const { campaignId } = req.params
+interface Campaign {
+  created_at: Date
+  csv_filename: string | null
+  demo_message_limit: number | null
+  template?: Template
+  has_credential: boolean
+  id: number
+  is_csv_processing: boolean
+  job_queue: any[]
+  name: string
+  num_recipients: number | null
+  protect: boolean
+  redacted: boolean
+  type: string
+  valid: boolean
+}
+
+const mockApis = () => {
+  // Constants
+  const USER_ID = 1
+
+  // In-memory database
+  const users: User[] = [
+    {
+      api_key: 'test-api-key',
+      creds: [
+        { label: TWILIO_CREDENTIAL, type: 'SMS' },
+        { label: TELEGRAM_CREDENTIAL, type: 'TELEGRAM' },
+      ],
+      demo: {
+        num_demo_sms: 0,
+        num_demo_telegram: 0,
+        is_displayed: false,
+      },
+      email: USER_EMAIL,
+      id: 1,
+    },
+  ]
+  const campaigns: Campaign[] = []
+
+  return [
+    rest.get('/auth/userinfo', (_req, res, ctx) => {
+      const { email, id } = users[USER_ID - 1]
+      return res(ctx.status(200), ctx.json({ email, id }))
+    }),
+    rest.get('/settings', (_req, res, ctx) => {
+      const { creds, demo, api_key } = users[USER_ID - 1]
       return res(
         ctx.status(200),
         ctx.json({
-          id: campaignId,
-          name: `Name of campaign ${campaignId}`,
-          type: 'EMAIL',
-          created_at: '2021-01-01T00:00:00.000Z',
-          valid: true,
-          protect: false,
-          demo_message_limit: null,
-          has_credential: false,
-          csv_filename: null,
-          is_csv_processing: false,
-          num_recipients: null,
-          redacted: false,
-          job_queue: [],
-          email_templates: null,
+          creds,
+          demo,
+          has_api_key: !!api_key,
         })
       )
     }),
@@ -154,9 +106,80 @@ test('creates and sends a new email campaign', async () => {
       return res(
         ctx.status(200),
         ctx.json({
-          from: [FROM],
+          from: [DEFAULT_FROM],
         })
       )
+    }),
+    rest.get('/settings/sms/credentials', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json(
+          users[USER_ID - 1].creds
+            .filter((cred) => cred.type === 'SMS')
+            .map((cred) => cred.label)
+        )
+      )
+    }),
+    rest.get('/settings/telegram/credentials', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json(
+          users[USER_ID - 1].creds
+            .filter((cred) => cred.type === 'TELEGRAM')
+            .map((cred) => cred.label)
+        )
+      )
+    }),
+    rest.get('/campaigns', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({
+          campaigns,
+          total_count: campaigns.length,
+        })
+      )
+    }),
+    rest.post('/campaigns', (req, res, ctx) => {
+      const { name, protect, type } = req.body as {
+        name?: string
+        protect?: boolean
+        type?: string
+      }
+      if (!name || protect === undefined || !type) {
+        return res(ctx.status(400))
+      }
+      const campaign = {
+        created_at: new Date(),
+        csv_filename: null,
+        demo_message_limit: null,
+        has_credential: false,
+        id: campaigns.length + 1,
+        is_csv_processing: false,
+        job_queue: [],
+        name,
+        num_recipients: null,
+        protect,
+        redacted: false,
+        type,
+        valid: true,
+      }
+      campaigns.push(campaign)
+      const { created_at, demo_message_limit, id } = campaign
+      return res(
+        ctx.status(201),
+        ctx.json({
+          created_at,
+          demo_message_limit,
+          id,
+          name,
+          protect,
+          type,
+        })
+      )
+    }),
+    rest.get('/campaign/:campaignId', (req, res, ctx) => {
+      const { campaignId } = req.params
+      return res(ctx.status(200), ctx.json(campaigns[campaignId - 1]))
     }),
     rest.put('/campaign/:campaignId/email/template', (req, res, ctx) => {
       const { campaignId } = req.params
@@ -169,18 +192,214 @@ test('creates and sends a new email campaign', async () => {
       if (!body || !from || replyTo === undefined || !subject) {
         return res(ctx.status(400))
       }
+
+      const template = {
+        body,
+        from,
+        params: '',
+        reply_to: replyTo ?? users[USER_ID - 1].email,
+        subject,
+      }
+      campaigns[campaignId - 1].template = template
+
       return res(
         ctx.status(200),
         ctx.json({
           message: `Template for campaign ${campaignId} updated`,
           valid: false,
           num_recipients: 0,
-          template: {
-            body,
-            subject,
-            params: [],
-            reply_to: replyTo ?? REPLY_TO,
-            from,
+          template,
+        })
+      )
+    }),
+    rest.put('/campaign/:campaignId/sms/template', (req, res, ctx) => {
+      const { campaignId } = req.params
+      const { body } = req.body as { body: string }
+      if (!body) {
+        return res(ctx.status(400))
+      }
+
+      const template = {
+        body,
+        params: '',
+      }
+      campaigns[campaignId - 1].template = template
+
+      return res(
+        ctx.status(200),
+        ctx.json({
+          message: `Template for campaign ${campaignId} updated`,
+          num_recipients: 0,
+          template,
+          valid: true,
+        })
+      )
+    }),
+    rest.put('/campaign/:campaignId/telegram/template', (req, res, ctx) => {
+      const { campaignId } = req.params
+      const { body } = req.body as { body: string }
+      if (!body) {
+        return res(ctx.status(400))
+      }
+
+      const template = {
+        body,
+        params: '',
+      }
+      campaigns[campaignId - 1].template = template
+
+      return res(
+        ctx.status(200),
+        ctx.json({
+          message: `Template for campaign ${campaignId} updated`,
+          num_recipients: 0,
+          template,
+          valid: true,
+        })
+      )
+    }),
+    rest.delete('/campaign/:campaignId/upload/status', (_req, res, ctx) => {
+      return res(ctx.status(200))
+    }),
+    rest.post('/campaign/:campaignId/send', (req, res, ctx) => {
+      const { campaignId } = req.params
+      return res(
+        ctx.status(200),
+        ctx.json({ campaign_id: campaignId, job_id: [1] })
+      )
+    }),
+    rest.get('/campaign/:campaignId/upload/start', (req, res, ctx) => {
+      const mimeType = req.url.searchParams.get('mime_type')
+      const md5 = req.url.searchParams.get('md5')
+      if (!mimeType || !md5) {
+        return res(ctx.status(400))
+      }
+      return res(
+        ctx.status(200),
+        ctx.json({
+          presigned_url: PRESIGNED_URL,
+          transaction_id: 'test_transaction_id',
+        })
+      )
+    }),
+    rest.put(PRESIGNED_URL, (_req, res, ctx) => {
+      return res(ctx.status(200), ctx.set('ETag', 'test_etag_value'))
+    }),
+    rest.post('/campaign/:campaignId/upload/complete', (req, res, ctx) => {
+      const { transaction_id: transactionId, filename, etag } = req.body as {
+        transaction_id?: string
+        filename?: string
+        etag?: string
+      }
+      if (!transactionId || !filename || !etag) {
+        return res(ctx.status(400))
+      }
+      return res(ctx.status(202))
+    }),
+    rest.get('/campaign/:campaignId/stats', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({
+          error: 0,
+          sent: 1,
+          unsent: 0,
+          invalid: 0,
+          updated_at: new Date(),
+          status: 'LOGGED',
+          halted: false,
+          status_updated_at: new Date(),
+        })
+      )
+    }),
+    rest.post('/campaign/:campaignId/refresh-stats', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({
+          error: 0,
+          sent: 1,
+          unsent: 0,
+          invalid: 0,
+          updated_at: new Date(),
+          status: 'LOGGED',
+          halted: false,
+          status_updated_at: new Date(),
+        })
+      )
+    }),
+    rest.post('/campaign/:campaignId/email/credentials', (req, res, ctx) => {
+      const { recipient } = req.body as { recipient?: string }
+      if (!recipient) {
+        return res(ctx.status(400))
+      }
+      return res(ctx.status(200))
+    }),
+    rest.post('/campaign/:campaignId/sms/credentials', (req, res, ctx) => {
+      const { recipient, label } = req.body as {
+        recipient?: string
+        label?: string
+      }
+      if (
+        !recipient ||
+        !label ||
+        // Check that the user actually has the credential
+        !users[USER_ID - 1].creds.some(
+          (cred) => cred.label === label && cred.type === 'SMS'
+        )
+      ) {
+        return res(ctx.status(400))
+      }
+      return res(ctx.status(200))
+    }),
+    rest.post('/campaign/:campaignId/telegram/credentials', (req, res, ctx) => {
+      const { label } = req.body as {
+        label?: string
+      }
+      if (
+        !label ||
+        // Check that the user actually has the credential
+        !users[USER_ID - 1].creds.some(
+          (cred) => cred.label === label && cred.type === 'TELEGRAM'
+        )
+      ) {
+        return res(ctx.status(400))
+      }
+      return res(ctx.status(200))
+    }),
+    rest.post(
+      '/campaign/:campaignId/telegram/credentials/verify',
+      (req, res, ctx) => {
+        const { recipient } = req.body as { recipient?: string }
+        if (!recipient) {
+          return res(ctx.status(400))
+        }
+        return res(ctx.status(200))
+      }
+    ),
+    rest.get('/campaign/:campaignId/email/preview', (req, res, ctx) => {
+      const { campaignId } = req.params
+      return res(
+        ctx.status(200),
+        ctx.json({
+          preview: campaigns[campaignId - 1].template,
+        })
+      )
+    }),
+    rest.get('/campaign/:campaignId/sms/preview', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({
+          preview: {
+            body: MESSAGE_TEXT,
+          },
+        })
+      )
+    }),
+    rest.get('/campaign/:campaignId/telegram/preview', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({
+          preview: {
+            body: MESSAGE_TEXT,
           },
         })
       )
@@ -217,7 +436,14 @@ test('creates and sends a new email campaign', async () => {
       }
       return res(ctx.status(202))
     }),
-    rest.get('/campaign/:campaignId/upload/status', (_req, res, ctx) => {
+    rest.get('/campaign/:campaignId/upload/status', (req, res, ctx) => {
+      const { campaignId } = req.params
+      if (!campaigns[campaignId - 1].template) {
+        return res(ctx.status(400))
+      }
+      const { body, subject, reply_to: replyTo, from } = campaigns[
+        campaignId - 1
+      ].template as Template
       return res(
         ctx.status(200),
         ctx.json({
@@ -225,35 +451,30 @@ test('creates and sends a new email campaign', async () => {
           csv_filename: CSV_FILENAME,
           num_recipients: 1,
           preview: {
-            body: MESSAGE_TEXT,
-            subject: SUBJECT_TEXT,
-            replyTo: REPLY_TO,
-            from: FROM,
+            body,
+            subject,
+            replyTo,
+            from,
           },
         })
       )
     }),
-    rest.post('/campaign/:campaignId/email/credentials', (req, res, ctx) => {
-      const { recipient } = req.body as { recipient?: string }
-      if (!recipient) {
-        return res(ctx.status(400))
-      }
-      return res(ctx.status(200))
-    }),
-    rest.get('/campaign/:campaignId/email/preview', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          preview: {
-            body: MESSAGE_TEXT,
-            subject: SUBJECT_TEXT,
-            reply_to: REPLY_TO,
-            from: FROM,
-          },
-        })
-      )
-    })
-  )
+  ]
+}
+
+const renderDashboard = () =>
+  _render(<Dashboard />, {
+    router: { initialIndex: 0, initialEntries: ['/campaigns'] },
+  })
+
+test('creates and sends a new email campaign', async () => {
+  const SUBJECT_TEXT = 'Test subject'
+  const RECIPIENT_EMAIL = 'testEmailRecipient@gmail.com'
+  const CSV_FILE = new File([`recipient\n${RECIPIENT_EMAIL}`], CSV_FILENAME, {
+    type: 'text/csv',
+  })
+
+  server.use(...mockApis())
 
   renderDashboard()
 
@@ -271,7 +492,6 @@ test('creates and sends a new email campaign', async () => {
   })
 
   // Fill in the campaign title
-  const CAMPAIGN_NAME = 'Name of campaign 1'
   userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
@@ -293,7 +513,7 @@ test('creates and sends a new email campaign', async () => {
 
   // Wait for the message template to load
   expect(
-    await screen.findByRole('heading', { name: /name of campaign 1/i })
+    await screen.findByRole('heading', { name: CAMPAIGN_NAME })
   ).toBeInTheDocument()
 
   // Select the default from address
@@ -303,10 +523,10 @@ test('creates and sends a new email campaign', async () => {
   userEvent.click(customFromDropdown)
   userEvent.click(
     await screen.findByRole('option', {
-      name: FROM,
+      name: DEFAULT_FROM,
     })
   )
-  expect(customFromDropdown).toHaveTextContent(FROM)
+  expect(customFromDropdown).toHaveTextContent(DEFAULT_FROM)
 
   // Type in email subject
   const subjectTextbox = screen.getByRole('textbox', {
@@ -354,7 +574,7 @@ test('creates and sends a new email campaign', async () => {
   expect(await screen.findByText(/message preview/i)).toBeInTheDocument()
   expect(screen.getByText(/1 recipient/i)).toBeInTheDocument()
   expect(screen.getByText(CSV_FILENAME)).toBeInTheDocument()
-  expect(screen.getByText(FROM)).toBeInTheDocument()
+  expect(screen.getByText(DEFAULT_FROM)).toBeInTheDocument()
   expect(screen.getByText(SUBJECT_TEXT)).toBeInTheDocument()
   expect(screen.getByText(MESSAGE_TEXT)).toBeInTheDocument()
   expect(screen.getAllByText(REPLY_TO)).toHaveLength(2)
@@ -402,7 +622,7 @@ test('creates and sends a new email campaign', async () => {
   )
 
   // Wait for the page to load and ensure the necessary elements are shown
-  expect(await screen.findByText(FROM)).toBeInTheDocument()
+  expect(await screen.findByText(DEFAULT_FROM)).toBeInTheDocument()
   expect(screen.getByText(SUBJECT_TEXT)).toBeInTheDocument()
   expect(screen.getByText(MESSAGE_TEXT)).toBeInTheDocument()
   expect(screen.getAllByText(REPLY_TO)).toHaveLength(2)
@@ -464,130 +684,7 @@ test('creates and sends a new SMS campaign', async () => {
     type: 'text/csv',
   })
 
-  server.use(
-    ...COMMON_API_ENDPOINTS,
-    rest.get('/campaign/:campaignId', (req, res, ctx) => {
-      const { campaignId } = req.params
-      return res(
-        ctx.status(200),
-        ctx.json({
-          created_at: '2021-01-01T00:00:00.000Z',
-          csv_filename: null,
-          demo_message_limit: null,
-          has_credential: false,
-          id: campaignId,
-          is_csv_processing: false,
-          job_queue: [],
-          name: `Name of campaign ${campaignId}`,
-          num_recipients: null,
-          protect: false,
-          redacted: false,
-          sms_templates: null, // diff
-          type: 'SMS', // diff
-          valid: true,
-        })
-      )
-    }),
-    rest.put('/campaign/:campaignId/sms/template', (req, res, ctx) => {
-      const { campaignId } = req.params
-      const { body } = req.body as { body: string }
-      if (!body) {
-        return res(ctx.status(400))
-      }
-      return res(
-        ctx.status(200),
-        ctx.json({
-          message: `Template for campaign ${campaignId} updated`,
-          num_recipients: 0,
-          template: {
-            body,
-            params: [],
-          },
-          valid: true,
-        })
-      )
-    }),
-    rest.get('/campaign/:campaignId/upload/start', (req, res, ctx) => {
-      const mimeType = req.url.searchParams.get('mime_type')
-      const md5 = req.url.searchParams.get('md5')
-      if (!mimeType || !md5) {
-        return res(ctx.status(400))
-      }
-      return res(
-        ctx.status(200),
-        ctx.json({
-          presigned_url: PRESIGNED_URL,
-          transaction_id: 'test_transaction_id',
-        })
-      )
-    }),
-    rest.put(PRESIGNED_URL, (_req, res, ctx) => {
-      return res(ctx.status(200), ctx.set('ETag', 'test_etag_value'))
-    }),
-    rest.post('/campaign/:campaignId/upload/complete', (req, res, ctx) => {
-      const { transaction_id: transactionId, filename, etag } = req.body as {
-        transaction_id?: string
-        filename?: string
-        etag?: string
-      }
-      if (!transactionId || !filename || !etag) {
-        return res(ctx.status(400))
-      }
-      return res(ctx.status(202))
-    }),
-
-    rest.get('/campaign/:campaignId/upload/status', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          csv_filename: CSV_FILENAME,
-          is_csv_processing: false,
-          num_recipients: 1,
-          preview: {
-            body: MESSAGE_TEXT,
-          },
-        })
-      )
-    }),
-    rest.get('/settings/sms/credentials', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json(
-          USER_CREDENTIALS.filter((cred) => cred.type === 'SMS').map(
-            (cred) => cred.label
-          )
-        )
-      )
-    }),
-    rest.post('/campaign/:campaignId/sms/credentials', (req, res, ctx) => {
-      const { recipient, label } = req.body as {
-        recipient?: string
-        label?: string
-      }
-      if (
-        !recipient ||
-        !label ||
-        // Check that the user actually has the credential
-        !USER_CREDENTIALS.some(
-          (cred) => cred.label === label && cred.type === 'SMS'
-        )
-      ) {
-        return res(ctx.status(400))
-      }
-      return res(ctx.status(200))
-    }),
-
-    rest.get('/campaign/:campaignId/sms/preview', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          preview: {
-            body: MESSAGE_TEXT,
-          },
-        })
-      )
-    })
-  )
+  server.use(...mockApis())
 
   renderDashboard()
 
@@ -605,7 +702,6 @@ test('creates and sends a new SMS campaign', async () => {
   })
 
   // Fill in the campaign title
-  const CAMPAIGN_NAME = 'Name of campaign 1'
   userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
@@ -627,7 +723,7 @@ test('creates and sends a new SMS campaign', async () => {
 
   // Wait for the message template to load
   expect(
-    await screen.findByRole('heading', { name: /name of campaign 1/i })
+    await screen.findByRole('heading', { name: CAMPAIGN_NAME })
   ).toBeInTheDocument()
 
   // Type in SMS message
@@ -785,137 +881,7 @@ test('creates and sends a new Telegram campaign', async () => {
     type: 'text/csv',
   })
 
-  server.use(
-    ...COMMON_API_ENDPOINTS,
-    rest.get('/campaign/:campaignId', (req, res, ctx) => {
-      const { campaignId } = req.params
-      return res(
-        ctx.status(200),
-        ctx.json({
-          created_at: '2021-01-01T00:00:00.000Z',
-          csv_filename: null,
-          demo_message_limit: null,
-          has_credential: false,
-          id: campaignId,
-          is_csv_processing: false,
-          job_queue: [],
-          name: `Name of campaign ${campaignId}`,
-          num_recipients: null,
-          protect: false,
-          redacted: false,
-          sms_templates: null,
-          type: 'TELEGRAM',
-          valid: true,
-        })
-      )
-    }),
-    rest.put('/campaign/:campaignId/telegram/template', (req, res, ctx) => {
-      const { campaignId } = req.params
-      const { body } = req.body as { body: string }
-      if (!body) {
-        return res(ctx.status(400))
-      }
-      return res(
-        ctx.status(200),
-        ctx.json({
-          message: `Template for campaign ${campaignId} updated`,
-          num_recipients: 0,
-          template: {
-            body,
-            params: [],
-          },
-          valid: true,
-        })
-      )
-    }),
-    rest.get('/campaign/:campaignId/upload/start', (req, res, ctx) => {
-      const mimeType = req.url.searchParams.get('mime_type')
-      const md5 = req.url.searchParams.get('md5')
-      if (!mimeType || !md5) {
-        return res(ctx.status(400))
-      }
-      return res(
-        ctx.status(200),
-        ctx.json({
-          presigned_url: PRESIGNED_URL,
-          transaction_id: 'test_transaction_id',
-        })
-      )
-    }),
-    rest.put(PRESIGNED_URL, (_req, res, ctx) => {
-      return res(ctx.status(200), ctx.set('ETag', 'test_etag_value'))
-    }),
-    rest.post('/campaign/:campaignId/upload/complete', (req, res, ctx) => {
-      const { transaction_id: transactionId, filename, etag } = req.body as {
-        transaction_id?: string
-        filename?: string
-        etag?: string
-      }
-      if (!transactionId || !filename || !etag) {
-        return res(ctx.status(400))
-      }
-      return res(ctx.status(202))
-    }),
-
-    rest.get('/campaign/:campaignId/upload/status', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          csv_filename: CSV_FILENAME,
-          is_csv_processing: false,
-          num_recipients: 1,
-          preview: {
-            body: MESSAGE_TEXT,
-          },
-        })
-      )
-    }),
-    rest.get('/settings/telegram/credentials', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json(
-          USER_CREDENTIALS.filter((cred) => cred.type === 'TELEGRAM').map(
-            (cred) => cred.label
-          )
-        )
-      )
-    }),
-    rest.post('/campaign/:campaignId/telegram/credentials', (req, res, ctx) => {
-      const { label } = req.body as {
-        label?: string
-      }
-      if (
-        !label ||
-        // Check that the user actually has the credential
-        !USER_CREDENTIALS.some(
-          (cred) => cred.label === label && cred.type === 'TELEGRAM'
-        )
-      ) {
-        return res(ctx.status(400))
-      }
-      return res(ctx.status(200))
-    }),
-    rest.post(
-      '/campaign/:campaignId/telegram/credentials/verify',
-      (req, res, ctx) => {
-        const { recipient } = req.body as { recipient?: string }
-        if (!recipient) {
-          return res(ctx.status(400))
-        }
-        return res(ctx.status(200))
-      }
-    ),
-    rest.get('/campaign/:campaignId/telegram/preview', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          preview: {
-            body: MESSAGE_TEXT,
-          },
-        })
-      )
-    })
-  )
+  server.use(...mockApis())
 
   renderDashboard()
 
@@ -933,7 +899,6 @@ test('creates and sends a new Telegram campaign', async () => {
   })
 
   // Fill in the campaign title
-  const CAMPAIGN_NAME = 'Name of campaign 1'
   userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
@@ -955,7 +920,7 @@ test('creates and sends a new Telegram campaign', async () => {
 
   // Wait for the message template to load
   expect(
-    await screen.findByRole('heading', { name: /name of campaign 1/i })
+    await screen.findByRole('heading', { name: CAMPAIGN_NAME })
   ).toBeInTheDocument()
 
   // Type in Telegram message
