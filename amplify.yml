@@ -24,7 +24,7 @@ frontend:
           export REACT_APP_SENTRY_ENVIRONMENT="staging";
           fi
         - cd frontend
-        - npm ci --cache .npm
+        - npm ci --cache .npm --prefer-offline
         - export REACT_APP_SENTRY_RELEASE=$(npm run --silent get-sentry-release)
     build:
       commands:
