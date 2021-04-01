@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import { useHistory } from 'react-router-dom'

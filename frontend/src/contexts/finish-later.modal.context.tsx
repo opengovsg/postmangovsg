@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext } from 'react'
+import { createContext, useState, useContext } from 'react'
+import * as React from 'react'
 import { ModalContext } from 'contexts/modal.context'
 
 import type { Dispatch, SetStateAction } from 'react'

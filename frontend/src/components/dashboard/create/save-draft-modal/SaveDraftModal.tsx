@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
 import { ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'

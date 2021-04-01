@@ -1,4 +1,3 @@
-import React from 'react'
 import Dashboard from '../Dashboard'
 import { mockCommonApis, render } from 'test-utils'
 

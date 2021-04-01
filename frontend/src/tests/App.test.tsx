@@ -1,4 +1,3 @@
-import React from 'react'
 import { mockCommonApis, server, within, render, screen } from 'test-utils'
 import App from '../App'
 

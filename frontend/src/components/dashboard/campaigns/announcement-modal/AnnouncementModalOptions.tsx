@@ -1,4 +1,3 @@
-import React from 'react'
 import { TextButton, PrimaryButton } from 'components/common'
 import { OutboundLink } from 'react-ga'
 import cx from 'classnames'

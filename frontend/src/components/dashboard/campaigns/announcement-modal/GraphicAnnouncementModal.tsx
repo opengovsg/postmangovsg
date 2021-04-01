@@ -1,5 +1,3 @@
-import React from 'react'
-
 import styles from './GraphicAnnouncementModal.module.scss'
 import AnnouncementModalOptions from './AnnouncementModalOptions'
 import { AnnouncementModalProps } from './AnnouncementModal'

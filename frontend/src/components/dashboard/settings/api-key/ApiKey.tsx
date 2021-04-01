@@ -1,4 +1,5 @@
-import React, { useState, useRef, useContext, useEffect } from 'react'
+import { useState, useRef, useContext, useEffect } from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 
 import {

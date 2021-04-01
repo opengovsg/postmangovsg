@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react'
+import { useEffect, useState, useContext, useCallback } from 'react'
+import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'

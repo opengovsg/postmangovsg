@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
 import { TelegramProgress, Status, TelegramCampaign } from 'classes'

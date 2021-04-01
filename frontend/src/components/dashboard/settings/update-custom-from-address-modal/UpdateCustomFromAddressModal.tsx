@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import isEmail from 'validator/lib/isEmail'
 import {
   PrimaryButton,

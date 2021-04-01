@@ -1,5 +1,4 @@
 import userEvent from '@testing-library/user-event'
-import React from 'react'
 import { Route } from 'react-router'
 import { screen, mockCommonApis, render, server } from 'test-utils'
 import Protected from '../Protected'

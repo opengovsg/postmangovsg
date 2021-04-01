@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 import querystring from 'querystring'
 import { Trans } from '@lingui/macro'

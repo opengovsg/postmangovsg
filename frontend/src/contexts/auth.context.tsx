@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react'
+import { createContext, useState, useEffect } from 'react'
+import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'

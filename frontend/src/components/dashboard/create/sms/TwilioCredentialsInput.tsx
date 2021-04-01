@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import { LINKS } from 'config'
 import { TextInput, LabelWithExternalLink } from 'components/common'

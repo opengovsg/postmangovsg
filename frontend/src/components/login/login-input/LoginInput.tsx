@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import cx from 'classnames'
 import { noop } from 'lodash'
 import { TextInputWithButton, TextButton } from 'components/common'

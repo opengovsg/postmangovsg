@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { updateAnnouncementVersion } from 'services/settings.service'
 
 import { ModalContext } from 'contexts/modal.context'

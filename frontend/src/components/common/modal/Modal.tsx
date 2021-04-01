@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React from 'react'
+import * as React from 'react'
 
 import { CloseButton } from 'components/common'
 import styles from './Modal.module.scss'

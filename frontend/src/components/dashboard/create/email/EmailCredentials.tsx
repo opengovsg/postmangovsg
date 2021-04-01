@@ -1,4 +1,4 @@
-import React, { useContext, useState, Dispatch, SetStateAction } from 'react'
+import { useContext, useState, Dispatch, SetStateAction } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendPreviewMessage } from 'services/email.service'

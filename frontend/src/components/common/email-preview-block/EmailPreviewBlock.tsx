@@ -1,5 +1,4 @@
 import cx from 'classnames'
-import React from 'react'
 import type { FC } from 'react'
 
 import RichTextEditor from '../rich-text-editor'

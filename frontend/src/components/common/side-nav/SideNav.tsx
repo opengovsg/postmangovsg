@@ -1,4 +1,3 @@
-import React from 'react'
 import { useHistory, NavLink } from 'react-router-dom'
 import cx from 'classnames'
 import styles from './SideNav.module.scss'

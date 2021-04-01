@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import { ContentBlock, ContentState, DraftDecorator } from 'draft-js'
 
 const HIGHLIGHT_REGEX = /{{\s*?\w+\s*?}}/g

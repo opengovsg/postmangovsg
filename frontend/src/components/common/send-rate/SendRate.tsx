@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 import { LINKS } from 'config'

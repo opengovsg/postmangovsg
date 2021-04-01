@@ -1,4 +1,5 @@
-import React, { createContext, useState, useCallback } from 'react'
+import { createContext, useState, useCallback } from 'react'
+import * as React from 'react'
 import { cloneDeep } from 'lodash'
 import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
 

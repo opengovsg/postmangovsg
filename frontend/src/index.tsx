@@ -2,7 +2,7 @@
 import 'react-app-polyfill/stable'
 import 'locales'
 
-import React from 'react'
+import { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
@@ -24,7 +24,7 @@ Sentry.init({
 })
 
 ReactDOM.render(
-  <React.StrictMode>
+  <StrictMode>
     <BrowserRouter>
       <I18nProvider i18n={i18n}>
         <AuthContextProvider>
@@ -32,6 +32,6 @@ ReactDOM.render(
         </AuthContextProvider>
       </I18nProvider>
     </BrowserRouter>
-  </React.StrictMode>,
+  </StrictMode>,
   document.getElementById('root')
 )

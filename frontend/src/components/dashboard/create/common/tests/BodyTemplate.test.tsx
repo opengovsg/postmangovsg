@@ -1,4 +1,3 @@
-import React from 'react'
 import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
 import BodyTemplate from '../BodyTemplate'
 import CampaignContextProvider from 'contexts/campaign.context'

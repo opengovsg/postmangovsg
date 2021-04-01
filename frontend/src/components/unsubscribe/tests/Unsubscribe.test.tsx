@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, mockCommonApis, server, screen } from 'test-utils'
 import Unsubscribe from '../Unsubscribe'
 import userEvent from '@testing-library/user-event'

@@ -1,5 +1,6 @@
 import cx from 'classnames'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import * as React from 'react'
 import Immutable from 'immutable'
 import {
   EditorState,

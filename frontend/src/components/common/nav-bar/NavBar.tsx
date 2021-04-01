@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import cx from 'classnames'
 import { OutboundLink } from 'react-ga'

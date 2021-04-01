@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import styles from './DemoBar.module.scss'
 import cx from 'classnames'
 import { CloseButton, TextButton } from 'components/common'

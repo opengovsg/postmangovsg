@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import cx from 'classnames'
 import styles from './CreateDemoModal.module.scss'
 import { channelIcons, ChannelType } from 'classes/Campaign'

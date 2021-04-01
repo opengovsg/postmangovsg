@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import styles from './CompletedDemoModal.module.scss'
 import CongratsImage from 'assets/img/demo/congrats.png'
 import EndDemoImage from 'assets/img/demo/end-demo.png'

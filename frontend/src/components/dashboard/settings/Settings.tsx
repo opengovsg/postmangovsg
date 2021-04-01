@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import cx from 'classnames'
 import { Redirect, Route, Switch } from 'react-router-dom'
 

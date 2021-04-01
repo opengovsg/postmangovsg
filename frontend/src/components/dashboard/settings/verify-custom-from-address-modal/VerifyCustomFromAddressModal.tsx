@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { PrimaryButton, ErrorBlock } from 'components/common'
 import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
 import { ModalContext } from 'contexts/modal.context'

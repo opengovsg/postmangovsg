@@ -1,4 +1,3 @@
-import React from 'react'
 import { without, times, constant } from 'lodash'
 import download from 'downloadjs'
 

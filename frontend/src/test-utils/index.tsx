@@ -1,4 +1,4 @@
-import React from 'react'
+import type { ReactElement } from 'react'
 import { render as _render, RenderOptions } from '@testing-library/react'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
@@ -15,7 +15,7 @@ interface RouterOptions {
 // Wraps the component to be rendered with context providers
 // that are required globally
 const render = (
-  ui: React.ReactElement,
+  ui: ReactElement,
   options?: {
     router?: RouterOptions
     render?: Omit<RenderOptions, 'queries'>

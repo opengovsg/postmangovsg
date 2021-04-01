@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import cx from 'classnames'

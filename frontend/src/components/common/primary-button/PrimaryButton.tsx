@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 
 import useIsMounted from 'components/custom-hooks/use-is-mounted'

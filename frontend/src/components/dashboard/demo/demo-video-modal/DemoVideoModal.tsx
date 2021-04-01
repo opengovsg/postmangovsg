@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { ModalContext } from 'contexts/modal.context'
 import styles from './DemoVideoModal.module.scss'
 import { PrimaryButton, TextButton } from 'components/common'

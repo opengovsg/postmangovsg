@@ -1,4 +1,3 @@
-import React from 'react'
 import CustomFromAddress from 'components/dashboard/settings/custom-from-address'
 import styles from './AddCustomFromAddressModal.module.scss'
 

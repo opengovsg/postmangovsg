@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import Moment from 'react-moment'
 import cx from 'classnames'
 

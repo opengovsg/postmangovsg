@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import { useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
 import { Status, ChannelType } from 'classes/Campaign'

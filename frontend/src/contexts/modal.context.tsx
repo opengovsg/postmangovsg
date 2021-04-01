@@ -1,4 +1,5 @@
-import React, { createContext, useState } from 'react'
+import { createContext, useState } from 'react'
+import * as React from 'react'
 import Modal from 'components/common/modal'
 import BodyWrapper from 'components/common/body-wrapper'
 

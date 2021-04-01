@@ -2,7 +2,6 @@ import userEvent from '@testing-library/user-event'
 import { TelegramCampaign } from 'classes'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
-import React from 'react'
 import { Route } from 'react-router'
 import {
   mockCommonApis,
