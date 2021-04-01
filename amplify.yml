@@ -24,7 +24,7 @@ frontend:
           export REACT_APP_SENTRY_ENVIRONMENT="staging";
           fi
         - cd frontend
-        - npm ci
+        - npm ci --cache .npm
         - export REACT_APP_SENTRY_RELEASE=$(npm run --silent get-sentry-release)
     build:
       commands:
@@ -35,3 +35,6 @@ frontend:
     baseDirectory: frontend/build
     files:
       - "**/*"
+  cache:
+    paths:
+      - .npm
