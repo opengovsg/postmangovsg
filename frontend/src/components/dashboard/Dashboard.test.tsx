@@ -275,16 +275,16 @@ test('creates and sends a new email campaign', async () => {
   userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
-  // Click on the SMS channel button
-  const smsChannelButton = screen.getByRole('button', {
-    name: /^sms$/i,
+  // Click on the email channel button
+  const emailChannelButton = screen.getByRole('button', {
+    name: /^email$/i,
   })
-  userEvent.click(smsChannelButton)
-  expect(smsChannelButton).toHaveClass('active')
+  userEvent.click(emailChannelButton)
+  expect(emailChannelButton).toHaveClass('active')
   expect(screen.getByRole('button', { name: /^telegram$/i })).not.toHaveClass(
     'active'
   )
-  expect(screen.getByRole('button', { name: /^email$/i })).not.toHaveClass(
+  expect(screen.getByRole('button', { name: /^sms/i })).not.toHaveClass(
     'active'
   )
 
