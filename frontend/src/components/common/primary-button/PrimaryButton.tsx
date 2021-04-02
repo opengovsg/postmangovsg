@@ -1,18 +1,22 @@
 import { useState, useMemo } from 'react'
-import * as React from 'react'
 import cx from 'classnames'
 
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import styles from './PrimaryButton.module.scss'
 
-interface PrimaryButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+import type {
+  ButtonHTMLAttributes,
+  ReactElement,
+  FunctionComponent,
+} from 'react'
+
+interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   alignRight?: boolean
   onClick?: (...args: any[]) => void | Promise<void>
-  loadingPlaceholder?: string | React.ReactElement
+  loadingPlaceholder?: string | ReactElement
 }
 
-const PrimaryButton: React.FunctionComponent<PrimaryButtonProps> = ({
+const PrimaryButton: FunctionComponent<PrimaryButtonProps> = ({
   alignRight,
   className,
   disabled,

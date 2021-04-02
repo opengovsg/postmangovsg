@@ -1,8 +1,9 @@
 import cx from 'classnames'
-import * as React from 'react'
 
 import { CloseButton } from 'components/common'
 import styles from './Modal.module.scss'
+
+import type { ReactNode } from 'react'
 
 const Modal = ({
   onClose,
@@ -10,7 +11,7 @@ const Modal = ({
   modalTitle,
 }: {
   onClose: any
-  children: React.ReactNode
+  children: ReactNode
   modalTitle?: string
 }) => {
   const modalBackgroundId = 'modal-background'

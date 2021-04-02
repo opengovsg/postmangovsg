@@ -1,9 +1,8 @@
 import { createContext, useState, useCallback } from 'react'
-import * as React from 'react'
 import { cloneDeep } from 'lodash'
 import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { ReactNode, Dispatch, SetStateAction } from 'react'
 
 type PossibleCampaign = SMSCampaign | EmailCampaign | TelegramCampaign
 
@@ -19,7 +18,7 @@ const CampaignContextProvider = ({
   children,
   initialCampaign = new Campaign({}) as PossibleCampaign,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   initialCampaign?: PossibleCampaign
 }) => {
   const [campaign, setCampaign] = useState(initialCampaign)

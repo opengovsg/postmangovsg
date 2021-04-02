@@ -1,7 +1,8 @@
-import * as React from 'react'
 import cx from 'classnames'
 import styles from './WarningBlock.module.scss'
 import MessageBlock from '../message-block'
+
+import type { ReactNode } from 'react'
 
 const WarningBlock = ({
   className,
@@ -12,7 +13,7 @@ const WarningBlock = ({
   ...otherProps
 }: {
   className?: string
-  children?: React.ReactNode
+  children?: ReactNode
   absolute?: boolean
   onClose?: () => void
   title?: string

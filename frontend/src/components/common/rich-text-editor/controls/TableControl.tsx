@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import * as React from 'react'
 import { Map } from 'immutable'
 import cx from 'classnames'
 import {
@@ -10,6 +9,8 @@ import {
   genKey,
 } from 'draft-js'
 import styles from '../RichTextEditor.module.scss'
+
+import type { MouseEvent as ReactMouseEvent } from 'react'
 
 const MIN_GRID_SIZE = 5
 const MAX_GRID_SIZE = 20
@@ -87,7 +88,7 @@ export const TableControl = ({
     setShowPopover(false)
   }
 
-  function handleClick(e: React.MouseEvent<HTMLElement>) {
+  function handleClick(e: ReactMouseEvent<HTMLElement>) {
     e.stopPropagation()
     if (!isDisabled()) setShowPopover(() => !showPopover)
   }

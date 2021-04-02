@@ -1,11 +1,10 @@
 import { createContext, useState, useEffect } from 'react'
-import * as React from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
 import { initializeGA, sendPageView } from 'services/ga.service'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { ReactNode, Dispatch, SetStateAction } from 'react'
 
 interface ContextProps {
   isAuthenticated: boolean
@@ -16,7 +15,7 @@ interface ContextProps {
 
 export const AuthContext = createContext({} as ContextProps)
 
-const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setAuthenticated] = useState(false)
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')

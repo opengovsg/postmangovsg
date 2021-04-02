@@ -1,8 +1,8 @@
-import * as React from 'react'
-
 import styles from './ButtonGroup.module.scss'
 
-const ButtonGroup = ({ children }: { children: React.ReactNode }) => {
+import type { ReactNode } from 'react'
+
+const ButtonGroup = ({ children }: { children: ReactNode }) => {
   return <div className={styles.buttonGroup}>{children}</div>
 }
 

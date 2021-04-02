@@ -1,5 +1,4 @@
 import { useState, useRef, useContext, useEffect } from 'react'
-import * as React from 'react'
 import cx from 'classnames'
 
 import {
@@ -11,6 +10,8 @@ import { ModalContext } from 'contexts/modal.context'
 import { regenerateApiKey } from 'services/settings.service'
 
 import styles from './ApiKey.module.scss'
+
+import type { FunctionComponent } from 'react'
 
 const RESET_COPY_TIMEOUT = 1000
 
@@ -26,10 +27,7 @@ enum ApiKeyState {
   REGENERATE = 'REGENERATE',
 }
 
-const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
-  hasApiKey,
-  onGenerate,
-}) => {
+const ApiKey: FunctionComponent<ApiKeyProps> = ({ hasApiKey, onGenerate }) => {
   const [apiKey, setApiKey] = useState('')
   const [errorMsg, setErrorMsg] = useState(null)
   const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(

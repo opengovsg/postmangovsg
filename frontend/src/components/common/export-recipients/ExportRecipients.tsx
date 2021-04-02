@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import * as React from 'react'
 import cx from 'classnames'
 import download from 'downloadjs'
 
@@ -11,6 +10,8 @@ import { exportCampaignStats } from 'services/campaign.service'
 import styles from './ExportRecipients.module.scss'
 import { Trans } from '@lingui/macro'
 import moment from 'moment'
+
+import type { MouseEvent as ReactMouseEvent } from 'react'
 
 export enum CampaignExportStatus {
   Unavailable = 'Unavailable',
@@ -73,7 +74,7 @@ const ExportRecipients = ({
   })
 
   async function exportRecipients(
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+    event: ReactMouseEvent<HTMLDivElement, MouseEvent>
   ) {
     try {
       event.stopPropagation()

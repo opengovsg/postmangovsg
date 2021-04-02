@@ -1,8 +1,8 @@
-import * as React from 'react'
-
 import { DetailBlock, ErrorBlock } from 'components/common'
 
 import styles from './CsvUpload.module.scss'
+
+import type { ReactNode } from 'react'
 
 const CsvUpload = ({
   isCsvProcessing,
@@ -18,7 +18,7 @@ const CsvUpload = ({
     csvError?: string
   }
   onErrorClose: () => void
-  children: React.ReactNode
+  children: ReactNode
 }) => {
   const { numRecipients = 0, csvFilename, tempCsvFilename, csvError } = csvInfo
 

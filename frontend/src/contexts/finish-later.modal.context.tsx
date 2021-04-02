@@ -1,12 +1,11 @@
 import { createContext, useState, useContext } from 'react'
-import * as React from 'react'
 import { ModalContext } from 'contexts/modal.context'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { ReactNode, Dispatch, SetStateAction } from 'react'
 
 interface ContextProps {
   handleFinishLater: () => void
-  finishLaterContent: React.ReactNode
+  finishLaterContent: ReactNode
   setFinishLaterContent: Dispatch<SetStateAction<any>>
 }
 
@@ -15,7 +14,7 @@ export const FinishLaterModalContext = createContext({} as ContextProps)
 const FinishLaterModalContextProvider = ({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) => {
   const { setModalContent } = useContext(ModalContext)
   const [finishLaterContent, setFinishLaterContent] = useState(null)

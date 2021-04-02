@@ -1,5 +1,4 @@
 import { useEffect, useState, useContext, useCallback } from 'react'
-import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import cx from 'classnames'
 import Moment from 'react-moment'
@@ -29,6 +28,8 @@ import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 import AnnouncementModal from './announcement-modal'
 import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+
+import type { MouseEvent as ReactMouseEvent } from 'react'
 
 const ITEMS_PER_PAGE = 10
 
@@ -205,7 +206,7 @@ const Campaigns = () => {
         return (
           <div
             className={cx(styles.iconContainer, styles.duplicate)}
-            onClick={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
               event.stopPropagation()
               sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
               const modal = campaign.demoMessageLimit ? (

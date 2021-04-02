@@ -1,24 +1,30 @@
 import { useState, MutableRefObject } from 'react'
-import * as React from 'react'
 import cx from 'classnames'
 
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { PrimaryButton, TextInput } from 'components/common'
 import styles from './TextInputWithButton.module.scss'
 
+import type {
+  InputHTMLAttributes,
+  ReactNode,
+  FunctionComponent,
+  FormEvent,
+} from 'react'
+
 interface TextInputWithButtonProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   onChange: (value: string) => void
   onClick: () => void | Promise<void>
   buttonDisabled?: boolean
   inputDisabled?: boolean
   textRef?: MutableRefObject<HTMLInputElement | undefined>
-  buttonLabel?: React.ReactNode
-  loadingButtonLabel?: React.ReactNode
+  buttonLabel?: ReactNode
+  loadingButtonLabel?: ReactNode
   errorMessage?: string | null
 }
 
-const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = ({
+const TextInputWithButton: FunctionComponent<TextInputWithButtonProps> = ({
   id,
   value,
   onChange,
@@ -36,7 +42,7 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
   const [asyncLoading, setAsyncLoading] = useState(false)
   const isMounted = useIsMounted()
 
-  const asyncSubmit = async (e: React.FormEvent) => {
+  const asyncSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
     setAsyncLoading(true)

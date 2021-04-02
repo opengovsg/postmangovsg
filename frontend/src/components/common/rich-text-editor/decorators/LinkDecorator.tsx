@@ -1,5 +1,4 @@
 import { useContext, useRef, useState } from 'react'
-import * as React from 'react'
 import ReactDOM from 'react-dom'
 import {
   ContentBlock,
@@ -12,6 +11,8 @@ import {
 import { EditorContext } from '../RichTextEditor'
 
 import styles from '../RichTextEditor.module.scss'
+
+import type { ReactChildren, MouseEvent as ReactMouseEvent } from 'react'
 
 const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
 
@@ -31,7 +32,7 @@ const linkStrategy = (
 
 const LinkSpan = (props: {
   blockKey: string
-  children: React.ReactChildren
+  children: ReactChildren
   entityKey: string
   contentState: ContentState
   start: number
@@ -54,7 +55,7 @@ const LinkSpan = (props: {
     hidePopover()
   }
 
-  function removeLink(e: React.MouseEvent<HTMLElement>) {
+  function removeLink(e: ReactMouseEvent<HTMLElement>) {
     e.preventDefault()
     e.stopPropagation()
 
@@ -73,7 +74,7 @@ const LinkSpan = (props: {
     setPopoverStyle({})
   }
 
-  function handleClick(event: React.MouseEvent<HTMLSpanElement, MouseEvent>) {
+  function handleClick(event: ReactMouseEvent<HTMLSpanElement, MouseEvent>) {
     if (!showPopover) {
       const linkElement: HTMLElement = event.currentTarget
       const dimensions = linkElement.getBoundingClientRect()
@@ -128,7 +129,7 @@ const PreviewLinkSpan = ({
   contentState,
   entityKey,
 }: {
-  children: React.ReactChildren
+  children: ReactChildren
   contentState: ContentState
   entityKey: string
 }) => {

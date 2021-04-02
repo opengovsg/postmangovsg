@@ -1,6 +1,6 @@
-import * as React from 'react'
-
 import styles from './StepHeader.module.scss'
+
+import { ReactNode } from 'react'
 
 const StepHeader = ({
   title,
@@ -9,7 +9,7 @@ const StepHeader = ({
 }: {
   title: string
   subtitle?: string
-  children?: React.ReactNode
+  children?: ReactNode
 }) => {
   return (
     <div className={styles.stepHeader}>

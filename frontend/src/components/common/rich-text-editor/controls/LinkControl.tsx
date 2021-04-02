@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import * as React from 'react'
 import styles from '../RichTextEditor.module.scss'
+
+import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
 interface LinkControlProps {
   currentState: any
@@ -22,11 +23,11 @@ const LinkForm = ({
   const [title, setTitle] = useState(link?.title || selectionText)
   const [url, setURL] = useState(link?.target || '')
 
-  function stopPropagation(e: React.MouseEvent<HTMLElement>) {
+  function stopPropagation(e: ReactMouseEvent<HTMLElement>) {
     e.stopPropagation()
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     onSubmit({ title, url })
   }

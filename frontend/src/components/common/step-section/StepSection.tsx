@@ -1,12 +1,12 @@
-import * as React from 'react'
-
 import styles from './StepSection.module.scss'
+
+import { ReactNode } from 'react'
 
 const StepSection = ({
   children,
   separator = true,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   separator?: boolean
 }) => {
   return (

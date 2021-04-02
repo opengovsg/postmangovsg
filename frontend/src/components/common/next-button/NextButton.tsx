@@ -1,6 +1,6 @@
-import * as React from 'react'
-
 import { PrimaryButton } from 'components/common'
+
+import type { ReactElement } from 'react'
 
 const NextButton = ({
   onClick,
@@ -9,7 +9,7 @@ const NextButton = ({
 }: {
   onClick: (...args: any[]) => void | Promise<void>
   disabled?: boolean
-  loadingPlaceholder?: string | React.ReactElement
+  loadingPlaceholder?: string | ReactElement
 }) => {
   return (
     <div className="progress-button">
