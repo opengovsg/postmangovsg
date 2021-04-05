@@ -1,11 +1,5 @@
 import cx from 'classnames'
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -27,10 +21,11 @@ import {
 } from 'components/common'
 import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
-import { RecipientListType, TelegramPreview, TelegramProgress } from 'classes'
-import { sendTiming } from 'services/ga.service'
-import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { RecipientListType } from 'classes'
 import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { TelegramPreview, TelegramProgress } from 'classes'
 
 import styles from '../Create.module.scss'
 
@@ -42,7 +37,7 @@ const TelegramRecipients = ({
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { demoMessageLimit, params } = campaign
   const isDemo = !!demoMessageLimit
-  const [sampleCsvError, setSampleCsvError] = useState(null)
+  const [sampleCsvError, setSampleCsvError] = useState<string | null>(null)
 
   const {
     isProcessing,
@@ -71,8 +66,8 @@ const TelegramRecipients = ({
     })
   }, [isProcessing, csvFilename, numRecipients, updateCampaign])
 
-  function handleFileSelected(files: File[]) {
-    if (files[0]) uploadRecipients(files[0])
+  async function handleFileSelected(files: FileList) {
+    if (files[0]) await uploadRecipients(files[0])
   }
 
   function isNextDisabled() {

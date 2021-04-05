@@ -7,13 +7,17 @@ import styles from '../RichTextEditor.module.scss'
 interface ImageControlProps {
   currentState: any
   expanded: boolean
-  onChange: Function
-  doExpand: Function
-  doCollapse: Function
-  onExpandEvent: Function
+  onChange: (key: string, ...vals: string[]) => void
+  doExpand: () => void
+  doCollapse: () => void
+  onExpandEvent: () => void
 }
 
-const ImageForm = ({ onChange }: { onChange: Function }) => {
+const ImageForm = ({
+  onChange,
+}: {
+  onChange: (key: string, ...vals: string[]) => void
+}) => {
   const [imgSrc, setImgSrc] = useState('')
 
   function stopPropagation(e: React.MouseEvent<HTMLElement>) {

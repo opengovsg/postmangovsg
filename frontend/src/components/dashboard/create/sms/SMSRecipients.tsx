@@ -1,11 +1,5 @@
 import cx from 'classnames'
-import React, {
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-  useContext,
-} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 
 import {
@@ -26,15 +20,12 @@ import {
 } from 'components/common'
 import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
-import {
-  RecipientListType,
-  SMSCampaign,
-  SMSPreview,
-  SMSProgress,
-} from 'classes'
-import { sendTiming } from 'services/ga.service'
+import { RecipientListType } from 'classes'
 import { CampaignContext } from 'contexts/campaign.context'
 import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 
 import styles from '../Create.module.scss'
 
@@ -46,8 +37,7 @@ const SMSRecipients = ({
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { demoMessageLimit, params } = campaign as SMSCampaign
   const isDemo = !!demoMessageLimit
-
-  const [sampleCsvError, setSampleCsvError] = useState(null)
+  const [sampleCsvError, setSampleCsvError] = useState<string | null>(null)
 
   const {
     isProcessing,
@@ -76,8 +66,8 @@ const SMSRecipients = ({
     })
   }, [isProcessing, csvFilename, numRecipients, updateCampaign])
 
-  function handleFileSelected(files: File[]) {
-    if (files[0]) uploadRecipients(files[0])
+  async function handleFileSelected(files: FileList) {
+    if (files[0]) await uploadRecipients(files[0])
   }
 
   function isNextDisabled() {

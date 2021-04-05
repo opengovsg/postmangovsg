@@ -1,12 +1,8 @@
-import React, {
-  createContext,
-  useState,
-  useCallback,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { createContext, useState, useCallback } from 'react'
 import { cloneDeep } from 'lodash'
 import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
+
+import type { Dispatch, SetStateAction } from 'react'
 
 interface ContextProps {
   campaign: SMSCampaign | EmailCampaign | TelegramCampaign

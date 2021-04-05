@@ -18,6 +18,7 @@ interface TextInputWithButtonProps
 }
 
 const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = ({
+  id,
   value,
   onChange,
   onClick,
@@ -52,6 +53,7 @@ const TextInputWithButton: React.FunctionComponent<TextInputWithButtonProps> = (
     <form className={styles.textInputForm} onSubmit={asyncSubmit}>
       <div className={styles.inputWithButton}>
         <TextInput
+          id={id}
           className={cx(styles.textInput, { [styles.error]: errorMessage })}
           value={value}
           onChange={onChange}

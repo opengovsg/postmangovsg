@@ -26,8 +26,6 @@ import {
 } from 'components/common'
 import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
-import { sendTiming } from 'services/ga.service'
-import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { RecipientListType, EmailPreview, EmailProgress } from 'classes'
 import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
 
@@ -46,7 +44,7 @@ const EmailRecipients = ({
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { params, protect } = campaign
-  const [sampleCsvError, setSampleCsvError] = useState(null)
+  const [sampleCsvError, setSampleCsvError] = useState<string | null>(null)
   const {
     isProcessing,
     isUploading,
@@ -74,8 +72,8 @@ const EmailRecipients = ({
     })
   }, [isProcessing, csvFilename, numRecipients, updateCampaign])
 
-  function handleFileSelected(files: File[]) {
-    if (files[0]) uploadRecipients(files[0])
+  async function handleFileSelected(files: FileList) {
+    if (files[0]) await uploadRecipients(files[0])
   }
 
   function isNextDisabled() {

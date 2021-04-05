@@ -1,14 +1,8 @@
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { Status, ChannelType, SMSProgress } from 'classes'
+import { Status, ChannelType } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -24,6 +18,9 @@ import { getPreviewMessage } from 'services/sms.service'
 import { sendCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
+import type { SMSProgress } from 'classes'
+import type { Dispatch, SetStateAction } from 'react'
+
 import styles from '../Create.module.scss'
 
 const SMSSend = ({
@@ -36,7 +33,7 @@ const SMSSend = ({
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   if (!campaignId) {
     throw new Error('Invalid campaign id')

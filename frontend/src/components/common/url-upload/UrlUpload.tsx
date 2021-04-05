@@ -16,7 +16,7 @@ const UrlUpload = ({
     tempCsvFilename?: string
     csvError?: string
   }
-  onErrorClose: Function
+  onErrorClose: () => void
 }) => {
   const { numRecipients = 0, csvFilename, tempCsvFilename, csvError } = csvInfo
   const [url, setUrl] = useState('')

@@ -21,6 +21,7 @@ const TelegramValidationInput = ({
 
   return (
     <TextInputWithButton
+      id="validateTelegram"
       type="tel"
       value={recipient}
       onChange={setRecipient}

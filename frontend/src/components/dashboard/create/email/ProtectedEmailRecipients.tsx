@@ -55,7 +55,7 @@ const ProtectedEmailRecipients = ({
   const [selectedFile, setSelectedFile] = useState<File>()
   const [removeEmptyLines, setRemoveEmptyLines] = useState(false)
   const [protectedCsvInfo, setProtectedCsvInfo] = useState<ProtectedCsvInfo>()
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   const [phase, setPhase] = useState<ProtectPhase>(
     computePhase(numRecipients, isProcessing)
@@ -143,7 +143,9 @@ const ProtectedEmailRecipients = ({
           subtitle="Step 2"
         />
         <div>
-          <h4>Message B</h4>
+          <h4>
+            <label htmlFor="protectedMessage">Message B</label>
+          </h4>
           <p>
             The content below is what your recipients see after opening their
             password protected mail using their unique password.
@@ -159,6 +161,7 @@ const ProtectedEmailRecipients = ({
             your tab or go back to Step 1 to edit.
           </p>
           <TextArea
+            id="protectedMessage"
             highlight={true}
             placeholder="Enter password protected message here"
             value={template}

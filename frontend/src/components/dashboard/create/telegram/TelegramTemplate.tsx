@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useCallback, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
@@ -19,7 +12,9 @@ import {
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { saveTemplate } from 'services/telegram.service'
-import { TelegramCampaign, TelegramProgress } from 'classes'
+
+import type { TelegramCampaign, TelegramProgress } from 'classes'
+import type { Dispatch, SetStateAction } from 'react'
 
 const TelegramTemplate = ({
   setActiveStep,
@@ -31,7 +26,7 @@ const TelegramTemplate = ({
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
   const [errorMsg, setErrorMsg] = useState(null)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
     setErrorMsg(null)
@@ -86,7 +81,9 @@ const TelegramTemplate = ({
       <StepSection>
         <StepHeader title="Create message template" subtitle="Step 1" />
         <div>
-          <h4>Message</h4>
+          <h4>
+            <label htmlFor="message">Message</label>
+          </h4>
           <p>
             To personalise your message, include keywords that are surrounded by
             double curly braces. The keywords in your message template should
@@ -104,6 +101,7 @@ const TelegramTemplate = ({
           </p>
         </div>
         <TextArea
+          id="message"
           placeholder="Enter message"
           highlight={true}
           value={body}

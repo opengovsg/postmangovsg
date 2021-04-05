@@ -33,8 +33,12 @@ const CredLabelInput = ({
 
   return (
     <>
-      <LabelWithExternalLink label="Credential Label" />
+      <LabelWithExternalLink
+        htmlFor="credentialLabel"
+        label="Credential Label"
+      />
       <TextInput
+        id="credentialLabel"
         className={className}
         placeholder="Enter a label (e.g. default-cred-1)"
         value={value}

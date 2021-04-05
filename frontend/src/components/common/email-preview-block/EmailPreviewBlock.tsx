@@ -1,5 +1,6 @@
 import cx from 'classnames'
-import React, { FC } from 'react'
+import React from 'react'
+import type { FC } from 'react'
 
 import RichTextEditor from '../rich-text-editor'
 import DetailBlock from '../detail-block'
