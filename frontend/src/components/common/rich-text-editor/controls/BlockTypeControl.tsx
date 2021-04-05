@@ -20,10 +20,10 @@ interface BlockTypeControlProps {
   config: any
   currentState: any
   expanded: boolean
-  onChange: Function
-  doExpand: Function
-  doCollapse: Function
-  onExpandEvent: Function
+  onChange: (type: string) => void
+  doExpand: () => void
+  doCollapse: () => void
+  onExpandEvent: () => void
 }
 
 const BlockOptions = ({
@@ -31,7 +31,7 @@ const BlockOptions = ({
   onChange,
 }: {
   options: string[]
-  onChange: Function
+  onChange: (type: string) => void
 }) => {
   return (
     <ul className="rdw-dropdown-optionwrapper">

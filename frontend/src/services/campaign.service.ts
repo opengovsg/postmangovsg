@@ -7,11 +7,12 @@ import {
   SMSCampaign,
   EmailCampaign,
   TelegramCampaign,
-  CampaignRecipient,
   EmailCampaignRecipient,
   SMSCampaignRecipient,
   TelegramCampaignRecipient,
 } from 'classes'
+
+import type { CampaignRecipient } from 'classes'
 
 function getJobTimestamps(
   jobs: Array<{ sent_at: Date; status_updated_at: Date }>

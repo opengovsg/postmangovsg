@@ -16,7 +16,7 @@ import styles from './DuplicateCampaignModal.module.scss'
 import { duplicateCampaign } from 'services/campaign.service'
 import { ModalContext } from 'contexts/modal.context'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   const { close } = useContext(ModalContext)
@@ -44,11 +44,16 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
     <>
       <div className={styles.content}>
         <div className={styles.section}>
-          <h2 className={styles.title}>Name your campaign</h2>
+          <h2 className={styles.title}>
+            <label htmlFor="nameCampaign">Name your campaign</label>
+          </h2>
           <h5 className={styles.subtitle}>
-            Give your campaign a descriptive name
+            <label htmlFor="nameCampaign">
+              Give your campaign a descriptive name
+            </label>
           </h5>
           <TextInput
+            id="nameCampaign"
             className={styles.input}
             type="text"
             value={selectedName}

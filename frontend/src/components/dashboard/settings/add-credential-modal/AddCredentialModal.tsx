@@ -31,7 +31,7 @@ import ChooseChannelsImage from 'assets/img/choose-channels.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
 import styles from './AddCredentialModal.module.scss'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 enum AddCredentialStep {
   SelectType,
@@ -46,7 +46,7 @@ const AddCredentialModal = ({
   onSuccess,
 }: {
   credType: ChannelType | null
-  onSuccess: Function
+  onSuccess: () => void
 }) => {
   // Using channel type as proxy for credential type for now
   const [isLoading, setIsLoading] = useState(credType !== null)

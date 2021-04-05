@@ -29,7 +29,7 @@ import {
   WarningBlock,
 } from 'components/common'
 import { LINKS } from 'config'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { EmailPreview, EmailProgress } from 'classes'
 import { sendTiming } from 'services/ga.service'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
@@ -55,7 +55,7 @@ const EmailRecipients = ({
     params,
     protect,
   } = campaign
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
   const [csvInfo, setCsvInfo] = useState<
@@ -65,7 +65,7 @@ const EmailRecipients = ({
     csvFilename: initialCsvFilename,
   })
   const [preview, setPreview] = useState({} as EmailPreview)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
 
@@ -113,7 +113,7 @@ const EmailRecipients = ({
   }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
   // Handle file upload
-  async function uploadFile(files: File[]) {
+  async function uploadFile(files: FileList) {
     setIsUploading(true)
     setErrorMessage(null)
     const uploadTimeStart = performance.now()

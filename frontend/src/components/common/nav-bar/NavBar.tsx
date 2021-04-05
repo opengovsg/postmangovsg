@@ -12,7 +12,7 @@ import { AuthContext } from 'contexts/auth.context'
 import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
 import styles from './NavBar.module.scss'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
 
 const NavBar = () => {
@@ -85,6 +85,14 @@ const NavBar = () => {
         >
           Settings
         </NavLink>
+        <OutboundLink
+          className={styles.link}
+          eventLabel={i18n._(LINKS.featureRequestUrl)}
+          to={i18n._(LINKS.featureRequestUrl)}
+          target="_blank"
+        >
+          Feature Request
+        </OutboundLink>
 
         <div className={styles.separator}></div>
 

@@ -1,14 +1,10 @@
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  SetStateAction,
-  Dispatch,
-} from 'react'
+import React, { createContext, useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
 import { initializeGA, sendPageView } from 'services/ga.service'
+
+import type { Dispatch, SetStateAction } from 'react'
 
 interface ContextProps {
   isAuthenticated: boolean

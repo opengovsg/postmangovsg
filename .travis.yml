@@ -53,7 +53,7 @@ jobs:
       script:
         - npm run lint-no-fix
       before_deploy:
-        - cp -R ../modules ./
+        - cd $TRAVIS_BUILD_DIR/worker && ./before-deploy.sh
       deploy:
         - provider: script
           skip_cleanup: true

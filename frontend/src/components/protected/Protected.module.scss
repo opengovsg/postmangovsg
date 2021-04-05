@@ -1,11 +1,17 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .outer {
   @include flex-center();
   background-color: $neutral-light;
   width: 100vw;
-  min-height: 100vh;
+  flex: 1;
   overflow: auto;
 }
 

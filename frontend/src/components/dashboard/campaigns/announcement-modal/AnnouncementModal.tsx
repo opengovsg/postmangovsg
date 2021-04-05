@@ -3,7 +3,7 @@ import { updateAnnouncementVersion } from 'services/settings.service'
 
 import { ModalContext } from 'contexts/modal.context'
 
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import { ErrorBlock } from 'components/common'
 import GraphicAnnouncementModal from './GraphicAnnouncementModal'

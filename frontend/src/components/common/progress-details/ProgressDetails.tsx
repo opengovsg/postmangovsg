@@ -13,7 +13,7 @@ import {
 import styles from './ProgressDetails.module.scss'
 import { OutboundLink } from 'react-ga'
 import { LINKS } from 'config'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 import { Trans } from '@lingui/macro'
 
 const ProgressDetails = ({
@@ -123,7 +123,7 @@ const ProgressDetails = ({
         <tbody>
           <tr>
             <td className={'md'}>
-              <Moment format="LLL">{sentAt}</Moment>
+              <Moment format="MMM DD YYYY, HH:mm">{sentAt}</Moment>
             </td>
 
             <td className={'md'}>{numRecipients}</td>

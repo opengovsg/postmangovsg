@@ -121,25 +121,25 @@ const config = convict({
     host: {
       doc: 'Amazon SES SMTP endpoint.',
       default: '',
-      env: 'SES_HOST',
+      env: 'WORKER_SES_HOST',
     },
     port: {
       doc: 'Amazon SES SMTP port, defaults to 465',
       default: 465,
-      env: 'SES_PORT',
+      env: 'WORKER_SES_PORT',
       format: 'int',
     },
     auth: {
       user: {
         doc: 'SMTP username',
         default: '',
-        env: 'SES_USER',
+        env: 'WORKER_SES_USER',
         sensitive: true,
       },
       pass: {
         doc: 'SMTP password',
         default: '',
-        env: 'SES_PASS',
+        env: 'WORKER_SES_PASS',
         sensitive: true,
       },
     },
@@ -147,7 +147,7 @@ const config = convict({
   mailFrom: {
     doc: 'The email address that appears in the From field of an email',
     default: '',
-    env: 'SES_FROM',
+    env: 'WORKER_SES_FROM',
   },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
@@ -206,10 +206,10 @@ const config = convict({
       },
     },
   },
-  frontendUrl: {
+  unsubscribeUrl: {
     doc: 'Used to generate unsubscribe url',
     default: 'https://postman.gov.sg', // prod only
-    env: 'FRONTEND_URL',
+    env: 'UNSUBSCRIBE_URL',
   },
 })
 
@@ -221,7 +221,7 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 // Override with local config
 if (config.get('env') === 'development') {
   config.load({
-    frontendUrl: 'http://localhost:3000',
+    unsubscribeUrl: 'http://localhost:3000',
     database: {
       dialectOptions: {
         ssl: {
@@ -236,7 +236,7 @@ if (config.get('env') === 'development') {
 
 if (config.get('env') === 'staging') {
   config.load({
-    frontendUrl: 'https://staging.postman.gov.sg',
+    unsubscribeUrl: 'https://staging.postman.gov.sg',
   })
 }
 

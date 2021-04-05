@@ -4,7 +4,7 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import cx from 'classnames'
 import { Trans } from '@lingui/macro'
 import { LINKS } from 'config'
-import { i18n } from 'locales'
+import { i18n } from '@lingui/core'
 
 import { StepHeader } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
@@ -18,7 +18,7 @@ const CustomFromAddress = ({
   onSuccess,
 }: {
   customFromAddresses: string[]
-  onSuccess: Function
+  onSuccess: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const { email } = useContext(AuthContext)
