@@ -102,7 +102,7 @@ export const getDbCredentialsWithoutUsers = async (): Promise<
       credentials
       LEFT OUTER JOIN user_credentials ON credentials.name = user_credentials.cred_name
     WHERE
-      LOWER(credentials.name) NOT SIMILAR TO '%_(default|demo)'
+      LOWER(credentials.name) NOT SIMILAR TO '%\\_(default|demo)'
       AND user_id IS NULL
       AND name NOT IN (
         SELECT DISTINCT
