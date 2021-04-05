@@ -2,6 +2,7 @@ import 'source-map-support/register'
 import * as Sentry from '@sentry/node'
 
 import config from './config'
+import { getSequelize } from './sequelize-loader'
 import { CleanupSecretsEvent, CleanupSecretsResponse } from './interfaces'
 import { removeCredentials, getDbCredentialsWithoutUsers } from './cleanup'
 import { Logger } from './utils/logger'
@@ -38,8 +39,13 @@ const handler = async (
       )
     }
 
-    const credentials = await getDbCredentialsWithoutUsers()
-    await removeCredentials(credentials, dryRun)
+    const sequelize = await getSequelize()
+    // Wrap the deletion in a database transaction to ensure a consistent view of the data
+    // during the deletion process.
+    await sequelize.transaction(async (t) => {
+      const credentials = await getDbCredentialsWithoutUsers(t)
+      await removeCredentials(credentials, dryRun, t)
+    })
 
     logger.log('Clean up completed')
 
