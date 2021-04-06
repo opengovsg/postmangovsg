@@ -1,3 +1,3 @@
-export function replaceNewLines(text: string): string {
-  return (text || '').replaceAll(/<br\s*\/?>/g, '\n')
+export function replaceNewLines(text?: string): string {
+  return (text ?? '').replaceAll(/<br\s*\/?>/g, '\n')
 }
