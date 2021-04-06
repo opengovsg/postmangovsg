@@ -24,10 +24,10 @@ export class Campaign {
   name: string
   type: ChannelType
   createdAt: string
-  sentAt: string
+  sentAt?: string
   status: Status
   isCsvProcessing: boolean
-  statusUpdatedAt: string
+  statusUpdatedAt?: string
   protect: boolean
   redacted: boolean
   demoMessageLimit: number | null

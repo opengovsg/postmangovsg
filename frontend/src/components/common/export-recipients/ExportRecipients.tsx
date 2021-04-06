@@ -33,9 +33,9 @@ const ExportRecipients = ({
   campaignId: number
   campaignName: string
   campaignType: ChannelType
-  sentAt: string
+  sentAt?: string
   status: Status
-  statusUpdatedAt: string
+  statusUpdatedAt?: string
   iconPosition: 'left' | 'right'
   isButton?: boolean
 }) => {
@@ -48,7 +48,7 @@ const ExportRecipients = ({
     let timeoutId: NodeJS.Timeout
 
     function getExportStatus(): void {
-      if (status === Status.Sending) {
+      if (status === Status.Sending || !statusUpdatedAt) {
         return setExportStatus(CampaignExportStatus.Unavailable)
       }
 
@@ -102,6 +102,10 @@ const ExportRecipients = ({
       } else {
         const emptyExplanation = `"Finalised delivery statuses for your messages are not yet available, try exporting again later."\n`
         content = content.concat(emptyExplanation)
+      }
+
+      if (!sentAt) {
+        throw new Error('sentAt is undefined')
       }
 
       const sentAtTime = new Date(sentAt)
