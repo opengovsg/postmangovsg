@@ -17,5 +17,5 @@ export const confirmSendCampaign = async ({
   if (sendRate) {
     sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, channelType)
   }
-  updateCampaign({ status: Status.Sending })
+  updateCampaign({ status: Status.Sending, sentAt: new Date().toISOString() })
 }
