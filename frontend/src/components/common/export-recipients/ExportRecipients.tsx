@@ -33,9 +33,9 @@ const ExportRecipients = ({
   campaignId: number
   campaignName: string
   campaignType: ChannelType
-  sentAt: Date
+  sentAt: string
   status: Status
-  statusUpdatedAt: Date
+  statusUpdatedAt: string
   iconPosition: 'left' | 'right'
   isButton?: boolean
 }) => {
