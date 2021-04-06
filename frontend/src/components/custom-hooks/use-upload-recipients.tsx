@@ -136,6 +136,7 @@ function useUploadRecipients<
     isProcessing,
     isUploading,
     error,
+    setError,
     preview,
     csvInfo,
     uploadRecipients,

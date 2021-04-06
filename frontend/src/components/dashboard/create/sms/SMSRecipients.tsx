@@ -43,6 +43,7 @@ const SMSRecipients = ({
     isProcessing,
     isUploading,
     error,
+    setError,
     preview,
     csvInfo,
     uploadRecipients,
@@ -68,6 +69,11 @@ const SMSRecipients = ({
 
   async function handleFileSelected(files: FileList) {
     if (files[0]) await uploadRecipients(files[0])
+  }
+
+  function selectRecipientListType(listType: RecipientListType) {
+    setRecipientListType(listType)
+    setError(null)
   }
 
   function isNextDisabled() {
@@ -192,7 +198,7 @@ const SMSRecipients = ({
 
           <div className={styles.recipientTypeSelector}>
             <PrimaryButton
-              onClick={() => setRecipientListType(RecipientListType.Csv)}
+              onClick={() => selectRecipientListType(RecipientListType.Csv)}
               className={cx({
                 [styles.active]: recipientListType === RecipientListType.Csv,
               })}
@@ -200,7 +206,7 @@ const SMSRecipients = ({
               Use CSV<i className={cx('bx', 'bx-spreadsheet')}></i>
             </PrimaryButton>
             <PrimaryButton
-              onClick={() => setRecipientListType(RecipientListType.Vault)}
+              onClick={() => selectRecipientListType(RecipientListType.Vault)}
               className={cx({
                 [styles.active]: recipientListType === RecipientListType.Vault,
               })}

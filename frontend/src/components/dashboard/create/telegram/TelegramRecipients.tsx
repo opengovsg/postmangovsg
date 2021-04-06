@@ -43,6 +43,7 @@ const TelegramRecipients = ({
     isProcessing,
     isUploading,
     error,
+    setError,
     preview,
     csvInfo,
     uploadRecipients,
@@ -68,6 +69,11 @@ const TelegramRecipients = ({
 
   async function handleFileSelected(files: FileList) {
     if (files[0]) await uploadRecipients(files[0])
+  }
+
+  function selectRecipientListType(listType: RecipientListType) {
+    setRecipientListType(listType)
+    setError(null)
   }
 
   function isNextDisabled() {
@@ -193,7 +199,7 @@ const TelegramRecipients = ({
 
           <div className={styles.recipientTypeSelector}>
             <PrimaryButton
-              onClick={() => setRecipientListType(RecipientListType.Csv)}
+              onClick={() => selectRecipientListType(RecipientListType.Csv)}
               className={cx({
                 [styles.active]: recipientListType === RecipientListType.Csv,
               })}
@@ -201,7 +207,7 @@ const TelegramRecipients = ({
               Use CSV<i className={cx('bx', 'bx-spreadsheet')}></i>
             </PrimaryButton>
             <PrimaryButton
-              onClick={() => setRecipientListType(RecipientListType.Vault)}
+              onClick={() => selectRecipientListType(RecipientListType.Vault)}
               className={cx({
                 [styles.active]: recipientListType === RecipientListType.Vault,
               })}
