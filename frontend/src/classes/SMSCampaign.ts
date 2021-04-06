@@ -13,8 +13,8 @@ export interface SMSPreview {
 }
 
 export class SMSCampaign extends Campaign {
-  body: string
-  params: Array<string>
+  body?: string
+  params?: string[]
   csvFilename: string
   numRecipients: number
   hasCredential: boolean

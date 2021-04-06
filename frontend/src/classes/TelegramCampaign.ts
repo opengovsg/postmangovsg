@@ -13,8 +13,8 @@ export interface TelegramPreview {
 }
 
 export class TelegramCampaign extends Campaign {
-  body: string
-  params: Array<string>
+  body?: string
+  params?: string[]
   csvFilename: string
   numRecipients: number
   preview: string
