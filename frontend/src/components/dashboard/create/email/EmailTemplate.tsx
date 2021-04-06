@@ -25,7 +25,7 @@ import { useParams } from 'react-router-dom'
 import { getCustomFromAddresses } from 'services/settings.service'
 import { saveTemplate } from 'services/email.service'
 import { EmailCampaign, EmailProgress } from 'classes'
-
+import { replaceNewLines } from 'components/dashboard/create/util'
 import styles from './EmailTemplate.module.scss'
 
 const EmailTemplate = ({
@@ -122,10 +122,6 @@ const EmailTemplate = ({
       setFinishLaterContent(null)
     }
   }, [body, subject, from, setFinishLaterContent, campaignId, replyTo])
-
-  function replaceNewLines(body: string): string {
-    return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
-  }
 
   return (
     <>

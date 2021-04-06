@@ -12,7 +12,7 @@ import {
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { exceedsCharacterThreshold, saveTemplate } from 'services/sms.service'
-
+import { replaceNewLines } from 'components/dashboard/create/util'
 import type { Dispatch, SetStateAction } from 'react'
 import type { SMSProgress } from 'classes'
 
@@ -90,10 +90,6 @@ const SMSTemplate = ({
       setFinishLaterContent(null)
     }
   }, [body, campaignId, setFinishLaterContent])
-
-  function replaceNewLines(body: string): string {
-    return (body || '').replace(/<br\s*\/?>/g, '\n')
-  }
 
   return (
     <>
