@@ -10,7 +10,7 @@ import appLogo from 'assets/img/brand/app-logo.svg'
 import landingHero from 'assets/img/landing/landing-hero.png'
 
 const Protected = () => {
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
   const [password, setPassword] = useState('')
   const [decryptedMessage, setDecryptedMessage] = useState('')
   const [errorMsg, setErrorMsg] = useState('')

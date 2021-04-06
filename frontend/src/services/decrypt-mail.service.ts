@@ -1,7 +1,9 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 
 import { hydrateTemplate } from './validate-csv.service'
 import { decryptData, hashPassword } from './crypto.service'
+
+import type { AxiosError } from 'axios'
 
 /**
  * This function should hash the password with salt in url

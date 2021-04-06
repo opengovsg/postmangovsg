@@ -1,30 +1,46 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-.topContainer {
+.rootContainer {
+  @include flex-center;
+  flex-direction: column;
   background-color: $neutral-light;
   height: 100vh;
-  @include flex-center;
 
-  .innerContainer {
-    display: flex;
-    justify-content: space-between;
-    max-width: 1000px;
-    width: 80vw;
+  @include mobile() {
+    justify-content: center;
+  }
+
+  .heroImg {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .title {
+    margin: $spacing-7 0 0 0;
+  }
+
+  .description {
+    margin: $spacing-3 0 0 0;
+    text-align: center;
+  }
+
+  .actions {
+    margin-top: $spacing-5;
+
+    & > .action:not(:first-child) {
+      margin-left: $spacing-7;
+    }
 
     @include mobile() {
-      justify-content: center;
-    }
-
-    .appLogo {
-      margin-bottom: 2rem;
-    }
-
-    .textContainer {
-      display: flex;
-      flex-direction: column;
+      @include flex-vertical;
       align-items: center;
-      flex: 1;
+      width: 100%;
+
+      & > .action:not(:first-child) {
+        margin-left: 0;
+        margin-top: $spacing-1;
+      }
     }
   }
 }

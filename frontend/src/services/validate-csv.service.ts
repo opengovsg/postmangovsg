@@ -38,7 +38,7 @@ export async function validateCsv({
 }: {
   file: File
   template: string
-  recipientValidator: Function
+  recipientValidator: (email: string) => boolean
   removeEmptyLines: boolean
 }): Promise<ProtectedCsvInfo> {
   const csvFilename = file.name
@@ -116,7 +116,7 @@ export function hydrateTemplate(
 function validateRow(
   row: Record<string, any>,
   requiredParams: Array<string>,
-  recipientValidator: Function
+  recipientValidator: (email: string) => boolean
 ): boolean {
   const params = keys(row).map((key) => key.toLowerCase())
   const missingParams = difference(requiredParams, params)

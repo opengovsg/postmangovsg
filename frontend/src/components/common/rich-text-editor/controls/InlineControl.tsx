@@ -5,10 +5,10 @@ interface InlineControlProps {
   config: any
   currentState: any
   expanded: boolean
-  onChange: Function
-  doExpand: Function
-  doCollapse: Function
-  onExpandEvent: Function
+  onChange: (style: string) => void
+  doExpand: () => void
+  doCollapse: () => void
+  onExpandEvent: () => void
 }
 
 export const InlineControl = (props: InlineControlProps) => {

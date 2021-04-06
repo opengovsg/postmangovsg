@@ -22,10 +22,12 @@ const TelegramCredentialsInput = ({
   return (
     <>
       <LabelWithExternalLink
+        htmlFor="telegramBotToken"
         label="Telegram Bot Token"
         link={i18n._(LINKS.guideTelegramUrl)}
       />
       <TextInput
+        id="telegramBotToken"
         placeholder="Enter Telegram Bot Token"
         value={telegramBotToken}
         onChange={setTelegramBotToken}

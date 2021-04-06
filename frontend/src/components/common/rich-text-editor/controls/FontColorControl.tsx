@@ -7,10 +7,10 @@ interface FontColorControlProps {
   config: any
   currentState: any
   expanded: boolean
-  onChange: Function
-  doExpand: Function
-  doCollapse: Function
-  onExpandEvent: Function
+  onChange: () => void
+  doExpand: () => void
+  doCollapse: () => void
+  onExpandEvent: () => void
 }
 
 const ColorPicker = ({
@@ -20,7 +20,7 @@ const ColorPicker = ({
 }: {
   colors: string[]
   selected: string
-  onChange: Function
+  onChange: (key: string, val: string) => void
 }) => {
   selected = selected || 'rgb(0,0,0)'
   function handleSelect(color: string) {

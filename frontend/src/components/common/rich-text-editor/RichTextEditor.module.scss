@@ -254,28 +254,6 @@
     }
   }
 
-  .popover {
-    @extend %caption;
-    position: absolute;
-    z-index: 999;
-    background: white;
-    width: max-content;
-    border: solid 1px $neutral;
-    box-shadow: 0px 0px 10px rgba(193, 199, 205, 0.5);
-    border-radius: 5px;
-    padding: $spacing-1;
-    margin-top: 0.25rem;
-
-    &.right {
-      right: 0;
-    }
-
-    .divider {
-      border-left: solid 1px $neutral;
-      margin: 0 $spacing-1;
-    }
-  }
-
   table {
     $border-color: adjust-color($primary-light, $alpha: -0.5);
     border: 1px solid $border-color;

@@ -20,6 +20,7 @@ const EmailValidationInput = ({
 
   return (
     <TextInputWithButton
+      id="validateEmail"
       type="email"
       value={recipient}
       onChange={setRecipient}

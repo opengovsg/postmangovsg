@@ -194,9 +194,10 @@ export class TemplateClient {
         if (!el) return
 
         // Base case 2: Element has child that is not empty
-        const nonEmptyChildren = el.children.filter(
-          (c) => c.type !== 'text' || c.data?.trim()
-        )
+        const nonEmptyChildren =
+          el.type === 'tag'
+            ? el.children.filter((c) => c.type !== 'text' || c.data?.trim())
+            : []
         if (nonEmptyChildren.length > 0) return
 
         const parent = el.parent

@@ -1,6 +1,8 @@
-import React, { createContext, useState, Dispatch, SetStateAction } from 'react'
+import React, { createContext, useState } from 'react'
 import Modal from 'components/common/modal'
 import BodyWrapper from 'components/common/body-wrapper'
+
+import type { Dispatch, SetStateAction } from 'react'
 
 const defaultValue = {
   modalContent: null as any,

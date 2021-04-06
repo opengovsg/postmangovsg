@@ -15,7 +15,7 @@ const RESET_COPY_TIMEOUT = 1000
 
 interface ApiKeyProps {
   hasApiKey: boolean
-  onGenerate?: Function
+  onGenerate?: () => void
 }
 
 enum ApiKeyState {

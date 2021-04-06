@@ -46,7 +46,7 @@ const AddCredentialModal = ({
   onSuccess,
 }: {
   credType: ChannelType | null
-  onSuccess: Function
+  onSuccess: () => void
 }) => {
   // Using channel type as proxy for credential type for now
   const [isLoading, setIsLoading] = useState(credType !== null)
