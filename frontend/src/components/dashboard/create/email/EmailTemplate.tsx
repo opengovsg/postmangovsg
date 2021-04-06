@@ -66,11 +66,10 @@ const EmailTemplate = ({
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
-      if (!subject) {
-        throw new Error('Invalid subject')
-      }
-      if (!body) {
-        throw new Error('Invalid body')
+      if (!subject || !body || !from) {
+        throw new Error(
+          'Message subject, from address, or template cannot be empty'
+        )
       }
       const { updatedTemplate, numRecipients } = await saveTemplate(
         +campaignId,
@@ -95,14 +94,13 @@ const EmailTemplate = ({
     }
   }, [body, campaignId, from, replyTo, setActiveStep, subject, updateCampaign])
 
-  async function populateFromAddresses() {
-    const fromAddresses = await getCustomFromAddresses()
-    const options = fromAddresses.map((v) => ({ label: v, value: v }))
-    setCustomFromAddresses(options)
-  }
-
   // Get custom from addresses
   useEffect(() => {
+    async function populateFromAddresses() {
+      const fromAddresses = await getCustomFromAddresses()
+      const options = fromAddresses.map((v) => ({ label: v, value: v }))
+      setCustomFromAddresses(options)
+    }
     populateFromAddresses()
   }, [])
 
@@ -114,8 +112,11 @@ const EmailTemplate = ({
         onSave={async () => {
           if (!campaignId) return
           try {
-            if (!subject || !body)
-              throw new Error('Message subject or template cannot be empty!')
+            if (!subject || !body || !from) {
+              throw new Error(
+                'Message subject, from address, or template cannot be empty'
+              )
+            }
             await saveTemplate(+campaignId, subject, body, replyTo, from)
           } catch (err) {
             setErrorMsg(err.message)
@@ -140,7 +141,7 @@ const EmailTemplate = ({
           <Dropdown
             onSelect={setFrom}
             options={customFromAddresses}
-            defaultLabel={from || customFromAddresses[0]?.label}
+            defaultLabel={from ?? customFromAddresses[0]?.label}
             aria-label="Custom from"
           ></Dropdown>
         </div>

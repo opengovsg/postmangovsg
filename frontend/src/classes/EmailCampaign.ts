@@ -29,7 +29,7 @@ export class EmailCampaign extends Campaign {
   params?: string[]
   subject?: string
   replyTo?: string | null
-  from: string
+  from?: string
   csvFilename: string
   numRecipients: number
   hasCredential: boolean
