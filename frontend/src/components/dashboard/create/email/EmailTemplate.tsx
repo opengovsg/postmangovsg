@@ -66,6 +66,12 @@ const EmailTemplate = ({
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
+      if (!subject) {
+        throw new Error('Invalid subject')
+      }
+      if (!body) {
+        throw new Error('Invalid body')
+      }
       const { updatedTemplate, numRecipients } = await saveTemplate(
         +campaignId,
         subject,

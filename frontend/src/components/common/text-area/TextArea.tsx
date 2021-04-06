@@ -19,7 +19,7 @@ const TextArea = ({
   highlight: boolean
   singleRow?: boolean
   placeholder?: string
-  value: string
+  value?: string
   onChange: (text: string) => void
 }) => {
   const minRows = singleRow ? 1 : 7

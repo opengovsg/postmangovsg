@@ -7,7 +7,7 @@ export async function saveTemplate(
   campaignId: number,
   subject: string,
   body: string,
-  replyTo: string | null,
+  replyTo: string | null | undefined,
   from: string
 ): Promise<{
   numRecipients: number

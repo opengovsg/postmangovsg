@@ -27,8 +27,8 @@ export interface EmailPreview {
 export class EmailCampaign extends Campaign {
   body?: string
   params?: string[]
-  subject: string
-  replyTo: string | null
+  subject?: string
+  replyTo?: string | null
   from: string
   csvFilename: string
   numRecipients: number
