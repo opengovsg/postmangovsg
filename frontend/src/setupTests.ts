@@ -24,16 +24,7 @@ beforeAll(() => {
   })
 })
 
-beforeEach(() => {
-  // Fake timers using Jest
-  jest.useFakeTimers()
-})
-
 afterEach(() => {
-  // Run all pending timers and switch to real timers using Jest
-  jest.runOnlyPendingTimers()
-  jest.useRealTimers()
-
   // Reset any runtime request handlers added during tests
   server.resetHandlers()
 })
