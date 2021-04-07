@@ -6,11 +6,14 @@ import type { InitializeOptions } from 'react-ga'
 
 // Re-export these later on as constants
 let gaInitializeOptions: InitializeOptions
+let gaTrackingId: string
 
 /**
  * Configs differentiated between environments
  */
 if (process.env.NODE_ENV === 'test') {
+  // Define a dummy tracking ID and enable test mode for Google Analytics during tests
+  gaTrackingId = 'UA-XXX-XX'
   gaInitializeOptions = {
     testMode: true,
   }
@@ -36,6 +39,8 @@ if (process.env.NODE_ENV === 'test') {
   // axios global defaults
   axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL as string
 
+  // react-ga (Google Analytics) configs
+  gaTrackingId = process.env.REACT_APP_GA_TRACKING_ID as string
   gaInitializeOptions = {
     debug: false, // Set to true only on development
   }
@@ -74,7 +79,7 @@ export const ALLOWED_IMAGE_SOURCES = t`allowedImageSources`
 //#endregion
 
 export const GA_INITIALIZE_OPTIONS = gaInitializeOptions
-export const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID as string
+export const GA_TRACKING_ID = gaTrackingId
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN as string
 export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
 export const SENTRY_ENVIRONMENT =
