@@ -31,7 +31,7 @@ const sendValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /transactional/email/send:
  *     post:
  *       summary: "Send a transactional email"

@@ -17,7 +17,7 @@ const sendValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /transactional/sms/send:
  *     post:
  *       summary: "Send a transactional SMS"
