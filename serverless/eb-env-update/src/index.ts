@@ -27,10 +27,17 @@ exports.handler = async (event : any) => {
         requestParameters.secretId === config.get('secretId')
       ) {
         const environmentName = config.get('secretId').substring(config.get('prefix').length)
+        const callbackEnvironmentName = `${environmentName}-callback`
         console.log(`Updating config for environmentName ${environmentName}`)
         await eb
           .restartAppServer({
             EnvironmentName: environmentName
+          })
+          .promise()
+        console.log(`Updating config for environmentName ${callbackEnvironmentName}`)
+        await eb
+          .restartAppServer({
+            EnvironmentName: callbackEnvironmentName
           })
           .promise()
       }

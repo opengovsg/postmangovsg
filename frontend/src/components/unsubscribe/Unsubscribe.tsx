@@ -4,6 +4,7 @@ import querystring from 'querystring'
 import { Trans } from '@lingui/macro'
 
 import { ErrorBlock, PrimaryButton, TextButton } from 'components/common'
+import Banner from 'components/landing/banner'
 
 import styles from './Unsubscribe.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
@@ -13,7 +14,7 @@ import cancelRequestHero from 'assets/img/unsubscribe/cancel-request.png'
 import { unsubscribeRequest } from 'services/unsubscribe.service'
 
 const Unsubscribe = () => {
-  const { version } = useParams()
+  const { version } = useParams<{ version: string }>()
   const [errorMsg, setErrorMsg] = useState('')
   const [isUnsubscribed, setUnsubscribed] = useState(false)
   const [isStaying, setStaying] = useState(false)
@@ -102,18 +103,21 @@ const Unsubscribe = () => {
   }
 
   return (
-    <div className={styles.outer}>
-      <div className={styles.inner}>
-        <>
-          <img src={appLogo} alt="Postman logo" className={styles.appLogo} />
-          <img
-            src={isStaying ? cancelRequestHero : landingHero}
-            alt="Landing hero"
-            className={styles.landingHero}
-          />
-          {renderUnsubscribeSection()}
-          <ErrorBlock>{errorMsg}</ErrorBlock>
-        </>
+    <div className={styles.container}>
+      <Banner />
+      <div className={styles.outer}>
+        <div className={styles.inner}>
+          <>
+            <img src={appLogo} alt="Postman logo" className={styles.appLogo} />
+            <img
+              src={isStaying ? cancelRequestHero : landingHero}
+              alt="Landing hero"
+              className={styles.landingHero}
+            />
+            {renderUnsubscribeSection()}
+            <ErrorBlock>{errorMsg}</ErrorBlock>
+          </>
+        </div>
       </div>
     </div>
   )

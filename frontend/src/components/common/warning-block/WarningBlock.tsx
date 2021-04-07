@@ -14,7 +14,7 @@ const WarningBlock = ({
   className?: string
   children?: React.ReactNode
   absolute?: boolean
-  onClose?: Function
+  onClose?: () => void
   title?: string
 }) => {
   return (

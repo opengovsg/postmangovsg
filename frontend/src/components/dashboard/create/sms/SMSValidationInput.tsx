@@ -21,6 +21,7 @@ const SMSValidationInput = ({
 
   return (
     <TextInputWithButton
+      id="validateSms"
       type="tel"
       value={recipient}
       onChange={setRecipient}

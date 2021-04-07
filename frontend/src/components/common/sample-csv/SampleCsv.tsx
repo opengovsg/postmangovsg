@@ -22,7 +22,7 @@ const SampleCsv = ({
   params?: Array<string>
   template?: string
   protect?: boolean
-  setErrorMsg?: Function
+  setErrorMsg?: (message: string | null) => void
 }) => {
   const RECIPIENT_HEADER = ['recipient']
 

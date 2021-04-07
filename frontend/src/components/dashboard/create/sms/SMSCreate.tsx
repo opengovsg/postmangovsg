@@ -2,13 +2,15 @@ import cx from 'classnames'
 import React, { useState, useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { SMSCampaign, SMSProgress, Status } from 'classes'
+import { SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import SMSTemplate from './SMSTemplate'
 import SMSRecipients from './SMSRecipients'
 import SMSCredentials from './SMSCredentials'
 import SMSSend from './SMSSend'
 import SMSDetail from './SMSDetail'
+
+import type { SMSCampaign } from 'classes'
 
 import styles from '../Create.module.scss'
 

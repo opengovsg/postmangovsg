@@ -13,12 +13,14 @@ export interface ProtectedCsvInfo {
 
 export const PROTECTED_CSV_HEADERS = ['recipient', 'password']
 
-// Using default xss options for registered mail
-const templateClient = new TemplateClient({
-  allowedImageSources: i18n._(ALLOWED_IMAGE_SOURCES).split(';'),
-})
+const getTemplateClient = (): TemplateClient => {
+  return new TemplateClient({
+    allowedImageSources: i18n._(ALLOWED_IMAGE_SOURCES).split(';'),
+  })
+}
 
 export function extractParams(template: string): string[] {
+  const templateClient = getTemplateClient()
   return templateClient.parseTemplate(template).variables
 }
 
@@ -36,7 +38,7 @@ export async function validateCsv({
 }: {
   file: File
   template: string
-  recipientValidator: Function
+  recipientValidator: (email: string) => boolean
   removeEmptyLines: boolean
 }): Promise<ProtectedCsvInfo> {
   const csvFilename = file.name
@@ -100,6 +102,8 @@ export function hydrateTemplate(
   row: Record<string, any>,
   removeEmptyLines?: boolean
 ) {
+  // Using default xss options for registered mail
+  const templateClient = getTemplateClient()
   const hydrated = templateClient.template(template, row, {
     removeEmptyLines,
     replaceNewLines: true,
@@ -112,7 +116,7 @@ export function hydrateTemplate(
 function validateRow(
   row: Record<string, any>,
   requiredParams: Array<string>,
-  recipientValidator: Function
+  recipientValidator: (email: string) => boolean
 ): boolean {
   const params = keys(row).map((key) => key.toLowerCase())
   const missingParams = difference(requiredParams, params)

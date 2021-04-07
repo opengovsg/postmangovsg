@@ -8,6 +8,9 @@ import {
   convertToRaw,
   DefaultDraftBlockRenderMap,
   RichUtils,
+  Modifier,
+  SelectionState,
+  KeyBindingUtil,
 } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 
@@ -35,6 +38,7 @@ import styles from './RichTextEditor.module.scss'
 
 const ExtendedEditor = (props: any) => <Editor {...props} />
 
+const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
 const TOOLBAR_OPTIONS = {
   options: [
     'inline',
@@ -84,6 +88,27 @@ const TOOLBAR_OPTIONS = {
     defaultTargetOption: '_blank',
     showOpenOptionOnHover: false,
     component: LinkControl,
+    // Return link as-is to allow use of variables in links
+    linkCallback: (link: {
+      title: string
+      target: string
+      targetOption: string
+    }) => {
+      const { target } = link
+      if (VARIABLE_REGEX.test(link.target)) return link
+      if (
+        !target.startsWith('http://') &&
+        !target.startsWith('https://') &&
+        !target.startsWith('mailto:')
+      ) {
+        return {
+          ...link,
+          target: `http://${target}`,
+        }
+      }
+
+      return link
+    },
   },
 }
 
@@ -99,7 +124,7 @@ const RichTextEditor = ({
   onChange,
   placeholder,
 }: {
-  onChange: Function
+  onChange: (html: string) => void
   placeholder?: string
 }) => {
   const { editorState, setEditorState } = useContext(EditorContext)
@@ -210,7 +235,7 @@ const RichTextEditor = ({
   }
 
   function handleReturn(
-    _e: React.KeyboardEvent,
+    e: React.KeyboardEvent,
     state: EditorState
   ): 'handled' | 'not-handled' {
     const selection = state.getSelection()
@@ -226,7 +251,55 @@ const RichTextEditor = ({
       return 'handled'
     }
 
+    // Insert soft new line if shift+enter is pressed.
+    if (KeyBindingUtil.isSoftNewlineEvent(e) && selection.isCollapsed()) {
+      setEditorState(RichUtils.insertSoftNewline(state))
+      return 'handled'
+    }
+
     return 'not-handled'
+  }
+
+  function handlePastedText(
+    text: string,
+    _html: string,
+    editorState: EditorState
+  ): boolean {
+    let contentState = editorState.getCurrentContent()
+    let selection = editorState.getSelection()
+    const anchorKey = selection.getAnchorKey()
+    const focusKey = selection.getFocusKey()
+    const currentBlock = contentState.getBlockForKey(anchorKey)
+
+    // Handle paste within table cells. We only paste as plain text and strip all HTML.
+    if (currentBlock.getType() === 'table-cell') {
+      // If user tries to select across multiple cells/blocks, we will replace the selection to just
+      // the whole of the anchor block.
+      if (anchorKey !== focusKey) {
+        selection = SelectionState.createEmpty(anchorKey).merge({
+          focusKey: anchorKey,
+          anchorOffset: selection.getAnchorOffset(),
+          focusOffset: currentBlock.getLength(),
+        })
+      }
+
+      if (selection.isCollapsed()) {
+        contentState = Modifier.insertText(contentState, selection, text)
+      } else {
+        contentState = Modifier.replaceText(contentState, selection, text)
+      }
+
+      const updated = EditorState.push(
+        editorState,
+        contentState,
+        'insert-characters'
+      )
+      setEditorState(updated)
+      return true
+    }
+
+    // Return false so that default behaviour will run
+    return false
   }
 
   return (
@@ -239,11 +312,12 @@ const RichTextEditor = ({
       onEditorStateChange={setEditorState}
       toolbar={TOOLBAR_OPTIONS}
       toolbarCustomButtons={TOOLBAR_CUSTOM_BUTTONS}
-      customDecorators={[VariableDecorator, LinkDecorator]}
+      customDecorators={[LinkDecorator, VariableDecorator]}
       customBlockRenderFunc={renderBlock}
       blockRenderMap={extendedBlockRenderMap}
       handleKeyCommand={handleKeyCommand}
       handleReturn={handleReturn}
+      handlePastedText={handlePastedText}
       stripPastedStyles
     />
   )

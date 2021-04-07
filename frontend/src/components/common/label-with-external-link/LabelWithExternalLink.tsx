@@ -6,13 +6,15 @@ import styles from './LabelWithExternalLink.module.scss'
 const LabelWithExternalLink = ({
   label,
   link,
+  htmlFor,
 }: {
   label: string
   link?: string
+  htmlFor?: string
 }) => {
   return (
     <div className={styles.label}>
-      <label>{label}</label>
+      <label htmlFor={htmlFor}>{label}</label>
       {link && (
         <OutboundLink
           className={styles.link}

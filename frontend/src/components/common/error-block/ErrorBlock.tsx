@@ -14,7 +14,7 @@ const ErrorBlock = ({
   className?: string
   children?: React.ReactNode
   absolute?: boolean
-  onClose?: Function
+  onClose?: () => void
   title?: string
 }) => {
   return (
@@ -24,6 +24,7 @@ const ErrorBlock = ({
       absolute={absolute}
       onClose={onClose}
       title={title}
+      role="alert"
       {...otherProps}
     >
       {children}
