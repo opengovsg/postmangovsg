@@ -32,7 +32,8 @@ Sensitive configuration has to be set with environment variables.
 | `DB_URI`               | URI to the postgres database                                                     |
 | `REDIS_OTP_URI`        | URI to the redis cache for storing one time passwords                            |
 | `REDIS_SESSION_URI`    | URI to the redis cache for storing login sessions                                |
-| `REDIS_RATE_LIMIT_URI` | URI to the redis cache for rate limiting requests                                |
+| `REDIS_RATE_LIMIT_URI` | URI to the redis cache for rate limiting transactional requests                  |
+| `REDIS_CREDENTIAL_URI` | URI to the redis cache for storing credentials                                   |
 | `SESSION_SECRET`       | Secret used to sign the session ID cookie                                        |
 | `JWT_SECRET`           | Secret used to sign pre-signed urls for uploading CSV files to AWS S3            |
 | `SECRET_MANAGER_SALT`  | Secret used to generate names of credentials to be stored in AWS Secrets Manager |
@@ -142,3 +143,9 @@ Further reference: [Twilio API Key documentation](https://www.twilio.com/docs/ia
 | ---------------------------- | --------------------------------------------------------------------------------- |
 | `TRANSACTIONAL_EMAIL_RATE`   | The max number of transactional emails that can be requested per window per user. |
 | `TRANSACTIONAL_EMAIL_WINDOW` | The duration of each window for transactional emails in seconds.                  |
+
+#### Credential cache
+
+| Name                              | Description                                                       |
+| --------------------------------- | ----------------------------------------------------------------- |
+| `TWILIO_CREDENTIAL_CACHE_MAX_AGE` | The maximum age in milliseconds of each cached Twilio credential. |

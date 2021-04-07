@@ -1,6 +1,5 @@
 import AWS from 'aws-sdk'
 import { get } from 'lodash'
-import LruCache from 'lru-cache'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
@@ -13,18 +12,12 @@ import {
 } from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { loggerWithLabel } from '@core/logger'
-
+import { RedisService } from '@core/services'
 import { TwilioCredentials } from '@sms/interfaces'
 import { UserSettings } from '@core/interfaces'
 
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 const logger = loggerWithLabel(module)
-
-const twilioCredentialCache = new LruCache<string, string>({
-  max: config.get('twilioCredentialCache.max'),
-  length: (item: string): number => item.length,
-  maxAge: config.get('twilioCredentialCache.maxAge'),
-})
 
 /**
  * Upserts credential into AWS SecretsManager
@@ -105,29 +98,45 @@ const storeCredential = async (
  * Retrieve a credential from secrets manager
  * @param name
  */
-const getTwilioCredentials = async (
-  name: string
-): Promise<TwilioCredentials> => {
+const getTwilioCredentials = (name: string): Promise<TwilioCredentials> => {
   const logMeta = { name, action: 'getTwilioCredentials' }
 
-  let secretString = twilioCredentialCache.get(name)
-  if (!secretString) {
-    const data = await secretsManager
-      .getSecretValue({ SecretId: name })
-      .promise()
-    logger.info({
-      messge: 'Retrieved secret from AWS secrets manager.',
-      ...logMeta,
+  return new Promise((resolve, reject) => {
+    RedisService.credentialClient.get(name, async (error, value) => {
+      if (error || value === null) {
+        const data = await secretsManager
+          .getSecretValue({ SecretId: name })
+          .promise()
+        logger.info({
+          message: 'Retrieved secret from AWS secrets manager.',
+          ...logMeta,
+        })
+
+        if (!data?.SecretString) {
+          reject(new Error('Missing secret string from AWS secrets manager.'))
+          return
+        }
+        value = data?.SecretString
+
+        RedisService.credentialClient.set(
+          name,
+          value,
+          'PX',
+          config.get('twilioCredentialCache.maxAge'),
+          (error) => {
+            if (error) {
+              logger.error({
+                message: 'Failed to save Twilio credential',
+                error,
+                ...logMeta,
+              })
+            }
+          }
+        )
+      }
+      resolve(JSON.parse(value))
     })
-
-    secretString = data?.SecretString ?? ''
-  }
-
-  if (!secretString) {
-    throw new Error('Missing secret string from AWS secrets manager.')
-  }
-  twilioCredentialCache.set(name, secretString)
-  return JSON.parse(secretString)
+  })
 }
 
 /**

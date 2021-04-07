@@ -255,9 +255,16 @@ const config = convict({
     sensitive: true,
   },
   redisRateLimitUri: {
-    doc: 'URI to redis cache for rate limiting transactional requests',
+    doc: 'URI to the redis cache for rate limiting transactional requests',
     default: '',
     env: 'REDIS_RATE_LIMIT_URI',
+    format: 'required-string',
+    sensitive: true,
+  },
+  redisCredentialUri: {
+    doc: 'URI to the redis cache for storing credentials',
+    default: '',
+    env: 'REDIS_CREDENTIAL_URI',
     format: 'required-string',
     sensitive: true,
   },
@@ -454,12 +461,6 @@ const config = convict({
     },
   },
   twilioCredentialCache: {
-    max: {
-      doc: 'Maximum size of the cache',
-      default: 1000000, // 1M chars or ~2MB
-      env: 'TWILIO_CREDENTIAL_CACHE_MAX',
-      format: 'int',
-    },
     maxAge: {
       doc: 'Maximum age of an item in milliseconds',
       default: 24 * 60 * 60 * 1000, // 1 day,

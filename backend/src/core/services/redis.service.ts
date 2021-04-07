@@ -76,8 +76,34 @@ const rateLimitClient = redis
     })
   })
 
+if (!config.get('redisCredentialUri')) {
+  throw new Error('credentialClient: redisCredentialUri not found')
+}
+
+/**
+ * Client to redis cache for storing credentials
+ */
+const credentialClient = redis
+  .createClient({
+    url: config.get('redisCredentialUri') || undefined,
+  })
+  .on('connect', () => {
+    logger.info({
+      message: 'credentialClient: Connected',
+      url: config.get('redisCredentialUri'),
+    })
+  })
+  .on('error', (err: Error) => {
+    logger.error({
+      message: 'Failed to connect to credentialClient',
+      url: config.get('redisCredentialUri'),
+      error: String(err),
+    })
+  })
+
 export const RedisService = {
   otpClient,
   sessionClient,
   rateLimitClient,
+  credentialClient,
 }
