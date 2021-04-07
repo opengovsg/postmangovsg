@@ -50,6 +50,10 @@ const sessionClient = redis
     })
   })
 
+if (!config.get('redisRateLimitUri')) {
+  throw new Error('rateLimitClient: redisRateLimitUri not found')
+}
+
 /**
  * Client to redis cache for rate limiting transactional requests
  */
