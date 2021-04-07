@@ -1,17 +1,28 @@
 import request from 'supertest'
-import app from '../server'
+import { Sequelize } from 'sequelize-typescript'
+import initialiseServer from '../server'
 import { Campaign, User, UserDemo } from '@core/models'
-import sequelizeLoader from '../sequelize-loader'
+import sequelizeLoader from '../../sequelize-loader'
+import { RedisService } from '@core/services'
+import { ChannelType } from '@core/constants'
+
+const app = initialiseServer(true)
+let sequelize: Sequelize
 
 beforeAll(async () => {
-  await sequelizeLoader()
-  await User.destroy({ where: {} })
-  await UserDemo.destroy({ where: {} })
+  sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   await User.create({ id: 1, email: 'user@agency.gov.sg' })
 })
 
 afterEach(async () => {
   await Campaign.destroy({ where: {} })
+})
+
+afterAll(async () => {
+  await User.destroy({ where: {} })
+  await sequelize.close()
+  RedisService.otpClient.quit()
+  RedisService.sessionClient.quit()
 })
 
 describe('GET /campaigns', () => {
@@ -69,28 +80,70 @@ describe('POST /campaigns', () => {
   test('Successfully create SMS campaign', async () => {
     const res = await request(app).post('/campaigns').send({
       name: 'test',
-      type: 'SMS',
+      type: ChannelType.SMS,
     })
     expect(res.status).toBe(201)
     expect(res.body).toEqual(
       expect.objectContaining({
         name: 'test',
+        type: ChannelType.SMS,
+        protect: false,
+      })
+    )
+  })
+
+  test('Successfully create Email campaign', async () => {
+    const res = await request(app).post('/campaigns').send({
+      name: 'test',
+      type: ChannelType.Email,
+    })
+    expect(res.status).toBe(201)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        name: 'test',
+        type: ChannelType.Email,
+        protect: false,
+      })
+    )
+  })
+
+  test('Successfully create Protected Email campaign', async () => {
+    const campaign = {
+      name: 'test',
+      type: ChannelType.Email,
+      protect: true,
+    }
+    const res = await request(app).post('/campaigns').send(campaign)
+    expect(res.status).toBe(201)
+    expect(res.body).toEqual(expect.objectContaining(campaign))
+  })
+
+  test('Successfully create Telegram campaign', async () => {
+    const res = await request(app).post('/campaigns').send({
+      name: 'test',
+      type: ChannelType.Telegram,
+    })
+    expect(res.status).toBe(201)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        name: 'test',
+        type: ChannelType.Telegram,
         protect: false,
       })
     )
   })
 
   test('Successfully create demo SMS campaign', async () => {
-    const res = await request(app).post('/campaigns').send({
+    const campaign = {
       name: 'demo',
-      type: 'SMS',
+      type: ChannelType.SMS,
       demo_message_limit: 10,
-    })
+    }
+    const res = await request(app).post('/campaigns').send(campaign)
     expect(res.status).toBe(201)
     expect(res.body).toEqual(
       expect.objectContaining({
-        name: 'demo',
-        protect: false,
+        ...campaign,
         demo_message_limit: 10,
       })
     )
@@ -99,7 +152,47 @@ describe('POST /campaigns', () => {
     expect(demo?.numDemosSms).toEqual(2)
   })
 
-  test('Create protected campaign for unsupported channel', async () => {
+  test('Successfully create demo Telegram campaign', async () => {
+    const campaign = {
+      name: 'demo',
+      type: ChannelType.Telegram,
+      demo_message_limit: 10,
+    }
+    const res = await request(app).post('/campaigns').send(campaign)
+    expect(res.status).toBe(201)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        ...campaign,
+        demo_message_limit: 10,
+      })
+    )
+
+    const demo = await UserDemo.findOne({ where: { userId: 1 } })
+    expect(demo?.numDemosTelegram).toEqual(2)
+  })
+
+  test('Unable to create demo Telegram campaign after user has no demos left', async () => {
+    const campaign = {
+      name: 'demo',
+      type: ChannelType.Telegram,
+      demo_message_limit: 10,
+    }
+    await UserDemo.update({ numDemosTelegram: 0 }, { where: { userId: 1 } })
+    const res = await request(app).post('/campaigns').send(campaign)
+    expect(res.status).toBe(400)
+  })
+
+  test('Unable to create demo campaign for unsupported channel', async () => {
+    const campaign = {
+      name: 'demo',
+      type: ChannelType.Email,
+      demo_message_limit: 10,
+    }
+    const res = await request(app).post('/campaigns').send(campaign)
+    expect(res.status).toBe(400)
+  })
+
+  test('Unable to create protected campaign for unsupported channel', async () => {
     const res = await request(app).post('/campaigns').send({
       name: 'test',
       type: 'SMS',

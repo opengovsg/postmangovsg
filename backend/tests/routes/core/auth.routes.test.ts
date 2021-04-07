@@ -1,10 +1,27 @@
 import request from 'supertest'
-import app from '../server'
-import sequelizeLoader from '../sequelize-loader'
-import { AuthService } from '@core/services'
+import { Sequelize } from 'sequelize-typescript'
+import bcrypt from 'bcrypt'
+import initialiseServer from '../server'
+import sequelizeLoader from '../../sequelize-loader'
+import { MailService, RedisService } from '@core/services'
+import { User } from '@core/models'
+
+const app = initialiseServer()
+const appWithUserSession = initialiseServer(true)
+let sequelize: Sequelize
 
 beforeAll(async () => {
-  await sequelizeLoader()
+  sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
+})
+
+afterEach(async () => {
+  await User.destroy({ where: {} })
+})
+
+afterAll(async () => {
+  await sequelize.close()
+  RedisService.otpClient.quit()
+  RedisService.sessionClient.quit()
 })
 
 describe('POST /auth/otp', () => {
@@ -23,33 +40,72 @@ describe('POST /auth/otp', () => {
     expect(res.status).toBe(401)
     expect(res.body).toEqual({ message: 'User is not authorized' })
   })
+
+  test('OTP is generated and sent to user', async () => {
+    const res = await request(app)
+      .post('/auth/otp')
+      .send({ email: 'user@agency.gov.sg' })
+    expect(res.status).toBe(200)
+
+    expect(MailService.mailClient.sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.stringMatching(/Your OTP is <b>[0-9]{6}<\/b>/),
+      })
+    )
+  })
 })
 
 describe('POST /auth/login', () => {
-  test('Invalid otp format', async () => {
+  test('Invalid otp format provided', async () => {
     const res = await request(app)
       .post('/auth/login')
       .send({ email: 'user@agency.gov.sg', otp: '123' })
     expect(res.status).toBe(400)
   })
 
-  test('Invalid otp', async () => {
+  test('Invalid otp provided', async () => {
     const res = await request(app)
       .post('/auth/login')
       .send({ email: 'user@agency.gov.sg', otp: '000000' })
     expect(res.status).toBe(401)
   })
 
-  test('Valid otp', async () => {
+  test('OTP is invalidted after retries are exceeded', async () => {
     const email = 'user@agency.gov.sg'
-    // Mock verification of otp
-    AuthService.verifyOtp = jest.fn(async () => true)
+    RedisService.otpClient.set(
+      email,
+      JSON.stringify({
+        retries: 1,
+        hash: await bcrypt.hash('123456', 10),
+        createdAt: 123,
+      })
+    )
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email, otp: '000000' })
+    expect(res.status).toBe(401)
+
+    // OTP should be deleted after exceeding retries
+    RedisService.otpClient.get(email, (_err, value) => {
+      expect(value).toBe(null)
+    })
+  })
+
+  test('Valid otp provided', async () => {
+    const email = 'user@agency.gov.sg'
+    RedisService.otpClient.set(
+      email,
+      JSON.stringify({
+        retries: 1,
+        hash: await bcrypt.hash('123456', 10),
+        createdAt: 123,
+      })
+    )
 
     const res = await request(app)
       .post('/auth/login')
       .send({ email, otp: '123456' })
     expect(res.status).toBe(200)
-    expect(res.body).toEqual({})
   })
 })
 
@@ -60,20 +116,17 @@ describe('GET /auth/userinfo', () => {
     expect(res.body).toEqual({})
   })
 
-  // test('Existing session found', async () => {
-  //   // Mock verification of otp
-  //   AuthService.verifyOtp = jest.fn(async () => true)
-  //   const email = 'user@agency.gov.sg'
-  //   await request(app).post('/auth/login').send({ email, otp: '123456' })
-  //   const res = await request(app).get('/auth/userinfo')
-  //   expect(res.status).toBe(200)
-  //   expect(res.body).toEqual({})
-  // })
+  test('Existing session found', async () => {
+    await User.create({ id: 1, email: 'user@agency.gov.sg' })
+    const res = await request(appWithUserSession).get('/auth/userinfo')
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ id: 1, email: 'user@agency.gov.sg' })
+  })
 })
 
 describe('GET /auth/logout', () => {
   test('Successfully logged out', async () => {
-    const res = await request(app).get('/auth/logout')
+    const res = await request(appWithUserSession).get('/auth/logout')
     expect(res.status).toBe(200)
   })
 })
