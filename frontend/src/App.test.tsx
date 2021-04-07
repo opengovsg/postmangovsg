@@ -2,14 +2,14 @@ import React from 'react'
 import { server, rest, within, render, screen } from './test-utils'
 import App from 'App'
 
-test('renders with no errors', async () => {
+test('displays landing page when unauthenticated', async () => {
   server.use(
-    // Landing page
+    // Mock 0 messages sent so far
     rest.get('/stats', (_req, res, ctx) => {
       return res(ctx.status(200), ctx.json({ sent: 0 }))
     }),
 
-    // Authentication
+    // Mock an unauthenticated user
     rest.get('/auth/userinfo', (_req, res, ctx) => {
       return res(ctx.status(200), ctx.json({}))
     })
