@@ -66,6 +66,7 @@ router.post(
   '/credentials',
   celebrate(storeCredentialValidator),
   SettingsMiddleware.checkUserCredentialLabel,
+  SmsMiddleware.canValidateCredentials,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
   SettingsMiddleware.storeUserCredential
@@ -101,6 +102,7 @@ router.post(
 router.post(
   '/credentials/verify',
   celebrate(verifyCredentialValidator),
+  SmsMiddleware.canValidateCredentials,
   SmsMiddleware.getCredentialsFromLabel,
   SmsMiddleware.validateAndStoreCredentials,
   (_req: Request, res: Response) => res.sendStatus(200)
