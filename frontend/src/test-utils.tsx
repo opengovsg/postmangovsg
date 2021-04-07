@@ -8,9 +8,7 @@ import { setupServer } from 'msw/node'
 
 const CommonProviders: React.FC = ({ children }) => (
   <I18nProvider i18n={i18n}>
-    <AuthContextProvider gaOptions={{ testMode: true }}>
-      {children}
-    </AuthContextProvider>
+    <AuthContextProvider>{children}</AuthContextProvider>
   </I18nProvider>
 )
 

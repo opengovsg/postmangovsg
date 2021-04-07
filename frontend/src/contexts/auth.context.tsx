@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react'
-import ReactGA from 'react-ga'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
@@ -16,13 +15,7 @@ interface ContextProps {
 
 export const AuthContext = createContext({} as ContextProps)
 
-const AuthContextProvider = ({
-  gaOptions,
-  children,
-}: {
-  gaOptions?: ReactGA.InitializeOptions
-  children: React.ReactNode
-}) => {
+const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setAuthenticated] = useState(false)
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')
@@ -41,7 +34,7 @@ const AuthContextProvider = ({
         setAuthenticated(!!user?.email)
         setEmail(user?.email || '')
 
-        initializeGA(gaOptions)
+        initializeGA()
         setUserAnalytics(user)
       } catch (err) {
         // is unauthorized
@@ -63,7 +56,7 @@ const AuthContextProvider = ({
       )
     }
     initialChecks()
-  }, [gaOptions])
+  }, [])
 
   return (
     <AuthContext.Provider
