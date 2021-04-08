@@ -1,5 +1,6 @@
 import { rest } from 'msw'
 import type { State } from './interfaces'
+import { USER_EMAIL, TWILIO_CREDENTIAL, TELEGRAM_CREDENTIAL } from './constants'
 
 function mockCommonApis(initialState?: Partial<State>) {
   const state: State = {
@@ -7,7 +8,22 @@ function mockCommonApis(initialState?: Partial<State>) {
     totalMessagesSent: 0,
 
     // Auth
-    users: [],
+    users: [
+      {
+        api_key: 'test-api-key',
+        creds: [
+          { label: TWILIO_CREDENTIAL, type: 'SMS' },
+          { label: TELEGRAM_CREDENTIAL, type: 'TELEGRAM' },
+        ],
+        demo: {
+          num_demo_sms: 0,
+          num_demo_telegram: 0,
+          is_displayed: false,
+        },
+        email: USER_EMAIL,
+        id: 1,
+      },
+    ],
     curUserId: 0, // start unauthenticated; 1-indexed
 
     ...initialState, // Allow tests to override the initial state
@@ -37,3 +53,4 @@ function mockAuthApis(state: State) {
 }
 
 export { mockCommonApis }
+export * from './constants'
