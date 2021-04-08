@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk'
 import { get } from 'lodash'
+import { PerformanceObserver, performance } from 'perf_hooks'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
@@ -102,7 +103,15 @@ const getTwilioCredentials = (name: string): Promise<TwilioCredentials> => {
   const logMeta = { name, action: 'getTwilioCredentials' }
 
   return new Promise((resolve, reject) => {
+    const observer = new PerformanceObserver((items) => {
+      console.log(items.getEntries()[0])
+      performance.clearMarks()
+    })
+    observer.observe({ entryTypes: ['measure'] })
+    performance.mark('Start')
     RedisService.credentialClient.get(name, async (error, value) => {
+      performance.mark('Callback')
+      performance.measure('Start to Callback', 'Start', 'Callback')
       if (error || value === null) {
         const data = await secretsManager
           .getSecretValue({ SecretId: name })
@@ -134,6 +143,8 @@ const getTwilioCredentials = (name: string): Promise<TwilioCredentials> => {
           }
         )
       }
+      performance.mark('Finalize')
+      performance.measure('Callback to Finalize', 'Callback', 'Finalize')
       resolve(JSON.parse(value))
     })
   })
