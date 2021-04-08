@@ -315,6 +315,48 @@ jobs:
             - SES_USER=$STAGING_REDACTION_DIGEST_SES_USER
             - SES_PORT=$STAGING_REDACTION_DIGEST_SES_PORT
             - CRONITOR_CODE=$STAGING_REDACTION_CRONITOR
+    - name: serverless-log-sns-sms
+      before_deploy:
+        - cd $TRAVIS_BUILD_DIR/serverless/log-sns-sms
+        - npm install && npm run build && npm prune --production
+        - zip -qr code.zip build package.json node_modules/
+      deploy:
+        - provider: lambda
+          edge: true
+          function_name: log-sns-sms-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_LOG_SNS_SMS_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 10
+          memory_size: 128
+          publish: true
+          zip: "../log-sns-sm/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - NODE_ENV=production
+            - DB_URI=$PRODUCTION_LOG_SNS_SMS_DB_URI
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+        - provider: lambda
+          edge: true
+          function_name: log-sns-sms-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_LOG_SNS_SMS_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: handler
+          timeout: 10
+          memory_size: 128
+          publish: true
+          zip: "../log-sns-sm/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - NODE_ENV=staging
+            - DB_URI=$STAGING_LOG_SNS_SMS_DB_URI
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
     - name: root
       install:
         - npm install --ignore-scripts
