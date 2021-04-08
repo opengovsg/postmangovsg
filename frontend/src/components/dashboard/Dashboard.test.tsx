@@ -7,13 +7,13 @@ import {
   screen,
   fireEvent,
   waitFor,
+  mockCommonApis,
+  TWILIO_CREDENTIAL,
+  TELEGRAM_CREDENTIAL,
 } from '../../test-utils'
 import Dashboard from './Dashboard'
 
-const TWILIO_CREDENTIAL = 'test-twilio-cred'
-const TELEGRAM_CREDENTIAL = 'test-telegram-cred'
 const REPLY_TO = 'testEmail@open.gov.sg'
-const USER_EMAIL = 'testEmail@open.gov.sg'
 const MESSAGE_TEXT = 'Test message'
 const UNPROTECTED_MESSAGE_TEXT = 'Test message {{protectedlink}}'
 const CSV_FILENAME = 'test_email_recipients.csv'
@@ -39,23 +39,6 @@ const MOBILE_CSV_FILE = new File(
     type: 'text/csv',
   }
 )
-
-interface Credential {
-  label: string
-  type: string
-}
-
-interface User {
-  api_key: string
-  creds: Credential[]
-  demo: {
-    num_demo_sms: number
-    num_demo_telegram: number
-    is_displayed: boolean
-  }
-  email: string
-  id: number
-}
 
 interface Template {
   body: string
@@ -96,35 +79,15 @@ function extractParamsFromBody(body: string) {
 }
 
 const mockApis = () => {
-  // Constants
-  const USER_ID = 1
-
-  // In-memory database
-  const users: User[] = [
-    {
-      api_key: 'test-api-key',
-      creds: [
-        { label: TWILIO_CREDENTIAL, type: 'SMS' },
-        { label: TELEGRAM_CREDENTIAL, type: 'TELEGRAM' },
-      ],
-      demo: {
-        num_demo_sms: 0,
-        num_demo_telegram: 0,
-        is_displayed: false,
-      },
-      email: USER_EMAIL,
-      id: 1,
-    },
-  ]
+  const { state, handlers } = mockCommonApis({
+    curUserId: 1, // Start out authenticated; 1-indexed
+  })
   const campaigns: Campaign[] = []
 
   return [
-    rest.get('/auth/userinfo', (_req, res, ctx) => {
-      const { email, id } = users[USER_ID - 1]
-      return res(ctx.status(200), ctx.json({ email, id }))
-    }),
+    ...handlers,
     rest.get('/settings', (_req, res, ctx) => {
-      const { creds, demo, api_key } = users[USER_ID - 1]
+      const { creds, demo, api_key } = state.users[state.curUserId - 1]
       return res(
         ctx.status(200),
         ctx.json({
@@ -146,7 +109,7 @@ const mockApis = () => {
       return res(
         ctx.status(200),
         ctx.json(
-          users[USER_ID - 1].creds
+          state.users[state.curUserId - 1].creds
             .filter((cred) => cred.type === 'SMS')
             .map((cred) => cred.label)
         )
@@ -156,7 +119,7 @@ const mockApis = () => {
       return res(
         ctx.status(200),
         ctx.json(
-          users[USER_ID - 1].creds
+          state.users[state.curUserId - 1].creds
             .filter((cred) => cred.type === 'TELEGRAM')
             .map((cred) => cred.label)
         )
@@ -236,7 +199,7 @@ const mockApis = () => {
         body,
         from,
         params: extractParamsFromBody(body),
-        reply_to: replyTo ?? users[USER_ID - 1].email,
+        reply_to: replyTo ?? state.users[state.curUserId - 1].email,
         subject,
       }
       campaigns[campaignId - 1].template = template
@@ -355,7 +318,7 @@ const mockApis = () => {
         !recipient ||
         !label ||
         // Check that the user actually has the credential
-        !users[USER_ID - 1].creds.some(
+        !state.users[state.curUserId - 1].creds.some(
           (cred) => cred.label === label && cred.type === 'SMS'
         )
       ) {
@@ -370,7 +333,7 @@ const mockApis = () => {
       if (
         !label ||
         // Check that the user actually has the credential
-        !users[USER_ID - 1].creds.some(
+        !state.users[state.curUserId - 1].creds.some(
           (cred) => cred.label === label && cred.type === 'TELEGRAM'
         )
       ) {
