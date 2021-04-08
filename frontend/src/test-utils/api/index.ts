@@ -13,6 +13,19 @@ import {
   PRESIGNED_URL,
   CSV_FILENAME,
 } from './constants'
+import {
+  TemplateClient,
+  XSS_EMAIL_OPTION,
+  XSS_SMS_OPTION,
+  XSS_TELEGRAM_OPTION,
+} from 'postman-templating'
+
+const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
+const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
+const telegramTemplateClient = new TemplateClient({
+  xssOptions: XSS_TELEGRAM_OPTION,
+  lineBreak: '\n',
+})
 
 function mockCommonApis(initialState?: Partial<State>) {
   const state: State = {
@@ -253,7 +266,22 @@ function mockCampaignTemplateApis(state: State) {
         reply_to: string
         subject: string
       }
-      if (!body || !from || replyTo === undefined || !subject) {
+
+      const sanitizedSubject = emailTemplateClient.replaceNewLinesAndSanitize(
+        subject
+      )
+      const sanitizedBody = emailTemplateClient.filterXSS(body)
+      if (!sanitizedBody || !sanitizedSubject) {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            message:
+              'Message template is invalid as it only contains invalid HTML tags!',
+          })
+        )
+      }
+
+      if (!from || replyTo === undefined) {
         return res(ctx.status(400))
       }
 
@@ -288,12 +316,20 @@ function mockCampaignTemplateApis(state: State) {
     rest.put('/campaign/:campaignId/sms/template', (req, res, ctx) => {
       const { campaignId } = req.params
       const { body } = req.body as { body: string }
-      if (!body) {
-        return res(ctx.status(400))
+
+      const sanitizedBody = smsTemplateClient.replaceNewLinesAndSanitize(body)
+      if (!sanitizedBody) {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            message:
+              'Message template is invalid as it only contains invalid HTML tags!',
+          })
+        )
       }
 
       const template: SMSTemplate = {
-        body,
+        body: sanitizedBody,
         params: extractParamsFromBody(body),
       }
       state.campaigns[campaignId - 1].sms_templates = template
@@ -313,12 +349,22 @@ function mockCampaignTemplateApis(state: State) {
     rest.put('/campaign/:campaignId/telegram/template', (req, res, ctx) => {
       const { campaignId } = req.params
       const { body } = req.body as { body: string }
-      if (!body) {
-        return res(ctx.status(400))
+
+      const sanitizedBody = telegramTemplateClient.replaceNewLinesAndSanitize(
+        body
+      )
+      if (!sanitizedBody) {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            message:
+              'Message template is invalid as it only contians invalid HTML tags!',
+          })
+        )
       }
 
       const template: TelegramTemplate = {
-        body,
+        body: sanitizedBody,
         params: extractParamsFromBody(body),
       }
       state.campaigns[campaignId - 1].telegram_templates = template
