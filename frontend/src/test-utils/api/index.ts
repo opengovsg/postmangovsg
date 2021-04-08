@@ -13,7 +13,7 @@ function mockCommonApis(initialState?: Partial<State>) {
     ...initialState, // Allow tests to override the initial state
   }
 
-  return [...mockStatsApis(state), ...mockAuthApis(state)]
+  return { state, handlers: [...mockStatsApis(state), ...mockAuthApis(state)] }
 }
 
 function mockStatsApis(state: State) {
