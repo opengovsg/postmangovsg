@@ -164,6 +164,44 @@ const getCredentialsFromLabel = async (
   }
 }
 
+const getCredentialsFromLabelLru = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  const { campaignId } = req.params // May be undefined if invoked from settings page
+  const { label } = req.body
+  const userId = req.session?.user?.id
+  const logMeta = {
+    campaignId,
+    label,
+    action: 'getCredentialsFromLabel',
+  }
+  try {
+    /* Determine if credential name can be used */
+    const campaign = campaignId
+      ? await SmsService.findCampaign(+campaignId, userId)
+      : null
+    const credentialName = campaign?.demoMessageLimit
+      ? getDemoCredentialName(label)
+      : await getCredentialName(label, +userId)
+
+    /* Get credential from the name */
+    const credentials = await CredentialService.getTwilioCredentialsLru(
+      credentialName
+    )
+    res.locals.credentials = credentials
+    res.locals.credentialName = credentialName
+    return next()
+  } catch (err) {
+    logger.error({
+      ...logMeta,
+      message: `${err.stack}`,
+    })
+    return res.status(400).json({ message: `${err.message}` })
+  }
+}
+
 /**
  * Sends a test message. If the test message succeeds,
  * store the credentials in AWS secrets manager and db.
@@ -341,6 +379,7 @@ const duplicateCampaign = async (
 export const SmsMiddleware = {
   getCredentialsFromBody,
   getCredentialsFromLabel,
+  getCredentialsFromLabelLru,
   isSmsCampaignOwnedByUser,
   validateAndStoreCredentials,
   setCampaignCredential,

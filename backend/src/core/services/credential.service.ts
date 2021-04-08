@@ -1,6 +1,7 @@
 import AWS from 'aws-sdk'
 import { get } from 'lodash'
 import { PerformanceObserver, performance } from 'perf_hooks'
+import LruCache from 'lru-cache'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
@@ -19,6 +20,12 @@ import { UserSettings } from '@core/interfaces'
 
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 const logger = loggerWithLabel(module)
+
+const twilioCredentialCache = new LruCache<string, string>({
+  max: 0,
+  length: (item: string): number => item.length,
+  maxAge: config.get('twilioCredentialCache.maxAge'),
+})
 
 /**
  * Upserts credential into AWS SecretsManager
@@ -104,14 +111,17 @@ const getTwilioCredentials = (name: string): Promise<TwilioCredentials> => {
 
   return new Promise((resolve, reject) => {
     const observer = new PerformanceObserver((items) => {
-      console.log(items.getEntries()[0])
-      performance.clearMarks()
+      const entry = items.getEntries()[0]
+      console.log(entry)
+      if (entry.name === 'Redis: Callback to Finalize') {
+        observer.disconnect()
+      }
     })
     observer.observe({ entryTypes: ['measure'] })
     performance.mark('Start')
     RedisService.credentialClient.get(name, async (error, value) => {
       performance.mark('Callback')
-      performance.measure('Start to Callback', 'Start', 'Callback')
+      performance.measure('Redis: Start to Callback', 'Start', 'Callback')
       if (error || value === null) {
         const data = await secretsManager
           .getSecretValue({ SecretId: name })
@@ -144,10 +154,47 @@ const getTwilioCredentials = (name: string): Promise<TwilioCredentials> => {
         )
       }
       performance.mark('Finalize')
-      performance.measure('Callback to Finalize', 'Callback', 'Finalize')
+      performance.measure('Redis: Callback to Finalize', 'Callback', 'Finalize')
       resolve(JSON.parse(value))
     })
   })
+}
+
+const getTwilioCredentialsLru = async (
+  name: string
+): Promise<TwilioCredentials> => {
+  const logMeta = { name, action: 'getTwilioCredentialsLru' }
+
+  const observer = new PerformanceObserver((items) => {
+    const entry = items.getEntries()[0]
+    console.log(entry)
+    if (entry.name === 'Lru: Callback to Finalize') {
+      observer.disconnect()
+    }
+  })
+  observer.observe({ entryTypes: ['measure'] })
+  performance.mark('Start')
+  let secretString = twilioCredentialCache.get(name)
+  performance.mark('Callback')
+  performance.measure('Lru: Start to Callback', 'Start', 'Callback')
+  if (!secretString) {
+    const data = await secretsManager
+      .getSecretValue({ SecretId: name })
+      .promise()
+    logger.info({
+      messge: 'Retrieved secret from AWS secrets manager.',
+      ...logMeta,
+    })
+
+    if (!data?.SecretString) {
+      throw new Error('Missing secret string from AWS secrets manager.')
+    }
+    secretString = data?.SecretString
+    twilioCredentialCache.set(name, secretString)
+  }
+  performance.mark('Finalize')
+  performance.measure('Lru: Callback to Finalize', 'Callback', 'Finalize')
+  return JSON.parse(secretString)
 }
 
 /**
@@ -373,6 +420,7 @@ export const CredentialService = {
   // Credentials (cred_name)
   storeCredential,
   getTwilioCredentials,
+  getTwilioCredentialsLru,
   getTelegramCredential,
   // User credentials (user - label - cred_name)
   createUserCredential,

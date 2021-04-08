@@ -57,4 +57,46 @@ router.post(
   SmsTransactionalMiddleware.sendMessage
 )
 
+/**
+ * @swagger
+ * paths:
+ *   /transactional/sms/send-lru:
+ *     post:
+ *       summary: "Send a transactional SMS using Lru"
+ *       tags:
+ *         - SMS
+ *       requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               required:
+ *                 - body
+ *                 - recipient
+ *                 - label
+ *               properties:
+ *                 body:
+ *                   type: string
+ *                 recipient:
+ *                   type: string
+ *                 label:
+ *                   type: string
+ *       responses:
+ *         "202":
+ *           description: Accepted. The message is being sent.
+ *         "400":
+ *           description: Bad Request
+ *         "401":
+ *           description: Unauthorized
+ *         "429":
+ *           description: Too many requests. Please try again later.
+ *         "500":
+ *           description: Internal Server Error
+ */
+router.post(
+  '/send-lru',
+  celebrate(sendValidator),
+  SmsMiddleware.getCredentialsFromLabelLru,
+  SmsTransactionalMiddleware.sendMessage
+)
+
 export default router
