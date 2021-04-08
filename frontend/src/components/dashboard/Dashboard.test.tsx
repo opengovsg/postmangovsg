@@ -539,7 +539,7 @@ const renderDashboard = () =>
     router: { initialIndex: 0, initialEntries: ['/campaigns'] },
   })
 
-test('creates and sends a new email campaign', async () => {
+test('successfully creates and sends a new email campaign', async () => {
   server.use(...mockApis())
 
   renderDashboard()
@@ -744,7 +744,7 @@ test('creates and sends a new email campaign', async () => {
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 })
 
-test('creates and sends a new SMS campaign', async () => {
+test('successfully creates and sends a new SMS campaign', async () => {
   server.use(...mockApis())
 
   renderDashboard()
@@ -936,7 +936,7 @@ test('creates and sends a new SMS campaign', async () => {
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 })
 
-test('creates and sends a new Telegram campaign', async () => {
+test('successfully creates and sends a new Telegram campaign', async () => {
   server.use(...mockApis())
 
   renderDashboard()
@@ -1140,7 +1140,7 @@ test('creates and sends a new Telegram campaign', async () => {
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 })
 
-test('creates and sends a new protected email campaign', async () => {
+test('successfully creates and sends a new protected email campaign', async () => {
   server.use(...mockApis())
 
   renderDashboard()
