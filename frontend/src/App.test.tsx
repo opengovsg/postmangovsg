@@ -3,7 +3,8 @@ import { mockCommonApis, server, within, render, screen } from './test-utils'
 import App from 'App'
 
 test('displays landing page when unauthenticated', async () => {
-  server.use(...mockCommonApis())
+  const { handlers } = mockCommonApis()
+  server.use(...handlers)
 
   render(<App />, { router: { initialIndex: 0, initialEntries: ['/'] } })
 
