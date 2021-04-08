@@ -1,6 +1,6 @@
 import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
-import { RateLimitError, RecipientError } from '@core/errors'
+import { RateLimitError, InvalidRecipientError } from '@core/errors'
 
 export default class TwilioClient {
   private client: any
@@ -55,7 +55,7 @@ export default class TwilioClient {
       }
 
       if (error.code === 21211) {
-        throw new RecipientError()
+        throw new InvalidRecipientError('Invalid phone number')
       }
 
       throw error

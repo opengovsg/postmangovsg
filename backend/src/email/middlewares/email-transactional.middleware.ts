@@ -7,7 +7,7 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
 import { AuthService } from '@core/services'
-import { RecipientError } from '@core/errors'
+import { InvalidRecipientError } from '@core/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -38,7 +38,7 @@ async function sendMessage(
       error: err,
     })
 
-    const BAD_REQUEST_ERRORS = [TemplateError, RecipientError]
+    const BAD_REQUEST_ERRORS = [TemplateError, InvalidRecipientError]
     if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
       res.status(400).json({ message: err.message })
       return

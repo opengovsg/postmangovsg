@@ -3,7 +3,7 @@ import { MailToSend } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from 'postman-templating'
 import { isBlacklisted } from '@email/utils/query'
-import { RecipientError } from '@core/errors'
+import { InvalidRecipientError } from '@core/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -37,7 +37,7 @@ async function sendMessage({
 
   const blacklisted = await isBlacklisted(recipient)
   if (blacklisted) {
-    throw new RecipientError('Recipient email is blacklisted')
+    throw new InvalidRecipientError('Recipient email is blacklisted')
   }
 
   const mailToSend: MailToSend = {
