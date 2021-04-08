@@ -10,6 +10,7 @@ import {
   mockCommonApis,
   TWILIO_CREDENTIAL,
   TELEGRAM_CREDENTIAL,
+  DEFAULT_FROM,
 } from '../../test-utils'
 import Dashboard from './Dashboard'
 
@@ -19,7 +20,6 @@ const UNPROTECTED_MESSAGE_TEXT = 'Test message {{protectedlink}}'
 const CSV_FILENAME = 'test_email_recipients.csv'
 const PRESIGNED_URL =
   'https://s3.ap-southeast-1.amazonaws.com/file-test.postman.gov.sg/test_params'
-const DEFAULT_FROM = 'Postman Test <donotreply@test.postman.gov.sg>'
 const CAMPAIGN_NAME = 'Test campaign name'
 const SUBJECT_TEXT = 'Test subject'
 const RECIPIENT_EMAIL = 'testEmailRecipient@gmail.com'
@@ -86,45 +86,6 @@ const mockApis = () => {
 
   return [
     ...handlers,
-    rest.get('/settings', (_req, res, ctx) => {
-      const { creds, demo, api_key } = state.users[state.curUserId - 1]
-      return res(
-        ctx.status(200),
-        ctx.json({
-          creds,
-          demo,
-          has_api_key: !!api_key,
-        })
-      )
-    }),
-    rest.get('/settings/email/from', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json({
-          from: [DEFAULT_FROM],
-        })
-      )
-    }),
-    rest.get('/settings/sms/credentials', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json(
-          state.users[state.curUserId - 1].creds
-            .filter((cred) => cred.type === 'SMS')
-            .map((cred) => cred.label)
-        )
-      )
-    }),
-    rest.get('/settings/telegram/credentials', (_req, res, ctx) => {
-      return res(
-        ctx.status(200),
-        ctx.json(
-          state.users[state.curUserId - 1].creds
-            .filter((cred) => cred.type === 'TELEGRAM')
-            .map((cred) => cred.label)
-        )
-      )
-    }),
     rest.get('/campaigns', (_req, res, ctx) => {
       return res(
         ctx.status(200),
