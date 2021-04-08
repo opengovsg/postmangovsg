@@ -1,6 +1,6 @@
 import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
-import { RateLimitError } from '@core/errors'
+import { RateLimitError, RecipientError } from '@core/errors'
 
 export default class TwilioClient {
   private client: any
@@ -52,6 +52,10 @@ export default class TwilioClient {
       // 21611 - Message queue limit exceeded
       if ([20429, 21611].includes(error.code)) {
         throw new RateLimitError()
+      }
+
+      if (error.code === 21211) {
+        throw new RecipientError()
       }
 
       throw error
