@@ -1,6 +1,6 @@
 import React from 'react'
-import { mockCommonApis, server, within, render, screen } from './test-utils'
-import App from 'App'
+import { mockCommonApis, server, within, render, screen } from '../test-utils'
+import App from '../App'
 
 test('displays landing page when unauthenticated', async () => {
   const { handlers } = mockCommonApis()
