@@ -1,14 +1,17 @@
 import React from 'react'
-import { server, rest, within, render, screen } from './test-utils'
+import {
+  mockCommonApis,
+  server,
+  rest,
+  within,
+  render,
+  screen,
+} from './test-utils'
 import App from 'App'
 
 test('displays landing page when unauthenticated', async () => {
   server.use(
-    // Mock 0 messages sent so far
-    rest.get('/stats', (_req, res, ctx) => {
-      return res(ctx.status(200), ctx.json({ sent: 0 }))
-    }),
-
+    ...mockCommonApis(),
     // Mock an unauthenticated user
     rest.get('/auth/userinfo', (_req, res, ctx) => {
       return res(ctx.status(200), ctx.json({}))
