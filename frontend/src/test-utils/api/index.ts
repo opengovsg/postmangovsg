@@ -1,6 +1,11 @@
 import { rest } from 'msw'
 import type { State } from './interfaces'
-import { USER_EMAIL, TWILIO_CREDENTIAL, TELEGRAM_CREDENTIAL } from './constants'
+import {
+  USER_EMAIL,
+  TWILIO_CREDENTIAL,
+  TELEGRAM_CREDENTIAL,
+  DEFAULT_FROM,
+} from './constants'
 
 function mockCommonApis(initialState?: Partial<State>) {
   const state: State = {
@@ -29,7 +34,14 @@ function mockCommonApis(initialState?: Partial<State>) {
     ...initialState, // Allow tests to override the initial state
   }
 
-  return { state, handlers: [...mockStatsApis(state), ...mockAuthApis(state)] }
+  return {
+    state,
+    handlers: [
+      ...mockStatsApis(state),
+      ...mockAuthApis(state),
+      ...mockSettingsApis(state),
+    ],
+  }
 }
 
 function mockStatsApis(state: State) {
@@ -48,6 +60,50 @@ function mockAuthApis(state: State) {
       }
       const { email, id } = state.users[state.curUserId - 1]
       return res(ctx.status(200), ctx.json({ email, id }))
+    }),
+  ]
+}
+
+function mockSettingsApis(state: State) {
+  return [
+    rest.get('/settings', (_req, res, ctx) => {
+      const { creds, demo, api_key } = state.users[state.curUserId - 1]
+      return res(
+        ctx.status(200),
+        ctx.json({
+          creds,
+          demo,
+          has_api_key: !!api_key,
+        })
+      )
+    }),
+    rest.get('/settings/email/from', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json({
+          from: [DEFAULT_FROM],
+        })
+      )
+    }),
+    rest.get('/settings/sms/credentials', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json(
+          state.users[state.curUserId - 1].creds
+            .filter((cred) => cred.type === 'SMS')
+            .map((cred) => cred.label)
+        )
+      )
+    }),
+    rest.get('/settings/telegram/credentials', (_req, res, ctx) => {
+      return res(
+        ctx.status(200),
+        ctx.json(
+          state.users[state.curUserId - 1].creds
+            .filter((cred) => cred.type === 'TELEGRAM')
+            .map((cred) => cred.label)
+        )
+      )
     }),
   ]
 }
