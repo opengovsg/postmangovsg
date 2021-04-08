@@ -1141,6 +1141,8 @@ test('successfully creates and sends a new Telegram campaign', async () => {
 })
 
 test('successfully creates and sends a new protected email campaign', async () => {
+  jest.useFakeTimers()
+
   server.use(...mockApis())
 
   renderDashboard()
@@ -1361,4 +1363,7 @@ test('successfully creates and sends a new protected email campaign', async () =
   userEvent.click(refreshStatsButton)
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
+
+  jest.runOnlyPendingTimers()
+  jest.useRealTimers()
 })
