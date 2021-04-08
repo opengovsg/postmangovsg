@@ -332,7 +332,7 @@ jobs:
           timeout: 10
           memory_size: 128
           publish: true
-          zip: "../log-sns-sm/code.zip"
+          zip: "../log-sns-sms/code.zip"
           on:
             branch: $PRODUCTION_BRANCH
           environment_variables:
@@ -350,7 +350,7 @@ jobs:
           timeout: 10
           memory_size: 128
           publish: true
-          zip: "../log-sns-sm/code.zip"
+          zip: "../log-sns-sms/code.zip"
           on:
             branch: $STAGING_BRANCH
           environment_variables:
