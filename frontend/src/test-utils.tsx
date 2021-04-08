@@ -32,16 +32,59 @@ const render = (
     options?.render
   )
 
-// Set up common API endpoints
 const server = setupServer()
 
-function mockCommonApis() {
-  // Start with 0 messages sent
-  const totalMessagesSent = 0
+interface State {
+  // Stats
+  totalMessagesSent: number
+
+  // Auth
+  users: User[]
+  curUserId: number
+}
+
+interface User {
+  api_key: string
+  creds: Credential[]
+  demo: {
+    num_demo_sms: number
+    num_demo_telegram: number
+    is_displayed: boolean
+  }
+  email: string
+  id: number
+}
+
+interface Credential {
+  label: string
+  type: string
+}
+
+function mockCommonApis(initialState: Partial<State>) {
+  const state: State = {
+    // Stats
+    totalMessagesSent: 0,
+
+    // Auth
+    users: [],
+    curUserId: 0, // start unauthenticated; 1-indexed
+
+    ...initialState, // Allow tests to override the initial state
+  }
 
   return [
+    // Stats
     rest.get('/stats', (_req, res, ctx) => {
-      return res(ctx.status(200), ctx.json({ sent: totalMessagesSent }))
+      return res(ctx.status(200), ctx.json({ sent: state.totalMessagesSent }))
+    }),
+
+    // Auth
+    rest.get('/auth/userinfo', (_req, res, ctx) => {
+      if (!state.curUserId) {
+        return res(ctx.status(200), ctx.json({}))
+      }
+      const { email, id } = state.users[state.curUserId - 1]
+      return res(ctx.status(200), ctx.json({ email, id }))
     }),
   ]
 }
