@@ -12,6 +12,7 @@ const TemplateTest = () => {
   const [html, setHtml] = useState('')
   const [removeEmptyLines, setRemoveEmptyLines] = useState(false)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const updatePreview = useCallback(
     debounce((template: string, csvString: string, trim: boolean) => {
       try {

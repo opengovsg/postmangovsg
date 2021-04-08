@@ -1,7 +1,9 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import Papa from 'papaparse'
 import SparkMD5 from 'spark-md5'
-import { EmailPreview, SMSPreview } from 'classes'
+
+import type { AxiosError } from 'axios'
+import type { EmailPreview, SMSPreview } from 'classes'
 
 const MD5_CHUNK_SIZE = 5000000 // 5MB
 

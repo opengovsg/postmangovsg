@@ -19,7 +19,8 @@ const MessageBlock = ({
   icon?: string
   children?: React.ReactNode
   absolute?: boolean
-  onClose?: Function
+  onClose?: () => void
+  role?: string
 }) => {
   if (!children) {
     return null
@@ -43,7 +44,13 @@ const MessageBlock = ({
           </div>
         </li>
 
-        {onClose && <CloseButton onClick={onClose} className={styles.close} />}
+        {onClose && (
+          <CloseButton
+            onClick={onClose}
+            className={styles.close}
+            title="Close message"
+          />
+        )}
       </div>
     </div>
   )

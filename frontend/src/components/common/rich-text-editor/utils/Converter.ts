@@ -263,7 +263,7 @@ const renderContent = (
   inlineStyles: HTMLTag[][],
   blockEntities: HTMLTag[][]
 ): string => {
-  const characters = text.split('')
+  const characters = text.split('').map((c) => (c === '\n' ? '<br />' : c))
   for (let i = 0; i < characters.length; i++) {
     const styles = inlineStyles[i]
     let tags = ''
@@ -660,7 +660,11 @@ class ContentBlocksBuilder {
 
   private addLink(node: ChildNode, style: DraftInlineStyle) {
     const link = node as HTMLAnchorElement
-    const { href, target, title } = link
+    const { target, title } = link
+
+    // Retrieve raw value of href so that link variables will not be escaped
+    const el = node as HTMLElement
+    const href = el.getAttribute('href')
 
     // Add entity
     this.contentState = this.contentState.createEntity('LINK', 'MUTABLE', {

@@ -8,17 +8,19 @@ import styles from './TextArea.module.scss'
 const HIGHLIGHT_REGEX = /{{\s*?\w+\s*?}}/g
 
 const TextArea = ({
+  id,
   highlight = false,
   singleRow,
   placeholder,
   value,
   onChange,
 }: {
+  id?: string
   highlight: boolean
   singleRow?: boolean
   placeholder?: string
   value: string
-  onChange: Function
+  onChange: (text: string) => void
 }) => {
   const minRows = singleRow ? 1 : 7
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -55,6 +57,7 @@ const TextArea = ({
         </div>
       )}
       <TextareaAutosize
+        id={id}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onTextChange(e.target.value)}

@@ -44,7 +44,29 @@ jobs:
           secret_access_key: $AWS_SECRET_ACCESS_KEY
           region: $AWS_DEFAULT_REGION
           app: "postmangovsg"
+          env: "postmangovsg-staging-amz2-callback"
+          bucket_name: "postmangovsg-elasticbeanstalk-appversion"
+          on:
+            branch: $STAGING_BRANCH
+        - provider: elasticbeanstalk
+          edge: true
+          skip_cleanup: true
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_DEFAULT_REGION
+          app: "postmangovsg"
           env: "postmangovsg-production-amz2"
+          bucket_name: "postmangovsg-elasticbeanstalk-appversion"
+          on:
+            branch: $PRODUCTION_BRANCH
+        - provider: elasticbeanstalk
+          edge: true
+          skip_cleanup: true
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: $AWS_DEFAULT_REGION
+          app: "postmangovsg"
+          env: "postmangovsg-production-amz2-callback"
           bucket_name: "postmangovsg-elasticbeanstalk-appversion"
           on:
             branch: $PRODUCTION_BRANCH

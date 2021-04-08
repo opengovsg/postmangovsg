@@ -7,9 +7,9 @@ const CloseButton = (props: any) => {
   const { className, ...otherProps } = props
 
   return (
-    <div className={cx(styles.close, className)} {...otherProps}>
+    <button className={cx(styles.close, className)} {...otherProps}>
       +
-    </div>
+    </button>
   )
 }
 

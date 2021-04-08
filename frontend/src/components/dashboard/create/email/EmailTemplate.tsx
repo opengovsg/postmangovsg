@@ -53,7 +53,7 @@ const EmailTemplate = ({
   const [customFromAddresses, setCustomFromAddresses] = useState(
     [] as { label: string; value: string }[]
   )
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   const protectedBodyPlaceholder =
     'Dear {{ recipient }}, \n\n You may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a> . \n\nPlease login with your birthday (DDMMYYYY) followed by the last 4 characters of your NRIC. E.g. 311290123A'
@@ -139,13 +139,19 @@ const EmailTemplate = ({
             onSelect={setFrom}
             options={customFromAddresses}
             defaultLabel={from || customFromAddresses[0]?.label}
+            aria-label="Custom from"
           ></Dropdown>
         </div>
 
         <div>
-          <h4>Subject</h4>
-          <p>Enter subject of the email</p>
+          <h4>
+            <label htmlFor="subject">Subject</label>
+          </h4>
+          <p>
+            <label htmlFor="subject">Enter subject of the email</label>
+          </p>
           <TextArea
+            id="subject"
             highlight={true}
             singleRow={true}
             placeholder="Enter subject"
@@ -196,9 +202,16 @@ const EmailTemplate = ({
         </div>
 
         <div>
-          <h4 className={styles.replyToHeader}>Replies</h4>
-          <p>If left blank, replies will be directed to {userEmail}</p>
+          <h4 className={styles.replyToHeader}>
+            <label htmlFor="replyTo">Replies</label>
+          </h4>
+          <p>
+            <label htmlFor="replyTo">
+              If left blank, replies will be directed to {userEmail}
+            </label>
+          </p>
           <TextInput
+            id="replyTo"
             placeholder="Enter reply-to email address"
             value={replyTo || ''}
             onChange={setReplyTo}

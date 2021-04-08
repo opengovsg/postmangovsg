@@ -26,6 +26,10 @@
     margin: 0 auto;
     align-items: center;
     color: #484848;
+
+    @include mobile() {
+      justify-content: center;
+    }
   }
 
   a:hover {

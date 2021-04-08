@@ -18,6 +18,10 @@
     // TODO: Remove this if possible
     $transparent-dark-blue: rgba(16, 12, 85, 0.95);
 
+    a {
+      @extend %body-2;
+    }
+
     img {
       display: block;
       margin: 0 auto;

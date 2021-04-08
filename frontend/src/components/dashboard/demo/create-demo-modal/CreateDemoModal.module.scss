@@ -52,6 +52,13 @@
           cursor: pointer;
         }
       }
+
+      &:not(.active):disabled {
+        background-color: transparent;
+        border: 1px solid $grey-500;
+        color: $grey-500;
+        cursor: not-allowed;
+      }
     }
   }
 }
