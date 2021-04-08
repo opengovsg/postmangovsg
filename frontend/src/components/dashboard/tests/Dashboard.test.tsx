@@ -11,7 +11,7 @@ import {
   TELEGRAM_CREDENTIAL,
   DEFAULT_FROM,
   CSV_FILENAME,
-} from '../../../test-utils'
+} from 'test-utils'
 import Dashboard from '../Dashboard'
 
 const REPLY_TO = 'testEmail@open.gov.sg'
