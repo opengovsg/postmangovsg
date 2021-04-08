@@ -4,8 +4,6 @@ import bodyParser from 'body-parser'
 import sessionLoader from '@core/loaders/session.loader'
 import routes from '@core/routes'
 
-// const unAuthenticatedRoutes = ['auth', 'stats', 'protect', 'unsubscribe']
-
 const initialiseServer = (session?: boolean): express.Application => {
   const app: express.Application = express()
   sessionLoader({ app })
