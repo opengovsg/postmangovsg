@@ -1,8 +1,8 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import bcrypt from 'bcrypt'
-import initialiseServer from '../server'
-import sequelizeLoader from '../../sequelize-loader'
+import initialiseServer from '@test-utils/server'
+import sequelizeLoader from '@test-utils/sequelize-loader'
 import { MailService, RedisService } from '@core/services'
 import { User } from '@core/models'
 

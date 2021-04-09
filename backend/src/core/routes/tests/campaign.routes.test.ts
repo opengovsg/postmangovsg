@@ -1,8 +1,8 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
-import initialiseServer from '../server'
+import initialiseServer from '@test-utils/server'
 import { Campaign, User, UserDemo } from '@core/models'
-import sequelizeLoader from '../../sequelize-loader'
+import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
 import { ChannelType } from '@core/constants'
 

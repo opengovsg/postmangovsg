@@ -7,12 +7,12 @@ module.exports = {
     '@sms/(.*)': '<rootDir>/src/sms/$1',
     '@email/(.*)': '<rootDir>/src/email/$1',
     '@telegram/(.*)': '<rootDir>/src/telegram/$1',
-    '@tests/(.*)': '<rootDir>/tests/$1',
+    '@test-utils/(.*)': '<rootDir>/src/test-utils/$1',
   },
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   testEnvironment: 'node',
-  setupFiles: ['<rootDir>/tests/test-env.ts'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  setupFiles: ['<rootDir>/src/test-utils/test-env.ts'],
+  setupFilesAfterEnv: ['<rootDir>/src/test-utils/setup.ts'],
 }
