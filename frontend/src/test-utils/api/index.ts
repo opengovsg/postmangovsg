@@ -19,7 +19,7 @@ import {
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
 } from 'postman-templating'
-import { union } from 'lodash'
+import { union, difference } from 'lodash'
 
 const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
@@ -251,6 +251,28 @@ function mockCampaignTemplateApis(state: State) {
     )
     return union(...parsed)
   }
+  function checkTemplateVariables(
+    template: string,
+    required: string[],
+    optional: string[]
+  ) {
+    const present = extractAndMergeParams(template)
+
+    const missing = difference(required, present)
+    if (missing.length > 0) {
+      throw new Error(
+        `Error: There are missing keywords in the message template: ${missing}. Please return to the previous step to add in the keywords.`
+      )
+    }
+
+    const whitelist = [...required, ...optional]
+    const forbidden = difference(present, whitelist)
+    if (forbidden.length > 0) {
+      throw new Error(
+        `Error: Only these keywords are allowed in the template: ${whitelist}.\nRemove the other keywords from the template: ${forbidden}.`
+      )
+    }
+  }
 
   return [
     rest.put('/campaign/:campaignId/email/template', (req, res, ctx) => {
@@ -280,11 +302,21 @@ function mockCampaignTemplateApis(state: State) {
         return res(ctx.status(400))
       }
 
-      if (
-        state.campaigns[campaignId - 1].protect &&
-        !body.includes('{{protectedlink}}')
-      ) {
-        return res(ctx.status(500))
+      if (state.campaigns[campaignId - 1].protect) {
+        try {
+          checkTemplateVariables(
+            sanitizedSubject,
+            [],
+            ['protectedlink', 'recipient']
+          )
+          checkTemplateVariables(
+            sanitizedBody,
+            ['protectedlink'],
+            ['recipient']
+          )
+        } catch (err) {
+          return res(ctx.status(500), ctx.json({ message: err.message }))
+        }
       }
 
       const template: EmailTemplate = {
