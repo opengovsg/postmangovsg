@@ -9,6 +9,7 @@ import {
   getCsvStatus,
   CsvStatusResponse,
 } from 'services/upload.service'
+import { getCampaignDetails } from 'services/campaign.service'
 import { EmailPreview, SMSPreview, TelegramPreview } from 'classes'
 
 type UploadFunction = (campaignId: number, file: any) => Promise<any>
@@ -26,7 +27,7 @@ const uploadFileOrVaultLink = (
 function useUploadRecipients<
   Preview extends EmailPreview | SMSPreview | TelegramPreview
 >(upload: UploadFunction = uploadFileOrVaultLink, forceReset?: boolean) {
-  const { campaign } = useContext(CampaignContext)
+  const { campaign, setCampaign } = useContext(CampaignContext)
   if (!campaign)
     throw new Error('useUploadCsv must be used within a CampaignProvider')
 
@@ -81,6 +82,10 @@ function useUploadRecipients<
 
         if (isProcessing) {
           timeoutId = setTimeout(pollStatus, 2000)
+        } else {
+          // Updated local campaign state to stay in sync with backend state
+          const updated = await getCampaignDetails(campaignId)
+          setCampaign(updated)
         }
       } catch (e) {
         setError(e.message)
@@ -92,7 +97,14 @@ function useUploadRecipients<
     pollStatus()
 
     return () => clearTimeout(timeoutId)
-  }, [campaignId, csvFilename, forceReset, isProcessing, isMounted])
+  }, [
+    campaignId,
+    csvFilename,
+    forceReset,
+    isProcessing,
+    isMounted,
+    setCampaign,
+  ])
 
   // Handle file upload
   async function uploadRecipients(recipientList: File | string) {
