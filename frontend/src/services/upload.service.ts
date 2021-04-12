@@ -21,6 +21,7 @@ export interface CsvStatusResponse {
   numRecipients?: number
   preview?: EmailPreview | SMSPreview
   recipientListType?: RecipientListType
+  tempRecipientListType?: RecipientListType
 }
 
 async function getMd5(blob: Blob): Promise<string> {
@@ -140,6 +141,7 @@ export async function getCsvStatus(
       is_csv_processing: isCsvProcessing,
       csv_filename: csvFilename,
       temp_csv_filename: tempCsvFilename,
+      temp_is_vault_link: tempIsVaultLink,
       csv_error: csvError,
       num_recipients: numRecipients,
       preview,
@@ -152,6 +154,9 @@ export async function getCsvStatus(
       csvError,
       numRecipients,
       recipientListType: isVaultLink
+        ? RecipientListType.Vault
+        : RecipientListType.Csv,
+      tempRecipientListType: tempIsVaultLink
         ? RecipientListType.Vault
         : RecipientListType.Csv,
     } as CsvStatusResponse

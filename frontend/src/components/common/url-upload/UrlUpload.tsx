@@ -1,24 +1,25 @@
 import React, { useState } from 'react'
 
-import { TextInputWithButton, DetailBlock, ErrorBlock } from 'components/common'
+import { CsvStatusResponse } from 'services/upload.service'
+import { TextInputWithButton, DetailBlock } from 'components/common'
+import { RecipientListType } from 'classes'
 
 const UrlUpload = ({
   isProcessing,
   onSubmit,
   csvInfo,
-  onErrorClose,
 }: {
   isProcessing: boolean
   onSubmit: (url: string) => any
-  csvInfo: {
-    numRecipients?: number
-    csvFilename?: string
-    tempCsvFilename?: string
-    csvError?: string
-  }
+  csvInfo: Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   onErrorClose: () => void
 }) => {
-  const { numRecipients = 0, csvFilename, tempCsvFilename, csvError } = csvInfo
+  const {
+    numRecipients = 0,
+    csvFilename,
+    tempCsvFilename,
+    recipientListType,
+  } = csvInfo
   const [url, setUrl] = useState('')
 
   function isValidUrl() {
@@ -57,7 +58,7 @@ const UrlUpload = ({
 
     return (
       <>
-        {numRecipients > 0 && (
+        {numRecipients > 0 && recipientListType === RecipientListType.Vault && (
           <DetailBlock>
             <li>
               <i className="bx bx-user-check"></i>
@@ -95,9 +96,6 @@ const UrlUpload = ({
           placeholder="Paste Vault link here"
         />
       )}
-      <ErrorBlock onClose={onErrorClose} title={tempCsvFilename}>
-        {csvError && <span>{csvError}</span>}
-      </ErrorBlock>
     </>
   )
 }

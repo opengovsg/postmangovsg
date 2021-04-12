@@ -57,8 +57,11 @@ const EmailRecipients = ({
   } = useUploadRecipients<EmailPreview>(onFileSelected, forceReset)
   const {
     recipientListType: currentRecipientListType,
+    tempCsvFilename,
     csvFilename,
     numRecipients = 0,
+    csvError,
+    tempRecipientListType,
   } = csvInfo
   const [recipientListType, setRecipientListType] = useState(
     currentRecipientListType
@@ -113,9 +116,7 @@ const EmailRecipients = ({
 
             <UrlUpload
               isProcessing={isProcessing}
-              csvInfo={
-                currentRecipientListType === recipientListType ? csvInfo : {}
-              }
+              csvInfo={csvInfo}
               onSubmit={(url) => uploadRecipients(url)}
               onErrorClose={clearCsvStatus}
             />
@@ -156,8 +157,7 @@ const EmailRecipients = ({
               </p>
             </StepHeader>
 
-            {(currentRecipientListType !== RecipientListType.Csv ||
-              !csvFilename) && (
+            {!csvFilename && (
               <WarningBlock>
                 We do not remove duplicate recipients.{' '}
                 <OutboundLink
@@ -173,9 +173,7 @@ const EmailRecipients = ({
 
             <CsvUpload
               isCsvProcessing={isProcessing}
-              csvInfo={
-                currentRecipientListType === recipientListType ? csvInfo : {}
-              }
+              csvInfo={csvInfo}
               onErrorClose={clearCsvStatus}
             >
               {/* Dont show upload button when upload completed for protected component */}
@@ -239,6 +237,11 @@ const EmailRecipients = ({
 
       <StepSection>
         {renderUploadInput()}
+        {tempRecipientListType === recipientListType && (
+          <ErrorBlock title={tempCsvFilename} onClose={clearCsvStatus}>
+            {csvError}
+          </ErrorBlock>
+        )}
         <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 
