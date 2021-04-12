@@ -95,7 +95,7 @@ const UrlUpload = ({
           placeholder="Paste Vault link here"
         />
       )}
-      <ErrorBlock onClose={onErrorClose} title={csvFilename}>
+      <ErrorBlock onClose={onErrorClose} title={tempCsvFilename}>
         {csvError && <span>{csvError}</span>}
       </ErrorBlock>
     </>
