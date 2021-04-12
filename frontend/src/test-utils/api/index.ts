@@ -288,11 +288,11 @@ function mockCampaignTemplateApis(state: State) {
       }
 
       const template: EmailTemplate = {
-        body,
+        body: sanitizedBody,
         from,
         params: extractAndMergeParams(body, subject),
         reply_to: replyTo ?? state.users[state.curUserId - 1].email,
-        subject,
+        subject: sanitizedSubject,
       }
       state.campaigns[campaignId - 1].email_templates = template
 
