@@ -73,7 +73,9 @@ test('displays the necessary elements', async () => {
   const credentialDropdown = await screen.findByRole('listbox', {
     name: /credential/i,
   })
-  const credentialLabelText = await screen.findByText(TWILIO_CREDENTIAL)
+  const credentialLabelText = await screen.findByRole('option', {
+    name: TWILIO_CREDENTIAL,
+  })
 
   /**
    * Assert that the following elements are present:
@@ -106,7 +108,9 @@ test('displays an error when attempting to validate an invalid credential', asyn
   const credentialDropdown = await screen.findByRole('listbox', {
     name: /credential/i,
   })
-  await screen.findByText(TWILIO_CREDENTIAL)
+  const credentialLabelText = await screen.findByRole('option', {
+    name: INVALID_TWILIO_CREDENTIAL,
+  })
   const testNumberTextbox = screen.getByRole('textbox', {
     name: /send a test sms/i,
   })
@@ -114,11 +118,7 @@ test('displays an error when attempting to validate an invalid credential', asyn
 
   // Select the invalid credential label
   userEvent.click(credentialDropdown)
-  userEvent.click(
-    await screen.findByRole('option', {
-      name: INVALID_TWILIO_CREDENTIAL,
-    })
-  )
+  userEvent.click(credentialLabelText)
 
   // Attempt to validate the credential
   userEvent.type(testNumberTextbox, '89898989')

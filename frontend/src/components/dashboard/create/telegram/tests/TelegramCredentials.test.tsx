@@ -72,7 +72,9 @@ test('displays the necessary elements', async () => {
   const credentialDropdown = await screen.findByRole('listbox', {
     name: /credential/i,
   })
-  const credentialLabelText = await screen.findByText(TELEGRAM_CREDENTIAL)
+  const credentialLabelText = await screen.findByRole('option', {
+    name: TELEGRAM_CREDENTIAL,
+  })
 
   /**
    * Assert that the following elements are present:
@@ -107,11 +109,13 @@ test('displays an error when attempting to validate an invalid credential', asyn
   const credentialDropdown = await screen.findByRole('listbox', {
     name: /credential/i,
   })
-  await screen.findByText(TELEGRAM_CREDENTIAL)
+  const credentialLabelText = await screen.findByRole('option', {
+    name: INVALID_TELEGRAM_CREDENTIAL,
+  })
 
   // Select the invalid credential label
   userEvent.click(credentialDropdown)
-  userEvent.click(await screen.findByText(INVALID_TELEGRAM_CREDENTIAL))
+  userEvent.click(credentialLabelText)
 
   // Attempt to validate the credential
   userEvent.click(
