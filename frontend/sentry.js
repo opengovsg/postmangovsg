@@ -15,7 +15,7 @@ async function createReleaseAndUpload() {
       include: ['build/static/js'],
       urlPrefix: '~/static/js',
       validate: true,
-      rewrite: false,
+      rewrite: true,
     })
 
     console.log('Finalizing release')
