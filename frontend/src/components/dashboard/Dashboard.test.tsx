@@ -540,8 +540,9 @@ const renderDashboard = () =>
   })
 
 test('successfully creates and sends a new email campaign', async () => {
+  // Setup
+  jest.useFakeTimers()
   server.use(...mockApis())
-
   renderDashboard()
 
   // Wait for the Dashboard to load
@@ -742,11 +743,16 @@ test('successfully creates and sends a new email campaign', async () => {
   userEvent.click(refreshStatsButton)
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
+
+  // Cleanup
+  jest.runOnlyPendingTimers()
+  jest.useRealTimers()
 })
 
 test('successfully creates and sends a new SMS campaign', async () => {
+  // Setup
+  jest.useFakeTimers()
   server.use(...mockApis())
-
   renderDashboard()
 
   // Wait for the Dashboard to load
@@ -934,11 +940,16 @@ test('successfully creates and sends a new SMS campaign', async () => {
   userEvent.click(refreshStatsButton)
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
+
+  // Cleanup
+  jest.runOnlyPendingTimers()
+  jest.useRealTimers()
 })
 
 test('successfully creates and sends a new Telegram campaign', async () => {
+  // Setup
+  jest.useFakeTimers()
   server.use(...mockApis())
-
   renderDashboard()
 
   // Wait for the Dashboard to load
@@ -1138,13 +1149,16 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   userEvent.click(refreshStatsButton)
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
+
+  // Cleanup
+  jest.runOnlyPendingTimers()
+  jest.useRealTimers()
 })
 
 test('successfully creates and sends a new protected email campaign', async () => {
+  // Setup
   jest.useFakeTimers()
-
   server.use(...mockApis())
-
   renderDashboard()
 
   // Wait for the Dashboard to load
