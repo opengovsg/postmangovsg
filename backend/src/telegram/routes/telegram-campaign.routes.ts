@@ -76,7 +76,9 @@ const tesseractCampaignValidator = {
     url: Joi.string()
       .trim()
       .custom((value: string, helpers: any) => {
-        const url = value.match(/^https:\/\/storage(-test)?.vault.gov.sg\/.+$/g)
+        const url = value.match(
+          /^https?:\/\/storage(-test)?.vault.gov.sg\/.+$/g
+        )
         if (url === null) {
           return helpers.error('string.uri')
         }
@@ -872,7 +874,6 @@ router.post(
   '/tesseract',
   celebrate(tesseractCampaignValidator),
   CampaignMiddleware.canEditCampaign,
-  CampaignMiddleware.isValidVaultUrl,
   TelegramTemplateMiddleware.tesseractHandler
 )
 
