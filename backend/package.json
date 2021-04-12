@@ -49,7 +49,7 @@
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.22.3",
     "sequelize-typescript": "^1.1.0",
-    "source-map-support": "^0.5.16",
+    "source-map-support": "^0.5.19",
     "starkbank-ecdsa": "^1.1.2",
     "swagger-jsdoc": "^5.0.1",
     "swagger-ui-express": "^4.1.4",
