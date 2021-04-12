@@ -49,6 +49,7 @@ function mockCommonApis(initialState?: Partial<State>) {
       ...mockCampaignTemplateApis(state),
       ...mockCampaignCredentialApis(state),
       ...mockCampaignUploadApis(state),
+      ...mockUnsubscribeApis(state),
     ],
   }
 }
@@ -514,6 +515,32 @@ function mockCampaignUploadApis(state: State) {
       )
     }),
     rest.delete('/campaign/:campaignId/upload/status', (_req, res, ctx) => {
+      return res(ctx.status(200))
+    }),
+  ]
+}
+
+function mockUnsubscribeApis(state: State) {
+  return [
+    rest.put('/unsubscribe/:campaignId/:recipient', (req, res, ctx) => {
+      // Possible todo: validate the hash
+      const { campaignId } = req.params
+      const { h, v } = req.body as {
+        h?: string
+        v?: string
+      }
+
+      if (!h || !v) {
+        return res(ctx.status(400))
+      }
+
+      if (campaignId <= 0 || campaignId > state.campaigns.length) {
+        return res(
+          ctx.status(400),
+          ctx.json({ message: 'Invalid unsubscribe request' })
+        )
+      }
+
       return res(ctx.status(200))
     }),
   ]
