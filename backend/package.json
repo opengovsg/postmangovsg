@@ -47,7 +47,7 @@
     "postman-templating": "file:../modules/postman-templating",
     "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^5.22.3",
+    "sequelize": "^5.22.4",
     "sequelize-typescript": "^1.1.0",
     "source-map-support": "^0.5.19",
     "starkbank-ecdsa": "^1.1.2",
