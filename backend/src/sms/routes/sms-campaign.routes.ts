@@ -77,7 +77,7 @@ router.use(SmsMiddleware.isSmsCampaignOwnedByUser)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms:
  *    get:
  *      tags:
@@ -108,7 +108,7 @@ router.get('/', SmsMiddleware.getCampaignDetails)
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/sms/template:
  *     put:
  *       tags:
@@ -181,7 +181,7 @@ router.put(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/sms/upload/start:
  *     get:
  *       summary: "Get a presigned URL for upload with Content-MD5 header"
@@ -233,7 +233,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/sms/upload/complete:
  *     post:
  *       summary: "Complete upload session with ETag verification"
@@ -280,7 +280,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/sms/upload/status:
  *     get:
  *       summary: "Get csv processing status"
@@ -359,7 +359,7 @@ router.delete(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/new-credentials:
  *    post:
  *      tags:
@@ -418,7 +418,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/credentials:
  *    post:
  *      tags:
@@ -469,7 +469,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/preview:
  *    get:
  *      tags:
@@ -503,7 +503,7 @@ router.get('/preview', SmsMiddleware.previewFirstMessage)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/send:
  *    post:
  *      tags:
@@ -558,7 +558,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/stop:
  *    post:
  *      tags:
@@ -585,7 +585,7 @@ router.post('/stop', JobMiddleware.stopCampaign)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/retry:
  *    post:
  *      tags:
@@ -616,7 +616,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/stats:
  *    get:
  *      tags:
@@ -646,7 +646,7 @@ router.get('/stats', SmsStatsMiddleware.getStats)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/refresh-stats:
  *    post:
  *      tags:
@@ -676,7 +676,7 @@ router.post('/refresh-stats', SmsStatsMiddleware.updateAndGetStats)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/export:
  *    get:
  *      tags:
@@ -714,7 +714,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/sms/duplicate:
  *    post:
  *      tags:

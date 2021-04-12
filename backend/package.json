@@ -51,7 +51,7 @@
     "sequelize-typescript": "^1.1.0",
     "source-map-support": "^0.5.16",
     "starkbank-ecdsa": "^1.1.2",
-    "swagger-jsdoc": "^4.0.0",
+    "swagger-jsdoc": "^5.0.1",
     "swagger-ui-express": "^4.1.4",
     "telegraf": "^3.38.0",
     "threads": "^1.4.0",

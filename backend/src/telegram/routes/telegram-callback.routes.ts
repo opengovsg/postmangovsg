@@ -4,7 +4,7 @@ const router = Router()
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /callback/telegram/{botToken}:
  *    post:
  *      summary: Subscribe to telegram bot

@@ -27,7 +27,7 @@ const createCampaignValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaigns:
  *    get:
  *      tags:
@@ -78,7 +78,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaigns:
  *    post:
  *      summary: Create a new campaign
