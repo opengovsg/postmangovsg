@@ -1,12 +1,12 @@
 import React from 'react'
-import { screen, mockCommonApis, server, render } from 'test-utils'
+import { screen, mockCommonApis, server, render, fireEvent } from 'test-utils'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import userEvent from '@testing-library/user-event'
 import { Route } from 'react-router-dom'
 import EmailTemplate from '../EmailTemplate'
 
-function mockApis() {
+function mockApis(protect: boolean) {
   const { handlers } = mockCommonApis({
     // Start with a freshly created email campaign
     campaigns: [
@@ -16,7 +16,7 @@ function mockApis() {
         type: 'EMAIL',
         created_at: new Date(),
         valid: false,
-        protect: false,
+        protect,
         demo_message_limit: null,
         csv_filename: null,
         is_csv_processing: false,
@@ -47,7 +47,7 @@ function renderTemplatePage() {
 }
 
 test('displays the necessary elements', async () => {
-  server.use(...mockApis())
+  server.use(...mockApis(false))
   renderTemplatePage()
 
   // Wait for the component to fully load
@@ -81,13 +81,13 @@ test('displays the necessary elements', async () => {
   expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument()
 })
 
-test('displays an error if the subject is invalid', async () => {
+test('displays an error if the subject is empty after sanitization', async () => {
   jest.spyOn(console, 'error').mockImplementation(() => {
     // Do nothing. Mock console.error to silence expected errors
     // due to submitting invalid templates to the API
   })
 
-  server.use(...mockApis())
+  server.use(...mockApis(false))
   renderTemplatePage()
 
   // Wait for the component to fully load
@@ -96,7 +96,7 @@ test('displays an error if the subject is invalid', async () => {
   })
   const nextButton = screen.getByRole('button', { name: /next/i })
 
-  // Test against various invalid templates
+  // Test against various empty templates
   const TEST_TEMPLATES = ['<hehe>', '<script>']
   for (const template of TEST_TEMPLATES) {
     // Type the template text into the textbox
@@ -113,4 +113,136 @@ test('displays an error if the subject is invalid', async () => {
   }
 
   jest.restoreAllMocks()
+})
+
+describe('protected email', () => {
+  test('displays an error if the subject contains extraneous invalid params', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {
+      // Do nothing. Mock console.error to silence expected errors
+      // due to submitting invalid templates to the API
+    })
+
+    server.use(...mockApis(true))
+    renderTemplatePage()
+
+    // Wait for the component to fully load
+    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
+    const subjectTextbox = screen.getByRole('textbox', {
+      name: /subject/i,
+    })
+    const nextButton = screen.getByRole('button', { name: /next/i })
+
+    // Test against various templates with extraneous invalid params
+    const TEST_TEMPLATES = [
+      'test {{invalidparam}}',
+      '{{anotherInvalidParam}} in a subject',
+    ]
+    for (const template of TEST_TEMPLATES) {
+      // Type the template text into the textbox
+      userEvent.clear(subjectTextbox)
+      userEvent.paste(subjectTextbox, template)
+
+      // Click the next button to submit the template
+      userEvent.click(nextButton)
+
+      // Assert that an error message is shown
+      expect(
+        await screen.findByText(/only these keywords are allowed/i)
+      ).toBeInTheDocument()
+    }
+
+    jest.restoreAllMocks()
+  })
+
+  test('displays an error if the body contains extraneous invalid params', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {
+      // Do nothing. Mock console.error to silence unexpected errors
+      // due to submitting invalid templates to the API
+    })
+
+    server.use(...mockApis(true))
+    renderTemplatePage()
+
+    // Wait for the component to fully load
+    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
+    const subjectTextbox = screen.getByRole('textbox', {
+      name: /subject/i,
+    })
+    const messageTextbox = screen.getByRole('textbox', {
+      name: /rdw-editor/i,
+    })
+    const nextButton = screen.getByRole('button', { name: /next/i })
+
+    // Make the subject non-empty
+    userEvent.paste(subjectTextbox, 'filler subject')
+
+    // Test against various templates with extraneous invalid params
+    const TEST_TEMPLATES = [
+      'a body with {{protectedlink}}, {{recipient}} and {{more}}',
+      'a body with {{protectedlink}} and {{unwanted}} params',
+    ]
+    for (const template of TEST_TEMPLATES) {
+      // Type the template text into the textbox
+      fireEvent.paste(messageTextbox, {
+        clipboardData: {
+          getData: () => template,
+        },
+      })
+
+      // Click the next button to submit the template
+      userEvent.click(nextButton)
+
+      // Assert that an error message is shown
+      expect(
+        await screen.findByText(/only these keywords are allowed/i)
+      ).toBeInTheDocument()
+    }
+
+    jest.restoreAllMocks()
+  })
+
+  test('displays an error if the body does not have required params', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {
+      // Do nothing. Mock console.error to silence unexpected errors
+      // due to submitting invalid templates to the API
+    })
+
+    server.use(...mockApis(true))
+    renderTemplatePage()
+
+    // Wait for the component to fully load
+    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
+    const subjectTextbox = screen.getByRole('textbox', {
+      name: /subject/i,
+    })
+    const messageTextbox = screen.getByRole('textbox', {
+      name: /rdw-editor/i,
+    })
+    const nextButton = screen.getByRole('button', { name: /next/i })
+
+    // Make the subject non-empty
+    userEvent.paste(subjectTextbox, 'filler subject')
+
+    // Test against various templates with extraneous invalid params
+    const TEST_TEMPLATES = [
+      'a body without protectedlink',
+      'a body with {{recipient}} but no protectedlink',
+    ]
+    for (const template of TEST_TEMPLATES) {
+      // Type the template text into the textbox
+      fireEvent.paste(messageTextbox, {
+        clipboardData: {
+          getData: () => template,
+        },
+      })
+
+      // Click the next button to submit the template
+      userEvent.click(nextButton)
+
+      // Assert that an error message is shown
+      expect(await screen.findByText(/missing keywords/i)).toBeInTheDocument()
+    }
+
+    jest.restoreAllMocks()
+  })
 })
