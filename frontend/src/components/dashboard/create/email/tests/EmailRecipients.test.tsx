@@ -56,6 +56,7 @@ function renderRecipients() {
 }
 
 test('displays the necessary elements', async () => {
+  // Setup
   server.use(...mockApis())
   renderRecipients()
 

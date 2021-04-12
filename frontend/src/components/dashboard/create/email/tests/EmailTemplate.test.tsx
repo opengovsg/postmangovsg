@@ -47,6 +47,7 @@ function renderTemplatePage() {
 }
 
 test('displays the necessary elements', async () => {
+  // Setup
   server.use(...mockApis(false))
   renderTemplatePage()
 
@@ -82,11 +83,11 @@ test('displays the necessary elements', async () => {
 })
 
 test('displays an error if the subject is empty after sanitization', async () => {
+  // Setup
   jest.spyOn(console, 'error').mockImplementation(() => {
     // Do nothing. Mock console.error to silence expected errors
     // due to submitting invalid templates to the API
   })
-
   server.use(...mockApis(false))
   renderTemplatePage()
 
@@ -112,16 +113,17 @@ test('displays an error if the subject is empty after sanitization', async () =>
     ).toBeInTheDocument()
   }
 
+  // Teardown
   jest.restoreAllMocks()
 })
 
 describe('protected email', () => {
   test('displays an error if the subject contains extraneous invalid params', async () => {
+    // Setup
     jest.spyOn(console, 'error').mockImplementation(() => {
       // Do nothing. Mock console.error to silence expected errors
       // due to submitting invalid templates to the API
     })
-
     server.use(...mockApis(true))
     renderTemplatePage()
 
@@ -151,15 +153,16 @@ describe('protected email', () => {
       ).toBeInTheDocument()
     }
 
+    // Teardown
     jest.restoreAllMocks()
   })
 
   test('displays an error if the body contains extraneous invalid params', async () => {
+    // Setup
     jest.spyOn(console, 'error').mockImplementation(() => {
       // Do nothing. Mock console.error to silence unexpected errors
       // due to submitting invalid templates to the API
     })
-
     server.use(...mockApis(true))
     renderTemplatePage()
 
@@ -202,11 +205,11 @@ describe('protected email', () => {
   })
 
   test('displays an error if the body does not have required params', async () => {
+    // Setup
     jest.spyOn(console, 'error').mockImplementation(() => {
       // Do nothing. Mock console.error to silence unexpected errors
       // due to submitting invalid templates to the API
     })
-
     server.use(...mockApis(true))
     renderTemplatePage()
 
@@ -243,6 +246,7 @@ describe('protected email', () => {
       expect(await screen.findByText(/missing keywords/i)).toBeInTheDocument()
     }
 
+    // Teardown
     jest.restoreAllMocks()
   })
 })

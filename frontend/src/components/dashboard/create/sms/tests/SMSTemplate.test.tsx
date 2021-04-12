@@ -47,6 +47,7 @@ function renderTemplatePage() {
 }
 
 test('displays the necessary elements', async () => {
+  // Setup
   server.use(...mockApis())
   renderTemplatePage()
 
@@ -73,6 +74,7 @@ test('displays the necessary elements', async () => {
 })
 
 test('next button is disabled when template is empty', async () => {
+  // Setup
   server.use(...mockApis())
   renderTemplatePage()
 
@@ -97,6 +99,7 @@ test('next button is disabled when template is empty', async () => {
 })
 
 test('next button is enabled when the template is filled', async () => {
+  // Setup
   server.use(...mockApis())
   renderTemplatePage()
 
@@ -118,6 +121,7 @@ test('next button is enabled when the template is filled', async () => {
 })
 
 test('character count text reflects the actual number of characters in the textbox', async () => {
+  // Setup
   server.use(...mockApis())
   renderTemplatePage()
 
@@ -142,11 +146,11 @@ test('character count text reflects the actual number of characters in the textb
 })
 
 test('displays an error if the template is invalid', async () => {
+  // Setup
   jest.spyOn(console, 'error').mockImplementation(() => {
     // Do nothing. Mock console.error to silence expected errors
     // due to submitting invalid templates to the API
   })
-
   server.use(...mockApis())
   renderTemplatePage()
 
@@ -172,5 +176,6 @@ test('displays an error if the template is invalid', async () => {
     ).toBeInTheDocument()
   }
 
+  // Teardown
   jest.restoreAllMocks()
 })
