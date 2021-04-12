@@ -28,6 +28,7 @@ interface User {
 interface Credential {
   label: string
   type: string
+  valid: boolean
 }
 
 export interface EmailTemplate {

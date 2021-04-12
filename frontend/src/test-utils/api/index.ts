@@ -12,6 +12,8 @@ import {
   DEFAULT_FROM,
   PRESIGNED_URL,
   CSV_FILENAME,
+  INVALID_TELEGRAM_CREDENTIAL,
+  INVALID_TWILIO_CREDENTIAL,
 } from './constants'
 import {
   TemplateClient,
@@ -38,8 +40,14 @@ function mockCommonApis(initialState?: Partial<State>) {
       {
         api_key: 'test-api-key',
         creds: [
-          { label: TWILIO_CREDENTIAL, type: 'SMS' },
-          { label: TELEGRAM_CREDENTIAL, type: 'TELEGRAM' },
+          { label: TWILIO_CREDENTIAL, type: 'SMS', valid: true },
+          { label: TELEGRAM_CREDENTIAL, type: 'TELEGRAM', valid: true },
+          { label: INVALID_TWILIO_CREDENTIAL, type: 'SMS', valid: false },
+          {
+            label: INVALID_TELEGRAM_CREDENTIAL,
+            type: 'TELEGRAM',
+            valid: false,
+          },
         ],
         demo: {
           num_demo_sms: 0,
@@ -460,7 +468,8 @@ function mockCampaignCredentialApis(state: State) {
         !label ||
         // Check that the user actually has the credential
         !state.users[state.curUserId - 1].creds.some(
-          (cred) => cred.label === label && cred.type === 'SMS'
+          // Use `valid` as a indicator for a valid credential
+          (cred) => cred.label === label && cred.type === 'SMS' && cred.valid
         )
       ) {
         return res(ctx.status(400))
@@ -477,7 +486,8 @@ function mockCampaignCredentialApis(state: State) {
         !label ||
         // Check that the user actually has the credential
         !state.users[state.curUserId - 1].creds.some(
-          (cred) => cred.label === label && cred.type === 'TELEGRAM'
+          (cred) =>
+            cred.label === label && cred.type === 'TELEGRAM' && cred.valid
         )
       ) {
         return res(ctx.status(400))
