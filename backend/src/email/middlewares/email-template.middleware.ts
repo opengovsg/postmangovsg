@@ -249,7 +249,8 @@ const pollCsvStatusHandler = async (
       num_recipients: numRecipients,
       preview,
       bucket,
-      is_vault_link: [bucket, tempBucket].includes(VAULT_BUCKET_NAME),
+      temp_is_vault_link: tempBucket === VAULT_BUCKET_NAME,
+      is_vault_link: bucket === VAULT_BUCKET_NAME,
     })
   } catch (err) {
     next(err)
