@@ -19,6 +19,7 @@ import {
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
 } from 'postman-templating'
+import { union } from 'lodash'
 
 const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
@@ -244,17 +245,11 @@ function mockBaseCampaignApis(state: State) {
 }
 
 function mockCampaignTemplateApis(state: State) {
-  function extractParamsFromBody(body: string) {
-    const params = []
-    const matches = body.matchAll(/{{.+?}}/g)
-    for (
-      let curMatch = matches.next();
-      !curMatch.done;
-      curMatch = matches.next()
-    ) {
-      params.push(curMatch.value[0].substring(1, curMatch.value[0].length - 1))
-    }
-    return params
+  function extractAndMergeParams(...texts: string[]) {
+    const parsed = texts.map(
+      (text) => emailTemplateClient.parseTemplate(text).variables
+    )
+    return union(...parsed)
   }
 
   return [
@@ -295,7 +290,7 @@ function mockCampaignTemplateApis(state: State) {
       const template: EmailTemplate = {
         body,
         from,
-        params: extractParamsFromBody(body),
+        params: extractAndMergeParams(body, subject),
         reply_to: replyTo ?? state.users[state.curUserId - 1].email,
         subject,
       }
@@ -330,7 +325,7 @@ function mockCampaignTemplateApis(state: State) {
 
       const template: SMSTemplate = {
         body: sanitizedBody,
-        params: extractParamsFromBody(body),
+        params: extractAndMergeParams(body),
       }
       state.campaigns[campaignId - 1].sms_templates = template
 
@@ -365,7 +360,7 @@ function mockCampaignTemplateApis(state: State) {
 
       const template: TelegramTemplate = {
         body: sanitizedBody,
-        params: extractParamsFromBody(body),
+        params: extractAndMergeParams(body),
       }
       state.campaigns[campaignId - 1].telegram_templates = template
 
