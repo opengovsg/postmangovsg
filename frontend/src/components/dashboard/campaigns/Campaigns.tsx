@@ -142,7 +142,9 @@ const Campaigns = () => {
     {
       name: 'Created At',
       render: (campaign: Campaign) => (
-        <Moment format="MMM DD YYYY, HH:mm">{campaign.createdAt}</Moment>
+        <Moment format="MMM DD YYYY, HH:mm" interval={0}>
+          {campaign.createdAt}
+        </Moment>
       ),
       width: 'md',
     },
@@ -150,7 +152,9 @@ const Campaigns = () => {
       name: 'Sent At',
       render: (campaign: Campaign) =>
         campaign.sentAt ? (
-          <Moment format="MMM DD YYYY, HH:mm">{campaign.sentAt}</Moment>
+          <Moment format="MMM DD YYYY, HH:mm" interval={0}>
+            {campaign.sentAt}
+          </Moment>
         ) : (
           <span></span>
         ),
