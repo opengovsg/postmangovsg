@@ -8,6 +8,9 @@ export interface State {
 
   // Campaigns
   campaigns: Campaign[]
+
+  // Protected messages
+  protectedMessages: ProtectedMessage[]
 }
 
 interface User {
@@ -50,4 +53,10 @@ export interface Campaign {
   job_queue: any[]
   num_recipients: number | null
   template?: Template
+}
+
+interface ProtectedMessage {
+  id: string
+  payload: string
+  passwordHash: string
 }

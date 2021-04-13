@@ -36,6 +36,9 @@ function mockCommonApis(initialState?: Partial<State>) {
     // Campaigns
     campaigns: [], // Start with zero campaigns
 
+    // Protected messages
+    protectedMessages: [], // Start with zero protecd messages
+
     ...initialState, // Allow tests to override the initial state
   }
 
@@ -50,6 +53,7 @@ function mockCommonApis(initialState?: Partial<State>) {
       ...mockCampaignCredentialApis(state),
       ...mockCampaignUploadApis(state),
       ...mockUnsubscribeApis(state),
+      ...mockProtectApis(state),
     ],
   }
 }
@@ -542,6 +546,36 @@ function mockUnsubscribeApis(state: State) {
       }
 
       return res(ctx.status(200))
+    }),
+  ]
+}
+
+function mockProtectApis(state: State) {
+  return [
+    rest.post('/protect/:id', (req, res, ctx) => {
+      const { id } = req.params
+      const { password_hash: passwordHash } = req.body as {
+        password_hash?: string
+      }
+
+      if (!passwordHash) {
+        return res(ctx.status(400))
+      }
+
+      const message = state.protectedMessages.find(
+        (message) => message.id === id && message.passwordHash === passwordHash
+      )
+      if (!message) {
+        return res(
+          ctx.status(403),
+          ctx.json({
+            message: 'Wrong password or message id. Please try again.',
+          })
+        )
+      }
+
+      const { payload } = message
+      return res(ctx.status(200), ctx.json({ payload }))
     }),
   ]
 }
