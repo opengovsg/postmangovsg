@@ -1,10 +1,10 @@
 import { CampaignStats, Status } from 'classes'
 import { useState, useEffect, useCallback, useContext } from 'react'
-import { getCampaignStats } from 'services/campaign.service'
+import { getCampaignStats, getCampaignDetails } from 'services/campaign.service'
 import { CampaignContext } from 'contexts/campaign.context'
 
 function usePollCampaignStats() {
-  const { campaign } = useContext(CampaignContext)
+  const { campaign, setCampaign } = useContext(CampaignContext)
   const { id } = campaign
   const [stats, setStats] = useState(new CampaignStats({}))
 
@@ -24,12 +24,15 @@ function usePollCampaignStats() {
       const { status } = await refreshCampaignStats()
       if (status !== Status.Sent) {
         timeoutId = setTimeout(poll, 2000)
+      } else {
+        const updatedCampaign = await getCampaignDetails(id)
+        setCampaign(updatedCampaign)
       }
     }
     poll()
 
     return () => clearTimeout(timeoutId)
-  }, [stats.status, refreshCampaignStats])
+  }, [stats.status, refreshCampaignStats, id, setCampaign])
 
   return { stats, refreshCampaignStats }
 }
