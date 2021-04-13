@@ -104,11 +104,16 @@ const ExportRecipients = ({
         content = content.concat(emptyExplanation)
       }
 
+      let sentAtTime
       if (!sentAt) {
-        throw new Error('sentAt is undefined')
+        console.error(
+          'sentAt is undefined. Using current Date() as a fallback.'
+        )
+        sentAtTime = new Date()
+      } else {
+        sentAtTime = new Date(sentAt)
       }
 
-      const sentAtTime = new Date(sentAt)
       download(
         new Blob(content),
         `${campaignName}_${sentAtTime.toLocaleDateString()}_${sentAtTime.toLocaleTimeString()}.csv`,
