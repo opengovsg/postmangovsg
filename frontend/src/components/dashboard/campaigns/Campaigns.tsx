@@ -27,10 +27,12 @@ import { getUserSettings } from 'services/settings.service'
 import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
 import AnnouncementModal from './announcement-modal'
 import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
 const ITEMS_PER_PAGE = 10
 
 const Campaigns = () => {
+  const isMounted = useIsMounted()
   const { email } = useContext(AuthContext)
   const modalContext = useContext(ModalContext)
   const [isLoading, setLoading] = useState(true)
@@ -90,13 +92,18 @@ const Campaigns = () => {
     async function getNumDemosAndAnnouncementVersion() {
       const { demo, announcementVersion } = await getUserSettings()
       const latestAnnouncementVersion = await getAnnouncementVersion()
+
+      if (!isMounted.current) {
+        return
+      }
+
       setIsDemoDisplayed(demo?.isDisplayed)
       setNumDemosSms(demo?.numDemosSms)
       setNumDemosTelegram(demo?.numDemosTelegram)
       displayNewAnnouncement(announcementVersion, latestAnnouncementVersion)
     }
     getNumDemosAndAnnouncementVersion()
-  }, [displayNewAnnouncement])
+  }, [displayNewAnnouncement, isMounted])
 
   /* eslint-disable react/display-name */
   const headers = [
@@ -135,7 +142,9 @@ const Campaigns = () => {
     {
       name: 'Created At',
       render: (campaign: Campaign) => (
-        <Moment format="MMM DD YYYY, HH:mm">{campaign.createdAt}</Moment>
+        <Moment format="MMM DD YYYY, HH:mm" interval={0}>
+          {campaign.createdAt}
+        </Moment>
       ),
       width: 'md',
     },
@@ -143,7 +152,9 @@ const Campaigns = () => {
       name: 'Sent At',
       render: (campaign: Campaign) =>
         campaign.sentAt ? (
-          <Moment format="MMM DD YYYY, HH:mm">{campaign.sentAt}</Moment>
+          <Moment format="MMM DD YYYY, HH:mm" interval={0}>
+            {campaign.sentAt}
+          </Moment>
         ) : (
           <span></span>
         ),
