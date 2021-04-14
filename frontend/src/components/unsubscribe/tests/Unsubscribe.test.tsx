@@ -59,3 +59,28 @@ test('successfully unsubscribes user from a campaign', async () => {
   })
   expect(heading).toBeInTheDocument()
 })
+
+test('displays thank you page when user does not unsubscribe', async () => {
+  // Setup
+  server.use(...mockApis())
+  renderUnsubscribe()
+
+  // Wait for the component to fully load
+  const stayButton = await screen.findByRole('button', {
+    name: /stay/i,
+  })
+
+  // Click on the stay button
+  userEvent.click(stayButton)
+
+  // Assert that the thank you page is fully displayed
+  expect(
+    await screen.findByRole('heading', { name: /excellent choice/i })
+  ).toBeInTheDocument()
+  expect(screen.getByText(/thank you/i)).toBeInTheDocument()
+  expect(screen.getByRole('img', { name: /hero/i })).toBeInTheDocument()
+  expect(screen.getByRole('img', { name: /postman logo/i })).toBeInTheDocument()
+  expect(
+    screen.getByRole('link', { name: /a singapore government agency website/i })
+  ).toBeInTheDocument()
+})
