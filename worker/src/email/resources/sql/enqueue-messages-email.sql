@@ -9,7 +9,7 @@ BEGIN
 	WITH messages AS 
   (
     UPDATE email_messages e
-    SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp(), delivered_at = NULL, sent_at = NULL, received_at = NULL, error_code = NULL, 
+    SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp(), delivered_at = NULL, sent_at = NULL, received_at = NULL, error_code = NULL, error_sub_type = NULL,
       status = (
         -- marks blacklisted messages by setting their status to INVALID_RECIPIENT, 
         -- and resets messages with status=ERROR to status=NULL
