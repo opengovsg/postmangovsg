@@ -9,7 +9,8 @@ BEGIN
     -- coalesced fields should prioritise message table over ops table 
     -- because callbacks might arrive before logging
 		error_code = COALESCE(m.error_code, p.error_code),
-    	status = COALESCE(m.status, p.status),
+		error_sub_type = COALESCE(m.error_sub_type, p.error_sub_type),
+		status = COALESCE(m.status, p.status),
 		message_id = p.message_id,
 		sent_at = p.sent_at,
 		delivered_at = p.delivered_at,
