@@ -59,6 +59,11 @@ export default class MailClient {
         })
         options.headers = { [REFERENCE_ID_HEADER]: headerValue }
       }
+      options.headers = {
+        ...options.headers,
+        'X-SES-CONFIGURATION-SET': 'track-email-opens',
+      }
+      console.log(options)
       this.mailer.sendMail(options, (err, info) => {
         if (err !== null) {
           logger.error({
@@ -68,6 +73,7 @@ export default class MailClient {
           })
           reject(new Error(`${err}`))
         } else {
+          console.log(info)
           resolve(info.messageId)
         }
       })
