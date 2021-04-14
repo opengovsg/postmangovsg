@@ -43,6 +43,7 @@ const TelegramRecipients = ({
     isProcessing,
     isUploading,
     error,
+    setError,
     preview,
     csvInfo,
     uploadRecipients,
@@ -51,7 +52,10 @@ const TelegramRecipients = ({
   const {
     recipientListType: currentRecipientListType,
     csvFilename,
+    tempCsvFilename,
     numRecipients = 0,
+    csvError,
+    tempRecipientListType,
   } = csvInfo
   const [recipientListType, setRecipientListType] = useState(
     currentRecipientListType
@@ -68,6 +72,11 @@ const TelegramRecipients = ({
 
   async function handleFileSelected(files: FileList) {
     if (files[0]) await uploadRecipients(files[0])
+  }
+
+  function selectRecipientListType(listType: RecipientListType) {
+    setRecipientListType(listType)
+    setError(null)
   }
 
   function isNextDisabled() {
@@ -101,9 +110,7 @@ const TelegramRecipients = ({
 
             <UrlUpload
               isProcessing={isProcessing}
-              csvInfo={
-                currentRecipientListType === recipientListType ? csvInfo : {}
-              }
+              csvInfo={csvInfo}
               onSubmit={(url) => uploadRecipients(url)}
               onErrorClose={clearCsvStatus}
             />
@@ -150,9 +157,7 @@ const TelegramRecipients = ({
 
             <CsvUpload
               isCsvProcessing={isProcessing}
-              csvInfo={
-                currentRecipientListType === recipientListType ? csvInfo : {}
-              }
+              csvInfo={csvInfo}
               onErrorClose={clearCsvStatus}
             >
               <FileInput
@@ -193,7 +198,7 @@ const TelegramRecipients = ({
 
           <div className={styles.recipientTypeSelector}>
             <PrimaryButton
-              onClick={() => setRecipientListType(RecipientListType.Csv)}
+              onClick={() => selectRecipientListType(RecipientListType.Csv)}
               className={cx({
                 [styles.active]: recipientListType === RecipientListType.Csv,
               })}
@@ -201,7 +206,7 @@ const TelegramRecipients = ({
               Use CSV<i className={cx('bx', 'bx-spreadsheet')}></i>
             </PrimaryButton>
             <PrimaryButton
-              onClick={() => setRecipientListType(RecipientListType.Vault)}
+              onClick={() => selectRecipientListType(RecipientListType.Vault)}
               className={cx({
                 [styles.active]: recipientListType === RecipientListType.Vault,
               })}
@@ -214,6 +219,11 @@ const TelegramRecipients = ({
 
       <StepSection>
         {renderUploadInput()}
+        {tempRecipientListType === recipientListType && (
+          <ErrorBlock title={tempCsvFilename} onClose={clearCsvStatus}>
+            {csvError}
+          </ErrorBlock>
+        )}
         <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 

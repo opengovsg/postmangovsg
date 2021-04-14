@@ -49,6 +49,7 @@ const EmailRecipients = ({
     isProcessing,
     isUploading,
     error,
+    setError,
     preview,
     csvInfo,
     uploadRecipients,
@@ -56,8 +57,11 @@ const EmailRecipients = ({
   } = useUploadRecipients<EmailPreview>(onFileSelected, forceReset)
   const {
     recipientListType: currentRecipientListType,
+    tempCsvFilename,
     csvFilename,
     numRecipients = 0,
+    csvError,
+    tempRecipientListType,
   } = csvInfo
   const [recipientListType, setRecipientListType] = useState(
     currentRecipientListType
@@ -74,6 +78,11 @@ const EmailRecipients = ({
 
   async function handleFileSelected(files: FileList) {
     if (files[0]) await uploadRecipients(files[0])
+  }
+
+  function selectRecipientListType(listType: RecipientListType) {
+    setRecipientListType(listType)
+    setError(null)
   }
 
   function isNextDisabled() {
@@ -107,9 +116,7 @@ const EmailRecipients = ({
 
             <UrlUpload
               isProcessing={isProcessing}
-              csvInfo={
-                currentRecipientListType === recipientListType ? csvInfo : {}
-              }
+              csvInfo={csvInfo}
               onSubmit={(url) => uploadRecipients(url)}
               onErrorClose={clearCsvStatus}
             />
@@ -150,8 +157,7 @@ const EmailRecipients = ({
               </p>
             </StepHeader>
 
-            {(currentRecipientListType !== RecipientListType.Csv ||
-              !csvFilename) && (
+            {!csvFilename && (
               <WarningBlock>
                 We do not remove duplicate recipients.{' '}
                 <OutboundLink
@@ -167,9 +173,7 @@ const EmailRecipients = ({
 
             <CsvUpload
               isCsvProcessing={isProcessing}
-              csvInfo={
-                currentRecipientListType === recipientListType ? csvInfo : {}
-              }
+              csvInfo={csvInfo}
               onErrorClose={clearCsvStatus}
             >
               {/* Dont show upload button when upload completed for protected component */}
@@ -212,7 +216,7 @@ const EmailRecipients = ({
 
           <div className={styles.recipientTypeSelector}>
             <PrimaryButton
-              onClick={() => setRecipientListType(RecipientListType.Csv)}
+              onClick={() => selectRecipientListType(RecipientListType.Csv)}
               className={cx({
                 [styles.active]: recipientListType === RecipientListType.Csv,
               })}
@@ -220,7 +224,7 @@ const EmailRecipients = ({
               Use CSV<i className={cx('bx', 'bx-spreadsheet')}></i>
             </PrimaryButton>
             <PrimaryButton
-              onClick={() => setRecipientListType(RecipientListType.Vault)}
+              onClick={() => selectRecipientListType(RecipientListType.Vault)}
               className={cx({
                 [styles.active]: recipientListType === RecipientListType.Vault,
               })}
@@ -233,6 +237,11 @@ const EmailRecipients = ({
 
       <StepSection>
         {renderUploadInput()}
+        {tempRecipientListType === recipientListType && (
+          <ErrorBlock title={tempCsvFilename} onClose={clearCsvStatus}>
+            {csvError}
+          </ErrorBlock>
+        )}
         <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 

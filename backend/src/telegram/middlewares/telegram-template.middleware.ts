@@ -211,6 +211,7 @@ const pollCsvStatusHandler = async (
       isCsvProcessing,
       filename,
       tempFilename,
+      tempBucket,
       bucket,
       error,
     } = await UploadService.getCsvStatus(+campaignId)
@@ -232,7 +233,8 @@ const pollCsvStatusHandler = async (
       num_recipients: numRecipients,
       preview,
       bucket,
-      is_vault_link: bucket === config.get('tesseract.vaultBucket'),
+      temp_is_vault_link: tempBucket === VAULT_BUCKET_NAME,
+      is_vault_link: bucket === VAULT_BUCKET_NAME,
     })
   } catch (err) {
     next(err)
@@ -289,7 +291,11 @@ const tesseractHandler = async (
     }
 
     // Store temp filename
-    await UploadService.storeS3TempFilename(+campaignId, datasetName)
+    await UploadService.storeS3TempFilename(
+      +campaignId,
+      datasetName,
+      config.get('tesseract.vaultBucket')
+    )
 
     // Return early because bulk insert is slow
     res.sendStatus(202)

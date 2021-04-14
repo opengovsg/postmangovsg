@@ -224,6 +224,7 @@ const getCampaignDetails = async (
   const campaignJobs = '(PARTITION BY "job_queue"."campaign_id")'
   const maxAge = config.get('redaction.maxAge')
 
+  const vaultBucket = config.get('tesseract.vaultBucket')
   const campaignDetails = await Campaign.findOne({
     where: { id: campaignId },
     attributes: [
@@ -236,12 +237,7 @@ const getCampaignDetails = async (
       'demo_message_limit',
       [literal('cred_name IS NOT NULL'), 'has_credential'],
       [literal("s3_object -> 'filename'"), 'csv_filename'],
-      [
-        literal(
-          `s3_object ->> 'bucket' = '${config.get('tesseract.vaultBucket')}'`
-        ),
-        'is_vault_link',
-      ],
+      [literal(`s3_object ->> 'bucket' = '${vaultBucket}'`), 'is_vault_link'],
       [
         literal(
           "s3_object -> 'temp_filename' IS NOT NULL AND s3_object -> 'error' IS NULL"

@@ -5,6 +5,7 @@ export interface CampaignS3ObjectInterface {
   bucket?: string
   filename?: string
   temp_filename?: string
+  temp_bucket?: string
   error?: string
 }
 
@@ -12,6 +13,7 @@ export interface CsvStatusInterface {
   isCsvProcessing: boolean
   filename?: string
   tempFilename?: string
+  tempBucket?: string
   bucket?: string
   error?: string
 }
