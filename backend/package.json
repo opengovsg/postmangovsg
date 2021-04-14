@@ -59,7 +59,7 @@
     "twilio": "^3.55.1",
     "uuid": "^7.0.3",
     "winston": "^3.3.3",
-    "winston-cloudwatch": "^2.3.2"
+    "winston-cloudwatch": "^2.5.2"
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.2",
