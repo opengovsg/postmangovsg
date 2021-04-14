@@ -29,6 +29,11 @@ type SendgridRecord = {
   'smtp-id': string
   timestamp: number
 }
+
+function stringifyPayload(payload: SendgridEvent): string {
+  return `[${payload.map((event) => JSON.stringify(event)).join(',\r\n')}]\r\n`
+}
+
 const isEvent = (req: Request): boolean => {
   const signature = req.get(SIGNATURE_HEADER)
   const timestamp = req.get(TIMESTAMP_HEADER)
@@ -36,7 +41,7 @@ const isEvent = (req: Request): boolean => {
     return false
   }
   const decodedSignature = Signature.fromBase64(signature)
-  const timestampPayload = timestamp + req.body
+  const timestampPayload = timestamp + stringifyPayload(req.body)
   if (!Ecdsa.verify(timestampPayload, decodedSignature, PUBLIC_KEY)) {
     throw new Error('Invalid record')
   }
