@@ -41,8 +41,8 @@ function renderUnsubscribe() {
 }
 
 test('successfully unsubscribes user from a campaign', async () => {
+  // Setup
   server.use(...mockApis())
-
   renderUnsubscribe()
 
   // Wait for the component to fully load

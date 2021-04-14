@@ -37,7 +37,7 @@ function mockCommonApis(initialState?: Partial<State>) {
     campaigns: [], // Start with zero campaigns
 
     // Protected messages
-    protectedMessages: [], // Start with zero protecd messages
+    protectedMessages: [], // Start with zero protected messages
 
     ...initialState, // Allow tests to override the initial state
   }
