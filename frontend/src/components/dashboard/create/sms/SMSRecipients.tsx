@@ -127,9 +127,8 @@ const SMSRecipients = ({
       setCsvInfo((info) => ({ ...info, tempCsvFilename }))
     } catch (err) {
       setErrorMessage(err.message)
-    } finally {
-      setIsUploading(false)
     }
+    setIsUploading(false)
   }
 
   // Hide csv error from previous upload and delete from db

@@ -30,7 +30,7 @@ const verifyCredentialValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/telegram/credentials:
  *    post:
  *      summary: Store new telegram credentials for user
@@ -70,7 +70,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/telegram/credentials/verify:
  *    post:
  *      summary: Verify stored credential for user

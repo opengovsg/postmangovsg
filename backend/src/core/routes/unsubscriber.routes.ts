@@ -18,7 +18,7 @@ const findOrCreateUnsubscribeValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /unsubscribe/{campaignId}/{recipient}:
  *    put:
  *      summary: Add an unsubscriber
