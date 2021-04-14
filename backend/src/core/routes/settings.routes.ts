@@ -36,7 +36,7 @@ const updateAnnouncementVersionValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings:
  *    get:
  *      summary: Retrieve stored settings for user
@@ -67,7 +67,7 @@ router.get('/', SettingsMiddleware.getUserSettings)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/regen:
  *    post:
  *      summary: Regenerates api key
@@ -90,7 +90,7 @@ router.post('/regen', SettingsMiddleware.regenerateApiKey)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/credentials:
  *    delete:
  *      summary: Deletes stored credential for user
@@ -121,7 +121,7 @@ router.delete(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/{channelType}/credentials:
  *    get:
  *      summary: Retrieve channel specific credentials for user
@@ -153,7 +153,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/demo:
  *    put:
  *       tags:
@@ -193,7 +193,7 @@ router.put(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/announcement-version:
  *    put:
  *       tags:
