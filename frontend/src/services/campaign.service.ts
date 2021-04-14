@@ -15,8 +15,8 @@ import {
 import type { CampaignRecipient } from 'classes'
 
 function getJobTimestamps(
-  jobs: Array<{ sent_at: Date; status_updated_at: Date }>
-): { sentAt: Date; statusUpdatedAt: Date } {
+  jobs: Array<{ sent_at: string; status_updated_at: string }>
+): { sentAt: string; statusUpdatedAt: string } {
   const jobsSentAt = jobs.map((x) => x.sent_at).sort()
   const jobsUpdatedAt = jobs.map((x) => x.status_updated_at).sort()
   // returns job with the earliest sentAt time
