@@ -91,6 +91,13 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(requestTracerMiddleware)
 
   app.use(overrideContentTypeHeaderMiddleware)
+
+  // We need to parse the body as text specifically for SendGrid callbacks.
+  // This is to avoid stripping whitespace characters and messing with unicode encoding.
+  // This route affects SES callbacks as well, so we'll need to parse the text as JSON
+  // in the parseEvent() handle before parsing the SES event.
+  app.use('/v1/callback/email', bodyParser.text({ type: 'application/json' }))
+
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: false }))
   // ref: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
