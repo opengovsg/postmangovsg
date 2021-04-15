@@ -23,11 +23,11 @@ export class Campaign {
   id: number
   name: string
   type: ChannelType
-  createdAt: Date
-  sentAt: Date
+  createdAt: string
+  sentAt?: string
   status: Status
   isCsvProcessing: boolean
-  statusUpdatedAt: Date
+  statusUpdatedAt?: string
   protect: boolean
   redacted: boolean
   demoMessageLimit: number | null
@@ -71,8 +71,8 @@ export class CampaignStats {
   sent: number
   invalid: number
   status: Status
-  statusUpdatedAt: Date // Timestamp when job's status was changed to this status
-  updatedAt: Date // Timestamp when statistic was updated
+  statusUpdatedAt: string // Timestamp when job's status was changed to this status
+  updatedAt: string // Timestamp when statistic was updated
   halted?: boolean
   waitTime?: number
   redacted?: boolean

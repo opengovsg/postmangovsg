@@ -3,7 +3,7 @@ import { EmailCallbackMiddleware } from '@email/middlewares'
 const router = Router()
 /**
  * @swagger
- * path:
+ * paths:
  *   /callback/email:
  *    post:
  *      summary: Update status of email message

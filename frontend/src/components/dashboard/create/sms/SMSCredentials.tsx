@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
@@ -28,14 +22,15 @@ import {
   InfoBlock,
 } from 'components/common'
 import SMSValidationInput from './SMSValidationInput'
-import TwilioCredentialsInput, {
-  TwilioCredentials,
-} from './TwilioCredentialsInput'
+import TwilioCredentialsInput from './TwilioCredentialsInput'
 import styles from '../Create.module.scss'
-import { SMSProgress } from 'classes'
 import { OutboundLink } from 'react-ga'
 import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { TwilioCredentials } from './TwilioCredentialsInput'
+import type { SMSProgress } from 'classes'
 
 const SMSCredentials = ({
   setActiveStep,
@@ -61,7 +56,7 @@ const SMSCredentials = ({
   )
   const [isManual, setIsManual] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   useEffect(() => {
     async function populateStoredCredentials(defaultLabels: string[]) {
@@ -158,9 +153,12 @@ const SMSCredentials = ({
                 <TwilioCredentialsInput onFilled={setCreds} />
               </div>
               {storedCredentials.length ? (
-                <p className="clickable" onClick={toggleInputMode}>
+                <TextButton
+                  className={styles.credentialInputButton}
+                  onClick={toggleInputMode}
+                >
                   Select from stored credentials
-                </p>
+                </TextButton>
               ) : null}
             </>
           ) : (
@@ -174,13 +172,15 @@ const SMSCredentials = ({
                 options={storedCredentials}
                 defaultLabel={storedCredentials[0]?.label}
                 disabled={isDemo}
+                aria-label="Twilio credentials"
               ></Dropdown>
-              <p
-                className={cx('clickable', { disabled: isDemo })}
+              <TextButton
+                className={styles.credentialInputButton}
+                disabled={isDemo}
                 onClick={() => !isDemo && setIsManual(true)}
               >
                 Input credentials manually
-              </p>
+              </TextButton>
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
                 <InfoBlock title="Use demo credentials">
                   <span>
@@ -206,9 +206,11 @@ const SMSCredentials = ({
         <StepSection separator={false}>
           <StepHeader title="Validate your credentials by doing a test send">
             <p className={styles.validateCredentialsInfo}>
-              To ensure your credentials are working perfectly, please send a
-              test SMS to an available phone number to receive a preview of your
-              message.
+              <label htmlFor="validateSms">
+                To ensure your credentials are working perfectly, please send a
+                test SMS to an available phone number to receive a preview of
+                your message.
+              </label>
             </p>
           </StepHeader>
           <SMSValidationInput

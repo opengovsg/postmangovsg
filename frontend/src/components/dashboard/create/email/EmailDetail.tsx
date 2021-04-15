@@ -1,29 +1,20 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
-import {
-  getCampaignStats,
-  stopCampaign,
-  retryCampaign,
-} from 'services/campaign.service'
+import { Status, ChannelType } from 'classes/Campaign'
+import { stopCampaign, retryCampaign } from 'services/campaign.service'
 import { StepHeader, ProgressDetails } from 'components/common'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 
 const EmailDetail = () => {
   const { campaign } = useContext(CampaignContext)
   const { id } = campaign
-  const [stats, setStats] = useState(new CampaignStats({}))
-
-  async function refreshCampaignStats(id: number, forceRefresh = false) {
-    const campaignStats = await getCampaignStats(id, forceRefresh)
-    setStats(campaignStats)
-    return campaignStats
-  }
+  const { stats, refreshCampaignStats } = usePollCampaignStats()
 
   async function handleRefreshStats() {
     try {
-      await refreshCampaignStats(id, true)
+      await refreshCampaignStats(true)
     } catch (err) {
       console.error(err)
     }
@@ -33,7 +24,7 @@ const EmailDetail = () => {
     try {
       sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.Email)
       await stopCampaign(id)
-      await refreshCampaignStats(id)
+      await refreshCampaignStats()
     } catch (err) {
       console.error(err)
     }
@@ -43,28 +34,11 @@ const EmailDetail = () => {
     try {
       sendUserEvent(GA_USER_EVENTS.RETRY_RESUME_SENDING, ChannelType.Email)
       await retryCampaign(id)
-      await refreshCampaignStats(id)
+      await refreshCampaignStats()
     } catch (err) {
       console.error(err)
     }
   }
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-
-    async function poll() {
-      const { status } = await refreshCampaignStats(id)
-
-      if (status !== Status.Sent) {
-        timeoutId = setTimeout(poll, 2000)
-      }
-    }
-
-    poll()
-    return () => {
-      timeoutId && clearTimeout(timeoutId)
-    }
-  }, [id, stats.status])
 
   function renderProgressHeader() {
     if (stats.waitTime && stats.waitTime > 0) {

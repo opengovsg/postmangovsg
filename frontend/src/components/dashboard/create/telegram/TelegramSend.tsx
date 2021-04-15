@@ -1,14 +1,8 @@
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { Status, ChannelType, TelegramProgress } from 'classes'
+import { ChannelType } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   PreviewBlock,
@@ -21,9 +15,10 @@ import {
   StepSection,
 } from 'components/common'
 import { getPreviewMessage } from 'services/telegram.service'
-import { sendCampaign } from 'services/campaign.service'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
+import type { TelegramProgress } from 'classes'
+import type { Dispatch, SetStateAction } from 'react'
+import { confirmSendCampaign } from '../util'
 import styles from '../Create.module.scss'
 
 const TelegramSend = ({
@@ -36,7 +31,7 @@ const TelegramSend = ({
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   if (!campaignId) {
     throw new Error('Invalid campaign id')
@@ -57,12 +52,13 @@ const TelegramSend = ({
     loadPreview(campaignId)
   }, [campaignId])
 
-  const onModalConfirm = async () => {
-    await sendCampaign(+campaignId, +sendRate)
-    if (sendRate) {
-      sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, ChannelType.Telegram)
-    }
-    updateCampaign({ status: Status.Sending })
+  const onModalConfirm = () => {
+    confirmSendCampaign({
+      campaignId: +campaignId,
+      sendRate: +sendRate,
+      channelType: ChannelType.Telegram,
+      updateCampaign,
+    })
   }
 
   const openModal = () => {

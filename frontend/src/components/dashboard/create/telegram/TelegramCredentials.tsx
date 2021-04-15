@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
@@ -35,7 +29,9 @@ import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 import styles from '../Create.module.scss'
 import { i18n } from '@lingui/core'
-import { TelegramProgress } from 'classes'
+
+import type { Dispatch, SetStateAction } from 'react'
+import type { TelegramProgress } from 'classes'
 
 const TelegramCredentials = ({
   setActiveStep,
@@ -63,7 +59,7 @@ const TelegramCredentials = ({
   const [errorMessage, setErrorMessage] = useState(null)
   const [sendSuccess, setSendSuccess] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
-  const { id: campaignId } = useParams()
+  const { id: campaignId } = useParams<{ id: string }>()
 
   useEffect(() => {
     async function populateStoredCredentials(defaultLabels: string[]) {
@@ -167,9 +163,12 @@ const TelegramCredentials = ({
           <>
             {storedCredentials.length ? (
               <StepSection>
-                <p className="clickable" onClick={toggleInputMode}>
+                <TextButton
+                  className={styles.credentialInputButton}
+                  onClick={toggleInputMode}
+                >
                   Select from stored credentials
-                </p>
+                </TextButton>
               </StepSection>
             ) : null}
 
@@ -247,16 +246,18 @@ const TelegramCredentials = ({
                 options={storedCredentials}
                 defaultLabel={storedCredentials[0]?.label}
                 disabled={isDemo}
+                aria-label="Telegram credentials"
               ></Dropdown>
 
               <ErrorBlock>{errorMessage}</ErrorBlock>
 
-              <p
-                className={cx('clickable', { disabled: isDemo })}
+              <TextButton
+                className={styles.credentialInputButton}
+                disabled={isDemo}
                 onClick={() => !isDemo && setIsManual(true)}
               >
                 Add new credentials
-              </p>
+              </TextButton>
 
               {isDemo && selectedCredential === DEMO_CREDENTIAL && (
                 <InfoBlock title="Use demo credentials">
@@ -351,10 +352,12 @@ const TelegramCredentials = ({
               <StepSection>
                 <StepHeader title="Optional: Send a test message">
                   <p className={styles.validateCredentialsInfo}>
-                    To ensure everything is working perfectly, please send a
-                    test message to receive a preview of your message. Do note
-                    that the phone number you are testing with must already be{' '}
-                    <b>subscribed to the bot</b>.
+                    <label htmlFor="validateTelegram">
+                      To ensure everything is working perfectly, please send a
+                      test message to receive a preview of your message. Do note
+                      that the phone number you are testing with must already be{' '}
+                      <b>subscribed to the bot</b>.
+                    </label>
                   </p>
                 </StepHeader>
                 <div>

@@ -7,7 +7,7 @@ const AddCustomFromAddressModal = ({
   onSuccess,
 }: {
   customFromAddresses: string[]
-  onSuccess: Function
+  onSuccess: () => void
 }) => {
   return (
     <div className={styles.container}>

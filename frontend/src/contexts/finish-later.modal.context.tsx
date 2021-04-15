@@ -1,11 +1,7 @@
-import React, {
-  createContext,
-  useState,
-  Dispatch,
-  SetStateAction,
-  useContext,
-} from 'react'
+import React, { createContext, useState, useContext } from 'react'
 import { ModalContext } from 'contexts/modal.context'
+
+import type { Dispatch, SetStateAction } from 'react'
 
 interface ContextProps {
   handleFinishLater: () => void

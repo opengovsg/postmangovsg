@@ -20,7 +20,7 @@ const VerifyCustomFromAddressModal = ({
   onSuccess,
 }: {
   label: string
-  onSuccess: Function
+  onSuccess: () => void
 }) => {
   const [step, setStep] = useState(VerifyEmailStep.Verify)
   const [errorMessage, setErrorMessage] = useState('')

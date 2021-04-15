@@ -7,13 +7,13 @@ interface ListControlProps {
   config: any
   currentState: any
   expanded: boolean
-  onChange: Function
-  doExpand: Function
-  doCollapse: Function
-  onExpandEvent: Function
+  onChange: (type: string) => void
+  doExpand: () => void
+  doCollapse: () => void
+  onExpandEvent: () => void
 }
 
-const ListOptions = ({ onChange }: { onChange: Function }) => {
+const ListOptions = ({ onChange }: { onChange: (type: string) => void }) => {
   function toggleListType(listType: string) {
     onChange(listType)
   }
