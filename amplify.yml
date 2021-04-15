@@ -29,6 +29,7 @@ frontend:
     build:
       commands:
         - npm run build
+        - CI=true npm run test
         - npm run upload-source-map
   artifacts:
     # IMPORTANT - Please verify your build output directory
