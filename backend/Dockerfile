@@ -2,11 +2,11 @@ FROM node:12-alpine
 
 # required for node-gyp
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
-  g++ make python tini python2-dev
+  g++ make python3 python3-dev tini
 
-RUN apk add py-pip && apk add jq
+RUN apk add jq
 
-RUN pip install awscli
+RUN python3 -m pip install awscli
 
 RUN aws configure set default.region ap-southeast-1
 
