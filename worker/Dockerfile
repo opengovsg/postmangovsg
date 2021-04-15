@@ -2,7 +2,7 @@ FROM node:12-alpine
 
 # required for node-gyp
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
-  g++ make python tini python-dev
+  g++ make python tini
 
 RUN apk add py-pip && apk add jq
 
