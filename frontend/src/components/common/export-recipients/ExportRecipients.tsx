@@ -33,9 +33,9 @@ const ExportRecipients = ({
   campaignId: number
   campaignName: string
   campaignType: ChannelType
-  sentAt: Date
+  sentAt?: string
   status: Status
-  statusUpdatedAt: Date
+  statusUpdatedAt?: string
   iconPosition: 'left' | 'right'
   isButton?: boolean
 }) => {
@@ -48,7 +48,7 @@ const ExportRecipients = ({
     let timeoutId: NodeJS.Timeout
 
     function getExportStatus(): void {
-      if (status === Status.Sending) {
+      if (status === Status.Sending || !statusUpdatedAt) {
         return setExportStatus(CampaignExportStatus.Unavailable)
       }
 
@@ -104,7 +104,16 @@ const ExportRecipients = ({
         content = content.concat(emptyExplanation)
       }
 
-      const sentAtTime = new Date(sentAt)
+      let sentAtTime
+      if (!sentAt) {
+        console.error(
+          'sentAt is undefined. Using current Date() as a fallback.'
+        )
+        sentAtTime = new Date()
+      } else {
+        sentAtTime = new Date(sentAt)
+      }
+
       download(
         new Blob(content),
         `${campaignName}_${sentAtTime.toLocaleDateString()}_${sentAtTime.toLocaleTimeString()}.csv`,

@@ -4,7 +4,7 @@ const router = Router()
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /callback/sms/{campaignId}/{messageId}:
  *    post:
  *      summary: Update status of sms message

@@ -12,7 +12,7 @@ const protectVerifyValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /protect/{id}:
  *     post:
  *       description: Verify password hash and return encrypted payload

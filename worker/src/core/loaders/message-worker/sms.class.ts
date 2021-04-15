@@ -7,6 +7,7 @@ import { CredentialService } from '@core/services/credential.service'
 import { PhoneNumberService } from '@core/services/phone-number.service'
 import { TemplateClient, XSS_SMS_OPTION } from 'postman-templating'
 import TwilioClient from '@sms/services/twilio-client.class'
+import SnsSmsClient from '@sms/services/sns-sms-client.class'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const logger = loggerWithLabel(module)
@@ -14,11 +15,11 @@ const logger = loggerWithLabel(module)
 class SMS {
   private workerId: string
   private connection: Sequelize
-  private twilioClient: TwilioClient | null
+  private smsClient: TwilioClient | SnsSmsClient | null
   constructor(workerId: string, connection: Sequelize) {
     this.workerId = workerId
     this.connection = connection
-    this.twilioClient = null
+    this.smsClient = null
   }
 
   enqueueMessages(jobId: number, campaignId: number): Promise<void> {
@@ -92,7 +93,7 @@ class SMS {
       }
     })
       .then((normalisedRecipient: string) => {
-        return this.twilioClient?.send(
+        return this.smsClient?.send(
           id,
           normalisedRecipient,
           templateClient.template(body, params),
@@ -128,11 +129,13 @@ class SMS {
     const credentials = await CredentialService.getTwilioCredentials(
       credentialName
     )
-    this.twilioClient = new TwilioClient(credentials)
+    this.smsClient = config.get('smsFallback.activate')
+      ? new SnsSmsClient()
+      : new TwilioClient(credentials)
   }
 
   destroySendingService(): void {
-    this.twilioClient = null
+    this.smsClient = null
   }
 }
 
