@@ -12,6 +12,8 @@ interface RouterOptions {
   initialEntries?: string[]
 }
 
+// Wraps the component to be rendered with context providers
+// that are required globally
 const render = (
   ui: React.ReactElement,
   options?: {
