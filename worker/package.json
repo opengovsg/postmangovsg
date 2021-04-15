@@ -16,6 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.7.0",
     "@types/bcrypt": "^3.0.0",
     "@types/convict": "^5.2.1",
     "@types/nodemailer-direct-transport": "^1.0.31",

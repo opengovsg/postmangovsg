@@ -409,6 +409,7 @@ router.post(
   '/new-credentials',
   celebrate(storeCredentialsValidator),
   CampaignMiddleware.canEditCampaign,
+  SmsMiddleware.canValidateCredentials,
   SmsMiddleware.disabledForDemoCampaign,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,

@@ -74,6 +74,11 @@ If not set, `nodemailer-direct-transport` will be used (for testing locally)
 
 #### Sending smses
 
+| Name                     | Description                                              |
+| ------------------------ | -------------------------------------------------------- |
+| `SMS_FALLBACK_ACTIVATE`  | Switch to true to use SNS fallback for all SMS campaigns |
+| `SMS_FALLBACK_SENDER_ID` | Sender ID to use for all SNS SMS                         |
+
 This set of twilio credentials is used for testing locally only (ie, `NODE_ENV=development`). When in production, users will have to upload their credentials, which will be stored and retrieved from Secrets Manager.
 If not set, smses cannot be sent.
 
