@@ -5,6 +5,7 @@ node_js:
 services:
   - docker
   - postgresql
+  - redis-server
 
 cache: npm
 
