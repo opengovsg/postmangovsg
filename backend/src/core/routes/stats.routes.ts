@@ -5,7 +5,7 @@ const router = Router()
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /stats:
  *    get:
  *      summary: Get count of total messages sent

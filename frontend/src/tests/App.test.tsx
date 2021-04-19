@@ -3,16 +3,16 @@ import { mockCommonApis, server, within, render, screen } from 'test-utils'
 import App from '../App'
 
 test('displays landing page when unauthenticated', async () => {
+  // Setup
   const { handlers } = mockCommonApis()
   server.use(...handlers)
-
   render(<App />, { router: { initialIndex: 0, initialEntries: ['/'] } })
 
   // Wait for the page to fully load
   const navigation = await screen.findByRole('navigation')
 
   /**
-   * Ensure that the following elements are present in the navigation header:
+   * Assert that the following elements are present in the navigation header:
    * 1. Postman logo
    * 2. "Sign in" button
    * 3. "Guide" link
@@ -34,7 +34,7 @@ test('displays landing page when unauthenticated', async () => {
   ).toBeInTheDocument()
 
   /**
-   * Ensure that the following elements are present in the landing area:
+   * Assert that the following elements are present in the landing area:
    * 1. "Sign in" button
    * 2. "Need help? Talk to us" link
    * 3. Pigeon landing animation
@@ -49,7 +49,7 @@ test('displays landing page when unauthenticated', async () => {
   expect(screen.getByText(/messages sent/i)).toBeInTheDocument()
 
   /**
-   * Ensure that the following elements are present in the footer:
+   * Assert that the following elements are present in the footer:
    * 1. "Guide" link
    * 2. "Contribute" link
    * 3. "Privacy" link

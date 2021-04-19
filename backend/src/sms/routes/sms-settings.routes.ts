@@ -31,7 +31,7 @@ const verifyCredentialValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/sms/credentials:
  *    post:
  *      summary: Store new twilio credentials for user
@@ -66,6 +66,7 @@ router.post(
   '/credentials',
   celebrate(storeCredentialValidator),
   SettingsMiddleware.checkUserCredentialLabel,
+  SmsMiddleware.canValidateCredentials,
   SmsMiddleware.getCredentialsFromBody,
   SmsMiddleware.validateAndStoreCredentials,
   SettingsMiddleware.storeUserCredential
@@ -73,7 +74,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/sms/credentials/verify:
  *    post:
  *      summary: Verify stored credential for user
@@ -101,6 +102,7 @@ router.post(
 router.post(
   '/credentials/verify',
   celebrate(verifyCredentialValidator),
+  SmsMiddleware.canValidateCredentials,
   SmsMiddleware.getCredentialsFromLabel,
   SmsMiddleware.validateAndStoreCredentials,
   (_req: Request, res: Response) => res.sendStatus(200)

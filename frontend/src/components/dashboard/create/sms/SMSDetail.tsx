@@ -1,33 +1,24 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { Status, CampaignStats, ChannelType } from 'classes/Campaign'
-import {
-  getCampaignStats,
-  stopCampaign,
-  retryCampaign,
-} from 'services/campaign.service'
+import { Status, ChannelType } from 'classes/Campaign'
+import { stopCampaign, retryCampaign } from 'services/campaign.service'
 import { StepHeader, ProgressDetails } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
+import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 
 const SMSDetail = () => {
   const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies
   const { campaign } = useContext(CampaignContext)
   const { id, demoMessageLimit } = campaign
   const isDemo = !!demoMessageLimit
-  const [stats, setStats] = useState(new CampaignStats({}))
-
-  async function refreshCampaignStats(id: number, forceRefresh = false) {
-    const campaignStats = await getCampaignStats(id, forceRefresh)
-    setStats(campaignStats)
-    return campaignStats
-  }
+  const { stats, refreshCampaignStats } = usePollCampaignStats()
 
   async function handleRefreshStats() {
     try {
-      await refreshCampaignStats(id, true)
+      await refreshCampaignStats(true)
     } catch (err) {
       console.error(err)
     }
@@ -37,7 +28,7 @@ const SMSDetail = () => {
     try {
       sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.SMS)
       await stopCampaign(id)
-      await refreshCampaignStats(id)
+      await refreshCampaignStats()
     } catch (err) {
       console.error(err)
     }
@@ -47,28 +38,11 @@ const SMSDetail = () => {
     try {
       sendUserEvent(GA_USER_EVENTS.RETRY_RESUME_SENDING, ChannelType.SMS)
       await retryCampaign(id)
-      await refreshCampaignStats(id)
+      await refreshCampaignStats()
     } catch (err) {
       console.error(err)
     }
   }
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-
-    async function poll() {
-      const { status } = await refreshCampaignStats(id)
-
-      if (status !== Status.Sent) {
-        timeoutId = setTimeout(poll, 2000)
-      }
-    }
-
-    poll()
-    return () => {
-      timeoutId && clearTimeout(timeoutId)
-    }
-  }, [id, stats.status])
 
   useEffect(() => {
     function renderCompletedDemoModal() {

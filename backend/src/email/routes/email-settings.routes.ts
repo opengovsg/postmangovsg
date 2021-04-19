@@ -20,7 +20,7 @@ const verifyValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/email/from/verify:
  *    post:
  *      summary: Verifies the user's email address to see if it can be used to send out emails
@@ -56,7 +56,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/email/from:
  *    get:
  *      summary: Returns an array of valid custom 'from' email addresses for the user

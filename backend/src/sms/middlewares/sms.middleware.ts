@@ -338,6 +338,26 @@ const duplicateCampaign = async (
   }
 }
 
+/**
+ * Determine if new credentials can be validated based on whether fallback is activated.
+ * @param req
+ * @param res
+ * @param next
+ */
+const canValidateCredentials = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  if (config.get('smsFallback.activate')) {
+    return res.status(400).json({
+      message:
+        'We are temporarily unable to validate Twilio credentials. Please try again later.',
+    })
+  }
+  next()
+}
+
 export const SmsMiddleware = {
   getCredentialsFromBody,
   getCredentialsFromLabel,
@@ -348,4 +368,5 @@ export const SmsMiddleware = {
   previewFirstMessage,
   disabledForDemoCampaign,
   duplicateCampaign,
+  canValidateCredentials,
 }
