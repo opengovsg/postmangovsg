@@ -343,7 +343,7 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className={styles.bottomContainer}>
+      <footer className={styles.bottomContainer}>
         <div className={styles.innerContainer}>
           <div className={styles.linksContainer}>
             <div className={styles.navLinks}>
@@ -409,7 +409,7 @@ const Landing = () => {
             </div>
           </div>
         </div>
-      </div>
+      </footer>
     </div>
   )
 }

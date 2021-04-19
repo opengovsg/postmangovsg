@@ -100,7 +100,10 @@ const ProgressDetails = ({
       return (
         <div className={styles.statsLastUpdated}>
           <span>
-            Stats last retrieved on <Moment format="LLL">{updatedAt}</Moment>
+            Stats last retrieved on{' '}
+            <Moment format="LLL" interval={0}>
+              {updatedAt}
+            </Moment>
           </span>
           <PrimaryButton onClick={handleRefreshStats}>
             Refresh stats
@@ -123,7 +126,9 @@ const ProgressDetails = ({
         <tbody>
           <tr>
             <td className={'md'}>
-              <Moment format="MMM DD YYYY, HH:mm">{sentAt}</Moment>
+              <Moment format="MMM DD YYYY, HH:mm" interval={0}>
+                {sentAt}
+              </Moment>
             </td>
 
             <td className={'md'}>{numRecipients}</td>

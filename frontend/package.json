@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.22.3",
+  "version": "1.22.4",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
@@ -13,7 +13,8 @@
     "get-sentry-release": "sentry-cli releases propose-version",
     "upload-source-map": "node sentry.js",
     "extract": "lingui extract",
-    "compile": "lingui compile"
+    "compile": "lingui compile",
+    "test": "react-scripts test --passWithNoTests"
   },
   "dependencies": {
     "@lingui/react": "^3.5.1",
@@ -57,13 +58,18 @@
     "@babel/core": "^7.10.4",
     "@lingui/cli": "^3.5.1",
     "@lingui/macro": "^3.5.1",
+    "@peculiar/webcrypto": "^1.1.6",
     "@sentry/cli": "^1.54.0",
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.2.5",
+    "@testing-library/user-event": "^13.0.1",
     "@types/classnames": "^2.2.10",
     "@types/downloadjs": "^1.4.2",
     "@types/draft-js": "^0.10.44",
     "@types/draftjs-to-html": "^0.8.0",
     "@types/escape-html": "0.0.20",
     "@types/html-to-draftjs": "^1.4.0",
+    "@types/jest": "^26.0.21",
     "@types/lodash": "^4.14.165",
     "@types/node": "^12.12.34",
     "@types/react": "^16.9.29",
@@ -80,7 +86,9 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-react": "^7.19.0",
+    "jest-canvas-mock": "^2.3.1",
     "lint-staged": "^10.2.6",
+    "msw": "^0.27.1",
     "node-sass": "^4.14.1",
     "prettier": "^2.0.5"
   },
