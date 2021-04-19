@@ -20,6 +20,7 @@ function mockApis() {
         num_recipients: 1,
         job_queue: [],
         halted: false,
+        has_credential: false,
       },
     ],
   })
