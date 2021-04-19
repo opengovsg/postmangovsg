@@ -95,7 +95,7 @@ router.use(TelegramMiddleware.isTelegramCampaignOwnedByUser)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram:
  *    get:
  *      tags:
@@ -130,7 +130,7 @@ router.get('/', TelegramMiddleware.getCampaignDetails)
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/telegram/template:
  *     put:
  *       tags:
@@ -203,7 +203,7 @@ router.put(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/telegram/upload/start:
  *     get:
  *       summary: "Get a presigned URL for upload with Content-MD5 header"
@@ -255,7 +255,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/telegram/upload/complete:
  *     post:
  *       summary: "Complete upload session with ETag verification"
@@ -314,7 +314,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *   /campaign/{campaignId}/telegram/upload/status:
  *     get:
  *       summary: "Get csv processing status"
@@ -397,7 +397,7 @@ router.delete(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/preview:
  *    get:
  *      tags:
@@ -431,7 +431,7 @@ router.get('/preview', TelegramMiddleware.previewFirstMessage)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/new-credentials:
  *    post:
  *      tags:
@@ -488,7 +488,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/credentials:
  *    post:
  *      tags:
@@ -537,7 +537,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/credentials/verify:
  *    post:
  *      tags:
@@ -585,7 +585,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/send:
  *    post:
  *      tags:
@@ -641,7 +641,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/stop:
  *    post:
  *      tags:
@@ -668,7 +668,7 @@ router.post('/stop', JobMiddleware.stopCampaign)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/retry:
  *    post:
  *      tags:
@@ -699,7 +699,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/stats:
  *    get:
  *      tags:
@@ -729,7 +729,7 @@ router.get('/stats', TelegramStatsMiddleware.getStats)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/update-stats:
  *    post:
  *      tags:
@@ -759,7 +759,7 @@ router.post('/refresh-stats', TelegramStatsMiddleware.updateAndGetStats)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/export:
  *    get:
  *      tags:
@@ -797,7 +797,7 @@ router.get(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /campaign/{campaignId}/telegram/duplicate:
  *    post:
  *      tags:

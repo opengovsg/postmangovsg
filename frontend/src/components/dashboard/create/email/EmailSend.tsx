@@ -8,7 +8,7 @@ import React, {
 import { useParams } from 'react-router-dom'
 
 import { CampaignContext } from 'contexts/campaign.context'
-import { EmailProgress, Status } from 'classes'
+import { ChannelType, EmailProgress } from 'classes'
 import { ModalContext } from 'contexts/modal.context'
 import {
   EmailPreviewBlock,
@@ -20,8 +20,7 @@ import {
   StepSection,
 } from 'components/common'
 import { getPreviewMessage } from 'services/email.service'
-import { sendCampaign } from 'services/campaign.service'
-
+import { confirmSendCampaign } from '../util'
 import styles from '../Create.module.scss'
 
 const EmailSend = ({
@@ -61,9 +60,13 @@ const EmailSend = ({
     loadPreview(campaignId)
   }, [campaignId])
 
-  const onModalConfirm = async () => {
-    await sendCampaign(+campaignId, 0)
-    updateCampaign({ status: Status.Sending })
+  const onModalConfirm = () => {
+    confirmSendCampaign({
+      campaignId: +campaignId,
+      sendRate: 0,
+      channelType: ChannelType.Email,
+      updateCampaign,
+    })
   }
 
   const openModal = () => {

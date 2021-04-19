@@ -33,7 +33,7 @@ const verifyOtpValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /auth/otp:
  *    post:
  *      tags:
@@ -64,7 +64,7 @@ router.post('/otp', celebrate(getOtpValidator), AuthMiddleware.getOtp)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /auth/login:
  *    post:
  *      summary: Verify user otp
@@ -103,7 +103,7 @@ router.post('/login', celebrate(verifyOtpValidator), AuthMiddleware.verifyOtp)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /auth/userinfo:
  *    get:
  *      summary: get logged in user info
@@ -125,7 +125,7 @@ router.get('/userinfo', AuthMiddleware.getUser)
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /auth/logout:
  *    get:
  *      summary: logs user out
