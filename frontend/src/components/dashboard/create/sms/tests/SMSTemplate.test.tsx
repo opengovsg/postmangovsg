@@ -1,30 +1,31 @@
 import React from 'react'
-import { screen, mockCommonApis, server, render } from 'test-utils'
+import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
 import SMSTemplate from '../SMSTemplate'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import userEvent from '@testing-library/user-event'
 import { Route } from 'react-router-dom'
 
+const TEST_SMS_CAMPAIGN: Campaign = {
+  id: 1,
+  name: 'Test SMS campaign',
+  type: 'SMS',
+  created_at: new Date(),
+  valid: false,
+  protect: false,
+  demo_message_limit: null,
+  csv_filename: null,
+  is_csv_processing: false,
+  num_recipients: null,
+  job_queue: [],
+  halted: false,
+  has_credential: false,
+}
+
 function mockApis() {
   const { handlers } = mockCommonApis({
     // Start with a freshly created SMS campaign
-    campaigns: [
-      {
-        id: 1,
-        name: 'Test SMS campaign',
-        type: 'SMS',
-        created_at: new Date(),
-        valid: false,
-        protect: false,
-        demo_message_limit: null,
-        csv_filename: null,
-        is_csv_processing: false,
-        num_recipients: null,
-        job_queue: [],
-        halted: false,
-      },
-    ],
+    campaigns: [{ ...TEST_SMS_CAMPAIGN }],
   })
   return handlers
 }

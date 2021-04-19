@@ -1,12 +1,20 @@
 import React from 'react'
-import { screen, mockCommonApis, server, render } from 'test-utils'
+import {
+  screen,
+  mockCommonApis,
+  server,
+  render,
+  Campaign,
+  USER_EMAIL,
+  DEFAULT_FROM,
+} from 'test-utils'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import { Route } from 'react-router-dom'
 import EmailRecipients from '../EmailRecipients'
 import { EmailCampaign } from 'classes'
 
-const TEST_EMAIL_CAMPAIGN = {
+const TEST_EMAIL_CAMPAIGN: Campaign = {
   id: 1,
   name: 'Test email campaign',
   type: 'EMAIL',
@@ -19,11 +27,14 @@ const TEST_EMAIL_CAMPAIGN = {
   num_recipients: null,
   job_queue: [],
   halted: false,
-  template: {
+  email_templates: {
     body: 'Test body',
     subject: 'Test subject',
     params: [],
+    reply_to: USER_EMAIL,
+    from: DEFAULT_FROM,
   },
+  has_credential: false,
 }
 
 function mockApis() {

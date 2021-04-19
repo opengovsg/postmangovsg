@@ -11,10 +11,11 @@ import {
   screen,
   TELEGRAM_CREDENTIAL,
   INVALID_TELEGRAM_CREDENTIAL,
+  Campaign,
 } from 'test-utils'
 import TelegramCredentials from '../TelegramCredentials'
 
-const TEST_TELEGRAM_CAMPAIGN = {
+const TEST_TELEGRAM_CAMPAIGN: Campaign = {
   id: 1,
   name: 'Test Telegram campaign',
   type: 'TELEGRAM',
@@ -27,10 +28,11 @@ const TEST_TELEGRAM_CAMPAIGN = {
   num_recipients: 1, // CSV already uploaded
   job_queue: [],
   halted: false,
-  template: {
+  telegram_templates: {
     body: 'Test body',
     params: [],
   },
+  has_credential: false,
 }
 
 function mockApis() {

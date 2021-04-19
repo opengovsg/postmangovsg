@@ -1,30 +1,31 @@
 import React from 'react'
-import { screen, mockCommonApis, server, render } from 'test-utils'
+import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import userEvent from '@testing-library/user-event'
 import { Route } from 'react-router-dom'
 import TelegramTemplate from '../TelegramTemplate'
 
+const TEST_TELEGRAM_CAMPAIGN: Campaign = {
+  id: 1,
+  name: 'Test Telegram campaign',
+  type: 'TELEGRAM',
+  created_at: new Date(),
+  valid: false,
+  protect: false,
+  demo_message_limit: null,
+  csv_filename: null,
+  is_csv_processing: false,
+  num_recipients: null,
+  job_queue: [],
+  halted: false,
+  has_credential: false,
+}
+
 function mockApis() {
   const { handlers } = mockCommonApis({
     // Start with a freshly created Telegram campaign
-    campaigns: [
-      {
-        id: 1,
-        name: 'Test Telegram campaign',
-        type: 'TELEGRAM',
-        created_at: new Date(),
-        valid: false,
-        protect: false,
-        demo_message_limit: null,
-        csv_filename: null,
-        is_csv_processing: false,
-        num_recipients: null,
-        job_queue: [],
-        halted: false,
-      },
-    ],
+    campaigns: [{ ...TEST_TELEGRAM_CAMPAIGN }],
   })
   return handlers
 }

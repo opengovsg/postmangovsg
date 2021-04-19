@@ -1,5 +1,12 @@
 import React from 'react'
-import { screen, mockCommonApis, server, render, fireEvent } from 'test-utils'
+import {
+  Campaign,
+  screen,
+  mockCommonApis,
+  server,
+  render,
+  fireEvent,
+} from 'test-utils'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import userEvent from '@testing-library/user-event'
@@ -7,24 +14,24 @@ import { Route } from 'react-router-dom'
 import EmailTemplate from '../EmailTemplate'
 
 function mockApis(protect: boolean) {
+  const campaign: Campaign = {
+    id: 1,
+    name: 'Test email campaign',
+    type: 'EMAIL',
+    created_at: new Date(),
+    valid: false,
+    protect,
+    demo_message_limit: null,
+    csv_filename: null,
+    is_csv_processing: false,
+    num_recipients: null,
+    job_queue: [],
+    halted: false,
+    has_credential: false,
+  }
   const { handlers } = mockCommonApis({
     // Start with a freshly created email campaign
-    campaigns: [
-      {
-        id: 1,
-        name: 'Test email campaign',
-        type: 'EMAIL',
-        created_at: new Date(),
-        valid: false,
-        protect,
-        demo_message_limit: null,
-        csv_filename: null,
-        is_csv_processing: false,
-        num_recipients: null,
-        job_queue: [],
-        halted: false,
-      },
-    ],
+    campaigns: [campaign],
   })
   return handlers
 }

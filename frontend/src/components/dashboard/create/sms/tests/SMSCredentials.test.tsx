@@ -11,10 +11,11 @@ import {
   TWILIO_CREDENTIAL,
   screen,
   INVALID_TWILIO_CREDENTIAL,
+  Campaign,
 } from 'test-utils'
 import SMSCredentials from '../SMSCredentials'
 
-const TEST_SMS_CAMPAIGN = {
+const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,
   name: 'Test SMS campaign',
   type: 'SMS',
@@ -27,11 +28,11 @@ const TEST_SMS_CAMPAIGN = {
   num_recipients: 1, // CSV already uploaded
   job_queue: [],
   halted: false,
-  template: {
+  sms_templates: {
     body: 'Test body',
-    subject: 'Test subject',
     params: [],
   },
+  has_credential: false,
 }
 
 function mockApis() {
