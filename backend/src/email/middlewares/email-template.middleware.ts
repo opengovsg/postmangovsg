@@ -479,8 +479,12 @@ const tesseractHandler = async (
         ...logMeta,
       })
 
+      let message = err.message
+      if (err.response?.status === 403) {
+        message = 'Error retrieving file from S3'
+      }
       // Store error to return on poll
-      UploadService.storeS3Error(+campaignId, err.message)
+      UploadService.storeS3Error(+campaignId, message)
     }
   } catch (err) {
     logger.error({

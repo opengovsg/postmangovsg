@@ -15,6 +15,7 @@ import config from '@core/config'
 import { fromAddressValidator } from '@core/utils/from-address'
 
 const router = Router({ mergeParams: true })
+const VAULT_URL = config.get('tesseract').vaultUrl
 
 // validators
 const storeTemplateValidator = {
@@ -93,7 +94,7 @@ const tesseractCampaignValidator = {
     url: Joi.string()
       .trim()
       .custom((value: string, helpers: any) => {
-        const url = value.match(/^https:\/\/storage(-test)?.vault.gov.sg\/.+$/g)
+        const url = value.match(VAULT_URL)
         if (url === null) {
           return helpers.error('string.uri')
         }
@@ -884,7 +885,6 @@ router.post(
   '/tesseract',
   celebrate(tesseractCampaignValidator),
   CampaignMiddleware.canEditCampaign,
-  CampaignMiddleware.isValidVaultUrl,
   EmailTemplateMiddleware.tesseractHandler
 )
 

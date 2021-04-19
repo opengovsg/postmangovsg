@@ -437,10 +437,10 @@ const config = convict({
       default: 'vaultgovsg',
       env: 'VAULT_BUCKET_NAME',
     },
-    vaultDomain: {
-      doc: 'Domain name for s3 pre-signed url for Vault datasets',
-      default: 'storage.vault.gov.sg',
-      env: 'VAULT_DOMAIN_NAME',
+    vaultUrl: {
+      doc: 'Vault url regex used to validate tesseract urls',
+      default: '/^https:\\/\\/storage.vault.gov.sg\\/.+$/g', // prod only
+      env: 'VAULT_BUCKET_NAME',
     },
   },
 })
@@ -474,7 +474,7 @@ switch (config.get('env')) {
       },
       tesseract: {
         vaultBucket: 'vaultgovsg-staging',
-        vaultDomain: 'storage-test.vault.gov.sg',
+        vaultUrl: '/^http:\\/\\/storage-test.vault.gov.sg\\/.+$/g',
       },
     })
     break
@@ -508,7 +508,7 @@ switch (config.get('env')) {
       },
       tesseract: {
         vaultBucket: 'vaultgovsg-staging',
-        vaultDomain: 'storage-test.vault.gov.sg',
+        vaultUrl: '/^http:\\/\\/storage-test.vault.gov.sg\\/.+$/g',
       },
     })
     break
