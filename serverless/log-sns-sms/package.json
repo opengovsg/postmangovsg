@@ -1,0 +1,39 @@
+{
+  "name": "log-sns-sms",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "rm -rf build && tsc && cp -r src/assets build/assets",
+    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h handler -e examples/event-sns-sms.js\""
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@sentry/node": "^6.2.5",
+    "aws-sdk": "^2.881.0",
+    "convict": "^6.0.1",
+    "dotenv": "^8.2.0",
+    "lambda-local": "^1.7.4",
+    "pg": "^8.5.1",
+    "pg-connection-string": "^2.4.0",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^6.6.2",
+    "sequelize-typescript": "^2.1.0",
+    "source-map-support": "^0.5.19"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.73",
+    "@types/convict": "^6.0.1",
+    "@types/node": "^14.14.37",
+    "@types/validator": "^13.1.3",
+    "@typescript-eslint/eslint-plugin": "^4.21.0",
+    "@typescript-eslint/parser": "^4.21.0",
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^4.2.3"
+  }
+}
