@@ -1,5 +1,10 @@
 import { rest } from 'msw'
-import type { State, Template } from './interfaces'
+import type {
+  State,
+  EmailTemplate,
+  SMSTemplate,
+  TelegramTemplate,
+} from './interfaces'
 import {
   USER_EMAIL,
   TWILIO_CREDENTIAL,
@@ -151,6 +156,7 @@ function mockBaseCampaignApis(state: State) {
         protect,
         type,
         valid: false,
+        has_credential: false,
 
         csv_filename: null,
         is_csv_processing: false,
@@ -177,6 +183,9 @@ function mockBaseCampaignApis(state: State) {
     }),
     rest.post('/campaign/:campaignId/send', (req, res, ctx) => {
       const { campaignId } = req.params
+      state.campaigns[campaignId - 1].job_queue = [
+        { status: 'LOGGED', sent_at: new Date().toISOString() },
+      ]
       return res(
         ctx.status(200),
         ctx.json({ campaign_id: campaignId, job_id: [1] })
@@ -232,7 +241,7 @@ function mockCampaignTemplateApis(state: State) {
     ) {
       params.push(curMatch.value[0].substring(1, curMatch.value[0].length - 1))
     }
-    return `{${params.join(',')}}`
+    return params
   }
 
   return [
@@ -255,14 +264,14 @@ function mockCampaignTemplateApis(state: State) {
         return res(ctx.status(500))
       }
 
-      const template = {
+      const template: EmailTemplate = {
         body,
         from,
         params: extractParamsFromBody(body),
         reply_to: replyTo ?? state.users[state.curUserId - 1].email,
         subject,
       }
-      state.campaigns[campaignId - 1].template = template
+      state.campaigns[campaignId - 1].email_templates = template
 
       const { valid, num_recipients } = state.campaigns[campaignId - 1]
 
@@ -283,11 +292,11 @@ function mockCampaignTemplateApis(state: State) {
         return res(ctx.status(400))
       }
 
-      const template = {
+      const template: SMSTemplate = {
         body,
         params: extractParamsFromBody(body),
       }
-      state.campaigns[campaignId - 1].template = template
+      state.campaigns[campaignId - 1].sms_templates = template
 
       const { valid, num_recipients } = state.campaigns[campaignId - 1]
 
@@ -308,11 +317,11 @@ function mockCampaignTemplateApis(state: State) {
         return res(ctx.status(400))
       }
 
-      const template = {
+      const template: TelegramTemplate = {
         body,
         params: extractParamsFromBody(body),
       }
-      state.campaigns[campaignId - 1].template = template
+      state.campaigns[campaignId - 1].telegram_templates = template
 
       const { valid, num_recipients } = state.campaigns[campaignId - 1]
 
@@ -331,7 +340,7 @@ function mockCampaignTemplateApis(state: State) {
       return res(
         ctx.status(200),
         ctx.json({
-          preview: state.campaigns[campaignId - 1].template,
+          preview: state.campaigns[campaignId - 1].email_templates,
         })
       )
     }),
@@ -340,7 +349,7 @@ function mockCampaignTemplateApis(state: State) {
       return res(
         ctx.status(200),
         ctx.json({
-          preview: state.campaigns[campaignId - 1].template,
+          preview: state.campaigns[campaignId - 1].sms_templates,
         })
       )
     }),
@@ -349,7 +358,7 @@ function mockCampaignTemplateApis(state: State) {
       return res(
         ctx.status(200),
         ctx.json({
-          preview: state.campaigns[campaignId - 1].template,
+          preview: state.campaigns[campaignId - 1].telegram_templates,
         })
       )
     }),
@@ -359,13 +368,16 @@ function mockCampaignTemplateApis(state: State) {
 function mockCampaignCredentialApis(state: State) {
   return [
     rest.post('/campaign/:campaignId/email/credentials', (req, res, ctx) => {
+      const { campaignId } = req.params
       const { recipient } = req.body as { recipient?: string }
       if (!recipient) {
         return res(ctx.status(400))
       }
+      state.campaigns[campaignId - 1].has_credential = true
       return res(ctx.status(200))
     }),
     rest.post('/campaign/:campaignId/sms/credentials', (req, res, ctx) => {
+      const { campaignId } = req.params
       const { recipient, label } = req.body as {
         recipient?: string
         label?: string
@@ -380,9 +392,11 @@ function mockCampaignCredentialApis(state: State) {
       ) {
         return res(ctx.status(400))
       }
+      state.campaigns[campaignId - 1].has_credential = true
       return res(ctx.status(200))
     }),
     rest.post('/campaign/:campaignId/telegram/credentials', (req, res, ctx) => {
+      const { campaignId } = req.params
       const { label } = req.body as {
         label?: string
       }
@@ -395,6 +409,7 @@ function mockCampaignCredentialApis(state: State) {
       ) {
         return res(ctx.status(400))
       }
+      state.campaigns[campaignId - 1].has_credential = true
       return res(ctx.status(200))
     }),
     rest.post(
@@ -490,18 +505,25 @@ function mockCampaignUploadApis(state: State) {
     }),
     rest.get('/campaign/:campaignId/upload/status', (req, res, ctx) => {
       const { campaignId } = req.params
-      if (!state.campaigns[campaignId - 1].template) {
-        return res(ctx.status(400))
+
+      const campaign = state.campaigns[campaignId - 1]
+      const { num_recipients, is_csv_processing, csv_filename } = campaign
+
+      let preview
+      if (campaign.email_templates) {
+        preview = {
+          ...campaign.email_templates,
+          replyTo: campaign.email_templates.reply_to,
+        }
+      } else if (campaign.sms_templates) {
+        preview = campaign.sms_templates
+      } else if (campaign.telegram_templates) {
+        preview = campaign.telegram_templates
       }
 
-      const { body, subject, reply_to: replyTo, from } = state.campaigns[
-        campaignId - 1
-      ].template as Template
-      const {
-        num_recipients,
-        is_csv_processing,
-        csv_filename,
-      } = state.campaigns[campaignId - 1]
+      if (!preview) {
+        return res(ctx.status(400))
+      }
 
       return res(
         ctx.status(200),
@@ -509,12 +531,7 @@ function mockCampaignUploadApis(state: State) {
           is_csv_processing,
           csv_filename,
           num_recipients,
-          preview: {
-            body,
-            subject,
-            replyTo,
-            from,
-          },
+          preview,
         })
       )
     }),

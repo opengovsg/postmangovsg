@@ -30,12 +30,22 @@ interface Credential {
   type: string
 }
 
-export interface Template {
+export interface EmailTemplate {
   body: string
-  subject?: string
-  from?: string
-  params: string
-  reply_to?: string
+  subject: string
+  from: string
+  params: string[]
+  reply_to: string
+}
+
+export interface TelegramTemplate {
+  body: string
+  params: string[]
+}
+
+export interface SMSTemplate {
+  body: string
+  params: string[]
 }
 
 export interface Campaign {
@@ -47,12 +57,15 @@ export interface Campaign {
   protect: boolean
   type: string
   valid: boolean
+  has_credential: boolean
 
   csv_filename: string | null
   is_csv_processing: boolean
   job_queue: any[]
   num_recipients: number | null
-  template?: Template
+  sms_templates?: SMSTemplate
+  email_templates?: EmailTemplate
+  telegram_templates?: TelegramTemplate
 }
 
 interface ProtectedMessage {
