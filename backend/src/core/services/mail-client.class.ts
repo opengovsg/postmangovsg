@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer'
 import directTransport from 'nodemailer-direct-transport'
 import { loggerWithLabel } from '@core/logger'
 import { MailToSend, MailCredentials } from '@core/interfaces'
+import config from '@core/config'
+
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
 const logger = loggerWithLabel(module)
 
@@ -38,7 +40,9 @@ export default class MailClient {
   public sendMail(input: MailToSend): Promise<string | void> {
     return new Promise<string | void>((resolve, reject) => {
       const options = {
-        from: input.from,
+        from: config.get('emailFallback.activate')
+          ? config.get('mailFrom')
+          : input.from,
         to: input.recipients,
         subject: input.subject,
         replyTo: input.replyTo,

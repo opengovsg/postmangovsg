@@ -114,6 +114,35 @@ const previewFirstMessage = async (
 }
 
 /**
+ * Checks if the from address is custom and rejects it if necessary.
+ */
+const isCustomFromAddressAllowed = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const { from } = req.body
+  const defaultEmail = config.get('mailFrom')
+
+  if (from === defaultEmail) {
+    next()
+    return
+  }
+
+  // We don't allow custom from address for the SendGrid fallback
+  // since they aren't DKIM-authenticated currently
+  if (config.get('emailFallback.activate')) {
+    res.status(503).json({
+      message:
+        'Unable to use a custom from address due to downtime. Please use the default from address instead.',
+    })
+    return
+  }
+
+  next()
+}
+
+/**
  * Checks that the from address is either the user's email or the default app email
  */
 const isFromAddressAccepted = async (
@@ -333,6 +362,7 @@ export const EmailMiddleware = {
   storeFromAddress,
   getCustomFromAddress,
   existsFromAddress,
+  isCustomFromAddressAllowed,
   isFromAddressAccepted,
   sendValidationMessage,
   duplicateCampaign,

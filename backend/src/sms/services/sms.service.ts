@@ -8,14 +8,15 @@ import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
 import { CampaignService, UploadService } from '@core/services'
+import { InvalidRecipientError } from '@core/errors'
+import { PhoneNumberService } from '@core/services'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
 import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
-import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
-import { InvalidRecipientError } from '@core/errors'
+import SnsSmsClient from './sns-sms-client.class'
 
 const logger = loggerWithLabel(module)
 
@@ -67,8 +68,7 @@ const sendMessage = (
   credential: TwilioCredentials,
   recipient: string,
   message: string
-): Promise<string> => {
-  const twilioService = new TwilioClient(credential)
+): Promise<string | void> => {
   try {
     recipient = PhoneNumberService.normalisePhoneNumber(
       recipient,
@@ -77,7 +77,11 @@ const sendMessage = (
   } catch (err) {
     throw new InvalidRecipientError('Invalid phone number')
   }
-  return twilioService.send(recipient, message)
+
+  const client = config.get('smsFallback.activate')
+    ? new SnsSmsClient()
+    : new TwilioClient(credential)
+  return client.send(recipient, message)
 }
 
 /**
@@ -91,7 +95,7 @@ const sendCampaignMessage = async (
   campaignId: number,
   recipient: string,
   credential: TwilioCredentials
-): Promise<string> => {
+): Promise<string | void> => {
   const msg = await getHydratedMessage(campaignId)
   if (!msg) throw new Error('No message to send')
   return sendMessage(credential, recipient, msg?.body)
@@ -105,7 +109,7 @@ const sendCampaignMessage = async (
 const sendValidationMessage = async (
   recipient: string,
   credential: TwilioCredentials
-): Promise<string> => {
+): Promise<string | void> => {
   return sendMessage(
     credential,
     recipient,

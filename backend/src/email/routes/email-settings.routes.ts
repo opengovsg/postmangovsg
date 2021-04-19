@@ -20,7 +20,7 @@ const verifyValidator = {
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/email/from/verify:
  *    post:
  *      summary: Verifies the user's email address to see if it can be used to send out emails
@@ -43,11 +43,14 @@ const verifyValidator = {
  *          description: OK
  *        400:
  *          description: Bad Request (verification fails)
+ *        503:
+ *          description: Service Unavailable. Try using the default from address instead.
  *
  */
 router.post(
   '/from/verify',
   celebrate(verifyValidator),
+  EmailMiddleware.isCustomFromAddressAllowed,
   EmailMiddleware.isFromAddressAccepted,
   EmailMiddleware.verifyFromAddress,
   EmailMiddleware.sendValidationMessage,
@@ -56,7 +59,7 @@ router.post(
 
 /**
  * @swagger
- * path:
+ * paths:
  *  /settings/email/from:
  *    get:
  *      summary: Returns an array of valid custom 'from' email addresses for the user
