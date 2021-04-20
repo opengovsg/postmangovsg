@@ -73,8 +73,10 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/worker
         - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       install:
-        - npm ci
+        - cd $TRAVIS_BUILD_DIR/shared && npm ci
+        - cd $TRAVIS_BUILD_DIR/worker && npm ci
       script:
+        - npm run build
         - npm run lint-no-fix
       before_deploy:
         - cd $TRAVIS_BUILD_DIR/worker && ./before-deploy.sh
