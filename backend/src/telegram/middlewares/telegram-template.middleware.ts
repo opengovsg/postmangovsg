@@ -9,7 +9,7 @@ import {
   InvalidRecipientError,
   UserError,
 } from '@core/errors'
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { Campaign } from '@core/models'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'

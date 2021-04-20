@@ -8,7 +8,7 @@ import {
   InvalidRecipientError,
   UserError,
 } from '@core/errors'
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'

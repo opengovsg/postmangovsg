@@ -1,12 +1,15 @@
 {
   "include": [
-    "./src/**/*"
+    "src"
   ],
   "exclude": [
     "node_modules"
   ],
   "files": [
     "./src/server.ts"
+  ],
+  "references": [
+    { "path": "../shared" }
   ],
   "compileOnSave": true,
   "compilerOptions": {
@@ -35,7 +38,8 @@
       "@core/*": ["core/*"],
       "@sms/*": ["sms/*"],
       "@email/*": ["email/*"],
-      "@telegram/*": ["telegram/*"]
+      "@telegram/*": ["telegram/*"],
+      "@shared/*": ["../../shared/src/*"]
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,
