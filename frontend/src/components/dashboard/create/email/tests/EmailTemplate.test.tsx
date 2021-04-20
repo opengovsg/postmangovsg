@@ -74,6 +74,11 @@ test('displays the necessary elements', async () => {
    */
   expect(heading).toBeInTheDocument()
   expect(
+    screen.getByRole('listbox', {
+      name: /custom from/i,
+    })
+  ).toBeInTheDocument()
+  expect(
     screen.getByRole('textbox', {
       name: /subject/i,
     })
