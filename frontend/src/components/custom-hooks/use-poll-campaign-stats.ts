@@ -32,7 +32,7 @@ function usePollCampaignStats() {
     poll()
 
     return () => clearTimeout(timeoutId)
-  }, [stats.status, refreshCampaignStats, id, setCampaign])
+  }, [refreshCampaignStats, id, setCampaign])
 
   return { stats, refreshCampaignStats }
 }
