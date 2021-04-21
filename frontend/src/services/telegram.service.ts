@@ -3,6 +3,11 @@ import Papa from 'papaparse'
 
 import type { AxiosError } from 'axios'
 
+// Telegram states that the total character limit is 4096.
+// This defines a threshold at which we warn the users on their template length.
+export const TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD = 3000
+export const TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD = 4096
+
 interface PresignedUrlResponse {
   presignedUrl: string
   transactionId: string
@@ -12,11 +17,6 @@ interface UploadCompleteResponse {
   template_body: string
   num_recipients: number
   hydrated_record: string
-}
-
-// A dummy function to follow the interface definition
-export function exceedsCharacterThreshold(_: string) {
-  return false
 }
 
 export async function saveTemplate(

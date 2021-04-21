@@ -19,33 +19,41 @@ import styles from '../Create.module.scss'
 
 function BodyTemplate({
   setActiveStep,
-  exceedsCharacterThreshold,
+  warnCharacterCount,
+  errorCharacterCount,
 }: {
   setActiveStep: Dispatch<SetStateAction<number>> // todo: look into tightening the type defn to SMSProgress | TelegramProgress
-  exceedsCharacterThreshold: (body: string) => boolean
+  warnCharacterCount: number
+  errorCharacterCount: number
 }) {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(campaign.body))
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [errorMsg, setErrorMsg] = useState<React.ReactNode>(null)
   const { id: campaignId } = useParams<{ id: string }>()
 
   useEffect(() => {
-    if (exceedsCharacterThreshold(body)) {
-      setErrorMsg(
-        (
-          <span>
-            Your template has more than 1000 characters. Messages which are
-            longer than <b>1600</b> characters (including keywords) can&apos;t
-            be sent. Consider making your message short and sweet to make it
-            easier to read on a mobile device.
-          </span>
-        ) as any
+    let errorMsg = null
+    if (body.length > errorCharacterCount) {
+      errorMsg = (
+        <span>
+          Your template has more than <b>{errorCharacterCount}</b> characters
+          and can&apos;t be sent. Consider making your message short and sweet
+          to make it easier to read on a mobile device.
+        </span>
       )
-    } else {
-      setErrorMsg(null)
+    } else if (body.length > warnCharacterCount) {
+      errorMsg = (
+        <span>
+          Your template has more than {warnCharacterCount} characters. Messages
+          which are longer than <b>{errorCharacterCount}</b> characters
+          (including keywords) can&apos;t be sent. Consider making your message
+          short and sweet to make it easier to read on a mobile device.
+        </span>
+      )
     }
-  }, [body, exceedsCharacterThreshold])
+    setErrorMsg(errorMsg)
+  }, [body.length, errorCharacterCount, warnCharacterCount])
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
     setErrorMsg(null)
@@ -130,7 +138,10 @@ function BodyTemplate({
         <p className={styles.characterCount}>{body.length} characters</p>
       </StepSection>
 
-      <NextButton disabled={!body} onClick={handleSaveTemplate} />
+      <NextButton
+        disabled={!body || body.length > errorCharacterCount}
+        onClick={handleSaveTemplate}
+      />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )
