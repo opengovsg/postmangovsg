@@ -11,22 +11,41 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { saveTemplate } from 'services/telegram.service'
+import { saveTemplate } from 'services/sms.service'
 
-import type { TelegramCampaign, TelegramProgress } from 'classes'
 import type { Dispatch, SetStateAction } from 'react'
 
-const TelegramTemplate = ({
+import styles from '../Create.module.scss'
+
+function BodyTemplate({
   setActiveStep,
+  exceedsCharacterThreshold,
 }: {
-  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
-}) => {
+  setActiveStep: Dispatch<SetStateAction<number>> // todo: look into tightening the type defn to SMSProgress | TelegramProgress
+  exceedsCharacterThreshold: (body: string) => boolean
+}) {
   const { campaign, updateCampaign } = useContext(CampaignContext)
-  const { body: initialBody } = campaign as TelegramCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
-  const [body, setBody] = useState(replaceNewLines(initialBody))
+  const [body, setBody] = useState(replaceNewLines(campaign.body))
   const [errorMsg, setErrorMsg] = useState(null)
   const { id: campaignId } = useParams<{ id: string }>()
+
+  useEffect(() => {
+    if (exceedsCharacterThreshold(body)) {
+      setErrorMsg(
+        (
+          <span>
+            Your template has more than 1000 characters. Messages which are
+            longer than <b>1600</b> characters (including keywords) can&apos;t
+            be sent. Consider making your message short and sweet to make it
+            easier to read on a mobile device.
+          </span>
+        ) as any
+      )
+    } else {
+      setErrorMsg(null)
+    }
+  }, [body, exceedsCharacterThreshold])
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
     setErrorMsg(null)
@@ -38,13 +57,14 @@ const TelegramTemplate = ({
         +campaignId,
         body
       )
-      if (!updatedTemplate) return
-      updateCampaign({
-        body: updatedTemplate?.body,
-        params: updatedTemplate?.params,
-        numRecipients,
-      })
-      setActiveStep((s) => s + 1)
+      if (updatedTemplate) {
+        updateCampaign({
+          body: updatedTemplate.body,
+          params: updatedTemplate.params,
+          numRecipients,
+        })
+        setActiveStep((s) => s + 1)
+      }
     } catch (err) {
       setErrorMsg(err.message)
     }
@@ -107,6 +127,7 @@ const TelegramTemplate = ({
           value={body}
           onChange={setBody}
         />
+        <p className={styles.characterCount}>{body.length} characters</p>
       </StepSection>
 
       <NextButton disabled={!body} onClick={handleSaveTemplate} />
@@ -115,4 +136,4 @@ const TelegramTemplate = ({
   )
 }
 
-export default TelegramTemplate
+export default BodyTemplate

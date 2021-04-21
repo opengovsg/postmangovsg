@@ -4,7 +4,6 @@ import React, { useState, useEffect, useContext } from 'react'
 import { CampaignContext } from 'contexts/campaign.context'
 import { SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
-import SMSTemplate from './SMSTemplate'
 import SMSRecipients from './SMSRecipients'
 import SMSCredentials from './SMSCredentials'
 import SMSSend from './SMSSend'
@@ -13,6 +12,8 @@ import SMSDetail from './SMSDetail'
 import type { SMSCampaign } from 'classes'
 
 import styles from '../Create.module.scss'
+import { exceedsCharacterThreshold } from 'services/sms.service'
+import BodyTemplate from '../common/BodyTemplate'
 
 const SMS_PROGRESS_STEPS = [
   'Create message',
@@ -36,7 +37,12 @@ const CreateSMS = () => {
   function renderStep() {
     switch (activeStep) {
       case SMSProgress.CreateTemplate:
-        return <SMSTemplate setActiveStep={setActiveStep} />
+        return (
+          <BodyTemplate
+            setActiveStep={setActiveStep}
+            exceedsCharacterThreshold={exceedsCharacterThreshold}
+          />
+        )
       case SMSProgress.UploadRecipients:
         return <SMSRecipients setActiveStep={setActiveStep} />
       case SMSProgress.InsertCredentials:

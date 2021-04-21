@@ -14,6 +14,11 @@ interface UploadCompleteResponse {
   hydrated_record: string
 }
 
+// A dummy function to follow the interface definition
+export function exceedsCharacterThreshold(_: string) {
+  return false
+}
+
 export async function saveTemplate(
   campaignId: number,
   body: string
