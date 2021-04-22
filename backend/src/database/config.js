@@ -11,6 +11,7 @@ const dbConfig = parseDBUri(DB_URI)
 
 const COMMON_CONFIG = {
   dialect: 'postgres',
+  seederStorage: 'sequelize',
   ...dbConfig,
 }
 
