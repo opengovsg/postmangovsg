@@ -29,7 +29,7 @@ const scriptLoader = async (): Promise<void> => {
       },
     },
   })
-  await sequelize.sync()
+  await sequelize.authenticate()
 
   const scriptsFilePaths = [
     ...sqlFilePaths,

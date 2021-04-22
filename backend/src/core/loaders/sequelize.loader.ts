@@ -51,7 +51,7 @@ const sequelizeLoader = async (): Promise<void> => {
   initializeModels(sequelize)
 
   try {
-    await sequelize.sync()
+    await sequelize.authenticate()
     logger.info({ message: 'Database loaded.' })
   } catch (error) {
     logger.error({ message: 'Unable to connect to database', error })
