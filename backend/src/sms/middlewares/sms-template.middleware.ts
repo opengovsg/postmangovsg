@@ -63,7 +63,6 @@ const storeTemplate = async (
         valid: false,
         template: {
           body: updatedTemplate?.body,
-
           params: updatedTemplate?.params,
         },
       })
