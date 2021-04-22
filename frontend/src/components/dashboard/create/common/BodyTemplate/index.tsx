@@ -15,7 +15,7 @@ import { saveTemplate } from 'services/sms.service'
 
 import type { Dispatch, SetStateAction } from 'react'
 
-import styles from '../Create.module.scss'
+import styles from './BodyTemplate.module.scss'
 
 function BodyTemplate({
   setActiveStep,

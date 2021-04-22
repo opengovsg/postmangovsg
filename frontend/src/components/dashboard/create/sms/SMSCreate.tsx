@@ -8,11 +8,11 @@ import SMSRecipients from './SMSRecipients'
 import SMSCredentials from './SMSCredentials'
 import SMSSend from './SMSSend'
 import SMSDetail from './SMSDetail'
+import BodyTemplate from '../common/BodyTemplate'
 
 import type { SMSCampaign } from 'classes'
 
 import styles from '../Create.module.scss'
-import BodyTemplate from '../common/BodyTemplate'
 import {
   SMS_WARN_EXCEED_CHARACTER_THRESHOLD,
   SMS_ERROR_EXCEED_CHARACTER_THRESHOLD,
