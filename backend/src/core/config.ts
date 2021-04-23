@@ -398,6 +398,11 @@ const config = convict({
       env: 'CALLBACK_SECRET',
       default: '',
     },
+    localSignatureCert: {
+      doc: 'Local certificate for signature',
+      env: 'LOCAL_SIGNATURE_CERT',
+      default: '',
+    },
   },
   smsCallback: {
     callbackSecret: {

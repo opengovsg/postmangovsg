@@ -2,6 +2,7 @@ import { Request } from 'express'
 import url from 'url'
 import crypto, { Utf8AsciiLatin1Encoding } from 'crypto'
 import https from 'https'
+import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import {
   updateDeliveredStatus,
@@ -50,6 +51,9 @@ const getReferenceID = (message: any): string | undefined => {
 }
 
 const isValidCertUrl = (urlToValidate: string): boolean => {
+  // Skip validation if it is a local cert used for tests
+  if (urlToValidate === 'local') return true
+
   const parsed = url.parse(urlToValidate)
   return (
     parsed.protocol === 'https:' &&
@@ -61,6 +65,11 @@ const isValidCertUrl = (urlToValidate: string): boolean => {
 
 const getCertificate = (certUrl: string): Promise<string> => {
   return new Promise((resolve, reject) => {
+    const localSignatureCert = config.get('emailCallback.localSignatureCert')
+    if (certUrl === 'local' && localSignatureCert) {
+      resolve(localSignatureCert)
+    }
+
     if (certCache[certUrl]) {
       resolve(certCache[certUrl])
     }
