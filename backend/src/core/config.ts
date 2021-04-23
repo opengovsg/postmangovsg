@@ -8,6 +8,9 @@ import fs from 'fs'
 import path from 'path'
 import { isSupportedCountry } from 'libphonenumber-js'
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
+const testCallbackCert = fs.readFileSync(
+  path.join(__dirname, '../assets/fake-callback-cert.pem')
+)
 /**
  * To require an env var without setting a default,
  * use
@@ -401,7 +404,7 @@ const config = convict({
     localSignatureCert: {
       doc: 'Local certificate for signature',
       env: 'LOCAL_SIGNATURE_CERT',
-      default: '',
+      default: testCallbackCert,
     },
   },
   smsCallback: {
