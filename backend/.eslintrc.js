@@ -32,5 +32,16 @@ module.exports = {
         allow: ['warn', 'error'],
       },
     ],
+
+    '@typescript-eslint/explicit-function-return-type': 'off',
   },
+  overrides: [
+    // enable rules specifically for typescript files
+    {
+      files: ['*.ts'],
+      rules: {
+        '@typescript-eslint/explicit-function-return-type': ['warn'],
+      },
+    },
+  ],
 }
