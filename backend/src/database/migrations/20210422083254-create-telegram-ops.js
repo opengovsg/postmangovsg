@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.createTable('telegram_ops', {
       id: {
         autoIncrement: true,
-        // Note: for some reason, this is a BIGINT but `telegram_messages` has it as a STRING(255)
+        // todo: for some reason, this is a BIGINT but `telegram_messages` has it as a STRING(255)
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
         primaryKey: true,
@@ -36,7 +36,7 @@ module.exports = {
         allowNull: true,
       },
       status: {
-        // Note: for some reason, this doesn't reference `enum_telegram_messages_status` in `telegram_messages`
+        // todo: for some reason, this doesn't reference `enum_telegram_messages_status` in `telegram_messages`
         type: Sequelize.DataTypes.ENUM(
           'SENDING',
           'ERROR',
