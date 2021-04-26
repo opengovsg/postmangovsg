@@ -6,20 +6,18 @@ import {
   server,
   render,
   Campaign,
-  USER_EMAIL,
-  DEFAULT_FROM,
-  INVALID_EMAIL_CSV_FILE,
+  INVALID_MOBILE_CSV_FILE,
 } from 'test-utils'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import { Route } from 'react-router-dom'
-import EmailRecipients from '../EmailRecipients'
-import { EmailCampaign } from 'classes'
+import SMSRecipients from '../SMSRecipients'
+import { SMSCampaign } from 'classes'
 
-const TEST_EMAIL_CAMPAIGN: Campaign = {
+const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,
-  name: 'Test email campaign',
-  type: 'EMAIL',
+  name: 'Test SMS campaign',
+  type: 'SMS',
   created_at: new Date(),
   valid: false,
   protect: false,
@@ -29,12 +27,9 @@ const TEST_EMAIL_CAMPAIGN: Campaign = {
   num_recipients: null,
   job_queue: [],
   halted: false,
-  email_templates: {
+  sms_templates: {
     body: 'Test body',
-    subject: 'Test subject',
     params: [],
-    reply_to: USER_EMAIL,
-    from: DEFAULT_FROM,
   },
   has_credential: false,
 }
@@ -43,8 +38,8 @@ function mockApis() {
   const { handlers } = mockCommonApis({
     curUserId: 1, // Start authenticated
 
-    // Start with an email campaign with a saved template
-    campaigns: [{ ...TEST_EMAIL_CAMPAIGN }],
+    // Start with an SMS campaign with a saved template
+    campaigns: [{ ...TEST_SMS_CAMPAIGN }],
   })
   return handlers
 }
@@ -55,10 +50,10 @@ function renderRecipients() {
   render(
     <Route path="/campaigns/:id">
       <CampaignContextProvider
-        initialCampaign={new EmailCampaign({ ...TEST_EMAIL_CAMPAIGN })}
+        initialCampaign={new SMSCampaign({ ...TEST_SMS_CAMPAIGN })}
       >
         <FinishLaterModalContextProvider>
-          <EmailRecipients setActiveStep={setActiveStep} />
+          <SMSRecipients setActiveStep={setActiveStep} />
         </FinishLaterModalContextProvider>
       </CampaignContextProvider>
     </Route>,
@@ -101,9 +96,9 @@ test('displays an error message after uploading an invalid recipients list', asy
 
   // Upload the file
   // Note: we cannot select files via the file picker
-  userEvent.upload(fileUploadInput, INVALID_EMAIL_CSV_FILE)
+  userEvent.upload(fileUploadInput, INVALID_MOBILE_CSV_FILE)
   expect(fileUploadInput?.files).toHaveLength(1)
-  expect(fileUploadInput?.files?.[0]).toBe(INVALID_EMAIL_CSV_FILE)
+  expect(fileUploadInput?.files?.[0]).toBe(INVALID_MOBILE_CSV_FILE)
 
   // Assert that an error message is displayed
   expect(

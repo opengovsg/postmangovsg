@@ -242,6 +242,7 @@ test('successfully creates and sends a new protected email campaign', async () =
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 
+  // Teardown
   jest.runOnlyPendingTimers()
   jest.useRealTimers()
 })

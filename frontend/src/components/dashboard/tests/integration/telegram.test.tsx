@@ -214,7 +214,7 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 
-  // Cleanup
+  // Teardown
   jest.runOnlyPendingTimers()
   jest.useRealTimers()
 })
