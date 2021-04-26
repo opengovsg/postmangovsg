@@ -7,6 +7,10 @@ import {
   TELEGRAM_CREDENTIAL,
   DEFAULT_FROM,
   VALID_CSV_FILENAME,
+  VALID_MOBILE_CSV_FILE,
+  VALID_EMAIL_CSV_FILE,
+  RECIPIENT_NUMBER,
+  RECIPIENT_EMAIL,
 } from 'test-utils'
 import {
   mockApis,
@@ -14,11 +18,7 @@ import {
   CAMPAIGN_NAME,
   SUBJECT_TEXT,
   MESSAGE_TEXT,
-  EMAIL_CSV_FILE,
   REPLY_TO,
-  RECIPIENT_EMAIL,
-  MOBILE_CSV_FILE,
-  RECIPIENT_NUMBER,
   UNPROTECTED_MESSAGE_TEXT,
 } from '../util'
 
@@ -92,9 +92,9 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   const fileUploadInput = screen.getByLabelText(
     /upload file/i
   ) as HTMLInputElement
-  userEvent.upload(fileUploadInput, MOBILE_CSV_FILE)
+  userEvent.upload(fileUploadInput, VALID_MOBILE_CSV_FILE)
   expect(fileUploadInput?.files).toHaveLength(1)
-  expect(fileUploadInput?.files?.[0]).toBe(MOBILE_CSV_FILE)
+  expect(fileUploadInput?.files?.[0]).toBe(VALID_MOBILE_CSV_FILE)
 
   // Wait for CSV to be processed and ensure that message preview is shown
   expect(await screen.findByText(/message preview/i)).toBeInTheDocument()
@@ -333,9 +333,9 @@ test('successfully creates and sends a new protected email campaign', async () =
   const fileUploadInput = screen.getByLabelText(
     /upload file/i
   ) as HTMLInputElement
-  userEvent.upload(fileUploadInput, EMAIL_CSV_FILE)
+  userEvent.upload(fileUploadInput, VALID_EMAIL_CSV_FILE)
   expect(fileUploadInput?.files).toHaveLength(1)
-  expect(fileUploadInput?.files?.[0]).toBe(EMAIL_CSV_FILE)
+  expect(fileUploadInput?.files?.[0]).toBe(VALID_EMAIL_CSV_FILE)
 
   // Wait for CSV to be processed and ensure that protected message preview is shown
   expect(await screen.findByText(/1 recipient/i)).toBeInTheDocument()

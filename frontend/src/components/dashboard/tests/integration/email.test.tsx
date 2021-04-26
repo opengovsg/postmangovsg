@@ -6,6 +6,8 @@ import {
   waitFor,
   DEFAULT_FROM,
   VALID_CSV_FILENAME,
+  RECIPIENT_EMAIL,
+  VALID_EMAIL_CSV_FILE,
 } from 'test-utils'
 import {
   mockApis,
@@ -13,9 +15,7 @@ import {
   CAMPAIGN_NAME,
   SUBJECT_TEXT,
   MESSAGE_TEXT,
-  EMAIL_CSV_FILE,
   REPLY_TO,
-  RECIPIENT_EMAIL,
 } from '../util'
 
 test('successfully creates and sends a new email campaign', async () => {
@@ -112,9 +112,9 @@ test('successfully creates and sends a new email campaign', async () => {
   const fileUploadInput = screen.getByLabelText(
     /upload file/i
   ) as HTMLInputElement
-  userEvent.upload(fileUploadInput, EMAIL_CSV_FILE)
+  userEvent.upload(fileUploadInput, VALID_EMAIL_CSV_FILE)
   expect(fileUploadInput?.files).toHaveLength(1)
-  expect(fileUploadInput?.files?.[0]).toBe(EMAIL_CSV_FILE)
+  expect(fileUploadInput?.files?.[0]).toBe(VALID_EMAIL_CSV_FILE)
 
   // Wait for CSV to be processed and ensure that message preview is shown
   expect(await screen.findByText(/message preview/i)).toBeInTheDocument()

@@ -5,15 +5,10 @@ import {
   waitFor,
   TWILIO_CREDENTIAL,
   VALID_CSV_FILENAME,
-} from 'test-utils'
-import {
-  mockApis,
-  renderDashboard,
-  CAMPAIGN_NAME,
-  MESSAGE_TEXT,
-  MOBILE_CSV_FILE,
   RECIPIENT_NUMBER,
-} from '../util'
+  VALID_MOBILE_CSV_FILE,
+} from 'test-utils'
+import { mockApis, renderDashboard, CAMPAIGN_NAME, MESSAGE_TEXT } from '../util'
 
 test('successfully creates and sends a new SMS campaign', async () => {
   // Setup
@@ -85,9 +80,9 @@ test('successfully creates and sends a new SMS campaign', async () => {
   const fileUploadInput = screen.getByLabelText(
     /upload file/i
   ) as HTMLInputElement
-  userEvent.upload(fileUploadInput, MOBILE_CSV_FILE)
+  userEvent.upload(fileUploadInput, VALID_MOBILE_CSV_FILE)
   expect(fileUploadInput?.files).toHaveLength(1)
-  expect(fileUploadInput?.files?.[0]).toBe(MOBILE_CSV_FILE)
+  expect(fileUploadInput?.files?.[0]).toBe(VALID_MOBILE_CSV_FILE)
 
   // Wait for CSV to be processed and ensure that message preview is shown
   expect(await screen.findByText(/message preview/i)).toBeInTheDocument()
