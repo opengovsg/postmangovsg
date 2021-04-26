@@ -4,35 +4,31 @@ import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
 
 import type { Dispatch, SetStateAction } from 'react'
 
+type PossibleCampaign = SMSCampaign | EmailCampaign | TelegramCampaign
+
 interface ContextProps {
-  campaign: SMSCampaign | EmailCampaign | TelegramCampaign
-  updateCampaign: (
-    changes: Partial<SMSCampaign | EmailCampaign | TelegramCampaign>
-  ) => void
-  setCampaign: Dispatch<
-    SetStateAction<SMSCampaign | EmailCampaign | TelegramCampaign>
-  >
+  campaign: PossibleCampaign
+  updateCampaign: (changes: Partial<PossibleCampaign>) => void
+  setCampaign: Dispatch<SetStateAction<PossibleCampaign>>
 }
 
 export const CampaignContext = createContext({} as ContextProps)
 
 const CampaignContextProvider = ({
   children,
+  initialCampaign = new Campaign({}) as PossibleCampaign,
 }: {
   children: React.ReactNode
+  initialCampaign?: PossibleCampaign
 }) => {
-  const [campaign, setCampaign] = useState(
-    new Campaign({}) as SMSCampaign | EmailCampaign | TelegramCampaign
-  )
+  const [campaign, setCampaign] = useState(initialCampaign)
 
-  function updateCampaign(
-    changes: Partial<SMSCampaign | EmailCampaign | TelegramCampaign>
-  ) {
+  function updateCampaign(changes: Partial<PossibleCampaign>) {
     setCampaign((c) => {
-      const updatedCampaign = Object.assign(cloneDeep(c), changes) as
-        | SMSCampaign
-        | EmailCampaign
-        | TelegramCampaign
+      const updatedCampaign = Object.assign(
+        cloneDeep(c),
+        changes
+      ) as PossibleCampaign
       updatedCampaign.setProgress()
       return updatedCampaign
     })
