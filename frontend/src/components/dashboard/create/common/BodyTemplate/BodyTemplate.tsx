@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { SMSProgress, TelegramProgress } from 'classes'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import {
@@ -22,7 +23,9 @@ function BodyTemplate({
   warnCharacterCount,
   errorCharacterCount,
 }: {
-  setActiveStep: Dispatch<SetStateAction<number>> // todo: look into tightening the type defn to SMSProgress | TelegramProgress
+  setActiveStep:
+    | Dispatch<SetStateAction<SMSProgress>>
+    | Dispatch<SetStateAction<TelegramProgress>>
   warnCharacterCount: number
   errorCharacterCount: number
 }) {
@@ -71,7 +74,7 @@ function BodyTemplate({
           params: updatedTemplate.params,
           numRecipients,
         })
-        setActiveStep((s) => s + 1)
+        setActiveStep((s: SMSProgress | TelegramProgress) => s + 1)
       }
     } catch (err) {
       setErrorMsg(err.message)
