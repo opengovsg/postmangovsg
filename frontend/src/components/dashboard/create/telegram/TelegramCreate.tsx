@@ -14,6 +14,7 @@ import styles from '../Create.module.scss'
 import {
   TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD,
   TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD,
+  saveTemplate,
 } from 'services/telegram.service'
 
 const TELEGRAM_PROGRESS_STEPS = [
@@ -43,6 +44,7 @@ const CreateTelegram = () => {
             setActiveStep={setActiveStep}
             warnCharacterCount={TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD}
             errorCharacterCount={TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD}
+            saveTemplate={saveTemplate}
           />
         )
       case TelegramProgress.UploadRecipients:

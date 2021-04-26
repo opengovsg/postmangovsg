@@ -16,6 +16,7 @@ import styles from '../Create.module.scss'
 import {
   SMS_WARN_EXCEED_CHARACTER_THRESHOLD,
   SMS_ERROR_EXCEED_CHARACTER_THRESHOLD,
+  saveTemplate,
 } from 'services/sms.service'
 
 const SMS_PROGRESS_STEPS = [
@@ -45,6 +46,7 @@ const CreateSMS = () => {
             setActiveStep={setActiveStep}
             warnCharacterCount={SMS_WARN_EXCEED_CHARACTER_THRESHOLD}
             errorCharacterCount={SMS_ERROR_EXCEED_CHARACTER_THRESHOLD}
+            saveTemplate={saveTemplate}
           />
         )
       case SMSProgress.UploadRecipients:

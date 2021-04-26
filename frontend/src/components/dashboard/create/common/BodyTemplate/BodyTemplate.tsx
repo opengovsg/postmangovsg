@@ -12,7 +12,6 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { saveTemplate } from 'services/sms.service'
 
 import type { Dispatch, SetStateAction } from 'react'
 
@@ -22,12 +21,20 @@ function BodyTemplate({
   setActiveStep,
   warnCharacterCount,
   errorCharacterCount,
+  saveTemplate,
 }: {
   setActiveStep:
     | Dispatch<SetStateAction<SMSProgress>>
     | Dispatch<SetStateAction<TelegramProgress>>
   warnCharacterCount: number
   errorCharacterCount: number
+  saveTemplate: (
+    campaignId: number,
+    body: string
+  ) => Promise<{
+    numRecipients: number
+    updatedTemplate?: { body: string; params: string[] }
+  }>
 }) {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
@@ -79,7 +86,7 @@ function BodyTemplate({
     } catch (err) {
       setErrorMsg(err.message)
     }
-  }, [body, campaignId, setActiveStep, updateCampaign])
+  }, [body, campaignId, setActiveStep, updateCampaign, saveTemplate])
 
   // Set callback for finish later button
   useEffect(() => {
@@ -101,7 +108,7 @@ function BodyTemplate({
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, campaignId, setFinishLaterContent])
+  }, [body, campaignId, setFinishLaterContent, saveTemplate])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')
