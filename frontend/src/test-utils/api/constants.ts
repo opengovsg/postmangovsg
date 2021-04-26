@@ -15,7 +15,7 @@ export const RECIPIENT_NUMBER = '89898989'
 export const RECIPIENT_EMAIL = 'testEmailRecipient@gmail.com'
 export const PROTECTED_PASSWORD = 'test password'
 export const INVALID_EMAIL_CSV_FILE = new File(
-  [`recipient,password\n${RECIPIENT_EMAIL},${PROTECTED_PASSWORD}`],
+  [`invalid_column\nInvalid Column Value`],
   INVALID_CSV_FILENAME,
   {
     type: 'text/csv',
@@ -36,7 +36,7 @@ export const VALID_MOBILE_CSV_FILE = new File(
   }
 )
 export const INVALID_MOBILE_CSV_FILE = new File(
-  [`recipient\n${RECIPIENT_NUMBER}`],
+  [`invalid_column\nInvalid Column Value`],
   INVALID_CSV_FILENAME,
   {
     type: 'text/csv',
