@@ -11,9 +11,9 @@ import {
   TELEGRAM_CREDENTIAL,
   DEFAULT_FROM,
   PRESIGNED_URL,
-  CSV_FILENAME,
   INVALID_TELEGRAM_CREDENTIAL,
   INVALID_TWILIO_CREDENTIAL,
+  INVALID_CSV_FILENAME,
 } from './constants'
 import {
   TemplateClient,
@@ -538,7 +538,7 @@ function mockCampaignUploadApis(state: State) {
         })
       )
     }),
-    rest.put(PRESIGNED_URL, (_req, res, ctx) => {
+    rest.put(PRESIGNED_URL, (req, res, ctx) => {
       return res(ctx.status(200), ctx.set('ETag', 'test_etag_value'))
     }),
     rest.post(
@@ -556,15 +556,31 @@ function mockCampaignUploadApis(state: State) {
           part_count: number
           transaction_id?: string
         }
+
         if (!transactionId || !filename || !etags || !partCount) {
           return res(ctx.status(400))
         }
-        state.campaigns[campaignId - 1] = {
-          ...state.campaigns[campaignId - 1],
-          valid: true,
-          num_recipients: 1,
-          csv_filename: CSV_FILENAME,
+
+        // Use the filename to determine if the CSV file is invalid
+        // since jsdom doesn't store the file data on uploads
+        if (filename === INVALID_CSV_FILENAME) {
+          state.campaigns[campaignId - 1] = {
+            ...state.campaigns[campaignId - 1],
+            csv_error: 'Error: invalid recipient file',
+            temp_csv_filename: filename,
+          }
+        } else {
+          state.campaigns[campaignId - 1] = {
+            ...state.campaigns[campaignId - 1],
+            valid: true,
+            num_recipients: 1,
+            csv_filename: filename,
+            is_csv_processing: false,
+            temp_csv_filename: undefined,
+            csv_error: undefined,
+          }
         }
+
         return res(ctx.status(202))
       }
     ),
@@ -578,19 +594,40 @@ function mockCampaignUploadApis(state: State) {
       if (!transactionId || !filename || !etag) {
         return res(ctx.status(400))
       }
-      state.campaigns[campaignId - 1] = {
-        ...state.campaigns[campaignId - 1],
-        valid: true,
-        num_recipients: 1,
-        csv_filename: CSV_FILENAME,
+
+      // Use the filename to determine if the CSV file is invalid
+      // since jsdom doesn't store the file data on uploads
+      if (filename === INVALID_CSV_FILENAME) {
+        state.campaigns[campaignId - 1] = {
+          ...state.campaigns[campaignId - 1],
+          csv_error: 'Error: invalid recipient file',
+          temp_csv_filename: filename,
+        }
+      } else {
+        state.campaigns[campaignId - 1] = {
+          ...state.campaigns[campaignId - 1],
+          valid: true,
+          num_recipients: 1,
+          csv_filename: filename,
+          is_csv_processing: false,
+          temp_csv_filename: undefined,
+          csv_error: undefined,
+        }
       }
+
       return res(ctx.status(202))
     }),
     rest.get('/campaign/:campaignId/upload/status', (req, res, ctx) => {
       const { campaignId } = req.params
 
       const campaign = state.campaigns[campaignId - 1]
-      const { num_recipients, is_csv_processing, csv_filename } = campaign
+      const {
+        num_recipients,
+        is_csv_processing,
+        csv_filename,
+        csv_error,
+        temp_csv_filename,
+      } = campaign
 
       let preview
       if (campaign.email_templates) {
@@ -611,10 +648,12 @@ function mockCampaignUploadApis(state: State) {
       return res(
         ctx.status(200),
         ctx.json({
-          is_csv_processing,
+          csv_error,
           csv_filename,
+          is_csv_processing,
           num_recipients,
           preview,
+          temp_csv_filename,
         })
       )
     }),

@@ -1,6 +1,6 @@
 import React from 'react'
 import Dashboard from '../Dashboard'
-import { mockCommonApis, CSV_FILENAME, render } from 'test-utils'
+import { mockCommonApis, VALID_CSV_FILENAME, render } from 'test-utils'
 
 export const REPLY_TO = 'testEmail@open.gov.sg'
 export const MESSAGE_TEXT = 'Test message'
@@ -12,14 +12,14 @@ export const RECIPIENT_NUMBER = '89898989'
 export const PROTECTED_PASSWORD = 'test password'
 export const EMAIL_CSV_FILE = new File(
   [`recipient,password\n${RECIPIENT_EMAIL},${PROTECTED_PASSWORD}`],
-  CSV_FILENAME,
+  VALID_CSV_FILENAME,
   {
     type: 'text/csv',
   }
 )
 export const MOBILE_CSV_FILE = new File(
   [`recipient\n${RECIPIENT_NUMBER}`],
-  CSV_FILENAME,
+  VALID_CSV_FILENAME,
   {
     type: 'text/csv',
   }

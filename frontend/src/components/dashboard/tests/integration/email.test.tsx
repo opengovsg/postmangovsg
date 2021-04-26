@@ -5,7 +5,7 @@ import {
   fireEvent,
   waitFor,
   DEFAULT_FROM,
-  CSV_FILENAME,
+  VALID_CSV_FILENAME,
 } from 'test-utils'
 import {
   mockApis,
@@ -119,7 +119,7 @@ test('successfully creates and sends a new email campaign', async () => {
   // Wait for CSV to be processed and ensure that message preview is shown
   expect(await screen.findByText(/message preview/i)).toBeInTheDocument()
   expect(screen.getByText(/1 recipient/i)).toBeInTheDocument()
-  expect(screen.getByText(CSV_FILENAME)).toBeInTheDocument()
+  expect(screen.getByText(VALID_CSV_FILENAME)).toBeInTheDocument()
   expect(screen.getByText(DEFAULT_FROM)).toBeInTheDocument()
   expect(screen.getByText(SUBJECT_TEXT)).toBeInTheDocument()
   expect(screen.getByText(MESSAGE_TEXT)).toBeInTheDocument()
