@@ -38,7 +38,7 @@
     "@types/cheerio": "^0.22.28",
     "@types/lodash": "^4.14.168",
     "@types/mustache": "^4.1.1",
-    "@types/node": "^14.14.31",
+    "@types/node": "^14.14.42",
     "cheerio": "^1.0.0-rc.3",
     "lodash": "^4.17.21",
     "mustache": "^4.1.0",
