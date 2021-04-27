@@ -28,6 +28,7 @@ interface User {
 interface Credential {
   label: string
   type: string
+  valid: boolean
 }
 
 export interface EmailTemplate {
@@ -59,13 +60,19 @@ export interface Campaign {
   valid: boolean
   has_credential: boolean
 
-  csv_filename: string | null
-  is_csv_processing: boolean
-  job_queue: any[]
-  num_recipients: number | null
+  // Templates
   sms_templates?: SMSTemplate
   email_templates?: EmailTemplate
   telegram_templates?: TelegramTemplate
+
+  // Recipients
+  temp_csv_filename?: string
+  csv_error?: string
+  csv_filename: string | null
+  is_csv_processing: boolean
+  num_recipients: number | null
+
+  job_queue: any[]
 }
 
 interface ProtectedMessage {

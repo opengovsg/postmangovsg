@@ -6,8 +6,8 @@ import {
   waitFor,
   DEFAULT_FROM,
   VALID_CSV_FILENAME,
-  RECIPIENT_EMAIL,
   VALID_EMAIL_CSV_FILE,
+  RECIPIENT_EMAIL,
 } from 'test-utils'
 import {
   mockApis,
@@ -16,9 +16,10 @@ import {
   SUBJECT_TEXT,
   MESSAGE_TEXT,
   REPLY_TO,
+  UNPROTECTED_MESSAGE_TEXT,
 } from '../util'
 
-test('successfully creates and sends a new email campaign', async () => {
+test('successfully creates and sends a new protected email campaign', async () => {
   // Setup
   jest.useFakeTimers()
   server.use(...mockApis())
@@ -46,6 +47,7 @@ test('successfully creates and sends a new email campaign', async () => {
     name: /^email$/i,
   })
   userEvent.click(emailChannelButton)
+  userEvent.click(screen.getByText(/password protected/i))
   expect(emailChannelButton).toHaveClass('active')
   expect(screen.getByRole('button', { name: /^telegram$/i })).not.toHaveClass(
     'active'
@@ -90,10 +92,10 @@ test('successfully creates and sends a new email campaign', async () => {
   })
   fireEvent.paste(messageTextbox, {
     clipboardData: {
-      getData: () => MESSAGE_TEXT,
+      getData: () => UNPROTECTED_MESSAGE_TEXT,
     },
   })
-  expect(messageTextbox).toHaveTextContent(MESSAGE_TEXT)
+  expect(messageTextbox).toHaveTextContent(UNPROTECTED_MESSAGE_TEXT)
 
   // Go to upload recipients page and wait for it to load
   userEvent.click(
@@ -107,6 +109,13 @@ test('successfully creates and sends a new email campaign', async () => {
     })
   ).toBeInTheDocument()
 
+  // Type in protected message
+  const protectedMessageTextbox = screen.getByRole('textbox', {
+    name: /message b/i,
+  })
+  userEvent.type(protectedMessageTextbox, MESSAGE_TEXT)
+  expect(protectedMessageTextbox).toHaveValue(MESSAGE_TEXT)
+
   // Upload the file
   // Note: we cannot select files via the file picker
   const fileUploadInput = screen.getByLabelText(
@@ -116,18 +125,28 @@ test('successfully creates and sends a new email campaign', async () => {
   expect(fileUploadInput?.files).toHaveLength(1)
   expect(fileUploadInput?.files?.[0]).toBe(VALID_EMAIL_CSV_FILE)
 
-  // Wait for CSV to be processed and ensure that message preview is shown
-  expect(await screen.findByText(/message preview/i)).toBeInTheDocument()
-  expect(screen.getByText(/1 recipient/i)).toBeInTheDocument()
-  expect(screen.getByText(VALID_CSV_FILENAME)).toBeInTheDocument()
-  expect(screen.getByText(DEFAULT_FROM)).toBeInTheDocument()
-  expect(screen.getByText(SUBJECT_TEXT)).toBeInTheDocument()
+  // Wait for CSV to be processed and ensure that protected message preview is shown
+  expect(await screen.findByText(/1 recipient/i)).toBeInTheDocument()
+  expect(screen.getByText(/results/i)).toBeInTheDocument()
   expect(screen.getByText(MESSAGE_TEXT)).toBeInTheDocument()
+
+  // Click the confirm button
+  userEvent.click(
+    screen.getByRole('button', {
+      name: /confirm/i,
+    })
+  )
+
+  // Wait for CSV to be processed and ensure that message preview is shown
+  expect(await screen.findByText(DEFAULT_FROM)).toBeInTheDocument()
+  expect(screen.getByText(VALID_CSV_FILENAME)).toBeInTheDocument()
+  expect(screen.getByText(SUBJECT_TEXT)).toBeInTheDocument()
+  expect(screen.getByText(UNPROTECTED_MESSAGE_TEXT)).toBeInTheDocument()
   expect(screen.getAllByText(REPLY_TO)).toHaveLength(2)
 
   // Go to the send test email page and wait for it to load
   userEvent.click(
-    screen.getByRole('button', {
+    await screen.findByRole('button', {
       name: /next/i,
     })
   )
@@ -170,7 +189,7 @@ test('successfully creates and sends a new email campaign', async () => {
   // Wait for the page to load and ensure the necessary elements are shown
   expect(await screen.findByText(DEFAULT_FROM)).toBeInTheDocument()
   expect(screen.getByText(SUBJECT_TEXT)).toBeInTheDocument()
-  expect(screen.getByText(MESSAGE_TEXT)).toBeInTheDocument()
+  expect(screen.getByText(UNPROTECTED_MESSAGE_TEXT)).toBeInTheDocument()
   expect(screen.getAllByText(REPLY_TO)).toHaveLength(2)
 
   // Click the send campaign button
@@ -223,7 +242,7 @@ test('successfully creates and sends a new email campaign', async () => {
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 
-  // Cleanup
+  // Teardown
   jest.runOnlyPendingTimers()
   jest.useRealTimers()
 })

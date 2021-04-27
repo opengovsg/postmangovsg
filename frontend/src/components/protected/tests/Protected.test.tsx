@@ -20,7 +20,7 @@ function mockApis() {
   return handlers
 }
 
-function renderProtected() {
+function renderProtected(id = TEST_PROTECTED_MESSAGE.id) {
   render(
     <Route exact path="/p/:version/:id">
       <Protected />
@@ -28,7 +28,7 @@ function renderProtected() {
     {
       router: {
         initialIndex: 0,
-        initialEntries: [`/p/1/${TEST_PROTECTED_MESSAGE.id}`],
+        initialEntries: [`/p/1/${id}`],
       },
     }
   )
@@ -71,4 +71,52 @@ test('successfully decrypts and displays a protected message', async () => {
 
   // Assert that the message is displayed
   expect(messageText).toBeInTheDocument()
+})
+
+test('displays an error when attempting to view a messagge with an invalid ID', async () => {
+  // Setup
+  jest.spyOn(console, 'error').mockImplementation(() => {
+    //Silence
+  })
+  server.use(...mockApis())
+  renderProtected('invalid-id')
+
+  // Wait for the component to fully load
+  const passwordTextbox = await screen.findByPlaceholderText(/password/i)
+
+  // Enter and submit a password
+  userEvent.type(passwordTextbox, TEST_PASSWORD)
+  userEvent.click(screen.getByRole('button', { name: /access/i }))
+
+  // Assert that an error is displayed
+  expect(
+    await screen.findByText(/wrong password or message id/i)
+  ).toBeInTheDocument()
+
+  // Teardown
+  jest.restoreAllMocks()
+})
+
+test('displays an error when attempting to view a message with an invalid password', async () => {
+  // Setup
+  jest.spyOn(console, 'error').mockImplementation(() => {
+    // Silence
+  })
+  server.use(...mockApis())
+  renderProtected()
+
+  // Wait for the component to fully load
+  const passwordTextbox = await screen.findByPlaceholderText(/password/i)
+
+  // Enter and submit a password
+  userEvent.type(passwordTextbox, 'invalid password')
+  userEvent.click(screen.getByRole('button', { name: /access/i }))
+
+  // Assert that an error is displayed
+  expect(
+    await screen.findByText(/wrong password or message id/i)
+  ).toBeInTheDocument()
+
+  // Teardown
+  jest.restoreAllMocks()
 })

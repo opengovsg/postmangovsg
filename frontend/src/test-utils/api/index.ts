@@ -11,8 +11,24 @@ import {
   TELEGRAM_CREDENTIAL,
   DEFAULT_FROM,
   PRESIGNED_URL,
-  CSV_FILENAME,
+  INVALID_TELEGRAM_CREDENTIAL,
+  INVALID_TWILIO_CREDENTIAL,
+  INVALID_CSV_FILENAME,
 } from './constants'
+import {
+  TemplateClient,
+  XSS_EMAIL_OPTION,
+  XSS_SMS_OPTION,
+  XSS_TELEGRAM_OPTION,
+} from 'postman-templating'
+import { union, difference } from 'lodash'
+
+const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
+const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
+const telegramTemplateClient = new TemplateClient({
+  xssOptions: XSS_TELEGRAM_OPTION,
+  lineBreak: '\n',
+})
 
 function mockCommonApis(initialState?: Partial<State>) {
   const state: State = {
@@ -24,8 +40,14 @@ function mockCommonApis(initialState?: Partial<State>) {
       {
         api_key: 'test-api-key',
         creds: [
-          { label: TWILIO_CREDENTIAL, type: 'SMS' },
-          { label: TELEGRAM_CREDENTIAL, type: 'TELEGRAM' },
+          { label: TWILIO_CREDENTIAL, type: 'SMS', valid: true },
+          { label: TELEGRAM_CREDENTIAL, type: 'TELEGRAM', valid: true },
+          { label: INVALID_TWILIO_CREDENTIAL, type: 'SMS', valid: false },
+          {
+            label: INVALID_TELEGRAM_CREDENTIAL,
+            type: 'TELEGRAM',
+            valid: false,
+          },
         ],
         demo: {
           num_demo_sms: 0,
@@ -231,17 +253,33 @@ function mockBaseCampaignApis(state: State) {
 }
 
 function mockCampaignTemplateApis(state: State) {
-  function extractParamsFromBody(body: string) {
-    const params = []
-    const matches = body.matchAll(/{{.+?}}/g)
-    for (
-      let curMatch = matches.next();
-      !curMatch.done;
-      curMatch = matches.next()
-    ) {
-      params.push(curMatch.value[0].substring(1, curMatch.value[0].length - 1))
+  function extractAndMergeParams(...texts: string[]) {
+    const parsed = texts.map(
+      (text) => emailTemplateClient.parseTemplate(text).variables
+    )
+    return union(...parsed)
+  }
+  function checkTemplateVariables(
+    template: string,
+    required: string[],
+    optional: string[]
+  ) {
+    const present = extractAndMergeParams(template)
+
+    const missing = difference(required, present)
+    if (missing.length > 0) {
+      throw new Error(
+        `Error: There are missing keywords in the message template: ${missing}. Please return to the previous step to add in the keywords.`
+      )
     }
-    return params
+
+    const whitelist = [...required, ...optional]
+    const forbidden = difference(present, whitelist)
+    if (forbidden.length > 0) {
+      throw new Error(
+        `Error: Only these keywords are allowed in the template: ${whitelist}.\nRemove the other keywords from the template: ${forbidden}.`
+      )
+    }
   }
 
   return [
@@ -253,23 +291,48 @@ function mockCampaignTemplateApis(state: State) {
         reply_to: string
         subject: string
       }
-      if (!body || !from || replyTo === undefined || !subject) {
+
+      const sanitizedSubject = emailTemplateClient.replaceNewLinesAndSanitize(
+        subject
+      )
+      const sanitizedBody = emailTemplateClient.filterXSS(body)
+      if (!sanitizedBody || !sanitizedSubject) {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            message:
+              'Message template is invalid as it only contains invalid HTML tags!',
+          })
+        )
+      }
+
+      if (!from || replyTo === undefined) {
         return res(ctx.status(400))
       }
 
-      if (
-        state.campaigns[campaignId - 1].protect &&
-        !body.includes('{{protectedlink}}')
-      ) {
-        return res(ctx.status(500))
+      if (state.campaigns[campaignId - 1].protect) {
+        try {
+          checkTemplateVariables(
+            sanitizedSubject,
+            [],
+            ['protectedlink', 'recipient']
+          )
+          checkTemplateVariables(
+            sanitizedBody,
+            ['protectedlink'],
+            ['recipient']
+          )
+        } catch (err) {
+          return res(ctx.status(500), ctx.json({ message: err.message }))
+        }
       }
 
       const template: EmailTemplate = {
-        body,
+        body: sanitizedBody,
         from,
-        params: extractParamsFromBody(body),
+        params: extractAndMergeParams(body, subject),
         reply_to: replyTo ?? state.users[state.curUserId - 1].email,
-        subject,
+        subject: sanitizedSubject,
       }
       state.campaigns[campaignId - 1].email_templates = template
 
@@ -288,13 +351,21 @@ function mockCampaignTemplateApis(state: State) {
     rest.put('/campaign/:campaignId/sms/template', (req, res, ctx) => {
       const { campaignId } = req.params
       const { body } = req.body as { body: string }
-      if (!body) {
-        return res(ctx.status(400))
+
+      const sanitizedBody = smsTemplateClient.replaceNewLinesAndSanitize(body)
+      if (!sanitizedBody) {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            message:
+              'Message template is invalid as it only contains invalid HTML tags!',
+          })
+        )
       }
 
       const template: SMSTemplate = {
-        body,
-        params: extractParamsFromBody(body),
+        body: sanitizedBody,
+        params: extractAndMergeParams(body),
       }
       state.campaigns[campaignId - 1].sms_templates = template
 
@@ -313,13 +384,23 @@ function mockCampaignTemplateApis(state: State) {
     rest.put('/campaign/:campaignId/telegram/template', (req, res, ctx) => {
       const { campaignId } = req.params
       const { body } = req.body as { body: string }
-      if (!body) {
-        return res(ctx.status(400))
+
+      const sanitizedBody = telegramTemplateClient.replaceNewLinesAndSanitize(
+        body
+      )
+      if (!sanitizedBody) {
+        return res(
+          ctx.status(400),
+          ctx.json({
+            message:
+              'Message template is invalid as it only contians invalid HTML tags!',
+          })
+        )
       }
 
       const template: TelegramTemplate = {
-        body,
-        params: extractParamsFromBody(body),
+        body: sanitizedBody,
+        params: extractAndMergeParams(body),
       }
       state.campaigns[campaignId - 1].telegram_templates = template
 
@@ -387,7 +468,8 @@ function mockCampaignCredentialApis(state: State) {
         !label ||
         // Check that the user actually has the credential
         !state.users[state.curUserId - 1].creds.some(
-          (cred) => cred.label === label && cred.type === 'SMS'
+          // Use `valid` as a indicator for a valid credential
+          (cred) => cred.label === label && cred.type === 'SMS' && cred.valid
         )
       ) {
         return res(ctx.status(400))
@@ -404,7 +486,8 @@ function mockCampaignCredentialApis(state: State) {
         !label ||
         // Check that the user actually has the credential
         !state.users[state.curUserId - 1].creds.some(
-          (cred) => cred.label === label && cred.type === 'TELEGRAM'
+          (cred) =>
+            cred.label === label && cred.type === 'TELEGRAM' && cred.valid
         )
       ) {
         return res(ctx.status(400))
@@ -455,7 +538,7 @@ function mockCampaignUploadApis(state: State) {
         })
       )
     }),
-    rest.put(PRESIGNED_URL, (_req, res, ctx) => {
+    rest.put(PRESIGNED_URL, (req, res, ctx) => {
       return res(ctx.status(200), ctx.set('ETag', 'test_etag_value'))
     }),
     rest.post(
@@ -473,15 +556,31 @@ function mockCampaignUploadApis(state: State) {
           part_count: number
           transaction_id?: string
         }
+
         if (!transactionId || !filename || !etags || !partCount) {
           return res(ctx.status(400))
         }
-        state.campaigns[campaignId - 1] = {
-          ...state.campaigns[campaignId - 1],
-          valid: true,
-          num_recipients: 1,
-          csv_filename: CSV_FILENAME,
+
+        // Use the filename to determine if the CSV file is invalid
+        // since jsdom doesn't store the file data on uploads
+        if (filename === INVALID_CSV_FILENAME) {
+          state.campaigns[campaignId - 1] = {
+            ...state.campaigns[campaignId - 1],
+            csv_error: 'Error: invalid recipient file',
+            temp_csv_filename: filename,
+          }
+        } else {
+          state.campaigns[campaignId - 1] = {
+            ...state.campaigns[campaignId - 1],
+            valid: true,
+            num_recipients: 1,
+            csv_filename: filename,
+            is_csv_processing: false,
+            temp_csv_filename: undefined,
+            csv_error: undefined,
+          }
         }
+
         return res(ctx.status(202))
       }
     ),
@@ -495,19 +594,40 @@ function mockCampaignUploadApis(state: State) {
       if (!transactionId || !filename || !etag) {
         return res(ctx.status(400))
       }
-      state.campaigns[campaignId - 1] = {
-        ...state.campaigns[campaignId - 1],
-        valid: true,
-        num_recipients: 1,
-        csv_filename: CSV_FILENAME,
+
+      // Use the filename to determine if the CSV file is invalid
+      // since jsdom doesn't store the file data on uploads
+      if (filename === INVALID_CSV_FILENAME) {
+        state.campaigns[campaignId - 1] = {
+          ...state.campaigns[campaignId - 1],
+          csv_error: 'Error: invalid recipient file',
+          temp_csv_filename: filename,
+        }
+      } else {
+        state.campaigns[campaignId - 1] = {
+          ...state.campaigns[campaignId - 1],
+          valid: true,
+          num_recipients: 1,
+          csv_filename: filename,
+          is_csv_processing: false,
+          temp_csv_filename: undefined,
+          csv_error: undefined,
+        }
       }
+
       return res(ctx.status(202))
     }),
     rest.get('/campaign/:campaignId/upload/status', (req, res, ctx) => {
       const { campaignId } = req.params
 
       const campaign = state.campaigns[campaignId - 1]
-      const { num_recipients, is_csv_processing, csv_filename } = campaign
+      const {
+        num_recipients,
+        is_csv_processing,
+        csv_filename,
+        csv_error,
+        temp_csv_filename,
+      } = campaign
 
       let preview
       if (campaign.email_templates) {
@@ -528,10 +648,12 @@ function mockCampaignUploadApis(state: State) {
       return res(
         ctx.status(200),
         ctx.json({
-          is_csv_processing,
+          csv_error,
           csv_filename,
+          is_csv_processing,
           num_recipients,
           preview,
+          temp_csv_filename,
         })
       )
     }),
