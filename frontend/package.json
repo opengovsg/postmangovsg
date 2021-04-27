@@ -39,7 +39,7 @@
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.13.1",
-    "react-draft-wysiwyg": "^1.14.5",
+    "react-draft-wysiwyg": "^1.14.6",
     "react-ga": "^2.7.0",
     "react-moment": "^0.9.7",
     "react-paginate": "^6.3.2",
