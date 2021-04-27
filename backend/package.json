@@ -57,7 +57,7 @@
     "telegraf": "^3.38.0",
     "threads": "^1.4.0",
     "tiny-worker": "^2.3.0",
-    "twilio": "^3.55.1",
+    "twilio": "^3.58.0",
     "uuid": "^7.0.3",
     "winston": "^3.3.3",
     "winston-cloudwatch": "^2.5.2"
