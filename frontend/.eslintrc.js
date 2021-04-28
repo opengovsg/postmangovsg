@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-undef
 module.exports = {
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'react-hooks'],
+  plugins: ['@typescript-eslint', 'react-hooks', 'import'],
   extends: [
     'eslint:recommended', // Recommended ESLint rules
     'plugin:@typescript-eslint/recommended', // Recommended TypeScript rules
@@ -12,6 +12,9 @@ module.exports = {
   settings: {
     react: {
       version: 'detect',
+    },
+    'import/resolver': {
+      typescript: {},
     },
   },
   parserOptions: {
@@ -41,6 +44,16 @@ module.exports = {
       'warn',
       {
         allow: ['warn', 'error'],
+      },
+    ],
+
+    'import/order': [
+      'error',
+      {
+        'newlines-between': 'always-and-inside-groups',
+        alphabetize: {
+          order: 'asc',
+        },
       },
     ],
   },
