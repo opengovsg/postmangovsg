@@ -179,7 +179,7 @@ export async function getMimeType(uploadedFile: File): Promise<string> {
           resolve(
             delimiter === ',' &&
               // papaparse parses everything, including images, pdfs... This checks that at least one of the columns is sane
-              fields.some((field) => /^[a-zA-Z0-9\s-_'"/]+$/.test(field))
+              fields?.some((field) => /^[a-zA-Z0-9\s-_'"/]+$/.test(field))
           )
         },
         error: function () {
