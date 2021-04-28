@@ -102,7 +102,10 @@ const listCampaigns = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { offset, limit } = req.query
+  const { offset, limit } = (req.query as unknown) as {
+    offset: number
+    limit: number
+  }
   const userId = req.session?.user?.id
   try {
     const { rows, count } = await CampaignService.listCampaigns({

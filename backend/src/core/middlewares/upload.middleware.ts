@@ -14,7 +14,10 @@ const uploadStartHandler = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { mime_type: contentType, md5 } = req.query
+  const { mime_type: contentType, md5 } = req.query as {
+    mime_type: string
+    md5: string
+  }
   const logMeta = { contentType, md5, action: 'uploadStartHandler' }
   try {
     const { presignedUrl, signedKey } = await UploadService.getUploadParameters(
@@ -49,7 +52,13 @@ const startMultipartUpload = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { mime_type: mimeType, part_count: partCount } = req.query
+  const {
+    mime_type: mimeType,
+    part_count: partCount,
+  } = (req.query as unknown) as {
+    mime_type: string
+    part_count: number
+  }
   const logMeta = { mimeType, partCount, action: 'startMultipartUpload' }
   try {
     const data = await MultipartUploadService.startMultipartUpload(
