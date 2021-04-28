@@ -70,7 +70,7 @@ describe('POST /auth/login', () => {
     expect(res.status).toBe(401)
   })
 
-  test('OTP is invalidted after retries are exceeded', async () => {
+  test('OTP is invalidated after retries are exceeded', async () => {
     const email = 'user@agency.gov.sg'
     RedisService.otpClient.set(
       email,

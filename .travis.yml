@@ -18,9 +18,6 @@ jobs:
         - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       install:
         - npm ci
-      before-script:
-        - psql -c 'create database postmangovsg_test_1;' -U postgres
-        - psql -c 'create database postmangovsg_test_2;' -U postgres
       script:
         - npm run lint-no-fix
         - npm run test
