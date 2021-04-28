@@ -33,7 +33,7 @@
     "html-to-draftjs": "^1.5.0",
     "lodash": "^4.17.21",
     "lottie-react": "^2.1.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.1",
     "papaparse": "^5.2.0",
     "postman-templating": "file:../modules/postman-templating",
     "react": "^16.13.1",
