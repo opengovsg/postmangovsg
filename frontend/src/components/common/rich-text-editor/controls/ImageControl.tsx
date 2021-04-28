@@ -96,6 +96,7 @@ export const ImageControl = (props: ImageControlProps) => {
   function formatLink(link: string): string {
     if (VARIABLE_REGEX.test(link)) return link
     if (
+      link &&
       !link.startsWith('http://') &&
       !link.startsWith('https://') &&
       !link.startsWith('mailto:')
