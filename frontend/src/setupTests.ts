@@ -5,6 +5,8 @@ import { Crypto } from '@peculiar/webcrypto'
 import 'locales' // Locales necessary for I18nProvider
 import { server } from './test-utils'
 
+jest.setTimeout(20000)
+
 // Mock WebCrypto APIs
 // Redeclare the type of `global` as it does not include the `crypto` prop
 interface Global extends NodeJS.Global {
