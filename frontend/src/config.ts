@@ -7,6 +7,7 @@ import type { InitializeOptions } from 'react-ga'
 // Re-export these later on as constants
 let gaInitializeOptions: InitializeOptions
 let gaTrackingId: string
+let announcementActive: string
 
 /**
  * Configs differentiated between environments
@@ -17,6 +18,9 @@ if (process.env.NODE_ENV === 'test') {
   gaInitializeOptions = {
     testMode: true,
   }
+
+  // Disable announcements in test environments
+  announcementActive = 'false'
 } else {
   /**
    * React env vars are used for injecting variables at build time
@@ -44,6 +48,9 @@ if (process.env.NODE_ENV === 'test') {
   gaInitializeOptions = {
     debug: false, // Set to true only on development
   }
+
+  // `REACT_APP_ANNOUNCEMENT_ACTIVE` must be set to `true` in Amplify if we want the modal to display
+  announcementActive = process.env.REACT_APP_ANNOUNCEMENT_ACTIVE as string
 }
 
 /**
@@ -86,16 +93,10 @@ export const SENTRY_ENVIRONMENT =
   (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
 
-// `REACT_APP_ANNOUNCEMENT_ACTIVE` must be set to `true` in Amplify if we want the modal to display
-function getAnnouncementActive() {
-  const envVar = process.env.REACT_APP_ANNOUNCEMENT_ACTIVE as string
-  return envVar === 'true'
-}
-
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user
 export const ANNOUNCEMENT: Record<string, any> = {
-  isActive: getAnnouncementActive(),
+  isActive: announcementActive,
   title: t`announcement.title`,
   subtext: t`announcement.subtext`,
   mediaUrl: t`announcement.mediaUrl`,
