@@ -118,6 +118,15 @@ function mockSettingsApis(state: State) {
         })
       )
     }),
+    rest.put('/settings/announcement-version', (req, res, ctx) => {
+      const { announcement_version } = req.body as {
+        announcement_version?: string
+      }
+      if (!announcement_version) {
+        return res(ctx.status(400))
+      }
+      return res(ctx.status(200))
+    }),
     rest.get('/settings/email/from', (_req, res, ctx) => {
       return res(
         ctx.status(200),
