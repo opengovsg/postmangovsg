@@ -22,7 +22,10 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   const { close } = useContext(ModalContext)
   const history = useHistory()
   const [errorMessage, setErrorMessage] = useState('')
-  const [selectedName, setSelectedName] = useState(`Copy of ${campaign.name}`)
+  const [selectedName, setSelectedName] = useState(
+    // Only prepend 'Copy of' if the campaign name doesn't already have one
+    (campaign.name.startsWith('Copy of') ? '' : 'Copy of ') + campaign.name
+  )
 
   async function handleDuplicateCampaign() {
     try {

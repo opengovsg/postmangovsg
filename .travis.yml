@@ -99,6 +99,7 @@ jobs:
         - npm run compile
         - npm run lint-no-fix
         - CI=false npm run build
+        - npm run test
     - name: serverless-unsubscribe-digest
       before_install:
         - cd $TRAVIS_BUILD_DIR/serverless/unsubscribe-digest

@@ -64,15 +64,21 @@ For testing locally, you may need to configure your `AWS_ACCESS_KEY_ID` and `AWS
 
 If not set, `nodemailer-direct-transport` will be used (for testing locally)
 
-| Name       | Description                                                  |
-| ---------- | ------------------------------------------------------------ |
-| `SES_HOST` | Amazon SES SMTP endpoint.                                    |
-| `SES_PORT` | Amazon SES SMTP port, defaults to 465                        |
-| `SES_USER` | SMTP username                                                |
-| `SES_PASS` | SMTP password                                                |
-| `SES_FROM` | The email address that appears in the From field of an email |
+| Name                      | Description                                                                                                                |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `WORKER_SES_HOST`         | Amazon SES SMTP endpoint.                                                                                                  |
+| `WORKER_SES_PORT`         | Amazon SES SMTP port, defaults to 465                                                                                      |
+| `WORKER_SES_USER`         | SMTP username                                                                                                              |
+| `WORKER_SES_PASS`         | SMTP password                                                                                                              |
+| `WORKER_SES_FROM`         | The email address that appears in the From field of an email                                                               |
+| `EMAIL_FALLBACK_ACTIVATE` | Switch to true to use the SendGrid fallback for all emails. Ensure that the SMTP settings are properly configured as well. |
 
 #### Sending smses
+
+| Name                     | Description                                              |
+| ------------------------ | -------------------------------------------------------- |
+| `SMS_FALLBACK_ACTIVATE`  | Switch to true to use SNS fallback for all SMS campaigns |
+| `SMS_FALLBACK_SENDER_ID` | Sender ID to use for all SNS SMS                         |
 
 This set of twilio credentials is used for testing locally only (ie, `NODE_ENV=development`). When in production, users will have to upload their credentials, which will be stored and retrieved from Secrets Manager.
 If not set, smses cannot be sent.

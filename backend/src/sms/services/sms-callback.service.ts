@@ -1,4 +1,5 @@
 import { Request } from 'express'
+import { Op } from 'sequelize'
 import bcrypt from 'bcrypt'
 import config from '@core/config'
 import { SmsMessage } from '@sms/models'
@@ -55,6 +56,9 @@ const parseEvent = async (req: Request): Promise<void> => {
       }
     )
   } else {
+    // longer messages are delivered in multiple segments
+    // each segment has a separate delivery status
+    // Update the message as successful only if there does not exist previous failed status
     await SmsMessage.update(
       {
         receivedAt: new Date(),
@@ -64,6 +68,7 @@ const parseEvent = async (req: Request): Promise<void> => {
         where: {
           id: messageId,
           campaignId,
+          errorCode: { [Op.eq]: null },
         },
       }
     )

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import querystring from 'querystring'
 import { Trans } from '@lingui/macro'
 
@@ -14,6 +14,7 @@ import cancelRequestHero from 'assets/img/unsubscribe/cancel-request.png'
 import { unsubscribeRequest } from 'services/unsubscribe.service'
 
 const Unsubscribe = () => {
+  const location = useLocation()
   const { version } = useParams<{ version: string }>()
   const [errorMsg, setErrorMsg] = useState('')
   const [isUnsubscribed, setUnsubscribed] = useState(false)
@@ -34,7 +35,7 @@ const Unsubscribe = () => {
       // Version is set to 'test' when the unsub link is generated from a campaign
       // test email. As such, we should not make any API calls.
       if (version !== 'test') {
-        const query = new URL(window.location.href).searchParams.toString()
+        const query = location.search.substring(1)
         const params = querystring.parse(query)
         validateParams(params)
 
