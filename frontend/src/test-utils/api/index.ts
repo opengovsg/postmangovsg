@@ -122,11 +122,9 @@ function mockSettingsApis(state: State) {
       const { announcement_version } = req.body as {
         announcement_version?: string
       }
-
       if (!announcement_version) {
         return res(ctx.status(400))
       }
-
       return res(ctx.status(200))
     }),
     rest.get('/settings/email/from', (_req, res, ctx) => {
