@@ -17,7 +17,7 @@
     "test": "react-scripts test --passWithNoTests"
   },
   "dependencies": {
-    "@lingui/react": "^3.5.1",
+    "@lingui/react": "^3.8.3",
     "@sentry/browser": "^5.27.6",
     "@types/bcryptjs": "^2.4.2",
     "@types/papaparse": "^5.2.5",
