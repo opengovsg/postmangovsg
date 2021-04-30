@@ -22,7 +22,7 @@ module.exports = async () => {
     pool: config.get('database.poolOptions'),
   } as SequelizeOptions)
 
-  for (let i = 0; i < JEST_WORKERS; i++) {
+  for (let i = 1; i <= JEST_WORKERS; i++) {
     await global.sequelize.query(`DROP DATABASE IF EXISTS ${TEST_DB}_${i}`)
     await global.sequelize.query(`CREATE DATABASE ${TEST_DB}_${i}`)
   }
