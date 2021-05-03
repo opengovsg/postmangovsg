@@ -1,15 +1,17 @@
 import React from 'react'
 import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
+import BodyTemplate from '../BodyTemplate'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import userEvent from '@testing-library/user-event'
 import { Route } from 'react-router-dom'
-import TelegramTemplate from '../TelegramTemplate'
+import { saveTemplate as saveSmsTemplate } from 'services/sms.service'
+import { saveTemplate as saveTelegramTemplate } from 'services/telegram.service'
 
-const TEST_TELEGRAM_CAMPAIGN: Campaign = {
+const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,
-  name: 'Test Telegram campaign',
-  type: 'TELEGRAM',
+  name: 'Test SMS campaign',
+  type: 'SMS',
   created_at: new Date(),
   valid: false,
   protect: false,
@@ -24,20 +26,27 @@ const TEST_TELEGRAM_CAMPAIGN: Campaign = {
 
 function mockApis() {
   const { handlers } = mockCommonApis({
-    // Start with a freshly created Telegram campaign
-    campaigns: [{ ...TEST_TELEGRAM_CAMPAIGN }],
+    // Start with a freshly created SMS campaign
+    campaigns: [{ ...TEST_SMS_CAMPAIGN }],
   })
   return handlers
 }
 
-function renderTemplatePage() {
+function renderTemplatePage(
+  saveTemplate: typeof BodyTemplate.arguments.saveTemplate
+) {
   const setActiveStep = jest.fn()
 
   render(
     <Route path="/campaigns/:id">
       <CampaignContextProvider>
         <FinishLaterModalContextProvider>
-          <TelegramTemplate setActiveStep={setActiveStep} />
+          <BodyTemplate
+            setActiveStep={setActiveStep}
+            saveTemplate={saveTemplate}
+            warnCharacterCount={5}
+            errorCharacterCount={10}
+          />
         </FinishLaterModalContextProvider>
       </CampaignContextProvider>
     </Route>,
@@ -50,7 +59,7 @@ function renderTemplatePage() {
 test('displays the necessary elements', async () => {
   // Setup
   server.use(...mockApis())
-  renderTemplatePage()
+  renderTemplatePage(jest.fn())
 
   // Wait for the component to fully load
   const heading = await screen.findByRole('heading', {
@@ -62,6 +71,7 @@ test('displays the necessary elements', async () => {
    * 1. "Create message template" heading
    * 2. Message template textbox
    * 3. "Next" button
+   * 4. Character count textbox
    */
   expect(heading).toBeInTheDocument()
   expect(
@@ -70,12 +80,13 @@ test('displays the necessary elements', async () => {
     })
   ).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument()
+  expect(screen.getByText(/characters/i)).toBeInTheDocument()
 })
 
 test('next button is disabled when template is empty', async () => {
   // Setup
   server.use(...mockApis())
-  renderTemplatePage()
+  renderTemplatePage(jest.fn())
 
   // Wait for the component to fully load
   const templateTextbox = await screen.findByRole('textbox', {
@@ -98,8 +109,9 @@ test('next button is disabled when template is empty', async () => {
 })
 
 test('next button is enabled when the template is filled', async () => {
+  // Setup
   server.use(...mockApis())
-  renderTemplatePage()
+  renderTemplatePage(jest.fn())
 
   // Wait for the component to fully load
   const templateTextbox = await screen.findByRole('textbox', {
@@ -118,37 +130,81 @@ test('next button is enabled when the template is filled', async () => {
   expect(nextButton).toBeEnabled()
 })
 
-test('displays an error if the template is invalid', async () => {
+test('character count text reflects the actual number of characters in the textbox', async () => {
   // Setup
-  jest.spyOn(console, 'error').mockImplementation(() => {
-    // Do nothing. Mock console.error to silence expected errors
-    // due to submitting invalid templates to the API
-  })
   server.use(...mockApis())
-  renderTemplatePage()
+  renderTemplatePage(jest.fn())
 
   // Wait for the component to fully load
   const templateTextbox = await screen.findByRole('textbox', {
     name: /message/i,
   })
-  const nextButton = screen.getByRole('button', { name: /next/i })
+  const characterCountText = screen.getByText(/characters/i)
 
-  // Test against various invalid templates
-  const TEST_TEMPLATES = ['<hehe>', '<script>']
+  // Test against various templates
+  const TEST_TEMPLATES = ['Letter wooded', '1234567890']
   for (const template of TEST_TEMPLATES) {
     // Type the template text into the textbox
     userEvent.clear(templateTextbox)
     userEvent.type(templateTextbox, template)
 
-    // Click the next button to submit the template
-    userEvent.click(nextButton)
+    // Assert that the character count is the same as the number of characters in the corpus
+    expect(characterCountText).toHaveTextContent(
+      `${template.length} characters`
+    )
+  }
+})
 
-    // Assert that an error message is shown
-    expect(
-      await screen.findByText(/message template is invalid/i)
-    ).toBeInTheDocument()
+describe('displays an error if the template is invalid', () => {
+  async function runTest() {
+    // Wait for the component to fully load
+    const templateTextbox = await screen.findByRole('textbox', {
+      name: /message/i,
+    })
+    const nextButton = screen.getByRole('button', { name: /next/i })
+
+    // Test against various invalid templates
+    const TEST_TEMPLATES = ['<hehe>', '<script>']
+    for (const template of TEST_TEMPLATES) {
+      // Type the template text into the textbox
+      userEvent.clear(templateTextbox)
+      userEvent.type(templateTextbox, template)
+
+      // Click the next button to submit the template
+      userEvent.click(nextButton)
+
+      // Assert that an error message is shown
+      expect(
+        await screen.findByText(/message template is invalid/i)
+      ).toBeInTheDocument()
+    }
   }
 
-  // Teardown
-  jest.restoreAllMocks()
+  beforeEach(() => {
+    // Setup
+    jest.spyOn(console, 'error').mockImplementation(() => {
+      // Do nothing. Mock console.error to silence expected errors
+      // due to submitting invalid templates to the API
+    })
+    server.use(...mockApis())
+  })
+
+  afterEach(() => {
+    // Teardown
+    jest.restoreAllMocks()
+  })
+
+  test('sms', async () => {
+    // Setup
+    renderTemplatePage(saveSmsTemplate)
+
+    await runTest()
+  })
+
+  test('email', async () => {
+    // Setup
+    renderTemplatePage(saveTelegramTemplate)
+
+    await runTest()
+  })
 })
