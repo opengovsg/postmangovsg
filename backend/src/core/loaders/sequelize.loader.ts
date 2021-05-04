@@ -1,5 +1,4 @@
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
-import { parse } from 'pg-connection-string'
 
 import config from '@core/config'
 import { Credential, initializeModels } from '@core/models'
@@ -7,14 +6,10 @@ import { Credential, initializeModels } from '@core/models'
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
 
-const logger = loggerWithLabel(module)
-const DB_URI = config.get('database.databaseUri')
-const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
+import { dbConfig as masterConfig, parseDBUri } from '@database/util'
 
-const parseDBUri = (uri: string): any => {
-  const config = parse(uri)
-  return { ...config, username: config.user }
-}
+const logger = loggerWithLabel(module)
+const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
 
 const sequelizeLoader = async (): Promise<void> => {
   const dialectOptions =
@@ -22,7 +17,6 @@ const sequelizeLoader = async (): Promise<void> => {
       ? config.get('database.dialectOptions')
       : {}
 
-  const masterConfig = parseDBUri(DB_URI)
   const readReplicaConfig = parseDBUri(DB_READ_REPLICA_URI)
 
   const sequelize = new Sequelize({
