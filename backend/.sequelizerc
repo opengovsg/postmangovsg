@@ -1,6 +1,6 @@
 const path = require('path')
 
-const BASE_PATH = './src/database'
+const BASE_PATH = './build/database'
 
 module.exports = {
 	config: path.resolve(BASE_PATH, 'config.js'),
