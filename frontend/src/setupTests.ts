@@ -5,6 +5,11 @@ import { Crypto } from '@peculiar/webcrypto'
 import 'locales' // Locales necessary for I18nProvider
 import { server } from './test-utils'
 
+// Some tests take longer than the default 5s to run.
+// Hence, allow the test timeout to be configured.
+const TEST_TIMEOUT = +(process.env.REACT_APP_TEST_TIMEOUT ?? 20000)
+jest.setTimeout(TEST_TIMEOUT)
+
 // Mock WebCrypto APIs
 // Redeclare the type of `global` as it does not include the `crypto` prop
 interface Global extends NodeJS.Global {
