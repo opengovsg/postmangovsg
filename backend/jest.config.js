@@ -13,6 +13,8 @@ module.exports = {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   testEnvironment: 'node',
+  globalSetup: '<rootDir>/src/test-utils/global-setup.ts',
+  globalTeardown: '<rootDir>/src/test-utils/global-teardown.ts',
   setupFiles: ['<rootDir>/src/test-utils/test-env.ts'],
   setupFilesAfterEnv: ['<rootDir>/src/test-utils/setup.ts'],
 }

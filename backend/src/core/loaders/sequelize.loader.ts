@@ -2,34 +2,7 @@ import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 import { parse } from 'pg-connection-string'
 
 import config from '@core/config'
-import {
-  Credential,
-  JobQueue,
-  Campaign,
-  Worker,
-  User,
-  UserFeature,
-  UserCredential,
-  UserDemo,
-  Statistic,
-  ProtectedMessage,
-  Unsubscriber,
-} from '@core/models'
-import {
-  EmailMessage,
-  EmailTemplate,
-  EmailOp,
-  EmailBlacklist,
-  EmailFromAddress,
-} from '@email/models'
-import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
-import {
-  BotSubscriber,
-  TelegramMessage,
-  TelegramOp,
-  TelegramSubscriber,
-  TelegramTemplate,
-} from '@telegram/models'
+import { Credential, initializeModels } from '@core/models'
 
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
@@ -75,40 +48,7 @@ const sequelizeLoader = async (): Promise<void> => {
     },
   } as SequelizeOptions)
 
-  const coreModels = [
-    Credential,
-    JobQueue,
-    Campaign,
-    Worker,
-    User,
-    UserFeature,
-    UserCredential,
-    UserDemo,
-    Statistic,
-    Unsubscriber,
-  ]
-  const emailModels = [
-    EmailMessage,
-    EmailTemplate,
-    EmailOp,
-    EmailBlacklist,
-    ProtectedMessage,
-    EmailFromAddress,
-  ]
-  const smsModels = [SmsMessage, SmsTemplate, SmsOp]
-  const telegramModels = [
-    BotSubscriber,
-    TelegramOp,
-    TelegramMessage,
-    TelegramTemplate,
-    TelegramSubscriber,
-  ]
-  sequelize.addModels([
-    ...coreModels,
-    ...emailModels,
-    ...smsModels,
-    ...telegramModels,
-  ])
+  initializeModels(sequelize)
 
   try {
     await sequelize.sync()
