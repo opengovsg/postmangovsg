@@ -440,7 +440,7 @@ const config = convict({
     vaultUrl: {
       doc: 'Vault url regex used to validate tesseract urls',
       default: '/^https:\\/\\/storage.vault.gov.sg\\/.+$/g', // prod only
-      env: 'VAULT_BUCKET_NAME',
+      env: 'VAULT_URL',
     },
   },
   smsFallback: {
@@ -486,7 +486,7 @@ switch (config.get('env')) {
       },
       tesseract: {
         vaultBucket: 'vaultgovsg-staging',
-        vaultUrl: '/^http:\\/\\/storage-test.vault.gov.sg\\/.+$/g',
+        vaultUrl: '/^http:\\/\\/storage-staging.vault.gov.sg\\/.+$/g',
       },
     })
     break
