@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { SMSProgress, TelegramProgress } from 'classes'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import {
@@ -11,22 +12,58 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { saveTemplate } from 'services/telegram.service'
 
-import type { TelegramCampaign, TelegramProgress } from 'classes'
 import type { Dispatch, SetStateAction } from 'react'
 
-const TelegramTemplate = ({
+import styles from './BodyTemplate.module.scss'
+
+function BodyTemplate({
   setActiveStep,
+  warnCharacterCount,
+  errorCharacterCount,
+  saveTemplate,
 }: {
-  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
-}) => {
+  setActiveStep:
+    | Dispatch<SetStateAction<SMSProgress>>
+    | Dispatch<SetStateAction<TelegramProgress>>
+  warnCharacterCount: number
+  errorCharacterCount: number
+  saveTemplate: (
+    campaignId: number,
+    body: string
+  ) => Promise<{
+    numRecipients: number
+    updatedTemplate?: { body: string; params: string[] }
+  }>
+}) {
   const { campaign, updateCampaign } = useContext(CampaignContext)
-  const { body: initialBody } = campaign as TelegramCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
-  const [body, setBody] = useState(replaceNewLines(initialBody))
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [body, setBody] = useState(replaceNewLines(campaign.body))
+  const [errorMsg, setErrorMsg] = useState<React.ReactNode>(null)
   const { id: campaignId } = useParams<{ id: string }>()
+
+  useEffect(() => {
+    let errorMsg = null
+    if (body.length > errorCharacterCount) {
+      errorMsg = (
+        <span>
+          Your template has more than <b>{errorCharacterCount}</b> characters
+          and can&apos;t be sent. Consider making your message short and sweet
+          to make it easier to read on a mobile device.
+        </span>
+      )
+    } else if (body.length > warnCharacterCount) {
+      errorMsg = (
+        <span>
+          Your template has more than {warnCharacterCount} characters. Messages
+          which are longer than <b>{errorCharacterCount}</b> characters
+          (including keywords) can&apos;t be sent. Consider making your message
+          short and sweet to make it easier to read on a mobile device.
+        </span>
+      )
+    }
+    setErrorMsg(errorMsg)
+  }, [body.length, errorCharacterCount, warnCharacterCount])
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
     setErrorMsg(null)
@@ -38,17 +75,18 @@ const TelegramTemplate = ({
         +campaignId,
         body
       )
-      if (!updatedTemplate) return
-      updateCampaign({
-        body: updatedTemplate?.body,
-        params: updatedTemplate?.params,
-        numRecipients,
-      })
-      setActiveStep((s) => s + 1)
+      if (updatedTemplate) {
+        updateCampaign({
+          body: updatedTemplate.body,
+          params: updatedTemplate.params,
+          numRecipients,
+        })
+        setActiveStep((s: SMSProgress | TelegramProgress) => s + 1)
+      }
     } catch (err) {
       setErrorMsg(err.message)
     }
-  }, [body, campaignId, setActiveStep, updateCampaign])
+  }, [body, campaignId, setActiveStep, updateCampaign, saveTemplate])
 
   // Set callback for finish later button
   useEffect(() => {
@@ -70,7 +108,7 @@ const TelegramTemplate = ({
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, campaignId, setFinishLaterContent])
+  }, [body, campaignId, setFinishLaterContent, saveTemplate])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')
@@ -107,12 +145,16 @@ const TelegramTemplate = ({
           value={body}
           onChange={setBody}
         />
+        <p className={styles.characterCount}>{body.length} characters</p>
       </StepSection>
 
-      <NextButton disabled={!body} onClick={handleSaveTemplate} />
+      <NextButton
+        disabled={!body || body.length > errorCharacterCount}
+        onClick={handleSaveTemplate}
+      />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )
 }
 
-export default TelegramTemplate
+export default BodyTemplate
