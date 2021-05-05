@@ -1,7 +1,7 @@
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 
 import config from '@core/config'
-import { Credential, initializeModels } from '@core/models'
+import { initializeModels } from '@core/models'
 
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
