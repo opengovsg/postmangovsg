@@ -51,10 +51,7 @@ const parseAndProcessCsv = async (
         try {
           // `rows` can have no data, but just the meta
           if (!previewed && data.length > 0) {
-            if (
-              meta.fields?.length > 0 &&
-              !meta.fields?.includes('recipient')
-            ) {
+            if (meta.fields?.length && !meta.fields?.includes('recipient')) {
               throw new RecipientColumnMissing()
             }
 

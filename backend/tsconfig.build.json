@@ -1,0 +1,5 @@
+// Excludes test in builds
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["tests/"]
+}

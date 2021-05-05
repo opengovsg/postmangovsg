@@ -202,11 +202,14 @@ router.get('/', EmailMiddleware.getCampaignDetails)
  *           description: Forbidden as there is a job in progress
  *         "500":
  *           description: Internal Server Error
+ *         "503":
+ *           description: Service Unavailable. Try using the default from address instead.
  */
 router.put(
   '/template',
   celebrate(storeTemplateValidator),
   CampaignMiddleware.canEditCampaign,
+  EmailMiddleware.isCustomFromAddressAllowed,
   EmailMiddleware.isFromAddressAccepted,
   EmailMiddleware.existsFromAddress,
   EmailMiddleware.verifyFromAddress,

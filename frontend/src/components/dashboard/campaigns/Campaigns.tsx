@@ -130,7 +130,7 @@ const Campaigns = () => {
       name: 'Name',
       render: (campaign: Campaign) => (
         <span
-          className={cx({
+          className={cx(styles.rowName, {
             [styles.demo]: !!campaign.demoMessageLimit,
           })}
         >

@@ -1,6 +1,7 @@
 {
   "include": [
-    "src"
+    "./src/**/*",
+    "./tests/**/*"
   ],
   "exclude": [
     "node_modules"
@@ -39,7 +40,8 @@
       "@sms/*": ["sms/*"],
       "@email/*": ["email/*"],
       "@telegram/*": ["telegram/*"],
-      "@shared/*": ["../../shared/src/*"]
+      "@shared/*": ["../../shared/src/*"],
+      "@test-utils/*": ["src/test-utils/*"]
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,

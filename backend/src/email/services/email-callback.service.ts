@@ -24,15 +24,16 @@ const isAuthenticated = (authHeader?: string): boolean => {
 }
 
 const parseEvent = async (req: Request): Promise<void> => {
+  const parsed = JSON.parse(req.body)
   let records: Promise<void>[] = []
   if (ses.isEvent(req)) {
     // body could be one record or an array of records, hence we concat
     const body: ses.SesRecord[] = []
-    const sesHttpEvent = body.concat(req.body)
+    const sesHttpEvent = body.concat(parsed)
     records = sesHttpEvent.map(ses.parseRecord)
   } else if (sendgrid.isEvent(req)) {
     // body is always an array
-    const sgEvent = req.body
+    const sgEvent = parsed
     records = sgEvent.map(sendgrid.parseRecord)
   } else {
     throw new Error('Unable to handle this event')
