@@ -41,7 +41,7 @@
       "@email/*": ["email/*"],
       "@telegram/*": ["telegram/*"],
       "@shared/*": ["../../shared/src/*"],
-      "@test-utils/*": ["src/test-utils/*"]
+      "@test-utils/*": ["test-utils/*"]
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,
