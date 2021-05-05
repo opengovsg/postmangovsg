@@ -1,9 +1,9 @@
+import path from 'path'
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
-import config from '@core/config'
-import { Credential, initializeModels } from '@core/models'
+import Umzug from 'umzug'
 
-import { DefaultCredentialName } from '@core/constants'
-import { formatDefaultCredentialName } from '@core/utils'
+import config from '@core/config'
+import { initializeModels } from '@core/models'
 
 const DB_TEST_URI = config.get('database.databaseUri')
 
@@ -14,25 +14,51 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
     pool: config.get('database.poolOptions'),
   } as SequelizeOptions)
 
-  initializeModels(sequelize)
-
   try {
-    await sequelize.sync()
+    await sequelize.authenticate()
     console.log({ message: 'Test Database loaded.' })
   } catch (error) {
     console.log(error.message)
     console.error({ message: 'Unable to connect to test database', error })
     process.exit(1)
   }
-  // Create the default credential names in the credentials table
-  // Each name should be accompanied by an entry in Secrets Manager
-  await Promise.all(
-    [
-      DefaultCredentialName.Email,
-      formatDefaultCredentialName(DefaultCredentialName.SMS),
-      formatDefaultCredentialName(DefaultCredentialName.Telegram),
-    ].map((name) => Credential.upsert({ name }))
-  )
+
+  const umzugMigrator = new Umzug({
+    migrations: {
+      path: path.resolve(__dirname, '../database/migrations'),
+      params: [sequelize.getQueryInterface(), sequelize.constructor],
+    },
+    storage: 'sequelize',
+    storageOptions: {
+      sequelize,
+    },
+  })
+  const umzugSeeder = new Umzug({
+    migrations: {
+      path: path.resolve(__dirname, '../database/seeders'),
+      params: [sequelize.getQueryInterface(), sequelize.constructor],
+    },
+    storage: 'sequelize',
+    storageOptions: {
+      sequelize,
+      modelName: 'SequelizeData',
+    },
+  })
+
+  try {
+    await umzugMigrator.up()
+    await umzugSeeder.up()
+    console.log({ message: 'Test database migrated and seeded.' })
+  } catch (error) {
+    console.log(error)
+    console.error({
+      message: 'Unable to migrate and seed test database',
+      error,
+    })
+    process.exit(1)
+  }
+
+  initializeModels(sequelize)
 
   return sequelize
 }
