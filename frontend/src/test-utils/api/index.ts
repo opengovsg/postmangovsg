@@ -20,7 +20,7 @@ import {
   XSS_EMAIL_OPTION,
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
-} from 'postman-templating'
+} from '@shared/templating'
 import { union, difference } from 'lodash'
 
 const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
