@@ -15,7 +15,13 @@
 }
 
 .titleText {
+  flex: 1;
   color: $secondary;
   margin-top: 0;
   margin-bottom: 0;
+  margin-right: $spacing-3;
+
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
