@@ -1,17 +1,12 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
-import { Op } from 'sequelize'
+import { QueryTypes } from 'sequelize'
 
 import { loggerWithLabel } from '@core/logger'
 import { PostmanTelegramError } from '../PostmanTelegramError'
 import { TelegramSubscriber, BotSubscriber } from '@telegram/models'
 
 const logger = loggerWithLabel(module)
-
-enum UpsertTelegramSubscriberResult {
-  Nothing,
-  Failed,
-}
 
 /**
  * Upserts a Telegram subscriber.
@@ -22,7 +17,7 @@ enum UpsertTelegramSubscriberResult {
 const upsertTelegramSubscriber = async (
   phoneNumber: string,
   telegramId: number
-): Promise<UpsertTelegramSubscriberResult> => {
+): Promise<boolean> => {
   const logMeta = {
     phoneNumber,
     telegramId,
@@ -34,29 +29,44 @@ const upsertTelegramSubscriber = async (
     phoneNumber = `+${phoneNumber}`
   }
 
-  const result = await TelegramSubscriber.sequelize?.transaction(
+  const success = await TelegramSubscriber.sequelize?.transaction(
     async (transaction) => {
-      const [subscriber, created] = await TelegramSubscriber.findOrCreate({
-        transaction,
-        where: {
-          [Op.or]: [{ telegramId }, { phoneNumber }],
-        },
-      })
+      /**
+       * Split into 2 scenarios:
+       * 1. a row with matching phone_number or telegram_id: update the row
+       * 2. no row matches: insert a new row
+       *
+       * Note: we have to use a raw query to update the phone_number.
+       * It is a primary key, and sequelize doesn't allow us to update
+       * primary keys in sequelize models.
+       */
+      const result = await TelegramSubscriber.sequelize?.query(
+        `
+        UPDATE telegram_subscribers
+        SET phone_number = :phoneNumber, telegram_id = :telegramId, updated_at = clock_timestamp()
+        WHERE phone_number = :phoneNumber OR telegram_id = :telegramId;
+        `,
+        {
+          transaction,
+          type: QueryTypes.UPDATE,
+          replacements: { phoneNumber, telegramId },
+        }
+      )
 
-      if (created) {
-        return UpsertTelegramSubscriberResult.Nothing
+      const updatedCount = result?.[1]
+      if (!updatedCount) {
+        await TelegramSubscriber.create(
+          { telegramId, phoneNumber },
+          { transaction }
+        )
       }
 
-      // todo: sequelize doesn't allow updates to primary keys, so phoneNumber doesn't get updated.
-      subscriber.phoneNumber = phoneNumber
-      subscriber.telegramId = telegramId
-      await subscriber.save({ transaction })
-      return UpsertTelegramSubscriberResult.Nothing
+      return true
     }
   )
 
-  logger.info({ message: 'Upserted Telegram subscriber', result, ...logMeta })
-  return result ?? UpsertTelegramSubscriberResult.Failed
+  logger.info({ message: 'Upserted Telegram subscriber', ...logMeta })
+  return success ?? false
 }
 
 /**
@@ -112,7 +122,7 @@ export const contactMessageHandler = (botId: string) => async (
   }
 
   // Upsert and add subscriptions
-  const upsertResult = await upsertTelegramSubscriber(phoneNumber, telegramId)
+  const upserted = await upsertTelegramSubscriber(phoneNumber, telegramId)
   const didAddBotSubscriber = await addBotSubscriber(botId, telegramId)
 
   // Respond
@@ -130,13 +140,10 @@ export const contactMessageHandler = (botId: string) => async (
     reply = 'You were already subscribed.'
   }
 
-  switch (upsertResult) {
-    case UpsertTelegramSubscriberResult.Nothing:
-      reply += ' Your account has been updated.'
-      break
-    case UpsertTelegramSubscriberResult.Failed:
-      reply += ' An internal failure has occurred.'
-      break
+  if (upserted) {
+    reply += ' Your phone number and Telegram ID have been updated.'
+  } else {
+    reply += ' An internal failure has occurred.'
   }
 
   return ctx.reply(reply, replyOptions)
