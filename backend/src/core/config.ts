@@ -439,7 +439,7 @@ const config = convict({
     },
     vaultUrl: {
       doc: 'Vault url regex used to validate tesseract urls',
-      default: '/^https:\\/\\/storage.vault.gov.sg\\/.+$/g', // prod only
+      default: '^https://storage.vault.gov.sg/.+$', // prod only
       env: 'VAULT_URL',
     },
   },
@@ -486,7 +486,7 @@ switch (config.get('env')) {
       },
       tesseract: {
         vaultBucket: 'vaultgovsg-staging',
-        vaultUrl: '/^http:\\/\\/storage-staging.vault.gov.sg\\/.+$/g',
+        vaultUrl: '^https://storage-staging.vault.gov.sg/.+$',
       },
     })
     break
@@ -520,7 +520,7 @@ switch (config.get('env')) {
       },
       tesseract: {
         vaultBucket: 'vaultgovsg-staging',
-        vaultUrl: '/^http:\\/\\/storage-test.vault.gov.sg\\/.+$/g',
+        vaultUrl: '^https://storage-staging.vault.gov.sg/.+$',
       },
     })
     break
