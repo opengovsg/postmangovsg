@@ -7,6 +7,14 @@ import { TelegramSubscriber, BotSubscriber } from '@telegram/models'
 
 const logger = loggerWithLabel(module)
 
+enum UpsertTelegramSubscriberResult {
+  Nothing,
+  Failed,
+  Created,
+  UpdatedPhoneNumber,
+  UpdatedTelegramId,
+}
+
 /**
  * Upserts a Telegram subscriber.
  *
@@ -16,46 +24,76 @@ const logger = loggerWithLabel(module)
 const upsertTelegramSubscriber = async (
   phoneNumber: string,
   telegramId: number
-): Promise<boolean> => {
+): Promise<UpsertTelegramSubscriberResult> => {
   const logMeta = {
     phoneNumber,
     telegramId,
     action: 'upsertTelegramSubscriber',
   }
+
   // Some Telegram clients send pre-prefixed phone numbers
   if (!phoneNumber.startsWith('+')) {
     phoneNumber = `+${phoneNumber}`
   }
 
-  /**
-   * Insert a telegram id and phone number, if that telegram id doesn't exist.
-   * Otherwise, if the new phone number does not exist,
-   * update the existing phone number associated with that telegram id with the new phone number,
-   * to maintain a 1-1 mapping.
-   */
-  const result = await TelegramSubscriber?.sequelize?.query(
-    `
-        INSERT INTO telegram_subscribers (phone_number, telegram_id, created_at, updated_at)
-        VALUES (:phoneNumber, :telegramId, clock_timestamp(), clock_timestamp())
-        ON CONFLICT (telegram_id) DO UPDATE
-        SET phone_number = :phoneNumber, updated_at = clock_timestamp()
-        WHERE NOT telegram_subscribers.phone_number = :phoneNumber
-      `,
-    {
-      replacements: {
-        phoneNumber,
-        telegramId,
-      },
+  const result = await TelegramSubscriber.sequelize?.transaction(
+    async (transaction) => {
+      /**
+       * Split into 4 cases:
+       * Same telegram ID, same phone number: do nothing.
+       * Same telegram ID, different phone number: update phone number.
+       * Different telegram ID, same phone number: update telegram ID.
+       * Different telegram ID, different phone number: create new mapping.
+       */
+      const curExactSubscriber = await TelegramSubscriber.findOne({
+        transaction,
+        where: { phoneNumber, telegramId },
+      })
+      if (curExactSubscriber) {
+        return UpsertTelegramSubscriberResult.Nothing
+      }
+
+      const curSubscriberWithPhoneNumber = await TelegramSubscriber.findOne({
+        transaction,
+        where: {
+          phoneNumber,
+        },
+      })
+      if (curSubscriberWithPhoneNumber) {
+        curSubscriberWithPhoneNumber.telegramId = telegramId
+        await curSubscriberWithPhoneNumber.save({ transaction })
+        return UpsertTelegramSubscriberResult.UpdatedTelegramId
+      }
+
+      const curSubscriberWithTelegramId = await TelegramSubscriber.findOne({
+        transaction,
+        where: {
+          telegramId,
+        },
+      })
+      if (curSubscriberWithTelegramId) {
+        // todo: fix this. this doesn't work because phoneNumber is a primary key
+        // and sequelize doesn't allow updates for primary keys.
+        curSubscriberWithTelegramId.phoneNumber = phoneNumber
+        await curSubscriberWithTelegramId.save({ transaction })
+        return UpsertTelegramSubscriberResult.UpdatedPhoneNumber
+      }
+
+      await TelegramSubscriber.create(
+        {
+          phoneNumber,
+          telegramId,
+        },
+        {
+          transaction,
+        }
+      )
+      return UpsertTelegramSubscriberResult.Created
     }
   )
-  const affectedRows = result ? (result[1] as number) : 0
-  logger.info({
-    message: 'Upserted Telegram subscribesr',
-    affectedRows,
-    ...logMeta,
-  })
 
-  return affectedRows > 0
+  logger.info({ message: 'Upserted Telegram subscriber', result, ...logMeta })
+  return result ?? UpsertTelegramSubscriberResult.Failed
 }
 
 /**
@@ -111,7 +149,7 @@ export const contactMessageHandler = (botId: string) => async (
   }
 
   // Upsert and add subscriptions
-  await upsertTelegramSubscriber(phoneNumber, telegramId)
+  const upsertResult = await upsertTelegramSubscriber(phoneNumber, telegramId)
   const didAddBotSubscriber = await addBotSubscriber(botId, telegramId)
 
   // Respond
@@ -121,8 +159,29 @@ export const contactMessageHandler = (botId: string) => async (
     },
   }
 
-  if (!didAddBotSubscriber) {
-    return ctx.reply('Your phone number has been updated.', replyOptions)
+  // Configure bot reply based on what actually happened
+  let reply
+  if (didAddBotSubscriber) {
+    reply = 'You are now subscribed.'
+  } else {
+    reply = 'You are already subscribed.'
   }
-  return ctx.reply('You are now subscribed.', replyOptions)
+
+  switch (upsertResult) {
+    case UpsertTelegramSubscriberResult.Nothing:
+    case UpsertTelegramSubscriberResult.Created:
+      reply += ' Your account has been updated.'
+      break
+    case UpsertTelegramSubscriberResult.UpdatedPhoneNumber:
+      reply += ' Your phone number has been updated.'
+      break
+    case UpsertTelegramSubscriberResult.UpdatedTelegramId:
+      reply += ' Your Telegram ID has been updated.'
+      break
+    case UpsertTelegramSubscriberResult.Failed:
+      reply += ' An internal failure has occurred.'
+      break
+  }
+
+  return ctx.reply(reply, replyOptions)
 }
