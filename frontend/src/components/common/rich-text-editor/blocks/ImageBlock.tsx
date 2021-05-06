@@ -99,8 +99,18 @@ export const ImageBlock = ({
     }
   }
 
+  function renderPreviewImage() {
+    return link ? (
+      <a href={link} target="_blank" rel="noopener noreferrer">
+        <img ref={imageRef} src={src} width={width} height={height} alt="" />
+      </a>
+    ) : (
+      <img ref={imageRef} src={src} width={width} height={height} alt="" />
+    )
+  }
+
   return readOnly ? (
-    <img ref={imageRef} src={src} width={width} height={height} alt="" />
+    renderPreviewImage()
   ) : (
     <span>
       <img
