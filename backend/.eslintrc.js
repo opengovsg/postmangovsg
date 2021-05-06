@@ -34,7 +34,7 @@ module.exports = {
     ],
   },
   overrides: [
-    // enable rules specifically for typescript files
+    // disable rules specifically for JavaScript files
     {
       files: ['*.js'],
       rules: {
