@@ -23,4 +23,4 @@ gcloud run deploy $GCLOUD_RUN_SERVICE_NAME \
   --max-instances 1 \
   --timeout 8m \
   --cpu 2 \
-  --memory 6Gi
+  --memory 8Gi
