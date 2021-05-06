@@ -14,8 +14,11 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
     pool: config.get('database.poolOptions'),
   } as SequelizeOptions)
 
+  initializeModels(sequelize)
+
   try {
-    await sequelize.authenticate()
+    // There isn't a reason to test migrations, so just use sync() here.
+    await sequelize.sync()
     console.log({ message: 'Test Database loaded.' })
   } catch (error) {
     console.log(error.message)
@@ -23,16 +26,6 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
     process.exit(1)
   }
 
-  const umzugMigrator = new Umzug({
-    migrations: {
-      path: path.resolve(__dirname, '../database/migrations'),
-      params: [sequelize.getQueryInterface(), sequelize.constructor],
-    },
-    storage: 'sequelize',
-    storageOptions: {
-      sequelize,
-    },
-  })
   const umzugSeeder = new Umzug({
     migrations: {
       path: path.resolve(__dirname, '../database/seeders'),
@@ -46,19 +39,16 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
   })
 
   try {
-    await umzugMigrator.up()
     await umzugSeeder.up()
-    console.log({ message: 'Test database migrated and seeded.' })
+    console.log({ message: 'Test database seeded.' })
   } catch (error) {
     console.log(error)
     console.error({
-      message: 'Unable to migrate and seed test database',
+      message: 'Unable to seed test database',
       error,
     })
     process.exit(1)
   }
-
-  initializeModels(sequelize)
 
   return sequelize
 }
