@@ -1,5 +1,6 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
+import { Op } from 'sequelize'
 
 import { loggerWithLabel } from '@core/logger'
 import { PostmanTelegramError } from '../PostmanTelegramError'
@@ -10,8 +11,6 @@ const logger = loggerWithLabel(module)
 enum UpsertTelegramSubscriberResult {
   Nothing,
   Failed,
-  UpdatedPhoneNumber,
-  UpdatedTelegramId,
 }
 
 /**
@@ -37,46 +36,22 @@ const upsertTelegramSubscriber = async (
 
   const result = await TelegramSubscriber.sequelize?.transaction(
     async (transaction) => {
-      /**
-       * Split into 3 scenarios:
-       * 1. Same phone number, same/diff telegram ID: update telegram ID
-       * 2. Diff phone number, same telegram ID: update phone number
-       * 3. Diff phone number, diff telegram ID: insert new row
-       */
-
-      // Scenario 1: same phone number, same/diff telegram ID: update telegram ID
-      const curSubscriberWithPhoneNumber = await TelegramSubscriber.findOne({
+      const [subscriber, created] = await TelegramSubscriber.findOrCreate({
         transaction,
         where: {
-          phoneNumber,
+          [Op.or]: [{ telegramId }, { phoneNumber }],
         },
       })
-      if (curSubscriberWithPhoneNumber) {
-        curSubscriberWithPhoneNumber.telegramId = telegramId
-        await curSubscriberWithPhoneNumber.save({ transaction })
-        return UpsertTelegramSubscriberResult.UpdatedTelegramId
+
+      if (created) {
+        return UpsertTelegramSubscriberResult.Nothing
       }
 
-      // Scenarios 2 and 3: Diff phone number: upsert
-      const result = await TelegramSubscriber.sequelize?.query(
-        `
-        INSERT INTO telegram_subscribers (phone_number, telegram_id, created_at, updated_at)
-        VALUES (:phoneNumber, :telegramId, clock_timestamp(), clock_timestamp())
-        ON CONFLICT (telegram_id) DO UPDATE
-        SET phone_number = :phoneNumber, updated_at = clock_timestamp()
-        WHERE NOT telegram_subscribers.phone_number = :phoneNumber
-        `,
-        {
-          transaction,
-          replacements: {
-            phoneNumber,
-            telegramId,
-          },
-        }
-      )
-      return result?.[1]
-        ? UpsertTelegramSubscriberResult.UpdatedPhoneNumber
-        : UpsertTelegramSubscriberResult.Nothing
+      // todo: sequelize doesn't allow updates to primary keys, so phoneNumber doesn't get updated.
+      subscriber.phoneNumber = phoneNumber
+      subscriber.telegramId = telegramId
+      await subscriber.save({ transaction })
+      return UpsertTelegramSubscriberResult.Nothing
     }
   )
 
@@ -158,12 +133,6 @@ export const contactMessageHandler = (botId: string) => async (
   switch (upsertResult) {
     case UpsertTelegramSubscriberResult.Nothing:
       reply += ' Your account has been updated.'
-      break
-    case UpsertTelegramSubscriberResult.UpdatedPhoneNumber:
-      reply += ' Your phone number has been updated.'
-      break
-    case UpsertTelegramSubscriberResult.UpdatedTelegramId:
-      reply += ' Your Telegram ID has been updated.'
       break
     case UpsertTelegramSubscriberResult.Failed:
       reply += ' An internal failure has occurred.'
