@@ -4,13 +4,18 @@ import React, { useState, useEffect, useContext } from 'react'
 import { CampaignContext } from 'contexts/campaign.context'
 import { TelegramProgress, Status, TelegramCampaign } from 'classes'
 import { ProgressPane } from 'components/common'
-import TelegramTemplate from './TelegramTemplate'
 import TelegramRecipients from './TelegramRecipients'
 import TelegramCredentials from './TelegramCredentials'
 import TelegramSend from './TelegramSend'
 import TelegramDetail from './TelegramDetail'
+import BodyTemplate from '../common/BodyTemplate'
 
 import styles from '../Create.module.scss'
+import {
+  TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD,
+  TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD,
+  saveTemplate,
+} from 'services/telegram.service'
 
 const TELEGRAM_PROGRESS_STEPS = [
   'Create message',
@@ -34,7 +39,14 @@ const CreateTelegram = () => {
   function renderStep() {
     switch (activeStep) {
       case TelegramProgress.CreateTemplate:
-        return <TelegramTemplate setActiveStep={setActiveStep} />
+        return (
+          <BodyTemplate
+            setActiveStep={setActiveStep}
+            warnCharacterCount={TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD}
+            errorCharacterCount={TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD}
+            saveTemplate={saveTemplate}
+          />
+        )
       case TelegramProgress.UploadRecipients:
         return <TelegramRecipients setActiveStep={setActiveStep} />
       case TelegramProgress.InsertCredentials:
