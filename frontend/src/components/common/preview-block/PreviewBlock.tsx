@@ -1,10 +1,11 @@
 import cx from 'classnames'
 import escapeHTML from 'escape-html'
 
-import DetailBlock from '../detail-block'
-import styles from './PreviewBlock.module.scss'
-
 import type { FunctionComponent } from 'react'
+
+import DetailBlock from '../detail-block'
+
+import styles from './PreviewBlock.module.scss'
 
 interface PreviewBlockProps {
   body: string

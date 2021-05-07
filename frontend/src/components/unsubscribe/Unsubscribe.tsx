@@ -1,15 +1,18 @@
-import { useState } from 'react'
-import { useParams, useLocation } from 'react-router-dom'
 import querystring from 'querystring'
+
 import { Trans } from '@lingui/macro'
 
-import { ErrorBlock, PrimaryButton, TextButton } from 'components/common'
-import Banner from 'components/landing/banner'
+import { useState } from 'react'
+
+import { useParams, useLocation } from 'react-router-dom'
 
 import styles from './Unsubscribe.module.scss'
+
 import appLogo from 'assets/img/brand/app-logo.svg'
-import landingHero from 'assets/img/unsubscribe/request-unsubscribe.png'
 import cancelRequestHero from 'assets/img/unsubscribe/cancel-request.png'
+import landingHero from 'assets/img/unsubscribe/request-unsubscribe.png'
+import { ErrorBlock, PrimaryButton, TextButton } from 'components/common'
+import Banner from 'components/landing/banner'
 
 import { unsubscribeRequest } from 'services/unsubscribe.service'
 

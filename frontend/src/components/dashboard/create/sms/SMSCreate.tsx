@@ -1,18 +1,19 @@
 import cx from 'classnames'
+
 import { useState, useEffect, useContext } from 'react'
 
-import { CampaignContext } from 'contexts/campaign.context'
-import { SMSProgress, Status } from 'classes'
-import { ProgressPane } from 'components/common'
-import SMSRecipients from './SMSRecipients'
-import SMSCredentials from './SMSCredentials'
-import SMSSend from './SMSSend'
-import SMSDetail from './SMSDetail'
+import styles from '../Create.module.scss'
 import BodyTemplate from '../common/BodyTemplate'
 
-import type { SMSCampaign } from 'classes'
+import SMSCredentials from './SMSCredentials'
+import SMSDetail from './SMSDetail'
+import SMSRecipients from './SMSRecipients'
+import SMSSend from './SMSSend'
 
-import styles from '../Create.module.scss'
+import type { SMSCampaign } from 'classes'
+import { SMSProgress, Status } from 'classes'
+import { ProgressPane } from 'components/common'
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   SMS_WARN_EXCEED_CHARACTER_THRESHOLD,
   SMS_ERROR_EXCEED_CHARACTER_THRESHOLD,

@@ -2,20 +2,22 @@
 import 'react-app-polyfill/stable'
 import 'locales'
 
+import { i18n } from '@lingui/core'
+import { I18nProvider } from '@lingui/react'
+import * as Sentry from '@sentry/browser'
+
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
-import * as Sentry from '@sentry/browser'
-import { SENTRY_DSN, SENTRY_RELEASE, SENTRY_ENVIRONMENT } from 'config'
 
 // Locales
-import { i18n } from '@lingui/core'
 
 // Contexts
-import AuthContextProvider from 'contexts/auth.context'
-import { I18nProvider } from '@lingui/react'
 
 import App from './App'
+
+import { SENTRY_DSN, SENTRY_RELEASE, SENTRY_ENVIRONMENT } from 'config'
+import AuthContextProvider from 'contexts/auth.context'
 
 Sentry.init({
   dsn: SENTRY_DSN,

@@ -1,16 +1,21 @@
+import { i18n } from '@lingui/core'
+
 import { useContext } from 'react'
-import { Redirect } from 'react-router-dom'
+
 import { OutboundLink } from 'react-ga'
 
-import LoginInput from './login-input'
-import { LINKS, INFO_BANNER } from 'config'
-import { AuthContext } from 'contexts/auth.context'
-import { InfoBanner } from 'components/common'
+import { Redirect } from 'react-router-dom'
+
 import styles from './Login.module.scss'
-import loginImg from 'assets/img/landing/login.svg'
+
+import LoginInput from './login-input'
+
 import appLogo from 'assets/img/brand/app-logo.svg'
 import companyLogo from 'assets/img/brand/company-logo-dark.svg'
-import { i18n } from '@lingui/core'
+import loginImg from 'assets/img/landing/login.svg'
+import { InfoBanner } from 'components/common'
+import { LINKS, INFO_BANNER } from 'config'
+import { AuthContext } from 'contexts/auth.context'
 
 const Login = () => {
   const authContext = useContext(AuthContext)

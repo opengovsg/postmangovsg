@@ -1,9 +1,12 @@
 import { useState, useCallback, useEffect, useContext } from 'react'
+
+import type { Dispatch, SetStateAction } from 'react'
+
 import { useParams } from 'react-router-dom'
 
+import styles from './BodyTemplate.module.scss'
+
 import { SMSProgress, TelegramProgress } from 'classes'
-import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
-import { CampaignContext } from 'contexts/campaign.context'
 import {
   TextArea,
   NextButton,
@@ -12,10 +15,8 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-
-import type { Dispatch, SetStateAction } from 'react'
-
-import styles from './BodyTemplate.module.scss'
+import { CampaignContext } from 'contexts/campaign.context'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 
 function BodyTemplate({
   setActiveStep,

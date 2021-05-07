@@ -1,5 +1,5 @@
-import { sendCampaign } from 'services/campaign.service'
 import { Campaign, ChannelType, Status } from 'classes'
+import { sendCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 export const confirmSendCampaign = async ({

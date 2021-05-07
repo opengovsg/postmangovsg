@@ -1,15 +1,20 @@
+import { i18n } from '@lingui/core'
+
 import { useContext, useEffect, useState } from 'react'
+
+import { OutboundLink } from 'react-ga'
+
 import styles from './CompletedDemoModal.module.scss'
+
 import CongratsImage from 'assets/img/demo/congrats.png'
 import EndDemoImage from 'assets/img/demo/end-demo.png'
-import { i18n } from '@lingui/core'
-import { LINKS } from 'config'
-import { OutboundLink } from 'react-ga'
 import { ChannelType } from 'classes'
-import { getUserSettings } from 'services/settings.service'
 import { PrimaryButton } from 'components/common'
 import DemoVideoModal from 'components/dashboard/demo/demo-video-modal'
+import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
+
+import { getUserSettings } from 'services/settings.service'
 
 const CompletedDemoModal = ({
   selectedChannel,

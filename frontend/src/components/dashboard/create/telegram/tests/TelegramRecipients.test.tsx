@@ -1,4 +1,12 @@
 import userEvent from '@testing-library/user-event'
+
+import { Route } from 'react-router-dom'
+
+import TelegramRecipients from '../TelegramRecipients'
+
+import { TelegramCampaign } from 'classes'
+import CampaignContextProvider from 'contexts/campaign.context'
+import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import {
   screen,
   mockCommonApis,
@@ -7,11 +15,6 @@ import {
   Campaign,
   INVALID_MOBILE_CSV_FILE,
 } from 'test-utils'
-import CampaignContextProvider from 'contexts/campaign.context'
-import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
-import { Route } from 'react-router-dom'
-import TelegramRecipients from '../TelegramRecipients'
-import { TelegramCampaign } from 'classes'
 
 const TEST_TELEGRAM_CAMPAIGN: Campaign = {
   id: 1,

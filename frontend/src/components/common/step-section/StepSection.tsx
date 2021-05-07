@@ -1,6 +1,6 @@
-import styles from './StepSection.module.scss'
-
 import { ReactNode } from 'react'
+
+import styles from './StepSection.module.scss'
 
 const StepSection = ({
   children,

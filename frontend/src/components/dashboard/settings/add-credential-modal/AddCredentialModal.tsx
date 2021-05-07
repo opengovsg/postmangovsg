@@ -1,21 +1,33 @@
-import { useEffect, useState, useContext } from 'react'
-import { OutboundLink } from 'react-ga'
+import { i18n } from '@lingui/core'
+
 import cx from 'classnames'
 
-import { LINKS } from 'config'
+import { useEffect, useState, useContext } from 'react'
+
+import { OutboundLink } from 'react-ga'
+
+import styles from './AddCredentialModal.module.scss'
+
+import ChooseChannelsImage from 'assets/img/choose-channels.svg'
+import ConfirmImage from 'assets/img/confirm-modal.svg'
+import FailureImage from 'assets/img/failure.png'
+import SuccessImage from 'assets/img/success.png'
 import { ChannelType, channelIcons } from 'classes'
+
 import {
   PrimaryButton,
   TextButton,
   ErrorBlock,
   CredLabelInput,
 } from 'components/common'
+import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
+import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
 import TwilioCredentialsInput from 'components/dashboard/create/sms/TwilioCredentialsInput'
 import TelegramCredentialsInput from 'components/dashboard/create/telegram/TelegramCredentialsInput'
-import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
 import TelegramValidationInput from 'components/dashboard/create/telegram/TelegramValidationInput'
-import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
+import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
+
 import {
   getStoredCredentials as getSmsStoredCredentials,
   storeCredentials as storeSmsCredentials,
@@ -25,13 +37,6 @@ import {
   verifyUserCredentials as verifyUserTelegramCredentials,
   storeCredentials as storeTelegramCredentials,
 } from 'services/telegram.service'
-
-import ConfirmImage from 'assets/img/confirm-modal.svg'
-import ChooseChannelsImage from 'assets/img/choose-channels.svg'
-import FailureImage from 'assets/img/failure.png'
-import SuccessImage from 'assets/img/success.png'
-import styles from './AddCredentialModal.module.scss'
-import { i18n } from '@lingui/core'
 
 enum AddCredentialStep {
   SelectType,

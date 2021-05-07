@@ -1,7 +1,8 @@
+// Components
 import { Suspense, lazy } from 'react'
+
 import { Route, Switch } from 'react-router-dom'
 
-// Components
 import Landing from 'components/landing'
 import Login from 'components/login'
 import ProtectedPage from 'components/protected'

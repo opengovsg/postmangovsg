@@ -1,11 +1,14 @@
-import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
+import userEvent from '@testing-library/user-event'
+
+import { Route } from 'react-router-dom'
+
 import BodyTemplate from '../BodyTemplate'
+
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
-import userEvent from '@testing-library/user-event'
-import { Route } from 'react-router-dom'
 import { saveTemplate as saveSmsTemplate } from 'services/sms.service'
 import { saveTemplate as saveTelegramTemplate } from 'services/telegram.service'
+import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
 
 const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,

@@ -1,6 +1,6 @@
-import styles from './TitleBar.module.scss'
-
 import type { ReactNode } from 'react'
+
+import styles from './TitleBar.module.scss'
 
 const TitleBar = ({
   children,

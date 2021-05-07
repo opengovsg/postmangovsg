@@ -1,11 +1,13 @@
-import { useContext, useState } from 'react'
 import cx from 'classnames'
+
+import { useContext, useState } from 'react'
+
+import styles from './ConfirmModal.module.scss'
+
+import ConfirmImage from 'assets/img/confirm-modal.svg'
 
 import { PrimaryButton, TextButton, ErrorBlock } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
-
-import ConfirmImage from 'assets/img/confirm-modal.svg'
-import styles from './ConfirmModal.module.scss'
 
 const ConfirmModal = ({
   title,

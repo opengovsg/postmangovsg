@@ -1,7 +1,15 @@
-import { useState, useContext, useEffect } from 'react'
+import { Trans, t } from '@lingui/macro'
 import cx from 'classnames'
+
 import { noop } from 'lodash'
+
+import { useState, useContext, useEffect } from 'react'
+
+import styles from './LoginInput.module.scss'
+
 import { TextInputWithButton, TextButton } from 'components/common'
+import { AuthContext } from 'contexts/auth.context'
+
 import {
   getOtpWithEmail,
   loginWithOtp,
@@ -9,14 +17,11 @@ import {
   setUserAnalytics,
 } from 'services/auth.service'
 
-import styles from './LoginInput.module.scss'
-import { AuthContext } from 'contexts/auth.context'
 import {
   GA_USER_EVENTS,
   sendUserEvent,
   sendException,
 } from 'services/ga.service'
-import { Trans, t } from '@lingui/macro'
 
 const RESEND_WAIT_TIME = 30000
 

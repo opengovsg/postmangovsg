@@ -7,6 +7,11 @@ import {
   SetStateAction,
 } from 'react'
 
+import { useParams } from 'react-router-dom'
+
+import styles from './EmailTemplate.module.scss'
+
+import { EmailCampaign, EmailProgress } from 'classes'
 import {
   TextArea,
   NextButton,
@@ -17,16 +22,14 @@ import {
   StepSection,
   RichTextEditor,
 } from 'components/common'
+
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
-import { useParams } from 'react-router-dom'
-import { getCustomFromAddresses } from 'services/settings.service'
-import { saveTemplate } from 'services/email.service'
-import { EmailCampaign, EmailProgress } from 'classes'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 
-import styles from './EmailTemplate.module.scss'
+import { saveTemplate } from 'services/email.service'
+import { getCustomFromAddresses } from 'services/settings.service'
 
 const EmailTemplate = ({
   setActiveStep,

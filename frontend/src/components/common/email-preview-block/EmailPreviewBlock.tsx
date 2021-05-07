@@ -1,8 +1,9 @@
 import cx from 'classnames'
 import type { FC } from 'react'
 
-import RichTextEditor from '../rich-text-editor'
 import DetailBlock from '../detail-block'
+import RichTextEditor from '../rich-text-editor'
+
 import styles from './EmailPreviewBlock.module.scss'
 
 interface EmailPreviewBlockProps {

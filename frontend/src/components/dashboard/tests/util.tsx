@@ -1,4 +1,5 @@
 import Dashboard from '../Dashboard'
+
 import { mockCommonApis, render } from 'test-utils'
 
 export const REPLY_TO = 'testEmail@open.gov.sg'

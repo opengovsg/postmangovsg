@@ -1,13 +1,20 @@
-import { useState, useEffect, useContext } from 'react'
-import { useParams } from 'react-router-dom'
+import { i18n } from '@lingui/core'
+
 import cx from 'classnames'
 
-import { CampaignContext } from 'contexts/campaign.context'
-import {
-  validateStoredCredentials,
-  validateNewCredentials,
-  getStoredCredentials,
-} from 'services/sms.service'
+import { useState, useEffect, useContext } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { OutboundLink } from 'react-ga'
+import { useParams } from 'react-router-dom'
+
+import styles from '../Create.module.scss'
+
+import SMSValidationInput from './SMSValidationInput'
+import TwilioCredentialsInput from './TwilioCredentialsInput'
+
+import type { TwilioCredentials } from './TwilioCredentialsInput'
+
+import type { SMSProgress } from 'classes'
 import {
   PrimaryButton,
   NextButton,
@@ -21,16 +28,13 @@ import {
   Checkbox,
   InfoBlock,
 } from 'components/common'
-import SMSValidationInput from './SMSValidationInput'
-import TwilioCredentialsInput from './TwilioCredentialsInput'
-import styles from '../Create.module.scss'
-import { OutboundLink } from 'react-ga'
-import { i18n } from '@lingui/core'
 import { LINKS } from 'config'
-
-import type { Dispatch, SetStateAction } from 'react'
-import type { TwilioCredentials } from './TwilioCredentialsInput'
-import type { SMSProgress } from 'classes'
+import { CampaignContext } from 'contexts/campaign.context'
+import {
+  validateStoredCredentials,
+  validateNewCredentials,
+  getStoredCredentials,
+} from 'services/sms.service'
 
 const SMSCredentials = ({
   setActiveStep,

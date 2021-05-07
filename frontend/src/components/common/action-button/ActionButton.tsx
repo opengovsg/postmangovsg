@@ -1,9 +1,9 @@
-import { useState } from 'react'
 import cx from 'classnames'
-
-import styles from './ActionButton.module.scss'
+import { useState } from 'react'
 
 import type { MouseEvent as ReactMouseEvent } from 'react'
+
+import styles from './ActionButton.module.scss'
 
 const ActionButton = (props: any) => {
   const { className, children, ...otherProps } = props

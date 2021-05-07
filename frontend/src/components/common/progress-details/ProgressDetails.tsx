@@ -1,8 +1,14 @@
-import { useContext } from 'react'
-import Moment from 'react-moment'
+import { i18n } from '@lingui/core'
+import { Trans } from '@lingui/macro'
+
 import cx from 'classnames'
 
-import { CampaignContext } from 'contexts/campaign.context'
+import { useContext } from 'react'
+import { OutboundLink } from 'react-ga'
+import Moment from 'react-moment'
+
+import styles from './ProgressDetails.module.scss'
+
 import { CampaignStats, Status } from 'classes/Campaign'
 import {
   ProgressBar,
@@ -10,11 +16,8 @@ import {
   ExportRecipients,
   InfoBlock,
 } from 'components/common'
-import styles from './ProgressDetails.module.scss'
-import { OutboundLink } from 'react-ga'
 import { LINKS } from 'config'
-import { i18n } from '@lingui/core'
-import { Trans } from '@lingui/macro'
+import { CampaignContext } from 'contexts/campaign.context'
 
 const ProgressDetails = ({
   stats,

@@ -1,8 +1,12 @@
 import userEvent from '@testing-library/user-event'
+
+import { Route } from 'react-router'
+
+import TelegramCredentials from '../TelegramCredentials'
+
 import { TelegramCampaign } from 'classes'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
-import { Route } from 'react-router'
 import {
   mockCommonApis,
   render,
@@ -12,7 +16,6 @@ import {
   INVALID_TELEGRAM_CREDENTIAL,
   Campaign,
 } from 'test-utils'
-import TelegramCredentials from '../TelegramCredentials'
 
 const TEST_TELEGRAM_CAMPAIGN: Campaign = {
   id: 1,

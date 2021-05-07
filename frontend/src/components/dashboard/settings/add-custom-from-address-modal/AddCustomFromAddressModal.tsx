@@ -1,5 +1,6 @@
-import CustomFromAddress from 'components/dashboard/settings/custom-from-address'
 import styles from './AddCustomFromAddressModal.module.scss'
+
+import CustomFromAddress from 'components/dashboard/settings/custom-from-address'
 
 const AddCustomFromAddressModal = ({
   customFromAddresses,

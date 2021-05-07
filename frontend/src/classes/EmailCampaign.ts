@@ -1,6 +1,7 @@
-import { get } from 'lodash'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
+import { get } from 'lodash'
+
 import { Campaign, CampaignRecipient } from './Campaign'
 
 const emailErrors = {

@@ -1,8 +1,8 @@
 import cx from 'classnames'
 
-import styles from './TextButton.module.scss'
-
 import type { ButtonHTMLAttributes } from 'react'
+
+import styles from './TextButton.module.scss'
 
 interface TextButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   // if true, remove text-decoration

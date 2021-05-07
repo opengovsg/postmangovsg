@@ -1,4 +1,5 @@
 import { OutboundLink } from 'react-ga'
+
 import styles from './LabelWithExternalLink.module.scss'
 
 const LabelWithExternalLink = ({

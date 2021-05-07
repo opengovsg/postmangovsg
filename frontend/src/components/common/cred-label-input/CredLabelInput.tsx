@@ -1,6 +1,6 @@
-import TextInput from '../text-input'
-import LabelWithExternalLink from '../label-with-external-link'
 import ErrorBlock from '../error-block'
+import LabelWithExternalLink from '../label-with-external-link'
+import TextInput from '../text-input'
 
 const CredLabelInput = ({
   value,

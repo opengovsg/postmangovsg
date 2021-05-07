@@ -1,5 +1,10 @@
-import { useState, useRef, useContext, useEffect } from 'react'
 import cx from 'classnames'
+
+import { useState, useRef, useContext, useEffect } from 'react'
+
+import type { FunctionComponent } from 'react'
+
+import styles from './ApiKey.module.scss'
 
 import {
   TextInputWithButton,
@@ -7,11 +12,8 @@ import {
   StepHeader,
 } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
+
 import { regenerateApiKey } from 'services/settings.service'
-
-import styles from './ApiKey.module.scss'
-
-import type { FunctionComponent } from 'react'
 
 const RESET_COPY_TIMEOUT = 1000
 

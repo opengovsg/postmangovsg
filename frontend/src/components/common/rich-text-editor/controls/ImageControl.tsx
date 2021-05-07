@@ -1,10 +1,11 @@
 import cx from 'classnames'
 import { useContext, useState } from 'react'
+
+import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
+
 import { EditorContext } from '../RichTextEditor'
 
 import styles from '../RichTextEditor.module.scss'
-
-import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
 interface ImageControlProps {
   currentState: any

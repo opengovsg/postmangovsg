@@ -1,6 +1,6 @@
-import { PrimaryButton } from 'components/common'
-
 import type { ReactElement } from 'react'
+
+import { PrimaryButton } from 'components/common'
 
 const NextButton = ({
   onClick,

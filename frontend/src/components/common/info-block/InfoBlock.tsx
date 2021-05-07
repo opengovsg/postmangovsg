@@ -1,8 +1,10 @@
 import cx from 'classnames'
-import styles from './InfoBlock.module.scss'
-import MessageBlock from '../message-block'
 
 import type { ReactNode } from 'react'
+
+import MessageBlock from '../message-block'
+
+import styles from './InfoBlock.module.scss'
 
 const InfoBlock = ({
   className,

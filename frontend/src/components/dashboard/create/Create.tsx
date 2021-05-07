@@ -1,19 +1,26 @@
-import { useEffect, useState, useContext } from 'react'
-import { useParams, useHistory } from 'react-router-dom'
 import cx from 'classnames'
 
-import { CampaignContext } from 'contexts/campaign.context'
-import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { useEffect, useState, useContext } from 'react'
+
+import { useParams, useHistory } from 'react-router-dom'
+
+import styles from './Create.module.scss'
+
+import EmailCreate from './email/EmailCreate'
+
+import SMSCreate from './sms/SMSCreate'
+
+import TelegramCreate from './telegram/TelegramCreate'
+
 import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import Error from 'components/error'
+import { CampaignContext } from 'contexts/campaign.context'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+
 import { getCampaignDetails } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import SMSCreate from './sms/SMSCreate'
-import EmailCreate from './email/EmailCreate'
-import TelegramCreate from './telegram/TelegramCreate'
-import styles from './Create.module.scss'
 
 const Create = () => {
   const { id } = useParams<{ id: string }>()

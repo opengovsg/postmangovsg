@@ -1,10 +1,10 @@
 import cx from 'classnames'
 
-import { CloseButton } from 'components/common'
+import type { ReactNode } from 'react'
 
 import styles from './MessageBlock.module.scss'
 
-import type { ReactNode } from 'react'
+import { CloseButton } from 'components/common'
 
 const MessageBlock = ({
   className,

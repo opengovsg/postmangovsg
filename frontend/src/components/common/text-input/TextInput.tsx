@@ -1,8 +1,9 @@
 import cx from 'classnames'
 import { forwardRef } from 'react'
-import styles from './TextInput.module.scss'
 
 import type { ReactNode, ChangeEvent } from 'react'
+
+import styles from './TextInput.module.scss'
 
 const TextInput = forwardRef((props: any, ref: ReactNode) => {
   const { onChange, className, ...otherProps } = props

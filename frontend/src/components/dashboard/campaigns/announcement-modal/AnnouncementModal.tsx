@@ -1,14 +1,17 @@
-import { useContext, useState, useEffect } from 'react'
-import { updateAnnouncementVersion } from 'services/settings.service'
-
-import { ModalContext } from 'contexts/modal.context'
-
 import { i18n } from '@lingui/core'
-import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
-import { ErrorBlock } from 'components/common'
-import GraphicAnnouncementModal from './GraphicAnnouncementModal'
-import VideoAnnouncementModal from './VideoAnnouncementModal'
+
+import { useContext, useState, useEffect } from 'react'
+
 import styles from './AnnouncementModal.module.scss'
+
+import GraphicAnnouncementModal from './GraphicAnnouncementModal'
+
+import VideoAnnouncementModal from './VideoAnnouncementModal'
+
+import { ErrorBlock } from 'components/common'
+import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
+import { ModalContext } from 'contexts/modal.context'
+import { updateAnnouncementVersion } from 'services/settings.service'
 
 export type AnnouncementModalProps = {
   title: string

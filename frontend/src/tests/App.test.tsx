@@ -1,5 +1,6 @@
-import { mockCommonApis, server, within, render, screen } from 'test-utils'
 import App from '../App'
+
+import { mockCommonApis, server, within, render, screen } from 'test-utils'
 
 test('displays landing page when unauthenticated', async () => {
   // Setup

@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import styles from '../RichTextEditor.module.scss'
 
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
+
+import styles from '../RichTextEditor.module.scss'
 
 interface LinkControlProps {
   currentState: any

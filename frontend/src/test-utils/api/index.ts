@@ -1,10 +1,13 @@
+import { union, difference } from 'lodash'
 import { rest } from 'msw'
-import type {
-  State,
-  EmailTemplate,
-  SMSTemplate,
-  TelegramTemplate,
-} from './interfaces'
+
+import {
+  TemplateClient,
+  XSS_EMAIL_OPTION,
+  XSS_SMS_OPTION,
+  XSS_TELEGRAM_OPTION,
+} from 'postman-templating'
+
 import {
   USER_EMAIL,
   TWILIO_CREDENTIAL,
@@ -15,13 +18,12 @@ import {
   INVALID_TWILIO_CREDENTIAL,
   INVALID_CSV_FILENAME,
 } from './constants'
-import {
-  TemplateClient,
-  XSS_EMAIL_OPTION,
-  XSS_SMS_OPTION,
-  XSS_TELEGRAM_OPTION,
-} from 'postman-templating'
-import { union, difference } from 'lodash'
+import type {
+  State,
+  EmailTemplate,
+  SMSTemplate,
+  TelegramTemplate,
+} from './interfaces'
 
 const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })

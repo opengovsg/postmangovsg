@@ -1,9 +1,15 @@
-import { useState, useContext, useEffect } from 'react'
-import { OutboundLink } from 'react-ga'
-import { useHistory } from 'react-router-dom'
+import { i18n } from '@lingui/core'
+
 import cx from 'classnames'
 
-import { LINKS } from 'config'
+import { useState, useContext, useEffect } from 'react'
+
+import { OutboundLink } from 'react-ga'
+
+import { useHistory } from 'react-router-dom'
+
+import styles from './CreateModal.module.scss'
+
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
 import {
   TextInput,
@@ -11,13 +17,11 @@ import {
   Checkbox,
   ErrorBlock,
 } from 'components/common'
-import styles from './CreateModal.module.scss'
-import { createCampaign } from 'services/campaign.service'
+import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
+import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 
-import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
-
-import { i18n } from '@lingui/core'
+import { createCampaign } from 'services/campaign.service'
 
 const CreateModal = ({
   name = '',

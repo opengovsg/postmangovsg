@@ -1,6 +1,4 @@
 import cx from 'classnames'
-import { createContext, useContext, useEffect, useState } from 'react'
-import Immutable from 'immutable'
 import {
   EditorState,
   ContentBlock,
@@ -12,8 +10,17 @@ import {
   SelectionState,
   KeyBindingUtil,
 } from 'draft-js'
+import Immutable from 'immutable'
+import { createContext, useContext, useEffect, useState } from 'react'
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import { Editor } from 'react-draft-wysiwyg'
 
+import styles from './RichTextEditor.module.scss'
+import { ImageBlock, TableWrapper } from './blocks'
 import {
   LinkControl,
   ImageControl,
@@ -30,17 +37,9 @@ import {
   PreviewLinkDecorator,
 } from './decorators'
 import { Converter } from './utils'
-import { ImageBlock, TableWrapper } from './blocks'
 
 import 'draft-js/dist/Draft.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
-import styles from './RichTextEditor.module.scss'
-
-import type {
-  KeyboardEvent as ReactKeyboardEvent,
-  Dispatch,
-  SetStateAction,
-} from 'react'
 
 const ExtendedEditor = (props: any) => <Editor {...props} />
 

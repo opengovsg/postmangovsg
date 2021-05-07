@@ -1,9 +1,6 @@
-import { useState, MutableRefObject } from 'react'
 import cx from 'classnames'
 
-import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import { PrimaryButton, TextInput } from 'components/common'
-import styles from './TextInputWithButton.module.scss'
+import { useState, MutableRefObject } from 'react'
 
 import type {
   InputHTMLAttributes,
@@ -11,6 +8,11 @@ import type {
   FunctionComponent,
   FormEvent,
 } from 'react'
+
+import styles from './TextInputWithButton.module.scss'
+
+import { PrimaryButton, TextInput } from 'components/common'
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
 interface TextInputWithButtonProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {

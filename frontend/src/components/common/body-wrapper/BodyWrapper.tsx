@@ -1,8 +1,8 @@
 import cx from 'classnames'
 
-import styles from './BodyWrapper.module.scss'
-
 import type { FunctionComponent } from 'react'
+
+import styles from './BodyWrapper.module.scss'
 
 interface BodyWrapperProps {
   /**

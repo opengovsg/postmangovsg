@@ -1,6 +1,6 @@
-import styles from './StepHeader.module.scss'
-
 import { ReactNode } from 'react'
+
+import styles from './StepHeader.module.scss'
 
 const StepHeader = ({
   title,

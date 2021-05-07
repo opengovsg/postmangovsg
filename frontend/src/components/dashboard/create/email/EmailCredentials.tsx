@@ -1,7 +1,10 @@
 import { useContext, useState, Dispatch, SetStateAction } from 'react'
 
-import { CampaignContext } from 'contexts/campaign.context'
-import { sendPreviewMessage } from 'services/email.service'
+import { useParams } from 'react-router-dom'
+
+import EmailValidationInput from './EmailValidationInput'
+
+import { EmailProgress } from 'classes'
 import {
   NextButton,
   DetailBlock,
@@ -11,10 +14,9 @@ import {
   StepHeader,
   StepSection,
 } from 'components/common'
-import { useParams } from 'react-router-dom'
+import { CampaignContext } from 'contexts/campaign.context'
 
-import EmailValidationInput from './EmailValidationInput'
-import { EmailProgress } from 'classes'
+import { sendPreviewMessage } from 'services/email.service'
 
 const EmailCredentials = ({
   setActiveStep,

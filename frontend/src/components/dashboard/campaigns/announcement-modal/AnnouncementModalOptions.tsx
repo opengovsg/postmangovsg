@@ -1,8 +1,10 @@
-import { TextButton, PrimaryButton } from 'components/common'
-import { OutboundLink } from 'react-ga'
 import cx from 'classnames'
 
+import { OutboundLink } from 'react-ga'
+
 import styles from './AnnouncementModalOptions.module.scss'
+
+import { TextButton, PrimaryButton } from 'components/common'
 
 interface AnnouncementModalOptionsProps {
   primaryButtonUrl: string

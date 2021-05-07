@@ -1,10 +1,15 @@
-import { useCallback, useContext, useEffect, useState } from 'react'
-import styles from './DemoBar.module.scss'
 import cx from 'classnames'
-import { CloseButton, TextButton } from 'components/common'
-import { updateDemoDisplayed } from 'services/settings.service'
-import { ModalContext } from 'contexts/modal.context'
+
+import { useCallback, useContext, useEffect, useState } from 'react'
+
 import CreateDemoModal from '../create-demo-modal'
+
+import styles from './DemoBar.module.scss'
+
+import { CloseButton, TextButton } from 'components/common'
+import { ModalContext } from 'contexts/modal.context'
+import { updateDemoDisplayed } from 'services/settings.service'
+
 const DemoBar = ({
   numDemosSms,
   numDemosTelegram,

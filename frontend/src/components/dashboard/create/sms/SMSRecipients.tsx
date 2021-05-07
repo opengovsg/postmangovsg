@@ -1,12 +1,16 @@
+import { i18n } from '@lingui/core'
+
 import { useState, useEffect, useContext } from 'react'
-import { useParams } from 'react-router-dom'
+
+import type { Dispatch, SetStateAction } from 'react'
+
 import { OutboundLink } from 'react-ga'
 
-import {
-  uploadFileToS3,
-  deleteCsvStatus,
-  getCsvStatus,
-} from 'services/upload.service'
+import { useParams } from 'react-router-dom'
+
+import styles from '../Create.module.scss'
+
+import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import {
   FileInput,
   CsvUpload,
@@ -21,17 +25,18 @@ import {
   InfoBlock,
   WarningBlock,
 } from 'components/common'
-import { LINKS } from 'config'
-import { i18n } from '@lingui/core'
-import { sendTiming } from 'services/ga.service'
-import { CampaignContext } from 'contexts/campaign.context'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { LINKS } from 'config'
+import { CampaignContext } from 'contexts/campaign.context'
 
-import type { Dispatch, SetStateAction } from 'react'
+import { sendTiming } from 'services/ga.service'
+import {
+  uploadFileToS3,
+  deleteCsvStatus,
+  getCsvStatus,
+} from 'services/upload.service'
+
 import type { CsvStatusResponse } from 'services/upload.service'
-import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
-
-import styles from '../Create.module.scss'
 
 const SMSRecipients = ({
   setActiveStep,

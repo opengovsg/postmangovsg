@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+
 import { EditorContext } from '../RichTextEditor'
 
 export const TableWrapper = (props: any) => {

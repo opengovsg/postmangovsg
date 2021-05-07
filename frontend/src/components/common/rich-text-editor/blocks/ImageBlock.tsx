@@ -1,4 +1,3 @@
-import { useRef, useState, useContext } from 'react'
 import {
   ContentBlock,
   ContentState,
@@ -6,6 +5,7 @@ import {
   SelectionState,
   Modifier,
 } from 'draft-js'
+import { useRef, useState, useContext } from 'react'
 
 import { EditorContext } from '../RichTextEditor'
 import styles from '../RichTextEditor.module.scss'

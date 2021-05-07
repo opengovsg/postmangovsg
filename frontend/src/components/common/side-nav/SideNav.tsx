@@ -1,5 +1,7 @@
-import { useHistory, NavLink } from 'react-router-dom'
 import cx from 'classnames'
+
+import { useHistory, NavLink } from 'react-router-dom'
+
 import styles from './SideNav.module.scss'
 
 import { Dropdown } from 'components/common'

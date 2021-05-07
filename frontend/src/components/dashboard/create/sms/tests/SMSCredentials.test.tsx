@@ -1,8 +1,12 @@
 import userEvent from '@testing-library/user-event'
+
+import { Route } from 'react-router'
+
+import SMSCredentials from '../SMSCredentials'
+
 import { SMSCampaign } from 'classes'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
-import { Route } from 'react-router'
 import {
   mockCommonApis,
   render,
@@ -12,7 +16,6 @@ import {
   INVALID_TWILIO_CREDENTIAL,
   Campaign,
 } from 'test-utils'
-import SMSCredentials from '../SMSCredentials'
 
 const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,
