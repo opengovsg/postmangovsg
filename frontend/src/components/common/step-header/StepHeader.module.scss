@@ -8,9 +8,13 @@
     margin-bottom: $spacing-1;
   }
 
-  h3 {
+  .title {
     margin: 0;
     margin-bottom: $spacing-3;
+
+    * {
+      margin: 0;
+    }
   }
 
   .description {

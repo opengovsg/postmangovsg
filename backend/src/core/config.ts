@@ -431,6 +431,18 @@ const config = convict({
       format: Number,
     },
   },
+  tesseract: {
+    vaultBucket: {
+      doc: 'Value of bucket name attribute for Vault datasets',
+      default: 'vaultgovsg',
+      env: 'VAULT_BUCKET_NAME',
+    },
+    vaultUrl: {
+      doc: 'Vault url regex used to validate tesseract urls',
+      default: '^https://storage.vault.gov.sg/.+$', // prod only
+      env: 'VAULT_URL',
+    },
+  },
   smsFallback: {
     activate: {
       doc: 'Switch to true to use SNS fallback for all SMS campaigns',
@@ -480,6 +492,10 @@ switch (config.get('env')) {
           path: '/',
         },
       },
+      tesseract: {
+        vaultBucket: 'vaultgovsg-staging',
+        vaultUrl: '^https://storage-staging.vault.gov.sg/.+$',
+      },
     })
     break
   case 'development':
@@ -509,6 +525,10 @@ switch (config.get('env')) {
           domain: 'localhost',
           path: '/',
         },
+      },
+      tesseract: {
+        vaultBucket: 'vaultgovsg-staging',
+        vaultUrl: '^https://storage-staging.vault.gov.sg/.+$',
       },
     })
     break

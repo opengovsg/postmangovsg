@@ -74,14 +74,15 @@ const replaceCampaignS3Metadata = (
   campaignId: number,
   key: string,
   filename: string,
-  transaction: Transaction | undefined
+  transaction: Transaction | undefined,
+  bucket?: string
 ): Promise<[number, Campaign[]]> => {
   return Campaign.update(
     {
       s3Object: {
         key,
         filename,
-        bucket: FILE_STORAGE_BUCKET_NAME,
+        bucket: bucket || FILE_STORAGE_BUCKET_NAME,
       },
     },
     {
@@ -100,10 +101,12 @@ const replaceCampaignS3Metadata = (
  */
 const storeS3TempFilename = async (
   campaignId: number,
-  tempFilename: string
+  tempFilename: string,
+  tempBucket: string = FILE_STORAGE_BUCKET_NAME
 ): Promise<void> => {
   return Campaign.updateS3ObjectKey(campaignId, {
     temp_filename: tempFilename,
+    temp_bucket: tempBucket,
     error: undefined,
   })
 }
@@ -133,14 +136,14 @@ const storeS3Error = async (
 const deleteS3TempKeys = async (campaignId: number): Promise<void> => {
   return Campaign.updateS3ObjectKey(campaignId, {
     temp_filename: undefined,
+    temp_bucket: undefined,
     error: undefined,
   })
 }
 
 /*
  * Returns status of csv processing
- * If tempFilename exists in S3Object without errors, processing is still ongoing
- * If error exists in S3Object, processing has failed
+ * If tempFilename exists in S3Object without errors, processing is still ongoing If error exists in S3Object, processing has failed
  * If neither exists, processing is complete
  * If lastUpdated timestamp on campaign has exceeded csvProcessingTimeout, consider processing timedout
  */
@@ -152,7 +155,12 @@ const getCsvStatus = async (
     throw new Error('Campaign does not exist')
   }
   // s3Object is nullable
-  const { filename, temp_filename: tempFilename } = campaign.s3Object || {}
+  const {
+    filename,
+    temp_filename: tempFilename,
+    temp_bucket: tempBucket,
+    bucket,
+  } = campaign.s3Object || {}
   let { error } = campaign.s3Object || {}
 
   let isCsvProcessing = !!tempFilename && !error
@@ -175,6 +183,8 @@ const getCsvStatus = async (
     isCsvProcessing,
     filename,
     tempFilename,
+    tempBucket,
+    bucket,
     error,
   }
 }
@@ -207,15 +217,23 @@ const uploadCompleteOnComplete = ({
   campaignId,
   key,
   filename,
+  bucket,
 }: {
   transaction: Transaction
   campaignId: number
   key: string
   filename: string
+  bucket?: string
 }): ((numRecords: number) => Promise<void>) => {
   return async (numRecords: number): Promise<void> => {
     // Updates metadata in project
-    await replaceCampaignS3Metadata(campaignId, key, filename, transaction)
+    await replaceCampaignS3Metadata(
+      campaignId,
+      key,
+      filename,
+      transaction,
+      bucket
+    )
 
     await StatsService.setNumRecipients(campaignId, numRecords, transaction)
 

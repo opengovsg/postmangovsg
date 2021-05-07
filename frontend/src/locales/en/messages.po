@@ -229,3 +229,8 @@ msgstr "https://guide.postman.gov.sg/contact-us"
 #: config.ts:50
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
+
+#: config.ts:56
+msgid "link.vaultUrl"
+msgstr "https://vault.gov.sg"
+

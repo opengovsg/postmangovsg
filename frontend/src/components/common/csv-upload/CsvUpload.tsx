@@ -1,32 +1,33 @@
 import React from 'react'
 
-import { DetailBlock, ErrorBlock } from 'components/common'
+import { CsvStatusResponse } from 'services/upload.service'
+import { DetailBlock } from 'components/common'
+import { RecipientListType } from 'classes'
 
 import styles from './CsvUpload.module.scss'
 
 const CsvUpload = ({
   isCsvProcessing,
   csvInfo,
-  onErrorClose,
   children,
 }: {
   isCsvProcessing: boolean
-  csvInfo: {
-    numRecipients?: number
-    csvFilename?: string
-    tempCsvFilename?: string
-    csvError?: string
-  }
+  csvInfo: Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   onErrorClose: () => void
   children: React.ReactNode
 }) => {
-  const { numRecipients = 0, csvFilename, tempCsvFilename, csvError } = csvInfo
+  const {
+    numRecipients = 0,
+    csvFilename,
+    recipientListType,
+    tempCsvFilename,
+  } = csvInfo
 
   function renderFileUploadInput() {
     if (!isCsvProcessing) {
       return (
         <>
-          {numRecipients > 0 && (
+          {numRecipients > 0 && recipientListType === RecipientListType.Csv && (
             <DetailBlock>
               <li>
                 <i className="bx bx-user-check"></i>
@@ -59,14 +60,7 @@ const CsvUpload = ({
     }
   }
 
-  return (
-    <div className={styles.container}>
-      {renderFileUploadInput()}
-      <ErrorBlock onClose={onErrorClose} title={tempCsvFilename}>
-        {csvError && <span>{csvError}</span>}
-      </ErrorBlock>
-    </div>
-  )
+  return <div className={styles.container}>{renderFileUploadInput()}</div>
 }
 
 export default CsvUpload
