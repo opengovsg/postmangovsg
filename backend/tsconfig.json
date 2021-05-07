@@ -23,7 +23,7 @@
     "sourceMap": true,                        /* Generates corresponding '.map' file. */
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
     "outDir": "./build",                      /* Redirect output structure to the directory. */
-    "rootDir": "./",                          /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    "rootDir": "./src",                          /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     // "composite": true,                     /* Enable project compilation */
     // "incremental": true,                   /* Enable incremental compilation */
     // "tsBuildInfoFile": "./",               /* Specify file to store incremental compilation information */
@@ -51,13 +51,13 @@
 
     /* Module Resolution Options */
     "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
-    "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
+    "baseUrl": "./src",                       /* Base directory to resolve non-absolute module names. */
     "paths": {
-      "@core/*": ["src/core/*"],
-      "@sms/*": ["src/sms/*"],
-      "@email/*": ["src/email/*"],
-      "@telegram/*": ["src/telegram/*"],
-      "@test-utils/*": ["src/test-utils/*"],
+      "@core/*": ["core/*"],
+      "@sms/*": ["sms/*"],
+      "@email/*": ["email/*"],
+      "@telegram/*": ["telegram/*"],
+      "@test-utils/*": ["test-utils/*"],
     },                           /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
