@@ -1,5 +1,3 @@
-import React from 'react'
-
 import styles from './InfoBanner.module.scss'
 
 const InfoBanner = (props: any) => {

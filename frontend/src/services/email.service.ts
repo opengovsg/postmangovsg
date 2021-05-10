@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import type { AxiosError } from 'axios'
+
 import type { EmailPreview } from 'classes'
 
 export async function saveTemplate(

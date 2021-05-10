@@ -1,7 +1,7 @@
-import React from 'react'
 import cx from 'classnames'
 
 import styles from './ProtectedPreview.module.scss'
+
 import appLogo from 'assets/img/brand/app-logo-grey.svg'
 
 /**

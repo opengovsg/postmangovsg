@@ -1,16 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { OutboundLink } from 'react-ga'
-import { useParams } from 'react-router-dom'
+import { i18n } from '@lingui/core'
+
 import cx from 'classnames'
 
-import { CampaignContext } from 'contexts/campaign.context'
-import { LINKS } from 'config'
-import {
-  validateStoredCredentials,
-  validateNewCredentials,
-  verifyCampaignCredentials,
-  getStoredCredentials,
-} from 'services/telegram.service'
+import { useState, useEffect, useContext } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { OutboundLink } from 'react-ga'
+import { useParams } from 'react-router-dom'
+
+import styles from '../Create.module.scss'
+
+import TelegramCredentialsInput from './TelegramCredentialsInput'
+import TelegramValidationInput from './TelegramValidationInput'
+
+import type { TelegramProgress } from 'classes'
 import {
   PrimaryButton,
   NextButton,
@@ -25,13 +27,14 @@ import {
   Checkbox,
   InfoBlock,
 } from 'components/common'
-import TelegramCredentialsInput from './TelegramCredentialsInput'
-import TelegramValidationInput from './TelegramValidationInput'
-import styles from '../Create.module.scss'
-import { i18n } from '@lingui/core'
-
-import type { Dispatch, SetStateAction } from 'react'
-import type { TelegramProgress } from 'classes'
+import { LINKS } from 'config'
+import { CampaignContext } from 'contexts/campaign.context'
+import {
+  validateStoredCredentials,
+  validateNewCredentials,
+  verifyCampaignCredentials,
+  getStoredCredentials,
+} from 'services/telegram.service'
 
 const TelegramCredentials = ({
   setActiveStep,

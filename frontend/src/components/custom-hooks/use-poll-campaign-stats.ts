@@ -1,7 +1,8 @@
-import { CampaignStats, Status } from 'classes'
 import { useState, useEffect, useCallback, useContext } from 'react'
-import { getCampaignStats, getCampaignDetails } from 'services/campaign.service'
+
+import { CampaignStats, Status } from 'classes'
 import { CampaignContext } from 'contexts/campaign.context'
+import { getCampaignStats, getCampaignDetails } from 'services/campaign.service'
 
 function usePollCampaignStats() {
   const { campaign, setCampaign } = useContext(CampaignContext)

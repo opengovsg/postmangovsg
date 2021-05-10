@@ -1,8 +1,9 @@
-import axios from 'axios'
-import { setGAUserId } from './ga.service'
 import * as Sentry from '@sentry/browser'
+import axios from 'axios'
 
 import type { AxiosError } from 'axios'
+
+import { setGAUserId } from './ga.service'
 
 async function getOtpWithEmail(email: string): Promise<void> {
   try {

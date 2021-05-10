@@ -1,5 +1,8 @@
 import cx from 'classnames'
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
+
+import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
+
 import { EditorContext } from '../RichTextEditor'
 
 import styles from '../RichTextEditor.module.scss'
@@ -20,11 +23,11 @@ const ImageForm = ({
 }) => {
   const [imgSrc, setImgSrc] = useState('')
 
-  function stopPropagation(e: React.MouseEvent<HTMLElement>) {
+  function stopPropagation(e: ReactMouseEvent<HTMLElement>) {
     e.stopPropagation()
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     onChange(imgSrc, 'auto', '100%', '')
   }
