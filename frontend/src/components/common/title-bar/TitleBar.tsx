@@ -1,11 +1,12 @@
-import React from 'react'
+import type { ReactNode } from 'react'
+
 import styles from './TitleBar.module.scss'
 
 const TitleBar = ({
   children,
   title,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   title: string
 }) => {
   return (

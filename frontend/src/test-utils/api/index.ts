@@ -1,10 +1,13 @@
+import { union, difference } from 'lodash'
 import { rest } from 'msw'
-import type {
-  State,
-  EmailTemplate,
-  SMSTemplate,
-  TelegramTemplate,
-} from './interfaces'
+
+import {
+  TemplateClient,
+  XSS_EMAIL_OPTION,
+  XSS_SMS_OPTION,
+  XSS_TELEGRAM_OPTION,
+} from 'postman-templating'
+
 import {
   USER_EMAIL,
   TWILIO_CREDENTIAL,
@@ -15,13 +18,12 @@ import {
   INVALID_TWILIO_CREDENTIAL,
   INVALID_CSV_FILENAME,
 } from './constants'
-import {
-  TemplateClient,
-  XSS_EMAIL_OPTION,
-  XSS_SMS_OPTION,
-  XSS_TELEGRAM_OPTION,
-} from 'postman-templating'
-import { union, difference } from 'lodash'
+import type {
+  State,
+  EmailTemplate,
+  SMSTemplate,
+  TelegramTemplate,
+} from './interfaces'
 
 const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
@@ -117,6 +119,15 @@ function mockSettingsApis(state: State) {
           has_api_key: !!api_key,
         })
       )
+    }),
+    rest.put('/settings/announcement-version', (req, res, ctx) => {
+      const { announcement_version } = req.body as {
+        announcement_version?: string
+      }
+      if (!announcement_version) {
+        return res(ctx.status(400))
+      }
+      return res(ctx.status(200))
     }),
     rest.get('/settings/email/from', (_req, res, ctx) => {
       return res(

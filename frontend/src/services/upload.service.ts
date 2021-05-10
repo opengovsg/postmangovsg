@@ -1,8 +1,9 @@
 import axios from 'axios'
+import type { AxiosError } from 'axios'
+
 import Papa from 'papaparse'
 import SparkMD5 from 'spark-md5'
 
-import type { AxiosError } from 'axios'
 import type { EmailPreview, SMSPreview } from 'classes'
 
 const MD5_CHUNK_SIZE = 5000000 // 5MB
@@ -179,7 +180,7 @@ export async function getMimeType(uploadedFile: File): Promise<string> {
           resolve(
             delimiter === ',' &&
               // papaparse parses everything, including images, pdfs... This checks that at least one of the columns is sane
-              fields.some((field) => /^[a-zA-Z0-9\s-_'"/]+$/.test(field))
+              fields?.some((field) => /^[a-zA-Z0-9\s-_'"/]+$/.test(field))
           )
         },
         error: function () {

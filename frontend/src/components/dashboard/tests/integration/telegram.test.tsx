@@ -1,4 +1,7 @@
 import userEvent from '@testing-library/user-event'
+
+import { mockApis, renderDashboard, CAMPAIGN_NAME, MESSAGE_TEXT } from '../util'
+
 import {
   server,
   screen,
@@ -8,7 +11,6 @@ import {
   VALID_MOBILE_CSV_FILE,
   RECIPIENT_NUMBER,
 } from 'test-utils'
-import { mockApis, renderDashboard, CAMPAIGN_NAME, MESSAGE_TEXT } from '../util'
 
 test('successfully creates and sends a new Telegram campaign', async () => {
   // Setup

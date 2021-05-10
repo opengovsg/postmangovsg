@@ -142,12 +142,6 @@
   }
 }
 
-.characterCount {
-  @extend %body-2;
-  text-align: right;
-  color: $light-grey;
-}
-
 .protectedPreview {
   border-radius: 1.25rem;
 }

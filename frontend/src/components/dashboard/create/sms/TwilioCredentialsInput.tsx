@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
-
-import { LINKS } from 'config'
-import { TextInput, LabelWithExternalLink } from 'components/common'
 import { i18n } from '@lingui/core'
+
+import { useState, useEffect } from 'react'
+
+import { TextInput, LabelWithExternalLink } from 'components/common'
+import { LINKS } from 'config'
 
 export interface TwilioCredentials {
   accountSid: string
