@@ -32,7 +32,7 @@ afterAll(async () => {
   RedisService.sessionClient.quit()
 })
 
-describe('PUT /sms/template', () => {
+describe('PUT /campaign/{campaignId}/sms/template', () => {
   test('Template with only invalid HTML tags is not accepted', async () => {
     const testBody = await request(app)
       .put(`/campaign/${campaignId}/sms/template`)
