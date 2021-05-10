@@ -23,6 +23,7 @@ import { i18n } from '@lingui/core'
 import { RecipientListType } from 'classes'
 import { CampaignContext } from 'contexts/campaign.context'
 import useUploadRecipients from 'components/custom-hooks/use-upload-recipients'
+import { getUserSettings } from 'services/settings.service'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
@@ -36,6 +37,7 @@ const SMSRecipients = ({
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { demoMessageLimit, params } = campaign as SMSCampaign
+  const [isTesseractUser, setTesseractUser] = useState(false)
   const isDemo = !!demoMessageLimit
   const [sampleCsvError, setSampleCsvError] = useState<string | null>(null)
 
@@ -60,6 +62,14 @@ const SMSRecipients = ({
   const [recipientListType, setRecipientListType] = useState(
     currentRecipientListType
   )
+
+  useEffect(() => {
+    async function getUserFeatureSettings() {
+      const { tesseract } = await getUserSettings()
+      setTesseractUser(tesseract)
+    }
+    getUserFeatureSettings()
+  }, [setTesseractUser])
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
@@ -121,7 +131,7 @@ const SMSRecipients = ({
           <>
             <StepHeader
               title={
-                isDemo ? (
+                isDemo || !isTesseractUser ? (
                   'Upload recipient list in CSV format'
                 ) : (
                   <h4>Upload CSV file</h4>
@@ -186,7 +196,7 @@ const SMSRecipients = ({
 
   return (
     <>
-      {!isDemo && (
+      {!isDemo && isTesseractUser && (
         <StepSection>
           <StepHeader title="Add recipient list" subtitle="Step 2">
             <p>
@@ -226,7 +236,7 @@ const SMSRecipients = ({
         <ErrorBlock>{error || sampleCsvError}</ErrorBlock>
       </StepSection>
 
-      {!isProcessing && numRecipients > 0 && isDemo && (
+      {!isProcessing && numRecipients > 0 && (isDemo || !isTesseractUser) && (
         <StepSection>
           <p className={styles.greyText}>Message preview</p>
           <PreviewBlock body={preview.body}></PreviewBlock>

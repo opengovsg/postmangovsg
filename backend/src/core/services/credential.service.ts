@@ -251,7 +251,10 @@ const getUserSettings = async (
       },
       {
         model: UserFeature,
-        attributes: [['announcement_version', 'announcementVersion']],
+        attributes: [
+          ['announcement_version', 'announcementVersion'],
+          'tesseract',
+        ],
       },
     ],
     plain: true,

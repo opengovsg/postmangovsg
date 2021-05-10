@@ -17,6 +17,7 @@ async function getUserSettings(): Promise<{
     isDisplayed: boolean
   }
   announcementVersion: string
+  tesseract: boolean
 }> {
   try {
     const response = await axios.get('/settings')
@@ -25,6 +26,7 @@ async function getUserSettings(): Promise<{
       creds,
       demo,
       announcement_version: announcementVersion,
+      tesseract,
     } = response.data
     return {
       hasApiKey,
@@ -35,6 +37,7 @@ async function getUserSettings(): Promise<{
         isDisplayed: demo?.is_displayed,
       },
       announcementVersion,
+      tesseract,
     }
   } catch (e) {
     errorHandler(e, 'Error fetching credentials')
