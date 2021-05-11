@@ -57,8 +57,8 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     expect(res.body).toEqual({ message: "Invalid 'from' email address." })
   })
 
-  test('Default from address is accepted', async () => {
-    let res = await request(app)
+  test('Default from address is used if not provided', async () => {
+    const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({
         subject: 'test',
@@ -75,8 +75,10 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         }),
       })
     )
+  })
 
-    res = await request(app)
+  test('Default from address is accepted', async () => {
+    const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({
         from: 'Postman <donotreply@mail.postman.gov.sg>',
@@ -114,7 +116,9 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       email: 'user@agency.gov.sg',
       name: 'Agency ABC',
     })
-    CustomDomainService.verifyFromAddress = jest.fn()
+    const mockVerifyFromAddress = jest
+      .spyOn(CustomDomainService, 'verifyFromAddress')
+      .mockReturnValue(Promise.resolve())
 
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
@@ -134,6 +138,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         }),
       })
     )
+    mockVerifyFromAddress.mockRestore()
   })
 
   test('Protected template without protectedlink variables is not accepted', async () => {
@@ -151,23 +156,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     })
   })
 
-  test('Protected template with disallowed variables is not accepted', async () => {
-    const testBody = await request(app)
-      .put(`/campaign/${protectedCampaignId}/email/template`)
-      .send({
-        subject: 'test',
-        body: '{{recipient}} {{protectedLink}} {{name}}',
-        reply_to: 'user@agency.gov.sg',
-      })
-
-    const expectedErrorMsg = {
-      message:
-        'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',
-    }
-
-    expect(testBody.status).toBe(500)
-    expect(testBody.body).toEqual(expectedErrorMsg)
-
+  test('Protected template with disallowed variables in subject is not accepted', async () => {
     const testSubject = await request(app)
       .put(`/campaign/${protectedCampaignId}/email/template`)
       .send({
@@ -176,7 +165,26 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         reply_to: 'user@agency.gov.sg',
       })
     expect(testSubject.status).toBe(500)
-    expect(testSubject.body).toEqual(expectedErrorMsg)
+    expect(testSubject.body).toEqual({
+      message:
+        'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',
+    })
+  })
+
+  test('Protected template with disallowed variables in body is not accepted', async () => {
+    const testBody = await request(app)
+      .put(`/campaign/${protectedCampaignId}/email/template`)
+      .send({
+        subject: 'test',
+        body: '{{recipient}} {{protectedLink}} {{name}}',
+        reply_to: 'user@agency.gov.sg',
+      })
+
+    expect(testBody.status).toBe(500)
+    expect(testBody.body).toEqual({
+      message:
+        'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',
+    })
   })
 
   test('Protected template with only allowed variables is accepted', async () => {
@@ -246,5 +254,29 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       where: { campaignId },
     })
     expect(emailMessages).toEqual(0)
+  })
+
+  test('Successfully update template', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        subject: 'test',
+        body: 'test {{name}}',
+        reply_to: 'user@agency.gov.sg',
+      })
+
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        template: {
+          subject: 'test',
+          body: 'test {{name}}',
+          from: 'Postman <donotreply@mail.postman.gov.sg>',
+          reply_to: 'user@agency.gov.sg',
+          params: ['name'],
+        },
+      })
+    )
   })
 })

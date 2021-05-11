@@ -70,10 +70,10 @@ describe('PUT /campaign/{campaignId}/telegram/template', () => {
       })
     )
 
-    const smsMessages = await TelegramMessage.count({
+    const telegramMessages = await TelegramMessage.count({
       where: { campaignId },
     })
-    expect(smsMessages).toEqual(0)
+    expect(telegramMessages).toEqual(0)
   })
 
   test('Successfully update template', async () => {
