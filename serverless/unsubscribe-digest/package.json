@@ -19,6 +19,7 @@
     "axios": "^0.21.1",
     "convict": "^6.0.1",
     "dotenv": "^8.2.0",
+    "lodash": "^4.17.21",
     "nodemailer": "^6.5.0",
     "nodemailer-direct-transport": "^3.3.2",
     "pg": "^8.5.1",
