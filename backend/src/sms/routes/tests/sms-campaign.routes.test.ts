@@ -127,8 +127,8 @@ describe('PUT /campaign/{id}/sms/template', () => {
 
 describe('GET /campaign/{id}/sms/upload/start', () => {
   test('Fail to generate presigned URL when invalid md5 provided', async () => {
-    UploadService.getUploadParameters = jest
-      .fn()
+    const mockGetUploadParameters = jest
+      .spyOn(UploadService, 'getUploadParameters')
       .mockRejectedValue({ message: 'hello' })
 
     const res = await request(app)
@@ -142,12 +142,15 @@ describe('GET /campaign/{id}/sms/upload/start', () => {
     expect(res.body).toEqual({
       message: 'Unable to generate presigned URL',
     })
+    mockGetUploadParameters.mockRestore()
   })
 
   test('Successfully generate presigned URL for valid md5', async () => {
-    UploadService.getUploadParameters = jest
-      .fn()
-      .mockReturnValue({ presignedUrl: 'url', signedKey: 'key' })
+    const mockGetUploadParameters = jest
+      .spyOn(UploadService, 'getUploadParameters')
+      .mockReturnValue(
+        Promise.resolve({ presignedUrl: 'url', signedKey: 'key' })
+      )
 
     const res = await request(app)
       .get(`/campaign/${campaignId}/sms/upload/start`)
@@ -158,6 +161,7 @@ describe('GET /campaign/{id}/sms/upload/start', () => {
 
     expect(res.status).toBe(200)
     expect(res.body).toEqual({ presigned_url: 'url', transaction_id: 'key' })
+    mockGetUploadParameters.mockRestore()
   })
 })
 
@@ -171,8 +175,8 @@ describe('POST /campaign/{id}/sms/upload/complete', () => {
   })
 
   test('Fails to complete upload if template is missing', async () => {
-    UploadService.extractParamsFromJwt = jest
-      .fn()
+    const mockExtractParamsFromJwt = jest
+      .spyOn(UploadService, 'extractParamsFromJwt')
       .mockReturnValue({ s3Key: 'key' })
 
     const res = await request(app)
@@ -180,17 +184,18 @@ describe('POST /campaign/{id}/sms/upload/complete', () => {
       .send({ transaction_id: '123', filename: 'abc', etag: '123' })
 
     expect(res.status).toEqual(500)
+    mockExtractParamsFromJwt.mockRestore()
   })
 
-  test('Successfully starts to complete upload', async () => {
+  test('Successfully starts recipient list processing', async () => {
     await SmsTemplate.create({
       campaignId: campaignId,
       params: { variable1: 'abc' },
       body: 'test {{variable1}}',
     })
 
-    UploadService.extractParamsFromJwt = jest
-      .fn()
+    const mockExtractParamsFromJwt = jest
+      .spyOn(UploadService, 'extractParamsFromJwt')
       .mockReturnValue({ s3Key: 'key' })
 
     const res = await request(app)
@@ -198,5 +203,6 @@ describe('POST /campaign/{id}/sms/upload/complete', () => {
       .send({ transaction_id: '123', filename: 'abc', etag: '123' })
 
     expect(res.status).toEqual(202)
+    mockExtractParamsFromJwt.mockRestore()
   })
 })
