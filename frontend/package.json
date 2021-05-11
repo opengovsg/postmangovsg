@@ -59,7 +59,7 @@
     "@lingui/cli": "^3.5.1",
     "@lingui/macro": "^3.5.1",
     "@peculiar/webcrypto": "^1.1.6",
-    "@sentry/cli": "^1.54.0",
+    "@sentry/cli": "^1.64.2",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^13.0.1",
