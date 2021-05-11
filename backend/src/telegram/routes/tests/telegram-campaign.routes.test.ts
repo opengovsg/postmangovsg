@@ -35,9 +35,9 @@ afterAll(async () => {
 
 describe('PUT /campaign/{campaignId}/telegram/upload/start', () => {
   test('Failed to get pre-signed url from S3', async () => {
-    UploadService.getUploadParameters = jest
-      .fn()
-      .mockImplementation(() => Promise.reject('error'))
+    const mockGetUploadParameters = jest
+      .spyOn(UploadService, 'getUploadParameters')
+      .mockRejectedValue({ message: 'hello' })
 
     const res = await request(app)
       .get(`/campaign/${campaignId}/telegram/upload/start`)
@@ -48,13 +48,15 @@ describe('PUT /campaign/{campaignId}/telegram/upload/start', () => {
 
     expect(res.status).toBe(500)
     expect(res.body).toEqual({ message: 'Unable to generate presigned URL' })
+    mockGetUploadParameters.mockRestore()
   })
 
   test('Successfully generate pre-signed url from S3', async () => {
-    UploadService.getUploadParameters = jest.fn().mockResolvedValue({
-      presignedUrl: 'url',
-      signedKey: 'key',
-    })
+    const mockGetUploadParameters = jest
+      .spyOn(UploadService, 'getUploadParameters')
+      .mockReturnValue(
+        Promise.resolve({ presignedUrl: 'url', signedKey: 'key' })
+      )
 
     const res = await request(app)
       .get(`/campaign/${campaignId}/telegram/upload/start`)
@@ -68,6 +70,7 @@ describe('PUT /campaign/{campaignId}/telegram/upload/start', () => {
       presigned_url: 'url',
       transaction_id: 'key',
     })
+    mockGetUploadParameters.mockRestore()
   })
 })
 
@@ -81,8 +84,8 @@ describe('POST /campaign/{id}/telegram/upload/complete', () => {
   })
 
   test('Fails to complete upload if template is missing', async () => {
-    UploadService.extractParamsFromJwt = jest
-      .fn()
+    const mockExtractParamsFromJwt = jest
+      .spyOn(UploadService, 'extractParamsFromJwt')
       .mockReturnValue({ s3Key: 'key' })
 
     const res = await request(app)
@@ -90,6 +93,7 @@ describe('POST /campaign/{id}/telegram/upload/complete', () => {
       .send({ transaction_id: '123', filename: 'abc', etag: '123' })
 
     expect(res.status).toEqual(500)
+    mockExtractParamsFromJwt.mockRestore()
   })
 
   test('Successfully starts to complete upload', async () => {
@@ -99,8 +103,8 @@ describe('POST /campaign/{id}/telegram/upload/complete', () => {
       body: 'test {{variable1}}',
     })
 
-    UploadService.extractParamsFromJwt = jest
-      .fn()
+    const mockExtractParamsFromJwt = jest
+      .spyOn(UploadService, 'extractParamsFromJwt')
       .mockReturnValue({ s3Key: 'key' })
 
     const res = await request(app)
@@ -108,5 +112,6 @@ describe('POST /campaign/{id}/telegram/upload/complete', () => {
       .send({ transaction_id: '123', filename: 'abc', etag: '123' })
 
     expect(res.status).toEqual(202)
+    mockExtractParamsFromJwt.mockRestore()
   })
 })
