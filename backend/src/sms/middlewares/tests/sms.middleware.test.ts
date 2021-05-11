@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
-import { Campaign, JobQueue, User } from '@core/models'
+import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
-import { ChannelType, JobStatus } from '@core/constants'
+import { ChannelType } from '@core/constants'
 import { SmsMiddleware } from '@sms/middlewares/sms.middleware'
 
 let sequelize: Sequelize
+let campaignId: number
 let mockRequest: Partial<Request>
 let mockResponse: Partial<Response>
 const nextFunction: NextFunction = jest.fn()
@@ -21,14 +22,18 @@ beforeEach(() => {
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   await User.create({ id: 1, email: 'user@agency.gov.sg' })
-})
-
-afterEach(async () => {
-  await JobQueue.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  const campaign = await Campaign.create({
+    name: 'campaign-1',
+    userId: 1,
+    type: ChannelType.SMS,
+    valid: false,
+    protect: false,
+  })
+  campaignId = campaign.id
 })
 
 afterAll(async () => {
+  await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
   RedisService.otpClient.quit()
@@ -37,20 +42,8 @@ afterAll(async () => {
 
 describe('isSmsCampaignOwnedByUser middleware', () => {
   test('Returns 403 campaign does not belong to user', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: ChannelType.SMS,
-      valid: false,
-      protect: false,
-    })
-    await JobQueue.create({
-      campaignId: campaign.id,
-      status: JobStatus.Sending,
-    })
-
     mockRequest = {
-      params: { campaignId: String(campaign.id) },
+      params: { campaignId: String(campaignId) },
       session: { user: { id: 2 } } as any,
     }
 
@@ -63,20 +56,8 @@ describe('isSmsCampaignOwnedByUser middleware', () => {
   })
 
   test('Returns next middleware when campaign belongs to user', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: ChannelType.SMS,
-      valid: false,
-      protect: false,
-    })
-    await JobQueue.create({
-      campaignId: campaign.id,
-      status: JobStatus.Sending,
-    })
-
     mockRequest = {
-      params: { campaignId: String(campaign.id) },
+      params: { campaignId: String(campaignId) },
       session: { user: { id: 1 } } as any,
     }
 

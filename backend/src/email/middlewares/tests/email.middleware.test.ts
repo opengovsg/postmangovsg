@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
-import { Campaign, JobQueue, User } from '@core/models'
+import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
-import { ChannelType, JobStatus } from '@core/constants'
+import { ChannelType } from '@core/constants'
 import { EmailMiddleware } from '@email/middlewares/email.middleware'
 
 let sequelize: Sequelize
@@ -32,10 +32,6 @@ beforeAll(async () => {
   campaignId = campaign.id
 })
 
-afterEach(async () => {
-  await JobQueue.destroy({ where: {} })
-})
-
 afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
@@ -46,11 +42,6 @@ afterAll(async () => {
 
 describe('isEmailCampaignOwnedByUser middleware', () => {
   test('Returns 403 campaign does not belong to user', async () => {
-    await JobQueue.create({
-      campaignId: campaignId,
-      status: JobStatus.Sending,
-    })
-
     mockRequest = {
       params: { campaignId: String(campaignId) },
       session: { user: { id: 2 } } as any,
@@ -65,10 +56,6 @@ describe('isEmailCampaignOwnedByUser middleware', () => {
   })
 
   test('Returns next middleware when campaign belongs to user', async () => {
-    await JobQueue.create({
-      campaignId: campaignId,
-      status: JobStatus.Sending,
-    })
     mockRequest = {
       params: { campaignId: String(campaignId) },
       session: { user: { id: 1 } } as any,
