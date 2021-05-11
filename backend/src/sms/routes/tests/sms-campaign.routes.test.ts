@@ -5,21 +5,32 @@ import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService, UploadService } from '@core/services'
 import { SmsMessage, SmsTemplate } from '@sms/models'
+import { ChannelType } from '@core/constants'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
+let campaignId: number
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  const campaign = await Campaign.create({
+    name: 'campaign-1',
+    userId: 1,
+    type: ChannelType.SMS,
+    valid: false,
+    protect: false,
+  })
+  campaignId = campaign.id
 })
 
 afterEach(async () => {
   await SmsMessage.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await SmsTemplate.destroy({ where: {} })
 })
 
 afterAll(async () => {
+  await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
   RedisService.otpClient.quit()
@@ -45,24 +56,16 @@ describe('GET /campaign/{id}/sms', () => {
 
 describe('PUT /campaign/{id}/sms/template', () => {
   test('Successfully update template for SMS campaign', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: 'SMS',
-      valid: false,
-      protect: false,
-    })
-
     const res = await request(app)
-      .put(`/campaign/${campaign.id}/sms/template`)
-      .query({ campaignId: campaign.id })
+      .put(`/campaign/${campaignId}/sms/template`)
+      .query({ campaignId: campaignId })
       .send({
         body: 'test {{variable}}',
       })
     expect(res.status).toBe(200)
     expect(res.body).toEqual(
       expect.objectContaining({
-        message: `Template for campaign ${campaign.id} updated`,
+        message: `Template for campaign ${campaignId} updated`,
         num_recipients: 0,
         template: {
           body: 'test {{variable}}',
@@ -73,30 +76,22 @@ describe('PUT /campaign/{id}/sms/template', () => {
   })
 
   test('Receive message to re-upload recipient when template has changed', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: 'SMS',
-      valid: false,
-      protect: false,
-    })
-
     await request(app)
-      .put(`/campaign/${campaign.id}/sms/template`)
-      .query({ campaignId: campaign.id })
+      .put(`/campaign/${campaignId}/sms/template`)
+      .query({ campaignId: campaignId })
       .send({
         body: 'test {{variable1}}',
       })
       .expect(200)
 
     await SmsMessage.create({
-      campaignId: campaign.id,
+      campaignId: campaignId,
       params: { variable1: 'abc' },
     })
 
     const res = await request(app)
-      .put(`/campaign/${campaign.id}/sms/template`)
-      .query({ campaignId: campaign.id })
+      .put(`/campaign/${campaignId}/sms/template`)
+      .query({ campaignId: campaignId })
       .send({
         body: 'test {{variable2}}',
       })
@@ -116,17 +111,9 @@ describe('PUT /campaign/{id}/sms/template', () => {
   })
 
   test('Fail to update template for SMS campaign', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: 'SMS',
-      valid: false,
-      protect: false,
-    })
-
     const res = await request(app)
-      .put(`/campaign/${campaign.id}/sms/template`)
-      .query({ campaignId: campaign.id })
+      .put(`/campaign/${campaignId}/sms/template`)
+      .query({ campaignId: campaignId })
       .send({
         body: '<p></p>',
       })
@@ -140,20 +127,12 @@ describe('PUT /campaign/{id}/sms/template', () => {
 
 describe('GET /campaign/{id}/sms/upload/start', () => {
   test('Fail to generate presigned URL when invalid md5 provided', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: 'SMS',
-      valid: false,
-      protect: false,
-    })
-
     UploadService.getUploadParameters = jest
       .fn()
       .mockRejectedValue({ message: 'hello' })
 
     const res = await request(app)
-      .get(`/campaign/${campaign.id}/sms/upload/start`)
+      .get(`/campaign/${campaignId}/sms/upload/start`)
       .query({
         mime_type: 'text/csv',
         md5: 'invalid md5 checksum',
@@ -166,20 +145,12 @@ describe('GET /campaign/{id}/sms/upload/start', () => {
   })
 
   test('Successfully generate presigned URL for valid md5', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: 'SMS',
-      valid: false,
-      protect: false,
-    })
-
     UploadService.getUploadParameters = jest
       .fn()
       .mockReturnValue({ presignedUrl: 'url', signedKey: 'key' })
 
     const res = await request(app)
-      .get(`/campaign/${campaign.id}/sms/upload/start`)
+      .get(`/campaign/${campaignId}/sms/upload/start`)
       .query({
         mime_type: 'text/csv',
         md5: 'valid md5 checksum',
@@ -191,36 +162,29 @@ describe('GET /campaign/{id}/sms/upload/start', () => {
 })
 
 describe('POST /campaign/{id}/sms/upload/complete', () => {
-  test('Fails to complete upload if template is missing', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: 'SMS',
-      valid: false,
-      protect: false,
-    })
+  test('Fails to complete upload if invalid transaction id provided', async () => {
+    const res = await request(app)
+      .post(`/campaign/${campaignId}/sms/upload/complete`)
+      .send({ transaction_id: '123', filename: 'abc', etag: '123' })
 
+    expect(res.status).toEqual(500)
+  })
+
+  test('Fails to complete upload if template is missing', async () => {
     UploadService.extractParamsFromJwt = jest
       .fn()
       .mockReturnValue({ s3Key: 'key' })
 
     const res = await request(app)
-      .post(`/campaign/${campaign.id}/sms/upload/complete`)
+      .post(`/campaign/${campaignId}/sms/upload/complete`)
       .send({ transaction_id: '123', filename: 'abc', etag: '123' })
 
     expect(res.status).toEqual(500)
   })
 
   test('Successfully starts to complete upload', async () => {
-    const campaign = await Campaign.create({
-      name: 'campaign-1',
-      userId: 1,
-      type: 'SMS',
-      valid: false,
-      protect: false,
-    })
     await SmsTemplate.create({
-      campaignId: campaign.id,
+      campaignId: campaignId,
       params: { variable1: 'abc' },
       body: 'test {{variable1}}',
     })
@@ -230,7 +194,7 @@ describe('POST /campaign/{id}/sms/upload/complete', () => {
       .mockReturnValue({ s3Key: 'key' })
 
     const res = await request(app)
-      .post(`/campaign/${campaign.id}/sms/upload/complete`)
+      .post(`/campaign/${campaignId}/sms/upload/complete`)
       .send({ transaction_id: '123', filename: 'abc', etag: '123' })
 
     expect(res.status).toEqual(202)

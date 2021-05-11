@@ -4,7 +4,7 @@ import { Campaign, JobQueue, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
 import { ChannelType, JobStatus } from '@core/constants'
-import { EmailMiddleware } from '@email/middlewares/email.middleware'
+import { TelegramMiddleware } from '@telegram/middlewares'
 
 let sequelize: Sequelize
 let campaignId: number
@@ -25,7 +25,7 @@ beforeAll(async () => {
   const campaign = await Campaign.create({
     name: 'campaign-1',
     userId: 1,
-    type: ChannelType.Email,
+    type: ChannelType.Telegram,
     valid: false,
     protect: false,
   })
@@ -44,7 +44,7 @@ afterAll(async () => {
   RedisService.sessionClient.quit()
 })
 
-describe('isEmailCampaignOwnedByUser middleware', () => {
+describe('isTelegramCampaignOwnedByUser middleware', () => {
   test('Returns 403 campaign does not belong to user', async () => {
     await JobQueue.create({
       campaignId: campaignId,
@@ -56,7 +56,7 @@ describe('isEmailCampaignOwnedByUser middleware', () => {
       session: { user: { id: 2 } } as any,
     }
 
-    await EmailMiddleware.isEmailCampaignOwnedByUser(
+    await TelegramMiddleware.isTelegramCampaignOwnedByUser(
       mockRequest as Request,
       mockResponse as Response,
       nextFunction
@@ -73,7 +73,7 @@ describe('isEmailCampaignOwnedByUser middleware', () => {
       params: { campaignId: String(campaignId) },
       session: { user: { id: 1 } } as any,
     }
-    await EmailMiddleware.isEmailCampaignOwnedByUser(
+    await TelegramMiddleware.isTelegramCampaignOwnedByUser(
       mockRequest as Request,
       mockResponse as Response,
       nextFunction
