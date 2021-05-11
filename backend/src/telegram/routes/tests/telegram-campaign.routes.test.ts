@@ -96,7 +96,7 @@ describe('POST /campaign/{id}/telegram/upload/complete', () => {
     mockExtractParamsFromJwt.mockRestore()
   })
 
-  test('Successfully starts to complete upload', async () => {
+  test('Successfully starts recipient list processing', async () => {
     await TelegramTemplate.create({
       campaignId: campaignId,
       params: { variable1: 'abc' },
