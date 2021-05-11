@@ -225,6 +225,9 @@ const getAttrStr = (attrs: Record<string, string>): string => {
       case 'targetOption':
         key = 'target'
         break
+      case 'link':
+        key = 'data-link'
+        break
     }
 
     return `${attrStr} ${key}="${value}"`
@@ -237,7 +240,9 @@ const renderTag = (htmlTag: HTMLTag): string => {
 
   switch (tag) {
     case 'img':
-      return `<${tag}${attrStr} />`
+      return attr.link
+        ? `<a href="${attr.link}"><${tag}${attrStr} /></a>`
+        : `<${tag}${attrStr} />`
     default:
       return type === 'open' ? `<${tag}${attrStr}>` : `</${tag}>`
   }
@@ -687,11 +692,13 @@ class ContentBlocksBuilder {
   private addImage(node: ChildNode, style: DraftInlineStyle) {
     const image = node as HTMLImageElement
     const { src, height, width } = image
+    const link = image.getAttribute('data-link')
 
     this.contentState = this.contentState.createEntity('IMAGE', 'MUTABLE', {
       src,
       height: height > 0 ? height : 'auto',
       width: `${width}%`,
+      link,
     })
 
     this.currentEntity = this.contentState.getLastCreatedEntityKey()
