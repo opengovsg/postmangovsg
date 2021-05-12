@@ -157,7 +157,7 @@ const isFromAddressAccepted = async (
   const defaultEmail = config.get('mailFrom')
 
   // Since from addresses with display name are accepted, we need to extract just the email address
-  const { name, fromAddress } = parseFromAddress(from)
+  const { fromName, fromAddress } = parseFromAddress(from)
 
   if (fromAddress !== userEmail && from !== defaultEmail) {
     logger.error({
@@ -170,8 +170,9 @@ const isFromAddressAccepted = async (
     })
     return res.status(400).json({ message: "Invalid 'from' email address." })
   }
-  res.locals.fromName = name
-  res.locals.from = fromAddress
+
+  res.locals.fromName = fromName
+  res.locals.fromAddress = fromAddress
 
   return next()
 }
@@ -187,7 +188,7 @@ const existsFromAddress = async (
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
   if (from === defaultEmail) return next()
-  const { fromName, from: fromAddress } = res.locals
+  const { fromName, fromAddress } = res.locals
 
   try {
     const exists = await CustomDomainService.existsFromAddress(
@@ -221,7 +222,7 @@ const verifyFromAddress = async (
   const { from } = req.body
   const defaultEmail = config.get('mailFrom')
   if (from === defaultEmail) return next()
-  const { from: fromAddress } = res.locals
+  const { fromAddress } = res.locals
 
   try {
     await CustomDomainService.verifyFromAddress(fromAddress)
@@ -252,7 +253,7 @@ const storeFromAddress = async (
   if (from === defaultEmail) {
     return res.sendStatus(200)
   }
-  const { fromName, from: fromAddress } = res.locals
+  const { fromName, fromAddress } = res.locals
 
   try {
     await CustomDomainService.storeFromAddress(fromName, fromAddress)
