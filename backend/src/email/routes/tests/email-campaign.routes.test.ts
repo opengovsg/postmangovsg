@@ -44,6 +44,10 @@ afterAll(async () => {
 })
 
 describe('PUT /campaign/{campaignId}/email/template', () => {
+  afterEach(async () => {
+    await EmailFromAddress.destroy({ where: {} })
+  })
+
   test('Invalid from address is not accepted', async () => {
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
