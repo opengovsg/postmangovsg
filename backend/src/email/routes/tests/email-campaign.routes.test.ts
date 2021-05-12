@@ -1,6 +1,7 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
+import config from '@core/config'
 import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
@@ -155,11 +156,12 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         reply_to: 'user@agency.gov.sg',
       })
     expect(res.status).toBe(200)
+    const mailVia = config.get('mailVia')
     expect(res.body).toEqual(
       expect.objectContaining({
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
-          from: 'Custom Name <donotreply@mail.postman.gov.sg>',
+          from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -185,11 +187,12 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       })
 
     expect(res.status).toBe(200)
+    const mailVia = config.get('mailVia')
     expect(res.body).toEqual(
       expect.objectContaining({
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
-          from: 'Custom Name <user@agency.gov.sg>',
+          from: `Custom Name ${mailVia} <user@agency.gov.sg>`,
           reply_to: 'user@agency.gov.sg',
         }),
       })

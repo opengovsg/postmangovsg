@@ -286,6 +286,11 @@ const config = convict({
     default: '',
     env: 'BACKEND_SES_FROM',
   },
+  mailVia: {
+    doc: 'Text to appended to custom sender name',
+    default: 'via Government Mail',
+    env: 'BACKEND_MAIL_VIA',
+  },
   mailDefaultRate: {
     doc: 'The default rate at which an email campaign will be sent',
     default: 35,
