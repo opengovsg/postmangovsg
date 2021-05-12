@@ -23,6 +23,10 @@ afterAll(async () => {
   RedisService.sessionClient.quit()
 })
 
+afterEach(async () => {
+  jest.clearAllMocks()
+})
+
 // Setup spy method (for Mock) getSecretValue that always returns TELEGRAM_SECRET_VALUE
 const TELEGRAM_SECRET_VALUE = {
   SecretString: 'TEST_TELEGRAM_API_TOKEN',
@@ -68,6 +72,9 @@ describe('POST /credentials', () => {
     expect(res.body).toEqual({
       message: `Campaign cannot use demo credentials. ${DefaultCredentialName.Telegram} is not allowed.`,
     })
+
+    // SecretManager should not be called
+    expect(mockGetSecretValue).not.toHaveBeenCalled()
   })
 
   test('Demo Campaign should not be able to use non-demo credentials', async () => {
@@ -85,6 +92,9 @@ describe('POST /credentials', () => {
     expect(res.body).toEqual({
       message: `Demo campaign must use demo credentials. ${NON_DEMO_CREDENTIAL_LABEL} is not allowed.`,
     })
+
+    // SecretManager should not be called
+    expect(mockGetSecretValue).not.toHaveBeenCalled()
   })
 
   test('Demo Campaign should be able to use demo credentials', async () => {
