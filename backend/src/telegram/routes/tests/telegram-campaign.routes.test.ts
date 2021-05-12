@@ -33,7 +33,7 @@ afterAll(async () => {
   RedisService.sessionClient.quit()
 })
 
-describe('PUT /campaign/{campaignId}/telegram/upload/start', () => {
+describe('GET /campaign/{campaignId}/telegram/upload/start', () => {
   test('Failed to get pre-signed url from S3', async () => {
     const mockGetUploadParameters = jest
       .spyOn(UploadService, 'getUploadParameters')
