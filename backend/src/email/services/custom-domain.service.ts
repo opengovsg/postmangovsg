@@ -75,16 +75,12 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 }
 
 /**
- *  Returns true if the supplied name and email exist in email_from_address
+ *  Returns true if the supplied email exist in email_from_address
  */
 
-const existsFromAddress = async (
-  name: string | null,
-  email: string
-): Promise<boolean> => {
+const existsFromAddress = async (email: string): Promise<boolean> => {
   return !!(await EmailFromAddress.findOne({
     where: {
-      name,
       email,
     },
   }))

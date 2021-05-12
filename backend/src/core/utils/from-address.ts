@@ -30,6 +30,17 @@ export const formatFromAddress = (
   return from
 }
 
+/**
+ * Determine if a from is using the default from email address
+ */
+export const isDefaultFromAddress = (from: string): boolean => {
+  const { fromAddress } = parseFromAddress(from)
+  const { fromAddress: defaultFromAddress } = parseFromAddress(
+    config.get('mailFrom')
+  )
+  return fromAddress === defaultFromAddress
+}
+
 export const fromAddressValidator = Joi.string()
   .trim()
   .default(config.get('mailFrom'))
