@@ -5,6 +5,7 @@ import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
+import { formatDefaultCredentialName } from '@core/utils'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
@@ -31,7 +32,9 @@ const TWILIO_SECRET_VALUE = {
     messagingServiceSid: '',
   }),
 }
-const mockGetSecretValue = jest.fn(() => TWILIO_SECRET_VALUE)
+
+// Take in SecretId as (unused) parameter so arguments can be checked within tests
+const mockGetSecretValue = jest.fn((_) => TWILIO_SECRET_VALUE)
 
 // Setup Mock AWS SecretsManager
 jest.mock('aws-sdk', () => {
@@ -39,11 +42,9 @@ jest.mock('aws-sdk', () => {
     ...jest.requireActual('aws-sdk'),
     SecretsManager: function () {
       return {
-        getSecretValue: function () {
-          return {
-            promise: mockGetSecretValue,
-          }
-        },
+        getSecretValue: ({ SecretId }: { SecretId: string }) => ({
+          promise: () => mockGetSecretValue(SecretId),
+        }),
       }
     },
   }
@@ -105,7 +106,9 @@ describe('POST /credentials', () => {
         recipient: '98765432',
       })
 
-    // Expect SecretManager to be called
-    expect(mockGetSecretValue).toHaveBeenCalled()
+    // Expect SecretManager to be called with default credentials
+    expect(mockGetSecretValue).toHaveBeenCalledWith(
+      formatDefaultCredentialName(DefaultCredentialName.SMS)
+    )
   })
 })

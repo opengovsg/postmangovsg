@@ -5,6 +5,7 @@ import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
+import { formatDefaultCredentialName } from '@core/utils'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
@@ -26,7 +27,7 @@ afterAll(async () => {
 const TELEGRAM_SECRET_VALUE = {
   SecretString: 'TEST_TELEGRAM_API_TOKEN',
 }
-const mockGetSecretValue = jest.fn(() => TELEGRAM_SECRET_VALUE)
+const mockGetSecretValue = jest.fn((_) => TELEGRAM_SECRET_VALUE)
 
 // Setup Mock AWS SecretsManager
 jest.mock('aws-sdk', () => {
@@ -34,11 +35,9 @@ jest.mock('aws-sdk', () => {
     ...jest.requireActual('aws-sdk'),
     SecretsManager: function () {
       return {
-        getSecretValue: function () {
-          return {
-            promise: mockGetSecretValue,
-          }
-        },
+        getSecretValue: ({ SecretId }: { SecretId: string }) => ({
+          promise: () => mockGetSecretValue(SecretId),
+        }),
       }
     },
   }
@@ -97,7 +96,9 @@ describe('POST /credentials', () => {
         label: DefaultCredentialName.Telegram,
       })
 
-    // Expect SecretManager to be called
-    expect(mockGetSecretValue).toHaveBeenCalled()
+    // Expect SecretManager to be called with default credentials
+    expect(mockGetSecretValue).toHaveBeenCalledWith(
+      formatDefaultCredentialName(DefaultCredentialName.Telegram)
+    )
   })
 })
