@@ -196,10 +196,11 @@ const storeTemplate = async ({
     expectedFromName = customFromName
   }
 
+  const mailVia = config.get('mailVia')
   const formattedFrom = formatFromAddress(
-    expectedFromName == fromName
-      ? fromName
-      : `${fromName} ${config.get('mailVia')}`,
+    fromName && expectedFromName !== fromName && !fromName.endsWith(mailVia)
+      ? `${fromName} ${mailVia}`
+      : fromName,
     fromAddress
   )
 

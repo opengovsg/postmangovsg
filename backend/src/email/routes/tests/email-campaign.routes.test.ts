@@ -214,6 +214,29 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     expect(res.body).toEqual({ message: 'From Address has not been verified.' })
   })
 
+  test('Mail via should only be appended once', async () => {
+    const mailVia = config.get('mailVia')
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        template: expect.objectContaining({
+          from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
+          reply_to: 'user@agency.gov.sg',
+        }),
+      })
+    )
+  })
+
   test('Protected template without protectedlink variables is not accepted', async () => {
     const res = await request(app)
       .put(`/campaign/${protectedCampaignId}/email/template`)
