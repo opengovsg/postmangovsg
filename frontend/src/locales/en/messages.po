@@ -13,13 +13,17 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: components/common/progress-details/ProgressDetails.tsx:95
+#: components/common/progress-details/ProgressDetails.tsx:100
 msgid "Delivery report has expired and is no longer available for download."
 msgstr "Delivery report has expired and is no longer available for download."
 
-#: components/common/export-recipients/ExportRecipients.tsx:133
+#: components/common/export-recipients/ExportRecipients.tsx:140
 msgid "Delivery report will expire 14 days after sending is completed."
 msgstr "Delivery report will expire 14 days after sending is completed."
+
+#: components/dashboard/create/email/EmailTemplate.tsx:148
+msgid "E.g. MOH Appointment"
+msgstr "E.g. MOH Appointment"
 
 #: components/login/login-input/LoginInput.tsx:88
 msgid "Enter OTP"
@@ -29,7 +33,7 @@ msgstr "Enter OTP"
 msgid "Get OTP"
 msgstr "Get OTP"
 
-#: components/unsubscribe/Unsubscribe.tsx:88
+#: components/unsubscribe/Unsubscribe.tsx:89
 msgid "I'd rather stay"
 msgstr "I'd rather stay"
 
@@ -37,7 +41,7 @@ msgstr "I'd rather stay"
 msgid "One-Time Password"
 msgstr "One-Time Password"
 
-#: components/dashboard/campaigns/Campaigns.tsx:132
+#: components/dashboard/campaigns/Campaigns.tsx:141
 msgid "Report expired"
 msgstr "Report expired"
 
@@ -61,7 +65,7 @@ msgstr "Sign In"
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
 
-#: components/unsubscribe/Unsubscribe.tsx:91
+#: components/unsubscribe/Unsubscribe.tsx:92
 msgid "Unsubscribe me"
 msgstr "Unsubscribe me"
 
@@ -69,50 +73,54 @@ msgstr "Unsubscribe me"
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: config.ts:60
+#: config.ts:88
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg"
 
-#: config.ts:78
+#: config.ts:102
 msgid "announcement.mediaUrl"
 msgstr "https://file.go.gov.sg/dz52q4.png"
 
-#: config.ts:80
+#: config.ts:104
 msgid "announcement.primaryButtonText"
 msgstr "Read guide"
 
-#: config.ts:79
+#: config.ts:103
 msgid "announcement.primaryButtonUrl"
 msgstr "https://guide.postman.gov.sg/release-notes"
 
-#: config.ts:82
+#: config.ts:106
 msgid "announcement.secondaryButtonText"
 msgstr "null"
 
-#: config.ts:81
+#: config.ts:105
 msgid "announcement.secondaryButtonUrl"
 msgstr "null"
 
-#: config.ts:77
+#: config.ts:101
 msgid "announcement.subtext"
 msgstr "Thanks for using Postman and joining us every step of the way while we mature as a product. We'll be releasing exciting new features this year. For instance, this is an announcement modal that will keep you up-to-date about our new features! Watch this space for things that are brewing. Learn more about Postman's releases by reading our guide."
 
-#: config.ts:76
+#: config.ts:100
 msgid "announcement.title"
 msgstr "Happy New Year! Congrats on making it through 2020."
 
 #: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
-#: config.ts:58
+#: config.ts:86
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
 
-#: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:7
+#: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:6
 msgid "demoMessage"
 msgstr "This demo campaign will be sent to a maximum of 20 recipients."
 
-#: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:6
+#: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:5
 msgid "demoMessageLabel"
 msgstr "DEMO"
+
+#: components/dashboard/create/email/EmailTemplate.tsx:159
+msgid "e.g. Appointment Confirmation"
+msgstr "e.g. Appointment Confirmation"
 
 #: components/login/login-input/LoginInput.tsx:88
 msgid "e.g. postman@agency.gov.sg"
@@ -154,78 +162,78 @@ msgstr "Bot has been blocked by the recipient. Please contact the recipient via 
 msgid "errors.telegram.notSubscribed"
 msgstr "Recipient has not subscribed to your agency's bot - please ask them to subscribe before sending a message."
 
-#: config.ts:48
+#: config.ts:76
 msgid "link.contactUsUrl"
 msgstr "https://go.gov.sg/postman-contact-us"
 
-#: config.ts:49
+#: config.ts:77
 msgid "link.contributeUrl"
 msgstr "https://github.com/opengovsg/postmangovsg"
 
-#: config.ts:53
+#: config.ts:81
 msgid "link.customFromAddressRequestUrl"
 msgstr "https://go.gov.sg/postman-custom-from"
 
-#: config.ts:54
+#: config.ts:82
 msgid "link.demoTelegramBotUrl"
 msgstr "https://go.gov.sg/postmangovsgbot"
 
-#: config.ts:55
+#: config.ts:83
 msgid "link.demoVideoUrl"
 msgstr "https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/Demo+Campaign+Mode.mp4"
 
-#: config.ts:56
+#: config.ts:84
 msgid "link.featureRequestUrl"
 msgstr "https://go.gov.sg/postman-featurerequest"
 
-#: config.ts:46
+#: config.ts:74
 msgid "link.guideDemoUrl"
 msgstr "https://guide.postman.gov.sg/before-you-start/demo-mode"
 
-#: config.ts:39
+#: config.ts:67
 msgid "link.guideEmailPasswordProtectedUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/password-protected-email"
 
-#: config.ts:45
+#: config.ts:73
 msgid "link.guidePowerUserUrl"
 msgstr "https://guide.postman.gov.sg/guide/power-users"
 
-#: config.ts:47
+#: config.ts:75
 msgid "link.guideRemoveDuplicatesUrl"
 msgstr "https://guide.postman.gov.sg/quick-start#remove-duplicates-in-excel"
 
-#: config.ts:41
+#: config.ts:69
 msgid "link.guideSmsAccountSidUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-1-account-sid-and-auth-token"
 
-#: config.ts:42
+#: config.ts:70
 msgid "link.guideSmsApiKeyUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-2-set-up-a-standard-api-key"
 
-#: config.ts:43
+#: config.ts:71
 msgid "link.guideSmsMessagingServiceUrl"
 msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-3-set-up-your-messaging-service"
 
-#: config.ts:40
+#: config.ts:68
 msgid "link.guideSmsUrl"
 msgstr "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
 
-#: config.ts:44
+#: config.ts:72
 msgid "link.guideTelegramUrl"
 msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
 
-#: config.ts:38
+#: config.ts:66
 msgid "link.guideUrl"
 msgstr "https://guide.postman.gov.sg"
 
-#: config.ts:51
+#: config.ts:79
 msgid "link.privacyUrl"
 msgstr "https://guide.postman.gov.sg/legal/privacy"
 
-#: config.ts:52
+#: config.ts:80
 msgid "link.reportBugUrl"
 msgstr "https://guide.postman.gov.sg/contact-us"
 
-#: config.ts:50
+#: config.ts:78
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"

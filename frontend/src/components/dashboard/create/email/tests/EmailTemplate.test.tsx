@@ -275,7 +275,7 @@ describe('custom sender details', () => {
     server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
     renderTemplatePage()
 
-    const fromNameInput = (await screen.findByPlaceholderText(
+    const fromNameInput = (await screen.findByLabelText(
       /sender name/i
     )) as HTMLInputElement
     const fromAddressDropdown = screen.getByRole('listbox', {
@@ -292,7 +292,7 @@ describe('custom sender details', () => {
     server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
     renderTemplatePage()
 
-    const fromNameInput = (await screen.findByPlaceholderText(
+    const fromNameInput = (await screen.findByLabelText(
       /sender name/i
     )) as HTMLInputElement
     const fromAddressDropdown = screen.getByRole('listbox', {

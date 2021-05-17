@@ -1,3 +1,4 @@
+import { t } from '@lingui/macro'
 import {
   useState,
   useEffect,
@@ -215,7 +216,8 @@ const EmailTemplate = ({
           <TextInput
             value={fromName}
             onChange={setFromName}
-            placeholder="Enter sender name"
+            aria-label="Sender name"
+            placeholder={t`E.g. MOH Appointment`}
           />
           <Dropdown
             onSelect={handleSelectFromAddress}
@@ -237,7 +239,7 @@ const EmailTemplate = ({
             id="subject"
             highlight={true}
             singleRow={true}
-            placeholder="Enter subject"
+            placeholder={t`e.g. Appointment Confirmation`}
             value={subject}
             onChange={setSubject}
           />
