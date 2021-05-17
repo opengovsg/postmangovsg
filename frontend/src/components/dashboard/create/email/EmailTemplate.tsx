@@ -31,6 +31,19 @@ import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { saveTemplate } from 'services/email.service'
 import { getCustomFromAddresses } from 'services/settings.service'
 
+const parseFromAddress = (
+  email: string
+): { fromName: string | null; fromAddress: string } => {
+  // Regex from https://github.com/validatorjs/validator.js/blob/685c3d2edef67d68c27193d28db84d08c0f4534a/src/lib/isEmail.js#L18
+  // eslint-disable-next-line no-control-regex
+  const address = email.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
+  if (address !== null) {
+    const [, fromName, fromAddress] = address
+    return { fromName: fromName.trim(), fromAddress }
+  }
+  return { fromName: '', fromAddress: email }
+}
+
 const EmailTemplate = ({
   setActiveStep,
 }: {
@@ -52,7 +65,15 @@ const EmailTemplate = ({
   const [replyTo, setReplyTo] = useState(
     initialReplyTo === userEmail ? null : initialReplyTo
   )
-  const [from, setFrom] = useState(initialFrom)
+  const {
+    fromName: initialFromName,
+    fromAddress: initialFromAddress,
+  } = initialFrom
+    ? parseFromAddress(initialFrom)
+    : { fromName: '', fromAddress: '' }
+  const [fromName, setFromName] = useState(initialFromName)
+  const [fromAddress, setFromAddress] = useState(initialFromAddress)
+
   const [customFromAddresses, setCustomFromAddresses] = useState(
     [] as { label: string; value: string }[]
   )
@@ -74,7 +95,7 @@ const EmailTemplate = ({
         subject,
         body,
         replyTo,
-        from
+        `${fromName} <${fromAddress}>`
       )
       if (updatedTemplate) {
         updateCampaign({
@@ -90,16 +111,32 @@ const EmailTemplate = ({
     } catch (err) {
       setErrorMsg(err.message)
     }
-  }, [body, campaignId, from, replyTo, setActiveStep, subject, updateCampaign])
-
-  async function populateFromAddresses() {
-    const fromAddresses = await getCustomFromAddresses()
-    const options = fromAddresses.map((v) => ({ label: v, value: v }))
-    setCustomFromAddresses(options)
-  }
+  }, [
+    body,
+    campaignId,
+    replyTo,
+    setActiveStep,
+    subject,
+    updateCampaign,
+    fromAddress,
+    fromName,
+  ])
 
   // Get custom from addresses
   useEffect(() => {
+    async function populateFromAddresses() {
+      const fromAddresses = await getCustomFromAddresses()
+      const options = fromAddresses.map((from) => {
+        const { fromAddress } = parseFromAddress(from)
+        return { label: fromAddress, value: from }
+      })
+      setCustomFromAddresses(options)
+
+      const { fromName, fromAddress } = parseFromAddress(fromAddresses[0])
+      setFromName((prev) => prev || fromName)
+      setFromAddress((prev) => prev || fromAddress)
+    }
+
     populateFromAddresses()
   }, [])
 
@@ -113,7 +150,13 @@ const EmailTemplate = ({
           try {
             if (!subject || !body)
               throw new Error('Message subject or template cannot be empty!')
-            await saveTemplate(+campaignId, subject, body, replyTo, from)
+            await saveTemplate(
+              +campaignId,
+              subject,
+              body,
+              replyTo,
+              `${fromName} <${fromAddress}>`
+            )
           } catch (err) {
             setErrorMsg(err.message)
             throw err
@@ -124,11 +167,39 @@ const EmailTemplate = ({
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, subject, from, setFinishLaterContent, campaignId, replyTo])
+  }, [
+    body,
+    subject,
+    fromName,
+    fromAddress,
+    setFinishLaterContent,
+    campaignId,
+    replyTo,
+  ])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
   }
+
+  const handleSelectFromAddress = useCallback(
+    (selectedFrom: string) => {
+      const {
+        fromName: selectedFromName,
+        fromAddress: selectedFromAddress,
+      } = parseFromAddress(selectedFrom)
+
+      // Use custom from name if it has already been set. For e.g.,
+      // for "Custom <donotreply@mail.postman.gov.sg>"", we should
+      // use "Custom" instead of the default "Postman.gov.sg".
+      setFromName(
+        selectedFromAddress === initialFromAddress
+          ? initialFromName
+          : selectedFromName
+      )
+      setFromAddress(selectedFromAddress)
+    },
+    [initialFromName, initialFromAddress]
+  )
 
   return (
     <>
@@ -137,12 +208,21 @@ const EmailTemplate = ({
 
         <div>
           <h4>From</h4>
-          <p>Emails will be sent from this address</p>
+          <p>
+            Sender details. Custom sender name will be automatically appended
+            with &quot;via Government Mail&quot;.
+          </p>
+          <TextInput
+            value={fromName}
+            onChange={setFromName}
+            placeholder="Enter sender name"
+          />
           <Dropdown
-            onSelect={setFrom}
+            onSelect={handleSelectFromAddress}
             options={customFromAddresses}
-            defaultLabel={from || customFromAddresses[0]?.label}
+            defaultLabel={fromAddress}
             aria-label="Custom from"
+            disabled={customFromAddresses.length <= 1}
           ></Dropdown>
         </div>
 
@@ -222,7 +302,10 @@ const EmailTemplate = ({
         </div>
       </StepSection>
 
-      <NextButton disabled={!body || !subject} onClick={handleSaveTemplate} />
+      <NextButton
+        disabled={!fromName || !fromAddress || !body || !subject}
+        onClick={handleSaveTemplate}
+      />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )
