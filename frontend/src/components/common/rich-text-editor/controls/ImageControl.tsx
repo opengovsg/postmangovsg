@@ -1,11 +1,13 @@
 import cx from 'classnames'
+import { AtomicBlockUtils } from 'draft-js'
 import { useContext, useState } from 'react'
 
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
 import { EditorContext } from '../RichTextEditor'
-
 import styles from '../RichTextEditor.module.scss'
+
+const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
 
 interface ImageControlProps {
   currentState: any
@@ -22,6 +24,7 @@ const ImageForm = ({
   onChange: (key: string, ...vals: string[]) => void
 }) => {
   const [imgSrc, setImgSrc] = useState('')
+  const [link, setLink] = useState('')
 
   function stopPropagation(e: ReactMouseEvent<HTMLElement>) {
     e.stopPropagation()
@@ -29,7 +32,7 @@ const ImageForm = ({
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onChange(imgSrc, 'auto', '100%', '')
+    onChange(imgSrc, 'auto', '100%', link)
   }
 
   return (
@@ -39,12 +42,25 @@ const ImageForm = ({
       className={styles.form}
     >
       <div className={styles.item}>
+        <label>Source</label>
         <div className={styles.control}>
           <input
             value={imgSrc}
             type="text"
-            placeholder="Enter file.go.gov.sg link"
+            placeholder="file.go.gov.sg link"
             onChange={(e) => setImgSrc(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className={styles.item}>
+        <label>Link to</label>
+        <div className={styles.control}>
+          <input
+            value={link}
+            type="text"
+            placeholder="Image click links to this URL"
+            onChange={(e) => setLink(e.target.value)}
           />
         </div>
       </div>
@@ -59,8 +75,8 @@ const ImageForm = ({
 }
 
 export const ImageControl = (props: ImageControlProps) => {
-  const { expanded, onChange, onExpandEvent } = props
-  const { editorState } = useContext(EditorContext)
+  const { expanded, onExpandEvent, doCollapse } = props
+  const { editorState, setEditorState } = useContext(EditorContext)
 
   function isDisabled(): boolean {
     const selection = editorState.getSelection()
@@ -79,6 +95,41 @@ export const ImageControl = (props: ImageControlProps) => {
     if (!isDisabled()) onExpandEvent()
   }
 
+  function formatLink(link: string): string {
+    if (VARIABLE_REGEX.test(link)) return link
+    if (
+      link &&
+      !link.startsWith('http://') &&
+      !link.startsWith('https://') &&
+      !link.startsWith('mailto:')
+    ) {
+      return `http://${link}`
+    }
+
+    return link
+  }
+
+  function addImage(
+    src: string,
+    height: string | number,
+    width: string | number,
+    link: string
+  ): void {
+    const entityData = { src, height, width, link: formatLink(link) }
+    const entityKey = editorState
+      .getCurrentContent()
+      .createEntity('IMAGE', 'MUTABLE', entityData)
+      .getLastCreatedEntityKey()
+    const updated = AtomicBlockUtils.insertAtomicBlock(
+      editorState,
+      entityKey,
+      ' '
+    )
+
+    setEditorState(updated)
+    doCollapse()
+  }
+
   return (
     <div className={styles.imageControl}>
       <div
@@ -89,7 +140,7 @@ export const ImageControl = (props: ImageControlProps) => {
       >
         <i className="bx bx-image"></i>
       </div>
-      {expanded && <ImageForm onChange={onChange} />}
+      {expanded && <ImageForm onChange={addImage} />}
     </div>
   )
 }
