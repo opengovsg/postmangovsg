@@ -61,7 +61,7 @@ const createCampaign = async ({ isDemo }: { isDemo: boolean }) =>
     demoMessageLimit: isDemo ? 20 : null,
   })
 
-describe('POST /credentials', () => {
+describe('POST /campaign/{campaignId}/telegram/credentials', () => {
   test('Non-Demo campaign should not be able to use demo credentials', async () => {
     const nonDemoCampaign = await createCampaign({ isDemo: false })
 
