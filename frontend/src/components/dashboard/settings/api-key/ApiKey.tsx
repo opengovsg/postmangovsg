@@ -1,5 +1,10 @@
-import React, { useState, useRef, useContext, useEffect } from 'react'
 import cx from 'classnames'
+
+import { useState, useRef, useContext, useEffect } from 'react'
+
+import type { FunctionComponent } from 'react'
+
+import styles from './ApiKey.module.scss'
 
 import {
   TextInputWithButton,
@@ -7,9 +12,8 @@ import {
   StepHeader,
 } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
-import { regenerateApiKey } from 'services/settings.service'
 
-import styles from './ApiKey.module.scss'
+import { regenerateApiKey } from 'services/settings.service'
 
 const RESET_COPY_TIMEOUT = 1000
 
@@ -25,10 +29,7 @@ enum ApiKeyState {
   REGENERATE = 'REGENERATE',
 }
 
-const ApiKey: React.FunctionComponent<ApiKeyProps> = ({
-  hasApiKey,
-  onGenerate,
-}) => {
+const ApiKey: FunctionComponent<ApiKeyProps> = ({ hasApiKey, onGenerate }) => {
   const [apiKey, setApiKey] = useState('')
   const [errorMsg, setErrorMsg] = useState(null)
   const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(

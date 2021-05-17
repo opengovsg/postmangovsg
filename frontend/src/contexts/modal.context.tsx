@@ -1,8 +1,9 @@
-import React, { createContext, useState } from 'react'
-import Modal from 'components/common/modal'
-import BodyWrapper from 'components/common/body-wrapper'
+import { createContext, useState } from 'react'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { ReactNode, Dispatch, SetStateAction } from 'react'
+
+import BodyWrapper from 'components/common/body-wrapper'
+import Modal from 'components/common/modal'
 
 const defaultValue = {
   modalContent: null as any,
@@ -18,8 +19,8 @@ const ModalContextProvider = ({
   initialModalContent = null,
   children,
 }: {
-  initialModalContent?: React.ReactNode
-  children?: React.ReactNode
+  initialModalContent?: ReactNode
+  children?: ReactNode
 }) => {
   const [modalContent, setModalContent] = useState(initialModalContent)
   const [modalTitle, setModalTitle] = useState('')

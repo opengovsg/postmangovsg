@@ -1,6 +1,7 @@
-import React from 'react'
-import type { Dispatch, SetStateAction } from 'react'
 import cx from 'classnames'
+import type { Dispatch, SetStateAction } from 'react'
+
+import type { ReactNode } from 'react'
 
 import styles from './Checkbox.module.scss'
 
@@ -13,7 +14,7 @@ const Checkbox = ({
   checked: boolean
   onChange: Dispatch<SetStateAction<boolean>>
   className?: string
-  children?: React.ReactNode
+  children?: ReactNode
 }) => {
   return (
     <div

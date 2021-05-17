@@ -1,15 +1,18 @@
-import React, {
+import {
   useContext,
   useState,
   useEffect,
   Dispatch,
   SetStateAction,
 } from 'react'
+
 import { useParams } from 'react-router-dom'
 
-import { CampaignContext } from 'contexts/campaign.context'
+import styles from '../Create.module.scss'
+
+import { confirmSendCampaign } from '../util'
+
 import { ChannelType, EmailProgress } from 'classes'
-import { ModalContext } from 'contexts/modal.context'
 import {
   EmailPreviewBlock,
   PrimaryButton,
@@ -19,9 +22,10 @@ import {
   StepHeader,
   StepSection,
 } from 'components/common'
+import { CampaignContext } from 'contexts/campaign.context'
+import { ModalContext } from 'contexts/modal.context'
+
 import { getPreviewMessage } from 'services/email.service'
-import { confirmSendCampaign } from '../util'
-import styles from '../Create.module.scss'
 
 const EmailSend = ({
   setActiveStep,

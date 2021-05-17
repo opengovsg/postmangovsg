@@ -1,13 +1,20 @@
-import React, {
+import {
   useState,
   useEffect,
   useContext,
   Dispatch,
   SetStateAction,
 } from 'react'
+
 import { useParams } from 'react-router-dom'
+
 import isEmail from 'validator/lib/isEmail'
 
+import styles from '../Create.module.scss'
+
+import EmailRecipients from './EmailRecipients'
+
+import { EmailCampaign, EmailProgress } from 'classes'
 import {
   PrimaryButton,
   TextButton,
@@ -20,14 +27,12 @@ import {
   StepSection,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 import { CampaignContext } from 'contexts/campaign.context'
-import EmailRecipients from './EmailRecipients'
-import { EmailCampaign, EmailProgress } from 'classes'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+
 import { sendTiming } from 'services/ga.service'
-import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 import { protectAndUploadCsv } from 'services/protect-csv.service'
-import styles from '../Create.module.scss'
+import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 
 enum ProtectPhase {
   READY,

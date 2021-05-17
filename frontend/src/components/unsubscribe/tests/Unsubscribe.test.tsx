@@ -1,8 +1,9 @@
-import React from 'react'
-import { render, mockCommonApis, server, screen } from 'test-utils'
-import Unsubscribe from '../Unsubscribe'
 import userEvent from '@testing-library/user-event'
 import { Route } from 'react-router-dom'
+
+import Unsubscribe from '../Unsubscribe'
+
+import { render, mockCommonApis, server, screen } from 'test-utils'
 
 function mockApis() {
   const { handlers } = mockCommonApis({

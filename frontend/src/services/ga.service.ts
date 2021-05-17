@@ -1,4 +1,5 @@
 import ReactGA from 'react-ga'
+
 import { GA_TRACKING_ID, GA_INITIALIZE_OPTIONS } from 'config'
 
 export const GA_USER_EVENTS = {

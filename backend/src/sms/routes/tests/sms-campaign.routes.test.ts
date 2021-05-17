@@ -30,6 +30,7 @@ afterEach(async () => {
 })
 
 afterAll(async () => {
+  await SmsMessage.destroy({ where: {} })
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
@@ -122,6 +123,65 @@ describe('PUT /campaign/{id}/sms/template', () => {
       message:
         'Message template is invalid as it only contains invalid HTML tags!',
     })
+  })
+
+  test('Template with only invalid HTML tags is not accepted', async () => {
+    const testBody = await request(app)
+      .put(`/campaign/${campaignId}/sms/template`)
+      .send({
+        body: '<img></img>',
+      })
+
+    expect(testBody.status).toBe(400)
+    expect(testBody.body).toEqual({
+      message:
+        'Message template is invalid as it only contains invalid HTML tags!',
+    })
+  })
+
+  test('Existing populated messages are removed when template has new variables', async () => {
+    await SmsMessage.create({
+      campaignId,
+      recipient: 'user@agency.gov.sg',
+      params: { recipient: 'user@agency.gov.sg' },
+    })
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/sms/template`)
+      .send({
+        body: 'test {{name}}',
+      })
+
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message:
+          'Please re-upload your recipient list as template has changed.',
+        template: expect.objectContaining({
+          params: ['name'],
+        }),
+      })
+    )
+
+    const smsMessages = await SmsMessage.count({
+      where: { campaignId },
+    })
+    expect(smsMessages).toEqual(0)
+  })
+
+  test('Successfully update template', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/sms/template`)
+      .send({
+        body: 'test {{name}}',
+      })
+
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        template: { body: 'test {{name}}', params: ['name'] },
+      })
+    )
   })
 })
 
