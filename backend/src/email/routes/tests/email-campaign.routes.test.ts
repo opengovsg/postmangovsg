@@ -308,4 +308,33 @@ describe('POST /campaign/{id}/email/protect/upload/complete', () => {
     mockCompleteMultipartUpload.mockRestore()
     mockExtractParamsFromJwt.mockRestore()
   })
+
+  test('Successfully starts recipient list processing', async () => {
+    await EmailTemplate.create({
+      campaignId: protectedCampaignId,
+      params: { variable1: 'abc' },
+      subject: 'test',
+      body: 'test {{protectedlink}}',
+    })
+
+    const mockCompleteMultipartUpload = jest
+      .spyOn(MultipartUploadService, 'completeMultipartUpload')
+      .mockReturnValue(Promise.resolve({ s3Key: 'key', etag: '123' }))
+    const mockExtractParamsFromJwt = jest
+      .spyOn(UploadService, 'extractParamsFromJwt')
+      .mockReturnValue({ s3Key: 'key' })
+
+    const res = await request(app)
+      .post(`/campaign/${protectedCampaignId}/email/protect/upload/complete`)
+      .send({
+        transaction_id: '123',
+        filename: 'abc',
+        part_count: 2,
+        etags: ['123', '345'],
+      })
+
+    expect(res.status).toEqual(202)
+    mockCompleteMultipartUpload.mockRestore()
+    mockExtractParamsFromJwt.mockRestore()
+  })
 })
