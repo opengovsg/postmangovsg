@@ -217,7 +217,7 @@ const EmailTemplate = ({
             value={fromName}
             onChange={setFromName}
             aria-label="Sender name"
-            placeholder={t`E.g. MOH Appointment`}
+            placeholder={t`E.g. Ministry of Health`}
           />
           <Dropdown
             onSelect={handleSelectFromAddress}

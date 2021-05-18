@@ -22,8 +22,12 @@ msgid "Delivery report will expire 14 days after sending is completed."
 msgstr "Delivery report will expire 14 days after sending is completed."
 
 #: components/dashboard/create/email/EmailTemplate.tsx:148
-msgid "E.g. MOH Appointment"
-msgstr "E.g. MOH Appointment"
+#~ msgid "E.g. MOH Appointment"
+#~ msgstr "E.g. MOH Appointment"
+
+#: components/dashboard/create/email/EmailTemplate.tsx:148
+msgid "E.g. Ministry of Health"
+msgstr "E.g. Ministry of Health"
 
 #: components/login/login-input/LoginInput.tsx:88
 msgid "Enter OTP"
