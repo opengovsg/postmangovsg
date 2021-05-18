@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
-import { Campaign, User } from '@core/models'
+import { Campaign, Credential, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
@@ -20,6 +20,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await TelegramMessage.destroy({ where: {} })
   await Campaign.destroy({ where: {} })
+  await Credential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
   RedisService.otpClient.quit()
@@ -32,9 +33,10 @@ afterEach(async () => {
 
 // Setup spy method (for Mock) getSecretValue that always returns TELEGRAM_SECRET_VALUE
 const TELEGRAM_SECRET_VALUE = {
-  SecretString: 'TEST_TELEGRAM_API_TOKEN',
+  SecretString: '12345:TEST_TELEGRAM_API_TOKEN',
 }
 const mockGetSecretValue = jest.fn((_) => TELEGRAM_SECRET_VALUE)
+const mockCreateSecret = jest.fn()
 
 // Setup Mock AWS SecretsManager
 jest.mock('aws-sdk', () => {
@@ -45,6 +47,24 @@ jest.mock('aws-sdk', () => {
         getSecretValue: ({ SecretId }: { SecretId: string }) => ({
           promise: () => mockGetSecretValue(SecretId),
         }),
+        createSecret: () => ({
+          promise: () => mockCreateSecret(),
+        }),
+      }
+    },
+  }
+})
+
+const mockGetMe = jest.fn()
+
+jest.mock('telegraf', () => {
+  return {
+    ...jest.requireActual('telegraf'),
+    Telegram: function () {
+      return {
+        getMe: mockGetMe,
+        setWebhook: jest.fn().mockResolvedValue(true),
+        setMyCommands: jest.fn().mockResolvedValue(true),
       }
     },
   }
@@ -113,6 +133,82 @@ describe('POST /campaign/{campaignId}/telegram/credentials', () => {
     expect(mockGetSecretValue).toHaveBeenCalledWith(
       formatDefaultCredentialName(DefaultCredentialName.Telegram)
     )
+  })
+})
+
+describe('POST /campaign/{campaignId}/telegram/new-credentials', () => {
+  test('Demo Campaign should not be able to create custom credential', async () => {
+    const demoCampaign = await createCampaign({ isDemo: true })
+
+    const FAKE_API_TOKEN = 'Some API Token'
+
+    const res = await request(app)
+      .post(`/campaign/${demoCampaign.id}/telegram/new-credentials`)
+      .send({
+        telegram_bot_token: FAKE_API_TOKEN,
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message: `Action disabled for demo campaign`,
+    })
+
+    expect(mockCreateSecret).not.toHaveBeenCalled()
+  })
+
+  test('User should not be able to add custom credential using invalid Telegram API key', async () => {
+    const nonDemoCampaign = await createCampaign({ isDemo: false })
+
+    const INVALID_API_TOKEN = 'Some Invalid API Token'
+
+    // Mock Telegram API to return 404 error (invalid token)
+    const TELEGRAM_ERROR_STRING = '404: Not Found'
+    mockGetMe.mockImplementation(() => {
+      throw Error(TELEGRAM_ERROR_STRING)
+    })
+
+    const res = await request(app)
+      .post(`/campaign/${nonDemoCampaign.id}/telegram/new-credentials`)
+      .send({
+        telegram_bot_token: INVALID_API_TOKEN,
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message: `Error: Invalid token. ${TELEGRAM_ERROR_STRING}`,
+    })
+
+    expect(mockCreateSecret).not.toHaveBeenCalled()
+  })
+
+  test('User should be able to add custom credential using valid Telegram API key', async () => {
+    const nonDemoCampaign = await createCampaign({ isDemo: false })
+
+    const VALID_API_TOKEN = '12345:Some Valid API Token'
+
+    // Mock Telegram API to return a bot with user id 12345
+    mockGetMe.mockResolvedValue({
+      id: 12345,
+      is_bot: true,
+    })
+
+    const res = await request(app)
+      .post(`/campaign/${nonDemoCampaign.id}/telegram/new-credentials`)
+      .send({
+        telegram_bot_token: VALID_API_TOKEN,
+      })
+
+    expect(res.status).toBe(200)
+
+    expect(mockCreateSecret).toHaveBeenCalled()
+
+    // Ensure credential was added into DB
+    const dbCredential = Credential.findOne({
+      where: {
+        name: '12345',
+      },
+    })
+    expect(dbCredential).not.toBe(null)
   })
 })
 
