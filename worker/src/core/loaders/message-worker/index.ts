@@ -1,4 +1,3 @@
-import { expose } from 'threads/worker'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
@@ -20,6 +19,7 @@ let connection: Sequelize,
   email: Email,
   sms: SMS,
   telegram: Telegram
+let shouldRun = false
 
 /**
  *  Different channel types operate on their own channel type tables.
@@ -156,26 +156,36 @@ const enqueueAndSend = async (): Promise<void> => {
   if (jobId && rate && credName && campaignId) {
     await service().setSendingService(credName)
     await enqueueMessages(jobId, campaignId)
+
     let hasNext = true
-    while (hasNext) {
+    while (hasNext && shouldRun) {
       const messages = await getMessages(jobId, rate)
       if (!messages[0]) {
         hasNext = false
       } else {
-        const start = Date.now()
-        await Promise.all(messages.map((m) => sendMessage(m)))
-        // Make sure at least 1 second has elapsed
-        const wait = Math.max(0, 1000 - (Date.now() - start))
-        await waitForMs(wait)
         logger.info({
           message: 'Sending messages',
           workerId,
           jobId,
           rate,
           numMessages: messages.length,
-          wait,
           action: 'enqueueAndSend',
         })
+
+        const start = Date.now()
+        await Promise.all(messages.map((m) => sendMessage(m)))
+        // Make sure at least 1 second has elapsed
+        const wait = Math.max(0, 1000 - (Date.now() - start))
+        await waitForMs(wait)
+
+        if (!shouldRun) {
+          logger.info({
+            message: 'Stopping send early due to worker shutdown',
+            action: 'enqueueAndSend',
+            workerId,
+            jobId,
+          })
+        }
       }
     }
     await service().destroySendingService()
@@ -203,22 +213,25 @@ const createAndResumeWorker = (): Promise<void> => {
     })
 }
 
-const init = async (index: string, isLogger = false): Promise<any> => {
+const start = async (index: string, isLogger = false): Promise<any> => {
   await ECSUtil.load()
   workerId = ECSUtil.getWorkerId(index)
   connection = createConnection()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
   telegram = new Telegram(workerId, connection)
+
   try {
+    shouldRun = true
+
     if (!isLogger) {
       await createAndResumeWorker()
-      for (;;) {
+      while (shouldRun) {
         await enqueueAndSend()
         await waitForMs(2000)
       }
     } else {
-      for (;;) {
+      while (shouldRun) {
         await finalize()
         await waitForMs(2000)
       }
@@ -228,11 +241,17 @@ const init = async (index: string, isLogger = false): Promise<any> => {
   }
 }
 
-const messageWorker = {
-  init,
+const shutdown = (): void => {
+  logger.info({
+    message: 'Shutdown signal recieved. Attempting to gracefully shutdown.',
+    action: 'shutdown',
+    workerId,
+  })
+  shouldRun = false
 }
 
-expose(messageWorker)
-
-export type MessageWorker = typeof messageWorker
-export default MessageWorker
+const worker = {
+  start,
+  shutdown,
+}
+export default worker
