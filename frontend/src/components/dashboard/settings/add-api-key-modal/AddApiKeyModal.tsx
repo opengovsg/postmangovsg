@@ -1,6 +1,6 @@
-import React from 'react'
-import ApiKey from 'components/dashboard/settings/api-key'
 import styles from './AddApiKeyModal.module.scss'
+
+import ApiKey from 'components/dashboard/settings/api-key'
 
 const AddApiKeyModal = ({ onSuccess }: { onSuccess: () => void }) => {
   return (

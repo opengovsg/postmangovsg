@@ -1,17 +1,19 @@
 import cx from 'classnames'
-import React, { useState, useEffect, useContext } from 'react'
 
-import { CampaignContext } from 'contexts/campaign.context'
-import { EmailCampaign, EmailProgress, Status } from 'classes'
-import { ProgressPane } from 'components/common'
-import EmailTemplate from './EmailTemplate'
-import EmailRecipients from './EmailRecipients'
-import ProtectedEmailRecipients from './ProtectedEmailRecipients'
-import EmailSend from './EmailSend'
-import EmailDetail from './EmailDetail'
-import EmailCredentials from './EmailCredentials'
+import { useState, useEffect, useContext } from 'react'
 
 import styles from '../Create.module.scss'
+
+import EmailCredentials from './EmailCredentials'
+import EmailDetail from './EmailDetail'
+import EmailRecipients from './EmailRecipients'
+import EmailSend from './EmailSend'
+import EmailTemplate from './EmailTemplate'
+import ProtectedEmailRecipients from './ProtectedEmailRecipients'
+
+import { EmailCampaign, EmailProgress, Status } from 'classes'
+import { ProgressPane } from 'components/common'
+import { CampaignContext } from 'contexts/campaign.context'
 
 const EMAIL_PROGRESS_STEPS = [
   'Create message',

@@ -1,9 +1,9 @@
-import React from 'react'
 import { useHistory } from 'react-router-dom'
-import { PrimaryButton, TextButton } from 'components/common'
+
+import styles from './Error.module.scss'
 
 import heroImg from 'assets/img/not-found.png'
-import styles from './Error.module.scss'
+import { PrimaryButton, TextButton } from 'components/common'
 
 const Error = () => {
   const history = useHistory()

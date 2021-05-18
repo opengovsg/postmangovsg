@@ -1,5 +1,6 @@
-import React from 'react'
 import cx from 'classnames'
+
+import type { FunctionComponent } from 'react'
 
 import styles from './BodyWrapper.module.scss'
 
@@ -11,7 +12,7 @@ interface BodyWrapperProps {
   wrap?: boolean
 }
 
-const BodyWrapper: React.FunctionComponent<BodyWrapperProps> = ({
+const BodyWrapper: FunctionComponent<BodyWrapperProps> = ({
   wrap,
   children,
 }) => <div className={cx(styles.base, { [styles.wrap]: wrap })}>{children}</div>

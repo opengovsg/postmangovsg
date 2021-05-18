@@ -1,20 +1,20 @@
-import React, {
+import { i18n } from '@lingui/core'
+
+import {
   useState,
   useEffect,
   useContext,
   Dispatch,
   SetStateAction,
 } from 'react'
-import { useParams } from 'react-router-dom'
+
 import { OutboundLink } from 'react-ga'
 
-import { CampaignContext } from 'contexts/campaign.context'
-import {
-  uploadFileToS3,
-  deleteCsvStatus,
-  getCsvStatus,
-  CsvStatusResponse,
-} from 'services/upload.service'
+import { useParams } from 'react-router-dom'
+
+import styles from '../Create.module.scss'
+
+import { EmailPreview, EmailProgress } from 'classes'
 import {
   FileInput,
   CsvUpload,
@@ -28,13 +28,17 @@ import {
   StepSection,
   WarningBlock,
 } from 'components/common'
-import { LINKS } from 'config'
-import { i18n } from '@lingui/core'
-import { EmailPreview, EmailProgress } from 'classes'
-import { sendTiming } from 'services/ga.service'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { LINKS } from 'config'
+import { CampaignContext } from 'contexts/campaign.context'
 
-import styles from '../Create.module.scss'
+import { sendTiming } from 'services/ga.service'
+import {
+  uploadFileToS3,
+  deleteCsvStatus,
+  getCsvStatus,
+  CsvStatusResponse,
+} from 'services/upload.service'
 
 const EmailRecipients = ({
   setActiveStep,
