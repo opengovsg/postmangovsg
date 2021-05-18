@@ -39,7 +39,6 @@
     "sequelize-typescript": "^1.1.0",
     "source-map-support": "^0.5.19",
     "telegraf": "^3.38.0",
-    "tiny-worker": "^2.3.0",
     "twilio": "^3.58.0",
     "winston": "^3.3.3"
   },
