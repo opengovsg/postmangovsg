@@ -1,4 +1,3 @@
-import React, { useRef, useState, useContext } from 'react'
 import {
   ContentBlock,
   ContentState,
@@ -6,9 +5,9 @@ import {
   SelectionState,
   Modifier,
 } from 'draft-js'
+import { useRef, useState, useContext } from 'react'
 
 import { EditorContext } from '../RichTextEditor'
-import styles from '../RichTextEditor.module.scss'
 
 export const ImageBlock = ({
   block,
@@ -24,7 +23,7 @@ export const ImageBlock = ({
   const imageRef = useRef<HTMLImageElement>(null)
   const [showPopover, setShowPopover] = useState(false)
   const entity = contentState.getEntity(block.getEntityAt(0))
-  const { src, width, height } = entity.getData()
+  const { src, width, height, link } = entity.getData()
 
   function hidePopover() {
     // Do not setState if link is already removed
@@ -100,8 +99,18 @@ export const ImageBlock = ({
     }
   }
 
+  function renderPreviewImage() {
+    return link ? (
+      <a href={link} target="_blank" rel="noopener noreferrer">
+        <img ref={imageRef} src={src} width={width} height={height} alt="" />
+      </a>
+    ) : (
+      <img ref={imageRef} src={src} width={width} height={height} alt="" />
+    )
+  }
+
   return readOnly ? (
-    <img ref={imageRef} src={src} width={width} height={height} alt="" />
+    renderPreviewImage()
   ) : (
     <span>
       <img
@@ -113,14 +122,22 @@ export const ImageBlock = ({
         alt=""
       />
       {showPopover && (
-        <div contentEditable={false} className={styles.popover}>
+        <div contentEditable={false} className="popover">
           <button onClick={getUpdateWidth(50)}>50%</button>
-          <span className={styles.divider}></span>
+          <span className="divider"></span>
           <button onClick={getUpdateWidth(75)}>75%</button>
-          <span className={styles.divider}></span>
+          <span className="divider"></span>
           <button onClick={getUpdateWidth(100)}>100%</button>
-          <span className={styles.divider}></span>
+          <span className="divider"></span>
           <button onClick={handleRemove}>Remove</button>
+          {link && (
+            <>
+              <span className="divider"></span>
+              <a href={link} target="_blank" rel="noopener noreferrer">
+                Link <i className="bx bx-link"></i>
+              </a>
+            </>
+          )}
         </div>
       )}
     </span>

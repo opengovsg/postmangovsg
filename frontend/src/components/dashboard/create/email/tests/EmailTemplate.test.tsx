@@ -1,4 +1,11 @@
-import React from 'react'
+import userEvent from '@testing-library/user-event'
+
+import { Route } from 'react-router-dom'
+
+import EmailTemplate from '../EmailTemplate'
+
+import CampaignContextProvider from 'contexts/campaign.context'
+import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import {
   Campaign,
   screen,
@@ -7,11 +14,6 @@ import {
   render,
   fireEvent,
 } from 'test-utils'
-import CampaignContextProvider from 'contexts/campaign.context'
-import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
-import userEvent from '@testing-library/user-event'
-import { Route } from 'react-router-dom'
-import EmailTemplate from '../EmailTemplate'
 
 function mockApis(protect: boolean) {
   const campaign: Campaign = {

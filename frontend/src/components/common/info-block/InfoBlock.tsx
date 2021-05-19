@@ -1,7 +1,10 @@
-import React from 'react'
 import cx from 'classnames'
-import styles from './InfoBlock.module.scss'
+
+import type { ReactNode } from 'react'
+
 import MessageBlock from '../message-block'
+
+import styles from './InfoBlock.module.scss'
 
 const InfoBlock = ({
   className,
@@ -12,7 +15,7 @@ const InfoBlock = ({
   ...otherProps
 }: {
   className?: string
-  children?: React.ReactNode
+  children?: ReactNode
   absolute?: boolean
   onClose?: () => void
   title?: string

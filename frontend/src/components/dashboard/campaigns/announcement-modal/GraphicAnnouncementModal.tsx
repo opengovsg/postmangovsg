@@ -1,8 +1,6 @@
-import React from 'react'
-
-import styles from './GraphicAnnouncementModal.module.scss'
-import AnnouncementModalOptions from './AnnouncementModalOptions'
 import { AnnouncementModalProps } from './AnnouncementModal'
+import AnnouncementModalOptions from './AnnouncementModalOptions'
+import styles from './GraphicAnnouncementModal.module.scss'
 
 const GraphicAnnouncementModal = ({
   title,
