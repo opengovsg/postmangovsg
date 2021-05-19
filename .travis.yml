@@ -77,6 +77,7 @@ jobs:
       script:
         - npm run lint-no-fix
       before_deploy:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - cd $TRAVIS_BUILD_DIR/worker && ./before-deploy.sh
       deploy:
         - provider: script
