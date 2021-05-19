@@ -288,7 +288,7 @@ const config = convict({
   },
   mailVia: {
     doc: 'Text to appended to custom sender name',
-    default: 'via Government Mail',
+    default: 'via Postman',
     env: 'BACKEND_MAIL_VIA',
   },
   mailDefaultRate: {
