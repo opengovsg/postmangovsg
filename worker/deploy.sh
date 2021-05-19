@@ -24,5 +24,6 @@ docker build -t $TAG .
 docker push $TAG
 
 # Update ECS
-./ecs-deploy -c $CLUSTER -n $SENDING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 300
-./ecs-deploy -c $CLUSTER -n $LOGGING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 300
+./ecs-deploy -c $CLUSTER -n $SENDING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 300 &
+./ecs-deploy -c $CLUSTER -n $LOGGING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 300 &
+wait
