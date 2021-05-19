@@ -1,4 +1,11 @@
 #!/bin/bash
+# Exit on failure of any command
+set -e
+# Keep track of the last executed command
+trap 'LAST_COMMAND=$CURRENT_COMMAND; CURRENT_COMMAND=$BASH_COMMAND' DEBUG
+# Echo an error message before exiting
+trap 'echo "\"${LAST_COMMAND}\" command failed with exit code $?."' EXIT
+
 CLUSTER=$1
 SENDING_SERVICE=$2
 LOGGING_SERVICE=$3
