@@ -4,7 +4,7 @@ set -e
 # Keep track of the last executed command
 trap 'LAST_COMMAND=$CURRENT_COMMAND; CURRENT_COMMAND=$BASH_COMMAND' DEBUG
 # Echo an error message before exiting
-trap 'echo "\"${LAST_COMMAND}\" command failed with exit code $?."' EXIT
+trap 'echo "\"${LAST_COMMAND}\" command failed with exit code $?."' ERR
 
 CLUSTER=$1
 SENDING_SERVICE=$2
