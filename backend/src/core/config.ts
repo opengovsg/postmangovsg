@@ -494,6 +494,32 @@ const config = convict({
     default: '.gov.sg',
     env: 'SHOW_MASTHEAD_DOMAIN',
   },
+  upload: {
+    redisUri: {
+      doc: 'URI to the redis database for recipient list upload job queue',
+      default: '',
+      env: 'UPLOAD_REDIS_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
+    queueName: {
+      doc: 'Name of queue used to store upload jobs',
+      default: 'uploads',
+      env: 'UPLOAD_QUEUE_NAME',
+    },
+    concurrency: {
+      doc: 'Maxmium number of simultaenous active jobs',
+      default: 3,
+      env: 'UPLOAD_CONCURRENCY',
+      format: Number,
+    },
+    checkStalledInterval: {
+      doc: 'How often to check for stalled jobs in milliseconds',
+      default: 5000,
+      env: 'UPLOAD_CHECK_STALLED_INTERVAL',
+      format: Number,
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
