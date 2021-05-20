@@ -1,7 +1,10 @@
 import { difference, keys } from 'lodash'
 
 import config from '@core/config'
+import { ChannelType } from '@core/constants'
 import { isSuperSet } from '@core/utils'
+import { UploadService } from '@core/services'
+import { UploadData } from '@core/interfaces'
 import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
 import { PhoneNumberService } from '@core/services'
@@ -12,6 +15,7 @@ import {
 } from '@shared/templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
+import { TelegramService } from '@telegram/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 const client = new TemplateClient({
@@ -227,10 +231,32 @@ const testHydration = (
   client.template(templateBody, firstRecord.params)
 }
 
+/**
+ * Enqueue a new Telegram recipient list upload
+ * @param uploadData
+ */
+const enqueueUpload = (data: UploadData<TelegramTemplate>): Promise<string> => {
+  return UploadService.enqueueUpload({
+    channelType: ChannelType.Telegram,
+    data,
+  })
+}
+
+/**
+ * Process a Telegram campaign recipient list upload
+ * @param uploadData
+ */
+const processUpload = UploadService.processUpload<TelegramTemplate>(
+  TelegramService.uploadCompleteOnPreview,
+  TelegramService.uploadCompleteOnChunk
+)
+
 export const TelegramTemplateService = {
   storeTemplate,
   getFilledTemplate,
   validateAndFormatNumber,
   testHydration,
   client,
+  enqueueUpload,
+  processUpload,
 }
