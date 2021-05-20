@@ -51,22 +51,8 @@ const initUploadQueue = async (): Promise<void> => {
     }
   )
 
-  uploadQueue.on(QueueEvent.FAILED, async (id, err) => {
-    const { data } = await UploadService.getUpload(id)
-    logger.error({
-      message: `Processing for campaign ${data.campaignId} recipient list failed`,
-      error: err,
-      ...data,
-    })
-  })
-
-  uploadQueue.on(QueueEvent.STALLED, async (id) => {
-    const { data } = await UploadService.getUpload(id)
-    logger.info({
-      message: `Upload for campaign ${data.campaignId} stalled and will be reprocessed`,
-      ...data,
-    })
-  })
+  uploadQueue.on(QueueEvent.FAILED, UploadService.handleFailedUpload)
+  uploadQueue.on(QueueEvent.STALLED, UploadService.handleStalledUpload)
 
   uploadQueue.checkStalledJobs(
     config.get('upload.checkStalledInterval'),

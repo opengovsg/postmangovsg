@@ -250,7 +250,6 @@ const getUploadQueue = async (): Promise<Queue<Upload>> => {
     uploadQueue = new Queue<Upload>(config.get('upload.queueName'), {
       redis: config.get('upload.redisUri'),
       removeOnSuccess: true,
-      removeOnFailure: true,
     })
     await uploadQueue.ready()
   }
@@ -279,6 +278,7 @@ const enqueueUpload = async (upload: Upload): Promise<string> => {
 const getUpload = async (id: string): Promise<Upload> => {
   const queue = await getUploadQueue()
   const job = await queue.getJob(id)
+  if (!job) throw new Error(`Unable to find upload ${id}`)
   return job.data
 }
 
@@ -335,26 +335,58 @@ const processUpload = <Template extends AllowedTemplateTypes>(
         })
       }, RETRY_CONFIG)
     } catch (err) {
-      // Do not return any response since it has already been sent
-      logger.error({
-        message: 'Error storing messages for campaign',
-        s3Key,
-        error: err,
-        campaignId,
-        action: 'processUpload',
-      })
-
       // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
       if (err.code === 'PreconditionFailed') {
         err.message =
           'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
       }
 
-      // Store error to return on poll
-      storeS3Error(+campaignId, err.message)
       throw err
     }
   }
+}
+
+/**
+ * Stores error message in s3_object on failed upload
+ * @param id - ID of failed upload job
+ * @param uploadError
+ */
+const handleFailedUpload = async (
+  id: string,
+  uploadError: Error
+): Promise<void> => {
+  const queue = await getUploadQueue()
+
+  try {
+    const { data } = await getUpload(id)
+    const { campaignId } = data
+    await storeS3Error(+campaignId, uploadError.message)
+    logger.error({
+      message: `Processing for campaign ${data.campaignId} recipient list failed`,
+      error: uploadError,
+      ...data,
+    })
+  } catch (err) {
+    logger.error({
+      message: 'Error occured while handling upload failure',
+      error: err,
+    })
+  } finally {
+    // Always remove the job after handling its error
+    await queue.removeJob(id)
+  }
+}
+
+/**
+ * Handle stalled upload jobs
+ * @param id - ID of stalled upload job
+ */
+const handleStalledUpload = async (id: string): Promise<void> => {
+  const { data } = await getUpload(id)
+  logger.info({
+    message: `Upload for campaign ${data.campaignId} stalled and will be reprocessed`,
+    ...data,
+  })
 }
 
 export const UploadService = {
@@ -372,4 +404,6 @@ export const UploadService = {
   enqueueUpload,
   getUpload,
   processUpload,
+  handleFailedUpload,
+  handleStalledUpload,
 }
