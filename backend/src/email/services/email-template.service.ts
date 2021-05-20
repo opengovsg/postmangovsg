@@ -1,7 +1,10 @@
 import { difference, keys } from 'lodash'
 
+import { ChannelType } from '@core/constants'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
+import { UploadService } from '@core/services'
+import { UploadData } from '@core/interfaces'
 import { Campaign, Statistic } from '@core/models'
 import {
   TemplateClient,
@@ -10,6 +13,7 @@ import {
 } from 'postman-templating'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailService } from '@email/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
@@ -238,9 +242,45 @@ const testHydration = (
   client.template(templateSubject, firstRecord.params)
 }
 
+/**
+ * Enqueue a new email recipient list upload
+ * @param uploadData
+ */
+const enqueueUpload = (
+  uploadData: UploadData<EmailTemplate>,
+  protect?: boolean
+): Promise<string> => {
+  return UploadService.enqueueUpload({
+    channelType: ChannelType.Email,
+    protect,
+    data: uploadData,
+  })
+}
+
+/**
+ * Process an email campaign recipient list upload
+ * @param uploadData
+ */
+const processUpload = UploadService.processUpload<EmailTemplate>(
+  EmailService.uploadCompleteOnPreview,
+  EmailService.uploadCompleteOnChunk
+)
+
+/**
+ * Process a protected email campaign recipient list upload
+ * @param uploadData
+ */
+const processProtectedUpload = UploadService.processUpload<EmailTemplate>(
+  EmailService.uploadProtectedCompleteOnPreview,
+  EmailService.uploadProtectedCompleteOnChunk
+)
+
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   testHydration,
+  enqueueUpload,
+  processUpload,
+  processProtectedUpload,
   client,
 }
