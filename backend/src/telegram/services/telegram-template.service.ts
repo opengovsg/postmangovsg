@@ -246,10 +246,13 @@ const enqueueUpload = (data: UploadData<TelegramTemplate>): Promise<string> => {
  * Process a Telegram campaign recipient list upload
  * @param uploadData
  */
-const processUpload = UploadService.processUpload<TelegramTemplate>(
-  TelegramService.uploadCompleteOnPreview,
-  TelegramService.uploadCompleteOnChunk
-)
+const processUpload = (
+  uploadData: UploadData<TelegramTemplate>
+): Promise<void> =>
+  UploadService.processUpload<TelegramTemplate>(
+    TelegramService.uploadCompleteOnPreview,
+    TelegramService.uploadCompleteOnChunk
+  )(uploadData)
 
 export const TelegramTemplateService = {
   storeTemplate,
