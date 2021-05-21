@@ -34,6 +34,7 @@ afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
+  await UploadService.destroyUploadQueue()
   RedisService.otpClient.quit()
   RedisService.sessionClient.quit()
 })

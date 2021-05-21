@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Campaign, User, UserDemo } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
+import { RedisService, UploadService } from '@core/services'
 import { ChannelType } from '@core/constants'
 
 const app = initialiseServer(true)
@@ -21,6 +21,7 @@ afterEach(async () => {
 afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
+  await UploadService.destroyUploadQueue()
   RedisService.otpClient.quit()
   RedisService.sessionClient.quit()
 })

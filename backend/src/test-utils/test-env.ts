@@ -5,3 +5,4 @@ process.env.SENDGRID_PUBLIC_KEY =
 process.env.SESSION_SECRET = 'SESSIONSECRET'
 process.env.DB_URI = 'postgres://localhost:5432/postmangovsg_test'
 process.env.BACKEND_SES_FROM = 'Postman <donotreply@mail.postman.gov.sg>'
+process.env.UPLOAD_REDIS_URI = 'redis://localhost:6379/6'

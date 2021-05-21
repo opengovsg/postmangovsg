@@ -389,6 +389,17 @@ const handleStalledUpload = async (id: string): Promise<void> => {
   })
 }
 
+/**
+ * Remove all jobs and close upload queue
+ */
+const destroyUploadQueue = async (): Promise<void> => {
+  if (uploadQueue) {
+    // Clear all jobs
+    await uploadQueue.destroy()
+    await uploadQueue.close()
+  }
+}
+
 export const UploadService = {
   /*** S3 API Calls ****/
   getUploadParameters,
@@ -406,4 +417,5 @@ export const UploadService = {
   processUpload,
   handleFailedUpload,
   handleStalledUpload,
+  destroyUploadQueue,
 }
