@@ -261,19 +261,23 @@ const enqueueUpload = (
  * Process an email campaign recipient list upload
  * @param uploadData
  */
-const processUpload = UploadService.processUpload<EmailTemplate>(
-  EmailService.uploadCompleteOnPreview,
-  EmailService.uploadCompleteOnChunk
-)
+const processUpload = (uploadData: UploadData<EmailTemplate>): Promise<void> =>
+  UploadService.processUpload<EmailTemplate>(
+    EmailService.uploadCompleteOnPreview,
+    EmailService.uploadCompleteOnChunk
+  )(uploadData)
 
 /**
  * Process a protected email campaign recipient list upload
  * @param uploadData
  */
-const processProtectedUpload = UploadService.processUpload<EmailTemplate>(
-  EmailService.uploadProtectedCompleteOnPreview,
-  EmailService.uploadProtectedCompleteOnChunk
-)
+const processProtectedUpload = (
+  uploadData: UploadData<EmailTemplate>
+): Promise<void> =>
+  UploadService.processUpload<EmailTemplate>(
+    EmailService.uploadProtectedCompleteOnPreview,
+    EmailService.uploadProtectedCompleteOnChunk
+  )(uploadData)
 
 export const EmailTemplateService = {
   storeTemplate,

@@ -232,10 +232,11 @@ const enqueueUpload = (data: UploadData<SmsTemplate>): Promise<string> => {
  * Process a SMS campaign recipient list upload
  * @param uploadData
  */
-const processUpload = UploadService.processUpload<SmsTemplate>(
-  SmsService.uploadCompleteOnPreview,
-  SmsService.uploadCompleteOnChunk
-)
+const processUpload = (uploadData: UploadData<SmsTemplate>): Promise<void> =>
+  UploadService.processUpload<SmsTemplate>(
+    SmsService.uploadCompleteOnPreview,
+    SmsService.uploadCompleteOnChunk
+  )(uploadData)
 
 export const SmsTemplateService = {
   storeTemplate,
