@@ -508,7 +508,7 @@ const config = convict({
       env: 'UPLOAD_QUEUE_NAME',
     },
     concurrency: {
-      doc: 'Maxmium number of simultaenous active jobs',
+      doc: 'Maximum number of simultaneous active jobs',
       default: 3,
       env: 'UPLOAD_CONCURRENCY',
       format: Number,
