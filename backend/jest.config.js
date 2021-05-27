@@ -11,6 +11,7 @@ module.exports = {
     '@shared/(.*)': '<rootDir>/../shared/src/$1',
     '@mocks/(.*)': '<rootDir>/src/__mocks__/$1',
   },
+  modulePathIgnorePatterns: ['<rootDir>/build'],
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
