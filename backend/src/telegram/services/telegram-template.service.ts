@@ -12,7 +12,7 @@ import {
   TemplateClient,
   XSS_TELEGRAM_OPTION,
   TemplateError,
-} from 'postman-templating'
+} from '@shared/templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { TelegramService } from '@telegram/services'

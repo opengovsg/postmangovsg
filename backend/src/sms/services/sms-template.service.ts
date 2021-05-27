@@ -10,7 +10,7 @@ import {
   TemplateClient,
   XSS_SMS_OPTION,
   TemplateError,
-} from 'postman-templating'
+} from '@shared/templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { SmsService } from '@sms/services'

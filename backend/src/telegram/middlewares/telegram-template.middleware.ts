@@ -6,7 +6,7 @@ import {
   InvalidRecipientError,
   UserError,
 } from '@core/errors'
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { UploadService, StatsService } from '@core/services'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'

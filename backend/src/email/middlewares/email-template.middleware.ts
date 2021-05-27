@@ -6,7 +6,7 @@ import {
   InvalidRecipientError,
   UserError,
 } from '@core/errors'
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { AuthService, UploadService, StatsService } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'

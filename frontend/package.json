@@ -1,11 +1,12 @@
 {
   "name": "frontend",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-app-rewired start",
     "dev": "npm start",
-    "build": "npm run compile && INLINE_RUNTIME_CHUNK=false react-scripts build",
+    "prebuild": "npm run compile && tsc --build",
+    "build": "INLINE_RUNTIME_CHUNK=false react-app-rewired build",
     "eject": "react-scripts eject",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx --cache . && prettier --check '**/*.{md,scss}'",
     "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx --cache --fix . && prettier --write '**/*.{md,scss}' --loglevel warn",
@@ -14,7 +15,8 @@
     "upload-source-map": "node sentry.js",
     "extract": "lingui extract",
     "compile": "lingui compile",
-    "test": "react-scripts test --passWithNoTests"
+    "pretest": "tsc --build",
+    "test": "react-app-rewired test --passWithNoTests"
   },
   "dependencies": {
     "@lingui/react": "^3.8.10",
@@ -35,9 +37,9 @@
     "lottie-react": "^2.1.0",
     "moment": "^2.29.1",
     "papaparse": "^5.2.0",
-    "postman-templating": "file:../modules/postman-templating",
     "react": "^16.14.0",
     "react-app-polyfill": "^1.0.6",
+    "react-app-rewired": "^2.1.8",
     "react-dom": "^16.14.0",
     "react-draft-wysiwyg": "^1.14.6",
     "react-ga": "^2.7.0",
@@ -92,7 +94,8 @@
     "lint-staged": "^10.2.6",
     "msw": "^0.27.1",
     "node-sass": "^4.14.1",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "react-app-rewire-alias": "^1.0.3"
   },
   "eslintConfig": {
     "extends": [

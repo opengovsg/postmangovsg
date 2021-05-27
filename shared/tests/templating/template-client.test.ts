@@ -1,12 +1,11 @@
-import { TemplateClient } from '../src/template-client'
-import { TemplateError } from '../src/errors'
+import { TemplateClient, TemplateError } from '../../src/templating'
 
 import {
   XSS_EMAIL_OPTION,
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
   filterImageSources,
-} from '../src/xss-options'
+} from '../../src/templating/xss-options'
 
 describe('template', () => {
   let templateClient: TemplateClient
