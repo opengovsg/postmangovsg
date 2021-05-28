@@ -27,5 +27,10 @@ module.exports.jest = (config) => {
     '^@shared/?(.*)': '<rootDir>/../shared/src/$1',
   }
   const moduleNameMapper = { ...config.moduleNameMapper, ...aliasMap }
-  return { ...config, moduleNameMapper }
+  const coveragePathIgnorePatterns = [
+    '<rootDir>/build',
+    '<rootDir>/node_modules',
+    '<rootDir>/src/test-utils',
+  ]
+  return { ...config, moduleNameMapper, coveragePathIgnorePatterns }
 }
