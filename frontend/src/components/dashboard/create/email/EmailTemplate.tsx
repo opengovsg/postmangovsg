@@ -211,7 +211,7 @@ const EmailTemplate = ({
           <h4>From</h4>
           <p>
             Sender details. Custom sender name will be automatically appended
-            with &quot;via Government Mail&quot;.
+            with &quot;via Postman&quot;.
           </p>
           <TextInput
             value={fromName}
