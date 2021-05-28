@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
-import { Campaign, User } from '@core/models'
+import { Campaign, User, Credential } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService, UploadService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
@@ -144,6 +144,110 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
 
     mockSecretsManager.getSecretValue().promise.mockReset()
     mockSendCampaignMessage.mockRestore()
+  })
+})
+
+describe('POST /campaign/{campaignId}/sms/new-credentials', () => {
+  afterEach(async () => {
+    // Reset number of calls for mocked functions
+    jest.clearAllMocks()
+  })
+
+  test('Demo Campaign should not be able to create custom credential', async () => {
+    const demoCampaign = await createCampaign({ isDemo: true })
+
+    const res = await request(app)
+      .post(`/campaign/${demoCampaign.id}/sms/new-credentials`)
+      .send({
+        recipient: '81234567',
+        twilio_account_sid: 'twilio_account_sid',
+        twilio_api_key: 'twilio_api_key',
+        twilio_api_secret: 'twilio_api_secret',
+        twilio_messaging_service_sid: 'twilio_messaging_service_sid',
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message: `Action not allowed for demo campaign`,
+    })
+
+    expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()
+  })
+
+  test('User should not be able to add custom credential using invalid Twilio API key', async () => {
+    const nonDemoCampaign = await createCampaign({ isDemo: false })
+
+    // Mock Twilio API to fail
+    const ERROR_MESSAGE = 'Some Error'
+    const mockSendCampaignMessage = jest
+      .spyOn(SmsService, 'sendCampaignMessage')
+      .mockRejectedValue(new Error(ERROR_MESSAGE))
+
+    const res = await request(app)
+      .post(`/campaign/${nonDemoCampaign.id}/sms/new-credentials`)
+      .send({
+        recipient: '81234567',
+        twilio_account_sid: 'twilio_account_sid',
+        twilio_api_key: 'twilio_api_key',
+        twilio_api_secret: 'twilio_api_secret',
+        twilio_messaging_service_sid: 'twilio_messaging_service_sid',
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message: `Error: ${ERROR_MESSAGE}`,
+    })
+
+    expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()
+    mockSendCampaignMessage.mockRestore()
+  })
+
+  test('User should be able to add custom credential using valid Twilio API key', async () => {
+    const nonDemoCampaign = await createCampaign({ isDemo: false })
+
+    const mockSendCampaignMessage = jest
+      .spyOn(SmsService, 'sendCampaignMessage')
+      .mockResolvedValue()
+
+    // getEncodedHash is used as the stored name in AWS SecretsManager
+    const HASHED_CREDS = 'HASHED_CREDS'
+    const mockGetEncodedHash = jest
+      .spyOn(SmsService, 'getEncodedHash')
+      .mockResolvedValue(HASHED_CREDS)
+
+    const res = await request(app)
+      .post(`/campaign/${nonDemoCampaign.id}/sms/new-credentials`)
+      .send({
+        recipient: '81234567',
+        twilio_account_sid: 'twilio_account_sid',
+        twilio_api_key: 'twilio_api_key',
+        twilio_api_secret: 'twilio_api_secret',
+        twilio_messaging_service_sid: 'twilio_messaging_service_sid',
+      })
+
+    expect(res.status).toBe(200)
+
+    expect(mockSecretsManager.createSecret).toHaveBeenCalledWith(
+      expect.objectContaining({
+        Name: HASHED_CREDS,
+        SecretString: JSON.stringify({
+          accountSid: 'twilio_account_sid',
+          apiKey: 'twilio_api_key',
+          apiSecret: 'twilio_api_secret',
+          messagingServiceSid: 'twilio_messaging_service_sid',
+        }),
+      })
+    )
+
+    // Ensure credential was added into DB
+    const dbCredential = await Credential.findOne({
+      where: {
+        name: HASHED_CREDS,
+      },
+    })
+    expect(dbCredential).not.toBe(null)
+    mockSendCampaignMessage.mockRestore()
+    mockGetEncodedHash.mockRestore()
   })
 })
 
