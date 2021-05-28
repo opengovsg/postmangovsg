@@ -13,7 +13,7 @@
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
     "pretest": "tsc --build",
     "test": "jest --maxWorkers=2",
-    "coverage": "npm test -- --coverage && coveralls < coverage/lcov.info",
+    "coverage": "npm test -- --coverage && sed -i.bak 's/SF:src/SF:backend\\/src/g' coverage/lcov.info",
     "precommit": "lint-staged"
   },
   "author": "",
@@ -91,7 +91,6 @@
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
     "copyfiles": "^2.2.0",
-    "coveralls": "^3.1.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-jest": "^24.1.3",

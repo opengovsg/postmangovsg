@@ -10,7 +10,7 @@
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
     "build:worker": "cd worker && npm run build",
-    "coverage": "npm run coverage:backend",
+    "coverage": "npm run coverage:backend && coveralls < backend/coverage/lcov.info",
     "coverage:backend": "cd backend && npm run coverage",
     "detect-secrets": "npm run --silent detect-secrets:exists && (git diff --staged --name-only | xargs detect-secrets-hook --baseline .secrets.baseline)",
     "detect-secrets:exists": "detect-secrets || (echo 'Run `pip install detect-secrets`' && false)",
@@ -52,6 +52,7 @@
   "dependencies": {},
   "devDependencies": {
     "concurrently": "^5.1.0",
+    "coveralls": "^3.1.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
