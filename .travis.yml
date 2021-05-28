@@ -333,11 +333,9 @@ jobs:
             - CRONITOR_CODE=$STAGING_REDACTION_CRONITOR
     - name: coverage
       install:
-        - npm install
-        - cd $TRAVIS_BUILD_DIR/shared && npm ci
-        - cd $TRAVIS_BUILD_DIR/backend && npm ci
+        - npm ci
       script:
-        - cd $TRAVIS_BUILD_DIR && npm run coverage
+        - npm run coverage
     - name: root
       install:
         - npm install --ignore-scripts

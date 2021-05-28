@@ -8,7 +8,8 @@
     "build": "rimraf build && tsc -b --clean && tsc",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
-    "test": "jest"
+    "test": "jest",
+    "coverage": "npm test -- --coverage && sed -i.bak 's/SF:src/SF:shared\\/src/g' coverage/lcov.info"
   },
   "types": "build/index",
   "repository": {
