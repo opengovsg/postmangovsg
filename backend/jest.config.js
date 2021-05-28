@@ -18,4 +18,10 @@ module.exports = {
   globalTeardown: '<rootDir>/src/test-utils/global-teardown.ts',
   setupFiles: ['<rootDir>/src/test-utils/test-env.ts'],
   setupFilesAfterEnv: ['<rootDir>/src/test-utils/setup.ts'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.{ts,js}'],
+  coveragePathIgnorePatterns: [
+    '<rootDir>/build',
+    '<rootDir>/node_modules',
+    '<rootDir>/src/test-utils',
+  ],
 }

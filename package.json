@@ -10,6 +10,8 @@
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
     "build:worker": "cd worker && npm run build",
+    "coverage": "npm run coverage:backend",
+    "coverage:backend": "cd backend && npm run coverage",
     "detect-secrets": "npm run --silent detect-secrets:exists && (git diff --staged --name-only | xargs detect-secrets-hook --baseline .secrets.baseline)",
     "detect-secrets:exists": "detect-secrets || (echo 'Run `pip install detect-secrets`' && false)",
     "detect-secrets:scan": "detect-secrets scan --exclude-files package-lock.json --no-keyword-scan > .secrets.baseline",
