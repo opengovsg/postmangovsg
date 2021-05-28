@@ -9,7 +9,7 @@ import {
   TemplateClient,
   XSS_EMAIL_OPTION,
   TemplateError,
-} from 'postman-templating'
+} from '@shared/templating'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'

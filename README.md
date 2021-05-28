@@ -191,6 +191,10 @@ env:
 $ git checkout develop
 $ git checkout -b release-v1.7.0
 
+# Bump shared module version
+$ cd ../ && cd shared/
+$ npm version minor
+
 # Bump frontend version
 $ cd frontend/
 $ npm version minor
