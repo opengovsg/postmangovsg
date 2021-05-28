@@ -1,5 +1,7 @@
 <a href="https://postman.gov.sg"><img src="frontend/src/assets/img/brand/app-logo.svg" title="Postman" alt="Postman.gov.sg"></a>
 
+[![Coverage Status](https://coveralls.io/repos/github/opengovsg/postmangovsg/badge.svg?branch=develop)](https://coveralls.io/github/opengovsg/postmangovsg?branch=develop)
+
 # Postman.gov.sg
 
 > Postman.gov.sg enables public officers to send templated messages to many recipients.
