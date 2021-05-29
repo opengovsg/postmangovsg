@@ -6,4 +6,9 @@ module.exports = {
   },
   testEnvironment: 'node',
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.{ts,js}'],
+  coveragePathIgnorePatterns: [
+    '<rootDir>/build',
+    '<rootDir>/node_modules',
+  ],
 }
