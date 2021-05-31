@@ -184,7 +184,7 @@ const uploadCompleteHandler = async (
       }
 
       // Store error to return on poll
-      UploadService.storeS3Error(+campaignId, err.message)
+      await UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     logger.error({
