@@ -237,7 +237,7 @@ const onComplete = ({
 
     // Set campaign to valid
     await CampaignService.setValid(campaignId, transaction)
-    transaction?.commit()
+    await transaction?.commit()
   }
 }
 
@@ -328,7 +328,7 @@ const processUpload = <Template extends AllowedTemplateTypes>(
             })
           )
         } catch (e) {
-          transaction.rollback()
+          await transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
