@@ -152,23 +152,25 @@ const uploadCompleteHandler = async (
           campaignId: +campaignId,
         }
 
-        await ParseCsvService.parseAndProcessCsv(
-          downloadStream,
-          EmailService.uploadCompleteOnPreview(params),
-          EmailService.uploadCompleteOnChunk(params),
-          UploadService.uploadCompleteOnComplete({
-            ...params,
-            key: s3Key,
-            filename,
-          })
-        ).catch((e) => {
-          transaction.rollback()
+        try {
+          await ParseCsvService.parseAndProcessCsv(
+            downloadStream,
+            EmailService.uploadCompleteOnPreview(params),
+            EmailService.uploadCompleteOnChunk(params),
+            UploadService.uploadCompleteOnComplete({
+              ...params,
+              key: s3Key,
+              filename,
+            })
+          )
+        } catch (e) {
+          await transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
             throw e
           }
-        })
+        }
       }, RETRY_CONFIG)
     } catch (err) {
       // Do not return any response since it has already been sent
@@ -317,29 +319,31 @@ const uploadProtectedCompleteHandler = async (
           campaignId: +campaignId,
         }
 
-        await ParseCsvService.parseAndProcessCsv(
-          downloadStream,
-          EmailService.uploadProtectedCompleteOnPreview(params),
-          EmailService.uploadProtectedCompleteOnChunk(params),
-          UploadService.uploadCompleteOnComplete({
-            ...params,
-            key: s3Key,
-            filename,
-          })
-        ).catch((e) => {
+        try {
+          await ParseCsvService.parseAndProcessCsv(
+            downloadStream,
+            EmailService.uploadProtectedCompleteOnPreview(params),
+            EmailService.uploadProtectedCompleteOnChunk(params),
+            UploadService.uploadCompleteOnComplete({
+              ...params,
+              key: s3Key,
+              filename,
+            })
+          )
+        } catch (e) {
           logger.error({
             message: 'Failed to process S3 file',
             s3Key,
             error: e,
             ...logMeta,
           })
-          transaction.rollback()
+          await transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
             throw e
           }
-        })
+        }
       }, RETRY_CONFIG)
     } catch (err) {
       // Do not return any response since it has already been sent

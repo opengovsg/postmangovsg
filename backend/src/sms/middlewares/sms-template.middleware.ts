@@ -147,24 +147,26 @@ const uploadCompleteHandler = async (
           template,
           campaignId: +campaignId,
         }
-        await ParseCsvService.parseAndProcessCsv(
-          downloadStream,
-          SmsService.uploadCompleteOnPreview(params),
-          SmsService.uploadCompleteOnChunk(params),
-          UploadService.uploadCompleteOnComplete({
-            ...params,
-            key: s3Key,
-            filename,
-          }),
-          campaign?.demoMessageLimit ? campaign.demoMessageLimit : undefined
-        ).catch((e) => {
-          transaction.rollback()
+        try {
+          await ParseCsvService.parseAndProcessCsv(
+            downloadStream,
+            SmsService.uploadCompleteOnPreview(params),
+            SmsService.uploadCompleteOnChunk(params),
+            UploadService.uploadCompleteOnComplete({
+              ...params,
+              key: s3Key,
+              filename,
+            }),
+            campaign?.demoMessageLimit ? campaign.demoMessageLimit : undefined
+          )
+        } catch (e) {
+          await transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
             throw e
           }
-        })
+        }
       }, RETRY_CONFIG)
     } catch (err) {
       // Do not return any response since it has already been sent

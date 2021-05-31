@@ -221,7 +221,7 @@ const uploadCompleteOnComplete = ({
 
     // Set campaign to valid
     await CampaignService.setValid(campaignId, transaction)
-    transaction?.commit()
+    await transaction?.commit()
   }
 }
 

@@ -53,7 +53,7 @@ const upsertEmailTemplate = async ({
         }
       )
 
-      transaction?.commit()
+      await transaction?.commit()
       return updatedTemplate[1][0]
     }
     // else create
@@ -70,10 +70,10 @@ const upsertEmailTemplate = async ({
       }
     )
 
-    transaction?.commit()
+    await transaction?.commit()
     return createdTemplate
   } catch (err) {
-    transaction?.rollback()
+    await transaction?.rollback()
     throw err
   }
 }
