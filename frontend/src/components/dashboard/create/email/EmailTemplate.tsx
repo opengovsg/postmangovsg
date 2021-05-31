@@ -54,6 +54,8 @@ const EmailTemplate = ({
   const [replyTo, setReplyTo] = useState(
     initialReplyTo === userEmail ? null : initialReplyTo
   )
+
+  // initialFrom is undefined for a new campaign without a saved template
   const {
     fromName: initialFromName,
     fromAddress: initialFromAddress,
