@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailService, CustomDomainService } from '@email/services'
-import {
-  parseFromAddress,
-  isDefaultFromAddress,
-} from '@core/utils/from-address'
+import { isDefaultFromAddress } from '@core/utils/from-address'
+import { parseFromAddress } from '@shared/utils/from-address'
 import { AuthService } from '@core/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'

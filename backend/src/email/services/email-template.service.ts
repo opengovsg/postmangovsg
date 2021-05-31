@@ -13,7 +13,7 @@ import {
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
-import { parseFromAddress, formatFromAddress } from '@core/utils/from-address'
+import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
 
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 

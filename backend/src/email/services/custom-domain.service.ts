@@ -6,7 +6,7 @@ import config from '@core/config'
 import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
-import { formatFromAddress } from '@core/utils/from-address'
+import { formatFromAddress } from '@shared/utils/from-address'
 
 const logger = loggerWithLabel(module)
 const [, region] = config.get('mailOptions.host').split('.')

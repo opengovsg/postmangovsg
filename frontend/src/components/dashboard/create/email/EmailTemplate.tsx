@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from './EmailTemplate.module.scss'
 
+import { parseFromAddress } from '@shared/utils/from-address'
 import { EmailCampaign, EmailProgress } from 'classes'
 import {
   TextArea,
@@ -31,19 +32,6 @@ import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 
 import { saveTemplate } from 'services/email.service'
 import { getCustomFromAddresses } from 'services/settings.service'
-
-const parseFromAddress = (
-  email: string
-): { fromName: string | null; fromAddress: string } => {
-  // Regex from https://github.com/validatorjs/validator.js/blob/685c3d2edef67d68c27193d28db84d08c0f4534a/src/lib/isEmail.js#L18
-  // eslint-disable-next-line no-control-regex
-  const address = email.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
-  if (address !== null) {
-    const [, fromName, fromAddress] = address
-    return { fromName: fromName.trim(), fromAddress }
-  }
-  return { fromName: '', fromAddress: email }
-}
 
 const EmailTemplate = ({
   setActiveStep,
