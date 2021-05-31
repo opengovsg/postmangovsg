@@ -1,14 +1,14 @@
 @import 'styles/_variables';
 
 .textInput {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
   height: $button-height;
   border: 1px solid $light-grey;
   border-radius: $border-radius;
   box-shadow: none;
-  line-height: 1rem;
-  font-size: 1rem;
-  padding-left: $border-radius;
-  color: $secondary;
   width: 100%;
   background: transparent;
 
@@ -26,7 +26,45 @@
     border-width: 1px;
   }
 
-  &::placeholder {
-    color: $neutral;
+  *:first-child {
+    margin-left: $border-radius;
+  }
+
+  *:last-child {
+    margin-right: $border-radius;
+  }
+
+  input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    line-height: 1rem;
+    font-size: 1rem;
+    color: $secondary;
+    background: transparent;
+
+    &:focus,
+    &:hover {
+      outline: none;
+      border-color: $primary;
+    }
+
+    &::placeholder {
+      color: $neutral;
+    }
+  }
+
+  .badge {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    @extend %overline;
+    color: $grey-700;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    padding: 0 $spacing-2;
+    height: 1.5rem;
+    background: #eceef0;
+    margin-left: $spacing-1;
   }
 }
