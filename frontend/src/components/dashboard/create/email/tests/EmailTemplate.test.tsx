@@ -1,3 +1,5 @@
+import { t } from '@lingui/macro'
+
 import { waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -318,5 +320,26 @@ describe('custom sender details', () => {
     )
 
     expect(fromNameInput.value).toBe(DEFAULT_FROM_NAME)
+  })
+
+  test('non-default from name should show mail via', async () => {
+    server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
+    renderTemplatePage()
+
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
+    const fromAddressDropdown = screen.getByRole('listbox', {
+      name: /custom from/i,
+    })
+
+    await waitFor(() => {
+      expect(fromNameInput.value).toBe('Agency')
+      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
+    })
+
+    expect(screen.queryByText(t`mailVia`)).toBeNull()
+    userEvent.type(fromNameInput, 'Custom name')
+    expect(screen.getByText(t`mailVia`)).toBeInTheDocument()
   })
 })
