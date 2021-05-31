@@ -316,23 +316,25 @@ const processUpload = <Template extends AllowedTemplateTypes>(
           campaignId: +campaignId,
         }
 
-        await ParseCsvService.parseAndProcessCsv(
-          downloadStream,
-          onPreview(params),
-          onChunk(params),
-          onComplete({
-            ...params,
-            key: s3Key,
-            filename,
-          })
-        ).catch((e) => {
+        try {
+          await ParseCsvService.parseAndProcessCsv(
+            downloadStream,
+            onPreview(params),
+            onChunk(params),
+            onComplete({
+              ...params,
+              key: s3Key,
+              filename,
+            })
+          )
+        } catch (e) {
           transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
             throw e
           }
-        })
+        }
       }, RETRY_CONFIG)
     } catch (err) {
       // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
