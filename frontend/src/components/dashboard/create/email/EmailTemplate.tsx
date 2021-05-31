@@ -192,6 +192,28 @@ const EmailTemplate = ({
     [initialFromName, initialFromAddress]
   )
 
+  const getFromNameInputProps = () => {
+    const mailVia = t`mailVia`
+
+    // Strip mail via that is appended at then end of from name by the backend.
+    const inputFromName = fromName?.replace(new RegExp(`\\s${mailVia}$`), '')
+    const props: { value?: string; badge?: string } = {
+      value: inputFromName,
+    }
+
+    const [selectedFrom] = customFromAddresses.filter(
+      ({ label }) => label === fromAddress
+    )
+    if (selectedFrom) {
+      const { fromName: selectedFromName } = parseFromAddress(
+        selectedFrom?.value
+      )
+      props.badge = selectedFromName !== inputFromName?.trim() ? mailVia : ''
+    }
+
+    return props
+  }
+
   return (
     <>
       <StepSection>
@@ -199,12 +221,9 @@ const EmailTemplate = ({
 
         <div>
           <h4>From</h4>
-          <p>
-            Sender details. Custom sender name will be automatically appended
-            with &quot;via Postman&quot;.
-          </p>
+          <p>Sender details.</p>
           <TextInput
-            value={fromName}
+            {...getFromNameInputProps()}
             onChange={setFromName}
             aria-label="Sender name"
             placeholder={t`E.g. Ministry of Health`}

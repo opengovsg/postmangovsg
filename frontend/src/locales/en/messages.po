@@ -25,7 +25,7 @@ msgstr "Delivery report will expire 14 days after sending is completed."
 #~ msgid "E.g. MOH Appointment"
 #~ msgstr "E.g. MOH Appointment"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:148
+#: components/dashboard/create/email/EmailTemplate.tsx:140
 msgid "E.g. Ministry of Health"
 msgstr "E.g. Ministry of Health"
 
@@ -122,7 +122,7 @@ msgstr "This demo campaign will be sent to a maximum of 20 recipients."
 msgid "demoMessageLabel"
 msgstr "DEMO"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:159
+#: components/dashboard/create/email/EmailTemplate.tsx:151
 msgid "e.g. Appointment Confirmation"
 msgstr "e.g. Appointment Confirmation"
 
@@ -241,3 +241,7 @@ msgstr "https://guide.postman.gov.sg/contact-us"
 #: config.ts:78
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
+
+#: components/dashboard/create/email/EmailTemplate.tsx:140
+msgid "mailVia"
+msgstr "via Postman"
