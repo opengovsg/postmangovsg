@@ -1,0 +1,118 @@
+{{!-- 
+  This template was generated with reference to https://www.goodemailcode.com/
+  Most styles have been inlined for maximum email client support
+  [if mso] blocks exist for MS Outlook layout compatibility 
+ --}}
+<!DOCTYPE html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    @media only screen and (max-width: 728px) {
+      .body-content-container {
+        border: 0px !important;
+      }
+
+      .body-vertical-spacer-top {
+        line-height: 0 !important;
+        height: 0 !important;
+      }
+
+      .logo-vertical-spacer {
+        line-height: 24px !important;
+        height: 24px !important;
+      }
+
+      .body-vertical-spacer-bottom {
+        line-height: 24px !important;
+        height: 24px !important;
+        border-bottom: 1px solid #E8EBEE;
+      }
+
+      .footer-vertical-spacer-top {
+        line-height: 24px !important;
+        height: 24px !important;
+      }
+    }
+
+    p {
+      margin-top: 0 !important;
+    }
+
+    :root {
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
+    }
+  </style>
+</head>
+
+<body style="margin:0; padding:0; word-spacing:normal; background-color:#ffffff;">
+  <div style="line-height:24px;height:24px;">&#8202;</div>
+  <div role="article" aria-roledescription="email" aria-label="email name" lang="en" style="font-size:14px; line-height: 1.4;">
+    <!--[if true]>
+    <table role="presentation" style="width:728px" align="center"><tr><td>
+    <![endif]-->
+    <div class="body-content-container" style="max-width:728px; margin:0 auto; border: 2px solid #E8EBEE; border-radius: 8px; padding: 0 16px 0 16px;">
+      <!--[if true]>
+      <table role="presentation" style="width:37.5em" align="center"><tr><td>
+      <![endif]-->
+      <div class="body-content" style="max-width:600px; margin:0 auto">
+        <div class="body-vertical-spacer-top" style="line-height:48px;height:48px;">&#8202;</div>
+        {{#agencyLogoURI}}
+        <img class="logo" src="{{agencyLogoURI}}" height="64"/>
+        <div class="logo-vertical-spacer" style="line-height:32px;height:32px;">&#8202;</div>
+        {{/agencyLogoURI}}
+        <div>
+          {{{body}}}
+        </div>
+        <div class="body-vertical-spacer-bottom" style="line-height:48px;height:48px;">&#8202;</div>
+      </div>
+      <!--[if true]>
+      </td></tr></table>
+      <![endif]-->
+    </div>
+    <!--[if true]>
+    </td></tr></table>
+    <![endif]-->
+    
+    <div style="padding: 0 16px 0 16px;">
+      <!--[if true]>
+      <table role="presentation" style="width:600px" align="center"><tr><td>
+      <![endif]-->
+      <div class="footer-content-container" style="max-width:600px; margin:0 auto; text-align: center;">
+        <div class="footer-vertical-spacer-top" style="line-height:32px;height:32px;">&#8202;</div>
+        <div style="font-size: 11px; color: #64707D">
+          {{#agencyName}}This email has been sent to you by {{agencyName}}.{{/agencyName}} If you are not the intended recipient, you should immediately notify the respective agency and delete this email.
+          <br />
+          <br />
+          If you wish to unsubscribe from similar emails from this agency, please click <a href="{{unsubLink}}">here</a> to inform them of your email preference.
+          <br />
+          <br />
+          Powered by <a href="https://postman.gov.sg">Postman.gov.sg</a>, official messaging service of the Singapore Government.
+        </div>
+        <div class="footer-vertical-spacer-bottom" style="line-height:24px;height:24px;">&#8202;</div>
+      </div>
+      <!--[if true]>
+      </td></tr></table>
+      <![endif]-->
+    </div>
+  </div>
+</body>
+
+</html>
