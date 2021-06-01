@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailService, CustomDomainService } from '@email/services'
-import { parseFromAddress } from '@core/utils/from-address'
+import { isDefaultFromAddress } from '@core/utils/from-address'
+import { parseFromAddress } from '@shared/utils/from-address'
 import { AuthService } from '@core/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
@@ -122,12 +123,7 @@ const isCustomFromAddressAllowed = (
   next: NextFunction
 ): void => {
   const { from } = req.body
-  const defaultEmail = config.get('mailFrom')
-
-  if (from === defaultEmail) {
-    next()
-    return
-  }
+  if (isDefaultFromAddress(from)) return next()
 
   // We don't allow custom from address for the SendGrid fallback
   // since they aren't DKIM-authenticated currently
@@ -150,28 +146,36 @@ const isFromAddressAccepted = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
+  // Since from addresses with display name are accepted, we need to extract just the email address
   const { from } = req.body
+  const { fromName, fromAddress } = parseFromAddress(from)
+
+  // Retrieve logged in user's email
   const userEmail =
     req.session?.user?.email ||
     (await AuthService.findUser(req.session?.user?.id))?.email
-  const defaultEmail = config.get('mailFrom')
 
-  // Since from addresses with display name are accepted, we need to extract just the email address
-  const { name, fromAddress } = parseFromAddress(from)
+  // Get default mail address for comparison
+  const {
+    fromName: defaultFromName,
+    fromAddress: defaultFromAddress,
+  } = parseFromAddress(config.get('mailFrom'))
 
-  if (fromAddress !== userEmail && from !== defaultEmail) {
+  if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
     logger.error({
       message: "Invalid 'from' email address",
       from,
       userEmail,
-      defaultEmail,
+      defaultFromName,
+      defaultFromAddress,
       fromAddress,
       action: 'isFromAddressAccepted',
     })
     return res.status(400).json({ message: "Invalid 'from' email address." })
   }
-  res.locals.fromName = name
-  res.locals.from = fromAddress
+
+  res.locals.fromName = fromName
+  res.locals.fromAddress = fromAddress
 
   return next()
 }
@@ -185,21 +189,17 @@ const existsFromAddress = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { from } = req.body
-  const defaultEmail = config.get('mailFrom')
-  if (from === defaultEmail) return next()
-  const { fromName, from: fromAddress } = res.locals
+  if (isDefaultFromAddress(from)) return next()
 
+  const { fromName, fromAddress } = res.locals
   try {
-    const exists = await CustomDomainService.existsFromAddress(
-      fromName,
-      fromAddress
-    )
+    const exists = await CustomDomainService.existsFromAddress(fromAddress)
     if (!exists) throw new Error('From Address has not been verified.')
   } catch (err) {
     logger.error({
       message: "Invalid 'from' email address",
       from,
-      defaultEmail,
+      defaultEmail: config.get('mailFrom'),
       fromName,
       fromAddress,
       error: err,
@@ -219,17 +219,16 @@ const verifyFromAddress = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { from } = req.body
-  const defaultEmail = config.get('mailFrom')
-  if (from === defaultEmail) return next()
-  const { from: fromAddress } = res.locals
+  if (isDefaultFromAddress(from)) return next()
 
+  const { fromAddress } = res.locals
   try {
     await CustomDomainService.verifyFromAddress(fromAddress)
   } catch (err) {
     logger.error({
       message: "Failed to verify 'from' email address",
       from,
-      defaultEmail,
+      defaultEmail: config.get('mailFrom'),
       fromAddress,
       error: err,
       action: 'verifyFromAddress',
@@ -252,7 +251,7 @@ const storeFromAddress = async (
   if (from === defaultEmail) {
     return res.sendStatus(200)
   }
-  const { fromName, from: fromAddress } = res.locals
+  const { fromName, fromAddress } = res.locals
 
   try {
     await CustomDomainService.storeFromAddress(fromName, fromAddress)

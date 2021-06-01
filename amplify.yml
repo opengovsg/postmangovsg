@@ -23,8 +23,8 @@ frontend:
           export REACT_APP_BACKEND_URL=${BACKEND_URL_STAGING} &&
           export REACT_APP_SENTRY_ENVIRONMENT="staging";
           fi
-        - cd frontend
-        - npm ci
+        - cd shared && npm ci && cd ..
+        - cd frontend && npm ci
         - export REACT_APP_SENTRY_RELEASE=$(npm run --silent get-sentry-release)
     build:
       commands:
