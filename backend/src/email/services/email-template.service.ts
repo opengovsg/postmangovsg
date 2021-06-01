@@ -1,7 +1,9 @@
 import { difference, keys } from 'lodash'
 
+import config from '@core/config'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
+import { CustomDomainService } from '@email/services'
 import { Campaign, Statistic } from '@core/models'
 import {
   TemplateClient,
@@ -11,6 +13,7 @@ import {
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
+import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
 
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
@@ -173,12 +176,40 @@ const storeTemplate = async ({
       'Message template is invalid as it only contains invalid HTML tags!'
     )
   }
+
+  // Append via to sender name if it is not the default from name
+  const {
+    fromName: defaultFromName,
+    fromAddress: defaultFromAddress,
+  } = parseFromAddress(config.get('mailFrom'))
+  const { fromName, fromAddress } = parseFromAddress(from)
+
+  let expectedFromName: string | null
+  if (fromAddress === defaultFromAddress) {
+    expectedFromName = defaultFromName
+  } else {
+    const customFromAddress = await CustomDomainService.getCustomFromAddress(
+      fromAddress
+    )
+    if (!customFromAddress) throw new Error('Invalid custom from address')
+    const { fromName: customFromName } = parseFromAddress(customFromAddress)
+    expectedFromName = customFromName
+  }
+
+  const mailVia = config.get('mailVia')
+  const formattedFrom = formatFromAddress(
+    fromName && expectedFromName !== fromName && !fromName.endsWith(mailVia)
+      ? `${fromName} ${mailVia}`
+      : fromName,
+    fromAddress
+  )
+
   const updatedTemplate = await upsertEmailTemplate({
     subject: sanitizedSubject,
     body: sanitizedBody,
     replyTo,
     campaignId,
-    from,
+    from: formattedFrom,
   })
 
   // TODO: this is slow when table is large

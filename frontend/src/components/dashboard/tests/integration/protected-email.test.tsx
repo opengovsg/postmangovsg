@@ -16,6 +16,7 @@ import {
   fireEvent,
   waitFor,
   DEFAULT_FROM,
+  DEFAULT_FROM_ADDRESS,
   VALID_CSV_FILENAME,
   VALID_EMAIL_CSV_FILE,
   RECIPIENT_EMAIL,
@@ -73,10 +74,10 @@ test('successfully creates and sends a new protected email campaign', async () =
   userEvent.click(customFromDropdown)
   userEvent.click(
     await screen.findByRole('option', {
-      name: DEFAULT_FROM,
+      name: DEFAULT_FROM_ADDRESS,
     })
   )
-  expect(customFromDropdown).toHaveTextContent(DEFAULT_FROM)
+  expect(customFromDropdown).toHaveTextContent(DEFAULT_FROM_ADDRESS)
 
   // Type in email subject
   const subjectTextbox = screen.getByRole('textbox', {
