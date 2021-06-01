@@ -17,7 +17,11 @@ const TextInput = forwardRef((props: any, ref: ReactNode) => {
         }
         {...otherProps}
       />
-      {badge && <span className={styles.badge}>{badge}</span>}
+      {badge && (
+        <div className={styles.badge}>
+          <span>{badge}</span>
+        </div>
+      )}
     </div>
   )
 })
