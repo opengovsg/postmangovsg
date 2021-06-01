@@ -7,4 +7,16 @@ export class Agency extends Model<Agency> {
     primaryKey: true,
   })
   domain!: string
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  name?: string
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  logo_uri?: string
 }
