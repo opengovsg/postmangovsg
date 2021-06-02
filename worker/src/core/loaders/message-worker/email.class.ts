@@ -8,6 +8,7 @@ import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
+import { Message } from './interface'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 const logger = loggerWithLabel(module)
@@ -51,21 +52,7 @@ class Email {
       })
   }
 
-  getMessages(
-    jobId: number,
-    rate: number
-  ): Promise<
-    {
-      id: number
-      recipient: string
-      params: { [key: string]: string }
-      body: string
-      subject: string
-      replyTo: string | null
-      from: string
-      campaignId: number
-    }[]
-  > {
+  getMessages(jobId: number, rate: number): Promise<Message[]> {
     return this.connection
       .query('SELECT get_messages_to_send_email(:job_id, :rate);', {
         replacements: { job_id: jobId, rate },
@@ -126,17 +113,8 @@ class Email {
     replyTo,
     from,
     campaignId,
-  }: {
-    id: number
-    recipient: string
-    params: { [key: string]: string }
-    body: string
-    subject?: string
-    replyTo?: string | null
-    from?: string
-    campaignId?: number
-  }): Promise<void> {
-    return new Promise((resolve, reject) => {
+  }: Message): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       if (!validator.isEmail(recipient)) {
         return reject(new Error('Recipient is incorrectly formatted'))
       }
