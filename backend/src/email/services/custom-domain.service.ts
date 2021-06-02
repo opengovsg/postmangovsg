@@ -43,33 +43,36 @@ const verifyCnames = async (
 }
 
 /**
- * Checks that the email address is verified with AWS
- * @returns DKIM tokens generated for the email address
+ * Retrieve DKIM tokens and check that they are verified
+ * @param identity either the verified email address or domain
+ * @returns DKIM tokens generated for the identity
  * @throws Error if the domain's dns do not have the cname records
  */
-const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
+const getVerifiedDkimTokens = async (
+  identity: string
+): Promise<Array<string>> => {
   // Get the dkim attributes for the email address
   const params = {
-    Identities: [email],
+    Identities: [identity],
   }
   const { DkimAttributes } = await ses
     .getIdentityDkimAttributes(params)
     .promise()
 
-  const verificationStatus = DkimAttributes[email]?.DkimVerificationStatus
-  const dkimTokens = DkimAttributes[email]?.DkimTokens
+  const verificationStatus = DkimAttributes[identity]?.DkimVerificationStatus
+  const dkimTokens = DkimAttributes[identity]?.DkimTokens
 
   // Check verification status & make sure dkim tokens are present
   if (!verificationStatus || verificationStatus !== 'Success' || !dkimTokens) {
+    const message = 'Unable to retrieve DKIM tokens for identity'
     logger.error({
-      message: 'Verification on AWS failed',
-      email,
-      action: 'verifyEmailWithAWS',
+      message,
+      identity,
+      action: 'getVerifiedDkimTokens',
     })
-    throw new Error(
-      `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
-    )
+    throw new Error(message)
   }
+
   // Make sure the dkim tokens are there.
   return dkimTokens
 }
@@ -128,7 +131,7 @@ const storeFromAddress = async (
  * 3. Checks the domain's dns to ensure that the cnames are there
  */
 const verifyFromAddress = async (email: string): Promise<void> => {
-  const dkimTokens = await verifyEmailWithAWS(email)
+  const dkimTokens = await getVerifiedDkimTokens(email)
 
   await verifyCnames(dkimTokens, email)
 }
