@@ -81,13 +81,13 @@ class Email {
     )) as {
       name?: string
       logo_uri?: string
-    }
+    } | null
 
     // Inject agency name and logo (if exists) into messages array
     const messages = map(result, (r: GetMessagesResult) => ({
       ...r['get_messages_to_send_email'], // message object from SQL query
-      agencyName: agency.name || replyTo || undefined,
-      agencyLogoURI: agency.logo_uri,
+      agencyName: agency?.name || replyTo || undefined,
+      agencyLogoURI: agency?.logo_uri,
     }))
     return messages
   }
