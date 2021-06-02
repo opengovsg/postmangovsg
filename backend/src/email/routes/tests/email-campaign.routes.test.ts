@@ -423,6 +423,35 @@ describe('GET /campaign/{id}/email/upload/status', () => {
     })
   })
 
+  test('Returns status of csv that timed out while processing', async () => {
+    const campaign = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: ChannelType.Email,
+      valid: false,
+      protect: false,
+      s3Object: {
+        temp_filename: 'file',
+      },
+    })
+
+    await sequelize.query(
+      `UPDATE campaigns SET updated_at = '${new Date(
+        Date.now() - 11 * 60 * 1000
+      ).toUTCString()}' WHERE id = ${campaignId}`
+    )
+
+    const res = await request(app).get(
+      `/campaign/${campaign.id}/email/upload/status`
+    )
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual({
+      is_csv_processing: true,
+      temp_csv_filename: 'file',
+    })
+  })
+
   test('Returns status of csv which has completed processing successfully', async () => {
     const campaign = await Campaign.create({
       name: 'campaign-1',

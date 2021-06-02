@@ -6,7 +6,7 @@ import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService, UploadService } from '@core/services'
 import { ChannelType } from '@core/constants'
 import { EmailMessage, EmailTemplate } from '@email/models'
-import { EmailTemplateMiddleware } from '../email-template.middleware'
+import { EmailTemplateMiddleware } from '@email/middlewares'
 import S3Client from '@core/services/s3-client.class'
 
 let sequelize: Sequelize
@@ -63,7 +63,7 @@ describe('uploadCompleteHandler middleware', () => {
       .spyOn(UploadService, 'extractParamsFromJwt')
       .mockReturnValue({ s3Key: 'key' })
 
-    // mock invalid file
+    // mock invalid recipient file
     const fileStream = Readable.from('name\nabc')
 
     const s3ClientMock = (S3Client as jest.Mock).mockImplementation(() => {
@@ -107,7 +107,7 @@ describe('uploadCompleteHandler middleware', () => {
       .spyOn(UploadService, 'extractParamsFromJwt')
       .mockReturnValue({ s3Key: 'key' })
 
-    // mock invalid file
+    // mock valid recipient file
     const fileStream = Readable.from('recipient,name\nabc@mail.com,abc')
 
     const s3ClientMock = (S3Client as jest.Mock).mockImplementation(() => {
