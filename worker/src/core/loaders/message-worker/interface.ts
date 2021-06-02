@@ -7,4 +7,6 @@ export interface Message {
   replyTo?: string | null
   campaignId?: number
   from?: string
+  agencyName?: string
+  agencyLogoURI?: string
 }

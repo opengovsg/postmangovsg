@@ -8,6 +8,7 @@ import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
+import { generateThemedHTMLEmail } from '@shared/theme'
 import { Message } from './interface'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
@@ -52,13 +53,43 @@ class Email {
       })
   }
 
-  getMessages(jobId: number, rate: number): Promise<Message[]> {
-    return this.connection
-      .query('SELECT get_messages_to_send_email(:job_id, :rate);', {
+  async getMessages(jobId: number, rate: number): Promise<Message[]> {
+    type GetMessagesResult = {
+      get_messages_to_send_email: Message
+    }
+
+    const result: GetMessagesResult[] = await this.connection.query(
+      'SELECT get_messages_to_send_email(:job_id, :rate);',
+      {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
-      })
-      .then((result) => map(result, 'get_messages_to_send_email'))
+      }
+    )
+
+    if (result.length === 0) return []
+
+    // Extract agency name and logo (if exists) based on replyTo email
+    const replyTo = result[0]['get_messages_to_send_email'].replyTo
+    const domain = replyTo?.substring(replyTo.lastIndexOf('@') + 1)
+
+    const agency = (await this.connection.query(
+      'SELECT name, logo_uri FROM agencies WHERE domain=:domain',
+      {
+        replacements: { domain },
+        plain: true,
+      }
+    )) as {
+      name?: string
+      logo_uri?: string
+    }
+
+    // Inject agency name and logo (if exists) into messages array
+    const messages = map(result, (r: GetMessagesResult) => ({
+      ...r['get_messages_to_send_email'], // message object from SQL query
+      agencyName: agency.name || replyTo || undefined,
+      agencyLogoURI: agency.logo_uri,
+    }))
+    return messages
   }
 
   calculateHash(campaignId: number, recipient: string): string {
@@ -85,25 +116,6 @@ class Email {
     return link
   }
 
-  appendUnsubToMessage(msg: string, unsubUrl: string): string {
-    const colors = {
-      text: '#697783',
-      link: '#2C2CDC',
-    }
-
-    return `${msg} <br><hr> 
-    <p style="font-size:12px;color:${colors.text};line-height:2em">\
-      <a href="https://postman.gov.sg" style="color:${colors.link}" target="_blank">Postman.gov.sg</a>
-      is a mass messaging platform used by the Singapore Government to communicate with stakeholders.
-      For more information, please visit our <a href="https://guide.postman.gov.sg/faqs/faq-recipients" style="color:${colors.link}" target="_blank">site</a>. 
-    </p>
-    <p style="font-size:12px;color:${colors.text};line-height:2em">
-      If you wish to unsubscribe from similar emails from your sender, please click <a href="${unsubUrl}" style="color:${colors.link}" target="_blank">here</a>
-      to unsubscribe and we will inform the respective agency.
-    </p>
-    `
-  }
-
   async sendMessage({
     id,
     recipient,
@@ -113,6 +125,8 @@ class Email {
     replyTo,
     from,
     campaignId,
+    agencyName,
+    agencyLogoURI,
   }: Message): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!validator.isEmail(recipient)) {
@@ -135,19 +149,21 @@ class Email {
           subject: string
           hydratedBody: string
         }) => {
-          const unsubUrl = this.generateUnsubLink(
+          const unsubLink = this.generateUnsubLink(
             campaignId!,
             recipient
           ).toString()
-          const bodyWithUnsub = this.appendUnsubToMessage(
-            hydratedBody,
-            unsubUrl
-          )
+          const themedHTMLEmail = generateThemedHTMLEmail({
+            body: hydratedBody,
+            unsubLink,
+            agencyName,
+            agencyLogoURI,
+          })
           return this.mailService.sendMail({
             from: from || config.get('mailFrom'),
             recipients: [recipient],
             subject,
-            body: bodyWithUnsub,
+            body: themedHTMLEmail,
             referenceId: String(id),
             ...(replyTo ? { replyTo } : {}),
           })
