@@ -2,7 +2,7 @@ import request from 'supertest'
 
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
-import { Campaign, User } from '@core/models'
+import { Campaign, User, Statistic } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService, UploadService } from '@core/services'
 import { ChannelType } from '@core/constants'
@@ -179,5 +179,98 @@ describe('POST /campaign/{id}/telegram/upload/complete', () => {
 
     expect(res.status).toEqual(202)
     mockExtractParamsFromJwt.mockRestore()
+  })
+})
+
+describe('GET /campaign/{id}/telegram/upload/status', () => {
+  test('Returns status of csv which is processing', async () => {
+    const campaign = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: ChannelType.Telegram,
+      valid: false,
+      s3Object: { temp_filename: 'file' },
+    })
+
+    const res = await request(app).get(
+      `/campaign/${campaign.id}/telegram/upload/status`
+    )
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual({
+      is_csv_processing: true,
+      temp_csv_filename: 'file',
+    })
+  })
+
+  test('Returns status of csv which has completed processing with error', async () => {
+    const campaign = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: ChannelType.Telegram,
+      valid: false,
+      s3Object: {
+        temp_filename: 'file',
+        error: 'error',
+      },
+    })
+
+    const res = await request(app).get(
+      `/campaign/${campaign.id}/telegram/upload/status`
+    )
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual({
+      is_csv_processing: false,
+      temp_csv_filename: 'file',
+      csv_error: 'error',
+      num_recipients: 0,
+      preview: null,
+    })
+  })
+
+  test('Returns status of csv which has completed processing successfully', async () => {
+    const campaign = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: ChannelType.Telegram,
+      valid: false,
+      s3Object: {
+        filename: 'file',
+      },
+    })
+
+    await Statistic.create({ campaignId: campaign.id, unsent: 20 })
+
+    const res = await request(app).get(
+      `/campaign/${campaign.id}/telegram/upload/status`
+    )
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual({
+      is_csv_processing: false,
+      csv_filename: 'file',
+      num_recipients: 20,
+      preview: null,
+    })
+  })
+})
+
+describe('DELETE /campaign/{id}/telegram/upload/status', () => {
+  test('Deletes status of csv which has completed processing with error', async () => {
+    const campaign = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: ChannelType.Telegram,
+      valid: false,
+      s3Object: { temp_filename: 'file', error: 'error' },
+    })
+
+    const res = await request(app).delete(
+      `/campaign/${campaign.id}/telegram/upload/status`
+    )
+
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual({})
   })
 })
