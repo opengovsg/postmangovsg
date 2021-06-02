@@ -3,7 +3,7 @@ import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { Campaign, ProtectedMessage } from '@core/models'
+import { Agency, Campaign, ProtectedMessage } from '@core/models'
 import {
   MailService,
   CampaignService,
@@ -17,6 +17,8 @@ import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
 import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
+
+import { generateThemedHTMLEmail } from '@shared/theme'
 
 const logger = loggerWithLabel(module)
 
@@ -46,6 +48,8 @@ const getHydratedMessage = async (
   subject: string
   replyTo: string | null
   from: string
+  agencyName: string | undefined
+  agencyLogoURI: string | undefined
 } | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
@@ -61,11 +65,30 @@ const getHydratedMessage = async (
     params
   )
   const body = EmailTemplateService.client.template(template?.body!, params)
+
+  // Extract agency name and logo (if exists) based on replyTo email
+  let agencyName, agencyLogoURI
+  if (template.replyTo != null) {
+    const domain = template.replyTo.substring(
+      template.replyTo.lastIndexOf('@') + 1
+    )
+    const agency = await Agency.findOne({
+      where: { domain },
+    })
+
+    if (agency != null) {
+      agencyName = agency.name || template.replyTo || undefined
+      agencyLogoURI = agency.logo_uri
+    }
+  }
+
   return {
     body,
     subject,
     replyTo: template.replyTo || null,
     from: template?.from!,
+    agencyName,
+    agencyLogoURI,
   }
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
 }
@@ -82,11 +105,16 @@ const getCampaignMessage = async (
   // get the body and subject
   const message = await getHydratedMessage(campaignId)
   if (message) {
-    const { body, subject, replyTo, from } = message
+    const { body, subject, replyTo, from, agencyName, agencyLogoURI } = message
     const mailToSend: MailToSend = {
       from: from || config.get('mailFrom'),
       recipients: [recipient],
-      body: UnsubscriberService.appendTestEmailUnsubLink(body),
+      body: generateThemedHTMLEmail({
+        body,
+        unsubLink: UnsubscriberService.generateTestUnsubLink(),
+        agencyName: agencyName,
+        agencyLogoURI,
+      }),
       subject,
       ...(replyTo ? { replyTo } : {}),
     }
