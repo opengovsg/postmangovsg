@@ -128,70 +128,54 @@ class Email {
     agencyName,
     agencyLogoURI,
   }: Message): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      if (!validator.isEmail(recipient)) {
-        return reject(new Error('Recipient is incorrectly formatted'))
-      }
-      return resolve()
-    })
-      .then(() => {
-        return {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          subject: templateClient.template(subject!, params),
-          hydratedBody: templateClient.template(body, params),
-        }
+    if (!validator.isEmail(recipient)) {
+      throw new Error('Recipient is incorrectly formatted')
+    }
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const hydratedSubject = templateClient.template(subject!, params)
+      const hydratedBody = templateClient.template(body, params)
+      const unsubLink = this.generateUnsubLink(
+        campaignId!,
+        recipient
+      ).toString()
+      const themedHTMLEmail = generateThemedHTMLEmail({
+        body: hydratedBody,
+        unsubLink,
+        agencyName,
+        agencyLogoURI,
       })
-      .then(
-        ({
-          subject,
-          hydratedBody,
-        }: {
-          subject: string
-          hydratedBody: string
-        }) => {
-          const unsubLink = this.generateUnsubLink(
-            campaignId!,
-            recipient
-          ).toString()
-          const themedHTMLEmail = generateThemedHTMLEmail({
-            body: hydratedBody,
-            unsubLink,
-            agencyName,
-            agencyLogoURI,
-          })
-          return this.mailService.sendMail({
-            from: from || config.get('mailFrom'),
-            recipients: [recipient],
-            subject,
-            body: themedHTMLEmail,
-            referenceId: String(id),
-            ...(replyTo ? { replyTo } : {}),
-          })
+
+      const messageId = await this.mailService.sendMail({
+        from: from || config.get('mailFrom'),
+        recipients: [recipient],
+        subject: hydratedSubject,
+        body: themedHTMLEmail,
+        referenceId: String(id),
+        ...(replyTo ? { replyTo } : {}),
+      })
+
+      await this.connection.query(
+        `UPDATE email_ops SET status='SENDING', delivered_at=clock_timestamp(), message_id=:messageId, updated_at=clock_timestamp() WHERE id=:id;`,
+        { replacements: { id, messageId }, type: QueryTypes.UPDATE }
+      )
+    } catch (error) {
+      await this.connection.query(
+        `UPDATE email_ops SET status='ERROR', delivered_at=clock_timestamp(), error_code=:error, updated_at=clock_timestamp() WHERE id=:id;`,
+        {
+          replacements: { id, error: error.message.substring(0, 255) },
+          type: QueryTypes.UPDATE,
         }
       )
-      .then((messageId) => {
-        return this.connection.query(
-          `UPDATE email_ops SET status='SENDING', delivered_at=clock_timestamp(), message_id=:messageId, updated_at=clock_timestamp() WHERE id=:id;`,
-          { replacements: { id, messageId }, type: QueryTypes.UPDATE }
-        )
-      })
-      .catch((error: Error) => {
-        return this.connection.query(
-          `UPDATE email_ops SET status='ERROR', delivered_at=clock_timestamp(), error_code=:error, updated_at=clock_timestamp() WHERE id=:id;`,
-          {
-            replacements: { id, error: error.message.substring(0, 255) },
-            type: QueryTypes.UPDATE,
-          }
-        )
-      })
-      .then(() => {
-        logger.info({
-          message: 'Sent email message',
-          workerId: this.workerId,
-          id,
-          action: 'sendMessage',
-        })
-      })
+    }
+
+    logger.info({
+      message: 'Sent email message',
+      workerId: this.workerId,
+      id,
+      action: 'sendMessage',
+    })
   }
 
   async setSendingService(_: string): Promise<void> {
