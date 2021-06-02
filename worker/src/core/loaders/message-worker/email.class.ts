@@ -140,7 +140,7 @@ class Email {
         campaignId!,
         recipient
       ).toString()
-      const themedHTMLEmail = generateThemedHTMLEmail({
+      const themedHTMLEmail = await generateThemedHTMLEmail({
         body: hydratedBody,
         unsubLink,
         agencyName,

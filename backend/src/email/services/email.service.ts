@@ -109,10 +109,10 @@ const getCampaignMessage = async (
     const mailToSend: MailToSend = {
       from: from || config.get('mailFrom'),
       recipients: [recipient],
-      body: generateThemedHTMLEmail({
+      body: await generateThemedHTMLEmail({
         body,
         unsubLink: UnsubscriberService.generateTestUnsubLink(),
-        agencyName: agencyName,
+        agencyName,
         agencyLogoURI,
       }),
       subject,
