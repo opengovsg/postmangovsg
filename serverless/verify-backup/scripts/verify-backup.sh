@@ -30,6 +30,9 @@ curl "https://cronitor.link/$CRONITOR_CODE/run"  -m 10 || true
 # Downloads latest backup dump and decrypts it
 npm run decrypt-dump
 
+# Start postgres
+su - postgres -c "pg_ctl start -D /var/lib/postgresql/data -l /var/lib/postgresql/log.log"
+
 # Find for existing db; If exists, drop previously created db
 echo 'Preparing db'
 dropdb --if-exists $PGDATABASE && createdb $PGDATABASE
@@ -57,3 +60,11 @@ notify "$RESTORE_LOG"
 
 # Completed Cronitor job
 curl "https://cronitor.link/$CRONITOR_CODE/complete" -m 10 || true
+
+# Stop postgres
+su - postgres -c "pg_ctl stop -D /var/lib/postgresql/data"
+
+rm postman.decrypted.dump
+rm postman.dump
+rm postman.json
+rm secrets.dump
