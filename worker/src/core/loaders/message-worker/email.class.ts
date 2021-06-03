@@ -54,42 +54,14 @@ class Email {
   }
 
   async getMessages(jobId: number, rate: number): Promise<Message[]> {
-    type GetMessagesResult = {
-      get_messages_to_send_email: Message
-    }
-
-    const result: GetMessagesResult[] = await this.connection.query(
+    const result = await this.connection.query(
       'SELECT get_messages_to_send_email(:job_id, :rate);',
       {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
       }
     )
-
-    if (result.length === 0) return []
-
-    // Extract agency name and logo (if exists) based on replyTo email
-    const replyTo = result[0]['get_messages_to_send_email'].replyTo
-    const domain = replyTo?.substring(replyTo.lastIndexOf('@') + 1)
-
-    const agency = (await this.connection.query(
-      'SELECT name, logo_uri FROM agencies WHERE domain=:domain',
-      {
-        replacements: { domain },
-        plain: true,
-      }
-    )) as {
-      name?: string
-      logo_uri?: string
-    } | null
-
-    // Inject agency name and logo (if exists) into messages array
-    const messages = map(result, (r: GetMessagesResult) => ({
-      ...r['get_messages_to_send_email'], // message object from SQL query
-      agencyName: agency?.name || replyTo || undefined,
-      agencyLogoURI: agency?.logo_uri,
-    }))
-    return messages
+    return map(result, 'get_messages_to_send_email')
   }
 
   calculateHash(campaignId: number, recipient: string): string {

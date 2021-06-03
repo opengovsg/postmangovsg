@@ -17,9 +17,23 @@ BEGIN
       id in (SELECT * from selected_ids)
       RETURNING id, recipient, params, campaign_id
     )
-    SELECT json_build_object('id', m.id, 'recipient', m.recipient, 'params', m.params, 'campaignId', m.campaign_id, 'body', t.body, 'subject', t.subject, 'replyTo', t.reply_to, 'from', t.from)
-    FROM messages m, email_templates t
-    WHERE m.campaign_id = t.campaign_id;
+    SELECT json_build_object(
+			'id', m.id,
+			'recipient', m.recipient,
+			'params', m.params,
+			'campaignId', m.campaign_id,
+			'body', t.body,
+			'subject', t.subject,
+			'replyTo', t.reply_to,
+			'from', t.from,
+			'agencyName', a.name,
+			'agencyLogoURI', a.logo_uri
+		)
+    FROM messages m
+		INNER JOIN email_templates t ON t.campaign_id = m.campaign_id
+		LEFT JOIN campaigns c ON c.id = m.campaign_id
+		LEFT JOIN users u ON u.id = c.user_id
+		LEFT JOIN agencies a ON a.id = u.agency_id;
 		
 	-- If there are no messages found, we assume the job is done
 	-- This is only correct because enqueue and send are serialized. All messages are enqueued before sending occurs
