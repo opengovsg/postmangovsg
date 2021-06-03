@@ -16,7 +16,6 @@ import { UserFeature } from './user-feature'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
-import { Agency } from '../agency'
 import { Domain } from '../domain'
 
 @Table({ tableName: 'users', underscored: true, timestamps: true })
@@ -43,12 +42,12 @@ export class User extends Model<User> {
   @HasOne(() => UserFeature)
   userFeature!: UserFeature
 
-  @ForeignKey(() => Agency)
-  @Column(DataType.INTEGER)
-  agencyId?: number
+  @ForeignKey(() => Domain)
+  @Column(DataType.STRING)
+  emailDomain?: string
 
-  @BelongsTo(() => Agency)
-  agency?: Agency
+  @BelongsTo(() => Domain)
+  domain?: Domain
 
   // During programmatic creation of users (users signing up by themselves), emails must end in a whitelisted domain
   // If we manually insert the user into the database, then this hook is bypassed.
@@ -63,21 +62,20 @@ export class User extends Model<User> {
     }
   }
 
-  // Find agency based on user email domain
+  // Populate foreign key on domains table based on user's email domain
   @BeforeCreate
-  static async populateAgency(instance: User): Promise<void> {
+  static async populateDomain(
+    instance: User,
+    options: CreateOptions
+  ): Promise<void> {
     const emailDomain = instance.email.substring(
       instance.email.lastIndexOf('@')
     )
-    const domain = await Domain.findOne({
+    await Domain.findOrCreate({
       where: { domain: emailDomain },
-      include: [Agency],
+      transaction: options.transaction,
     })
-
-    if (domain?.agency) {
-      instance.agency = domain.agency
-      instance.agencyId = domain.agencyId
-    }
+    instance.emailDomain = emailDomain
   }
 
   @AfterCreate

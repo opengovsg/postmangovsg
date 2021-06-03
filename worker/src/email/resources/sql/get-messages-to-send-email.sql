@@ -33,7 +33,8 @@ BEGIN
 		INNER JOIN email_templates t ON t.campaign_id = m.campaign_id
 		LEFT JOIN campaigns c ON c.id = m.campaign_id
 		LEFT JOIN users u ON u.id = c.user_id
-		LEFT JOIN agencies a ON a.id = u.agency_id;
+		LEFT JOIN domains d ON d.domain = u.email_domain
+		LEFT JOIN agencies a ON a.id = d.agency_id;
 		
 	-- If there are no messages found, we assume the job is done
 	-- This is only correct because enqueue and send are serialized. All messages are enqueued before sending occurs

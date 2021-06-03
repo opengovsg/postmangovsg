@@ -3,7 +3,7 @@ import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { Agency, Campaign, ProtectedMessage, User } from '@core/models'
+import { Agency, Campaign, Domain, ProtectedMessage, User } from '@core/models'
 import {
   MailService,
   CampaignService,
@@ -72,11 +72,16 @@ const getHydratedMessage = async (
     include: [
       {
         model: User,
-        include: [Agency],
+        include: [
+          {
+            model: Domain,
+            include: [Agency],
+          },
+        ],
       },
     ],
   })
-  const agency = campaign?.user?.agency
+  const agency = campaign?.user?.domain?.agency
   const agencyName = agency?.name
   const agencyLogoURI = agency?.logo_uri
 
