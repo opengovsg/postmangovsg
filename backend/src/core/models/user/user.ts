@@ -7,6 +7,8 @@ import {
   HasMany,
   HasOne,
   AfterCreate,
+  ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
 import { UserDemo } from './user-demo'
@@ -14,6 +16,8 @@ import { UserFeature } from './user-feature'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
+import { Agency } from '../agency'
+import { Domain } from '../domain'
 
 @Table({ tableName: 'users', underscored: true, timestamps: true })
 export class User extends Model<User> {
@@ -39,6 +43,13 @@ export class User extends Model<User> {
   @HasOne(() => UserFeature)
   userFeature!: UserFeature
 
+  @ForeignKey(() => Agency)
+  @Column(DataType.INTEGER)
+  agencyId?: number
+
+  @BelongsTo(() => Agency)
+  agency?: Agency
+
   // During programmatic creation of users (users signing up by themselves), emails must end in a whitelisted domain
   // If we manually insert the user into the database, then this hook is bypassed.
   // This enables us to whitelist specific emails that do not end in a whitelisted domain, which can sign in, but not sign up.
@@ -49,6 +60,23 @@ export class User extends Model<User> {
       throw new Error(
         `User email ${instance.email} does not end in a whitelisted domain`
       )
+    }
+  }
+
+  // Find agency based on user email domain
+  @BeforeCreate
+  static async populateAgency(instance: User): Promise<void> {
+    const emailDomain = instance.email.substring(
+      instance.email.lastIndexOf('@')
+    )
+    const domain = await Domain.findOne({
+      where: { domain: emailDomain },
+      include: [Agency],
+    })
+
+    if (domain?.agency) {
+      instance.agency = domain.agency
+      instance.agencyId = domain.agencyId
     }
   }
 
