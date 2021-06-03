@@ -1,18 +1,21 @@
-import { DataType, Model, Column, Table } from 'sequelize-typescript'
+import { DataType, Model, Column, Table, HasMany } from 'sequelize-typescript'
+import { Domain } from './domain'
 
 @Table({ tableName: 'agencies', underscored: true, timestamps: true })
 export class Agency extends Model<Agency> {
+  @HasMany(() => Domain, { as: 'domain' })
   @Column({
-    type: DataType.STRING,
+    type: DataType.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
   })
-  domain!: string
+  id!: number
 
   @Column({
     type: DataType.STRING,
-    allowNull: true,
+    allowNull: false,
   })
-  name?: string
+  name!: string
 
   @Column({
     type: DataType.TEXT,
