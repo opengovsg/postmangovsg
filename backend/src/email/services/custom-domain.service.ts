@@ -6,6 +6,7 @@ import config from '@core/config'
 import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { getEmailDomain } from '@core/utils/email-address'
 import { formatFromAddress } from '@shared/utils/from-address'
 
 const logger = loggerWithLabel(module)
@@ -15,31 +16,93 @@ const ses = new AWS.SES({ region: region })
  * Verifies if the cname records are in the email's domain dns
  * @throws Error if verification fails
  */
-const verifyCnames = async (
+const verifyDkimRecords = async (
   tokens: Array<string>,
-  email: string
+  domain: string
 ): Promise<void> => {
   // get email domain
-  const domain = email.slice(email.lastIndexOf('@') + 1)
   try {
     for (const token of tokens) {
       const cname = `${token}._domainkey.${domain}`
       const [result] = await dns.promises.resolve(cname, 'CNAME')
       if (result !== `${token}.dkim.amazonses.com`) {
-        throw new Error(`Dkim record doesn't match for ${email}`)
+        throw new Error(`Dkim record doesn't match for ${domain}`)
       }
     }
   } catch (e) {
+    const message = 'Verification of dkim records failed'
     logger.error({
-      message: 'Verification of dkim records failed',
-      email,
+      message,
+      email: domain,
       error: e,
-      action: 'verifyCnames',
+      action: 'verifyDkimRecords',
     })
-    throw new Error(
-      `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
-    )
+    throw new Error(message)
   }
+}
+
+/**
+ * Verifies if the verification TXT record are in the domain dns
+ * @throws Error if verification fails
+ */
+const verifyDomainRecord = async (
+  domain: string,
+  token: string
+): Promise<void> => {
+  const txt = `_amazonses.${domain}`
+  const records = await dns.promises.resolve(txt, 'TXT')
+
+  // At least one TXT record should contain the required value
+  const match = records.filter((r) => r.join('') === token)
+  if (match.length < 1) {
+    throw new Error(`No verification TXT record found for ${domain}`)
+  }
+}
+
+/**
+ * Check if either the email address or domain is verified on SES
+ * @param email email address to be checked
+ * @returns verified whether email or domain is verified
+ */
+const hasVerifiedIdentity = async (email: string): Promise<boolean> => {
+  const domain = getEmailDomain(email)
+  const params = {
+    Identities: [email, domain],
+  }
+  const {
+    VerificationAttributes,
+  } = await ses.getIdentityVerificationAttributes(params).promise()
+
+  const emailAttr = VerificationAttributes[email]
+  const emailStatus = emailAttr?.VerificationStatus ?? 'NotStarted'
+  // Skip checking domain verification if email is already verified
+  if (emailStatus === 'Success') return true
+
+  const domainAttr = VerificationAttributes[domain]
+  const domainStatus = domainAttr?.VerificationStatus ?? 'NotStarted'
+  const domainToken = domainAttr?.VerificationToken
+  if (domainStatus === 'Success' && domainToken) {
+    // Ensure that the verification TXT record still exists
+    await verifyDomainRecord(domain, domainToken)
+    logger.info({
+      message: 'Custom from address verified using domain',
+      email,
+      domain,
+      domainStatus,
+      action: 'getVerifiedIdentity',
+    })
+    return true
+  }
+
+  logger.info({
+    message: 'Verified attributes not found',
+    email,
+    emailStatus,
+    domain,
+    domainStatus,
+    attributes: VerificationAttributes,
+  })
+  return false
 }
 
 /**
@@ -126,14 +189,30 @@ const storeFromAddress = async (
 }
 
 /**
- * 1. Checks if email is already verified
- * 2. With AWS to ensure that we can use the email address to send
- * 3. Checks the domain's dns to ensure that the cnames are there
+ * 1. Checks if either email or domain is already verified
+ * 2. Verify that the dkim records still exist
  */
 const verifyFromAddress = async (email: string): Promise<void> => {
-  const dkimTokens = await getVerifiedDkimTokens(email)
+  try {
+    if (!(await hasVerifiedIdentity(email))) {
+      throw new Error('Neither email nor domain is verified')
+    }
 
-  await verifyCnames(dkimTokens, email)
+    const domain = getEmailDomain(email)
+    const dkimTokens = await getVerifiedDkimTokens(domain)
+    await verifyDkimRecords(dkimTokens, domain)
+  } catch (err) {
+    logger.error({
+      message: err.message,
+      error: err,
+      action: 'verifyFromAddress',
+    })
+
+    // Rethrow a more generic error message
+    throw new Error(
+      `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
+    )
+  }
 }
 
 const sendValidationMessage = async (
