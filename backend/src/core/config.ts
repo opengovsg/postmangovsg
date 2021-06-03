@@ -67,7 +67,7 @@ const config = convict({
       env: 'AWS_ENDPOINT',
     },
     logGroupName: {
-      doc: '	Name of Cloudwatch log group to write application logs to',
+      doc: 'Name of Cloudwatch log group to write application logs to',
       default: 'postmangovsg-beanstalk-prod',
       env: 'AWS_LOG_GROUP_NAME',
     },
