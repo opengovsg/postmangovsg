@@ -3,7 +3,7 @@ import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { Agency, Campaign, ProtectedMessage } from '@core/models'
+import { Agency, Campaign, ProtectedMessage, User } from '@core/models'
 import {
   MailService,
   CampaignService,
@@ -66,21 +66,19 @@ const getHydratedMessage = async (
   )
   const body = EmailTemplateService.client.template(template?.body!, params)
 
-  // Extract agency name and logo (if exists) based on replyTo email
-  let agencyName, agencyLogoURI
-  if (template.replyTo != null) {
-    const domain = template.replyTo.substring(
-      template.replyTo.lastIndexOf('@') + 1
-    )
-    const agency = await Agency.findOne({
-      where: { domain },
-    })
-
-    if (agency != null) {
-      agencyName = agency.name || template.replyTo || undefined
-      agencyLogoURI = agency.logo_uri
-    }
-  }
+  // Get agency details (if exists) from campaign user
+  const campaign = await Campaign.findOne({
+    where: { id: campaignId },
+    include: [
+      {
+        model: User,
+        include: [Agency],
+      },
+    ],
+  })
+  const agency = campaign?.user?.agency
+  const agencyName = agency?.name
+  const agencyLogoURI = agency?.logo_uri
 
   return {
     body,
