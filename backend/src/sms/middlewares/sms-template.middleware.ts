@@ -8,7 +8,7 @@ import {
   InvalidRecipientError,
   UserError,
 } from '@core/errors'
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { UploadService, StatsService, ParseCsvService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
@@ -63,7 +63,6 @@ const storeTemplate = async (
         valid: false,
         template: {
           body: updatedTemplate?.body,
-
           params: updatedTemplate?.params,
         },
       })
@@ -148,24 +147,26 @@ const uploadCompleteHandler = async (
           template,
           campaignId: +campaignId,
         }
-        await ParseCsvService.parseAndProcessCsv(
-          downloadStream,
-          SmsService.uploadCompleteOnPreview(params),
-          SmsService.uploadCompleteOnChunk(params),
-          UploadService.uploadCompleteOnComplete({
-            ...params,
-            key: s3Key,
-            filename,
-          }),
-          campaign?.demoMessageLimit ? campaign.demoMessageLimit : undefined
-        ).catch((e) => {
-          transaction.rollback()
+        try {
+          await ParseCsvService.parseAndProcessCsv(
+            downloadStream,
+            SmsService.uploadCompleteOnPreview(params),
+            SmsService.uploadCompleteOnChunk(params),
+            UploadService.uploadCompleteOnComplete({
+              ...params,
+              key: s3Key,
+              filename,
+            }),
+            campaign?.demoMessageLimit ? campaign.demoMessageLimit : undefined
+          )
+        } catch (e) {
+          await transaction.rollback()
           if (e.code !== 'NoSuchKey') {
             bail(e)
           } else {
             throw e
           }
-        })
+        }
       }, RETRY_CONFIG)
     } catch (err) {
       // Do not return any response since it has already been sent
@@ -183,7 +184,7 @@ const uploadCompleteHandler = async (
       }
 
       // Store error to return on poll
-      UploadService.storeS3Error(+campaignId, err.message)
+      await UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     logger.error({

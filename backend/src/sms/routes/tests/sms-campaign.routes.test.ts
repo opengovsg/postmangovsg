@@ -36,7 +36,93 @@ afterAll(async () => {
   RedisService.sessionClient.quit()
 })
 
-describe('PUT /campaign/{campaignId}/sms/template', () => {
+describe('GET /campaign/{id}/sms', () => {
+  test('Get SMS campaign details', async () => {
+    const campaign = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: 'SMS',
+      valid: false,
+      protect: false,
+    })
+    const { id, name, type } = campaign
+
+    const res = await request(app).get(`/campaign/${campaign.id}/sms`)
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(expect.objectContaining({ id, name, type }))
+  })
+})
+
+describe('PUT /campaign/{id}/sms/template', () => {
+  test('Successfully update template for SMS campaign', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/sms/template`)
+      .query({ campaignId: campaignId })
+      .send({
+        body: 'test {{variable}}',
+      })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        num_recipients: 0,
+        template: {
+          body: 'test {{variable}}',
+          params: ['variable'],
+        },
+      })
+    )
+  })
+
+  test('Receive message to re-upload recipient when template has changed', async () => {
+    await request(app)
+      .put(`/campaign/${campaignId}/sms/template`)
+      .query({ campaignId: campaignId })
+      .send({
+        body: 'test {{variable1}}',
+      })
+      .expect(200)
+
+    await SmsMessage.create({
+      campaignId: campaignId,
+      params: { variable1: 'abc' },
+    })
+
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/sms/template`)
+      .query({ campaignId: campaignId })
+      .send({
+        body: 'test {{variable2}}',
+      })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message:
+          'Please re-upload your recipient list as template has changed.',
+        extra_keys: ['variable2'],
+        num_recipients: 0,
+        template: {
+          body: 'test {{variable2}}',
+          params: ['variable2'],
+        },
+      })
+    )
+  })
+
+  test('Fail to update template for SMS campaign', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/sms/template`)
+      .query({ campaignId: campaignId })
+      .send({
+        body: '<p></p>',
+      })
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message:
+        'Message template is invalid as it only contains invalid HTML tags!',
+    })
+  })
+
   test('Template with only invalid HTML tags is not accepted', async () => {
     const testBody = await request(app)
       .put(`/campaign/${campaignId}/sms/template`)

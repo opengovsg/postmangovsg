@@ -7,7 +7,7 @@ import {
   TemplateClient,
   XSS_SMS_OPTION,
   TemplateError,
-} from 'postman-templating'
+} from '@shared/templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
@@ -47,7 +47,7 @@ const upsertSmsTemplate = async ({
         }
       )
 
-      transaction?.commit()
+      await transaction?.commit()
       return updatedTemplate[1][0]
     }
     // else create
@@ -61,10 +61,10 @@ const upsertSmsTemplate = async ({
       }
     )
 
-    transaction?.commit()
+    await transaction?.commit()
     return createdTemplate
   } catch (err) {
-    transaction?.rollback()
+    await transaction?.rollback()
     throw err
   }
 }

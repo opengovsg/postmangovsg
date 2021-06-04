@@ -12,7 +12,8 @@ RUN aws configure set default.region ap-southeast-1
 
 WORKDIR /usr/home/postmangovsg
 
-COPY modules ../modules
+COPY shared ../shared
+RUN cd ../shared && npm ci && cd ../postmangovsg
 
 COPY ./package* ./
 RUN npm ci

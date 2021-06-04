@@ -5,21 +5,15 @@
   "exclude": [
     "node_modules"
   ],
-  "files": [
-    "./src/server.ts"
-  ],
-  "references": [
-    { "path": "../shared" }
-  ],
   "compileOnSave": true,
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "allowJs": true,
     "sourceMap": true,
     "outDir": "./build",
     "rootDir": "./src",
-
+    "downlevelIteration": true,
+    "declaration": true,
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -34,15 +28,9 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "baseUrl": "./src",
-    "paths": {
-      "@core/*": ["core/*"],
-      "@sms/*": ["sms/*"],
-      "@email/*": ["email/*"],
-      "@telegram/*": ["telegram/*"],
-      "@shared/*": ["../../shared/src/*"]
-    },
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "composite": true
   }
 }
