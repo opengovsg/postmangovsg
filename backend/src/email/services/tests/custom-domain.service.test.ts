@@ -103,9 +103,9 @@ describe('verifyFromAddress', () => {
     ).rejects.toThrow()
   })
 
-  test('Fail if domain verification is not successful', async () => {
-    const statuses = ['Pending', 'Failure', 'TemporaryFailure', 'NotStarted']
-    statuses.forEach(async (VerificationStatus) => {
+  test.each(['Pending', 'Failure', 'TemporaryFailure', 'NotStarted'])(
+    'Fail if domain verification status is %s',
+    async (VerificationStatus) => {
       const verificationAttrs = {
         'agency.gov.sg': {
           VerificationStatus,
@@ -116,12 +116,12 @@ describe('verifyFromAddress', () => {
       await expect(
         CustomDomainService.verifyFromAddress('user@agency.gov.sg')
       ).rejects.toThrow()
-    })
-  })
+    }
+  )
 
-  test('Fail if email address verification is not successful', async () => {
-    const statuses = ['Pending', 'Failure', 'TemporaryFailure', 'NotStarted']
-    statuses.forEach(async (VerificationStatus) => {
+  test.each(['Pending', 'Failure', 'TemporaryFailure', 'NotStarted'])(
+    'Fail if email address verification status is %s',
+    async (VerificationStatus) => {
       const verificationAttrs = {
         'user@agency.gov.sg': {
           VerificationStatus,
@@ -132,21 +132,8 @@ describe('verifyFromAddress', () => {
       await expect(
         CustomDomainService.verifyFromAddress('user@agency.gov.sg')
       ).rejects.toThrow()
-    })
-  })
-
-  test('Fail if email address is pending verification', async () => {
-    const verificationAttrs = {
-      'agency.gov.sg': {
-        VerificationStatus: 'Pending',
-        VerificationToken: 'token',
-      },
     }
-    mockSesResponses(verificationAttrs)
-    await expect(
-      CustomDomainService.verifyFromAddress('user@agency.gov.sg')
-    ).rejects.toThrow()
-  })
+  )
 
   test('Fail if domain is verified but TXT records are not set', async () => {
     const verificationAttrs = {
