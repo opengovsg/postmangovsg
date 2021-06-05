@@ -1,17 +1,22 @@
-import React, { useContext } from 'react'
 import cx from 'classnames'
+
+import { useContext } from 'react'
+
+import AddCredentialModal from '../add-credential-modal'
+
+import VerifyCredentialModal from '../verify-credential-modal'
+
+import styles from './Credentials.module.scss'
+
+import EmptyCredentialsImage from 'assets/img/credentials.svg'
+import type { ChannelType } from 'classes'
 
 import { PrimaryButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
+
 import { deleteCredential } from 'services/settings.service'
 
-import AddCredentialModal from '../add-credential-modal'
-import EmptyCredentialsImage from 'assets/img/credentials.svg'
-import VerifyCredentialModal from '../verify-credential-modal'
-import styles from './Credentials.module.scss'
-
 import type { UserCredential } from 'services/settings.service'
-import type { ChannelType } from 'classes'
 
 const Credentials = ({
   creds,

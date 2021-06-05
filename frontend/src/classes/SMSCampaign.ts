@@ -1,4 +1,5 @@
 import { t } from '@lingui/macro'
+
 import { Campaign, CampaignRecipient } from './Campaign'
 
 export enum SMSProgress {

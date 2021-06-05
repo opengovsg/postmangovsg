@@ -1,17 +1,23 @@
-import React, { useContext } from 'react'
-import { OutboundLink } from 'react-ga'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import cx from 'classnames'
-import { Trans } from '@lingui/macro'
-import { LINKS } from 'config'
 import { i18n } from '@lingui/core'
+import { Trans } from '@lingui/macro'
+import cx from 'classnames'
+
+import { useContext } from 'react'
+
+import { OutboundLink } from 'react-ga'
+
+import UpdateCustomFromAddressModal from '../update-custom-from-address-modal'
+
+import VerifyCustomFromAddressModal from '../verify-custom-from-address-modal'
+
+import styles from './CustomFromAddress.module.scss'
 
 import { StepHeader } from 'components/common'
-import { ModalContext } from 'contexts/modal.context'
+import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
-import styles from './CustomFromAddress.module.scss'
-import VerifyCustomFromAddressModal from '../verify-custom-from-address-modal'
-import UpdateCustomFromAddressModal from '../update-custom-from-address-modal'
+import { ModalContext } from 'contexts/modal.context'
+
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const CustomFromAddress = ({
   customFromAddresses,

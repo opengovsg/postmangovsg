@@ -12,13 +12,15 @@ RUN aws configure set default.region ap-southeast-1
 
 WORKDIR /usr/home/postmangovsg
 
-COPY modules ../modules
+COPY shared ../shared
+RUN cd ../shared && npm ci && cd ../postmangovsg
 
 COPY ./package* ./
 RUN npm ci
 
 COPY src ./src
 COPY tsconfig.json ./
+COPY tsconfig.build.json ./
 
 RUN npm run build
 RUN npm prune --production

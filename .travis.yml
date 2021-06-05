@@ -17,8 +17,10 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/backend
         - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       install:
-        - npm ci
+        - cd $TRAVIS_BUILD_DIR/shared && npm ci
+        - cd $TRAVIS_BUILD_DIR/backend && npm ci
       script:
+        - npm run build
         - npm run lint-no-fix
         - npm run test
       before_deploy:
@@ -73,10 +75,13 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/worker
         - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       install:
-        - npm ci
+        - cd $TRAVIS_BUILD_DIR/shared && npm ci
+        - cd $TRAVIS_BUILD_DIR/worker && npm ci
       script:
+        - npm run build
         - npm run lint-no-fix
       before_deploy:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - cd $TRAVIS_BUILD_DIR/worker && ./before-deploy.sh
       deploy:
         - provider: script
@@ -93,15 +98,24 @@ jobs:
             condition: "$DEPLOY_WORKER = true"
     - name: frontend
       before_install:
+        - cd $TRAVIS_BUILD_DIR/shared && npm install
         - cd $TRAVIS_BUILD_DIR/frontend
       install:
         - npm install
       script:
-        - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
-        - npm run compile
-        - npm run lint-no-fix
         - CI=false npm run build
         - npm run test
+        - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+        - npm run lint-no-fix
+    - name: shared
+      before_install:
+        - cd $TRAVIS_BUILD_DIR/shared
+      install:
+        - npm install
+      script:
+        - npm run build
+        - npm run test
+        - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
     - name: serverless-unsubscribe-digest
       before_install:
         - cd $TRAVIS_BUILD_DIR/serverless/unsubscribe-digest

@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.paths.json",
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -18,13 +19,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
-    "baseUrl": "src",
+    "jsx": "react-jsx",
     "sourceMap": true,
     "inlineSources": true,
-    "sourceRoot": "/",
+    "sourceRoot": "/"
   },
   "include": [
     "src"
+  ],
+  "references": [
+    {
+      "path": "../shared"
+    }
   ]
 }

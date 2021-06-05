@@ -1,18 +1,19 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 
-import { ChannelType } from 'classes'
-import { PrimaryButton, ErrorBlock } from 'components/common'
-import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
-import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
-import TelegramValidationInput from 'components/dashboard/create/telegram/TelegramValidationInput'
-import { ModalContext } from 'contexts/modal.context'
-import { verifyUserCredentials as VerifyUserSmsCredentials } from 'services/sms.service'
-import { verifyUserCredentials as VerifyUserTelegramCredentials } from 'services/telegram.service'
+import styles from './VerifyCredentialModal.module.scss'
 
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
-import styles from './VerifyCredentialModal.module.scss'
+import { ChannelType } from 'classes'
+
+import { PrimaryButton, ErrorBlock } from 'components/common'
+import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
+import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
+import TelegramValidationInput from 'components/dashboard/create/telegram/TelegramValidationInput'
+import { ModalContext } from 'contexts/modal.context'
+import { verifyUserCredentials as VerifyUserSmsCredentials } from 'services/sms.service'
+import { verifyUserCredentials as VerifyUserTelegramCredentials } from 'services/telegram.service'
 
 enum VerifyCredentialStep {
   Verify,

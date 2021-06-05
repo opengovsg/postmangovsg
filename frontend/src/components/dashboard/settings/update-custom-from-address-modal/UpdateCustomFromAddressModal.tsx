@@ -1,5 +1,14 @@
-import React, { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect } from 'react'
+
 import isEmail from 'validator/lib/isEmail'
+
+import styles from './UpdateCustomFromAddressModal.module.scss'
+
+import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
+
+import ConfirmImage from 'assets/img/confirm-modal.svg'
+import FailureImage from 'assets/img/failure.png'
+import SuccessImage from 'assets/img/success.png'
 import {
   PrimaryButton,
   ErrorBlock,
@@ -8,11 +17,6 @@ import {
 } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { verifyFromAddress } from 'services/email.service'
-
-import ConfirmImage from 'assets/img/confirm-modal.svg'
-import FailureImage from 'assets/img/failure.png'
-import SuccessImage from 'assets/img/success.png'
-import styles from './UpdateCustomFromAddressModal.module.scss'
 
 enum UpdateFromAddressStep {
   Update,
@@ -35,31 +39,9 @@ const UpdateCustomFromAddressModal = ({
   const [fromAddress, setFromAddress] = useState(label)
   const modalContext = useContext(ModalContext)
 
-  function parseFromAddress(
-    email: string
-  ): { name: string | null; fromAddress: string } {
-    // Regex from https://github.com/validatorjs/validator.js/blob/685c3d2edef67d68c27193d28db84d08c0f4534a/src/lib/isEmail.js#L18
-    // eslint-disable-next-line no-control-regex
-    const address = email.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
-    if (address !== null) {
-      const [, name, fromAddress] = address
-      return { name: name.trim(), fromAddress }
-    }
-    return { name: null, fromAddress: email }
-  }
-
-  function formatFromAddress(
-    name: string | null | undefined,
-    fromAddress: string
-  ): string {
-    const from = fromAddress.toLowerCase()
-    if (name) return `${name} <${from}>`
-    return from
-  }
-
   // On load, prepopulate the display name input box
   useEffect(() => {
-    const { name } = parseFromAddress(label)
+    const { fromName: name } = parseFromAddress(label)
     setDisplayName(name || '')
   }, [label])
 

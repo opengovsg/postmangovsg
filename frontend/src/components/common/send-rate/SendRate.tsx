@@ -1,11 +1,15 @@
-import React, { Dispatch, SetStateAction, useState } from 'react'
-import { OutboundLink } from 'react-ga'
-import cx from 'classnames'
-import { LINKS } from 'config'
-import { TextInput } from 'components/common'
-import styles from './SendRate.module.scss'
-import { ChannelType } from 'classes'
 import { i18n } from '@lingui/core'
+
+import cx from 'classnames'
+
+import { Dispatch, SetStateAction, useState } from 'react'
+import { OutboundLink } from 'react-ga'
+
+import styles from './SendRate.module.scss'
+
+import { ChannelType } from 'classes'
+import { TextInput } from 'components/common'
+import { LINKS } from 'config'
 
 const SendRate = ({
   sendRate,

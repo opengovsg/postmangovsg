@@ -1,8 +1,10 @@
-import axios from 'axios'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
-import { sha256 } from './services/crypto.service'
+import axios from 'axios'
+
 import type { InitializeOptions } from 'react-ga'
+
+import { sha256 } from './services/crypto.service'
 
 // Re-export these later on as constants
 let gaInitializeOptions: InitializeOptions

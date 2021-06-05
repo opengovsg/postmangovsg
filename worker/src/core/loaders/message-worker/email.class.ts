@@ -7,7 +7,7 @@ import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
-import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 const logger = loggerWithLabel(module)

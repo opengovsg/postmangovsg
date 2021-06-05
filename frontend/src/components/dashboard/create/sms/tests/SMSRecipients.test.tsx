@@ -1,5 +1,12 @@
-import React from 'react'
 import userEvent from '@testing-library/user-event'
+
+import { Route } from 'react-router-dom'
+
+import SMSRecipients from '../SMSRecipients'
+
+import { SMSCampaign } from 'classes'
+import CampaignContextProvider from 'contexts/campaign.context'
+import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import {
   screen,
   mockCommonApis,
@@ -8,11 +15,6 @@ import {
   Campaign,
   INVALID_MOBILE_CSV_FILE,
 } from 'test-utils'
-import CampaignContextProvider from 'contexts/campaign.context'
-import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
-import { Route } from 'react-router-dom'
-import SMSRecipients from '../SMSRecipients'
-import { SMSCampaign } from 'classes'
 
 const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,

@@ -1,5 +1,6 @@
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
+import { QueryTypes } from 'sequelize'
 
 import { loggerWithLabel } from '@core/logger'
 import { PostmanTelegramError } from '../PostmanTelegramError'
@@ -22,40 +23,50 @@ const upsertTelegramSubscriber = async (
     telegramId,
     action: 'upsertTelegramSubscriber',
   }
+
   // Some Telegram clients send pre-prefixed phone numbers
   if (!phoneNumber.startsWith('+')) {
     phoneNumber = `+${phoneNumber}`
   }
 
-  /**
-   * Insert a telegram id and phone number, if that telegram id doesn't exist.
-   * Otherwise, if the new phone number does not exist,
-   * update the existing phone number associated with that telegram id with the new phone number,
-   * to maintain a 1-1 mapping.
-   */
-  const result = await TelegramSubscriber?.sequelize?.query(
-    `
-        INSERT INTO telegram_subscribers (phone_number, telegram_id, created_at, updated_at)
-        VALUES (:phoneNumber, :telegramId, clock_timestamp(), clock_timestamp())
-        ON CONFLICT (telegram_id) DO UPDATE
-        SET phone_number = :phoneNumber, updated_at = clock_timestamp()
-        WHERE NOT telegram_subscribers.phone_number = :phoneNumber
-      `,
-    {
-      replacements: {
-        phoneNumber,
-        telegramId,
-      },
+  const success = await TelegramSubscriber.sequelize?.transaction(
+    async (transaction) => {
+      /**
+       * Split into 2 scenarios:
+       * 1. a row with matching phone_number or telegram_id: update the row
+       * 2. no row matches: insert a new row
+       *
+       * Note: we have to use a raw query to update the phone_number.
+       * It is a primary key, and sequelize doesn't allow us to update
+       * primary keys in sequelize models.
+       */
+      const result = await TelegramSubscriber.sequelize?.query(
+        `
+        UPDATE telegram_subscribers
+        SET phone_number = :phoneNumber, telegram_id = :telegramId, updated_at = clock_timestamp()
+        WHERE phone_number = :phoneNumber OR telegram_id = :telegramId;
+        `,
+        {
+          transaction,
+          type: QueryTypes.UPDATE,
+          replacements: { phoneNumber, telegramId },
+        }
+      )
+
+      const updatedCount = result?.[1]
+      if (!updatedCount) {
+        await TelegramSubscriber.create(
+          { telegramId, phoneNumber },
+          { transaction }
+        )
+      }
+
+      return true
     }
   )
-  const affectedRows = result ? (result[1] as number) : 0
-  logger.info({
-    message: 'Upserted Telegram subscribesr',
-    affectedRows,
-    ...logMeta,
-  })
 
-  return affectedRows > 0
+  logger.info({ message: 'Upserted Telegram subscriber', ...logMeta })
+  return success ?? false
 }
 
 /**
@@ -111,7 +122,7 @@ export const contactMessageHandler = (botId: string) => async (
   }
 
   // Upsert and add subscriptions
-  await upsertTelegramSubscriber(phoneNumber, telegramId)
+  const upserted = await upsertTelegramSubscriber(phoneNumber, telegramId)
   const didAddBotSubscriber = await addBotSubscriber(botId, telegramId)
 
   // Respond
@@ -121,8 +132,19 @@ export const contactMessageHandler = (botId: string) => async (
     },
   }
 
-  if (!didAddBotSubscriber) {
-    return ctx.reply('Your phone number has been updated.', replyOptions)
+  // Configure bot reply based on what actually happened
+  let reply
+  if (didAddBotSubscriber) {
+    reply = 'You are now subscribed.'
+  } else {
+    reply = 'You were already subscribed.'
   }
-  return ctx.reply('You are now subscribed.', replyOptions)
+
+  if (upserted) {
+    reply += ' Your phone number and Telegram ID have been updated.'
+  } else {
+    reply += ' An internal failure has occurred.'
+  }
+
+  return ctx.reply(reply, replyOptions)
 }
