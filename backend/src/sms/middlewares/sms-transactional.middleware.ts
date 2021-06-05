@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { RateLimitError, InvalidRecipientError } from '@core/errors'
 
 const logger = loggerWithLabel(module)

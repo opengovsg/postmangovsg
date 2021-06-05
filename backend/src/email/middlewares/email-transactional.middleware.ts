@@ -5,7 +5,7 @@ import { RedisService } from '@core/services'
 import { EmailTransactionalService } from '@email/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { AuthService } from '@core/services'
 import { InvalidRecipientError } from '@core/errors'
 

@@ -1,4 +1,4 @@
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { SmsService, SmsTemplateService } from '@sms/services'
 import { TwilioCredentials } from '@sms/interfaces'
 import { loggerWithLabel } from '@core/logger'

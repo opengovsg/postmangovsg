@@ -1,7 +1,7 @@
 import { EmailTemplateService, EmailService } from '@email/services'
 import { MailToSend } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
-import { TemplateError } from 'postman-templating'
+import { TemplateError } from '@shared/templating'
 import { isBlacklisted } from '@email/utils/query'
 import { InvalidRecipientError } from '@core/errors'
 
