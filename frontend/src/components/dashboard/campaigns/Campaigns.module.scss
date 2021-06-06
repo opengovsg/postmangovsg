@@ -27,6 +27,7 @@
       #{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding}
     );
     width: 100%;
+    table-layout: fixed;
 
     thead tr {
       th {
@@ -47,6 +48,13 @@
 
       td {
         @extend %body-2;
+
+        .rowName {
+          display: inline-block;
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
   }

@@ -1,8 +1,10 @@
-import React from 'react'
 import cx from 'classnames'
 import escapeHTML from 'escape-html'
 
+import type { FunctionComponent } from 'react'
+
 import DetailBlock from '../detail-block'
+
 import styles from './PreviewBlock.module.scss'
 
 interface PreviewBlockProps {
@@ -13,7 +15,7 @@ interface PreviewBlockProps {
   className?: string
 }
 
-const PreviewBlock: React.FunctionComponent<PreviewBlockProps> = ({
+const PreviewBlock: FunctionComponent<PreviewBlockProps> = ({
   body,
   subject,
   replyTo,

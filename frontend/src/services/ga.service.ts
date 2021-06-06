@@ -1,5 +1,6 @@
 import ReactGA from 'react-ga'
-import { GA_TRACKING_ID } from 'config'
+
+import { GA_TRACKING_ID, GA_INITIALIZE_OPTIONS } from 'config'
 
 export const GA_USER_EVENTS = {
   RESEND_OTP: 'Resend OTP',
@@ -20,9 +21,7 @@ export const GA_USER_EVENTS = {
 }
 
 export function initializeGA() {
-  ReactGA.initialize(GA_TRACKING_ID, {
-    debug: false, // Set to true only on development
-  })
+  ReactGA.initialize(GA_TRACKING_ID, GA_INITIALIZE_OPTIONS)
 }
 
 export function setGAUserId(userId: number | null) {

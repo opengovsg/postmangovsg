@@ -1,13 +1,14 @@
-import React, { useEffect, useContext } from 'react'
+import { useEffect, useContext } from 'react'
 
-import { CampaignContext } from 'contexts/campaign.context'
 import { Status, ChannelType } from 'classes/Campaign'
-import { stopCampaign, retryCampaign } from 'services/campaign.service'
 import { StepHeader, ProgressDetails } from 'components/common'
-import { ModalContext } from 'contexts/modal.context'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
+import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
+import { CampaignContext } from 'contexts/campaign.context'
+import { ModalContext } from 'contexts/modal.context'
+
+import { stopCampaign, retryCampaign } from 'services/campaign.service'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const SMSDetail = () => {
   const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies

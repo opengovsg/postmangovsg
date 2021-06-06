@@ -1,26 +1,25 @@
-import React, { useContext, useState, useEffect } from 'react'
 import cx from 'classnames'
+
+import { useContext, useState, useEffect } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
-import { ModalContext } from 'contexts/modal.context'
+import styles from './Settings.module.scss'
+import AddApiKeyModal from './add-api-key-modal'
+import AddCredentialModal from './add-credential-modal'
+import AddCustomFromAddress from './add-custom-from-address-modal'
+import ApiKey from './api-key'
+import Credentials from './credentials'
+import CustomFromAddress from './custom-from-address'
+
+import CredentialsImage from 'assets/img/credentials.svg'
+import { ChannelType, channelIcons } from 'classes'
 import { SideNav, TitleBar } from 'components/common'
+import { ModalContext } from 'contexts/modal.context'
+import type { UserCredential } from 'services/settings.service'
 import {
   getUserSettings,
   getCustomFromAddresses,
 } from 'services/settings.service'
-import { ChannelType, channelIcons } from 'classes'
-
-import ApiKey from './api-key'
-import Credentials from './credentials'
-import CustomFromAddress from './custom-from-address'
-import AddCredentialModal from './add-credential-modal'
-import AddApiKeyModal from './add-api-key-modal'
-import AddCustomFromAddress from './add-custom-from-address-modal'
-
-import CredentialsImage from 'assets/img/credentials.svg'
-import styles from './Settings.module.scss'
-
-import type { UserCredential } from 'services/settings.service'
 
 const SETTINGS_LINKS = [
   {

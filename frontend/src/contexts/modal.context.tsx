@@ -1,8 +1,9 @@
-import React, { createContext, useState } from 'react'
-import Modal from 'components/common/modal'
-import BodyWrapper from 'components/common/body-wrapper'
+import { createContext, useState } from 'react'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { ReactNode, Dispatch, SetStateAction } from 'react'
+
+import BodyWrapper from 'components/common/body-wrapper'
+import Modal from 'components/common/modal'
 
 const defaultValue = {
   modalContent: null as any,
@@ -14,8 +15,14 @@ const defaultValue = {
 
 export const ModalContext = createContext(defaultValue)
 
-const ModalContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [modalContent, setModalContent] = useState(null)
+const ModalContextProvider = ({
+  initialModalContent = null,
+  children,
+}: {
+  initialModalContent?: ReactNode
+  children?: ReactNode
+}) => {
+  const [modalContent, setModalContent] = useState(initialModalContent)
   const [modalTitle, setModalTitle] = useState('')
 
   // Important: to pass a function into setBeforeClose, you must anonymize it twice

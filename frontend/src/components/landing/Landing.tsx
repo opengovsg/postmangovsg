@@ -1,37 +1,36 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { Redirect, useHistory } from 'react-router-dom'
-import { OutboundLink } from 'react-ga'
+import { i18n } from '@lingui/core'
+
 import cx from 'classnames'
+
 import Lottie from 'lottie-react'
+import { useState, useContext, useEffect } from 'react'
 
-import { LINKS, INFO_BANNER } from 'config'
-
-import Navbar from './nav-bar'
-import Banner from './banner'
-import { InfoBanner, PrimaryButton } from 'components/common'
-import { AuthContext } from 'contexts/auth.context'
-import { getLandingStats } from 'services/stats.service'
+import { OutboundLink } from 'react-ga'
+import { Redirect, useHistory } from 'react-router-dom'
 
 import styles from './Landing.module.scss'
+import Banner from './banner'
+
+import Navbar from './nav-bar'
+
 import companyLogo from 'assets/img/brand/company-logo.svg'
-
-import mohAgencyImg from 'assets/img/landing/moh-gray.png'
-import moeAgencyImg from 'assets/img/landing/moe-gray.png'
-import momAgencyImg from 'assets/img/landing/mom-gray.png'
-
-import userImg from 'assets/img/landing/moe-circle.png'
 import channelsImg from 'assets/img/landing/channels.png'
-
-import onboardingImg from 'assets/img/landing/onboard.svg'
 import landingHeroImg from 'assets/img/landing/landing-hero.png'
+import userImg from 'assets/img/landing/moe-circle.png'
+import moeAgencyImg from 'assets/img/landing/moe-gray.png'
+import mohAgencyImg from 'assets/img/landing/moh-gray.png'
+import momAgencyImg from 'assets/img/landing/mom-gray.png'
+import onboardingImg from 'assets/img/landing/onboard.svg'
 
+import landingAnimation from 'assets/lottie/landing.json'
 import whyUse1 from 'assets/mp4/why-use-1.mp4'
 import whyUse2 from 'assets/mp4/why-use-2.mp4'
 import whyUse3 from 'assets/mp4/why-use-3.mp4'
+import { InfoBanner, PrimaryButton } from 'components/common'
+import { LINKS, INFO_BANNER } from 'config'
 
-import landingAnimation from 'assets/lottie/landing.json'
-
-import { i18n } from '@lingui/core'
+import { AuthContext } from 'contexts/auth.context'
+import { getLandingStats } from 'services/stats.service'
 
 const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 
@@ -343,7 +342,7 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className={styles.bottomContainer}>
+      <footer className={styles.bottomContainer}>
         <div className={styles.innerContainer}>
           <div className={styles.linksContainer}>
             <div className={styles.navLinks}>
@@ -409,7 +408,7 @@ const Landing = () => {
             </div>
           </div>
         </div>
-      </div>
+      </footer>
     </div>
   )
 }

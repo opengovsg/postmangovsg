@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import isEmail from 'validator/lib/isEmail'
 
 import { TextInputWithButton } from 'components/common'

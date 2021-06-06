@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
 import cx from 'classnames'
+import { useState, useEffect, useRef } from 'react'
 
 import styles from './Dropdown.module.scss'
 
@@ -47,11 +47,13 @@ const Dropdown = ({
   useEffect(() => {
     if (defaultLabel) {
       setSelectedLabel(defaultLabel)
-      onSelect(defaultLabel)
+
+      const selected = options.filter((o) => o.label === defaultLabel)[0]
+      if (selected) onSelect(selected.value)
     } else {
       setSelectedLabel('Select an option')
     }
-  }, [defaultLabel, onSelect])
+  }, [defaultLabel, onSelect, options])
 
   return (
     <div

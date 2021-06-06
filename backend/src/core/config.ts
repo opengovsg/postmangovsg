@@ -67,7 +67,7 @@ const config = convict({
       env: 'AWS_ENDPOINT',
     },
     logGroupName: {
-      doc: '	Name of Cloudwatch log group to write application logs to',
+      doc: 'Name of Cloudwatch log group to write application logs to',
       default: 'postmangovsg-beanstalk-prod',
       env: 'AWS_LOG_GROUP_NAME',
     },
@@ -286,6 +286,11 @@ const config = convict({
     default: '',
     env: 'BACKEND_SES_FROM',
   },
+  mailVia: {
+    doc: 'Text to appended to custom sender name',
+    default: 'via Postman',
+    env: 'BACKEND_MAIL_VIA',
+  },
   mailDefaultRate: {
     doc: 'The default rate at which an email campaign will be sent',
     default: 35,
@@ -441,6 +446,14 @@ const config = convict({
       doc: 'Sender ID to use for all SNS SMS',
       default: 'Postman',
       env: 'SMS_FALLBACK_SENDER_ID',
+    },
+  },
+  emailFallback: {
+    activate: {
+      doc:
+        'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
+      default: false,
+      env: 'EMAIL_FALLBACK_ACTIVATE',
     },
   },
 })

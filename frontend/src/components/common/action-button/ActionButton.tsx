@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
 import cx from 'classnames'
+import { useState } from 'react'
+
+import type { MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from './ActionButton.module.scss'
 
@@ -8,7 +10,7 @@ const ActionButton = (props: any) => {
   const [toggleDropdown, setToggleDropdown] = useState(false)
 
   function handleToggleDropdown(
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+    event: ReactMouseEvent<HTMLDivElement, MouseEvent>
   ) {
     event.stopPropagation()
     setToggleDropdown((toggleDropdown) => !toggleDropdown)

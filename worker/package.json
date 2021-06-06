@@ -1,10 +1,10 @@
 {
   "name": "worker",
-  "version": "1.22.4",
+  "version": "1.25.0",
   "description": "Workers for Postman",
   "main": "build/server.js",
   "scripts": {
-    "build": "rimraf build && tsc",
+    "build": "rimraf build && tsc --build",
     "dev": "npm run postbuild && tsc-watch --onSuccess \"node ./build/server.js\"",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
@@ -29,10 +29,9 @@
     "libphonenumber-js": "^1.9.16",
     "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
-    "nodemailer": "^6.5.0",
+    "nodemailer": "^6.6.0",
     "nodemailer-direct-transport": "^3.3.2",
     "pg": "^8.5.1",
-    "postman-templating": "file:../modules/postman-templating",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.22.4",
     "sequelize-typescript": "^1.1.0",
@@ -40,7 +39,7 @@
     "telegraf": "^3.38.0",
     "threads": "^1.4.0",
     "tiny-worker": "^2.3.0",
-    "twilio": "^3.55.1",
+    "twilio": "^3.58.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {
@@ -66,7 +65,8 @@
     "@core": "build/core",
     "@sms": "build/sms",
     "@email": "build/email",
-    "@telegram": "build/telegram"
+    "@telegram": "build/telegram",
+    "@shared": "../shared/build"
   },
   "repository": {
     "type": "git",

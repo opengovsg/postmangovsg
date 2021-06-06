@@ -1,10 +1,15 @@
-import React, { useState, useContext } from 'react'
-import { OutboundLink } from 'react-ga'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import { useHistory } from 'react-router-dom'
+import { i18n } from '@lingui/core'
+
 import cx from 'classnames'
 
-import { LINKS } from 'config'
+import { useState, useContext } from 'react'
+
+import { OutboundLink } from 'react-ga'
+
+import { useHistory } from 'react-router-dom'
+
+import styles from './DuplicateCampaignModal.module.scss'
+
 import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
 import {
   TextInput,
@@ -12,17 +17,20 @@ import {
   Checkbox,
   ErrorBlock,
 } from 'components/common'
-import styles from './DuplicateCampaignModal.module.scss'
-import { duplicateCampaign } from 'services/campaign.service'
+import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 
-import { i18n } from '@lingui/core'
+import { duplicateCampaign } from 'services/campaign.service'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   const { close } = useContext(ModalContext)
   const history = useHistory()
   const [errorMessage, setErrorMessage] = useState('')
-  const [selectedName, setSelectedName] = useState(`Copy of ${campaign.name}`)
+  const [selectedName, setSelectedName] = useState(
+    // Only prepend 'Copy of' if the campaign name doesn't already have one
+    (campaign.name.startsWith('Copy of') ? '' : 'Copy of ') + campaign.name
+  )
 
   async function handleDuplicateCampaign() {
     try {

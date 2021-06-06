@@ -1,7 +1,10 @@
-import React from 'react'
 import cx from 'classnames'
-import styles from './ErrorBlock.module.scss'
+
+import type { ReactNode } from 'react'
+
 import MessageBlock from '../message-block'
+
+import styles from './ErrorBlock.module.scss'
 
 const ErrorBlock = ({
   className,
@@ -12,7 +15,7 @@ const ErrorBlock = ({
   ...otherProps
 }: {
   className?: string
-  children?: React.ReactNode
+  children?: ReactNode
   absolute?: boolean
   onClose?: () => void
   title?: string

@@ -1,9 +1,10 @@
-import React from 'react'
 import cx from 'classnames'
 
-import { CloseButton } from 'components/common'
+import type { ReactNode } from 'react'
 
 import styles from './MessageBlock.module.scss'
+
+import { CloseButton } from 'components/common'
 
 const MessageBlock = ({
   className,
@@ -17,7 +18,7 @@ const MessageBlock = ({
   className?: string
   title?: string
   icon?: string
-  children?: React.ReactNode
+  children?: ReactNode
   absolute?: boolean
   onClose?: () => void
   role?: string

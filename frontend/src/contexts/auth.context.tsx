@@ -1,10 +1,10 @@
-import React, { createContext, useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
 import axios from 'axios'
+import { createContext, useState, useEffect } from 'react'
+import type { ReactNode, Dispatch, SetStateAction } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
 import { initializeGA, sendPageView } from 'services/ga.service'
-
-import type { Dispatch, SetStateAction } from 'react'
 
 interface ContextProps {
   isAuthenticated: boolean
@@ -15,7 +15,7 @@ interface ContextProps {
 
 export const AuthContext = createContext({} as ContextProps)
 
-const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setAuthenticated] = useState(false)
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')
@@ -27,35 +27,34 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     isLoaded && sendPageView(location.pathname)
   }, [location, isLoaded])
 
-  async function initialChecks() {
-    try {
-      const user = await getUser()
-      setAuthenticated(!!user?.email)
-      setEmail(user?.email || '')
-
-      initializeGA()
-      setUserAnalytics(user)
-    } catch (err) {
-      // is unauthorized
-    }
-    setLoaded(true)
-
-    // Set up axios interceptor to redirect to login if any axios requests are unauthorized
-    axios.interceptors.response.use(
-      function (response) {
-        return response
-      },
-      async function (error) {
-        if (error.response && error.response.status === 401) {
-          await logout()
-          setAuthenticated(false)
-        }
-        return Promise.reject(error)
-      }
-    )
-  }
-
   useEffect(() => {
+    async function initialChecks() {
+      try {
+        const user = await getUser()
+        setAuthenticated(!!user?.email)
+        setEmail(user?.email || '')
+
+        initializeGA()
+        setUserAnalytics(user)
+      } catch (err) {
+        // is unauthorized
+      }
+      setLoaded(true)
+
+      // Set up axios interceptor to redirect to login if any axios requests are unauthorized
+      axios.interceptors.response.use(
+        function (response) {
+          return response
+        },
+        async function (error) {
+          if (error.response && error.response.status === 401) {
+            await logout()
+            setAuthenticated(false)
+          }
+          return Promise.reject(error)
+        }
+      )
+    }
     initialChecks()
   }, [])
 
