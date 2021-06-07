@@ -456,6 +456,13 @@ const config = convict({
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
   },
+  defaultAgency: {
+    name: {
+      doc: 'Default agency name used for users from unrecognised domains',
+      default: 'Singapore Government',
+      env: 'DEFAULT_AGENCY_NAME',
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
