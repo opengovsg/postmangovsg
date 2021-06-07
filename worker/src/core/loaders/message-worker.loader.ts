@@ -19,7 +19,7 @@ const messageWorkerLoader = async (): Promise<void> => {
     logger.error({
       message: 'Worker died',
       workerId,
-      isLogger: false,
+      isLogger,
       error: err,
       action: 'createMessageWorker',
     })
