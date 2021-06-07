@@ -170,12 +170,16 @@ const storeTemplate = async ({
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const sanitizedSubject = client.replaceNewLinesAndSanitize(subject)
-  const sanitizedBody = client.filterXSS(body)
+  let sanitizedBody = client.filterXSS(body)
   if (!sanitizedSubject || !sanitizedBody) {
     throw new TemplateError(
       'Message template is invalid as it only contains invalid HTML tags!'
     )
   }
+
+  // Add whitespace, if not present, after email salutation
+  // to prevent phisy looking email preview
+  sanitizedBody = sanitizedBody.replace(/(^.+?,)([^\s].+?<\/p>.+)/, '$1 $2')
 
   // Append via to sender name if it is not the default from name
   const {
