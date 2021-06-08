@@ -1,8 +1,3 @@
-{{!-- 
-  This template was generated with reference to https://www.goodemailcode.com/
-  Most styles have been inlined for maximum email client support
-  [if mso] blocks exist for MS Outlook layout compatibility 
- --}}
 <!DOCTYPE html>
 <html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
@@ -24,14 +19,27 @@
   </noscript>
   <![endif]-->
   <style>
-    @media only screen and (max-width: 728px) {
-      .body-content-container {
-        border: 0px !important;
+    @media only screen and (max-width: 500px) {
+      .root-container {
+        min-width: 0 !important;
+      }
+
+      .masthead {
+        border-radius: 0 !important;
+      }
+
+      .body-content {
+        border-width: 0 !important;
+        padding: 0 16px !important;
       }
 
       .body-vertical-spacer-top {
-        line-height: 0 !important;
-        height: 0 !important;
+        line-height: 24px !important;
+        height: 24px !important;
+      }
+
+      .logo {
+        height: 44px !important;
       }
 
       .logo-vertical-spacer {
@@ -43,6 +51,10 @@
         line-height: 24px !important;
         height: 24px !important;
         border-bottom: 1px solid #E8EBEE;
+      }
+
+      .footer-content {
+        padding: 0 16px !important;
       }
 
       .footer-vertical-spacer-top {
@@ -63,19 +75,30 @@
 </head>
 
 <body style="margin:0; padding:0; word-spacing:normal; background-color:#ffffff;">
-  <div style="line-height:24px;height:24px;">&#8202;</div>
-  <div role="article" aria-roledescription="email" aria-label="email name" lang="en" style="font-size:14px; line-height: 1.4;">
+  <div style="display: none; max-height: 0px; overflow: hidden;">
+    {{preheader}}
+  </div>
+
+  {{!-- Insert spacers to prevent text below from appearing in preheader --}}
+  <div style="display: none; max-height: 0px; overflow: hidden;">
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+  </div>
+
+  <div role="article" aria-roledescription="email" aria-label="email name" lang="en"
+    style="font-size:14px; line-height: 1.71; font-family: Arial, Helvetica, sans-serif;">
     <!--[if true]>
     <table role="presentation" style="width:728px" align="center"><tr><td>
     <![endif]-->
-    <div class="body-content-container" style="max-width:728px; margin:0 auto; border: 2px solid #E8EBEE; border-radius: 8px; padding: 0 16px 0 16px;">
-      <!--[if true]>
-      <table role="presentation" style="width:37.5em" align="center"><tr><td>
-      <![endif]-->
-      <div class="body-content" style="max-width:600px; margin:0 auto">
+    <div class="root-container" style="max-width:728px; min-width: 500px; margin:0 auto;">
+      <div class="masthead"
+        style="text-align: center; font-size: 11px; line-height: 28px; height: 28px; background-color: #E8EBEE; border-top-left-radius: 8px; border-top-right-radius: 8px; white-space: nowrap;">
+        Official Singapore government email addresses end with gov.sg
+      </div>
+      <div class="body-content"
+        style="max-width:728px; padding:0 64px; mso-padding-alt: 0 64px; border-color: #E8EBEE; border-width: 0 2px 2px 2px; border-style: solid;  border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; ">
         <div class="body-vertical-spacer-top" style="line-height:48px;height:48px;">&#8202;</div>
         {{#agencyLogoURI}}
-        <img class="logo" src="{{agencyLogoURI}}" height="64"/>
+        <img class="logo" src="{{agencyLogoURI}}" height="64" {{#agencyName}} alt="{{agencyName}} Logo" {{/agencyName}} />
         <div class="logo-vertical-spacer" style="line-height:32px;height:32px;">&#8202;</div>
         {{/agencyLogoURI}}
         <div>
@@ -83,36 +106,29 @@
         </div>
         <div class="body-vertical-spacer-bottom" style="line-height:48px;height:48px;">&#8202;</div>
       </div>
-      <!--[if true]>
-      </td></tr></table>
-      <![endif]-->
+
+      <div class="footer-content" style="max-width:600px; padding:0 64px; mso-padding-alt: 0 64px; text-align: center;">
+        <div class="footer-vertical-spacer-top" style="line-height:32px;height:32px;">&#8202;</div>
+        <div style="font-size: 11px; color: #64707D">
+          {{#agencyName}}This email has been sent to you by {{agencyName}}.{{/agencyName}} If you are not the intended
+          recipient, you should immediately notify the respective agency and delete this email.
+          <br />
+          <br />
+          If you wish to unsubscribe from similar emails from this agency, please click <a href="{{unsubLink}}">here</a>
+          to inform them of your email preference.
+          <br />
+          <br />
+          Powered by <a href="https://postman.gov.sg">Postman.gov.sg</a>, official messaging service of the Singapore
+          government.
+          <div class="footer-vertical-spacer-top" style="line-height:16px;height:16px;">&#8202;</div>
+          <img src="https://file.go.gov.sg/postmanlogo-grey.png" alt="Postman.gov.sg Logo" height="24">
+        </div>
+        <div class="footer-vertical-spacer-bottom" style="line-height:24px;height:24px;">&#8202;</div>
+      </div>
     </div>
     <!--[if true]>
     </td></tr></table>
     <![endif]-->
-    
-    <div style="padding: 0 16px 0 16px;">
-      <!--[if true]>
-      <table role="presentation" style="width:600px" align="center"><tr><td>
-      <![endif]-->
-      <div class="footer-content-container" style="max-width:600px; margin:0 auto; text-align: center;">
-        <div class="footer-vertical-spacer-top" style="line-height:32px;height:32px;">&#8202;</div>
-        <div style="font-size: 11px; color: #64707D">
-          {{#agencyName}}This email has been sent to you by {{agencyName}}.{{/agencyName}} If you are not the intended recipient, you should immediately notify the respective agency and delete this email.
-          <br />
-          <br />
-          If you wish to unsubscribe from similar emails from this agency, please click <a href="{{unsubLink}}">here</a> to inform them of your email preference.
-          <br />
-          <br />
-          Powered by <a href="https://postman.gov.sg">Postman.gov.sg</a>, official messaging service of the Singapore Government.
-        </div>
-        <div class="footer-vertical-spacer-bottom" style="line-height:24px;height:24px;">&#8202;</div>
-      </div>
-      <!--[if true]>
-      </td></tr></table>
-      <![endif]-->
-    </div>
-  </div>
 </body>
 
 </html>
