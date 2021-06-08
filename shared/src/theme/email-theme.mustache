@@ -84,18 +84,39 @@
     &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
   </div>
 
+  {{!--
+    The code below uses conditional HTML that only IE/Outlook recognises to maintain compatibility with Outlook
+    [if true] blocks will render only within Outlook and IE
+    [if false] blocks will render only in all other browsers/clients
+  --}}
+
   <div role="article" aria-roledescription="email" aria-label="email name" lang="en"
     style="font-size:14px; line-height: 1.71; font-family: Arial, Helvetica, sans-serif;">
     <!--[if true]>
-    <table role="presentation" style="width:728px" align="center"><tr><td>
+    <table role="presentation" style="width: 728px; border: 1px solid #E8EBEE" align="center" cellspacing="0" cellpadding="0" bgcolor="#E8EBEE">
+      <tr><td align="center" valign="middle" style="font-size: 12px; border: 1px solid #E8EBEE; padding: 4px;">
     <![endif]-->
+
+    <!--[if false]><!-->
     <div class="root-container" style="max-width:728px; min-width: 500px; margin:0 auto;">
       <div class="masthead"
         style="text-align: center; font-size: 11px; line-height: 28px; height: 28px; background-color: #E8EBEE; border-top-left-radius: 8px; border-top-right-radius: 8px; white-space: nowrap;">
-        Official Singapore government email addresses end with gov.sg
+    <!--<![endif]-->
+        <span>Official Singapore government email addresses end with gov.sg</span>
+    <!--[if false]><!-->
       </div>
+    <!--<![endif]-->
+    
+    <!--[if true]>
+      </td></tr>
+      <tr><td style="padding: 0 64px; border: 1px solid #E8EBEE;" bgcolor="#FFFFFF">
+    <![endif]-->
+
+    <!--[if false]><!-->
       <div class="body-content"
-        style="max-width:728px; padding:0 64px; mso-padding-alt: 0 64px; border-color: #E8EBEE; border-width: 0 2px 2px 2px; border-style: solid;  border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; ">
+        style="max-width:728px; padding:0 64px; border-color: #E8EBEE; border-width: 0 2px 2px 2px; border-style: solid;  border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+    <!--<![endif]-->
+
         <div class="body-vertical-spacer-top" style="line-height:48px;height:48px;">&#8202;</div>
         {{#agencyLogoURI}}
         <img class="logo" src="{{agencyLogoURI}}" height="64" {{#agencyName}} alt="{{agencyName}} Logo" {{/agencyName}} />
@@ -105,8 +126,17 @@
           {{{body}}}
         </div>
         <div class="body-vertical-spacer-bottom" style="line-height:48px;height:48px;">&#8202;</div>
+    
+    <!--[if false]><!-->
       </div>
-
+    <!--<![endif]-->
+    
+    <!--[if true]>
+      </tr></td>
+    </table>
+    <table role="presentation" style="width: 728px;" align="center">
+      <tr><td>
+    <![endif]-->
       <div class="footer-content" style="max-width:600px; padding:0 64px; mso-padding-alt: 0 64px; text-align: center;">
         <div class="footer-vertical-spacer-top" style="line-height:32px;height:32px;">&#8202;</div>
         <div style="font-size: 11px; color: #64707D">
@@ -127,7 +157,7 @@
       </div>
     </div>
     <!--[if true]>
-    </td></tr></table>
+      </td></tr></table>
     <![endif]-->
 </body>
 
