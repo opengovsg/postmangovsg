@@ -30,6 +30,8 @@ module.exports = {
           FROM messages m, sms_templates t
           WHERE m.campaign_id = t.campaign_id;
 
+        -- If there are no messages found, we assume the job is done	
+        -- This is only correct because enqueue and send are serialized. All messages are enqueued before sending occurs
         -- An edge case exists where the status of a job is set to 'SENT', but the sending client hasn't responded to all the sent messages
         -- In that case, finalization of the job has to be deferred, so that the response can be updated in the ops table
         -- The check for this edge case is carried out in the log_job_<channel> function. 
