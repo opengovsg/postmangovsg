@@ -6,7 +6,9 @@ export const INVALID_TELEGRAM_CREDENTIAL = 'invalid-test-telegram-cred'
 
 // Email addresses
 export const USER_EMAIL = 'testEmail@open.gov.sg'
-export const DEFAULT_FROM = 'Postman Test <donotreply@test.postman.gov.sg>'
+export const DEFAULT_FROM_NAME = 'Postman Test'
+export const DEFAULT_FROM_ADDRESS = 'donotreply@test.postman.gov.sg'
+export const DEFAULT_FROM = `${DEFAULT_FROM_NAME} <${DEFAULT_FROM_ADDRESS}>`
 
 // Recipient uploads
 export const VALID_CSV_FILENAME = 'test_valid_recipients.csv'

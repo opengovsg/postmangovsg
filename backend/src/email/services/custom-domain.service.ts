@@ -6,7 +6,7 @@ import config from '@core/config'
 import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
-import { formatFromAddress } from '@core/utils/from-address'
+import { formatFromAddress } from '@shared/utils/from-address'
 
 const logger = loggerWithLabel(module)
 const [, region] = config.get('mailOptions.host').split('.')
@@ -75,16 +75,12 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 }
 
 /**
- *  Returns true if the supplied name and email exist in email_from_address
+ *  Returns true if the supplied email exist in email_from_address
  */
 
-const existsFromAddress = async (
-  name: string | null,
-  email: string
-): Promise<boolean> => {
+const existsFromAddress = async (email: string): Promise<boolean> => {
   return !!(await EmailFromAddress.findOne({
     where: {
-      name,
       email,
     },
   }))

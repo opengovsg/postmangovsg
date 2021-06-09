@@ -11,6 +11,9 @@ export interface State {
 
   // Protected messages
   protectedMessages: ProtectedMessage[]
+
+  // Custom from addresses
+  customFroms?: string[]
 }
 
 interface User {

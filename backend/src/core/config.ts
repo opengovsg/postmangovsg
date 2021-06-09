@@ -67,7 +67,7 @@ const config = convict({
       env: 'AWS_ENDPOINT',
     },
     logGroupName: {
-      doc: '	Name of Cloudwatch log group to write application logs to',
+      doc: 'Name of Cloudwatch log group to write application logs to',
       default: 'postmangovsg-beanstalk-prod',
       env: 'AWS_LOG_GROUP_NAME',
     },
@@ -285,6 +285,11 @@ const config = convict({
     doc: 'The email address that appears in the From field of an email',
     default: '',
     env: 'BACKEND_SES_FROM',
+  },
+  mailVia: {
+    doc: 'Text to appended to custom sender name',
+    default: 'via Postman',
+    env: 'BACKEND_MAIL_VIA',
   },
   mailDefaultRate: {
     doc: 'The default rate at which an email campaign will be sent',
