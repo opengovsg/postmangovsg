@@ -12,7 +12,7 @@ module.exports = {
   SET status = 'SENDING', updated_at = clock_timestamp()
   WHERE id = job_id
     AND status = 'ENQUEUED'
-	RETURNING campaign_id INTO selected_campaign_id;
+  RETURNING campaign_id INTO selected_campaign_id;
 
   WITH messages AS (
     -- start with this campaign's messages joined with telegram ids

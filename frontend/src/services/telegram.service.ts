@@ -1,7 +1,6 @@
 import axios from 'axios'
-import Papa from 'papaparse'
-
 import type { AxiosError } from 'axios'
+import Papa from 'papaparse'
 
 // Telegram states that the total character limit is 4096.
 // This defines a threshold at which we warn the users on their template length.

@@ -1,14 +1,5 @@
 import userEvent from '@testing-library/user-event'
-import {
-  server,
-  screen,
-  fireEvent,
-  waitFor,
-  DEFAULT_FROM,
-  VALID_CSV_FILENAME,
-  VALID_EMAIL_CSV_FILE,
-  RECIPIENT_EMAIL,
-} from 'test-utils'
+
 import {
   mockApis,
   renderDashboard,
@@ -18,6 +9,18 @@ import {
   REPLY_TO,
   UNPROTECTED_MESSAGE_TEXT,
 } from '../util'
+
+import {
+  server,
+  screen,
+  fireEvent,
+  waitFor,
+  DEFAULT_FROM,
+  DEFAULT_FROM_ADDRESS,
+  VALID_CSV_FILENAME,
+  VALID_EMAIL_CSV_FILE,
+  RECIPIENT_EMAIL,
+} from 'test-utils'
 
 test('successfully creates and sends a new protected email campaign', async () => {
   // Setup
@@ -71,10 +74,10 @@ test('successfully creates and sends a new protected email campaign', async () =
   userEvent.click(customFromDropdown)
   userEvent.click(
     await screen.findByRole('option', {
-      name: DEFAULT_FROM,
+      name: DEFAULT_FROM_ADDRESS,
     })
   )
-  expect(customFromDropdown).toHaveTextContent(DEFAULT_FROM)
+  expect(customFromDropdown).toHaveTextContent(DEFAULT_FROM_ADDRESS)
 
   // Type in email subject
   const subjectTextbox = screen.getByRole('textbox', {

@@ -1,12 +1,17 @@
-import React, { useContext } from 'react'
-import { ModalContext } from 'contexts/modal.context'
+import { i18n } from '@lingui/core'
+
+import { useContext } from 'react'
+
+import { OutboundLink } from 'react-ga'
+
+import ReactPlayer from 'react-player/lazy'
+
 import styles from './DemoVideoModal.module.scss'
+
 import { PrimaryButton, TextButton } from 'components/common'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import { LINKS } from 'config'
-import { i18n } from '@lingui/core'
-import { OutboundLink } from 'react-ga'
-import ReactPlayer from 'react-player/lazy'
+import { ModalContext } from 'contexts/modal.context'
 
 const DemoVideoModal = ({
   numDemosSms,

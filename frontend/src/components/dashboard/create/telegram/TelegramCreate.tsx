@@ -1,16 +1,18 @@
 import cx from 'classnames'
-import React, { useState, useEffect, useContext } from 'react'
 
-import { CampaignContext } from 'contexts/campaign.context'
-import { TelegramProgress, Status, TelegramCampaign } from 'classes'
-import { ProgressPane } from 'components/common'
-import TelegramRecipients from './TelegramRecipients'
-import TelegramCredentials from './TelegramCredentials'
-import TelegramSend from './TelegramSend'
-import TelegramDetail from './TelegramDetail'
-import BodyTemplate from '../common/BodyTemplate'
+import { useState, useEffect, useContext } from 'react'
 
 import styles from '../Create.module.scss'
+import BodyTemplate from '../common/BodyTemplate'
+
+import TelegramCredentials from './TelegramCredentials'
+import TelegramDetail from './TelegramDetail'
+import TelegramRecipients from './TelegramRecipients'
+import TelegramSend from './TelegramSend'
+
+import { TelegramProgress, Status, TelegramCampaign } from 'classes'
+import { ProgressPane } from 'components/common'
+import { CampaignContext } from 'contexts/campaign.context'
 import {
   TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD,
   TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD,

@@ -2,12 +2,12 @@ import Papa from 'papaparse'
 import { uuid } from 'uuidv4'
 
 import { encryptData, sha256 } from './crypto.service'
-import { hydrateTemplate } from './validate-csv.service'
 import {
   beginMultipartUpload,
   uploadPartWithPresignedUrl,
   completeMultiPartUpload,
 } from './upload.service'
+import { hydrateTemplate } from './validate-csv.service'
 
 const DEFAULT_CHUNK_SIZE = 10000000 // 10 Mb
 const MIN_UPLOAD_SIZE = 5000000 // 5Mb minimum needed for uploading each part

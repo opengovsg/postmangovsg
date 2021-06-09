@@ -1,6 +1,6 @@
 import { Transaction } from 'sequelize'
 import { difference } from 'lodash'
-import { TemplateClient, XSS_EMAIL_OPTION } from 'postman-templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 
 import { ProtectedMessage, Campaign } from '@core/models'
 import config from '@core/config'

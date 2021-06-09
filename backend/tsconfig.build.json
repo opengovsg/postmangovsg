@@ -1,5 +1,10 @@
 // Excludes test in builds
+// We have to duplicate project references as they are not inherited.
+// See: https://github.com/microsoft/TypeScript/issues/27098
 {
   "extends": "./tsconfig.json",
-  "exclude": ["tests/"]
+  "exclude": ["tests/"],
+  "references": [
+    { "path": "../shared" }
+  ]
 }

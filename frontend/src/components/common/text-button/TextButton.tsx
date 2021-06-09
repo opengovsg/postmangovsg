@@ -1,10 +1,10 @@
-import React from 'react'
 import cx from 'classnames'
+
+import type { ButtonHTMLAttributes } from 'react'
 
 import styles from './TextButton.module.scss'
 
-interface TextButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface TextButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   // if true, remove text-decoration
   noUnderline?: boolean
   // if true, follow min-width of primary button

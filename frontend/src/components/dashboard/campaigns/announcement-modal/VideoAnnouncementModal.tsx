@@ -1,9 +1,8 @@
-import React from 'react'
 import ReactPlayer from 'react-player/lazy'
 
-import styles from './VideoAnnouncementModal.module.scss'
 import { AnnouncementModalProps } from './AnnouncementModal'
 import AnnouncementModalOptions from './AnnouncementModalOptions'
+import styles from './VideoAnnouncementModal.module.scss'
 
 const VideoAnnouncementModal = ({
   title,

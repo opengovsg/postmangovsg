@@ -1,19 +1,28 @@
-import React from 'react'
 import cx from 'classnames'
+import { forwardRef } from 'react'
+
+import type { ReactNode, ChangeEvent } from 'react'
+
 import styles from './TextInput.module.scss'
 
-const TextInput = React.forwardRef((props: any, ref: React.ReactNode) => {
-  const { onChange, className, ...otherProps } = props
+const TextInput = forwardRef((props: any, ref: ReactNode) => {
+  const { onChange, className, badge, ...otherProps } = props
 
   return (
-    <input
-      ref={ref}
-      className={cx(styles.textInput, className)}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        onChange(e.target.value)
-      }
-      {...otherProps}
-    />
+    <div className={cx(styles.textInput, className)}>
+      <input
+        ref={ref}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          onChange(e.target.value)
+        }
+        {...otherProps}
+      />
+      {badge && (
+        <div className={styles.badge}>
+          <span>{badge}</span>
+        </div>
+      )}
+    </div>
   )
 })
 

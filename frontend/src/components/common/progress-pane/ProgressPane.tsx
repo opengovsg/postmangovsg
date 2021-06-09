@@ -1,5 +1,5 @@
-import React from 'react'
 import cx from 'classnames'
+
 import styles from './ProgressPane.module.scss'
 
 const ProgressItem = ({
