@@ -18,7 +18,7 @@ import { EmailTemplateService } from '@email/services'
 import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
 
-import { generateThemedHTMLEmail } from '@shared/theme'
+import { ThemeClient } from '@shared/theme'
 
 const logger = loggerWithLabel(module)
 
@@ -112,7 +112,7 @@ const getCampaignMessage = async (
     const mailToSend: MailToSend = {
       from: from || config.get('mailFrom'),
       recipients: [recipient],
-      body: await generateThemedHTMLEmail({
+      body: await ThemeClient.generateThemedHTMLEmail({
         body,
         unsubLink: UnsubscriberService.generateTestUnsubLink(),
         agencyName,

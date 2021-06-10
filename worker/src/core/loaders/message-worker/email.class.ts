@@ -8,7 +8,7 @@ import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import MailClient from '@email/services/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
-import { generateThemedHTMLEmail } from '@shared/theme'
+import { ThemeClient } from '@shared/theme'
 import { Message } from './interface'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
@@ -112,7 +112,7 @@ class Email {
         campaignId!,
         recipient
       ).toString()
-      const themedHTMLEmail = await generateThemedHTMLEmail({
+      const themedHTMLEmail = await ThemeClient.generateThemedHTMLEmail({
         body: hydratedBody,
         unsubLink,
         agencyName,
