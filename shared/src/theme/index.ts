@@ -3,6 +3,13 @@ import xss from 'xss'
 import fs from 'fs'
 import path from 'path'
 
+type EmailThemeFields = {
+  body: string
+  agencyName?: string
+  agencyLogoURI?: string
+  unsubLink: string
+}
+
 export class ThemeClient {
   private static emailHTMLTemplate: string
 
@@ -15,12 +22,7 @@ export class ThemeClient {
     }
   }
 
-  static async generateThemedHTMLEmail (emailThemeFields: {
-    body: string
-    agencyName?: string
-    agencyLogoURI?: string
-    unsubLink: string
-  }): Promise<string> {
+  static async generateThemedHTMLEmail (emailThemeFields: EmailThemeFields): Promise<string> {
     await this.loadEmailHTMLTemplate()
 
     // Take first 200 characters of the body (without html tags) to use as preheader (preview text of email content)
@@ -42,5 +44,17 @@ export class ThemeClient {
       ...emailThemeFields,
       preheader,
     })
+  }
+
+  // Returns contents of <body> tag from generateThemedHTMLEmail
+  static async generateThemedBody (emailThemeFields: EmailThemeFields) {
+    const themedHTMLEmail = await this.generateThemedHTMLEmail(emailThemeFields)
+
+    /**
+     * Regex to match contents of <body> tag
+     * @see: https://stackoverflow.com/a/2857261
+     */
+    const themedBody = /<body.*?>([\s\S]*)<\/body>/.exec(themedHTMLEmail)?.[1]
+    return themedBody
   }
 }
