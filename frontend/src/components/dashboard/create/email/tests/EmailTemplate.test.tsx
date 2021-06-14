@@ -1,3 +1,6 @@
+import { t } from '@lingui/macro'
+
+import { waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { Route } from 'react-router-dom'
@@ -13,9 +16,11 @@ import {
   server,
   render,
   fireEvent,
+  DEFAULT_FROM_NAME,
+  DEFAULT_FROM_ADDRESS,
 } from 'test-utils'
 
-function mockApis(protect: boolean) {
+function mockApis(protect: boolean, customFroms: string[] = []) {
   const campaign: Campaign = {
     id: 1,
     name: 'Test email campaign',
@@ -34,6 +39,7 @@ function mockApis(protect: boolean) {
   const { handlers } = mockCommonApis({
     // Start with a freshly created email campaign
     campaigns: [campaign],
+    customFroms,
   })
   return handlers
 }
@@ -106,6 +112,7 @@ test('displays an error if the subject is empty after sanitization', async () =>
   renderTemplatePage()
 
   // Wait for the component to fully load
+  expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
   const subjectTextbox = await screen.findByRole('textbox', {
     name: /subject/i,
   })
@@ -262,5 +269,77 @@ describe('protected email', () => {
 
     // Teardown
     jest.restoreAllMocks()
+  })
+})
+
+describe('custom sender details', () => {
+  test('custom from name and address should be selected as default', async () => {
+    server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
+    renderTemplatePage()
+
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
+    const fromAddressDropdown = screen.getByRole('listbox', {
+      name: /custom from/i,
+    })
+
+    await waitFor(() => {
+      expect(fromNameInput.value).toBe('Agency')
+      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
+    })
+  })
+
+  test('selecting from address should update from name', async () => {
+    server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
+    renderTemplatePage()
+
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
+    const fromAddressDropdown = screen.getByRole('listbox', {
+      name: /custom from/i,
+    })
+
+    // Wait for from addersses to be loaded
+    await waitFor(() => {
+      expect(fromNameInput.value).toBe('Agency')
+      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
+    })
+
+    // Key in custom from to be overwritten later
+    userEvent.clear(fromNameInput)
+    userEvent.type(fromNameInput, 'Custom name')
+
+    // Select a new from address
+    userEvent.click(fromAddressDropdown)
+    userEvent.click(
+      await screen.findByRole('option', {
+        name: DEFAULT_FROM_ADDRESS,
+      })
+    )
+
+    expect(fromNameInput.value).toBe(DEFAULT_FROM_NAME)
+  })
+
+  test('non-default from name should show mail via', async () => {
+    server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
+    renderTemplatePage()
+
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
+    const fromAddressDropdown = screen.getByRole('listbox', {
+      name: /custom from/i,
+    })
+
+    await waitFor(() => {
+      expect(fromNameInput.value).toBe('Agency')
+      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
+    })
+
+    expect(screen.queryByText(t`mailVia`)).toBeNull()
+    userEvent.type(fromNameInput, 'Custom name')
+    expect(screen.getByText(t`mailVia`)).toBeInTheDocument()
   })
 })

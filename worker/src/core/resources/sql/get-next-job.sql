@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION get_next_job(worker text)
 RETURNS json
 LANGUAGE plpgsql AS $$
-DECLARE  
-selected_job_id int;  
+DECLARE
+selected_job_id int;
 selected_campaign_id int;
 selected_rate int;
 result json;
@@ -10,8 +10,8 @@ BEGIN
 
 UPDATE job_queue
 SET worker_id = worker, status = 'ENQUEUED', updated_at = clock_timestamp()
-WHERE 
--- worker is not already operating on a job 
+WHERE
+-- worker is not already operating on a job
 NOT EXISTS (SELECT 1 FROM job_queue q WHERE q.worker_id = worker LIMIT 1)
 AND id = ( SELECT q.id
     FROM job_queue q, campaigns p, credentials c

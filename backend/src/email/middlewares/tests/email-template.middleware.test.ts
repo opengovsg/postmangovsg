@@ -55,8 +55,7 @@ afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await RedisService.close()
 })
 
 describe('uploadCompleteHandler middleware', () => {

@@ -51,12 +51,7 @@ export default class TelegramClient {
    */
   public getBotInfo(): Promise<string | number> {
     return this.client.getMe().then((user) => {
-      const { is_bot: isBot, id } = user
-      if (!isBot) {
-        return Promise.reject(new Error('User is not a bot.'))
-      }
-
-      return id
+      return user.id
     })
   }
 }

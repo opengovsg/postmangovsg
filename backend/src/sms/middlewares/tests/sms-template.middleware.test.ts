@@ -83,7 +83,6 @@ describe('uploadCompleteHandler middleware', () => {
     )
 
     const campaign = await Campaign.findOne({ where: { id: campaignId } })
-    console.log(campaign?.s3Object)
     expect(campaign?.s3Object).toEqual({
       temp_filename: 'abc',
       error:
@@ -124,6 +123,12 @@ describe('uploadCompleteHandler middleware', () => {
       mockRequest as Request,
       mockResponse as Response,
       nextFunction
+    )
+
+    await new Promise<void>((resolve) =>
+      setTimeout(() => {
+        resolve()
+      }, 1000)
     )
 
     const campaign = await Campaign.findOne({ where: { id: campaignId } })

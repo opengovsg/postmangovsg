@@ -131,10 +131,11 @@ function mockSettingsApis(state: State) {
       return res(ctx.status(200))
     }),
     rest.get('/settings/email/from', (_req, res, ctx) => {
+      const froms = state.customFroms || []
       return res(
         ctx.status(200),
         ctx.json({
-          from: [DEFAULT_FROM],
+          from: froms.concat([DEFAULT_FROM]),
         })
       )
     }),

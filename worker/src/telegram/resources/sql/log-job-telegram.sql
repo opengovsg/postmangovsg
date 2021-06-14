@@ -14,7 +14,7 @@ BEGIN
   WHERE o.campaign_id = selected_campaign_id
     AND o.id = m.id;
 
-	DELETE FROM telegram_ops o
+  DELETE FROM telegram_ops o
   WHERE o.campaign_id = selected_campaign_id;
 
   PERFORM update_stats_telegram(selected_campaign_id);

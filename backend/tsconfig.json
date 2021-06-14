@@ -41,10 +41,11 @@
       "@email/*": ["email/*"],
       "@telegram/*": ["telegram/*"],
       "@shared/*": ["../../shared/src/*"],
-      "@test-utils/*": ["test-utils/*"]
+      "@test-utils/*": ["test-utils/*"],
+      "@mocks/*": ["__mocks__/*"],
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
   }
 }

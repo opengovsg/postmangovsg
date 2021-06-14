@@ -1,3 +1,4 @@
+import { t } from '@lingui/macro'
 import {
   useState,
   useEffect,
@@ -11,6 +12,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from './EmailTemplate.module.scss'
 
+import { parseFromAddress } from '@shared/utils/from-address'
 import { EmailCampaign, EmailProgress } from 'classes'
 import {
   TextArea,
@@ -52,7 +54,17 @@ const EmailTemplate = ({
   const [replyTo, setReplyTo] = useState(
     initialReplyTo === userEmail ? null : initialReplyTo
   )
-  const [from, setFrom] = useState(initialFrom)
+
+  // initialFrom is undefined for a new campaign without a saved template
+  const {
+    fromName: initialFromName,
+    fromAddress: initialFromAddress,
+  } = initialFrom
+    ? parseFromAddress(initialFrom)
+    : { fromName: '', fromAddress: '' }
+  const [fromName, setFromName] = useState(initialFromName)
+  const [fromAddress, setFromAddress] = useState(initialFromAddress)
+
   const [customFromAddresses, setCustomFromAddresses] = useState(
     [] as { label: string; value: string }[]
   )
@@ -74,7 +86,7 @@ const EmailTemplate = ({
         subject,
         body,
         replyTo,
-        from
+        `${fromName} <${fromAddress}>`
       )
       if (updatedTemplate) {
         updateCampaign({
@@ -90,16 +102,32 @@ const EmailTemplate = ({
     } catch (err) {
       setErrorMsg(err.message)
     }
-  }, [body, campaignId, from, replyTo, setActiveStep, subject, updateCampaign])
-
-  async function populateFromAddresses() {
-    const fromAddresses = await getCustomFromAddresses()
-    const options = fromAddresses.map((v) => ({ label: v, value: v }))
-    setCustomFromAddresses(options)
-  }
+  }, [
+    body,
+    campaignId,
+    replyTo,
+    setActiveStep,
+    subject,
+    updateCampaign,
+    fromAddress,
+    fromName,
+  ])
 
   // Get custom from addresses
   useEffect(() => {
+    async function populateFromAddresses() {
+      const fromAddresses = await getCustomFromAddresses()
+      const options = fromAddresses.map((from) => {
+        const { fromAddress } = parseFromAddress(from)
+        return { label: fromAddress, value: from }
+      })
+      setCustomFromAddresses(options)
+
+      const { fromName, fromAddress } = parseFromAddress(fromAddresses[0])
+      setFromName((prev) => prev || fromName)
+      setFromAddress((prev) => prev || fromAddress)
+    }
+
     populateFromAddresses()
   }, [])
 
@@ -113,7 +141,13 @@ const EmailTemplate = ({
           try {
             if (!subject || !body)
               throw new Error('Message subject or template cannot be empty!')
-            await saveTemplate(+campaignId, subject, body, replyTo, from)
+            await saveTemplate(
+              +campaignId,
+              subject,
+              body,
+              replyTo,
+              `${fromName} <${fromAddress}>`
+            )
           } catch (err) {
             setErrorMsg(err.message)
             throw err
@@ -124,10 +158,60 @@ const EmailTemplate = ({
     return () => {
       setFinishLaterContent(null)
     }
-  }, [body, subject, from, setFinishLaterContent, campaignId, replyTo])
+  }, [
+    body,
+    subject,
+    fromName,
+    fromAddress,
+    setFinishLaterContent,
+    campaignId,
+    replyTo,
+  ])
 
   function replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n') || ''
+  }
+
+  const handleSelectFromAddress = useCallback(
+    (selectedFrom: string) => {
+      const {
+        fromName: selectedFromName,
+        fromAddress: selectedFromAddress,
+      } = parseFromAddress(selectedFrom)
+
+      // Use custom from name if it has already been set. For e.g.,
+      // for "Custom <donotreply@mail.postman.gov.sg>"", we should
+      // use "Custom" instead of the default "Postman.gov.sg".
+      setFromName(
+        selectedFromAddress === initialFromAddress
+          ? initialFromName
+          : selectedFromName
+      )
+      setFromAddress(selectedFromAddress)
+    },
+    [initialFromName, initialFromAddress]
+  )
+
+  const getFromNameInputProps = () => {
+    const mailVia = t`mailVia`
+
+    // Strip mail via that is appended at then end of from name by the backend.
+    const inputFromName = fromName?.replace(new RegExp(`\\s${mailVia}$`), '')
+    const props: { value?: string; badge?: string } = {
+      value: inputFromName,
+    }
+
+    const [selectedFrom] = customFromAddresses.filter(
+      ({ label }) => label === fromAddress
+    )
+    if (selectedFrom) {
+      const { fromName: selectedFromName } = parseFromAddress(
+        selectedFrom?.value
+      )
+      props.badge = selectedFromName !== inputFromName?.trim() ? mailVia : ''
+    }
+
+    return props
   }
 
   return (
@@ -137,12 +221,19 @@ const EmailTemplate = ({
 
         <div>
           <h4>From</h4>
-          <p>Emails will be sent from this address</p>
+          <p>Sender details.</p>
+          <TextInput
+            {...getFromNameInputProps()}
+            onChange={setFromName}
+            aria-label="Sender name"
+            placeholder={t`E.g. Ministry of Health`}
+          />
           <Dropdown
-            onSelect={setFrom}
+            onSelect={handleSelectFromAddress}
             options={customFromAddresses}
-            defaultLabel={from || customFromAddresses[0]?.label}
+            defaultLabel={fromAddress}
             aria-label="Custom from"
+            disabled={customFromAddresses.length <= 1}
           ></Dropdown>
         </div>
 
@@ -157,7 +248,7 @@ const EmailTemplate = ({
             id="subject"
             highlight={true}
             singleRow={true}
-            placeholder="Enter subject"
+            placeholder={t`e.g. Appointment Confirmation`}
             value={subject}
             onChange={setSubject}
           />
@@ -222,7 +313,10 @@ const EmailTemplate = ({
         </div>
       </StepSection>
 
-      <NextButton disabled={!body || !subject} onClick={handleSaveTemplate} />
+      <NextButton
+        disabled={!fromName || !fromAddress || !body || !subject}
+        onClick={handleSaveTemplate}
+      />
       <ErrorBlock>{errorMsg}</ErrorBlock>
     </>
   )

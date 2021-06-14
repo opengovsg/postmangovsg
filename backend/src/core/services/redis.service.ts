@@ -50,7 +50,31 @@ const sessionClient = redis
     })
   })
 
+const close = async (): Promise<void> => {
+  console.log('close')
+  const closeOtpClient = new Promise<void>((resolve) => {
+    otpClient.quit(() => {
+      console.log('otp quit')
+      resolve()
+    })
+  })
+
+  const closeSessionClient = new Promise<void>((resolve) => {
+    sessionClient.quit(() => {
+      console.log('sess quit')
+      resolve()
+    })
+  })
+
+  await Promise.all([closeOtpClient, closeSessionClient])
+
+  // redis.quit() creates a thread to close the connection.
+  // We wait until all threads have been run once to ensure the connection closes.
+  await new Promise((resolve) => setImmediate(resolve))
+}
+
 export const RedisService = {
   otpClient,
   sessionClient,
+  close,
 }
