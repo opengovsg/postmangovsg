@@ -8,6 +8,7 @@ import styles from './EmailPreviewBlock.module.scss'
 
 interface EmailPreviewBlockProps {
   body: string
+  themedBody?: string
   subject?: string
   replyTo?: string | null
   from?: string
@@ -16,6 +17,7 @@ interface EmailPreviewBlockProps {
 
 const EmailPreviewBlock: FC<EmailPreviewBlockProps> = ({
   body,
+  themedBody,
   subject,
   replyTo,
   from,
@@ -34,19 +36,32 @@ const EmailPreviewBlock: FC<EmailPreviewBlockProps> = ({
   }
 
   return (
-    <div className={cx(styles.preview, className)}>
-      <h5>From</h5>
-      <p>{from}</p>
+    <>
+      <div className={cx(styles.previewInfo, className)}>
+        <h5>From</h5>
+        <p>{from}</p>
 
-      <h5>Subject</h5>
-      <p>{subject}</p>
+        <h5>Subject</h5>
+        <p>{subject}</p>
 
-      <h5>Body</h5>
-      <RichTextEditor value={body} preview {...otherProps} />
+        {
+          // In case themedBody doesn't exist, render body as fallback instead
+          themedBody != undefined || (
+            <>
+              <h5>Body</h5>
+              <RichTextEditor value={body} preview {...otherProps} />
+            </>
+          )
+        }
+        <h5>Replies</h5>
+        <p>{replyTo}</p>
+      </div>
 
-      <h5>Replies</h5>
-      <p>{replyTo}</p>
-    </div>
+      <div
+        className={styles.previewBody}
+        dangerouslySetInnerHTML={{ __html: themedBody ?? '' }}
+      ></div>
+    </>
   )
 }
 
