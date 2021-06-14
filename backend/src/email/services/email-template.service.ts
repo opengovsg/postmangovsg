@@ -179,7 +179,7 @@ const storeTemplate = async ({
 
   // Add whitespace, if not present, after email salutation
   // to prevent phisy looking email preview
-  sanitizedBody = sanitizedBody.replace(/(^.+?,)([^\s].+?<\/p>.+)/, '$1 $2')
+  sanitizedBody = sanitizedBody.replace(/(^.+?,)([^\s].+?<\/p>.*)/, '$1 $2')
 
   // Append via to sender name if it is not the default from name
   const {
