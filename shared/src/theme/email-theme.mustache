@@ -1,3 +1,6 @@
+{{!-- 
+  Email template built with reference to https://www.goodemailcode.com/
+--}}
 <!DOCTYPE html>
 <html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
@@ -18,6 +21,11 @@
     </xml>
   </noscript>
   <![endif]-->
+
+  {{!--
+    Most styles have been inlined into the HTML below for best email client support
+    Only media queries (for responsive devices) and generic styles remain in the style tag
+  --}}
   <style>
     @media only screen and (max-width: 500px) {
       .root-container {
@@ -75,6 +83,10 @@
 </head>
 
 <body style="margin: 0; padding: 0; word-spacing: normal; background-color: #ffffff;">
+  {{!--
+    Preheader text (within a hidden div) is the preview text being shown in email clients
+    @see: https://www.litmus.com/blog/the-little-known-preview-text-hack-you-may-want-to-use-in-every-email/
+  --}}
   <div style="display: none; max-height: 0px; overflow: hidden;">
     {{preheader}}
   </div>
@@ -176,9 +188,9 @@
         <div class="footer-vertical-spacer-bottom" style="line-height: 24px; height: 24px;">&#8202;</div>
       </div>
     </div>
-    <!--[if true]>
-      </td></tr></table>
-    <![endif]-->
+  <!--[if true]>
+  </td></tr></table>
+  <![endif]-->
 </body>
 
 </html>
