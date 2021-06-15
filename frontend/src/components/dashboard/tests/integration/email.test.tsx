@@ -15,6 +15,7 @@ import {
   fireEvent,
   waitFor,
   DEFAULT_FROM,
+  DEFAULT_FROM_NAME,
   DEFAULT_FROM_ADDRESS,
   VALID_CSV_FILENAME,
   RECIPIENT_EMAIL,
@@ -76,6 +77,12 @@ test('successfully creates and sends a new email campaign', async () => {
     })
   )
   expect(customFromDropdown).toHaveTextContent(DEFAULT_FROM_ADDRESS)
+
+  // Enter a from name
+  const fromNameInput = (await screen.findByLabelText(
+    /sender name/i
+  )) as HTMLInputElement
+  userEvent.type(fromNameInput, DEFAULT_FROM_NAME)
 
   // Type in email subject
   const subjectTextbox = screen.getByRole('textbox', {

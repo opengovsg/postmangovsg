@@ -16,7 +16,6 @@ import {
   server,
   render,
   fireEvent,
-  DEFAULT_FROM_NAME,
   DEFAULT_FROM_ADDRESS,
 } from 'test-utils'
 
@@ -117,6 +116,9 @@ test('displays an error if the subject is empty after sanitization', async () =>
     name: /subject/i,
   })
   const nextButton = screen.getByRole('button', { name: /next/i })
+  const fromNameInput = (await screen.findByLabelText(
+    /sender name/i
+  )) as HTMLInputElement
 
   // Test against various empty templates
   const TEST_TEMPLATES = ['<hehe>', '<script>']
@@ -124,6 +126,9 @@ test('displays an error if the subject is empty after sanitization', async () =>
     // Type the template text into the textbox
     userEvent.clear(subjectTextbox)
     userEvent.type(subjectTextbox, template)
+
+    // Enter a custom from name
+    userEvent.type(fromNameInput, 'Postman.gov.sg')
 
     // Click the next button to submit the template
     userEvent.click(nextButton)
@@ -154,6 +159,9 @@ describe('protected email', () => {
       name: /subject/i,
     })
     const nextButton = screen.getByRole('button', { name: /next/i })
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
 
     // Test against various templates with extraneous invalid params
     const TEST_TEMPLATES = [
@@ -164,6 +172,9 @@ describe('protected email', () => {
       // Type the template text into the textbox
       userEvent.clear(subjectTextbox)
       userEvent.paste(subjectTextbox, template)
+
+      // Enter a custom from name
+      userEvent.type(fromNameInput, 'Postman.gov.sg')
 
       // Click the next button to submit the template
       userEvent.click(nextButton)
@@ -196,6 +207,9 @@ describe('protected email', () => {
       name: /rdw-editor/i,
     })
     const nextButton = screen.getByRole('button', { name: /next/i })
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
 
     // Make the subject non-empty
     userEvent.paste(subjectTextbox, 'filler subject')
@@ -212,6 +226,9 @@ describe('protected email', () => {
           getData: () => template,
         },
       })
+
+      // Enter a custom from name
+      userEvent.type(fromNameInput, 'Postman.gov.sg')
 
       // Click the next button to submit the template
       userEvent.click(nextButton)
@@ -243,6 +260,9 @@ describe('protected email', () => {
       name: /rdw-editor/i,
     })
     const nextButton = screen.getByRole('button', { name: /next/i })
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
 
     // Make the subject non-empty
     userEvent.paste(subjectTextbox, 'filler subject')
@@ -259,6 +279,9 @@ describe('protected email', () => {
           getData: () => template,
         },
       })
+
+      // Enter a custom from name
+      userEvent.type(fromNameInput, 'Postman.gov.sg')
 
       // Click the next button to submit the template
       userEvent.click(nextButton)
@@ -290,7 +313,7 @@ describe('custom sender details', () => {
     })
   })
 
-  test('selecting from address should update from name', async () => {
+  test('selecting default from address should clear from name', async () => {
     server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
     renderTemplatePage()
 
@@ -301,7 +324,7 @@ describe('custom sender details', () => {
       name: /custom from/i,
     })
 
-    // Wait for from addersses to be loaded
+    // Wait for from address to be loaded
     await waitFor(() => {
       expect(fromNameInput.value).toBe('Agency')
       expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
@@ -319,7 +342,7 @@ describe('custom sender details', () => {
       })
     )
 
-    expect(fromNameInput.value).toBe(DEFAULT_FROM_NAME)
+    expect(fromNameInput.value).toBe('')
   })
 
   test('non-default from name should show mail via', async () => {
