@@ -1,7 +1,8 @@
 import psl from 'psl'
 
 /**
- * Extract the domain of an email address
+ * Extract the domain of an email address, excluding it's subdomain.
+ * E.g. user@sub.agency.gov.sg -> agency.gov.sg
  * @param email email address to get domain from
  * @returns domain parsed domain for the email address
  * @throws Error if email address is not valid
