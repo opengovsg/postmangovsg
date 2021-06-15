@@ -23,9 +23,16 @@
 
 .previewBody {
   margin-top: 3rem;
+  color: #000000;
 
   * {
     font-family: Arial, Helvetica, sans-serif;
+    color: inherit;
+  }
+
+  p,
+  a,
+  span {
     font-size: inherit;
   }
 }
