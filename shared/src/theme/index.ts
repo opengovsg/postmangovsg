@@ -23,14 +23,19 @@ export class ThemeClient {
     }
   }
 
-  // Take first 200 characters of the body (without html tags) to use as preheader (preview text of email content)
-  // Append whitespace after closing tags so paragraphs are spaced out in preheader
+  /**
+   * Take first 200 characters of the body (with html tags stripped) to use as
+   * preheader (preview text of email content)
+   * @param body - HTML body of email
+   * @returns first 200 characters after stripping html tags
+   */
   static generatePreheader(body: string): string {
     return xss
       .filterXSS(body, {
-        whiteList: {},                  // whitelist for tags is empty, i.e. strip all HTML tags 
-        stripIgnoreTagBody: ['script'], // remove contents of script tags entirely
+        whiteList: {},
+        stripIgnoreTagBody: ['script'],
         onIgnoreTag: (_tag, _html, options) => {
+          // Append whitespace after each closing tag
           // @ts-ignore types are missing, upgrade to js-xss 1.0.9 which fixes missing types
           if (options.isClosing) return ' '
           else return ''
