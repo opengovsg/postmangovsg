@@ -221,12 +221,12 @@ const EmailTemplate = ({
 
         <div>
           <h4>From</h4>
-          <p>Sender details.</p>
+          <p>Sender details</p>
           <TextInput
             {...getFromNameInputProps()}
             onChange={setFromName}
             aria-label="Sender name"
-            placeholder={t`E.g. Ministry of Health`}
+            placeholder={t`e.g. Ministry of Health`}
           />
           <Dropdown
             onSelect={handleSelectFromAddress}

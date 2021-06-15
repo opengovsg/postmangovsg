@@ -21,14 +21,6 @@ msgstr "Delivery report has expired and is no longer available for download."
 msgid "Delivery report will expire 14 days after sending is completed."
 msgstr "Delivery report will expire 14 days after sending is completed."
 
-#: components/dashboard/create/email/EmailTemplate.tsx:148
-#~ msgid "E.g. MOH Appointment"
-#~ msgstr "E.g. MOH Appointment"
-
-#: components/dashboard/create/email/EmailTemplate.tsx:140
-msgid "E.g. Ministry of Health"
-msgstr "E.g. Ministry of Health"
-
 #: components/login/login-input/LoginInput.tsx:88
 msgid "Enter OTP"
 msgstr "Enter OTP"
@@ -122,9 +114,13 @@ msgstr "This demo campaign will be sent to a maximum of 20 recipients."
 msgid "demoMessageLabel"
 msgstr "DEMO"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:151
+#: components/dashboard/create/email/EmailTemplate.tsx:162
 msgid "e.g. Appointment Confirmation"
 msgstr "e.g. Appointment Confirmation"
+
+#: components/dashboard/create/email/EmailTemplate.tsx:151
+msgid "e.g. Ministry of Health"
+msgstr "e.g. Ministry of Health"
 
 #: components/login/login-input/LoginInput.tsx:88
 msgid "e.g. postman@agency.gov.sg"
@@ -242,6 +238,8 @@ msgstr "https://guide.postman.gov.sg/contact-us"
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:140
+#: components/dashboard/create/email/EmailTemplate.tsx:131
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:267
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:269
 msgid "mailVia"
 msgstr "via Postman"
