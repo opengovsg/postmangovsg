@@ -198,7 +198,7 @@ const EmailTemplate = ({
     // Strip mail via that is appended at then end of from name by the backend.
     const inputFromName = fromName?.replace(new RegExp(`\\s${mailVia}$`), '')
     const props: { value?: string; badge?: string } = {
-      value: inputFromName,
+      value: inputFromName ?? '',
     }
 
     const [selectedFrom] = customFromAddresses.filter(
