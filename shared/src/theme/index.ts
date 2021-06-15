@@ -23,13 +23,10 @@ export class ThemeClient {
     }
   }
 
-  static async generateThemedHTMLEmail (emailThemeFields: EmailThemeFields): Promise<string> {
-    await this.loadEmailHTMLTemplate()
-
-    // Take first 200 characters of the body (without html tags) to use as preheader (preview text of email content)
-    // Append whitespace after closing tags so paragraphs are spaced out in preheader
-    const { body } = emailThemeFields
-    const preheader = xss
+  // Take first 200 characters of the body (without html tags) to use as preheader (preview text of email content)
+  // Append whitespace after closing tags so paragraphs are spaced out in preheader
+  static generatePreheader(body: string): string {
+    return xss
       .filterXSS(body, {
         whiteList: {},                  // whitelist for tags is empty, i.e. strip all HTML tags 
         stripIgnoreTagBody: ['script'], // remove contents of script tags entirely
@@ -40,6 +37,12 @@ export class ThemeClient {
         }
       })
       .substring(0, 200)
+  }
+
+  static async generateThemedHTMLEmail (emailThemeFields: EmailThemeFields): Promise<string> {
+    await this.loadEmailHTMLTemplate()
+
+    const preheader = this.generatePreheader(emailThemeFields.body)
 
     return mustache.render(this.emailHTMLTemplate, {
       ...emailThemeFields,
