@@ -54,14 +54,29 @@ class Email {
   }
 
   async getMessages(jobId: number, rate: number): Promise<Message[]> {
-    const result = await this.connection.query(
+    interface MessageWithSenderEmail extends Message {
+      senderEmail: string
+    }
+    interface ResultRow {
+      get_messages_to_send_email: MessageWithSenderEmail
+    }
+
+    const showMastheadDomain = config.get('showMastheadDomain')
+    const result = await this.connection.query<ResultRow>(
       'SELECT get_messages_to_send_email(:job_id, :rate);',
       {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
       }
     )
-    return map(result, 'get_messages_to_send_email')
+    return map(result, (row) => {
+      const { senderEmail } = row.get_messages_to_send_email
+      const showMasthead = senderEmail.endsWith(showMastheadDomain)
+      return {
+        ...row.get_messages_to_send_email,
+        showMasthead,
+      }
+    })
   }
 
   calculateHash(campaignId: number, recipient: string): string {
@@ -99,6 +114,7 @@ class Email {
     campaignId,
     agencyName,
     agencyLogoURI,
+    showMasthead,
   }: Message): Promise<void> {
     if (!validator.isEmail(recipient)) {
       throw new Error('Recipient is incorrectly formatted')
@@ -117,6 +133,7 @@ class Email {
         unsubLink,
         agencyName,
         agencyLogoURI,
+        showMasthead,
       })
 
       const messageId = await this.mailService.sendMail({

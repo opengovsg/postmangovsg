@@ -9,4 +9,5 @@ export interface Message {
   from?: string
   agencyName?: string
   agencyLogoURI?: string
+  showMasthead?: boolean
 }

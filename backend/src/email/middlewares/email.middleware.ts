@@ -101,12 +101,21 @@ const previewFirstMessage = async (
 
     if (!message) return res.json({})
 
-    const { body, subject, replyTo, from, agencyName, agencyLogoURI } = message
+    const {
+      body,
+      subject,
+      replyTo,
+      from,
+      agencyName,
+      agencyLogoURI,
+      showMasthead,
+    } = message
     const themedBody = await ThemeClient.generateThemedBody({
       body,
       unsubLink: '',
       agencyName,
       agencyLogoURI,
+      showMasthead,
     })
 
     return res.json({

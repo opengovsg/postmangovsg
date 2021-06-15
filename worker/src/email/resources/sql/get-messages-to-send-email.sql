@@ -27,7 +27,8 @@ BEGIN
 			'replyTo', t.reply_to,
 			'from', t.from,
 			'agencyName', a.name,
-			'agencyLogoURI', a.logo_uri
+			'agencyLogoURI', a.logo_uri,
+			'senderEmail', u.email
 		)
     FROM messages m
 		INNER JOIN email_templates t ON t.campaign_id = m.campaign_id

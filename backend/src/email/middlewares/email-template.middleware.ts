@@ -226,16 +226,7 @@ const pollCsvStatusHandler = async (
     } = await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
-    let numRecipients
-    let preview: {
-      body: string
-      subject: string
-      replyTo: string | null
-      from: string
-      agencyName: string | undefined
-      agencyLogoURI: string | undefined
-      themedBody?: string
-    } | void
+    let numRecipients, preview, themedBody
 
     if (!isCsvProcessing) {
       ;[numRecipients, preview] = await Promise.all([
@@ -244,12 +235,13 @@ const pollCsvStatusHandler = async (
       ])
 
       if (preview !== undefined) {
-        const { body, agencyName, agencyLogoURI } = preview
-        preview.themedBody = await ThemeClient.generateThemedBody({
+        const { body, agencyName, agencyLogoURI, showMasthead } = preview
+        themedBody = await ThemeClient.generateThemedBody({
           body,
           unsubLink: '',
           agencyName,
           agencyLogoURI,
+          showMasthead,
         })
       }
     }
@@ -260,7 +252,10 @@ const pollCsvStatusHandler = async (
       temp_csv_filename: tempFilename,
       csv_error: error,
       num_recipients: numRecipients,
-      preview,
+      preview: {
+        ...preview,
+        themedBody,
+      },
     })
   } catch (err) {
     next(err)

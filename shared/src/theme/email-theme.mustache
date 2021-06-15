@@ -94,11 +94,18 @@
     style="font-size:14px; line-height: 1.71; font-family: Arial, Helvetica, sans-serif;">
     <!--[if true]>
     <table role="presentation" style="width: 728px; border: 1px solid #E8EBEE" align="center" cellspacing="0" cellpadding="0" bgcolor="#E8EBEE">
-      <tr><td align="center" valign="middle" style="font-size: 12px; border: 1px solid #E8EBEE; padding: 4px;">
     <![endif]-->
 
     <!--[if false]><!-->
     <div class="root-container" style="max-width:728px; min-width: 500px; margin:0 auto;">
+    <!--<![endif]-->
+
+    {{#showMasthead}}
+    <!--[if true]>
+      <tr><td align="center" valign="middle" style="font-size: 12px; border: 1px solid #E8EBEE; padding: 4px;">
+    <![endif]-->
+
+    <!--[if false]><!-->
       <div class="masthead"
         style="text-align: center; font-size: 11px; line-height: 28px; height: 28px; background-color: #E8EBEE; border-top-left-radius: 8px; border-top-right-radius: 8px; white-space: nowrap;">
     <!--<![endif]-->
@@ -109,12 +116,18 @@
     
     <!--[if true]>
       </td></tr>
+    <![endif]-->
+    {{/showMasthead}}
+
+    <!--[if true]>
       <tr><td style="padding: 0 64px; border: 1px solid #E8EBEE;" bgcolor="#FFFFFF">
     <![endif]-->
 
     <!--[if false]><!-->
       <div class="body-content"
-        style="max-width:728px; padding:0 64px; border-color: #E8EBEE; border-width: 0 2px 2px 2px; border-style: solid;  border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+        style="max-width: 728px; padding: 0 64px; border-color: #E8EBEE; border-style: solid;
+                {{#showMasthead}} border-width: 0 2px 2px 2px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; {{/showMasthead}}
+                {{^showMasthead}} border-width: 2px; border-radius: 8px; {{/showMasthead}}">
     <!--<![endif]-->
 
         <div class="body-vertical-spacer-top" style="line-height:48px;height:48px;">&#8202;</div>

@@ -50,6 +50,7 @@ const getHydratedMessage = async (
   from: string
   agencyName: string | undefined
   agencyLogoURI: string | undefined
+  showMasthead?: boolean
 } | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
@@ -85,6 +86,10 @@ const getHydratedMessage = async (
   const agencyName = agency?.name
   const agencyLogoURI = agency?.logo_uri
 
+  const showMasthead = campaign?.user?.email.endsWith(
+    config.get('showMastheadDomain')
+  )
+
   return {
     body,
     subject,
@@ -92,6 +97,7 @@ const getHydratedMessage = async (
     from: template?.from!,
     agencyName,
     agencyLogoURI,
+    showMasthead,
   }
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
 }
@@ -108,7 +114,15 @@ const getCampaignMessage = async (
   // get the body and subject
   const message = await getHydratedMessage(campaignId)
   if (message) {
-    const { body, subject, replyTo, from, agencyName, agencyLogoURI } = message
+    const {
+      body,
+      subject,
+      replyTo,
+      from,
+      agencyName,
+      agencyLogoURI,
+      showMasthead,
+    } = message
     const mailToSend: MailToSend = {
       from: from || config.get('mailFrom'),
       recipients: [recipient],
@@ -117,6 +131,7 @@ const getCampaignMessage = async (
         unsubLink: UnsubscriberService.generateTestUnsubLink(),
         agencyName,
         agencyLogoURI,
+        showMasthead,
       }),
       subject,
       ...(replyTo ? { replyTo } : {}),
