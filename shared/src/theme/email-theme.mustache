@@ -74,14 +74,15 @@
   </style>
 </head>
 
-<body style="margin:0; padding:0; word-spacing:normal; background-color:#ffffff;">
+<body style="margin: 0; padding: 0; word-spacing: normal; background-color: #ffffff;">
   <div style="display: none; max-height: 0px; overflow: hidden;">
     {{preheader}}
   </div>
 
   {{!-- Insert spacers to prevent text below from appearing in preheader --}}
   <div style="display: none; max-height: 0px; overflow: hidden;">
-    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
   </div>
 
   {{!--
@@ -91,13 +92,14 @@
   --}}
 
   <div role="article" aria-roledescription="email" aria-label="email name" lang="en"
-    style="font-size:14px; line-height: 1.71; font-family: Arial, Helvetica, sans-serif;">
+    style="font-size: 14px; line-height: 1.71; font-family: Arial, Helvetica, sans-serif;">
     <!--[if true]>
-    <table role="presentation" style="width: 728px; border: 1px solid #E8EBEE" align="center" cellspacing="0" cellpadding="0" bgcolor="#E8EBEE">
+    <table role="presentation" style="width: 728px; border: 1px solid #E8EBEE"
+      align="center" cellspacing="0" cellpadding="0" bgcolor="#E8EBEE">
     <![endif]-->
 
     <!--[if false]><!-->
-    <div class="root-container" style="max-width:728px; min-width: 500px; margin:0 auto;">
+    <div class="root-container" style="max-width: 728px; min-width: 500px; margin: 0 auto;">
     <!--<![endif]-->
 
     {{#showMasthead}}
@@ -107,7 +109,8 @@
 
     <!--[if false]><!-->
       <div class="masthead"
-        style="text-align: center; font-size: 11px; line-height: 28px; height: 28px; background-color: #E8EBEE; border-top-left-radius: 8px; border-top-right-radius: 8px; white-space: nowrap;">
+        style="text-align: center; font-size: 11px; line-height: 28px; height: 28px; background-color: #E8EBEE;
+          border-top-left-radius: 8px; border-top-right-radius: 8px; white-space: nowrap;">
     <!--<![endif]-->
         <span>Singapore government emails are sent from .gov.sg addresses</span>
     <!--[if false]><!-->
@@ -130,15 +133,18 @@
                 {{^showMasthead}} border-width: 2px; border-radius: 8px; {{/showMasthead}}">
     <!--<![endif]-->
 
-        <div class="body-vertical-spacer-top" style="line-height:48px;height:48px;">&#8202;</div>
+        <div class="body-vertical-spacer-top" style="line-height: 48px; height: 48px;">&#8202;</div>
+
         {{#agencyLogoURI}}
-        <img class="logo" src="{{agencyLogoURI}}" height="64" {{#agencyName}} alt="{{agencyName}} Logo" {{/agencyName}} style="height: 64px;"/>
-        <div class="logo-vertical-spacer" style="line-height:32px;height:32px;">&#8202;</div>
+        <img class="logo" src="{{agencyLogoURI}}" height="64" style="height: 64px;"
+          {{#agencyName}} alt="{{agencyName}} Logo" {{/agencyName}} />
+        <div class="logo-vertical-spacer" style="line-height: 32px; height: 32px;">&#8202;</div>
         {{/agencyLogoURI}}
+
         <div>
           {{{body}}}
         </div>
-        <div class="body-vertical-spacer-bottom" style="line-height:48px;height:48px;">&#8202;</div>
+        <div class="body-vertical-spacer-bottom" style="line-height: 48px; height: 48px;">&#8202;</div>
     
     <!--[if false]><!-->
       </div>
@@ -150,8 +156,8 @@
     <table role="presentation" style="width: 728px;" align="center">
       <tr><td>
     <![endif]-->
-      <div class="footer-content" style="max-width:728px; padding:0 64px; mso-padding-alt: 0 64px; text-align: center; line-height: 1.4;">
-        <div class="footer-vertical-spacer-top" style="line-height:32px;height:32px;">&#8202;</div>
+      <div class="footer-content" style="max-width: 728px; padding: 0 64px; mso-padding-alt: 0 64px; text-align: center; line-height: 1.4;">
+        <div class="footer-vertical-spacer-top" style="line-height: 32px; height: 32px;">&#8202;</div>
         <div style="font-size: 11px; color: #64707D">
           This email and any links transmitted with it may contain privileged, confidential or official information. If you are
           not the intended recipient, please delete this email, refrain from disclosing the contents to any person, and notify the
@@ -164,10 +170,10 @@
           <br />
           <br />
           Powered by <a href="https://postman.gov.sg">Postman</a>
-          <div class="footer-vertical-spacer-top" style="line-height:16px;height:16px;">&#8202;</div>
+          <div class="footer-vertical-spacer-top" style="line-height: 16px; height: 16px;">&#8202;</div>
           <img src="https://file.go.gov.sg/postmanlogo-grey.png" alt="Postman.gov.sg Logo" height="24" style="height: 24px;">
         </div>
-        <div class="footer-vertical-spacer-bottom" style="line-height:24px;height:24px;">&#8202;</div>
+        <div class="footer-vertical-spacer-bottom" style="line-height: 24px; height: 24px;">&#8202;</div>
       </div>
     </div>
     <!--[if true]>
