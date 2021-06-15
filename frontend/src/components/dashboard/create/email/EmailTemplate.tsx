@@ -123,8 +123,7 @@ const EmailTemplate = ({
       })
       setCustomFromAddresses(options)
 
-      const { fromName, fromAddress } = parseFromAddress(fromAddresses[0])
-      setFromName((prev) => prev || fromName)
+      const { fromAddress } = parseFromAddress(fromAddresses[0])
       setFromAddress((prev) => prev || fromAddress)
     }
 
@@ -179,15 +178,26 @@ const EmailTemplate = ({
         fromAddress: selectedFromAddress,
       } = parseFromAddress(selectedFrom)
 
-      // Use custom from name if it has already been set. For e.g.,
-      // for "Custom <donotreply@mail.postman.gov.sg>"", we should
-      // use "Custom" instead of the default "Postman.gov.sg".
-      setFromName(
-        selectedFromAddress === initialFromAddress
-          ? initialFromName
-          : selectedFromName
-      )
       setFromAddress(selectedFromAddress)
+
+      // Populate from name only for custom from address or if a from name
+      // has already been set.
+      if (
+        !selectedFromAddress.endsWith(t`defaultEmailDomain`) ||
+        initialFromName
+      ) {
+        // Use custom from name if it has already been set. For e.g.,
+        // for "Custom <donotreply@mail.postman.gov.sg>"", we should
+        // use "Custom" instead of the default "Postman.gov.sg".
+        setFromName(
+          selectedFromAddress === initialFromAddress
+            ? initialFromName
+            : selectedFromName
+        )
+      } else {
+        // Reset from name to empty
+        setFromName('')
+      }
     },
     [initialFromName, initialFromAddress]
   )

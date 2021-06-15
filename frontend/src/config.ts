@@ -85,6 +85,7 @@ export const LINKS = {
 export const DEFAULT_MAIL_FROM = t`defaultMailFrom`
 // Semi-colon separated list of allowed image source hostnames
 export const ALLOWED_IMAGE_SOURCES = t`allowedImageSources`
+export const DEFAULT_EMAIL_DOMAIN = t`defaultEmailDomain`
 //#endregion
 
 export const GA_INITIALIZE_OPTIONS = gaInitializeOptions
