@@ -43,9 +43,10 @@
       "@shared/*": ["../../shared/src/*"],
       "@test-utils/*": ["test-utils/*"],
       "@database/*": ["database/*"],
+      "@mocks/*": ["__mocks__/*"],
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
   }
 }
