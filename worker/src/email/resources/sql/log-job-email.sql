@@ -9,15 +9,16 @@ BEGIN
     -- coalesced fields should prioritise message table over ops table
     -- because callbacks might arrive before logging
     error_code = COALESCE(m.error_code, p.error_code),
-      status = COALESCE(m.status, p.status),
+    error_sub_type = COALESCE(m.error_sub_type, p.error_sub_type),
+    status = COALESCE(m.status, p.status),
     message_id = p.message_id,
     sent_at = p.sent_at,
     delivered_at = p.delivered_at,
     received_at = COALESCE(m.received_at, p.received_at),
-    updated_at = clock_timestamp()
-  FROM email_ops p WHERE
+    updated_at = clock_timestamp() 
+  FROM email_ops p WHERE 
   m.id = p.id;
-
+  
   DELETE FROM email_ops p WHERE  p.campaign_id = selected_campaign_id;
 
   PERFORM update_stats_email(selected_campaign_id);

@@ -78,7 +78,7 @@ The sender worker picks off `send_rate` messages from the ops table at once, set
 
 For email, sender worker uses Postman's SES credentials. For SMS, sender worker retrieves the campaign's credentials from AWS Secrets Manager.
 
-The hydrated message is sent to the end client (Twilio, SES). Upon receiving a response from the end client, the sender worker updates the message with `delivered_at`. If it is a successful response, it will also set `message_id`, otherwise, it sets `error_code`.
+The hydrated message is sent to the end client (Twilio, SES). Upon receiving a response from the end client, the sender worker updates the message with `delivered_at`. If it is a successful response, it will also set `message_id`, otherwise, it sets `error_code`, and `error_sub_type` if any.
 
 ## Logger worker
 
@@ -94,7 +94,7 @@ The job must be in `SENT` or `STOPPED` state.
 
 The logger worker picks a job, and tries to set its state to `LOGGED`. Since this is a transaction, only one worker can set the state for the same job. Competing workers will fail to commit the transaction and have to roll back.
 
-The winning worker will update the ground truth table with the `sent_at`, `delivered_at`, `message_id` and `error_code` from the ops table, then delete the messages from the ops table for that campaign.
+The winning worker will update the ground truth table with the `sent_at`, `delivered_at`, `message_id`, `error_code`, and `error_sub_type` from the ops table, then delete the messages from the ops table for that campaign.
 
 ## Retrying a job
 
