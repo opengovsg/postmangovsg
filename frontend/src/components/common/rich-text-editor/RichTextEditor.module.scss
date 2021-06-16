@@ -308,4 +308,41 @@
       text-align: justify;
     }
   }
+
+  // Typography styles to match email theme
+  // Changes here should also be made in email-theme.mustache to update the actual email theme
+  // These styles are repeated in EmailPreviewBlock.module.scss due to differences in DOM structure
+  color: #000000;
+  font-size: 14px;
+
+  * {
+    font-family: Arial, Helvetica, sans-serif;
+    color: inherit;
+  }
+
+  h1 {
+    font-size: 28px !important;
+    line-height: 42px !important;
+    letter-spacing: 0.25px !important;
+    font-weight: bold;
+    margin: 32px 0;
+  }
+
+  h2 {
+    font-size: 24.5px !important;
+    line-height: 35px !important;
+    font-weight: bold;
+    margin: 24px 0;
+  }
+
+  h4 {
+    font-size: 21px !important;
+    line-height: 28px !important;
+    font-weight: medium 500;
+    margin: 24px 0;
+  }
+
+  .public-DraftStyleDefault-block {
+    margin: 16px 0;
+  }
 }

@@ -25,11 +25,15 @@
   {{!--
     Most styles have been inlined into the HTML below for best email client support
     Only media queries (for responsive devices) and generic styles remain in the style tag
+
+    NOTE: Styles within the style tag are not rendered on the frontend preview.
+    Any changes made here should be manually added to the frontend email preview styles.
   --}}
   <style>
     @media only screen and (max-width: 500px) {
       .root-container {
         min-width: 0 !important;
+        line-height: 20px !important;
       }
 
       .masthead {
@@ -48,21 +52,17 @@
 
       .logo {
         height: 44px !important;
-      }
-
-      .logo-vertical-spacer {
-        line-height: 24px !important;
-        height: 24px !important;
+        margin-bottom: 24px !important;
       }
 
       .body-vertical-spacer-bottom {
-        line-height: 24px !important;
-        height: 24px !important;
+        margin-top: 24px !important;
         border-bottom: 1px solid #E8EBEE;
       }
 
       .footer-content {
         padding: 0 16px !important;
+        font-size: 10px !important;
       }
 
       .footer-vertical-spacer-top {
@@ -71,8 +71,30 @@
       }
     }
 
+    h1 {
+      font-size: 28px !important;
+      line-height: 42px !important;
+      letter-spacing: 0.25px !important;
+      font-weight: bold;
+      margin: 32px 0;
+    }
+
+    h2 {
+      font-size: 24.5px !important;
+      line-height: 35px !important;
+      font-weight: bold;
+      margin: 24px 0;
+    }
+
+    h4 {
+      font-size: 21px !important;
+      line-height: 28px !important;
+      font-weight: medium 500;
+      margin: 24px 0;
+    }
+
     p {
-      margin-top: 0 !important;
+      margin: 16px 0;
     }
 
     :root {
@@ -104,7 +126,7 @@
   --}}
 
   <div role="article" aria-roledescription="email" aria-label="email name" lang="en"
-    style="font-size: 14px; line-height: 1.71; font-family: Arial, Helvetica, sans-serif;">
+    style="font-size: 14px; line-height: 1.714; font-family: Arial, Helvetica, sans-serif;">
     <!--[if true]>
     <table role="presentation" style="width: 728px; border: 1px solid #E8EBEE"
       align="center" cellspacing="0" cellpadding="0" bgcolor="#E8EBEE">
@@ -148,15 +170,13 @@
         <div class="body-vertical-spacer-top" style="line-height: 48px; height: 48px;">&#8202;</div>
 
         {{#agencyLogoURI}}
-        <img class="logo" src="{{agencyLogoURI}}" height="64" style="height: 64px;"
+        <img class="logo" src="{{agencyLogoURI}}" height="64" style="height: 64px; margin-bottom: 32px; display: block;"
           {{#agencyName}} alt="{{agencyName}} Logo" {{/agencyName}} />
-        <div class="logo-vertical-spacer" style="line-height: 32px; height: 32px;">&#8202;</div>
         {{/agencyLogoURI}}
-
         <div>
           {{{body}}}
         </div>
-        <div class="body-vertical-spacer-bottom" style="line-height: 48px; height: 48px;">&#8202;</div>
+        <div class="body-vertical-spacer-bottom" style="line-height: 0px; height: 0px; margin-top: 48px;">&#8202;</div>
     
     <!--[if false]><!-->
       </div>
@@ -168,7 +188,7 @@
     <table role="presentation" style="width: 728px;" align="center">
       <tr><td>
     <![endif]-->
-      <div class="footer-content" style="max-width: 728px; padding: 0 64px; mso-padding-alt: 0 64px; text-align: center; line-height: 1.4;">
+      <div class="footer-content" style="max-width: 728px; padding: 0 64px; mso-padding-alt: 0 64px; text-align: center; line-height: 1.45;">
         <div class="footer-vertical-spacer-top" style="line-height: 32px; height: 32px;">&#8202;</div>
         <div style="font-size: 11px; color: #64707D">
           This email and any links transmitted with it may contain privileged, confidential or official information. If you are
