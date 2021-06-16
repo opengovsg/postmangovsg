@@ -13,6 +13,7 @@
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
     "pretest": "tsc --build",
     "test": "jest --maxWorkers=2",
+    "coverage": "npm test -- --coverage && sed -i.bak 's/SF:src/SF:backend\\/src/g' coverage/lcov.info",
     "precommit": "lint-staged"
   },
   "author": "",

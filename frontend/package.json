@@ -15,8 +15,9 @@
     "upload-source-map": "node sentry.js",
     "extract": "lingui extract",
     "compile": "lingui compile",
-    "pretest": "tsc --build",
-    "test": "react-app-rewired test --passWithNoTests"
+    "pretest": "npm run compile && tsc --build",
+    "test": "react-app-rewired test --passWithNoTests",
+    "coverage": "CI=1 npm test -- --coverage && sed -i.bak 's/SF:src/SF:frontend\\/src/g' coverage/lcov.info"
   },
   "dependencies": {
     "@lingui/react": "^3.8.10",

@@ -332,6 +332,11 @@ jobs:
             - SES_USER=$STAGING_REDACTION_DIGEST_SES_USER
             - SES_PORT=$STAGING_REDACTION_DIGEST_SES_PORT
             - CRONITOR_CODE=$STAGING_REDACTION_CRONITOR
+    - name: coverage
+      install:
+        - npm ci
+      script:
+        - npm run coverage
     - name: root
       install:
         - npm install --ignore-scripts
