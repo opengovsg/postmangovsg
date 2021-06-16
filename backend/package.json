@@ -110,6 +110,7 @@
     "@sms": "build/sms",
     "@email": "build/email",
     "@telegram": "build/telegram",
+    "@database": "build/database",
     "@shared": "../shared/build/"
   },
   "repository": {
