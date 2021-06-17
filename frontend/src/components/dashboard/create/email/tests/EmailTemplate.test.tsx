@@ -296,7 +296,7 @@ describe('protected email', () => {
 })
 
 describe('custom sender details', () => {
-  test('custom from name and address should be selected as default', async () => {
+  test('custom from name and address should not be selected as default', async () => {
     server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
     renderTemplatePage()
 
@@ -308,7 +308,7 @@ describe('custom sender details', () => {
     })
 
     await waitFor(() => {
-      expect(fromNameInput.value).toBe('Agency')
+      expect(fromNameInput.value).toBe('')
       expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
     })
   })
@@ -326,7 +326,6 @@ describe('custom sender details', () => {
 
     // Wait for from address to be loaded
     await waitFor(() => {
-      expect(fromNameInput.value).toBe('Agency')
       expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
     })
 
@@ -357,11 +356,13 @@ describe('custom sender details', () => {
     })
 
     await waitFor(() => {
-      expect(fromNameInput.value).toBe('Agency')
+      expect(fromNameInput.value).toBe('')
       expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
     })
 
+    userEvent.type(fromNameInput, 'Agency')
     expect(screen.queryByText(t`mailVia`)).toBeNull()
+
     userEvent.type(fromNameInput, 'Custom name')
     expect(screen.getByText(t`mailVia`)).toBeInTheDocument()
   })
