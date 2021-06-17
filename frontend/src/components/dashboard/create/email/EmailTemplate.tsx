@@ -183,7 +183,7 @@ const EmailTemplate = ({
       // Populate from name only if it has been previously saved.
       if (initialFromName) {
         // Use custom from name if it has already been set. For e.g.,
-        // for "Custom <donotreply@mail.postman.gov.sg>"", we should
+        // for "Custom <donotreply@postman.gov.sg>"", we should
         // use "Custom" instead of the default "Postman.gov.sg".
         setFromName(
           selectedFromAddress === initialFromAddress
