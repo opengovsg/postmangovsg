@@ -11,7 +11,9 @@ export const isDefaultFromAddress = (from: string): boolean => {
   const { fromAddress: defaultFromAddress } = parseFromAddress(
     config.get('mailFrom')
   )
-  return fromAddress === defaultFromAddress
+
+  const alternateFroms = config.get('alternateMailFroms').split(',')
+  return [defaultFromAddress, ...alternateFroms].includes(fromAddress)
 }
 
 export const fromAddressValidator = Joi.string()

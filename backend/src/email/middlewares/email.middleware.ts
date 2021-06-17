@@ -161,7 +161,7 @@ const isFromAddressAccepted = async (
     fromAddress: defaultFromAddress,
   } = parseFromAddress(config.get('mailFrom'))
 
-  if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
+  if (fromAddress !== userEmail && !isDefaultFromAddress(from)) {
     logger.error({
       message: "Invalid 'from' email address",
       from,

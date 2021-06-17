@@ -14,6 +14,7 @@ import {
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
+import { isDefaultFromAddress } from '@core/utils/from-address'
 
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
@@ -178,14 +179,11 @@ const storeTemplate = async ({
   }
 
   // Append via to sender name if it is not the default from name
-  const {
-    fromName: defaultFromName,
-    fromAddress: defaultFromAddress,
-  } = parseFromAddress(config.get('mailFrom'))
+  const { fromName: defaultFromName } = parseFromAddress(config.get('mailFrom'))
   const { fromName, fromAddress } = parseFromAddress(from)
 
   let expectedFromName: string | null
-  if (fromAddress === defaultFromAddress) {
+  if (isDefaultFromAddress(from)) {
     expectedFromName = defaultFromName
   } else {
     const customFromAddress = await CustomDomainService.getCustomFromAddress(
