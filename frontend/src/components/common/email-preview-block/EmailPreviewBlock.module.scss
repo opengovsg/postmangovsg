@@ -24,6 +24,17 @@
 .previewBody {
   margin-top: 3rem;
 
+  // Reset site-wide styles so tables render correctly
+  table {
+    tr {
+      display: table-row;
+      td,
+      th {
+        display: table-cell;
+      }
+    }
+  }
+
   // Typography styles to match email theme
   // Changes here should also be made in email-theme.mustache to update the actual email theme
   // These styles are repeated in RichTextEditor.module.scss due to differences in DOM structure

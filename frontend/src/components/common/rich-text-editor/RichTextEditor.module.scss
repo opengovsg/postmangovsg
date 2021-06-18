@@ -319,10 +319,6 @@
     font-family: Arial, Helvetica, sans-serif;
   }
 
-  .DraftEditor-editorContainer * {
-    color: inherit;
-  }
-
   h1 {
     font-size: 28px !important;
     line-height: 42px !important;
@@ -345,7 +341,16 @@
     margin: 24px 0;
   }
 
-  .public-DraftStyleDefault-block {
-    margin: 16px 0;
+  :global {
+    // This represents a <p> block when rendered
+    .public-DraftStyleDefault-block {
+      margin: 16px 0;
+    }
+
+    // Within tables/lists, <p> tags are not created, so reset the margin styles
+    table .public-DraftStyleDefault-block,
+    li .public-DraftStyleDefault-block {
+      margin: 0;
+    }
   }
 }
