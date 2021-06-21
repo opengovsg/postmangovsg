@@ -37,6 +37,9 @@ export class EmailMessage extends Model<EmailMessage> {
   @Column(DataType.STRING)
   errorCode?: string
 
+  @Column(DataType.STRING)
+  errorSubType?: string
+
   @Column({
     type: DataType.ENUM(...Object.values(MessageStatus)),
     allowNull: true,
