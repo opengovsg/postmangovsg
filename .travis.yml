@@ -116,6 +116,7 @@ jobs:
         - npm run build
         - npm run test
         - npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+        - npm run lint-no-fix
     - name: serverless-unsubscribe-digest
       before_install:
         - cd $TRAVIS_BUILD_DIR/serverless/unsubscribe-digest
