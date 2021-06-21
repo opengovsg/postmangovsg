@@ -19,6 +19,7 @@ import S3Client from '@core/services/s3-client.class'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { Campaign } from '@core/models'
 import { loggerWithLabel } from '@core/logger'
+import { ThemeClient } from '@shared/theme'
 
 const logger = loggerWithLabel(module)
 const RETRY_CONFIG = {
@@ -225,12 +226,22 @@ const pollCsvStatusHandler = async (
     } = await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
-    let numRecipients, preview
+    let numRecipients, preview, themedBody
+
     if (!isCsvProcessing) {
       ;[numRecipients, preview] = await Promise.all([
         StatsService.getNumRecipients(+campaignId),
         EmailService.getHydratedMessage(+campaignId),
       ])
+
+      if (preview !== undefined) {
+        const { body, showMasthead } = preview
+        themedBody = await ThemeClient.generateThemedBody({
+          body,
+          unsubLink: '',
+          showMasthead,
+        })
+      }
     }
 
     res.json({
@@ -239,7 +250,10 @@ const pollCsvStatusHandler = async (
       temp_csv_filename: tempFilename,
       csv_error: error,
       num_recipients: numRecipients,
-      preview,
+      preview: {
+        ...preview,
+        themedBody,
+      },
     })
   } catch (err) {
     next(err)
