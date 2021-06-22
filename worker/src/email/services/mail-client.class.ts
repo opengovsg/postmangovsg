@@ -6,6 +6,7 @@ import config from '@core/config'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
+const CONFIGURATION_SET_HEADER = 'X-SES-CONFIGURATION-SET' // Case sensitive
 
 export default class MailClient {
   private mailer: nodemailer.Transporter
@@ -43,7 +44,9 @@ export default class MailClient {
         subject: input.subject,
         replyTo: input.replyTo,
         html: input.body,
-        headers: {},
+        headers: {
+          [CONFIGURATION_SET_HEADER]: config.get('mailConfigurationSet'),
+        },
       }
       if (input.referenceId !== undefined) {
         // Signature expected by Sendgrid
@@ -51,8 +54,12 @@ export default class MailClient {
         const headerValue = JSON.stringify({
           unique_args: { message_id: input.referenceId },
         })
-        options.headers = { [REFERENCE_ID_HEADER]: headerValue }
+        options.headers = {
+          ...options.headers,
+          [REFERENCE_ID_HEADER]: headerValue,
+        } as any
       }
+
       this.mailer.sendMail(options, (err, info) => {
         if (err !== null) {
           reject(new Error(`${err}`))

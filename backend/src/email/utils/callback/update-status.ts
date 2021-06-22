@@ -2,6 +2,7 @@ import {
   addToBlacklist,
   updateMessageWithError,
   updateMessageWithSuccess,
+  updateMessageWithRead,
   haltCampaignIfThresholdExceeded,
 } from './query'
 import {
@@ -65,4 +66,8 @@ export const updateComplaintStatus = async (
     })
     await haltCampaignIfThresholdExceeded(campaignId)
   }
+}
+
+export const updateReadStatus = async (metadata: Metadata): Promise<void> => {
+  await updateMessageWithRead(metadata)
 }

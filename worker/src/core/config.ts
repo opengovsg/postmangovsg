@@ -149,6 +149,11 @@ const config = convict({
     default: '',
     env: 'WORKER_SES_FROM',
   },
+  mailConfigurationSet: {
+    doc: 'The configuration set specified when sending an email',
+    default: '',
+    env: 'WORKER_SES_CONFIGURATION_SET',
+  },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
     default: 'SG',

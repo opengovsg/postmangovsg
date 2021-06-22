@@ -7,6 +7,7 @@ import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
+  updateReadStatus,
 } from '@email/utils/callback/update-status'
 
 const logger = loggerWithLabel(module)
@@ -104,25 +105,15 @@ const isEvent = (req: Request): boolean => {
     req.get('x-amz-sns-message-type') !== undefined && req.body !== undefined
   )
 }
-const parseRecord = async (record: SesRecord): Promise<void> => {
-  if (!(record.SignatureVersion === '1' && (await validateSignature(record)))) {
-    throw new Error(`Invalid record`)
-  }
-  const message = JSON.parse(record.Message)
+
+const parseNotification = async (
+  notificationType: string,
+  message: any,
+  metadata: any
+): Promise<void> => {
   const messageId = message?.mail?.commonHeaders?.messageId
   const logMeta = { messageId, action: 'parseRecord' }
-  const id = getReferenceID(message)
-  if (id === undefined) {
-    logger.info({ message: 'No reference message id found', ...logMeta })
-    return
-  }
-  const notificationType = message?.notificationType
-  logger.info({
-    message: 'Update for notificationType',
-    notificationType,
-    ...logMeta,
-  })
-  const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
+
   switch (notificationType) {
     case 'Delivery':
       await updateDeliveredStatus(metadata)
@@ -143,11 +134,67 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       break
     default:
       logger.error({
-        message: 'Unable handle messages with this notification type',
+        message: 'Unable to handle messages with this notification type',
         notificationType,
         ...logMeta,
       })
       return
+  }
+}
+
+const parseEvent = async (
+  eventType: string,
+  message: any,
+  metadata: any
+): Promise<void> => {
+  const messageId = message?.mail?.commonHeaders?.messageId
+  const logMeta = { messageId, action: 'parseEvent' }
+
+  if (eventType === 'Open') {
+    await updateReadStatus(metadata)
+  } else {
+    logger.error({
+      message: 'Unable to handle messages with this event type',
+      eventType,
+      ...logMeta,
+    })
+    return
+  }
+}
+
+const parseRecord = async (record: SesRecord): Promise<void> => {
+  if (!(record.SignatureVersion === '1' && (await validateSignature(record)))) {
+    throw new Error(`Invalid record`)
+  }
+  const message = JSON.parse(record.Message)
+  const messageId = message?.mail?.commonHeaders?.messageId
+  const logMeta = { messageId, action: 'parseRecord' }
+  const id = getReferenceID(message)
+  if (id === undefined) {
+    logger.info({ message: 'No reference message id found', ...logMeta })
+    return
+  }
+
+  const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
+
+  if (message?.notificationType) {
+    const notificationType = message?.notificationType
+    logger.info({
+      message: 'Update for notificationType',
+      notificationType,
+      ...logMeta,
+    })
+    return parseNotification(notificationType, message, metadata)
+  }
+
+  if (message?.eventType) {
+    const eventType = message?.eventType
+    logger.info({
+      message: 'Update for eventType',
+      eventType,
+      ...logMeta,
+    })
+    return parseEvent(eventType, message, metadata)
   }
 }
 
