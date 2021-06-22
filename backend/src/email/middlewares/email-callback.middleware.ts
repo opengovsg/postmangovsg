@@ -42,9 +42,10 @@ const printConfirmSubscription = (
   res: Response,
   next: NextFunction
 ): Response | void => {
-  const { Type: type, SubscribeURL: subscribeUrl } = req.body
+  const { Type: type, SubscribeURL: subscribeUrl } = JSON.parse(req.body)
+  console.log(type, subscribeUrl)
   if (type === 'SubscriptionConfirmation') {
-    const parsed = new URL(req.body['SubscribeURL'])
+    const parsed = new URL(subscribeUrl)
     if (
       parsed.protocol === 'https:' &&
       /^sns\.[a-zA-Z0-9-]{3,}\.amazonaws\.com(\.cn)?$/.test(parsed.host)
