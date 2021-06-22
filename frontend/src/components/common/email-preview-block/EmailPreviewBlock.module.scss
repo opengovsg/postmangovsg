@@ -1,5 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
+@import 'styles/_email_typography';
 
 .previewInfo {
   border-radius: 1.25rem;
@@ -38,12 +39,10 @@
   }
 
   // Typography styles to match email theme
-  // Changes here should also be made in email-theme.mustache to update the actual email theme
-  // These styles are repeated in RichTextEditor.module.scss due to differences in DOM structure
-  color: #000000;
+  color: $email-font-color;
 
   * {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: $email-font-stack;
     color: inherit;
   }
 
@@ -54,28 +53,18 @@
   }
 
   h1 {
-    font-size: 28px;
-    line-height: 42px;
-    letter-spacing: 0.25px;
-    font-weight: bold;
-    margin: 32px 0;
+    @extend %email-heading-1;
   }
 
   h2 {
-    font-size: 24.5px;
-    line-height: 35px;
-    font-weight: bold;
-    margin: 24px 0;
+    @extend %email-heading-2;
   }
 
   h4 {
-    font-size: 21px;
-    line-height: 28px;
-    font-weight: 500;
-    margin: 24px 0;
+    @extend %email-heading-4;
   }
 
   p {
-    margin: 16px 0;
+    @extend %email-body;
   }
 }
