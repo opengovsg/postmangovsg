@@ -26,7 +26,9 @@
 
   // Reset site-wide styles so tables render correctly
   table {
+    width: auto;
     tr {
+      height: auto;
       display: table-row;
       td,
       th {

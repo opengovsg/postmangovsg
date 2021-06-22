@@ -262,6 +262,7 @@
     $border-color: adjust-color($primary-light, $alpha: -0.5);
     border: 1px solid $border-color;
     table-layout: fixed;
+    width: auto;
 
     tr {
       display: table-row;
