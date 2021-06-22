@@ -1,5 +1,5 @@
 import mustache from 'mustache'
-import xss from 'xss'
+import { filterXSS } from 'xss'
 import fs from 'fs'
 import path from 'path'
 
@@ -30,13 +30,11 @@ export class ThemeClient {
    * @returns first 200 characters after stripping html tags
    */
   static generatePreheader(body: string): string {
-    return xss
-      .filterXSS(body, {
+    return filterXSS(body, {
         whiteList: {},
         stripIgnoreTagBody: ['script'],
         onIgnoreTag: (_tag, _html, options) => {
           // Append whitespace after each closing tag
-          // @ts-ignore types are missing, upgrade to js-xss 1.0.9 which fixes missing types
           if (options.isClosing) return ' '
           else return ''
         }
