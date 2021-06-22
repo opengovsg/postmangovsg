@@ -13,6 +13,7 @@ import {
   UploadService,
   StatsService,
   ParseCsvService,
+  UnsubscriberService,
 } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import S3Client from '@core/services/s3-client.class'
@@ -238,7 +239,7 @@ const pollCsvStatusHandler = async (
         const { body, showMasthead } = preview
         themedBody = await ThemeClient.generateThemedBody({
           body,
-          unsubLink: '',
+          unsubLink: UnsubscriberService.generateTestUnsubLink(),
           showMasthead,
         })
       }
