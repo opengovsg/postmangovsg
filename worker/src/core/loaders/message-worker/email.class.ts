@@ -54,11 +54,8 @@ class Email {
   }
 
   async getMessages(jobId: number, rate: number): Promise<Message[]> {
-    interface MessageWithSenderEmail extends Message {
-      senderEmail: string
-    }
     interface ResultRow {
-      get_messages_to_send_email: MessageWithSenderEmail
+      get_messages_to_send_email: Message & { senderEmail: string }
     }
 
     const showMastheadDomain = config.get('showMastheadDomain')
