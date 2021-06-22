@@ -31,18 +31,19 @@ export class ThemeClient {
    */
   static generatePreheader(body: string): string {
     return filterXSS(body, {
-        whiteList: {},
-        stripIgnoreTagBody: ['script'],
-        onIgnoreTag: (_tag, _html, options) => {
-          // Append whitespace after each closing tag
-          if (options.isClosing) return ' '
-          else return ''
-        }
-      })
-      .substring(0, 200)
+      whiteList: {},
+      stripIgnoreTagBody: ['script'],
+      onIgnoreTag: (_tag, _html, options) => {
+        // Append whitespace after each closing tag
+        if (options.isClosing) return ' '
+        else return ''
+      },
+    }).substring(0, 200)
   }
 
-  static async generateThemedHTMLEmail (emailThemeFields: EmailThemeFields): Promise<string> {
+  static async generateThemedHTMLEmail(
+    emailThemeFields: EmailThemeFields
+  ): Promise<string> {
     await this.loadEmailHTMLTemplate()
 
     const preheader = this.generatePreheader(emailThemeFields.body)
@@ -54,7 +55,7 @@ export class ThemeClient {
   }
 
   // Returns contents of <body> tag from generateThemedHTMLEmail
-  static async generateThemedBody (emailThemeFields: EmailThemeFields) {
+  static async generateThemedBody(emailThemeFields: EmailThemeFields): Promise<string> {
     const themedHTMLEmail = await this.generateThemedHTMLEmail(emailThemeFields)
 
     /**
@@ -62,6 +63,6 @@ export class ThemeClient {
      * @see: https://stackoverflow.com/a/2857261
      */
     const themedBody = /<body.*?>([\s\S]*)<\/body>/.exec(themedHTMLEmail)?.[1]
-    return themedBody
+    return themedBody!
   }
 }
