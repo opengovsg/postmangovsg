@@ -43,7 +43,6 @@ const printConfirmSubscription = (
   next: NextFunction
 ): Response | void => {
   const { Type: type, SubscribeURL: subscribeUrl } = JSON.parse(req.body)
-  console.log(type, subscribeUrl)
   if (type === 'SubscriptionConfirmation') {
     const parsed = new URL(subscribeUrl)
     if (

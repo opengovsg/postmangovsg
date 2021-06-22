@@ -94,7 +94,7 @@ export const updateMessageWithSuccess = async (
             ],
           },
           {
-            [Op.not]: 'READ',
+            [Op.or]: [{ status: null }, { status: { [Op.ne]: 'READ' } }],
           },
         ],
       },
