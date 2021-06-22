@@ -55,22 +55,22 @@ class Email {
 
   async getMessages(jobId: number, rate: number): Promise<Message[]> {
     interface ResultRow {
-      get_messages_to_send_email: Message & { senderEmail: string }
+      message: Message & { senderEmail: string }
     }
 
     const showMastheadDomain = config.get('showMastheadDomain')
     const result = await this.connection.query<ResultRow>(
-      'SELECT get_messages_to_send_email(:job_id, :rate);',
+      'SELECT get_messages_to_send_email_with_sender(:job_id, :rate) AS message;',
       {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
       }
     )
     return map(result, (row) => {
-      const { senderEmail } = row.get_messages_to_send_email
+      const { senderEmail } = row.message
       const showMasthead = senderEmail.endsWith(showMastheadDomain)
       return {
-        ...row.get_messages_to_send_email,
+        ...row.message,
         showMasthead,
       }
     })
