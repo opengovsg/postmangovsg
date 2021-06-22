@@ -8,7 +8,7 @@ WITH stats AS (
   SELECT
     COUNT(*) FILTER (WHERE status IS NULL) AS unsent,
     COUNT(*) FILTER (WHERE status = 'ERROR') AS errored,
-    COUNT(*) FILTER (WHERE status = 'SENDING' OR status = 'SUCCESS') AS sent,
+    COUNT(*) FILTER (WHERE status = 'SENDING' OR status = 'SUCCESS' OR status = 'READ') AS sent,
     COUNT(*) FILTER (WHERE status = 'INVALID_RECIPIENT') AS invalid
   FROM email_messages
   WHERE campaign_id = selected_campaign_id
