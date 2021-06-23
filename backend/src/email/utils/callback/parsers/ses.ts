@@ -17,6 +17,7 @@ const certCache: { [key: string]: string } = {}
 type SesRecord = {
   Message: string
   MessageId: string
+  Subject?: string
   Timestamp: string
   TopicArn: string
   Type: string
@@ -80,6 +81,7 @@ const basestring = (record: SesRecord): string => {
   return (
     `Message\n${record.Message}\n` +
     `MessageId\n${record.MessageId}\n` +
+    `${record.Subject ? `Subject\n${record.Subject}\n` : ``}` +
     `Timestamp\n${record.Timestamp}\n` +
     `TopicArn\n${record.TopicArn}\n` +
     `Type\n${record.Type}\n`
@@ -198,4 +200,4 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   }
 }
 
-export { HttpEvent, SesRecord, isEvent, parseRecord }
+export { HttpEvent, SesRecord, isEvent, parseRecord, validateSignature }
