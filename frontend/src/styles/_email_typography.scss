@@ -1,0 +1,36 @@
+/** 
+ * Typography styles to match email theme
+ *
+ * Changes here should also be made in email-theme.mustache to update the actual
+ * theme of the emails being sent
+**/
+
+$email-font-stack: Helvetica, Arial, sans-serif;
+$email-font-color: #000000;
+$email-body-font-size: 14px;
+
+%email-heading-1 {
+  font-size: 28px;
+  line-height: 42px;
+  letter-spacing: 0.25px;
+  font-weight: bold;
+  margin: 32px 0;
+}
+
+%email-heading-2 {
+  font-size: 24.5px;
+  line-height: 35px;
+  font-weight: bold;
+  margin: 24px 0;
+}
+
+%email-heading-4 {
+  font-size: 21px;
+  line-height: 28px;
+  font-weight: 500;
+  margin: 24px 0;
+}
+
+%email-body {
+  margin: 16px 0;
+}
