@@ -147,7 +147,7 @@ const getTelegramCredential = async (name: string): Promise<string> => {
   const logMeta = { name, action: 'getTelegramCredential' }
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   logger.info({
-    messge: 'Retrieved secret from AWS secrets manager.',
+    message: 'Retrieved secret from AWS secrets manager.',
     ...logMeta,
   })
   const secretString = get(data, 'SecretString', '')

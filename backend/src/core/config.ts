@@ -67,7 +67,7 @@ const config = convict({
       env: 'AWS_ENDPOINT',
     },
     logGroupName: {
-      doc: '	Name of Cloudwatch log group to write application logs to',
+      doc: 'Name of Cloudwatch log group to write application logs to',
       default: 'postmangovsg-beanstalk-prod',
       env: 'AWS_LOG_GROUP_NAME',
     },
@@ -492,6 +492,12 @@ const config = convict({
       default: false,
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
+  },
+  showMastheadDomain: {
+    doc:
+      'Show masthead within email template if logged-in user has email ending with this domain',
+    default: '.gov.sg',
+    env: 'SHOW_MASTHEAD_DOMAIN',
   },
 })
 

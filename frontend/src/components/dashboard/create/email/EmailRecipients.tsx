@@ -229,6 +229,7 @@ const EmailRecipients = ({
           <p className={styles.greyText}>Message preview</p>
           <EmailPreviewBlock
             body={preview?.body}
+            themedBody={preview?.themedBody}
             subject={preview?.subject}
             replyTo={preview?.replyTo}
             from={preview?.from}

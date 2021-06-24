@@ -161,13 +161,17 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
     case 'Bounce':
       await updateBouncedStatus({
         ...metadata,
-        bounceType,
+        bounceType: message?.bounce?.bounceType,
+        bounceSubType: message?.bounce?.bounceSubType,
+        to: message?.mail?.commonHeaders?.to,
       })
       break
     case 'Complaint':
       await updateComplaintStatus({
         ...metadata,
-        complaintType,
+        complaintType: message?.complaint?.complaintFeedbackType,
+        complaintSubType: message?.complaint?.complaintSubType,
+        to: message?.mail?.commonHeaders?.to,
       })
       break
     default:

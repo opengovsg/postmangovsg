@@ -1,13 +1,15 @@
 {
   "name": "shared",
-  "version": "1.25.0",
+  "version": "1.26.0",
   "description": "Shared modules for Postman",
   "main": "build/index.js",
   "scripts": {
-    "dev": "tsc --build -w",
+    "dev": "npm run postbuild && tsc --build -w",
     "build": "rimraf build && tsc -b --clean && tsc",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
+    "postbuild": "npm run copy-assets",
+    "copy-assets": "copyfiles -u 1 src/**/*.mustache build",
     "test": "jest"
   },
   "types": "build/index",
@@ -29,6 +31,7 @@
     "@types/jest": "^25.2.3",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
+    "copyfiles": "^2.2.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.3",
@@ -42,6 +45,6 @@
     "mustache": "^4.2.0",
     "rimraf": "^3.0.2",
     "typescript": "^3.9.9",
-    "xss": "=1.0.6"
+    "xss": "^1.0.9"
   }
 }

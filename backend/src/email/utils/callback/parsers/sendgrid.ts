@@ -27,6 +27,7 @@ type SendgridRecord = {
   email: string
   event: string
   type: string
+  reason: string
   'smtp-id': string
   timestamp: number
 }
@@ -78,12 +79,16 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
       await updateBouncedStatus({
         ...metadata,
         bounceType: 'Permanent',
+        bounceSubType: record.reason,
+        to: [record.email],
       })
       break
     case 'blocked': // Soft bounce
       await updateBouncedStatus({
         ...metadata,
         bounceType: 'Temporary',
+        bounceSubType: record.reason,
+        to: [record.email],
       })
       break
     case 'spamreport':
