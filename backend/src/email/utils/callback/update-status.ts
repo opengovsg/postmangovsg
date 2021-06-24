@@ -26,6 +26,7 @@ export const updateBouncedStatus = async (
   metadata: BounceMetadata
 ): Promise<void> => {
   const bounceType = metadata.bounceType
+  const errorSubType = metadata.bounceSubType
   const recipients = metadata.to
   let errorCode
 
@@ -39,6 +40,7 @@ export const updateBouncedStatus = async (
 
   const campaignId = await updateMessageWithError({
     errorCode,
+    errorSubType,
     timestamp: metadata.timestamp,
     id: metadata.id,
   })
@@ -54,12 +56,14 @@ export const updateComplaintStatus = async (
   metadata: ComplaintMetadata
 ): Promise<void> => {
   const errorCode = metadata.complaintType
+  const errorSubType = metadata.complaintSubType
   const recipients = metadata.to
 
   if (errorCode && recipients) {
     await Promise.all(recipients.map(addToBlacklist))
     const campaignId = await updateMessageWithError({
       errorCode,
+      errorSubType,
       timestamp: metadata.timestamp,
       id: metadata.id,
     })
