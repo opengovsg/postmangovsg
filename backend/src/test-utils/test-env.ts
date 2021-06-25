@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt'
+
 process.env.REDIS_OTP_URI = 'redis://localhost:6379/3'
 process.env.REDIS_SESSION_URI = 'redis://localhost:6379/4'
 process.env.REDIS_RATE_LIMIT_URI = 'redis://localhost:6379/5'
@@ -7,3 +9,5 @@ process.env.SENDGRID_PUBLIC_KEY =
 process.env.SESSION_SECRET = 'SESSIONSECRET'
 process.env.DB_URI = 'postgres://localhost:5432/postmangovsg_test'
 process.env.BACKEND_SES_FROM = 'Postman <donotreply@mail.postman.gov.sg>'
+process.env.API_KEY_SALT_V1 = bcrypt.genSaltSync(1)
+process.env.TRANSACTIONAL_EMAIL_RATE = '1'
