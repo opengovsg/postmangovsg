@@ -101,9 +101,21 @@ const credentialClient = redis
     })
   })
 
+/**
+ * Shutdown all redis clients
+ */
+const shutdown = async (): Promise<void> => {
+  const clients = [otpClient, sessionClient, rateLimitClient, credentialClient]
+  await Promise.all(
+    clients.map((client) => new Promise((resolve) => client.quit(resolve)))
+  )
+  await new Promise((resolve) => setImmediate(resolve))
+}
+
 export const RedisService = {
   otpClient,
   sessionClient,
   rateLimitClient,
   credentialClient,
+  shutdown,
 }
