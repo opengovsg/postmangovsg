@@ -30,12 +30,6 @@ const createCampaign = async ({
     demoMessageLimit: isDemo ? 20 : null,
   })
 
-beforeEach(async () => {
-  // Clear redis credential cache before each test to ensure that we always fetch
-  // from mock secrets manager.
-  await new Promise((resolve) => RedisService.credentialClient.flushdb(resolve))
-})
-
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   await User.create({ id: 1, email: 'user@agency.gov.sg' })
