@@ -1,8 +1,11 @@
 import { difference, keys } from 'lodash'
 
 import config from '@core/config'
+import { ChannelType } from '@core/constants'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
+import { UploadService } from '@core/services'
+import { UploadData } from '@core/interfaces'
 import { CustomDomainService } from '@email/services'
 import { Campaign, Statistic } from '@core/models'
 import {
@@ -12,6 +15,7 @@ import {
 } from '@shared/templating'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailService } from '@email/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
 
@@ -269,9 +273,49 @@ const testHydration = (
   client.template(templateSubject, firstRecord.params)
 }
 
+/**
+ * Enqueue a new email recipient list upload
+ * @param uploadData
+ */
+const enqueueUpload = (
+  uploadData: UploadData<EmailTemplate>,
+  protect?: boolean
+): Promise<string> => {
+  return UploadService.enqueueUpload({
+    channelType: ChannelType.Email,
+    protect,
+    data: uploadData,
+  })
+}
+
+/**
+ * Process an email campaign recipient list upload
+ * @param uploadData
+ */
+const processUpload = (uploadData: UploadData<EmailTemplate>): Promise<void> =>
+  UploadService.processUpload<EmailTemplate>(
+    EmailService.uploadCompleteOnPreview,
+    EmailService.uploadCompleteOnChunk
+  )(uploadData)
+
+/**
+ * Process a protected email campaign recipient list upload
+ * @param uploadData
+ */
+const processProtectedUpload = (
+  uploadData: UploadData<EmailTemplate>
+): Promise<void> =>
+  UploadService.processUpload<EmailTemplate>(
+    EmailService.uploadProtectedCompleteOnPreview,
+    EmailService.uploadProtectedCompleteOnChunk
+  )(uploadData)
+
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   testHydration,
+  enqueueUpload,
+  processUpload,
+  processProtectedUpload,
   client,
 }

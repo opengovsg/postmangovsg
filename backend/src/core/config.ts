@@ -456,6 +456,32 @@ const config = convict({
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
   },
+  upload: {
+    redisUri: {
+      doc: 'URI to the redis database for recipient list upload job queue',
+      default: '',
+      env: 'UPLOAD_REDIS_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
+    queueName: {
+      doc: 'Name of queue used to store upload jobs',
+      default: 'uploads',
+      env: 'UPLOAD_QUEUE_NAME',
+    },
+    concurrency: {
+      doc: 'Maximum number of simultaneous active jobs',
+      default: 3,
+      env: 'UPLOAD_CONCURRENCY',
+      format: Number,
+    },
+    checkStalledInterval: {
+      doc: 'How often to check for stalled jobs in milliseconds',
+      default: 5000,
+      env: 'UPLOAD_CHECK_STALLED_INTERVAL',
+      format: Number,
+    },
+  },
   showMastheadDomain: {
     doc:
       'Show masthead within email template if logged-in user has email ending with this domain',
