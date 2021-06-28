@@ -25,3 +25,41 @@ describe('generatePreheader', () => {
     )
   })
 })
+
+describe('generateThemedHTMLEmail', () => {
+  it('should embed text in body field into <body> tag', async () => {
+    const htmlEmail = await ThemeClient.generateThemedHTMLEmail({
+      body: '<p>Test</p>',
+      unsubLink: '',
+    })
+
+    /**
+     * Regex to match contents of <body> tag
+     * @see: https://stackoverflow.com/a/2857261
+     */
+    const bodyContent = /<body.*?>([\s\S]*)<\/body>/.exec(htmlEmail)?.[1]
+    expect(bodyContent).not.toBeUndefined()
+    expect(bodyContent).toContain('<p>Test</p>')
+  })
+})
+
+describe('generateThemedBody', () => {
+  it('should return the <body> content from the return value of generateThemedHTMLEmail', async () => {
+    jest.spyOn(ThemeClient, 'generateThemedHTMLEmail').mockResolvedValue(`
+      <html>
+        <head>
+          <title>Page Title</title>
+        </head>
+        <body>
+          <p>Body Content</p>
+        </body>
+      </html>
+    `)
+
+    const themedBody = await ThemeClient.generateThemedBody({} as any)
+    const trimmedBody = themedBody.trim() // remove whitespace before comparing values
+    expect(trimmedBody).toEqual('<p>Body Content</p>')
+
+    jest.resetAllMocks()
+  })
+})
