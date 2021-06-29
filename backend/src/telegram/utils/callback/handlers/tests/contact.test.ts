@@ -12,13 +12,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  await new Promise((resolve) => {
-    RedisService.otpClient.quit(resolve)
-  })
-  await new Promise((resolve) => {
-    RedisService.sessionClient.quit(resolve)
-  })
-  await new Promise((resolve) => setImmediate(resolve))
+  await RedisService.shutdown()
 })
 
 describe('contactMessageHandler', () => {

@@ -12,7 +12,7 @@ import {
 } from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { loggerWithLabel } from '@core/logger'
-
+import { RedisService } from '@core/services'
 import { TwilioCredentials } from '@sms/interfaces'
 import { UserSettings } from '@core/interfaces'
 
@@ -95,23 +95,48 @@ const storeCredential = async (
 }
 
 /**
- * Retrieve a credential from secrets amanger
+ * Retrieve a credential from secrets manager
  * @param name
  */
-const getTwilioCredentials = async (
-  name: string
-): Promise<TwilioCredentials> => {
+const getTwilioCredentials = (name: string): Promise<TwilioCredentials> => {
   const logMeta = { name, action: 'getTwilioCredentials' }
-  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
-  logger.info({
-    messge: 'Retrieved secret from AWS secrets manager.',
-    ...logMeta,
+
+  return new Promise((resolve, reject) => {
+    RedisService.credentialClient.get(name, async (error, value) => {
+      if (error || value === null) {
+        const data = await secretsManager
+          .getSecretValue({ SecretId: name })
+          .promise()
+        logger.info({
+          message: 'Retrieved secret from AWS secrets manager.',
+          ...logMeta,
+        })
+
+        if (!data?.SecretString) {
+          reject(new Error('Missing secret string from AWS secrets manager.'))
+          return
+        }
+        value = data?.SecretString
+
+        RedisService.credentialClient.set(
+          name,
+          value,
+          'PX',
+          config.get('twilioCredentialCache.maxAge'),
+          (error) => {
+            if (error) {
+              logger.error({
+                message: 'Failed to save Twilio credential',
+                error,
+                ...logMeta,
+              })
+            }
+          }
+        )
+      }
+      resolve(JSON.parse(value))
+    })
   })
-  const secretString = get(data, 'SecretString', '')
-  if (!secretString) {
-    throw new Error('Missing secret string from AWS secrets manager.')
-  }
-  return JSON.parse(secretString)
 }
 
 /**
