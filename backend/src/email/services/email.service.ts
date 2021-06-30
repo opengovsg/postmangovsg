@@ -3,7 +3,7 @@ import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { Campaign, ProtectedMessage, User } from '@core/models'
+import { Agency, Campaign, Domain, ProtectedMessage, User } from '@core/models'
 import {
   MailService,
   CampaignService,
@@ -48,6 +48,8 @@ const getHydratedMessage = async (
   subject: string
   replyTo: string | null
   from: string
+  agencyName: string | undefined
+  agencyLogoURI: string | undefined
   showMasthead?: boolean
 } | void> => {
   // get email template
@@ -65,11 +67,24 @@ const getHydratedMessage = async (
   )
   const body = EmailTemplateService.client.template(template?.body!, params)
 
-  // Check if campaign user has gov.sg email to determine whether to show masthead
+  // Get agency details (if exists) from campaign user
   const campaign = await Campaign.findOne({
     where: { id: campaignId },
-    include: [User],
+    include: [
+      {
+        model: User,
+        include: [
+          {
+            model: Domain,
+            include: [Agency],
+          },
+        ],
+      },
+    ],
   })
+  const agency = campaign?.user?.domain?.agency
+  const agencyName = agency?.name
+  const agencyLogoURI = agency?.logo_uri
 
   const showMasthead = campaign?.user?.email.endsWith(
     config.get('showMastheadDomain')
@@ -80,6 +95,8 @@ const getHydratedMessage = async (
     subject,
     replyTo: template.replyTo || null,
     from: template?.from!,
+    agencyName,
+    agencyLogoURI,
     showMasthead,
   }
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
@@ -97,13 +114,23 @@ const getCampaignMessage = async (
   // get the body and subject
   const message = await getHydratedMessage(campaignId)
   if (message) {
-    const { body, subject, replyTo, from, showMasthead } = message
+    const {
+      body,
+      subject,
+      replyTo,
+      from,
+      agencyName,
+      agencyLogoURI,
+      showMasthead,
+    } = message
     const mailToSend: MailToSend = {
       from: from || config.get('mailFrom'),
       recipients: [recipient],
       body: await ThemeClient.generateThemedHTMLEmail({
         body,
         unsubLink: UnsubscriberService.generateTestUnsubLink(),
+        agencyName,
+        agencyLogoURI,
         showMasthead,
       }),
       subject,

@@ -236,10 +236,12 @@ const pollCsvStatusHandler = async (
       ])
 
       if (preview !== undefined) {
-        const { body, showMasthead } = preview
+        const { body, agencyName, agencyLogoURI, showMasthead } = preview
         themedBody = await ThemeClient.generateThemedBody({
           body,
           unsubLink: UnsubscriberService.generateTestUnsubLink(),
+          agencyName,
+          agencyLogoURI,
           showMasthead,
         })
       }

@@ -109,6 +109,8 @@ class Email {
     replyTo,
     from,
     campaignId,
+    agencyName,
+    agencyLogoURI,
     showMasthead,
   }: Message): Promise<void> {
     try {
@@ -127,6 +129,8 @@ class Email {
       const themedHTMLEmail = await ThemeClient.generateThemedHTMLEmail({
         body: hydratedBody,
         unsubLink,
+        agencyName,
+        agencyLogoURI,
         showMasthead,
       })
 
