@@ -1,7 +1,7 @@
 import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
-import { Agency } from '@core/models'
+import { Domain } from '@core/models'
 
 const logger = loggerWithLabel(module)
 
@@ -23,7 +23,7 @@ const isValidDomain = (domain: string): boolean => {
 
 const validateDomain = async (email: string): Promise<boolean> => {
   const configDomains = config.get('domains').split(';')
-  const agencyDomains = (await Agency.findAll()).map((agency) => agency.domain)
+  const agencyDomains = (await Domain.findAll()).map((d: Domain) => d.domain)
 
   const domainsToWhitelist = configDomains
     .concat(agencyDomains)
