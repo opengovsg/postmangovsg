@@ -111,11 +111,11 @@ class Email {
     campaignId,
     showMasthead,
   }: Message): Promise<void> {
-    if (!validator.isEmail(recipient)) {
-      throw new Error('Recipient is incorrectly formatted')
-    }
-
     try {
+      if (!validator.isEmail(recipient)) {
+        throw new Error('Recipient is incorrectly formatted')
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const hydratedSubject = templateClient.template(subject!, params)
       const hydratedBody = templateClient.template(body, params)

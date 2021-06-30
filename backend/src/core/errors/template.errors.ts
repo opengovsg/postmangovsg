@@ -19,10 +19,10 @@ export class HydrationError extends Error {
 }
 
 export class InvalidRecipientError extends Error {
-  constructor() {
-    super(
-      'There are invalid recipient(s) in the uploaded recipient list.\nPlease check the recipient column in your csv file.'
-    )
+  constructor(
+    message = 'There are invalid recipient(s) in the uploaded recipient list.\nPlease check the recipient column in your csv file.'
+  ) {
+    super(message)
     Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
     Error.captureStackTrace(this)
   }
