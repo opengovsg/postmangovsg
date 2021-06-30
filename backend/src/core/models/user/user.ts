@@ -7,6 +7,8 @@ import {
   HasMany,
   HasOne,
   AfterCreate,
+  ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
 import { UserDemo } from './user-demo'
@@ -14,6 +16,7 @@ import { UserFeature } from './user-feature'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
+import { Domain } from '../domain'
 
 @Table({ tableName: 'users', underscored: true, timestamps: true })
 export class User extends Model<User> {
@@ -39,6 +42,13 @@ export class User extends Model<User> {
   @HasOne(() => UserFeature)
   userFeature!: UserFeature
 
+  @ForeignKey(() => Domain)
+  @Column(DataType.STRING)
+  emailDomain?: string
+
+  @BelongsTo(() => Domain)
+  domain?: Domain
+
   // During programmatic creation of users (users signing up by themselves), emails must end in a whitelisted domain
   // If we manually insert the user into the database, then this hook is bypassed.
   // This enables us to whitelist specific emails that do not end in a whitelisted domain, which can sign in, but not sign up.
@@ -50,6 +60,22 @@ export class User extends Model<User> {
         `User email ${instance.email} does not end in a whitelisted domain`
       )
     }
+  }
+
+  // Populate foreign key on domains table based on user's email domain
+  @BeforeCreate
+  static async populateDomain(
+    instance: User,
+    options: CreateOptions
+  ): Promise<void> {
+    const emailDomain = instance.email.substring(
+      instance.email.lastIndexOf('@')
+    )
+    await Domain.findOrCreate({
+      where: { domain: emailDomain },
+      transaction: options.transaction,
+    })
+    instance.emailDomain = emailDomain
   }
 
   @AfterCreate
