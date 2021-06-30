@@ -3,7 +3,7 @@ import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { Campaign, ProtectedMessage } from '@core/models'
+import { Campaign, ProtectedMessage, User } from '@core/models'
 import {
   MailService,
   CampaignService,
@@ -17,6 +17,8 @@ import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
 import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
+
+import { ThemeClient } from '@shared/theme'
 
 const logger = loggerWithLabel(module)
 
@@ -46,6 +48,7 @@ const getHydratedMessage = async (
   subject: string
   replyTo: string | null
   from: string
+  showMasthead?: boolean
 } | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
@@ -61,11 +64,23 @@ const getHydratedMessage = async (
     params
   )
   const body = EmailTemplateService.client.template(template?.body!, params)
+
+  // Check if campaign user has gov.sg email to determine whether to show masthead
+  const campaign = await Campaign.findOne({
+    where: { id: campaignId },
+    include: [User],
+  })
+
+  const showMasthead = campaign?.user?.email.endsWith(
+    config.get('showMastheadDomain')
+  )
+
   return {
     body,
     subject,
     replyTo: template.replyTo || null,
     from: template?.from!,
+    showMasthead,
   }
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
 }
@@ -82,11 +97,15 @@ const getCampaignMessage = async (
   // get the body and subject
   const message = await getHydratedMessage(campaignId)
   if (message) {
-    const { body, subject, replyTo, from } = message
+    const { body, subject, replyTo, from, showMasthead } = message
     const mailToSend: MailToSend = {
       from: from || config.get('mailFrom'),
       recipients: [recipient],
-      body: UnsubscriberService.appendTestEmailUnsubLink(body),
+      body: await ThemeClient.generateThemedHTMLEmail({
+        body,
+        unsubLink: UnsubscriberService.generateTestUnsubLink(),
+        showMasthead,
+      }),
       subject,
       ...(replyTo ? { replyTo } : {}),
     }
@@ -361,4 +380,5 @@ export const EmailService = {
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
   duplicateCampaign,
+  sendEmail,
 }

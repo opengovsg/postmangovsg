@@ -1,6 +1,6 @@
 {
   "name": "postmangovsg",
-  "version": "1.25.0",
+  "version": "1.27.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -28,10 +28,11 @@
     "postinstall:frontend": "cd frontend && npm install",
     "postinstall:backend": "cd backend && npm install",
     "postinstall:worker": "cd worker && npm install",
-    "precommit": "npm run precommit:frontend && npm run precommit:backend && npm run precommit:worker && npm run precommit:root",
+    "precommit": "npm run precommit:frontend && npm run precommit:backend && npm run precommit:worker && npm run precommit:shared && npm run precommit:root",
     "precommit:frontend": "cd frontend && npm run precommit",
     "precommit:backend": "cd backend && npm run precommit",
     "precommit:worker": "cd worker && npm run precommit",
+    "precommit:shared": "cd shared && npm run precommit",
     "precommit:root": "lint-staged && sh check-env-format.sh && npm run detect-secrets",
     "lint-no-fix": "prettier --check '**/*.{yml,md}'",
     "lint": "prettier --write '**/*.{yml,md}' --loglevel warn",

@@ -20,6 +20,7 @@ export enum EmailProgress {
 
 export interface EmailPreview {
   body: string
+  themedBody: string
   subject: string
   replyTo: string | null
   from: string

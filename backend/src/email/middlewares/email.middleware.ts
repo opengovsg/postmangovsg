@@ -2,9 +2,10 @@ import { Request, Response, NextFunction } from 'express'
 import { EmailService, CustomDomainService } from '@email/services'
 import { isDefaultFromAddress } from '@core/utils/from-address'
 import { parseFromAddress } from '@shared/utils/from-address'
-import { AuthService } from '@core/services'
+import { AuthService, UnsubscriberService } from '@core/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
+import { ThemeClient } from '@shared/theme'
 
 const logger = loggerWithLabel(module)
 
@@ -100,13 +101,20 @@ const previewFirstMessage = async (
 
     if (!message) return res.json({})
 
-    const { body, subject, replyTo, from } = message
+    const { body, subject, replyTo, from, showMasthead } = message
+    const themedBody = await ThemeClient.generateThemedBody({
+      body,
+      unsubLink: UnsubscriberService.generateTestUnsubLink(),
+      showMasthead,
+    })
+
     return res.json({
       preview: {
         body,
         subject,
         reply_to: replyTo,
         from,
+        themed_body: themedBody,
       },
     })
   } catch (err) {

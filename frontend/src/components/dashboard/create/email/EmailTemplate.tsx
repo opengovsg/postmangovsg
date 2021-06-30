@@ -248,7 +248,10 @@ const EmailTemplate = ({
             <label htmlFor="subject">Subject</label>
           </h4>
           <p>
-            <label htmlFor="subject">Enter subject of the email</label>
+            <label htmlFor="subject">
+              Keep it short, specific and personalised. Try to use less than 10
+              words.
+            </label>
           </p>
           <TextArea
             id="subject"

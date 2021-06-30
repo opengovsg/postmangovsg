@@ -20,8 +20,7 @@ afterEach(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await RedisService.shutdown()
 })
 
 describe('POST /auth/otp', () => {
@@ -72,14 +71,15 @@ describe('POST /auth/login', () => {
 
   test('OTP is invalidated after retries are exceeded', async () => {
     const email = 'user@agency.gov.sg'
-    RedisService.otpClient.set(
-      email,
-      JSON.stringify({
-        retries: 1,
-        hash: await bcrypt.hash('123456', 10),
-        createdAt: 123,
-      })
+    const otp = JSON.stringify({
+      retries: 1,
+      hash: await bcrypt.hash('123456', 10),
+      createdAt: 123,
+    })
+    await new Promise((resolve) =>
+      RedisService.otpClient.set(email, otp, resolve)
     )
+
     const res = await request(app)
       .post('/auth/login')
       .send({ email, otp: '000000' })
@@ -93,13 +93,13 @@ describe('POST /auth/login', () => {
 
   test('Valid otp provided', async () => {
     const email = 'user@agency.gov.sg'
-    RedisService.otpClient.set(
-      email,
-      JSON.stringify({
-        retries: 1,
-        hash: await bcrypt.hash('123456', 10),
-        createdAt: 123,
-      })
+    const otp = JSON.stringify({
+      retries: 1,
+      hash: await bcrypt.hash('123456', 10),
+      createdAt: 123,
+    })
+    await new Promise((resolve) =>
+      RedisService.otpClient.set(email, otp, resolve)
     )
 
     const res = await request(app)

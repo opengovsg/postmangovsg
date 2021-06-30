@@ -31,8 +31,7 @@ afterEach(async () => {
 afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await RedisService.shutdown()
 })
 
 describe('canEditCampaign middleware', () => {

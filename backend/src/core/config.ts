@@ -254,6 +254,20 @@ const config = convict({
     format: 'required-string',
     sensitive: true,
   },
+  redisRateLimitUri: {
+    doc: 'URI to the redis cache for rate limiting transactional requests',
+    default: '',
+    env: 'REDIS_RATE_LIMIT_URI',
+    format: 'required-string',
+    sensitive: true,
+  },
+  redisCredentialUri: {
+    doc: 'URI to the redis cache for storing credentials',
+    default: '',
+    env: 'REDIS_CREDENTIAL_URI',
+    format: 'required-string',
+    sensitive: true,
+  },
   mailOptions: {
     host: {
       doc: 'Amazon SES SMTP endpoint.',
@@ -302,6 +316,21 @@ const config = convict({
     default: 35,
     env: 'EMAIL_DEFAULT_RATE',
     format: 'int',
+  },
+  transactionalEmail: {
+    rate: {
+      doc:
+        'The max number of transactional emails that can be requested per window per user',
+      default: 10,
+      env: 'TRANSACTIONAL_EMAIL_RATE',
+      format: 'int',
+    },
+    window: {
+      doc: 'The duration of each window for transactional emails in seconds.',
+      default: 1,
+      env: 'TRANSACTIONAL_EMAIL_WINDOW',
+      format: 'int',
+    },
   },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
@@ -442,6 +471,14 @@ const config = convict({
       format: Number,
     },
   },
+  twilioCredentialCache: {
+    maxAge: {
+      doc: 'Maximum age of an item in milliseconds',
+      default: 24 * 60 * 60 * 1000, // 1 day,
+      env: 'TWILIO_CREDENTIAL_CACHE_MAX_AGE',
+      format: 'int',
+    },
+  },
   smsFallback: {
     activate: {
       doc: 'Switch to true to use SNS fallback for all SMS campaigns',
@@ -461,6 +498,12 @@ const config = convict({
       default: false,
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
+  },
+  showMastheadDomain: {
+    doc:
+      'Show masthead within email template if logged-in user has email ending with this domain',
+    default: '.gov.sg',
+    env: 'SHOW_MASTHEAD_DOMAIN',
   },
 })
 

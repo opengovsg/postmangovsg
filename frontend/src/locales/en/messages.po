@@ -118,11 +118,11 @@ msgstr "This demo campaign will be sent to a maximum of 20 recipients."
 msgid "demoMessageLabel"
 msgstr "DEMO"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:164
+#: components/dashboard/create/email/EmailTemplate.tsx:171
 msgid "e.g. Appointment Confirmation"
 msgstr "e.g. Appointment Confirmation"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:153
+#: components/dashboard/create/email/EmailTemplate.tsx:157
 msgid "e.g. Ministry of Health"
 msgstr "e.g. Ministry of Health"
 
@@ -242,8 +242,8 @@ msgstr "https://guide.postman.gov.sg/contact-us"
 msgid "link.tncUrl"
 msgstr "https://guide.postman.gov.sg/legal/t-and-c"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:133
-#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:267
-#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:269
+#: components/dashboard/create/email/EmailTemplate.tsx:137
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:279
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:281
 msgid "mailVia"
 msgstr "via Postman"
