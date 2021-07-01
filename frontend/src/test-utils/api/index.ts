@@ -431,10 +431,16 @@ function mockCampaignTemplateApis(state: State) {
     }),
     rest.get('/campaign/:campaignId/email/preview', (req, res, ctx) => {
       const { campaignId } = req.params
+      const preview = state.campaigns[campaignId - 1].email_templates
       return res(
         ctx.status(200),
         ctx.json({
-          preview: state.campaigns[campaignId - 1].email_templates,
+          preview: {
+            ...preview,
+            // Frontend doesn't have access to the actual email theme, so return
+            // body as themed_body for it to render for frontend tests
+            themed_body: preview?.body,
+          },
         })
       )
     }),
@@ -647,6 +653,9 @@ function mockCampaignUploadApis(state: State) {
         preview = {
           ...campaign.email_templates,
           replyTo: campaign.email_templates.reply_to,
+          // Frontend doesn't have access to the actual email theme, so return
+          // body as themed_body for it to render for frontend tests
+          themedBody: campaign.email_templates.body,
         }
       } else if (campaign.sms_templates) {
         preview = campaign.sms_templates

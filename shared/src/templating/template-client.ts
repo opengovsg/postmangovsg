@@ -1,6 +1,6 @@
 import cheerio from 'cheerio'
 import { mapKeys } from 'lodash'
-import xss from 'xss'
+import { IFilterXSSOptions, filterXSS } from 'xss'
 import { TemplateError } from './errors'
 import { TemplatingConfig, TemplatingConfigDefault } from './interfaces'
 import { filterImageSources } from './xss-options'
@@ -8,7 +8,7 @@ import { filterImageSources } from './xss-options'
 import mustache from 'mustache'
 
 export class TemplateClient {
-  xssOptions: xss.IFilterXSSOptions
+  xssOptions: IFilterXSSOptions
   lineBreak: string
   allowedImageSources?: Array<string>
 
@@ -17,7 +17,7 @@ export class TemplateClient {
     lineBreak,
     allowedImageSources,
   }: {
-    xssOptions?: xss.IFilterXSSOptions
+    xssOptions?: IFilterXSSOptions
     lineBreak?: string
     allowedImageSources?: Array<string>
   }) {
@@ -35,7 +35,7 @@ export class TemplateClient {
    * @param value Input to be filtered
    */
   filterXSS(value: string): string {
-    return xss.filterXSS(value, this.xssOptions)
+    return filterXSS(value, this.xssOptions)
   }
 
   /**

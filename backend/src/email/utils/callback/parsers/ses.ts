@@ -8,6 +8,7 @@ import {
   updateBouncedStatus,
   updateComplaintStatus,
 } from '@email/utils/callback/update-status'
+import { addToBlacklist } from '@email/utils/callback/query'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V1 = 'X-Postman-ID' // Case sensitive
@@ -104,6 +105,22 @@ const isEvent = (req: Request): boolean => {
     req.get('x-amz-sns-message-type') !== undefined && req.body !== undefined
   )
 }
+
+const shouldBlacklist = ({
+  notificationType,
+  bounceType,
+  complaintType,
+}: {
+  notificationType?: string
+  bounceType?: string
+  complaintType?: string
+}) => {
+  return (
+    (notificationType === 'Bounce' && bounceType === 'Permanent') ||
+    (notificationType === 'Complaint' && complaintType)
+  )
+}
+
 const parseRecord = async (record: SesRecord): Promise<void> => {
   if (!(record.SignatureVersion === '1' && (await validateSignature(record)))) {
     throw new Error(`Invalid record`)
@@ -111,12 +128,26 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   const message = JSON.parse(record.Message)
   const messageId = message?.mail?.commonHeaders?.messageId
   const logMeta = { messageId, action: 'parseRecord' }
+
+  const notificationType = message?.notificationType
+  const bounceType = message?.bounce?.bounceType
+  const complaintType = message?.complaint?.complaintFeedbackType
+  const recipients = message?.mail?.commonHeaders?.to
+
+  // Transactional emails don't have message IDs, so blacklist
+  // relevant email addresses before everything else
+  if (
+    recipients &&
+    shouldBlacklist({ notificationType, bounceType, complaintType })
+  ) {
+    await Promise.all(recipients.map(addToBlacklist))
+  }
+
   const id = getReferenceID(message)
   if (id === undefined) {
     logger.info({ message: 'No reference message id found', ...logMeta })
     return
   }
-  const notificationType = message?.notificationType
   logger.info({
     message: 'Update for notificationType',
     notificationType,
@@ -131,6 +162,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       await updateBouncedStatus({
         ...metadata,
         bounceType: message?.bounce?.bounceType,
+        bounceSubType: message?.bounce?.bounceSubType,
         to: message?.mail?.commonHeaders?.to,
       })
       break
@@ -138,6 +170,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       await updateComplaintStatus({
         ...metadata,
         complaintType: message?.complaint?.complaintFeedbackType,
+        complaintSubType: message?.complaint?.complaintSubType,
         to: message?.mail?.commonHeaders?.to,
       })
       break

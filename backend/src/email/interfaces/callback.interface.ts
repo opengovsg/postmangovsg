@@ -6,14 +6,17 @@ export interface Metadata {
 
 export interface BounceMetadata extends Metadata {
   bounceType?: string
+  bounceSubType?: string
   to?: string[]
 }
 
 export interface ComplaintMetadata extends Metadata {
   complaintType?: string
+  complaintSubType?: string
   to?: string[]
 }
 
-export interface UpdateMessageWithErrorCode extends Metadata {
+export interface UpdateMessageWithErrorMetadata extends Metadata {
   errorCode: string
+  errorSubType?: string
 }

@@ -1,26 +1,39 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
-import { Campaign, User } from '@core/models'
+import { Campaign, User, Credential } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService, UploadService } from '@core/services'
+import { DefaultCredentialName } from '@core/constants'
+import { formatDefaultCredentialName } from '@core/utils'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
+import { mockSecretsManager } from '@mocks/aws-sdk'
+import { SmsService } from '@sms/services'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
 let campaignId: number
 
+// Helper function to create demo/non-demo campaign based on parameters
+const createCampaign = async ({
+  isDemo,
+}: {
+  isDemo: boolean
+}): Promise<Campaign> =>
+  await Campaign.create({
+    name: 'test-campaign',
+    userId: 1,
+    type: ChannelType.SMS,
+    protect: false,
+    valid: false,
+    demoMessageLimit: isDemo ? 20 : null,
+  })
+
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   await User.create({ id: 1, email: 'user@agency.gov.sg' })
-  const campaign = await Campaign.create({
-    name: 'campaign-1',
-    userId: 1,
-    type: ChannelType.SMS,
-    valid: false,
-    protect: false,
-  })
+  const campaign = await createCampaign({ isDemo: false })
   campaignId = campaign.id
 })
 
@@ -34,8 +47,7 @@ afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await RedisService.shutdown()
 })
 
 describe('GET /campaign/{id}/sms', () => {
@@ -52,6 +64,189 @@ describe('GET /campaign/{id}/sms', () => {
     const res = await request(app).get(`/campaign/${campaign.id}/sms`)
     expect(res.status).toBe(200)
     expect(res.body).toEqual(expect.objectContaining({ id, name, type }))
+  })
+})
+
+describe('POST /campaign/{campaignId}/sms/credentials', () => {
+  afterEach(async () => {
+    // Reset number of calls for mocked functions
+    jest.clearAllMocks()
+  })
+
+  test('Non-Demo campaign should not be able to use demo credentials', async () => {
+    const nonDemoCampaign = await createCampaign({ isDemo: false })
+
+    const res = await request(app)
+      .post(`/campaign/${nonDemoCampaign.id}/sms/credentials`)
+      .send({
+        label: DefaultCredentialName.SMS,
+        recipient: '98765432',
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message: `Campaign cannot use demo credentials. ${DefaultCredentialName.SMS} is not allowed.`,
+    })
+
+    expect(mockSecretsManager.getSecretValue).not.toHaveBeenCalled()
+  })
+
+  test('Demo Campaign should not be able to use non-demo credentials', async () => {
+    const demoCampaign = await createCampaign({ isDemo: true })
+
+    const NON_DEMO_CREDENTIAL_LABEL = 'Some Credential'
+
+    const res = await request(app)
+      .post(`/campaign/${demoCampaign.id}/sms/credentials`)
+      .send({
+        label: NON_DEMO_CREDENTIAL_LABEL,
+        recipient: '98765432',
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message: `Demo campaign must use demo credentials. ${NON_DEMO_CREDENTIAL_LABEL} is not allowed.`,
+    })
+
+    expect(mockSecretsManager.getSecretValue).not.toHaveBeenCalled()
+  })
+
+  test('Demo Campaign should be able to use demo credentials', async () => {
+    const demoCampaign = await createCampaign({ isDemo: true })
+
+    const TEST_TWILIO_CREDENTIALS = {
+      accountSid: '',
+      apiKey: '',
+      apiSecret: '',
+      messagingServiceSid: '',
+    }
+    mockSecretsManager.getSecretValue().promise.mockResolvedValue({
+      SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
+    })
+
+    const mockSendCampaignMessage = jest
+      .spyOn(SmsService, 'sendCampaignMessage')
+      .mockResolvedValue()
+
+    const res = await request(app)
+      .post(`/campaign/${demoCampaign.id}/sms/credentials`)
+      .send({
+        label: DefaultCredentialName.SMS,
+        recipient: '98765432',
+      })
+
+    expect(res.status).toBe(200)
+
+    expect(mockSecretsManager.getSecretValue).toHaveBeenCalledWith({
+      SecretId: formatDefaultCredentialName(DefaultCredentialName.SMS),
+    })
+
+    mockSecretsManager.getSecretValue().promise.mockReset()
+    mockSendCampaignMessage.mockRestore()
+  })
+})
+
+describe('POST /campaign/{campaignId}/sms/new-credentials', () => {
+  afterEach(async () => {
+    // Reset number of calls for mocked functions
+    jest.clearAllMocks()
+  })
+
+  test('Demo Campaign should not be able to create custom credential', async () => {
+    const demoCampaign = await createCampaign({ isDemo: true })
+
+    const res = await request(app)
+      .post(`/campaign/${demoCampaign.id}/sms/new-credentials`)
+      .send({
+        recipient: '81234567',
+        twilio_account_sid: 'twilio_account_sid',
+        twilio_api_key: 'twilio_api_key',
+        twilio_api_secret: 'twilio_api_secret',
+        twilio_messaging_service_sid: 'twilio_messaging_service_sid',
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message: `Action not allowed for demo campaign`,
+    })
+
+    expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()
+  })
+
+  test('User should not be able to add custom credential using invalid Twilio API key', async () => {
+    const nonDemoCampaign = await createCampaign({ isDemo: false })
+
+    // Mock Twilio API to fail
+    const ERROR_MESSAGE = 'Some Error'
+    const mockSendCampaignMessage = jest
+      .spyOn(SmsService, 'sendCampaignMessage')
+      .mockRejectedValue(new Error(ERROR_MESSAGE))
+
+    const res = await request(app)
+      .post(`/campaign/${nonDemoCampaign.id}/sms/new-credentials`)
+      .send({
+        recipient: '81234567',
+        twilio_account_sid: 'twilio_account_sid',
+        twilio_api_key: 'twilio_api_key',
+        twilio_api_secret: 'twilio_api_secret',
+        twilio_messaging_service_sid: 'twilio_messaging_service_sid',
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      message: `Error: ${ERROR_MESSAGE}`,
+    })
+
+    expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()
+    mockSendCampaignMessage.mockRestore()
+  })
+
+  test('User should be able to add custom credential using valid Twilio API key', async () => {
+    const nonDemoCampaign = await createCampaign({ isDemo: false })
+
+    const mockSendCampaignMessage = jest
+      .spyOn(SmsService, 'sendCampaignMessage')
+      .mockResolvedValue()
+
+    // getEncodedHash is used as the stored name in AWS SecretsManager
+    const HASHED_CREDS = 'HASHED_CREDS'
+    const mockGetEncodedHash = jest
+      .spyOn(SmsService, 'getEncodedHash')
+      .mockResolvedValue(HASHED_CREDS)
+
+    const res = await request(app)
+      .post(`/campaign/${nonDemoCampaign.id}/sms/new-credentials`)
+      .send({
+        recipient: '81234567',
+        twilio_account_sid: 'twilio_account_sid',
+        twilio_api_key: 'twilio_api_key',
+        twilio_api_secret: 'twilio_api_secret',
+        twilio_messaging_service_sid: 'twilio_messaging_service_sid',
+      })
+
+    expect(res.status).toBe(200)
+
+    expect(mockSecretsManager.createSecret).toHaveBeenCalledWith(
+      expect.objectContaining({
+        Name: HASHED_CREDS,
+        SecretString: JSON.stringify({
+          accountSid: 'twilio_account_sid',
+          apiKey: 'twilio_api_key',
+          apiSecret: 'twilio_api_secret',
+          messagingServiceSid: 'twilio_messaging_service_sid',
+        }),
+      })
+    )
+
+    // Ensure credential was added into DB
+    const dbCredential = await Credential.findOne({
+      where: {
+        name: HASHED_CREDS,
+      },
+    })
+    expect(dbCredential).not.toBe(null)
+    mockSendCampaignMessage.mockRestore()
+    mockGetEncodedHash.mockRestore()
   })
 })
 
