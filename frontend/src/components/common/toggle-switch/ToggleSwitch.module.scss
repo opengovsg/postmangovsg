@@ -1,0 +1,44 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.toggleSelector {
+  height: 36px;
+  width: 64px;
+  border-radius: 18px;
+  padding: 2px;
+  cursor: pointer;
+  transition: 0.3s;
+
+  &.checked {
+    background-color: $green;
+  }
+
+  &.unchecked {
+    background-color: $grey-500;
+  }
+}
+
+.toggleSelectorSwitch {
+  height: 32px;
+  width: 32px;
+  border-radius: 16px;
+  background-color: $white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+
+  .icon {
+    color: inherit;
+    font-size: 1.2rem;
+  }
+
+  &.checked {
+    color: $green;
+    transform: translateX(28px);
+  }
+
+  &.unchecked {
+    color: $grey-700;
+  }
+}
