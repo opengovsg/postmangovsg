@@ -43,7 +43,13 @@ const storeTemplate = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { campaignId } = req.params
-  const { subject, body, reply_to: replyTo, from } = req.body
+  const {
+    subject,
+    body,
+    reply_to: replyTo,
+    from,
+    show_logo: showLogo,
+  } = req.body
   const logMeta = { campaignId, action: 'storeTemplate' }
   try {
     const {
@@ -57,6 +63,7 @@ const storeTemplate = async (
       replyTo:
         replyTo || (await AuthService.findUser(req.session?.user?.id))?.email,
       from,
+      showLogo,
     })
 
     const template = {
@@ -65,6 +72,7 @@ const storeTemplate = async (
       params: updatedTemplate?.params,
       reply_to: updatedTemplate?.replyTo,
       from: updatedTemplate?.from,
+      show_logo: updatedTemplate?.showLogo,
     }
 
     if (check?.reupload) {
