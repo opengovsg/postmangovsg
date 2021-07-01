@@ -227,20 +227,22 @@ const EmailTemplate = ({
 
         <div>
           <h4>From</h4>
-          <p>Sender details</p>
+          <p>Sender {customFromAddresses.length > 1 ? 'details' : 'name'}</p>
           <TextInput
             {...getFromNameInputProps()}
             onChange={setFromName}
             aria-label="Sender name"
             placeholder={t`e.g. Ministry of Health`}
           />
-          <Dropdown
-            onSelect={handleSelectFromAddress}
-            options={customFromAddresses}
-            defaultLabel={fromAddress}
-            aria-label="Custom from"
-            disabled={customFromAddresses.length <= 1}
-          ></Dropdown>
+          {customFromAddresses.length > 1 && (
+            <Dropdown
+              onSelect={handleSelectFromAddress}
+              options={customFromAddresses}
+              defaultLabel={fromAddress}
+              aria-label="Custom from"
+              disabled={customFromAddresses.length <= 1}
+            ></Dropdown>
+          )}
         </div>
 
         <div>
