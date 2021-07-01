@@ -73,18 +73,14 @@ test('displays the necessary elements', async () => {
   /**
    * Assert that the following elements are present:
    * 1. "Create email message" heading
-   * 2. From address dropdown
+   * 2. From name input
    * 3. Subject textbox
    * 4. Message textbox
    * 5. Reply-to textbox
    * 6. Next button
    */
   expect(heading).toBeInTheDocument()
-  expect(
-    screen.getByRole('listbox', {
-      name: /custom from/i,
-    })
-  ).toBeInTheDocument()
+  expect(screen.getByLabelText(/sender name/i)).toBeInTheDocument()
   expect(
     screen.getByRole('textbox', {
       name: /subject/i,
@@ -110,8 +106,6 @@ test('displays an error if the subject is empty after sanitization', async () =>
   server.use(...mockApis(false))
   renderTemplatePage()
 
-  // Wait for the component to fully load
-  expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
   const subjectTextbox = await screen.findByRole('textbox', {
     name: /subject/i,
   })
@@ -153,9 +147,7 @@ describe('protected email', () => {
     server.use(...mockApis(true))
     renderTemplatePage()
 
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
+    const subjectTextbox = await screen.findByRole('textbox', {
       name: /subject/i,
     })
     const nextButton = screen.getByRole('button', { name: /next/i })
@@ -198,9 +190,7 @@ describe('protected email', () => {
     server.use(...mockApis(true))
     renderTemplatePage()
 
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
+    const subjectTextbox = await screen.findByRole('textbox', {
       name: /subject/i,
     })
     const messageTextbox = screen.getByRole('textbox', {
@@ -251,9 +241,7 @@ describe('protected email', () => {
     server.use(...mockApis(true))
     renderTemplatePage()
 
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
+    const subjectTextbox = await screen.findByRole('textbox', {
       name: /subject/i,
     })
     const messageTextbox = screen.getByRole('textbox', {
@@ -303,13 +291,9 @@ describe('custom sender details', () => {
     const fromNameInput = (await screen.findByLabelText(
       /sender name/i
     )) as HTMLInputElement
-    const fromAddressDropdown = screen.getByRole('listbox', {
-      name: /custom from/i,
-    })
 
     await waitFor(() => {
       expect(fromNameInput.value).toBe('')
-      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
     })
   })
 
@@ -320,14 +304,11 @@ describe('custom sender details', () => {
     const fromNameInput = (await screen.findByLabelText(
       /sender name/i
     )) as HTMLInputElement
-    const fromAddressDropdown = screen.getByRole('listbox', {
+    const fromAddressDropdown = await screen.findByRole('listbox', {
       name: /custom from/i,
     })
 
-    // Wait for from address to be loaded
-    await waitFor(() => {
-      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
-    })
+    expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
 
     // Key in custom from to be overwritten later
     userEvent.clear(fromNameInput)
@@ -351,14 +332,12 @@ describe('custom sender details', () => {
     const fromNameInput = (await screen.findByLabelText(
       /sender name/i
     )) as HTMLInputElement
-    const fromAddressDropdown = screen.getByRole('listbox', {
+    const fromAddressDropdown = await screen.findByRole('listbox', {
       name: /custom from/i,
     })
 
-    await waitFor(() => {
-      expect(fromNameInput.value).toBe('')
-      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
-    })
+    expect(fromNameInput.value).toBe('')
+    expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
 
     userEvent.type(fromNameInput, 'Agency')
     expect(screen.queryByText(t`mailVia`)).toBeNull()

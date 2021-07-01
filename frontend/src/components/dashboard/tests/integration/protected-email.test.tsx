@@ -17,7 +17,6 @@ import {
   waitFor,
   DEFAULT_FROM,
   DEFAULT_FROM_NAME,
-  DEFAULT_FROM_ADDRESS,
   VALID_CSV_FILENAME,
   VALID_EMAIL_CSV_FILE,
   RECIPIENT_EMAIL,
@@ -67,18 +66,6 @@ test('successfully creates and sends a new protected email campaign', async () =
   expect(
     await screen.findByRole('heading', { name: CAMPAIGN_NAME })
   ).toBeInTheDocument()
-
-  // Select the default from address
-  const customFromDropdown = screen.getByRole('listbox', {
-    name: /custom from/i,
-  })
-  userEvent.click(customFromDropdown)
-  userEvent.click(
-    await screen.findByRole('option', {
-      name: DEFAULT_FROM_ADDRESS,
-    })
-  )
-  expect(customFromDropdown).toHaveTextContent(DEFAULT_FROM_ADDRESS)
 
   // Enter a from name
   const fromNameInput = (await screen.findByLabelText(
