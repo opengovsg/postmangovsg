@@ -215,7 +215,30 @@ const getCampaignDetails = async (
   return await CampaignService.getCampaignDetails(campaignId, [
     {
       model: EmailTemplate,
-      attributes: ['body', 'subject', 'params', 'reply_to', 'from'],
+      attributes: [
+        'body',
+        'subject',
+        'params',
+        'reply_to',
+        'from',
+        'show_logo',
+      ],
+    },
+    {
+      model: User,
+      attributes: ['email_domain'],
+      include: [
+        {
+          model: Domain,
+          attributes: ['agency_id'],
+          include: [
+            {
+              model: Agency,
+              attributes: ['name', 'logo_uri'],
+            },
+          ],
+        },
+      ],
     },
   ])
 }
