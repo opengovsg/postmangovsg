@@ -2,11 +2,12 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    await queryInterface.removeConstraint('agencies', 'agencies_pkey')
     await queryInterface.changeColumn('agencies', 'domain', {
       type: Sequelize.DataTypes.STRING(255),
       allowNull: true,
-      primaryKey: false,
     })
+
     await queryInterface.addColumn('agencies', 'id', {
       autoIncrement: true,
       type: Sequelize.DataTypes.INTEGER,
@@ -24,13 +25,19 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.changeColumn('agencies', 'domain', {
-      type: Sequelize.DataTypes.STRING(255),
-      allowNull: false,
-      primaryKey: true,
-    })
+    await queryInterface.removeConstraint('agencies', 'agencies_id_key')
     await queryInterface.removeColumn('agencies', 'id')
     await queryInterface.removeColumn('agencies', 'name')
     await queryInterface.removeColumn('agencies', 'logo_uri')
+
+    await queryInterface.changeColumn('agencies', 'domain', {
+      type: Sequelize.DataTypes.STRING(255),
+      allowNull: false,
+    })
+    await queryInterface.addConstraint('agencies', {
+      fields: ['domain'],
+      type: 'primary key',
+      name: 'agencies_pkey',
+    })
   },
 }
