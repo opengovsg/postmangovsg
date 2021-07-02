@@ -37,7 +37,12 @@ module.exports = {
             'from', t.from,
             'senderEmail', u.email,
             'agencyName', a.name,
-            'agencyLogoURI', a.logo_uri
+            -- if show_logo is disabled for template, don't return an agency logo
+            'agencyLogoURI', 
+              CASE t.show_logo 
+                WHEN TRUE THEN a.logo_uri
+                ELSE NULL
+              END
           )
           FROM messages m
           INNER JOIN email_templates t ON m.campaign_id = t.campaign_id

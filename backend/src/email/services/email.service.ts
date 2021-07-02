@@ -84,7 +84,8 @@ const getHydratedMessage = async (
   })
   const agency = campaign?.user?.domain?.agency
   const agencyName = agency?.name
-  const agencyLogoURI = agency?.logo_uri
+  // if showLogo is disabled for template, don't return an agency logo
+  const agencyLogoURI = template?.showLogo ? agency?.logo_uri : undefined
 
   const showMasthead = campaign?.user?.email.endsWith(
     config.get('showMastheadDomain')
