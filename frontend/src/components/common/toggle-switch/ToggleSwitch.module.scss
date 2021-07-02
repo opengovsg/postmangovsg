@@ -2,10 +2,10 @@
 @import 'styles/_mixins';
 
 .toggleSelector {
-  height: 36px;
-  width: 64px;
-  border-radius: 18px;
-  padding: 2px;
+  height: 2.25rem;
+  width: 4rem;
+  border-radius: 1.5rem;
+  padding: 0.125rem;
   cursor: pointer;
   transition: 0.3s;
 
@@ -19,9 +19,9 @@
 }
 
 .toggleSelectorSwitch {
-  height: 32px;
-  width: 32px;
-  border-radius: 16px;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 1rem;
   background-color: $white;
   display: flex;
   align-items: center;
@@ -35,7 +35,7 @@
 
   &.checked {
     color: $green;
-    transform: translateX(28px);
+    transform: translateX(1.75rem);
   }
 
   &.unchecked {
