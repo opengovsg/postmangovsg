@@ -213,60 +213,6 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     expect(res.body).toEqual({ message: 'From Address has not been verified.' })
   })
 
-  test('Custom sender name with parentheses using default from address should be accepted', async () => {
-    const res = await request(app)
-      .put(`/campaign/${campaignId}/email/template`)
-      .send({
-        from: 'User (Department) <donotreply@mail.postman.gov.sg>',
-        subject: 'test',
-        body: 'test',
-        reply_to: 'user@agency.gov.sg',
-      })
-    expect(res.status).toBe(200)
-    const mailVia = config.get('mailVia')
-    expect(res.body).toEqual(
-      expect.objectContaining({
-        message: `Template for campaign ${campaignId} updated`,
-        template: expect.objectContaining({
-          from: `User (Department) ${mailVia} <donotreply@mail.postman.gov.sg>`,
-          reply_to: 'user@agency.gov.sg',
-        }),
-      })
-    )
-  })
-
-  test('Custom sender name with parentheses using verified custom from address should be accepted', async () => {
-    await EmailFromAddress.create({
-      email: 'user@agency.gov.sg',
-      name: 'Agency ABC',
-    })
-    const mockVerifyFromAddress = jest
-      .spyOn(CustomDomainService, 'verifyFromAddress')
-      .mockReturnValue(Promise.resolve())
-
-    const res = await request(app)
-      .put(`/campaign/${campaignId}/email/template`)
-      .send({
-        from: 'User (Department) <user@agency.gov.sg>',
-        subject: 'test',
-        body: 'test',
-        reply_to: 'user@agency.gov.sg',
-      })
-
-    expect(res.status).toBe(200)
-    const mailVia = config.get('mailVia')
-    expect(res.body).toEqual(
-      expect.objectContaining({
-        message: `Template for campaign ${campaignId} updated`,
-        template: expect.objectContaining({
-          from: `User (Department) ${mailVia} <user@agency.gov.sg>`,
-          reply_to: 'user@agency.gov.sg',
-        }),
-      })
-    )
-    mockVerifyFromAddress.mockRestore()
-  })
-
   test('Mail via should only be appended once', async () => {
     const mailVia = config.get('mailVia')
     const res = await request(app)
