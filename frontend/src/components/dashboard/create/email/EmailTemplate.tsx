@@ -173,23 +173,15 @@ const EmailTemplate = ({
 
   const handleSelectFromAddress = useCallback(
     (selectedFrom: string) => {
-      const {
-        fromName: selectedFromName,
-        fromAddress: selectedFromAddress,
-      } = parseFromAddress(selectedFrom)
+      const { fromAddress: selectedFromAddress } = parseFromAddress(
+        selectedFrom
+      )
 
       setFromAddress(selectedFromAddress)
 
-      // Populate from name only if it has been previously saved.
-      if (initialFromName) {
-        // Use custom from name if it has already been set. For e.g.,
-        // for "Custom <donotreply@postman.gov.sg>"", we should
-        // use "Custom" instead of the default "Postman.gov.sg".
-        setFromName(
-          selectedFromAddress === initialFromAddress
-            ? initialFromName
-            : selectedFromName
-        )
+      // Populate from name only if it has been previously saved and from address had not changed.
+      if (initialFromName && initialFromAddress === selectedFromAddress) {
+        setFromName(initialFromName)
       } else {
         // Reset from name to empty
         setFromName('')
