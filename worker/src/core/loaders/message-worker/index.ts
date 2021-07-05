@@ -238,6 +238,15 @@ const start = async (index: string, isLogger = false): Promise<any> => {
     }
   } catch (err) {
     return Promise.reject(err)
+  } finally {
+    if (connection) {
+      logger.info({
+        message: 'Closing database connection',
+        action: 'start',
+        workerId,
+      })
+      await connection.close()
+    }
   }
 }
 

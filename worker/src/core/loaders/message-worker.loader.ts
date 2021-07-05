@@ -23,7 +23,7 @@ const messageWorkerLoader = async (): Promise<void> => {
       error: err,
       action: 'createMessageWorker',
     })
-    process.exit(1)
+    worker.shutdown()
   }
 }
 
