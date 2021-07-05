@@ -83,7 +83,7 @@ const EmailTemplate = ({
   const protectedBodyPlaceholder =
     'Dear {{ recipient }}, \n\n You may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a> . \n\nPlease login with your birthday (DDMMYYYY) followed by the last 4 characters of your NRIC. E.g. 311290123A'
   const bodyPlaceholder =
-    'Dear {{ name }}, your next appointment at {{ clinic }} is on {{ date }} at {{ time }}'
+    'Dear {{ name }},\n\nYour next appointment at {{ clinic }} is on {{ date }} at {{ time }}\n\nMinistry of Health\n16 College Road, College of Medicine Building, Singapore 169854\n6325 9220 | www.moh.gov.sg'
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
     setErrorMsg(null)
@@ -276,7 +276,7 @@ const EmailTemplate = ({
           <div className={styles.logoTextContainer}>
             <div className={styles.logoText}>
               <h4>
-                <label htmlFor="logo">Logo</label>
+                <label htmlFor="logo">Show or hide logo</label>
               </h4>
               <p>
                 <label htmlFor="logo">
@@ -284,7 +284,7 @@ const EmailTemplate = ({
                 </label>
               </p>
             </div>
-            {agencyLogoURI != null && (
+            {!!agencyLogoURI && (
               <div className={styles.logoSwitch}>
                 <ToggleSwitch
                   checked={showLogo}
@@ -348,8 +348,17 @@ const EmailTemplate = ({
                 template should match the headers in your recipients CSV file.
               </p>
               <p>
-                <b>Note:</b> Recipient (email address) is a required column in
-                the CSV file.
+                You can increase the legitimacy of your email by signing off
+                with a proper agency signature.
+              </p>
+              <p>
+                <b>Suggested signature:</b>
+                <br />
+                Agency name
+                <br />
+                Office address
+                <br />
+                Contact number | Website
               </p>
             </>
           )}
