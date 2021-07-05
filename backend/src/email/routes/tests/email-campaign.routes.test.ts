@@ -1,6 +1,7 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
+import config from '@core/config'
 import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { RedisService } from '@core/services'
@@ -39,8 +40,7 @@ afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await RedisService.shutdown()
 })
 
 describe('PUT /campaign/{campaignId}/email/template', () => {
@@ -143,6 +143,97 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       })
     )
     mockVerifyFromAddress.mockRestore()
+  })
+
+  test('Custom sender name with default from address should be accepted', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: 'Custom Name <donotreply@mail.postman.gov.sg>',
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+    expect(res.status).toBe(200)
+    const mailVia = config.get('mailVia')
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        template: expect.objectContaining({
+          from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
+          reply_to: 'user@agency.gov.sg',
+        }),
+      })
+    )
+  })
+
+  test('Custom sender name with verified custom from address should be accepted', async () => {
+    await EmailFromAddress.create({
+      email: 'user@agency.gov.sg',
+      name: 'Agency ABC',
+    })
+    const mockVerifyFromAddress = jest
+      .spyOn(CustomDomainService, 'verifyFromAddress')
+      .mockReturnValue(Promise.resolve())
+
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: 'Custom Name <user@agency.gov.sg>',
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+
+    expect(res.status).toBe(200)
+    const mailVia = config.get('mailVia')
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        template: expect.objectContaining({
+          from: `Custom Name ${mailVia} <user@agency.gov.sg>`,
+          reply_to: 'user@agency.gov.sg',
+        }),
+      })
+    )
+    mockVerifyFromAddress.mockRestore()
+  })
+
+  test('Custom sender name with unverified from address should not be accepted', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: 'Custom Name <user@agency.gov.sg>',
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({ message: 'From Address has not been verified.' })
+  })
+
+  test('Mail via should only be appended once', async () => {
+    const mailVia = config.get('mailVia')
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        template: expect.objectContaining({
+          from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
+          reply_to: 'user@agency.gov.sg',
+        }),
+      })
+    )
   })
 
   test('Protected template without protectedlink variables is not accepted', async () => {

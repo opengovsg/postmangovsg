@@ -13,7 +13,7 @@ RUN aws configure set default.region ap-southeast-1
 WORKDIR /usr/home/postmangovsg
 
 COPY shared ../shared
-RUN cd ../shared && npm ci && cd ../postmangovsg
+RUN cd ../shared && npm ci
 
 COPY ./package* ./
 RUN npm ci
@@ -22,6 +22,7 @@ COPY src ./src
 COPY tsconfig.json ./
 
 RUN npm run build
+RUN cd ../shared && npm run postbuild
 RUN npm prune --production
 
 COPY ./docker-entrypoint.sh ./

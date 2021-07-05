@@ -231,6 +231,12 @@ const config = convict({
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
   },
+  showMastheadDomain: {
+    doc:
+      'Show masthead within email template if logged-in user has email ending with this domain',
+    default: '.gov.sg',
+    env: 'SHOW_MASTHEAD_DOMAIN',
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name

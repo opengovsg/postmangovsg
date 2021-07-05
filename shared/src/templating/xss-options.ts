@@ -1,4 +1,4 @@
-import xss, { IFilterXSSOptions } from 'xss'
+import { IFilterXSSOptions, cssFilter, safeAttrValue } from 'xss'
 import { TemplateError } from './errors'
 
 const URL =
@@ -70,7 +70,7 @@ export const XSS_EMAIL_OPTION = {
     }
     // The default safeAttrValue does guard against some edge cases
     // https://github.com/leizongmin/js-xss/blob/446f5daa3b65e9e8f0e9c71276cf61dad73d1ec3/dist/xss.js
-    return xss.safeAttrValue(tag, name, value, xss.cssFilter)
+    return safeAttrValue(tag, name, value, cssFilter)
   },
   stripIgnoreTag: true,
 }
@@ -102,7 +102,7 @@ export const XSS_TELEGRAM_OPTION = {
     ) {
       return value
     }
-    return xss.safeAttrValue(tag, name, value, xss.cssFilter)
+    return safeAttrValue(tag, name, value, cssFilter)
   },
   stripIgnoreTag: true,
 }
@@ -132,8 +132,8 @@ export const filterImageSources = (
 
     const defaultSafeAttrValue = baseOptions?.safeAttrValue
       ? baseOptions.safeAttrValue
-      : xss.safeAttrValue
+      : safeAttrValue
 
-    return defaultSafeAttrValue(tag, name, value, xss.cssFilter)
+    return defaultSafeAttrValue(tag, name, value, cssFilter)
   },
 })
