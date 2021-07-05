@@ -25,19 +25,23 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeConstraint('agencies', 'agencies_id_key')
-    await queryInterface.removeColumn('agencies', 'id')
-    await queryInterface.removeColumn('agencies', 'name')
-    await queryInterface.removeColumn('agencies', 'logo_uri')
-
-    await queryInterface.changeColumn('agencies', 'domain', {
-      type: Sequelize.DataTypes.STRING(255),
-      allowNull: false,
-    })
-    await queryInterface.addConstraint('agencies', {
-      fields: ['domain'],
-      type: 'primary key',
-      name: 'agencies_pkey',
+    // Drop the whole table and re-create it, as NULL values for domain are
+    // not valid for the previous schema anyway
+    await queryInterface.dropTable('agencies')
+    await queryInterface.createTable('agencies', {
+      domain: {
+        type: Sequelize.DataTypes.STRING(255),
+        allowNull: false,
+        primaryKey: true,
+      },
+      created_at: {
+        type: Sequelize.DataTypes.DATE,
+        allowNull: false,
+      },
+      updated_at: {
+        type: Sequelize.DataTypes.DATE,
+        allowNull: false,
+      },
     })
   },
 }
