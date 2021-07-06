@@ -2,6 +2,7 @@ import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { Domain } from '@core/models'
+import { Transaction } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 
@@ -21,9 +22,16 @@ const isValidDomain = (domain: string): boolean => {
   return isWildCardDomain || isSpecificDomain
 }
 
-const validateDomain = async (email: string): Promise<boolean> => {
+const validateDomain = async (
+  email: string,
+  transaction?: Transaction | null
+): Promise<boolean> => {
   const configDomains = config.get('domains').split(';')
-  const agencyDomains = (await Domain.findAll()).map((d: Domain) => d.domain)
+  const agencyDomains = (
+    await Domain.findAll({
+      transaction,
+    })
+  ).map((d: Domain) => d.domain)
 
   const domainsToWhitelist = configDomains
     .concat(agencyDomains)
