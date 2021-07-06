@@ -248,7 +248,7 @@ msgstr "https://guide.postman.gov.sg/legal/t-and-c"
 
 #: config.ts:85
 msgid "link.uploadLogoUrl"
-msgstr "https://form.gov.sg"
+msgstr "https://go.gov.sg/postman-upload-logo-request"
 
 #: components/dashboard/create/email/EmailTemplate.tsx:137
 #: components/dashboard/create/email/tests/EmailTemplate.test.tsx:267
