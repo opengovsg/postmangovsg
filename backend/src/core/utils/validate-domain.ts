@@ -22,20 +22,37 @@ const isValidDomain = (domain: string): boolean => {
   return isWildCardDomain || isSpecificDomain
 }
 
+/**
+ * Checks if email is valid and has a domain that's whitelisted
+ * (either in domains table or in env var)
+ * @param email
+ * @param transaction Sequelize transaction to use for DB lookup (optional)
+ */
 const validateDomain = async (
   email: string,
   transaction?: Transaction | null
 ): Promise<boolean> => {
-  const configDomains = config.get('domains').split(';')
-  const agencyDomains = (
-    await Domain.findAll({
-      transaction,
-    })
-  ).map((d: Domain) => d.domain)
+  if (!validator.isEmail(email)) return false
 
-  const domainsToWhitelist = configDomains
-    .concat(agencyDomains)
-    .filter(isValidDomain)
+  // First, check if there exists an exact match in the domains table
+  const emailDomain = email.substring(email.lastIndexOf('@'))
+  const dbDomain = await Domain.findOne({
+    where: { domain: emailDomain },
+    transaction,
+  })
+  if (dbDomain != null) {
+    logger.info({
+      message: 'Match for email found in domains table',
+      email,
+      matched: emailDomain,
+      action: 'validateDomain',
+    })
+    return true
+  }
+
+  // If not, check env var for matches (either wildcard or exact)
+  const configDomains = config.get('domains').split(';')
+  const domainsToWhitelist = configDomains.filter(isValidDomain)
 
   if (domainsToWhitelist.length === 0) {
     throw new Error(
@@ -45,7 +62,7 @@ const validateDomain = async (
     )
   } else {
     logger.info({
-      message: 'Domains whitelisted',
+      message: 'Domains whitelisted in env var',
       domainsToWhitelist,
       action: 'validateDomain',
     })
@@ -54,14 +71,14 @@ const validateDomain = async (
   const matched = domainsToWhitelist.filter((domain) => email.endsWith(domain))
   if (matched.length > 0) {
     logger.info({
-      message: 'Match for email found.',
+      message: 'Match for email found in env var',
       matched,
       email,
       action: 'validateDomain',
     })
   }
 
-  return validator.isEmail(email) && matched.length > 0
+  return matched.length > 0
 }
 
 export { validateDomain }
