@@ -116,10 +116,13 @@ export class User extends Model<User> {
         },
         transaction: options.transaction,
       })
-      await Domain.create({
-        domain: emailDomain,
-        agencyId: defaultAgency.id,
-      })
+      await Domain.create(
+        {
+          domain: emailDomain,
+          agencyId: defaultAgency.id,
+        },
+        { transaction: options.transaction }
+      )
     }
 
     instance.emailDomain = emailDomain
