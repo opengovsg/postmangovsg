@@ -280,8 +280,12 @@ const EmailTemplate = ({
               </h4>
               <p>
                 <label htmlFor="logo">
-                  Your agency’s logo will appear in the header of the email
+                  Your agency’s logo will appear in the header of the email.
                 </label>
+              </p>
+              <p>
+                <b>Note:</b> Logos may not be visible in government email
+                inboxes.
               </p>
             </div>
             {!!agencyLogoURI && (
