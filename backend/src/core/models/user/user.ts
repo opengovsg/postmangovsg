@@ -105,6 +105,9 @@ export class User extends Model<User> {
     if (domain == null) {
       logger.info({
         message: `Creating new domain ${emailDomain}`,
+        action: 'populateDomain',
+        email: instance.email,
+        domain: emailDomain,
       })
 
       const [defaultAgency] = await Agency.findOrCreate({
