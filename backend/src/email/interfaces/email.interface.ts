@@ -7,6 +7,7 @@ export interface StoreTemplateInput {
   body: string
   replyTo: string | null
   from: string
+  showLogo: boolean
 }
 export interface StoreTemplateOutput {
   updatedTemplate: EmailTemplate

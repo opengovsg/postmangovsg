@@ -55,7 +55,9 @@ export class ThemeClient {
   }
 
   // Returns contents of <body> tag from generateThemedHTMLEmail
-  static async generateThemedBody(emailThemeFields: EmailThemeFields): Promise<string> {
+  static async generateThemedBody(
+    emailThemeFields: EmailThemeFields
+  ): Promise<string> {
     const themedHTMLEmail = await this.generateThemedHTMLEmail(emailThemeFields)
 
     /**
