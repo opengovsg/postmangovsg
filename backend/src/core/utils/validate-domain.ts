@@ -40,7 +40,7 @@ const validateDomain = async (
     where: { domain: emailDomain },
     transaction,
   })
-  if (dbDomain != null) {
+  if (dbDomain !== null) {
     logger.info({
       message: 'Match for email found in domains table',
       email,
