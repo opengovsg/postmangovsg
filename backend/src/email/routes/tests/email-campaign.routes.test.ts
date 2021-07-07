@@ -395,17 +395,15 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       })
 
     expect(res.status).toBe(200)
-    expect(res.body).toEqual(
-      expect.objectContaining({
-        message: `Template for campaign ${campaignId} updated`,
-        template: {
-          subject: 'test',
-          body: 'test {{name}}',
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
-          reply_to: 'user@agency.gov.sg',
-          params: ['name'],
-        },
-      })
-    )
+    expect(res.body).toMatchObject({
+      message: `Template for campaign ${campaignId} updated`,
+      template: {
+        subject: 'test',
+        body: 'test {{name}}',
+        from: 'Postman <donotreply@mail.postman.gov.sg>',
+        reply_to: 'user@agency.gov.sg',
+        params: ['name'],
+      },
+    })
   })
 })

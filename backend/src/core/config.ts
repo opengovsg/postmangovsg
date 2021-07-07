@@ -493,6 +493,13 @@ const config = convict({
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
   },
+  defaultAgency: {
+    name: {
+      doc: 'Default agency name used for users from unrecognised domains',
+      default: 'Singapore Government',
+      env: 'DEFAULT_AGENCY_NAME',
+    },
+  },
   showMastheadDomain: {
     doc:
       'Show masthead within email template if logged-in user has email ending with this domain',
