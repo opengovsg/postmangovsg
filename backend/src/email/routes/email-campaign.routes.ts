@@ -29,6 +29,7 @@ const storeTemplateValidator = {
       .allow(null)
       .required(),
     from: fromAddressValidator,
+    show_logo: Joi.boolean().default(true),
   }),
 }
 

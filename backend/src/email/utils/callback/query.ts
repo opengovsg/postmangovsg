@@ -1,6 +1,6 @@
 import { QueryTypes, Op, cast, fn } from 'sequelize'
 import {
-  UpdateMessageWithErrorCode,
+  UpdateMessageWithErrorMetadata,
   Metadata,
 } from '@email/interfaces/callback.interface'
 import { EmailBlacklist, EmailMessage } from '@email/models'
@@ -30,9 +30,9 @@ export const addToBlacklist = (
  *
  */
 export const updateMessageWithError = async (
-  opts: UpdateMessageWithErrorCode
+  opts: UpdateMessageWithErrorMetadata
 ): Promise<number | undefined> => {
-  const { errorCode, timestamp, id } = opts
+  const { errorCode, errorSubType, timestamp, id } = opts
 
   logger.info({
     message: 'Updating email_messages table',
@@ -42,6 +42,7 @@ export const updateMessageWithError = async (
   const [, result] = await EmailMessage.update(
     {
       errorCode: errorCode,
+      errorSubType,
       receivedAt: timestamp,
       status: 'INVALID_RECIPIENT',
     },

@@ -172,14 +172,12 @@ const EmailRecipients = ({
               a <b>recipient</b> column with recipients&apos; email addresses
             </li>
             {protect && (
-              <>
-                <li>
-                  a <b>password</b> column with the password to access the
-                  protected message
-                </li>
-                <li>all other keywords in the template</li>
-              </>
+              <li>
+                a <b>password</b> column with the password to access the
+                protected message
+              </li>
             )}
+            <li>all other keywords in the template</li>
           </p>
         </StepHeader>
 
@@ -229,6 +227,7 @@ const EmailRecipients = ({
           <p className={styles.greyText}>Message preview</p>
           <EmailPreviewBlock
             body={preview?.body}
+            themedBody={preview?.themedBody}
             subject={preview?.subject}
             replyTo={preview?.replyTo}
             from={preview?.from}

@@ -9,6 +9,7 @@ import {
   updateComplaintStatus,
   updateReadStatus,
 } from '@email/utils/callback/update-status'
+import { addToBlacklist } from '@email/utils/callback/query'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V1 = 'X-Postman-ID' // Case sensitive
@@ -108,6 +109,21 @@ const isEvent = (req: Request): boolean => {
   )
 }
 
+const shouldBlacklist = ({
+  notificationType,
+  bounceType,
+  complaintType,
+}: {
+  notificationType?: string
+  bounceType?: string
+  complaintType?: string
+}) => {
+  return (
+    (notificationType === 'Bounce' && bounceType === 'Permanent') ||
+    (notificationType === 'Complaint' && complaintType)
+  )
+}
+
 const parseNotification = async (
   notificationType: string,
   message: any,
@@ -124,6 +140,7 @@ const parseNotification = async (
       await updateBouncedStatus({
         ...metadata,
         bounceType: message?.bounce?.bounceType,
+        bounceSubType: message?.bounce?.bounceSubType,
         to: message?.mail?.commonHeaders?.to,
       })
       break
@@ -131,6 +148,7 @@ const parseNotification = async (
       await updateComplaintStatus({
         ...metadata,
         complaintType: message?.complaint?.complaintFeedbackType,
+        complaintSubType: message?.complaint?.complaintSubType,
         to: message?.mail?.commonHeaders?.to,
       })
       break
@@ -171,16 +189,30 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   const message = JSON.parse(record.Message)
   const messageId = message?.mail?.commonHeaders?.messageId
   const logMeta = { messageId, action: 'parseRecord' }
-  const id = getReferenceID(message)
-  if (id === undefined) {
-    logger.info({ message: 'No reference message id found', ...logMeta })
-    return
-  }
-
-  const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
 
   if (message?.notificationType) {
     const notificationType = message?.notificationType
+    const bounceType = message?.bounce?.bounceType
+    const complaintType = message?.complaint?.complaintFeedbackType
+    const recipients = message?.mail?.commonHeaders?.to
+
+    // Transactional emails don't have message IDs, so blacklist
+    // relevant email addresses before everything else
+    if (
+      recipients &&
+      shouldBlacklist({ notificationType, bounceType, complaintType })
+    ) {
+      await Promise.all(recipients.map(addToBlacklist))
+    }
+
+    const id = getReferenceID(message)
+    if (id === undefined) {
+      logger.info({ message: 'No reference message id found', ...logMeta })
+      return
+    }
+
+    const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
+
     logger.info({
       message: 'Update for notificationType',
       notificationType,
@@ -191,6 +223,14 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
 
   if (message?.eventType) {
     const eventType = message?.eventType
+
+    const id = getReferenceID(message)
+    if (id === undefined) {
+      logger.info({ message: 'No reference message id found', ...logMeta })
+      return
+    }
+
+    const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
     logger.info({
       message: 'Update for eventType',
       eventType,

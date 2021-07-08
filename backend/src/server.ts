@@ -1,9 +1,4 @@
-require('dotenv').config()
-require('module-alias/register')
-
-import config from '@core/config'
-// Validate to make sure all the required env vars have been set
-config.validate()
+import './setup'
 
 /** Load the app after all env vars are set */
 import 'source-map-support/register'
