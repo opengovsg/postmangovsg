@@ -115,7 +115,7 @@
 }
 
 .greenInfoBlock {
-  @include block(rgba($success, 0.2), $success);
+  @include block(rgba($success, 0.2), $success, $success);
 }
 
 .editBtn {
