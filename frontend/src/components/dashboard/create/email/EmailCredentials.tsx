@@ -74,18 +74,6 @@ const EmailCredentials = ({
               <EmailValidationInput onClick={handleTestSend} />
             </div>
             <ErrorBlock>{errorMsg}</ErrorBlock>
-
-            {hasCredential && (
-              <DetailBlock>
-                <li>
-                  <i className="bx bx-check-circle"></i>
-                  <span>
-                    Email credentials have been validated but you may continue
-                    to send test messages.
-                  </span>
-                </li>
-              </DetailBlock>
-            )}
           </StepSection>
 
           <ButtonGroup>
