@@ -28,6 +28,11 @@
 .container {
   background-color: #f0f0f0;
   height: auto;
+  padding: 0 $site-padding;
+
+  @include mobile() {
+    padding: 0;
+  }
 
   * {
     font-family: 'Lato', sans-serif;
