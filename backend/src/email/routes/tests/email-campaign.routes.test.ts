@@ -98,7 +98,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({
-        from: 'Agency.gov.sg <donotreply@mail.postman.gov.sg>',
+        from: 'Agency.gov.sg <donotreply@postman.gov.sg>',
         subject: 'test',
         body: 'test',
         reply_to: 'user@agency.gov.sg',
@@ -108,7 +108,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       expect.objectContaining({
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
-          from: 'Agency.gov.sg via Postman <donotreply@mail.postman.gov.sg>',
+          from: 'Agency.gov.sg via Postman <donotreply@postman.gov.sg>',
           reply_to: 'user@agency.gov.sg',
         }),
       })
