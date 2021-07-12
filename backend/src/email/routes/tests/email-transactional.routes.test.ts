@@ -71,7 +71,7 @@ describe('POST /transactional/email/send', () => {
         recipient: 'recipient@agency.gov.sg',
         subject: 'subject',
         body: '<p>body</p>',
-        from: 'Postman <donotreply@mail.postman.gov.sg>',
+        from: 'Postman <donotreply@postman.gov.sg>',
         reply_to: 'user@agency.gov.sg',
       })
 
@@ -91,7 +91,27 @@ describe('POST /transactional/email/send', () => {
         recipient: 'recipient@agency.gov.sg',
         subject: 'subject',
         body: '<p>body</p>',
-        from: 'Hello <donotreply@mail.postman.gov.sg>',
+        from: 'Hello <donotreply@postman.gov.sg>',
+        reply_to: user.email,
+      })
+
+    expect(res.status).toBe(202)
+    expect(mockSendEmail).toBeCalledTimes(1)
+  })
+
+  test('Should be backward compatible with donotreply@mail.postman.gov.sg', async () => {
+    const mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
+
+    const res = await request(app)
+      .post('/transactional/email/send')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        recipient: 'recipient@agency.gov.sg',
+        subject: 'subject',
+        body: '<p>body</p>',
+        from: 'Postman <donotreply@mail.postman.gov.sg>',
         reply_to: user.email,
       })
 
@@ -119,7 +139,7 @@ describe('POST /transactional/email/send', () => {
     expect(mockSendEmail).toBeCalledTimes(1)
   })
 
-  test('Should thrown an error with invalid custom from address', async () => {
+  test('Should throw an error with invalid custom from address', async () => {
     const mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
@@ -151,7 +171,7 @@ describe('POST /transactional/email/send', () => {
           recipient: 'recipient@agency.gov.sg',
           subject: 'subject',
           body: '<p>body</p>',
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
+          from: 'Postman <donotreply@postman.gov.sg>',
           reply_to: user.email,
         })
     }
@@ -181,7 +201,7 @@ describe('POST /transactional/email/send', () => {
           recipient: 'recipient@agency.gov.sg',
           subject: 'subject',
           body: '<p>body</p>',
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
+          from: 'Postman <donotreply@postman.gov.sg>',
           reply_to: user.email,
         })
     }
