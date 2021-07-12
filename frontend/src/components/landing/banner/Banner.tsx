@@ -47,7 +47,7 @@ const Banner = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Trusted websites. <i className="bx bx-link-external" />
+                  Trusted websites <i className="bx bx-link-external" />
                 </a>
               </div>
             </div>
