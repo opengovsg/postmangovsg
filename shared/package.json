@@ -1,11 +1,11 @@
 {
   "name": "shared",
-  "version": "1.27.1",
+  "version": "1.28.0",
   "description": "Shared modules for Postman",
   "main": "build/index.js",
   "scripts": {
-    "dev": "npm run postbuild && tsc --build -w",
-    "build": "rimraf build && tsc -b --clean && tsc",
+    "dev": "npm run postbuild && tsc --build tsconfig.build.json -w",
+    "build": "rimraf build && tsc --build tsconfig.build.json --clean && tsc -p tsconfig.build.json",
     "lint-no-fix": "tsc --composite false --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
     "postbuild": "npm run copy-assets",

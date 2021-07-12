@@ -9,7 +9,8 @@ export async function saveTemplate(
   subject: string,
   body: string,
   replyTo: string | null,
-  from: string
+  from: string,
+  showLogo: boolean
 ): Promise<{
   numRecipients: number
   updatedTemplate?: {
@@ -17,6 +18,7 @@ export async function saveTemplate(
     body: string
     subject: string
     reply_to: string | null
+    show_logo: boolean
     params: Array<string>
   }
 }> {
@@ -29,6 +31,7 @@ export async function saveTemplate(
       // 2. User deletes the replyTo email after previously setting it - empty string
       reply_to: replyTo || null,
       from,
+      show_logo: showLogo,
     })
     const {
       num_recipients: numRecipients,
