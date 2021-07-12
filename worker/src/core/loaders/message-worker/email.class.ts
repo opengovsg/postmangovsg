@@ -60,7 +60,7 @@ class Email {
 
     const showMastheadDomain = config.get('showMastheadDomain')
     const result = await this.connection.query<ResultRow>(
-      'SELECT get_messages_to_send_email_with_sender(:job_id, :rate) AS message;',
+      'SELECT get_messages_to_send_email_with_agency(:job_id, :rate) AS message;',
       {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
@@ -109,6 +109,8 @@ class Email {
     replyTo,
     from,
     campaignId,
+    agencyName,
+    agencyLogoURI,
     showMasthead,
   }: Message): Promise<void> {
     try {
@@ -127,6 +129,8 @@ class Email {
       const themedHTMLEmail = await ThemeClient.generateThemedHTMLEmail({
         body: hydratedBody,
         unsubLink,
+        agencyName,
+        agencyLogoURI,
         showMasthead,
       })
 

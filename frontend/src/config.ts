@@ -81,6 +81,7 @@ export const LINKS = {
   demoTelegramBotUrl: t`link.demoTelegramBotUrl`,
   demoVideoUrl: t`link.demoVideoUrl`,
   featureRequestUrl: t`link.featureRequestUrl`,
+  uploadLogoUrl: t`link.uploadLogoUrl`,
 }
 export const DEFAULT_MAIL_FROM = t`defaultMailFrom`
 // Semi-colon separated list of allowed image source hostnames

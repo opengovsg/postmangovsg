@@ -28,6 +28,7 @@ const upsertEmailTemplate = async ({
   replyTo,
   campaignId,
   from,
+  showLogo,
 }: StoreTemplateInput): Promise<EmailTemplate> => {
   let transaction
   try {
@@ -48,6 +49,7 @@ const upsertEmailTemplate = async ({
           body,
           replyTo,
           from,
+          showLogo,
         },
         {
           where: { campaignId },
@@ -68,6 +70,7 @@ const upsertEmailTemplate = async ({
         subject,
         replyTo,
         from,
+        showLogo,
       },
       {
         transaction,
@@ -168,6 +171,7 @@ const storeTemplate = async ({
   body,
   replyTo,
   from,
+  showLogo,
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const sanitizedSubject = client.replaceNewLinesAndSanitize(subject)
@@ -208,6 +212,7 @@ const storeTemplate = async ({
     replyTo,
     campaignId,
     from: formattedFrom,
+    showLogo,
   })
 
   // TODO: this is slow when table is large
