@@ -17,7 +17,7 @@ const createMessageWorker = async (
       message: 'Worker died',
       workerId,
       isLogger,
-      error: err,
+      error: `${err.stack}`.substring(0, 1000),
       action: 'createMessageWorker',
     })
     process.exit(1)
