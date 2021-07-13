@@ -117,10 +117,10 @@ const shouldBlacklist = ({
   notificationType?: string
   bounceType?: string
   complaintType?: string
-}) => {
+}): boolean => {
   return (
     (notificationType === 'Bounce' && bounceType === 'Permanent') ||
-    (notificationType === 'Complaint' && complaintType)
+    (notificationType === 'Complaint' && !!complaintType)
   )
 }
 
