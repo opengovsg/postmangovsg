@@ -151,7 +151,7 @@ const config = convict({
   },
   mailConfigurationSet: {
     doc: 'The configuration set specified when sending an email',
-    default: '',
+    default: 'postman-email-open',
     env: 'WORKER_SES_CONFIGURATION_SET',
   },
   defaultCountry: {
