@@ -130,7 +130,7 @@ const parseNotification = async (
   metadata: any
 ): Promise<void> => {
   const messageId = message?.mail?.commonHeaders?.messageId
-  const logMeta = { messageId, action: 'parseRecord' }
+  const logMeta = { messageId, action: 'parseNotification' }
 
   switch (notificationType) {
     case 'Delivery':
