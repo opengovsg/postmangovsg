@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer'
-import directTransport from 'nodemailer-direct-transport'
 import { loggerWithLabel } from '@core/logger'
 import { MailToSend, MailCredentials } from '@email/interfaces'
 import config from '@core/config'
@@ -13,15 +12,6 @@ export default class MailClient {
 
   constructor(credentials: MailCredentials) {
     const { host, port, auth } = credentials
-
-    if (!host) {
-      logger.info({ message: 'Mailer: Using direct transport' })
-      this.mailer = nodemailer.createTransport(directTransport({ debug: true }))
-      return
-    }
-
-    if (!port || !auth.user || !auth.pass)
-      throw new Error('Missing credentials while constructing MailService')
 
     logger.info({ message: 'Mailer: Using SMTP transport', host, port })
     this.mailer = nodemailer.createTransport({
