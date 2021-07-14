@@ -12,12 +12,13 @@ module.exports = {
   ],
   parserOptions: {
     sourceType: 'module',
+    project: ['./tsconfig.json']
   },
   env: {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['build', 'dist', 'node_modules'],
+  ignorePatterns: ['build', 'dist', 'node_modules', 'coverage', 'jest.config.js'],
   rules: {
     '@typescript-eslint/camelcase': [
       'error',
@@ -25,6 +26,7 @@ module.exports = {
     ],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-floating-promises': ['error'],
 
     'no-console': [
       'warn',

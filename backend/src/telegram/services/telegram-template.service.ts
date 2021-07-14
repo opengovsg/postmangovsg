@@ -48,7 +48,7 @@ const upsertTelegramTemplate = async ({
         }
       )
 
-      transaction?.commit()
+      await transaction?.commit()
       return updatedTemplate[1][0]
     }
 
@@ -57,10 +57,10 @@ const upsertTelegramTemplate = async ({
       { transaction }
     )
 
-    transaction?.commit()
+    await transaction?.commit()
     return createdTemplate
   } catch (err) {
-    transaction?.rollback()
+    await transaction?.rollback()
     throw err
   }
 }
