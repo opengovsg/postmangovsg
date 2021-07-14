@@ -35,7 +35,7 @@ class Email {
         // This is to ensure that stats count tally with total count during sending
         // as enqueue step may set messages as invalid
         await this.connection.query(
-          'SELECT update_stats_email(:campaign_id);',
+          'SELECT update_stats_email_with_read(:campaign_id);',
           {
             replacements: { campaign_id: campaignId },
             type: QueryTypes.SELECT,
