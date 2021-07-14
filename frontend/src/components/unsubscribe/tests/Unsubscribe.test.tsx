@@ -83,6 +83,6 @@ test('displays thank you page when user does not unsubscribe', async () => {
   expect(screen.getByRole('img', { name: /hero/i })).toBeInTheDocument()
   expect(screen.getByRole('img', { name: /postman logo/i })).toBeInTheDocument()
   expect(
-    screen.getByRole('link', { name: /a singapore government agency website/i })
+    screen.getByText(/a singapore government agency website/i)
   ).toBeInTheDocument()
 })

@@ -51,7 +51,7 @@ test('displays the necessary elements', async () => {
   expect(passwordTextbox).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /access/i })).toBeInTheDocument()
   expect(
-    screen.getByRole('link', { name: /singapore government agency website/i })
+    screen.getByText(/singapore government agency website/i)
   ).toBeInTheDocument()
 })
 
