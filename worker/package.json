@@ -5,7 +5,8 @@
   "main": "build/server.js",
   "scripts": {
     "build": "rimraf build && tsc --build",
-    "dev": "npm run postbuild && tsc-watch --onSuccess \"node ./build/server.js\"",
+    "dev:sender": "npm run postbuild && MESSAGE_WORKER_SENDER=1 tsc-watch --onSuccess \"node ./build/server.js\"",
+    "dev:logger": "npm run postbuild && MESSAGE_WORKER_LOGGER=1 tsc-watch --onSuccess \"node ./build/server.js\"",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
     "postbuild": "npm run copy-assets",
@@ -35,8 +36,6 @@
     "sequelize-typescript": "^1.1.0",
     "source-map-support": "^0.5.19",
     "telegraf": "^3.38.0",
-    "threads": "^1.4.0",
-    "tiny-worker": "^2.3.0",
     "twilio": "^3.58.0",
     "winston": "^3.3.3"
   },
