@@ -7,6 +7,7 @@ import {
   updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
+  updateReadStatus,
 } from '@email/utils/callback/update-status'
 import { addToBlacklist } from '@email/utils/callback/query'
 
@@ -17,6 +18,7 @@ const certCache: { [key: string]: string } = {}
 type SesRecord = {
   Message: string
   MessageId: string
+  Subject?: string
   Timestamp: string
   TopicArn: string
   Type: string
@@ -80,6 +82,7 @@ const basestring = (record: SesRecord): string => {
   return (
     `Message\n${record.Message}\n` +
     `MessageId\n${record.MessageId}\n` +
+    `${record.Subject ? `Subject\n${record.Subject}\n` : ``}` +
     `Timestamp\n${record.Timestamp}\n` +
     `TopicArn\n${record.TopicArn}\n` +
     `Type\n${record.Type}\n`
@@ -114,46 +117,21 @@ const shouldBlacklist = ({
   notificationType?: string
   bounceType?: string
   complaintType?: string
-}) => {
+}): boolean => {
   return (
     (notificationType === 'Bounce' && bounceType === 'Permanent') ||
-    (notificationType === 'Complaint' && complaintType)
+    (notificationType === 'Complaint' && !!complaintType)
   )
 }
 
-const parseRecord = async (record: SesRecord): Promise<void> => {
-  if (!(record.SignatureVersion === '1' && (await validateSignature(record)))) {
-    throw new Error(`Invalid record`)
-  }
-  const message = JSON.parse(record.Message)
+const parseNotification = async (
+  notificationType: string,
+  message: any,
+  metadata: any
+): Promise<void> => {
   const messageId = message?.mail?.commonHeaders?.messageId
-  const logMeta = { messageId, action: 'parseRecord' }
+  const logMeta = { messageId, action: 'parseNotification' }
 
-  const notificationType = message?.notificationType
-  const bounceType = message?.bounce?.bounceType
-  const complaintType = message?.complaint?.complaintFeedbackType
-  const recipients = message?.mail?.commonHeaders?.to
-
-  // Transactional emails don't have message IDs, so blacklist
-  // relevant email addresses before everything else
-  if (
-    recipients &&
-    shouldBlacklist({ notificationType, bounceType, complaintType })
-  ) {
-    await Promise.all(recipients.map(addToBlacklist))
-  }
-
-  const id = getReferenceID(message)
-  if (id === undefined) {
-    logger.info({ message: 'No reference message id found', ...logMeta })
-    return
-  }
-  logger.info({
-    message: 'Update for notificationType',
-    notificationType,
-    ...logMeta,
-  })
-  const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
   switch (notificationType) {
     case 'Delivery':
       await updateDeliveredStatus(metadata)
@@ -176,7 +154,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       break
     default:
       logger.error({
-        message: 'Unable handle messages with this notification type',
+        message: 'Unable to handle messages with this notification type',
         notificationType,
         ...logMeta,
       })
@@ -184,4 +162,82 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   }
 }
 
-export { HttpEvent, SesRecord, isEvent, parseRecord }
+const parseEvent = async (
+  eventType: string,
+  message: any,
+  metadata: any
+): Promise<void> => {
+  const messageId = message?.mail?.commonHeaders?.messageId
+  const logMeta = { messageId, action: 'parseEvent' }
+
+  if (eventType === 'Open') {
+    await updateReadStatus(metadata)
+  } else {
+    logger.error({
+      message: 'Unable to handle messages with this event type',
+      eventType,
+      ...logMeta,
+    })
+    return
+  }
+}
+
+const parseRecord = async (record: SesRecord): Promise<void> => {
+  if (!(record.SignatureVersion === '1' && (await validateSignature(record)))) {
+    throw new Error(`Invalid record`)
+  }
+  const message = JSON.parse(record.Message)
+  const messageId = message?.mail?.commonHeaders?.messageId
+  const logMeta = { messageId, action: 'parseRecord' }
+
+  if (message?.notificationType) {
+    const notificationType = message?.notificationType
+    const bounceType = message?.bounce?.bounceType
+    const complaintType = message?.complaint?.complaintFeedbackType
+    const recipients = message?.mail?.commonHeaders?.to
+
+    // Transactional emails don't have message IDs, so blacklist
+    // relevant email addresses before everything else
+    if (
+      recipients &&
+      shouldBlacklist({ notificationType, bounceType, complaintType })
+    ) {
+      await Promise.all(recipients.map(addToBlacklist))
+    }
+
+    const id = getReferenceID(message)
+    if (id === undefined) {
+      logger.info({ message: 'No reference message id found', ...logMeta })
+      return
+    }
+
+    const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
+
+    logger.info({
+      message: 'Update for notificationType',
+      notificationType,
+      ...logMeta,
+    })
+    return parseNotification(notificationType, message, metadata)
+  }
+
+  if (message?.eventType) {
+    const eventType = message?.eventType
+
+    const id = getReferenceID(message)
+    if (id === undefined) {
+      logger.info({ message: 'No reference message id found', ...logMeta })
+      return
+    }
+
+    const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
+    logger.info({
+      message: 'Update for eventType',
+      eventType,
+      ...logMeta,
+    })
+    return parseEvent(eventType, message, metadata)
+  }
+}
+
+export { HttpEvent, SesRecord, isEvent, parseRecord, validateSignature }

@@ -13,13 +13,13 @@ const getCredentialsFromSecretsManager = async (name: string): Promise<any> => {
   logger.info({
     message: 'Getting secret from AWS secrets manager.',
     name,
-    action: getCredentialsFromSecretsManager,
+    action: 'getCredentialsFromSecretsManager',
   })
   const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
   logger.info({
     message: 'Retreived secret from AWS secrets manager.',
     name,
-    action: getCredentialsFromSecretsManager,
+    action: 'getCredentialsFromSecretsManager',
   })
   const secretString = get(data, 'SecretString', '')
   if (!secretString)

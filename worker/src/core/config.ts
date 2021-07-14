@@ -122,6 +122,7 @@ const config = convict({
       doc: 'Amazon SES SMTP endpoint.',
       default: '',
       env: 'WORKER_SES_HOST',
+      format: 'required-string',
     },
     port: {
       doc: 'Amazon SES SMTP port, defaults to 465',
@@ -135,12 +136,14 @@ const config = convict({
         default: '',
         env: 'WORKER_SES_USER',
         sensitive: true,
+        format: 'required-string',
       },
       pass: {
         doc: 'SMTP password',
         default: '',
         env: 'WORKER_SES_PASS',
         sensitive: true,
+        format: 'required-string',
       },
     },
   },
@@ -148,6 +151,11 @@ const config = convict({
     doc: 'The email address that appears in the From field of an email',
     default: '',
     env: 'WORKER_SES_FROM',
+  },
+  mailConfigurationSet: {
+    doc: 'The configuration set specified when sending an email',
+    default: 'postman-email-open',
+    env: 'WORKER_SES_CONFIGURATION_SET',
   },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',

@@ -47,6 +47,40 @@ describe('BeforeCreate hook', () => {
     mockValidateDomain.mockReset()
   })
 
+  test('User with invalid email_domain should not cause domain or default agency to be created', async () => {
+    mockValidateDomain.mockResolvedValue(false)
+    const INVALID_DOMAIN_EMAIL = 'user@invaliddomain.com'
+    const INVALID_DOMAIN = '@invaliddomain.com'
+
+    // Ensure domain doesn't already exist
+    await expect(
+      Domain.findOne({ where: { domain: INVALID_DOMAIN } })
+    ).resolves.toBeNull()
+
+    // Ensure default agency doesn't already exist
+    await expect(
+      Agency.findOne({ where: { name: config.get('defaultAgency.name') } })
+    ).resolves.toBeNull()
+
+    await expect(
+      User.create({
+        email: INVALID_DOMAIN_EMAIL,
+      })
+    ).rejects.toThrow(
+      `User email ${INVALID_DOMAIN_EMAIL} does not end in a whitelisted domain`
+    )
+
+    // After error is thrown, rest of beforeCreate hook should not run
+    await expect(
+      Domain.findOne({ where: { domain: INVALID_DOMAIN } })
+    ).resolves.toBeNull()
+    await expect(
+      Agency.findOne({ where: { name: config.get('defaultAgency.name') } })
+    ).resolves.toBeNull()
+
+    mockValidateDomain.mockReset()
+  })
+
   test('User with valid email_domain should be created', async () => {
     mockValidateDomain.mockResolvedValue(true)
     const VALID_DOMAIN_EMAIL = 'user@agency.gov.sg'
@@ -79,9 +113,13 @@ describe('BeforeCreate hook', () => {
       Agency.findOne({ where: { name: config.get('defaultAgency.name') } })
     ).resolves.toBeNull()
 
-    const user = await User.create({
-      email: NEW_DOMAIN_EMAIL,
+    // Create user (and trigger beforeCreate hook) with a single transaction,
+    // to simulate behavior of auth service
+    await sequelize.transaction(async (transaction) => {
+      await User.create({ email: NEW_DOMAIN_EMAIL }, { transaction })
     })
+
+    const user = await User.findOne({ where: { email: NEW_DOMAIN_EMAIL } })
     expect(user).not.toBeNull()
     expect(user).toMatchObject({
       email: NEW_DOMAIN_EMAIL,
