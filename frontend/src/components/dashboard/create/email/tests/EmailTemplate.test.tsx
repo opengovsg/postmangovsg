@@ -16,7 +16,6 @@ import {
   server,
   render,
   fireEvent,
-  DEFAULT_FROM_NAME,
   DEFAULT_FROM_ADDRESS,
 } from 'test-utils'
 
@@ -74,18 +73,14 @@ test('displays the necessary elements', async () => {
   /**
    * Assert that the following elements are present:
    * 1. "Create email message" heading
-   * 2. From address dropdown
+   * 2. From name input
    * 3. Subject textbox
    * 4. Message textbox
    * 5. Reply-to textbox
    * 6. Next button
    */
   expect(heading).toBeInTheDocument()
-  expect(
-    screen.getByRole('listbox', {
-      name: /custom from/i,
-    })
-  ).toBeInTheDocument()
+  expect(screen.getByLabelText(/sender name/i)).toBeInTheDocument()
   expect(
     screen.getByRole('textbox', {
       name: /subject/i,
@@ -111,12 +106,13 @@ test('displays an error if the subject is empty after sanitization', async () =>
   server.use(...mockApis(false))
   renderTemplatePage()
 
-  // Wait for the component to fully load
-  expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
   const subjectTextbox = await screen.findByRole('textbox', {
     name: /subject/i,
   })
   const nextButton = screen.getByRole('button', { name: /next/i })
+  const fromNameInput = (await screen.findByLabelText(
+    /sender name/i
+  )) as HTMLInputElement
 
   // Test against various empty templates
   const TEST_TEMPLATES = ['<hehe>', '<script>']
@@ -124,6 +120,9 @@ test('displays an error if the subject is empty after sanitization', async () =>
     // Type the template text into the textbox
     userEvent.clear(subjectTextbox)
     userEvent.type(subjectTextbox, template)
+
+    // Enter a custom from name
+    userEvent.type(fromNameInput, 'Postman.gov.sg')
 
     // Click the next button to submit the template
     userEvent.click(nextButton)
@@ -148,12 +147,13 @@ describe('protected email', () => {
     server.use(...mockApis(true))
     renderTemplatePage()
 
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
+    const subjectTextbox = await screen.findByRole('textbox', {
       name: /subject/i,
     })
     const nextButton = screen.getByRole('button', { name: /next/i })
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
 
     // Test against various templates with extraneous invalid params
     const TEST_TEMPLATES = [
@@ -164,6 +164,9 @@ describe('protected email', () => {
       // Type the template text into the textbox
       userEvent.clear(subjectTextbox)
       userEvent.paste(subjectTextbox, template)
+
+      // Enter a custom from name
+      userEvent.type(fromNameInput, 'Postman.gov.sg')
 
       // Click the next button to submit the template
       userEvent.click(nextButton)
@@ -187,15 +190,16 @@ describe('protected email', () => {
     server.use(...mockApis(true))
     renderTemplatePage()
 
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
+    const subjectTextbox = await screen.findByRole('textbox', {
       name: /subject/i,
     })
     const messageTextbox = screen.getByRole('textbox', {
       name: /rdw-editor/i,
     })
     const nextButton = screen.getByRole('button', { name: /next/i })
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
 
     // Make the subject non-empty
     userEvent.paste(subjectTextbox, 'filler subject')
@@ -212,6 +216,9 @@ describe('protected email', () => {
           getData: () => template,
         },
       })
+
+      // Enter a custom from name
+      userEvent.type(fromNameInput, 'Postman.gov.sg')
 
       // Click the next button to submit the template
       userEvent.click(nextButton)
@@ -234,15 +241,16 @@ describe('protected email', () => {
     server.use(...mockApis(true))
     renderTemplatePage()
 
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
+    const subjectTextbox = await screen.findByRole('textbox', {
       name: /subject/i,
     })
     const messageTextbox = screen.getByRole('textbox', {
       name: /rdw-editor/i,
     })
     const nextButton = screen.getByRole('button', { name: /next/i })
+    const fromNameInput = (await screen.findByLabelText(
+      /sender name/i
+    )) as HTMLInputElement
 
     // Make the subject non-empty
     userEvent.paste(subjectTextbox, 'filler subject')
@@ -260,6 +268,9 @@ describe('protected email', () => {
         },
       })
 
+      // Enter a custom from name
+      userEvent.type(fromNameInput, 'Postman.gov.sg')
+
       // Click the next button to submit the template
       userEvent.click(nextButton)
 
@@ -273,39 +284,31 @@ describe('protected email', () => {
 })
 
 describe('custom sender details', () => {
-  test('custom from name and address should be selected as default', async () => {
+  test('custom from name and address should not be selected as default', async () => {
     server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
     renderTemplatePage()
 
     const fromNameInput = (await screen.findByLabelText(
       /sender name/i
     )) as HTMLInputElement
-    const fromAddressDropdown = screen.getByRole('listbox', {
-      name: /custom from/i,
-    })
 
     await waitFor(() => {
-      expect(fromNameInput.value).toBe('Agency')
-      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
+      expect(fromNameInput.value).toBe('')
     })
   })
 
-  test('selecting from address should update from name', async () => {
+  test('selecting default from address should clear from name', async () => {
     server.use(...mockApis(true, ['Agency <user@agency.gov.sg>']))
     renderTemplatePage()
 
     const fromNameInput = (await screen.findByLabelText(
       /sender name/i
     )) as HTMLInputElement
-    const fromAddressDropdown = screen.getByRole('listbox', {
+    const fromAddressDropdown = await screen.findByRole('listbox', {
       name: /custom from/i,
     })
 
-    // Wait for from addersses to be loaded
-    await waitFor(() => {
-      expect(fromNameInput.value).toBe('Agency')
-      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
-    })
+    expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
 
     // Key in custom from to be overwritten later
     userEvent.clear(fromNameInput)
@@ -319,7 +322,7 @@ describe('custom sender details', () => {
       })
     )
 
-    expect(fromNameInput.value).toBe(DEFAULT_FROM_NAME)
+    expect(fromNameInput.value).toBe('')
   })
 
   test('non-default from name should show mail via', async () => {
@@ -329,16 +332,16 @@ describe('custom sender details', () => {
     const fromNameInput = (await screen.findByLabelText(
       /sender name/i
     )) as HTMLInputElement
-    const fromAddressDropdown = screen.getByRole('listbox', {
+    const fromAddressDropdown = await screen.findByRole('listbox', {
       name: /custom from/i,
     })
 
-    await waitFor(() => {
-      expect(fromNameInput.value).toBe('Agency')
-      expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
-    })
+    expect(fromNameInput.value).toBe('')
+    expect(fromAddressDropdown).toHaveTextContent('user@agency.gov.sg')
 
+    userEvent.type(fromNameInput, 'Agency')
     expect(screen.queryByText(t`mailVia`)).toBeNull()
+
     userEvent.type(fromNameInput, 'Custom name')
     expect(screen.getByText(t`mailVia`)).toBeInTheDocument()
   })

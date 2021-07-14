@@ -303,6 +303,12 @@ const config = convict({
     default: '',
     env: 'BACKEND_SES_FROM',
   },
+  alternateMailFroms: {
+    doc:
+      'Comma separated list of alternate froms that we support. For backward compatibility.',
+    default: 'donotreply@mail.postman.gov.sg',
+    env: 'BACKEND_ALTERNATE_MAIL_FROMS',
+  },
   mailVia: {
     doc: 'Text to appended to custom sender name',
     default: 'via Postman',
@@ -512,9 +518,7 @@ const config = convict({
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
-const defaultMailFrom = `${config.get(
-  'APP_NAME'
-)} <donotreply@mail.postman.gov.sg>`
+const defaultMailFrom = `${config.get('APP_NAME')} <donotreply@postman.gov.sg>`
 config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 
 // Override some defaults
