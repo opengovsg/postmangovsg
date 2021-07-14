@@ -38,13 +38,11 @@
     font-family: 'Lato', sans-serif;
     font-size: 14px;
     line-height: 16px;
-    letter-spacing: -0.006em;
     color: #484848;
 
     @include mobile() {
       font-size: 12px;
       line-height: 16px;
-      letter-spacing: 0;
     }
   }
 
