@@ -9,8 +9,15 @@ const app: express.Application = express()
 
 const start = async (): Promise<void> => {
   await loaders({ app })
-  // eslint-disable-next-line no-console
-  app.listen(port, () => console.log(`Listening on port ${port}!`))
+  const server = app.listen(port, () =>
+    // eslint-disable-next-line no-console
+    console.log(`Listening on port ${port}!`)
+  )
+
+  // Set the keepAliveTimeout to be greater than ALB and nginx's timeout settings to
+  // prevent race condition where a connection that is being reused is closed at the
+  // same time by node, resulting in a connection reset error.
+  server.keepAliveTimeout = 110 * 1000
 }
 
 start().catch((err) => {
