@@ -2,5 +2,5 @@
 @import 'styles/_mixins';
 
 .warningBlock {
-  @include block($warning-light, $warning-dark);
+  @include block($warning-light, $warning-dark, $warning-dark);
 }

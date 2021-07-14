@@ -2,7 +2,7 @@
 @import 'styles/_mixins';
 
 .detailBlock {
-  @include block($neutral-light, $secondary);
+  @include block($neutral-light, $secondary, $secondary);
   overflow-wrap: anywhere;
   border-left: none;
   margin: 0;
