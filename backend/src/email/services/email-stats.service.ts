@@ -28,7 +28,7 @@ const refreshStats = async (campaignId: number): Promise<void> => {
   })
 
   await EmailMessage.sequelize?.query(
-    'SELECT update_stats_email(:campaign_id)',
+    'SELECT update_stats_email_with_read(:campaign_id)',
     {
       replacements: { campaign_id: campaignId },
       type: QueryTypes.SELECT,

@@ -32,9 +32,12 @@ export class EmailCampaign extends Campaign {
   subject: string
   replyTo: string | null
   from: string
+  showLogo: boolean
   csvFilename: string
   numRecipients: number
   hasCredential: boolean
+  agencyName: string
+  agencyLogoURI: string
   progress: EmailProgress = EmailProgress.CreateTemplate
 
   constructor(input: any) {
@@ -44,9 +47,12 @@ export class EmailCampaign extends Campaign {
     this.subject = input['email_templates']?.subject
     this.replyTo = input['email_templates']?.reply_to
     this.from = input['email_templates']?.from
+    this.showLogo = input['email_templates']?.show_logo
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
     this.hasCredential = input['has_credential']
+    this.agencyName = input['user']?.domain?.agency?.name
+    this.agencyLogoURI = input['user']?.domain?.agency?.logo_uri
     this.setProgress()
   }
 

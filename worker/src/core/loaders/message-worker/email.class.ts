@@ -35,7 +35,7 @@ class Email {
         // This is to ensure that stats count tally with total count during sending
         // as enqueue step may set messages as invalid
         await this.connection.query(
-          'SELECT update_stats_email(:campaign_id);',
+          'SELECT update_stats_email_with_read(:campaign_id);',
           {
             replacements: { campaign_id: campaignId },
             type: QueryTypes.SELECT,
@@ -60,7 +60,7 @@ class Email {
 
     const showMastheadDomain = config.get('showMastheadDomain')
     const result = await this.connection.query<ResultRow>(
-      'SELECT get_messages_to_send_email_with_sender(:job_id, :rate) AS message;',
+      'SELECT get_messages_to_send_email_with_agency(:job_id, :rate) AS message;',
       {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
@@ -109,13 +109,15 @@ class Email {
     replyTo,
     from,
     campaignId,
+    agencyName,
+    agencyLogoURI,
     showMasthead,
   }: Message): Promise<void> {
-    if (!validator.isEmail(recipient)) {
-      throw new Error('Recipient is incorrectly formatted')
-    }
-
     try {
+      if (!validator.isEmail(recipient)) {
+        throw new Error('Recipient is incorrectly formatted')
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const hydratedSubject = templateClient.template(subject!, params)
       const hydratedBody = templateClient.template(body, params)
@@ -127,6 +129,8 @@ class Email {
       const themedHTMLEmail = await ThemeClient.generateThemedHTMLEmail({
         body: hydratedBody,
         unsubLink,
+        agencyName,
+        agencyLogoURI,
         showMasthead,
       })
 

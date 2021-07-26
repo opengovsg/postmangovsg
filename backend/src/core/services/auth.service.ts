@@ -262,7 +262,7 @@ const verifyOtp = async (input: VerifyOtpInput): Promise<boolean> => {
  */
 const findOrCreateUser = async (email: string): Promise<User> => {
   const result = await User.sequelize?.transaction(async (t: Transaction) => {
-    const [user] = await User.findCreateFind({
+    const [user] = await User.findOrCreate({
       where: { email: email },
       transaction: t,
     })

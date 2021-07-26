@@ -41,8 +41,7 @@ afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
   await UploadService.destroyUploadQueue()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await RedisService.shutdown()
 })
 
 describe('PUT /campaign/{campaignId}/email/template', () => {
@@ -63,6 +62,19 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     expect(res.body).toEqual({ message: "Invalid 'from' email address." })
   })
 
+  test('Invalid values for email is not accepted', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: 'not an email <not email>',
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+    expect(res.status).toBe(400)
+    expect(res.body).toMatchObject({ message: '"from" must be a valid email' })
+  })
+
   test('Default from address is used if not provided', async () => {
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
@@ -77,6 +89,27 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
           from: 'Postman <donotreply@mail.postman.gov.sg>',
+          reply_to: 'user@agency.gov.sg',
+        }),
+      })
+    )
+  })
+
+  test('Unquoted from address with periods is accepted', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: 'Agency.gov.sg <donotreply@mail.postman.gov.sg>',
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        template: expect.objectContaining({
+          from: 'Agency.gov.sg via Postman <donotreply@mail.postman.gov.sg>',
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -363,17 +396,15 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       })
 
     expect(res.status).toBe(200)
-    expect(res.body).toEqual(
-      expect.objectContaining({
-        message: `Template for campaign ${campaignId} updated`,
-        template: {
-          subject: 'test',
-          body: 'test {{name}}',
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
-          reply_to: 'user@agency.gov.sg',
-          params: ['name'],
-        },
-      })
-    )
+    expect(res.body).toMatchObject({
+      message: `Template for campaign ${campaignId} updated`,
+      template: {
+        subject: 'test',
+        body: 'test {{name}}',
+        from: 'Postman <donotreply@mail.postman.gov.sg>',
+        reply_to: 'user@agency.gov.sg',
+        params: ['name'],
+      },
+    })
   })
 })

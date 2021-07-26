@@ -12,6 +12,7 @@ import {
   ProtectedMessage,
   Unsubscriber,
   Agency,
+  Domain,
 } from '@core/models'
 import {
   EmailMessage,
@@ -42,6 +43,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     Statistic,
     Unsubscriber,
     Agency,
+    Domain,
   ]
   const emailModels = [
     EmailMessage,
