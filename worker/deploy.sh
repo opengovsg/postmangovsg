@@ -25,5 +25,9 @@ docker push $TAG
 
 # Update ECS
 ./ecs-deploy -c $CLUSTER -n $SENDING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 600 &
+SENDER_DEPLOY_PID=$!
 ./ecs-deploy -c $CLUSTER -n $LOGGING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 600 &
-wait
+LOGGER_DEPLOY_PID=$!
+
+wait $SENDER_DEPLOY_PID
+wait $LOGGER_DEPLOY_PID
