@@ -4,6 +4,8 @@ import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from '../RichTextEditor.module.scss'
 
+import CloseButton from 'components/common/close-button'
+
 interface LinkControlProps {
   currentState: any
   expanded: boolean
@@ -16,9 +18,11 @@ interface LinkControlProps {
 const LinkForm = ({
   initialState,
   onSubmit,
+  doCollapse,
 }: {
   initialState: any
   onSubmit: ({ title, url }: { title: string; url: string }) => void
+  doCollapse: () => void
 }) => {
   const { link, selectionText } = initialState
   const [title, setTitle] = useState(link?.title || selectionText)
@@ -39,27 +43,35 @@ const LinkForm = ({
       onSubmit={handleSubmit}
       className={styles.form}
     >
+      <div className={styles.top}>
+        <div>
+          <p className={styles.header}>Insert link</p>
+        </div>
+        <CloseButton onClick={doCollapse} className={styles.closeButton} />
+      </div>
       <div className={styles.item}>
-        <label>Title</label>
+        <label>Text</label>
         <input
           className={styles.control}
           value={title}
           type="text"
+          placeholder="Text to display"
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
       <div className={styles.item}>
-        <label>URL</label>
+        <label>Link to</label>
         <input
           className={styles.control}
           value={url}
           type="text"
+          placeholder="URL"
           onChange={(e) => setURL(e.target.value)}
         />
       </div>
       <div className={styles.submit}>
         <button type="submit" disabled={!title || !url}>
-          Add
+          Insert
         </button>
       </div>
     </form>
@@ -67,7 +79,7 @@ const LinkForm = ({
 }
 
 export const LinkControl = (props: LinkControlProps) => {
-  const { currentState, expanded, onChange, onExpandEvent } = props
+  const { currentState, expanded, onChange, onExpandEvent, doCollapse } = props
   function showPopover() {
     onExpandEvent()
   }
@@ -81,7 +93,13 @@ export const LinkControl = (props: LinkControlProps) => {
       <div onClick={showPopover} className="rdw-option-wrapper">
         <i className="bx bx-link"></i>
       </div>
-      {expanded && <LinkForm initialState={currentState} onSubmit={addLink} />}
+      {expanded && (
+        <LinkForm
+          initialState={currentState}
+          onSubmit={addLink}
+          doCollapse={doCollapse}
+        />
+      )}
     </div>
   )
 }

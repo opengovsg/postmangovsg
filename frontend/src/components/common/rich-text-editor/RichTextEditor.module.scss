@@ -112,18 +112,38 @@
     top: 35px;
     left: 5px;
     background: $white;
-    padding: $spacing-2;
-    border-radius: 5px;
+    padding: $spacing-3 $spacing-4;
+    border-radius: 4px;
     box-shadow: 0px 0px 20px rgba(193, 199, 205, 0.7);
+
+    .top {
+      @include flex-horizontal;
+      margin-bottom: $spacing-1;
+      justify-content: space-between;
+      .header {
+        @extend %body-2;
+        line-height: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0;
+      }
+
+      .closeButton {
+        color: $grey-700;
+        font-size: 1.5rem;
+        height: 1.5rem;
+        width: 1.5rem;
+        margin-right: -$spacing-1;
+      }
+    }
 
     .item {
       @include flex-horizontal;
       margin-bottom: $spacing-1;
-      width: 300px;
+      width: 18rem;
 
       label {
         @extend %caption;
-        width: 50px;
+        width: 3rem;
       }
 
       .control {
@@ -133,10 +153,19 @@
       }
 
       input {
+        height: 1.75rem;
         width: 100%;
         padding: 0.25rem $spacing-1;
         border: solid 1px $neutral;
         border-radius: 0.25rem;
+        color: $secondary;
+        font-size: 0.75rem;
+        line-height: 1rem;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+        }
 
         &::placeholder {
           color: $neutral;
@@ -146,7 +175,17 @@
 
     .submit {
       @extend .item;
+      margin-bottom: 0;
       flex-direction: row-reverse;
+
+      button {
+        @extend %secondary-btn;
+        @extend %caption;
+        height: 1.75rem;
+        min-width: 0;
+        border-radius: 4px;
+        padding: 6px 8px;
+      }
     }
   }
 
@@ -185,6 +224,7 @@
 
   .tableSelector {
     $grid-size: $height-1;
+    padding: $spacing-3;
 
     table {
       border-top: solid 1px $neutral;

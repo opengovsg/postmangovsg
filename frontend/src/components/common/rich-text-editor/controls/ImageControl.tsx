@@ -7,6 +7,8 @@ import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 import { EditorContext } from '../RichTextEditor'
 import styles from '../RichTextEditor.module.scss'
 
+import CloseButton from 'components/common/close-button'
+
 const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
 
 interface ImageControlProps {
@@ -20,8 +22,10 @@ interface ImageControlProps {
 
 const ImageForm = ({
   onChange,
+  doCollapse,
 }: {
   onChange: (key: string, ...vals: string[]) => void
+  doCollapse: () => void
 }) => {
   const [imgSrc, setImgSrc] = useState('')
   const [link, setLink] = useState('')
@@ -41,13 +45,19 @@ const ImageForm = ({
       onSubmit={handleSubmit}
       className={styles.form}
     >
+      <div className={styles.top}>
+        <div>
+          <p className={styles.header}>Insert image</p>
+        </div>
+        <CloseButton onClick={doCollapse} className={styles.closeButton} />
+      </div>
       <div className={styles.item}>
         <label>Source</label>
         <div className={styles.control}>
           <input
             value={imgSrc}
             type="text"
-            placeholder="file.go.gov.sg link"
+            placeholder="https://file.go.gov.sg/image"
             onChange={(e) => setImgSrc(e.target.value)}
           />
         </div>
@@ -59,7 +69,7 @@ const ImageForm = ({
           <input
             value={link}
             type="text"
-            placeholder="Image click links to this URL"
+            placeholder="(Optional) Image click links to this URL"
             onChange={(e) => setLink(e.target.value)}
           />
         </div>
@@ -67,7 +77,7 @@ const ImageForm = ({
 
       <div className={styles.submit}>
         <button type="submit" disabled={!imgSrc}>
-          Add
+          Insert
         </button>
       </div>
     </form>
@@ -140,7 +150,7 @@ export const ImageControl = (props: ImageControlProps) => {
       >
         <i className="bx bx-image"></i>
       </div>
-      {expanded && <ImageForm onChange={addImage} />}
+      {expanded && <ImageForm onChange={addImage} doCollapse={doCollapse} />}
     </div>
   )
 }
