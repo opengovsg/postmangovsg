@@ -54,6 +54,8 @@
     i {
       color: #2f60ce;
       font-size: 12px;
+      width: 12px;
+      height: 12px;
     }
   }
 
@@ -72,7 +74,7 @@
   .banner {
     @include flex-horizontal;
     align-items: center;
-    padding: 6px 0;
+    padding: 5px 0;
 
     max-width: $header-max-width;
     margin: 0 auto;
@@ -118,12 +120,12 @@
       }
 
       .icon {
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
         margin-right: 14px;
 
         i {
-          font-size: 20px;
+          font-size: 24px;
         }
       }
 

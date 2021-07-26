@@ -41,7 +41,9 @@ const Banner = () => {
               </div>
               <div>
                 Government agencies communicate via <strong>.gov.sg</strong>{' '}
-                websites (e.g. go.gov.sg/open).{' '}
+                websites
+                <br />
+                (e.g. go.gov.sg/open).{' '}
                 <a
                   href="http://www.go.gov.sg/trusted-websites"
                   target="_blank"
@@ -61,8 +63,9 @@ const Banner = () => {
               <div className={styles.title}>Secure websites use HTTPS</div>
               <div>
                 Look for a lock (<i className="bx bxs-lock-alt"></i>) or{' '}
-                {'https://'} as an added precaution. Share sensitive information
-                only on official, secure websites.
+                {'https://'} as an added precaution.
+                <br />
+                Share sensitive information only on official, secure websites.
               </div>
             </div>
           </div>
