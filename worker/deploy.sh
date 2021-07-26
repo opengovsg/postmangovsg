@@ -6,6 +6,8 @@ trap 'LAST_COMMAND=$CURRENT_COMMAND; CURRENT_COMMAND=$BASH_COMMAND' DEBUG
 # Echo an error message before exiting
 trap 'echo "\"${LAST_COMMAND}\" command failed with exit code $?."' ERR
 
+throw_error () { echo "Throwing error"; exit 100; }
+
 CLUSTER=$1
 SENDING_SERVICE=$2
 LOGGING_SERVICE=$3
@@ -13,6 +15,7 @@ TAG=$REPO:travis-$TRAVIS_BRANCH-$TRAVIS_COMMIT-$TRAVIS_BUILD_NUMBER
 echo "CLUSTER=$CLUSTER SENDING_SERVICE=$SENDING_SERVICE LOGGING_SERVICE=$LOGGING_SERVICE TAG=$TAG REGION=$AWS_DEFAULT_REGION"
 
 export PATH=$PATH:$HOME/.local/bin
+throw_error
 # Install tools for deployment
 pip install --user awscli # For docker 
 curl https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy -o ecs-deploy
