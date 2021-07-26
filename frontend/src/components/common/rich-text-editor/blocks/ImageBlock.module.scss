@@ -1,0 +1,45 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+// Include both "div" and class ".popover" for selector priority
+div.popover {
+  padding: 8px 12px;
+  font-family: $font-stack;
+
+  .sizeButton {
+    @extend %outline-secondary-btn;
+    @extend %caption;
+    padding: 6px 8px;
+  }
+
+  .textButton {
+    @include button(transparent, rgba($primary-light, 0.5), $primary-light);
+    color: $secondary;
+    font-size: 0.9rem;
+    padding: 2px 4px;
+
+    :global {
+      i.bx {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1rem;
+        padding: 0 4px;
+        width: 1rem;
+      }
+    }
+  }
+
+  .sizeButton,
+  .textButton {
+    font-family: inherit;
+    height: 1.75rem;
+    min-width: 0;
+    border-radius: 4px;
+    margin-left: 12px;
+    font-weight: 400;
+
+    &:first-of-type {
+      margin-left: 0;
+    }
+  }
+}

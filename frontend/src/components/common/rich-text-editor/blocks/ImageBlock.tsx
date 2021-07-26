@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import {
   ContentBlock,
   ContentState,
@@ -8,6 +9,8 @@ import {
 import { useRef, useState, useContext } from 'react'
 
 import { EditorContext } from '../RichTextEditor'
+
+import styles from './ImageBlock.module.scss'
 
 export const ImageBlock = ({
   block,
@@ -122,22 +125,30 @@ export const ImageBlock = ({
         alt=""
       />
       {showPopover && (
-        <div contentEditable={false} className="popover">
-          <button onClick={getUpdateWidth(50)}>50%</button>
+        <div contentEditable={false} className={cx('popover', styles.popover)}>
+          <button onClick={getUpdateWidth(50)} className={styles.sizeButton}>
+            50%
+          </button>
+          <button onClick={getUpdateWidth(75)} className={styles.sizeButton}>
+            75%
+          </button>
+          <button onClick={getUpdateWidth(100)} className={styles.sizeButton}>
+            100%
+          </button>
           <span className="divider"></span>
-          <button onClick={getUpdateWidth(75)}>75%</button>
-          <span className="divider"></span>
-          <button onClick={getUpdateWidth(100)}>100%</button>
-          <span className="divider"></span>
-          <button onClick={handleRemove}>Remove</button>
           {link && (
-            <>
-              <span className="divider"></span>
-              <a href={link} target="_blank" rel="noopener noreferrer">
-                Link <i className="bx bx-link"></i>
-              </a>
-            </>
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.textButton}
+            >
+              Link <i className="bx bx-link"></i>
+            </a>
           )}
+          <button onClick={handleRemove} className={styles.textButton}>
+            Remove
+          </button>
         </div>
       )}
     </span>
