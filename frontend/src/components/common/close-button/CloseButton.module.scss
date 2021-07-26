@@ -3,19 +3,25 @@
 
 .close {
   @include flex-center;
-  color: $primary;
-  font-size: 2.5rem;
-  line-height: 1;
-  font-weight: 100;
-  transform: rotate(45deg);
-  height: 3rem;
-  width: 3rem;
-  border-radius: 50%;
+  font-size: 2rem;
+  height: 2.5rem;
+  width: 2.5rem;
   cursor: pointer;
   user-select: none;
   border: 0;
   background: none;
   padding: 0;
+
+  :global {
+    i.bx {
+      display: block;
+      font-size: inherit;
+      line-height: 1;
+      font-weight: 100;
+      border-radius: 50%;
+      margin: 0;
+    }
+  }
 
   &:hover,
   &:active,
