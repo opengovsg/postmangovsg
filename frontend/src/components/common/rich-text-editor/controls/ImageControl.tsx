@@ -1,13 +1,18 @@
+import { i18n } from '@lingui/core'
+
 import cx from 'classnames'
 import { AtomicBlockUtils } from 'draft-js'
 import { useContext, useState } from 'react'
 
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
+import { OutboundLink } from 'react-ga'
+
 import { EditorContext } from '../RichTextEditor'
 import styles from '../RichTextEditor.module.scss'
 
 import CloseButton from 'components/common/close-button'
+import { LINKS } from 'config'
 
 const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
 
@@ -76,6 +81,14 @@ const ImageForm = ({
       </div>
 
       <div className={styles.submit}>
+        <OutboundLink
+          className={styles.guideLink}
+          eventLabel={i18n._(LINKS.guideEmailImageUrl)}
+          to={i18n._(LINKS.guideEmailImageUrl)}
+          target="_blank"
+        >
+          View guide <i className="bx bx-link-external"></i>
+        </OutboundLink>
         <button type="submit" disabled={!imgSrc}>
           Insert
         </button>

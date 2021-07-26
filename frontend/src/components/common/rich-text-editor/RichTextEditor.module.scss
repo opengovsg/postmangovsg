@@ -176,7 +176,27 @@
     .submit {
       @extend .item;
       margin-bottom: 0;
-      flex-direction: row-reverse;
+      justify-content: flex-end;
+
+      .guideLink {
+        color: $secondary;
+        font-size: 0.65rem;
+        font-weight: 500;
+        line-height: 1rem;
+        margin-right: 0.75rem;
+
+        &:hover {
+          color: $primary;
+          text-decoration: underline;
+        }
+
+        :global {
+          i.bx {
+            font-size: 0.75rem;
+            line-height: 1rem;
+          }
+        }
+      }
 
       button {
         @extend %secondary-btn;
