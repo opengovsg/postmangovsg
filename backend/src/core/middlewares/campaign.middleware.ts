@@ -106,8 +106,8 @@ const listCampaigns = async (
   const userId = req.session?.user?.id
   try {
     const { rows, count } = await CampaignService.listCampaigns({
-      offset,
-      limit,
+      offset: +offset!,
+      limit: +limit!,
       userId,
     })
 

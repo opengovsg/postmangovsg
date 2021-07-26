@@ -17,6 +17,7 @@ export enum MessageStatus {
   Sending = 'SENDING',
   Error = 'ERROR',
   Success = 'SUCCESS',
+  Read = 'READ',
   InvalidRecipient = 'INVALID_RECIPIENT',
 }
 
