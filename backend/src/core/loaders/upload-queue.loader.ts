@@ -5,6 +5,8 @@ import { EmailTemplateService } from '@email/services'
 import { SmsTemplateService } from '@sms/services'
 import { TelegramTemplateService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
+import { EmailTemplate } from '@email/models'
+import { UploadData } from '@core/interfaces'
 
 const logger = loggerWithLabel(module)
 enum QueueEvent {
@@ -39,8 +41,12 @@ const initUploadQueue = async (): Promise<void> => {
       switch (channelType) {
         case ChannelType.Email:
           return protect
-            ? EmailTemplateService.processProtectedUpload(data)
-            : EmailTemplateService.processUpload(data)
+            ? EmailTemplateService.processProtectedUpload(
+                data as UploadData<EmailTemplate>
+              )
+            : EmailTemplateService.processUpload(
+                data as UploadData<EmailTemplate>
+              )
 
         case ChannelType.SMS:
           return SmsTemplateService.processUpload(data)

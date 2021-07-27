@@ -498,7 +498,7 @@ const config = convict({
     redisUri: {
       doc: 'URI to the redis database for recipient list upload job queue',
       default: '',
-      env: 'UPLOAD_REDIS_URI',
+      env: 'REDIS_UPLOAD_URI',
       format: 'required-string',
       sensitive: true,
     },
