@@ -159,7 +159,10 @@ const ImageForm = ({
         >
           View guide <i className="bx bx-link-external"></i>
         </OutboundLink>
-        <button type="submit" disabled={!imgSrc}>
+        <button
+          type="submit"
+          disabled={previewState !== ImagePreviewState.Success}
+        >
           Insert
         </button>
       </div>
