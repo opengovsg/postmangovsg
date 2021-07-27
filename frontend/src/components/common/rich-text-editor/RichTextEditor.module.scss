@@ -136,20 +136,27 @@
       }
     }
 
+    $label-width: 3rem;
+    $item-width: 18rem;
+
     .item {
       @include flex-horizontal;
       margin-bottom: $spacing-1;
-      width: 18rem;
+      width: $item-width;
 
       label {
         @extend %caption;
-        width: 3rem;
+        width: $label-width;
       }
 
       .control {
         @include flex-horizontal;
         justify-content: space-between;
         flex: 1;
+
+        &.errorControl input {
+          border-color: $red;
+        }
       }
 
       input {
@@ -170,6 +177,35 @@
         &::placeholder {
           color: $neutral;
         }
+      }
+    }
+
+    .controlErrorMsg {
+      margin-top: -0.375rem;
+      margin-bottom: 0.5rem;
+      margin-left: $label-width;
+      font-size: 0.65rem;
+      line-height: 1rem;
+      color: $red;
+    }
+
+    .loadingIcon {
+      text-align: center;
+      padding: 0.5rem;
+
+      :global {
+        i.bx {
+          font-size: 2rem;
+        }
+      }
+    }
+
+    .imagePreview {
+      text-align: center;
+
+      img {
+        max-width: $item-width;
+        max-height: 154px;
       }
     }
 

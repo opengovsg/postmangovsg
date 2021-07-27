@@ -2,7 +2,8 @@ import { i18n } from '@lingui/core'
 
 import cx from 'classnames'
 import { AtomicBlockUtils } from 'draft-js'
-import { useContext, useState } from 'react'
+import { debounce } from 'lodash'
+import { useContext, useState, useMemo } from 'react'
 
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
@@ -15,6 +16,13 @@ import CloseButton from 'components/common/close-button'
 import { LINKS } from 'config'
 
 const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
+
+enum ImagePreviewState {
+  Blank,
+  Error,
+  Loading,
+  Success,
+}
 
 interface ImageControlProps {
   currentState: any
@@ -34,6 +42,14 @@ const ImageForm = ({
 }) => {
   const [imgSrc, setImgSrc] = useState('')
   const [link, setLink] = useState('')
+  const [previewState, setPreviewState] = useState(ImagePreviewState.Blank)
+  const [showImgPreview, setShowImgPreview] = useState(false)
+
+  // Debounced function that triggers an attempt to load image at imgSrc
+  const loadImgPreview = useMemo(() => {
+    setShowImgPreview(false)
+    return debounce(() => setShowImgPreview(true), 900)
+  }, [])
 
   function stopPropagation(e: ReactMouseEvent<HTMLElement>) {
     e.stopPropagation()
@@ -58,15 +74,38 @@ const ImageForm = ({
       </div>
       <div className={styles.item}>
         <label>Source</label>
-        <div className={styles.control}>
+        <div
+          className={
+            previewState === ImagePreviewState.Error
+              ? cx(styles.control, styles.errorControl)
+              : styles.control
+          }
+        >
           <input
             value={imgSrc}
             type="text"
             placeholder="https://file.go.gov.sg/image"
-            onChange={(e) => setImgSrc(e.target.value)}
+            onChange={(e) => {
+              setImgSrc(e.target.value)
+              setPreviewState(ImagePreviewState.Loading)
+              loadImgPreview()
+            }}
+            onBlur={() => {
+              if (previewState === ImagePreviewState.Loading) {
+                // Cancel debounce and manually try loading the image preview
+                loadImgPreview.cancel()
+                setShowImgPreview(true)
+              }
+            }}
           />
         </div>
       </div>
+
+      {previewState === ImagePreviewState.Error && (
+        <div className={styles.controlErrorMsg}>
+          Image not found at this address
+        </div>
+      )}
 
       <div className={styles.item}>
         <label>Link to</label>
@@ -79,6 +118,37 @@ const ImageForm = ({
           />
         </div>
       </div>
+
+      {previewState === ImagePreviewState.Loading && (
+        <div className={styles.loadingIcon}>
+          <i className="bx bx-loader-alt bx-spin"></i>
+        </div>
+      )}
+
+      {showImgPreview && (
+        // This img tag is used to check if imgSrc is a valid image URI
+        // onLoad/onError will be triggered depending on the outcome
+        <div
+          style={{
+            // Hide the image if it is still loading
+            display:
+              previewState === ImagePreviewState.Success ? 'block' : 'none',
+          }}
+          className={styles.imagePreview}
+        >
+          <img
+            src={imgSrc}
+            onLoad={() => setPreviewState(ImagePreviewState.Success)}
+            onError={() => {
+              setShowImgPreview(false)
+              loadImgPreview.cancel()
+
+              if (imgSrc === '') setPreviewState(ImagePreviewState.Blank)
+              else setPreviewState(ImagePreviewState.Error)
+            }}
+          ></img>
+        </div>
+      )}
 
       <div className={styles.submit}>
         <OutboundLink
