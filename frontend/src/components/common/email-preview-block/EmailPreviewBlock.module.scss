@@ -44,6 +44,15 @@
   * {
     font-family: $email-font-stack;
     color: inherit;
+    // revert is a new (2019) feature, keeping inherit above for backwards compat
+    color: revert;
+  }
+
+  a {
+    color: blue;
+    text-decoration: underline;
+    // revert is a new (2019) feature, keeping blue above for backwards compat
+    color: revert;
   }
 
   p,
