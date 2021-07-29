@@ -13,6 +13,7 @@ import { EditorContext } from '../RichTextEditor'
 import styles from '../RichTextEditor.module.scss'
 
 import CloseButton from 'components/common/close-button'
+import Tooltip from 'components/common/tooltip'
 import { LINKS } from 'config'
 
 const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
@@ -68,7 +69,15 @@ const ImageForm = ({
     >
       <div className={styles.top}>
         <div>
-          <p className={styles.header}>Insert image</p>
+          <p className={styles.header}>
+            Insert image
+            <Tooltip
+              containerClassName={styles.infoIcon}
+              text="Upload your image to go.gov.sg and copy the file.go.gov.sg link"
+            >
+              <i className="bx bxs-help-circle"></i>
+            </Tooltip>
+          </p>
         </div>
         <CloseButton onClick={doCollapse} className={styles.closeButton} />
       </div>
