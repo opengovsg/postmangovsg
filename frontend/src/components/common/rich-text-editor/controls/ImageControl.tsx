@@ -3,7 +3,7 @@ import { i18n } from '@lingui/core'
 import cx from 'classnames'
 import { AtomicBlockUtils } from 'draft-js'
 import { debounce } from 'lodash'
-import { useContext, useState, useMemo } from 'react'
+import { useContext, useState, useMemo, useCallback } from 'react'
 
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
@@ -34,6 +34,20 @@ interface ImageControlProps {
   onExpandEvent: () => void
 }
 
+/**
+ * Checks if an img src value is valid by creating a non-mounted image element
+ * @param imgSrc
+ * @returns whether imgSrc is valid
+ */
+const isImgSrcValid = (imgSrc: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const img = document.createElement('img')
+    img.onerror = () => resolve(false)
+    img.onload = () => resolve(true)
+    img.src = imgSrc
+  })
+}
+
 const ImageForm = ({
   onChange,
   doCollapse,
@@ -44,13 +58,21 @@ const ImageForm = ({
   const [imgSrc, setImgSrc] = useState('')
   const [link, setLink] = useState('')
   const [previewState, setPreviewState] = useState(ImagePreviewState.Blank)
-  const [showImgPreview, setShowImgPreview] = useState(false)
 
-  // Debounced function that triggers an attempt to load image at imgSrc
-  const loadImgPreview = useMemo(() => {
-    setShowImgPreview(false)
-    return debounce(() => setShowImgPreview(true), 900)
+  const updatePreviewState = useCallback(async (imgSrc: string) => {
+    if (imgSrc === '') {
+      setPreviewState(ImagePreviewState.Blank)
+    } else if (await isImgSrcValid(imgSrc)) {
+      setPreviewState(ImagePreviewState.Success)
+    } else {
+      setPreviewState(ImagePreviewState.Error)
+    }
   }, [])
+
+  const debouncedUpdatePreviewState = useMemo(
+    () => debounce(updatePreviewState, 900),
+    [updatePreviewState]
+  )
 
   function stopPropagation(e: ReactMouseEvent<HTMLElement>) {
     e.stopPropagation()
@@ -97,13 +119,13 @@ const ImageForm = ({
             onChange={(e) => {
               setImgSrc(e.target.value)
               setPreviewState(ImagePreviewState.Loading)
-              loadImgPreview()
+              debouncedUpdatePreviewState(e.target.value)
             }}
-            onBlur={() => {
+            onBlur={async (e) => {
+              // If updatePreviewState is queued (due to debounce), cancel and immediately run validation
               if (previewState === ImagePreviewState.Loading) {
-                // Cancel debounce and manually try loading the image preview
-                loadImgPreview.cancel()
-                setShowImgPreview(true)
+                debouncedUpdatePreviewState.cancel()
+                await updatePreviewState(e.target.value)
               }
             }}
           />
@@ -134,28 +156,9 @@ const ImageForm = ({
         </div>
       )}
 
-      {showImgPreview && (
-        // This img tag is used to check if imgSrc is a valid image URI
-        // onLoad/onError will be triggered depending on the outcome
-        <div
-          style={{
-            // Hide the image if it is still loading
-            display:
-              previewState === ImagePreviewState.Success ? 'block' : 'none',
-          }}
-          className={styles.imagePreview}
-        >
-          <img
-            src={imgSrc}
-            onLoad={() => setPreviewState(ImagePreviewState.Success)}
-            onError={() => {
-              setShowImgPreview(false)
-              loadImgPreview.cancel()
-
-              if (imgSrc === '') setPreviewState(ImagePreviewState.Blank)
-              else setPreviewState(ImagePreviewState.Error)
-            }}
-          ></img>
+      {previewState === ImagePreviewState.Success && (
+        <div className={styles.imagePreview}>
+          <img src={imgSrc}></img>
         </div>
       )}
 
