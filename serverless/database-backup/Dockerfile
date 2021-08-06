@@ -2,7 +2,7 @@ FROM node:12-alpine
 
 RUN apk update && \
   apk upgrade && \
-  apk add postgresql-client
+  apk add python3 python3-dev postgresql-client
 
 WORKDIR /usr/home/postmangovsg
 
