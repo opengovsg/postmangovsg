@@ -1,4 +1,5 @@
 import 'source-map-support/register'
+import process from 'process'
 import * as Sentry from '@sentry/node'
 
 import config from './config'
@@ -9,7 +10,6 @@ import { Logger } from './utils/logger'
 import { getCronitor } from './utils/cronitor'
 
 import { EncryptionConfig, DatabaseConfig } from './interfaces'
-import { parseRdsEvents, RDS_EVENTS } from './utils/event'
 
 const logger = new Logger('db-backup')
 // If cronitor is null, monitoring is not enabled for this environment
@@ -30,31 +30,26 @@ Sentry.configureScope((scope) => {
  * Lambda to run pg_dump to S3 for backup
  * @param event
  */
-const handler = async (event: any) => {
+const main = async () => {
   try {
-    const events = parseRdsEvents(event)
-    for (const ev of events) {
-      if (ev.eventId === RDS_EVENTS.BACKUP_COMPLETE) {
-        await cronitor?.run()
+    await cronitor?.run()
 
-        const dbConfig = config.get('database') as DatabaseConfig
-        const encryptionConfig = config.get('encryption') as EncryptionConfig
+    const dbConfig = config.get('database') as DatabaseConfig
+    const encryptionConfig = config.get('encryption') as EncryptionConfig
 
-        const pgDump = new PgDump(dbConfig)
-        const secretsDump = new SecretsManagerDump(dbConfig)
-        const encryptor = new Encryptor(encryptionConfig)
+    const pgDump = new PgDump(dbConfig)
+    const secretsDump = new SecretsManagerDump(dbConfig)
+    const encryptor = new Encryptor(encryptionConfig)
 
-        const backup = new Backup({
-          encryptor,
-          pgDump,
-          secretsDump,
-        })
-        const backupLocation = await backup.upload()
+    const backup = new Backup({
+      encryptor,
+      pgDump,
+      secretsDump,
+    })
+    const backupLocation = await backup.upload()
 
-        logger.log(`Database backup uploaded to ${backupLocation}`)
-        await cronitor?.complete()
-      }
-    }
+    logger.log(`Database backup uploaded to ${backupLocation}`)
+    await cronitor?.complete()
     return { statusCode: 200 }
   } catch (err) {
     console.error(err)
@@ -68,4 +63,12 @@ const handler = async (event: any) => {
   }
 }
 
-exports.handler = handler
+main()
+  .then(() => {
+    console.log('Succesfully completed backup')
+    process.exit(0)
+  })
+  .catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
