@@ -11,6 +11,7 @@ import { OutboundLink } from 'react-ga'
 
 import { EditorContext } from '../RichTextEditor'
 import styles from '../RichTextEditor.module.scss'
+import { isImgSrcValid, isExternalImage } from '../utils/image'
 
 import CloseButton from 'components/common/close-button'
 import Tooltip from 'components/common/tooltip'
@@ -23,6 +24,7 @@ enum ImagePreviewState {
   Error,
   Loading,
   Success,
+  External,
 }
 
 interface ImageControlProps {
@@ -32,20 +34,6 @@ interface ImageControlProps {
   doExpand: () => void
   doCollapse: () => void
   onExpandEvent: () => void
-}
-
-/**
- * Checks if an img src value is valid by creating a non-mounted image element
- * @param imgSrc
- * @returns whether imgSrc is valid
- */
-const isImgSrcValid = (imgSrc: string): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const img = document.createElement('img')
-    img.onerror = () => resolve(false)
-    img.onload = () => resolve(true)
-    img.src = imgSrc
-  })
 }
 
 const ImageForm = ({
@@ -60,11 +48,17 @@ const ImageForm = ({
   const [previewState, setPreviewState] = useState(ImagePreviewState.Blank)
 
   const updatePreviewState = useCallback(async (imgSrc: string) => {
-    if (imgSrc === '') {
-      setPreviewState(ImagePreviewState.Blank)
-    } else if (await isImgSrcValid(imgSrc)) {
-      setPreviewState(ImagePreviewState.Success)
-    } else {
+    try {
+      if (imgSrc === '') {
+        setPreviewState(ImagePreviewState.Blank)
+      } else if (isExternalImage(imgSrc)) {
+        setPreviewState(ImagePreviewState.External)
+      } else if (await isImgSrcValid(imgSrc)) {
+        setPreviewState(ImagePreviewState.Success)
+      } else {
+        setPreviewState(ImagePreviewState.Error)
+      }
+    } catch (err) {
       setPreviewState(ImagePreviewState.Error)
     }
   }, [])
@@ -162,6 +156,16 @@ const ImageForm = ({
         </div>
       )}
 
+      {previewState === ImagePreviewState.External && (
+        <div className={styles.externalImagePreview}>
+          <p>
+            <i className="bx bx-image"></i>
+            <i className="bx bx-x"></i>
+          </p>
+          <p>Preview not available for external images</p>
+        </div>
+      )}
+
       <div className={styles.submit}>
         <OutboundLink
           className={styles.guideLink}
@@ -173,7 +177,10 @@ const ImageForm = ({
         </OutboundLink>
         <button
           type="submit"
-          disabled={previewState !== ImagePreviewState.Success}
+          disabled={
+            previewState !== ImagePreviewState.Success &&
+            previewState !== ImagePreviewState.External
+          }
         >
           Insert
         </button>

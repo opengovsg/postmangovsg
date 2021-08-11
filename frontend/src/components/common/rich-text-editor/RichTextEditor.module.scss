@@ -213,10 +213,35 @@
 
     .imagePreview {
       text-align: center;
+      margin: $spacing-3 0;
 
       img {
         max-width: $item-width;
         max-height: 154px;
+      }
+    }
+
+    .externalImagePreview {
+      text-align: center;
+      background: $neutral-light;
+      padding: $spacing-6;
+      margin: $spacing-3 0;
+
+      p {
+        @extend %caption;
+        margin: $spacing-1;
+
+        :global {
+          i.bx {
+            font-size: 32px;
+          }
+
+          i.bx-x {
+            font-size: 12px;
+            margin-left: -6px;
+            background: $neutral-light;
+          }
+        }
       }
     }
 
