@@ -128,7 +128,9 @@ const ImageForm = ({
 
       {previewState === ImagePreviewState.Error && (
         <div className={styles.controlErrorMsg}>
-          Image not found at this address
+          {isExternalImage(imgSrc)
+            ? 'Image not found at this address'
+            : 'Make sure to use https for file.gov.sg links'}
         </div>
       )}
 
