@@ -6,11 +6,107 @@ import {
   SelectionState,
   Modifier,
 } from 'draft-js'
-import { useRef, useState, useContext } from 'react'
+import {
+  useRef,
+  useState,
+  useContext,
+  useEffect,
+  useMemo,
+  forwardRef,
+} from 'react'
 
 import { EditorContext } from '../RichTextEditor'
+import { isImgSrcValid, isExternalImage } from '../utils/image'
 
 import styles from './ImageBlock.module.scss'
+
+interface ImageWithFallbackProps {
+  onClick: () => void
+  src: string
+  width: number
+  height: number
+}
+
+const ImageWithFallback = forwardRef<HTMLImageElement, ImageWithFallbackProps>(
+  ({ onClick, src, width, height }, ref) => {
+    const [loading, setLoading] = useState<boolean>(false)
+    const [valid, setValid] = useState<boolean>(false)
+    const isExternal = useMemo(() => isExternalImage(src), [src])
+
+    const truncatedSrc = src.substring(0, 64) + (src.length > 64 ? '...' : '')
+
+    useEffect(() => {
+      const verifyImage = async () => {
+        try {
+          setLoading(true)
+          const valid = await isImgSrcValid(src)
+          setValid(valid)
+        } catch (err) {
+          setValid(false)
+        } finally {
+          setLoading(false)
+        }
+      }
+      if (!isExternal) verifyImage()
+    }, [src, isExternal])
+
+    if (loading) {
+      return (
+        <div className={styles.loading}>
+          <i className="bx bx-loader-alt bx-spin"></i>
+          <span>Loading image...</span>
+        </div>
+      )
+    }
+
+    if (isExternal) {
+      return (
+        <div
+          ref={ref}
+          className={styles.fallback}
+          style={{ width }}
+          onClick={onClick}
+        >
+          <p>
+            <i className="bx bx-image"></i>
+            <i className="bx bx-x"></i>
+          </p>
+          <p>Preview not available for external link:</p>
+          <p>
+            <a href={src} target="_blank" rel="noopener noreferrer">
+              {truncatedSrc}
+            </a>
+          </p>
+        </div>
+      )
+    }
+
+    return !valid ? (
+      <img
+        ref={ref}
+        onClick={onClick}
+        src={src}
+        width={width}
+        height={height}
+        alt=""
+      />
+    ) : (
+      <div className={styles.fallback} style={{ width }} onClick={onClick}>
+        <p>
+          <i className="bx bx-image"></i>
+          <i className="bx bx-x"></i>
+        </p>
+        <p>The following image cannot be displayed:</p>
+        <p>
+          <a href={src} target="_blank" rel="noopener noreferrer">
+            {truncatedSrc}
+          </a>
+        </p>
+      </div>
+    )
+  }
+)
+ImageWithFallback.displayName = 'ImageWithFallback'
 
 export const ImageBlock = ({
   block,
@@ -116,13 +212,12 @@ export const ImageBlock = ({
     renderPreviewImage()
   ) : (
     <span>
-      <img
+      <ImageWithFallback
         ref={imageRef}
         onClick={handleClick}
         src={src}
         width={width}
         height={height}
-        alt=""
       />
       {showPopover && (
         <div contentEditable={false} className={cx('popover', styles.popover)}>
