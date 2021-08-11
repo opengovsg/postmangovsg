@@ -81,7 +81,7 @@ const ImageWithFallback = forwardRef<HTMLImageElement, ImageWithFallbackProps>(
       )
     }
 
-    return !valid ? (
+    return valid ? (
       <img
         ref={ref}
         onClick={onClick}
