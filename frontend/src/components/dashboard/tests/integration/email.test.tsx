@@ -159,16 +159,6 @@ test('successfully creates and sends a new email campaign', async () => {
       name: /send/i,
     })
   )
-  expect(
-    await screen.findByText(/credentials have been validated/i)
-  ).toBeInTheDocument()
-
-  // Go to the preview and send page
-  userEvent.click(
-    screen.getByRole('button', {
-      name: /next/i,
-    })
-  )
 
   // Wait for the page to load and ensure the necessary elements are shown
   expect(await screen.findByText(DEFAULT_FROM)).toBeInTheDocument()
