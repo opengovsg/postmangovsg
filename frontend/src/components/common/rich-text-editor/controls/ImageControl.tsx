@@ -1,4 +1,5 @@
 import { i18n } from '@lingui/core'
+import { t } from '@lingui/macro'
 
 import cx from 'classnames'
 import { AtomicBlockUtils } from 'draft-js'
@@ -46,8 +47,11 @@ const ImageForm = ({
   const [imgSrc, setImgSrc] = useState('')
   const [link, setLink] = useState('')
   const [previewState, setPreviewState] = useState(ImagePreviewState.Blank)
+  const [error, setError] = useState('')
 
   const updatePreviewState = useCallback(async (imgSrc: string) => {
+    setError('')
+
     try {
       if (imgSrc === '') {
         setPreviewState(ImagePreviewState.Blank)
@@ -57,9 +61,17 @@ const ImageForm = ({
         setPreviewState(ImagePreviewState.Success)
       } else {
         setPreviewState(ImagePreviewState.Error)
+
+        const url = new URL(imgSrc)
+        setError(
+          url.protocol !== 'https:'
+            ? t`errors.insertImage.notHttps`
+            : t`errors.insertImage.invalidUrl`
+        )
       }
     } catch (err) {
       setPreviewState(ImagePreviewState.Error)
+      setError(t`errors.insertImage.invalidUrl`)
     }
   }, [])
 
@@ -127,11 +139,7 @@ const ImageForm = ({
       </div>
 
       {previewState === ImagePreviewState.Error && (
-        <div className={styles.controlErrorMsg}>
-          {isExternalImage(imgSrc)
-            ? 'Image not found at this address'
-            : 'Make sure to use https for file.gov.sg links'}
-        </div>
+        <div className={styles.controlErrorMsg}>{error}</div>
       )}
 
       <div className={styles.item}>

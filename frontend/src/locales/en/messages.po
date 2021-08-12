@@ -17,7 +17,7 @@ msgstr ""
 msgid "Delivery report has expired and is no longer available for download."
 msgstr "Delivery report has expired and is no longer available for download."
 
-#: components/common/export-recipients/ExportRecipients.tsx:140
+#: components/common/export-recipients/ExportRecipients.tsx:141
 msgid "Delivery report will expire 14 days after sending is completed."
 msgstr "Delivery report will expire 14 days after sending is completed."
 
@@ -153,6 +153,15 @@ msgstr "Error: Incorrect email formatting. Please check for typos, spaces, and s
 #: classes/EmailCampaign.ts:7
 msgid "errors.email.softBounce"
 msgstr "Soft bounce: The email inbox might be full or the recipient might have an out-of-office message."
+
+#: components/common/rich-text-editor/controls/ImageControl.tsx:54
+#: components/common/rich-text-editor/controls/ImageControl.tsx:59
+msgid "errors.insertImage.invalidUrl"
+msgstr "Image not found at this URL. Please check that the URL provided is valid."
+
+#: components/common/rich-text-editor/controls/ImageControl.tsx:53
+msgid "errors.insertImage.notHttps"
+msgstr "Make sure to use https for file.gov.sg URLs"
 
 #: classes/SMSCampaign.ts:44
 msgid "errors.sms.invalidFormat"
