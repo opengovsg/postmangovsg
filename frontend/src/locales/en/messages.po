@@ -154,14 +154,13 @@ msgstr "Error: Incorrect email formatting. Please check for typos, spaces, and s
 msgid "errors.email.softBounce"
 msgstr "Soft bounce: The email inbox might be full or the recipient might have an out-of-office message."
 
-#: components/common/rich-text-editor/controls/ImageControl.tsx:54
-#: components/common/rich-text-editor/controls/ImageControl.tsx:59
+#: components/common/rich-text-editor/controls/ImageControl.tsx:56
 msgid "errors.insertImage.invalidUrl"
-msgstr "Image not found at this URL. Please check that the URL provided is valid."
+msgstr "This does not seem to be an image"
 
-#: components/common/rich-text-editor/controls/ImageControl.tsx:53
-msgid "errors.insertImage.notHttps"
-msgstr "Make sure to use https for file.gov.sg URLs"
+#: components/common/rich-text-editor/controls/ImageControl.tsx:51
+msgid "errors.insertImage.notImage"
+msgstr "Enter a link to an image"
 
 #: classes/SMSCampaign.ts:44
 msgid "errors.sms.invalidFormat"

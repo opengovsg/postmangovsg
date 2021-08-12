@@ -49,29 +49,33 @@ const ImageForm = ({
   const [previewState, setPreviewState] = useState(ImagePreviewState.Blank)
   const [error, setError] = useState('')
 
+  const isValidUrl = (url: string): boolean => {
+    try {
+      const { protocol } = new URL(url)
+      return protocol === 'http:' || protocol === 'https:'
+    } catch (err) {
+      return false
+    }
+  }
+
   const updatePreviewState = useCallback(async (imgSrc: string) => {
     setError('')
 
     try {
-      if (imgSrc === '') {
-        setPreviewState(ImagePreviewState.Blank)
+      if (!isValidUrl(imgSrc)) {
+        setPreviewState(ImagePreviewState.Error)
+        setError(t`errors.insertImage.notImage`)
       } else if (isExternalImage(imgSrc)) {
         setPreviewState(ImagePreviewState.External)
       } else if (await isImgSrcValid(imgSrc)) {
         setPreviewState(ImagePreviewState.Success)
       } else {
         setPreviewState(ImagePreviewState.Error)
-
-        const url = new URL(imgSrc)
-        setError(
-          url.protocol !== 'https:'
-            ? t`errors.insertImage.notHttps`
-            : t`errors.insertImage.invalidUrl`
-        )
+        setError(t`errors.insertImage.invalidUrl`)
       }
     } catch (err) {
       setPreviewState(ImagePreviewState.Error)
-      setError(t`errors.insertImage.invalidUrl`)
+      setError(t`errors.insertImage.notImage`)
     }
   }, [])
 
