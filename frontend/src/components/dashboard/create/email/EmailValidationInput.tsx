@@ -22,6 +22,7 @@ const EmailValidationInput = ({
     <TextInputWithButton
       id="validateEmail"
       type="email"
+      placeholder="Enter test email address"
       value={recipient}
       onChange={setRecipient}
       onClick={onClickHandler}
