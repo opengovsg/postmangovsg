@@ -18,6 +18,11 @@ export function isImgSrcValid(imgSrc: string): Promise<boolean> {
   })
 }
 
+/**
+ * Checks if an imgSrc is from an allowed domain
+ * @param imgSrc
+ * @returns whether imgSrc is valid
+ */
 export function isExternalImage(imgSrc: string): boolean {
   const allowed = i18n._(ALLOWED_IMAGE_SOURCES).split(';')
   const url = new URL(imgSrc)
