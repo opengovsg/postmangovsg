@@ -1,4 +1,11 @@
 #!/bin/bash
+# Exit on failure of any command
+set -e
+# Keep track of the last executed command
+trap 'LAST_COMMAND=$CURRENT_COMMAND; CURRENT_COMMAND=$BASH_COMMAND' DEBUG
+# Echo an error message before exiting
+trap 'echo "\"${LAST_COMMAND}\" command failed with exit code $?."' ERR
+
 CLUSTER=$1
 SENDING_SERVICE=$2
 LOGGING_SERVICE=$3
@@ -17,5 +24,10 @@ docker build -t $TAG .
 docker push $TAG
 
 # Update ECS
-./ecs-deploy -c $CLUSTER -n $SENDING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 300
-./ecs-deploy -c $CLUSTER -n $LOGGING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 300
+./ecs-deploy -c $CLUSTER -n $SENDING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 600 &
+SENDER_DEPLOY_PID=$!
+./ecs-deploy -c $CLUSTER -n $LOGGING_SERVICE -i $TAG -r $AWS_DEFAULT_REGION --use-latest-task-def -t 600 &
+LOGGER_DEPLOY_PID=$!
+
+wait $SENDER_DEPLOY_PID
+wait $LOGGER_DEPLOY_PID
