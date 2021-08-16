@@ -1,7 +1,7 @@
 import {
-  addToBlacklist,
   updateMessageWithError,
   updateMessageWithSuccess,
+  updateMessageWithRead,
   haltCampaignIfThresholdExceeded,
 } from './query'
 import {
@@ -26,19 +26,18 @@ export const updateBouncedStatus = async (
   metadata: BounceMetadata
 ): Promise<void> => {
   const bounceType = metadata.bounceType
-  const recipients = metadata.to
+  const errorSubType = metadata.bounceSubType
   let errorCode
 
   if (bounceType === 'Permanent') {
     errorCode = 'Hard bounce'
-    // Add to black list
-    if (recipients) await Promise.all(recipients.map(addToBlacklist))
   } else {
     errorCode = 'Soft bounce'
   }
 
   const campaignId = await updateMessageWithError({
     errorCode,
+    errorSubType,
     timestamp: metadata.timestamp,
     id: metadata.id,
   })
@@ -54,15 +53,19 @@ export const updateComplaintStatus = async (
   metadata: ComplaintMetadata
 ): Promise<void> => {
   const errorCode = metadata.complaintType
-  const recipients = metadata.to
+  const errorSubType = metadata.complaintSubType
 
-  if (errorCode && recipients) {
-    await Promise.all(recipients.map(addToBlacklist))
+  if (errorCode) {
     const campaignId = await updateMessageWithError({
       errorCode,
+      errorSubType,
       timestamp: metadata.timestamp,
       id: metadata.id,
     })
     await haltCampaignIfThresholdExceeded(campaignId)
   }
+}
+
+export const updateReadStatus = async (metadata: Metadata): Promise<void> => {
+  await updateMessageWithRead(metadata)
 }

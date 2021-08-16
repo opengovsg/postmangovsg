@@ -107,6 +107,7 @@ const config = convict({
       doc: 'Amazon SES SMTP endpoint.',
       default: '',
       env: 'SES_HOST',
+      format: 'required-string',
     },
     port: {
       doc: 'Amazon SES SMTP port, defaults to 465',
@@ -120,12 +121,14 @@ const config = convict({
         default: '',
         env: 'SES_USER',
         sensitive: true,
+        format: 'required-string',
       },
       pass: {
         doc: 'SMTP password',
         default: '',
         env: 'SES_PASS',
         sensitive: true,
+        format: 'required-string',
       },
     },
   },

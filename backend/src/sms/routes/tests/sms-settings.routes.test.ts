@@ -21,8 +21,7 @@ afterAll(async () => {
   await Credential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await RedisService.shutdown()
 })
 
 describe('POST /settings/sms/credentials', () => {

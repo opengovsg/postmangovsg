@@ -87,7 +87,9 @@ const ExportRecipients = ({
       const list = await exportCampaignStats(campaignId, campaignType)
 
       const exportedAt = moment().format('LLL').replace(',', '')
-      const explanation = `"This report was exported on ${exportedAt} and can change in the future when Postman.gov.sg receives notifications about the sent messages. "\n`
+      const explanation =
+        `"Exported ${exportedAt}. Reports are updated as and when Postman receives new notifications about message status."\n` +
+        `"'Read' status may not show up accurately for corporate and Singapore government recipients due to email filtering policies."\n\n`
 
       let content = [explanation]
 

@@ -1,9 +1,8 @@
 import nodemailer from 'nodemailer'
-import directTransport from 'nodemailer-direct-transport'
 import { loggerWithLabel } from '@core/logger'
 import { MailToSend, MailCredentials } from '@core/interfaces'
 import config from '@core/config'
-
+import { escapeFromAddress } from '@shared/utils/from-address'
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
 const logger = loggerWithLabel(module)
 
@@ -15,16 +14,6 @@ export default class MailClient {
    */
   constructor(credentials: MailCredentials) {
     const { host, port, auth } = credentials
-
-    if (!host) {
-      logger.info({ message: 'Mailer: Using direct transport', host, port })
-      this.mailer = nodemailer.createTransport(directTransport({ debug: true }))
-      return
-    }
-
-    if (!port || !auth.user || !auth.pass) {
-      throw new Error('Missing credentials while constructing MailService')
-    }
 
     logger.info({ message: 'Mailer: Using SMTP transport', host, port })
     this.mailer = nodemailer.createTransport({
@@ -39,10 +28,11 @@ export default class MailClient {
 
   public sendMail(input: MailToSend): Promise<string | void> {
     return new Promise<string | void>((resolve, reject) => {
+      const from = config.get('emailFallback.activate')
+        ? config.get('mailFrom')
+        : input.from
       const options = {
-        from: config.get('emailFallback.activate')
-          ? config.get('mailFrom')
-          : input.from,
+        from: escapeFromAddress(from),
         to: input.recipients,
         subject: input.subject,
         replyTo: input.replyTo,
