@@ -2,5 +2,5 @@
 @import 'styles/_mixins';
 
 .errorBlock {
-  @include block($error-light, $error);
+  @include block($error-light, $error, $error);
 }

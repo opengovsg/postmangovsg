@@ -17,15 +17,15 @@
   align-items: center;
 }
 
-@mixin block($backgroundColor, $color) {
+@mixin block($backgroundColor, $fontColor, $accentColor) {
   padding: 1rem 2rem;
   border-radius: 0.3rem;
   display: flex;
   flex-direction: column;
   background-color: $backgroundColor;
-  border-left: 0.5rem solid $color;
+  border-left: 0.5rem solid $accentColor;
   margin: 2rem 0;
-  color: $color;
+  color: $fontColor;
 
   li {
     margin-bottom: 0.5rem;
@@ -42,16 +42,19 @@
     margin-top: 0.2rem;
     margin-right: 1rem;
     font-size: 1.3rem;
+    color: $accentColor;
   }
 
   p {
-    color: $color;
+    color: $fontColor;
     font-size: 1rem;
     margin-block-end: 0;
   }
 
   a {
     font-size: 1rem;
+    color: $primary;
+    text-decoration: underline;
   }
 }
 

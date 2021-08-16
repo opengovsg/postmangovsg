@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer'
-import directTransport from 'nodemailer-direct-transport'
 import { loggerWithLabel } from '@core/logger'
 import { MailToSend, MailCredentials } from '@email/interfaces'
 import config from '@core/config'
@@ -7,21 +6,13 @@ import { escapeFromAddress } from '@shared/utils/from-address'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
+const CONFIGURATION_SET_HEADER = 'X-SES-CONFIGURATION-SET' // Case sensitive
 
 export default class MailClient {
   private mailer: nodemailer.Transporter
 
   constructor(credentials: MailCredentials) {
     const { host, port, auth } = credentials
-
-    if (!host) {
-      logger.info({ message: 'Mailer: Using direct transport' })
-      this.mailer = nodemailer.createTransport(directTransport({ debug: true }))
-      return
-    }
-
-    if (!port || !auth.user || !auth.pass)
-      throw new Error('Missing credentials while constructing MailService')
 
     logger.info({ message: 'Mailer: Using SMTP transport', host, port })
     this.mailer = nodemailer.createTransport({
@@ -45,7 +36,9 @@ export default class MailClient {
         subject: input.subject,
         replyTo: input.replyTo,
         html: input.body,
-        headers: {},
+        headers: {
+          [CONFIGURATION_SET_HEADER]: config.get('mailConfigurationSet'),
+        },
       }
       if (input.referenceId !== undefined) {
         // Signature expected by Sendgrid
@@ -53,8 +46,12 @@ export default class MailClient {
         const headerValue = JSON.stringify({
           unique_args: { message_id: input.referenceId },
         })
-        options.headers = { [REFERENCE_ID_HEADER]: headerValue }
+        options.headers = {
+          ...options.headers,
+          [REFERENCE_ID_HEADER]: headerValue,
+        } as any
       }
+
       this.mailer.sendMail(options, (err, info) => {
         if (err !== null) {
           reject(new Error(`${err}`))

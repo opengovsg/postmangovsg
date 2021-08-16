@@ -273,6 +273,7 @@ const config = convict({
       doc: 'Amazon SES SMTP endpoint.',
       default: '',
       env: 'BACKEND_SES_HOST',
+      format: 'required-string',
     },
     port: {
       doc: 'Amazon SES SMTP port, defaults to 465',
@@ -285,12 +286,14 @@ const config = convict({
         doc: 'SMTP username',
         default: '',
         env: 'BACKEND_SES_USER',
+        format: 'required-string',
         sensitive: true,
       },
       pass: {
         doc: 'SMTP password',
         default: '',
         env: 'BACKEND_SES_PASS',
+        format: 'required-string',
         sensitive: true,
       },
     },
