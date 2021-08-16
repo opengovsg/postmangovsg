@@ -17,17 +17,9 @@ msgstr ""
 msgid "Delivery report has expired and is no longer available for download."
 msgstr "Delivery report has expired and is no longer available for download."
 
-#: components/common/export-recipients/ExportRecipients.tsx:140
+#: components/common/export-recipients/ExportRecipients.tsx:141
 msgid "Delivery report will expire 14 days after sending is completed."
 msgstr "Delivery report will expire 14 days after sending is completed."
-
-#: components/dashboard/create/email/EmailTemplate.tsx:148
-#~ msgid "E.g. MOH Appointment"
-#~ msgstr "E.g. MOH Appointment"
-
-#: components/dashboard/create/email/EmailTemplate.tsx:140
-#~ msgid "E.g. Ministry of Health"
-#~ msgstr "E.g. Ministry of Health"
 
 #: components/login/login-input/LoginInput.tsx:88
 msgid "Enter OTP"
@@ -122,11 +114,11 @@ msgstr "This demo campaign will be sent to a maximum of 20 recipients."
 msgid "demoMessageLabel"
 msgstr "DEMO"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:171
+#: components/dashboard/create/email/EmailTemplate.tsx:173
 msgid "e.g. Appointment Confirmation"
 msgstr "e.g. Appointment Confirmation"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:157
+#: components/dashboard/create/email/EmailTemplate.tsx:159
 msgid "e.g. Ministry of Health"
 msgstr "e.g. Ministry of Health"
 
@@ -250,8 +242,8 @@ msgstr "https://guide.postman.gov.sg/legal/t-and-c"
 msgid "link.uploadLogoUrl"
 msgstr "https://go.gov.sg/postman-upload-logo-request"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:137
-#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:267
-#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:269
+#: components/dashboard/create/email/EmailTemplate.tsx:139
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:260
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:262
 msgid "mailVia"
 msgstr "via Postman"

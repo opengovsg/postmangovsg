@@ -136,8 +136,7 @@ const EmailTemplate = ({
       })
       setCustomFromAddresses(options)
 
-      const { fromName, fromAddress } = parseFromAddress(fromAddresses[0])
-      setFromName((prev) => prev || fromName)
+      const { fromAddress } = parseFromAddress(fromAddresses[0])
       setFromAddress((prev) => prev || fromAddress)
     }
 
@@ -189,20 +188,19 @@ const EmailTemplate = ({
 
   const handleSelectFromAddress = useCallback(
     (selectedFrom: string) => {
-      const {
-        fromName: selectedFromName,
-        fromAddress: selectedFromAddress,
-      } = parseFromAddress(selectedFrom)
-
-      // Use custom from name if it has already been set. For e.g.,
-      // for "Custom <donotreply@mail.postman.gov.sg>"", we should
-      // use "Custom" instead of the default "Postman.gov.sg".
-      setFromName(
-        selectedFromAddress === initialFromAddress
-          ? initialFromName
-          : selectedFromName
+      const { fromAddress: selectedFromAddress } = parseFromAddress(
+        selectedFrom
       )
+
       setFromAddress(selectedFromAddress)
+
+      // Populate from name only if it has been previously saved and from address had not changed.
+      if (initialFromName && initialFromAddress === selectedFromAddress) {
+        setFromName(initialFromName)
+      } else {
+        // Reset from name to empty
+        setFromName('')
+      }
     },
     [initialFromName, initialFromAddress]
   )
@@ -213,7 +211,7 @@ const EmailTemplate = ({
     // Strip mail via that is appended at then end of from name by the backend.
     const inputFromName = fromName?.replace(new RegExp(`\\s${mailVia}$`), '')
     const props: { value?: string; badge?: string } = {
-      value: inputFromName,
+      value: inputFromName ?? '',
     }
 
     const [selectedFrom] = customFromAddresses.filter(
@@ -236,20 +234,22 @@ const EmailTemplate = ({
 
         <div>
           <h4>From</h4>
-          <p>Sender details</p>
+          <p>Sender {customFromAddresses.length > 1 ? 'details' : 'name'}</p>
           <TextInput
             {...getFromNameInputProps()}
             onChange={setFromName}
             aria-label="Sender name"
             placeholder={t`e.g. Ministry of Health`}
           />
-          <Dropdown
-            onSelect={handleSelectFromAddress}
-            options={customFromAddresses}
-            defaultLabel={fromAddress}
-            aria-label="Custom from"
-            disabled={customFromAddresses.length <= 1}
-          ></Dropdown>
+          {customFromAddresses.length > 1 && (
+            <Dropdown
+              onSelect={handleSelectFromAddress}
+              options={customFromAddresses}
+              defaultLabel={fromAddress}
+              aria-label="Custom from"
+              disabled={customFromAddresses.length <= 1}
+            ></Dropdown>
+          )}
         </div>
 
         <div>
