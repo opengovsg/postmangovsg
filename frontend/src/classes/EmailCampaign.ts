@@ -76,6 +76,7 @@ export class EmailCampaignRecipient extends CampaignRecipient {
     switch (this.status) {
       case 'SENDING':
       case 'SUCCESS':
+      case 'READ':
         return ''
       case 'INVALID_RECIPIENT':
         // If error code is null and status is invalid, the email has been blacklisted. Otherwise, the error has not been mapped.
