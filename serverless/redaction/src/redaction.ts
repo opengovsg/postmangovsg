@@ -1,3 +1,4 @@
+import { QueryTypes } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import sequelizeLoader from './sequelize-loader'
 
@@ -77,4 +78,69 @@ export const getUserRedactedCampaigns = async (
   )?.[0] as Array<UserRedactedCampaigns>
 
   return redactedCampaigns
+}
+
+/**
+ * Delete expired messages from email, sms and telegram messages
+ */
+export const redactExpiredMessages = async (): Promise<{
+  email: number
+  sms: number
+  telegram: number
+}> => {
+  // Wrapping up deletes in a single transaction
+  const deleted = await sequelize?.transaction(async (transaction) => {
+    const options = {
+      transaction,
+      replacements: {
+        retentionPeriod: RETENTION_PERIOD,
+        type: QueryTypes.DELETE,
+      },
+    }
+
+    // Subquery for selecting IDs of campaigns that are older than the retention period.
+    const expiredCampaigns = `
+      SELECT
+        campaigns.id
+      FROM
+        campaigns,
+        job_queue,
+        "statistics"
+      WHERE
+        campaigns.id = "statistics".campaign_id
+        AND job_queue.campaign_id = campaigns.id
+      GROUP BY
+        campaigns.id
+      HAVING
+        sum(unsent) = 0
+        AND every(job_queue.status = 'LOGGED')
+        AND MAX(job_queue.updated_at) <= cast(CURRENT_TIMESTAMP as date) - INTERVAL ':retentionPeriod days'
+    `
+
+    const { rowCount: email } = (
+      await sequelize?.query(
+        `DELETE FROM email_messages WHERE campaign_id IN (${expiredCampaigns})`,
+        options
+      )
+    )?.[1] as { rowCount: number }
+
+    const { rowCount: sms } = (
+      await sequelize?.query(
+        `DELETE FROM sms_messages WHERE campaign_id IN (${expiredCampaigns})`,
+        options
+      )
+    )?.[1] as { rowCount: number }
+
+    const { rowCount: telegram } = (
+      await sequelize?.query(
+        `DELETE FROM telegram_messages WHERE campaign_id IN (${expiredCampaigns})`,
+        options
+      )
+    )?.[1] as { rowCount: number }
+
+    return { email, sms, telegram }
+  })
+
+  if (!deleted) throw new Error('Unable to delete messages')
+  return deleted
 }

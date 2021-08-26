@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
-    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h handler -e examples/event-cloudwatch-scheduled-event.js\""
+    "dev:digest": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h sendDigest -e examples/event-cloudwatch-scheduled-event.js\"",
+    "dev:delete": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h deleteExpired -e examples/event-cloudwatch-scheduled-event.js\""
   },
   "author": "",
   "license": "MIT",

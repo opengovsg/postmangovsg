@@ -278,7 +278,7 @@ jobs:
             - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
     - name: serverless-redaction-digest
       before_deploy:
-        - cd $TRAVIS_BUILD_DIR/serverless/redaction-digest
+        - cd $TRAVIS_BUILD_DIR/serverless/redaction
         - npm install && npm run build && npm prune --production
         - zip -qr code.zip build src package.json node_modules/
       deploy:
@@ -289,11 +289,11 @@ jobs:
           role: $PRODUCTION_REDACTION_ROLE
           runtime: nodejs12.x
           module_name: build/index
-          handler_name: handler
+          handler_name: sendDigest
           timeout: 600
           memory_size: 256
           publish: true
-          zip: "../redaction-digest/code.zip"
+          zip: "../redaction/code.zip"
           on:
             branch: $PRODUCTION_BRANCH
           environment_variables:
@@ -306,7 +306,7 @@ jobs:
             - SES_PASS=$PRODUCTION_REDACTION_DIGEST_SES_PASS
             - SES_USER=$PRODUCTION_REDACTION_DIGEST_SES_USER
             - SES_PORT=$PRODUCTION_REDACTION_DIGEST_SES_PORT
-            - CRONITOR_CODE=$PRODUCTION_REDACTION_CRONITOR
+            - CRONITOR_CODE=$PRODUCTION_REDACTION_DIGEST_CRONITOR
         - provider: lambda
           edge: true
           function_name: redaction-digest-staging
@@ -314,11 +314,11 @@ jobs:
           role: $STAGING_REDACTION_ROLE
           runtime: nodejs12.x
           module_name: build/index
-          handler_name: handler
+          handler_name: sendDigest
           timeout: 600
           memory_size: 256
           publish: true
-          zip: "../redaction-digest/code.zip"
+          zip: "../redaction/code.zip"
           on:
             branch: $STAGING_BRANCH
           environment_variables:
@@ -332,7 +332,52 @@ jobs:
             - SES_PASS=$STAGING_REDACTION_DIGEST_SES_PASS
             - SES_USER=$STAGING_REDACTION_DIGEST_SES_USER
             - SES_PORT=$STAGING_REDACTION_DIGEST_SES_PORT
-            - CRONITOR_CODE=$STAGING_REDACTION_CRONITOR
+            - CRONITOR_CODE=$STAGING_REDACTION_DIGEST_CRONITOR
+    - name: serverless-redaction-delete-expired
+      before_deploy:
+        - cd $TRAVIS_BUILD_DIR/serverless/redaction
+        - npm install && npm run build && npm prune --production
+        - zip -qr code.zip build src package.json node_modules/
+      deploy:
+        - provider: lambda
+          edge: true
+          function_name: redaction-delete-expired-production
+          region: $AWS_DEFAULT_REGION
+          role: $PRODUCTION_REDACTION_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: deleteExpired
+          timeout: 600
+          memory_size: 256
+          publish: true
+          zip: "../redaction/code.zip"
+          on:
+            branch: $PRODUCTION_BRANCH
+          environment_variables:
+            - DB_URI=$PRODUCTION_REDACTION_DELETE_DB_URI
+            - DB_USE_IAM=$PRODUCTION_DB_USE_IAM
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - CRONITOR_CODE=$PRODUCTION_REDACTION_DELETE_CRONITOR
+        - provider: lambda
+          edge: true
+          function_name: redaction-delete-expired-staging
+          region: $AWS_DEFAULT_REGION
+          role: $STAGING_REDACTION_ROLE
+          runtime: nodejs12.x
+          module_name: build/index
+          handler_name: deleteExpired
+          timeout: 600
+          memory_size: 256
+          publish: true
+          zip: "../redaction/code.zip"
+          on:
+            branch: $STAGING_BRANCH
+          environment_variables:
+            - DB_URI=$STAGING_REDACTION_DELETE_DB_URI
+            - DB_USE_IAM=$STAGING_DB_USE_IAM
+            - SENTRY_DSN=$SERVERLESS_SENTRY_DSN
+            - NODE_ENV=staging
+            - CRONITOR_CODE=$STAGING_REDACTION_DELETE_CRONITOR
     - name: root
       install:
         - npm install --ignore-scripts

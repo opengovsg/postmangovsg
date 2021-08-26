@@ -25,7 +25,7 @@ const sequelizeLoader = async (): Promise<Sequelize> => {
     logging: false,
     pool: config.get('database.poolOptions'),
     replication: {
-      read: [parseDBUri(DB_READ_REPLICA_URI)],
+      read: [parseDBUri(DB_READ_REPLICA_URI || DB_URI)],
       write: parseDBUri(DB_URI),
     },
     dialectOptions,

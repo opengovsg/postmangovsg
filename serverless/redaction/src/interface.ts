@@ -31,3 +31,7 @@ export interface Cronitor {
   complete: () => Promise<void>
   fail: (message?: string) => Promise<void>
 }
+
+export interface HandlerResult {
+  statusCode: number
+}

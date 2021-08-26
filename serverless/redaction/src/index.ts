@@ -2,30 +2,36 @@ import 'source-map-support/register'
 import * as Sentry from '@sentry/node'
 
 import config from './config'
-import { init, getUserRedactedCampaigns } from './redaction'
+import {
+  init,
+  getUserRedactedCampaigns,
+  redactExpiredMessages,
+} from './redaction'
 import { mailClient } from './mail-client.class'
 import { getCronitor } from './utils/cronitor'
 import { Logger } from './utils/logger'
 import { createEmailBody } from './utils/generate-digest-mail'
+import { HandlerResult } from './interface'
 
-const logger = new Logger('redaction-digest')
 const cronitor = getCronitor()
 
 Sentry.init({
   dsn: config.get('sentryDsn'),
   environment: config.get('env'),
 })
-Sentry.configureScope((scope) => {
-  const functionName =
-    process.env.AWS_LAMBDA_FUNCTION_NAME ||
-    `redaction-digest-${config.get('env')}`
-  scope.setTag('lambda-function-name', functionName)
-})
 
 /**
  * Lambda handler to send redaction digest
  */
-const handler = async (event: any): Promise<{ statusCode: number }> => {
+const sendDigest = async (event: any): Promise<HandlerResult> => {
+  const logger = new Logger('redaction-digest')
+  Sentry.configureScope((scope) => {
+    const functionName =
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      `redaction-digest-${config.get('env')}`
+    scope.setTag('lambda-function-name', functionName)
+  })
+
   try {
     await cronitor?.run()
     await init()
@@ -82,4 +88,36 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
   }
 }
 
-export { handler }
+const deleteExpired = async (): Promise<HandlerResult> => {
+  const logger = new Logger('redaction-messages')
+  Sentry.configureScope((scope) => {
+    const functionName =
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      `redaction-delete-expired-${config.get('env')}`
+    scope.setTag('lambda-function-name', functionName)
+  })
+
+  try {
+    await cronitor?.run()
+    await init()
+
+    const { email, sms, telegram } = await redactExpiredMessages()
+    logger.log(`Deleted ${email} email messages`)
+    logger.log(`Deleted ${sms} sms messages`)
+    logger.log(`Deleted ${telegram} telegram messages`)
+  } catch (err) {
+    logger.log(err)
+
+    Sentry.captureException(err)
+    await Sentry.flush(2000)
+
+    cronitor?.fail(err.message)
+
+    // Rethrow error to signal a lambda failure
+    throw err
+  }
+
+  return { statusCode: 200 }
+}
+
+export { sendDigest, deleteExpired }
