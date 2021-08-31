@@ -148,6 +148,7 @@ export const haltCampaignIfThresholdExceeded = async (
       [fn('sum', cast({ error_code: 'Hard bounce' }, 'int')), 'invalid'],
       [fn('count', 1), 'running_total'],
     ],
+    useMaster: false,
   })) as any[]
   const {
     invalid,
