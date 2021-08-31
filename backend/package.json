@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.29.0",
+  "version": "1.29.1",
   "description": "Backend / API server for Postman",
   "main": "build/server.js",
   "scripts": {
