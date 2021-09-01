@@ -128,22 +128,27 @@ $section-vertical-padding: 4rem;
         transition: opacity 1s ease-out;
         @include overflowHeaderText();
 
+        margin-top: 1.5rem;
+        margin-bottom: 2rem;
+
+        @include mobile() {
+          margin-top: 2vh;
+          margin-bottom: 2vh;
+        }
+
         &.ready {
           opacity: 1;
         }
 
         .numOfMessages {
           @extend %display-1;
-
-          margin-top: 1.5rem;
-          margin-bottom: 2rem;
           margin-right: 1rem;
+          margin-bottom: 0.5rem;
 
           @include mobile() {
             font-size: 3rem;
-            margin-top: 2vh;
-            margin-bottom: 2vh;
             margin-right: 1rem;
+            margin-bottom: 0rem;
           }
         }
       }

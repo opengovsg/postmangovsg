@@ -278,7 +278,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         body: 'test',
         reply_to: 'user@agency.gov.sg',
       })
-    expect(res.status).toBe(500)
+    expect(res.status).toBe(400)
     expect(res.body).toEqual({
       message:
         'Error: There are missing keywords in the message template: protectedlink. Please return to the previous step to add in the keywords.',
@@ -293,7 +293,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         body: '{{recipient}} {{protectedLink}}',
         reply_to: 'user@agency.gov.sg',
       })
-    expect(testSubject.status).toBe(500)
+    expect(testSubject.status).toBe(400)
     expect(testSubject.body).toEqual({
       message:
         'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',
@@ -309,7 +309,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         reply_to: 'user@agency.gov.sg',
       })
 
-    expect(testBody.status).toBe(500)
+    expect(testBody.status).toBe(400)
     expect(testBody.body).toEqual({
       message:
         'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',

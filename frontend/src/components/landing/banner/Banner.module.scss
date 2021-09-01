@@ -9,35 +9,6 @@
   font-style: normal;
 }
 
-.container {
-  background-color: #f0f0f0;
-  height: auto;
-  padding: 4px $site-padding;
-  color: #484848;
-
-  @include mobile() {
-    padding: 4px $mobile-site-padding;
-  }
-
-  a {
-    @include flex-horizontal;
-    width: 100%;
-    max-width: $header-max-width;
-    margin: 0 auto;
-    align-items: center;
-    color: #484848;
-
-    @include mobile() {
-      justify-content: center;
-    }
-  }
-
-  a:hover {
-    color: #000;
-    text-decoration: none;
-  }
-}
-
 .sgdsIcon {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'sgds-icons' !important;
@@ -54,6 +25,126 @@
   font-size: 20px;
 }
 
-.bannerText {
-  margin-left: 3px;
+.container {
+  background-color: #f0f0f0;
+  height: auto;
+  padding: 0 $site-padding;
+
+  @include mobile() {
+    padding: 0;
+  }
+
+  * {
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    line-height: 16px;
+    color: #484848;
+
+    @include mobile() {
+      font-size: 12px;
+      line-height: 16px;
+    }
+  }
+
+  a,
+  .link {
+    text-decoration: underline;
+    color: #2f60ce;
+
+    i {
+      color: #2f60ce;
+      font-size: 12px;
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .linkButton {
+    padding: 0;
+    margin: 0;
+    border: 0;
+
+    i {
+      color: #2f60ce;
+      margin-left: 5px;
+      font-size: 16px;
+    }
+  }
+
+  .banner {
+    @include flex-horizontal;
+    align-items: center;
+    padding: 5px 0;
+
+    max-width: $header-max-width;
+    margin: 0 auto;
+
+    @include mobile() {
+      max-width: 100%;
+      padding: 8px $mobile-site-padding;
+      border-bottom: solid 1px #c9cccf;
+    }
+
+    .icon {
+      margin-right: 14px;
+    }
+  }
+
+  .info {
+    display: grid;
+    align-items: start;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 44px 0;
+
+    max-width: $header-max-width;
+    margin: 0 auto;
+
+    @include mobile() {
+      grid-template-columns: 1fr;
+      grid-row-gap: 16px;
+
+      max-width: 100%;
+      padding: 16px $mobile-site-padding;
+    }
+
+    .section {
+      @include flex-horizontal;
+      align-items: flex-start;
+
+      flex: 1;
+      max-width: 476px;
+      margin: 0;
+
+      @include mobile() {
+        max-width: 100%;
+      }
+
+      .icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 14px;
+
+        i {
+          font-size: 24px;
+        }
+      }
+
+      .content {
+        @include flex-vertical;
+        flex: 1;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: -0.006em;
+
+        div {
+          display: block;
+        }
+
+        .title {
+          font-weight: bold;
+          margin-bottom: 12px;
+        }
+      }
+    }
+  }
 }
