@@ -1,6 +1,6 @@
 {
   "name": "shared",
-  "version": "1.29.1",
+  "version": "1.29.2",
   "description": "Shared modules for Postman",
   "main": "build/index.js",
   "scripts": {
