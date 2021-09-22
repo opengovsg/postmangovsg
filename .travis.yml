@@ -198,7 +198,7 @@ jobs:
           module_name: build/index
           handler_name: handler
           timeout: 900
-          memory_size: 512
+          memory_size: 2048
           publish: true
           zip: "../database-backup/code.zip"
           on:
@@ -220,7 +220,7 @@ jobs:
           module_name: build/index
           handler_name: handler
           timeout: 900
-          memory_size: 512
+          memory_size: 2048
           publish: true
           zip: "../database-backup/code.zip"
           on:
