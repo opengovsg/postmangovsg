@@ -138,7 +138,6 @@ const createConnection = (): Sequelize => {
     dialectOptions,
     retry: {
       max: 5,
-      backoffBase: 1000,
       match: [
         /ConnectionError/,
         /SequelizeConnectionError/,
