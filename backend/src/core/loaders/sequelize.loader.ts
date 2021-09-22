@@ -31,6 +31,20 @@ const sequelizeLoader = async (): Promise<void> => {
     query: {
       useMaster: true,
     },
+    retry: {
+      max: 5,
+      match: [
+        /ConnectionError/,
+        /SequelizeConnectionError/,
+        /SequelizeConnectionRefusedError/,
+        /SequelizeHostNotFoundError/,
+        /SequelizeHostNotReachableError/,
+        /SequelizeInvalidConnectionError/,
+        /SequelizeConnectionTimedOutError/,
+        /SequelizeConnectionAcquireTimeoutError/,
+        /Connection terminated unexpectedly/,
+      ],
+    },
     hooks: {
       beforeConnect: async (dbConfig: MutableConfig): Promise<void> => {
         if (config.get('database.useIam')) {
