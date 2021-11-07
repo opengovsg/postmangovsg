@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
-    "dev": "npm run build && tsc-watch --onSuccess \"node -r dotenv/config build/dev\""
+    "dev": "npm run build && tsc-watch --onSuccess \"node -r dotenv/config build/dev\"",
+    "test": "echo 'No tests yet for unsubscribe-digest'"
   },
   "repository": {
     "type": "git",
