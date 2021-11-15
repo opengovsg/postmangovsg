@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.29.3",
+  "version": "1.29.4",
   "private": true,
   "scripts": {
     "start": "react-app-rewired start",
