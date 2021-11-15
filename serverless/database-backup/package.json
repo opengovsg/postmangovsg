@@ -6,7 +6,8 @@
   "scripts": {
     "build:docker": "docker run --rm  -e PG_VERSION=$PG_VERSION -v $PWD:/var/task lambci/lambda:build-nodejs12.x ./build.sh",
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
-    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 60000 -h handler -e examples/event-rds-backup-complete.js\""
+    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 60000 -h handler -e examples/event-rds-backup-complete.js\"",
+    "test": "echo 'No tests yet for database-backup'"
   },
   "keywords": [],
   "author": "",

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
-    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h handler -e examples/event-cloudwatch-scheduled-event.js\""
+    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h handler -e examples/event-cloudwatch-scheduled-event.js\"",
+    "test": "echo 'No tests yet for redaction-digest'"
   },
   "author": "",
   "license": "MIT",

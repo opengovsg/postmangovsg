@@ -9,7 +9,7 @@
     "decrypt-dump": "node build/index",
     "send-sentry-event": "sentry-cli send-event --env $NODE_ENV --tag 'gcloud-function-name':$GCLOUD_RUN_SERVICE_NAME --no-environ",
     "dev": "npm run build && tsc-watch --onSuccess \"node ./build/index.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo 'No tests yet for verify-backup'"
   },
   "keywords": [],
   "author": "",
