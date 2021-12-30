@@ -1,0 +1,125 @@
+name: Deploy worker to AWS Elastic Container Service
+on:
+  push:
+    branches: # There should be 2 environments in github actions secrets: staging, production. This is different from the DEPLOY_ENV secret which corresponds to elastic beanstalk environment name
+      - develop
+      - master
+      - github-actions-test
+
+jobs:
+  set_environment:
+    outputs:
+      current_env: ${{ steps.set-environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-environment
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "::set-output name=current_env::production"
+          else
+             echo "::set-output name=current_env::staging"
+          fi
+
+  build_deploy_application:
+    needs: set_environment
+    environment:
+      name: ${{ needs.set_environment.outputs.current_env }}
+    env:
+      IMAGE_TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
+      BRANCH: ${{ needs.set_environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: 'npm'
+      - name: Build shared package
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+        run: cd shared && npm ci
+      - name: Build worker
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          SECRET_ID: ${{ secrets.SECRET_ID }}
+        run: |
+          cd worker
+          cp -R ../shared ./
+          sed -i -e "s#@SECRET_ID#$SECRET_ID#g" docker-entrypoint.sh
+          npm ci
+          set -e
+          npm_config_mode=yes npx lockfile-lint --type npm --path package.json --validate-https --allowed-hosts npm
+          npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REPOSITORY: ${{ secrets.REPO }}
+        run: |
+          cd worker
+          docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$BRANCH
+          docker push -a $ECR_REPOSITORY
+          echo "::set-output name=image::$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: (Sending) Download task definition
+        id: get-task-definition-sending
+        env:
+          TASK_DEFINITION: ${{ secrets.WORKER_TASK_DEFINITION_SENDING }}
+          OUT: task-definition-sending.json
+        run: |
+          aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > $OUT
+          echo "::set-output name=task-definition::$OUT"
+
+      - name: (Sending) Fill in the new image ID in the Amazon ECS task definition
+        id: task-def-sending
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ steps.get-task-definition-sending.outputs.task-definition }}
+          image: ${{ steps.build-image.outputs.image }}
+          container-name: sending
+
+      - name: (Sending) Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def-sending.outputs.task-definition }}
+          service: ${{ secrets.WORKER_SERVICE_SENDING }}
+          cluster: ${{ secrets.WORKER_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: (Logging) Download task definition
+        id: get-task-definition-logging
+        env:
+          TASK_DEFINITION: ${{ secrets.WORKER_TASK_DEFINITION_LOGGING }}
+          OUT: task-definition-logging.json
+        run: |
+          aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > $OUT
+          echo "::set-output name=task-definition::$OUT"
+
+      - name: (Logging) Fill in the new image ID in the Amazon ECS task definition
+        id: task-def-logging
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ steps.get-task-definition-logging.outputs.task-definition }}
+          image: ${{ steps.build-image.outputs.image }}
+          container-name: logging
+
+      - name: (Logging) Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def-logging.outputs.task-definition }}
+          service: ${{ secrets.WORKER_SERVICE_LOGGING }}
+          cluster: ${{ secrets.WORKER_CLUSTER }}
+          wait-for-service-stability: true
