@@ -4,8 +4,7 @@ on:
     branches: # There should be 2 environments in github actions secrets: staging, production. This is different from the DEPLOY_ENV secret which corresponds to elastic beanstalk environment name
       - develop
       - master
-      - github-actions-test
-
+      
 jobs:
   set_environment:
     outputs:

@@ -21,13 +21,15 @@ jobs:
              echo "::set-output name=current_env::staging"
           fi
 
-  build_deploy_application:
+  build_application:
     needs: set_environment
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
       IMAGE_TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
       BRANCH: ${{ needs.set_environment.outputs.current_env }}
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -72,7 +74,20 @@ jobs:
           docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$BRANCH
           docker push -a $ECR_REPOSITORY
-          echo "::set-output name=image::$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "::set-output name=image::$IMAGE_TAG"
+
+  deploy_sending:
+    needs: [set_environment, build_application]
+    environment:
+      name: ${{ needs.set_environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
       - name: (Sending) Download task definition
         id: get-task-definition-sending
@@ -88,7 +103,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ steps.get-task-definition-sending.outputs.task-definition }}
-          image: ${{ steps.build-image.outputs.image }}
+          image:  "${{ secrets.REPO }}:${{ needs.build_application.outputs.image }}"
           container-name: sending
 
       - name: (Sending) Deploy Amazon ECS task definition
@@ -98,6 +113,19 @@ jobs:
           service: ${{ secrets.WORKER_SERVICE_SENDING }}
           cluster: ${{ secrets.WORKER_CLUSTER }}
           wait-for-service-stability: true
+
+  deploy_logging:
+    needs: [set_environment, build_application]
+    environment:
+      name: ${{ needs.set_environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
       - name: (Logging) Download task definition
         id: get-task-definition-logging
@@ -113,7 +141,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ steps.get-task-definition-logging.outputs.task-definition }}
-          image: ${{ steps.build-image.outputs.image }}
+          image: "${{ secrets.REPO }}:${{ needs.build_application.outputs.image }}"
           container-name: logging
 
       - name: (Logging) Deploy Amazon ECS task definition
