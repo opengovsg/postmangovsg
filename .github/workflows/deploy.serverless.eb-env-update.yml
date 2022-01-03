@@ -1,8 +1,15 @@
 name: Deploy serverless-eb-env-update
 on:
   push:
-    branches: # There should be 2 environments in github actions secrets: staging, production. This is different from the DEPLOY_ENV secret which corresponds to elastic beanstalk environment name
+    branches:
+      - master
+      - develop
       - github-actions-test-lambda
+
+env:
+  # Update this common config
+  DIRECTORY: serverless/eb-env-update
+  FUNCTION: eb-env-update
 
 jobs:
   set_environment:
@@ -19,12 +26,23 @@ jobs:
              echo "::set-output name=current_env::staging"
           fi
 
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: 'npm'
+      - name: Lint lock file
+        run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      - name: Test app code
+        run: cd $DIRECTORY && npm test
+
   build_deploy_application:
-    needs: set_environment
+    needs: [ set_environment, lint-test ]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
-    env:
-      BRANCH: ${{ needs.set_environment.outputs.current_env }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -38,46 +56,38 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Set function name according to environment
+        id: function-name
+        run: echo "::set-output name=value::$FUNCTION-${{ needs.set_environment.outputs.current_env }}"
       - name: Build  
         id: build-lambda
         env:
-          # Update this config
-          FUNCTION_NAME: "eb-env-update-${{ needs.set_environment.outputs.current_env }}"
-          DIRECTORY: serverless/eb-env-update
           ZIP_FILE: code.zip
         run: |
           cd $DIRECTORY
           npm ci 
-          npm run build 
+          npm run build
           npm prune --production
-          zip -qr $ZIP_FILE build package.json node_modules/
+          sudo zip -qr $ZIP_FILE build package.json node_modules/
           echo "::set-output name=zip_path::$DIRECTORY/$ZIP_FILE"
-          echo "::set-output name=function_name::$FUNCTION_NAME"
 
       - name: Check if lambda can be updated (1)
-        env:
-          FUNCTION_NAME: ${{ steps.build-lambda.outputs.function_name }}
         run: |
-          result=$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Configuration.[State, LastUpdateStatus]')
+          result=$(aws lambda get-function --function-name "${{ steps.function-name.outputs.value }}" --query 'Configuration.[State, LastUpdateStatus]')
           echo "$result"
           if [[ ! $result =~ "Successful" ]] || [[ ! $result =~ "Active" ]]; then
               sleep 10;
           fi
 
       - name: Update function code
-        env:
-          FUNCTION_NAME: ${{ steps.build-lambda.outputs.function_name }}
-          ZIP_PATH: ${{ steps.build-lambda.outputs.zip_path }} 
         run: |
-          aws lambda update-function-code --function-name=$FUNCTION_NAME \
-          --zip-file=fileb://$ZIP_PATH --publish
+          aws lambda update-function-code --function-name "${{ steps.function-name.outputs.value }}" \
+          --zip-file=fileb://${{ steps.build-lambda.outputs.zip_path }}  --publish 2>&1
 
 
       - name: Check if lambda can be updated (2)
-        env:
-          FUNCTION_NAME: ${{ steps.build-lambda.outputs.function_name }}
         run: |
-          result=$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Configuration.[State, LastUpdateStatus]')
+          result=$(aws lambda get-function --function-name "${{ steps.function-name.outputs.value }}" --query 'Configuration.[State, LastUpdateStatus]')
           echo "$result"
           if [[ ! $result =~ "Successful" ]] || [[ ! $result =~ "Active" ]]; then
               sleep 10;
@@ -85,21 +95,19 @@ jobs:
 
       - name: Update function config
         env:
-          # Update this config
-          DIRECTORY: serverless/eb-env-update
           # Update the configuration
           ROLE: ${{ secrets.EBENVUPDATE_ROLE }}
           RUNTIME: nodejs12.x
           HANDLER: build/index.handler
           TIMEOUT: 10
           MEMORY_SIZE: 128
-          FUNCTION_NAME: ${{ steps.build-lambda.outputs.function_name }}
           TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
           # Update env vars
           NODE_ENV: ${{ needs.set_environment.outputs.current_env }}
           SECRET_ID: ${{ secrets.SECRET_ID }}
           SENTRY_DSN: ${{ secrets.SERVERLESS_SENTRY_DSN }}
+           #Update environment variables in the command
         run: |
-          aws lambda update-function-configuration --function-name=$FUNCTION_NAME \
+          aws lambda update-function-configuration --function-name="${{ steps.function-name.outputs.value }}" \
           --role=$ROLE --description=$TAG --timeout=$TIMEOUT --memory-size=$MEMORY_SIZE --runtime=$RUNTIME --handler=$HANDLER \
           --environment "Variables={NODE_ENV=$NODE_ENV,SECRET_ID=$SECRET_ID,SENTRY_DSN=$SENTRY_DSN}"
