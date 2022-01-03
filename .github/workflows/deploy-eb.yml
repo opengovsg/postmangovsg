@@ -4,7 +4,12 @@ on:
     branches: # There should be 2 environments in github actions secrets: staging, production. This is different from the DEPLOY_ENV secret which corresponds to elastic beanstalk environment name
       - develop
       - master
-      
+      - github-actions-test
+
+env:
+  # Update this common config
+  DIRECTORY: backend
+
 jobs:
   set_environment:
     outputs:
@@ -20,12 +25,57 @@ jobs:
              echo "::set-output name=current_env::staging"
           fi
 
+  lint-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:alpine
+        ports: 
+          - "6379:6379"
+        options: --entrypoint redis-server
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: 'npm'
+      - name: Lint lock file
+        run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      - name: Lint and test app code
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: |
+          cd shared 
+          npm ci
+          cd ..
+          cd $DIRECTORY
+          npm ci
+          npm run build
+          npm run lint-no-fix
+          npm test
+
+
   build_deploy_application:
-    needs: set_environment
+    needs: [ set_environment, lint-test ]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
-      IMAGE_TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
+      IMAGE_TAG: github-actions-backend-$(echo "${{ github.sha }}" | cut -c1-8)-${{ github.run_id }}-${{github.run_attempt}}
       BRANCH: ${{ needs.set_environment.outputs.current_env }}
     runs-on: ubuntu-latest
     steps:
@@ -34,22 +84,13 @@ jobs:
         with:
           node-version: '12'
           cache: 'npm'
-      - name: Build shared package
+      - name: Before deploy
         env:
-          NODE_OPTIONS: '--max-old-space-size=4096'
-        run: cd shared && npm ci
-      - name: Build backend
-        env:
-          NODE_OPTIONS: '--max-old-space-size=4096'
           SECRET_ID: ${{ secrets.SECRET_ID }}
         run: |
-          cd backend
+          cd $DIRECTORY
           cp -R ../shared ./
           sed -i -e "s#@SECRET_ID#$SECRET_ID#g" docker-entrypoint.sh
-          npm ci
-          set -e
-          npm_config_mode=yes npx lockfile-lint --type npm --path package.json --validate-https --allowed-hosts npm
-          npm run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -66,7 +107,7 @@ jobs:
         env:
           ECR_REPOSITORY: ${{ secrets.REPO }}
         run: |
-          cd backend
+          cd $DIRECTORY
           sed -i -e "s|@TAG|$IMAGE_TAG|g" Dockerrun.aws.json
           sed -i -e "s|@REPO|$ECR_REPOSITORY|g" Dockerrun.aws.json 
           docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
