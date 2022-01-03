@@ -24,7 +24,6 @@ jobs:
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
-      IMAGE_TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
       BRANCH: ${{ needs.set_environment.outputs.current_env }}
     runs-on: ubuntu-latest
     steps:
@@ -95,6 +94,7 @@ jobs:
           TIMEOUT: 900
           MEMORY_SIZE: 2048
           FUNCTION_NAME: ${{ steps.build-lambda.outputs.function_name }}
+          TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
           # Update env vars
           DB_URI: ${{ secrets.BACKUP_DB_URI }}
           DB_USE_IAM: ${{ secrets.DB_USE_IAM }}
