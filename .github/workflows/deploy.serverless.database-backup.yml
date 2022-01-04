@@ -14,7 +14,7 @@ env:
 jobs:
   set_environment:
     outputs:
-      current_env: ${{ steps.set-environment.outputs.current_env }}
+      current_env: "${{ steps.set-environment.outputs.current_env }}"
     runs-on: ubuntu-latest
     steps:
       - id: set-environment
@@ -42,9 +42,9 @@ jobs:
   build_deploy_application:
     needs: [set_environment, lint-test]
     environment:
-      name: ${{ needs.set_environment.outputs.current_env }}
+      name: "${{ needs.set_environment.outputs.current_env }}"
     env:
-      BRANCH: ${{ needs.set_environment.outputs.current_env }}
+      BRANCH: "${{ needs.set_environment.outputs.current_env }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -55,9 +55,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+          aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          aws-region: "${{ secrets.AWS_DEFAULT_REGION }}"
       - name: Set function name according to environment
         id: function-name
         run: echo "::set-output name=value::$FUNCTION-${{ needs.set_environment.outputs.current_env }}"
@@ -65,7 +65,7 @@ jobs:
         id: build-lambda
         env:
           ZIP_FILE: code.zip
-          PG_VERSION: ${{ secrets.PG_VERSION }}
+          PG_VERSION: "${{ secrets.PG_VERSION }}"
         run: |
           cd "$DIRECTORY"
           npm ci 
@@ -97,20 +97,20 @@ jobs:
       - name: Update function config
         env:
           # Update the configuration
-          ROLE: ${{ secrets.BACKUP_ROLE }}
+          ROLE: "${{ secrets.BACKUP_ROLE }}"
           RUNTIME: nodejs12.x
           HANDLER: build/index.handler
           TIMEOUT: 900
           MEMORY_SIZE: 2048
-          TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
+          TAG: "github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
           # Update env vars
-          DB_URI: ${{ secrets.BACKUP_DB_URI }}
-          DB_USE_IAM: ${{ secrets.DB_USE_IAM }}
-          BACKUP_BUCKET_NAME: ${{ secrets.BACKUP_BUCKET_NAME }}
-          GCP_SECRET_NAME: ${{ secrets.BACKUP_GCP_SECRET_NAME }}
-          KEY_ENCRYPTION_PUBLIC_KEY: ${{ secrets.BACKUP_PUBLIC_KEY }}
-          SENTRY_DSN: ${{ secrets.SERVERLESS_SENTRY_DSN }}
-          CRONITOR_CODE: ${{ secrets.BACKUP_CRONITOR_CODE }}
+          DB_URI: "${{ secrets.BACKUP_DB_URI }}"
+          DB_USE_IAM: "${{ secrets.DB_USE_IAM }}"
+          BACKUP_BUCKET_NAME: "${{ secrets.BACKUP_BUCKET_NAME }}"
+          GCP_SECRET_NAME: "${{ secrets.BACKUP_GCP_SECRET_NAME }}"
+          KEY_ENCRYPTION_PUBLIC_KEY: "${{ secrets.BACKUP_PUBLIC_KEY }}"
+          SENTRY_DSN: "${{ secrets.SERVERLESS_SENTRY_DSN }}"
+          CRONITOR_CODE: "${{ secrets.BACKUP_CRONITOR_CODE }}"
           # Update environment variables in the command
         run: |
           aws lambda update-function-configuration --function-name="${{ steps.function-name.outputs.value }}" \

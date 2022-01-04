@@ -14,7 +14,7 @@ env:
 jobs:
   set_environment:
     outputs:
-      current_env: ${{ steps.set-environment.outputs.current_env }}
+      current_env: "${{ steps.set-environment.outputs.current_env }}"
     runs-on: ubuntu-latest
     steps:
       - id: set-environment
@@ -42,7 +42,7 @@ jobs:
   build_deploy_application:
     needs: [set_environment, lint-test]
     environment:
-      name: ${{ needs.set_environment.outputs.current_env }}
+      name: "${{ needs.set_environment.outputs.current_env }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -53,9 +53,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+          aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          aws-region: "${{ secrets.AWS_DEFAULT_REGION }}"
       - name: Set function name according to environment
         id: function-name
         run: echo "::set-output name=value::$FUNCTION-${{ needs.set_environment.outputs.current_env }}"
@@ -95,16 +95,16 @@ jobs:
       - name: Update function config
         env:
           # Update the configuration
-          ROLE: ${{ secrets.EBENVUPDATE_ROLE }}
+          ROLE: "${{ secrets.EBENVUPDATE_ROLE }}"
           RUNTIME: nodejs12.x
           HANDLER: build/index.handler
           TIMEOUT: 10
           MEMORY_SIZE: 128
-          TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
+          TAG: "github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
           # Update env vars
-          NODE_ENV: ${{ needs.set_environment.outputs.current_env }}
-          SECRET_ID: ${{ secrets.SECRET_ID }}
-          SENTRY_DSN: ${{ secrets.SERVERLESS_SENTRY_DSN }}
+          NODE_ENV: "${{ needs.set_environment.outputs.current_env }}"
+          SECRET_ID: "${{ secrets.SECRET_ID }}"
+          SENTRY_DSN: "${{ secrets.SERVERLESS_SENTRY_DSN }}"
           # Update environment variables in the command
         run: |
           aws lambda update-function-configuration --function-name="${{ steps.function-name.outputs.value }}" \
