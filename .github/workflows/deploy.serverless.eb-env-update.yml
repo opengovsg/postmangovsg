@@ -35,9 +35,9 @@ jobs:
           node-version: "12"
           cache: "npm"
       - name: Lint lock file
-        run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+        run: cd "$DIRECTORY" && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - name: Test app code
-        run: cd $DIRECTORY && npm test
+        run: cd "$DIRECTORY" && npm test
 
   build_deploy_application:
     needs: [set_environment, lint-test]
@@ -64,18 +64,18 @@ jobs:
         env:
           ZIP_FILE: code.zip
         run: |
-          cd $DIRECTORY
+          cd "$DIRECTORY"
           npm ci 
           npm run build
           npm prune --production
-          sudo zip -qr $ZIP_FILE build package.json node_modules/
+          sudo zip -qr "$ZIP_FILE" build package.json node_modules/
           echo "::set-output name=zip_path::$DIRECTORY/$ZIP_FILE"
 
       - name: Check if lambda can be updated (1)
         run: |
           result=$(aws lambda get-function --function-name "${{ steps.function-name.outputs.value }}" --query 'Configuration.[State, LastUpdateStatus]')
           echo "$result"
-          if [[ ! $result =~ "Successful" ]] || [[ ! $result =~ "Active" ]]; then
+          if [[ ! "$result" =~ "Successful" ]] || [[ ! "$result" =~ "Active" ]]; then
               sleep 10;
           fi
 
@@ -88,7 +88,7 @@ jobs:
         run: |
           result=$(aws lambda get-function --function-name "${{ steps.function-name.outputs.value }}" --query 'Configuration.[State, LastUpdateStatus]')
           echo "$result"
-          if [[ ! $result =~ "Successful" ]] || [[ ! $result =~ "Active" ]]; then
+          if [[ ! "$result" =~ "Successful" ]] || [[ ! "$result" =~ "Active" ]]; then
               sleep 10;
           fi
 
@@ -108,5 +108,5 @@ jobs:
           # Update environment variables in the command
         run: |
           aws lambda update-function-configuration --function-name="${{ steps.function-name.outputs.value }}" \
-          --role=$ROLE --description=$TAG --timeout=$TIMEOUT --memory-size=$MEMORY_SIZE --runtime=$RUNTIME --handler=$HANDLER \
+          --role="$ROLE" --description="$TAG" --timeout="$TIMEOUT" --memory-size="$MEMORY_SIZE" --runtime="$RUNTIME" --handler="$HANDLER" \
           --environment "Variables={NODE_ENV=$NODE_ENV,SECRET_ID=$SECRET_ID,SENTRY_DSN=$SENTRY_DSN}"
