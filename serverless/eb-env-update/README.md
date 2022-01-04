@@ -82,3 +82,6 @@ Sample cloudtrail event for testing event pattern on Event bridge
    }
 }
 ```
+
+Where to set event trigger?
+<img width="1224" alt="Screenshot 2022-01-04 at 5 37 03 PM" src="https://user-images.githubusercontent.com/33819199/148039828-09390583-0666-4f24-bd41-308019d2b91a.png">
