@@ -50,7 +50,7 @@ jobs:
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
-      IMAGE_TAG: github-actions-worker-$(echo "${{ github.sha }}" | cut -c1-8)-${{ github.run_id }}-${{github.run_attempt}}
+      IMAGE_TAG: "github-actions-worker-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
       BRANCH: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       image: ${{ steps.build-image.outputs.image }}
