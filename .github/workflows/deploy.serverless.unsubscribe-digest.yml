@@ -4,7 +4,7 @@ on:
     branches:
       - master
       - develop
-      - github-actions-test-lambda
+      - github-actions-test
 
 env:
   # Update this common config
