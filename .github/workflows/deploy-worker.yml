@@ -6,6 +6,10 @@ on:
       - master
       - github-actions-test
 
+env:
+  # Update this common config
+  DIRECTORY: worker
+
 jobs:
   set_environment:
     outputs:
@@ -21,12 +25,32 @@ jobs:
              echo "::set-output name=current_env::staging"
           fi
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: 'npm'
+      - name: Lint lock file
+        run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      - name: Lint app code
+        run: |
+          cd shared 
+          npm ci
+          cd ..
+          cd $DIRECTORY
+          npm ci
+          npm run build
+          npm run lint-no-fix
+
   build_application:
-    needs: set_environment
+    needs: [ set_environment, lint ]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
-      IMAGE_TAG: github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}
+      IMAGE_TAG: github-actions-worker-$(echo "${{ github.sha }}" | cut -c1-8)-${{ github.run_id }}-${{github.run_attempt}}
       BRANCH: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       image: ${{ steps.build-image.outputs.image }}
@@ -41,18 +65,14 @@ jobs:
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
         run: cd shared && npm ci
-      - name: Build worker
+      - name: Replace id of secret to be used for retrieving env vars from secrets manager
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
           SECRET_ID: ${{ secrets.SECRET_ID }}
         run: |
-          cd worker
+          cd $DIRECTORY
           cp -R ../shared ./
           sed -i -e "s#@SECRET_ID#$SECRET_ID#g" docker-entrypoint.sh
-          npm ci
-          set -e
-          npm_config_mode=yes npx lockfile-lint --type npm --path package.json --validate-https --allowed-hosts npm
-          npm run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -70,7 +90,7 @@ jobs:
         env:
           ECR_REPOSITORY: ${{ secrets.REPO }}
         run: |
-          cd worker
+          cd $DIRECTORY
           docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$BRANCH
           docker push -a $ECR_REPOSITORY
