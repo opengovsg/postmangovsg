@@ -6,7 +6,6 @@ on:
       - develop
       - github-actions-test-lambda
 
-
 env:
   # Update this common config
   DIRECTORY: serverless/database-backup
@@ -33,15 +32,15 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
-          cache: 'npm'
+          node-version: "12"
+          cache: "npm"
       - name: Lint lock file
         run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - name: Test app code
         run: cd $DIRECTORY && npm test
 
   build_deploy_application:
-    needs: [ set_environment, lint-test ]
+    needs: [set_environment, lint-test]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
@@ -51,8 +50,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
-          cache: 'npm'
+          node-version: "12"
+          cache: "npm"
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -62,7 +61,7 @@ jobs:
       - name: Set function name according to environment
         id: function-name
         run: echo "::set-output name=value::$FUNCTION-${{ needs.set_environment.outputs.current_env }}"
-      - name: Build  
+      - name: Build
         id: build-lambda
         env:
           ZIP_FILE: code.zip
@@ -86,7 +85,6 @@ jobs:
         run: |
           aws lambda update-function-code --function-name "${{ steps.function-name.outputs.value }}" \
           --zip-file=fileb://${{ steps.build-lambda.outputs.zip_path }}  --publish 2>&1
-
 
       - name: Check if lambda can be updated (2)
         run: |
@@ -113,7 +111,7 @@ jobs:
           KEY_ENCRYPTION_PUBLIC_KEY: ${{ secrets.BACKUP_PUBLIC_KEY }}
           SENTRY_DSN: ${{ secrets.SERVERLESS_SENTRY_DSN }}
           CRONITOR_CODE: ${{ secrets.BACKUP_CRONITOR_CODE }}
-          #Update environment variables in the command
+          # Update environment variables in the command
         run: |
           aws lambda update-function-configuration --function-name="${{ steps.function-name.outputs.value }}" \
           --role=$ROLE --description=$TAG --timeout=$TIMEOUT --memory-size=$MEMORY_SIZE --runtime=$RUNTIME --handler=$HANDLER \
