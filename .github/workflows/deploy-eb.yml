@@ -43,20 +43,20 @@ jobs:
           --health-retries 5
       redis:
         image: redis:alpine
-        ports: 
+        ports:
           - "6379:6379"
         options: --entrypoint redis-server
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
-          cache: 'npm'
+          node-version: "12"
+          cache: "npm"
       - name: Lint lock file
         run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - name: Lint and test app code
         env:
-          NODE_OPTIONS: '--max-old-space-size=4096'
+          NODE_OPTIONS: "--max-old-space-size=4096"
           PGUSER: postgres
           PGPASSWORD: postgres
         run: |
@@ -69,9 +69,8 @@ jobs:
           npm run lint-no-fix
           npm test
 
-
   build_deploy_application:
-    needs: [ set_environment, lint-test ]
+    needs: [set_environment, lint-test]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
@@ -82,8 +81,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
-          cache: 'npm'
+          node-version: "12"
+          cache: "npm"
       - name: Before deploy
         env:
           SECRET_ID: ${{ secrets.SECRET_ID }}
