@@ -1,0 +1,22 @@
+name: Lint root
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - github-actions-test
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "12"
+          cache: "npm"
+      - name: Lint lock file
+        run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      - name: Lint app code
+        run: |
+          npm install --ignore-scripts
+          npm run lint-no-fix

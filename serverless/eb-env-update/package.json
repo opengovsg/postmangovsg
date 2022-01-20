@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "build": "rm -rf build && tsc",
-    "test": "echo 'No tests yet for eb-env-update"
+    "test": "echo 'No tests yet for eb-env-update'"
   },
   "author": "",
   "license": "ISC",
