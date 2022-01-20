@@ -13,6 +13,15 @@ Sentry.configureScope((scope) => {
 })
 
 const eb = new AWS.ElasticBeanstalk()
+
+const matchSecretId = (request: string, secretId: string) =>{
+  // arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:<SECRET_NAME>-<RANDOM_CHARS>
+  const indexOfSecretId = request.indexOf(secretId)
+  if(indexOfSecretId === -1) return false
+  const indexOfRandomChars = request.lastIndexOf('-')
+  return secretId === request.substring(indexOfSecretId, indexOfRandomChars > -1 ? indexOfRandomChars : undefined)
+}
+
 exports.handler = async (event : any) => {
   try{
     const { detail } = event
@@ -24,7 +33,7 @@ exports.handler = async (event : any) => {
       const { requestParameters } = detail
       if (
         requestParameters &&
-        requestParameters.secretId === config.get('secretId')
+        matchSecretId(requestParameters.secretId, config.get('secretId'))
       ) {
         const environmentName = config.get('secretId').substring(config.get('prefix').length)
         const callbackEnvironmentName = `${environmentName}-callback`
