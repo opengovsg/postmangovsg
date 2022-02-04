@@ -7,6 +7,7 @@ import { EmailBlacklist, EmailMessage } from '@email/models'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
+import { MessageStatus } from '@core/constants'
 
 const logger = loggerWithLabel(module)
 
@@ -43,8 +44,8 @@ export const updateMessageWithError = async (
     {
       errorCode: errorCode,
       errorSubType,
-      receivedAt: timestamp,
-      status: 'INVALID_RECIPIENT',
+      receivedAt: new Date(timestamp),
+      status: 'INVALID_RECIPIENT' as MessageStatus,
     },
     {
       where: {
@@ -81,8 +82,8 @@ export const updateMessageWithSuccess = async (
   // Should not overwrite a READ status for the message
   const [, result] = await EmailMessage.update(
     {
-      receivedAt: timestamp,
-      status: 'SUCCESS',
+      receivedAt: new Date(timestamp),
+      status: 'SUCCESS' as MessageStatus,
     },
     {
       where: {
@@ -120,8 +121,8 @@ export const updateMessageWithRead = async (
   // Since open event supercedes error or success notification types, overwrite any previous status
   const [, result] = await EmailMessage.update(
     {
-      receivedAt: timestamp,
-      status: 'READ',
+      receivedAt: new Date(timestamp),
+      status: 'READ' as MessageStatus,
     },
     {
       where: { id },

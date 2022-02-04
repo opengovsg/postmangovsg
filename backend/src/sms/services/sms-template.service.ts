@@ -11,6 +11,7 @@ import {
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
+import { CreationAttributes } from 'sequelize/dist'
 
 const client = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 
@@ -55,7 +56,7 @@ const upsertSmsTemplate = async ({
       {
         campaignId,
         body,
-      },
+      } as CreationAttributes<SmsTemplate>,
       {
         transaction,
       }

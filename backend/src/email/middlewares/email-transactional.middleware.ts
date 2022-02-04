@@ -8,6 +8,7 @@ import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from '@shared/templating'
 import { AuthService } from '@core/services'
 import { InvalidRecipientError } from '@core/errors'
+import { RedisClient } from 'redis'
 
 const logger = loggerWithLabel(module)
 
@@ -40,7 +41,7 @@ async function sendMessage(
 
     const BAD_REQUEST_ERRORS = [TemplateError, InvalidRecipientError]
     if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
-      res.status(400).json({ message: err.message })
+      res.status(400).json({ message: (err as Error).message })
       return
     }
     next(err)
@@ -50,7 +51,7 @@ async function sendMessage(
 const rateLimit = expressRateLimit({
   store: new RedisStore({
     prefix: 'transactionalEmail:',
-    client: RedisService.rateLimitClient,
+    client: RedisService.rateLimitClient as RedisClient,
     expiry: config.get('transactionalEmail.window'),
   }),
   keyGenerator: (req: Request) => req?.session?.user.id,

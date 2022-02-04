@@ -10,6 +10,8 @@
     "./src/__mocks__"
   ],
   "references": [
-    { "path": "../shared/tsconfig.build.json" }
+    {
+      "path": "../shared/tsconfig.build.json"
+    }
   ]
 }

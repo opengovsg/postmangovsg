@@ -1,14 +1,13 @@
 import express, { Request, Response, NextFunction } from 'express'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
-import bodyParser from 'body-parser'
 import sessionLoader from '@core/loaders/session.loader'
 import routes from '@core/routes'
 
 const initialiseServer = (session?: boolean): express.Application => {
   const app: express.Application = express()
   sessionLoader({ app })
-  app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: false }))
 
   app.use((req: Request, _res: Response, next: NextFunction): void => {
     if (session && req.session) {

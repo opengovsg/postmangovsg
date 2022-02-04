@@ -42,7 +42,9 @@ export default class TwilioClient {
     } catch (error) {
       // Handle +65802 errors by forcing delivery once
       if (
-        /\+65802\d+ is not a valid phone number/.test(error.message) &&
+        /\+65802\d+ is not a valid phone number/.test(
+          (error as Error).message
+        ) &&
         !forceDelivery
       ) {
         return this.send(recipient, message, true)
@@ -50,11 +52,11 @@ export default class TwilioClient {
 
       // 20429 - REST API rate limit exceeded
       // 21611 - Message queue limit exceeded
-      if ([20429, 21611].includes(error.code)) {
+      if ([20429, 21611].includes((error as any).code)) {
         throw new RateLimitError()
       }
 
-      if (error.code === 21211) {
+      if ((error as any).code === 21211) {
         throw new InvalidRecipientError('Invalid phone number')
       }
 
