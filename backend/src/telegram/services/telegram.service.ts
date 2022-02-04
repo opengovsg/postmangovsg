@@ -1,4 +1,4 @@
-import { Transaction } from 'sequelize'
+import { CreationAttributes, Transaction } from 'sequelize'
 
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
@@ -22,6 +22,7 @@ import {
 } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 import { TelegramDuplicateCampaignDetails } from '@telegram/interfaces'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -54,9 +55,10 @@ const getHydratedMessage = async (
   const params = await getParams(campaignId)
   if (params === null || template === null) return null
 
-  /* eslint-disable @typescript-eslint/no-non-null-assertion */
-  const body = TelegramTemplateService.client.template(template?.body!, params)
-  /* eslint-enable @typescript-eslint/no-non-null-assertion */
+  const body = TelegramTemplateService.client.template(
+    template?.body as string,
+    params
+  )
   return { body }
 }
 
@@ -145,7 +147,7 @@ const validateAndConfigureBot = async (
   try {
     await telegramService.getBotInfo()
   } catch (err) {
-    throw new Error(`Invalid token. ${err.message}`)
+    throw new Error(`Invalid token. ${(err as Error).message}`)
   }
 
   const callbackUrl = `${config.get(
@@ -168,7 +170,7 @@ const validateAndConfigureBot = async (
 const findCampaign = (
   campaignId: number,
   userId: number
-): Promise<Campaign> => {
+): Promise<Campaign | null> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.Telegram },
   })
@@ -253,24 +255,26 @@ const uploadCompleteOnChunk = ({
 
     // Append default country code as telegram handler stores number with the country
     // code by default.
-    const formattedRecords = TelegramTemplateService.validateAndFormatNumber(
-      records
-    )
+    const formattedRecords =
+      TelegramTemplateService.validateAndFormatNumber(records)
     // START populate template
-    await TelegramMessage.bulkCreate(formattedRecords, {
-      transaction,
-      logging: (_message, benchmark) => {
-        if (benchmark) {
-          logger.info({
-            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
-            benchmark,
-            campaignId,
-            action: 'uploadCompleteOnChunk',
-          })
-        }
-      },
-      benchmark: true,
-    })
+    await TelegramMessage.bulkCreate(
+      formattedRecords as CreationAttributes<TelegramMessage>[],
+      {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info({
+              message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+              benchmark,
+              campaignId,
+              action: 'uploadCompleteOnChunk',
+            })
+          }
+        },
+        benchmark: true,
+      }
+    )
   }
 }
 
@@ -291,7 +295,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as TelegramDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as TelegramDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -311,7 +315,7 @@ const duplicateCampaign = async ({
             {
               campaignId: duplicate.id,
               body: template.body,
-            },
+            } as CreationAttributes<TelegramTemplate>,
             { transaction }
           )
         }

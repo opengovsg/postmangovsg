@@ -28,7 +28,7 @@ const logger = winston.createLogger({
 })
 
 logger.stream = {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   write: (message: string, _encoding: any): void => {
     // use the 'info' log level so the output will be picked up by both transports

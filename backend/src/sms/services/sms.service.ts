@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { Transaction } from 'sequelize'
+import { CreationAttributes, Transaction } from 'sequelize'
 
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
@@ -17,6 +17,7 @@ import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
 
 import TwilioClient from './twilio-client.class'
 import SnsSmsClient from './sns-sms-client.class'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -49,9 +50,10 @@ const getHydratedMessage = async (
   const params = await getParams(campaignId)
   if (params === null || template === null) return null
 
-  /* eslint-disable @typescript-eslint/no-non-null-assertion */
-  const body = SmsTemplateService.client.template(template?.body!, params)
-  /* eslint-enable @typescript-eslint/no-non-null-assertion */
+  const body = SmsTemplateService.client.template(
+    template?.body as string,
+    params
+  )
   return { body }
 }
 
@@ -125,7 +127,7 @@ const sendValidationMessage = async (
 const findCampaign = (
   campaignId: number,
   userId: number
-): Promise<Campaign> => {
+): Promise<Campaign | null> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.SMS },
   })
@@ -219,7 +221,7 @@ const uploadCompleteOnChunk = ({
       }
     })
     // START populate template
-    await SmsMessage.bulkCreate(records, {
+    await SmsMessage.bulkCreate(records as CreationAttributes<SmsMessage>[], {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -253,7 +255,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as SmsDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as SmsDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -273,7 +275,7 @@ const duplicateCampaign = async ({
             {
               campaignId: duplicate.id,
               body: template.body,
-            },
+            } as CreationAttributes<SmsTemplate>,
             { transaction }
           )
         }

@@ -1,4 +1,4 @@
-import { Transaction } from 'sequelize'
+import { CreationAttributes, Transaction } from 'sequelize'
 import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
@@ -19,6 +19,7 @@ import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
 
 import { ThemeClient } from '@shared/theme'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -62,10 +63,13 @@ const getHydratedMessage = async (
 
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
   const subject = EmailTemplateService.client.template(
-    template?.subject!,
+    template?.subject as string,
     params
   )
-  const body = EmailTemplateService.client.template(template?.body!, params)
+  const body = EmailTemplateService.client.template(
+    template?.body as string,
+    params
+  )
 
   // Get agency details (if exists) from campaign user
   const campaign = await Campaign.findOne({
@@ -95,7 +99,7 @@ const getHydratedMessage = async (
     body,
     subject,
     replyTo: template.replyTo || null,
-    from: template?.from!,
+    from: template?.from as string,
     agencyName,
     agencyLogoURI,
     showMasthead,
@@ -167,7 +171,7 @@ const sendEmail = async (mail: MailToSend): Promise<string | void> => {
 const findCampaign = (
   campaignId: number,
   userId: number
-): Promise<Campaign> => {
+): Promise<Campaign | null> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.Email },
   })
@@ -287,20 +291,23 @@ const uploadCompleteOnChunk = ({
       }
     })
     // START populate template
-    await EmailMessage.bulkCreate(records, {
-      transaction,
-      logging: (_message, benchmark) => {
-        if (benchmark) {
-          logger.info({
-            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
-            benchmark,
-            campaignId,
-            action: 'uploadCompleteOnChunk',
-          })
-        }
-      },
-      benchmark: true,
-    })
+    await EmailMessage.bulkCreate(
+      records as CreationAttributes<EmailMessage>[],
+      {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info({
+              message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+              benchmark,
+              campaignId,
+              action: 'uploadCompleteOnChunk',
+            })
+          }
+        },
+        benchmark: true,
+      }
+    )
   }
 }
 
@@ -350,20 +357,23 @@ const uploadProtectedCompleteOnChunk = ({
       campaignId,
       data,
     })
-    await EmailMessage.bulkCreate(messages, {
-      transaction,
-      logging: (_message, benchmark) => {
-        if (benchmark) {
-          logger.info({
-            message: 'uploadProtectedCompleteOnChunk: ElapsedTime in ms',
-            benchmark,
-            campaignId,
-            action: 'uploadProtectedCompleteOnChunk',
-          })
-        }
-      },
-      benchmark: true,
-    })
+    await EmailMessage.bulkCreate(
+      messages as CreationAttributes<EmailMessage>[],
+      {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info({
+              message: 'uploadProtectedCompleteOnChunk: ElapsedTime in ms',
+              benchmark,
+              campaignId,
+              action: 'uploadProtectedCompleteOnChunk',
+            })
+          }
+        },
+        benchmark: true,
+      }
+    )
   }
 }
 
@@ -384,7 +394,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as EmailDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as EmailDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -406,8 +416,9 @@ const duplicateCampaign = async ({
               body: template.body,
               subject: template.subject,
               from: template.from,
-              replyTo: template.reply_to,
-            },
+              // ternary to fix type mismatch between <string | null> and <string | undefined>
+              replyTo: template.reply_to ? template.reply_to : undefined,
+            } as CreationAttributes<EmailTemplate>,
             { transaction }
           )
         }

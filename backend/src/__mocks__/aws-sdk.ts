@@ -19,7 +19,7 @@ const MockAWS = {
   // By default, use unmocked version of AWS services
   ...jest.requireActual('aws-sdk'),
 
-  SecretsManager: function (): {} {
+  SecretsManager: function (): Record<string, unknown> {
     return mockSecretsManager
   },
 }

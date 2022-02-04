@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import path from 'path'
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 import Umzug from 'umzug'
@@ -21,7 +22,7 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
     await sequelize.sync()
     console.log({ message: 'Test Database loaded.' })
   } catch (error) {
-    console.log(error.message)
+    console.log((error as Error).message)
     console.error({ message: 'Unable to connect to test database', error })
     process.exit(1)
   }
