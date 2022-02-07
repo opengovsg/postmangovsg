@@ -40,7 +40,7 @@
   @include flex-center;
   border-top-right-radius: $border-radius;
   border-bottom-right-radius: $border-radius;
-  min-width: $button-min-width / 4;
+  min-width: calc($button-min-width / 4);
   height: $button-height;
   background-color: $primary;
 
