@@ -1,0 +1,7 @@
+// this file is for disabling specific rules for auto generated migration
+// files
+{
+	"rules": {
+		"no-console": "off"
+	}
+}
