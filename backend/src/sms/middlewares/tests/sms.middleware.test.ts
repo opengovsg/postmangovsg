@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
 import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { ChannelType } from '@core/constants'
 import { SmsMiddleware } from '@sms/middlewares/sms.middleware'
+import { CreationAttributes } from 'sequelize/dist'
 
 let sequelize: Sequelize
 let campaignId: number
@@ -21,14 +21,17 @@ beforeEach(() => {
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({
+    id: 1,
+    email: 'user@agency.gov.sg',
+  } as CreationAttributes<User>)
   const campaign = await Campaign.create({
     name: 'campaign-1',
     userId: 1,
     type: ChannelType.SMS,
     valid: false,
     protect: false,
-  })
+  } as CreationAttributes<Campaign>)
   campaignId = campaign.id
 })
 
@@ -36,7 +39,6 @@ afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  await RedisService.shutdown()
 })
 
 describe('isSmsCampaignOwnedByUser middleware', () => {

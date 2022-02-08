@@ -24,7 +24,7 @@ const getOtp = async (req: Request, res: Response): Promise<Response> => {
       ...logMeta,
       error: e,
     })
-    return res.status(401).json({ message: e.message })
+    return res.status(401).json({ message: (e as Error).message })
   }
   try {
     const ipAddress = getRequestIp(req)

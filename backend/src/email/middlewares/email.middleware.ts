@@ -59,7 +59,7 @@ const validateAndStoreCredentials = async (
       error: err,
       ...logMeta,
     })
-    return res.status(400).json({ message: `${err.message}` })
+    return res.status(400).json({ message: `${(err as Error).message}` })
   }
   return res.json({ message: 'OK' })
 }
@@ -174,10 +174,8 @@ const isFromAddressAccepted = async (
     (await AuthService.findUser(req.session?.user?.id))?.email
 
   // Get default mail address for comparison
-  const {
-    fromName: defaultFromName,
-    fromAddress: defaultFromAddress,
-  } = parseFromAddress(config.get('mailFrom'))
+  const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
+    parseFromAddress(config.get('mailFrom'))
 
   if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
     logger.error({
@@ -223,7 +221,7 @@ const existsFromAddress = async (
       error: err,
       action: 'existsFromAddress',
     })
-    return res.status(400).json({ message: err.message })
+    return res.status(400).json({ message: (err as Error).message })
   }
   return next()
 }
@@ -251,7 +249,7 @@ const verifyFromAddress = async (
       error: err,
       action: 'verifyFromAddress',
     })
-    return res.status(400).json({ message: err.message })
+    return res.status(400).json({ message: (err as Error).message })
   }
   return next()
 }
@@ -324,7 +322,7 @@ const sendValidationMessage = async (
       error: err,
       action: 'sendValidationMessage',
     })
-    return res.status(400).json({ message: err.message })
+    return res.status(400).json({ message: (err as Error).message })
   }
   return next()
 }

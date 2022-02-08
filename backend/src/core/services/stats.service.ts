@@ -60,7 +60,7 @@ const setNumRecipients = async (
       errored: 0,
       sent: 0,
       invalid: 0,
-    },
+    } as Statistic,
     {
       transaction,
     }

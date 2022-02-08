@@ -7,6 +7,7 @@ import { EmailService } from '@email/services'
 
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
+import { CreationAttributes } from 'sequelize/dist'
 
 let sequelize: Sequelize
 let user: User
@@ -19,7 +20,7 @@ beforeEach(async () => {
   user = await User.create({
     id: userId,
     email: `user_${userId}@agency.gov.sg`,
-  })
+  } as CreationAttributes<User>)
   apiKey = await user.regenerateAndSaveApiKey()
   userId += 1
 })
@@ -27,7 +28,7 @@ beforeEach(async () => {
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   // Flush the rate limit redis database
-  await new Promise((resolve) => RedisService.rateLimitClient.flushdb(resolve))
+  await new Promise((resolve) => RedisService.rateLimitClient?.flushdb(resolve))
 })
 
 afterEach(() => jest.resetAllMocks())
@@ -36,8 +37,7 @@ afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
 
-  await new Promise((resolve) => RedisService.rateLimitClient.flushdb(resolve))
-  await RedisService.shutdown()
+  await new Promise((resolve) => RedisService.rateLimitClient?.flushdb(resolve))
 })
 
 describe('POST /transactional/email/send', () => {

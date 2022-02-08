@@ -15,6 +15,7 @@ import { loggerWithLabel } from '@core/logger'
 import { RedisService } from '@core/services'
 import { TwilioCredentials } from '@sms/interfaces'
 import { UserSettings } from '@core/interfaces'
+import { CreationAttributes } from 'sequelize/dist'
 
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
 const logger = loggerWithLabel(module)
@@ -48,7 +49,7 @@ const upsertCredential = async (
       ...logMeta,
     })
   } catch (err) {
-    if (err.name === 'ResourceExistsException') {
+    if ((err as any).name === 'ResourceExistsException') {
       await secretsManager
         .putSecretValue({
           SecretId: name,
@@ -102,7 +103,7 @@ const getTwilioCredentials = (name: string): Promise<TwilioCredentials> => {
   const logMeta = { name, action: 'getTwilioCredentials' }
 
   return new Promise((resolve, reject) => {
-    RedisService.credentialClient.get(name, async (error, value) => {
+    RedisService.credentialClient?.get(name, async (error, value) => {
       if (error || value === null) {
         const data = await secretsManager
           .getSecretValue({ SecretId: name })
@@ -118,7 +119,7 @@ const getTwilioCredentials = (name: string): Promise<TwilioCredentials> => {
         }
         value = data?.SecretString
 
-        RedisService.credentialClient.set(
+        RedisService.credentialClient?.set(
           name,
           value,
           'PX',
@@ -175,7 +176,7 @@ const createUserCredential = (
     type,
     credName,
     userId,
-  })
+  } as CreationAttributes<UserCredential>)
 }
 
 /**
@@ -203,7 +204,7 @@ const deleteUserCredential = (
 const getUserCredential = (
   userId: number,
   label: string
-): Promise<UserCredential> => {
+): Promise<UserCredential | null> => {
   return UserCredential.findOne({
     where: {
       userId,
@@ -341,7 +342,10 @@ const updateAnnouncementVersion = async (
   announcementVersion: string
 ): Promise<{ announcementVersion: string }> => {
   const [rowUpserted] = await UserFeature.upsert(
-    { userId: userId, announcementVersion: announcementVersion },
+    {
+      userId: userId,
+      announcementVersion: announcementVersion,
+    } as CreationAttributes<UserFeature>,
     { returning: true }
   )
 

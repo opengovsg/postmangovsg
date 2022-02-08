@@ -50,7 +50,7 @@ const disabledForDemoCampaign = async (
       +req.params.campaignId,
       userId
     )
-    if (campaign.demoMessageLimit) {
+    if (campaign?.demoMessageLimit) {
       return res.status(400).json({
         message: `Action not allowed for demo campaign`,
       })
@@ -156,11 +156,12 @@ const getCredentialsFromLabel = async (
     res.locals.credentialName = credentialName
     return next()
   } catch (err) {
+    const errAsError = err as Error
     logger.error({
       ...logMeta,
-      message: `${err.stack}`,
+      message: `${errAsError.stack}`,
     })
-    return res.status(400).json({ message: `${err.message}` })
+    return res.status(400).json({ message: `${errAsError.message}` })
   }
 }
 
@@ -228,7 +229,7 @@ const validateAndStoreCredentials = async (
       error: err,
       ...logMeta,
     })
-    return res.status(400).json({ message: `${err.message}` })
+    return res.status(400).json({ message: `${(err as Error).message}` })
   }
 }
 
