@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "concurrently -k -p \"[{name}]\" -n \"Backend,Frontend\" -c \"green.bold,yellow.bold\" \"npm run test:backend\" \"npm run test:frontend\"",
+    "test": "concurrently -k -p \"[{name}]\" -n \"Shared,Backend,Frontend\" -c \"green.bold,yellow.bold,cyan.bold\" \"npm run test:backend\" \"npm run test:frontend\" \"npm run test:shared\"",
     "test:frontend": "cd frontend && npm run test",
     "test:backend": "cd backend && npm run test",
+    "test:shared": "cd shared && npm run test",
     "build": "npm run build:shared && npm run build:backend && npm run build:worker && npm run build:frontend",
     "build:shared": "cd shared && npm run build",
     "build:frontend": "cd frontend && npm run build",
