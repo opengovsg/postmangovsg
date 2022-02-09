@@ -4,7 +4,6 @@ import { CredentialService } from '@core/services'
 import { TelegramService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
 import { formatDefaultCredentialName } from '@core/utils'
-import { Campaign } from '@core/models'
 
 const logger = loggerWithLabel(module)
 
@@ -28,7 +27,7 @@ const disabledForDemoCampaign = async (
       +req.params.campaignId,
       userId
     )
-    if (campaign?.demoMessageLimit) {
+    if (campaign.demoMessageLimit) {
       return res.status(400).json({
         message: `Action disabled for demo campaign`,
       })
@@ -123,12 +122,11 @@ const getCredentialsFromLabel = async (
     res.locals.credentialName = botId(telegramBotToken)
     return next()
   } catch (err) {
-    const errAsError = err as Error
     logger.error({
       ...logMeta,
-      message: `${errAsError.stack}`,
+      message: `${err.stack}`,
     })
-    return res.status(400).json({ message: `${errAsError.message}` })
+    return res.status(400).json({ message: `${err.message}` })
   }
 }
 
@@ -147,7 +145,7 @@ const getCampaignCredential = async (
   const userId = req.session?.user?.id
   const campaign = await TelegramService.findCampaign(+campaignId, userId)
 
-  const { credName } = campaign as Campaign
+  const { credName } = campaign
   if (!credName) {
     logger.error({
       message: 'Credential not found for this campaign',
@@ -257,7 +255,7 @@ const sendValidationMessage = async (
       error: err,
       ...logMeta,
     })
-    return res.status(400).json({ message: `${(err as Error).message}` })
+    return res.status(400).json({ message: `${err.message}` })
   }
 }
 

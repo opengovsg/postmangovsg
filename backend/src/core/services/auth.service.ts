@@ -34,7 +34,7 @@ const saveHashedOtp = (
   hashedOtp: HashedOtp
 ): Promise<boolean> => {
   return new Promise((resolve, reject) => {
-    RedisService.otpClient?.set(
+    RedisService.otpClient.set(
       email,
       JSON.stringify(hashedOtp),
       'EX',
@@ -59,10 +59,10 @@ const saveHashedOtp = (
  * Get the hashed otp that was saved against the user's email
  * @param email
  */
-const getHashedOtp = async (email: string): Promise<HashedOtp> => {
+const getHashedOtp = (email: string): Promise<HashedOtp> => {
   const logMeta = { email, action: 'getHashedOtp' }
   return new Promise((resolve, reject) => {
-    RedisService.otpClient?.get(email, (error, value) => {
+    RedisService.otpClient.get(email, (error, value) => {
       if (error) {
         logger.error({ message: 'Failed to get hashed otp', error, ...logMeta })
         reject(new Error('Internal server error - request for otp again'))
@@ -70,7 +70,7 @@ const getHashedOtp = async (email: string): Promise<HashedOtp> => {
       if (value === null) {
         reject(new Error('OTP has expired. Please request for a new OTP.'))
       }
-      resolve(JSON.parse(value as string))
+      resolve(JSON.parse(value))
     })
   })
 }
@@ -81,7 +81,7 @@ const getHashedOtp = async (email: string): Promise<HashedOtp> => {
  */
 const deleteHashedOtp = async (email: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
-    RedisService.otpClient?.del(email, (error, response) => {
+    RedisService.otpClient.del(email, (error, response) => {
       if (error || response !== 1) {
         logger.error({
           message: 'Failed to delete hashed otp',
@@ -277,7 +277,7 @@ const findOrCreateUser = async (email: string): Promise<User> => {
  * Helper method to find a user by their id
  * @param id
  */
-const findUser = (id: number): Promise<User | null> => {
+const findUser = (id: number): Promise<User> => {
   return User.findOne({
     where: { id },
   })

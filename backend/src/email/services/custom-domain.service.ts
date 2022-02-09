@@ -7,7 +7,6 @@ import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 import { formatFromAddress } from '@shared/utils/from-address'
-import { CreationAttributes } from 'sequelize/dist'
 
 const logger = loggerWithLabel(module)
 const [, region] = config.get('mailOptions.host').split('.')
@@ -109,10 +108,9 @@ const storeFromAddress = async (
 ): Promise<void> => {
   try {
     await EmailFromAddress.upsert({
-      // ternary to fix type mismatch between <string | null> and <string | undefined>
-      name: name ? name : undefined,
+      name,
       email,
-    } as CreationAttributes<EmailFromAddress>)
+    })
   } catch (err) {
     logger.error({
       message: 'Failed to store email address in EmailFromAddress table',

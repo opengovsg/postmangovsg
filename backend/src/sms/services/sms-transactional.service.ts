@@ -19,8 +19,9 @@ async function sendMessage({
   body: string
   recipient: string
 }): Promise<void> {
-  const sanitizedBody =
-    SmsTemplateService.client.replaceNewLinesAndSanitize(body)
+  const sanitizedBody = SmsTemplateService.client.replaceNewLinesAndSanitize(
+    body
+  )
   if (!sanitizedBody) {
     throw new TemplateError(
       'Message is invalid as it only contains invalid HTML tags.'

@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { User, Credential, UserCredential } from '@core/models'
 import { ChannelType } from '@core/constants'
+import { RedisService } from '@core/services'
 import { RateLimitError, InvalidRecipientError } from '@core/errors'
 import { TemplateError } from '@shared/templating'
 import { SmsService } from '@sms/services'
@@ -10,7 +11,6 @@ import { SmsService } from '@sms/services'
 import { mockSecretsManager } from '@mocks/aws-sdk'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { CreationAttributes } from 'sequelize/dist'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',
@@ -32,22 +32,20 @@ beforeEach(async () => {
   user = await User.create({
     id: userId,
     email: `user_${userId}@agency.gov.sg`,
-  } as CreationAttributes<User>)
+  })
   apiKey = await user.regenerateAndSaveApiKey()
   userCredential = await UserCredential.create({
     label: `twilio-${userId}`,
     type: ChannelType.SMS,
     credName: credential.name,
     userId,
-  } as CreationAttributes<UserCredential>)
+  })
   userId += 1
 })
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  credential = await Credential.create({
-    name: 'twilio',
-  } as CreationAttributes<Credential>)
+  credential = await Credential.create({ name: 'twilio' })
 })
 
 afterEach(() => jest.clearAllMocks())
@@ -57,6 +55,7 @@ afterAll(async () => {
   await UserCredential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
+  await RedisService.shutdown()
 })
 
 describe('POST /transactional/sms/send', () => {

@@ -3,14 +3,13 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Campaign, User, Credential } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { UploadService } from '@core/services'
+import { RedisService, UploadService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
 import { formatDefaultCredentialName } from '@core/utils'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
 import { mockSecretsManager } from '@mocks/aws-sdk'
 import { SmsService } from '@sms/services'
-import { CreationAttributes } from 'sequelize/dist'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
@@ -21,26 +20,19 @@ const createCampaign = async ({
   isDemo,
 }: {
   isDemo: boolean
-}): Promise<Campaign> => {
-  const campaign = {
+}): Promise<Campaign> =>
+  await Campaign.create({
     name: 'test-campaign',
     userId: 1,
     type: ChannelType.SMS,
     protect: false,
     valid: false,
-  } as Campaign
-  if (isDemo) {
-    campaign.demoMessageLimit = 20
-  }
-  return Campaign.create(campaign as CreationAttributes<Campaign>)
-}
+    demoMessageLimit: isDemo ? 20 : null,
+  })
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({
-    id: 1,
-    email: 'user@agency.gov.sg',
-  } as CreationAttributes<User>)
+  await User.create({ id: 1, email: 'user@agency.gov.sg' })
   const campaign = await createCampaign({ isDemo: false })
   campaignId = campaign.id
 })
@@ -55,6 +47,7 @@ afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
+  await RedisService.shutdown()
 })
 
 describe('GET /campaign/{id}/sms', () => {
@@ -62,10 +55,10 @@ describe('GET /campaign/{id}/sms', () => {
     const campaign = await Campaign.create({
       name: 'campaign-1',
       userId: 1,
-      type: ChannelType.SMS,
+      type: 'SMS',
       valid: false,
       protect: false,
-    } as CreationAttributes<Campaign>)
+    })
     const { id, name, type } = campaign
 
     const res = await request(app).get(`/campaign/${campaign.id}/sms`)
@@ -290,7 +283,7 @@ describe('PUT /campaign/{id}/sms/template', () => {
     await SmsMessage.create({
       campaignId: campaignId,
       params: { variable1: 'abc' },
-    } as CreationAttributes<SmsMessage>)
+    })
 
     const res = await request(app)
       .put(`/campaign/${campaignId}/sms/template`)
@@ -346,7 +339,7 @@ describe('PUT /campaign/{id}/sms/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    } as CreationAttributes<SmsMessage>)
+    })
     const res = await request(app)
       .put(`/campaign/${campaignId}/sms/template`)
       .send({
@@ -452,8 +445,9 @@ describe('POST /campaign/{id}/sms/upload/complete', () => {
   test('Successfully starts recipient list processing', async () => {
     await SmsTemplate.create({
       campaignId: campaignId,
-      body: 'test abc',
-    } as CreationAttributes<SmsTemplate>)
+      params: { variable1: 'abc' },
+      body: 'test {{variable1}}',
+    })
 
     const mockExtractParamsFromJwt = jest
       .spyOn(UploadService, 'extractParamsFromJwt')

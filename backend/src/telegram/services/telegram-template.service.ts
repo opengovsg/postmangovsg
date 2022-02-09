@@ -14,7 +14,6 @@ import {
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
-import { CreationAttributes } from 'sequelize/dist'
 const client = new TemplateClient({
   xssOptions: XSS_TELEGRAM_OPTION,
   lineBreak: '\n',

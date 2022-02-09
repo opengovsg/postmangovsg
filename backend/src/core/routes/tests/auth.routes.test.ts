@@ -5,7 +5,6 @@ import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { MailService, RedisService } from '@core/services'
 import { User } from '@core/models'
-import { CreationAttributes } from 'sequelize/dist'
 
 const app = initialiseServer()
 const appWithUserSession = initialiseServer(true)
@@ -21,6 +20,7 @@ afterEach(async () => {
 
 afterAll(async () => {
   await sequelize.close()
+  await RedisService.shutdown()
 })
 
 describe('POST /auth/otp', () => {
@@ -77,7 +77,7 @@ describe('POST /auth/login', () => {
       createdAt: 123,
     })
     await new Promise((resolve) =>
-      RedisService.otpClient?.set(email, otp, resolve)
+      RedisService.otpClient.set(email, otp, resolve)
     )
 
     const res = await request(app)
@@ -86,7 +86,7 @@ describe('POST /auth/login', () => {
     expect(res.status).toBe(401)
 
     // OTP should be deleted after exceeding retries
-    RedisService.otpClient?.get(email, (_err, value) => {
+    RedisService.otpClient.get(email, (_err, value) => {
       expect(value).toBe(null)
     })
   })
@@ -99,7 +99,7 @@ describe('POST /auth/login', () => {
       createdAt: 123,
     })
     await new Promise((resolve) =>
-      RedisService.otpClient?.set(email, otp, resolve)
+      RedisService.otpClient.set(email, otp, resolve)
     )
 
     const res = await request(app)
@@ -117,10 +117,7 @@ describe('GET /auth/userinfo', () => {
   })
 
   test('Existing session found', async () => {
-    await User.create({
-      id: 1,
-      email: 'user@agency.gov.sg',
-    } as CreationAttributes<User>)
+    await User.create({ id: 1, email: 'user@agency.gov.sg' })
     const res = await request(appWithUserSession).get('/auth/userinfo')
     expect(res.status).toBe(200)
     expect(res.body).toEqual({ id: 1, email: 'user@agency.gov.sg' })

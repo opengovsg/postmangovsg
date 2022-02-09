@@ -2,10 +2,9 @@ import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
 import { Campaign, JobQueue, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-// import { RedisService } from '@core/services'
+import { RedisService } from '@core/services'
 import { ChannelType, JobStatus } from '@core/constants'
 import { CampaignMiddleware } from '@core/middlewares/campaign.middleware'
-import { CreationAttributes } from 'sequelize/dist'
 
 let sequelize: Sequelize
 let mockRequest: Partial<Request>
@@ -21,10 +20,7 @@ beforeEach(() => {
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({
-    id: 1,
-    email: 'user@agency.gov.sg',
-  } as CreationAttributes<User>)
+  await User.create({ id: 1, email: 'user@agency.gov.sg' })
 })
 
 afterEach(async () => {
@@ -35,6 +31,7 @@ afterEach(async () => {
 afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
+  await RedisService.shutdown()
 })
 
 describe('canEditCampaign middleware', () => {
@@ -45,11 +42,11 @@ describe('canEditCampaign middleware', () => {
       type: ChannelType.SMS,
       valid: false,
       protect: false,
-    } as CreationAttributes<Campaign>)
+    })
     await JobQueue.create({
       campaignId: campaign.id,
       status: JobStatus.Sending,
-    } as CreationAttributes<JobQueue>)
+    })
 
     mockRequest = {
       params: { campaignId: String(campaign.id) },
@@ -71,7 +68,7 @@ describe('canEditCampaign middleware', () => {
       valid: false,
       protect: false,
       s3Object: { temp_filename: 'file' },
-    } as CreationAttributes<Campaign>)
+    })
 
     mockRequest = {
       params: { campaignId: String(campaign.id) },
@@ -92,7 +89,7 @@ describe('canEditCampaign middleware', () => {
       type: ChannelType.SMS,
       valid: false,
       protect: false,
-    } as CreationAttributes<Campaign>)
+    })
 
     mockRequest = {
       params: { campaignId: String(campaign.id) },

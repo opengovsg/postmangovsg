@@ -1,5 +1,3 @@
-import { RedisService } from '@core/services'
-
 /* eslint-disable no-console */
 global.console = {
   ...global.console,
@@ -12,4 +10,3 @@ global.console = {
 
 // Mock services
 jest.mock('@core/services/mail-client.class')
-RedisService.init()

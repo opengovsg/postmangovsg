@@ -164,12 +164,11 @@ const getChannelSpecificCredentials = async (
     }
     return res.json(result)
   } catch (e) {
-    const errAsError = e as Error
     logger.error({
-      message: `${errAsError.stack}`,
+      message: `${e.stack}`,
       action: 'getChannelSpecificCredentials',
     })
-    return res.status(400).json({ message: `${errAsError.message}` })
+    return res.status(400).json({ message: `${e.message}` })
   }
 }
 

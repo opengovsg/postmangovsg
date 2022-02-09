@@ -1,7 +1,3 @@
-require('module-alias/register')
-import { RedisService } from '@core/services'
-
-module.exports = async function (): Promise<void> {
+module.exports = async function () {
   await global.sequelize.close()
-  await RedisService.shutdown()
 }

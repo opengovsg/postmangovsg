@@ -20,5 +20,4 @@ module.exports = {
   globalTeardown: '<rootDir>/src/test-utils/global-teardown.ts',
   setupFiles: ['<rootDir>/src/test-utils/test-env.ts'],
   setupFilesAfterEnv: ['<rootDir>/src/test-utils/setup.ts'],
-  testTimeout: 10000,
 }

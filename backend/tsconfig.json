@@ -9,9 +9,7 @@
     "./src/server.ts"
   ],
   "references": [
-    {
-      "path": "../shared/tsconfig.build.json"
-    }
+    { "path": "../shared/tsconfig.build.json" }
   ],
   "compileOnSave": true,
   "compilerOptions": {
@@ -37,33 +35,17 @@
     "moduleResolution": "node",
     "baseUrl": "./src",
     "paths": {
-      "@core/*": [
-        "core/*"
-      ],
-      "@sms/*": [
-        "sms/*"
-      ],
-      "@email/*": [
-        "email/*"
-      ],
-      "@telegram/*": [
-        "telegram/*"
-      ],
-      "@shared/*": [
-        "../../shared/src/*"
-      ],
-      "@test-utils/*": [
-        "test-utils/*"
-      ],
-      "@database/*": [
-        "database/*"
-      ],
-      "@mocks/*": [
-        "__mocks__/*"
-      ],
+      "@core/*": ["core/*"],
+      "@sms/*": ["sms/*"],
+      "@email/*": ["email/*"],
+      "@telegram/*": ["telegram/*"],
+      "@shared/*": ["../../shared/src/*"],
+      "@test-utils/*": ["test-utils/*"],
+      "@database/*": ["database/*"],
+      "@mocks/*": ["__mocks__/*"],
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
   }
 }

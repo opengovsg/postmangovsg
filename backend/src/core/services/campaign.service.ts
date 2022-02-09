@@ -56,7 +56,7 @@ const createDemoCampaign = async ({
         valid: false,
         protect,
         demoMessageLimit,
-      } as Campaign,
+      },
       { transaction }
     )
     await userDemo?.decrement(numDemosColumn, { transaction })
@@ -104,7 +104,7 @@ const createCampaign = async ({
         userId,
         valid: false,
         protect,
-      } as Campaign,
+      },
       { transaction }
     )
   }
@@ -271,7 +271,7 @@ const getCampaignDetails = async (
     ],
   })
 
-  return campaignDetails?.get({ plain: true }) as unknown as CampaignDetails
+  return campaignDetails?.get({ plain: true }) as CampaignDetails
 }
 
 /**

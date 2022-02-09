@@ -117,16 +117,15 @@ export class TemplateClient {
         tokens,
       }
     } catch (err) {
-      const errAsError = err as Error
-      console.error({ message: `${errAsError.stack}` })
-      if (errAsError.message.includes('Unclosed tag'))
+      console.error({ message: `${err.stack}` })
+      if (err.message.includes('Unclosed tag'))
         throw new TemplateError(
           'Check that all the keywords have double curly brackets around them.\nA correct example is {{ keyword }}, and incorrect ones are {{ keyword } or {{ keyword . '
         )
       // reserved chars in mustache are '^' and '#' and '/'
       if (
-        errAsError.message.includes('Unclosed section') ||
-        errAsError.message.includes('Unopened section')
+        err.message.includes('Unclosed section') ||
+        err.message.includes('Unopened section')
       )
         throw new TemplateError(
           "Check that the keywords only contain letters, numbers and underscore.\nKeywords like {{ Person's Name }} are not allowed, but {{ Person_Name }} is allowed."

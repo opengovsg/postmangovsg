@@ -3,13 +3,13 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Campaign, User, Credential } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
+import { RedisService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
 import { formatDefaultCredentialName } from '@core/utils'
 import { TelegramMessage } from '@telegram/models'
 import { ChannelType } from '@core/constants'
 import { mockSecretsManager } from '@mocks/aws-sdk'
 import { mockTelegram, Telegram } from '@mocks/telegraf'
-import { CreationAttributes } from 'sequelize/dist'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
@@ -20,26 +20,19 @@ const createCampaign = async ({
   isDemo,
 }: {
   isDemo: boolean
-}): Promise<Campaign> => {
-  const campaign = {
+}): Promise<Campaign> =>
+  await Campaign.create({
     name: 'test-campaign',
     userId: 1,
     type: ChannelType.Telegram,
     protect: false,
     valid: false,
-  } as Campaign
-  if (isDemo) {
-    campaign.demoMessageLimit = 20
-  }
-  return Campaign.create(campaign as CreationAttributes<Campaign>)
-}
+    demoMessageLimit: isDemo ? 20 : null,
+  })
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({
-    id: 1,
-    email: 'user@agency.gov.sg',
-  } as CreationAttributes<User>)
+  await User.create({ id: 1, email: 'user@agency.gov.sg' })
   const campaign = await createCampaign({ isDemo: false })
   campaignId = campaign.id
 })
@@ -50,6 +43,7 @@ afterAll(async () => {
   await Credential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
+  await RedisService.shutdown()
 })
 
 describe('POST /campaign/{campaignId}/telegram/credentials', () => {
@@ -246,7 +240,7 @@ describe('PUT /campaign/{campaignId}/telegram/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    } as CreationAttributes<TelegramMessage>)
+    })
     const res = await request(app)
       .put(`/campaign/${campaignId}/telegram/template`)
       .send({

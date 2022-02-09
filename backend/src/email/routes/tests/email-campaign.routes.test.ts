@@ -4,10 +4,10 @@ import initialiseServer from '@test-utils/server'
 import config from '@core/config'
 import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
+import { RedisService } from '@core/services'
 import { EmailFromAddress, EmailMessage } from '@email/models'
 import { CustomDomainService } from '@email/services'
 import { ChannelType } from '@core/constants'
-import { CreationAttributes } from 'sequelize/dist'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
@@ -16,17 +16,14 @@ let protectedCampaignId: number
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({
-    id: 1,
-    email: 'user@agency.gov.sg',
-  } as CreationAttributes<User>)
+  await User.create({ id: 1, email: 'user@agency.gov.sg' })
   const campaign = await Campaign.create({
     name: 'campaign-1',
     userId: 1,
     type: ChannelType.Email,
     valid: false,
     protect: false,
-  } as CreationAttributes<Campaign>)
+  })
   campaignId = campaign.id
   const protectedCampaign = await Campaign.create({
     name: 'campaign-2',
@@ -34,7 +31,7 @@ beforeAll(async () => {
     type: ChannelType.Email,
     valid: false,
     protect: true,
-  } as CreationAttributes<Campaign>)
+  })
   protectedCampaignId = protectedCampaign.id
 })
 
@@ -43,6 +40,7 @@ afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
+  await RedisService.shutdown()
 })
 
 describe('PUT /campaign/{campaignId}/email/template', () => {
@@ -155,7 +153,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     await EmailFromAddress.create({
       email: 'user@agency.gov.sg',
       name: 'Agency ABC',
-    } as CreationAttributes<EmailFromAddress>)
+    })
     const mockVerifyFromAddress = jest
       .spyOn(CustomDomainService, 'verifyFromAddress')
       .mockReturnValue(Promise.resolve())
@@ -207,7 +205,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     await EmailFromAddress.create({
       email: 'user@agency.gov.sg',
       name: 'Agency ABC',
-    } as CreationAttributes<EmailFromAddress>)
+    })
     const mockVerifyFromAddress = jest
       .spyOn(CustomDomainService, 'verifyFromAddress')
       .mockReturnValue(Promise.resolve())
@@ -360,7 +358,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    } as CreationAttributes<EmailMessage>)
+    })
     const testBody = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({

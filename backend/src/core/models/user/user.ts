@@ -20,7 +20,6 @@ import { CreateOptions } from 'sequelize/types'
 import { Domain } from '../domain'
 import { Agency } from '../agency'
 import { loggerWithLabel } from '@core/logger'
-import { CreationAttributes } from 'sequelize/dist'
 
 const logger = loggerWithLabel(module)
 
@@ -121,7 +120,7 @@ export class User extends Model<User> {
         {
           domain: emailDomain,
           agencyId: defaultAgency.id,
-        } as CreationAttributes<Domain>,
+        },
         { transaction: options.transaction }
       )
     }

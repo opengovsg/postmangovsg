@@ -3,20 +3,17 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Credential, UserCredential, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
+import { RedisService } from '@core/services'
 import { ChannelType } from '@core/constants'
 import { mockSecretsManager } from '@mocks/aws-sdk'
 import { SmsService } from '@sms/services'
-import { CreationAttributes } from 'sequelize/dist'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({
-    id: 1,
-    email: 'user@agency.gov.sg',
-  } as CreationAttributes<User>)
+  await User.create({ id: 1, email: 'user@agency.gov.sg' })
 })
 
 afterAll(async () => {
@@ -24,6 +21,7 @@ afterAll(async () => {
   await Credential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
+  await RedisService.shutdown()
 })
 
 describe('POST /settings/sms/credentials', () => {

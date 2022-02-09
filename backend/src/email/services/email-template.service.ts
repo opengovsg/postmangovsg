@@ -14,7 +14,6 @@ import {
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
-import { CreationAttributes } from 'sequelize/dist'
 
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
@@ -40,23 +39,24 @@ const upsertEmailTemplate = async ({
       })) !== null
     ) {
       // .update is actually a bulkUpdate
-      const updatedTemplate: [number, EmailTemplate[]] =
-        await EmailTemplate.update(
-          {
-            subject,
-            body,
-            // ternary to fix type mismatch between <string | null> and <string | undefined>
-            replyTo: replyTo ? replyTo : undefined,
-            from,
-            showLogo,
-          },
-          {
-            where: { campaignId },
-            individualHooks: true, // required so that BeforeUpdate hook runs
-            returning: true,
-            transaction,
-          }
-        )
+      const updatedTemplate: [
+        number,
+        EmailTemplate[]
+      ] = await EmailTemplate.update(
+        {
+          subject,
+          body,
+          replyTo,
+          from,
+          showLogo,
+        },
+        {
+          where: { campaignId },
+          individualHooks: true, // required so that BeforeUpdate hook runs
+          returning: true,
+          transaction,
+        }
+      )
 
       transaction?.commit()
       return updatedTemplate[1][0]
@@ -67,11 +67,10 @@ const upsertEmailTemplate = async ({
         campaignId,
         body,
         subject,
-        // ternary to fix type mismatch between <string | null> and <string | undefined>
-        replyTo: replyTo ? replyTo : undefined,
+        replyTo,
         from,
         showLogo,
-      } as CreationAttributes<EmailTemplate>,
+      },
       {
         transaction,
       }
@@ -183,8 +182,10 @@ const storeTemplate = async ({
   }
 
   // Append via to sender name if it is not the default from name
-  const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
-    parseFromAddress(config.get('mailFrom'))
+  const {
+    fromName: defaultFromName,
+    fromAddress: defaultFromAddress,
+  } = parseFromAddress(config.get('mailFrom'))
   const { fromName, fromAddress } = parseFromAddress(from)
 
   let expectedFromName: string | null

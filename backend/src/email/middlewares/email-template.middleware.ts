@@ -52,16 +52,19 @@ const storeTemplate = async (
   } = req.body
   const logMeta = { campaignId, action: 'storeTemplate' }
   try {
-    const { check, valid, updatedTemplate }: StoreTemplateOutput =
-      await EmailTemplateService.storeTemplate({
-        campaignId: +campaignId,
-        subject,
-        body,
-        replyTo:
-          replyTo || (await AuthService.findUser(req.session?.user?.id))?.email,
-        from,
-        showLogo,
-      })
+    const {
+      check,
+      valid,
+      updatedTemplate,
+    }: StoreTemplateOutput = await EmailTemplateService.storeTemplate({
+      campaignId: +campaignId,
+      subject,
+      body,
+      replyTo:
+        replyTo || (await AuthService.findUser(req.session?.user?.id))?.email,
+      from,
+      showLogo,
+    })
 
     const template = {
       body: updatedTemplate?.body,
@@ -178,7 +181,6 @@ const uploadCompleteHandler = async (
         })
       }, RETRY_CONFIG)
     } catch (err) {
-      const errAsError = err as Error
       // Do not return any response since it has already been sent
       logger.error({
         message: 'Error storing messages for campaign',
@@ -188,13 +190,13 @@ const uploadCompleteHandler = async (
       })
 
       // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
-      if ((err as any).code === 'PreconditionFailed') {
-        errAsError.message =
+      if (err.code === 'PreconditionFailed') {
+        err.message =
           'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
       }
 
       // Store error to return on poll
-      UploadService.storeS3Error(+campaignId, errAsError.message)
+      UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     logger.error({
@@ -209,7 +211,7 @@ const uploadCompleteHandler = async (
       InvalidRecipientError,
     ]
     if (userErrors.some((errType) => err instanceof errType)) {
-      return res.status(400).json({ message: (err as Error).message })
+      return res.status(400).json({ message: err.message })
     }
     return next(err)
   }
@@ -225,8 +227,12 @@ const pollCsvStatusHandler = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const { isCsvProcessing, filename, tempFilename, error } =
-      await UploadService.getCsvStatus(+campaignId)
+    const {
+      isCsvProcessing,
+      filename,
+      tempFilename,
+      error,
+    } = await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
     let numRecipients, preview, themedBody
@@ -361,7 +367,6 @@ const uploadProtectedCompleteHandler = async (
         })
       }, RETRY_CONFIG)
     } catch (err) {
-      const errAsError = err as Error
       // Do not return any response since it has already been sent
       logger.error({
         message: 'Error storing messages for campaign',
@@ -371,13 +376,13 @@ const uploadProtectedCompleteHandler = async (
       })
 
       // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
-      if ((err as any).code === 'PreconditionFailed') {
-        errAsError.message =
+      if (err.code === 'PreconditionFailed') {
+        err.message =
           'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
       }
 
       // Store error to return on poll
-      UploadService.storeS3Error(+campaignId, errAsError.message)
+      UploadService.storeS3Error(+campaignId, err.message)
     }
   } catch (err) {
     logger.error({
@@ -393,7 +398,7 @@ const uploadProtectedCompleteHandler = async (
     ]
 
     if (userErrors.some((errType) => err instanceof errType)) {
-      return res.status(400).json({ message: (err as Error).message })
+      return res.status(400).json({ message: err.message })
     }
     return next(err)
   }

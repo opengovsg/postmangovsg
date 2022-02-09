@@ -48,8 +48,8 @@
     "rate-limit-redis": "^2.1.0",
     "redis": "^3.1.2",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.14.1",
-    "sequelize-typescript": "^2.1.2",
+    "sequelize": "^5.22.4",
+    "sequelize-typescript": "^1.1.0",
     "source-map-support": "^0.5.19",
     "starkbank-ecdsa": "^1.1.2",
     "swagger-jsdoc": "^5.0.1",
@@ -83,7 +83,7 @@
     "@types/nodemailer": "^6.4.0",
     "@types/papaparse": "^5.2.5",
     "@types/qs": "^6.9.4",
-    "@types/rate-limit-redis": "^1.7.4",
+    "@types/rate-limit-redis": "^1.7.1",
     "@types/redis": "^2.8.17",
     "@types/supertest": "^2.0.10",
     "@types/swagger-jsdoc": "^3.0.2",
@@ -106,7 +106,7 @@
     "supertest": "^6.0.1",
     "ts-jest": "^25.5.1",
     "tsc-watch": "^4.2.3",
-    "typescript": "^4.5.5",
+    "typescript": "^3.8.3",
     "umzug": "^2.3.0"
   },
   "_moduleAliases": {
