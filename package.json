@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "concurrently -k -p \"[{name}]\" -n \"Backend,Frontend\" -c \"green.bold,yellow.bold\" \"npm run test:backend\" \"npm run test:frontend\"",
+    "test:frontend": "cd frontend && npm run test",
+    "test:backend": "cd backend && npm run test",
     "build": "npm run build:shared && npm run build:backend && npm run build:worker && npm run build:frontend",
     "build:shared": "cd shared && npm run build",
     "build:frontend": "cd frontend && npm run build",
