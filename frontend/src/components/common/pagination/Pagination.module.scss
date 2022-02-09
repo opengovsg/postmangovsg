@@ -16,11 +16,11 @@
 }
 
 .navIcon:first-child {
-  margin-right: $spacing-5 - ($spacing-2 / 2);
+  margin-right: $spacing-5 - calc(($spacing-2 / 2));
 }
 
 .navIcon:last-child {
-  margin-left: $spacing-5 - ($spacing-2 / 2);
+  margin-left: $spacing-5 - calc(($spacing-2 / 2));
 }
 
 .navIconDisabled span {
@@ -37,8 +37,8 @@
 
   width: 2rem;
   height: 2rem;
-  margin-right: $spacing-2 / 2;
-  margin-left: $spacing-2 / 2;
+  margin-right: calc($spacing-2 / 2);
+  margin-left: calc($spacing-2 / 2);
   justify-content: center;
   cursor: pointer;
 
