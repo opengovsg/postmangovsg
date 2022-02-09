@@ -1,6 +1,6 @@
 {
   "name": "postmangovsg",
-  "version": "1.29.5",
+  "version": "1.30.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -49,9 +49,8 @@
     "url": "https://github.com/datagovsg/postmangovsg/issues"
   },
   "homepage": "https://github.com/datagovsg/postmangovsg#readme",
-  "dependencies": {},
   "devDependencies": {
-    "concurrently": "^5.1.0",
+    "concurrently": "^7.0.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
