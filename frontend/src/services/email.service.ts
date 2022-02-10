@@ -64,13 +64,8 @@ export async function getPreviewMessage(
 ): Promise<EmailPreview> {
   try {
     const response = await axios.get(`/campaign/${campaignId}/email/preview`)
-    const {
-      body,
-      themed_body: themedBody,
-      subject,
-      reply_to: replyTo,
-      from,
-    } = response.data?.preview
+    const { body, themed_body: themedBody, subject, reply_to: replyTo, from } =
+      response.data?.preview || {}
     return { body, themedBody, subject, replyTo, from }
   } catch (e) {
     errorHandler(e, 'Unable to get preview message')

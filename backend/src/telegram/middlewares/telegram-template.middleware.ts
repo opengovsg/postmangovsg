@@ -40,14 +40,11 @@ const storeTemplate = async (
   const { body } = req.body
   const logMeta = { campaignId, action: 'storeTemplate' }
   try {
-    const {
-      check,
-      valid,
-      updatedTemplate,
-    } = await TelegramTemplateService.storeTemplate({
-      campaignId: +campaignId,
-      body,
-    })
+    const { check, valid, updatedTemplate } =
+      await TelegramTemplateService.storeTemplate({
+        campaignId: +campaignId,
+        body,
+      })
 
     if (check?.reupload) {
       logger.info({
@@ -203,12 +200,8 @@ const pollCsvStatusHandler = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const {
-      isCsvProcessing,
-      filename,
-      tempFilename,
-      error,
-    } = await UploadService.getCsvStatus(+campaignId)
+    const { isCsvProcessing, filename, tempFilename, error } =
+      await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
     let numRecipients, preview

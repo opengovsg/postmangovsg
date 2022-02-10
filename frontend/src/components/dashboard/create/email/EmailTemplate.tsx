@@ -1,5 +1,6 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
+import { parseFromAddress } from '@shared/utils/from-address'
 import {
   useState,
   useEffect,
@@ -15,7 +16,6 @@ import { useParams } from 'react-router-dom'
 
 import styles from './EmailTemplate.module.scss'
 
-import { parseFromAddress } from '@shared/utils/from-address'
 import { EmailCampaign, EmailProgress } from 'classes'
 import {
   TextArea,

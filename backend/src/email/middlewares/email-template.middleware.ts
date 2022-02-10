@@ -52,19 +52,16 @@ const storeTemplate = async (
   } = req.body
   const logMeta = { campaignId, action: 'storeTemplate' }
   try {
-    const {
-      check,
-      valid,
-      updatedTemplate,
-    }: StoreTemplateOutput = await EmailTemplateService.storeTemplate({
-      campaignId: +campaignId,
-      subject,
-      body,
-      replyTo:
-        replyTo || (await AuthService.findUser(req.session?.user?.id))?.email,
-      from,
-      showLogo,
-    })
+    const { check, valid, updatedTemplate }: StoreTemplateOutput =
+      await EmailTemplateService.storeTemplate({
+        campaignId: +campaignId,
+        subject,
+        body,
+        replyTo:
+          replyTo || (await AuthService.findUser(req.session?.user?.id))?.email,
+        from,
+        showLogo,
+      })
 
     const template = {
       body: updatedTemplate?.body,
@@ -227,12 +224,8 @@ const pollCsvStatusHandler = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const {
-      isCsvProcessing,
-      filename,
-      tempFilename,
-      error,
-    } = await UploadService.getCsvStatus(+campaignId)
+    const { isCsvProcessing, filename, tempFilename, error } =
+      await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
     let numRecipients, preview, themedBody

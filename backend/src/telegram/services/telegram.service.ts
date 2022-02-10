@@ -22,6 +22,7 @@ import {
 } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 import { TelegramDuplicateCampaignDetails } from '@telegram/interfaces'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -55,7 +56,10 @@ const getHydratedMessage = async (
   if (params === null || template === null) return null
 
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
-  const body = TelegramTemplateService.client.template(template?.body!, params)
+  const body = TelegramTemplateService.client.template(
+    template?.body as string,
+    params
+  )
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
   return { body }
 }
@@ -253,9 +257,8 @@ const uploadCompleteOnChunk = ({
 
     // Append default country code as telegram handler stores number with the country
     // code by default.
-    const formattedRecords = TelegramTemplateService.validateAndFormatNumber(
-      records
-    )
+    const formattedRecords =
+      TelegramTemplateService.validateAndFormatNumber(records)
     // START populate template
     await TelegramMessage.bulkCreate(formattedRecords, {
       transaction,

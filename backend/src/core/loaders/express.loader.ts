@@ -28,7 +28,7 @@ const origin = (v: string): string | RegExp => {
 
 morgan.token('client-ip', clientIp)
 morgan.token('user-id', userId)
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
   stream: getStream(),

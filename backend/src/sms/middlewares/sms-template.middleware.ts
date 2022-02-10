@@ -40,14 +40,11 @@ const storeTemplate = async (
   const logMeta = { campaignId, action: 'storeTemplate' }
   try {
     // extract params from template, save to db (this will be done with hook)
-    const {
-      check,
-      valid,
-      updatedTemplate,
-    }: StoreTemplateOutput = await SmsTemplateService.storeTemplate({
-      campaignId: +campaignId,
-      body,
-    })
+    const { check, valid, updatedTemplate }: StoreTemplateOutput =
+      await SmsTemplateService.storeTemplate({
+        campaignId: +campaignId,
+        body,
+      })
 
     if (check?.reupload) {
       logger.info({
@@ -214,12 +211,8 @@ const pollCsvStatusHandler = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const {
-      isCsvProcessing,
-      filename,
-      tempFilename,
-      error,
-    } = await UploadService.getCsvStatus(+campaignId)
+    const { isCsvProcessing, filename, tempFilename, error } =
+      await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
     let numRecipients, preview
