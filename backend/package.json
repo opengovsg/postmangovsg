@@ -12,7 +12,7 @@
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
     "pretest": "tsc --build",
-    "test": "jest --maxWorkers=2",
+    "test": "jest --runInBand --detectOpenHandles",
     "precommit": "lint-staged"
   },
   "author": "",

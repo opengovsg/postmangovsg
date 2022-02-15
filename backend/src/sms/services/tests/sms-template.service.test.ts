@@ -4,7 +4,7 @@ import sequelizeLoader from '@test-utils/sequelize-loader'
 import S3Client from '@core/services/s3-client.class'
 import { ChannelType } from '@core/constants'
 import { Campaign, User } from '@core/models'
-import { RedisService, UploadService } from '@core/services'
+import { UploadService } from '@core/services'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
@@ -45,8 +45,6 @@ afterAll(async () => {
 
   await UploadService.destroyUploadQueue()
 
-  await new Promise((resolve) => RedisService.otpClient.quit(resolve))
-  await new Promise((resolve) => RedisService.sessionClient.quit(resolve))
   await new Promise((resolve) => setImmediate(resolve))
 })
 

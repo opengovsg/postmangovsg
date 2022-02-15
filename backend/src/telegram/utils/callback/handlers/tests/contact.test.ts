@@ -1,7 +1,6 @@
 import { Sequelize } from 'sequelize-typescript'
 import { TelegrafContext } from 'telegraf/typings/context'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { BotSubscriber, TelegramSubscriber } from '@telegram/models'
 import { contactMessageHandler } from '../contact'
 
@@ -12,7 +11,6 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  await RedisService.shutdown()
 })
 
 describe('contactMessageHandler', () => {

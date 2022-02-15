@@ -3,7 +3,6 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { User, Credential, UserCredential } from '@core/models'
 import { ChannelType } from '@core/constants'
-import { RedisService } from '@core/services'
 import { RateLimitError, InvalidRecipientError } from '@core/errors'
 import { TemplateError } from '@shared/templating'
 import { SmsService } from '@sms/services'
@@ -55,7 +54,7 @@ afterAll(async () => {
   await UserCredential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  await RedisService.shutdown()
+  await (app as any).cleanup()
 })
 
 describe('POST /transactional/sms/send', () => {
