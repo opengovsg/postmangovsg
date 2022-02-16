@@ -2,7 +2,7 @@ name: Deploy worker to AWS Elastic Container Service
 on:
   push:
     branches: # There should be 2 environments in github actions secrets: staging, production. This is different from the DEPLOY_ENV secret which corresponds to elastic beanstalk environment name
-      - develop
+      - staging
       - master
       - github-actions-test
 
