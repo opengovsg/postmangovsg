@@ -1,5 +1,4 @@
 import { i18n } from '@lingui/core'
-import { TemplateClient, TemplateError } from '@shared/templating'
 
 import { TemplateClient, TemplateError } from '@shared/templating'
 import { keys, difference, uniq } from 'lodash'
