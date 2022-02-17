@@ -2,7 +2,7 @@ name: Lint root
 on:
   push:
     branches:
-      - develop
+      - staging
       - master
       - github-actions-test
 jobs:
