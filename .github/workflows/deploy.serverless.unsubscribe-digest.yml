@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - master
-      - develop
+      - staging
       - github-actions-test
 
 env:

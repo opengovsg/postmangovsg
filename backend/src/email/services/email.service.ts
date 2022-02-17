@@ -19,6 +19,7 @@ import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
 
 import { ThemeClient } from '@shared/theme'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -62,10 +63,13 @@ const getHydratedMessage = async (
 
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
   const subject = EmailTemplateService.client.template(
-    template?.subject!,
+    template?.subject as string,
     params
   )
-  const body = EmailTemplateService.client.template(template?.body!, params)
+  const body = EmailTemplateService.client.template(
+    template?.body as string,
+    params
+  )
 
   // Get agency details (if exists) from campaign user
   const campaign = await Campaign.findOne({
@@ -95,7 +99,7 @@ const getHydratedMessage = async (
     body,
     subject,
     replyTo: template.replyTo || null,
-    from: template?.from!,
+    from: template?.from as string,
     agencyName,
     agencyLogoURI,
     showMasthead,

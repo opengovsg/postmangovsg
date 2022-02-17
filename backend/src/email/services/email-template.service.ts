@@ -39,24 +39,22 @@ const upsertEmailTemplate = async ({
       })) !== null
     ) {
       // .update is actually a bulkUpdate
-      const updatedTemplate: [
-        number,
-        EmailTemplate[]
-      ] = await EmailTemplate.update(
-        {
-          subject,
-          body,
-          replyTo,
-          from,
-          showLogo,
-        },
-        {
-          where: { campaignId },
-          individualHooks: true, // required so that BeforeUpdate hook runs
-          returning: true,
-          transaction,
-        }
-      )
+      const updatedTemplate: [number, EmailTemplate[]] =
+        await EmailTemplate.update(
+          {
+            subject,
+            body,
+            replyTo,
+            from,
+            showLogo,
+          },
+          {
+            where: { campaignId },
+            individualHooks: true, // required so that BeforeUpdate hook runs
+            returning: true,
+            transaction,
+          }
+        )
 
       transaction?.commit()
       return updatedTemplate[1][0]
@@ -182,10 +180,8 @@ const storeTemplate = async ({
   }
 
   // Append via to sender name if it is not the default from name
-  const {
-    fromName: defaultFromName,
-    fromAddress: defaultFromAddress,
-  } = parseFromAddress(config.get('mailFrom'))
+  const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
+    parseFromAddress(config.get('mailFrom'))
   const { fromName, fromAddress } = parseFromAddress(from)
 
   let expectedFromName: string | null

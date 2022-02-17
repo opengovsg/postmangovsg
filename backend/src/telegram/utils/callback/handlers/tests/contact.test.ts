@@ -74,9 +74,7 @@ describe('contactMessageHandler', () => {
     })
     expect(botSubscriber).not.toBeNull()
 
-    expect(
-      ctx.reply
-    ).toBeCalledWith(
+    expect(ctx.reply).toBeCalledWith(
       'You are now subscribed. Your phone number and Telegram ID have been updated.',
       { reply_markup: { remove_keyboard: true } }
     )
@@ -99,9 +97,7 @@ describe('contactMessageHandler', () => {
     })
     expect(botSubscriber).not.toBeNull()
 
-    expect(
-      ctx.reply
-    ).toBeCalledWith(
+    expect(ctx.reply).toBeCalledWith(
       'You were already subscribed. Your phone number and Telegram ID have been updated.',
       { reply_markup: { remove_keyboard: true } }
     )
@@ -124,9 +120,7 @@ describe('contactMessageHandler', () => {
     })
     expect(botSubscriber).not.toBeNull()
 
-    expect(
-      ctx.reply
-    ).toBeCalledWith(
+    expect(ctx.reply).toBeCalledWith(
       'You were already subscribed. Your phone number and Telegram ID have been updated.',
       { reply_markup: { remove_keyboard: true } }
     )

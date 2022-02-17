@@ -17,6 +17,7 @@ import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
 
 import TwilioClient from './twilio-client.class'
 import SnsSmsClient from './sns-sms-client.class'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -50,7 +51,10 @@ const getHydratedMessage = async (
   if (params === null || template === null) return null
 
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
-  const body = SmsTemplateService.client.template(template?.body!, params)
+  const body = SmsTemplateService.client.template(
+    template?.body as string,
+    params
+  )
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
   return { body }
 }
