@@ -4,10 +4,20 @@ const {
   aliasDangerous,
   configPaths,
 } = require('react-app-rewire-alias/lib/aliasDangerous')
+const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
 
 const aliasMap = configPaths('./tsconfig.paths.json')
 
 module.exports = (config) => {
+  config.resolve.plugins = config.resolve.plugins.filter(
+    (plugin) => !(plugin instanceof ModuleScopePlugin)
+  )
+  config.resolve.fallback = {
+    stream: require.resolve('stream'),
+    querystring: require.resolve('querystring'),
+    url: require.resolve('url'),
+    util: require.resolve('util'),
+  }
   const modified = aliasDangerous(aliasMap)(config)
   return modified
 }

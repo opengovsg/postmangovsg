@@ -10,8 +10,8 @@ import styles from './Login.module.scss'
 
 import LoginInput from './login-input'
 
+import companyLogo from '!file-loader!assets/img/brand/company-logo-dark.svg'
 import appLogo from 'assets/img/brand/app-logo.svg'
-import companyLogo from 'assets/img/brand/company-logo-dark.svg'
 import loginImg from 'assets/img/landing/login.svg'
 import { InfoBanner } from 'components/common'
 import { LINKS, INFO_BANNER } from 'config'
