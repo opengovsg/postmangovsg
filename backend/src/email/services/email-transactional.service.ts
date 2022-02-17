@@ -25,9 +25,8 @@ async function sendMessage({
   recipient: string
   replyTo?: string
 }): Promise<void> {
-  const sanitizedSubject = EmailTemplateService.client.replaceNewLinesAndSanitize(
-    subject
-  )
+  const sanitizedSubject =
+    EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
   const sanitizedBody = EmailTemplateService.client.filterXSS(body)
   if (!sanitizedSubject || !sanitizedBody) {
     throw new TemplateError(

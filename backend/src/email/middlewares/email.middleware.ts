@@ -174,10 +174,8 @@ const isFromAddressAccepted = async (
     (await AuthService.findUser(req.session?.user?.id))?.email
 
   // Get default mail address for comparison
-  const {
-    fromName: defaultFromName,
-    fromAddress: defaultFromAddress,
-  } = parseFromAddress(config.get('mailFrom'))
+  const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
+    parseFromAddress(config.get('mailFrom'))
 
   if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
     logger.error({

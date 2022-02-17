@@ -13,6 +13,7 @@ import {
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 const client = new TemplateClient({
   xssOptions: XSS_TELEGRAM_OPTION,
   lineBreak: '\n',
@@ -35,18 +36,16 @@ const upsertTelegramTemplate = async ({
     if (
       (await TelegramTemplate.findByPk(campaignId, { transaction })) !== null
     ) {
-      const updatedTemplate: [
-        number,
-        TelegramTemplate[]
-      ] = await TelegramTemplate.update(
-        { body },
-        {
-          where: { campaignId },
-          individualHooks: true, // required so that BeforeUpdate hook runs
-          returning: true,
-          transaction,
-        }
-      )
+      const updatedTemplate: [number, TelegramTemplate[]] =
+        await TelegramTemplate.update(
+          { body },
+          {
+            where: { campaignId },
+            individualHooks: true, // required so that BeforeUpdate hook runs
+            returning: true,
+            transaction,
+          }
+        )
 
       transaction?.commit()
       return updatedTemplate[1][0]

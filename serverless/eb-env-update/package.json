@@ -17,13 +17,7 @@
   },
   "devDependencies": {
     "@types/convict": "^5.2.1",
-    "@typescript-eslint/eslint-plugin": "^3.7.0",
-    "@typescript-eslint/parser": "^3.7.0",
     "aws-sdk": "^2.884.0",
-    "eslint": "^7.5.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^2.0.5",
     "typescript": "^3.9.7"
   }
 }

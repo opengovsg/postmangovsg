@@ -6,6 +6,10 @@ import { ProtectedMessage, Campaign } from '@core/models'
 import config from '@core/config'
 import { CSVParams } from '@core/types'
 import { loggerWithLabel } from '@core/logger'
+import {
+  MessageBulkInsertInterface,
+  ProtectedMessageRecordInterface,
+} from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 const PROTECTED_URL = config.get('protectedUrl')

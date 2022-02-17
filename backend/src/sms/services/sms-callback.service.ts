@@ -28,10 +28,8 @@ const isAuthenticated = (
 
 const parseEvent = async (req: Request): Promise<void> => {
   const { messageId, campaignId } = req.params
-  const {
-    MessageStatus: twilioMessageStatus,
-    ErrorCode: twilioErrorCode,
-  } = req.body
+  const { MessageStatus: twilioMessageStatus, ErrorCode: twilioErrorCode } =
+    req.body
   // Do not process message if it's not of a finalized delivery status
   if (FINALIZED_STATUS.indexOf(twilioMessageStatus as string) === -1) {
     return

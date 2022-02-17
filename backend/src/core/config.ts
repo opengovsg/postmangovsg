@@ -60,8 +60,7 @@ const config = convict({
       env: 'AWS_REGION',
     },
     awsEndpoint: {
-      doc:
-        'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      doc: 'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
       format: '*',
       default: null,
       env: 'AWS_ENDPOINT',
@@ -77,8 +76,7 @@ const config = convict({
       env: 'FILE_STORAGE_BUCKET_NAME',
     },
     secretManagerSalt: {
-      doc:
-        'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
+      doc: 'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
       default: '',
       env: 'SECRET_MANAGER_SALT',
       format: 'required-string',
@@ -130,8 +128,7 @@ const config = convict({
         format: 'int',
       },
       acquire: {
-        doc:
-          'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
+        doc: 'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
         default: 600000,
         env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
         format: 'int',
@@ -144,8 +141,7 @@ const config = convict({
     },
   },
   jwtSecret: {
-    doc:
-      'Secret used to sign pre-signed urls for uploading CSV files to AWS S3',
+    doc: 'Secret used to sign pre-signed urls for uploading CSV files to AWS S3',
     default: '',
     env: 'JWT_SECRET',
     format: 'required-string',
@@ -187,8 +183,7 @@ const config = convict({
     },
     cookieSettings: {
       httpOnly: {
-        doc:
-          'Specifies the boolean value for the HttpOnly Set-Cookie attribute.',
+        doc: 'Specifies the boolean value for the HttpOnly Set-Cookie attribute.',
         default: true,
         env: 'COOKIE_HTTP_ONLY',
       },
@@ -198,15 +193,13 @@ const config = convict({
         env: 'COOKIE_SECURE',
       },
       maxAge: {
-        doc:
-          'Specifies the number (in milliseconds) to use when calculating the Expires Set-Cookie attribute',
+        doc: 'Specifies the number (in milliseconds) to use when calculating the Expires Set-Cookie attribute',
         default: 24 * 60 * 60 * 1000,
         env: 'COOKIE_MAX_AGE',
         format: 'int',
       },
       sameSite: {
-        doc:
-          'true will set the SameSite attribute to Strict for strict same site enforcement.',
+        doc: 'true will set the SameSite attribute to Strict for strict same site enforcement.',
         default: true,
         env: 'COOKIE_SAME_SITE',
       },
@@ -224,8 +217,7 @@ const config = convict({
   },
   otp: {
     retries: {
-      doc:
-        'Number of attempts a user can enter otp before a new otp is required',
+      doc: 'Number of attempts a user can enter otp before a new otp is required',
       default: 4,
       env: 'OTP_RETRIES',
     },
@@ -316,8 +308,7 @@ const config = convict({
   },
   transactionalEmail: {
     rate: {
-      doc:
-        'The max number of transactional emails that can be requested per window per user',
+      doc: 'The max number of transactional emails that can be requested per window per user',
       default: 10,
       env: 'TRANSACTIONAL_EMAIL_RATE',
       format: 'int',
@@ -375,8 +366,7 @@ const config = convict({
     env: 'DOMAIN_WHITELIST',
   },
   csvProcessingTimeout: {
-    doc:
-      'Max duration for csv processing before timeout. Prevent campaigns from being stuck in csv processing state if server dies.',
+    doc: 'Max duration for csv processing before timeout. Prevent campaigns from being stuck in csv processing state if server dies.',
     default: 10 * 60 * 1000, // 10 minutes
     env: 'CSV_PROCESSING_TIMEOUT_IN_MS',
     format: 'int',
@@ -411,15 +401,13 @@ const config = convict({
   },
   emailCallback: {
     minHaltNumber: {
-      doc:
-        'Halt if there is this minimum number of invalid recipients, and it exceeds the percentage threshold',
+      doc: 'Halt if there is this minimum number of invalid recipients, and it exceeds the percentage threshold',
       default: 10,
       env: 'MIN_HALT_NUMBER',
       format: 'int',
     },
     minHaltPercentage: {
-      doc:
-        'Halt if the percentage of invalid recipients exceeds this threshold. Supply a float from 0 to 1',
+      doc: 'Halt if the percentage of invalid recipients exceeds this threshold. Supply a float from 0 to 1',
       default: 0.1,
       env: 'MIN_HALT_PERCENTAGE',
       format: 'float-percent',
@@ -438,8 +426,7 @@ const config = convict({
   },
   smsCallback: {
     callbackSecret: {
-      doc:
-        'Secret used to generate the basic auth credentials for twilio callback',
+      doc: 'Secret used to generate the basic auth credentials for twilio callback',
       default: '',
       env: 'TWILIO_CALLBACK_SECRET',
       format: 'required-string',
@@ -490,8 +477,7 @@ const config = convict({
   },
   emailFallback: {
     activate: {
-      doc:
-        'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
+      doc: 'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
       default: false,
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
@@ -504,8 +490,7 @@ const config = convict({
     },
   },
   showMastheadDomain: {
-    doc:
-      'Show masthead within email template if logged-in user has email ending with this domain',
+    doc: 'Show masthead within email template if logged-in user has email ending with this domain',
     default: '.gov.sg',
     env: 'SHOW_MASTHEAD_DOMAIN',
   },
