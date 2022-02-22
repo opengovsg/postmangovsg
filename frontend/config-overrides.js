@@ -1,5 +1,4 @@
 /* eslint-disable */
-const fs = require('fs')
 const {
   aliasDangerous,
   configPaths,
