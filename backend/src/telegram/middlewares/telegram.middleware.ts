@@ -51,7 +51,9 @@ const getCredentialsFromBody = async (
   const { telegram_bot_token: telegramBotToken } = req.body
 
   res.locals.credentials = { telegramBotToken }
-  res.locals.credentialName = botId(telegramBotToken)
+  res.locals.credentialName = `${process.env.NODE_ENV}-${botId(
+    telegramBotToken
+  )}`
   return next()
 }
 
