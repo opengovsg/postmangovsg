@@ -75,9 +75,10 @@ describe('POST /settings/telegram/credentials', () => {
 
     expect(res.status).toBe(200)
 
+    const secretName = `${process.env.NODE_ENV}-12345`
     expect(mockSecretsManager.createSecret).toHaveBeenCalledWith(
       expect.objectContaining({
-        Name: '12345',
+        Name: secretName,
         SecretString: VALID_API_TOKEN,
       })
     )
@@ -85,7 +86,7 @@ describe('POST /settings/telegram/credentials', () => {
     // Ensure credential was added into DB
     const dbCredential = await Credential.findOne({
       where: {
-        name: '12345',
+        name: secretName,
       },
     })
     expect(dbCredential).not.toBe(null)
@@ -94,7 +95,7 @@ describe('POST /settings/telegram/credentials', () => {
       where: {
         label: CREDENTIAL_LABEL,
         type: ChannelType.Telegram,
-        credName: '12345',
+        credName: secretName,
         userId: 1,
       },
     })
