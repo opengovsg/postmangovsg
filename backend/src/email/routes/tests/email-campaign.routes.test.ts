@@ -4,7 +4,7 @@ import initialiseServer from '@test-utils/server'
 import config from '@core/config'
 import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
+import { RedisService, UploadService } from '@core/services'
 import { EmailFromAddress, EmailMessage } from '@email/models'
 import { CustomDomainService } from '@email/services'
 import { ChannelType } from '@core/constants'
@@ -40,7 +40,9 @@ afterAll(async () => {
   await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  await RedisService.shutdown()
+  await UploadService.destroyUploadQueue()
+  RedisService.otpClient.quit()
+  RedisService.sessionClient.quit()
 })
 
 describe('PUT /campaign/{campaignId}/email/template', () => {

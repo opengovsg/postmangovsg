@@ -3,9 +3,9 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Campaign, User, Credential } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
 import { formatDefaultCredentialName } from '@core/utils'
+import { RedisService, UploadService } from '@core/services'
 import { TelegramMessage } from '@telegram/models'
 import { ChannelType } from '@core/constants'
 import { mockSecretsManager } from '@mocks/aws-sdk'
@@ -43,7 +43,9 @@ afterAll(async () => {
   await Credential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  await RedisService.shutdown()
+  await UploadService.destroyUploadQueue()
+  RedisService.otpClient.quit()
+  RedisService.sessionClient.quit()
 })
 
 describe('POST /campaign/{campaignId}/telegram/credentials', () => {
