@@ -96,7 +96,20 @@ export const InitEmailMiddleware = (
     try {
       const { campaignId } = req.params
       const result = await EmailService.getCampaignDetails(+campaignId)
-      return res.json(result)
+      const themedBody = await ThemeClient.generateThemedBody({
+        body: result.email_templates?.body as string,
+        agencyName: result.user?.domain?.agency?.name as string,
+        agencyLogoURI: result.user?.domain?.agency?.logo_uri as string,
+        unsubLink: '/unsubscribe/test',
+        showMasthead: true,
+      })
+      return res.json({
+        ...result,
+        email_templates: {
+          ...result.email_templates,
+          themed_body: themedBody,
+        },
+      })
     } catch (err) {
       return next(err)
     }
