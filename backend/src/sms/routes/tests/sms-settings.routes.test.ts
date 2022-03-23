@@ -3,7 +3,6 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Credential, UserCredential, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { ChannelType } from '@core/constants'
 import { mockSecretsManager } from '@mocks/aws-sdk'
 import { SmsService } from '@sms/services'
@@ -21,7 +20,7 @@ afterAll(async () => {
   await Credential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  await RedisService.shutdown()
+  await (app as any).cleanup()
 })
 
 describe('POST /settings/sms/credentials', () => {

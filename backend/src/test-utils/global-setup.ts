@@ -15,7 +15,7 @@ const TEST_DB = 'postmangovsg_test'
 // defined in  npm test command
 const JEST_WORKERS = 2
 
-module.exports = async () => {
+module.exports = async (): Promise<void> => {
   global.sequelize = new Sequelize(DB_URI, {
     dialect: 'postgres',
     logging: false,
