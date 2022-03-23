@@ -6,33 +6,33 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
+import { confirmSendCampaign } from '../util'
+
 import { ChannelType } from 'classes'
 import type { SMSProgress } from 'classes'
 import {
   PreviewBlock,
   PrimaryButton,
   SendRate,
-  // ConfirmModal,
+  ConfirmModal,
   ButtonGroup,
   TextButton,
   StepHeader,
   StepSection,
 } from 'components/common'
 import { CampaignContext } from 'contexts/campaign.context'
-// import { ModalContext } from 'contexts/modal.context'
+import { ModalContext } from 'contexts/modal.context'
 
 import { getPreviewMessage } from 'services/sms.service'
-
-// import { confirmSendCampaign } from '../util'
 
 const SMSSend = ({
   setActiveStep,
 }: {
   setActiveStep: Dispatch<SetStateAction<SMSProgress>>
 }) => {
-  const { campaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
-  // const modalContext = useContext(ModalContext)
+  const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')
   const { id: campaignId } = useParams<{ id: string }>()
@@ -56,26 +56,26 @@ const SMSSend = ({
     loadPreview(campaignId)
   }, [campaignId])
 
-  // const onModalConfirm = () => {
-  //   confirmSendCampaign({
-  //     campaignId: +campaignId,
-  //     sendRate: +sendRate,
-  //     channelType: ChannelType.SMS,
-  //     updateCampaign,
-  //   })
-  // }
+  const onModalConfirm = () => {
+    confirmSendCampaign({
+      campaignId: +campaignId,
+      sendRate: +sendRate,
+      channelType: ChannelType.SMS,
+      updateCampaign,
+    })
+  }
 
-  // const openModal = () => {
-  //   modalContext.setModalContent(
-  //     <ConfirmModal
-  //       title="Are you absolutely sure?"
-  //       subtitle="Sending out a campaign is irreversible."
-  //       buttonText="Confirm send now"
-  //       buttonIcon="bx-send"
-  //       onConfirm={onModalConfirm}
-  //     />
-  //   )
-  // }
+  const openModal = () => {
+    modalContext.setModalContent(
+      <ConfirmModal
+        title="Are you absolutely sure?"
+        subtitle="Sending out a campaign is irreversible."
+        buttonText="Confirm send now"
+        buttonIcon="bx-send"
+        onConfirm={onModalConfirm}
+      />
+    )
+  }
 
   return (
     <>
@@ -107,13 +107,7 @@ const SMSSend = ({
       </StepSection>
 
       <ButtonGroup>
-        <PrimaryButton
-          className={styles.turquoiseGreenBtn}
-          // onClick={openModal}
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          onClick={function noop() {}}
-          disabled
-        >
+        <PrimaryButton className={styles.turquoiseGreenBtn} onClick={openModal}>
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
