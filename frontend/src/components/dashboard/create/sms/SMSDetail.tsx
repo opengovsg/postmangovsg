@@ -106,6 +106,7 @@ const SMSDetail = () => {
             handlePause={handlePause}
             handleRetry={handleRetry}
             handleRefreshStats={handleRefreshStats}
+            isRetryDisabled
           />
         )}
       </>

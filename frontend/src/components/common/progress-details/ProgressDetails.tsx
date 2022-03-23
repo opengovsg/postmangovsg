@@ -25,12 +25,14 @@ const ProgressDetails = ({
   handlePause,
   handleRetry,
   handleRefreshStats,
+  isRetryDisabled,
 }: {
   stats: CampaignStats
   redacted: boolean
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
   handleRefreshStats: () => Promise<void>
+  isRetryDisabled?: boolean
 }) => {
   const { campaign } = useContext(CampaignContext)
   const { id, name, type, sentAt, numRecipients } = campaign
@@ -76,7 +78,12 @@ const ProgressDetails = ({
     }
     if (!isComplete) {
       return (
-        <PrimaryButton className={styles.retry} onClick={handleRetry}>
+        <PrimaryButton
+          className={styles.retry}
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
+          onClick={isRetryDisabled ? function noop() {} : handleRetry}
+          disabled={isRetryDisabled}
+        >
           Retry/Resume sending
           <i className={cx(styles.icon, 'bx bx-revision')}></i>
         </PrimaryButton>
