@@ -2,7 +2,6 @@ import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
 import { User } from '@core/models'
-import { RedisService } from '@core/services'
 import { EmailService } from '@email/services'
 
 import initialiseServer from '@test-utils/server'
@@ -27,7 +26,9 @@ beforeEach(async () => {
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   // Flush the rate limit redis database
-  await new Promise((resolve) => RedisService.rateLimitClient.flushdb(resolve))
+  await new Promise((resolve) =>
+    (app as any).redisService.rateLimitClient.flushdb(resolve)
+  )
 })
 
 afterEach(() => jest.resetAllMocks())
@@ -36,8 +37,10 @@ afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
 
-  await new Promise((resolve) => RedisService.rateLimitClient.flushdb(resolve))
-  await RedisService.shutdown()
+  await new Promise((resolve) =>
+    (app as any).redisService.rateLimitClient.flushdb(resolve)
+  )
+  await (app as any).cleanup()
 })
 
 describe('POST /transactional/email/send', () => {

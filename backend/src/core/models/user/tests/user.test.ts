@@ -2,7 +2,6 @@ import { Sequelize } from 'sequelize-typescript'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { User, Domain, Agency } from '@core/models'
 import { validateDomain } from '@core/utils/validate-domain'
-import { RedisService } from '@core/services'
 import config from '@core/config'
 
 let sequelize: Sequelize
@@ -24,7 +23,6 @@ afterEach(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  await RedisService.shutdown()
 })
 
 describe('BeforeCreate hook', () => {

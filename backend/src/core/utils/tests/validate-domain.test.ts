@@ -1,6 +1,5 @@
 import { Sequelize } from 'sequelize-typescript'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { Domain } from '@core/models'
 import { validateDomain } from '../validate-domain'
 import config from '@core/config'
@@ -17,7 +16,6 @@ afterEach(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  await RedisService.shutdown()
 })
 
 describe('validateDomain', () => {

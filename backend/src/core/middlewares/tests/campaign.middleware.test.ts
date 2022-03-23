@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
 import { Campaign, JobQueue, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { ChannelType, JobStatus } from '@core/constants'
 import { CampaignMiddleware } from '@core/middlewares/campaign.middleware'
 
@@ -31,7 +30,6 @@ afterEach(async () => {
 afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
-  await RedisService.shutdown()
 })
 
 describe('canEditCampaign middleware', () => {

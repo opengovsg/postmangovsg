@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/node'
 import requestTracer from 'cls-rtracer'
 
 import config from '@core/config'
-import v1Router from '@core/routes'
+import { InitV1Route } from '@core/routes'
 import { getStream, loggerWithLabel } from '@core/logger'
 import { clientIp, userId } from '@core/utils/morgan'
 
@@ -128,7 +128,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
 
   app.use(sentrySessionMiddleware)
 
-  app.use('/v1', v1Router)
+  app.use('/v1', InitV1Route(app))
   app.use(celebrateErrorMiddleware())
   app.use(Sentry.Handlers.errorHandler())
 

@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import bcrypt from 'bcrypt'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { MailService, RedisService } from '@core/services'
+import { MailService } from '@core/services'
 import { User } from '@core/models'
 
 const app = initialiseServer()
@@ -20,7 +20,8 @@ afterEach(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  await RedisService.shutdown()
+  await (app as any).cleanup()
+  await (appWithUserSession as any).cleanup()
 })
 
 describe('POST /auth/otp', () => {
@@ -77,16 +78,15 @@ describe('POST /auth/login', () => {
       createdAt: 123,
     })
     await new Promise((resolve) =>
-      RedisService.otpClient.set(email, otp, resolve)
+      (app as any).redisService.otpClient.set(email, otp, resolve)
     )
 
     const res = await request(app)
       .post('/auth/login')
       .send({ email, otp: '000000' })
     expect(res.status).toBe(401)
-
     // OTP should be deleted after exceeding retries
-    RedisService.otpClient.get(email, (_err, value) => {
+    ;(app as any).redisService.otpClient.get(email, (_err: any, value: any) => {
       expect(value).toBe(null)
     })
   })
@@ -99,7 +99,7 @@ describe('POST /auth/login', () => {
       createdAt: 123,
     })
     await new Promise((resolve) =>
-      RedisService.otpClient.set(email, otp, resolve)
+      (app as any).redisService.otpClient.set(email, otp, resolve)
     )
 
     const res = await request(app)

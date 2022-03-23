@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.31.3",
+  "version": "1.32.0",
   "description": "Backend / API server for Postman",
   "main": "build/server.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
     "pretest": "tsc --build",
-    "test": "jest --maxWorkers=2",
+    "test": "jest --runInBand --detectOpenHandles",
     "precommit": "lint-staged"
   },
   "author": "",
