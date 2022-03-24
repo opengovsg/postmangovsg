@@ -12,7 +12,7 @@ let sequelize: Sequelize
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
 })
 
 afterAll(async () => {

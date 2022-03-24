@@ -27,14 +27,14 @@ beforeEach(() => {
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await Campaign.create({
     name: 'campaign-1',
     userId: 1,
     type: ChannelType.Telegram,
     valid: false,
     protect: false,
-  })
+  } as Campaign)
   campaignId = campaign.id
 })
 

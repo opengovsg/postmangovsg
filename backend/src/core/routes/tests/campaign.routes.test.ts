@@ -11,7 +11,7 @@ let sequelize: Sequelize
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
 })
 
 afterEach(async () => {
@@ -33,14 +33,14 @@ describe('GET /campaigns', () => {
       type: 'SMS',
       valid: false,
       protect: false,
-    })
+    } as Campaign)
     await Campaign.create({
       name: 'campaign-2',
       userId: 1,
       type: 'SMS',
       valid: false,
       protect: false,
-    })
+    } as Campaign)
 
     const res = await request(app).get('/campaigns')
     expect(res.status).toBe(200)
@@ -60,7 +60,7 @@ describe('GET /campaigns', () => {
         type: 'SMS',
         valid: false,
         protect: false,
-      })
+      } as Campaign)
     }
 
     const res = await request(app)

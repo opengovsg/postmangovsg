@@ -56,7 +56,7 @@ const upsertTelegramTemplate = async ({
     }
 
     const createdTemplate = await TelegramTemplate.create(
-      { campaignId, body },
+      { campaignId, body } as TelegramTemplate,
       { transaction }
     )
 

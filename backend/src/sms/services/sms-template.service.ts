@@ -59,7 +59,7 @@ const upsertSmsTemplate = async ({
       {
         campaignId,
         body,
-      },
+      } as SmsTemplate,
       {
         transaction,
       }

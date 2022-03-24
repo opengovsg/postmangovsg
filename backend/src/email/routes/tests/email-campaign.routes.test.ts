@@ -16,14 +16,14 @@ let protectedCampaignId: number
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await Campaign.create({
     name: 'campaign-1',
     userId: 1,
     type: ChannelType.Email,
     valid: false,
     protect: false,
-  })
+  } as Campaign)
   campaignId = campaign.id
   const protectedCampaign = await Campaign.create({
     name: 'campaign-2',
@@ -31,7 +31,7 @@ beforeAll(async () => {
     type: ChannelType.Email,
     valid: false,
     protect: true,
-  })
+  } as Campaign)
   protectedCampaignId = protectedCampaign.id
 })
 
@@ -154,7 +154,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     await EmailFromAddress.create({
       email: 'user@agency.gov.sg',
       name: 'Agency ABC',
-    })
+    } as EmailFromAddress)
     const mockVerifyFromAddress = jest
       .spyOn(CustomDomainService, 'verifyFromAddress')
       .mockReturnValue(Promise.resolve())
@@ -206,7 +206,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     await EmailFromAddress.create({
       email: 'user@agency.gov.sg',
       name: 'Agency ABC',
-    })
+    } as EmailFromAddress)
     const mockVerifyFromAddress = jest
       .spyOn(CustomDomainService, 'verifyFromAddress')
       .mockReturnValue(Promise.resolve())
@@ -359,7 +359,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    })
+    } as EmailMessage)
     const testBody = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({

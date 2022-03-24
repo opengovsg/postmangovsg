@@ -33,7 +33,7 @@ beforeEach(() => {
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
 })
 
 afterAll(async () => {
@@ -56,7 +56,7 @@ describe('processUpload', () => {
       type: ChannelType.SMS,
       valid: false,
       protect: false,
-    })
+    } as Campaign)
   })
 
   test('Successfully process a valid CSV file', async () => {
@@ -65,9 +65,9 @@ describe('processUpload', () => {
     const { id: campaignId } = campaign
     const template = await SmsTemplate.create({
       campaignId,
-      params: { name: 'name' },
+      params: ['name'],
       body: '{{name}}',
-    })
+    } as SmsTemplate)
 
     await expect(
       SmsTemplateService.processUpload({
@@ -97,9 +97,9 @@ describe('processUpload', () => {
     const { id: campaignId } = campaign
     const template = await SmsTemplate.create({
       campaignId,
-      params: { missing: 'missing' },
+      params: ['missing'],
       body: '{{missing}}',
-    })
+    } as SmsTemplate)
 
     await expect(
       SmsTemplateService.processUpload({

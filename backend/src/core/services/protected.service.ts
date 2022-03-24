@@ -96,20 +96,23 @@ const storeProtectedMessages = async ({
     }
   )
   // START populate template
-  await ProtectedMessage.bulkCreate(protectedMessages, {
-    transaction,
-    logging: (_message, benchmark) => {
-      if (benchmark) {
-        logger.info({
-          message:
-            'uploadProtectedCompleteOnChunk - ElapsedTime for ProtectedMessage in ms',
-          benchmark,
-          action: 'storeProtectedMessages',
-        })
-      }
-    },
-    benchmark: true,
-  })
+  await ProtectedMessage.bulkCreate(
+    protectedMessages as unknown as ProtectedMessage[],
+    {
+      transaction,
+      logging: (_message, benchmark) => {
+        if (benchmark) {
+          logger.info({
+            message:
+              'uploadProtectedCompleteOnChunk - ElapsedTime for ProtectedMessage in ms',
+            benchmark,
+            action: 'storeProtectedMessages',
+          })
+        }
+      },
+      benchmark: true,
+    }
+  )
 
   const messages = protectedMessages.map(({ campaignId, recipient, id }) => ({
     campaignId,

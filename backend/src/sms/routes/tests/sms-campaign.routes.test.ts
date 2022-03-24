@@ -28,11 +28,11 @@ const createCampaign = async ({
     protect: false,
     valid: false,
     demoMessageLimit: isDemo ? 20 : null,
-  })
+  } as Campaign)
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await createCampaign({ isDemo: false })
   campaignId = campaign.id
 })
@@ -59,7 +59,7 @@ describe('GET /campaign/{id}/sms', () => {
       type: 'SMS',
       valid: false,
       protect: false,
-    })
+    } as Campaign)
     const { id, name, type } = campaign
 
     const res = await request(app).get(`/campaign/${campaign.id}/sms`)
@@ -284,7 +284,7 @@ describe('PUT /campaign/{id}/sms/template', () => {
     await SmsMessage.create({
       campaignId: campaignId,
       params: { variable1: 'abc' },
-    })
+    } as SmsMessage)
 
     const res = await request(app)
       .put(`/campaign/${campaignId}/sms/template`)
@@ -340,7 +340,7 @@ describe('PUT /campaign/{id}/sms/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    })
+    } as SmsMessage)
     const res = await request(app)
       .put(`/campaign/${campaignId}/sms/template`)
       .send({
@@ -446,9 +446,9 @@ describe('POST /campaign/{id}/sms/upload/complete', () => {
   test('Successfully starts recipient list processing', async () => {
     await SmsTemplate.create({
       campaignId: campaignId,
-      params: { variable1: 'abc' },
+      params: ['variable1'],
       body: 'test {{variable1}}',
-    })
+    } as SmsTemplate)
 
     const mockExtractParamsFromJwt = jest
       .spyOn(UploadService, 'extractParamsFromJwt')

@@ -168,7 +168,7 @@ export const InitEmailTemplateMiddleware = (
         InvalidRecipientError,
       ]
       if (userErrors.some((errType) => err instanceof errType)) {
-        return res.status(400).json({ message: err.message })
+        return res.status(400).json({ message: (err as Error).message })
       }
       return next(err)
     }
@@ -306,7 +306,7 @@ export const InitEmailTemplateMiddleware = (
       ]
 
       if (userErrors.some((errType) => err instanceof errType)) {
-        return res.status(400).json({ message: err.message })
+        return res.status(400).json({ message: (err as Error).message })
       }
       return next(err)
     }

@@ -84,7 +84,7 @@ export const InitCredentialService = (redisService: RedisService) => {
         ...logMeta,
       })
     } catch (err) {
-      if (err.name === 'ResourceExistsException') {
+      if ((err as Error).name === 'ResourceExistsException') {
         await secretsManager
           .putSecretValue({
             SecretId: name,
@@ -213,7 +213,7 @@ export const InitCredentialService = (redisService: RedisService) => {
       type,
       credName,
       userId,
-    })
+    } as UserCredential)
   }
 
   /**
@@ -248,7 +248,7 @@ export const InitCredentialService = (redisService: RedisService) => {
         label,
       },
       attributes: ['credName'],
-    })
+    }) as Promise<UserCredential>
   }
 
   /**
@@ -379,7 +379,10 @@ export const InitCredentialService = (redisService: RedisService) => {
     announcementVersion: string
   ): Promise<{ announcementVersion: string }> => {
     const [rowUpserted] = await UserFeature.upsert(
-      { userId: userId, announcementVersion: announcementVersion },
+      {
+        userId: userId,
+        announcementVersion: announcementVersion,
+      } as UserFeature,
       { returning: true }
     )
 
