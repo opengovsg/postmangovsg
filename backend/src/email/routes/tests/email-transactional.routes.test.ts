@@ -18,7 +18,7 @@ beforeEach(async () => {
   user = await User.create({
     id: userId,
     email: `user_${userId}@agency.gov.sg`,
-  })
+  } as User)
   apiKey = await user.regenerateAndSaveApiKey()
   userId += 1
 })

@@ -179,11 +179,12 @@ export const InitSettingsMiddleware = (
       }
       return res.json(result)
     } catch (e) {
+      const errAsError = e as Error
       logger.error({
-        message: `${e.stack}`,
+        message: `${errAsError.stack}`,
         action: 'getChannelSpecificCredentials',
       })
-      return res.status(400).json({ message: `${e.message}` })
+      return res.status(400).json({ message: `${errAsError.message}` })
     }
   }
 

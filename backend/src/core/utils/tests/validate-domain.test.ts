@@ -22,7 +22,7 @@ describe('validateDomain', () => {
   it('should match exact domain in database', async () => {
     await Domain.create({
       domain: '@exactdomain.com',
-    })
+    } as Domain)
 
     await expect(validateDomain('user@exactdomain.com')).resolves.toBe(true)
   })
@@ -30,7 +30,7 @@ describe('validateDomain', () => {
   it('should not match subdomains in database', async () => {
     await Domain.create({
       domain: '@school.edu.sg',
-    })
+    } as Domain)
 
     await expect(validateDomain('teacher@school.edu.sg')).resolves.toBe(true)
     await expect(validateDomain('student@student.school.edu.sg')).resolves.toBe(

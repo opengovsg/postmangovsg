@@ -20,7 +20,7 @@ const messageWorkerLoader = async (): Promise<void> => {
       message: 'Worker died',
       workerId,
       isLogger,
-      error: `${err.stack}`.substring(0, 1000),
+      error: `${(err as Error).stack}`.substring(0, 1000),
       action: 'createMessageWorker',
     })
     worker.shutdown()

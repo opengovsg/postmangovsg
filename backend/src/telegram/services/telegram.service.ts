@@ -149,7 +149,7 @@ const validateAndConfigureBot = async (
   try {
     await telegramService.getBotInfo()
   } catch (err) {
-    throw new Error(`Invalid token. ${err.message}`)
+    throw new Error(`Invalid token. ${(err as Error).message}`)
   }
 
   const callbackUrl = `${config.get(
@@ -175,7 +175,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.Telegram },
-  })
+  }) as Promise<Campaign>
 }
 
 /**
@@ -186,7 +186,7 @@ const findCampaign = (
 const setCampaignCredential = (
   campaignId: number,
   credentialName: string
-): Promise<[number, Campaign[]]> => {
+): Promise<[number]> => {
   return Campaign.update(
     { credName: credentialName },
     {
@@ -260,20 +260,23 @@ const uploadCompleteOnChunk = ({
     const formattedRecords =
       TelegramTemplateService.validateAndFormatNumber(records)
     // START populate template
-    await TelegramMessage.bulkCreate(formattedRecords, {
-      transaction,
-      logging: (_message, benchmark) => {
-        if (benchmark) {
-          logger.info({
-            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
-            benchmark,
-            campaignId,
-            action: 'uploadCompleteOnChunk',
-          })
-        }
-      },
-      benchmark: true,
-    })
+    await TelegramMessage.bulkCreate(
+      formattedRecords as Array<TelegramMessage>,
+      {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info({
+              message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+              benchmark,
+              campaignId,
+              action: 'uploadCompleteOnChunk',
+            })
+          }
+        },
+        benchmark: true,
+      }
+    )
   }
 }
 
@@ -294,7 +297,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as TelegramDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as TelegramDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -314,7 +317,7 @@ const duplicateCampaign = async ({
             {
               campaignId: duplicate.id,
               body: template.body,
-            },
+            } as TelegramTemplate,
             { transaction }
           )
         }

@@ -45,7 +45,7 @@ const parseEvent = async (req: Request): Promise<void> => {
       {
         errorCode: twilioErrorCode,
         status: 'ERROR',
-      },
+      } as SmsMessage,
       {
         where: {
           id: messageId,
@@ -61,7 +61,7 @@ const parseEvent = async (req: Request): Promise<void> => {
       {
         receivedAt: new Date(),
         status: 'SUCCESS',
-      },
+      } as SmsMessage,
       {
         where: {
           id: messageId,

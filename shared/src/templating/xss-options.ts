@@ -2,6 +2,7 @@ import { IFilterXSSOptions, cssFilter, safeAttrValue } from 'xss'
 import { TemplateError } from './errors'
 
 const URL =
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   typeof window !== 'undefined' && window.URL ? window.URL : require('url').URL
 
 const KEYWORD_REGEX = /^{{\s*?\w+\s*?}}$/

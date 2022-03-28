@@ -117,7 +117,7 @@ describe('GET /auth/userinfo', () => {
   })
 
   test('Existing session found', async () => {
-    await User.create({ id: 1, email: 'user@agency.gov.sg' })
+    await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
     const res = await request(appWithUserSession).get('/auth/userinfo')
     expect(res.status).toBe(200)
     expect(res.body).toEqual({ id: 1, email: 'user@agency.gov.sg' })

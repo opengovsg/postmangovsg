@@ -110,7 +110,7 @@ const storeFromAddress = async (
     await EmailFromAddress.upsert({
       name,
       email,
-    })
+    } as EmailFromAddress)
   } catch (err) {
     logger.error({
       message: 'Failed to store email address in EmailFromAddress table',

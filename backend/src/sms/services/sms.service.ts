@@ -132,7 +132,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.SMS },
-  })
+  }) as Promise<Campaign>
 }
 
 /**
@@ -143,7 +143,7 @@ const findCampaign = (
 const setCampaignCredential = (
   campaignId: number,
   credentialName: string
-): Promise<[number, Campaign[]]> => {
+): Promise<[number]> => {
   return Campaign.update(
     {
       credName: credentialName,
@@ -223,7 +223,7 @@ const uploadCompleteOnChunk = ({
       }
     })
     // START populate template
-    await SmsMessage.bulkCreate(records, {
+    await SmsMessage.bulkCreate(records as Array<SmsMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -257,7 +257,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as SmsDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as SmsDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -277,7 +277,7 @@ const duplicateCampaign = async ({
             {
               campaignId: duplicate.id,
               body: template.body,
-            },
+            } as SmsTemplate,
             { transaction }
           )
         }

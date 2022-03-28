@@ -45,11 +45,11 @@ describe('contactMessageHandler', () => {
     await TelegramSubscriber.create({
       phoneNumber,
       telegramId,
-    })
+    } as TelegramSubscriber)
     await BotSubscriber.create({
       botId,
       telegramId,
-    })
+    } as BotSubscriber)
   }
 
   afterEach(async () => {

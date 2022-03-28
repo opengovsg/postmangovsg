@@ -33,7 +33,7 @@ beforeEach(() => {
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   await Campaign.destroy({ where: {} })
 })
 
@@ -58,7 +58,7 @@ describe('processUpload', () => {
       type: ChannelType.Email,
       valid: false,
       protect: false,
-    })
+    } as Campaign)
   })
 
   test('Successfully process a valid CSV file', async () => {
@@ -70,10 +70,10 @@ describe('processUpload', () => {
     const { id: campaignId } = campaign
     const template = await EmailTemplate.create({
       campaignId,
-      params: { name: 'name' },
+      params: ['name'],
       subject: 'subject',
       body: '{{name}}',
-    })
+    } as EmailTemplate)
 
     await expect(
       EmailTemplateService.processUpload({
@@ -104,10 +104,10 @@ describe('processUpload', () => {
     const { id: campaignId } = campaign
     const template = await EmailTemplate.create({
       campaignId,
-      params: { recipient: 'test@open.gov.sg', missing: 'missing' },
+      params: ['recipient', 'missing'],
       subject: 'subject',
       body: '{{missing}}',
-    })
+    } as EmailTemplate)
 
     await expect(
       EmailTemplateService.processUpload({
@@ -135,7 +135,7 @@ describe('processProtectedUpload', () => {
       type: ChannelType.Email,
       valid: false,
       protect: true,
-    })
+    } as Campaign)
   })
 
   test('Successfully process a valid CSV file', async () => {
@@ -147,10 +147,10 @@ describe('processProtectedUpload', () => {
     const { id: campaignId } = campaign
     const template = await EmailTemplate.create({
       campaignId,
-      params: { recipient: 'test@open.gov.sg', protectedlink: 'link' },
+      params: ['recipient', 'protectedlink'],
       subject: 'subject',
       body: '{{protectedlink}}',
-    })
+    } as EmailTemplate)
 
     await expect(
       EmailTemplateService.processProtectedUpload({

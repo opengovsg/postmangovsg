@@ -31,20 +31,20 @@ beforeEach(async () => {
   user = await User.create({
     id: userId,
     email: `user_${userId}@agency.gov.sg`,
-  })
+  } as User)
   apiKey = await user.regenerateAndSaveApiKey()
   userCredential = await UserCredential.create({
     label: `twilio-${userId}`,
     type: ChannelType.SMS,
     credName: credential.name,
     userId,
-  })
+  } as UserCredential)
   userId += 1
 })
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  credential = await Credential.create({ name: 'twilio' })
+  credential = await Credential.create({ name: 'twilio' } as Credential)
 })
 
 afterEach(() => jest.clearAllMocks())

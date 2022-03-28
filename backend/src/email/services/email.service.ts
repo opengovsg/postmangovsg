@@ -174,7 +174,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.Email },
-  })
+  }) as Promise<Campaign>
 }
 
 /**
@@ -201,9 +201,7 @@ const sendCampaignMessage = async (
  * update the credential column for the campaign with the default credential
  * @param campaignId
  */
-const setCampaignCredential = (
-  campaignId: number
-): Promise<[number, Campaign[]]> => {
+const setCampaignCredential = (campaignId: number): Promise<[number]> => {
   return Campaign.update(
     { credName: DefaultCredentialName.Email },
     { where: { id: campaignId } }
@@ -291,7 +289,7 @@ const uploadCompleteOnChunk = ({
       }
     })
     // START populate template
-    await EmailMessage.bulkCreate(records, {
+    await EmailMessage.bulkCreate(records as Array<EmailMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -354,7 +352,7 @@ const uploadProtectedCompleteOnChunk = ({
       campaignId,
       data,
     })
-    await EmailMessage.bulkCreate(messages, {
+    await EmailMessage.bulkCreate(messages as Array<EmailMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -388,7 +386,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as EmailDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as EmailDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -411,7 +409,7 @@ const duplicateCampaign = async ({
               subject: template.subject,
               from: template.from,
               replyTo: template.reply_to,
-            },
+            } as EmailTemplate,
             { transaction }
           )
         }
