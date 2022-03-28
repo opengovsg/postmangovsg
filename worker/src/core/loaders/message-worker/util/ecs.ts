@@ -31,7 +31,9 @@ class ECSUtil {
         (err: AWSError, data: ECS.ListTasksResponse) => {
           if (err) reject(err)
           resolve(
-            data.taskArns?.map((taskArn) => getLabel(taskArn, taskKeyword))
+            data.taskArns?.map((taskArn) =>
+              getLabel(taskArn, taskKeyword)
+            ) as string[]
           )
         }
       )

@@ -213,7 +213,8 @@ export class TemplateClient {
       result = $.html()
 
       // Looks for 2 or more consecutive <br>, <br/> or <br />
-      const CONSECUTIVE_LINEBREAK_REGEX = /(\s)*(<br\s*\/?>(\s)*(\n|\r\n)?){2,}/g
+      const CONSECUTIVE_LINEBREAK_REGEX =
+        /(\s)*(<br\s*\/?>(\s)*(\n|\r\n)?){2,}/g
       result = result.replace(CONSECUTIVE_LINEBREAK_REGEX, this.lineBreak)
     }
     return result
