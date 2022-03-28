@@ -33,7 +33,7 @@ describe('BeforeCreate hook', () => {
     await expect(
       User.create({
         email: INVALID_DOMAIN_EMAIL,
-      })
+      } as User)
     ).rejects.toThrow(
       `User email ${INVALID_DOMAIN_EMAIL} does not end in a whitelisted domain`
     )
@@ -63,7 +63,7 @@ describe('BeforeCreate hook', () => {
     await expect(
       User.create({
         email: INVALID_DOMAIN_EMAIL,
-      })
+      } as User)
     ).rejects.toThrow(
       `User email ${INVALID_DOMAIN_EMAIL} does not end in a whitelisted domain`
     )
@@ -86,7 +86,7 @@ describe('BeforeCreate hook', () => {
 
     const user = await User.create({
       email: VALID_DOMAIN_EMAIL,
-    })
+    } as User)
     expect(user).not.toBeNull()
     expect(user).toMatchObject({
       email: VALID_DOMAIN_EMAIL,
@@ -114,7 +114,7 @@ describe('BeforeCreate hook', () => {
     // Create user (and trigger beforeCreate hook) with a single transaction,
     // to simulate behavior of auth service
     await sequelize.transaction(async (transaction) => {
-      await User.create({ email: NEW_DOMAIN_EMAIL }, { transaction })
+      await User.create({ email: NEW_DOMAIN_EMAIL } as User, { transaction })
     })
 
     const user = await User.findOne({ where: { email: NEW_DOMAIN_EMAIL } })

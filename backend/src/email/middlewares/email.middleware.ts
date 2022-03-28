@@ -77,7 +77,7 @@ export const InitEmailMiddleware = (
         error: err,
         ...logMeta,
       })
-      return res.status(400).json({ message: `${err.message}` })
+      return res.status(400).json({ message: `${(err as Error).message}` })
     }
     return res.json({ message: 'OK' })
   }
@@ -252,7 +252,7 @@ export const InitEmailMiddleware = (
         error: err,
         action: 'existsFromAddress',
       })
-      return res.status(400).json({ message: err.message })
+      return res.status(400).json({ message: (err as Error).message })
     }
     return next()
   }
@@ -280,7 +280,7 @@ export const InitEmailMiddleware = (
         error: err,
         action: 'verifyFromAddress',
       })
-      return res.status(400).json({ message: err.message })
+      return res.status(400).json({ message: (err as Error).message })
     }
     return next()
   }
@@ -353,7 +353,7 @@ export const InitEmailMiddleware = (
         error: err,
         action: 'sendValidationMessage',
       })
-      return res.status(400).json({ message: err.message })
+      return res.status(400).json({ message: (err as Error).message })
     }
     return next()
   }

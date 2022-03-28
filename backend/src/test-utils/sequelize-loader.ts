@@ -23,7 +23,7 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
     console.log({ message: 'Test Database loaded.' })
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error.message)
+    console.log((error as Error).message)
     console.error({ message: 'Unable to connect to test database', error })
     process.exit(1)
   }

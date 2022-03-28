@@ -49,7 +49,7 @@ export const InitEmailTransactionalMiddleware = (
 
       const BAD_REQUEST_ERRORS = [TemplateError, InvalidRecipientError]
       if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
-        res.status(400).json({ message: err.message })
+        res.status(400).json({ message: (err as Error).message })
         return
       }
       next(err)

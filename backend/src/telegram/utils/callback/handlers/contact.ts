@@ -56,7 +56,7 @@ const upsertTelegramSubscriber = async (
       const updatedCount = result?.[1]
       if (!updatedCount) {
         await TelegramSubscriber.create(
-          { telegramId, phoneNumber },
+          { telegramId, phoneNumber } as TelegramSubscriber,
           { transaction }
         )
       }

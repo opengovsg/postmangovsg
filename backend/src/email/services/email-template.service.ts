@@ -51,7 +51,7 @@ const upsertEmailTemplate = async ({
             replyTo,
             from,
             showLogo,
-          },
+          } as EmailTemplate,
           {
             where: { campaignId },
             individualHooks: true, // required so that BeforeUpdate hook runs
@@ -72,7 +72,7 @@ const upsertEmailTemplate = async ({
         replyTo,
         from,
         showLogo,
-      },
+      } as EmailTemplate,
       {
         transaction,
       }

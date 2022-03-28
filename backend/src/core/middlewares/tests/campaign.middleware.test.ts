@@ -19,7 +19,7 @@ beforeEach(() => {
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
 })
 
 afterEach(async () => {
@@ -40,11 +40,11 @@ describe('canEditCampaign middleware', () => {
       type: ChannelType.SMS,
       valid: false,
       protect: false,
-    })
+    } as Campaign)
     await JobQueue.create({
       campaignId: campaign.id,
       status: JobStatus.Sending,
-    })
+    } as JobQueue)
 
     mockRequest = {
       params: { campaignId: String(campaign.id) },
@@ -66,7 +66,7 @@ describe('canEditCampaign middleware', () => {
       valid: false,
       protect: false,
       s3Object: { temp_filename: 'file' },
-    })
+    } as Campaign)
 
     mockRequest = {
       params: { campaignId: String(campaign.id) },
@@ -87,7 +87,7 @@ describe('canEditCampaign middleware', () => {
       type: ChannelType.SMS,
       valid: false,
       protect: false,
-    })
+    } as Campaign)
 
     mockRequest = {
       params: { campaignId: String(campaign.id) },

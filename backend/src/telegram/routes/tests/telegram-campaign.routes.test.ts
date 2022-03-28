@@ -28,11 +28,11 @@ const createCampaign = async ({
     protect: false,
     valid: false,
     demoMessageLimit: isDemo ? 20 : null,
-  })
+  } as Campaign)
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await createCampaign({ isDemo: false })
   campaignId = campaign.id
 })
@@ -242,7 +242,7 @@ describe('PUT /campaign/{campaignId}/telegram/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    })
+    } as TelegramMessage)
     const res = await request(app)
       .put(`/campaign/${campaignId}/telegram/template`)
       .send({

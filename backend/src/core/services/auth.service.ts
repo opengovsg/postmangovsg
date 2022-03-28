@@ -300,7 +300,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   const findUser = (id: number): Promise<User> => {
     return User.findOne({
       where: { id },
-    })
+    }) as Promise<User>
   }
 
   return {

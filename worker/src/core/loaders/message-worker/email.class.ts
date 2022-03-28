@@ -151,7 +151,10 @@ class Email {
       await this.connection.query(
         `UPDATE email_ops SET status='ERROR', delivered_at=clock_timestamp(), error_code=:error, updated_at=clock_timestamp() WHERE id=:id;`,
         {
-          replacements: { id, error: error.message.substring(0, 255) },
+          replacements: {
+            id,
+            error: (error as Error).message.substring(0, 255),
+          },
           type: QueryTypes.UPDATE,
         }
       )
