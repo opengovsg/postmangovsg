@@ -68,6 +68,7 @@
     "@types/async-retry": "^1.4.2",
     "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.30",
+    "@types/cheerio": "^0.22.31",
     "@types/connect-redis": "0.0.13",
     "@types/convict": "^5.2.1",
     "@types/cors": "^2.8.6",
