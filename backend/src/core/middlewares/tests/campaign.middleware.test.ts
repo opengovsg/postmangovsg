@@ -24,7 +24,7 @@ beforeAll(async () => {
 
 afterEach(async () => {
   await JobQueue.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
 })
 
 afterAll(async () => {

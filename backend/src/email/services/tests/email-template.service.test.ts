@@ -34,14 +34,14 @@ beforeEach(() => {
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
 })
 
 afterAll(async () => {
   await EmailTemplate.destroy({ where: {} })
   await EmailMessage.destroy({ where: {} })
   await ProtectedMessage.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
   await User.destroy({ where: {} })
   await sequelize.close()
 

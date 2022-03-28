@@ -37,7 +37,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
   await User.destroy({ where: {} })
   await sequelize.close()
   await redisService.shutdown()
