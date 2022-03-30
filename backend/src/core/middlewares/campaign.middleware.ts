@@ -158,9 +158,7 @@ const deleteCampaign = async (
 ): Promise<Response | void> => {
   try {
     const campaignId = +req.params.campaignId
-    console.log('campaignId', campaignId, typeof campaignId)
     const deletedRows = await CampaignService.deleteCampaign(campaignId)
-    console.log('deletedRows', deletedRows)
     if (deletedRows < 1) {
       logger.error({
         message: 'Campaign not found',

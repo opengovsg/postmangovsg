@@ -20,7 +20,7 @@
 .tableContainer {
   display: block;
   max-width: 100%;
-  overflow: auto;
+  overflow-x: scroll;
 
   table.campaignTable {
     min-width: calc(

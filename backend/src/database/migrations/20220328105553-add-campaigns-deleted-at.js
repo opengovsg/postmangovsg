@@ -4,7 +4,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.addColumn(
       'campaigns',
-      'deletedAt',
+      'deleted_at',
       {
         type: Sequelize.DataTypes.DATE,
         allowNull: true
@@ -13,6 +13,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeColumn('campaigns', 'deletedAt')
+    await queryInterface.removeColumn('campaigns', 'deleted_at')
   }
 };
