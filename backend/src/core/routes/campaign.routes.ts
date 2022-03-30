@@ -29,6 +29,12 @@ const deleteCampaignValidator = {
   }),
 }
 
+const updateCampaignValidator = {
+  [Segments.BODY]: Joi.object({
+    name: Joi.string().max(255).trim().required(),
+  }),
+}
+
 // actual routes here
 
 /**
@@ -85,7 +91,7 @@ router.get(
 /**
  * @swagger
  * paths:
- *  /campaigns:
+ *  /campaigns/{campaignId}:
  *    post:
  *      summary: Create a new campaign
  *      tags:
@@ -165,6 +171,51 @@ router.delete(
   '/:campaignId',
   celebrate(deleteCampaignValidator),
   CampaignMiddleware.deleteCampaign
+)
+
+/**
+ * paths:
+ *  /campaigns/{campaignId}:
+ *   put:
+ *    summary: Rename campaign
+ *    tags:
+ *      - Campaigns
+ *    parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            required:
+ *              - id
+ *            properties:
+ *              id:
+ *                type: number
+ *              name:
+ *                type: string
+ *    responses:
+ *      "200":
+ *        content:
+ *          application/json:
+ *            schema:
+ *             type: object
+ *      "401":
+ *        description: Unauthorized
+ *      "404":
+ *        description: Not found
+ *      "500":
+ *        description: Internal Server Error
+ */
+router.put(
+  '/:campaignId',
+  celebrate(updateCampaignValidator),
+  CampaignMiddleware.updateCampaign
 )
 
 export default router
