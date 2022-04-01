@@ -1,5 +1,3 @@
-import { Trans } from '@lingui/macro'
-
 import cx from 'classnames'
 
 import { capitalize } from 'lodash'
@@ -21,13 +19,8 @@ import ActionsButton from './actions-button'
 import AnnouncementModal from './announcement-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
-import { Campaign, channelIcons, Status } from 'classes'
-import {
-  Pagination,
-  TitleBar,
-  PrimaryButton,
-  ExportRecipients,
-} from 'components/common'
+import { Campaign, channelIcons } from 'classes'
+import { Pagination, TitleBar, PrimaryButton } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
@@ -36,7 +29,7 @@ import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
 
-import { getCampaigns } from 'services/campaign.service'
+import { deleteCampaignById, getCampaigns } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import { getUserSettings } from 'services/settings.service'
@@ -90,6 +83,12 @@ const Campaigns = () => {
       return
     }
     setCampaignIdWithMenuOpen(campaignId)
+  }
+
+  async function deleteCampaign(campaignId: number) {
+    await deleteCampaignById(campaignId)
+    setCampaignCount(campaignCount - 1)
+    setCampaignsDisplayed(campaignsDisplayed.filter((c) => c.id !== campaignId))
   }
 
   // Only call the modalContext if content is currently null - prevents infinite re-rendering
@@ -192,32 +191,6 @@ const Campaigns = () => {
     {
       name: '',
       render: (campaign: Campaign) => {
-        if (campaign.status === Status.Draft) return
-        if (campaign.redacted) {
-          return (
-            <span className={styles.expired}>
-              <Trans>Report expired</Trans>
-            </span>
-          )
-        }
-
-        return (
-          <ExportRecipients
-            iconPosition="left"
-            campaignId={campaign.id}
-            campaignName={campaign.name}
-            campaignType={campaign.type}
-            sentAt={campaign.sentAt}
-            status={campaign.status}
-            statusUpdatedAt={campaign.statusUpdatedAt}
-          />
-        )
-      },
-      width: 'sm center',
-    },
-    {
-      name: '',
-      render: (campaign: Campaign) => {
         return (
           <ActionsButton
             campaign={campaign}
@@ -229,9 +202,11 @@ const Campaigns = () => {
               e.stopPropagation()
               toggleMenu(campaign.id)
             }}
-            onDelete={(e: ReactMouseEvent<HTMLButtonElement>) => {
+            onDelete={(
+              e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>
+            ) => {
               e.stopPropagation()
-              console.log(e)
+              deleteCampaign(campaign.id)
             }}
             onClose={() => setCampaignIdWithMenuOpen(undefined)}
           />

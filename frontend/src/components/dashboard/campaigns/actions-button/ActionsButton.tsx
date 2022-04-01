@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro'
 import cx from 'classnames'
 import {
   createRef,
@@ -32,7 +33,7 @@ const ActionsButton = ({
   modalContext: any
   isMenuOpen?: boolean
   onToggle?: (e: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => void
-  onDelete?: (e: ReactMouseEvent<HTMLButtonElement>) => void
+  onDelete?: (e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>) => void
   onClose?: () => void
 }) => {
   const btnGroupRef = createRef<HTMLDivElement>()
@@ -84,9 +85,9 @@ const ActionsButton = ({
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('click', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('click', handleClickOutside)
     }
   }, [menuRef, btnGroupRef, onClose])
 
@@ -136,20 +137,31 @@ const ActionsButton = ({
         style={dropdownMenuStyle}
         ref={menuRef}
       >
-        <div className={styles.dropdownItem}>
-          <ExportRecipients
-            iconPosition="right"
-            campaignId={campaign.id}
-            campaignName={campaign.name}
-            campaignType={campaign.type}
-            sentAt={campaign.sentAt}
-            status={campaign.status}
-            statusUpdatedAt={campaign.statusUpdatedAt}
-          />
-        </div>
-        {onDelete ? (
+        {campaign.redacted ? (
+          <span
+            className={styles.expired}
+            onClick={(e: ReactMouseEvent<HTMLSpanElement>) =>
+              e.stopPropagation()
+            }
+          >
+            <Trans>Report expired</Trans>
+          </span>
+        ) : (
           <div className={styles.dropdownItem}>
-            <button className={styles.btnDanger} onClick={onDelete}>
+            <ExportRecipients
+              iconPosition="right"
+              campaignId={campaign.id}
+              campaignName={campaign.name}
+              campaignType={campaign.type}
+              sentAt={campaign.sentAt}
+              status={campaign.status}
+              statusUpdatedAt={campaign.statusUpdatedAt}
+            />
+          </div>
+        )}
+        {onDelete ? (
+          <div className={styles.dropdownItem} onClick={onDelete}>
+            <button className={styles.btnDanger}>
               Delete <i className="bx bx-trash"></i>
             </button>
           </div>

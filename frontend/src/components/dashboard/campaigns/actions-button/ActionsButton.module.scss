@@ -1,3 +1,4 @@
+@import 'styles/_mixins';
 @import 'styles/_variables';
 
 .btnGroup {
@@ -89,4 +90,10 @@
   font-weight: 400;
   letter-spacing: 0px;
   background: none;
+}
+
+.expired {
+  color: $grey-500;
+  padding: calc(0.5rem + 10px);
+  @include flex-horizontal;
 }
