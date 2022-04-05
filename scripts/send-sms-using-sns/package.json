@@ -1,0 +1,21 @@
+{
+  "name": "send-sms-using-sns",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "aws-sdk": "^2.1101.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "args": "^5.0.1",
+    "bluebird": "^3.7.2",
+    "csv-parse": "^5.0.4",
+    "mustache": "^4.2.0"
+  }
+}
