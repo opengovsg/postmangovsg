@@ -29,7 +29,7 @@
     "convict": "^6.0.1",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.21",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "nodemailer": "^6.6.2",
     "pg": "^8.5.1",
     "pg-connection-string": "^2.4.0",
