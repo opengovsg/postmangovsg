@@ -20,7 +20,12 @@ import AnnouncementModal from './announcement-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
 import { Campaign, channelIcons } from 'classes'
-import { Pagination, TitleBar, PrimaryButton } from 'components/common'
+import {
+  Pagination,
+  TitleBar,
+  PrimaryButton,
+  ConfirmModal,
+} from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import CreateCampaign from 'components/dashboard/create/create-modal'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
@@ -85,11 +90,34 @@ const Campaigns = () => {
     setCampaignIdWithMenuOpen(campaignId)
   }
 
-  async function deleteCampaign(campaignId: number) {
-    await deleteCampaignById(campaignId)
-    setCampaignCount(campaignCount - 1)
-    setCampaignsDisplayed(campaignsDisplayed.filter((c) => c.id !== campaignId))
-  }
+  const deleteCampaign = useCallback(
+    async (campaignId: number) => {
+      await deleteCampaignById(campaignId)
+      setCampaignCount(campaignCount - 1)
+      setCampaignsDisplayed(
+        campaignsDisplayed.filter((c) => c.id !== campaignId)
+      )
+    },
+    [setCampaignCount, setCampaignsDisplayed, campaignCount, campaignsDisplayed]
+  )
+  const promptDeleteConfirmation = useCallback(
+    (campaignId: number) => {
+      if (modalContext.modalContent === null) {
+        modalContext.setModalContent(
+          <ConfirmModal
+            title="Are you absolutely sure?"
+            subtitle="Deleting a campaign is irreversible."
+            buttonText="Yes"
+            cancelText="Cancel"
+            onConfirm={() => deleteCampaign(campaignId)}
+            disableImage
+            destructive
+          />
+        )
+      }
+    },
+    [modalContext, deleteCampaign]
+  )
 
   // Only call the modalContext if content is currently null - prevents infinite re-rendering
   // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
@@ -206,7 +234,7 @@ const Campaigns = () => {
               e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>
             ) => {
               e.stopPropagation()
-              deleteCampaign(campaign.id)
+              promptDeleteConfirmation(campaign.id)
             }}
             onClose={() => setCampaignIdWithMenuOpen(undefined)}
           />
