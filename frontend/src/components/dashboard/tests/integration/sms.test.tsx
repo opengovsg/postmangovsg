@@ -24,7 +24,7 @@ test('successfully creates and sends a new SMS campaign', async () => {
   })
 
   // Click on the "Create new campaign" button
-  await userEvent.click(newCampaignButton)
+  await userEvent.click(newCampaignButton, { delay: null })
 
   // Wait for the CreateModal to load
   const campaignNameTextbox = await screen.findByRole('textbox', {
@@ -32,14 +32,14 @@ test('successfully creates and sends a new SMS campaign', async () => {
   })
 
   // Fill in the campaign title
-  await userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
+  await userEvent.type(campaignNameTextbox, CAMPAIGN_NAME, { delay: null })
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
   // Click on the SMS channel button
   const smsChannelButton = screen.getByRole('button', {
     name: /^sms$/i,
   })
-  await userEvent.click(smsChannelButton)
+  await userEvent.click(smsChannelButton, { delay: null })
   expect(smsChannelButton).toHaveClass('active')
   expect(screen.getByRole('button', { name: /^telegram$/i })).not.toHaveClass(
     'active'
@@ -50,7 +50,8 @@ test('successfully creates and sends a new SMS campaign', async () => {
 
   // Click on the "Create campaign" button
   await userEvent.click(
-    screen.getByRole('button', { name: /create campaign/i })
+    screen.getByRole('button', { name: /create campaign/i }),
+    { delay: null }
   )
 
   // Wait for the message template to load
@@ -63,7 +64,7 @@ test('successfully creates and sends a new SMS campaign', async () => {
     name: /message/i,
   })
   for (const char of MESSAGE_TEXT) {
-    userEvent.type(messageTextbox, char)
+    await userEvent.type(messageTextbox, char, { delay: null })
   }
   expect(messageTextbox).toHaveTextContent(MESSAGE_TEXT)
 
@@ -71,7 +72,8 @@ test('successfully creates and sends a new SMS campaign', async () => {
   await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByRole('button', {
@@ -84,7 +86,9 @@ test('successfully creates and sends a new SMS campaign', async () => {
   const fileUploadInput = screen.getByLabelText(
     /upload file/i
   ) as HTMLInputElement
-  await userEvent.upload(fileUploadInput, VALID_MOBILE_CSV_FILE)
+  await userEvent.upload(fileUploadInput, VALID_MOBILE_CSV_FILE, {
+    delay: null,
+  })
   expect(fileUploadInput?.files).toHaveLength(1)
   expect(fileUploadInput?.files?.[0]).toBe(VALID_MOBILE_CSV_FILE)
 
@@ -98,7 +102,8 @@ test('successfully creates and sends a new SMS campaign', async () => {
   await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByRole('heading', {
@@ -110,11 +115,12 @@ test('successfully creates and sends a new SMS campaign', async () => {
   const credentialDropdown = screen.getByRole('listbox', {
     name: /twilio credentials/i,
   })
-  await userEvent.click(credentialDropdown)
+  await userEvent.click(credentialDropdown, { delay: null })
   await userEvent.click(
     await screen.findByRole('option', {
       name: TWILIO_CREDENTIAL,
-    })
+    }),
+    { delay: null }
   )
   expect(credentialDropdown).toHaveTextContent(TWILIO_CREDENTIAL)
 
@@ -122,14 +128,15 @@ test('successfully creates and sends a new SMS campaign', async () => {
   const testNumberTextbox = await screen.findByRole('textbox', {
     name: /preview/i,
   })
-  await userEvent.type(testNumberTextbox, RECIPIENT_NUMBER)
+  await userEvent.type(testNumberTextbox, RECIPIENT_NUMBER, { delay: null })
   expect(testNumberTextbox).toHaveValue(RECIPIENT_NUMBER)
 
   // Send the test SMS and wait for validation
   await userEvent.click(
     screen.getByRole('button', {
       name: /send/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByText(/credentials have already been validated/i)
@@ -139,7 +146,8 @@ test('successfully creates and sends a new SMS campaign', async () => {
   await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
   // Wait for the page to load and ensure the necessary elements are shown
   expect(await screen.findByText(MESSAGE_TEXT)).toBeInTheDocument()
@@ -148,19 +156,21 @@ test('successfully creates and sends a new SMS campaign', async () => {
   await userEvent.click(
     screen.getByRole('button', {
       name: /send rate/i,
-    })
+    }),
+    { delay: null }
   )
   const sendRateTextbox = screen.getByRole('textbox', {
     name: /send rate/i,
   })
-  await userEvent.type(sendRateTextbox, '10')
+  await userEvent.type(sendRateTextbox, '10', { delay: null })
   expect(sendRateTextbox).toHaveValue('10')
 
   // Click the send campaign button
   await userEvent.click(
     screen.getByRole('button', {
       name: /send campaign now/i,
-    })
+    }),
+    { delay: null }
   )
 
   // Wait for the confirmation modal to load
@@ -174,7 +184,8 @@ test('successfully creates and sends a new SMS campaign', async () => {
   await userEvent.click(
     screen.getByRole('button', {
       name: /confirm send now/i,
-    })
+    }),
+    { delay: null }
   )
 
   // Wait for the campaign to be sent and ensure
@@ -202,7 +213,7 @@ test('successfully creates and sends a new SMS campaign', async () => {
     name: /refresh stats/i,
   })
 
-  await userEvent.click(refreshStatsButton)
+  await userEvent.click(refreshStatsButton, { delay: null })
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 
