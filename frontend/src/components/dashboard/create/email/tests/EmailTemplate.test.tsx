@@ -1,6 +1,6 @@
 import { t } from '@lingui/macro'
 
-import { waitFor } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { Route } from 'react-router-dom'
@@ -135,6 +135,152 @@ test('displays an error if the subject is empty after sanitization', async () =>
 
   // Teardown
   jest.restoreAllMocks()
+})
+
+describe('protected email', () => {
+  test('displays an error if the subject contains extraneous invalid params', async () => {
+    // Setup
+    jest.spyOn(console, 'error').mockImplementation(() => {
+      // Do nothing. Mock console.error to silence expected errors
+      // due to submitting invalid templates to the API
+    })
+    server.use(...mockApis(true))
+    renderTemplatePage()
+
+    // Wait for the component to fully load
+    expect((await screen.findAllByText(/donotreply/i))[0]).toBeInTheDocument()
+    const subjectTextbox = screen.getByRole('textbox', {
+      name: /subject/i,
+    })
+    const nextButton = screen.getByRole('button', { name: /next/i })
+
+    // Test against various templates with extraneous invalid params
+    // Doubling opening curly brace ({) due to it being a special character for
+    // keyboard object https://testing-library.com/docs/user-event/keyboard
+    const TEST_TEMPLATES = [
+      'test {{{{invalidparam}} ',
+      '{{{{anotherInvalidParam}} in a subject',
+    ]
+
+    const messageTextbox = screen.getByRole('textbox', {
+      name: /rdw-editor/i,
+    })
+    fireEvent.paste(messageTextbox, {
+      clipboardData: {
+        getData: () => 'filler body {{protectedlink}}',
+      },
+    })
+
+    for (const template of TEST_TEMPLATES) {
+      // Type the template text into the textbox
+      await userEvent.clear(subjectTextbox)
+      await userEvent.type(subjectTextbox, template)
+
+      // Click the next button to submit the template
+      await userEvent.click(nextButton)
+
+      // Assert that an error message is shown
+      expect(
+        await screen.findByText(/only these keywords are allowed/i)
+      ).toBeInTheDocument()
+    }
+
+    // Teardown
+    jest.restoreAllMocks()
+  })
+
+  test('displays an error if the body contains extraneous invalid params', async () => {
+    // Setup
+    jest.spyOn(console, 'error').mockImplementation(() => {
+      // Do nothing. Mock console.error to silence unexpected errors
+      // due to submitting invalid templates to the API
+    })
+    server.use(...mockApis(true))
+    renderTemplatePage()
+
+    // Wait for the component to fully load
+    expect((await screen.findAllByText(/donotreply/i))[0]).toBeInTheDocument()
+    const subjectTextbox = screen.getByRole('textbox', {
+      name: /subject/i,
+    })
+    const messageTextbox = screen.getByRole('textbox', {
+      name: /rdw-editor/i,
+    })
+    const nextButton = screen.getByRole('button', { name: /next/i })
+
+    // Make the subject non-empty
+    await userEvent.type(subjectTextbox, 'filler subject')
+
+    // Test against various templates with extraneous invalid params
+    const TEST_TEMPLATES = [
+      'a body with {{protectedlink}}, {{recipient}} and {{more}}',
+      'a body with {{protectedlink}} and {{unwanted}} params',
+    ]
+    for (const template of TEST_TEMPLATES) {
+      // Type the template text into the textbox
+      fireEvent.paste(messageTextbox, {
+        clipboardData: {
+          getData: () => template,
+        },
+      })
+
+      // Click the next button to submit the template
+      await userEvent.click(nextButton)
+
+      // Assert that an error message is shown
+      expect(
+        await screen.findByText(/only these keywords are allowed/i)
+      ).toBeInTheDocument()
+    }
+
+    jest.restoreAllMocks()
+  })
+
+  test('displays an error if the body does not have required params', async () => {
+    // Setup
+    jest.spyOn(console, 'error').mockImplementation(() => {
+      // Do nothing. Mock console.error to silence unexpected errors
+      // due to submitting invalid templates to the API
+    })
+    server.use(...mockApis(true))
+    renderTemplatePage()
+
+    // Wait for the component to fully load
+    expect((await screen.findAllByText(/donotreply/i))[0]).toBeInTheDocument()
+    const subjectTextbox = screen.getByRole('textbox', {
+      name: /subject/i,
+    })
+    const messageTextbox = screen.getByRole('textbox', {
+      name: /rdw-editor/i,
+    })
+    const nextButton = screen.getByRole('button', { name: /next/i })
+
+    // Make the subject non-empty
+    await userEvent.type(subjectTextbox, 'filler subject')
+
+    // Test against various templates with extraneous invalid params
+    const TEST_TEMPLATES = [
+      'a body without protectedlink',
+      'a body with {{recipient}} but no protectedlink',
+    ]
+    for (const template of TEST_TEMPLATES) {
+      // Type the template text into the textbox
+      fireEvent.paste(messageTextbox, {
+        clipboardData: {
+          getData: () => template,
+        },
+      })
+
+      // Click the next button to submit the template
+      await userEvent.click(nextButton)
+
+      // Assert that an error message is shown
+      expect(await screen.findByText(/missing keywords/i)).toBeInTheDocument()
+    }
+
+    // Teardown
+    jest.restoreAllMocks()
+  })
 })
 
 describe('custom sender details', () => {
