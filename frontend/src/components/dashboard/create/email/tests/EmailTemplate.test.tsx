@@ -15,7 +15,6 @@ import {
   mockCommonApis,
   server,
   render,
-  fireEvent,
   DEFAULT_FROM_NAME,
   DEFAULT_FROM_ADDRESS,
 } from 'test-utils'
@@ -112,7 +111,7 @@ test('displays an error if the subject is empty after sanitization', async () =>
   renderTemplatePage()
 
   // Wait for the component to fully load
-  expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
+  expect((await screen.findAllByText(/donotreply/i))[0]).toBeInTheDocument()
   const subjectTextbox = await screen.findByRole('textbox', {
     name: /subject/i,
   })
@@ -122,11 +121,11 @@ test('displays an error if the subject is empty after sanitization', async () =>
   const TEST_TEMPLATES = ['<hehe>', '<script>']
   for (const template of TEST_TEMPLATES) {
     // Type the template text into the textbox
-    userEvent.clear(subjectTextbox)
-    userEvent.type(subjectTextbox, template)
+    await userEvent.clear(subjectTextbox)
+    await userEvent.type(subjectTextbox, template)
 
     // Click the next button to submit the template
-    userEvent.click(nextButton)
+    await userEvent.click(nextButton)
 
     // Assert that an error message is shown
     expect(
@@ -136,140 +135,6 @@ test('displays an error if the subject is empty after sanitization', async () =>
 
   // Teardown
   jest.restoreAllMocks()
-})
-
-describe('protected email', () => {
-  test('displays an error if the subject contains extraneous invalid params', async () => {
-    // Setup
-    jest.spyOn(console, 'error').mockImplementation(() => {
-      // Do nothing. Mock console.error to silence expected errors
-      // due to submitting invalid templates to the API
-    })
-    server.use(...mockApis(true))
-    renderTemplatePage()
-
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
-      name: /subject/i,
-    })
-    const nextButton = screen.getByRole('button', { name: /next/i })
-
-    // Test against various templates with extraneous invalid params
-    const TEST_TEMPLATES = [
-      'test {{invalidparam}}',
-      '{{anotherInvalidParam}} in a subject',
-    ]
-    for (const template of TEST_TEMPLATES) {
-      // Type the template text into the textbox
-      userEvent.clear(subjectTextbox)
-      userEvent.paste(subjectTextbox, template)
-
-      // Click the next button to submit the template
-      userEvent.click(nextButton)
-
-      // Assert that an error message is shown
-      expect(
-        await screen.findByText(/only these keywords are allowed/i)
-      ).toBeInTheDocument()
-    }
-
-    // Teardown
-    jest.restoreAllMocks()
-  })
-
-  test('displays an error if the body contains extraneous invalid params', async () => {
-    // Setup
-    jest.spyOn(console, 'error').mockImplementation(() => {
-      // Do nothing. Mock console.error to silence unexpected errors
-      // due to submitting invalid templates to the API
-    })
-    server.use(...mockApis(true))
-    renderTemplatePage()
-
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
-      name: /subject/i,
-    })
-    const messageTextbox = screen.getByRole('textbox', {
-      name: /rdw-editor/i,
-    })
-    const nextButton = screen.getByRole('button', { name: /next/i })
-
-    // Make the subject non-empty
-    userEvent.paste(subjectTextbox, 'filler subject')
-
-    // Test against various templates with extraneous invalid params
-    const TEST_TEMPLATES = [
-      'a body with {{protectedlink}}, {{recipient}} and {{more}}',
-      'a body with {{protectedlink}} and {{unwanted}} params',
-    ]
-    for (const template of TEST_TEMPLATES) {
-      // Type the template text into the textbox
-      fireEvent.paste(messageTextbox, {
-        clipboardData: {
-          getData: () => template,
-        },
-      })
-
-      // Click the next button to submit the template
-      userEvent.click(nextButton)
-
-      // Assert that an error message is shown
-      expect(
-        await screen.findByText(/only these keywords are allowed/i)
-      ).toBeInTheDocument()
-    }
-
-    jest.restoreAllMocks()
-  })
-
-  test('displays an error if the body does not have required params', async () => {
-    // Setup
-    jest.spyOn(console, 'error').mockImplementation(() => {
-      // Do nothing. Mock console.error to silence unexpected errors
-      // due to submitting invalid templates to the API
-    })
-    server.use(...mockApis(true))
-    renderTemplatePage()
-
-    // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
-    const subjectTextbox = screen.getByRole('textbox', {
-      name: /subject/i,
-    })
-    const messageTextbox = screen.getByRole('textbox', {
-      name: /rdw-editor/i,
-    })
-    const nextButton = screen.getByRole('button', { name: /next/i })
-
-    // Make the subject non-empty
-    userEvent.paste(subjectTextbox, 'filler subject')
-
-    // Test against various templates with extraneous invalid params
-    const TEST_TEMPLATES = [
-      'a body without protectedlink',
-      'a body with {{recipient}} but no protectedlink',
-    ]
-    for (const template of TEST_TEMPLATES) {
-      // Type the template text into the textbox
-      fireEvent.paste(messageTextbox, {
-        clipboardData: {
-          getData: () => template,
-        },
-      })
-
-      // Click the next button to submit the template
-      userEvent.click(nextButton)
-
-      // Assert that an error message is shown
-      expect(await screen.findByText(/missing keywords/i)).toBeInTheDocument()
-    }
-
-    // Teardown
-    jest.restoreAllMocks()
-  })
 })
 
 describe('custom sender details', () => {
@@ -308,12 +173,12 @@ describe('custom sender details', () => {
     })
 
     // Key in custom from to be overwritten later
-    userEvent.clear(fromNameInput)
-    userEvent.type(fromNameInput, 'Custom name')
+    await userEvent.clear(fromNameInput)
+    await userEvent.type(fromNameInput, 'Custom name')
 
     // Select a new from address
-    userEvent.click(fromAddressDropdown)
-    userEvent.click(
+    await userEvent.click(fromAddressDropdown)
+    await userEvent.click(
       await screen.findByRole('option', {
         name: DEFAULT_FROM_ADDRESS,
       })
@@ -339,7 +204,7 @@ describe('custom sender details', () => {
     })
 
     expect(screen.queryByText(t`mailVia`)).toBeNull()
-    userEvent.type(fromNameInput, 'Custom name')
+    await userEvent.type(fromNameInput, 'Custom name')
     expect(screen.getByText(t`mailVia`)).toBeInTheDocument()
   })
 })

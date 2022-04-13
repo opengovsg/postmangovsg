@@ -105,11 +105,11 @@ test('displays an error message after uploading an invalid recipients list', asy
   })
 
   // Type in a message
-  userEvent.type(messageTextbox, 'test message')
-
+  await userEvent.type(messageTextbox, 'test message')
   // Upload the file
   // Note: we cannot select files via the file picker
-  userEvent.upload(fileUploadInput, INVALID_EMAIL_CSV_FILE)
+  await userEvent.upload(fileUploadInput, INVALID_EMAIL_CSV_FILE)
+
   expect(fileUploadInput?.files).toHaveLength(1)
   expect(fileUploadInput?.files?.[0]).toBe(INVALID_EMAIL_CSV_FILE)
 
