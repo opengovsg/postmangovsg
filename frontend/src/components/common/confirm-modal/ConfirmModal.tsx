@@ -18,6 +18,7 @@ const ConfirmModal = ({
   destructive,
   onConfirm,
   onCancel,
+  disableImage,
 }: {
   title: string
   subtitle: string
@@ -27,6 +28,7 @@ const ConfirmModal = ({
   destructive?: boolean
   onConfirm: () => Promise<any> | any
   onCancel?: () => Promise<any> | any
+  disableImage?: boolean
 }) => {
   const modalContext = useContext(ModalContext)
   const [errorMessage, setErrorMessage] = useState('')
@@ -52,9 +54,13 @@ const ConfirmModal = ({
   }
   return (
     <div className={styles.confirm}>
-      <div className={styles.modalImg}>
-        <img src={ConfirmImage} alt="Modal graphic"></img>
-      </div>
+      {disableImage ? (
+        ''
+      ) : (
+        <div className={styles.modalImg}>
+          <img src={ConfirmImage} alt="Modal graphic"></img>
+        </div>
+      )}
       <h2 className={styles.title}>{title}</h2>
       <h4 className={styles.subtitle}>{subtitle}</h4>
       <div className={styles.options}>

@@ -1,0 +1,104 @@
+@import 'styles/_mixins';
+@import 'styles/_variables';
+
+.btnGroup {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.dropdownMenu {
+  position: fixed;
+  z-index: 1;
+  background: #fff;
+  border-radius: 4px;
+  filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.15));
+}
+.displayNone {
+  display: none;
+}
+.dropdownItem {
+  padding: 10px;
+  min-width: 100px;
+  &:hover {
+    background: #f5f6fc;
+  }
+}
+.btnGroupBtn {
+  border: 1px solid $blue-500;
+  background-color: #fff;
+  padding: $spacing-1 $spacing-2;
+  display: inline-block;
+}
+.btnGroupLeft {
+  display: flex;
+  align-items: baseline;
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right-width: 0;
+  span,
+  .bx {
+    font-weight: 500;
+    line-height: 1.5rem;
+    color: $blue-500;
+  }
+  span {
+    font-size: 0.75rem;
+
+    margin-right: 0.25rem;
+  }
+  .bx {
+    font-size: 1.5rem;
+  }
+}
+
+// Workaround as nesting &:before inside .btnGroupLeft .bx doesn't work
+.bxBlue {
+  &:before {
+    color: $blue-500;
+  }
+}
+
+.colorDisabled {
+  color: #c1c7cd;
+  border-color: #c1c7cd;
+  span {
+    color: #c1c7cd;
+  }
+  &:before {
+    color: #c1c7cd;
+  }
+}
+
+.btnGroupRight {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  color: $blue-500;
+}
+
+.btn {
+  border: none;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0px;
+  background: none;
+}
+.btnPrimary {
+  color: $primary;
+}
+.btnDanger {
+  color: $red-500;
+}
+
+.expired {
+  color: $grey-500;
+  padding: calc(0.5rem + 10px);
+  @include flex-horizontal;
+}

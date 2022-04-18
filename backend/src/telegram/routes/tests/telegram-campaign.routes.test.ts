@@ -39,7 +39,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await TelegramMessage.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
   await Credential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()

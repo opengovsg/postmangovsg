@@ -1,6 +1,6 @@
 {
   "name": "postmangovsg",
-  "version": "1.32.1",
+  "version": "1.33.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,10 +13,6 @@
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
     "build:worker": "cd worker && npm run build",
-    "detect-secrets": "npm run --silent detect-secrets:exists && (git diff --staged --name-only | xargs detect-secrets-hook --baseline .secrets.baseline)",
-    "detect-secrets:exists": "detect-secrets || (echo 'Run `pip install detect-secrets`' && false)",
-    "detect-secrets:scan": "detect-secrets scan --exclude-files package-lock.json --no-keyword-scan > .secrets.baseline",
-    "detect-secrets:update": "detect-secrets scan --update .secrets.baseline",
     "start": "cd backend && npm start",
     "predev": "npm run build:shared",
     "dev": "concurrently -k -p \"[{name}]\" -n \"Shared,Backend,Sender,Logger,Frontend\" -c \"green.bold,yellow.bold,cyan.bold,blue.bold,white.bold\" \"npm run dev:shared\" \"npm run dev:backend\" \"npm run dev:worker:sender\" \"npm run dev:worker:logger\" \"npm run dev:frontend\"",
@@ -37,10 +33,11 @@
     "precommit:backend": "cd backend && npm run precommit",
     "precommit:worker": "cd worker && npm run precommit",
     "precommit:shared": "cd shared && npm run precommit",
-    "precommit:root": "lint-staged && sh check-env-format.sh && npm run detect-secrets",
+    "precommit:root": "lint-staged && sh check-env-format.sh",
     "lint-no-fix": "prettier --check '**/*.{yml,md}'",
     "lint": "prettier --write '**/*.{yml,md}' --loglevel warn",
-    "wait:backend": "wait-on http-get://localhost:4000"
+    "wait:backend": "wait-on http-get://localhost:4000",
+    "secretlint": "secretlint --secretlintignore .secretlintignore '**/*'"
   },
   "repository": {
     "type": "git",
@@ -53,14 +50,17 @@
   },
   "homepage": "https://github.com/datagovsg/postmangovsg#readme",
   "devDependencies": {
+    "@secretlint/secretlint-rule-preset-recommend": "^5.1.3",
     "concurrently": "^7.0.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
+    "secretlint": "^5.1.3",
     "wait-on": "^5.3.0"
   },
   "lint-staged": {
-    "*.{yml,md}": "prettier --write"
+    "*.{yml,md}": "prettier --write",
+    "*": "secretlint --secretlintignore .secretlintignore"
   },
   "husky": {
     "hooks": {

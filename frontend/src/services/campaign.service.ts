@@ -193,3 +193,16 @@ export async function exportCampaignStats(
     return campaignRecipients
   })
 }
+
+export async function deleteCampaignById(campaignId: number): Promise<void> {
+  return axios.delete(`/campaigns/${campaignId}`)
+}
+
+export async function renameCampaign(
+  campaignId: number,
+  name: string
+): Promise<void> {
+  return axios.put(`/campaigns/${campaignId}`, {
+    name,
+  })
+}

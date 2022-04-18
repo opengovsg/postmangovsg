@@ -36,5 +36,9 @@ module.exports.jest = (config) => {
     '^@shared/?(.*)': '<rootDir>/../shared/src/$1',
   }
   const moduleNameMapper = { ...config.moduleNameMapper, ...aliasMap }
-  return { ...config, moduleNameMapper }
+  return {
+    ...config,
+    setupFilesAfterEnv: ['./src/setupTests.ts'],
+    moduleNameMapper,
+  }
 }

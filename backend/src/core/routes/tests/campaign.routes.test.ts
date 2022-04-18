@@ -15,7 +15,7 @@ beforeAll(async () => {
 })
 
 afterEach(async () => {
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
 })
 
 afterAll(async () => {
@@ -199,5 +199,24 @@ describe('POST /campaigns', () => {
       protect: true,
     })
     expect(res.status).toBe(403)
+  })
+})
+
+describe('DELETE /campaigns/:campaignId', () => {
+  test('Delete a campaign based on its ID', async () => {
+    const c = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: 'SMS',
+      valid: false,
+      protect: false,
+    } as Campaign)
+
+    const res = await request(app).delete(`/campaigns/${c.id}`)
+    expect(res.status).toBe(200)
+  })
+  test('Returns 404 if the campaign ID doesnt exist', async () => {
+    const res = await request(app).delete('/campaigns/696969')
+    expect(res.status).toBe(404)
   })
 })

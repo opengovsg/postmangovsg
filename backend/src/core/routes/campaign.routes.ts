@@ -23,6 +23,18 @@ const createCampaignValidator = {
   }),
 }
 
+const deleteCampaignValidator = {
+  [Segments.PARAMS]: Joi.object({
+    campaignId: Joi.number().required(),
+  }),
+}
+
+const updateCampaignValidator = {
+  [Segments.BODY]: Joi.object({
+    name: Joi.string().max(255).trim().required(),
+  }),
+}
+
 // actual routes here
 
 /**
@@ -79,7 +91,7 @@ router.get(
 /**
  * @swagger
  * paths:
- *  /campaigns:
+ *  /campaigns/{campaignId}:
  *    post:
  *      summary: Create a new campaign
  *      tags:
@@ -124,6 +136,86 @@ router.post(
   '/',
   celebrate(createCampaignValidator),
   CampaignMiddleware.createCampaign
+)
+
+/**
+ * @swagger
+ * paths:
+ *  /campaigns/{campaignId}:
+ *    delete:
+ *      tags:
+ *        - Campaigns
+ *      summary: Delete a campaign using its ID
+ *      parameters:
+ *        - in: path
+ *          name: campaignId
+ *          description: ID of the campaign
+ *          required: true
+ *          schema:
+ *            type: integer
+ *            minimum: 1
+ *      responses:
+ *        "200":
+ *          description: Successfully deleted
+ *          content:
+ *            schema:
+ *              type: object
+ *        "401":
+ *          description: Unauthorized
+ *        "404":
+ *          description: Campaign not found
+ *        "500":
+ *          description: Internal Server Error
+ */
+router.delete(
+  '/:campaignId',
+  celebrate(deleteCampaignValidator),
+  CampaignMiddleware.deleteCampaign
+)
+
+/**
+ * paths:
+ *  /campaigns/{campaignId}:
+ *   put:
+ *    summary: Rename campaign
+ *    tags:
+ *      - Campaigns
+ *    parameters:
+ *        - name: campaignId
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            required:
+ *              - id
+ *            properties:
+ *              id:
+ *                type: number
+ *              name:
+ *                type: string
+ *    responses:
+ *      "200":
+ *        content:
+ *          application/json:
+ *            schema:
+ *             type: object
+ *      "401":
+ *        description: Unauthorized
+ *      "404":
+ *        description: Not found
+ *      "500":
+ *        description: Internal Server Error
+ */
+router.put(
+  '/:campaignId',
+  celebrate(updateCampaignValidator),
+  CampaignMiddleware.updateCampaign
 )
 
 export default router

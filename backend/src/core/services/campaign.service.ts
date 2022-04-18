@@ -308,6 +308,17 @@ const setValid = (
   )
 }
 
+const deleteCampaign = (campaignId: number): Promise<number> => {
+  return Campaign.destroy({
+    where: { id: +campaignId },
+  })
+}
+const updateCampaign = (campaign: Campaign): Promise<[number, Campaign[]]> =>
+  Campaign.update(campaign, {
+    where: { id: campaign.id },
+    returning: true,
+  })
+
 export const CampaignService = {
   hasJobInProgress,
   createCampaign,
@@ -316,4 +327,6 @@ export const CampaignService = {
   getCampaignDetails,
   setInvalid,
   setValid,
+  deleteCampaign,
+  updateCampaign,
 }

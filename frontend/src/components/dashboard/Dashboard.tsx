@@ -8,7 +8,6 @@ import Settings from './settings'
 
 import { InfoBanner, NavBar } from 'components/common'
 import Error from 'components/error'
-import { INFO_BANNER } from 'config'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterContextProvider from 'contexts/finish-later.modal.context'
 import ModalContextProvider from 'contexts/modal.context'
@@ -16,7 +15,7 @@ import ModalContextProvider from 'contexts/modal.context'
 const Dashboard = () => {
   return (
     <ModalContextProvider>
-      <InfoBanner>{INFO_BANNER}</InfoBanner>
+      <InfoBanner />
       <NavBar></NavBar>
       <Switch>
         <Route exact path="/campaigns" component={Campaigns}></Route>
