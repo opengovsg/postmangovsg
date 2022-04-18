@@ -129,8 +129,8 @@ test('next button is disabled when template is empty', async () => {
   expect(nextButton).toBeDisabled()
 
   // Type something in the textbox and erase it
-  userEvent.type(templateTextbox, 'test body')
-  userEvent.clear(templateTextbox)
+  await userEvent.type(templateTextbox, 'test body')
+  await userEvent.clear(templateTextbox)
 
   // Assert that the next button is disabled after clearing the text
   expect(nextButton).toBeDisabled()
@@ -151,7 +151,7 @@ test('next button is enabled when the template is filled', async () => {
 
   // Type something in the textbox
   const TEST_BODY = 'test body'
-  userEvent.type(templateTextbox, TEST_BODY)
+  await userEvent.type(templateTextbox, TEST_BODY)
   expect(templateTextbox).toHaveValue(TEST_BODY)
 
   // Assert that the next button is enabled
@@ -173,8 +173,8 @@ test('character count text reflects the actual number of characters in the textb
   const TEST_TEMPLATES = ['Letter wooded', '1234567890']
   for (const template of TEST_TEMPLATES) {
     // Type the template text into the textbox
-    userEvent.clear(templateTextbox)
-    userEvent.type(templateTextbox, template)
+    await userEvent.clear(templateTextbox)
+    await userEvent.type(templateTextbox, template)
 
     // Assert that the character count is the same as the number of characters in the corpus
     expect(characterCountText).toHaveTextContent(
@@ -203,8 +203,8 @@ test('SMS cost should be correct for SMS campaign body template', async () => {
   ]
   for (const template of TEST_TEMPLATES) {
     // Type the template text into the textbox
-    userEvent.clear(templateTextbox)
-    userEvent.type(templateTextbox, template)
+    await userEvent.clear(templateTextbox)
+    await userEvent.type(templateTextbox, template)
 
     const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD = 0.0395 // correct as at 5 Feb 2022
     const segmentedMessage = new SegmentedMessage(template)
@@ -246,11 +246,11 @@ describe('displays an error if the template is invalid', () => {
     const TEST_TEMPLATES = ['<hehe>', '<script>']
     for (const template of TEST_TEMPLATES) {
       // Type the template text into the textbox
-      userEvent.clear(templateTextbox)
-      userEvent.type(templateTextbox, template)
+      await userEvent.clear(templateTextbox)
+      await userEvent.type(templateTextbox, template)
 
       // Click the next button to submit the template
-      userEvent.click(nextButton)
+      await userEvent.click(nextButton)
 
       // Assert that an error message is shown
       expect(

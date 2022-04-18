@@ -213,11 +213,11 @@ function mockBaseCampaignApis(state: State) {
     }),
     rest.get('/campaign/:campaignId', (req, res, ctx) => {
       const { campaignId } = req.params
-      return res(ctx.status(200), ctx.json(state.campaigns[campaignId - 1]))
+      return res(ctx.status(200), ctx.json(state.campaigns[+campaignId - 1]))
     }),
     rest.post('/campaign/:campaignId/send', (req, res, ctx) => {
       const { campaignId } = req.params
-      state.campaigns[campaignId - 1].job_queue = [
+      state.campaigns[+campaignId - 1].job_queue = [
         { status: 'LOGGED', sent_at: new Date().toISOString() },
       ]
       return res(
@@ -227,7 +227,7 @@ function mockBaseCampaignApis(state: State) {
     }),
     rest.get('/campaign/:campaignId/stats', (req, res, ctx) => {
       const { campaignId } = req.params
-      const { halted } = state.campaigns[campaignId - 1]
+      const { halted } = state.campaigns[+campaignId - 1]
 
       return res(
         ctx.status(200),
@@ -245,7 +245,7 @@ function mockBaseCampaignApis(state: State) {
     }),
     rest.post('/campaign/:campaignId/refresh-stats', (req, res, ctx) => {
       const { campaignId } = req.params
-      const { halted } = state.campaigns[campaignId - 1]
+      const { halted } = state.campaigns[+campaignId - 1]
 
       return res(
         ctx.status(200),
@@ -322,7 +322,7 @@ function mockCampaignTemplateApis(state: State) {
         return res(ctx.status(400))
       }
 
-      if (state.campaigns[campaignId - 1].protect) {
+      if (state.campaigns[+campaignId - 1].protect) {
         try {
           checkTemplateVariables(
             sanitizedSubject,
@@ -335,7 +335,10 @@ function mockCampaignTemplateApis(state: State) {
             ['recipient']
           )
         } catch (err) {
-          return res(ctx.status(500), ctx.json({ message: err.message }))
+          return res(
+            ctx.status(500),
+            ctx.json({ message: (err as Error).message })
+          )
         }
       }
 
@@ -346,9 +349,9 @@ function mockCampaignTemplateApis(state: State) {
         reply_to: replyTo ?? state.users[state.curUserId - 1].email,
         subject: sanitizedSubject,
       }
-      state.campaigns[campaignId - 1].email_templates = template
+      state.campaigns[+campaignId - 1].email_templates = template
 
-      const { valid, num_recipients } = state.campaigns[campaignId - 1]
+      const { valid, num_recipients } = state.campaigns[+campaignId - 1]
 
       return res(
         ctx.status(200),
@@ -379,9 +382,9 @@ function mockCampaignTemplateApis(state: State) {
         body: sanitizedBody,
         params: extractAndMergeParams(body),
       }
-      state.campaigns[campaignId - 1].sms_templates = template
+      state.campaigns[+campaignId - 1].sms_templates = template
 
-      const { valid, num_recipients } = state.campaigns[campaignId - 1]
+      const { valid, num_recipients } = state.campaigns[+campaignId - 1]
 
       return res(
         ctx.status(200),
@@ -414,9 +417,9 @@ function mockCampaignTemplateApis(state: State) {
         body: sanitizedBody,
         params: extractAndMergeParams(body),
       }
-      state.campaigns[campaignId - 1].telegram_templates = template
+      state.campaigns[+campaignId - 1].telegram_templates = template
 
-      const { valid, num_recipients } = state.campaigns[campaignId - 1]
+      const { valid, num_recipients } = state.campaigns[+campaignId - 1]
 
       return res(
         ctx.status(200),
@@ -430,7 +433,7 @@ function mockCampaignTemplateApis(state: State) {
     }),
     rest.get('/campaign/:campaignId/email/preview', (req, res, ctx) => {
       const { campaignId } = req.params
-      const preview = state.campaigns[campaignId - 1].email_templates
+      const preview = state.campaigns[+campaignId - 1].email_templates
       return res(
         ctx.status(200),
         ctx.json({
@@ -448,7 +451,7 @@ function mockCampaignTemplateApis(state: State) {
       return res(
         ctx.status(200),
         ctx.json({
-          preview: state.campaigns[campaignId - 1].sms_templates,
+          preview: state.campaigns[+campaignId - 1].sms_templates,
         })
       )
     }),
@@ -457,7 +460,7 @@ function mockCampaignTemplateApis(state: State) {
       return res(
         ctx.status(200),
         ctx.json({
-          preview: state.campaigns[campaignId - 1].telegram_templates,
+          preview: state.campaigns[+campaignId - 1].telegram_templates,
         })
       )
     }),
@@ -472,7 +475,7 @@ function mockCampaignCredentialApis(state: State) {
       if (!recipient) {
         return res(ctx.status(400))
       }
-      state.campaigns[campaignId - 1].has_credential = true
+      state.campaigns[+campaignId - 1].has_credential = true
       return res(ctx.status(200))
     }),
     rest.post('/campaign/:campaignId/sms/credentials', (req, res, ctx) => {
@@ -492,7 +495,7 @@ function mockCampaignCredentialApis(state: State) {
       ) {
         return res(ctx.status(400))
       }
-      state.campaigns[campaignId - 1].has_credential = true
+      state.campaigns[+campaignId - 1].has_credential = true
       return res(ctx.status(200))
     }),
     rest.post('/campaign/:campaignId/telegram/credentials', (req, res, ctx) => {
@@ -510,7 +513,7 @@ function mockCampaignCredentialApis(state: State) {
       ) {
         return res(ctx.status(400))
       }
-      state.campaigns[campaignId - 1].has_credential = true
+      state.campaigns[+campaignId - 1].has_credential = true
       return res(ctx.status(200))
     }),
     rest.post(
@@ -582,14 +585,14 @@ function mockCampaignUploadApis(state: State) {
         // Use the filename to determine if the CSV file is invalid
         // since jsdom doesn't store the file data on uploads
         if (filename === INVALID_CSV_FILENAME) {
-          state.campaigns[campaignId - 1] = {
-            ...state.campaigns[campaignId - 1],
+          state.campaigns[+campaignId - 1] = {
+            ...state.campaigns[+campaignId - 1],
             csv_error: 'Error: invalid recipient file',
             temp_csv_filename: filename,
           }
         } else {
-          state.campaigns[campaignId - 1] = {
-            ...state.campaigns[campaignId - 1],
+          state.campaigns[+campaignId - 1] = {
+            ...state.campaigns[+campaignId - 1],
             valid: true,
             num_recipients: 1,
             csv_filename: filename,
@@ -616,14 +619,14 @@ function mockCampaignUploadApis(state: State) {
       // Use the filename to determine if the CSV file is invalid
       // since jsdom doesn't store the file data on uploads
       if (filename === INVALID_CSV_FILENAME) {
-        state.campaigns[campaignId - 1] = {
-          ...state.campaigns[campaignId - 1],
+        state.campaigns[+campaignId - 1] = {
+          ...state.campaigns[+campaignId - 1],
           csv_error: 'Error: invalid recipient file',
           temp_csv_filename: filename,
         }
       } else {
-        state.campaigns[campaignId - 1] = {
-          ...state.campaigns[campaignId - 1],
+        state.campaigns[+campaignId - 1] = {
+          ...state.campaigns[+campaignId - 1],
           valid: true,
           num_recipients: 1,
           csv_filename: filename,
@@ -638,7 +641,7 @@ function mockCampaignUploadApis(state: State) {
     rest.get('/campaign/:campaignId/upload/status', (req, res, ctx) => {
       const { campaignId } = req.params
 
-      const campaign = state.campaigns[campaignId - 1]
+      const campaign = state.campaigns[+campaignId - 1]
       const {
         num_recipients,
         is_csv_processing,
@@ -698,7 +701,7 @@ function mockUnsubscribeApis(state: State) {
         return res(ctx.status(400))
       }
 
-      if (campaignId <= 0 || campaignId > state.campaigns.length) {
+      if (+campaignId <= 0 || +campaignId > state.campaigns.length) {
         return res(
           ctx.status(400),
           ctx.json({ message: 'Invalid unsubscribe request' })

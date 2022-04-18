@@ -1,6 +1,6 @@
 import { t } from '@lingui/macro'
 
-import { waitFor } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { Route } from 'react-router-dom'
@@ -15,7 +15,6 @@ import {
   mockCommonApis,
   server,
   render,
-  fireEvent,
   DEFAULT_FROM_NAME,
   DEFAULT_FROM_ADDRESS,
 } from 'test-utils'
@@ -112,7 +111,7 @@ test('displays an error if the subject is empty after sanitization', async () =>
   renderTemplatePage()
 
   // Wait for the component to fully load
-  expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
+  expect((await screen.findAllByText(/donotreply/i))[0]).toBeInTheDocument()
   const subjectTextbox = await screen.findByRole('textbox', {
     name: /subject/i,
   })
@@ -122,11 +121,11 @@ test('displays an error if the subject is empty after sanitization', async () =>
   const TEST_TEMPLATES = ['<hehe>', '<script>']
   for (const template of TEST_TEMPLATES) {
     // Type the template text into the textbox
-    userEvent.clear(subjectTextbox)
-    userEvent.type(subjectTextbox, template)
+    await userEvent.clear(subjectTextbox)
+    await userEvent.type(subjectTextbox, template)
 
     // Click the next button to submit the template
-    userEvent.click(nextButton)
+    await userEvent.click(nextButton)
 
     // Assert that an error message is shown
     expect(
@@ -149,24 +148,36 @@ describe('protected email', () => {
     renderTemplatePage()
 
     // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
+    expect((await screen.findAllByText(/donotreply/i))[0]).toBeInTheDocument()
     const subjectTextbox = screen.getByRole('textbox', {
       name: /subject/i,
     })
     const nextButton = screen.getByRole('button', { name: /next/i })
 
     // Test against various templates with extraneous invalid params
+    // Doubling opening curly brace ({) due to it being a special character for
+    // keyboard object https://testing-library.com/docs/user-event/keyboard
     const TEST_TEMPLATES = [
-      'test {{invalidparam}}',
-      '{{anotherInvalidParam}} in a subject',
+      'test {{{{invalidparam}} ',
+      '{{{{anotherInvalidParam}} in a subject',
     ]
+
+    const messageTextbox = screen.getByRole('textbox', {
+      name: /rdw-editor/i,
+    })
+    fireEvent.paste(messageTextbox, {
+      clipboardData: {
+        getData: () => 'filler body {{protectedlink}}',
+      },
+    })
+
     for (const template of TEST_TEMPLATES) {
       // Type the template text into the textbox
-      userEvent.clear(subjectTextbox)
-      userEvent.paste(subjectTextbox, template)
+      await userEvent.clear(subjectTextbox)
+      await userEvent.type(subjectTextbox, template)
 
       // Click the next button to submit the template
-      userEvent.click(nextButton)
+      await userEvent.click(nextButton)
 
       // Assert that an error message is shown
       expect(
@@ -188,7 +199,7 @@ describe('protected email', () => {
     renderTemplatePage()
 
     // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
+    expect((await screen.findAllByText(/donotreply/i))[0]).toBeInTheDocument()
     const subjectTextbox = screen.getByRole('textbox', {
       name: /subject/i,
     })
@@ -198,7 +209,7 @@ describe('protected email', () => {
     const nextButton = screen.getByRole('button', { name: /next/i })
 
     // Make the subject non-empty
-    userEvent.paste(subjectTextbox, 'filler subject')
+    await userEvent.type(subjectTextbox, 'filler subject')
 
     // Test against various templates with extraneous invalid params
     const TEST_TEMPLATES = [
@@ -214,7 +225,7 @@ describe('protected email', () => {
       })
 
       // Click the next button to submit the template
-      userEvent.click(nextButton)
+      await userEvent.click(nextButton)
 
       // Assert that an error message is shown
       expect(
@@ -235,7 +246,7 @@ describe('protected email', () => {
     renderTemplatePage()
 
     // Wait for the component to fully load
-    expect(await screen.findByText(/donotreply/i)).toBeInTheDocument()
+    expect((await screen.findAllByText(/donotreply/i))[0]).toBeInTheDocument()
     const subjectTextbox = screen.getByRole('textbox', {
       name: /subject/i,
     })
@@ -245,7 +256,7 @@ describe('protected email', () => {
     const nextButton = screen.getByRole('button', { name: /next/i })
 
     // Make the subject non-empty
-    userEvent.paste(subjectTextbox, 'filler subject')
+    await userEvent.type(subjectTextbox, 'filler subject')
 
     // Test against various templates with extraneous invalid params
     const TEST_TEMPLATES = [
@@ -261,7 +272,7 @@ describe('protected email', () => {
       })
 
       // Click the next button to submit the template
-      userEvent.click(nextButton)
+      await userEvent.click(nextButton)
 
       // Assert that an error message is shown
       expect(await screen.findByText(/missing keywords/i)).toBeInTheDocument()
@@ -308,12 +319,12 @@ describe('custom sender details', () => {
     })
 
     // Key in custom from to be overwritten later
-    userEvent.clear(fromNameInput)
-    userEvent.type(fromNameInput, 'Custom name')
+    await userEvent.clear(fromNameInput)
+    await userEvent.type(fromNameInput, 'Custom name')
 
     // Select a new from address
-    userEvent.click(fromAddressDropdown)
-    userEvent.click(
+    await userEvent.click(fromAddressDropdown)
+    await userEvent.click(
       await screen.findByRole('option', {
         name: DEFAULT_FROM_ADDRESS,
       })
@@ -339,7 +350,7 @@ describe('custom sender details', () => {
     })
 
     expect(screen.queryByText(t`mailVia`)).toBeNull()
-    userEvent.type(fromNameInput, 'Custom name')
+    await userEvent.type(fromNameInput, 'Custom name')
     expect(screen.getByText(t`mailVia`)).toBeInTheDocument()
   })
 })

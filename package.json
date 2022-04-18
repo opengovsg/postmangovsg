@@ -37,7 +37,7 @@
     "lint-no-fix": "prettier --check '**/*.{yml,md}'",
     "lint": "prettier --write '**/*.{yml,md}' --loglevel warn",
     "wait:backend": "wait-on http-get://localhost:4000",
-    "secretlint": "secretlint '**/*'"
+    "secretlint": "secretlint --secretlintignore .secretlintignore '**/*'"
   },
   "repository": {
     "type": "git",
@@ -60,7 +60,7 @@
   },
   "lint-staged": {
     "*.{yml,md}": "prettier --write",
-    "*": "secretlint"
+    "*": "secretlint --secretlintignore .secretlintignore"
   },
   "husky": {
     "hooks": {
