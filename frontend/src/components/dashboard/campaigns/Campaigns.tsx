@@ -8,14 +8,18 @@ import {
   useContext,
   useCallback,
   MouseEvent as ReactMouseEvent,
+  useRef,
 } from 'react'
 
 import Moment from 'react-moment'
-import { useHistory } from 'react-router-dom'
+
+import { Link } from 'react-router-dom'
 
 import styles from './Campaigns.module.scss'
+import overrideStyles from './OverrideTextInputWithButton.module.scss'
 
 import ActionsButton from './actions-button'
+
 import AnnouncementModal from './announcement-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
@@ -25,6 +29,7 @@ import {
   TitleBar,
   PrimaryButton,
   ConfirmModal,
+  TextInputWithButton,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import CreateCampaign from 'components/dashboard/create/create-modal'
@@ -34,7 +39,11 @@ import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
 
-import { deleteCampaignById, getCampaigns } from 'services/campaign.service'
+import {
+  deleteCampaignById,
+  getCampaigns,
+  renameCampaign,
+} from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import { getUserSettings } from 'services/settings.service'
@@ -57,8 +66,12 @@ const Campaigns = () => {
   const [campaignIdWithMenuOpen, setCampaignIdWithMenuOpen] = useState<
     number | undefined
   >(undefined)
+  const [campaignIdWithRenameOpen, setCampaignIdWithRenameOpen] = useState<
+    number | undefined
+  >(undefined)
+  const [campaignNewName, setCampaignNewName] = useState('')
+  const renameInputRef = useRef<HTMLInputElement>()
 
-  const history = useHistory()
   const name = getNameFromEmail(email)
   const title = `Welcome, ${name}`
 
@@ -90,6 +103,10 @@ const Campaigns = () => {
     setCampaignIdWithMenuOpen(campaignId)
   }
 
+  function closeMenu(): void {
+    setCampaignIdWithMenuOpen(undefined)
+  }
+
   const deleteCampaign = useCallback(
     async (campaignId: number) => {
       await deleteCampaignById(campaignId)
@@ -118,6 +135,19 @@ const Campaigns = () => {
     },
     [modalContext, deleteCampaign]
   )
+
+  async function handleRename(): Promise<void> {
+    await renameCampaign(campaignIdWithRenameOpen as number, campaignNewName)
+    setCampaignsDisplayed(
+      campaignsDisplayed.map((c) => {
+        if (c.id === campaignIdWithRenameOpen) {
+          c.name = campaignNewName
+        }
+        return c
+      })
+    )
+    setCampaignIdWithRenameOpen(undefined)
+  }
 
   // Only call the modalContext if content is currently null - prevents infinite re-rendering
   // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
@@ -156,6 +186,11 @@ const Campaigns = () => {
     getNumDemosAndAnnouncementVersion()
   }, [displayNewAnnouncement, isMounted])
 
+  useEffect(() => {
+    if (!campaignIdWithRenameOpen) return
+    renameInputRef.current?.focus()
+  }, [campaignIdWithRenameOpen])
+
   /* eslint-disable react/display-name */
   const headers = [
     {
@@ -179,15 +214,28 @@ const Campaigns = () => {
     },
     {
       name: 'Name',
-      render: (campaign: Campaign) => (
-        <span
-          className={cx(styles.rowName, {
-            [styles.demo]: !!campaign.demoMessageLimit,
-          })}
-        >
-          {campaign.name}
-        </span>
-      ),
+      render: (campaign: Campaign) =>
+        campaignIdWithRenameOpen === campaign.id ? (
+          <TextInputWithButton
+            value={campaignNewName || campaign.name}
+            type="text"
+            placeholder="Enter new name"
+            onChange={setCampaignNewName}
+            onClick={handleRename}
+            buttonLabel={<i className={cx('bx bx-check', overrideStyles.bx)} />}
+            loadingButtonLabel={<i className="bx bx-loader-alt bx-spin" />}
+            overrideStyles={overrideStyles}
+            textRef={renameInputRef}
+          />
+        ) : (
+          <span
+            className={cx(styles.rowName, {
+              [styles.demo]: !!campaign.demoMessageLimit,
+            })}
+          >
+            <Link to={`/campaigns/${campaign.id}`}>{campaign.name}</Link>
+          </span>
+        ),
       width: 'lg ellipsis',
     },
     {
@@ -236,7 +284,14 @@ const Campaigns = () => {
               e.stopPropagation()
               promptDeleteConfirmation(campaign.id)
             }}
-            onClose={() => setCampaignIdWithMenuOpen(undefined)}
+            onClose={closeMenu}
+            onRename={(
+              e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>
+            ) => {
+              e.stopPropagation()
+              setCampaignIdWithRenameOpen(campaign.id)
+              closeMenu()
+            }}
           />
         )
       },
@@ -247,7 +302,7 @@ const Campaigns = () => {
 
   function renderRow(campaign: Campaign, key: number) {
     return (
-      <tr key={key} onClick={() => history.push(`/campaigns/${campaign.id}`)}>
+      <tr key={key}>
         {headers.map(({ render, width }, key) => (
           <td className={width} key={key}>
             {render(campaign)}

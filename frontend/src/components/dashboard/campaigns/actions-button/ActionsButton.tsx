@@ -26,6 +26,7 @@ const ActionsButton = ({
   onToggle,
   onDelete,
   onClose,
+  onRename,
 }: {
   campaign: Campaign
   numDemosSms: number
@@ -35,6 +36,7 @@ const ActionsButton = ({
   onToggle?: (e: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => void
   onDelete?: (e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>) => void
   onClose?: () => void
+  onRename?: (e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>) => void
 }) => {
   const btnGroupRef = createRef<HTMLDivElement>()
   const [dropdownMenuStyle, setDropdownMenuStyle] = useState<object>()
@@ -159,9 +161,18 @@ const ActionsButton = ({
             />
           </div>
         )}
+        {onRename ? (
+          <div className={styles.dropdownItem} onClick={onRename}>
+            <button className={cx(styles.btn, styles.btnPrimary)}>
+              Rename <i className="bx bx-pencil"></i>
+            </button>
+          </div>
+        ) : (
+          ''
+        )}
         {onDelete ? (
           <div className={styles.dropdownItem} onClick={onDelete}>
-            <button className={styles.btnDanger}>
+            <button className={cx(styles.btn, styles.btnDanger)}>
               Delete <i className="bx bx-trash"></i>
             </button>
           </div>

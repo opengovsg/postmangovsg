@@ -81,8 +81,7 @@
   color: $blue-500;
 }
 
-.btnDanger {
-  color: $red-500;
+.btn {
   border: none;
   padding: 0.5rem;
   font-size: 0.9rem;
@@ -90,6 +89,12 @@
   font-weight: 400;
   letter-spacing: 0px;
   background: none;
+}
+.btnPrimary {
+  color: $primary;
+}
+.btnDanger {
+  color: $red-500;
 }
 
 .expired {

@@ -1,0 +1,61 @@
+@import 'styles/_variables';
+
+$button-width: 0.5rem;
+
+.inputWithButton {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  padding: 0 10px 0 0;
+
+  .textInput {
+    width: 100%;
+    height: 100%;
+    flex-shrink: 1;
+    margin-right: -$button-height;
+
+    input {
+      margin-right: 0px;
+      padding-right: $button-height + 0.5rem;
+      height: 42px;
+    }
+
+    &:hover {
+      input {
+        height: 41px;
+      }
+    }
+  }
+
+  .textInput.error {
+    border-color: $error;
+  }
+}
+@media (max-width: 768px) {
+  .inputWithButton {
+    .textInput {
+      input {
+        height: 39px;
+      }
+      &:hover {
+        height: 38px;
+      }
+    }
+  }
+}
+
+.inputButton {
+  min-width: $button-width;
+  flex-grow: 1;
+  flex-shrink: 0;
+  height: 100%;
+}
+.bx {
+  margin: 0 !important;
+}
+
+.errorMessage {
+  @extend %caption;
+  padding-left: $border-radius;
+  color: $error;
+}
