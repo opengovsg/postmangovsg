@@ -23,6 +23,12 @@ const createCampaignValidator = {
   }),
 }
 
+const deleteCampaignValidator = {
+  [Segments.PARAMS]: Joi.object({
+    campaignId: Joi.number().required(),
+  }),
+}
+
 // actual routes here
 
 /**
@@ -124,6 +130,41 @@ router.post(
   '/',
   celebrate(createCampaignValidator),
   CampaignMiddleware.createCampaign
+)
+
+/**
+ * @swagger
+ * paths:
+ *  /campaigns/{campaignId}:
+ *    delete:
+ *      tags:
+ *        - Campaigns
+ *      summary: Delete a campaign using its ID
+ *      parameters:
+ *        - in: path
+ *          name: campaignId
+ *          description: ID of the campaign
+ *          required: true
+ *          schema:
+ *            type: integer
+ *            minimum: 1
+ *      responses:
+ *        "200":
+ *          description: Successfully deleted
+ *          content:
+ *            schema:
+ *              type: object
+ *        "401":
+ *          description: Unauthorized
+ *        "404":
+ *          description: Campaign not found
+ *        "500":
+ *          description: Internal Server Error
+ */
+router.delete(
+  '/:campaignId',
+  celebrate(deleteCampaignValidator),
+  CampaignMiddleware.deleteCampaign
 )
 
 export default router

@@ -1,28 +1,30 @@
-import { Trans } from '@lingui/macro'
-
 import cx from 'classnames'
 
 import { capitalize } from 'lodash'
 
-import { useEffect, useState, useContext, useCallback } from 'react'
+import {
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+  MouseEvent as ReactMouseEvent,
+} from 'react'
 
-import type { MouseEvent as ReactMouseEvent } from 'react'
 import Moment from 'react-moment'
 import { useHistory } from 'react-router-dom'
 
-import DuplicateCampaignModal from '../create/duplicate-campaign-modal'
-
 import styles from './Campaigns.module.scss'
 
+import ActionsButton from './actions-button'
 import AnnouncementModal from './announcement-modal'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
-import { Campaign, channelIcons, ChannelType, Status } from 'classes'
+import { Campaign, channelIcons } from 'classes'
 import {
   Pagination,
   TitleBar,
   PrimaryButton,
-  ExportRecipients,
+  ConfirmModal,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import CreateCampaign from 'components/dashboard/create/create-modal'
@@ -32,7 +34,7 @@ import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
 
-import { getCampaigns } from 'services/campaign.service'
+import { deleteCampaignById, getCampaigns } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import { getUserSettings } from 'services/settings.service'
@@ -52,6 +54,10 @@ const Campaigns = () => {
   const [isDemoDisplayed, setIsDemoDisplayed] = useState(false)
   const [numDemosSms, setNumDemosSms] = useState(0)
   const [numDemosTelegram, setNumDemosTelegram] = useState(0)
+  const [campaignIdWithMenuOpen, setCampaignIdWithMenuOpen] = useState<
+    number | undefined
+  >(undefined)
+
   const history = useHistory()
   const name = getNameFromEmail(email)
   const title = `Welcome, ${name}`
@@ -75,6 +81,43 @@ const Campaigns = () => {
     setCampaignsDisplayed(campaigns)
     setLoading(false)
   }
+
+  function toggleMenu(campaignId: number): void {
+    if (campaignId === campaignIdWithMenuOpen) {
+      setCampaignIdWithMenuOpen(undefined)
+      return
+    }
+    setCampaignIdWithMenuOpen(campaignId)
+  }
+
+  const deleteCampaign = useCallback(
+    async (campaignId: number) => {
+      await deleteCampaignById(campaignId)
+      setCampaignCount(campaignCount - 1)
+      setCampaignsDisplayed(
+        campaignsDisplayed.filter((c) => c.id !== campaignId)
+      )
+    },
+    [setCampaignCount, setCampaignsDisplayed, campaignCount, campaignsDisplayed]
+  )
+  const promptDeleteConfirmation = useCallback(
+    (campaignId: number) => {
+      if (modalContext.modalContent === null) {
+        modalContext.setModalContent(
+          <ConfirmModal
+            title="Are you absolutely sure?"
+            subtitle="Deleting a campaign is irreversible."
+            buttonText="Yes"
+            cancelText="Cancel"
+            onConfirm={() => deleteCampaign(campaignId)}
+            disableImage
+            destructive
+          />
+        )
+      }
+    },
+    [modalContext, deleteCampaign]
+  )
 
   // Only call the modalContext if content is currently null - prevents infinite re-rendering
   // Note that this triggers unnecessary network calls because useCallback evaluates the function being passed in
@@ -176,63 +219,25 @@ const Campaigns = () => {
     {
       name: '',
       render: (campaign: Campaign) => {
-        if (campaign.status === Status.Draft) return
-        if (campaign.redacted) {
-          return (
-            <span className={styles.expired}>
-              <Trans>Report expired</Trans>
-            </span>
-          )
-        }
-
         return (
-          <ExportRecipients
-            iconPosition="left"
-            campaignId={campaign.id}
-            campaignName={campaign.name}
-            campaignType={campaign.type}
-            sentAt={campaign.sentAt}
-            status={campaign.status}
-            statusUpdatedAt={campaign.statusUpdatedAt}
-          />
-        )
-      },
-      width: 'sm center',
-    },
-    {
-      name: '',
-      render: (campaign: Campaign) => {
-        if (
-          campaign.demoMessageLimit &&
-          ((numDemosSms === 0 && campaign.type === ChannelType.SMS) ||
-            (numDemosTelegram === 0 && campaign.type === ChannelType.Telegram))
-        ) {
-          return
-        }
-        return (
-          <div
-            className={cx(styles.iconContainer, styles.duplicate)}
-            onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
-              event.stopPropagation()
-              sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
-              const modal = campaign.demoMessageLimit ? (
-                <CreateDemoModal
-                  duplicateCampaign={{
-                    name: campaign.name,
-                    type: campaign.type,
-                  }}
-                  numDemosSms={numDemosSms}
-                  numDemosTelegram={numDemosTelegram}
-                />
-              ) : (
-                <DuplicateCampaignModal campaign={campaign} />
-              )
-              modalContext.setModalContent(modal)
+          <ActionsButton
+            campaign={campaign}
+            numDemosSms={numDemosSms}
+            numDemosTelegram={numDemosTelegram}
+            modalContext={modalContext}
+            isMenuOpen={campaign.id === campaignIdWithMenuOpen}
+            onToggle={(e: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
+              e.stopPropagation()
+              toggleMenu(campaign.id)
             }}
-          >
-            <i className={cx('bx bx-duplicate', styles.icon)}></i>{' '}
-            <span>Duplicate</span>
-          </div>
+            onDelete={(
+              e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>
+            ) => {
+              e.stopPropagation()
+              promptDeleteConfirmation(campaign.id)
+            }}
+            onClose={() => setCampaignIdWithMenuOpen(undefined)}
+          />
         )
       },
       width: 'sm center',

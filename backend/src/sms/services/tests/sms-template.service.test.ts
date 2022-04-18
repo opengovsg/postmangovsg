@@ -39,7 +39,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await SmsMessage.destroy({ where: {} })
   await SmsTemplate.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
   await User.destroy({ where: {} })
   await sequelize.close()
 

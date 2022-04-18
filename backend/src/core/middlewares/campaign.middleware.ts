@@ -151,9 +151,37 @@ const isCampaignRedacted = async (
   }
 }
 
+const deleteCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const campaignId = +req.params.campaignId
+    const deletedRows = await CampaignService.deleteCampaign(campaignId)
+    if (deletedRows < 1) {
+      logger.error({
+        message: 'Campaign not found',
+        campaignId: campaignId,
+        action: 'deleteCampaign',
+      })
+
+      return res
+        .status(404)
+        .json({ message: `Campaign ${campaignId} not found` })
+    }
+
+    res.json({})
+  } catch (e) {
+    console.error(e)
+    return next(e)
+  }
+}
+
 export const CampaignMiddleware = {
   canEditCampaign,
   createCampaign,
   listCampaigns,
   isCampaignRedacted,
+  deleteCampaign,
 }

@@ -20,7 +20,12 @@ import { EmailTemplate } from '@email/models'
 import { SmsTemplate } from '@sms/models'
 import { TelegramTemplate } from '@telegram/models'
 
-@Table({ tableName: 'campaigns', underscored: true, timestamps: true })
+@Table({
+  tableName: 'campaigns',
+  underscored: true,
+  timestamps: true,
+  paranoid: true,
+})
 export class Campaign extends Model<Campaign> {
   @HasMany(() => JobQueue, { as: 'job_queue' })
   @HasOne(() => EmailTemplate, { as: 'email_templates' })
