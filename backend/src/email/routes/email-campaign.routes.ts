@@ -11,7 +11,6 @@ import {
   EmailStatsMiddleware,
   EmailMiddleware,
 } from '@email/middlewares'
-import config from '@core/config'
 import { fromAddressValidator } from '@core/utils/from-address'
 
 export const InitEmailCampaignRoute = (
@@ -59,15 +58,6 @@ export const InitEmailCampaignRoute = (
         .options({ convert: true }) // Converts email to lowercase if it isn't
         .lowercase()
         .required(),
-    }),
-  }
-
-  const sendCampaignValidator = {
-    [Segments.BODY]: Joi.object({
-      rate: Joi.number()
-        .integer()
-        .positive()
-        .default(config.get('mailDefaultRate')),
     }),
   }
 
@@ -524,7 +514,6 @@ export const InitEmailCampaignRoute = (
    */
   router.post(
     '/send',
-    celebrate(sendCampaignValidator),
     CampaignMiddleware.canEditCampaign,
     JobMiddleware.sendCampaign
   )
