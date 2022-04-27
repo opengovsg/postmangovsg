@@ -57,8 +57,6 @@ jobs:
       - name: Lint and test app code
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
-          PGUSER: postgres
-          PGPASSWORD: postgres
         run: |
           cd shared 
           npm ci

@@ -9,6 +9,11 @@ declare global {
     }
   }
 }
+
+// fix PGUSER and PGPASSWORD inside this global test setup to dictate test db
+// credentials for surrounding setup like local docker compose or CI containers
+process.env.PGUSER = 'postgres'
+process.env.PGPASSWORD = 'postgres'
 const DB_URI = 'postgres://localhost:5432/postgres'
 const TEST_DB = 'postmangovsg_test'
 // The number of workers should match the maxWorkers
