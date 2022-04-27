@@ -69,9 +69,6 @@ jobs:
         run: npm run lint-no-fix
       - name: Run tests
         run: npm test
-        env:
-          PGUSER: postgres
-          PGPASSWORD: postgres
   test-shared:
     runs-on: ubuntu-latest
     defaults:
