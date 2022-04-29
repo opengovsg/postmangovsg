@@ -58,12 +58,10 @@ const Landing = () => {
       const govBannerHeight = bannerRef.current?.offsetHeight as number
       const scrollTop = (document.documentElement.scrollTop ||
         document.body.scrollTop) as number
-      if (scrollTop >= govBannerHeight) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        infoBannerRef.current!.style.top = '0'
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        infoBannerRef.current!.style.top = `${govBannerHeight - scrollTop}px`
+      if (infoBannerRef.current) {
+        const offsetTop =
+          scrollTop >= govBannerHeight ? 0 : govBannerHeight - scrollTop
+        infoBannerRef.current.style.top = `${offsetTop}px`
       }
     }
     window.addEventListener('scroll', recalculateBannerPos)
