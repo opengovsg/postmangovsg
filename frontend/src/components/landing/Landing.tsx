@@ -3,7 +3,7 @@ import { i18n } from '@lingui/core'
 import cx from 'classnames'
 
 import Lottie from 'lottie-react'
-import { useState, useContext, useEffect, createRef } from 'react'
+import { createRef, useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 import { Redirect, useHistory } from 'react-router-dom'
@@ -73,7 +73,7 @@ const Landing = () => {
   })
 
   if (isAuthenticated) {
-    return <Redirect to="/campaigns"></Redirect>
+    return <Redirect to="/campaigns" />
   }
 
   function directToSignIn() {
@@ -172,7 +172,7 @@ const Landing = () => {
       <Banner innerRef={bannerRef} />
       <InfoBanner innerRef={infoBannerRef} />
       <div className={styles.topContainer}>
-        <Navbar></Navbar>
+        <Navbar />
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>
@@ -266,7 +266,7 @@ const Landing = () => {
               target="_blank"
             >
               <PrimaryButton className={styles.button}>
-                Learn More <i className="bx bx-right-arrow-alt"></i>
+                Learn More <i className="bx bx-right-arrow-alt" />
               </PrimaryButton>
             </OutboundLink>
           </div>
@@ -292,7 +292,7 @@ const Landing = () => {
             ))}
           </div>
 
-          <div className={styles.lineBreak}></div>
+          <div className={styles.lineBreak} />
 
           <div className={styles.testimonial}>
             <span className={cx(styles.openInvertedComma, styles.comma)}>
@@ -395,7 +395,7 @@ const Landing = () => {
               <img src={companyLogo} alt="logo" />
             </div>
           </div>
-          <div className={styles.lineBreak}></div>
+          <div className={styles.lineBreak} />
           <div className={styles.footer}>
             <div className={styles.links}>
               <OutboundLink
