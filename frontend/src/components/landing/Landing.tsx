@@ -3,7 +3,7 @@ import { i18n } from '@lingui/core'
 import cx from 'classnames'
 
 import Lottie from 'lottie-react'
-import { useState, useContext, useEffect, createRef } from 'react'
+import { createRef, useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 import { Redirect, useHistory } from 'react-router-dom'
@@ -58,12 +58,10 @@ const Landing = () => {
       const govBannerHeight = bannerRef.current?.offsetHeight as number
       const scrollTop = (document.documentElement.scrollTop ||
         document.body.scrollTop) as number
-      if (scrollTop >= govBannerHeight) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        infoBannerRef.current!.style.top = '0'
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        infoBannerRef.current!.style.top = `${govBannerHeight - scrollTop}px`
+      if (infoBannerRef.current) {
+        const offsetTop =
+          scrollTop >= govBannerHeight ? 0 : govBannerHeight - scrollTop
+        infoBannerRef.current.style.top = `${offsetTop}px`
       }
     }
     window.addEventListener('scroll', recalculateBannerPos)
@@ -73,7 +71,7 @@ const Landing = () => {
   })
 
   if (isAuthenticated) {
-    return <Redirect to="/campaigns"></Redirect>
+    return <Redirect to="/campaigns" />
   }
 
   function directToSignIn() {
@@ -172,7 +170,7 @@ const Landing = () => {
       <Banner innerRef={bannerRef} />
       <InfoBanner innerRef={infoBannerRef} />
       <div className={styles.topContainer}>
-        <Navbar></Navbar>
+        <Navbar />
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>
@@ -266,7 +264,7 @@ const Landing = () => {
               target="_blank"
             >
               <PrimaryButton className={styles.button}>
-                Learn More <i className="bx bx-right-arrow-alt"></i>
+                Learn More <i className="bx bx-right-arrow-alt" />
               </PrimaryButton>
             </OutboundLink>
           </div>
@@ -292,7 +290,7 @@ const Landing = () => {
             ))}
           </div>
 
-          <div className={styles.lineBreak}></div>
+          <div className={styles.lineBreak} />
 
           <div className={styles.testimonial}>
             <span className={cx(styles.openInvertedComma, styles.comma)}>
@@ -395,7 +393,7 @@ const Landing = () => {
               <img src={companyLogo} alt="logo" />
             </div>
           </div>
-          <div className={styles.lineBreak}></div>
+          <div className={styles.lineBreak} />
           <div className={styles.footer}>
             <div className={styles.links}>
               <OutboundLink
