@@ -1,0 +1,54 @@
+{
+  "plugins": ["import", "simple-import-sort", "prettier"],
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "extends": ["plugin:@typescript-eslint/recommended"],
+      "parser": "@typescript-eslint/parser"
+    }
+  ],
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "ignorePatterns": [
+    "commitlint.config.js",
+    "jest.config.js",
+    "node_modules",
+    "src/db/migrations",
+    "src/db/seeders"
+  ],
+  "rules": {
+    // Rules for auto sort of imports
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          // Side effect imports.
+          ["^\\u0000"],
+          // Packages.
+          // Packages. `react` related packages come first.
+          // Things that start with a letter (or digit or underscore), or
+          // `@` followed by a letter.
+          ["^react", "^@?\\w"],
+          // Root imports
+          // Shared imports should be separate from application imports.
+          ["^(~shared)(/.*|$)"],
+          ["^(~)(/.*|$)"],
+          // Parent imports. Put `..` last.
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+          // Other relative imports. Put same-folder imports and `.` last.
+          ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"]
+        ]
+      }
+    ],
+    "simple-import-sort/exports": "error",
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "import/no-duplicates": "error"
+  }
+}

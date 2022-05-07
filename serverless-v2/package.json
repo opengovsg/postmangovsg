@@ -1,0 +1,68 @@
+{
+  "name": "postmangovsg-serverless",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "lint": "eslint '{scripts,src}/**/*.{js,ts,mjs}' --quiet --fix",
+    "env": "ENV=${ENV:-'staging'} node scripts/envLoader.mjs",
+    "dev": "npm run env && nodemon --exec sls offline --stage staging --region ap-southeast-1",
+    "dev:local": "docker-compose up & nodemon --exec sls offline --stage staging --region ap-southeast-1",
+    "test": "ENV=staging npm run env && LOCAL=true jest --reporters jest-silent-reporter",
+    "file": "npm run env && LOCAL=true ts-node -r dotenv/config -r tsconfig-paths/register",
+    "deploy": "npm run env && sls deploy --stage ${ENV:-'staging'} --region ap-southeast-1 --conceal",
+    "compile": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "convict": "^6.0.0",
+    "sequelize-typescript": "^2.1.3"
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^16.0.0",
+    "@types/async-retry": "^1.4.3",
+    "@types/aws-lambda": "^8.10.70",
+    "@types/convict": "^5.2.2",
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "commitlint": "^16.2.1",
+    "dotenv": "^16.0.0",
+    "eslint": "^8.10.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.25.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.2.1",
+    "sequelize-cli": "^6.4.1",
+    "serverless": "^3.7.1",
+    "serverless-deployment-bucket": "^1.5.2",
+    "serverless-disable-functions": "^1.0.0",
+    "serverless-dotenv-plugin": "^3.12.2",
+    "serverless-layers": "^2.5.4-beta.1",
+    "serverless-offline": "^8.5.0",
+    "serverless-plugin-aws-alerts": "^1.7.4",
+    "serverless-plugin-typescript": "^2.1.1",
+    "serverless-tscpaths": "^0.0.6",
+    "ts-jest": "^27.1.3",
+    "ts-loader": "^9.2.6",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^4.6.2"
+  },
+  "lint-staged": {
+    "**/*.(js|jsx|ts|tsx)": [
+      "eslint --cache --fix"
+    ],
+    "**/*.json": [
+      "prettier --write"
+    ]
+  },
+  "nodemonConfig": {
+    "ext": "yml"
+  }
+}

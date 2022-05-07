@@ -1,0 +1,19 @@
+# generated files
+node_modules
+*.log
+.eslintcache
+.tsbuildinfo
+.build
+.serverless
+
+# Artifacts of dev machine
+.vscode
+*.DS_Store
+
+# Secrets
+*.pem
+*.pfx
+.env
+
+# Local development
+local

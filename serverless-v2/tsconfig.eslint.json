@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true
+  },
+  "exclude": ["src/local"] /** Don't lint local playground files */
+}

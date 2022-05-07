@@ -1,0 +1,84 @@
+service: postmangovsg-serverless
+variablesResolutionMode: 20210326
+plugins:
+  # .env file is populated from SSM, via a script in package.json. Then we pass to Lambda
+  - serverless-dotenv-plugin
+  # We use TypeScript
+  - serverless-plugin-typescript
+  # TS plugin above does not understand module aliases from tsconfig.json
+  - serverless-tscpaths
+  # Ease of local development - supports our "npm run dev"
+  - serverless-offline
+  # Stores deployment artifacts in a fixed, named bucket. Easy to cleanup on CloudFormation.
+  - serverless-deployment-bucket
+  # Automatically upload layers to Lambda upon deploy.
+  - serverless-layers
+  # Easy definition of alarms + metrics.
+  - serverless-plugin-aws-alerts
+  # Disable functions based on ENV vars.
+  - serverless-disable-functions
+package:
+  patterns:
+    - src/services/slift/**
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ap-southeast-1
+  memorySize: 1768 # MB. This magic number gives the max power with 1 vCPU (node is single-thread)
+  stage: ${opt:stage}
+  tags:
+    CreatedBy: ServerlessFramework
+    Project: ${self:service}
+  stackName: ${self:service}-${opt:stage}
+  stackTags:
+    CreatedBy: ServerlessFramework
+    Project: ${self:service}
+  lambdaHashingVersion: 20201221
+  iam: # Permissions granted to all Lambdas. These are additional to the basic AWSLambdaVPCAccessExecutionRole
+    role:
+      statements: # Can add in-line permissions
+        - Effect: 'Allow'
+          Action:
+            - 's3:GetObject'
+          Resource:
+            - '*'
+        - Effect: 'Allow'
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource:
+            - '*'
+        # managedPolicies: # can add policies here, after we manually create one on AWS Console
+        #   - 'some:aws:arn:xxx:*:*'
+  apiGateway:
+    apiKeys:
+      - vaccinegovsg-${opt:stage}-default-key
+  vpc:
+    securityGroupIds: # These lambdas are in their own security group. DB security groups trust it.
+      - ${ssm:/${opt:stage}/SECURITY_GROUP_ID}
+    subnetIds: # Private subnets 1a,1b,1c of covid-production-vpc
+      ${ssm:/${opt:stage}/SUBNET_IDS}
+custom:
+  alarm-name: # custom key to help us switch a variable; TODO: switch to postmangovsg specific alarm
+    staging: arn:aws:sns:${aws:region}:${aws::accountId}:vaccinegovsg-serverless-staging-alerts-alarm
+    production: arn:aws:sns:${aws:region}:${aws::accountId}:opsgenie-alerts
+  alerts:
+    dashboards: # Cloudwatch Alarm Dashboard, but only for prod
+      stages:
+        - production
+    topics:
+      alarm:
+        topic: ${self:custom.alarm-name.${opt:stage}}
+    alarms: # These 2 are defaults provided by the plugin, but we can specify custom logics too.
+      - functionThrottles
+      - functionErrors
+  serverless-layers:
+    dependenciesPath: ./package.json
+    compatibleRuntimes: ['nodejs']
+    layersDeploymentBucket: ${self:service}-${opt:stage}-deployment-bucket
+  deploymentBucket:
+    name: ${self:service}-${opt:stage}-deployment-bucket
+  layersToUse: # Just in case we forget what layers we have available, listed here. No effect on deployment
+    - arn:aws:lambdas:${aws:region}:${aws::accountId}:layer:javaLayer:4 # Provides headless JRE for SLIFT
+
+functions: # Describe functions in their own .yml (per service), then reference the service here.
+  - ${file(./src/lambdas/usage-statistics-digest/serverless.yml)}
