@@ -18,8 +18,11 @@ The serverless functions are deployed onto Lambda, and called via API Gateway.
     + [Finalised delivery statuses](#finalised-delivery-statuses)
     + [Environment variables](#environment-variables-1)
 * [Unsubscribe Email Digest](#unsubscribe-email-digest)
-    + [Overview](#overview)
+    + [Overview](#overview-1)
     + [Environment variables](#environment-variables-2)
++ [Usage Statistics Digest](#usage-statistics-digest)
+  + [Overview](#overview-2)
+  + [Environment variables](#environment-variables-3)
 * [Telegram handler](#telegram-handler)
 
 ## Postman API Gateway Authorizer
@@ -110,3 +113,18 @@ The `unsubscribers` table stores unsubscribed recipients by `campaign_id` and `s
 
 ## Telegram handler
 To be updated
+
+## Usage Statistics Digest
+`usage-statistics-digest` regularly sends a digest summarising Postman's usage statistics to our Slack channel
+
+### Overview
+
+TODO: add more details when available
+
+### Environment variables
+| Name                  | Description                               |
+|-----------------------|-------------------------------------------|
+| `DB_URI`              | URI to the postgres database              |
+| `DB_READ_REPLICA_URI` | URI to the postgres read replica database |
+| `SENTRY_DSN`          | Sentry DSN for serverless                 |
+| `SLACK_WEBHOOK_URL`   | Slack webhook URL to receive digest       |
