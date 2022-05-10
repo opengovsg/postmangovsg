@@ -61,11 +61,10 @@
     "twilio": "^3.58.0",
     "uuid": "^7.0.3",
     "validator": "^13.6.0",
-    "winston": "^3.7.2",
-    "winston-cloudwatch": "^6.0.0"
+    "winston": "^3.3.3",
+    "winston-cloudwatch": "^3.1.1"
   },
   "devDependencies": {
-    "@aws-sdk/client-cloudwatch-logs": "^3.87.0",
     "@types/async-retry": "^1.4.2",
     "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.30",
