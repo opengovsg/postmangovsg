@@ -3,7 +3,6 @@ import express, { Request, Response, NextFunction } from 'express'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
 import morgan from 'morgan'
 import * as Sentry from '@sentry/node'
-import requestTracer from 'cls-rtracer'
 
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
@@ -32,20 +31,6 @@ morgan.token('user-id', userId)
 const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
   stream: getStream(),
 })
-
-const requestTracerMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  const customRequestTracerMiddleware = requestTracer.expressMiddleware({
-    requestIdFactory: () => ({
-      ip: clientIp(req, res),
-      userId: userId(req, res),
-    }),
-  })
-  customRequestTracerMiddleware(req, res, next)
-}
 
 const sentrySessionMiddleware = (
   req: Request,
@@ -87,7 +72,6 @@ const overrideContentTypeHeaderMiddleware = (
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
   app.use(loggerMiddleware)
-  app.use(requestTracerMiddleware)
 
   app.use(overrideContentTypeHeaderMiddleware)
 

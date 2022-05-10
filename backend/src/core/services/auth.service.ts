@@ -85,7 +85,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
         if (value === null) {
           reject(new Error('OTP has expired. Please request for a new OTP.'))
         }
-        resolve(JSON.parse(value))
+        resolve(JSON.parse(value as string))
       })
     })
   }
