@@ -34,11 +34,11 @@ logger.stream = {
   },
 }
 
-const getStream = () => {
+export const getStream = () => {
   return logger.stream
 }
 
-const addTransport = (transport: any) => {
+export const addTransport = (transport: any) => {
   logger.add(transport)
 }
 
@@ -50,7 +50,7 @@ const truncate = (message: string, length: number, suffix = true): string => {
     ? `${message.substring(0, length)}${suffix ? '...<TRUNCATED>' : ''}`
     : message
 }
-const loggerWithLabel = (module: NodeModule): any => {
+export const loggerWithLabel = (module: NodeModule): any => {
   const label = getModuleLabel(module)
   return {
     log: (logMeta: any): winston.Logger => logger.log({ label, ...logMeta }),
@@ -67,5 +67,3 @@ const loggerWithLabel = (module: NodeModule): any => {
     warn: (logMeta: any): winston.Logger => logger.warn({ label, ...logMeta }),
   }
 }
-
-export { getStream, addTransport, loggerWithLabel }
