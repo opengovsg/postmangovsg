@@ -1,0 +1,44 @@
+{
+  "name": "usage-statistics-digest",
+  "version": "1.0.0",
+  "description": "Send Postman usage statistics to product owners",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "rm -rf build && tsc && cp -r src/assets build/assets",
+    "dev": "npm run build && tsc-watch --onSuccess \"node -r dotenv/config build/dev\"",
+    "test": "echo 'No tests yet for statistics-digest'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opengovsg/postmangovsg.git"
+  },
+  "author": "tan-zx",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/opengovsg/postmangovsg/issues"
+  },
+  "homepage": "https://github.com/opengovsg/postmangovsg#readme",
+  "dependencies": {
+    "@sentry/node": "^5.21.1",
+    "aws-sdk": "^2.1127.0",
+    "axios": "^0.21.1",
+    "convict": "^6.0.0",
+    "dotenv": "^8.2.0",
+    "pg": "^8.3.0",
+    "pg-connection-string": "^2.3.0",
+    "sequelize": "^5.21.11",
+    "sequelize-typescript": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/convict": "^5.2.1",
+    "@types/node": "^14.0.23",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.0.5",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^3.9.7"
+  }
+}
