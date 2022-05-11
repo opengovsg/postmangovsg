@@ -84,10 +84,12 @@ jobs:
       - name: Before deploy
         env:
           SECRET_ID: ${{ secrets.SECRET_ID }}
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
         run: |
           cd $DIRECTORY
           cp -R ../shared ./
           sed -i -e "s#@SECRET_ID#$SECRET_ID#g" docker-entrypoint.sh
+          sed -i -e "s#@DD_API_KEY#$DD_API_KEY#g" .ebextensions/99datadog.config
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
