@@ -3,9 +3,9 @@ import * as Sentry from '@sentry/node'
 import config from './config'
 import { getCronitor } from './utils/cronitor'
 import {
+  generateUsageStatisticsDigest,
   init,
-  // getUsageStatistics
-  //sendStatisticsToSlackChannel
+  sendDigestToSlackChannel,
 } from './usageStatistics'
 
 // If cronitor is null, monitoring is not enabled for this environment
@@ -27,8 +27,8 @@ export const handler = async (): Promise<{ statusCode: number }> => {
     await cronitor?.run()
     await init()
 
-    // const usageStatistics = await getUsageStatistics()
-    // await sendStatisticsToSlackChannel(usageStatistics)
+    const usageStatisticsDigest = await generateUsageStatisticsDigest()
+    await sendDigestToSlackChannel(usageStatisticsDigest)
     await cronitor?.complete()
   } catch (err) {
     Sentry.captureException(err)

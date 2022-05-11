@@ -1,4 +1,6 @@
-// TODO
+export interface CountQueryResult {
+  count: number
+}
 
 export interface Cronitor {
   run: () => Promise<void>
