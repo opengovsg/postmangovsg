@@ -4,7 +4,6 @@ import expressLoader from './express.loader'
 import swaggerLoader from './swagger.loader'
 import sessionLoader from './session.loader'
 import sequelizeLoader from './sequelize.loader'
-import cloudwatchLoader from './cloudwatch.loader'
 import uploadQueueLoader from './upload-queue.loader'
 import {
   InitAuthService,
@@ -18,7 +17,6 @@ const loaders = async ({ app }: { app: Application }): Promise<void> => {
   ;(app as any).authService = InitAuthService(redisService)
   ;(app as any).credentialService = InitCredentialService(redisService)
   securityHeadersLoader({ app })
-  await cloudwatchLoader()
   await sequelizeLoader()
   await sessionLoader({ app })
   await expressLoader({ app })

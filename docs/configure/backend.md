@@ -82,7 +82,6 @@ Further reference: [Sequelize documentation](https://sequelize.org/master/manual
 | `FILE_STORAGE_BUCKET_NAME` | Name of the S3 bucket that is used to store file uploads                         |
 | `JWT_SECRET`               | Secret used to sign pre-signed urls for uploading CSV files to AWS S3            |
 | `SECRET_MANAGER_SALT`      | Secret used to generate names of credentials to be stored in AWS Secrets Manager |
-| `AWS_LOG_GROUP_NAME`       | Name of Cloudwatch log group to write application logs to                        |
 
 For testing locally, you may need to configure your `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to be able to call AWS APIs. In production, your server should be granted the IAM role with permissions to access resources directly.
 

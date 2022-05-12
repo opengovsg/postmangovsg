@@ -65,11 +65,6 @@ const config = convict({
       default: null,
       env: 'AWS_ENDPOINT',
     },
-    logGroupName: {
-      doc: 'Name of Cloudwatch log group to write application logs to',
-      default: 'postmangovsg-beanstalk-prod',
-      env: 'AWS_LOG_GROUP_NAME',
-    },
     uploadBucket: {
       doc: 'Name of the S3 bucket that is used to store file uploads',
       default: 'postmangovsg-prod-upload',
