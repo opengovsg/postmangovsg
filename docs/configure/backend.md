@@ -38,6 +38,9 @@ Sensitive configuration has to be set with environment variables.
 | `JWT_SECRET`           | Secret used to sign pre-signed urls for uploading CSV files to AWS S3            |
 | `SECRET_MANAGER_SALT`  | Secret used to generate names of credentials to be stored in AWS Secrets Manager |
 | `API_KEY_SALT_V1`      | Secret used to hash API Keys before storing them in the database                 |
+| `DD_ENV`               | Environment tag for datadog traces                                               |
+| `DD_SERVICE`           | Service name tag for datadog traces (suggest: `postman`)                         |
+| `DD_LOGS_INJECTION`    | Flag determining whether to inject `trace_id` to our logs (suggest: `true`)      |
 
 ### Full set of environment variables that can be set
 
