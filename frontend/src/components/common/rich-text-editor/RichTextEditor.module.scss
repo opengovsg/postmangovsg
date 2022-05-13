@@ -260,7 +260,7 @@
   }
 
   table {
-    $border-color: adjust-color($primary-light, $alpha: -0.5);
+    $border-color: $primary-light;
     border: 1px solid $border-color;
     table-layout: fixed;
     width: auto;
