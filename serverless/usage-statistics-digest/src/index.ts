@@ -6,7 +6,7 @@ import {
   generateUsageStatisticsDigest,
   init,
   sendDigestToSlackChannel,
-} from './usageStatistics'
+} from './usage-statistics'
 
 // If cronitor is null, monitoring is not enabled for this environment
 const cronitor = getCronitor()
