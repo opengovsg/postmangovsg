@@ -5,10 +5,13 @@ See [eb-env-update-docs](eb-env-update/README.md) for details on `eb-env-update`
 
 TODO: Include README for `redaction-digest` and `database-backup`
 
-The serverless functions are deployed onto Lambda, and called via API Gateway. 
+The serverless functions are deployed onto Lambda. For more details on how the serverless functions are set up and how they work, see [here](https://docs.google.com/document/d/1ZYvCKgQK5DhZAO1MkxF5le0nplHYVmi08MRWXia0UQw).
 
 * [Unsubscribe Email Digest](#unsubscribe-email-digest)
     + [Overview](#overview-1)
+    + [Environment variables](#environment-variables-1)
+* [Usage Statistics Digest](#usage-statistics-digest)
+    + [Overview](#overview-2)
     + [Environment variables](#environment-variables-2)
 
 ## Unsubscribe Email Digest
@@ -22,18 +25,17 @@ The `unsubscribers` table stores unsubscribed recipients by `campaign_id` and `s
 ### Environment variables
 | Name                    | Description                                                  |
 |-------------------------|--------------------------------------------------------------|
+| `CRONITOR_CODE`         | Cronitor code for unsubscribe-email-digest                   |
 | `DB_URI`                | URI to the postgres database                                 |
 | `DB_READ_REPLICA_URI`   | URI to the postgres read replica database                    |
+| `DB_USE_IAM`            | Boolean for whether DB uses IAM (?)                          |
+| `SENTRY_DSN`            | Sentry DSN for serverless                                    |
 | `SES_HOST`              | Amazon SES SMTP endpoint.                                    |
 | `SES_PORT`              | Amazon SES SMTP port, defaults to 465                        |
 | `SES_USER`              | SMTP username                                                |
 | `SES_PASS`              | SMTP password                                                |
 | `SES_FROM`              | The email address that appears in the From field of an email |
 | `UNSUBSCRIBE_GUIDE_URL` | URL to unsubscribe guide                                     |
-| `SENTRY_DSN`            | Sentry DSN for serverless                                    |
-
-## Telegram handler
-To be updated
 
 ## Usage Statistics Digest
 `usage-statistics-digest` regularly sends a digest summarising Postman's usage statistics to our Slack channel
@@ -45,7 +47,9 @@ TODO: add more details when available
 ### Environment variables
 | Name                  | Description                               |
 |-----------------------|-------------------------------------------|
+| `CRONITOR_CODE`       | Cronitor code for usage-statistics-digest |
 | `DB_URI`              | URI to the postgres database              |
 | `DB_READ_REPLICA_URI` | URI to the postgres read replica database |
+| `DB_USE_IAM`          | Boolean for whether DB uses IAM (?)       |
 | `SENTRY_DSN`          | Sentry DSN for serverless                 |
 | `SLACK_WEBHOOK_URL`   | Slack webhook URL to receive digest       |
