@@ -6,8 +6,6 @@ import sequelizeLoader from './sequelize-loader'
 import { CountQueryResult } from './interface'
 
 const slackWebhookUrl = config.get('slackWebhookUrl')
-const today = new Date()
-const yesterday = new Date(today.getDate() - 1)
 
 const client = axios.create({
   baseURL: slackWebhookUrl,
@@ -45,6 +43,13 @@ export const getCampaignsCount = async (): Promise<number> => {
 export const getPreviousDayMessageCount = async (
   messageTable: string
 ): Promise<number> => {
+  const today = new Date()
+
+  const yesterday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 1
+  )
   return countQueryHelper(
     `SELECT
       COUNT(*)
@@ -72,6 +77,12 @@ export const generateUsageStatisticsDigest = async (): Promise<string> => {
   // weird single spacing is a compromise between Prettier and working with Slack API
   // for Slack's formatting rules, see https://api.slack.com/reference/surfaces/formatting
   // for interactivity, use Slack Block Kit: https://api.slack.com/reference/block-kit/
+  const today = new Date()
+  const yesterday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 1
+  )
 
   return `*Postman Usage Statistics Digest*
  Number of agencies onboarded: ${await getAgenciesCount()}
