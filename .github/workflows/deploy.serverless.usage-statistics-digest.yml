@@ -95,7 +95,7 @@ jobs:
       - name: Update function config
         env:
           # Update the configuration
-          ROLE: "${{ secrets.UNSUBSCRIBE_ROLE }}"
+          ROLE: "${{ secrets.USAGE_STATS_ROLE }}"
           RUNTIME: nodejs12.x
           HANDLER: build/index.handler
           TIMEOUT: 600
@@ -103,11 +103,11 @@ jobs:
           TAG: "github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
           # Update env vars
           NODE_ENV: "${{ needs.set_environment.outputs.current_env }}"
-          DB_URI: "${{ secrets.UNSUBSCRIBE_DIGEST_DB_URI }}"
-          DB_READ_REPLICA_URI: "${{ secrets.UNSUBSCRIBE_DIGEST_DB_READ_REPLICA_URI }}"
+          DB_URI: "${{ secrets.USAGE_STATS_DB_URI }}"
+          DB_READ_REPLICA_URI: "${{ secrets.USAGE_STATS_DB_READ_REPLICA_URI }}"
           DB_USE_IAM: "${{ secrets.DB_USE_IAM }}"
           SENTRY_DSN: "${{ secrets.SERVERLESS_SENTRY_DSN }}"
-          CRONITOR_CODE: "${{ secrets.UNSUBSCRIBE_CRONITOR_CODE }}"
+          CRONITOR_CODE: "${{ secrets.USAGE_STATS_CRONITOR_CODE }}"
           SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}"
           # Update environment variables in the command
         run: |
