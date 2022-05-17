@@ -16,3 +16,12 @@ tracer.use('http', {
     },
   },
 })
+
+export const getHttpLogTransportOpts = () => {
+  const httpTransportOptions = {
+    host: 'http-intake.logs.datadoghq.com',
+    path: `/api/v2/logs?dd-api-key=${process.env.DD_API_KEY}&ddsource=nodejs&service=${process.env.DD_SERVICE}`,
+    ssl: true,
+  }
+  return httpTransportOptions
+}

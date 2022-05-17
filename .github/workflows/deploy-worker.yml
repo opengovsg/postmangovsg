@@ -73,7 +73,6 @@ jobs:
           cd $DIRECTORY
           cp -R ../shared ./
           sed -i -e "s#@SECRET_ID#$SECRET_ID#g" docker-entrypoint.sh
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

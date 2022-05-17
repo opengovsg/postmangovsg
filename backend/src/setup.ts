@@ -7,4 +7,4 @@ import config from '@core/config'
 config.validate()
 
 // This needs to be done before all traced packages (like express) 's imports
-import '@core/tracing'
+import '@shared/tracing'
