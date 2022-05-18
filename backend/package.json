@@ -5,7 +5,7 @@
   "main": "build/server.js",
   "scripts": {
     "build": "rimraf build && tsc --build tsconfig.build.json",
-    "dev": "npm run database:migrate && npm run database:seed && npm run postbuild && tsc-watch --onSuccess \"node ./build/server.js\"",
+    "dev": "npm run postbuild && tsc-watch --onSuccess \"node ./build/server.js\"",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache .",
     "lint": "npm run lint-no-fix -- --fix",
     "postbuild": "npm run copy-assets",
