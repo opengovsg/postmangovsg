@@ -70,15 +70,15 @@ const LIST_WRAPPER: Record<string, TagType> = {
 
 const TABLE_STYLE = {
   table: {
-    border: 'solid 1px rgba(181, 196, 255, 0.5)',
+    border: 'solid 1px #b5c4ff',
     'border-collapse': 'collapse',
     'min-width': '50%',
   },
   row: {
-    border: 'solid 1px rgba(181, 196, 255, 0.5)',
+    border: 'solid 1px #b5c4ff',
   },
   cell: {
-    border: 'solid 1px rgba(181, 196, 255, 0.5)',
+    border: 'solid 1px #b5c4ff',
     padding: '0.5rem',
   },
 }
