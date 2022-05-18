@@ -3,6 +3,8 @@ import get from 'lodash/get'
 
 import config from '@core/config'
 import { Campaign } from '@core/models'
+import { CampaignService } from './campaign.service'
+import { ChannelType } from '@core/constants'
 
 /**
  * Inserts a job into the job_queue table.
@@ -51,7 +53,17 @@ const sendCampaign = async ({
 }: {
   campaignId: number
   rate: number
-}): Promise<(number | undefined)[]> => {
+}): Promise<(number | undefined)[] | (number | undefined)> => {
+  const campaign = await CampaignService.getCampaignDetails(campaignId, [])
+  if (campaign.type === ChannelType.Email) {
+    // For email type, we only want to take up a single worker at a time at the
+    // preconfigured mailDefaultRate to avoid hogging resources from other campaigns
+    return createJob({
+      campaignId: +campaignId,
+      rate: config.get('mailDefaultRate'),
+    })
+  }
+
   // Split jobs if the supplied send rate is higher than the rate 1 worker can support
   // The rate is distributed evenly across workers.
   const jobs = []

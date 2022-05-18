@@ -302,7 +302,7 @@ const config = convict({
   },
   mailDefaultRate: {
     doc: 'The default rate at which an email campaign will be sent',
-    default: 35,
+    default: 150,
     env: 'EMAIL_DEFAULT_RATE',
     format: 'int',
   },
