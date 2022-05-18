@@ -1,0 +1,1 @@
+Hi {{name}}, please go to {{clinic}} at {{date}} and {{time}}.

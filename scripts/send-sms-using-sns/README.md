@@ -17,3 +17,5 @@ Example:
 ```
 
 csvPath, templatePath, and senderId are **required**.
+
+Refer to the examples folder for sample CSV and template files.
