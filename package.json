@@ -39,7 +39,8 @@
     "wait:backend": "wait-on http-get://localhost:4000",
     "detect-secrets:update": "detect-secrets scan --baseline .secrets.baseline",
     "detect-secrets:check": "git ls-files -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline",
-    "detect-secrets:precommit": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline"
+    "detect-secrets:precommit": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline",
+    "cy:run": "npx cypress run -s cypress/integration/home.spec.js"
   },
   "repository": {
     "type": "git",
@@ -53,6 +54,7 @@
   "homepage": "https://github.com/datagovsg/postmangovsg#readme",
   "devDependencies": {
     "concurrently": "^7.0.0",
+    "cypress": "^9.6.1",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
