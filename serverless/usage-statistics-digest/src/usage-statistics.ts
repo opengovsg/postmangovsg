@@ -23,43 +23,54 @@ export const init = async (): Promise<void> => {
 /*
  * Helper function for querying database for a count
  * */
-export const countQueryHelper = async (countQuery: string): Promise<number> => {
-  const query = (await sequelize?.query(countQuery, {
+interface TimeRange {
+  start: string
+  end: string
+}
+export const countQueryHelper = async (
+  countQuery: string,
+  timeRange?: TimeRange
+): Promise<number> => {
+  const queryOptions = {
     type: QueryTypes.SELECT,
     useMaster: false,
-  })) as Array<CountQueryResult>
+    replacements: timeRange ? [timeRange.start, timeRange.end] : [],
+  }
 
+  const query = (await sequelize?.query(
+    countQuery,
+    queryOptions
+  )) as Array<CountQueryResult>
   return query?.[0]?.count || 0
 }
 
-export const getAgenciesCount = async (): Promise<number> => {
+export const getCumulativeAgenciesCount = async (): Promise<number> => {
   return countQueryHelper('SELECT COUNT(*) FROM agencies')
 }
 
-export const getCampaignsCount = async (): Promise<number> => {
+export const getCumulativeCampaignsCount = async (): Promise<number> => {
   return countQueryHelper('SELECT COUNT(*) FROM campaigns')
 }
 
 export const getPreviousDayMessageCount = async (
   messageTable: string
 ): Promise<number> => {
-  const today = new Date()
-
-  const yesterday = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() - 1
+  const nowUTC = new Date()
+  const nowGMT8 = new Date(nowUTC.getTime() + 8 * 60 * 60 * 1000)
+  const todayYYYYMMDD = convertToYYYYMMDD(nowGMT8)
+  const yesterdayYYYYMMDD = convertToYYYYMMDD(
+    new Date(nowGMT8.getTime() - 24 * 60 * 60 * 1000)
   )
+  const startTimestamp = `${yesterdayYYYYMMDD} 00:00:00':: TIMESTAMP`
+  const endTimestamp = `${todayYYYYMMDD} 00:00:00':: TIMESTAMP`
   return countQueryHelper(
     `SELECT
       COUNT(*)
     FROM
       ${messageTable}
     WHERE
-      delivered_at BETWEEN '${convertToYYYYMMDD(
-        yesterday
-      )} 00:00:00':: TIMESTAMP
-      AND '${convertToYYYYMMDD(today)} 00:00:00':: TIMESTAMP`
+       delivered_at BETWEEN ? AND ?`,
+    { start: startTimestamp, end: endTimestamp }
   )
 }
 
@@ -85,8 +96,8 @@ export const generateUsageStatisticsDigest = async (): Promise<string> => {
   )
 
   return `*Postman Usage Statistics Digest*
- Number of agencies onboarded: ${await getAgenciesCount()}
- Number of campaigns conducted: ${await getCampaignsCount()}
+ Number of agencies onboarded: ${await getCumulativeAgenciesCount()}
+ Number of campaigns conducted: ${await getCumulativeCampaignsCount()}
  Total number of messages sent on ${yesterday.toDateString()}:
  • SMS: ${await getPreviousDaySMSCount()}
  • Email: ${await getPreviousDayEmailCount()}
