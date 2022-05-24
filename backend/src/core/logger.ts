@@ -1,5 +1,4 @@
 import winston from 'winston'
-import requestTracer from 'cls-rtracer'
 
 const getModuleLabel = (callingModule: NodeModule): string => {
   const moduleName = callingModule.filename
@@ -14,14 +13,13 @@ const logger = winston.createLogger({
   level: 'debug',
   levels: winston.config.npm.levels,
   format: winston.format.combine(
-    winston.format((info) => {
-      const requestTracerMeta = requestTracer.id() as any
-      return { ...requestTracerMeta, ...info }
-    })(),
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
     winston.format.splat(),
     winston.format.metadata(),
+    winston.format.json({
+      space: process.env.NODE_ENV === 'development' ? 2 : 0,
+    }),
     winston.format.json()
   ),
   transports: [new winston.transports.Console()],
@@ -55,6 +53,7 @@ const truncate = (message: string, length: number, suffix = true): string => {
 const loggerWithLabel = (module: NodeModule): any => {
   const label = getModuleLabel(module)
   return {
+    log: (logMeta: any): winston.Logger => logger.log({ label, ...logMeta }),
     info: (logMeta: any): winston.Logger => logger.info({ label, ...logMeta }),
     error: (logMeta: any): winston.Logger => {
       if (logMeta.error && logMeta.error instanceof Error) {

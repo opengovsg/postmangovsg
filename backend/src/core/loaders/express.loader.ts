@@ -1,14 +1,12 @@
 import cors from 'cors'
 import express, { Request, Response, NextFunction } from 'express'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
-import morgan from 'morgan'
 import * as Sentry from '@sentry/node'
-import requestTracer from 'cls-rtracer'
+import expressWinston from 'express-winston'
 
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
-import { getStream, loggerWithLabel } from '@core/logger'
-import { clientIp, userId } from '@core/utils/morgan'
+import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
@@ -23,28 +21,6 @@ const origin = (v: string): string | RegExp => {
     return new RegExp(v.substring(1, v.length - 1))
   }
   return v
-}
-
-morgan.token('client-ip', clientIp)
-morgan.token('user-id', userId)
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
-  stream: getStream(),
-})
-
-const requestTracerMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  const customRequestTracerMiddleware = requestTracer.expressMiddleware({
-    requestIdFactory: () => ({
-      ip: clientIp(req, res),
-      userId: userId(req, res),
-    }),
-  })
-  customRequestTracerMiddleware(req, res, next)
 }
 
 const sentrySessionMiddleware = (
@@ -86,8 +62,6 @@ const overrideContentTypeHeaderMiddleware = (
 
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
-  app.use(loggerMiddleware)
-  app.use(requestTracerMiddleware)
 
   app.use(overrideContentTypeHeaderMiddleware)
 
@@ -121,6 +95,18 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     res.setHeader('Pragma', 'no-cache')
     next()
   })
+
+  app.use(
+    expressWinston.logger({
+      msg: `Incoming HTTP Request {{req.method}} {{req.url}}`,
+      winstonInstance: logger,
+      ignoredRoutes: ['/'],
+      requestWhitelist: ['method', 'url', 'body', 'headers'],
+      responseWhitelist: ['body', 'statusCode'],
+      headerBlacklist: ['authorization'],
+      metaField: null, // flatten this log to root instead of nesting under `meta`
+    })
+  )
 
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
