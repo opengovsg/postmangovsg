@@ -40,7 +40,7 @@
     "detect-secrets:update": "detect-secrets scan --baseline .secrets.baseline",
     "detect-secrets:check": "git ls-files -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline",
     "detect-secrets:precommit": "git diff --staged --name-only -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline",
-    "cy:run": "npx cypress run -s cypress/integration/home.spec.js"
+    "cy:run": "npx cypress run"
   },
   "repository": {
     "type": "git",
@@ -55,6 +55,8 @@
   "devDependencies": {
     "concurrently": "^7.0.0",
     "cypress": "^9.6.1",
+    "cypress-file-upload": "^5.0.8",
+    "gmail-tester": "^1.3.4",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
