@@ -1,0 +1,34 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Cypress Test
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the feat/add-cypress branch
+  push:
+    branches:
+      - feat/add-cypress
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.2
+
+      - name: Write credentials file
+        env:
+          GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
+        run: |
+          echo $GMAIL_CREDENTIALS > cypress/plugins/credentials.json
+          cat cypress/plugins/credentials.json
+
+      - name: Write token file
+        env:
+          GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
+        run: |
+          echo $GMAIL_TOKEN > cypress/plugins/gmail_token.json
+          cat cypress/plugins/gmail_token.json
+
+      - name: Cypress.io
+        uses: cypress-io/github-action@v2.9.7

@@ -51,7 +51,7 @@ describe('SMS Test', () => {
 
         //step 2 : upload csv file
         cy.get('input[type="file"]').attachFile(CSV_FILENAME)
-        cy.contains('Message preview', {timeout: 10000})
+        cy.contains('Message preview', {timeout: 50000})
         cy.contains(CSV_FILENAME)
         cy.contains(NUM_RECIPIENTS.concat(" recipients"))
         cy.contains(":button", "Next").click()

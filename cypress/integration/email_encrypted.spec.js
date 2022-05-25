@@ -59,11 +59,11 @@ describe('Encrypted Email Test', () => {
         //step 2 : enter message template for encryption and upload csv file
         cy.get('textarea[id="protectedMessage"]').type(MSG_CONTENT)
         cy.get('input[type="file"]').attachFile(CSV_FILENAME)
-        cy.contains('Results', {timeout: 10000})
+        cy.contains('Results', {timeout: 50000})
         cy.contains(CSV_FILENAME)
         cy.contains(NUM_RECIPIENTS.concat(" recipients"))
         cy.contains(":button", "Confirm").click()
-        cy.contains('Message preview', {timeout: 10000})
+        cy.contains('Message preview', {timeout: 50000})
         cy.contains(":button", "Next").click()
 
         //step 3 : send test email
