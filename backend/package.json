@@ -28,7 +28,7 @@
     "celebrate": "^12.0.1",
     "cls-rtracer": "^2.4.0",
     "connect-redis": "^4.0.4",
-    "convict": "^6.0.1",
+    "convict": "^6.2.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "escape-html": "^1.0.3",
