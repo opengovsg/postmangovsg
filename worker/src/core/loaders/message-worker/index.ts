@@ -91,6 +91,10 @@ const sendMessage = tracer.wrap(
     },
   },
   (message: Message): Promise<void> => {
+    logger.info({
+      message: 'Start sending message',
+      messageValue: message,
+    })
     return service().sendMessage(message)
   }
 )
