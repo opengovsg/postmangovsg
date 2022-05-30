@@ -100,11 +100,19 @@ cw tail -r ap-northeast-1 -u $AWS_ENDPOINT -f $AWS_LOG_GROUP_NAME:`node --eval='
 ### Secrets detection
 
 This project makes of [detect-secrets](https://github.com/Yelp/detect-secrets) to prevent secrets and credentials from being committed to the repository.
-It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo. Run the following to install:
+It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo.
+**Note**: The reason we're running `detect-secrets` through `detect-secrets:precommit` instead of using `lint-staged` is because `detect-secrets-hook` doesn't work well with the combination of output of staged files by `lint-staged` and baseline supplied.
+
+Run the following to install:
 
 ```bash
-pip install detect-secrets
+pip install detect-secrets==1.2.0
 ```
+
+Upon blockage by `detect-secrets-hook`, please take these steps:
+
+- Go into each of the locations pointed out by `detect-secrets-hook` and remove accidentally added secrets
+- If some of these detections are false positive (please be super sure about this, when not sure check with teammates), update the secrets baseline by running `npm run detect-secrets:update
 
 ### Set environment variables
 
