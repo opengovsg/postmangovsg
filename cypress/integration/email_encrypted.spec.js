@@ -11,15 +11,15 @@ describe('Encrypted Email Test', () => {
                 + CUR_DATE.getMinutes() + ":" 
                 + CUR_DATE.getSeconds();
     const CAMPAIGN_NAME = "encrypted_".concat(DATETIME)
-    const SUBJECT_NAME = "sub_".concat(DATETIME)
+    const RANDOM_STRING = "_".concat((Math.floor((Math.random() * 1000000) + 1)).toString())
+    const SUBJECT_NAME = "sub_enc_".concat(DATETIME).concat(RANDOM_STRING)
+    const MSG_CONTENT = Cypress.env('MSG_CONTENT').concat(RANDOM_STRING)
+    const MSG_TO_VERIFY = Cypress.env('MSG_TO_VERIFY').concat(RANDOM_STRING)
 
     const OTP_SUBJECT = Cypress.env('OTP_SUBJECT')
     const EMAIL = Cypress.env('EMAIL')
-    const MAIL_TESTER = Cypress.env('MAIL_TESTER')
     const MAIL_SENDER = Cypress.env('MAIL_SENDER')
     const REDIRECTION_MSG = Cypress.env('REDIRECTION_MSG')
-    const MSG_CONTENT = Cypress.env('MSG_CONTENT')
-    const MSG_TO_VERIFY = Cypress.env('MSG_TO_VERIFY')
     const PASSWORD_ENC_VERIFICATION = Cypress.env('PASSWORD_ENC_VERIFICATION')
 
     it('initiate email campaign', () => {
@@ -67,7 +67,7 @@ describe('Encrypted Email Test', () => {
         cy.contains(":button", "Next").click()
 
         //step 3 : send test email
-        cy.get('input[type="email"]').type(MAIL_TESTER)
+        cy.get('input[type="email"]').type(EMAIL)
         cy.get('button[type="submit"]').click()
         cy.contains('validated', {timeout: 10000})
         cy.contains(":button", "Next").click()
@@ -79,6 +79,7 @@ describe('Encrypted Email Test', () => {
         //check stats for success
         cy.contains('Sending completed', {timeout: 100000})
         cy.contains('Sent to recipient').siblings().contains(NUM_RECIPIENTS)
+        cy.wait(10000)
 
         //Verify that email is being received
         cy.task("gmail:check", {
@@ -86,16 +87,21 @@ describe('Encrypted Email Test', () => {
             to: EMAIL,
             subject: SUBJECT_NAME
         }).then(email => {
-            assert.isNotNull(email, 'Email was not found')
-            const SENT_EMAIL_CONTENT = email[0].body.html
+            cy.log(email.length)
+            cy.log(email)
+            assert(email.length == 2, 'test and/or actual email was not found')
+
             const LINK_RE = /postman\.gov\.sg\/([^\<]+)/;
-            const LINK = SENT_EMAIL_CONTENT.match(LINK_RE)[1]
-            cy.log(LINK)
-            cy.visit("/".concat(LINK))
+            for (let i = 0; i < 2; i ++){
+                var sent_email_content = email[i].body.html
+                var link = sent_email_content.match(LINK_RE)[1]
+                cy.log(link)
+                cy.visit("/".concat(link))
+                cy.get('input[type="password"]').type(PASSWORD_ENC_VERIFICATION)
+                cy.get('button[type="submit"]').click()
+                cy.contains(MSG_TO_VERIFY)
+            }
         })
-        cy.get('input[type="password"]').type(PASSWORD_ENC_VERIFICATION)
-        cy.get('button[type="submit"]').click()
-        cy.contains(MSG_TO_VERIFY)
     })
 
 })

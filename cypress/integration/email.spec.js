@@ -1,7 +1,7 @@
 describe('Email Test', () => {
 
     const CSV_FILENAME = "testfile_email.csv"
-    const NUM_RECIPIENTS = '2'
+    const NUM_RECIPIENTS = '1'
 
     var CUR_DATE = new Date();
     var DATETIME = CUR_DATE.getDate() + "/"
@@ -11,18 +11,19 @@ describe('Email Test', () => {
                 + CUR_DATE.getMinutes() + ":" 
                 + CUR_DATE.getSeconds();
     const CAMPAIGN_NAME = "email_".concat(DATETIME)
-    const SUBJECT_NAME = "sub_".concat(DATETIME)
+    const RANDOM_STRING = "_".concat((Math.floor((Math.random() * 1000000) + 1)).toString())
+    const SUBJECT_NAME = "sub_".concat(DATETIME).concat(RANDOM_STRING)
+    const MSG_CONTENT = Cypress.env('MSG_CONTENT').concat(RANDOM_STRING)
+    const MSG_TO_VERIFY = Cypress.env('MSG_TO_VERIFY').concat(RANDOM_STRING)
 
     const OTP_SUBJECT = Cypress.env('OTP_SUBJECT')
     const EMAIL = Cypress.env('EMAIL')
-    const MAIL_TESTER = Cypress.env('MAIL_TESTER')
     const MAIL_SENDER = Cypress.env('MAIL_SENDER')
-    const MSG_CONTENT = Cypress.env('MSG_CONTENT')
-    const MSG_TO_VERIFY = Cypress.env('MSG_TO_VERIFY')
 
     it('initiate email campaign', () => {
         //log in via OTP
         cy.visit('/login')
+        cy.get('input[type=email]', {timeout: 50000})
         cy.get('input[type=email]').type(EMAIL)
         cy.get('button[type=submit]').click()
         cy.wait(10000)
@@ -60,7 +61,7 @@ describe('Email Test', () => {
         cy.contains(":button", "Next").click()
 
         //step 3 : send test email
-        cy.get('input[type="email"]').type(MAIL_TESTER)
+        cy.get('input[type="email"]').type(EMAIL)
         cy.get('button[type="submit"]').click()
         cy.contains('validated', {timeout: 10000})
         cy.contains(":button", "Next").click()
@@ -72,6 +73,7 @@ describe('Email Test', () => {
         //check stats for success
         cy.contains('Sending completed', {timeout: 100000})
         cy.contains('Sent to recipient').siblings().contains(NUM_RECIPIENTS)
+        cy.wait(10000)
 
         //Verify that email is being received
         cy.task("gmail:check", {
@@ -79,12 +81,17 @@ describe('Email Test', () => {
             to: EMAIL,
             subject: SUBJECT_NAME
         }).then(email => {
-            assert.isNotNull(email, 'Email was not found')
-            const SENT_EMAIL_CONTENT = email[0].body.html
+            assert(email.length == 2, 'test and/or actual email was not found')
             const MSG_RE = /\<p\>([^]+)\<\/p\>/;
-            const MSG = SENT_EMAIL_CONTENT.match(MSG_RE)[1]
-            cy.log(MSG)
-            assert.equal(MSG, MSG_TO_VERIFY, "Incorrect email content")
+            var msg_cnt = 0
+            for (let i = 0; i < 2; i ++){
+                var sent_email_content = email[i].body.html
+                var msg = sent_email_content.match(MSG_RE)[1]
+                if (msg != null && msg === MSG_TO_VERIFY){
+                    msg_cnt += 1
+                }
+            }
+            assert.equal(msg_cnt, 2, "test and/or actual email has incorrect content")
         })
     })
 

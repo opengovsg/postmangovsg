@@ -1,10 +1,6 @@
 {
     "baseUrl": "https://staging.postman.gov.sg/",
     "env": {
-        "EMAIL": "rae@open.gov.sg",
-        "MAIL_SENDER": "donotreply@mail.postman.gov.sg",
-        "MAIL_TESTER": "yingyee0111@gmail.com",
-        "SMS_NUMBER": "81771020",
         "MSG_TO_VERIFY" : "Dear rae",
         "MSG_CONTENT" : "Dear {{}{{}name{}}{}}",
         "REDIRECTION_MSG": "Dear {{}{{}recipient{}}{}}, please access via {{}{{}protectedlink{}}{}}",
