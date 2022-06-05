@@ -156,28 +156,12 @@ You should find the
 
 ## Deployment
 
-We use TravisCI to simplify our deployment process:
+We use Github Actions to simplify our deployment process:
 
-- `backend` is deployed on Elastic Beanstalk
-- `frontend` is deployed on AWS Amplify
-- `worker` is deployed on Elastic Container Service
+- `backend` is deployed on [Elastic Beanstalk](.github/workflows/deploy-eb.yml)
+- `frontend` is deployed on [AWS Amplify](.github/workflows/deploy-frontend.yml)
+- `worker` is deployed on [Elastic Container Service](.github/workflows/deploy-worker.yml)
 - `serverless` is deployed on AWS Lambda
-
-The environment variables on Travis are:
-
-- `AWS_ACCESS_KEY_ID` : access key for the travis IAM user
-- `AWS_SECRET_ACCESS_KEY` : access key for the travis IAM user
-- `AWS_DEFAULT_REGION` : region where your infrastructure is deployed (`ap-northeast-1` for us)
-- `REPO`: Path to the elastic container registry (`<account_id>.dkr.ecr.ap-northeast-1.amazonaws.com/<repo_name>`)
-- `PRODUCTION_BRANCH` : branch that is deployed to production
-- `STAGING_BRANCH`: branch that is deployed to staging. Change this variable to test different branches.
-
-To deploy workers, trigger a custom build on Travis with the Custom Config set to
-
-```
-env:
-  - DEPLOY_WORKER=true
-```
 
 ## Releasing
 
