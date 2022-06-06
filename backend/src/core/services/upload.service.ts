@@ -264,7 +264,10 @@ const getUploadQueue = async (): Promise<Queue<Upload>> => {
  */
 const enqueueUpload = async (upload: Upload): Promise<string> => {
   const queue = await getUploadQueue()
-  const job = queue.createJob(upload)
+  // set job id to be campaign ID just in case a duplicate job is created while
+  // another job for the same campaign is being processed, the duplicate job won't
+  // be created
+  const job = queue.createJob(upload).setId(upload.data.campaignId.toString())
   // Retries are already handled within the processing function, hence we set it to zero
   const saved = await job.retries(0).save()
   return saved.id

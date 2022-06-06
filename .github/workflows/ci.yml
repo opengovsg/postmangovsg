@@ -22,8 +22,11 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Lint app code
         run: npm run lint-no-fix
-      - name: Lint secrets
-        run: npm run secretlint
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.x"
+      - run: pip install detect-secrets==1.2.0
+      - run: npm run detect-secrets:check
   test-backend:
     runs-on: ubuntu-latest
     services:

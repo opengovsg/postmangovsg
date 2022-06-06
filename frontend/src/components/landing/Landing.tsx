@@ -20,7 +20,7 @@ import userImg from 'assets/img/landing/moe-circle.png'
 import moeAgencyImg from 'assets/img/landing/moe-gray.png'
 import mohAgencyImg from 'assets/img/landing/moh-gray.png'
 import momAgencyImg from 'assets/img/landing/mom-gray.png'
-import onboardingImg from 'assets/img/landing/onboard.svg'
+import onboardingImg from 'assets/img/landing/onboard.png'
 
 import landingAnimation from 'assets/lottie/landing.json'
 import whyUse1 from 'assets/mp4/why-use-1.mp4'
@@ -61,7 +61,13 @@ const Landing = () => {
       if (infoBannerRef.current) {
         const offsetTop =
           scrollTop >= govBannerHeight ? 0 : govBannerHeight - scrollTop
-        infoBannerRef.current.style.top = `${offsetTop}px`
+        const infoBannerHeight = infoBannerRef.current?.offsetHeight as number
+        if (scrollTop > govBannerHeight + infoBannerHeight) {
+          infoBannerRef.current.style.position = 'fixed'
+          infoBannerRef.current.style.top = `${offsetTop}px`
+        } else {
+          infoBannerRef.current.style.position = 'relative'
+        }
       }
     }
     window.addEventListener('scroll', recalculateBannerPos)

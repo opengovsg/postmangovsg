@@ -22,7 +22,7 @@ import ActionsButton from './actions-button'
 
 import AnnouncementModal from './announcement-modal'
 
-import EmptyDashboardImg from 'assets/img/empty-dashboard.svg'
+import EmptyDashboardImg from 'assets/img/empty-dashboard.png'
 import { Campaign, channelIcons } from 'classes'
 import {
   Pagination,

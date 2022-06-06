@@ -100,11 +100,19 @@ cw tail -r ap-northeast-1 -u $AWS_ENDPOINT -f $AWS_LOG_GROUP_NAME:`node --eval='
 ### Secrets detection
 
 This project makes of [detect-secrets](https://github.com/Yelp/detect-secrets) to prevent secrets and credentials from being committed to the repository.
-It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo. Run the following to install:
+It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo.
+**Note**: The reason we're running `detect-secrets` through `detect-secrets:precommit` instead of using `lint-staged` is because `detect-secrets-hook` doesn't work well with the combination of output of staged files by `lint-staged` and baseline supplied.
+
+Run the following to install:
 
 ```bash
-pip install detect-secrets
+pip install detect-secrets==1.2.0
 ```
+
+Upon blockage by `detect-secrets-hook`, please take these steps:
+
+- Go into each of the locations pointed out by `detect-secrets-hook` and remove accidentally added secrets
+- If some of these detections are false positive (please be super sure about this, when not sure check with teammates), update the secrets baseline by running `npm run detect-secrets:update
 
 ### Set environment variables
 
@@ -148,28 +156,12 @@ You should find the
 
 ## Deployment
 
-We use TravisCI to simplify our deployment process:
+We use Github Actions to simplify our deployment process:
 
-- `backend` is deployed on Elastic Beanstalk
-- `frontend` is deployed on AWS Amplify
-- `worker` is deployed on Elastic Container Service
+- `backend` is deployed on [Elastic Beanstalk](.github/workflows/deploy-eb.yml)
+- `frontend` is deployed on [AWS Amplify](.github/workflows/deploy-frontend.yml)
+- `worker` is deployed on [Elastic Container Service](.github/workflows/deploy-worker.yml)
 - `serverless` is deployed on AWS Lambda
-
-The environment variables on Travis are:
-
-- `AWS_ACCESS_KEY_ID` : access key for the travis IAM user
-- `AWS_SECRET_ACCESS_KEY` : access key for the travis IAM user
-- `AWS_DEFAULT_REGION` : region where your infrastructure is deployed (`ap-northeast-1` for us)
-- `REPO`: Path to the elastic container registry (`<account_id>.dkr.ecr.ap-northeast-1.amazonaws.com/<repo_name>`)
-- `PRODUCTION_BRANCH` : branch that is deployed to production
-- `STAGING_BRANCH`: branch that is deployed to staging. Change this variable to test different branches.
-
-To deploy workers, trigger a custom build on Travis with the Custom Config set to
-
-```
-env:
-  - DEPLOY_WORKER=true
-```
 
 ## Releasing
 

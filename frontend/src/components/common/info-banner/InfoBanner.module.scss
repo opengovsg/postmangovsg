@@ -8,7 +8,7 @@
   text-align: center;
   @include flex-horizontal;
   justify-content: center;
-  position: fixed;
+  position: relative;
   width: 100%;
   z-index: 5;
 
