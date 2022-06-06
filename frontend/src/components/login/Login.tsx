@@ -12,7 +12,7 @@ import LoginInput from './login-input'
 
 import appLogo from 'assets/img/brand/app-logo.svg'
 import companyLogo from 'assets/img/brand/company-logo-dark.svg'
-import loginImg from 'assets/img/landing/login.svg'
+import loginImg from 'assets/img/landing/login.png'
 import { InfoBanner } from 'components/common'
 import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
