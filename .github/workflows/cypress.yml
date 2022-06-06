@@ -3,11 +3,7 @@
 name: Cypress Test
 
 # Controls when the workflow will run
-on:
-  # Triggers the workflow on push or pull request events but only for the feat/add-cypress branch
-  push:
-    branches:
-      - feat/add-cypress
+on: workflow_dispatch
 
 jobs:
   cypress-run:
@@ -31,4 +27,7 @@ jobs:
           cat cypress/plugins/gmail_token.json
 
       - name: Cypress.io
+        env:
+          CYPRESS_TWILIO_ACC_SID: ${{ secrets.CYPRESS_TWILIO_ACC_SID }}
+          CYPRESS_TWILIO_AUTH_TOKEN: ${{ secrets.CYPRESS_TWILIO_AUTH_TOKEN }}
         uses: cypress-io/github-action@v2.9.7

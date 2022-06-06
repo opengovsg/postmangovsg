@@ -46,9 +46,6 @@ module.exports = (on, config) => {
     }
   })
 
-  config.env.EMAIL = process.env.CYPRESS_EMAIL
-  config.env.MAIL_SENDER = process.env.CYPRESS_MAIL_SENDER
-  config.env.SMS_NUMBER = process.env.CYPRESS_SMS_NUMBER
   config.env.TWILIO_ACC_SID = process.env.CYPRESS_TWILIO_ACC_SID
   config.env.TWILIO_AUTH_TOKEN = process.env.CYPRESS_TWILIO_AUTH_TOKEN
   return config
