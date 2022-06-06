@@ -61,7 +61,13 @@ const Landing = () => {
       if (infoBannerRef.current) {
         const offsetTop =
           scrollTop >= govBannerHeight ? 0 : govBannerHeight - scrollTop
-        infoBannerRef.current.style.top = `${offsetTop}px`
+        const infoBannerHeight = infoBannerRef.current?.offsetHeight as number
+        if (scrollTop > govBannerHeight + infoBannerHeight) {
+          infoBannerRef.current.style.position = 'fixed'
+          infoBannerRef.current.style.top = `${offsetTop}px`
+        } else {
+          infoBannerRef.current.style.position = 'relative'
+        }
       }
     }
     window.addEventListener('scroll', recalculateBannerPos)

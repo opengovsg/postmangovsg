@@ -1,6 +1,6 @@
 import { i18n } from '@lingui/core'
 
-import { useContext } from 'react'
+import { createRef, useEffect, useContext } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
@@ -19,6 +19,26 @@ import { AuthContext } from 'contexts/auth.context'
 
 const Login = () => {
   const authContext = useContext(AuthContext)
+  const infoBannerRef = createRef<HTMLDivElement>()
+
+  useEffect(() => {
+    function recalculateBannerPos() {
+      const scrollTop = (document.documentElement.scrollTop ||
+        document.body.scrollTop) as number
+      if (infoBannerRef.current) {
+        const infoBannerHeight = infoBannerRef.current?.offsetHeight as number
+        if (scrollTop > infoBannerHeight) {
+          infoBannerRef.current.style.position = 'fixed'
+        } else {
+          infoBannerRef.current.style.position = 'relative'
+        }
+      }
+    }
+    window.addEventListener('scroll', recalculateBannerPos)
+    return () => {
+      window.removeEventListener('scroll', recalculateBannerPos)
+    }
+  })
 
   if (authContext.isAuthenticated) {
     return <Redirect to="/campaigns"></Redirect>
@@ -26,7 +46,7 @@ const Login = () => {
 
   return (
     <>
-      <InfoBanner />
+      <InfoBanner innerRef={infoBannerRef} />
       <div className={styles.topContainer}>
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
