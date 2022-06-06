@@ -2,6 +2,7 @@ describe('SMS Test', () => {
 
     const CSV_FILENAME = "testfile_sms.csv"
     const NUM_RECIPIENTS = '1'
+    const TWILIO_CRED_SAVED = "default-postman"
 
     var CUR_DATE = new Date();
     var DATETIME = CUR_DATE.getDate() + "/"
@@ -67,7 +68,7 @@ describe('SMS Test', () => {
 
         //step 3 : send test SMS
         cy.get('div[class*="Dropdown_select"]').click()
-        cy.contains('default').click()
+        cy.contains(TWILIO_CRED_SAVED).click()
         cy.get('input[type="tel"]').type(SMS_NUMBER)
         cy.get('button[type="submit"]').click()
         cy.contains('validated', {timeout: TIMEOUT})
