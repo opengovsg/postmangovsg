@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: "16"
           cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: "16"
           cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
@@ -81,7 +81,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: "16"
           cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
@@ -99,7 +99,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: "16"
           cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
@@ -123,7 +123,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: "16"
           cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
