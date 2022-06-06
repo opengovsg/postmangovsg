@@ -1,10 +1,12 @@
 {
     "baseUrl": "https://staging.postman.gov.sg/",
     "env": {
-        "MSG_TO_VERIFY" : "Dear rae",
+        "MSG_TO_VERIFY" : "Dear postman",
         "MSG_CONTENT" : "Dear {{}{{}name{}}{}}",
         "REDIRECTION_MSG": "Dear {{}{{}recipient{}}{}}, please access via {{}{{}protectedlink{}}{}}",
         "OTP_SUBJECT": "One-Time Password (OTP) for Postman.gov.sg",
-        "PASSWORD_ENC_VERIFICATION": "hello"
+        "DUMMY_ENC": "hello",
+        "TIMEOUT": 100000,
+        "WAIT_TIME": 10000
     }
 }

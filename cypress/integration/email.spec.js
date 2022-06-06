@@ -19,14 +19,18 @@ describe('Email Test', () => {
     const OTP_SUBJECT = Cypress.env('OTP_SUBJECT')
     const EMAIL = Cypress.env('EMAIL')
     const MAIL_SENDER = Cypress.env('MAIL_SENDER')
+    const TIMEOUT = Cypress.env('TIMEOUT')
+    const WAIT_TIME = Cypress.env('WAIT_TIME')
+
+    const EMAIL_TO_EXPECT = 2 //both test and actual emails
 
     it('initiate email campaign', () => {
         //log in via OTP
         cy.visit('/login')
-        cy.get('input[type=email]', {timeout: 50000})
+        cy.get('input[type=email]', {timeout: TIMEOUT})
         cy.get('input[type=email]').type(EMAIL)
         cy.get('button[type=submit]').click()
-        cy.wait(10000)
+        cy.wait(WAIT_TIME)
 
         cy.task("gmail:check", {
             from: MAIL_SENDER,
@@ -55,7 +59,7 @@ describe('Email Test', () => {
 
         //step 2 : upload csv file
         cy.get('input[type="file"]').attachFile(CSV_FILENAME)
-        cy.contains('Message preview', {timeout: 50000})
+        cy.contains('Message preview', {timeout: TIMEOUT})
         cy.contains(CSV_FILENAME)
         cy.contains(NUM_RECIPIENTS.concat(" recipients"))
         cy.contains(":button", "Next").click()
@@ -63,7 +67,7 @@ describe('Email Test', () => {
         //step 3 : send test email
         cy.get('input[type="email"]').type(EMAIL)
         cy.get('button[type="submit"]').click()
-        cy.contains('validated', {timeout: 10000})
+        cy.contains('validated', {timeout: TIMEOUT})
         cy.contains(":button", "Next").click()
 
         //step 4 : send campaign
@@ -71,9 +75,9 @@ describe('Email Test', () => {
         cy.contains(":button", "Confirm").click()
 
         //check stats for success
-        cy.contains('Sending completed', {timeout: 100000})
+        cy.contains('Sending completed', {timeout: TIMEOUT})
         cy.contains('Sent to recipient').siblings().contains(NUM_RECIPIENTS)
-        cy.wait(10000)
+        cy.wait(WAIT_TIME)
 
         //Verify that email is being received
         cy.task("gmail:check", {
@@ -81,17 +85,17 @@ describe('Email Test', () => {
             to: EMAIL,
             subject: SUBJECT_NAME
         }).then(email => {
-            assert(email.length == 2, 'test and/or actual email was not found')
+            assert(email.length == EMAIL_TO_EXPECT, 'test and/or actual email was not found')
             const MSG_RE = /\<p\>([^]+)\<\/p\>/;
             var msg_cnt = 0
-            for (let i = 0; i < 2; i ++){
+            for (let i = 0; i < EMAIL_TO_EXPECT; i ++){
                 var sent_email_content = email[i].body.html
                 var msg = sent_email_content.match(MSG_RE)[1]
                 if (msg != null && msg === MSG_TO_VERIFY){
                     msg_cnt += 1
                 }
             }
-            assert.equal(msg_cnt, 2, "test and/or actual email has incorrect content")
+            assert.equal(msg_cnt, EMAIL_TO_EXPECT, "test and/or actual email has incorrect content")
         })
     })
 

@@ -21,13 +21,18 @@ describe('SMS Test', () => {
     const SMS_NUMBER = Cypress.env('SMS_NUMBER')
     const TWILIO_ACC_SID = Cypress.env('TWILIO_ACC_SID')
     const TWILIO_AUTH_TOKEN = Cypress.env('TWILIO_AUTH_TOKEN')
+    const TIMEOUT = Cypress.env('TIMEOUT')
+    const WAIT_TIME = Cypress.env('WAIT_TIME')
+
+    const MSG_TO_SEARCH = 15
+    const MSG_TO_EXPECT = 2 //both test and actual sms
 
     it('initiate email campaign', () => {
         //log in via OTP
         cy.visit('/login')
         cy.get('input[type=email]').type(EMAIL)
         cy.get('button[type=submit]').click()
-        cy.wait(10000)
+        cy.wait(WAIT_TIME)
 
         cy.task("gmail:check", {
             from: MAIL_SENDER,
@@ -55,7 +60,7 @@ describe('SMS Test', () => {
 
         //step 2 : upload csv file
         cy.get('input[type="file"]').attachFile(CSV_FILENAME)
-        cy.contains('Message preview', {timeout: 50000})
+        cy.contains('Message preview', {timeout: TIMEOUT})
         cy.contains(CSV_FILENAME)
         cy.contains(NUM_RECIPIENTS.concat(" recipients"))
         cy.contains(":button", "Next").click()
@@ -65,7 +70,7 @@ describe('SMS Test', () => {
         cy.contains('default').click()
         cy.get('input[type="tel"]').type(SMS_NUMBER)
         cy.get('button[type="submit"]').click()
-        cy.contains('validated', {timeout: 10000})
+        cy.contains('validated', {timeout: TIMEOUT})
         cy.contains(":button", "Next").click()
 
         //step 4 : send campaign
@@ -73,9 +78,9 @@ describe('SMS Test', () => {
         cy.contains(":button", "Confirm").click()
 
         //check feedback for success
-        cy.contains('Sending completed', {timeout: 100000})
+        cy.contains('Sending completed', {timeout: TIMEOUT})
         cy.contains('Sent to recipient').siblings().contains(NUM_RECIPIENTS)
-        cy.wait(10000)
+        cy.wait(WAIT_TIME)
 
         //verify that SMS is being received
         cy.request({
@@ -89,12 +94,12 @@ describe('SMS Test', () => {
         })
             .its('body').then((res) => {
             var msg_cnt = 0
-            for (let i = 0; i < 15; i ++){
+            for (let i = 0; i < MSG_TO_SEARCH; i ++){
                 if (res.messages[i].direction === 'inbound' && res.messages[i].body === MSG_TO_VERIFY){
                     msg_cnt += 1
                 }
             }
-            assert.equal(msg_cnt, 2, "test and/or actual email not received")
+            assert.equal(msg_cnt, MSG_TO_EXPECT, "test and/or actual email not received")
         })
     })
 

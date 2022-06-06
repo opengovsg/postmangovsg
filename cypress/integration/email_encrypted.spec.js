@@ -20,14 +20,18 @@ describe('Encrypted Email Test', () => {
     const EMAIL = Cypress.env('EMAIL')
     const MAIL_SENDER = Cypress.env('MAIL_SENDER')
     const REDIRECTION_MSG = Cypress.env('REDIRECTION_MSG')
-    const PASSWORD_ENC_VERIFICATION = Cypress.env('PASSWORD_ENC_VERIFICATION')
+    const DUMMY_ENC = Cypress.env('DUMMY_ENC')
+    const TIMEOUT = Cypress.env('TIMEOUT')
+    const WAIT_TIME = Cypress.env('WAIT_TIME')
+
+    const EMAIL_TO_EXPECT = 2 //both test and actual emails
 
     it('initiate email campaign', () => {
         //log in via OTP
         cy.visit('/login')
         cy.get('input[type=email]').type(EMAIL)
         cy.get('button[type=submit]').click()
-        cy.wait(10000)
+        cy.wait(WAIT_TIME)
 
         cy.task("gmail:check", {
             from: MAIL_SENDER,
@@ -59,17 +63,17 @@ describe('Encrypted Email Test', () => {
         //step 2 : enter message template for encryption and upload csv file
         cy.get('textarea[id="protectedMessage"]').type(MSG_CONTENT)
         cy.get('input[type="file"]').attachFile(CSV_FILENAME)
-        cy.contains('Results', {timeout: 50000})
+        cy.contains('Results', {timeout: TIMEOUT})
         cy.contains(CSV_FILENAME)
         cy.contains(NUM_RECIPIENTS.concat(" recipients"))
         cy.contains(":button", "Confirm").click()
-        cy.contains('Message preview', {timeout: 50000})
+        cy.contains('Message preview', {timeout: TIMEOUT})
         cy.contains(":button", "Next").click()
 
         //step 3 : send test email
         cy.get('input[type="email"]').type(EMAIL)
         cy.get('button[type="submit"]').click()
-        cy.contains('validated', {timeout: 10000})
+        cy.contains('validated', {timeout: TIMEOUT})
         cy.contains(":button", "Next").click()
 
         //step 4 : send campaign
@@ -77,9 +81,9 @@ describe('Encrypted Email Test', () => {
         cy.contains(":button", "Confirm").click()
 
         //check stats for success
-        cy.contains('Sending completed', {timeout: 100000})
+        cy.contains('Sending completed', {timeout: TIMEOUT})
         cy.contains('Sent to recipient').siblings().contains(NUM_RECIPIENTS)
-        cy.wait(10000)
+        cy.wait(WAIT_TIME)
 
         //Verify that email is being received
         cy.task("gmail:check", {
@@ -89,15 +93,15 @@ describe('Encrypted Email Test', () => {
         }).then(email => {
             cy.log(email.length)
             cy.log(email)
-            assert(email.length == 2, 'test and/or actual email was not found')
+            assert(email.length == EMAIL_TO_EXPECT, 'test and/or actual email was not found')
 
             const LINK_RE = /postman\.gov\.sg\/([^\<]+)/;
-            for (let i = 0; i < 2; i ++){
+            for (let i = 0; i < EMAIL_TO_EXPECT; i ++){
                 var sent_email_content = email[i].body.html
                 var link = sent_email_content.match(LINK_RE)[1]
                 cy.log(link)
                 cy.visit("/".concat(link))
-                cy.get('input[type="password"]').type(PASSWORD_ENC_VERIFICATION)
+                cy.get('input[type="password"]').type(DUMMY_ENC)
                 cy.get('button[type="submit"]').click()
                 cy.contains(MSG_TO_VERIFY)
             }
