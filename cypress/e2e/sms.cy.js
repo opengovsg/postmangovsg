@@ -3,8 +3,8 @@ describe('SMS Test', () => {
   const NUM_RECIPIENTS = '1';
   const TWILIO_CRED_SAVED = 'default-postman';
 
-  var CUR_DATE = new Date();
-  var DATETIME =
+  const CUR_DATE = new Date();
+  const DATETIME =
     CUR_DATE.getDate() +
     '/' +
     (CUR_DATE.getMonth() + 1) +
@@ -93,7 +93,7 @@ describe('SMS Test', () => {
     //verify that SMS is being received
     cy.request({
       method: 'GET',
-      url: `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACC_SID}/Messages.json`,
+      url: `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACC_SID}/Messages.json?to=${SMS_NUMBER}`,
       auth: {
         username: TWILIO_ACC_SID,
         password: TWILIO_AUTH_TOKEN,
