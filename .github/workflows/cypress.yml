@@ -1,0 +1,34 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Cypress Test
+
+# Controls when the workflow will run
+on: workflow_dispatch
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.2
+
+      - name: Write credentials file
+        env:
+          GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
+        run: |
+          echo $GMAIL_CREDENTIALS > cypress/plugins/credentials.json
+          cat cypress/plugins/credentials.json
+
+      - name: Write token file
+        env:
+          GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
+        run: |
+          echo $GMAIL_TOKEN > cypress/plugins/gmail_token.json
+          cat cypress/plugins/gmail_token.json
+
+      - name: Cypress.io
+        env:
+          CYPRESS_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg/' || 'https://staging.postman.gov.sg/' }}
+          CYPRESS_TWILIO_ACC_SID: ${{ secrets.CYPRESS_TWILIO_ACC_SID }}
+          CYPRESS_TWILIO_AUTH_TOKEN: ${{ secrets.CYPRESS_TWILIO_AUTH_TOKEN }}
+        uses: cypress-io/github-action@v2.9.7
