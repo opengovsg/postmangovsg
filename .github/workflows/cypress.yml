@@ -12,19 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.4.2
 
-      - name: Write credentials file
+      - name: Write gmail credentials file
         env:
           GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
-        run: |
-          echo $GMAIL_CREDENTIALS > cypress/plugins/credentials.json
-          cat cypress/plugins/credentials.json
-
-      - name: Write token file
-        env:
           GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
         run: |
-          echo $GMAIL_TOKEN > cypress/plugins/gmail_token.json
-          cat cypress/plugins/gmail_token.json
+          echo $GMAIL_CREDENTIALS > credentials.json
+          echo $GMAIL_TOKEN > gmail_token.json
 
       - name: Cypress.io
         env:
