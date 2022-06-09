@@ -131,6 +131,17 @@ cd postmangovsg
 npm install
 ```
 
+### Database migration
+
+#### Local database
+
+This step needs to be run if you have made a change to the database schema, or if you are setting up the project for the first time.
+
+```bash
+cd postmangovsg/backend
+npm run database:migrate && npm run database:seed
+```
+
 ### Compile frontend translations
 
 [lingui](https://lingui.js.org/) is used for internationalization. Read [this](frontend/src/locales/README.md) for more info.

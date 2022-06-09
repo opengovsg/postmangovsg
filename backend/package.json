@@ -13,7 +13,9 @@
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
     "pretest": "tsc --build",
     "test": "jest --runInBand --detectOpenHandles",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "database:migrate": "npx sequelize db:migrate",
+    "database:seed": "npx sequelize db:seed:all"
   },
   "author": "",
   "license": "MIT",
