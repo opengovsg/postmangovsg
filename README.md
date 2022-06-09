@@ -122,7 +122,7 @@ Example environment variables can be found in
 - [frontend/.env-example](frontend/.env-example)
 - [worker/.env-example](worker/.env-example)
 
-Set the environment variables in a file named `.env` in each folder. You need to specify the set of `mailOptions` environment variables in `backend/src/core/config.ts` for `npm run dev` to work.
+Set the environment variables in a file named `.env` in each folder. If you're a developer at OGP, ask your friendly colleague for their env variables. (Please help to ensure the `.env-example` file stays up-to-date though!)
 
 ### Install dependencies
 
