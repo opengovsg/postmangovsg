@@ -47,9 +47,19 @@ Just want to use the API? See [api-usage.md](docs/api-usage.md) for details.
 
 ### Install and run required services
 
-Set up a **postgresql@11** database, **redis** cache and **localstack** server. Postgresql and redis can be started either natively or using Docker.
+Set up a **postgresql@11** database, **redis** cache and **localstack** server. Postgresql and redis can be started either natively or using Docker. We recommend using Docker.
 
-Starting postgresql and redis natively:
+#### Starting all services using Docker:
+
+```bash
+export AWS_ENDPOINT=http://localhost:4566
+export FILE_STORAGE_BUCKET_NAME=localstack-upload
+export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
+
+npm run dev:services
+```
+
+#### Starting postgresql and redis natively:
 
 ```bash
 # Install postgres
@@ -75,16 +85,6 @@ export FILE_STORAGE_BUCKET_NAME=localstack-upload
 export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
 
 npm run dev:localstack
-```
-
-Starting all services using Docker:
-
-```bash
-export AWS_ENDPOINT=http://localhost:4566
-export FILE_STORAGE_BUCKET_NAME=localstack-upload
-export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
-
-npm run dev:services
 ```
 
 Optionally, run the following to install and use `cw` to tail Cloudwatch logs:
