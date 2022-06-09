@@ -25,4 +25,7 @@ jobs:
           CYPRESS_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg/' || 'https://staging.postman.gov.sg/' }}
           CYPRESS_TWILIO_ACC_SID: ${{ secrets.CYPRESS_TWILIO_ACC_SID }}
           CYPRESS_TWILIO_AUTH_TOKEN: ${{ secrets.CYPRESS_TWILIO_AUTH_TOKEN }}
-        uses: cypress-io/github-action@v2.9.7
+        uses: cypress-io/github-action@v4
+        with:
+          config-file: cypress.config.js
+          install-command: npm ci --ignore-scripts
