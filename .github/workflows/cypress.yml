@@ -3,7 +3,10 @@
 name: Cypress Test
 
 # Controls when the workflow will run
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - github-actions-test
 
 jobs:
   cypress-run:
@@ -19,7 +22,8 @@ jobs:
         run: |
           echo $GMAIL_CREDENTIALS > credentials.json
           echo $GMAIL_TOKEN > gmail_token.json
-
+      - run: npm ci --ignore-scripts
+      - run: npx cypress install
       - name: Cypress.io
         env:
           CYPRESS_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg/' || 'https://staging.postman.gov.sg/' }}
@@ -28,4 +32,4 @@ jobs:
         uses: cypress-io/github-action@v4
         with:
           config-file: cypress.config.js
-          install-command: npm ci --ignore-scripts
+          install: false
