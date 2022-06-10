@@ -41,11 +41,11 @@ module.exports = {
         format: null,
       },
       {
-        selector: [
-          'typeProperty',
-          'objectLiteralProperty',
-          'objectLiteralMethod',
-        ],
+        selector: 'objectLiteralProperty',
+        format: null,
+      },
+      {
+        selector: ['typeProperty', 'objectLiteralMethod'],
         format: ['camelCase', 'snake_case', 'PascalCase', 'UPPER_CASE'],
       },
     ],
