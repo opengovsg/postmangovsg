@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import url from 'url'
-import crypto, { Utf8AsciiLatin1Encoding } from 'crypto'
+import crypto, { Encoding } from 'crypto'
 import https from 'https'
 import { loggerWithLabel } from '@core/logger'
 import {
@@ -99,7 +99,7 @@ const validateSignature = async (
 
   const certificate = await getCertificate(certUrl)
   const verifier = crypto.createVerify('RSA-SHA1')
-  verifier.update(basestring(record), encoding as Utf8AsciiLatin1Encoding)
+  verifier.update(basestring(record), encoding as Encoding)
   return verifier.verify(certificate, record.Signature, 'base64')
 }
 
