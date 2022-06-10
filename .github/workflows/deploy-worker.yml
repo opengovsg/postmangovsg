@@ -37,7 +37,6 @@ jobs:
         run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - name: Lint app code
         run: |
-          npm i
           cd shared 
           npm ci
           cd ..
