@@ -41,12 +41,12 @@ module.exports = {
         format: null,
       },
       {
-        selector: 'objectLiteralProperty',
+        selector: [
+          'typeProperty',
+          'objectLiteralProperty',
+          'objectLiteralMethod',
+        ],
         format: null,
-      },
-      {
-        selector: ['typeProperty', 'objectLiteralMethod'],
-        format: ['camelCase', 'snake_case', 'PascalCase', 'UPPER_CASE'],
       },
     ],
     '@typescript-eslint/no-explicit-any': 'off',
