@@ -33,6 +33,3 @@ The `unsubscribers` table stores unsubscribed recipients by `campaign_id` and `s
 | `SES_PASS`              | SMTP password                                                |
 | `SES_FROM`              | The email address that appears in the From field of an email |
 | `UNSUBSCRIBE_GUIDE_URL` | URL to unsubscribe guide                                     |
-
-## Telegram handler
-To be updated
