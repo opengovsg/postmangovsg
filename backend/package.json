@@ -14,8 +14,9 @@
     "pretest": "tsc --build",
     "test": "jest --runInBand --detectOpenHandles",
     "precommit": "lint-staged",
-    "database:migrate": "npx sequelize db:migrate",
-    "database:seed": "npx sequelize db:seed:all"
+    "db:migrate": "npx sequelize db:migrate",
+    "db:seed": "npx sequelize db:seed:all",
+    "db:undo": "npx sequelize db:migrate:undo"
   },
   "author": "",
   "license": "MIT",

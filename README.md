@@ -127,7 +127,6 @@ Set the environment variables in a file named `.env` in each folder. If you're a
 ### Install dependencies
 
 ```bash
-cd postmangovsg
 npm install
 ```
 
@@ -138,16 +137,25 @@ npm install
 This step needs to be run if you have made a change to the database schema, or if you are setting up the project for the first time.
 
 ```bash
-cd postmangovsg/backend
-npm run database:migrate && npm run database:seed
+cd backend
+npm run db:migrate # run all pending migrations
+npm run db:seed # seed database with dummy data
 ```
+
+If you need to undo any database migrations:
+```bash
+cd backend
+npm run db:undo # undo most recent migration
+```
+
+You can find more info on undoing migrations using Sequelize [here](https://sequelize.org/docs/v6/other-topics/migrations/#undoing-migrations).
 
 ### Compile frontend translations
 
 [lingui](https://lingui.js.org/) is used for internationalization. Read [this](frontend/src/locales/README.md) for more info.
 
 ```bash
-cd postmangovsg/frontend
+cd frontend
 npm run extract
 npm run compile
 ```
@@ -155,7 +163,6 @@ npm run compile
 ### Run the app
 
 ```bash
-cd postmangovsg
 npm run dev
 ```
 
@@ -252,10 +259,10 @@ See [downtime-procedure](docs/downtime-procedure/index.md) for steps on how to b
 Create a cluster with four services. These names are currently hardcoded for deployment in .travis.yml
 
 | Cluster Name: postmangovsg-workers |
-| ---------------------------------- |
+|------------------------------------|
 
 | Service Name    | LaunchType | Platform version |
-| --------------- | ---------- | ---------------- |
+|-----------------|------------|------------------|
 | staging-sending | FARGATE    | 1.4.0            |
 | staging-logger  | FARGATE    | 1.4.0            |
 | prod-sending    | FARGATE    | 1.4.0            |
