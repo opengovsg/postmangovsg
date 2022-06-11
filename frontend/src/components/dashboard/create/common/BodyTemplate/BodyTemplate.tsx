@@ -19,11 +19,12 @@ import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 
+export const COST_PER_TWILIO_SMS_SEGMENT_IN_USD = 0.0395 // correct as at 11 Jun 2022, TODO: fetch via API
+export const USD_SGD_RATE = 1.4 // correct as at 11 Jun 2022
+export const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD =
+  COST_PER_TWILIO_SMS_SEGMENT_IN_USD * USD_SGD_RATE
+
 const SmsMessageBodyInfo = ({ body }: { body: string }) => {
-  const COST_PER_TWILIO_SMS_SEGMENT_IN_USD = 0.0395 // correct as at 11 Jun 2022, TODO: fetch via API
-  const USD_SGD_RATE = 1.4 // correct as at 11 Jun 2022
-  const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD =
-    COST_PER_TWILIO_SMS_SEGMENT_IN_USD * USD_SGD_RATE
   const segmentedMessage = new SegmentedMessage(body)
   const segmentEncoding = segmentedMessage.encodingName
   const segmentCount = segmentedMessage.segmentsCount
