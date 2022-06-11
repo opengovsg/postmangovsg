@@ -20,7 +20,10 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 
 const SmsMessageBodyInfo = ({ body }: { body: string }) => {
-  const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD = 0.0395 // correct as at 5 Feb 2022
+  const COST_PER_TWILIO_SMS_SEGMENT_IN_USD = 0.0395 // correct as at 11 Jun 2022, TODO: fetch via API
+  const USD_SGD_RATE = 1.4 // correct as at 11 Jun 2022
+  const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD =
+    COST_PER_TWILIO_SMS_SEGMENT_IN_USD * USD_SGD_RATE
   const segmentedMessage = new SegmentedMessage(body)
   const segmentEncoding = segmentedMessage.encodingName
   const segmentCount = segmentedMessage.segmentsCount
@@ -28,7 +31,7 @@ const SmsMessageBodyInfo = ({ body }: { body: string }) => {
   return (
     <p className={styles.characterCount}>
       This SMS will cost approximately SGD{' '}
-      {segmentCount * COST_PER_TWILIO_SMS_SEGMENT_IN_SGD}.
+      {(segmentCount * COST_PER_TWILIO_SMS_SEGMENT_IN_SGD).toFixed(3)}.
       <br />
       This estimate is calculated based on Twilio&apos;s pricing. Find out more{' '}
       <a
