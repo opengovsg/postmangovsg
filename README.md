@@ -143,6 +143,7 @@ npm run db:seed # seed database with dummy data
 ```
 
 If you need to undo any database migrations:
+
 ```bash
 cd backend
 npm run db:undo # undo most recent migration
@@ -259,10 +260,10 @@ See [downtime-procedure](docs/downtime-procedure/index.md) for steps on how to b
 Create a cluster with four services. These names are currently hardcoded for deployment in .travis.yml
 
 | Cluster Name: postmangovsg-workers |
-|------------------------------------|
+| ---------------------------------- |
 
 | Service Name    | LaunchType | Platform version |
-|-----------------|------------|------------------|
+| --------------- | ---------- | ---------------- |
 | staging-sending | FARGATE    | 1.4.0            |
 | staging-logger  | FARGATE    | 1.4.0            |
 | prod-sending    | FARGATE    | 1.4.0            |
