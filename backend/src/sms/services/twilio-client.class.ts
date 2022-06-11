@@ -2,6 +2,24 @@ import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
 import { RateLimitError, InvalidRecipientError } from '@core/errors'
 
+interface MessageCountryPricing {
+  country: string
+  outboundSmsPrices: OutboundSmsPrice[]
+  priceUnit: string
+  url: string
+}
+
+interface OutboundSmsPrice {
+  carrier: string
+  prices: Price[]
+}
+
+interface Price {
+  base_price: string
+  current_price: string
+  number_type: string
+}
+
 export default class TwilioClient {
   private client: any
   private messagingServiceSid: string
@@ -71,5 +89,13 @@ export default class TwilioClient {
    */
   private replaceNewLines(body: string): string {
     return (body || '').replace(/<br\s*\/?>/g, '\n')
+  }
+
+  async getOutgoingSMSPriceSingapore(): Promise<number> {
+    const messageCountryPricing: MessageCountryPricing =
+      await this.client.pricing.v1.messaging.countries('SG').fetch()
+    return parseFloat(
+      messageCountryPricing.outboundSmsPrices[0].prices[0].base_price
+    )
   }
 }

@@ -162,12 +162,17 @@ const setCampaignCredential = (
 const getCampaignDetails = async (
   campaignId: number
 ): Promise<CampaignDetails> => {
-  return await CampaignService.getCampaignDetails(campaignId, [
+  const campaignDetails = await CampaignService.getCampaignDetails(campaignId, [
     {
       model: SmsTemplate,
       attributes: ['body', 'params'],
     },
   ])
+  const costPerSMS = await getTwilioCostPerOutgoingSMSSegment()
+  return {
+    ...campaignDetails,
+    cost_per_message: costPerSMS,
+  }
 }
 
 /**
@@ -288,6 +293,17 @@ const duplicateCampaign = async ({
   }
 
   return
+}
+
+const getTwilioCostPerOutgoingSMSSegment = async (): Promise<number> => {
+  const credentials: TwilioCredentials = {
+    accountSid: process.env.TWILIO_ACCOUNT_SID!,
+    apiKey: process.env.TWILIO_API_KEY!,
+    apiSecret: process.env.TWILIO_API_SECRET!,
+    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID!,
+  }
+  const twilioClient = new TwilioClient(credentials)
+  return twilioClient.getOutgoingSMSPriceSingapore()
 }
 
 export const SmsService = {
