@@ -3,9 +3,9 @@ See [verify-backup-docs](verify-backup/README.md) for details on `verify-backup`
 
 See [eb-env-update-docs](eb-env-update/README.md) for details on `eb-env-update`
 
-TODO: Include README for `redaction-digest` and `database-backup`
+TODO: Include README for `redaction-digest` and `database-backup` and more details on all Lambda functions, pending refactoring to use `serverless` framework.
 
-The serverless functions are deployed onto Lambda. For more details on how the serverless functions are set up and how they work, see [here](https://docs.google.com/document/d/1ZYvCKgQK5DhZAO1MkxF5le0nplHYVmi08MRWXia0UQw).
+The serverless functions are deployed onto AWS Lambda.
 
 * [Unsubscribe Email Digest](#unsubscribe-email-digest)
     + [Overview](#overview)
