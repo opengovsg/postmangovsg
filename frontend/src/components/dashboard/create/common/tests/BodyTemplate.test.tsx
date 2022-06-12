@@ -12,6 +12,10 @@ import { saveTemplate as saveSmsTemplate } from 'services/sms.service'
 import { saveTemplate as saveTelegramTemplate } from 'services/telegram.service'
 import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
 
+// correct as at 12 Jun 2022
+const COST_PER_SMS = 0.0395
+const USD_SGD_EXCHANGE_RATE = 1.4
+
 const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,
   name: 'Test SMS campaign',
@@ -26,7 +30,7 @@ const TEST_SMS_CAMPAIGN: Campaign = {
   job_queue: [],
   halted: false,
   has_credential: false,
-  cost_per_message: 0.0395,
+  cost_per_message: COST_PER_SMS,
 }
 
 function mockApis() {
@@ -207,10 +211,10 @@ test('SMS cost should be correct for SMS campaign body template', async () => {
     await userEvent.clear(templateTextbox)
     await userEvent.type(templateTextbox, template)
 
-    const COST_PER_TWILIO_SMS_SEGMENT_IN_USD = TEST_SMS_CAMPAIGN.cost_per_message!
-    const USD_SGD_RATE = 1.4 // correct as at 11 Jun 2022
+    const COST_PER_TWILIO_SMS_SEGMENT_IN_USD =
+      TEST_SMS_CAMPAIGN.cost_per_message ?? COST_PER_SMS
     const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD =
-      COST_PER_TWILIO_SMS_SEGMENT_IN_USD * USD_SGD_RATE
+      COST_PER_TWILIO_SMS_SEGMENT_IN_USD * USD_SGD_EXCHANGE_RATE
     const segmentedMessage = new SegmentedMessage(template)
     const segmentEncoding = segmentedMessage.encodingName
     const segmentCount = segmentedMessage.segmentsCount
