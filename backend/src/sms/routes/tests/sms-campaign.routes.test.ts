@@ -62,9 +62,13 @@ describe('GET /campaign/{id}/sms', () => {
     } as Campaign)
     const { id, name, type } = campaign
 
+    const mockGetCampaign = jest
+      .spyOn(SmsService, 'getTwilioCostPerOutgoingSMSSegment')
+      .mockResolvedValue(0.0395)
     const res = await request(app).get(`/campaign/${campaign.id}/sms`)
     expect(res.status).toBe(200)
     expect(res.body).toEqual(expect.objectContaining({ id, name, type }))
+    mockGetCampaign.mockRestore()
   })
 })
 

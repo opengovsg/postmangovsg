@@ -168,7 +168,7 @@ const getCampaignDetails = async (
       attributes: ['body', 'params'],
     },
   ])
-  const costPerSMS = await getTwilioCostPerOutgoingSMSSegment()
+  const costPerSMS = await SmsService.getTwilioCostPerOutgoingSMSSegment()
   return {
     ...campaignDetails,
     cost_per_message: costPerSMS,
@@ -318,4 +318,5 @@ export const SmsService = {
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
   duplicateCampaign,
+  getTwilioCostPerOutgoingSMSSegment,
 }
