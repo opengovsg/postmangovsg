@@ -47,9 +47,19 @@ Just want to use the API? See [api-usage.md](docs/api-usage.md) for details.
 
 ### Install and run required services
 
-Set up a **postgresql@11** database, **redis** cache and **localstack** server. Postgresql and redis can be started either natively or using Docker.
+Set up a **postgresql@11** database, **redis** cache and **localstack** server. PostgreSQL and Redis can be started either natively or using Docker. We recommend using Docker.
 
-Starting postgresql and redis natively:
+#### Starting all services using Docker
+
+```bash
+export AWS_ENDPOINT=http://localhost:4566
+export FILE_STORAGE_BUCKET_NAME=localstack-upload
+export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
+
+npm run dev:services
+```
+
+#### Starting postgresql and redis natively
 
 ```bash
 # Install postgres
@@ -77,17 +87,7 @@ export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
 npm run dev:localstack
 ```
 
-Starting all services using Docker:
-
-```bash
-export AWS_ENDPOINT=http://localhost:4566
-export FILE_STORAGE_BUCKET_NAME=localstack-upload
-export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
-
-npm run dev:services
-```
-
-Optionally, run the following to install and use `cw` to tail Cloudwatch logs:
+#### Optionally, run the following to install and use `cw` to tail Cloudwatch logs
 
 ```bash
 brew tap lucagrulla/tap
@@ -122,12 +122,11 @@ Example environment variables can be found in
 - [frontend/.env-example](frontend/.env-example)
 - [worker/.env-example](worker/.env-example)
 
-Set the environment variables in a file named `.env` in each folder. You need to specify the set of `mailOptions` environment variables in `backend/src/core/config.ts` for `npm run dev` to work.
+Set the environment variables in a file named `.env` in each folder. If you're a developer at OGP, ask your friendly colleague for their env variables. (Please help to ensure the `.env-example` file stays up-to-date though!)
 
 ### Install dependencies
 
 ```bash
-cd postmangovsg
 npm install
 ```
 
@@ -138,16 +137,26 @@ npm install
 This step needs to be run if you have made a change to the database schema, or if you are setting up the project for the first time.
 
 ```bash
-cd postmangovsg/backend
-npm run database:migrate && npm run database:seed
+cd backend
+npm run db:migrate # run all pending migrations
+npm run db:seed # seed database with dummy data
 ```
+
+If you need to undo any database migrations:
+
+```bash
+cd backend
+npm run db:undo # undo most recent migration
+```
+
+You can find more info on undoing migrations using Sequelize [here](https://sequelize.org/docs/v6/other-topics/migrations/#undoing-migrations).
 
 ### Compile frontend translations
 
 [lingui](https://lingui.js.org/) is used for internationalization. Read [this](frontend/src/locales/README.md) for more info.
 
 ```bash
-cd postmangovsg/frontend
+cd frontend
 npm run extract
 npm run compile
 ```
@@ -155,7 +164,6 @@ npm run compile
 ### Run the app
 
 ```bash
-cd postmangovsg
 npm run dev
 ```
 
