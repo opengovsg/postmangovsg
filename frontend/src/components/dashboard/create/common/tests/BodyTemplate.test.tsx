@@ -6,15 +6,15 @@ import { SegmentedMessage } from 'sms-segments-calculator'
 import BodyTemplate from '../BodyTemplate'
 
 import { EmailCampaign, SMSCampaign } from 'classes'
+import {
+  COST_PER_SMS,
+  USD_SGD_EXCHANGE_RATE,
+} from 'components/dashboard/create/common/BodyTemplate/BodyTemplate'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import { saveTemplate as saveSmsTemplate } from 'services/sms.service'
 import { saveTemplate as saveTelegramTemplate } from 'services/telegram.service'
 import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
-
-// correct as at 12 Jun 2022
-const COST_PER_SMS = 0.0395
-const USD_SGD_EXCHANGE_RATE = 1.4
 
 const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,
