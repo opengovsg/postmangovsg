@@ -296,11 +296,13 @@ const duplicateCampaign = async ({
 }
 
 const getTwilioCostPerOutgoingSMSSegment = async (): Promise<number> => {
+  const { accountSid, apiKey, apiSecret, messagingServiceSid } =
+    config.get('twilio')
   const credentials: TwilioCredentials = {
-    accountSid: process.env.TWILIO_ACCOUNT_SID,
-    apiKey: process.env.TWILIO_API_KEY!,
-    apiSecret: process.env.TWILIO_API_SECRET!,
-    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID!,
+    accountSid,
+    apiKey,
+    apiSecret,
+    messagingServiceSid,
   }
   const twilioClient = new TwilioClient(credentials)
   return twilioClient.getOutgoingSMSPriceSingapore()
