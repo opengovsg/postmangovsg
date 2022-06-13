@@ -83,39 +83,6 @@ const config = convict({
       sensitive: true,
     },
   },
-  twilio: {
-    // credentials for direct Twilio API calls from backend
-    accountSid: {
-      doc: 'Twilio account SID',
-      default: '',
-      env: 'TWILIO_ACCOUNT_SID',
-      format: 'required-string',
-    },
-    apiKey: {
-      doc: 'Twilio API key',
-      default: '',
-      env: 'TWILIO_API_KEY',
-      format: 'required-string',
-    },
-    apiSecret: {
-      doc: 'Twilio API secret',
-      default: '',
-      env: 'TWILIO_API_SECRET',
-      format: 'required-string',
-    },
-    messagingServiceSid: {
-      doc: 'Twilio messaging service SID',
-      default: '',
-      env: 'TWILIO_MESSAGING_SERVICE_SID',
-      format: 'required-string',
-    },
-    // optional: not required for backend functionality
-    authToken: {
-      doc: 'Twilio auth token',
-      default: '',
-      env: 'TWILIO_AUTH_TOKEN',
-    },
-  },
   database: {
     databaseUri: {
       doc: 'URI to the postgres database',
