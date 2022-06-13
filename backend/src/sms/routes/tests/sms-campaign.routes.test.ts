@@ -61,10 +61,18 @@ describe('GET /campaign/{id}/sms', () => {
       protect: false,
     } as Campaign)
     const { id, name, type } = campaign
-
+    const TEST_TWILIO_CREDENTIALS = {
+      accountSid: '',
+      apiKey: '',
+      apiSecret: '',
+      messagingServiceSid: '',
+    }
     const mockGetCampaign = jest
       .spyOn(SmsService, 'getTwilioCostPerOutgoingSMSSegmentUSD')
       .mockResolvedValue(0.0395) // exact value unimportant for test to pass
+    mockSecretsManager.getSecretValue().promise.mockResolvedValue({
+      SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
+    })
     const res = await request(app).get(`/campaign/${campaign.id}/sms`)
     expect(res.status).toBe(200)
     expect(res.body).toEqual(expect.objectContaining({ id, name, type }))
