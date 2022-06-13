@@ -441,6 +441,14 @@ const config = convict({
       format: 'required-string',
     },
   },
+  twilio: {
+    usdToSgdRate: {
+      doc: 'Rate of USD to SGD',
+      default: 1.4,
+      env: 'USD_TO_SGD_RATE',
+      format: Number,
+    },
+  },
   redaction: {
     maxAge: {
       doc: 'Maximum age before campaign is redacted',

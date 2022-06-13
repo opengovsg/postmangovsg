@@ -178,7 +178,8 @@ const getCampaignDetails = async (
     )
   }
   const [campaignDetails, costPerSmsUSD] = await Promise.all(processes)
-  const costPerSms = costPerSmsUSD * 1.4
+  const USD_TO_SGD = config.get('twilio').usdToSgdRate
+  const costPerSms = costPerSmsUSD * USD_TO_SGD
   return { ...campaignDetails, cost_per_message: costPerSms }
 }
 
