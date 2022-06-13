@@ -63,7 +63,7 @@ describe('GET /campaign/{id}/sms', () => {
     const { id, name, type } = campaign
 
     const mockGetCampaign = jest
-      .spyOn(SmsService, 'getTwilioCostPerOutgoingSMSSegment')
+      .spyOn(SmsService, 'getTwilioCostPerOutgoingSMSSegmentUSD')
       .mockResolvedValue(0.0395) // exact value unimportant for test to pass
     const res = await request(app).get(`/campaign/${campaign.id}/sms`)
     expect(res.status).toBe(200)
@@ -92,8 +92,6 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
     expect(res.body).toEqual({
       message: `Campaign cannot use demo credentials. ${DefaultCredentialName.SMS} is not allowed.`,
     })
-
-    expect(mockSecretsManager.getSecretValue).not.toHaveBeenCalled()
   })
 
   test('Demo Campaign should not be able to use non-demo credentials', async () => {

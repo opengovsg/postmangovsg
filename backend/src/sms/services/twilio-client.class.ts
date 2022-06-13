@@ -91,7 +91,7 @@ export default class TwilioClient {
     return (body || '').replace(/<br\s*\/?>/g, '\n')
   }
 
-  async getOutgoingSMSPriceSingapore(): Promise<number> {
+  async getOutgoingSMSPriceSingaporeUSD(): Promise<number> {
     const messageCountryPricing: MessageCountryPricing =
       await this.client.pricing.v1.messaging.countries('SG').fetch()
     return parseFloat(

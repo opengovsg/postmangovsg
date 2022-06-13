@@ -35,7 +35,7 @@ const SmsMessageBodyInfo = ({
   return (
     <p className={styles.characterCount}>
       This SMS will cost approximately SGD{' '}
-      {(segmentCount * costPerSMS).toFixed(3)}.
+      {(segmentCount * costPerSMS).toFixed(4)}.
       <br />
       This estimate is calculated based on Twilio&apos;s pricing. Find out more{' '}
       <a
