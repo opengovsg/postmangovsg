@@ -22,7 +22,11 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 })
 
-const loggerWithLabel = (module: NodeModule): any => {
+export const addTransport = (transport: winston.transport) => {
+  logger.add(transport)
+}
+
+export const loggerWithLabel = (module: NodeModule): any => {
   const label = getModuleLabel(module)
   return {
     info: (logMeta: any): winston.Logger => logger.info({ label, ...logMeta }),
@@ -33,5 +37,3 @@ const loggerWithLabel = (module: NodeModule): any => {
     warn: (logMeta: any): winston.Logger => logger.warn({ label, ...logMeta }),
   }
 }
-
-export { loggerWithLabel }

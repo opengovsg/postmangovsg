@@ -147,12 +147,6 @@ const config = convict({
     format: 'required-string',
     sensitive: true,
   },
-  MORGAN_LOG_FORMAT: {
-    doc: 'Format for logging requests to server',
-    default:
-      ':client-ip - :user-id [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :response-time ms',
-    env: 'MORGAN_LOG_FORMAT',
-  },
   frontendUrl: {
     doc: 'CORS: accept requests from this origin. Can be a string, or regex',
     default: 'https://postman.gov.sg', // prod only
