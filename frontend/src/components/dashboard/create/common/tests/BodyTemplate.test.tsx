@@ -216,7 +216,7 @@ test('SMS cost should be correct for SMS campaign body template', async () => {
     const smsCampaignExpectedText = `This SMS will cost approximately SGD ${(
       segmentCount * COST_PER_TWILIO_SMS_SEGMENT_IN_SGD
     ).toFixed(
-      3
+      4
     )}.This estimate is calculated based on Twilio's pricing. Find out more here.${
       template.length
     } characters | ${segmentCount} message segment(s) | ${segmentEncoding} encoding`
