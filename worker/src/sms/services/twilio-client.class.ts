@@ -73,9 +73,8 @@ export default class TwilioClient {
     if (!this.hasCallback) return undefined
 
     const username = Math.random().toString(36).substring(2, 15) // random string
-    const password: string =
-      username + messageId + campaignId + config.get('callbackSecret')
-    const hashedPwd = getSha256Hash(password)
+    const password: string = username + messageId + campaignId
+    const hashedPwd = getSha256Hash(config.get('callbackSecret'), password)
 
     const callbackUrl = new URL(config.get('backendUrl'))
     callbackUrl.username = username

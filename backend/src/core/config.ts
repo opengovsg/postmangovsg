@@ -417,6 +417,12 @@ const config = convict({
       env: 'CALLBACK_SECRET',
       default: '',
     },
+    hashSecret: {
+      doc: 'Secret for email callback hash',
+      env: 'EMAIL_CALLBACK_HASH_SECRET',
+      default: '',
+      format: 'required-string',
+    },
   },
   smsCallback: {
     callbackSecret: {

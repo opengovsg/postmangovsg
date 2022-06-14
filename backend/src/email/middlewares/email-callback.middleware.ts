@@ -14,6 +14,7 @@ const isAuthenticated = (
     logger.error({
       message: 'Authorization headers not found',
       action: 'isAuthenticated',
+      req,
     })
     res.set('WWW-Authenticate', 'Basic realm="Email"')
     return res.sendStatus(401)

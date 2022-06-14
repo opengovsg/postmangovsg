@@ -13,6 +13,7 @@ const isAuthenticated = (
     logger.error({
       message: 'Authorization headers not found',
       action: 'isAuthenticated',
+      req,
     })
     res.set('WWW-Authenticate', 'Basic realm="Twilio"')
     return res.sendStatus(401)

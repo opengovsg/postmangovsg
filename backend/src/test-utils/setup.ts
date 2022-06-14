@@ -9,4 +9,4 @@ global.console = {
 }
 
 // Mock services
-jest.mock('@core/services/mail-client.class')
+jest.mock('@shared/clients/mail-client.class')

@@ -4,15 +4,16 @@ import { QueryTypes } from 'sequelize'
 import { Logger } from './utils/logger'
 import sequelizeLoader from './sequelize-loader'
 import { UserUnsubscribeDigest } from './interface'
-import MailClient from './mail-client.class'
+import MailClient from '@shared/clients/mail-client.class'
 import { createEmailBody } from './utils/generate-digest-mail'
 import config from './config'
 
 const logger = new Logger('unsubscribe')
 
-const mailClient = new MailClient(
+export const mailClient = new MailClient(
+  config.get('mailOptions'),
+  config.get('mailOptions.callbackHashSecret'),
   config.get('mailFrom'),
-  config.get('mailOptions')
 )
 
 let sequelize: Sequelize | undefined
