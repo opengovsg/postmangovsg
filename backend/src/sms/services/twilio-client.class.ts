@@ -2,6 +2,7 @@ import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
 import { RateLimitError, InvalidRecipientError } from '@core/errors'
 
+// find details on API here: https://www.twilio.com/docs/sms/api/pricing
 interface MessageCountryPricing {
   country: string
   outboundSmsPrices: OutboundSmsPrice[]

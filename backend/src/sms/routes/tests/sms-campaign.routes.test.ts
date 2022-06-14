@@ -70,6 +70,8 @@ describe('GET /campaign/{id}/sms', () => {
     const mockGetCampaign = jest
       .spyOn(SmsService, 'getTwilioCostPerOutgoingSMSSegmentUSD')
       .mockResolvedValue(0.0395) // exact value unimportant for test to pass
+    // needed because demo credentials are extracted from secrets manager to get
+    // credentials to call Twilio API for SMS price
     mockSecretsManager.getSecretValue().promise.mockResolvedValue({
       SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
     })
@@ -100,6 +102,8 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
     expect(res.body).toEqual({
       message: `Campaign cannot use demo credentials. ${DefaultCredentialName.SMS} is not allowed.`,
     })
+    // deleted the following test because demo credentials used to call Twilio API for SMS price
+    // expect(mockSecretsManager.getSecretValue).not.toHaveBeenCalled()
   })
 
   test('Demo Campaign should not be able to use non-demo credentials', async () => {
