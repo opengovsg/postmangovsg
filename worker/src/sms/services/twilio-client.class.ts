@@ -1,11 +1,10 @@
 import twilio from 'twilio'
-import bcrypt from 'bcrypt'
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
+import { getSha256Hash } from '@shared/utils/crypto'
 
 const logger = loggerWithLabel(module)
-const SALT_ROUNDS = 10
 
 export default class TwilioClient {
   private client: any
@@ -76,7 +75,7 @@ export default class TwilioClient {
     const username = Math.random().toString(36).substring(2, 15) // random string
     const password: string =
       username + messageId + campaignId + config.get('callbackSecret')
-    const hashedPwd = await bcrypt.hash(password, SALT_ROUNDS)
+    const hashedPwd = getSha256Hash(password)
 
     const callbackUrl = new URL(config.get('backendUrl'))
     callbackUrl.username = username

@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import config from '@core/config'
 import { SmsMessage } from '@sms/models'
 import { loggerWithLabel } from '@core/logger'
+import { getSha256Hash } from '@shared/utils/crypto'
 
 const logger = loggerWithLabel(module)
 const FINALIZED_STATUS = ['sent', 'delivered', 'undelivered', 'failed']
@@ -23,7 +24,14 @@ const isAuthenticated = (
   const [username, password] = credentials.split(':')
   const plainTextPassword =
     username + messageId + campaignId + config.get('smsCallback.callbackSecret')
-  return bcrypt.compareSync(plainTextPassword, password)
+
+  let isAuthenticated = getSha256Hash(plainTextPassword) === password
+  // if not passed with the new hash, retry with the old way
+  // TODO: remove this after all campaigns sent with the old way have completed
+  if (!isAuthenticated) {
+    isAuthenticated = bcrypt.compareSync(plainTextPassword, password)
+  }
+  return isAuthenticated
 }
 
 const parseEvent = async (req: Request): Promise<void> => {
