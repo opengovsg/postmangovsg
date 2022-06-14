@@ -28,6 +28,7 @@
     "axios": "0.21.4",
     "boxicons": "2.0.5",
     "buffer": "5.7.1",
+    "ckeditor5-custom-build": "file:./ckeditor5-custom",
     "classnames": "2.2.6",
     "downloadjs": "1.4.7",
     "draft-js": "0.11.7",
@@ -62,6 +63,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.18.2",
+    "@ckeditor/ckeditor5-react": "^5.0.2",
     "@lingui/cli": "3.5.1",
     "@lingui/macro": "3.5.1",
     "@peculiar/webcrypto": "1.1.6",
@@ -123,7 +125,7 @@
     ]
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
-    "*.{md,scss}": "prettier --write"
+    "!(ckeditor5-custom)/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix",
+    "!(ckeditor5-custom)/**/*.{md,scss}": "prettier --write"
   }
 }

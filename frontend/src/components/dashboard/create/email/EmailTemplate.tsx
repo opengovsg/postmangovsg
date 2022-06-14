@@ -1,6 +1,8 @@
+import { CKEditor } from '@ckeditor/ckeditor5-react'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { parseFromAddress } from '@shared/utils/from-address'
+import Editor from 'ckeditor5-custom-build'
 import {
   useState,
   useEffect,
@@ -25,7 +27,6 @@ import {
   Dropdown,
   StepHeader,
   StepSection,
-  RichTextEditor,
   InfoBlock,
   ToggleSwitch,
 } from 'components/common'
@@ -81,9 +82,10 @@ const EmailTemplate = ({
   const { id: campaignId } = useParams<{ id: string }>()
 
   const protectedBodyPlaceholder =
-    'Dear {{ recipient }}, \n\n You may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a> . \n\nPlease login with your birthday (DDMMYYYY) followed by the last 4 characters of your NRIC. E.g. 311290123A'
+    'Dear {{ recipient }}, <br> <br> You may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a> . <br> <br>Please login with your birthday (DDMMYYYY) followed by the last 4 characters of your NRIC. E.g. 311290123A'
   const bodyPlaceholder =
-    'Dear {{ name }},\n\nYour next appointment at {{ clinic }} is on {{ date }} at {{ time }}\n\nMinistry of Health\n16 College Road, College of Medicine Building, Singapore 169854\n6325 9220 | www.moh.gov.sg'
+    'Dear {{ name }}, <br> <br> Your next appointment at {{ clinic }} is on {{ date }} at {{ time }}<br> <br>Ministry of Health<br>16 College Road, College of Medicine Building, Singapore 169854<br>6325 9220 | www.moh.gov.sg'
+  //replaced '\n' with <br>, TODO: check if it introduces a vuln (XSS??)
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
     setErrorMsg(null)
@@ -366,12 +368,24 @@ const EmailTemplate = ({
               </p>
             </>
           )}
-
-          <RichTextEditor
-            value={body}
-            onChange={setBody}
-            placeholder={protect ? protectedBodyPlaceholder : bodyPlaceholder}
-          />
+          <div className="document-editor">
+            <div className="document-editor__toolbar"></div>
+            <div className="document-editor__editable-container"></div>
+            <CKEditor
+              editor={Editor}
+              onReady={(editor: any) => {
+                const toolbarContainer = document.querySelector(
+                  '.document-editor__toolbar'
+                )
+                if (toolbarContainer)
+                  toolbarContainer.appendChild(editor.ui.view.toolbar.element)
+              }}
+              onChange={(_event: any, editor: any) => {
+                setBody(editor.getData())
+              }}
+              data={protect ? protectedBodyPlaceholder : bodyPlaceholder}
+            />
+          </div>
         </div>
 
         <div>
