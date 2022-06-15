@@ -16,10 +16,10 @@
   "license": "MIT",
   "dependencies": {
     "@sentry/node": "5.21.1",
-    "aws-sdk": "2.933.0",
+    "aws-sdk": "2.1140.0",
     "axios": "0.27.2",
     "convict": "6.2.3",
-    "dotenv": "8.2.0",
+    "dotenv": "8.6.0",
     "lodash": "4.17.21",
     "nodemailer": "6.6.2",
     "pg": "8.5.1",
