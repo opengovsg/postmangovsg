@@ -12,11 +12,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-          cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - run: npm ci --ignore-scripts
@@ -52,11 +51,10 @@ jobs:
       run:
         working-directory: ./backend
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-          cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
 
@@ -78,11 +76,10 @@ jobs:
       run:
         working-directory: ./shared
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-          cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - run: npm ci
@@ -96,11 +93,10 @@ jobs:
       run:
         working-directory: ./worker
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-          cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
 
@@ -120,11 +116,10 @@ jobs:
       run:
         working-directory: ./frontend
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-          cache: "npm"
       - name: Lint lock file
         run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
 

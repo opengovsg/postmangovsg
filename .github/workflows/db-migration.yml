@@ -1,0 +1,45 @@
+name: Migrate/undo DB migration
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Action to be done on the DB
+        required: true
+        default: migrate
+        type: choice
+        options:
+          - migrate
+          - undo
+      environment:
+        description: Which environment's database to run on
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+jobs:
+  set_environment:
+    outputs:
+      current_env: ${{ steps.set-environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-environment
+        run: echo "::set-output name=current_env::${{ inputs.environment }}"
+  run_migration:
+    runs-on: ubuntu-latest
+    needs: [set_environment]
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Run migration
+        env:
+          DB_URI: ${{ secrets.DB_URI }}
+        run: |
+          npm ci
+          npm run db:${{ inputs.action }}

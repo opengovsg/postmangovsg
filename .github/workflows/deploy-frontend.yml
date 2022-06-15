@@ -3,14 +3,13 @@ on:
   push:
     branches:
       - staging
-    tags:
-      - v[0-9]+.[0-9]+.[0-9]+
+      - master
 
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -20,8 +19,8 @@ jobs:
       - name: Extract branch name
         shell: bash
         run: |
-          echo "Running on ref ${{ github.ref }}"
-          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
             echo "##[set-output name=branch;]master"
           else
             echo "##[set-output name=branch;]staging"

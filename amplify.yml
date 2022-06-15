@@ -13,6 +13,7 @@ frontend:
   phases:
     preBuild:
       commands:
+        - nvm install
         - if [ "${AWS_BRANCH}" = "master" ]; then
           export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION} &&
           export REACT_APP_SENTRY_ENVIRONMENT="production";
