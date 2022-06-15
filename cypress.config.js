@@ -19,7 +19,7 @@ module.exports = defineConfig({
       WAIT_TIME: 10000,
       EMAIL: 'internal-use@open.gov.sg',
       MAIL_SENDER: 'donotreply@mail.postman.gov.sg',
-      SMS_NUMBER: '+13254238044',
+      SMS_NUMBER: '82410222',
       TWILIO_ACC_SID: process.env.CYPRESS_TWILIO_ACC_SID,
       TWILIO_AUTH_TOKEN: process.env.CYPRESS_TWILIO_AUTH_TOKEN,
     },
