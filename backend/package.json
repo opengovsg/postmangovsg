@@ -60,7 +60,7 @@
     "telegraf": "3.38.0",
     "threads": "1.4.0",
     "tiny-worker": "2.3.0",
-    "twilio": "3.58.0",
+    "twilio": "3.77.1",
     "uuid": "7.0.3",
     "validator": "13.7.0",
     "winston": "3.3.3",
