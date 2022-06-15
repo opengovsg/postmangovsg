@@ -9,7 +9,7 @@ Set the Twilio credentials as environmental variables
 
 Set the credentials for Gmail API call
 
-- If you're a developer at OGP, obtain the `credentials.json` and `gmail_token.json.json` from 1Password.
+- If you're a developer at OGP, obtain the `credentials.json` and `gmail_token.json` from 1Password.
 - If you're not a developer at OGP, follow the steps to set up your Gmail API credentials
   - Create a project and an OAuth credential on Google Cloud Platform
   - Download the OAuth credentials file as `credentials.json` and add `"urn:ietf:wg:oauth:2.0:oob"` as a redirect URI

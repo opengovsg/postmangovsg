@@ -263,7 +263,6 @@ Create a cluster with four services. These names are currently hardcoded for dep
 | Cluster Name: postmangovsg-workers |
 | ---------------------------------- |
 
-
 | Service Name    | LaunchType | Platform version |
 | --------------- | ---------- | ---------------- |
 | staging-sending | FARGATE    | 1.4.0            |
