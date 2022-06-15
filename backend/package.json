@@ -40,7 +40,7 @@
     "express-winston": "4.2.0",
     "helmet": "3.23.3",
     "jsonwebtoken": "8.5.1",
-    "libphonenumber-js": "1.9.16",
+    "libphonenumber-js": "1.10.6",
     "lodash": "4.17.21",
     "module-alias": "2.2.2",
     "nodemailer": "6.6.2",
