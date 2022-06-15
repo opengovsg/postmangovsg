@@ -1,6 +1,6 @@
 ## Set up credentials for local run
 
-Set the Twilio credentials as environmental variables
+Set the Twilio credentials as environmental variables. If you're a developer at OGP, you can find our Postman testing credentials in our 1Password vault.
 
 | Name                        | Description               |
 | --------------------------- | ------------------------- |
@@ -22,6 +22,7 @@ Set the credentials for Gmail API call
     ```bash
     > node ../../node_modules/gmail-tester/init.js ./credentials.json gmail_token.json internal-use@open.gov.sg
     ```
+- Put both `credentials.json` and `gmail_token.json` in the root folder
 
 ## Set up other environmental variables
 
