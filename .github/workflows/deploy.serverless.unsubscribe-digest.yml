@@ -2,9 +2,9 @@ name: Deploy serverless-unsubscribe-digest
 on:
   push:
     branches:
-      - master
       - staging
-      - github-actions-test
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
 
 env:
   # Update this common config
@@ -19,8 +19,8 @@ jobs:
     steps:
       - id: set-environment
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+          echo "Running on ref ${{ github.ref }}"
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::set-output name=current_env::production"
           else
             echo "::set-output name=current_env::staging"
