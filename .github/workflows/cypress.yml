@@ -26,8 +26,8 @@ jobs:
           CYPRESS_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg/' || 'https://staging.postman.gov.sg/' }}
           CYPRESS_TWILIO_ACC_SID: ${{ secrets.CYPRESS_TWILIO_ACC_SID }}
           CYPRESS_TWILIO_AUTH_TOKEN: ${{ secrets.CYPRESS_TWILIO_AUTH_TOKEN }}
-          CYPRESS_EMAIL: ${{ secrets.CYPRESS_EMAIL }}
-          CYPRESS_SMS_NUMBER: ${{ secrets.CYPRESS_SMS_NUMBER }}
+          CYPRESS_EMAIL: "internal-use@open.gov.sg"
+          CYPRESS_SMS_NUMBER: "+6582410222"
         uses: cypress-io/github-action@v4
         with:
           config-file: cypress.config.js
