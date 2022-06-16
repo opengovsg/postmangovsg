@@ -27,6 +27,10 @@ describe('Encrypted Email Test', () => {
     const EMAIL_TO_EXPECT = 2 //both test and actual emails
 
     it('initiate email campaign', () => {
+        //write csv test file
+        const CSV_CONTENT = "recipient,password,name\n" + EMAIL + ",hello,postman"
+        cy.writeFile('cypress/fixtures/'.concat(CSV_FILENAME), CSV_CONTENT)
+
         //log in via OTP
         cy.visit('/login')
         cy.get('input[type=email]').type(EMAIL)

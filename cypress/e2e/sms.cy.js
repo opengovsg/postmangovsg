@@ -36,6 +36,10 @@ describe('SMS Test', () => {
   const MSG_TO_EXPECT = 2; //both test and actual sms
 
   it('initiate email campaign', () => {
+    //write csv test file
+    const CSV_CONTENT = "recipient,name\n" + SMS_NUMBER + ",postman"
+    cy.writeFile('cypress/fixtures/'.concat(CSV_FILENAME), CSV_CONTENT)
+
     //log in via OTP
     cy.visit('/login');
     cy.get('input[type=email]').type(EMAIL);

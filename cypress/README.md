@@ -1,11 +1,14 @@
 ## Set up credentials for local run
 
-Set the Twilio credentials as environmental variables. If you're a developer at OGP, you can find our Postman testing credentials in our 1Password vault.
+Set the Twilio credentials, email and sms_number used as environmental variables.
+If you're a developer at OGP, you can find our Postman testing credentials in our 1Password vault.
 
-| Name                        | Description               |
-| --------------------------- | ------------------------- |
-| `CYPRESS_TWILIO_ACC_SID`    | Twilio account SID        |
-| `CYPRESS_TWILIO_AUTH_TOKEN` | Twilio account Auth Token |
+| Name                        | Description                                          |
+| --------------------------- | ---------------------------------------------------- |
+| `CYPRESS_TWILIO_ACC_SID`    | Twilio account SID                                   |
+| `CYPRESS_TWILIO_AUTH_TOKEN` | Twilio account Auth Token                            |
+| `CYPRESS_EMAIL`             | Email used to log into Postman and to receive emails |
+| `CYPRESS_SMS_NUMBER`        | Number used to receive SMS                           |
 
 Set the credentials for Gmail API call
 
@@ -24,19 +27,17 @@ Set the credentials for Gmail API call
     ```
 - Put both `credentials.json` and `gmail_token.json` in the root folder
 
-## Set up other environmental variables
+## Other environmental variables (leave as default)
 
-Make sure the environmental variables for cypress configuration match your test cases
+Variables to change to customize message sent and verified
 
 | Name            | Description                                                            |
 | --------------- | ---------------------------------------------------------------------- |
-| `EMAIL`         | Email used to log into Postman and to receive emails                   |
-| `SMS_NUMBER`    | Number used to receive SMS                                             |
 | `MSG_CONTENT`   | Test message sent, variables should have a match in CSV files          |
 | `MSG_TO_VERIFY` | Test message to verify, content should match MSG_CONTENT and CSV files |
 | `DUMMY_ENC`     | Dummy password for encrypted email test, should match CSV file         |
 
-Other variables used in tests (leave as default)
+Other variables used in tests
 
 | Name              | Description                               |
 | ----------------- | ----------------------------------------- |
@@ -46,7 +47,7 @@ Other variables used in tests (leave as default)
 | `TIMEOUT`         | Time to wait while page loads             |
 | `WAIT_TIME`       | Time to wait while emails/ sms are sent   |
 
-Refer to the fixtures folder for CSV files used in tests.
+CSV files used in tests are generated in runtime.
 
 ## To run locally
 
