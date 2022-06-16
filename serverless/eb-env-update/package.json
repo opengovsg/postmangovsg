@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sentry/node": "5.29.2",
+    "@sentry/node": "5.30.0",
     "convict": "6.2.3",
     "dotenv": "8.2.0",
     "lodash": "4.17.21"
