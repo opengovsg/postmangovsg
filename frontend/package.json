@@ -24,7 +24,7 @@
     "@sentry/browser": "5.27.6",
     "@types/bcryptjs": "2.4.2",
     "@types/papaparse": "5.2.5",
-    "@types/validator": "13.0.0",
+    "@types/validator": "13.7.2",
     "axios": "0.21.4",
     "boxicons": "2.0.5",
     "buffer": "5.7.1",
