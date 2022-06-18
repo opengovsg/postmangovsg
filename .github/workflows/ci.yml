@@ -135,8 +135,8 @@ jobs:
       - run: npm run build
         working-directory: ./shared
 
-      # using legacy-peer-deps as lottie-react only declares to support til v17 for now
-      # more info https://github.com/Gamote/lottie-react/issues/61
+      # using legacy-peer-deps as some dependencies are broken
+      # more info see https://github.com/opengovsg/postmangovsg/pull/1578
       - run: npm ci --legacy-peer-deps
       - run: npm run compile
       - name: Lint app code
