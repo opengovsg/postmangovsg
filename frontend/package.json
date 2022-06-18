@@ -56,7 +56,7 @@
     "typescript": "4.2.3",
     "url": "0.11.0",
     "util": "0.12.4",
-    "uuidv4": "6.1.1",
+    "uuidv4": "6.2.13",
     "validator": "13.7.0",
     "webcrypto-shim": "0.1.5"
   },
