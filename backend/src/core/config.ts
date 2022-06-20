@@ -442,6 +442,7 @@ const config = convict({
     },
   },
   twilio: {
+    // for future extension: fetch via API
     usdToSgdRate: {
       doc: 'Rate of USD to SGD',
       default: 1.4,

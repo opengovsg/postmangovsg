@@ -6,7 +6,7 @@ import { SegmentedMessage } from 'sms-segments-calculator'
 import BodyTemplate from '../BodyTemplate'
 
 import { EmailCampaign, SMSCampaign } from 'classes'
-import { COST_PER_SMS } from 'components/dashboard/create/common/BodyTemplate/BodyTemplate'
+import { FALLBACK_COST_PER_SMS_SGD } from 'components/dashboard/create/common/BodyTemplate/BodyTemplate'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import { saveTemplate as saveSmsTemplate } from 'services/sms.service'
@@ -27,7 +27,7 @@ const TEST_SMS_CAMPAIGN: Campaign = {
   job_queue: [],
   halted: false,
   has_credential: false,
-  cost_per_message: COST_PER_SMS,
+  cost_per_message: FALLBACK_COST_PER_SMS_SGD,
 }
 
 function mockApis() {
@@ -209,7 +209,7 @@ test('SMS cost should be correct for SMS campaign body template', async () => {
     await userEvent.type(templateTextbox, template)
 
     const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD =
-      TEST_SMS_CAMPAIGN.cost_per_message ?? COST_PER_SMS
+      TEST_SMS_CAMPAIGN.cost_per_message ?? FALLBACK_COST_PER_SMS_SGD
     const segmentedMessage = new SegmentedMessage(template)
     const segmentEncoding = segmentedMessage.encodingName
     const segmentCount = segmentedMessage.segmentsCount

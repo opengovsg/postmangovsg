@@ -18,8 +18,8 @@ import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 
-// correct as at 12 Jun 2022
-export const COST_PER_SMS = 0.0395 * 1.4
+// correct as at 12 Jun 2022; to use if costPerSMS from backend unavailable
+export const FALLBACK_COST_PER_SMS_SGD = 0.0395 * 1.4
 
 const SmsMessageBodyInfo = ({
   body,
@@ -190,7 +190,7 @@ function BodyTemplate({
         {campaign instanceof SMSCampaign ? (
           <SmsMessageBodyInfo
             body={body}
-            costPerSMS={costPerMessage ?? COST_PER_SMS}
+            costPerSMS={costPerMessage ?? FALLBACK_COST_PER_SMS_SGD}
           />
         ) : (
           <TelegramMessageBodyInfo body={body} />
