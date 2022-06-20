@@ -1,0 +1,20 @@
+service: serverless-test
+
+frameworkVersion: '3'
+
+
+provider:
+  runtime: nodejs14.x
+  name: aws
+
+functions:
+  rateHandler:
+    handler: handler.run
+    events:
+      # Invoke Lambda function every minute
+      - schedule: rate(1 minute)
+  cronHandler:
+    handler: handler.run
+    events:
+      # Invoke Lambda function every weekday 9am
+      - schedule: cron(0 9 ? * MON-FRI *)
