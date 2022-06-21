@@ -83,6 +83,7 @@ export class Campaign extends Model<Campaign> {
   @HasOne(() => Statistic)
   statistic?: Statistic
 
+  // this allows for manual override of halting: if halted is set to null, campaign will not be halted
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
