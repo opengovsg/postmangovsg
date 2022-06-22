@@ -1,10 +1,9 @@
 name: Deploy worker to AWS Elastic Container Service
 on:
   push:
-    branches: # There should be 2 environments in github actions secrets: staging, production. This is different from the DEPLOY_ENV secret which corresponds to elastic beanstalk environment name
+    branches:
       - staging
       - master
-      - github-actions-test
 
 env:
   # Update this common config
@@ -28,11 +27,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
-          node-version: "12"
-          cache: "npm"
+          node-version: "16"
       - name: Lint lock file
         run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - name: Lint app code
@@ -56,11 +54,10 @@ jobs:
       image: ${{ steps.build-image.outputs.image }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
-          node-version: "12"
-          cache: "npm"
+          node-version: "16"
       - name: Build shared package
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"

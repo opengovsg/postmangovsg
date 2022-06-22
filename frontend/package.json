@@ -1,6 +1,5 @@
 {
   "name": "frontend",
-  "version": "1.36.1",
   "private": true,
   "proxy": "https://api-staging.postman.gov.sg",
   "scripts": {

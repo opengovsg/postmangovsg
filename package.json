@@ -1,6 +1,5 @@
 {
   "name": "postmangovsg",
-  "version": "1.36.1",
   "description": "",
   "main": "index.js",
   "scripts": {
