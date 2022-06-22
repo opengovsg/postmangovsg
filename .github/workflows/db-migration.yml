@@ -41,5 +41,10 @@ jobs:
         env:
           DB_URI: ${{ secrets.DB_URI }}
         run: |
+          cd ../shared
+          npm ci 
+          npm run build
+          cd ../backend
           npm ci
-          npm run db:${{ inputs.action }}
+          npm run build
+          npm run db:${{ inputs.action }} -- --config build/database/config-ci.js
