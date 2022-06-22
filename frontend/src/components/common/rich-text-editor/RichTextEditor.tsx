@@ -146,7 +146,12 @@ const RichTextEditor = ({
   useEffect(() => {
     // Normalise HTML whenever editor state is initialised or updated
     const currentContent = editorState.getCurrentContent()
-    const html = Converter.convertToHTML(convertToRaw(currentContent))
+    const html = Converter.convertToHTML(
+      convertToRaw(currentContent)
+      // Empty lines are converted to <p></p> as it's considered a text block
+      // however, the actual intention is probably an extra line break.
+      // Converting empty paragraphs in the html to make them line breaks
+    ).replaceAll('<p></p>', '<br>')
     onChange(html)
   }, [editorState, onChange])
 
