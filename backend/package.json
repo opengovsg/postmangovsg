@@ -35,7 +35,7 @@
     "dotenv": "8.2.0",
     "escape-html": "1.0.3",
     "express": "4.17.1",
-    "express-rate-limit": "5.2.6",
+    "express-rate-limit": "5.5.1",
     "express-session": "1.17.0",
     "express-winston": "4.2.0",
     "helmet": "3.23.3",
