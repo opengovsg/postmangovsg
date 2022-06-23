@@ -5,6 +5,8 @@ on:
       - staging
       - master
 
+# Making sure that the current deployment is completed before the next one
+concurrency: deploy-frontend-${{ github.ref }}
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
