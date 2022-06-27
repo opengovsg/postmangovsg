@@ -102,8 +102,6 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
     expect(res.body).toEqual({
       message: `Campaign cannot use demo credentials. ${DefaultCredentialName.SMS} is not allowed.`,
     })
-    // deleted the following test because demo credentials used to call Twilio API for SMS price
-    // expect(mockSecretsManager.getSecretValue).not.toHaveBeenCalled()
   })
 
   test('Demo Campaign should not be able to use non-demo credentials', async () => {
