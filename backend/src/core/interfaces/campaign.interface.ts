@@ -56,6 +56,7 @@ export interface CampaignDetails {
       }
     }
   }
+  cost_per_message?: number
 }
 
 export interface CampaignStats extends CampaignStatsCount {

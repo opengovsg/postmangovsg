@@ -290,7 +290,14 @@ export const InitSmsMiddleware = (
   ): Promise<Response | void> => {
     try {
       const { campaignId } = req.params
-      const result = await SmsService.getCampaignDetails(+campaignId)
+      const credentialName = getDemoCredentialName(DefaultCredentialName.SMS)
+      const credentials = await credentialService.getTwilioCredentials(
+        credentialName
+      )
+      const result = await SmsService.getCampaignDetails(
+        +campaignId,
+        credentials
+      )
       return res.json(result)
     } catch (err) {
       return next(err)
@@ -361,7 +368,7 @@ export const InitSmsMiddleware = (
 
   /**
    * Determine if new credentials can be validated based on whether fallback is activated.
-   * @param req
+   * @param _req
    * @param res
    * @param next
    */
