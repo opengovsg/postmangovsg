@@ -45,7 +45,7 @@ const Banner = ({ innerRef }: { innerRef?: RefObject<HTMLDivElement> }) => {
                 <br />
                 (e.g. go.gov.sg/open).{' '}
                 <a
-                  href="http://www.go.gov.sg/trusted-websites"
+                  href="https://go.gov.sg/trusted-sites"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
