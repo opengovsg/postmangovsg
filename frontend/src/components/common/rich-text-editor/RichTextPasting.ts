@@ -251,7 +251,7 @@ function modifyTableDOM(node: Element, isNestedBlock: boolean) {
     if (
       cells.length === 1 &&
       firstCellChild &&
-      ['DVI', 'P'].includes(firstCellChild.tagName)
+      ['DIV', 'P'].includes(firstCellChild.tagName)
     ) {
       const newNode = changeTag(firstCellChild, 'span')
       node.replaceWith(newNode)
@@ -309,9 +309,11 @@ function traverse(node: Element, isNestedBlock: boolean) {
   if (node.tagName === 'TABLE') modifyTableDOM(node, isNestedBlock)
 
   if (node.nextElementSibling) traverse(node.nextElementSibling, isNestedBlock)
-  isNestedBlock =
+  const isFirstElemNested =
     isNestedBlock || node.tagName === 'LI' || node.tagName === 'TD'
-  if (node.firstElementChild) traverse(node.firstElementChild, isNestedBlock)
+  if (node.firstElementChild) {
+    traverse(node.firstElementChild, isFirstElemNested)
+  }
 }
 
 /**
@@ -352,8 +354,9 @@ function cleanHtml(newHtml: string): string {
 
   parsedHTML = removeStyleTags(parsedHTML)
 
-  if (parsedHTML.firstElementChild)
+  if (parsedHTML.firstElementChild) {
     traverse(parsedHTML.firstElementChild, false)
+  }
 
   const s = new XMLSerializer()
   const cleanedHtml = s.serializeToString(parsedHTML).concat('<p></p>')
@@ -404,7 +407,7 @@ function adjustListDepth(newEditorState: EditorState): EditorState {
   const newBlocks = curContent.getBlocksAsArray()
   let blockMap = curContent.getBlockMap()
 
-  // sets depth of each item block
+  // sets depth to data.level -1 as depth is indexed from 0 while level was indexed from 1
   newBlocks.forEach((block) => {
     if (
       ['ordered-list-item', 'unordered-list-item'].includes(block.getType())
@@ -424,6 +427,41 @@ function adjustListDepth(newEditorState: EditorState): EditorState {
 }
 
 /**
+ * Removes white space on new line (clean up of our newline parsing)
+ * We previously inserted a white space on every new line as empty lines get ignored,
+ * hence we are removing these extra white spaces.
+ * @param newEditorState editor state to remove extra white spaces
+ * @returns state with extra white spaces removed
+ */
+function removeSpaceOnNewLine(newEditorState: EditorState): EditorState {
+  const curContent = newEditorState.getCurrentContent()
+  const newBlocks = curContent.getBlocksAsArray()
+  let blockMap = curContent.getBlockMap()
+
+  // check for lines with white spaces and remove them
+  newBlocks.forEach((block) => {
+    if (['unstyled'].includes(block.getType())) {
+      const blockKey = block.getKey()
+      const text = block.getText()
+      if (/^\s*$/.test(text)) {
+        const newBlock = block.set('text', '') as ContentBlock
+        blockMap = blockMap.set(blockKey, newBlock)
+      }
+    }
+  })
+
+  // update editor state with new block map
+  const newContent = curContent.set('blockMap', blockMap) as ContentState
+  newEditorState = EditorState.push(
+    newEditorState,
+    newContent,
+    'delete-character'
+  )
+
+  return newEditorState
+}
+
+/**
  * Post processing of editor state created
  * - filter state to only keep items that our rich text editor supports
  * - adjusts depth of list items
@@ -433,6 +471,7 @@ function adjustListDepth(newEditorState: EditorState): EditorState {
 function statePostProcessing(newEditorState: EditorState): EditorState {
   newEditorState = filterState(newEditorState)
   newEditorState = adjustListDepth(newEditorState)
+  newEditorState = removeSpaceOnNewLine(newEditorState)
   return newEditorState
 }
 
@@ -460,9 +499,9 @@ function convertHtmlToEditorState(newHtml: string): EditorState {
  * - pushes new content to editor state
  * @param newHtml html of pasted text
  * @param currentEditorState editor state before handling paste
- * @returns true to end paste handling; false to continue with default handling
+ * @returns new editor state
  */
-export function addHtmlToDocument(
+export function addHtmlToState(
   newHtml: string,
   currentEditorState: EditorState
 ): EditorState {

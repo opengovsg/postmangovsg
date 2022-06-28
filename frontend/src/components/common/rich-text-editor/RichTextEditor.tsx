@@ -20,7 +20,7 @@ import type {
 import { Editor } from 'react-draft-wysiwyg'
 
 import styles from './RichTextEditor.module.scss'
-import { addHtmlToDocument } from './RichTextPasting'
+import { addHtmlToState } from './RichTextPasting'
 import { ImageBlock, TableWrapper } from './blocks'
 import {
   LinkControl,
@@ -304,9 +304,14 @@ const RichTextEditor = ({
       return true
     }
 
-    // call custom paste handling function
-    setEditorState(addHtmlToDocument(html, editorState))
-    return true
+    // call custom paste handling function if html is pasted
+    if (html) {
+      setEditorState(addHtmlToState(html, editorState))
+      return true
+    }
+
+    // return false to proceed with default if plain text is pasted
+    return false
   }
 
   return (
