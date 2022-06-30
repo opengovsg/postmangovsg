@@ -103,7 +103,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       ignoredRoutes: ['/'],
       requestWhitelist: ['method', 'url', 'body', 'headers'],
       responseWhitelist: ['body', 'statusCode'],
-      // headerBlacklist: ['authorization'],
+      headerBlacklist: ['authorization'],
       metaField: null, // flatten this log to root instead of nesting under `meta`
     })
   )
