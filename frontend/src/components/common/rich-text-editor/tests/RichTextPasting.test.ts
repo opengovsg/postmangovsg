@@ -13,8 +13,8 @@ import { readFileSync } from 'fs'
 
 import { EditorState, convertToRaw } from 'draft-js'
 
-import { addHtmlToState } from '../components/common/rich-text-editor/RichTextPasting'
-import { Converter } from '../components/common/rich-text-editor/utils'
+import { addHtmlToState } from '../RichTextPasting'
+import { Converter } from '../utils'
 
 const testFileDir = __dirname.concat('/../test-utils/htmlFromWord/')
 const fileNames = [
@@ -75,7 +75,7 @@ const htmlToExpect = [
   '<ol><li>test1<ol><li>test1.1</li><li>test1.2<ol><li>test1.2.1</li></ol></li></ol></li><li>test2<ol><li>test2.1</li><li>test2.2<ol><li>test2.2.1</li></ol></li></ol></li></ol><p></p>',
   '<p><a href="https://www.google.com/">test</a></p><p></p>',
   '<p></p><table style="border: solid 1px #b5c4ff; border-collapse: collapse; min-width: 50%;"><tbody><tr style="border: solid 1px #b5c4ff;"><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.1</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.2</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.3</td></tr><tr style="border: solid 1px #b5c4ff;"><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.1</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.2</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.3</td></tr></tbody></table><p></p>',
-  '<p></p><table style="border: solid 1px #b5c4ff; border-collapse: collapse; min-width: 50%;"><tbody><tr style="border: solid 1px #b5c4ff;"><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.1</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.2</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.3</td></tr><tr style="border: solid 1px #b5c4ff;"><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.1</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.2</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.3.outer test2.3.inner</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem;"> </td></tr></tbody></table><p></p>',
+  '<p></p><table style="border: solid 1px #b5c4ff; border-collapse: collapse; min-width: 50%;"><tbody><tr style="border: solid 1px #b5c4ff;"><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.1</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.2</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test1.3</td></tr><tr style="border: solid 1px #b5c4ff;"><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.1</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.2</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 33.333%;">test2.3.outer test2.3.inner</td></tr></tbody></table><p></p>',
   '<p></p><p>test1.1</p><p>test1.2</p><table style="border: solid 1px #b5c4ff; border-collapse: collapse; min-width: 50%;"><tbody><tr style="border: solid 1px #b5c4ff;"><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 50.000%;">test1.2.1</td><td style="border: solid 1px #b5c4ff; padding: 0.5rem; width: 50.000%;">test1.2.2</td></tr></tbody></table><p>test1.3</p><p>test2.1</p><p>test2.2</p><p>test2.3</p><p></p>',
   '<p></p><p>test1.1</p><p>test1.2</p><p>test1.3</p><p>test2.2</p><p>test2.3</p><p></p>',
 ]
