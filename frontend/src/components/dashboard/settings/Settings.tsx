@@ -6,7 +6,6 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import styles from './Settings.module.scss'
 import AddApiKeyModal from './add-api-key-modal'
 import AddCredentialModal from './add-credential-modal'
-import AddCustomFromAddress from './add-custom-from-address-modal'
 import ApiKey from './api-key'
 import Credentials from './credentials'
 import CustomFromAddress from './custom-from-address'
@@ -71,15 +70,6 @@ const Settings = () => {
     )
   }
 
-  function onAddCustomFromAddressClicked() {
-    modalContext.setModalContent(
-      <AddCustomFromAddress
-        customFromAddresses={customFromAddresses}
-        onSuccess={fetchCustomFromAddresses}
-      />
-    )
-  }
-
   async function fetchUserSettings() {
     const { hasApiKey, creds } = await getUserSettings()
     setCreds(creds)
@@ -114,10 +104,6 @@ const Settings = () => {
             <button onClick={onAddApiKeyClicked}>
               Generate API key
               <i className={cx('bx', 'bx-key')}></i>
-            </button>
-            <button onClick={onAddCustomFromAddressClicked}>
-              Add From Address
-              <i className={cx('bx', 'bx-mail-send')}></i>
             </button>
           </div>
         </div>
