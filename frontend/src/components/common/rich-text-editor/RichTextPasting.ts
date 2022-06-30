@@ -190,7 +190,7 @@ const stateFromHtmlOptions: any = {
     }
 
     // list handling (word doc)
-    if (element.className.startsWith('MsoList')) {
+    if (styleDict['mso-list']) {
       return MsoListConversion(element, styleDict)
     }
 
@@ -236,9 +236,9 @@ function changeTag(element: Element, tag: string) {
  * switch it to a span as a single cell's contents of the outer table
  * @param node table element
  * @param isNestedBlock if block is nested
- * @returns
+ * @returns modified node
  */
-function modifyTableDOM(node: Element, isNestedBlock: boolean) {
+function modifyTableDOM(node: Element, isNestedBlock: boolean): Element {
   if (!node.previousElementSibling) {
     const newNode = document.createElement('p')
     node.parentNode?.insertBefore(newNode, node)
@@ -247,16 +247,25 @@ function modifyTableDOM(node: Element, isNestedBlock: boolean) {
   // Render content of single cell nested table directly
   if (isNestedBlock) {
     const cells = node?.querySelectorAll('td')
-    const firstCellChild = cells[0].firstElementChild
-    if (
-      cells.length === 1 &&
-      firstCellChild &&
-      ['DIV', 'P'].includes(firstCellChild.tagName)
-    ) {
-      const newNode = changeTag(firstCellChild, 'span')
-      node.replaceWith(newNode)
+    if (cells.length === 1) {
+      let cell = cells[0] as Element
+      if (
+        cell &&
+        cell.firstElementChild &&
+        ['DIV', 'P'].includes(cell.firstElementChild.tagName)
+      ) {
+        cell = cell.firstElementChild
+      }
+      if (cell) {
+        // discard the table wrap and
+        // obtain the element with cell content as span
+        const newNode = changeTag(cell, 'span')
+        node.replaceWith(newNode)
+        node = newNode
+      }
     }
   }
+  return node
 }
 
 /**
@@ -304,9 +313,11 @@ function traverse(node: Element, isNestedBlock: boolean) {
     node = newNode
   }
 
-  if (node.className.startsWith('MsoList')) setListOrderedAttribute(node)
+  const style = node.getAttribute('style') || ''
+  const styleDict = convertStyleStringToObject(style) || {}
+  if (styleDict['mso-list']) setListOrderedAttribute(node)
 
-  if (node.tagName === 'TABLE') modifyTableDOM(node, isNestedBlock)
+  if (node.tagName === 'TABLE') node = modifyTableDOM(node, isNestedBlock)
 
   if (node.nextElementSibling) traverse(node.nextElementSibling, isNestedBlock)
   const isFirstElemNested =
@@ -427,26 +438,34 @@ function adjustListDepth(newEditorState: EditorState): EditorState {
 }
 
 /**
- * Removes white space on new line (clean up of our newline parsing)
+ * 1. Removes white space on new line (clean up of our newline parsing)
  * We previously inserted a white space on every new line as empty lines get ignored,
  * hence we are removing these extra white spaces.
- * @param newEditorState editor state to remove extra white spaces
- * @returns state with extra white spaces removed
+ * 2. Removes redundant table cells (clean up of our table parsing)
+ * Redundant table cells may created if there exists multiple children within <td>
+ * These cells are broken without the correct data fields and hence we remove them.
+ * @param newEditorState editor state to clean up
+ * @returns state with redundant white spaces and cells removed
  */
-function removeSpaceOnNewLine(newEditorState: EditorState): EditorState {
+function cleanupNewLineAndTable(newEditorState: EditorState): EditorState {
   const curContent = newEditorState.getCurrentContent()
   const newBlocks = curContent.getBlocksAsArray()
   let blockMap = curContent.getBlockMap()
 
   // check for lines with white spaces and remove them
   newBlocks.forEach((block) => {
-    if (['unstyled'].includes(block.getType())) {
-      const blockKey = block.getKey()
+    const blockKey = block.getKey()
+    if (block.getType() === 'unstyled') {
       const text = block.getText()
       if (/^\s*$/.test(text)) {
         const newBlock = block.set('text', '') as ContentBlock
         blockMap = blockMap.set(blockKey, newBlock)
       }
+    } else if (
+      block.getType() === 'table-cell' &&
+      !block.getData().get('rows')
+    ) {
+      blockMap = blockMap.remove(blockKey)
     }
   })
 
@@ -465,13 +484,14 @@ function removeSpaceOnNewLine(newEditorState: EditorState): EditorState {
  * Post processing of editor state created
  * - filter state to only keep items that our rich text editor supports
  * - adjusts depth of list items
+ * - correct the rendering of new lines and table cells
  * @param newEditorState editor state to process
  * @returns processed state
  */
 function statePostProcessing(newEditorState: EditorState): EditorState {
   newEditorState = filterState(newEditorState)
   newEditorState = adjustListDepth(newEditorState)
-  newEditorState = removeSpaceOnNewLine(newEditorState)
+  newEditorState = cleanupNewLineAndTable(newEditorState)
   return newEditorState
 }
 
