@@ -11,7 +11,6 @@ import { Redirect, useHistory } from 'react-router-dom'
 import styles from './Landing.module.scss'
 import Banner from './banner'
 
-import Footer from './footer'
 import Navbar from './nav-bar'
 
 import channelsImg from 'assets/img/landing/channels.png'
@@ -27,6 +26,7 @@ import whyUse1 from 'assets/mp4/why-use-1.mp4'
 import whyUse2 from 'assets/mp4/why-use-2.mp4'
 import whyUse3 from 'assets/mp4/why-use-3.mp4'
 import { InfoBanner, PrimaryButton } from 'components/common'
+import Footer from 'components/common/footer'
 import { LINKS } from 'config'
 
 import { AuthContext } from 'contexts/auth.context'

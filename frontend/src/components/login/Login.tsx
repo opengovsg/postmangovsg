@@ -1,8 +1,4 @@
-import { i18n } from '@lingui/core'
-
 import { createRef, useEffect, useContext } from 'react'
-
-import { OutboundLink } from 'react-ga'
 
 import { Redirect } from 'react-router-dom'
 
@@ -11,10 +7,9 @@ import styles from './Login.module.scss'
 import LoginInput from './login-input'
 
 import appLogo from 'assets/img/brand/app-logo.svg'
-import companyLogo from 'assets/img/brand/company-logo-dark.svg'
 import loginImg from 'assets/img/landing/login.png'
 import { InfoBanner } from 'components/common'
-import { LINKS } from 'config'
+import Footer from 'components/common/footer'
 import { AuthContext } from 'contexts/auth.context'
 
 const Login = () => {
@@ -62,33 +57,8 @@ const Login = () => {
           </div>
         </div>
       </div>
-      <div className={styles.bottomContainer}>
-        <div className={styles.bottomContent}>
-          <img
-            className={styles.companyLogo}
-            src={companyLogo}
-            alt="company logo"
-          ></img>
-          <div className={styles.linkBar}>
-            <OutboundLink
-              className={styles.navLink}
-              eventLabel={i18n._(LINKS.guideUrl)}
-              to={i18n._(LINKS.guideUrl)}
-              target="_blank"
-            >
-              Guide
-            </OutboundLink>
-            <OutboundLink
-              className={styles.navLink}
-              eventLabel={i18n._(LINKS.contactUsUrl)}
-              to={i18n._(LINKS.contactUsUrl)}
-              target="_blank"
-            >
-              Contact Us
-            </OutboundLink>
-          </div>
-        </div>
-      </div>
+
+      <Footer />
     </>
   )
 }
