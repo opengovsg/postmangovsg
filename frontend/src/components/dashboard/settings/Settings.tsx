@@ -20,16 +20,11 @@ import {
   getCustomFromAddresses,
 } from 'services/settings.service'
 
-const SETTINGS_LINKS = [
+const SETTINGS_LINKS_WITHOUT_EMAIL = [
   {
     label: 'API Keys',
     location: '/settings/api',
     icon: 'bx-key',
-  },
-  {
-    label: 'Email',
-    location: '/settings/email',
-    icon: channelIcons[ChannelType.Email],
   },
   {
     label: 'SMS',
@@ -41,6 +36,16 @@ const SETTINGS_LINKS = [
     location: '/settings/telegram',
     icon: channelIcons[ChannelType.Telegram],
   },
+]
+
+const SETTINGS_LINKS_WITH_EMAIL = [
+  SETTINGS_LINKS_WITHOUT_EMAIL[0],
+  {
+    label: 'Email',
+    location: '/settings/email',
+    icon: channelIcons[ChannelType.Email],
+  },
+  ...SETTINGS_LINKS_WITHOUT_EMAIL.slice(1),
 ]
 
 const Settings = () => {
@@ -114,18 +119,26 @@ const Settings = () => {
   function renderSettings() {
     return (
       <div className={styles.settingsContainer}>
-        <SideNav links={SETTINGS_LINKS} />
+        <SideNav
+          links={
+            hasCustomFromAddresses
+              ? SETTINGS_LINKS_WITH_EMAIL
+              : SETTINGS_LINKS_WITHOUT_EMAIL
+          }
+        />
         <div className={styles.detailsContainer}>
           <Switch>
             <Route exact path="/settings/api">
               <ApiKey hasApiKey={hasApiKey} />
             </Route>
-            <Route exact path="/settings/email">
-              <CustomFromAddress
-                customFromAddresses={customFromAddresses}
-                onSuccess={fetchCustomFromAddresses}
-              />
-            </Route>
+            {hasCustomFromAddresses && (
+              <Route exact path="/settings/email">
+                <CustomFromAddress
+                  customFromAddresses={customFromAddresses}
+                  onSuccess={fetchCustomFromAddresses}
+                />
+              </Route>
+            )}
             <Route exact path="/settings/sms">
               <Credentials
                 credType={ChannelType.SMS}
