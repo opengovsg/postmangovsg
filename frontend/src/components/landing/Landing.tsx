@@ -11,9 +11,9 @@ import { Redirect, useHistory } from 'react-router-dom'
 import styles from './Landing.module.scss'
 import Banner from './banner'
 
+import Footer from './footer'
 import Navbar from './nav-bar'
 
-import companyLogo from 'assets/img/brand/company-logo.svg'
 import channelsImg from 'assets/img/landing/channels.png'
 import landingHeroImg from 'assets/img/landing/landing-hero.png'
 import userImg from 'assets/img/landing/moe-circle.png'
@@ -368,73 +368,7 @@ const Landing = () => {
         </div>
       </div>
 
-      <footer className={styles.bottomContainer}>
-        <div className={styles.innerContainer}>
-          <div className={styles.linksContainer}>
-            <div className={styles.navLinks}>
-              <div className={styles.header}>
-                <span className={styles.title}>Postman</span>
-                <span className={styles.text}>
-                  Reach out to citizens in minutes
-                </span>
-              </div>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.guideUrl)}
-                to={i18n._(LINKS.guideUrl)}
-                target="_blank"
-              >
-                Guide
-              </OutboundLink>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.contributeUrl)}
-                to={i18n._(LINKS.contributeUrl)}
-                target="_blank"
-              >
-                Contribute
-              </OutboundLink>
-            </div>
-
-            <div className={styles.builtBy}>
-              <span>Built by</span>
-              <img src={companyLogo} alt="logo" />
-            </div>
-          </div>
-          <div className={styles.lineBreak} />
-          <div className={styles.footer}>
-            <div className={styles.links}>
-              <OutboundLink
-                className={styles.navLink}
-                eventLabel={i18n._(LINKS.privacyUrl)}
-                to={i18n._(LINKS.privacyUrl)}
-                target="_blank"
-              >
-                Privacy
-              </OutboundLink>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.tncUrl)}
-                to={i18n._(LINKS.tncUrl)}
-                target="_blank"
-              >
-                Terms of Use
-              </OutboundLink>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.reportBugUrl)}
-                to={i18n._(LINKS.reportBugUrl)}
-                target="_blank"
-              >
-                Report Vulnerability
-              </OutboundLink>
-            </div>
-            <span>
-              &copy; {new Date().getFullYear()} Open Government Products
-            </span>
-            <div className={styles.builtByMobile}>
-              <span>Built by</span>
-              <img src={companyLogo} alt="logo" />
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
