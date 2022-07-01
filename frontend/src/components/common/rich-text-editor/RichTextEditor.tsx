@@ -171,7 +171,7 @@ const RichTextEditor = ({
   }
 
   // customise command from key press
-  function myKeyBindingFn(e: any): string | null {
+  function keyBindingFn(e: any): string | null {
     if (e.keyCode === 9) {
       // tab key
       const selection = editorState.getSelection()
@@ -362,7 +362,7 @@ const RichTextEditor = ({
       customBlockRenderFunc={renderBlock}
       blockRenderMap={extendedBlockRenderMap}
       handleKeyCommand={handleKeyCommand}
-      keyBindingFn={myKeyBindingFn}
+      keyBindingFn={keyBindingFn}
       handleReturn={handleReturn}
       handlePastedText={handlePastedText}
       stripPastedStyles
