@@ -25,6 +25,10 @@
   }
 }
 
+.spinner {
+  @include spinner;
+}
+
 .emptySettings {
   text-align: center;
 
