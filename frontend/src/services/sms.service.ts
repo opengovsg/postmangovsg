@@ -20,10 +20,8 @@ export async function saveTemplate(
     const response = await axios.put(`/campaign/${campaignId}/sms/template`, {
       body,
     })
-    const {
-      num_recipients: numRecipients,
-      template: updatedTemplate,
-    } = response.data
+    const { num_recipients: numRecipients, template: updatedTemplate } =
+      response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template.')

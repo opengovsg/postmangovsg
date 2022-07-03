@@ -139,9 +139,8 @@ const RichTextEditor = ({
       wrapper: <TableWrapper />,
     },
   })
-  const extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(
-    blockRenderMap
-  )
+  const extendedBlockRenderMap =
+    DefaultDraftBlockRenderMap.merge(blockRenderMap)
 
   useEffect(() => {
     // Normalise HTML whenever editor state is initialised or updated
@@ -337,9 +336,8 @@ const RichTextPreview = ({ placeholder }: { placeholder: string }) => {
       wrapper: <TableWrapper />,
     },
   })
-  const extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(
-    blockRenderMap
-  )
+  const extendedBlockRenderMap =
+    DefaultDraftBlockRenderMap.merge(blockRenderMap)
 
   function renderBlock(block: ContentBlock): any | void {
     if (block.getType() === 'atomic') {

@@ -24,12 +24,8 @@ const EMAIL_PROGRESS_STEPS = [
 
 const CreateEmail = () => {
   const { campaign } = useContext(CampaignContext)
-  const {
-    progress,
-    isCsvProcessing,
-    status,
-    protect,
-  } = campaign as EmailCampaign
+  const { progress, isCsvProcessing, status, protect } =
+    campaign as EmailCampaign
   const [activeStep, setActiveStep] = useState(progress)
 
   // If isCsvProcessing, user can only access UploadRecipients tab

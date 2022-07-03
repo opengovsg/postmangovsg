@@ -33,10 +33,8 @@ export async function saveTemplate(
       from,
       show_logo: showLogo,
     })
-    const {
-      num_recipients: numRecipients,
-      template: updatedTemplate,
-    } = response.data
+    const { num_recipients: numRecipients, template: updatedTemplate } =
+      response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template')
@@ -64,8 +62,13 @@ export async function getPreviewMessage(
 ): Promise<EmailPreview> {
   try {
     const response = await axios.get(`/campaign/${campaignId}/email/preview`)
-    const { body, themed_body: themedBody, subject, reply_to: replyTo, from } =
-      response.data?.preview || {}
+    const {
+      body,
+      themed_body: themedBody,
+      subject,
+      reply_to: replyTo,
+      from,
+    } = response.data?.preview || {}
     return { body, themedBody, subject, replyTo, from }
   } catch (e) {
     errorHandler(e, 'Unable to get preview message')

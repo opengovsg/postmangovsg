@@ -26,9 +26,8 @@ import {
 const RESEND_WAIT_TIME = 30000
 
 const Login = () => {
-  const { setAuthenticated, setEmail: setAuthContextEmail } = useContext(
-    AuthContext
-  )
+  const { setAuthenticated, setEmail: setAuthContextEmail } =
+    useContext(AuthContext)
 
   const [otpSent, setOtpSent] = useState(false)
   const [email, setEmail] = useState('')

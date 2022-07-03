@@ -29,12 +29,8 @@ const SMS_PROGRESS_STEPS = [
 
 const CreateSMS = () => {
   const { campaign } = useContext(CampaignContext)
-  const {
-    progress,
-    isCsvProcessing,
-    status,
-    costPerMessage,
-  } = campaign as SMSCampaign
+  const { progress, isCsvProcessing, status, costPerMessage } =
+    campaign as SMSCampaign
   const [activeStep, setActiveStep] = useState(progress)
 
   // If isCsvProcessing, user can only access UploadRecipients tab
