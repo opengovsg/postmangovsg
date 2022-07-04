@@ -404,7 +404,7 @@ const Campaigns = () => {
       )}
       <div className={styles.content}>
         {isLoading ? (
-          <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
+          <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')} />
         ) : campaignCount > 0 ? (
           renderCampaignList()
         ) : (
