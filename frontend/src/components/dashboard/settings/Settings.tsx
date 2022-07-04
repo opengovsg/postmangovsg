@@ -51,23 +51,17 @@ const SETTINGS_LINKS_WITH_EMAIL = [
 const Settings = () => {
   const modalContext = useContext(ModalContext)
   const [isLoading, setIsLoading] = useState(true)
-  const [fetchedUserSettings, setFetchedUserSettings] = useState(false)
-  const [fetchedCustomFromAddresses, setFetchedCustomFromAddresses] = useState(
-    false
-  )
   const [hasApiKey, setHasApiKey] = useState(false)
   const [hasCustomFromAddresses, setHasCustomFromAddresses] = useState(false)
   const [customFromAddresses, setCustomFromAddresses] = useState([] as string[])
   const [creds, setCreds] = useState([] as UserCredential[])
 
   useEffect(() => {
-    fetchUserSettings()
-    fetchCustomFromAddresses()
+    setIsLoading(true)
+    Promise.all([fetchUserSettings(), fetchCustomFromAddresses()]).finally(() =>
+      setIsLoading(false)
+    )
   }, [])
-
-  useEffect(() => {
-    setIsLoading(!fetchedUserSettings && !fetchedCustomFromAddresses)
-  }, [fetchedUserSettings, fetchedCustomFromAddresses])
 
   function onAddCredentialClicked() {
     modalContext.setModalContent(
@@ -85,19 +79,15 @@ const Settings = () => {
   }
 
   async function fetchUserSettings() {
-    setFetchedUserSettings(false)
     const { hasApiKey, creds } = await getUserSettings()
     setCreds(creds)
     setHasApiKey(hasApiKey)
-    setFetchedUserSettings(true)
   }
 
   async function fetchCustomFromAddresses() {
-    setFetchedCustomFromAddresses(false)
     const customFromAddresses = await getCustomFromAddresses()
     setCustomFromAddresses(customFromAddresses)
     setHasCustomFromAddresses(customFromAddresses.length > 1)
-    setFetchedCustomFromAddresses(true)
   }
 
   function renderEmptySettings() {
