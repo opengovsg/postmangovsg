@@ -142,9 +142,8 @@ export const TableControl = ({
       fragmentArray.push(empty)
 
       // Create block map to be inserted
-      const fragment = ContentState.createFromBlockArray(
-        fragmentArray
-      ).getBlockMap()
+      const fragment =
+        ContentState.createFromBlockArray(fragmentArray).getBlockMap()
 
       // Replace existing selection with the fragment containing table cells and empty block
       contentState = Modifier.replaceWithFragment(

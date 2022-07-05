@@ -297,16 +297,20 @@ function mockCampaignTemplateApis(state: State) {
   return [
     rest.put('/campaign/:campaignId/email/template', (req, res, ctx) => {
       const { campaignId } = req.params
-      const { body, from, reply_to: replyTo, subject } = req.body as {
+      const {
+        body,
+        from,
+        reply_to: replyTo,
+        subject,
+      } = req.body as {
         body: string
         from: string
         reply_to: string
         subject: string
       }
 
-      const sanitizedSubject = emailTemplateClient.replaceNewLinesAndSanitize(
-        subject
-      )
+      const sanitizedSubject =
+        emailTemplateClient.replaceNewLinesAndSanitize(subject)
       const sanitizedBody = emailTemplateClient.filterXSS(body)
       if (!sanitizedBody || !sanitizedSubject) {
         return res(
@@ -400,9 +404,8 @@ function mockCampaignTemplateApis(state: State) {
       const { campaignId } = req.params
       const { body } = req.body as { body: string }
 
-      const sanitizedBody = telegramTemplateClient.replaceNewLinesAndSanitize(
-        body
-      )
+      const sanitizedBody =
+        telegramTemplateClient.replaceNewLinesAndSanitize(body)
       if (!sanitizedBody) {
         return res(
           ctx.status(400),
@@ -607,7 +610,11 @@ function mockCampaignUploadApis(state: State) {
     ),
     rest.post('/campaign/:campaignId/upload/complete', (req, res, ctx) => {
       const { campaignId } = req.params
-      const { transaction_id: transactionId, filename, etag } = req.body as {
+      const {
+        transaction_id: transactionId,
+        filename,
+        etag,
+      } = req.body as {
         transaction_id?: string
         filename?: string
         etag?: string
