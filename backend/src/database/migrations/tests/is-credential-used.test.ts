@@ -83,6 +83,116 @@ describe('is_credential_used(campaignId) SQL function', () => {
         type: QueryTypes.SELECT,
       }
     )
-    expect(get(result, 'is_credential_used') === null)
+    expect(get(result, 'is_credential_used')).toBeNull()
+  })
+
+  test('return null if the credential is only used once on another campaign of type email', async () => {
+    const anotherEmailCampaign = await Campaign.create({
+      name: 'campaign-2',
+      userId: 1,
+      type: ChannelType.Email,
+      credName: credNameNotUsed,
+      valid: true,
+      protect: false,
+    } as Campaign)
+    await JobQueue.create({
+      campaignId: anotherEmailCampaign.id,
+      status: JobStatus.Sending,
+    } as JobQueue)
+    const campaign = await Campaign.create({
+      name: 'campaign-3',
+      userId: 1,
+      type: ChannelType.Email,
+      credName: credNameNotUsed,
+      valid: true,
+      protect: false,
+    } as Campaign)
+    const [result] = await sql.query(
+      'SELECT is_credential_used(:campaignId);',
+      {
+        replacements: { campaignId: campaign.id },
+        type: QueryTypes.SELECT,
+      }
+    )
+    expect(get(result, 'is_credential_used')).toBeNull()
+  })
+
+  test('return true if the credential is used twice already on other campaigns of type email', async () => {
+    const otherEmailCampaigns = await Campaign.bulkCreate([
+      {
+        name: 'campaign-2',
+        userId: 1,
+        type: ChannelType.Email,
+        credName: credNameNotUsed,
+        valid: true,
+        protect: false,
+      } as Campaign,
+      {
+        name: 'campaign-3',
+        userId: 1,
+        type: ChannelType.Email,
+        credName: credNameNotUsed,
+        valid: true,
+        protect: false,
+      } as Campaign,
+    ])
+    await JobQueue.bulkCreate(
+      otherEmailCampaigns.map(
+        (c) =>
+          ({
+            campaignId: c.id,
+            status: JobStatus.Sending,
+          } as JobQueue)
+      )
+    )
+    const campaign = await Campaign.create({
+      name: 'campaign-4',
+      userId: 1,
+      type: ChannelType.Email,
+      credName: credNameNotUsed,
+      valid: true,
+      protect: false,
+    } as Campaign)
+    const [result] = await sql.query(
+      'SELECT is_credential_used(:campaignId);',
+      {
+        replacements: { campaignId: campaign.id },
+        type: QueryTypes.SELECT,
+      }
+    )
+    expect(get(result, 'is_credential_used')).toBe(true)
+  })
+
+  // practically this case will never happen, but we still have this test to narrow
+  // down the behavior of this function
+  test('return true if the credential is alread used once on another campaign not type email even if the new campaign is of type email', async () => {
+    const anotherEmailCampaign = await Campaign.create({
+      name: 'campaign-2',
+      userId: 1,
+      type: ChannelType.SMS,
+      credName: credNameNotUsed,
+      valid: true,
+      protect: false,
+    } as Campaign)
+    await JobQueue.create({
+      campaignId: anotherEmailCampaign.id,
+      status: JobStatus.Sending,
+    } as JobQueue)
+    const campaign = await Campaign.create({
+      name: 'campaign-3',
+      userId: 1,
+      type: ChannelType.Email,
+      credName: credNameNotUsed,
+      valid: true,
+      protect: false,
+    } as Campaign)
+    const [result] = await sql.query(
+      'SELECT is_credential_used(:campaignId);',
+      {
+        replacements: { campaignId: campaign.id },
+        type: QueryTypes.SELECT,
+      }
+    )
+    expect(get(result, 'is_credential_used')).toBe(true)
   })
 })
