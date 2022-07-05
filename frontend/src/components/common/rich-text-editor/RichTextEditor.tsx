@@ -9,6 +9,7 @@ import {
   Modifier,
   SelectionState,
   KeyBindingUtil,
+  getDefaultKeyBinding,
 } from 'draft-js'
 import Immutable from 'immutable'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -40,6 +41,8 @@ import { Converter } from './utils'
 
 import 'draft-js/dist/Draft.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+
+const MAX_LIST_DEPTH = 4
 
 const ExtendedEditor = (props: any) => <Editor {...props} />
 
@@ -167,7 +170,45 @@ const RichTextEditor = ({
     }
   }
 
+  // customise command from key press
+  function keyBindingFn(e: any): string | null {
+    if (e.keyCode === 9) {
+      // tab key
+      const selection = editorState.getSelection()
+      const startKey = selection.getStartKey()
+      const block = editorState.getCurrentContent().getBlockForKey(startKey)
+      const blockType = block.getType()
+
+      // handle indent on list separately
+      if (['unordered-list-item', 'ordered-list-item'].includes(blockType)) {
+        const blockBefore = editorState
+          .getCurrentContent()
+          .getBlockBefore(startKey)
+        let MAX_DEPTH = 0
+        if (blockBefore && blockBefore.getType() === blockType) {
+          MAX_DEPTH = Math.min(blockBefore.getDepth() + 1, MAX_LIST_DEPTH)
+        }
+        setEditorState(RichUtils.onTab(e, editorState, MAX_DEPTH))
+        return null
+      }
+      return 'indent'
+    }
+    return getDefaultKeyBinding(e)
+  }
+
   function handleKeyCommand(command: string): 'handled' | 'not-handled' {
+    if (command === 'indent') {
+      const newContentState = Modifier.replaceText(
+        editorState.getCurrentContent(),
+        editorState.getSelection(),
+        '\t'
+      )
+      setEditorState(
+        EditorState.push(editorState, newContentState, 'insert-characters')
+      )
+      return 'handled'
+    }
+
     if (command === 'backspace') {
       const selection = editorState.getSelection()
       const anchorKey = selection.getAnchorKey()
@@ -321,6 +362,7 @@ const RichTextEditor = ({
       customBlockRenderFunc={renderBlock}
       blockRenderMap={extendedBlockRenderMap}
       handleKeyCommand={handleKeyCommand}
+      keyBindingFn={keyBindingFn}
       handleReturn={handleReturn}
       handlePastedText={handlePastedText}
       stripPastedStyles
