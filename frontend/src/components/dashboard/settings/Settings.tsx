@@ -50,14 +50,17 @@ const SETTINGS_LINKS_WITH_EMAIL = [
 
 const Settings = () => {
   const modalContext = useContext(ModalContext)
+  const [isLoading, setIsLoading] = useState(true)
   const [hasApiKey, setHasApiKey] = useState(false)
   const [hasCustomFromAddresses, setHasCustomFromAddresses] = useState(false)
   const [customFromAddresses, setCustomFromAddresses] = useState([] as string[])
   const [creds, setCreds] = useState([] as UserCredential[])
 
   useEffect(() => {
-    fetchUserSettings()
-    fetchCustomFromAddresses()
+    setIsLoading(true)
+    Promise.all([fetchUserSettings(), fetchCustomFromAddresses()]).finally(() =>
+      setIsLoading(false)
+    )
   }, [])
 
   function onAddCredentialClicked() {
@@ -165,9 +168,13 @@ const Settings = () => {
   return (
     <>
       <TitleBar title="Settings"> </TitleBar>
-      {!hasApiKey && creds.length < 1 && !hasCustomFromAddresses
-        ? renderEmptySettings()
-        : renderSettings()}
+      {isLoading ? (
+        <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')} />
+      ) : !hasApiKey && creds.length < 1 && !hasCustomFromAddresses ? (
+        renderEmptySettings()
+      ) : (
+        renderSettings()
+      )}
     </>
   )
 }
