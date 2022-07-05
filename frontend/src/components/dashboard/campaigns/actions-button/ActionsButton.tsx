@@ -1,4 +1,3 @@
-import { Trans } from '@lingui/macro'
 import cx from 'classnames'
 import {
   createRef,
@@ -11,7 +10,6 @@ import styles from './ActionsButton.module.scss'
 
 import { Campaign, ChannelType } from 'classes'
 
-import { ExportRecipients } from 'components/common'
 import DuplicateCampaignModal from 'components/dashboard/create/duplicate-campaign-modal'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 
@@ -139,28 +137,6 @@ const ActionsButton = ({
         style={dropdownMenuStyle}
         ref={menuRef}
       >
-        {campaign.redacted ? (
-          <span
-            className={styles.expired}
-            onClick={(e: ReactMouseEvent<HTMLSpanElement>) =>
-              e.stopPropagation()
-            }
-          >
-            <Trans>Report expired</Trans>
-          </span>
-        ) : (
-          <div className={styles.dropdownItem}>
-            <ExportRecipients
-              iconPosition="right"
-              campaignId={campaign.id}
-              campaignName={campaign.name}
-              campaignType={campaign.type}
-              sentAt={campaign.sentAt}
-              status={campaign.status}
-              statusUpdatedAt={campaign.statusUpdatedAt}
-            />
-          </div>
-        )}
         {onRename ? (
           <div className={styles.dropdownItem} onClick={onRename}>
             <button className={cx(styles.btn, styles.btnPrimary)}>

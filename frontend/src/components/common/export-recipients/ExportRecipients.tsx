@@ -5,7 +5,6 @@ import cx from 'classnames'
 import download from 'downloadjs'
 import moment from 'moment'
 import { useState, useEffect } from 'react'
-
 import type { MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from './ExportRecipients.module.scss'
@@ -23,7 +22,8 @@ export enum CampaignExportStatus {
   Exporting = 'Exporting',
 }
 
-const EXPORT_LINK_DISPLAY_WAIT_TIME = 1 * 60 * 1000 // 1 min
+const EXPORT_LINK_DISPLAY_WAIT_TIME = 60 * 1000 // 1 min
+const TOTAL_MESSAGES_THRESHOLD_TO_DISABLE_DOWNLOAD_RECIPIENT_BUTTON = 100 * 1000 // temporary
 
 const ExportRecipients = ({
   campaignId,
@@ -33,6 +33,7 @@ const ExportRecipients = ({
   status,
   statusUpdatedAt,
   iconPosition,
+  totalMessages,
   isButton = false,
 }: {
   campaignId: number
@@ -42,12 +43,16 @@ const ExportRecipients = ({
   status: Status
   statusUpdatedAt?: string
   iconPosition: 'left' | 'right'
+  totalMessages: number
   isButton?: boolean
 }) => {
   const [exportStatus, setExportStatus] = useState(
     CampaignExportStatus.Unavailable
   )
   const [disabled, setDisabled] = useState(false)
+  const hasTotalMessagesExceededThreshold =
+    totalMessages >=
+    TOTAL_MESSAGES_THRESHOLD_TO_DISABLE_DOWNLOAD_RECIPIENT_BUTTON
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
@@ -204,12 +209,23 @@ const ExportRecipients = ({
       {isButton ? (
         <div className={styles.actionButton}>
           <InfoBlock className={styles.notice}>
-            <Trans>
-              Delivery report will expire 14 days after sending is completed.
-            </Trans>
+            {hasTotalMessagesExceededThreshold ? (
+              <Trans>
+                Due to the large campaign size, we are unable to generate your
+                report. Please reach out to the Postman team separately through{' '}
+                <a href="mailto:postman@open.gov.sg">postman@open.gov.sg</a>.
+              </Trans>
+            ) : (
+              <Trans>
+                Delivery report will expire 14 days after sending is completed.
+              </Trans>
+            )}
           </InfoBlock>
           <ActionButton
-            disabled={exportStatus !== CampaignExportStatus.Ready}
+            disabled={
+              exportStatus !== CampaignExportStatus.Ready ||
+              hasTotalMessagesExceededThreshold
+            }
             className={cx(styles.exportButton, {
               [styles.disableActiveState]:
                 exportStatus === CampaignExportStatus.Loading,

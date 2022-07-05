@@ -158,6 +158,7 @@ const ProgressDetails = ({
           iconPosition="right"
           status={status}
           statusUpdatedAt={statusUpdatedAt}
+          totalMessages={numRecipients}
           isButton
         />
       ) : (
