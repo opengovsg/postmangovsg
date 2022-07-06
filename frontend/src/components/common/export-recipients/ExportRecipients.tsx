@@ -49,10 +49,11 @@ const ExportRecipients = ({
   const [exportStatus, setExportStatus] = useState(
     CampaignExportStatus.Unavailable
   )
-  const [disabled, setDisabled] = useState(false)
   const hasTotalMessagesExceededThreshold =
     totalMessages >=
     TOTAL_MESSAGES_THRESHOLD_TO_DISABLE_DOWNLOAD_RECIPIENT_BUTTON
+
+  const [disabled, setDisabled] = useState(hasTotalMessagesExceededThreshold)
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
