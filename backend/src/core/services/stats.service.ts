@@ -1,4 +1,4 @@
-import { fn, cast, Transaction, Op, literal } from 'sequelize'
+import { fn, cast, Transaction, Op, literal, FindOptions } from 'sequelize'
 import { Statistic, JobQueue, Campaign } from '@core/models'
 import {
   CampaignStats,
@@ -6,6 +6,8 @@ import {
   CampaignRecipient,
 } from '@core/interfaces'
 import { MessageStatus, JobStatus } from '@core/constants'
+import { Writable } from 'stream'
+import { waitForMs } from '@shared/utils/wait-for-ms'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -199,28 +201,57 @@ const getTotalSentCount = async (): Promise<number> => {
   return Statistic.sum('sent')
 }
 
+interface LogsTable<T> {
+  findAll(options?: FindOptions<T> | undefined): Promise<T[]>
+}
 /**
- * Helper method to get delivered messages from logs table
+ * Stream delivered messages from logs table
  * @param campaignId
  * @param logsTable
+ * @param writableStream
  */
 const getDeliveredRecipients = async (
   campaignId: number,
-  logsTable: any
-): Promise<Array<CampaignRecipient>> => {
-  const data = await logsTable.findAll({
-    raw: true,
-    where: {
-      campaignId,
-      status: {
-        [Op.ne]: null,
-      },
-    },
-    attributes: ['recipient', 'status', 'error_code', 'updated_at'],
-    useMaster: false,
-  })
+  logsTable: LogsTable<any>,
+  writableStream: Writable
+): Promise<void> => {
+  writableStream.write('[') //array starting bracket
+  const limit = 10000
+  let offset = 0
+  let data = []
+  let started = false
 
-  return data
+  while (data.length > 0 || !started) {
+    let prefix = ''
+    // if there has been a batch processed previously, a new batch needs to be
+    // prefixed with a comma
+    if (started) {
+      prefix = ','
+    }
+    // wait for 0.5s cool down before the next batch
+    await waitForMs(500)
+    data = (await logsTable.findAll({
+      raw: true,
+      where: {
+        campaignId,
+        status: {
+          [Op.ne]: null,
+        },
+      },
+      attributes: ['recipient', 'status', 'error_code', 'updated_at'],
+      useMaster: false,
+      limit,
+      offset,
+    })) as Array<CampaignRecipient>
+    offset += limit
+    if (data.length > 0) {
+      writableStream.write(
+        prefix + data.map((d) => JSON.stringify(d)).join(',')
+      )
+    }
+    started = true
+  }
+  writableStream.write(']')
 }
 
 export const StatsService = {
