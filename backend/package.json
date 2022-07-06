@@ -15,7 +15,8 @@
     "precommit": "lint-staged",
     "db:migrate": "npx sequelize db:migrate",
     "db:seed": "npx sequelize db:seed:all",
-    "db:undo": "npx sequelize db:migrate:undo"
+    "db:undo": "npx sequelize db:migrate:undo",
+    "tunneldb:staging": "source .env && ssh -i $STAGING_JUMPHOST_KEY_FOLDER -N -L $STAGING_AURORA_PORT_URL_HOST $STAGING_AURORA_SSH_HOST"
   },
   "author": "",
   "license": "MIT",
