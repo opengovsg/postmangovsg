@@ -481,7 +481,11 @@ const convertToHTML = (contentState: RawDraftContentState): string => {
     prevBlock = currBlock
   }
 
-  return tree.toHTML()
+  let html = tree.toHTML()
+
+  // replace tab with 4 white spaces
+  html = html.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+  return html
 }
 
 const TAG_BLOCK_TYPE_MAPPING: Record<string, string> = {
