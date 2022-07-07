@@ -11,10 +11,13 @@ const isAuthenticated = (
 ): Response | void => {
   const authHeader = req.get('authorization')
   if (!authHeader) {
-    logger.error({
-      message: 'Authorization headers not found',
-      action: 'isAuthenticated',
-    })
+    // SNS will send 2 request:
+    // - first one without the basic authorization first and require the callback
+    //   server to respond with 401 WWW-Authenticate Basic realm="Email"
+    // - second one with the basic authorization
+    // The above mechanism is based on RFC-2671 https://www.rfc-editor.org/rfc/rfc2617.html#page-8
+    // Of course, this middleare is to reject all requests without the
+    // Authorization header as well
     res.set('WWW-Authenticate', 'Basic realm="Email"')
     return res.sendStatus(401)
   }
