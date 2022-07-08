@@ -6,6 +6,7 @@ require('module-alias/register') // to resolve aliased paths like @core, @sms, @
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
+import { waitForMs } from '@shared/utils/wait-for-ms'
 import Email from './email.class'
 import SMS from './sms.class'
 import Telegram from './telegram.class'
@@ -183,11 +184,6 @@ const createConnection = (): Sequelize => {
       },
     },
   })
-}
-
-const waitForMs = (ms: number): Promise<void> => {
-  if (ms > 0) return new Promise((resolve) => setTimeout(() => resolve(), ms))
-  return Promise.resolve()
 }
 
 const enqueueAndSend = async (): Promise<void> => {
