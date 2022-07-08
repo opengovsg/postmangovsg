@@ -5,7 +5,14 @@ import { Campaign, Credential, JobQueue, User } from '@core/models'
 import { ChannelType, JobStatus } from '@core/constants'
 import { get } from 'lodash'
 import { QueryTypes } from 'sequelize'
-import { up, down } from '../20210429045222-create-is-credential-used-function'
+import {
+  up as createUp,
+  down as createDown,
+} from '../20210429045222-create-is-credential-used-function'
+import {
+  up as updateUp,
+  down as updateDown,
+} from '../20220711025216-update-is-credential-used-function'
 
 let sql: Sequelize
 const credNameNotUsed = 'cred-not-used'
@@ -13,7 +20,8 @@ const credNameUsed = 'cred-used'
 
 beforeAll(async () => {
   sql = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await up(sql.getQueryInterface())
+  await createUp(sql.getQueryInterface())
+  await updateUp(sql.getQueryInterface())
 })
 
 beforeEach(async () => {
@@ -37,13 +45,14 @@ beforeEach(async () => {
 })
 afterEach(async () => {
   await JobQueue.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
   await User.destroy({ where: {} })
   await Credential.destroy({ where: {} })
 })
 
 afterAll(async () => {
-  await down(sql.getQueryInterface())
+  await updateDown(sql.getQueryInterface())
+  await createDown(sql.getQueryInterface())
   await sql.close()
 })
 
