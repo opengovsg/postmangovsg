@@ -37,7 +37,7 @@ beforeEach(async () => {
 })
 afterEach(async () => {
   await JobQueue.destroy({ where: {} })
-  await Campaign.destroy({ where: {}, force: true })
+  await Campaign.destroy({ where: {} })
   await User.destroy({ where: {} })
   await Credential.destroy({ where: {} })
 })
