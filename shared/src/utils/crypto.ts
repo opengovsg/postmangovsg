@@ -11,5 +11,14 @@ export const compareSha256Hash = (
 ): boolean => {
   const generatedHashBuffer = Buffer.from(getSha256Hash(secret, text))
   const hashBuffer = Buffer.from(hash)
-  return timingSafeEqual(generatedHashBuffer, hashBuffer)
+  try {
+    return timingSafeEqual(generatedHashBuffer, hashBuffer)
+  } catch (e) {
+    // Why we're doing this?
+    // If the hashBuffers don't have the same length, `timingSafeEqual` will throw
+    // an error 🙄  instead of returning false, hence this catch.
+    // Extra implication: if there're other errors thrown from timingSafeEqual,
+    // we will return false as well
+    return false
+  }
 }
