@@ -63,6 +63,10 @@ jobs:
         env:
           ZIP_FILE: code.zip
         run: |
+          pushd shared/
+          npm ci
+          npm run build
+          popd
           cd "$DIRECTORY"
           npm ci 
           npm run build
