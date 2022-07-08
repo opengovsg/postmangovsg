@@ -38,7 +38,12 @@ const isAuthenticated = (
       campaignId,
       username,
     })
-    isAuthenticated = bcrypt.compareSync(plainTextPassword, password)
+    const bcryptPlainTextPassword =
+      username +
+      messageId +
+      campaignId +
+      config.get('smsCallback.callbackSecret')
+    isAuthenticated = bcrypt.compareSync(bcryptPlainTextPassword, password)
   }
   return isAuthenticated
 }
