@@ -23,7 +23,7 @@ const Protected = () => {
       const data = await fetchMessage(id, password)
       setDecryptedMessage(data)
     } catch (err) {
-      setErrorMsg(err.message)
+      setErrorMsg((err as Error).message)
     }
   }
 

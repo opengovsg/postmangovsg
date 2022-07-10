@@ -1,8 +1,6 @@
 import * as Sentry from '@sentry/browser'
 import axios from 'axios'
 
-import type { AxiosError } from 'axios'
-
 import { setGAUserId } from './ga.service'
 
 async function getOtpWithEmail(email: string): Promise<void> {
@@ -56,8 +54,8 @@ function setUserAnalytics(user?: { email: string; id: number } | null) {
   })
 }
 
-function errorHandler(e: AxiosError, customHandlers: any = {}) {
-  if (e.response && e.response.status) {
+function errorHandler(e: unknown, customHandlers: any = {}) {
+  if (axios.isAxiosError(e) && e.response && e.response.status) {
     const code = e.response.status
     if (customHandlers[code]) {
       throw new Error(customHandlers[code])

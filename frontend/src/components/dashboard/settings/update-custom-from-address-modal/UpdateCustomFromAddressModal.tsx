@@ -58,7 +58,7 @@ const UpdateCustomFromAddressModal = ({
       onSuccess()
     } catch (e) {
       console.error(e)
-      setErrorMessage(e.message)
+      setErrorMessage((e as Error).message)
       setStep(UpdateFromAddressStep.Failure)
     }
   }

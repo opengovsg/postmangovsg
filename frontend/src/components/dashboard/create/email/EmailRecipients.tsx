@@ -100,7 +100,7 @@ const EmailRecipients = ({
           timeoutId = setTimeout(pollStatus, 2000)
         }
       } catch (e) {
-        setErrorMessage(e.message)
+        setErrorMessage((e as Error).message)
       }
     }
 
@@ -142,7 +142,7 @@ const EmailRecipients = ({
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     }
     setIsUploading(false)
   }
