@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import type { AxiosError } from 'axios'
-
 import type { EmailPreview } from 'classes'
 
 export async function saveTemplate(
@@ -89,10 +87,15 @@ export async function verifyFromAddress(
   }
 }
 
-function errorHandler(e: AxiosError, defaultMsg: string): never {
+function errorHandler(e: unknown, defaultMsg: string): never {
   console.error(e)
-  if (e.response && e.response.data && e.response.data.message) {
+  if (
+    axios.isAxiosError(e) &&
+    e.response &&
+    e.response.data &&
+    e.response.data.message
+  ) {
     throw new Error(e.response.data.message)
   }
-  throw new Error(defaultMsg || e.response?.statusText)
+  throw new Error(defaultMsg)
 }

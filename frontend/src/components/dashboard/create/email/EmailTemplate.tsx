@@ -58,7 +58,7 @@ const EmailTemplate = ({
   } = campaign as EmailCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [errorMsg, setErrorMsg] = useState('')
   const [subject, setSubject] = useState(initialSubject)
   const [replyTo, setReplyTo] = useState(
     initialReplyTo === userEmail ? null : initialReplyTo
@@ -84,7 +84,7 @@ const EmailTemplate = ({
     'Dear {{ name }},\n\nYour next appointment at {{ clinic }} is on {{ date }} at {{ time }}\n\nMinistry of Health\n16 College Road, College of Medicine Building, Singapore 169854\n6325 9220 | www.moh.gov.sg'
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
-    setErrorMsg(null)
+    setErrorMsg('')
     try {
       if (!campaignId) {
         throw new Error('Invalid campaign id')
@@ -110,7 +110,7 @@ const EmailTemplate = ({
         setActiveStep((s) => s + 1)
       }
     } catch (err) {
-      setErrorMsg(err.message)
+      setErrorMsg((err as Error).message)
     }
   }, [
     body,
@@ -161,7 +161,7 @@ const EmailTemplate = ({
               showLogo
             )
           } catch (err) {
-            setErrorMsg(err.message)
+            setErrorMsg((err as Error).message)
             throw err
           }
         }}
