@@ -1,3 +1,4 @@
+require('module-alias/register')
 import 'source-map-support/register'
 import {
   init,
