@@ -67,8 +67,8 @@ const AnnouncementModal = () => {
     setBeforeClose(() => async () => {
       try {
         await updateAnnouncementVersion(await getAnnouncementVersion())
-      } catch (err) {
-        setErrorMessage(err.message)
+      } catch (e) {
+        setErrorMessage((e as Error).message)
       }
     })
   }, [setBeforeClose])
@@ -77,8 +77,8 @@ const AnnouncementModal = () => {
     try {
       // Closes the modal
       await close()
-    } catch (err) {
-      setErrorMessage(err.message)
+    } catch (e) {
+      setErrorMessage((e as Error).message)
     }
   }
 

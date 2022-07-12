@@ -125,8 +125,8 @@ function BodyTemplate({
         })
         setActiveStep((s: SMSProgress | TelegramProgress) => s + 1)
       }
-    } catch (err) {
-      setErrorMsg(err.message)
+    } catch (e) {
+      setErrorMsg((e as Error).message)
     }
   }, [body, campaignId, setActiveStep, updateCampaign, saveTemplate])
 
@@ -140,9 +140,9 @@ function BodyTemplate({
           try {
             if (!body) throw new Error('Message template cannot be empty!')
             await saveTemplate(+campaignId, body)
-          } catch (err) {
-            setErrorMsg(err.message)
-            throw err
+          } catch (e) {
+            setErrorMsg((e as Error).message)
+            throw e
           }
         }}
       />
