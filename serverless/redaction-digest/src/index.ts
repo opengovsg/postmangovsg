@@ -1,3 +1,4 @@
+require('module-alias/register')
 import 'source-map-support/register'
 import * as Sentry from '@sentry/node'
 
@@ -52,7 +53,7 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
         logger.log(`Redaction reminder sent to ${email}`)
       } catch (err) {
         logger.log(
-          `Failed to send redaction reminder to ${email}. Error: ${err.message}`
+          `Failed to send redaction reminder to ${email}. Error: ${(err as Error).message}`
         )
 
         failedRecipients.push(email)
@@ -70,12 +71,13 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
     await cronitor?.complete()
     return { statusCode: 200 }
   } catch (err) {
-    logger.log(err)
+    const errAsError = err as Error
+    logger.log(errAsError.message)
 
     Sentry.captureException(err)
     await Sentry.flush(2000)
 
-    cronitor?.fail(err.message)
+    cronitor?.fail(errAsError.message)
 
     // Rethrow error to signal a lambda failure
     throw err

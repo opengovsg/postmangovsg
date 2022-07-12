@@ -11,24 +11,25 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/bluebird": "3.5.33",
+    "@types/node": "14.14.7",
+    "@types/validator": "13.1.0",
     "@types/convict": "5.2.1",
     "@types/lodash": "4.14.165",
     "@types/nodemailer": "6.4.0",
     "@types/pg-connection-string": "2.0.0",
     "lambda-local": "1.7.4",
     "tsc-watch": "4.2.9",
-    "typescript": "4.0.5"
+    "typescript": "4.7.3"
   },
   "dependencies": {
     "@sentry/node": "5.27.4",
-    "@types/bluebird": "3.5.33",
-    "@types/node": "14.14.7",
-    "@types/validator": "13.1.0",
     "aws-sdk": "2.1140.0",
     "axios": "0.27.2",
     "convict": "6.2.3",
     "dotenv": "8.2.0",
     "lodash": "4.17.21",
+    "module-alias": "2.2.2",
     "moment": "2.29.3",
     "nodemailer": "6.6.2",
     "pg": "8.5.1",
@@ -37,5 +38,8 @@
     "sequelize": "5.22.5",
     "sequelize-typescript": "1.1.0",
     "source-map-support": "0.5.19"
+  },
+  "_moduleAliases": {
+    "@shared": "../../shared/build"
   }
 }

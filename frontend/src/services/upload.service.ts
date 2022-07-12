@@ -1,5 +1,4 @@
 import axios from 'axios'
-import type { AxiosError } from 'axios'
 
 // require buffer with trailing slash to ensure use of the npm module named buffer
 // instead of the node.js core module named buffer
@@ -320,10 +319,15 @@ export async function completeMultiPartUpload({
   }
 }
 
-function errorHandler(e: AxiosError, defaultMsg?: string): never {
+function errorHandler(e: unknown, defaultMsg?: string): never {
   console.error(e)
-  if (e.response && e.response.data && e.response.data.message) {
+  if (
+    axios.isAxiosError(e) &&
+    e.response &&
+    e.response.data &&
+    e.response.data.message
+  ) {
     throw new Error(e.response.data.message)
   }
-  throw new Error(defaultMsg || e.response?.statusText)
+  throw new Error(defaultMsg)
 }

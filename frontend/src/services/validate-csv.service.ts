@@ -75,8 +75,8 @@ export async function validateCsv({
             )
           }
 
+          errors.push(`Line ${count}: ${(e as Error).message}`)
           // If there is errors, append to the errors array
-          errors.push(`Line ${count}: ${e.message}`)
           if (errors.length === 3) {
             // abort when there are 3 errors
             parser.abort()
