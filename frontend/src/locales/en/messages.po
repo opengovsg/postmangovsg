@@ -176,7 +176,7 @@ msgstr "https://go.gov.sg/postman-contact-us"
 
 #: config.ts:77
 msgid "link.contributeUrl"
-msgstr "https://github.com/opengovsg/postmangovsg"
+msgstr "https://go.gov.sg/postman-github"
 
 #: config.ts:81
 msgid "link.customFromAddressRequestUrl"
@@ -196,55 +196,55 @@ msgstr "https://go.gov.sg/postman-featurerequest"
 
 #: config.ts:74
 msgid "link.guideDemoUrl"
-msgstr "https://guide.postman.gov.sg/before-you-start/demo-mode"
+msgstr "https://go.gov.sg/postman-demo-guide"
 
 #: config.ts:67
 msgid "link.guideEmailPasswordProtectedUrl"
-msgstr "https://guide.postman.gov.sg/guide/quick-start/password-protected-email"
+msgstr "https://go.gov.sg/postman-password-protected-email-guide"
 
 #: config.ts:73
 msgid "link.guidePowerUserUrl"
-msgstr "https://guide.postman.gov.sg/guide/power-users"
+msgstr "https://go.gov.sg/postman-power-users"
 
 #: config.ts:75
 msgid "link.guideRemoveDuplicatesUrl"
-msgstr "https://guide.postman.gov.sg/quick-start#remove-duplicates-in-excel"
+msgstr "https://go.gov.sg/postman-remove-dups-excel"
 
 #: config.ts:69
 msgid "link.guideSmsAccountSidUrl"
-msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-1-account-sid-and-auth-token"
+msgstr "https://go.gov.sg/postman-sms-acc-sid"
 
 #: config.ts:70
 msgid "link.guideSmsApiKeyUrl"
-msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-2-set-up-a-standard-api-key"
+msgstr "https://go.gov.sg/postman-sms-standard-api-key"
 
 #: config.ts:71
 msgid "link.guideSmsMessagingServiceUrl"
-msgstr "https://guide.postman.gov.sg/guide/quick-start/sms#step-3-set-up-your-messaging-service"
+msgstr "https://go.gov.sg/postman-sms-messaging-service"
 
 #: config.ts:68
 msgid "link.guideSmsUrl"
-msgstr "https://guide.postman.gov.sg/guide/getting-started/sms#find-twilio-credentials-on-twilio-console"
+msgstr "https://go.gov.sg/postman-sms-creds"
 
 #: config.ts:72
 msgid "link.guideTelegramUrl"
-msgstr "https://guide.postman.gov.sg/guide/getting-started/telegram-bot"
+msgstr "https://go.gov.sg/postman-telegram-bot"
 
 #: config.ts:66
 msgid "link.guideUrl"
-msgstr "https://guide.postman.gov.sg"
+msgstr "https://guide.postman.gov.sg/"
 
 #: config.ts:79
 msgid "link.privacyUrl"
-msgstr "https://guide.postman.gov.sg/legal/privacy"
+msgstr "https://go.gov.sg/postman-privacy"
 
 #: config.ts:80
 msgid "link.reportBugUrl"
-msgstr "https://guide.postman.gov.sg/contact-us"
+msgstr "https://go.gov.sg/postman-report-bug"
 
 #: config.ts:78
 msgid "link.tncUrl"
-msgstr "https://guide.postman.gov.sg/legal/t-and-c"
+msgstr "https://go.gov.sg/postman-legal-tnc"
 
 #: config.ts:85
 msgid "link.uploadLogoUrl"
