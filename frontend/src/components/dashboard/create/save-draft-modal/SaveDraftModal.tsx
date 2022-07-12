@@ -14,14 +14,14 @@ const SaveDraftModal = ({
 }) => {
   const history = useHistory()
   const modalContext = useContext(ModalContext)
-  const [error, setError] = useState()
+  const [error, setError] = useState('')
 
   async function handleOnSaveClicked(): Promise<void> {
     try {
       if (onSave) await onSave()
       history.push('/campaigns')
     } catch (err) {
-      setError(err)
+      setError((err as Error).message)
       // Propagate error so that ConfirmModal will display the error message
       throw err
     }

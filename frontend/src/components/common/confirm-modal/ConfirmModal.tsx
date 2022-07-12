@@ -39,7 +39,7 @@ const ConfirmModal = ({
       // Closes the modal
       modalContext.close()
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     }
   }
 
@@ -49,7 +49,7 @@ const ConfirmModal = ({
       // Closes the modal
       modalContext.close()
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     }
   }
   return (
