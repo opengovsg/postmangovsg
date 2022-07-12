@@ -88,7 +88,7 @@ const parseEvent = async (req: Request): Promise<void> => {
         where: {
           id: messageId,
           campaignId,
-          errorCode: { [Op.eq]: null },
+          errorCode: { [Op.eq]: undefined },
         },
       }
     )

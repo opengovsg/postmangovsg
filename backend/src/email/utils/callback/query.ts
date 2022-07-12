@@ -52,7 +52,7 @@ export const updateMessageWithError = async (
           { id },
           {
             [Op.or]: [
-              { receivedAt: null },
+              { receivedAt: undefined },
               { receivedAt: { [Op.lt]: timestamp } },
             ],
           },
@@ -90,12 +90,12 @@ export const updateMessageWithSuccess = async (
           { id },
           {
             [Op.or]: [
-              { receivedAt: null },
+              { receivedAt: undefined },
               { receivedAt: { [Op.lt]: timestamp } },
             ],
           },
           {
-            [Op.or]: [{ status: null }, { status: { [Op.ne]: 'READ' } }],
+            [Op.or]: [{ status: undefined }, { status: { [Op.ne]: 'READ' } }],
           },
         ],
       },
@@ -143,7 +143,7 @@ export const haltCampaignIfThresholdExceeded = async (
   // Source: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/faqs-enforcement.html#e-faq-bn
   const [result] = (await EmailMessage.findAll({
     raw: true,
-    where: { campaignId, status: { [Op.ne]: null } },
+    where: { campaignId, status: { [Op.ne]: undefined } },
     attributes: [
       [fn('sum', cast({ error_code: 'Hard bounce' }, 'int')), 'invalid'],
       [fn('count', 1), 'running_total'],
