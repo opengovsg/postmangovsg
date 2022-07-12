@@ -35,7 +35,7 @@
     "html-to-draftjs": "1.5.0",
     "lodash": "4.17.21",
     "lottie-react": "2.3.0",
-    "moment": "2.29.3",
+    "moment": "2.29.4",
     "papaparse": "5.2.0",
     "querystring": "0.2.1",
     "react": "18.1.0",
