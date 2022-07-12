@@ -21,6 +21,7 @@
     "convict": "6.2.3",
     "dotenv": "8.6.0",
     "lodash": "4.17.21",
+    "module-alias": "2.2.2",
     "nodemailer": "6.6.2",
     "pg": "8.5.1",
     "pg-connection-string": "2.4.0",
@@ -38,5 +39,8 @@
     "@types/validator": "13.1.0",
     "tsc-watch": "4.2.9",
     "typescript": "3.9.7"
+  },
+  "_moduleAliases": {
+    "@shared": "../../shared/build"
   }
 }
