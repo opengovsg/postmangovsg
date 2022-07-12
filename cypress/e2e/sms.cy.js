@@ -67,6 +67,7 @@ describe('SMS Test', () => {
     cy.contains(':button', 'Create').click();
 
     //step 1 : enter message template
+    cy.get('textarea[id="message"]', { timeout: TIMEOUT });
     cy.get('textarea[id="message"]').type(MSG_CONTENT);
     cy.contains(':button', 'Next').click();
 
