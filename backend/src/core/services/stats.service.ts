@@ -7,7 +7,7 @@ import {
 } from '@core/interfaces'
 import { MessageStatus, JobStatus } from '@core/constants'
 import { Writable } from 'stream'
-import { waitForMs } from '@shared/utils/wait-for-ms'
+import { waitForMs } from '@shared/utils/time'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
