@@ -221,6 +221,14 @@ const enqueueAndSend = async (): Promise<void> => {
             jobId,
           })
         }
+        const whileLoopTimeTaken = Math.floor((Date.now() - start) / 1000) // in seconds
+        logger.info({
+          message: 'Logging sending while loop duration',
+          action: 'enqueueAndSend',
+          whileLoopTimeTaken,
+          workerId,
+          jobId,
+        })
       }
     }
     await service().destroySendingService()
