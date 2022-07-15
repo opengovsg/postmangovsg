@@ -228,6 +228,7 @@ const enqueueAndSend = async (): Promise<void> => {
           )}`,
           action: 'enqueueAndSend',
           whileLoopTimeTaken,
+          rate,
           currentCampaignType,
           campaignId,
           workerId,
