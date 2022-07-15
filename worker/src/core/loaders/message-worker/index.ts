@@ -6,7 +6,7 @@ require('module-alias/register') // to resolve aliased paths like @core, @sms, @
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
-import { waitForMs } from '@shared/utils/wait-for-ms'
+import { millisecondsToMinSecString, waitForMs } from '@shared/utils/time'
 import Email from './email.class'
 import SMS from './sms.class'
 import Telegram from './telegram.class'
@@ -221,11 +221,15 @@ const enqueueAndSend = async (): Promise<void> => {
             jobId,
           })
         }
-        const whileLoopTimeTaken = Math.floor((Date.now() - start) / 1000) // in seconds
+        const whileLoopTimeTaken = Math.floor(Date.now() - start) // in milliseconds
         logger.info({
-          message: 'Logging sending while loop duration',
+          message: `Logging sending while loop duration: ${millisecondsToMinSecString(
+            whileLoopTimeTaken
+          )}`,
           action: 'enqueueAndSend',
           whileLoopTimeTaken,
+          currentCampaignType,
+          campaignId,
           workerId,
           jobId,
         })
