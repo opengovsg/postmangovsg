@@ -6,5 +6,5 @@ export const waitForMs = (ms: number): Promise<void> => {
 export const millisecondsToMinSecString = (milliseconds: number): string => {
   const minutes = Math.floor(milliseconds / 60000)
   const seconds = ((milliseconds % 60000) / 1000).toFixed(0)
-  return `${minutes}:${seconds.length === 1 ? '0' : ''}${seconds}`
+  return `${minutes > 0 ? `${minutes} min ` : ''}${seconds} s`
 }
