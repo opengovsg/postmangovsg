@@ -36,3 +36,12 @@ export const escapeFromAddress = (from: string): string => {
   if (fromName) return `"${fromName}" <${normalisedFromAddress}>`
   return normalisedFromAddress
 }
+
+/**
+ * Extract domain from email address
+ */
+
+export const extractDomainFromEmail = (email: string): string => {
+  const [, domain] = email.split('@')
+  return domain
+}
