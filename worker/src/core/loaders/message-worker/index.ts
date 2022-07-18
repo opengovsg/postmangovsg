@@ -221,14 +221,15 @@ const enqueueAndSend = async (): Promise<void> => {
             jobId,
           })
         }
-        const whileLoopTimeTaken = Math.floor(Date.now() - start) // in milliseconds
+        const whileLoopTimeTakenMs = Date.now() - start
+        const numMessages = messages.length
+        const numMessagesPerSecond = (numMessages / whileLoopTimeTakenMs) * 1000
         logger.info({
           message: `Logging sending while loop duration: ${millisecondsToMinSecString(
-            whileLoopTimeTaken
+            whileLoopTimeTakenMs
           )}`,
           action: 'enqueueAndSend',
-          whileLoopTimeTaken,
-          rate,
+          numMessagesPerSecond,
           currentCampaignType,
           campaignId,
           workerId,
