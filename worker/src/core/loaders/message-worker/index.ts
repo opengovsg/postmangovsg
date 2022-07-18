@@ -230,6 +230,7 @@ const enqueueAndSend = async (): Promise<void> => {
           )}`,
           action: 'enqueueAndSend',
           numMessagesPerSecond,
+          numMessages,
           currentCampaignType,
           campaignId,
           workerId,
