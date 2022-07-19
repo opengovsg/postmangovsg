@@ -29,7 +29,8 @@ const SMS_PROGRESS_STEPS = [
 
 const CreateSMS = () => {
   const { campaign } = useContext(CampaignContext)
-  const { progress, isCsvProcessing, status } = campaign as SMSCampaign
+  const { progress, isCsvProcessing, status, costPerMessage } =
+    campaign as SMSCampaign
   const [activeStep, setActiveStep] = useState(progress)
 
   // If isCsvProcessing, user can only access UploadRecipients tab
@@ -48,6 +49,7 @@ const CreateSMS = () => {
             warnCharacterCount={SMS_WARN_EXCEED_CHARACTER_THRESHOLD}
             errorCharacterCount={SMS_ERROR_EXCEED_CHARACTER_THRESHOLD}
             saveTemplate={saveTemplate}
+            costPerMessage={costPerMessage}
           />
         )
       case SMSProgress.UploadRecipients:

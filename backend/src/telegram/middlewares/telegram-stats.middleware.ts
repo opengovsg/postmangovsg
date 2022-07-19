@@ -68,15 +68,14 @@ const getDeliveredRecipients = async (
 ): Promise<Response | void> => {
   const { campaignId } = req.params
   try {
-    const recipients = await TelegramStatsService.getDeliveredRecipients(
-      +campaignId
-    )
+    res.set('Content-Type', 'application/json')
+    await TelegramStatsService.getDeliveredRecipients(+campaignId, res)
     logger.info({
       message: 'Retreived failed recipients',
       campaignId,
       action: 'getFailedRecipients',
     })
-    return res.json(recipients)
+    return res.end()
   } catch (err) {
     next(err)
   }

@@ -25,6 +25,19 @@
 .previewBody {
   margin-top: 3rem;
 
+  // Override app.scss
+  ul {
+    list-style: disc;
+  }
+
+  ul ul {
+    list-style: circle;
+  }
+
+  ul ul ul {
+    list-style: square;
+  }
+
   // Reset site-wide styles so tables render correctly
   table {
     width: auto;

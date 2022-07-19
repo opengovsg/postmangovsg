@@ -32,10 +32,8 @@ export async function saveTemplate(
         body,
       }
     )
-    const {
-      num_recipients: numRecipients,
-      template: updatedTemplate,
-    } = response.data
+    const { num_recipients: numRecipients, template: updatedTemplate } =
+      response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template.')
@@ -176,10 +174,8 @@ export async function getPresignedUrl({
         },
       }
     )
-    const {
-      transaction_id: transactionId,
-      presigned_url: presignedUrl,
-    } = response.data
+    const { transaction_id: transactionId, presigned_url: presignedUrl } =
+      response.data
     return { transactionId, presignedUrl } as PresignedUrlResponse
   } catch (e) {
     errorHandler(e, 'Error completing file upload')

@@ -1,5 +1,5 @@
 import { EmailTemplateService, EmailService } from '@email/services'
-import { MailToSend } from '@core/interfaces'
+import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from '@shared/templating'
 import { isBlacklisted } from '@email/utils/query'

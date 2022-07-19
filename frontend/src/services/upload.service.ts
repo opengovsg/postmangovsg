@@ -101,10 +101,8 @@ export async function getPresignedUrl({
         md5,
       },
     })
-    const {
-      transaction_id: transactionId,
-      presigned_url: presignedUrl,
-    } = response.data
+    const { transaction_id: transactionId, presigned_url: presignedUrl } =
+      response.data
     return { transactionId, presignedUrl } as PresignedUrlResponse
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
@@ -260,10 +258,8 @@ export async function beginMultipartUpload({
         },
       }
     )
-    const {
-      transaction_id: transactionId,
-      presigned_urls: presignedUrls,
-    } = response.data
+    const { transaction_id: transactionId, presigned_urls: presignedUrls } =
+      response.data
     return { transactionId, presignedUrls }
   } catch (e) {
     errorHandler(e, 'Failed to begin multipart upload.')

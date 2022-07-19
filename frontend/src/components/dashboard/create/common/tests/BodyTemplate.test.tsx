@@ -6,6 +6,7 @@ import { SegmentedMessage } from 'sms-segments-calculator'
 import BodyTemplate from '../BodyTemplate'
 
 import { EmailCampaign, SMSCampaign } from 'classes'
+import { FALLBACK_COST_PER_SMS_SGD } from 'components/dashboard/create/common/BodyTemplate/BodyTemplate'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import { saveTemplate as saveSmsTemplate } from 'services/sms.service'
@@ -26,6 +27,7 @@ const TEST_SMS_CAMPAIGN: Campaign = {
   job_queue: [],
   halted: false,
   has_credential: false,
+  cost_per_message: FALLBACK_COST_PER_SMS_SGD,
 }
 
 function mockApis() {
@@ -206,13 +208,16 @@ test('SMS cost should be correct for SMS campaign body template', async () => {
     await userEvent.clear(templateTextbox)
     await userEvent.type(templateTextbox, template)
 
-    const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD = 0.0395 // correct as at 5 Feb 2022
+    const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD =
+      TEST_SMS_CAMPAIGN.cost_per_message ?? FALLBACK_COST_PER_SMS_SGD
     const segmentedMessage = new SegmentedMessage(template)
     const segmentEncoding = segmentedMessage.encodingName
     const segmentCount = segmentedMessage.segmentsCount
-    const smsCampaignExpectedText = `This SMS will cost approximately SGD ${
+    const smsCampaignExpectedText = `This SMS will cost approximately SGD ${(
       segmentCount * COST_PER_TWILIO_SMS_SEGMENT_IN_SGD
-    }.This estimate is calculated based on Twilio's pricing. Find out more here.${
+    ).toFixed(
+      4
+    )}.This estimate is calculated based on Twilio's pricing. Find out more here.${
       template.length
     } characters | ${segmentCount} message segment(s) | ${segmentEncoding} encoding`
 

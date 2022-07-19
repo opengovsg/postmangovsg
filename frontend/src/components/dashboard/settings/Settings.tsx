@@ -6,7 +6,6 @@ import { Redirect, Route, Switch } from 'react-router-dom'
 import styles from './Settings.module.scss'
 import AddApiKeyModal from './add-api-key-modal'
 import AddCredentialModal from './add-credential-modal'
-import AddCustomFromAddress from './add-custom-from-address-modal'
 import ApiKey from './api-key'
 import Credentials from './credentials'
 import CustomFromAddress from './custom-from-address'
@@ -21,16 +20,11 @@ import {
   getCustomFromAddresses,
 } from 'services/settings.service'
 
-const SETTINGS_LINKS = [
+const SETTINGS_LINKS_WITHOUT_EMAIL = [
   {
     label: 'API Keys',
     location: '/settings/api',
     icon: 'bx-key',
-  },
-  {
-    label: 'Email',
-    location: '/settings/email',
-    icon: channelIcons[ChannelType.Email],
   },
   {
     label: 'SMS',
@@ -44,16 +38,29 @@ const SETTINGS_LINKS = [
   },
 ]
 
+const SETTINGS_LINKS_WITH_EMAIL = [
+  SETTINGS_LINKS_WITHOUT_EMAIL[0],
+  {
+    label: 'Email',
+    location: '/settings/email',
+    icon: channelIcons[ChannelType.Email],
+  },
+  ...SETTINGS_LINKS_WITHOUT_EMAIL.slice(1),
+]
+
 const Settings = () => {
   const modalContext = useContext(ModalContext)
+  const [isLoading, setIsLoading] = useState(true)
   const [hasApiKey, setHasApiKey] = useState(false)
   const [hasCustomFromAddresses, setHasCustomFromAddresses] = useState(false)
   const [customFromAddresses, setCustomFromAddresses] = useState([] as string[])
   const [creds, setCreds] = useState([] as UserCredential[])
 
   useEffect(() => {
-    fetchUserSettings()
-    fetchCustomFromAddresses()
+    setIsLoading(true)
+    Promise.all([fetchUserSettings(), fetchCustomFromAddresses()]).finally(() =>
+      setIsLoading(false)
+    )
   }, [])
 
   function onAddCredentialClicked() {
@@ -68,15 +75,6 @@ const Settings = () => {
   function onAddApiKeyClicked() {
     modalContext.setModalContent(
       <AddApiKeyModal onSuccess={fetchUserSettings} />
-    )
-  }
-
-  function onAddCustomFromAddressClicked() {
-    modalContext.setModalContent(
-      <AddCustomFromAddress
-        customFromAddresses={customFromAddresses}
-        onSuccess={fetchCustomFromAddresses}
-      />
     )
   }
 
@@ -115,10 +113,6 @@ const Settings = () => {
               Generate API key
               <i className={cx('bx', 'bx-key')}></i>
             </button>
-            <button onClick={onAddCustomFromAddressClicked}>
-              Add From Address
-              <i className={cx('bx', 'bx-mail-send')}></i>
-            </button>
           </div>
         </div>
       </div>
@@ -128,18 +122,26 @@ const Settings = () => {
   function renderSettings() {
     return (
       <div className={styles.settingsContainer}>
-        <SideNav links={SETTINGS_LINKS} />
+        <SideNav
+          links={
+            hasCustomFromAddresses
+              ? SETTINGS_LINKS_WITH_EMAIL
+              : SETTINGS_LINKS_WITHOUT_EMAIL
+          }
+        />
         <div className={styles.detailsContainer}>
           <Switch>
             <Route exact path="/settings/api">
               <ApiKey hasApiKey={hasApiKey} />
             </Route>
-            <Route exact path="/settings/email">
-              <CustomFromAddress
-                customFromAddresses={customFromAddresses}
-                onSuccess={fetchCustomFromAddresses}
-              />
-            </Route>
+            {hasCustomFromAddresses && (
+              <Route exact path="/settings/email">
+                <CustomFromAddress
+                  customFromAddresses={customFromAddresses}
+                  onSuccess={fetchCustomFromAddresses}
+                />
+              </Route>
+            )}
             <Route exact path="/settings/sms">
               <Credentials
                 credType={ChannelType.SMS}
@@ -166,9 +168,13 @@ const Settings = () => {
   return (
     <>
       <TitleBar title="Settings"> </TitleBar>
-      {!hasApiKey && creds.length < 1 && !hasCustomFromAddresses
-        ? renderEmptySettings()
-        : renderSettings()}
+      {isLoading ? (
+        <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')} />
+      ) : !hasApiKey && creds.length < 1 && !hasCustomFromAddresses ? (
+        renderEmptySettings()
+      ) : (
+        renderSettings()
+      )}
     </>
   )
 }

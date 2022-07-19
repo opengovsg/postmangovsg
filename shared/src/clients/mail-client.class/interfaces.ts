@@ -4,7 +4,7 @@ export interface MailToSend {
   body: string
   replyTo?: string
   referenceId?: string
-  from: string
+  from?: string
 }
 
 export interface MailCredentials {

@@ -417,6 +417,12 @@ const config = convict({
       env: 'CALLBACK_SECRET',
       default: '',
     },
+    hashSecret: {
+      doc: 'Secret for email callback hash',
+      env: 'EMAIL_CALLBACK_HASH_SECRET',
+      default: '',
+      format: 'required-string',
+    },
   },
   smsCallback: {
     callbackSecret: {
@@ -439,6 +445,15 @@ const config = convict({
       default: '',
       env: 'TELEGRAM_BOT_GUIDE_URL',
       format: 'required-string',
+    },
+  },
+  twilio: {
+    // for future extension: fetch via API
+    usdToSgdRate: {
+      doc: 'Rate of USD to SGD',
+      default: 1.4,
+      env: 'USD_TO_SGD_RATE',
+      format: Number,
     },
   },
   redaction: {

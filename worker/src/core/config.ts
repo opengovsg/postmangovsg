@@ -143,6 +143,12 @@ const config = convict({
         format: 'required-string',
       },
     },
+    callbackHashSecret: {
+      doc: 'Callback secret for email',
+      default: '',
+      env: 'EMAIL_CALLBACK_HASH_SECRET',
+      format: 'required-string',
+    },
   },
   mailFrom: {
     doc: 'The email address that appears in the From field of an email',

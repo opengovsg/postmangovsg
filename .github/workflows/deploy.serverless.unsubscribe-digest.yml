@@ -63,12 +63,18 @@ jobs:
         env:
           ZIP_FILE: code.zip
         run: |
-          cd "$DIRECTORY"
+          pushd shared/
+          npm ci
+          npm run build
+          npm prune --production
+          popd
+          pushd "$DIRECTORY"
           npm ci 
           npm run build
           npm prune --production
-          sudo zip -qr "$ZIP_FILE" build package.json node_modules/
-          echo "::set-output name=zip_path::$DIRECTORY/$ZIP_FILE"
+          popd
+          sudo zip -qr "$ZIP_FILE" $DIRECTORY shared
+          echo "::set-output name=zip_path::$ZIP_FILE"
 
       - name: Check if lambda can be updated (1)
         run: |
@@ -96,7 +102,7 @@ jobs:
           # Update the configuration
           ROLE: "${{ secrets.UNSUBSCRIBE_ROLE }}"
           RUNTIME: nodejs12.x
-          HANDLER: build/index.handler
+          HANDLER: serverless/unsubscribe-digest/build/index.handler
           TIMEOUT: 600
           MEMORY_SIZE: 256
           TAG: "github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
@@ -113,8 +119,9 @@ jobs:
           SES_USER: "${{ secrets.SES_USER }}"
           SES_PORT: "${{ secrets.SES_PORT }}"
           UNSUBSCRIBE_GUIDE_URL: "${{ secrets.UNSUBSCRIBE_GUIDE_URL }}"
+          EMAIL_CALLBACK_HASH_SECRET: "${{ secrets.EMAIL_CALLBACK_HASH_SECRET }}"
           # Update environment variables in the command
         run: |
           aws lambda update-function-configuration --function-name="${{ steps.function-name.outputs.value }}" \
           --role="$ROLE" --description="$TAG" --timeout="$TIMEOUT" --memory-size="$MEMORY_SIZE" --runtime="$RUNTIME" --handler="$HANDLER" \
-          --environment "Variables={NODE_ENV=$NODE_ENV,DB_URI=$DB_URI,DB_READ_REPLICA_URI=$DB_READ_REPLICA_URI,DB_USE_IAM=$DB_USE_IAM,SENTRY_DSN=$SENTRY_DSN,CRONITOR_CODE=$CRONITOR_CODE,SES_FROM=$SES_FROM,SES_HOST=$SES_HOST,SES_PASS=$SES_PASS,SES_USER=$SES_USER,SES_PORT=$SES_PORT,UNSUBSCRIBE_GUIDE_URL=$UNSUBSCRIBE_GUIDE_URL}"
+          --environment "Variables={NODE_ENV=$NODE_ENV,DB_URI=$DB_URI,DB_READ_REPLICA_URI=$DB_READ_REPLICA_URI,DB_USE_IAM=$DB_USE_IAM,SENTRY_DSN=$SENTRY_DSN,CRONITOR_CODE=$CRONITOR_CODE,SES_FROM=$SES_FROM,SES_HOST=$SES_HOST,SES_PASS=$SES_PASS,SES_USER=$SES_USER,SES_PORT=$SES_PORT,UNSUBSCRIBE_GUIDE_URL=$UNSUBSCRIBE_GUIDE_URL,EMAIL_CALLBACK_HASH_SECRET=$EMAIL_CALLBACK_HASH_SECRET}"

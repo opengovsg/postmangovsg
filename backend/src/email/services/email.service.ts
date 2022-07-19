@@ -11,7 +11,8 @@ import {
   ProtectedService,
   UnsubscriberService,
 } from '@core/services'
-import { MailToSend, CampaignDetails } from '@core/interfaces'
+import { CampaignDetails } from '@core/interfaces'
+import { MailToSend } from '@shared/clients/mail-client.class'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'

@@ -2,9 +2,10 @@ import { QueryTypes } from 'sequelize'
 
 import { loggerWithLabel } from '@core/logger'
 import { StatsService } from '@core/services'
-import { CampaignStats, CampaignRecipient } from '@core/interfaces'
+import { CampaignStats } from '@core/interfaces'
 
 import { SmsOp, SmsMessage } from '@sms/models'
+import { Writable } from 'stream'
 
 const logger = loggerWithLabel(module)
 
@@ -35,13 +36,15 @@ const refreshStats = async (campaignId: number): Promise<void> => {
 
 /**
  * Gets delivered recipients for sms campaign
+ * Stream to deal with large campaign size
  * @param campaignId
  */
 const getDeliveredRecipients = async (
-  campaignId: number
-): Promise<Array<CampaignRecipient>> => {
+  campaignId: number,
+  stream: Writable
+): Promise<void> => {
   await refreshStats(+campaignId)
-  return StatsService.getDeliveredRecipients(campaignId, SmsMessage)
+  return StatsService.getDeliveredRecipients(campaignId, SmsMessage, stream)
 }
 
 export const SmsStatsService = {

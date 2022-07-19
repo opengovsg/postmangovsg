@@ -66,12 +66,10 @@ const EmailTemplate = ({
   const [showLogo, setShowLogo] = useState(initialShowLogo ?? true)
 
   // initialFrom is undefined for a new campaign without a saved template
-  const {
-    fromName: initialFromName,
-    fromAddress: initialFromAddress,
-  } = initialFrom
-    ? parseFromAddress(initialFrom)
-    : { fromName: '', fromAddress: '' }
+  const { fromName: initialFromName, fromAddress: initialFromAddress } =
+    initialFrom
+      ? parseFromAddress(initialFrom)
+      : { fromName: '', fromAddress: '' }
   const [fromName, setFromName] = useState(initialFromName)
   const [fromAddress, setFromAddress] = useState(initialFromAddress)
 
@@ -189,10 +187,8 @@ const EmailTemplate = ({
 
   const handleSelectFromAddress = useCallback(
     (selectedFrom: string) => {
-      const {
-        fromName: selectedFromName,
-        fromAddress: selectedFromAddress,
-      } = parseFromAddress(selectedFrom)
+      const { fromName: selectedFromName, fromAddress: selectedFromAddress } =
+        parseFromAddress(selectedFrom)
 
       // Use custom from name if it has already been set. For e.g.,
       // for "Custom <donotreply@mail.postman.gov.sg>"", we should
