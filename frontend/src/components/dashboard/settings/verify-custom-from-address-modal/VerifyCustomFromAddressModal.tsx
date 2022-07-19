@@ -35,7 +35,7 @@ const VerifyCustomFromAddressModal = ({
       onSuccess()
     } catch (e) {
       console.error(e)
-      setErrorMessage(e.message)
+      setErrorMessage((e as Error).message)
       setStep(VerifyEmailStep.Failure)
     }
   }

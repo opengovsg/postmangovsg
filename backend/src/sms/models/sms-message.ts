@@ -35,7 +35,7 @@ export class SmsMessage extends Model<SmsMessage> {
   messageId?: string
 
   @Column(DataType.STRING)
-  errorCode?: string
+  errorCode!: string | null
 
   @Column({
     type: DataType.ENUM(...Object.values(MessageStatus)),

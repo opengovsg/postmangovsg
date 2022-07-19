@@ -32,7 +32,7 @@ const Login = () => {
   const [otpSent, setOtpSent] = useState(false)
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [errorMsg, setErrorMsg] = useState('')
   const [canResend, setCanResend] = useState(false)
   const [isResending, setIsResending] = useState(false)
   let timeoutId: NodeJS.Timeout
@@ -52,13 +52,13 @@ const Login = () => {
       }, RESEND_WAIT_TIME)
     } catch (err) {
       setCanResend(true)
-      setErrorMsg(err.message)
-      sendException(err.message)
+      setErrorMsg((err as Error).message)
+      sendException((err as Error).message)
     }
   }
 
   async function login() {
-    setErrorMsg(null)
+    setErrorMsg('')
     try {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
@@ -66,13 +66,13 @@ const Login = () => {
       const user = await getUser()
       setUserAnalytics(user)
     } catch (err) {
-      setErrorMsg(err.message)
-      sendException(err.message)
+      setErrorMsg((err as Error).message)
+      sendException((err as Error).message)
     }
   }
 
   function resetButton() {
-    setErrorMsg(null)
+    setErrorMsg('')
     setCanResend(false)
     setOtp('')
   }
