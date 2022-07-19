@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Campaign, User, UserDemo } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
+import { UploadService } from '@core/services'
 import { ChannelType } from '@core/constants'
 
 const app = initialiseServer(true)
@@ -11,18 +11,18 @@ let sequelize: Sequelize
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
 })
 
 afterEach(async () => {
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
 })
 
 afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await UploadService.destroyUploadQueue()
+  await (app as any).cleanup()
 })
 
 describe('GET /campaigns', () => {
@@ -33,14 +33,14 @@ describe('GET /campaigns', () => {
       type: 'SMS',
       valid: false,
       protect: false,
-    })
+    } as Campaign)
     await Campaign.create({
       name: 'campaign-2',
       userId: 1,
       type: 'SMS',
       valid: false,
       protect: false,
-    })
+    } as Campaign)
 
     const res = await request(app).get('/campaigns')
     expect(res.status).toBe(200)
@@ -60,7 +60,7 @@ describe('GET /campaigns', () => {
         type: 'SMS',
         valid: false,
         protect: false,
-      })
+      } as Campaign)
     }
 
     const res = await request(app)
@@ -199,5 +199,24 @@ describe('POST /campaigns', () => {
       protect: true,
     })
     expect(res.status).toBe(403)
+  })
+})
+
+describe('DELETE /campaigns/:campaignId', () => {
+  test('Delete a campaign based on its ID', async () => {
+    const c = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: 'SMS',
+      valid: false,
+      protect: false,
+    } as Campaign)
+
+    const res = await request(app).delete(`/campaigns/${c.id}`)
+    expect(res.status).toBe(200)
+  })
+  test('Returns 404 if the campaign ID doesnt exist', async () => {
+    const res = await request(app).delete('/campaigns/696969')
+    expect(res.status).toBe(404)
   })
 })

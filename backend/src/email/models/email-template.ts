@@ -50,6 +50,11 @@ export class EmailTemplate extends Model<EmailTemplate> {
   })
   from?: string
 
+  @Column({
+    type: DataType.BOOLEAN,
+  })
+  showLogo!: boolean
+
   // Does not work with beforeUpsert
   // @see https://github.com/RobinBuschmann/sequelize-typescript/blob/883cb2c92c09160a82b9a39fb0c33b6b12a4051c/test/specs/hooks/hooks.spec.ts#L97
   @BeforeUpdate

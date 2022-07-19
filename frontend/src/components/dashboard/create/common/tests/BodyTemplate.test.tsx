@@ -1,9 +1,12 @@
 import userEvent from '@testing-library/user-event'
 
 import { Route } from 'react-router-dom'
+import { SegmentedMessage } from 'sms-segments-calculator'
 
 import BodyTemplate from '../BodyTemplate'
 
+import { EmailCampaign, SMSCampaign } from 'classes'
+import { FALLBACK_COST_PER_SMS_SGD } from 'components/dashboard/create/common/BodyTemplate/BodyTemplate'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import { saveTemplate as saveSmsTemplate } from 'services/sms.service'
@@ -24,6 +27,7 @@ const TEST_SMS_CAMPAIGN: Campaign = {
   job_queue: [],
   halted: false,
   has_credential: false,
+  cost_per_message: FALLBACK_COST_PER_SMS_SGD,
 }
 
 function mockApis() {
@@ -34,14 +38,38 @@ function mockApis() {
   return handlers
 }
 
-function renderTemplatePage(
+function renderSmsTemplatePage(
   saveTemplate: typeof BodyTemplate.arguments.saveTemplate
 ) {
   const setActiveStep = jest.fn()
 
   render(
     <Route path="/campaigns/:id">
-      <CampaignContextProvider>
+      <CampaignContextProvider initialCampaign={new SMSCampaign({})}>
+        <FinishLaterModalContextProvider>
+          <BodyTemplate
+            setActiveStep={setActiveStep}
+            saveTemplate={saveTemplate}
+            warnCharacterCount={5}
+            errorCharacterCount={10}
+          />
+        </FinishLaterModalContextProvider>
+      </CampaignContextProvider>
+    </Route>,
+    {
+      router: { initialIndex: 0, initialEntries: ['/campaigns/1'] },
+    }
+  )
+}
+
+function renderEmailTemplatePage(
+  saveTemplate: typeof BodyTemplate.arguments.saveTemplate
+) {
+  const setActiveStep = jest.fn()
+
+  render(
+    <Route path="/campaigns/:id">
+      <CampaignContextProvider initialCampaign={new EmailCampaign({})}>
         <FinishLaterModalContextProvider>
           <BodyTemplate
             setActiveStep={setActiveStep}
@@ -61,7 +89,7 @@ function renderTemplatePage(
 test('displays the necessary elements', async () => {
   // Setup
   server.use(...mockApis())
-  renderTemplatePage(jest.fn())
+  renderSmsTemplatePage(jest.fn())
 
   // Wait for the component to fully load
   const heading = await screen.findByRole('heading', {
@@ -88,7 +116,7 @@ test('displays the necessary elements', async () => {
 test('next button is disabled when template is empty', async () => {
   // Setup
   server.use(...mockApis())
-  renderTemplatePage(jest.fn())
+  renderSmsTemplatePage(jest.fn())
 
   // Wait for the component to fully load
   const templateTextbox = await screen.findByRole('textbox', {
@@ -103,8 +131,8 @@ test('next button is disabled when template is empty', async () => {
   expect(nextButton).toBeDisabled()
 
   // Type something in the textbox and erase it
-  userEvent.type(templateTextbox, 'test body')
-  userEvent.clear(templateTextbox)
+  await userEvent.type(templateTextbox, 'test body')
+  await userEvent.clear(templateTextbox)
 
   // Assert that the next button is disabled after clearing the text
   expect(nextButton).toBeDisabled()
@@ -113,7 +141,7 @@ test('next button is disabled when template is empty', async () => {
 test('next button is enabled when the template is filled', async () => {
   // Setup
   server.use(...mockApis())
-  renderTemplatePage(jest.fn())
+  renderSmsTemplatePage(jest.fn())
 
   // Wait for the component to fully load
   const templateTextbox = await screen.findByRole('textbox', {
@@ -125,7 +153,7 @@ test('next button is enabled when the template is filled', async () => {
 
   // Type something in the textbox
   const TEST_BODY = 'test body'
-  userEvent.type(templateTextbox, TEST_BODY)
+  await userEvent.type(templateTextbox, TEST_BODY)
   expect(templateTextbox).toHaveValue(TEST_BODY)
 
   // Assert that the next button is enabled
@@ -135,7 +163,7 @@ test('next button is enabled when the template is filled', async () => {
 test('character count text reflects the actual number of characters in the textbox', async () => {
   // Setup
   server.use(...mockApis())
-  renderTemplatePage(jest.fn())
+  renderSmsTemplatePage(jest.fn())
 
   // Wait for the component to fully load
   const templateTextbox = await screen.findByRole('textbox', {
@@ -147,14 +175,68 @@ test('character count text reflects the actual number of characters in the textb
   const TEST_TEMPLATES = ['Letter wooded', '1234567890']
   for (const template of TEST_TEMPLATES) {
     // Type the template text into the textbox
-    userEvent.clear(templateTextbox)
-    userEvent.type(templateTextbox, template)
+    await userEvent.clear(templateTextbox)
+    await userEvent.type(templateTextbox, template)
 
     // Assert that the character count is the same as the number of characters in the corpus
     expect(characterCountText).toHaveTextContent(
       `${template.length} characters`
     )
   }
+})
+
+test('SMS cost should be correct for SMS campaign body template', async () => {
+  // Setup
+  server.use(...mockApis())
+  renderSmsTemplatePage(jest.fn())
+
+  // Wait for the component to fully load
+  const templateTextbox = await screen.findByRole('textbox', {
+    name: /message/i,
+  })
+  const smsCampaignInfoText = screen.getByText(
+    /This SMS will cost approximately SGD/i
+  )
+
+  // Test against various templates
+  const TEST_TEMPLATES = [
+    '你好 你好 你好 hello hello hello 你好 你好 你好 hello hello hello 你好 你好 你好 hello hello hello 你好 你好 你好 hello hello',
+    'the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox',
+  ]
+  for (const template of TEST_TEMPLATES) {
+    // Type the template text into the textbox
+    await userEvent.clear(templateTextbox)
+    await userEvent.type(templateTextbox, template)
+
+    const COST_PER_TWILIO_SMS_SEGMENT_IN_SGD =
+      TEST_SMS_CAMPAIGN.cost_per_message ?? FALLBACK_COST_PER_SMS_SGD
+    const segmentedMessage = new SegmentedMessage(template)
+    const segmentEncoding = segmentedMessage.encodingName
+    const segmentCount = segmentedMessage.segmentsCount
+    const smsCampaignExpectedText = `This SMS will cost approximately SGD ${(
+      segmentCount * COST_PER_TWILIO_SMS_SEGMENT_IN_SGD
+    ).toFixed(
+      4
+    )}.This estimate is calculated based on Twilio's pricing. Find out more here.${
+      template.length
+    } characters | ${segmentCount} message segment(s) | ${segmentEncoding} encoding`
+
+    // Assert that the character count is the same as the number of characters in the corpus
+    expect(smsCampaignInfoText).toHaveTextContent(smsCampaignExpectedText)
+  }
+})
+
+test('SMS cost should not appear in the email campaign body template', async () => {
+  // Setup
+  server.use(...mockApis())
+  renderEmailTemplatePage(jest.fn())
+
+  const smsCampaignInfoText = screen.queryByText(
+    /This SMS will cost approximately SGD/i
+  )
+
+  // Assert that the SMS campaign info text should not exist in the email campaign body template
+  expect(smsCampaignInfoText).toBe(null)
 })
 
 describe('displays an error if the template is invalid', () => {
@@ -169,11 +251,11 @@ describe('displays an error if the template is invalid', () => {
     const TEST_TEMPLATES = ['<hehe>', '<script>']
     for (const template of TEST_TEMPLATES) {
       // Type the template text into the textbox
-      userEvent.clear(templateTextbox)
-      userEvent.type(templateTextbox, template)
+      await userEvent.clear(templateTextbox)
+      await userEvent.type(templateTextbox, template)
 
       // Click the next button to submit the template
-      userEvent.click(nextButton)
+      await userEvent.click(nextButton)
 
       // Assert that an error message is shown
       expect(
@@ -198,14 +280,14 @@ describe('displays an error if the template is invalid', () => {
 
   test('sms', async () => {
     // Setup
-    renderTemplatePage(saveSmsTemplate)
+    renderSmsTemplatePage(saveSmsTemplate)
 
     await runTest()
   })
 
   test('email', async () => {
     // Setup
-    renderTemplatePage(saveTelegramTemplate)
+    renderSmsTemplatePage(saveTelegramTemplate)
 
     await runTest()
   })

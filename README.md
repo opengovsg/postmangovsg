@@ -47,9 +47,19 @@ Just want to use the API? See [api-usage.md](docs/api-usage.md) for details.
 
 ### Install and run required services
 
-Set up a **postgresql@11** database, **redis** cache and **localstack** server. Postgresql and redis can be started either natively or using Docker.
+Set up a **postgresql@11** database, **redis** cache and **localstack** server. PostgreSQL and Redis can be started either natively or using Docker. We recommend using Docker.
 
-Starting postgresql and redis natively:
+#### Starting all services using Docker
+
+```bash
+export AWS_ENDPOINT=http://localhost:4566
+export FILE_STORAGE_BUCKET_NAME=localstack-upload
+export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
+
+npm run dev:services
+```
+
+#### Starting postgresql and redis natively
 
 ```bash
 # Install postgres
@@ -77,17 +87,7 @@ export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
 npm run dev:localstack
 ```
 
-Starting all services using Docker:
-
-```bash
-export AWS_ENDPOINT=http://localhost:4566
-export FILE_STORAGE_BUCKET_NAME=localstack-upload
-export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
-
-npm run dev:services
-```
-
-Optionally, run the following to install and use `cw` to tail Cloudwatch logs:
+#### Optionally, run the following to install and use `cw` to tail Cloudwatch logs
 
 ```bash
 brew tap lucagrulla/tap
@@ -100,11 +100,19 @@ cw tail -r ap-northeast-1 -u $AWS_ENDPOINT -f $AWS_LOG_GROUP_NAME:`node --eval='
 ### Secrets detection
 
 This project makes of [detect-secrets](https://github.com/Yelp/detect-secrets) to prevent secrets and credentials from being committed to the repository.
-It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo. Run the following to install:
+It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo.
+**Note**: The reason we're running `detect-secrets` through `detect-secrets:precommit` instead of using `lint-staged` is because `detect-secrets-hook` doesn't work well with the combination of output of staged files by `lint-staged` and baseline supplied.
+
+Run the following to install:
 
 ```bash
-pip install detect-secrets
+pip install detect-secrets==1.2.0
 ```
+
+Upon blockage by `detect-secrets-hook`, please take these steps:
+
+- Go into each of the locations pointed out by `detect-secrets-hook` and remove accidentally added secrets
+- If some of these detections are false positive (please be super sure about this, when not sure check with teammates), update the secrets baseline by running `npm run detect-secrets:update
 
 ### Set environment variables
 
@@ -113,22 +121,43 @@ Example environment variables can be found in
 - [backend/.env-example](backend/.env-example)
 - [frontend/.env-example](frontend/.env-example)
 - [worker/.env-example](worker/.env-example)
+- [.env-example](.env-example)
 
-Set the environment variables in a file named `.env` in each folder
+Set the environment variables in a file named `.env` in each folder. If you're a developer at OGP, ask your friendly colleague for their env variables. (Please help to ensure the `.env-example` file stays up-to-date though!)
 
 ### Install dependencies
 
 ```bash
-cd postmangovsg
 npm install
 ```
+
+### Database migration
+
+#### Local database
+
+This step needs to be run if you have made a change to the database schema, or if you are setting up the project for the first time.
+
+```bash
+cd backend
+npm run db:migrate # run all pending migrations
+npm run db:seed # seed database with dummy data
+```
+
+If you need to undo any database migrations:
+
+```bash
+cd backend
+npm run db:undo # undo most recent migration
+```
+
+You can find more info on undoing migrations using Sequelize [here](https://sequelize.org/docs/v6/other-topics/migrations/#undoing-migrations).
 
 ### Compile frontend translations
 
 [lingui](https://lingui.js.org/) is used for internationalization. Read [this](frontend/src/locales/README.md) for more info.
 
 ```bash
-cd postmangovsg/frontend
+cd frontend
 npm run extract
 npm run compile
 ```
@@ -136,7 +165,6 @@ npm run compile
 ### Run the app
 
 ```bash
-cd postmangovsg
 npm run dev
 ```
 
@@ -148,28 +176,12 @@ You should find the
 
 ## Deployment
 
-We use TravisCI to simplify our deployment process:
+We use Github Actions to simplify our deployment process:
 
-- `backend` is deployed on Elastic Beanstalk
-- `frontend` is deployed on AWS Amplify
-- `worker` is deployed on Elastic Container Service
+- `backend` is deployed on [Elastic Beanstalk](.github/workflows/deploy-eb.yml)
+- `frontend` is deployed on [AWS Amplify](.github/workflows/deploy-frontend.yml)
+- `worker` is deployed on [Elastic Container Service](.github/workflows/deploy-worker.yml)
 - `serverless` is deployed on AWS Lambda
-
-The environment variables on Travis are:
-
-- `AWS_ACCESS_KEY_ID` : access key for the travis IAM user
-- `AWS_SECRET_ACCESS_KEY` : access key for the travis IAM user
-- `AWS_DEFAULT_REGION` : region where your infrastructure is deployed (`ap-northeast-1` for us)
-- `REPO`: Path to the elastic container registry (`<account_id>.dkr.ecr.ap-northeast-1.amazonaws.com/<repo_name>`)
-- `PRODUCTION_BRANCH` : branch that is deployed to production
-- `STAGING_BRANCH`: branch that is deployed to staging. Change this variable to test different branches.
-
-To deploy workers, trigger a custom build on Travis with the Custom Config set to
-
-```
-env:
-  - DEPLOY_WORKER=true
-```
 
 ## Releasing
 
@@ -250,7 +262,6 @@ Create a cluster with four services. These names are currently hardcoded for dep
 
 | Cluster Name: postmangovsg-workers |
 | ---------------------------------- |
-
 
 | Service Name    | LaunchType | Platform version |
 | --------------- | ---------- | ---------------- |

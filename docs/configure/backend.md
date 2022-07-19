@@ -27,15 +27,20 @@ Sensitive configuration has to be set with environment variables.
 
 ### Minimal set of environment variables
 
-| Name                  | Description                                                                      |
-| --------------------- | -------------------------------------------------------------------------------- |
-| `DB_URI`              | URI to the postgres database                                                     |
-| `REDIS_OTP_URI`       | URI to the redis cache for storing one time passwords                            |
-| `REDIS_SESSION_URI`   | URI to the redis cache for storing login sessions                                |
-| `SESSION_SECRET`      | Secret used to sign the session ID cookie                                        |
-| `JWT_SECRET`          | Secret used to sign pre-signed urls for uploading CSV files to AWS S3            |
-| `SECRET_MANAGER_SALT` | Secret used to generate names of credentials to be stored in AWS Secrets Manager |
-| `API_KEY_SALT_V1`     | Secret used to hash API Keys before storing them in the database                 |
+| Name                   | Description                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `DB_URI`               | URI to the postgres database                                                     |
+| `REDIS_OTP_URI`        | URI to the redis cache for storing one time passwords                            |
+| `REDIS_SESSION_URI`    | URI to the redis cache for storing login sessions                                |
+| `REDIS_RATE_LIMIT_URI` | URI to the redis cache for rate limiting transactional requests                  |
+| `REDIS_CREDENTIAL_URI` | URI to the redis cache for storing credentials                                   |
+| `SESSION_SECRET`       | Secret used to sign the session ID cookie                                        |
+| `JWT_SECRET`           | Secret used to sign pre-signed urls for uploading CSV files to AWS S3            |
+| `SECRET_MANAGER_SALT`  | Secret used to generate names of credentials to be stored in AWS Secrets Manager |
+| `API_KEY_SALT_V1`      | Secret used to hash API Keys before storing them in the database                 |
+| `DD_ENV`               | Environment tag for datadog traces                                               |
+| `DD_SERVICE`           | Service name tag for datadog traces (suggest: `postman`)                         |
+| `DD_LOGS_INJECTION`    | Flag determining whether to inject `trace_id` to our logs (suggest: `true`)      |
 
 ### Full set of environment variables that can be set
 
@@ -63,10 +68,11 @@ Further reference: [Sequelize documentation](https://sequelize.org/master/manual
 
 #### Cache
 
-| Name                | Description                                           |
-| ------------------- | ----------------------------------------------------- |
-| `REDIS_OTP_URI`     | URI to the redis cache for storing one time passwords |
-| `REDIS_SESSION_URI` | URI to the redis cache for storing login sessions     |
+| Name                   | Description                                           |
+| ---------------------- | ----------------------------------------------------- |
+| `REDIS_OTP_URI`        | URI to the redis cache for storing one time passwords |
+| `REDIS_SESSION_URI`    | URI to the redis cache for storing login sessions     |
+| `REDIS_RATE_LIMIT_URI` | URI to the redis cache for rate limiting requests     |
 
 #### AWS Settings
 
@@ -139,3 +145,16 @@ If not set, smses cannot be sent.
 | `DEFAULT_COUNTRY_CODE`         | Country code to prepend to phone numbers  |
 
 Further reference: [Twilio API Key documentation](https://www.twilio.com/docs/iam/keys/api-key-resource?code-sample=code-authenticate-with-api-key-and-api-secret)
+
+#### Transactional messages
+
+| Name                         | Description                                                                       |
+| ---------------------------- | --------------------------------------------------------------------------------- |
+| `TRANSACTIONAL_EMAIL_RATE`   | The max number of transactional emails that can be requested per window per user. |
+| `TRANSACTIONAL_EMAIL_WINDOW` | The duration of each window for transactional emails in seconds.                  |
+
+#### Credential cache
+
+| Name                              | Description                                                       |
+| --------------------------------- | ----------------------------------------------------------------- |
+| `TWILIO_CREDENTIAL_CACHE_MAX_AGE` | The maximum age in milliseconds of each cached Twilio credential. |

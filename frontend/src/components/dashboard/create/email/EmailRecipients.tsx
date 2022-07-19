@@ -172,27 +172,27 @@ const EmailRecipients = ({
               a <b>recipient</b> column with recipients&apos; email addresses
             </li>
             {protect && (
-              <>
-                <li>
-                  a <b>password</b> column with the password to access the
-                  protected message
-                </li>
-                <li>all other keywords in the template</li>
-              </>
+              <li>
+                a <b>password</b> column with the password to access the
+                protected message
+              </li>
             )}
+            <li>all other keywords in the template</li>
           </p>
         </StepHeader>
 
         {!csvFilename && (
           <WarningBlock title={'We do not remove duplicate recipients'}>
+            Learn how to remove duplicates in your excel{' '}
             <OutboundLink
               className={styles.warningHelpLink}
               eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
               to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
               target="_blank"
             >
-              Learn how to remove duplicates in your excel from our guide.
+              from our guide
             </OutboundLink>
+            .
           </WarningBlock>
         )}
 
@@ -229,6 +229,7 @@ const EmailRecipients = ({
           <p className={styles.greyText}>Message preview</p>
           <EmailPreviewBlock
             body={preview?.body}
+            themedBody={preview?.themedBody}
             subject={preview?.subject}
             replyTo={preview?.replyTo}
             from={preview?.from}

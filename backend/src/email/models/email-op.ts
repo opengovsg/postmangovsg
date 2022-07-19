@@ -37,6 +37,9 @@ export class EmailOp extends Model<EmailOp> {
   @Column(DataType.STRING)
   errorCode?: string
 
+  @Column(DataType.STRING)
+  errorSubType?: string
+
   @Column({
     // Explicitly typed since sequelize creates a new enum with a different name (https://github.com/sequelize/sequelize/issues/2577)
     type: 'enum_email_messages_status',

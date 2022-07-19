@@ -4,7 +4,7 @@ import initialiseServer from '@test-utils/server'
 import config from '@core/config'
 import { Campaign, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
+import { UploadService } from '@core/services'
 import { EmailFromAddress, EmailMessage } from '@email/models'
 import { CustomDomainService } from '@email/services'
 import { ChannelType } from '@core/constants'
@@ -16,14 +16,14 @@ let protectedCampaignId: number
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await Campaign.create({
     name: 'campaign-1',
     userId: 1,
     type: ChannelType.Email,
     valid: false,
     protect: false,
-  })
+  } as Campaign)
   campaignId = campaign.id
   const protectedCampaign = await Campaign.create({
     name: 'campaign-2',
@@ -31,17 +31,17 @@ beforeAll(async () => {
     type: ChannelType.Email,
     valid: false,
     protect: true,
-  })
+  } as Campaign)
   protectedCampaignId = protectedCampaign.id
 })
 
 afterAll(async () => {
   await EmailMessage.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await UploadService.destroyUploadQueue()
+  await (app as any).cleanup()
 })
 
 describe('PUT /campaign/{campaignId}/email/template', () => {
@@ -62,6 +62,19 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     expect(res.body).toEqual({ message: "Invalid 'from' email address." })
   })
 
+  test('Invalid values for email is not accepted', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: 'not an email <not email>',
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+    expect(res.status).toBe(400)
+    expect(res.body).toMatchObject({ message: '"from" must be a valid email' })
+  })
+
   test('Default from address is used if not provided', async () => {
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
@@ -76,6 +89,27 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
           from: 'Postman <donotreply@mail.postman.gov.sg>',
+          reply_to: 'user@agency.gov.sg',
+        }),
+      })
+    )
+  })
+
+  test('Unquoted from address with periods is accepted', async () => {
+    const res = await request(app)
+      .put(`/campaign/${campaignId}/email/template`)
+      .send({
+        from: 'Agency.gov.sg <donotreply@mail.postman.gov.sg>',
+        subject: 'test',
+        body: 'test',
+        reply_to: 'user@agency.gov.sg',
+      })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: `Template for campaign ${campaignId} updated`,
+        template: expect.objectContaining({
+          from: 'Agency.gov.sg via Postman <donotreply@mail.postman.gov.sg>',
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -120,7 +154,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     await EmailFromAddress.create({
       email: 'user@agency.gov.sg',
       name: 'Agency ABC',
-    })
+    } as EmailFromAddress)
     const mockVerifyFromAddress = jest
       .spyOn(CustomDomainService, 'verifyFromAddress')
       .mockReturnValue(Promise.resolve())
@@ -172,7 +206,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     await EmailFromAddress.create({
       email: 'user@agency.gov.sg',
       name: 'Agency ABC',
-    })
+    } as EmailFromAddress)
     const mockVerifyFromAddress = jest
       .spyOn(CustomDomainService, 'verifyFromAddress')
       .mockReturnValue(Promise.resolve())
@@ -245,7 +279,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         body: 'test',
         reply_to: 'user@agency.gov.sg',
       })
-    expect(res.status).toBe(500)
+    expect(res.status).toBe(400)
     expect(res.body).toEqual({
       message:
         'Error: There are missing keywords in the message template: protectedlink. Please return to the previous step to add in the keywords.',
@@ -260,7 +294,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         body: '{{recipient}} {{protectedLink}}',
         reply_to: 'user@agency.gov.sg',
       })
-    expect(testSubject.status).toBe(500)
+    expect(testSubject.status).toBe(400)
     expect(testSubject.body).toEqual({
       message:
         'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',
@@ -276,7 +310,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         reply_to: 'user@agency.gov.sg',
       })
 
-    expect(testBody.status).toBe(500)
+    expect(testBody.status).toBe(400)
     expect(testBody.body).toEqual({
       message:
         'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',
@@ -325,7 +359,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    })
+    } as EmailMessage)
     const testBody = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({
@@ -362,17 +396,15 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       })
 
     expect(res.status).toBe(200)
-    expect(res.body).toEqual(
-      expect.objectContaining({
-        message: `Template for campaign ${campaignId} updated`,
-        template: {
-          subject: 'test',
-          body: 'test {{name}}',
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
-          reply_to: 'user@agency.gov.sg',
-          params: ['name'],
-        },
-      })
-    )
+    expect(res.body).toMatchObject({
+      message: `Template for campaign ${campaignId} updated`,
+      template: {
+        subject: 'test',
+        body: 'test {{name}}',
+        from: 'Postman <donotreply@mail.postman.gov.sg>',
+        reply_to: 'user@agency.gov.sg',
+        params: ['name'],
+      },
+    })
   })
 })

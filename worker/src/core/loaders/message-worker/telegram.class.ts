@@ -128,8 +128,9 @@ class Telegram {
         }
       )
     } catch (err) {
+      const errAsAny = err as any
       // Sending failure, update `telegram_ops` with error code
-      const error = `${err.code}: ${err.description}`
+      const error = `${errAsAny.code}: ${errAsAny.description}`
       await this.connection.query(
         `
           UPDATE telegram_ops

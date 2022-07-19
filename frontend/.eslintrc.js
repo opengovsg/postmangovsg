@@ -6,7 +6,7 @@ module.exports = {
     'eslint:recommended', // Recommended ESLint rules
     'plugin:@typescript-eslint/recommended', // Recommended TypeScript rules
     'plugin:react/recommended', // Recommended React rules
-    'prettier/@typescript-eslint', // Disables rules from `@typescript-eslint/recommended` that are covered by Prettier
+    'prettier', // Disables rules from `@typescript-eslint/recommended` that are covered by Prettier
     'plugin:prettier/recommended', // Recommended Prettier rules
   ],
   settings: {

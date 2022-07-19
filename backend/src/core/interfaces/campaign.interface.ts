@@ -48,6 +48,15 @@ export interface CampaignDetails {
   job_queue?: {
     status: string
   }
+  user?: {
+    domain?: {
+      agency?: {
+        logo_uri: string
+        name: string
+      }
+    }
+  }
+  cost_per_message?: number
 }
 
 export interface CampaignStats extends CampaignStatsCount {

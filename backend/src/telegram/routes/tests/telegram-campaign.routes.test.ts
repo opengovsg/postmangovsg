@@ -3,9 +3,9 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Campaign, User, Credential } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
 import { formatDefaultCredentialName } from '@core/utils'
+import { UploadService } from '@core/services'
 import { TelegramMessage } from '@telegram/models'
 import { ChannelType } from '@core/constants'
 import { mockSecretsManager } from '@mocks/aws-sdk'
@@ -28,23 +28,23 @@ const createCampaign = async ({
     protect: false,
     valid: false,
     demoMessageLimit: isDemo ? 20 : null,
-  })
+  } as Campaign)
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await createCampaign({ isDemo: false })
   campaignId = campaign.id
 })
 
 afterAll(async () => {
   await TelegramMessage.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
   await Credential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await UploadService.destroyUploadQueue()
+  await (app as any).cleanup()
 })
 
 describe('POST /campaign/{campaignId}/telegram/credentials', () => {
@@ -203,9 +203,10 @@ describe('POST /campaign/{campaignId}/telegram/new-credentials', () => {
 
     expect(res.status).toBe(200)
 
+    const secretName = `${process.env.NODE_ENV}-12345`
     expect(mockSecretsManager.createSecret).toHaveBeenCalledWith(
       expect.objectContaining({
-        Name: '12345',
+        Name: secretName,
         SecretString: VALID_API_TOKEN,
       })
     )
@@ -213,7 +214,7 @@ describe('POST /campaign/{campaignId}/telegram/new-credentials', () => {
     // Ensure credential was added into DB
     const dbCredential = await Credential.findOne({
       where: {
-        name: '12345',
+        name: secretName,
       },
     })
     expect(dbCredential).not.toBe(null)
@@ -241,7 +242,7 @@ describe('PUT /campaign/{campaignId}/telegram/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    })
+    } as TelegramMessage)
     const res = await request(app)
       .put(`/campaign/${campaignId}/telegram/template`)
       .send({

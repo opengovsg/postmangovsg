@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:11-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+  localstack:
+    image: localstack/localstack:0.11.6
+    ports:
+      - "4566-4599:4566-4599"
+    environment:
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - FILE_STORAGE_BUCKET_NAME=${FILE_STORAGE_BUCKET_NAME:-localstack-upload}
+      - BACKUP_BUCKET_NAME=${BACKUP_BUCKET_NAME:-localstack-backup}
+      - AWS_LOG_GROUP_NAME=${AWS_LOG_GROUP_NAME:-postmangovsg-beanstalk-localstack}

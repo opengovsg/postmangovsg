@@ -8,14 +8,16 @@ import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
 import { CampaignService, UploadService } from '@core/services'
+import { InvalidRecipientError } from '@core/errors'
+import { PhoneNumberService } from '@core/services'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
 import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
-import { PhoneNumberService } from '@core/services'
 
 import TwilioClient from './twilio-client.class'
 import SnsSmsClient from './sns-sms-client.class'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -49,9 +51,41 @@ const getHydratedMessage = async (
   if (params === null || template === null) return null
 
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
-  const body = SmsTemplateService.client.template(template?.body!, params)
+  const body = SmsTemplateService.client.template(
+    template?.body as string,
+    params
+  )
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
   return { body }
+}
+
+/**
+ * Sends a SMS message.
+ *
+ * @param credential
+ * @param recipient
+ * @param message
+ *
+ * @returns Promise<string | void>
+ */
+const sendMessage = (
+  credential: TwilioCredentials,
+  recipient: string,
+  message: string
+): Promise<string | void> => {
+  try {
+    recipient = PhoneNumberService.normalisePhoneNumber(
+      recipient,
+      config.get('defaultCountry')
+    )
+  } catch (err) {
+    throw new InvalidRecipientError('Invalid phone number')
+  }
+
+  const client = config.get('smsFallback.activate')
+    ? new SnsSmsClient()
+    : new TwilioClient(credential)
+  return client.send(recipient, message)
 }
 
 /**
@@ -68,16 +102,7 @@ const sendCampaignMessage = async (
 ): Promise<string | void> => {
   const msg = await getHydratedMessage(campaignId)
   if (!msg) throw new Error('No message to send')
-
-  recipient = PhoneNumberService.normalisePhoneNumber(
-    recipient,
-    config.get('defaultCountry')
-  )
-  const client = config.get('smsFallback.activate')
-    ? new SnsSmsClient()
-    : new TwilioClient(credential)
-
-  return client.send(recipient, msg?.body)
+  return sendMessage(credential, recipient, msg?.body)
 }
 
 /**
@@ -89,15 +114,11 @@ const sendValidationMessage = async (
   recipient: string,
   credential: TwilioCredentials
 ): Promise<string | void> => {
-  recipient = PhoneNumberService.normalisePhoneNumber(
+  return sendMessage(
+    credential,
     recipient,
-    config.get('defaultCountry')
+    'Your Twilio credential has been validated.'
   )
-  const client = config.get('smsFallback.activate')
-    ? new SnsSmsClient()
-    : new TwilioClient(credential)
-
-  return client.send(recipient, 'Your Twilio credential has been validated.')
 }
 
 /**
@@ -111,7 +132,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.SMS },
-  })
+  }) as Promise<Campaign>
 }
 
 /**
@@ -122,7 +143,7 @@ const findCampaign = (
 const setCampaignCredential = (
   campaignId: number,
   credentialName: string
-): Promise<[number, Campaign[]]> => {
+): Promise<[number]> => {
   return Campaign.update(
     {
       credName: credentialName,
@@ -137,16 +158,29 @@ const setCampaignCredential = (
 /**
  * Gets details of a campaign
  * @param campaignId
+ * @param credentials
  */
 const getCampaignDetails = async (
-  campaignId: number
+  campaignId: number,
+  credentials?: TwilioCredentials
 ): Promise<CampaignDetails> => {
-  return await CampaignService.getCampaignDetails(campaignId, [
-    {
-      model: SmsTemplate,
-      attributes: ['body', 'params'],
-    },
-  ])
+  const processes: Array<Promise<any>> = [
+    CampaignService.getCampaignDetails(campaignId, [
+      {
+        model: SmsTemplate,
+        attributes: ['body', 'params'],
+      },
+    ]),
+  ]
+  if (credentials) {
+    processes.push(
+      SmsService.getTwilioCostPerOutgoingSMSSegmentUSD(credentials)
+    )
+  }
+  const [campaignDetails, costPerSmsUSD] = await Promise.all(processes)
+  const USD_TO_SGD = config.get('twilio').usdToSgdRate // for future extension: fetch via API
+  const costPerSms = costPerSmsUSD * USD_TO_SGD
+  return { ...campaignDetails, cost_per_message: costPerSms }
 }
 
 /**
@@ -202,7 +236,7 @@ const uploadCompleteOnChunk = ({
       }
     })
     // START populate template
-    await SmsMessage.bulkCreate(records, {
+    await SmsMessage.bulkCreate(records as Array<SmsMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -236,7 +270,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as SmsDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as SmsDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -256,7 +290,7 @@ const duplicateCampaign = async ({
             {
               campaignId: duplicate.id,
               body: template.body,
-            },
+            } as SmsTemplate,
             { transaction }
           )
         }
@@ -269,15 +303,24 @@ const duplicateCampaign = async ({
   return
 }
 
+const getTwilioCostPerOutgoingSMSSegmentUSD = async (
+  credentials: TwilioCredentials
+): Promise<number> => {
+  const twilioClient = new TwilioClient(credentials)
+  return twilioClient.getOutgoingSMSPriceSingaporeUSD()
+}
+
 export const SmsService = {
   getEncodedHash,
   findCampaign,
   getCampaignDetails,
   getHydratedMessage,
+  sendMessage,
   sendCampaignMessage,
   sendValidationMessage,
   setCampaignCredential,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
   duplicateCampaign,
+  getTwilioCostPerOutgoingSMSSegmentUSD,
 }

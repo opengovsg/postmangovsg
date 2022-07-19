@@ -1,6 +1,6 @@
 $button-height: $height-2;
 $button-min-width: 10rem;
-$border-radius: $button-height / 2;
+$border-radius: calc($button-height / 2);
 
 @mixin button($bg-color, $hover-bg-color, $pressed-bg-color) {
   @extend %button-text;

@@ -1,7 +1,8 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
+@import 'styles/_email_typography';
 
-.preview {
+.previewInfo {
   border-radius: 1.25rem;
   padding: $spacing-3 $spacing-5;
   background: $neutral-light;
@@ -18,5 +19,74 @@
     color: $secondary;
     font-size: 1rem;
     margin-block-end: 0;
+  }
+}
+
+.previewBody {
+  margin-top: 3rem;
+
+  // Override app.scss
+  ul {
+    list-style: disc;
+  }
+
+  ul ul {
+    list-style: circle;
+  }
+
+  ul ul ul {
+    list-style: square;
+  }
+
+  // Reset site-wide styles so tables render correctly
+  table {
+    width: auto;
+    tr {
+      height: auto;
+      display: table-row;
+      td,
+      th {
+        display: table-cell;
+      }
+    }
+  }
+
+  // Typography styles to match email theme
+  color: $email-font-color;
+
+  * {
+    font-family: $email-font-stack;
+    color: inherit;
+    // revert is a new (2019) feature, keeping inherit above for backwards compat
+    color: revert;
+  }
+
+  a {
+    color: blue;
+    text-decoration: underline;
+    // revert is a new (2019) feature, keeping blue above for backwards compat
+    color: revert;
+  }
+
+  p,
+  a,
+  span {
+    font-size: inherit;
+  }
+
+  h1 {
+    @extend %email-heading-1;
+  }
+
+  h2 {
+    @extend %email-heading-2;
+  }
+
+  h4 {
+    @extend %email-heading-4;
+  }
+
+  p {
+    @extend %email-body;
   }
 }

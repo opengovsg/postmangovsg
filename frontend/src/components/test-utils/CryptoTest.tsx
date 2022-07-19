@@ -1,3 +1,6 @@
+// require buffer with trailing slash to ensure use of the npm module named buffer
+// instead of the node.js core module named buffer
+import { Buffer } from 'buffer/'
 import { useState } from 'react'
 
 import { uuid } from 'uuidv4'

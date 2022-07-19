@@ -1,6 +1,10 @@
 import axios from 'axios'
 import type { AxiosError } from 'axios'
 
+// require buffer with trailing slash to ensure use of the npm module named buffer
+// instead of the node.js core module named buffer
+import { Buffer } from 'buffer/'
+
 import Papa from 'papaparse'
 import SparkMD5 from 'spark-md5'
 
@@ -97,10 +101,8 @@ export async function getPresignedUrl({
         md5,
       },
     })
-    const {
-      transaction_id: transactionId,
-      presigned_url: presignedUrl,
-    } = response.data
+    const { transaction_id: transactionId, presigned_url: presignedUrl } =
+      response.data
     return { transactionId, presignedUrl } as PresignedUrlResponse
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
@@ -256,10 +258,8 @@ export async function beginMultipartUpload({
         },
       }
     )
-    const {
-      transaction_id: transactionId,
-      presigned_urls: presignedUrls,
-    } = response.data
+    const { transaction_id: transactionId, presigned_urls: presignedUrls } =
+      response.data
     return { transactionId, presignedUrls }
   } catch (e) {
     errorHandler(e, 'Failed to begin multipart upload.')

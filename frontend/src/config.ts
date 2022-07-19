@@ -81,6 +81,7 @@ export const LINKS = {
   demoTelegramBotUrl: t`link.demoTelegramBotUrl`,
   demoVideoUrl: t`link.demoVideoUrl`,
   featureRequestUrl: t`link.featureRequestUrl`,
+  uploadLogoUrl: t`link.uploadLogoUrl`,
 }
 export const DEFAULT_MAIL_FROM = t`defaultMailFrom`
 // Semi-colon separated list of allowed image source hostnames
@@ -94,6 +95,8 @@ export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
 export const SENTRY_ENVIRONMENT =
   (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
+export const INFO_BANNER_COLOR = process.env
+  .REACT_APP_INFO_BANNER_COLOR as string
 
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user

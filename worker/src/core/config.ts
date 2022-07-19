@@ -40,15 +40,13 @@ const config = convict({
       env: 'AWS_REGION',
     },
     awsEndpoint: {
-      doc:
-        'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      doc: 'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
       format: '*',
       default: null,
       env: 'AWS_ENDPOINT',
     },
     secretManagerSalt: {
-      doc:
-        'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
+      doc: 'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
       default: '',
       env: 'SECRET_MANAGER_SALT',
       format: 'required-string',
@@ -104,8 +102,7 @@ const config = convict({
         format: 'int',
       },
       acquire: {
-        doc:
-          'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
+        doc: 'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
         default: 600000,
         env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
         format: 'int',
@@ -122,6 +119,7 @@ const config = convict({
       doc: 'Amazon SES SMTP endpoint.',
       default: '',
       env: 'WORKER_SES_HOST',
+      format: 'required-string',
     },
     port: {
       doc: 'Amazon SES SMTP port, defaults to 465',
@@ -135,19 +133,32 @@ const config = convict({
         default: '',
         env: 'WORKER_SES_USER',
         sensitive: true,
+        format: 'required-string',
       },
       pass: {
         doc: 'SMTP password',
         default: '',
         env: 'WORKER_SES_PASS',
         sensitive: true,
+        format: 'required-string',
       },
+    },
+    callbackHashSecret: {
+      doc: 'Callback secret for email',
+      default: '',
+      env: 'EMAIL_CALLBACK_HASH_SECRET',
+      format: 'required-string',
     },
   },
   mailFrom: {
     doc: 'The email address that appears in the From field of an email',
     default: '',
     env: 'WORKER_SES_FROM',
+  },
+  mailConfigurationSet: {
+    doc: 'The configuration set specified when sending an email',
+    default: 'postman-email-open',
+    env: 'WORKER_SES_CONFIGURATION_SET',
   },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
@@ -225,11 +236,15 @@ const config = convict({
   },
   emailFallback: {
     activate: {
-      doc:
-        'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
+      doc: 'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
       default: false,
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
+  },
+  showMastheadDomain: {
+    doc: 'Show masthead within email template if logged-in user has email ending with this domain',
+    default: '.gov.sg',
+    env: 'SHOW_MASTHEAD_DOMAIN',
   },
 })
 
@@ -260,32 +275,30 @@ if (config.get('env') === 'staging') {
   })
 }
 
-// If the environment is a prod environment,
-// we ensure that there is only 1 worker per ecs task,
-// and required credentials are set
-if (config.get('env') !== 'development') {
-  if (
-    config.get('messageWorker.numSender') +
-      config.get('messageWorker.numLogger') !==
-    1
-  ) {
-    throw new Error(`Only 1 worker of 1 variant per task supported in production.
-    You supplied MESSAGE_WORKER_SENDER=${config.get('messageWorker.numSender')},
-    MESSAGE_WORKER_LOGGER=${config.get('messageWorker.numLogger')}`)
-  }
+// Each worker process must be either a sender or logger but not both.
+const numSender = config.get('messageWorker.numSender')
+const numLogger = config.get('messageWorker.numLogger')
 
-  // If a message worker is set, ensure that the credentials needed are also set
-  if (config.get('messageWorker.numSender') > 0) {
-    if (
-      !config.get('mailOptions.host') ||
-      !config.get('mailOptions.port') ||
-      !config.get('mailOptions.auth.user') ||
-      !config.get('mailOptions.auth.pass')
-    ) {
-      throw new Error(
-        'Email credentials must be set since a sender worker is required'
-      )
-    }
+if (numSender < 1 && numLogger < 1) {
+  throw new Error(`Worker must be either a sender or logger`)
+}
+
+if (numSender + numLogger !== 1) {
+  throw new Error(`Only 1 worker of 1 variant per task supported in production.
+		You supplied MESSAGE_WORKER_SENDER=${numSender}, MESSAGE_WORKER_LOGGER=${numLogger}`)
+}
+
+// If a message worker is set, ensure that the credentials needed are also set
+if (numSender > 0) {
+  if (
+    !config.get('mailOptions.host') ||
+    !config.get('mailOptions.port') ||
+    !config.get('mailOptions.auth.user') ||
+    !config.get('mailOptions.auth.pass')
+  ) {
+    throw new Error(
+      'Email credentials must be set since a sender worker is required'
+    )
   }
 }
 

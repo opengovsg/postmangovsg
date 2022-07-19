@@ -9,7 +9,7 @@
     "./src/server.ts"
   ],
   "references": [
-    { "path": "../shared" }
+    { "path": "../shared/tsconfig.build.json" }
   ],
   "compileOnSave": true,
   "compilerOptions": {

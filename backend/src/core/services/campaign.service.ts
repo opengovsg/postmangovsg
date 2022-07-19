@@ -51,12 +51,12 @@ const createDemoCampaign = async ({
     const campaign = await Campaign.create(
       {
         name,
-        type,
+        type: type as ChannelType,
         userId,
         valid: false,
         protect,
-        demoMessageLimit,
-      },
+        demoMessageLimit: demoMessageLimit as number,
+      } as Campaign,
       { transaction }
     )
     await userDemo?.decrement(numDemosColumn, { transaction })
@@ -100,11 +100,11 @@ const createCampaign = async ({
     campaign = await Campaign.create(
       {
         name,
-        type,
+        type: type as ChannelType,
         userId,
         valid: false,
         protect,
-      },
+      } as Campaign,
       { transaction }
     )
   }
@@ -271,14 +271,14 @@ const getCampaignDetails = async (
     ],
   })
 
-  return campaignDetails?.get({ plain: true }) as CampaignDetails
+  return campaignDetails?.get({ plain: true }) as unknown as CampaignDetails
 }
 
 /**
  * Helper method to set a campaign to invalid (when the template and uploaded csv's columns don't match)
  * @param campaignId
  */
-const setInvalid = (campaignId: number): Promise<[number, Campaign[]]> => {
+const setInvalid = (campaignId: number): Promise<[number]> => {
   return Campaign.update(
     {
       valid: false,
@@ -296,7 +296,7 @@ const setInvalid = (campaignId: number): Promise<[number, Campaign[]]> => {
 const setValid = (
   campaignId: number,
   transaction?: Transaction
-): Promise<[number, Campaign[]]> => {
+): Promise<[number]> => {
   return Campaign.update(
     {
       valid: true,
@@ -308,6 +308,17 @@ const setValid = (
   )
 }
 
+const deleteCampaign = (campaignId: number): Promise<number> => {
+  return Campaign.destroy({
+    where: { id: +campaignId },
+  })
+}
+const updateCampaign = (campaign: Campaign): Promise<[number, Campaign[]]> =>
+  Campaign.update(campaign, {
+    where: { id: campaign.id },
+    returning: true,
+  })
+
 export const CampaignService = {
   hasJobInProgress,
   createCampaign,
@@ -316,4 +327,6 @@ export const CampaignService = {
   getCampaignDetails,
   setInvalid,
   setValid,
+  deleteCampaign,
+  updateCampaign,
 }

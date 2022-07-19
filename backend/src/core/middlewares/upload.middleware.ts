@@ -18,8 +18,8 @@ const uploadStartHandler = async (
   const logMeta = { contentType, md5, action: 'uploadStartHandler' }
   try {
     const { presignedUrl, signedKey } = await UploadService.getUploadParameters(
-      contentType,
-      md5
+      contentType as string,
+      md5 as string
     )
 
     logger.info({ message: 'Start file upload', presignedUrl })
@@ -53,8 +53,8 @@ const startMultipartUpload = async (
   const logMeta = { mimeType, partCount, action: 'startMultipartUpload' }
   try {
     const data = await MultipartUploadService.startMultipartUpload(
-      mimeType,
-      partCount
+      mimeType as string,
+      +(partCount as string)
     )
     logger.info({ messsage: 'Start multipart file upload', ...logMeta })
     return res.json({

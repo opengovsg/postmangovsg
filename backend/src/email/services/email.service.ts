@@ -3,7 +3,7 @@ import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { Campaign, ProtectedMessage } from '@core/models'
+import { Agency, Campaign, Domain, ProtectedMessage, User } from '@core/models'
 import {
   MailService,
   CampaignService,
@@ -11,12 +11,16 @@ import {
   ProtectedService,
   UnsubscriberService,
 } from '@core/services'
-import { MailToSend, CampaignDetails } from '@core/interfaces'
+import { CampaignDetails } from '@core/interfaces'
+import { MailToSend } from '@shared/clients/mail-client.class'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
 import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
+
+import { ThemeClient } from '@shared/theme'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -46,6 +50,9 @@ const getHydratedMessage = async (
   subject: string
   replyTo: string | null
   from: string
+  agencyName: string | undefined
+  agencyLogoURI: string | undefined
+  showMasthead?: boolean
 } | void> => {
   // get email template
   const template = await EmailTemplateService.getFilledTemplate(campaignId)
@@ -57,15 +64,46 @@ const getHydratedMessage = async (
 
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
   const subject = EmailTemplateService.client.template(
-    template?.subject!,
+    template?.subject as string,
     params
   )
-  const body = EmailTemplateService.client.template(template?.body!, params)
+  const body = EmailTemplateService.client.template(
+    template?.body as string,
+    params
+  )
+
+  // Get agency details (if exists) from campaign user
+  const campaign = await Campaign.findOne({
+    where: { id: campaignId },
+    include: [
+      {
+        model: User,
+        include: [
+          {
+            model: Domain,
+            include: [Agency],
+          },
+        ],
+      },
+    ],
+  })
+  const agency = campaign?.user?.domain?.agency
+  const agencyName = agency?.name
+  // if showLogo is disabled for template, don't return an agency logo
+  const agencyLogoURI = template?.showLogo ? agency?.logo_uri : undefined
+
+  const showMasthead = campaign?.user?.email.endsWith(
+    config.get('showMastheadDomain')
+  )
+
   return {
     body,
     subject,
     replyTo: template.replyTo || null,
-    from: template?.from!,
+    from: template?.from as string,
+    agencyName,
+    agencyLogoURI,
+    showMasthead,
   }
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
 }
@@ -82,11 +120,25 @@ const getCampaignMessage = async (
   // get the body and subject
   const message = await getHydratedMessage(campaignId)
   if (message) {
-    const { body, subject, replyTo, from } = message
+    const {
+      body,
+      subject,
+      replyTo,
+      from,
+      agencyName,
+      agencyLogoURI,
+      showMasthead,
+    } = message
     const mailToSend: MailToSend = {
       from: from || config.get('mailFrom'),
       recipients: [recipient],
-      body: UnsubscriberService.appendTestEmailUnsubLink(body),
+      body: await ThemeClient.generateThemedHTMLEmail({
+        body,
+        unsubLink: UnsubscriberService.generateTestUnsubLink(),
+        agencyName,
+        agencyLogoURI,
+        showMasthead,
+      }),
       subject,
       ...(replyTo ? { replyTo } : {}),
     }
@@ -123,7 +175,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.Email },
-  })
+  }) as Promise<Campaign>
 }
 
 /**
@@ -150,9 +202,7 @@ const sendCampaignMessage = async (
  * update the credential column for the campaign with the default credential
  * @param campaignId
  */
-const setCampaignCredential = (
-  campaignId: number
-): Promise<[number, Campaign[]]> => {
+const setCampaignCredential = (campaignId: number): Promise<[number]> => {
   return Campaign.update(
     { credName: DefaultCredentialName.Email },
     { where: { id: campaignId } }
@@ -169,7 +219,30 @@ const getCampaignDetails = async (
   return await CampaignService.getCampaignDetails(campaignId, [
     {
       model: EmailTemplate,
-      attributes: ['body', 'subject', 'params', 'reply_to', 'from'],
+      attributes: [
+        'body',
+        'subject',
+        'params',
+        'reply_to',
+        'from',
+        'show_logo',
+      ],
+    },
+    {
+      model: User,
+      attributes: ['email_domain'],
+      include: [
+        {
+          model: Domain,
+          attributes: ['agency_id'],
+          include: [
+            {
+              model: Agency,
+              attributes: ['name', 'logo_uri'],
+            },
+          ],
+        },
+      ],
     },
   ])
 }
@@ -217,7 +290,7 @@ const uploadCompleteOnChunk = ({
       }
     })
     // START populate template
-    await EmailMessage.bulkCreate(records, {
+    await EmailMessage.bulkCreate(records as Array<EmailMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -280,7 +353,7 @@ const uploadProtectedCompleteOnChunk = ({
       campaignId,
       data,
     })
-    await EmailMessage.bulkCreate(messages, {
+    await EmailMessage.bulkCreate(messages as Array<EmailMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -314,7 +387,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as EmailDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as EmailDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -337,7 +410,7 @@ const duplicateCampaign = async ({
               subject: template.subject,
               from: template.from,
               replyTo: template.reply_to,
-            },
+            } as EmailTemplate,
             { transaction }
           )
         }
@@ -361,4 +434,5 @@ export const EmailService = {
   uploadProtectedCompleteOnPreview,
   uploadProtectedCompleteOnChunk,
   duplicateCampaign,
+  sendEmail,
 }

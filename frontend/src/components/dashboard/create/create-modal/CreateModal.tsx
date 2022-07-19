@@ -77,9 +77,7 @@ const CreateModal = ({
             <label htmlFor="nameCampaign">Name your campaign</label>
           </h2>
           <h5 className={styles.subtitle}>
-            <label htmlFor="nameCampaign">
-              Give your campaign a descriptive name
-            </label>
+            <label>Give your campaign a descriptive name</label>
           </h5>
           <TextInput
             id="nameCampaign"

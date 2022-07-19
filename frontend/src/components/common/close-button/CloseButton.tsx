@@ -7,7 +7,7 @@ const CloseButton = (props: any) => {
 
   return (
     <button className={cx(styles.close, className)} {...otherProps}>
-      +
+      <i className="bx bx-x"></i>
     </button>
   )
 }

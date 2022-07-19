@@ -1,0 +1,155 @@
+name: Deploy backend to AWS Elastic Beanstalk
+on:
+  push:
+    branches:
+      - staging
+      - master
+
+# Making sure that the current deployment is completed before the next one
+concurrency: deploy-eb-${{ github.ref }}
+env:
+  # Update this common config
+  DIRECTORY: backend
+
+jobs:
+  set_environment:
+    outputs:
+      current_env: ${{ steps.set-environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-environment
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "::set-output name=current_env::production"
+          else
+             echo "::set-output name=current_env::staging"
+          fi
+
+  lint-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:alpine
+        ports:
+          - "6379:6379"
+        options: --entrypoint redis-server
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Lint lock file
+        run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      - name: Lint and test app code
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: |
+          cd shared 
+          npm ci
+          cd ..
+          cd $DIRECTORY
+          npm ci
+          npm run build
+          npm run lint-no-fix
+          npm test
+
+  build_deploy_application:
+    needs: [set_environment, lint-test]
+    environment:
+      name: ${{ needs.set_environment.outputs.current_env }}
+    env:
+      IMAGE_TAG: "github-actions-backend-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
+      BRANCH: ${{ needs.set_environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Before deploy
+        env:
+          SECRET_ID: ${{ secrets.SECRET_ID }}
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+        run: |
+          cd $DIRECTORY
+          cp -R ../shared ./
+          sed -i -e "s#@SECRET_ID#$SECRET_ID#g" docker-entrypoint.sh
+          sed -i -e "s#@DD_API_KEY#$DD_API_KEY#g" .ebextensions/99datadog.config
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REPOSITORY: ${{ secrets.REPO }}
+        run: |
+          cd $DIRECTORY
+          sed -i -e "s|@TAG|$IMAGE_TAG|g" Dockerrun.aws.json
+          sed -i -e "s|@REPO|$ECR_REPOSITORY|g" Dockerrun.aws.json 
+          docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$BRANCH
+          docker push -a $ECR_REPOSITORY
+          zip -r "$IMAGE_TAG.zip" .ebextensions .platform Dockerrun.aws.json
+
+      - name: Copy to S3
+        env:
+          BUCKET_NAME: ${{ secrets.EB_BUCKET_NAME }}
+        run: |
+          cd backend
+          aws s3 cp $IMAGE_TAG.zip s3://$BUCKET_NAME/$IMAGE_TAG.zip
+
+      - name: Create application version
+        env:
+          BUCKET_NAME: ${{ secrets.EB_BUCKET_NAME }}
+          APP_NAME: ${{ secrets.EB_APP_NAME }}
+        run: |
+          cd backend
+          TRUNCATED_DESC=$(echo "${{github.event.head_commit.message}}" | head -n 1 | cut -b1-180)
+          aws elasticbeanstalk create-application-version --application-name $APP_NAME \
+          --version-label $IMAGE_TAG \
+          --source-bundle S3Bucket=$BUCKET_NAME,S3Key=$IMAGE_TAG.zip \
+          --description "$TRUNCATED_DESC"
+
+      - name: Update EB environment
+        id: update-eb-1
+        env:
+          APP_NAME: ${{ secrets.EB_APP_NAME }}
+          DEPLOY_ENV: ${{ secrets.EB_ENV_NAME }}
+        run: |
+          cd backend
+          aws elasticbeanstalk update-environment --application-name $APP_NAME \
+            --environment-name $DEPLOY_ENV \
+            --version-label $IMAGE_TAG
+
+      - name: Update EB2 environment
+        id: update-eb-2
+        env:
+          APP_NAME: ${{ secrets.EB_APP_NAME }}
+          DEPLOY_ENV: ${{ secrets.EB_ENV_NAME_2 }}
+        run: |
+          cd backend
+          aws elasticbeanstalk update-environment --application-name $APP_NAME \
+            --environment-name $DEPLOY_ENV \
+            --version-label $IMAGE_TAG

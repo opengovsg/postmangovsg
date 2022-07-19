@@ -38,6 +38,7 @@ const EmailSend = ({
   const [preview, setPreview] = useState(
     {} as {
       body: string
+      themedBody: string
       subject: string
       replyTo: string | null
       from: string
@@ -103,6 +104,7 @@ const EmailSend = ({
           <p className={styles.greyText}>Message</p>
           <EmailPreviewBlock
             body={preview.body}
+            themedBody={preview.themedBody}
             subject={preview.subject}
             replyTo={preview.replyTo}
             from={preview.from}

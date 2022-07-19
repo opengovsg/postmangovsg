@@ -1,22 +1,15 @@
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
-import { parse } from 'pg-connection-string'
 
 import config from '@core/config'
-import { Credential, initializeModels } from '@core/models'
+import { initializeModels } from '@core/models'
 
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
-import { DefaultCredentialName } from '@core/constants'
-import { formatDefaultCredentialName } from '@core/utils'
+
+import { dbConfig as masterConfig, parseDBUri } from '@database/util'
 
 const logger = loggerWithLabel(module)
-const DB_URI = config.get('database.databaseUri')
 const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')
-
-const parseDBUri = (uri: string): any => {
-  const config = parse(uri)
-  return { ...config, username: config.user }
-}
 
 const sequelizeLoader = async (): Promise<void> => {
   const dialectOptions =
@@ -24,7 +17,6 @@ const sequelizeLoader = async (): Promise<void> => {
       ? config.get('database.dialectOptions')
       : {}
 
-  const masterConfig = parseDBUri(DB_URI)
   const readReplicaConfig = parseDBUri(DB_READ_REPLICA_URI)
 
   const sequelize = new Sequelize({
@@ -39,6 +31,20 @@ const sequelizeLoader = async (): Promise<void> => {
     query: {
       useMaster: true,
     },
+    retry: {
+      max: 5,
+      match: [
+        /ConnectionError/,
+        /SequelizeConnectionError/,
+        /SequelizeConnectionRefusedError/,
+        /SequelizeHostNotFoundError/,
+        /SequelizeHostNotReachableError/,
+        /SequelizeInvalidConnectionError/,
+        /SequelizeConnectionTimedOutError/,
+        /SequelizeConnectionAcquireTimeoutError/,
+        /Connection terminated unexpectedly/,
+      ],
+    },
     hooks: {
       beforeConnect: async (dbConfig: MutableConfig): Promise<void> => {
         if (config.get('database.useIam')) {
@@ -51,21 +57,12 @@ const sequelizeLoader = async (): Promise<void> => {
   initializeModels(sequelize)
 
   try {
-    await sequelize.sync()
+    await sequelize.authenticate()
     logger.info({ message: 'Database loaded.' })
   } catch (error) {
     logger.error({ message: 'Unable to connect to database', error })
     process.exit(1)
   }
-  // Create the default credential names in the credentials table
-  // Each name should be accompanied by an entry in Secrets Manager
-  await Promise.all(
-    [
-      DefaultCredentialName.Email,
-      formatDefaultCredentialName(DefaultCredentialName.SMS),
-      formatDefaultCredentialName(DefaultCredentialName.Telegram),
-    ].map((name) => Credential.upsert({ name }))
-  )
 }
 
 export default sequelizeLoader

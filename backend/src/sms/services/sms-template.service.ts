@@ -1,7 +1,10 @@
 import { difference, keys } from 'lodash'
 
+import { ChannelType } from '@core/constants'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
+import { UploadService } from '@core/services'
+import { UploadData } from '@core/interfaces'
 import { Campaign, Statistic } from '@core/models'
 import {
   TemplateClient,
@@ -10,6 +13,7 @@ import {
 } from '@shared/templating'
 
 import { SmsTemplate, SmsMessage } from '@sms/models'
+import { SmsService } from '@sms/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 
 const client = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
@@ -55,7 +59,7 @@ const upsertSmsTemplate = async ({
       {
         campaignId,
         body,
-      },
+      } as SmsTemplate,
       {
         transaction,
       }
@@ -213,9 +217,32 @@ const testHydration = (
   client.template(templateBody, firstRecord.params)
 }
 
+/**
+ * Enqueue a new SMS recipient list upload
+ * @param uploadData
+ */
+const enqueueUpload = (data: UploadData<SmsTemplate>): Promise<string> => {
+  return UploadService.enqueueUpload({
+    channelType: ChannelType.SMS,
+    data,
+  })
+}
+
+/**
+ * Process a SMS campaign recipient list upload
+ * @param uploadData
+ */
+const processUpload = (uploadData: UploadData<SmsTemplate>): Promise<void> =>
+  UploadService.processUpload<SmsTemplate>(
+    SmsService.uploadCompleteOnPreview,
+    SmsService.uploadCompleteOnChunk
+  )(uploadData)
+
 export const SmsTemplateService = {
   storeTemplate,
   getFilledTemplate,
   testHydration,
   client,
+  enqueueUpload,
+  processUpload,
 }

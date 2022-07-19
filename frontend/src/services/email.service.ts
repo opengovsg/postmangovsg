@@ -9,7 +9,8 @@ export async function saveTemplate(
   subject: string,
   body: string,
   replyTo: string | null,
-  from: string
+  from: string,
+  showLogo: boolean
 ): Promise<{
   numRecipients: number
   updatedTemplate?: {
@@ -17,6 +18,7 @@ export async function saveTemplate(
     body: string
     subject: string
     reply_to: string | null
+    show_logo: boolean
     params: Array<string>
   }
 }> {
@@ -29,11 +31,10 @@ export async function saveTemplate(
       // 2. User deletes the replyTo email after previously setting it - empty string
       reply_to: replyTo || null,
       from,
+      show_logo: showLogo,
     })
-    const {
-      num_recipients: numRecipients,
-      template: updatedTemplate,
-    } = response.data
+    const { num_recipients: numRecipients, template: updatedTemplate } =
+      response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template')
@@ -61,8 +62,14 @@ export async function getPreviewMessage(
 ): Promise<EmailPreview> {
   try {
     const response = await axios.get(`/campaign/${campaignId}/email/preview`)
-    const { body, subject, reply_to: replyTo, from } = response.data?.preview
-    return { body, subject, replyTo, from }
+    const {
+      body,
+      themed_body: themedBody,
+      subject,
+      reply_to: replyTo,
+      from,
+    } = response.data?.preview || {}
+    return { body, themedBody, subject, replyTo, from }
   } catch (e) {
     errorHandler(e, 'Unable to get preview message')
   }

@@ -12,8 +12,12 @@ import {
 } from '@shared/templating'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailService } from '@email/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
+import { UploadService } from '@core/services'
+import { UploadData } from '@core/interfaces'
+import { ChannelType } from '@core/constants'
 
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
@@ -27,6 +31,7 @@ const upsertEmailTemplate = async ({
   replyTo,
   campaignId,
   from,
+  showLogo,
 }: StoreTemplateInput): Promise<EmailTemplate> => {
   let transaction
   try {
@@ -38,23 +43,22 @@ const upsertEmailTemplate = async ({
       })) !== null
     ) {
       // .update is actually a bulkUpdate
-      const updatedTemplate: [
-        number,
-        EmailTemplate[]
-      ] = await EmailTemplate.update(
-        {
-          subject,
-          body,
-          replyTo,
-          from,
-        },
-        {
-          where: { campaignId },
-          individualHooks: true, // required so that BeforeUpdate hook runs
-          returning: true,
-          transaction,
-        }
-      )
+      const updatedTemplate: [number, EmailTemplate[]] =
+        await EmailTemplate.update(
+          {
+            subject,
+            body,
+            replyTo,
+            from,
+            showLogo,
+          } as EmailTemplate,
+          {
+            where: { campaignId },
+            individualHooks: true, // required so that BeforeUpdate hook runs
+            returning: true,
+            transaction,
+          }
+        )
 
       transaction?.commit()
       return updatedTemplate[1][0]
@@ -67,7 +71,8 @@ const upsertEmailTemplate = async ({
         subject,
         replyTo,
         from,
-      },
+        showLogo,
+      } as EmailTemplate,
       {
         transaction,
       }
@@ -167,6 +172,7 @@ const storeTemplate = async ({
   body,
   replyTo,
   from,
+  showLogo,
 }: StoreTemplateInput): Promise<StoreTemplateOutput> => {
   // extract params from template, save to db (this will be done with hook)
   const sanitizedSubject = client.replaceNewLinesAndSanitize(subject)
@@ -178,10 +184,8 @@ const storeTemplate = async ({
   }
 
   // Append via to sender name if it is not the default from name
-  const {
-    fromName: defaultFromName,
-    fromAddress: defaultFromAddress,
-  } = parseFromAddress(config.get('mailFrom'))
+  const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
+    parseFromAddress(config.get('mailFrom'))
   const { fromName, fromAddress } = parseFromAddress(from)
 
   let expectedFromName: string | null
@@ -210,6 +214,7 @@ const storeTemplate = async ({
     replyTo,
     campaignId,
     from: formattedFrom,
+    showLogo,
   })
 
   // TODO: this is slow when table is large
@@ -269,9 +274,49 @@ const testHydration = (
   client.template(templateSubject, firstRecord.params)
 }
 
+/**
+ * Enqueue a new email recipient list upload
+ * @param uploadData
+ */
+const enqueueUpload = (
+  uploadData: UploadData<EmailTemplate>,
+  protect?: boolean
+): Promise<string> => {
+  return UploadService.enqueueUpload({
+    channelType: ChannelType.Email,
+    protect,
+    data: uploadData,
+  })
+}
+
+/**
+ * Process an email campaign recipient list upload
+ * @param uploadData
+ */
+const processUpload = (uploadData: UploadData<EmailTemplate>): Promise<void> =>
+  UploadService.processUpload<EmailTemplate>(
+    EmailService.uploadCompleteOnPreview,
+    EmailService.uploadCompleteOnChunk
+  )(uploadData)
+
+/**
+ * Process a protected email campaign recipient list upload
+ * @param uploadData
+ */
+const processProtectedUpload = (
+  uploadData: UploadData<EmailTemplate>
+): Promise<void> =>
+  UploadService.processUpload<EmailTemplate>(
+    EmailService.uploadProtectedCompleteOnPreview,
+    EmailService.uploadProtectedCompleteOnChunk
+  )(uploadData)
+
 export const EmailTemplateService = {
   storeTemplate,
   getFilledTemplate,
   testHydration,
+  enqueueUpload,
+  processUpload,
+  processProtectedUpload,
   client,
 }

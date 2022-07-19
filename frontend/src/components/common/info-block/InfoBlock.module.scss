@@ -2,5 +2,5 @@
 @import 'styles/_mixins';
 
 .infoBlock {
-  @include block($neutral-light, $primary);
+  @include block($neutral-light, $secondary, $primary);
 }

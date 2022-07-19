@@ -56,7 +56,7 @@ const upsertTelegramSubscriber = async (
       const updatedCount = result?.[1]
       if (!updatedCount) {
         await TelegramSubscriber.create(
-          { telegramId, phoneNumber },
+          { telegramId, phoneNumber } as TelegramSubscriber,
           { transaction }
         )
       }
@@ -95,56 +95,56 @@ const addBotSubscriber = async (
 /**
  * Handles updates with contacts.
  */
-export const contactMessageHandler = (botId: string) => async (
-  ctx: TelegrafContext
-): Promise<Message> => {
-  logger.info({
-    from: ctx.from,
-    contact: ctx.message?.contact,
-    botId,
-    action: 'contactMessageHandler',
-  })
+export const contactMessageHandler =
+  (botId: string) =>
+  async (ctx: TelegrafContext): Promise<Message> => {
+    logger.info({
+      from: ctx.from,
+      contact: ctx.message?.contact,
+      botId,
+      action: 'contactMessageHandler',
+    })
 
-  // Parse contact data
-  const contact = ctx.message?.contact
-  if (!contact) {
-    throw new PostmanTelegramError('Contact not defined')
+    // Parse contact data
+    const contact = ctx.message?.contact
+    if (!contact) {
+      throw new PostmanTelegramError('Contact not defined')
+    }
+
+    const { phone_number: phoneNumber, user_id: telegramId } = contact
+    if (!(phoneNumber && telegramId)) {
+      throw new PostmanTelegramError('Invalid contact information')
+    }
+
+    const senderTelegramId = ctx.from?.id
+    if (!senderTelegramId || telegramId !== senderTelegramId) {
+      throw new PostmanTelegramError('Sender and contact mismatch')
+    }
+
+    // Upsert and add subscriptions
+    const upserted = await upsertTelegramSubscriber(phoneNumber, telegramId)
+    const didAddBotSubscriber = await addBotSubscriber(botId, telegramId)
+
+    // Respond
+    const replyOptions: ExtraReplyMessage = {
+      reply_markup: {
+        remove_keyboard: true,
+      },
+    }
+
+    // Configure bot reply based on what actually happened
+    let reply
+    if (didAddBotSubscriber) {
+      reply = 'You are now subscribed.'
+    } else {
+      reply = 'You were already subscribed.'
+    }
+
+    if (upserted) {
+      reply += ' Your phone number and Telegram ID have been updated.'
+    } else {
+      reply += ' An internal failure has occurred.'
+    }
+
+    return ctx.reply(reply, replyOptions)
   }
-
-  const { phone_number: phoneNumber, user_id: telegramId } = contact
-  if (!(phoneNumber && telegramId)) {
-    throw new PostmanTelegramError('Invalid contact information')
-  }
-
-  const senderTelegramId = ctx.from?.id
-  if (!senderTelegramId || telegramId !== senderTelegramId) {
-    throw new PostmanTelegramError('Sender and contact mismatch')
-  }
-
-  // Upsert and add subscriptions
-  const upserted = await upsertTelegramSubscriber(phoneNumber, telegramId)
-  const didAddBotSubscriber = await addBotSubscriber(botId, telegramId)
-
-  // Respond
-  const replyOptions: ExtraReplyMessage = {
-    reply_markup: {
-      remove_keyboard: true,
-    },
-  }
-
-  // Configure bot reply based on what actually happened
-  let reply
-  if (didAddBotSubscriber) {
-    reply = 'You are now subscribed.'
-  } else {
-    reply = 'You were already subscribed.'
-  }
-
-  if (upserted) {
-    reply += ' Your phone number and Telegram ID have been updated.'
-  } else {
-    reply += ' An internal failure has occurred.'
-  }
-
-  return ctx.reply(reply, replyOptions)
-}

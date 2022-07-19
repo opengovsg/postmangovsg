@@ -1,0 +1,140 @@
+name: Lint and test
+on:
+  push:
+    branches:
+      - staging
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Lint lock file
+        run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      - run: npm ci --ignore-scripts
+      - name: Lint app code
+        run: npm run lint-no-fix
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.x"
+      - run: pip install detect-secrets==1.2.0
+      - run: npm run detect-secrets:check
+  test-backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:alpine
+        ports:
+          - "6379:6379"
+        options: --entrypoint redis-server
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Lint lock file
+        run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+
+      # building shared components from source file to avoid
+      # "d.ts files are not built from source" errors
+      - run: npm ci
+        working-directory: ./shared
+      - run: npm run build
+        working-directory: ./shared
+
+      - run: npm ci
+      - name: Lint app code
+        run: npm run lint-no-fix
+      - name: Run tests
+        run: npm test
+  test-shared:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./shared
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Lint lock file
+        run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      - run: npm ci
+      - name: Lint app code
+        run: npm run lint-no-fix
+      - name: Run tests
+        run: npm test
+  test-worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./worker
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Lint lock file
+        run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+
+      # building shared components from source file to avoid
+      # "d.ts files are not built from source" errors
+      - run: npm ci
+        working-directory: ./shared
+      - run: npm run build
+        working-directory: ./shared
+
+      - run: npm ci
+      - name: Lint app code
+        run: npm run lint-no-fix
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Lint lock file
+        run: npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+
+      # building shared components from source file to avoid
+      # "d.ts files are not built from source" errors
+      - run: npm ci
+        working-directory: ./shared
+      - run: npm run build
+        working-directory: ./shared
+
+      # using legacy-peer-deps as some dependencies are broken
+      # more info see https://github.com/opengovsg/postmangovsg/pull/1578
+      - run: npm ci --legacy-peer-deps
+      - run: npm run compile
+      - name: Lint app code
+        run: npm run lint-no-fix
+      - name: Run tests
+        run: npm test

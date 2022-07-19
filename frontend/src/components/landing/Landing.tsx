@@ -3,7 +3,7 @@ import { i18n } from '@lingui/core'
 import cx from 'classnames'
 
 import Lottie from 'lottie-react'
-import { useState, useContext, useEffect } from 'react'
+import { createRef, useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 import { Redirect, useHistory } from 'react-router-dom'
@@ -20,14 +20,14 @@ import userImg from 'assets/img/landing/moe-circle.png'
 import moeAgencyImg from 'assets/img/landing/moe-gray.png'
 import mohAgencyImg from 'assets/img/landing/moh-gray.png'
 import momAgencyImg from 'assets/img/landing/mom-gray.png'
-import onboardingImg from 'assets/img/landing/onboard.svg'
+import onboardingImg from 'assets/img/landing/onboard.png'
 
 import landingAnimation from 'assets/lottie/landing.json'
 import whyUse1 from 'assets/mp4/why-use-1.mp4'
 import whyUse2 from 'assets/mp4/why-use-2.mp4'
 import whyUse3 from 'assets/mp4/why-use-3.mp4'
 import { InfoBanner, PrimaryButton } from 'components/common'
-import { LINKS, INFO_BANNER } from 'config'
+import { LINKS } from 'config'
 
 import { AuthContext } from 'contexts/auth.context'
 import { getLandingStats } from 'services/stats.service'
@@ -38,6 +38,9 @@ const Landing = () => {
   const { isAuthenticated } = useContext(AuthContext)
   const [sentMessages, setSentMessages] = useState('0')
   const history = useHistory()
+
+  const bannerRef = createRef<HTMLDivElement>()
+  const infoBannerRef = createRef<HTMLDivElement>()
 
   useEffect(() => {
     if (isAuthenticated) return
@@ -50,8 +53,31 @@ const Landing = () => {
     getSentMessages()
   }, [isAuthenticated])
 
+  useEffect(() => {
+    function recalculateBannerPos() {
+      const govBannerHeight = bannerRef.current?.offsetHeight as number
+      const scrollTop = (document.documentElement.scrollTop ||
+        document.body.scrollTop) as number
+      if (infoBannerRef.current) {
+        const offsetTop =
+          scrollTop >= govBannerHeight ? 0 : govBannerHeight - scrollTop
+        const infoBannerHeight = infoBannerRef.current?.offsetHeight as number
+        if (scrollTop > govBannerHeight + infoBannerHeight) {
+          infoBannerRef.current.style.position = 'fixed'
+          infoBannerRef.current.style.top = `${offsetTop}px`
+        } else {
+          infoBannerRef.current.style.position = 'relative'
+        }
+      }
+    }
+    window.addEventListener('scroll', recalculateBannerPos)
+    return () => {
+      window.removeEventListener('scroll', recalculateBannerPos)
+    }
+  })
+
   if (isAuthenticated) {
-    return <Redirect to="/campaigns"></Redirect>
+    return <Redirect to="/campaigns" />
   }
 
   function directToSignIn() {
@@ -147,10 +173,10 @@ const Landing = () => {
 
   return (
     <div className={styles.landing}>
-      <Banner></Banner>
-      <InfoBanner>{INFO_BANNER}</InfoBanner>
+      <Banner innerRef={bannerRef} />
+      <InfoBanner innerRef={infoBannerRef} />
       <div className={styles.topContainer}>
-        <Navbar></Navbar>
+        <Navbar />
         <div className={styles.innerContainer}>
           <div className={styles.textContainer}>
             <h1 className={styles.headerText}>
@@ -244,7 +270,7 @@ const Landing = () => {
               target="_blank"
             >
               <PrimaryButton className={styles.button}>
-                Learn More <i className="bx bx-right-arrow-alt"></i>
+                Learn More <i className="bx bx-right-arrow-alt" />
               </PrimaryButton>
             </OutboundLink>
           </div>
@@ -270,7 +296,7 @@ const Landing = () => {
             ))}
           </div>
 
-          <div className={styles.lineBreak}></div>
+          <div className={styles.lineBreak} />
 
           <div className={styles.testimonial}>
             <span className={cx(styles.openInvertedComma, styles.comma)}>
@@ -373,7 +399,7 @@ const Landing = () => {
               <img src={companyLogo} alt="logo" />
             </div>
           </div>
-          <div className={styles.lineBreak}></div>
+          <div className={styles.lineBreak} />
           <div className={styles.footer}>
             <div className={styles.links}>
               <OutboundLink

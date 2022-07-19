@@ -1,0 +1,222 @@
+{{!-- 
+  Email template built with reference to https://www.goodemailcode.com/
+--}}
+<!DOCTYPE html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+  <meta name="x-apple-disable-message-reformatting">
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+
+  {{!--
+    Most styles have been inlined into the HTML below for best email client support
+    Only media queries (for responsive devices) and generic styles remain in the style tag
+
+    NOTE: Styles within the style tag are not rendered on the frontend preview.
+    Any changes made here should be manually added to the frontend email preview styles.
+  --}}
+  <style>
+    @media only screen and (max-width: 500px) {
+      .root-container {
+        min-width: 0 !important;
+        line-height: 20px !important;
+      }
+
+      .masthead {
+        border-radius: 0 !important;
+      }
+
+      .body-content {
+        border-width: 0 !important;
+        padding: 0 16px !important;
+      }
+
+      .body-vertical-spacer-top {
+        margin-bottom: 24px !important;
+      }
+
+      .logo {
+        height: 44px !important;
+        margin-bottom: 24px !important;
+      }
+
+      .body-vertical-spacer-bottom {
+        margin-top: 24px !important;
+        border-bottom: 1px solid #E8EBEE;
+      }
+
+      .footer-content {
+        padding: 0 16px !important;
+        font-size: 10px !important;
+      }
+
+      .footer-vertical-spacer-top {
+        line-height: 24px !important;
+        height: 24px !important;
+      }
+    }
+
+    h1 {
+      font-size: 28px !important;
+      line-height: 42px !important;
+      letter-spacing: 0.25px !important;
+      font-weight: bold;
+      margin: 32px 0;
+    }
+
+    h2 {
+      font-size: 24.5px !important;
+      line-height: 35px !important;
+      font-weight: bold;
+      margin: 24px 0;
+    }
+
+    h4 {
+      font-size: 21px !important;
+      line-height: 28px !important;
+      font-weight: 500;
+      margin: 24px 0;
+    }
+
+    p {
+      margin: 16px 0;
+    }
+  </style>
+</head>
+
+<body style="margin: 0; padding: 0; word-spacing: normal; background-color: #ffffff;">
+  {{!--
+    Preheader text (within a hidden div) is the preview text being shown in email clients
+    @see: https://www.litmus.com/blog/the-little-known-preview-text-hack-you-may-want-to-use-in-every-email/
+
+    Table with "mso-hide: all" for Outlook 2007-2016 which apparently doesn't support "display: none"
+    @see: https://litmus.com/community/discussions/6911-display-none-not-working-in-outlook
+  --}}
+  <table style="mso-hide: all; display: none; max-height: 0px; overflow: hidden;">
+    <tr>
+      <td>
+        <div style="display: none; max-height: 0px; overflow: hidden;">
+          {{preheader}}
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  {{!-- Insert spacers to prevent text below from appearing in preheader --}}
+  <div style="display: none; max-height: 0px; overflow: hidden;">
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+  </div>
+
+  {{!--
+    The code below uses conditional HTML that only IE/Outlook recognises to maintain compatibility with Outlook
+    [if true] blocks will render only within Outlook and IE
+    [if false] blocks will render only in all other browsers/clients
+  --}}
+
+  <div role="article" aria-roledescription="email" aria-label="email name" lang="en"
+    style="font-size: 14px; line-height: 1.714; font-family: Helvetica, Arial, sans-serif;">
+    <!--[if true]>
+    <table role="presentation" style="width: 728px; border: 1px solid #E8EBEE"
+      align="center" cellspacing="0" cellpadding="0" bgcolor="#E8EBEE">
+    <![endif]-->
+
+    <!--[if false]><!-->
+    <div class="root-container" style="max-width: 728px; min-width: 500px; margin: 0 auto;">
+    <!--<![endif]-->
+
+    {{#showMasthead}}
+    <!--[if true]>
+      <tr><td align="center" valign="middle" style="font-size: 12px; border: 1px solid #E8EBEE; padding: 4px;">
+    <![endif]-->
+
+    <!--[if false]><!-->
+      <div class="masthead"
+        style="text-align: center; font-size: 11px; line-height: 28px; height: 28px; background-color: #E8EBEE;
+          border-top-left-radius: 8px; border-top-right-radius: 8px; white-space: nowrap;">
+    <!--<![endif]-->
+        <span>Singapore government emails are sent from .gov.sg addresses</span>
+    <!--[if false]><!-->
+      </div>
+    <!--<![endif]-->
+    
+    <!--[if true]>
+      </td></tr>
+    <![endif]-->
+    {{/showMasthead}}
+
+    <!--[if true]>
+      <tr><td style="padding: 0 64px; border: 1px solid #E8EBEE;" bgcolor="#FFFFFF">
+    <![endif]-->
+
+    <!--[if false]><!-->
+      <div class="body-content"
+        style="max-width: 728px; padding: 0 64px; border-color: #E8EBEE; border-style: solid;
+                {{#showMasthead}} border-width: 0 2px 2px 2px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; {{/showMasthead}}
+                {{^showMasthead}} border-width: 2px; border-radius: 8px; {{/showMasthead}}">
+    <!--<![endif]-->
+
+        <div class="body-vertical-spacer-top" style="line-height: 0px; height: 0px; margin-bottom: 48px;">&#8202;</div>
+
+        {{#agencyLogoURI}}
+        <img class="logo" src="{{agencyLogoURI}}" height="64" style="height: 64px; width: auto; margin-bottom: 32px; display: block;"
+          {{#agencyName}} alt="{{agencyName}} Logo" {{/agencyName}} />
+        {{/agencyLogoURI}}
+        <div>
+          {{{body}}}
+        </div>
+        <div class="body-vertical-spacer-bottom" style="line-height: 0px; height: 0px; margin-top: 48px;">&#8202;</div>
+    
+    <!--[if false]><!-->
+      </div>
+    <!--<![endif]-->
+    
+    <!--[if true]>
+      </tr></td>
+    </table>
+    <table role="presentation" style="width: 728px;" align="center">
+      <tr><td>
+    <![endif]-->
+      <div class="footer-content" style="max-width: 728px; padding: 0 64px; mso-padding-alt: 0 64px; text-align: center; line-height: 1.45;">
+        <div class="footer-vertical-spacer-top" style="line-height: 32px; height: 32px;">&#8202;</div>
+        <div style="font-size: 11px; color: #64707D">
+          This email and any links transmitted with it may contain privileged, confidential or official information. If you are
+          not the intended recipient, please delete this email, refrain from disclosing the contents to any person, and notify the
+          agency or organisation that sent this to you.
+          <br />
+          <br />          
+          If you wish to unsubscribe from similar emails, please click <a href="{{{unsubLink}}}">here</a> to inform the sender of your email preference.
+          Alternatively, you may also contact the sender agency or organisation directly through their public contact channels.
+          <br />
+          <br />
+          Powered by <a href="https://postman.gov.sg">Postman</a>
+          <div class="footer-vertical-spacer-top" style="line-height: 16px; height: 16px;">&#8202;</div>
+          <img src="https://file.go.gov.sg/postmanlogo-grey.png" alt="Postman.gov.sg Logo" height="24" style="height: 24px; width: 109.55px;">
+        </div>
+        <div class="footer-vertical-spacer-bottom" style="line-height: 24px; height: 24px;">&#8202;</div>
+      </div>
+    </div>
+  <!--[if true]>
+  </td></tr></table>
+  <![endif]-->
+</body>
+
+</html>

@@ -25,3 +25,23 @@ export const formatFromAddress = (
   if (fromName) return `${fromName} <${from}>`
   return from
 }
+
+/**
+ * Wrap from name in double quotes to escape special characters
+ */
+export const escapeFromAddress = (from: string): string => {
+  const { fromName, fromAddress } = parseFromAddress(from)
+  const normalisedFromAddress = fromAddress.toLowerCase()
+
+  if (fromName) return `"${fromName}" <${normalisedFromAddress}>`
+  return normalisedFromAddress
+}
+
+/**
+ * Extract domain from email address
+ */
+
+export const extractDomainFromEmail = (email: string): string => {
+  const [, domain] = email.split('@')
+  return domain
+}

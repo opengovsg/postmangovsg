@@ -51,7 +51,7 @@ test('displays the necessary elements', async () => {
   expect(passwordTextbox).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /access/i })).toBeInTheDocument()
   expect(
-    screen.getByRole('link', { name: /singapore government agency website/i })
+    screen.getByText(/singapore government agency website/i)
   ).toBeInTheDocument()
 })
 
@@ -64,8 +64,8 @@ test('successfully decrypts and displays a protected message', async () => {
   const passwordTextbox = await screen.findByPlaceholderText(/password/i)
 
   // Enter and submit a password
-  userEvent.type(passwordTextbox, TEST_PASSWORD)
-  userEvent.click(screen.getByRole('button', { name: /access/i }))
+  await userEvent.type(passwordTextbox, TEST_PASSWORD)
+  await userEvent.click(screen.getByRole('button', { name: /access/i }))
 
   // Wait for the protected message to be fully loaded
   const messageText = await screen.findByText(TEST_MESSAGE)

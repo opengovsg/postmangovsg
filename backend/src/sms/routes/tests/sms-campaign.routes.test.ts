@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Campaign, User, Credential } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService, UploadService } from '@core/services'
+import { UploadService } from '@core/services'
 import { DefaultCredentialName } from '@core/constants'
 import { formatDefaultCredentialName } from '@core/utils'
 import { SmsMessage, SmsTemplate } from '@sms/models'
@@ -28,11 +28,11 @@ const createCampaign = async ({
     protect: false,
     valid: false,
     demoMessageLimit: isDemo ? 20 : null,
-  })
+  } as Campaign)
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await createCampaign({ isDemo: false })
   campaignId = campaign.id
 })
@@ -44,11 +44,11 @@ afterEach(async () => {
 
 afterAll(async () => {
   await SmsMessage.destroy({ where: {} })
-  await Campaign.destroy({ where: {} })
+  await Campaign.destroy({ where: {}, force: true })
   await User.destroy({ where: {} })
   await sequelize.close()
-  RedisService.otpClient.quit()
-  RedisService.sessionClient.quit()
+  await UploadService.destroyUploadQueue()
+  await (app as any).cleanup()
 })
 
 describe('GET /campaign/{id}/sms', () => {
@@ -59,12 +59,26 @@ describe('GET /campaign/{id}/sms', () => {
       type: 'SMS',
       valid: false,
       protect: false,
-    })
+    } as Campaign)
     const { id, name, type } = campaign
-
+    const TEST_TWILIO_CREDENTIALS = {
+      accountSid: '',
+      apiKey: '',
+      apiSecret: '',
+      messagingServiceSid: '',
+    }
+    const mockGetCampaign = jest
+      .spyOn(SmsService, 'getTwilioCostPerOutgoingSMSSegmentUSD')
+      .mockResolvedValue(0.0395) // exact value unimportant for test to pass
+    // needed because demo credentials are extracted from secrets manager to get
+    // credentials to call Twilio API for SMS price
+    mockSecretsManager.getSecretValue().promise.mockResolvedValue({
+      SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
+    })
     const res = await request(app).get(`/campaign/${campaign.id}/sms`)
     expect(res.status).toBe(200)
     expect(res.body).toEqual(expect.objectContaining({ id, name, type }))
+    mockGetCampaign.mockRestore()
   })
 })
 
@@ -88,8 +102,6 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
     expect(res.body).toEqual({
       message: `Campaign cannot use demo credentials. ${DefaultCredentialName.SMS} is not allowed.`,
     })
-
-    expect(mockSecretsManager.getSecretValue).not.toHaveBeenCalled()
   })
 
   test('Demo Campaign should not be able to use non-demo credentials', async () => {
@@ -284,7 +296,7 @@ describe('PUT /campaign/{id}/sms/template', () => {
     await SmsMessage.create({
       campaignId: campaignId,
       params: { variable1: 'abc' },
-    })
+    } as SmsMessage)
 
     const res = await request(app)
       .put(`/campaign/${campaignId}/sms/template`)
@@ -340,7 +352,7 @@ describe('PUT /campaign/{id}/sms/template', () => {
       campaignId,
       recipient: 'user@agency.gov.sg',
       params: { recipient: 'user@agency.gov.sg' },
-    })
+    } as SmsMessage)
     const res = await request(app)
       .put(`/campaign/${campaignId}/sms/template`)
       .send({
@@ -446,9 +458,9 @@ describe('POST /campaign/{id}/sms/upload/complete', () => {
   test('Successfully starts recipient list processing', async () => {
     await SmsTemplate.create({
       campaignId: campaignId,
-      params: { variable1: 'abc' },
+      params: ['variable1'],
       body: 'test {{variable1}}',
-    })
+    } as SmsTemplate)
 
     const mockExtractParamsFromJwt = jest
       .spyOn(UploadService, 'extractParamsFromJwt')

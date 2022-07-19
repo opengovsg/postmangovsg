@@ -1,9 +1,9 @@
+import path from 'path'
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
-import config from '@core/config'
-import { Credential, initializeModels } from '@core/models'
+import Umzug from 'umzug'
 
-import { DefaultCredentialName } from '@core/constants'
-import { formatDefaultCredentialName } from '@core/utils'
+import config from '@core/config'
+import { initializeModels } from '@core/models'
 
 const DB_TEST_URI = config.get('database.databaseUri')
 
@@ -17,22 +17,42 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
   initializeModels(sequelize)
 
   try {
+    // There isn't a reason to test migrations, so just use sync() here.
     await sequelize.sync()
+    // eslint-disable-next-line no-console
     console.log({ message: 'Test Database loaded.' })
   } catch (error) {
-    console.log(error.message)
+    // eslint-disable-next-line no-console
+    console.log((error as Error).message)
     console.error({ message: 'Unable to connect to test database', error })
     process.exit(1)
   }
-  // Create the default credential names in the credentials table
-  // Each name should be accompanied by an entry in Secrets Manager
-  await Promise.all(
-    [
-      DefaultCredentialName.Email,
-      formatDefaultCredentialName(DefaultCredentialName.SMS),
-      formatDefaultCredentialName(DefaultCredentialName.Telegram),
-    ].map((name) => Credential.upsert({ name }))
-  )
+
+  const umzugSeeder = new Umzug({
+    migrations: {
+      path: path.resolve(__dirname, '../database/seeders'),
+      params: [sequelize.getQueryInterface(), sequelize.constructor],
+    },
+    storage: 'sequelize',
+    storageOptions: {
+      sequelize,
+      modelName: 'SequelizeData',
+    },
+  })
+
+  try {
+    await umzugSeeder.up()
+    // eslint-disable-next-line no-console
+    console.log({ message: 'Test database seeded.' })
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error)
+    console.error({
+      message: 'Unable to seed test database',
+      error,
+    })
+    process.exit(1)
+  }
 
   return sequelize
 }

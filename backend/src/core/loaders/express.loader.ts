@@ -1,15 +1,12 @@
 import cors from 'cors'
 import express, { Request, Response, NextFunction } from 'express'
-import bodyParser from 'body-parser'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
-import morgan from 'morgan'
 import * as Sentry from '@sentry/node'
-import requestTracer from 'cls-rtracer'
+import expressWinston from 'express-winston'
 
 import config from '@core/config'
-import v1Router from '@core/routes'
-import { getStream, loggerWithLabel } from '@core/logger'
-import { clientIp, userId } from '@core/utils/morgan'
+import { InitV1Route } from '@core/routes'
+import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
@@ -24,28 +21,6 @@ const origin = (v: string): string | RegExp => {
     return new RegExp(v.substring(1, v.length - 1))
   }
   return v
-}
-
-morgan.token('client-ip', clientIp)
-morgan.token('user-id', userId)
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
-const loggerMiddleware = morgan(config.get('MORGAN_LOG_FORMAT'), {
-  stream: getStream(),
-})
-
-const requestTracerMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  const customRequestTracerMiddleware = requestTracer.expressMiddleware({
-    requestIdFactory: () => ({
-      ip: clientIp(req, res),
-      userId: userId(req, res),
-    }),
-  })
-  customRequestTracerMiddleware(req, res, next)
 }
 
 const sentrySessionMiddleware = (
@@ -87,8 +62,6 @@ const overrideContentTypeHeaderMiddleware = (
 
 const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(Sentry.Handlers.requestHandler())
-  app.use(loggerMiddleware)
-  app.use(requestTracerMiddleware)
 
   app.use(overrideContentTypeHeaderMiddleware)
 
@@ -96,10 +69,10 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   // This is to avoid stripping whitespace characters and messing with unicode encoding.
   // This route affects SES callbacks as well, so we'll need to parse the text as JSON
   // in the parseEvent() handle before parsing the SES event.
-  app.use('/v1/callback/email', bodyParser.text({ type: 'application/json' }))
+  app.use('/v1/callback/email', express.text({ type: 'application/json' }))
 
-  app.use(bodyParser.json())
-  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: false }))
   // ref: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
   // Default CORS setting:
   // {
@@ -123,13 +96,25 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     next()
   })
 
+  app.use(
+    expressWinston.logger({
+      msg: `Incoming HTTP Request {{req.method}} {{req.url}}`,
+      winstonInstance: logger,
+      ignoredRoutes: ['/'],
+      requestWhitelist: ['method', 'url', 'body', 'headers'],
+      responseWhitelist: ['body', 'statusCode'],
+      headerBlacklist: ['authorization'],
+      metaField: null, // flatten this log to root instead of nesting under `meta`
+    })
+  )
+
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
   })
 
   app.use(sentrySessionMiddleware)
 
-  app.use('/v1', v1Router)
+  app.use('/v1', InitV1Route(app))
   app.use(celebrateErrorMiddleware())
   app.use(Sentry.Handlers.errorHandler())
 

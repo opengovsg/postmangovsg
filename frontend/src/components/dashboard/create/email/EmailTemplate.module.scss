@@ -1,3 +1,5 @@
+@import 'styles/_variables';
+
 .replyToHeader {
   em {
     font-weight: 400;
@@ -6,4 +8,39 @@
 
 .replyToInfo {
   margin-bottom: 2rem;
+}
+
+.logoTextContainer {
+  display: flex;
+}
+
+.logoText {
+  flex-grow: 1;
+}
+
+.logoSwitch {
+  display: flex;
+  margin-top: 0.5rem;
+}
+
+.uploadLogoInfoBlock {
+  margin-top: 0;
+}
+
+.uploadLogoLink {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.agencyLogoContainer {
+  display: inline-block;
+  border: 1px solid $light-grey;
+  border-radius: 1.5rem;
+  padding: 20px;
+  width: auto;
+}
+
+.agencyLogo {
+  height: 64px;
+  width: auto;
 }

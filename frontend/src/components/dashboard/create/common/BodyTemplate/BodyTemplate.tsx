@@ -1,28 +1,68 @@
-import { useState, useCallback, useEffect, useContext } from 'react'
-
 import type { Dispatch, SetStateAction } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 
 import { useParams } from 'react-router-dom'
+import { SegmentedMessage } from 'sms-segments-calculator'
 
 import styles from './BodyTemplate.module.scss'
 
-import { SMSProgress, TelegramProgress } from 'classes'
+import { SMSCampaign, SMSProgress, TelegramProgress } from 'classes'
 import {
-  TextArea,
-  NextButton,
   ErrorBlock,
+  NextButton,
   StepHeader,
   StepSection,
+  TextArea,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+
+// correct as at 12 Jun 2022; to use if costPerSMS from backend unavailable
+export const FALLBACK_COST_PER_SMS_SGD = 0.0395 * 1.4
+
+const SmsMessageBodyInfo = ({
+  body,
+  costPerSMS,
+}: {
+  body: string
+  costPerSMS: number
+}) => {
+  const segmentedMessage = new SegmentedMessage(body)
+  const segmentEncoding = segmentedMessage.encodingName
+  const segmentCount = segmentedMessage.segmentsCount
+
+  return (
+    <p className={styles.characterCount}>
+      This SMS will cost approximately SGD{' '}
+      {(segmentCount * costPerSMS).toFixed(4)}.
+      <br />
+      This estimate is calculated based on Twilio&apos;s pricing. Find out more{' '}
+      <a
+        href="https://go.gov.sg/postman-sms-cost"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        here
+      </a>
+      .
+      <br />
+      {body.length} characters | {segmentCount} message segment(s) |{' '}
+      {segmentEncoding} encoding
+    </p>
+  )
+}
+
+const TelegramMessageBodyInfo = ({ body }: { body: string }) => (
+  <p className={styles.characterCount}>{body.length} characters</p>
+)
 
 function BodyTemplate({
   setActiveStep,
   warnCharacterCount,
   errorCharacterCount,
   saveTemplate,
+  costPerMessage,
 }: {
   setActiveStep:
     | Dispatch<SetStateAction<SMSProgress>>
@@ -36,6 +76,7 @@ function BodyTemplate({
     numRecipients: number
     updatedTemplate?: { body: string; params: string[] }
   }>
+  costPerMessage?: number
 }) {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
@@ -146,7 +187,14 @@ function BodyTemplate({
           value={body}
           onChange={setBody}
         />
-        <p className={styles.characterCount}>{body.length} characters</p>
+        {campaign instanceof SMSCampaign ? (
+          <SmsMessageBodyInfo
+            body={body}
+            costPerSMS={costPerMessage ?? FALLBACK_COST_PER_SMS_SGD}
+          />
+        ) : (
+          <TelegramMessageBodyInfo body={body} />
+        )}
       </StepSection>
 
       <NextButton

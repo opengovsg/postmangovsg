@@ -1,7 +1,6 @@
 {
   "include": [
-    "./src/**/*",
-    "./tests/**/*"
+    "./src/**/*"
   ],
   "exclude": [
     "node_modules"
@@ -10,7 +9,7 @@
     "./src/server.ts"
   ],
   "references": [
-    { "path": "../shared" }
+    { "path": "../shared/tsconfig.build.json" }
   ],
   "compileOnSave": true,
   "compilerOptions": {
@@ -42,6 +41,7 @@
       "@telegram/*": ["telegram/*"],
       "@shared/*": ["../../shared/src/*"],
       "@test-utils/*": ["test-utils/*"],
+      "@database/*": ["database/*"],
       "@mocks/*": ["__mocks__/*"],
     },
     "esModuleInterop": true,

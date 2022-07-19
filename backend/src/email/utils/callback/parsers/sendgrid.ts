@@ -1,5 +1,5 @@
 import { Request } from 'express'
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa'
 import config from '@core/config'
@@ -9,6 +9,7 @@ import {
   updateBouncedStatus,
   updateComplaintStatus,
 } from '@email/utils/callback/update-status'
+import { addToBlacklist } from '@email/utils/callback/query'
 
 const logger = loggerWithLabel(module)
 const PUBLIC_KEY = PublicKey.fromPem(
@@ -26,6 +27,7 @@ type SendgridRecord = {
   email: string
   event: string
   type: string
+  reason: string
   'smtp-id': string
   timestamp: number
 }
@@ -43,7 +45,19 @@ const isEvent = (req: Request): boolean => {
   return true
 }
 
+const shouldBlacklist = (event?: string): boolean => {
+  return event === 'bounce' || event === 'spamreport'
+}
+
 const parseRecord = async (record: SendgridRecord): Promise<void> => {
+  const { event, email } = record
+
+  // Transactional emails don't have message IDs, so blacklist
+  // relevant addresses before everything else
+  if (email && shouldBlacklist(event)) {
+    await addToBlacklist(email)
+  }
+
   if (record.message_id === undefined) {
     logger.info({
       message: 'No reference message id found',
@@ -57,7 +71,7 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
     timestamp: new Date(record.timestamp * 1000).toISOString(),
     messageId: record['smtp-id'],
   }
-  switch (record.event) {
+  switch (event) {
     case 'delivered':
       await updateDeliveredStatus(metadata)
       break
@@ -65,6 +79,7 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
       await updateBouncedStatus({
         ...metadata,
         bounceType: 'Permanent',
+        bounceSubType: record.reason,
         to: [record.email],
       })
       break
@@ -72,20 +87,20 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
       await updateBouncedStatus({
         ...metadata,
         bounceType: 'Temporary',
+        bounceSubType: record.reason,
         to: [record.email],
       })
       break
     case 'spamreport':
       await updateComplaintStatus({
         ...metadata,
-        complaintType: record.event,
-        to: [record.email],
+        complaintType: event,
       })
       break
     default:
       logger.error({
         message: 'Unable handle messages with this notification type',
-        notificationType: record.event,
+        notificationType: event,
         action: 'parseRecord',
       })
       return

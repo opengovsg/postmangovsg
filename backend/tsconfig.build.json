@@ -3,8 +3,13 @@
 // See: https://github.com/microsoft/TypeScript/issues/27098
 {
   "extends": "./tsconfig.json",
-  "exclude": ["tests/"],
+  "exclude": [
+    "node_modules",
+    "./src/**/*.test.ts",
+    "./src/test-utils",
+    "./src/__mocks__"
+  ],
   "references": [
-    { "path": "../shared" }
+    { "path": "../shared/tsconfig.build.json" }
   ]
 }

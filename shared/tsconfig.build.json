@@ -1,0 +1,8 @@
+// Excludes test in builds
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "node_modules",
+    "./src/**/*.test.ts",
+  ]
+}

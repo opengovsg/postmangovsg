@@ -1,3 +1,4 @@
-export { default as emailCampaignRoutes } from './email-campaign.routes'
-export { default as emailSettingsRoutes } from './email-settings.routes'
+export * from './email-campaign.routes'
+export * from './email-settings.routes'
 export { default as emailCallbackRoutes } from './email-callback.routes'
+export * from './email-transactional.routes'

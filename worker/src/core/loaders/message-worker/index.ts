@@ -1,4 +1,4 @@
-import { expose } from 'threads/worker'
+import tracer from 'dd-trace'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
@@ -6,6 +6,7 @@ require('module-alias/register') // to resolve aliased paths like @core, @sms, @
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
+import { waitForMs } from '@shared/utils/wait-for-ms'
 import Email from './email.class'
 import SMS from './sms.class'
 import Telegram from './telegram.class'
@@ -20,6 +21,7 @@ let connection: Sequelize,
   email: Email,
   sms: SMS,
   telegram: Telegram
+let shouldRun = false
 
 /**
  *  Different channel types operate on their own channel type tables.
@@ -82,49 +84,73 @@ const getMessages = async (jobId: number, rate: number): Promise<Message[]> => {
   return await service().getMessages(jobId, rate)
 }
 
-const sendMessage = (message: Message): Promise<void> => {
-  return service().sendMessage(message)
-}
-
-const finalize = (): Promise<void> => {
-  const logEmailJob = connection
-    .query('SELECT log_next_job_email();')
-    .then(([result]) => get(result, '[0].log_next_job_email', ''))
-    .catch((err) => {
-      logger.error({ message: 'Log email job', error: err, action: 'finalize' })
+const sendMessage = tracer.wrap(
+  'message-worker',
+  {
+    tags: {
+      'resource.name': 'sendMessage',
+    },
+  },
+  (message: Message): Promise<void> => {
+    logger.info({
+      message: 'Start sending message',
+      messageValue: message,
     })
+    return service().sendMessage(message)
+  }
+)
 
-  const logSmsJob = connection
-    .query('SELECT log_next_job_sms();')
-    .then(([result]) => get(result, '[0].log_next_job_sms', ''))
-    .catch((err) => {
-      logger.error({ message: 'Log sms job', error: err, action: 'finalize' })
-    })
-
-  const logTelegramJob = connection
-    .query('SELECT log_next_job_telegram();')
-    .then(([result]) => get(result, '[0].log_next_job_telegram', ''))
-    .catch((err) => {
-      logger.error({
-        message: 'Log telegram job',
-        error: err,
-        action: 'finalize',
-      })
-    })
-
-  return Promise.all([logEmailJob, logSmsJob, logTelegramJob]).then(
-    (campaignIds) => {
-      campaignIds.filter(Boolean).forEach((campaignId) => {
-        logger.info({
-          message: 'Logging finalized',
-          workerId,
-          campaignId,
+const finalize = tracer.wrap(
+  'message-worker',
+  {
+    tags: {
+      'resource.name': 'finalize',
+    },
+  },
+  (): Promise<void> => {
+    const logEmailJob = connection
+      .query('SELECT log_next_job_email();')
+      .then(([result]) => get(result, '[0].log_next_job_email', ''))
+      .catch((err) => {
+        logger.error({
+          message: 'Log email job',
+          error: err,
           action: 'finalize',
         })
       })
-    }
-  )
-}
+
+    const logSmsJob = connection
+      .query('SELECT log_next_job_sms();')
+      .then(([result]) => get(result, '[0].log_next_job_sms', ''))
+      .catch((err) => {
+        logger.error({ message: 'Log sms job', error: err, action: 'finalize' })
+      })
+
+    const logTelegramJob = connection
+      .query('SELECT log_next_job_telegram();')
+      .then(([result]) => get(result, '[0].log_next_job_telegram', ''))
+      .catch((err) => {
+        logger.error({
+          message: 'Log telegram job',
+          error: err,
+          action: 'finalize',
+        })
+      })
+
+    return Promise.all([logEmailJob, logSmsJob, logTelegramJob]).then(
+      (campaignIds) => {
+        campaignIds.filter(Boolean).forEach((campaignId) => {
+          logger.info({
+            message: 'Logging finalized',
+            workerId,
+            campaignId,
+            action: 'finalize',
+          })
+        })
+      }
+    )
+  }
+)
 
 const createConnection = (): Sequelize => {
   const dialectOptions =
@@ -136,6 +162,20 @@ const createConnection = (): Sequelize => {
     logging: false,
     pool: config.get('database.poolOptions'),
     dialectOptions,
+    retry: {
+      max: 5,
+      match: [
+        /ConnectionError/,
+        /SequelizeConnectionError/,
+        /SequelizeConnectionRefusedError/,
+        /SequelizeHostNotFoundError/,
+        /SequelizeHostNotReachableError/,
+        /SequelizeInvalidConnectionError/,
+        /SequelizeConnectionTimedOutError/,
+        /SequelizeConnectionAcquireTimeoutError/,
+        /Connection terminated unexpectedly/,
+      ],
+    },
     hooks: {
       beforeConnect: async (dbConfig: MutableConfig): Promise<void> => {
         if (config.get('database.useIam')) {
@@ -146,36 +186,41 @@ const createConnection = (): Sequelize => {
   })
 }
 
-const waitForMs = (ms: number): Promise<void> => {
-  if (ms > 0) return new Promise((resolve) => setTimeout(() => resolve(), ms))
-  return Promise.resolve()
-}
-
 const enqueueAndSend = async (): Promise<void> => {
   const { jobId, rate, credName, campaignId } = await getNextJob()
   if (jobId && rate && credName && campaignId) {
     await service().setSendingService(credName)
     await enqueueMessages(jobId, campaignId)
+
     let hasNext = true
-    while (hasNext) {
+    while (hasNext && shouldRun) {
       const messages = await getMessages(jobId, rate)
       if (!messages[0]) {
         hasNext = false
       } else {
-        const start = Date.now()
-        await Promise.all(messages.map((m) => sendMessage(m)))
-        // Make sure at least 1 second has elapsed
-        const wait = Math.max(0, 1000 - (Date.now() - start))
-        await waitForMs(wait)
         logger.info({
           message: 'Sending messages',
           workerId,
           jobId,
           rate,
           numMessages: messages.length,
-          wait,
           action: 'enqueueAndSend',
         })
+
+        const start = Date.now()
+        await Promise.all(messages.map((m) => sendMessage(m)))
+        // Make sure at least 1 second has elapsed
+        const wait = Math.max(0, 1000 - (Date.now() - start))
+        await waitForMs(wait)
+
+        if (!shouldRun) {
+          logger.info({
+            message: 'Stopping send early due to worker shutdown',
+            action: 'enqueueAndSend',
+            workerId,
+            jobId,
+          })
+        }
       }
     }
     await service().destroySendingService()
@@ -203,36 +248,54 @@ const createAndResumeWorker = (): Promise<void> => {
     })
 }
 
-const init = async (index: string, isLogger = false): Promise<any> => {
+const start = async (index: string, isLogger = false): Promise<any> => {
   await ECSUtil.load()
   workerId = ECSUtil.getWorkerId(index)
   connection = createConnection()
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
   telegram = new Telegram(workerId, connection)
+
   try {
+    shouldRun = true
+
     if (!isLogger) {
       await createAndResumeWorker()
-      for (;;) {
+      while (shouldRun) {
         await enqueueAndSend()
         await waitForMs(2000)
       }
     } else {
-      for (;;) {
+      while (shouldRun) {
         await finalize()
         await waitForMs(2000)
       }
     }
   } catch (err) {
     return Promise.reject(err)
+  } finally {
+    if (connection) {
+      logger.info({
+        message: 'Closing database connection',
+        action: 'start',
+        workerId,
+      })
+      await connection.close()
+    }
   }
 }
 
-const messageWorker = {
-  init,
+const shutdown = (): void => {
+  logger.info({
+    message: 'Shutdown signal recieved. Attempting to gracefully shutdown.',
+    action: 'shutdown',
+    workerId,
+  })
+  shouldRun = false
 }
 
-expose(messageWorker)
-
-export type MessageWorker = typeof messageWorker
-export default MessageWorker
+const worker = {
+  start,
+  shutdown,
+}
+export default worker

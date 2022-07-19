@@ -1,5 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
+@import 'styles/_email_typography';
 
 %toolbar-modal-base {
   height: auto;
@@ -259,9 +260,10 @@
   }
 
   table {
-    $border-color: adjust-color($primary-light, $alpha: -0.5);
+    $border-color: $primary-light;
     border: 1px solid $border-color;
     table-layout: fixed;
+    width: auto;
 
     tr {
       display: table-row;
@@ -306,6 +308,41 @@
 
     .rdw-justify-aligned-block .public-DraftStyleDefault-block {
       text-align: justify;
+    }
+  }
+
+  // Typography styles to match email theme
+  // Changes here should also be made in email-theme.mustache to update the actual email theme
+  // These styles are repeated in EmailPreviewBlock.module.scss due to differences in DOM structure
+  color: $email-font-color;
+  font-size: $email-body-font-size;
+
+  * {
+    font-family: $email-font-stack;
+  }
+
+  h1 {
+    @extend %email-heading-1;
+  }
+
+  h2 {
+    @extend %email-heading-2;
+  }
+
+  h4 {
+    @extend %email-heading-4;
+  }
+
+  :global {
+    // This represents a <p> block when rendered
+    .public-DraftStyleDefault-block {
+      @extend %email-body;
+    }
+
+    // Within tables/lists, <p> tags are not created, so reset the margin styles
+    table .public-DraftStyleDefault-block,
+    li .public-DraftStyleDefault-block {
+      margin: 0;
     }
   }
 }

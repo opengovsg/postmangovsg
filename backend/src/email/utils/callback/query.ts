@@ -1,6 +1,6 @@
 import { QueryTypes, Op, cast, fn } from 'sequelize'
 import {
-  UpdateMessageWithErrorCode,
+  UpdateMessageWithErrorMetadata,
   Metadata,
 } from '@email/interfaces/callback.interface'
 import { EmailBlacklist, EmailMessage } from '@email/models'
@@ -30,9 +30,9 @@ export const addToBlacklist = (
  *
  */
 export const updateMessageWithError = async (
-  opts: UpdateMessageWithErrorCode
+  opts: UpdateMessageWithErrorMetadata
 ): Promise<number | undefined> => {
-  const { errorCode, timestamp, id } = opts
+  const { errorCode, errorSubType, timestamp, id } = opts
 
   logger.info({
     message: 'Updating email_messages table',
@@ -42,9 +42,10 @@ export const updateMessageWithError = async (
   const [, result] = await EmailMessage.update(
     {
       errorCode: errorCode,
-      receivedAt: timestamp,
+      errorSubType,
+      receivedAt: new Date(timestamp),
       status: 'INVALID_RECIPIENT',
-    },
+    } as Partial<EmailMessage>,
     {
       where: {
         [Op.and]: [
@@ -77,11 +78,12 @@ export const updateMessageWithSuccess = async (
   })
   const { timestamp, id } = metadata
   // Since notifications for the same messageId can be interleaved, we only update that message if this notification is newer than the previous.
+  // Should not overwrite a READ status for the message
   const [, result] = await EmailMessage.update(
     {
-      receivedAt: timestamp,
+      receivedAt: new Date(timestamp),
       status: 'SUCCESS',
-    },
+    } as EmailMessage,
     {
       where: {
         [Op.and]: [
@@ -92,8 +94,37 @@ export const updateMessageWithSuccess = async (
               { receivedAt: { [Op.lt]: timestamp } },
             ],
           },
+          {
+            [Op.or]: [{ status: null }, { status: { [Op.ne]: 'READ' } }],
+          },
         ],
       },
+      returning: true,
+    }
+  )
+  return result[0]?.campaignId
+}
+
+/**
+ *  Updates the email_messages table for read receipt of an email.
+ */
+export const updateMessageWithRead = async (
+  metadata: Metadata
+): Promise<number | undefined> => {
+  logger.info({
+    message: 'Updating email_messages table',
+    metadata,
+    action: 'updateMessageWithRead',
+  })
+  const { timestamp, id } = metadata
+  // Since open event supercedes error or success notification types, overwrite any previous status
+  const [, result] = await EmailMessage.update(
+    {
+      receivedAt: new Date(timestamp),
+      status: 'READ',
+    } as EmailMessage,
+    {
+      where: { id },
       returning: true,
     }
   )
@@ -117,6 +148,7 @@ export const haltCampaignIfThresholdExceeded = async (
       [fn('sum', cast({ error_code: 'Hard bounce' }, 'int')), 'invalid'],
       [fn('count', 1), 'running_total'],
     ],
+    useMaster: false,
   })) as any[]
   const {
     invalid,

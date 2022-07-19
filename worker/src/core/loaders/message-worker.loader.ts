@@ -1,51 +1,30 @@
-import { Worker, spawn, ModuleThread } from 'threads'
-import MessageWorker from './message-worker'
+import process from 'process'
+import worker from './message-worker'
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 
 const logger = loggerWithLabel(module)
 
-const createMessageWorker = async (
-  workerId: string,
-  isLogger = false
-): Promise<ModuleThread<MessageWorker>> => {
-  const worker = await spawn<MessageWorker>(new Worker('./message-worker'))
+const messageWorkerLoader = async (): Promise<void> => {
+  const workerId = String(1)
+  const isLogger = config.get('messageWorker.numLogger') > 0
+
   try {
-    await worker.init(workerId, isLogger)
+    process.on(
+      config.get('env') === 'development' ? 'SIGINT' : 'SIGTERM',
+      worker.shutdown
+    )
+    await worker.start(workerId, isLogger)
   } catch (err) {
     logger.error({
       message: 'Worker died',
       workerId,
       isLogger,
-      error: err,
+      error: `${(err as Error).stack}`.substring(0, 1000),
       action: 'createMessageWorker',
     })
-    process.exit(1)
+    worker.shutdown()
   }
-  return worker
-}
-
-const messageWorkerLoader = async (): Promise<void> => {
-  let i = 1
-  const workers = []
-  for (; i <= config.get('messageWorker.numSender'); i++) {
-    workers.push(createMessageWorker(String(i)))
-  }
-  for (
-    ;
-    i <=
-    config.get('messageWorker.numSender') +
-      config.get('messageWorker.numLogger');
-    i++
-  ) {
-    workers.push(createMessageWorker(String(i), true))
-  }
-  return Promise.all(workers).then(() => {
-    logger.info({
-      message: 'MessageWorker loaded',
-      action: 'messageWorkerLoader',
-    })
-  })
 }
 
 export default messageWorkerLoader

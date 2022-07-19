@@ -115,7 +115,7 @@
 }
 
 .greenInfoBlock {
-  @include block(rgba($success, 0.2), $success);
+  @include block(rgba($success, 0.2), $success, $success);
 }
 
 .editBtn {
@@ -131,14 +131,6 @@
   }
   &:active {
     color: $secondary;
-  }
-}
-
-.warningHelpLink {
-  font-style: italic;
-  color: inherit;
-  &:hover {
-    text-decoration: underline;
   }
 }
 

@@ -1,4 +1,6 @@
+import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
+import { parseFromAddress } from '@shared/utils/from-address'
 import {
   useState,
   useEffect,
@@ -8,11 +10,12 @@ import {
   SetStateAction,
 } from 'react'
 
+import { OutboundLink } from 'react-ga'
+
 import { useParams } from 'react-router-dom'
 
 import styles from './EmailTemplate.module.scss'
 
-import { parseFromAddress } from '@shared/utils/from-address'
 import { EmailCampaign, EmailProgress } from 'classes'
 import {
   TextArea,
@@ -23,9 +26,12 @@ import {
   StepHeader,
   StepSection,
   RichTextEditor,
+  InfoBlock,
+  ToggleSwitch,
 } from 'components/common'
 
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
@@ -45,6 +51,9 @@ const EmailTemplate = ({
     subject: initialSubject,
     replyTo: initialReplyTo,
     from: initialFrom,
+    showLogo: initialShowLogo,
+    agencyName,
+    agencyLogoURI,
     protect,
   } = campaign as EmailCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
@@ -54,14 +63,13 @@ const EmailTemplate = ({
   const [replyTo, setReplyTo] = useState(
     initialReplyTo === userEmail ? null : initialReplyTo
   )
+  const [showLogo, setShowLogo] = useState(initialShowLogo ?? true)
 
   // initialFrom is undefined for a new campaign without a saved template
-  const {
-    fromName: initialFromName,
-    fromAddress: initialFromAddress,
-  } = initialFrom
-    ? parseFromAddress(initialFrom)
-    : { fromName: '', fromAddress: '' }
+  const { fromName: initialFromName, fromAddress: initialFromAddress } =
+    initialFrom
+      ? parseFromAddress(initialFrom)
+      : { fromName: '', fromAddress: '' }
   const [fromName, setFromName] = useState(initialFromName)
   const [fromAddress, setFromAddress] = useState(initialFromAddress)
 
@@ -73,7 +81,7 @@ const EmailTemplate = ({
   const protectedBodyPlaceholder =
     'Dear {{ recipient }}, \n\n You may access your results via this link <a href="{{ protectedlink }}">{{ protectedlink }}</a> . \n\nPlease login with your birthday (DDMMYYYY) followed by the last 4 characters of your NRIC. E.g. 311290123A'
   const bodyPlaceholder =
-    'Dear {{ name }}, your next appointment at {{ clinic }} is on {{ date }} at {{ time }}'
+    'Dear {{ name }},\n\nYour next appointment at {{ clinic }} is on {{ date }} at {{ time }}\n\nMinistry of Health\n16 College Road, College of Medicine Building, Singapore 169854\n6325 9220 | www.moh.gov.sg'
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
     setErrorMsg(null)
@@ -86,7 +94,8 @@ const EmailTemplate = ({
         subject,
         body,
         replyTo,
-        `${fromName} <${fromAddress}>`
+        `${fromName} <${fromAddress}>`,
+        showLogo
       )
       if (updatedTemplate) {
         updateCampaign({
@@ -94,6 +103,7 @@ const EmailTemplate = ({
           subject: updatedTemplate.subject,
           body: updatedTemplate.body,
           replyTo: updatedTemplate.reply_to,
+          showLogo: updatedTemplate.show_logo,
           params: updatedTemplate.params,
           numRecipients,
         })
@@ -111,6 +121,7 @@ const EmailTemplate = ({
     updateCampaign,
     fromAddress,
     fromName,
+    showLogo,
   ])
 
   // Get custom from addresses
@@ -146,7 +157,8 @@ const EmailTemplate = ({
               subject,
               body,
               replyTo,
-              `${fromName} <${fromAddress}>`
+              `${fromName} <${fromAddress}>`,
+              showLogo
             )
           } catch (err) {
             setErrorMsg(err.message)
@@ -166,6 +178,7 @@ const EmailTemplate = ({
     setFinishLaterContent,
     campaignId,
     replyTo,
+    showLogo,
   ])
 
   function replaceNewLines(body: string): string {
@@ -174,10 +187,8 @@ const EmailTemplate = ({
 
   const handleSelectFromAddress = useCallback(
     (selectedFrom: string) => {
-      const {
-        fromName: selectedFromName,
-        fromAddress: selectedFromAddress,
-      } = parseFromAddress(selectedFrom)
+      const { fromName: selectedFromName, fromAddress: selectedFromAddress } =
+        parseFromAddress(selectedFrom)
 
       // Use custom from name if it has already been set. For e.g.,
       // for "Custom <donotreply@mail.postman.gov.sg>"", we should
@@ -221,12 +232,12 @@ const EmailTemplate = ({
 
         <div>
           <h4>From</h4>
-          <p>Sender details.</p>
+          <p>Sender details</p>
           <TextInput
             {...getFromNameInputProps()}
             onChange={setFromName}
             aria-label="Sender name"
-            placeholder={t`E.g. Ministry of Health`}
+            placeholder={t`e.g. Ministry of Health`}
           />
           <Dropdown
             onSelect={handleSelectFromAddress}
@@ -239,10 +250,13 @@ const EmailTemplate = ({
 
         <div>
           <h4>
-            <label htmlFor="subject">Subject</label>
+            <label htmlFor="subject">Email Subject</label>
           </h4>
           <p>
-            <label htmlFor="subject">Enter subject of the email</label>
+            <label htmlFor="subject">
+              Keep it short, specific and personalised. Try to use less than 10
+              words.
+            </label>
           </p>
           <TextArea
             id="subject"
@@ -252,6 +266,58 @@ const EmailTemplate = ({
             value={subject}
             onChange={setSubject}
           />
+        </div>
+
+        <div>
+          <div className={styles.logoTextContainer}>
+            <div className={styles.logoText}>
+              <h4>
+                <label htmlFor="logo">Show or hide logo</label>
+              </h4>
+              <p>
+                <label htmlFor="logo">
+                  Your agency’s logo will appear in the header of the email.
+                </label>
+              </p>
+              <p>
+                <b>Note:</b> Logos may not be visible in government email
+                inboxes.
+              </p>
+            </div>
+            {!!agencyLogoURI && (
+              <div className={styles.logoSwitch}>
+                <ToggleSwitch
+                  checked={showLogo}
+                  onChange={setShowLogo}
+                ></ToggleSwitch>
+              </div>
+            )}
+          </div>
+          {agencyLogoURI ? (
+            showLogo && (
+              <div className={styles.agencyLogoContainer}>
+                <img
+                  className={styles.agencyLogo}
+                  src={agencyLogoURI}
+                  alt={agencyName}
+                />
+              </div>
+            )
+          ) : (
+            <InfoBlock className={styles.uploadLogoInfoBlock}>
+              Your agency’s logo has not been uploaded. To upload a logo, please
+              fill up this{' '}
+              <OutboundLink
+                className={styles.uploadLogoLink}
+                eventLabel={i18n._(LINKS.uploadLogoUrl)}
+                to={i18n._(LINKS.uploadLogoUrl)}
+                target="_blank"
+              >
+                form
+              </OutboundLink>
+              .
+            </InfoBlock>
+          )}
         </div>
 
         <div>
@@ -282,8 +348,17 @@ const EmailTemplate = ({
                 template should match the headers in your recipients CSV file.
               </p>
               <p>
-                <b>Note:</b> Recipient (email address) is a required column in
-                the CSV file.
+                You can increase the legitimacy of your email by signing off
+                with a proper agency signature.
+              </p>
+              <p>
+                <b>Suggested signature:</b>
+                <br />
+                Agency name
+                <br />
+                Office address
+                <br />
+                Contact number | Website
               </p>
             </>
           )}

@@ -4,9 +4,9 @@ global.console = {
   log: jest.fn(), // console.log are ignored in tests
   error: console.error,
   warn: console.warn,
-  info: console.info,
+  info: console.log,
   debug: console.debug,
 }
 
 // Mock services
-jest.mock('@core/services/mail-client.class')
+jest.mock('@shared/clients/mail-client.class')

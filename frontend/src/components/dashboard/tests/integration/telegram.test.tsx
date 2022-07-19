@@ -24,7 +24,7 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   })
 
   // Click on the "Create new campaign" button
-  userEvent.click(newCampaignButton)
+  await userEvent.click(newCampaignButton, { delay: null })
 
   // Wait for the CreateModal to load
   const campaignNameTextbox = await screen.findByRole('textbox', {
@@ -32,14 +32,15 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   })
 
   // Fill in the campaign title
-  userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
+  await userEvent.type(campaignNameTextbox, CAMPAIGN_NAME, { delay: null })
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
   // Click on the Telegram channel button
-  const telegramChannelButton = screen.getByRole('button', {
+  const telegramChannelButton = await screen.findByRole('button', {
     name: /^telegram$/i,
   })
-  userEvent.click(telegramChannelButton)
+
+  await userEvent.click(telegramChannelButton, { delay: null })
   expect(telegramChannelButton).toHaveClass('active')
   expect(screen.getByRole('button', { name: /^sms/i })).not.toHaveClass(
     'active'
@@ -49,7 +50,10 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   )
 
   // Click on the "Create campaign" button
-  userEvent.click(screen.getByRole('button', { name: /create campaign/i }))
+  await userEvent.click(
+    screen.getByRole('button', { name: /create campaign/i }),
+    { delay: null }
+  )
 
   // Wait for the message template to load
   expect(
@@ -61,15 +65,16 @@ test('successfully creates and sends a new Telegram campaign', async () => {
     name: /message/i,
   })
   for (const char of MESSAGE_TEXT) {
-    userEvent.type(messageTextbox, char)
+    await userEvent.type(messageTextbox, char, { delay: null })
   }
   expect(messageTextbox).toHaveTextContent(MESSAGE_TEXT)
 
   // Go to upload recipients page and wait for it to load
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByRole('button', {
@@ -82,7 +87,9 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   const fileUploadInput = screen.getByLabelText(
     /upload file/i
   ) as HTMLInputElement
-  userEvent.upload(fileUploadInput, VALID_MOBILE_CSV_FILE)
+  await userEvent.upload(fileUploadInput, VALID_MOBILE_CSV_FILE, {
+    delay: null,
+  })
   expect(fileUploadInput?.files).toHaveLength(1)
   expect(fileUploadInput?.files?.[0]).toBe(VALID_MOBILE_CSV_FILE)
 
@@ -93,10 +100,11 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   expect(screen.getByText(MESSAGE_TEXT)).toBeInTheDocument()
 
   // Go to the credential validation page and wait for it to load
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByRole('heading', {
@@ -108,19 +116,21 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   const credentialDropdown = screen.getByRole('listbox', {
     name: /telegram credentials/i,
   })
-  userEvent.click(credentialDropdown)
-  userEvent.click(
+  await userEvent.click(credentialDropdown, { delay: null })
+  await userEvent.click(
     await screen.findByRole('option', {
       name: TELEGRAM_CREDENTIAL,
-    })
+    }),
+    { delay: null }
   )
   expect(credentialDropdown).toHaveTextContent(TELEGRAM_CREDENTIAL)
 
   // Click on the "Validate credentials" button
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /validate credentials/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByRole('heading', {
@@ -132,45 +142,49 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   const testNumberTextbox = await screen.findByRole('textbox', {
     name: /preview/i,
   })
-  userEvent.type(testNumberTextbox, RECIPIENT_NUMBER)
+  await userEvent.type(testNumberTextbox, RECIPIENT_NUMBER, { delay: null })
   expect(testNumberTextbox).toHaveValue(RECIPIENT_NUMBER)
 
   // Click on the "Send test message" button and wait for validation
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /send test message/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByText(/message sent successfully\./i)
   ).toBeInTheDocument()
 
   // Go to the preview and send page
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
   // Wait for the page to load and ensure the necessary elements are shown
   expect(await screen.findByText(MESSAGE_TEXT)).toBeInTheDocument()
 
   // Enter a custom send rate
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /send rate/i,
-    })
+    }),
+    { delay: null }
   )
   const sendRateTextbox = screen.getByRole('textbox', {
     name: /send rate/i,
   })
-  userEvent.type(sendRateTextbox, '30')
+  await userEvent.type(sendRateTextbox, '30', { delay: null })
   expect(sendRateTextbox).toHaveValue('30')
 
   // Click the send campaign button
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /send campaign now/i,
-    })
+    }),
+    { delay: null }
   )
 
   // Wait for the confirmation modal to load
@@ -181,10 +195,11 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   ).toBeInTheDocument()
 
   // Click on the confirm send now button
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /confirm send now/i,
-    })
+    }),
+    { delay: null }
   )
 
   // Wait for the campaign to be sent and ensure
@@ -212,7 +227,7 @@ test('successfully creates and sends a new Telegram campaign', async () => {
     name: /refresh stats/i,
   })
 
-  userEvent.click(refreshStatsButton)
+  await userEvent.click(refreshStatsButton, { delay: null })
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 

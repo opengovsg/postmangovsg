@@ -1,5 +1,7 @@
+import Queue from 'bee-queue'
 import { v4 as uuid } from 'uuid'
 import { difference, keys } from 'lodash'
+import retry from 'async-retry'
 
 import S3 from 'aws-sdk/clients/s3'
 import { Transaction } from 'sequelize'
@@ -11,18 +13,32 @@ import { MissingTemplateKeysError } from '@core/errors/template.errors'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
 import { Campaign } from '@core/models'
-import { CsvStatusInterface } from '@core/interfaces'
+import {
+  CsvStatusInterface,
+  UploadData,
+  Upload,
+  AllowedTemplateTypes,
+} from '@core/interfaces'
 import { CSVParams } from '@core/types'
-import { StatsService, CampaignService } from '.'
+import S3Client from '@core/services/s3-client.class'
+import { StatsService, CampaignService, ParseCsvService } from '.'
 
 const logger = loggerWithLabel(module)
 const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 
+const RETRY_CONFIG = {
+  retries: 3,
+  minTimeout: 1000,
+  maxTimeout: 3 * 1000,
+  factor: 1,
+}
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 const s3 = new S3({
   signatureVersion: 'v4',
   ...configureEndpoint(config),
 })
+
+let uploadQueue: Queue<Upload> | undefined
 
 /**
  * Returns a presigned url for uploading file to s3 bucket
@@ -202,7 +218,7 @@ const checkTemplateKeysMatch = (
  * @param param.key
  * @param param.filename
  */
-const uploadCompleteOnComplete = ({
+const onComplete = ({
   transaction,
   campaignId,
   key,
@@ -221,7 +237,171 @@ const uploadCompleteOnComplete = ({
 
     // Set campaign to valid
     await CampaignService.setValid(campaignId, transaction)
-    transaction?.commit()
+    await transaction?.commit()
+  }
+}
+
+/**
+ * Get or create upload queue
+ * @return uploadQueue - Queue holding all upload jobs
+ */
+const getUploadQueue = async (): Promise<Queue<Upload>> => {
+  if (!uploadQueue) {
+    uploadQueue = new Queue<Upload>(config.get('upload.queueName'), {
+      redis: config.get('upload.redisUri'),
+      removeOnSuccess: true,
+    })
+    await uploadQueue.ready()
+  }
+
+  return uploadQueue
+}
+
+/**
+ * Enqueue a new upload job for processing
+ * @param upload - Upload holding channel type and upload data
+ * @return jobId
+ */
+const enqueueUpload = async (upload: Upload): Promise<string> => {
+  const queue = await getUploadQueue()
+  // set job id to be campaign ID just in case a duplicate job is created while
+  // another job for the same campaign is being processed, the duplicate job won't
+  // be created
+  const job = queue.createJob(upload).setId(upload.data.campaignId.toString())
+  // Retries are already handled within the processing function, hence we set it to zero
+  const saved = await job.retries(0).save()
+  return saved.id
+}
+
+/**
+ * Retrieve a previously enqueued upload job
+ * @param id - ID of the previously enqueued upload job
+ * @return uploadJob
+ */
+const getUpload = async (id: string): Promise<Upload> => {
+  const queue = await getUploadQueue()
+  const job = await queue.getJob(id)
+  if (!job) throw new Error(`Unable to find upload ${id}`)
+  return job.data
+}
+
+/**
+ * Create channel specific function for processing uploads
+ * @param onPreview - Function that returns function to call to preview recipient rows
+ * @param onChunk - Function that returns function to call to process and store recipient rows
+ * @return processUpload - Function that processes an upload
+ */
+const processUpload = <Template extends AllowedTemplateTypes>(
+  onPreview: (params: {
+    transaction: Transaction
+    template: Template
+    campaignId: number
+  }) => (data: CSVParams[]) => Promise<void>,
+  onChunk: (params: {
+    transaction: Transaction
+    campaignId: number
+  }) => (data: CSVParams[]) => Promise<void>
+) => {
+  return async (uploadData: UploadData<Template>): Promise<void> => {
+    const { campaignId, template, s3Key, etag, filename } = uploadData
+
+    try {
+      // - download from s3
+      const s3Client = new S3Client()
+      await retry(async (bail) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const transaction = await Campaign.sequelize!.transaction()
+
+        const downloadStream = s3Client.download(s3Key, etag)
+        const params = {
+          transaction,
+          template,
+          campaignId: +campaignId,
+        }
+
+        try {
+          await ParseCsvService.parseAndProcessCsv(
+            downloadStream,
+            onPreview(params),
+            onChunk(params),
+            onComplete({
+              ...params,
+              key: s3Key,
+              filename,
+            })
+          )
+        } catch (e) {
+          await transaction.rollback()
+          if ((e as any).code !== 'NoSuchKey') {
+            bail(e as Error)
+          } else {
+            throw e
+          }
+        }
+      }, RETRY_CONFIG)
+    } catch (err) {
+      // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
+      if ((err as any).code === 'PreconditionFailed') {
+        ;(err as Error).message =
+          'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
+      }
+
+      throw err
+    }
+  }
+}
+
+/**
+ * Stores error message in s3_object on failed upload
+ * @param id - ID of failed upload job
+ * @param uploadError
+ */
+const handleFailedUpload = async (
+  id: string,
+  uploadError: Error
+): Promise<void> => {
+  const queue = await getUploadQueue()
+
+  try {
+    const { data } = await getUpload(id)
+    const { campaignId } = data
+    await storeS3Error(+campaignId, uploadError.message)
+    logger.error({
+      message: `Processing for campaign ${data.campaignId} recipient list failed`,
+      error: uploadError,
+      ...data,
+    })
+  } catch (err) {
+    logger.error({
+      message: 'Error occured while handling upload failure',
+      error: err,
+    })
+  } finally {
+    // Always remove the job after handling its error
+    await queue.removeJob(id)
+  }
+}
+
+/**
+ * Handle stalled upload jobs
+ * @param id - ID of stalled upload job
+ */
+const handleStalledUpload = async (id: string): Promise<void> => {
+  const { data } = await getUpload(id)
+  logger.info({
+    message: `Upload for campaign ${data.campaignId} stalled and will be reprocessed`,
+    ...data,
+  })
+}
+
+/**
+ * Remove all jobs and close upload queue
+ */
+const destroyUploadQueue = async (): Promise<void> => {
+  if (uploadQueue) {
+    // Clear all jobs
+    await uploadQueue.destroy()
+    await uploadQueue.close()
   }
 }
 
@@ -235,6 +415,12 @@ export const UploadService = {
   deleteS3TempKeys,
   getCsvStatus,
   checkTemplateKeysMatch,
-  /** Shared uploadComplete function */
-  uploadCompleteOnComplete,
+  /** Upload queue functions */
+  getUploadQueue,
+  enqueueUpload,
+  getUpload,
+  processUpload,
+  handleFailedUpload,
+  handleStalledUpload,
+  destroyUploadQueue,
 }

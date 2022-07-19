@@ -7,7 +7,7 @@ import { server } from './test-utils'
 
 // Some tests take longer than the default 5s to run.
 // Hence, allow the test timeout to be configured.
-const TEST_TIMEOUT = +(process.env.REACT_APP_TEST_TIMEOUT ?? 20000)
+const TEST_TIMEOUT = +(process.env.REACT_APP_TEST_TIMEOUT ?? 5000)
 jest.setTimeout(TEST_TIMEOUT)
 
 // Mock WebCrypto APIs

@@ -41,7 +41,7 @@ To test the changes you want to make to a module like `postman-templating`:
 
 `npm start build` will remove & replace the `build` folder in `postman-templating` with the updated change.
 
-## Deploying or building in Travis
+## Deploying or building in CI
 
 If there are any new dependencies installed in the local node module, the parent folder's `package-lock.json` needs to be updated. This can be done through deleting the `node_modules` and running `npm install`.
 

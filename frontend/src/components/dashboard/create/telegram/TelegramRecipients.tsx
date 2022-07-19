@@ -160,14 +160,16 @@ const TelegramRecipients = ({
 
         {!csvFilename && (
           <WarningBlock title={'We do not remove duplicate recipients'}>
+            Learn how to remove duplicates in your excel{' '}
             <OutboundLink
               className={styles.warningHelpLink}
               eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
               to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
               target="_blank"
             >
-              Learn how to remove duplicates in your excel from our guide.
+              from our guide
             </OutboundLink>
+            .
           </WarningBlock>
         )}
 

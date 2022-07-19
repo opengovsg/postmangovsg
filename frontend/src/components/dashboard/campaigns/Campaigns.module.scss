@@ -20,7 +20,7 @@
 .tableContainer {
   display: block;
   max-width: 100%;
-  overflow: auto;
+  overflow-x: scroll;
 
   table.campaignTable {
     min-width: calc(
@@ -37,11 +37,6 @@
     }
 
     tbody tr {
-      &:hover {
-        cursor: pointer;
-        background-color: $neutral-light;
-      }
-
       &:active {
         opacity: 0.5;
       }
@@ -144,8 +139,4 @@
       @include flex-vertical;
     }
   }
-}
-
-.expired {
-  color: $neutral;
 }

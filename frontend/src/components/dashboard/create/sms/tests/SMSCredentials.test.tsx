@@ -7,6 +7,7 @@ import SMSCredentials from '../SMSCredentials'
 import { SMSCampaign } from 'classes'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
+import 'locales'
 import {
   mockCommonApis,
   render,
