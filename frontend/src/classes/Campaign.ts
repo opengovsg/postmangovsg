@@ -13,6 +13,21 @@ export enum Status {
   Halted = 'Halted',
 }
 
+export enum StatusFilter {
+  Draft = 'Draft',
+  Sent = 'Sent',
+}
+
+export enum SortField {
+  Created = 'created_at',
+  Sent = 'sent_at',
+}
+
+export enum Ordering {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
   [ChannelType.Email]: 'bx-envelope-open',
