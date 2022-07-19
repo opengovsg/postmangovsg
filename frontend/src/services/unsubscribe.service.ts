@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 export async function unsubscribeRequest({
   campaignId,
@@ -33,5 +33,5 @@ function errorHandler(e: unknown, defaultMsg?: string): never {
   ) {
     throw new Error(e.response.data.message)
   }
-  throw new Error(defaultMsg)
+  throw new Error(defaultMsg || (e as AxiosError).response?.statusText)
 }
