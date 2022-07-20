@@ -59,7 +59,7 @@ export class Campaign extends Model<Campaign> {
 
   @ForeignKey(() => Credential)
   @Column(DataType.STRING)
-  credName?: string
+  credName!: string | null
 
   @BelongsTo(() => Credential)
   credential?: Credential
@@ -89,7 +89,7 @@ export class Campaign extends Model<Campaign> {
     type: DataType.BOOLEAN,
     allowNull: true,
   })
-  halted?: boolean
+  halted!: boolean | null
 
   @Default(null)
   @Column({

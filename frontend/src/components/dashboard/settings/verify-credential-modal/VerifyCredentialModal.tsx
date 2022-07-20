@@ -48,7 +48,7 @@ const VerifyCredentialModal = ({
       setCredStep(VerifyCredentialStep.Success)
     } catch (e) {
       console.error(e)
-      setErrorMessage(e.message)
+      setErrorMessage((e as Error).message)
       setCredStep(VerifyCredentialStep.Failure)
     }
   }
