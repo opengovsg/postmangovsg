@@ -8,6 +8,7 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: process.env.CYPRESS_BASE_URL || 'https://staging.postman.gov.sg/',
     video: false,
+    defaultCommandTimeout: 100000,
     env: {
       MSG_TO_VERIFY: 'Dear postman',
       MSG_CONTENT: 'Dear {{}{{}name{}}{}}',
@@ -15,7 +16,6 @@ module.exports = defineConfig({
         'Dear {{}{{}recipient{}}{}}, please access via {{}{{}protectedlink{}}{}}',
       OTP_SUBJECT: 'One-Time Password (OTP) for Postman.gov.sg',
       DUMMY_ENC: 'hello',
-      TIMEOUT: 100000,
       WAIT_TIME: 10000,
       MAIL_SENDER: 'donotreply@mail.postman.gov.sg',
       EMAIL: process.env.CYPRESS_EMAIL,

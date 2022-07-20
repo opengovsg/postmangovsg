@@ -29,7 +29,6 @@ describe('SMS Test', () => {
   const SMS_NUMBER = Cypress.env('SMS_NUMBER');
   const TWILIO_ACC_SID = Cypress.env('TWILIO_ACC_SID');
   const TWILIO_AUTH_TOKEN = Cypress.env('TWILIO_AUTH_TOKEN');
-  const TIMEOUT = Cypress.env('TIMEOUT');
   const WAIT_TIME = Cypress.env('WAIT_TIME');
 
   const MSG_TO_SEARCH = 15;
@@ -67,12 +66,12 @@ describe('SMS Test', () => {
     cy.contains(':button', 'Create').click();
 
     //step 1 : enter message template
-    cy.get('textarea[id="message"]').type(MSG_CONTENT);
+    cy.get('#message').type(MSG_CONTENT);
     cy.contains(':button', 'Next').click();
 
     //step 2 : upload csv file
     cy.get('input[type="file"]').attachFile(CSV_FILENAME);
-    cy.contains('Message preview', { timeout: TIMEOUT });
+    cy.contains('Message preview');
     cy.contains(CSV_FILENAME);
     cy.contains(NUM_RECIPIENTS.concat(' recipients'));
     cy.contains(':button', 'Next').click();
@@ -82,7 +81,7 @@ describe('SMS Test', () => {
     cy.contains(TWILIO_CRED_SAVED).click();
     cy.get('input[type="tel"]').type(SMS_NUMBER);
     cy.get('button[type="submit"]').click();
-    cy.contains('validated', { timeout: TIMEOUT });
+    cy.contains('validated');
     cy.contains(':button', 'Next').click();
 
     //step 4 : send campaign
@@ -90,7 +89,7 @@ describe('SMS Test', () => {
     cy.contains(':button', 'Confirm').click();
 
     //check feedback for success
-    cy.contains('Sending completed', { timeout: TIMEOUT });
+    cy.contains('Sending completed');
     cy.contains('Sent to recipient').siblings().contains(NUM_RECIPIENTS);
     cy.wait(WAIT_TIME);
 
