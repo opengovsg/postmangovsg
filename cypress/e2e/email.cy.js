@@ -19,7 +19,6 @@ describe('Email Test', () => {
     const OTP_SUBJECT = Cypress.env('OTP_SUBJECT')
     const EMAIL = Cypress.env('EMAIL')
     const MAIL_SENDER = Cypress.env('MAIL_SENDER')
-    const TIMEOUT = Cypress.env('TIMEOUT')
     const WAIT_TIME = Cypress.env('WAIT_TIME')
 
     const EMAIL_TO_EXPECT = 2 //both test and actual emails
@@ -31,7 +30,7 @@ describe('Email Test', () => {
         
         //log in via OTP
         cy.visit('/login')
-        cy.get('input[type=email]', {timeout: TIMEOUT})
+        cy.get('input[type=email]')
         cy.get('input[type=email]').type(EMAIL)
         cy.get('button[type=submit]').click()
         cy.wait(WAIT_TIME)
@@ -63,7 +62,7 @@ describe('Email Test', () => {
 
         //step 2 : upload csv file
         cy.get('input[type="file"]').attachFile(CSV_FILENAME)
-        cy.contains('Message preview', {timeout: TIMEOUT})
+        cy.contains('Message preview')
         cy.contains(CSV_FILENAME)
         cy.contains(NUM_RECIPIENTS.concat(" recipients"))
         cy.contains(":button", "Next").click()
@@ -71,7 +70,7 @@ describe('Email Test', () => {
         //step 3 : send test email
         cy.get('input[type="email"]').type(EMAIL)
         cy.get('button[type="submit"]').click()
-        cy.contains('validated', {timeout: TIMEOUT})
+        cy.contains('validated')
         cy.contains(":button", "Next").click()
 
         //step 4 : send campaign
@@ -79,7 +78,7 @@ describe('Email Test', () => {
         cy.contains(":button", "Confirm").click()
 
         //check stats for success
-        cy.contains('Sending completed', {timeout: TIMEOUT})
+        cy.contains('Sending completed')
         cy.contains('Sent to recipient').siblings().contains(NUM_RECIPIENTS)
         cy.wait(WAIT_TIME)
 
