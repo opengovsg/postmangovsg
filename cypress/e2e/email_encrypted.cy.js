@@ -21,7 +21,6 @@ describe('Encrypted Email Test', () => {
     const MAIL_SENDER = Cypress.env('MAIL_SENDER')
     const REDIRECTION_MSG = Cypress.env('REDIRECTION_MSG')
     const DUMMY_ENC = Cypress.env('DUMMY_ENC')
-    const TIMEOUT = Cypress.env('TIMEOUT')
     const WAIT_TIME = Cypress.env('WAIT_TIME')
 
     const EMAIL_TO_EXPECT = 2 //both test and actual emails
@@ -67,17 +66,17 @@ describe('Encrypted Email Test', () => {
         //step 2 : enter message template for encryption and upload csv file
         cy.get('textarea[id="protectedMessage"]').type(MSG_CONTENT)
         cy.get('input[type="file"]').attachFile(CSV_FILENAME)
-        cy.contains('Results', {timeout: TIMEOUT})
+        cy.contains('Results')
         cy.contains(CSV_FILENAME)
         cy.contains(NUM_RECIPIENTS.concat(" recipients"))
         cy.contains(":button", "Confirm").click()
-        cy.contains('Message preview', {timeout: TIMEOUT})
+        cy.contains('Message preview')
         cy.contains(":button", "Next").click()
 
         //step 3 : send test email
         cy.get('input[type="email"]').type(EMAIL)
         cy.get('button[type="submit"]').click()
-        cy.contains('validated', {timeout: TIMEOUT})
+        cy.contains('validated')
         cy.contains(":button", "Next").click()
 
         //step 4 : send campaign
@@ -85,7 +84,7 @@ describe('Encrypted Email Test', () => {
         cy.contains(":button", "Confirm").click()
 
         //check stats for success
-        cy.contains('Sending completed', {timeout: TIMEOUT})
+        cy.contains('Sending completed')
         cy.contains('Sent to recipient').siblings().contains(NUM_RECIPIENTS)
         cy.wait(WAIT_TIME)
 
