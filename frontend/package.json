@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@lingui/react": "3.13.3",
-    "@sentry/browser": "5.27.6",
+    "@sentry/browser": "5.30.0",
     "@types/bcryptjs": "2.4.2",
     "@types/papaparse": "5.2.5",
     "@types/validator": "13.0.0",
