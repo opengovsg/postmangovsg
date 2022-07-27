@@ -61,7 +61,7 @@ export interface CampaignDetails {
 
 export interface CampaignStats extends CampaignStatsCount {
   status: string
-  halted?: boolean
+  halted: boolean | null
   status_updated_at?: Date
   wait_time?: number
 }

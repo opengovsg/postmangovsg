@@ -59,7 +59,7 @@ const SMSCredentials = ({
     !hasCredential
   )
   const [isManual, setIsManual] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
   const { id: campaignId } = useParams<{ id: string }>()
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const SMSCredentials = ({
         }
       } catch (e) {
         console.error(e)
-        setErrorMessage(e.message)
+        setErrorMessage((e as Error).message)
       }
     }
     const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
@@ -90,7 +90,7 @@ const SMSCredentials = ({
   }
 
   async function handleValidateCredentials(recipient: string) {
-    setErrorMessage(null)
+    setErrorMessage('')
     try {
       if (!campaignId) {
         throw new Error('Invalid campaign id')
@@ -116,7 +116,7 @@ const SMSCredentials = ({
       // Saves hasCredential property but do not advance to next step
       updateCampaign({ hasCredential: true })
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     }
   }
 

@@ -51,7 +51,7 @@ Set up a **postgresql@11** database, **redis** cache and **localstack** server. 
 
 #### Starting all services using Docker
 
-```bash
+```zsh
 export AWS_ENDPOINT=http://localhost:4566
 export FILE_STORAGE_BUCKET_NAME=localstack-upload
 export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
@@ -61,7 +61,7 @@ npm run dev:services
 
 #### Starting postgresql and redis natively
 
-```bash
+```zsh
 # Install postgres
 brew install postgresql@11
 brew services start postgresql@11
@@ -89,7 +89,7 @@ npm run dev:localstack
 
 #### Optionally, run the following to install and use `cw` to tail Cloudwatch logs
 
-```bash
+```zsh
 brew tap lucagrulla/tap
 brew install cw
 
@@ -105,7 +105,7 @@ It runs as a pre-commit hook and it needs to be installed if you intend to make 
 
 Run the following to install:
 
-```bash
+```zsh
 pip install detect-secrets==1.2.0
 ```
 
@@ -127,7 +127,7 @@ Set the environment variables in a file named `.env` in each folder. If you're a
 
 ### Install dependencies
 
-```bash
+```zsh
 npm install
 ```
 
@@ -137,7 +137,7 @@ npm install
 
 This step needs to be run if you have made a change to the database schema, or if you are setting up the project for the first time.
 
-```bash
+```zsh
 cd backend
 npm run db:migrate # run all pending migrations
 npm run db:seed # seed database with dummy data
@@ -145,7 +145,7 @@ npm run db:seed # seed database with dummy data
 
 If you need to undo any database migrations:
 
-```bash
+```zsh
 cd backend
 npm run db:undo # undo most recent migration
 ```
@@ -156,7 +156,7 @@ You can find more info on undoing migrations using Sequelize [here](https://sequ
 
 [lingui](https://lingui.js.org/) is used for internationalization. Read [this](frontend/src/locales/README.md) for more info.
 
-```bash
+```zsh
 cd frontend
 npm run extract
 npm run compile
@@ -164,7 +164,7 @@ npm run compile
 
 ### Run the app
 
-```bash
+```zsh
 npm run dev
 ```
 
@@ -173,6 +173,14 @@ You should find the
 - React frontend at [localhost:3000](http://localhost:3000)
 - Express backend at [localhost:4000](http://localhost:4000)
 - Swagger docs at [localhost:4000/docs](http://localhost:4000/docs)
+
+Alternatively, if you would like to develop locally against staging database and workers, ensure that you have set up the necessary variables in `./backend/.env` and run the following:
+
+```zsh
+npm run lazydev
+```
+
+Your frontend and backend will still be on `localhost` but you will be able to use staging database and workers.
 
 ## Deployment
 
@@ -198,7 +206,7 @@ We use Github Actions to simplify our deployment process:
 
 **Example:**
 
-```bash
+```zsh
 # Create a new release branch for a new minor version (e.g. v1.6.0 -> v1.7.0)
 $ git checkout develop
 $ git checkout -b release-v1.7.0

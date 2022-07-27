@@ -44,7 +44,7 @@ export class EmailMessage extends Model<EmailMessage> {
     type: DataType.ENUM(...Object.values(MessageStatus)),
     allowNull: true,
   })
-  status?: MessageStatus
+  status!: MessageStatus | null
 
   @Column(DataType.DATE)
   dequeuedAt?: Date
@@ -56,5 +56,5 @@ export class EmailMessage extends Model<EmailMessage> {
   deliveredAt?: Date
 
   @Column(DataType.DATE)
-  receivedAt?: Date
+  receivedAt!: Date | null
 }

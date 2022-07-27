@@ -51,7 +51,7 @@ const SampleCsv = ({
 
       sendUserEvent(GA_USER_EVENTS.DOWNLOAD_SAMPLE_FILE)
     } catch (e) {
-      setErrorMsg ? setErrorMsg(e.message) : console.error(e)
+      setErrorMsg ? setErrorMsg((e as Error).message) : console.error(e)
     }
   }
 

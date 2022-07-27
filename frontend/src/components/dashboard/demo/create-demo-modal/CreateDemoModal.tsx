@@ -90,7 +90,7 @@ const CreateDemoModal = ({
       close()
       history.push(`/campaigns/${campaign.id}`)
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     }
   }
 

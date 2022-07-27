@@ -44,7 +44,7 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
       history.push(`/campaigns/${duplicate.id}`)
     } catch (err) {
       console.error(err)
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     }
   }
 

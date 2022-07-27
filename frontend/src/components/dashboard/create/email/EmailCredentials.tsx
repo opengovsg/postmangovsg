@@ -26,11 +26,11 @@ const EmailCredentials = ({
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { hasCredential: initialHasCredential, protect } = campaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [errorMsg, setErrorMsg] = useState('')
   const { id: campaignId } = useParams<{ id: string }>()
 
   async function handleTestSend(recipient: string) {
-    setErrorMsg(null)
+    setErrorMsg('')
     try {
       if (!campaignId) {
         throw new Error('Invalid campaign id')
@@ -43,7 +43,7 @@ const EmailCredentials = ({
       // Saves hasCredential property but do not advance to next step
       updateCampaign({ hasCredential: true })
     } catch (err) {
-      setErrorMsg(err.message)
+      setErrorMsg((err as Error).message)
     }
   }
 

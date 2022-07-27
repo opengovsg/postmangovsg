@@ -81,7 +81,7 @@ export async function encryptData(
       key,
     }
   } catch (error) {
-    throw new Error(`Error encrypting data: ${error.message}`)
+    throw new Error(`Error encrypting data: ${(error as Error).message}`)
   }
 }
 
@@ -112,8 +112,8 @@ export async function decryptData(
     const plaintext = Buffer.from(plainBuffer).toString()
 
     return plaintext
-  } catch (error) {
-    throw new Error(`Error decrypting data: ${error.message}`)
+  } catch (error: unknown) {
+    throw new Error(`Error decrypting data: ${(error as Error).message}`)
   }
 }
 
