@@ -154,7 +154,7 @@ const sendValidationMessage = async (
 ): Promise<void> => {
   const fromAddress = from || config.get('mailFrom')
   const appName = config.get('APP_NAME')
-  MailService.mailClient.sendMail({
+  await MailService.mailClient.sendMail({
     from: fromAddress,
     recipients: [recipient],
     subject: `Your From Address has been validated on ${appName}`,
