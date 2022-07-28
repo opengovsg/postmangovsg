@@ -176,7 +176,7 @@ const config = convict({
   },
   retentionPeriod: {
     doc: 'Number of days to keep campaign before redacting',
-    default: 14,
+    default: 30,
     format: Number,
     env: 'RETENTION_PERIOD',
   },

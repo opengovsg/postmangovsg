@@ -459,7 +459,7 @@ const config = convict({
   redaction: {
     maxAge: {
       doc: 'Maximum age before campaign is redacted',
-      default: 14,
+      default: 30,
       env: 'REDACTION_MAXIMUM_AGE',
       format: Number,
     },
