@@ -144,6 +144,7 @@ class Email {
         subject: hydratedSubject,
         body: themedHTMLEmail,
         referenceId: String(id),
+        unsubLink,
         ...(replyTo ? { replyTo } : {}),
       })
 

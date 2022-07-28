@@ -46,15 +46,22 @@ export default class MailClient {
           message_id: input.referenceId,
         }
       }
+      let headers: any = {
+        [REFERENCE_ID_HEADER]: JSON.stringify(xSmtpHeader),
+      }
+      if (input.unsubLink) {
+        headers = {
+          ...headers,
+          ['List-Unsubscribe']: `<${input.unsubLink}>`,
+        }
+      }
       const options = {
         from: this.email || escapeFromAddress(input.from as string),
         to: input.recipients,
         subject: input.subject,
         replyTo: input.replyTo,
         html: input.body,
-        headers: {
-          [REFERENCE_ID_HEADER]: JSON.stringify(xSmtpHeader),
-        },
+        headers,
       }
 
       this.mailer.sendMail(options, (err, info) => {
