@@ -90,6 +90,8 @@ export const InitEmailTransactionalRoute = (
    *              text/plain:
    *                type: string
    *                example: Unauthorized
+   *         "403":
+   *           description: Forbidden. Request violates firewall rules.
    *         "429":
    *           description: Rate limit exceeded
    *           content:
@@ -100,11 +102,31 @@ export const InitEmailTransactionalRoute = (
    *                schema:
    *                  $ref: '#/components/schemas/RateLimit'
    *         "500":
-   *           description: Internal Server Error (Eg. custom domain passed email validation but is incorrect)
+   *           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
    *           content:
    *              text/plain:
    *                type: string
    *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    *
    * components:
    *  schemas:
