@@ -5,6 +5,7 @@ export interface MailToSend {
   replyTo?: string
   referenceId?: string
   from?: string
+  unsubLink?: string
 }
 
 export interface MailCredentials {
