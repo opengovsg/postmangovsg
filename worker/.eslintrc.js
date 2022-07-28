@@ -46,7 +46,7 @@ module.exports = {
           'objectLiteralProperty',
           'objectLiteralMethod',
         ],
-        format: ['camelCase', 'snake_case', 'PascalCase', 'UPPER_CASE'],
+        format: null,
       },
     ],
     '@typescript-eslint/no-explicit-any': 'off',
