@@ -36,19 +36,34 @@ const validateHash = ({
   }
 }
 
-/**
- * Create a new unsubscriber
- * @param campaignId
- * @param recipient
- */
 const findOrCreateUnsubscriber = ({
+  campaignId,
+  recipient,
+  reason,
+}: {
+  campaignId: number
+  recipient: string
+  reason: string
+}): Promise<[Unsubscriber, boolean]> => {
+  return Unsubscriber.findOrCreate({
+    defaults: {
+      reason,
+    } as Unsubscriber,
+    where: {
+      campaignId,
+      recipient,
+    },
+  })
+}
+
+const deleteUnsubscriber = async ({
   campaignId,
   recipient,
 }: {
   campaignId: number
   recipient: string
-}): Promise<[Unsubscriber, boolean]> => {
-  return Unsubscriber.findOrCreate({
+}): Promise<void> => {
+  await Unsubscriber.destroy({
     where: {
       campaignId,
       recipient,
@@ -64,4 +79,5 @@ export const UnsubscriberService = {
   validateHash,
   findOrCreateUnsubscriber,
   generateTestUnsubLink,
+  deleteUnsubscriber,
 }
