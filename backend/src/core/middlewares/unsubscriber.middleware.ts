@@ -44,6 +44,7 @@ const isUnsubscribeRequestValid = async (
 
     next()
   } catch (err) {
+    console.error(err)
     logger.error({ message: 'Invalid unsubscribe request', ...logMeta })
     return res.status(400).json({
       message: 'Invalid unsubscribe request',

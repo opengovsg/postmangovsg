@@ -51,6 +51,7 @@ async function unsubscribe() {
     name: /proceed to unsubscribe/i,
   })
 
+  // Click on the unsubscribe button
   await userEvent.click(radioInput)
   await userEvent.click(unsubscribeButton)
 }
