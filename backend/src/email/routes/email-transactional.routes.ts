@@ -5,6 +5,7 @@ import {
   EmailMiddleware,
 } from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
+import { FileAttachmentMiddleware } from '@core/middlewares'
 
 export const InitEmailTransactionalRoute = (
   emailTransactionalMiddleware: EmailTransactionalMiddleware,
@@ -28,6 +29,7 @@ export const InitEmailTransactionalRoute = (
         .email()
         .options({ convert: true })
         .lowercase(),
+      attachments: Joi.array().items(Joi.object().keys().required()),
     }),
   }
 
@@ -61,6 +63,16 @@ export const InitEmailTransactionalRoute = (
    *                 reply_to:
    *                   type: string
    *                   nullable: true
+   *                 attachments:
+   *                   type: array
+   *                   nullable: true
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       name:
+   *                         type: string
+   *                       data:
+   *                         type: Buffer
    *       responses:
    *         "202":
    *           description: Accepted. The message is being sent.
@@ -75,6 +87,8 @@ export const InitEmailTransactionalRoute = (
    */
   router.use(
     '/send',
+    FileAttachmentMiddleware.fileUploadHandler,
+    FileAttachmentMiddleware.preprocessPotentialIncomingFile,
     celebrate(sendValidator),
     emailMiddleware.isFromAddressAccepted,
     emailTransactionalMiddleware.rateLimit,

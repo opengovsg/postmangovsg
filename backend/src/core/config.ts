@@ -529,6 +529,20 @@ const config = convict({
       format: Number,
     },
   },
+  file: {
+    maxAttachmentSize: {
+      doc: 'Maximum accepted file attachment size in MB',
+      default: 5 * 1024 * 1024, // 5 MB
+      env: 'FILE_ATTACHMENT_MAX_SIZE',
+      format: Number,
+    },
+    maxAttachmentNum: {
+      doc: 'Maximum number of file attachments',
+      default: 10,
+      env: 'FILE_ATTACHMENT_MAX_NUM',
+      format: Number,
+    },
+  },
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
