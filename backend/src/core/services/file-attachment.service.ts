@@ -1,4 +1,14 @@
+import CloudmersiveClient from '@core/services/cloudmersive-client.class'
+import config from '@core/config'
+import { Promise as BluebirdPromise } from 'bluebird'
+import _ from 'lodash'
 import { MailAttachment } from '@shared/clients/mail-client.class'
+
+if (!config.get('file.cloudmersiveKey')) {
+  throw new Error('fileScanner: cloudmersiveKey not found')
+}
+
+const client = new CloudmersiveClient(config.get('file.cloudmersiveKey'))
 
 const checkType = (files: { data: Buffer; name: string }[]): boolean => {
   if (files) return true
@@ -8,8 +18,10 @@ const checkType = (files: { data: Buffer; name: string }[]): boolean => {
 const virusScan = async (
   files: { data: Buffer; name: string }[]
 ): Promise<boolean> => {
-  if (files) return true
-  return false
+  const isSafe = await BluebirdPromise.map(files, (file) =>
+    client.scanFile(file.data)
+  )
+  return _.every(isSafe)
 }
 
 const parseFiles = async (

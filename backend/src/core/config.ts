@@ -530,6 +530,13 @@ const config = convict({
     },
   },
   file: {
+    cloudmersiveKey: {
+      doc: 'API key for Cloudmersive file scanning service',
+      default: '',
+      env: 'FILE_CLOUDMERSIVE_KEY',
+      format: 'required-string',
+      sensitive: true,
+    },
     maxAttachmentSize: {
       doc: 'Maximum accepted file attachment size in MB',
       default: 5 * 1024 * 1024, // 5 MB
