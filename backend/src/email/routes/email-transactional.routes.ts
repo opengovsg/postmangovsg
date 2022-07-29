@@ -77,7 +77,7 @@ export const InitEmailTransactionalRoute = (
    *         "202":
    *           description: Accepted. The message is being sent.
    *         "400":
-   *           description: Bad Request
+   *           description: Bad Request. Message is malformed, or attachments are rejected.
    *         "401":
    *           description: Unauthorized
    *         "429":

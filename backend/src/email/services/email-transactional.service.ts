@@ -10,6 +10,8 @@ const logger = loggerWithLabel(module)
 /**
  * Sanitizes an email message and sends it.
  * @throws TemplateError if the body or subject is invalid
+ * @throws MaliciousFileError if file attachment is potentially malicious
+ * @throws UnsupportedFileTypeError if file attachment is unsupported file type
  * @throws Error if the message could not be sent.
  */
 async function sendMessage({

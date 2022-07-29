@@ -4,6 +4,7 @@ import { Promise as BluebirdPromise } from 'bluebird'
 import _ from 'lodash'
 import { MailAttachment } from '@shared/clients/mail-client.class'
 import FileType from 'file-type'
+import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
 
 if (!config.get('file.cloudmersiveKey')) {
   throw new Error('fileScanner: cloudmersiveKey not found')
@@ -55,11 +56,11 @@ const sanitizeFiles = async (
 ): Promise<MailAttachment[]> => {
   const isAcceptedType = await checkType(files)
   if (!isAcceptedType) {
-    throw new Error('unsupported file type')
+    throw new UnsupportedFileTypeError()
   }
   const isSafe = await virusScan(files)
   if (!isSafe) {
-    throw new Error('malicious file upload')
+    throw new MaliciousFileError()
   }
   return parseFiles(files)
 }
