@@ -3,7 +3,7 @@ import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from '@shared/templating'
 import { isBlacklisted } from '@email/utils/query'
-import { InvalidRecipientError } from '@core/errors'
+import { FileAttachmentService } from '@core/services'
 
 const logger = loggerWithLabel(module)
 
@@ -18,12 +18,14 @@ async function sendMessage({
   from,
   recipient,
   replyTo,
+  attachments,
 }: {
   subject: string
   body: string
   from: string
   recipient: string
   replyTo?: string
+  attachments?: { data: Buffer; name: string }[]
 }): Promise<void> {
   const sanitizedSubject =
     EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
@@ -32,6 +34,16 @@ async function sendMessage({
     throw new TemplateError(
       'Message is invalid as the subject or body only contains invalid HTML tags.'
     )
+  }
+
+  let sanitizedAttachments
+  if (attachments) {
+    sanitizedAttachments = await FileAttachmentService.sanitizeFiles(
+      attachments
+    )
+    if (!sanitizedAttachments) {
+      throw new Error('Malicious file in attachments')
+    }
   }
 
   const blacklisted = await isBlacklisted(recipient)
@@ -45,6 +57,7 @@ async function sendMessage({
     body: sanitizedBody,
     recipients: [recipient],
     replyTo,
+    attachments: sanitizedAttachments,
   }
   logger.info({
     message: 'Sending transactional email',

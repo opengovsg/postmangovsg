@@ -28,7 +28,14 @@ export const InitEmailTransactionalMiddleware = (
     const ACTION = 'sendMessage'
 
     try {
-      const { subject, body, from, recipient, reply_to: replyTo } = req.body
+      const {
+        subject,
+        body,
+        from,
+        recipient,
+        reply_to: replyTo,
+        attachments,
+      } = req.body
 
       logger.info({ message: 'Sending email', action: ACTION })
       await EmailTransactionalService.sendMessage({
@@ -38,6 +45,7 @@ export const InitEmailTransactionalMiddleware = (
         recipient,
         replyTo:
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
+        attachments,
       })
       res.sendStatus(202)
     } catch (err) {
