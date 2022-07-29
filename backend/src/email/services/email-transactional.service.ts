@@ -41,9 +41,6 @@ async function sendMessage({
     sanitizedAttachments = await FileAttachmentService.sanitizeFiles(
       attachments
     )
-    if (!sanitizedAttachments) {
-      throw new Error('Malicious file in attachments')
-    }
   }
 
   const blacklisted = await isBlacklisted(recipient)

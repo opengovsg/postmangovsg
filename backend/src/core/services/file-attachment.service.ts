@@ -3,6 +3,7 @@ import config from '@core/config'
 import { Promise as BluebirdPromise } from 'bluebird'
 import _ from 'lodash'
 import { MailAttachment } from '@shared/clients/mail-client.class'
+import FileType from 'file-type'
 
 if (!config.get('file.cloudmersiveKey')) {
   throw new Error('fileScanner: cloudmersiveKey not found')
@@ -10,9 +11,25 @@ if (!config.get('file.cloudmersiveKey')) {
 
 const client = new CloudmersiveClient(config.get('file.cloudmersiveKey'))
 
-const checkType = (files: { data: Buffer; name: string }[]): boolean => {
-  if (files) return true
-  return false
+const hasAllowedType = async (file: {
+  data: Buffer
+  name: string
+}): Promise<boolean> => {
+  const { data, name } = file
+  const allowedFileExtensions = config.get('file.supportedExtensions')
+
+  const fileType = await FileType.fromBuffer(data)
+  const extension = fileType?.ext || `${`${name}`.split('.').pop()}`
+  return allowedFileExtensions.includes(extension)
+}
+
+const checkType = async (
+  files: { data: Buffer; name: string }[]
+): Promise<boolean> => {
+  const isAllowed = await BluebirdPromise.map(files, (file) =>
+    hasAllowedType(file)
+  )
+  return _.every(isAllowed)
 }
 
 const virusScan = async (
@@ -35,13 +52,16 @@ const parseFiles = async (
 
 const sanitizeFiles = async (
   files: { data: Buffer; name: string }[]
-): Promise<MailAttachment[] | undefined> => {
-  const isAcceptedType = checkType(files)
-  const isSafe = await virusScan(files)
-  if (isAcceptedType && isSafe) {
-    return parseFiles(files)
+): Promise<MailAttachment[]> => {
+  const isAcceptedType = await checkType(files)
+  if (!isAcceptedType) {
+    throw new Error('unsupported file type')
   }
-  return undefined
+  const isSafe = await virusScan(files)
+  if (!isSafe) {
+    throw new Error('malicious file upload')
+  }
+  return parseFiles(files)
 }
 
 export const FileAttachmentService = {
