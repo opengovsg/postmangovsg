@@ -86,11 +86,6 @@ const getMessages = async (jobId: number, rate: number): Promise<Message[]> => {
 
 const sendMessage = tracer.wrap(
   'message-worker',
-  {
-    tags: {
-      'resource.name': 'send_message',
-    },
-  },
   (
     message: Message,
     metadata: {
@@ -102,6 +97,7 @@ const sendMessage = tracer.wrap(
   ): Promise<void> => {
     const span = tracer.scope().active()
     span?.addTags({
+      'resource.name': `send_message_${metadata.campaignType.toLowerCase()}`,
       'campaign.type': metadata.campaignType.toLowerCase(),
       'campaign.id': metadata.campaignId,
       workerId: metadata.workerId,
