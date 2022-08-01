@@ -8,7 +8,8 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: process.env.CYPRESS_BASE_URL || 'https://staging.postman.gov.sg/',
     video: false,
-    defaultCommandTimeout: 100000,
+    defaultCommandTimeout: 20000,
+    retries: 2,
     env: {
       MSG_TO_VERIFY: 'Dear postman',
       MSG_CONTENT: 'Dear {{}{{}name{}}{}}',
