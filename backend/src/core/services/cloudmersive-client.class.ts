@@ -3,11 +3,16 @@ import {
   ApiClient,
   VirusScanResult,
 } from 'cloudmersive-virus-api-client'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 
 export default class CloudmersiveClient {
   private api: ScanApi
+  private apiKey: string
 
   constructor(cloudmersiveKey: string) {
+    this.apiKey = cloudmersiveKey
     const client = ApiClient.instance
     const ApiKey = client.authentications.Apikey
     ApiKey.apiKey = cloudmersiveKey
@@ -20,7 +25,17 @@ export default class CloudmersiveClient {
    * @throws Will throw error if Cloudmersive fails to scan file
    * @return  true if the scan contains no viruses, false otherwise
    */
-  scanFile: (fileBuffer: Buffer) => Promise<boolean> = (fileBuffer) =>
+  scanFile: (fileBuffer: Buffer) => Promise<boolean> = async (fileBuffer) => {
+    if (!this.apiKey) {
+      logger.warn({
+        message: 'Cloudmersive API key not found, not scanning files',
+      })
+      return true
+    }
+    return this.isSafe(fileBuffer)
+  }
+
+  isSafe: (fileBuffer: Buffer) => Promise<boolean> = (fileBuffer) =>
     new Promise((res) => {
       this.api.scanFile(fileBuffer, (err: any, data: VirusScanResult) => {
         if (err) {

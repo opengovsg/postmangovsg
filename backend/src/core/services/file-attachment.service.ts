@@ -6,12 +6,6 @@ import { MailAttachment } from '@shared/clients/mail-client.class'
 import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
 import { FileExtensionService } from '@core/services'
 
-if (!config.get('file.cloudmersiveKey')) {
-  throw new Error('fileScanner: cloudmersiveKey not found')
-}
-
-const client = new CloudmersiveClient(config.get('file.cloudmersiveKey'))
-
 const checkExtensions = async (
   files: { data: Buffer; name: string }[]
 ): Promise<boolean> => {
@@ -24,6 +18,8 @@ const checkExtensions = async (
 const virusScan = async (
   files: { data: Buffer; name: string }[]
 ): Promise<boolean> => {
+  const client = new CloudmersiveClient(config.get('file.cloudmersiveKey'))
+
   const isSafe = await BluebirdPromise.map(files, (file) =>
     client.scanFile(file.data)
   )
