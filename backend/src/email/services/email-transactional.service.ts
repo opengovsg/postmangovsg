@@ -3,6 +3,7 @@ import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from '@shared/templating'
 import { isBlacklisted } from '@email/utils/query'
+import { InvalidRecipientError } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 
 const logger = loggerWithLabel(module)
