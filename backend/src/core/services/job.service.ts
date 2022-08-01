@@ -8,7 +8,7 @@ import { ChannelType } from '@core/constants'
 
 /**
  * Inserts a job into the job_queue table.
- * @see ../worker/src/core/resources/sql/insert-job.sql
+ * @see ../backend/src/database/migrations/20210429044423-create-insert-job-function.js
  */
 const createJob = async ({
   campaignId,
@@ -83,7 +83,7 @@ const sendCampaign = async ({
 }
 
 /**
- * @see ../worker/src/core/resources/sql/stop-jobs.sql
+ * @see ../backend/src/database/migrations/20210501121338-create-stop-jobs-function.js
  * @param campaignId
  */
 const stopCampaign = (campaignId: number): Promise<any> | undefined => {
@@ -94,7 +94,7 @@ const stopCampaign = (campaignId: number): Promise<any> | undefined => {
 }
 
 /**
- * @see ../worker/src/core/resources/sql/retry-jobs.sql
+ * @see ../backend/src/database/migrations/20210501120857-create-retry-jobs-function.js
  * @param campaignId
  */
 const retryCampaign = (campaignId: number): Promise<any> | undefined => {
