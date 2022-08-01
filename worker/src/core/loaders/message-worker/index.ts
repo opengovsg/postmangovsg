@@ -98,10 +98,10 @@ const sendMessage = tracer.wrap(
     const span = tracer.scope().active()
     span?.addTags({
       'resource.name': `send_message_${metadata.campaignType.toLowerCase()}`,
-      'campaign.type': metadata.campaignType.toLowerCase(),
-      'campaign.id': metadata.campaignId,
-      workerId: metadata.workerId,
-      jobId: metadata.jobId,
+      campaign_type: metadata.campaignType.toLowerCase(),
+      campaign_id: metadata.campaignId,
+      worker_id: metadata.workerId,
+      job_id: metadata.jobId,
     })
     logger.info({
       message: 'Start sending message',
