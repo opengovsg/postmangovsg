@@ -154,4 +154,10 @@
       @include flex-vertical;
     }
   }
+  .removeFilter {
+    @extend %body-2;
+    height: auto;
+    color: $blue-500;
+    text-decoration: underline;
+  }
 }

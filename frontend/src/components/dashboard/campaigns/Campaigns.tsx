@@ -561,6 +561,24 @@ const Campaigns = () => {
     )
   }
 
+  function removeFilter() {
+    setCreatedOrder(Ordering.DESC)
+    setSentOrder(Ordering.DESC)
+    setSortBy(SortField.Created)
+    setOrderBy(Ordering.DESC)
+    setStatusFilter(filterInit)
+    setModeFilter(filterInit)
+    setNameFilter(searchInit)
+    fetchCampaigns(
+      0,
+      SortField.Created,
+      Ordering.DESC,
+      filterInit,
+      filterInit,
+      searchInit
+    )
+  }
+
   function renderNoMatch() {
     return (
       <div className={styles.content}>
@@ -573,13 +591,13 @@ const Campaigns = () => {
           <h3>Sorry, no matches found</h3>
           <p>
             Search a new word or{' '}
-            <Link
-              to={`/campaigns`}
-              className={styles.linkUnderline}
-              onClick={() => window.location.reload()}
+            <TextButton
+              className={styles.removeFilter}
+              minButtonWidth
+              onClick={removeFilter}
             >
               go back to campaign list
-            </Link>
+            </TextButton>
           </p>
         </div>
       </div>

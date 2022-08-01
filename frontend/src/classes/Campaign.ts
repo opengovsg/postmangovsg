@@ -31,7 +31,7 @@ export enum Ordering {
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
   [ChannelType.Email]: 'bx-envelope-open',
-  [ChannelType.Telegram]: 'bxl-telegram',
+  [ChannelType.Telegram]: 'bx-paper-plane',
 }
 
 export class Campaign {
