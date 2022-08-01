@@ -21,8 +21,10 @@ module.exports = {
     LIMIT 1;
 
     SELECT count(*) INTO count_email_campaign_using
-    FROM campaigns c1 WHERE 
-    c1.id <> campaignId
+    FROM job_queue j, campaigns c1 WHERE 
+    j.campaign_id = c1.id 
+    AND j.status NOT IN ('READY','LOGGED')
+    AND c1.id <> campaignId
     AND c1.cred_name = (SELECT c.cred_name FROM campaigns c WHERE c.id = campaignId LIMIT 1)
     AND c1.type = 'EMAIL';
 

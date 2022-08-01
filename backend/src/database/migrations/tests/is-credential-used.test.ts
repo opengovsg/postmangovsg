@@ -73,7 +73,7 @@ describe('is_credential_used(campaignId) SQL function', () => {
         type: QueryTypes.SELECT,
       }
     )
-    expect(get(result, 'is_credential_used') === true)
+    expect(get(result, 'is_credential_used')).toBe(true)
   })
 
   test('returns null if the credential is not used yet', async () => {
@@ -95,7 +95,36 @@ describe('is_credential_used(campaignId) SQL function', () => {
     expect(get(result, 'is_credential_used')).toBeNull()
   })
 
-  test('return null if the credential is only used once on another campaign of type email', async () => {
+  test('returns null if the credential is only used in finished campaigns', async () => {
+    const campaign = await Campaign.create({
+      name: 'campaign-2',
+      userId: 1,
+      type: ChannelType.SMS,
+      credName: credNameNotUsed,
+      valid: true,
+      protect: false,
+    } as Campaign)
+    await Promise.all([
+      JobQueue.create({
+        campaignId: campaign.id,
+        status: JobStatus.Logged,
+      } as JobQueue),
+      JobQueue.create({
+        campaignId: campaign.id,
+        status: JobStatus.Logged,
+      } as JobQueue),
+    ])
+    const [result] = await sql.query(
+      'SELECT is_credential_used(:campaignId);',
+      {
+        replacements: { campaignId: campaign.id },
+        type: QueryTypes.SELECT,
+      }
+    )
+    expect(get(result, 'is_credential_used')).toBeNull()
+  })
+
+  test('return null if the credential is only used once on another sending campaign of type email or finished ones', async () => {
     const anotherEmailCampaign = await Campaign.create({
       name: 'campaign-2',
       userId: 1,
@@ -107,6 +136,14 @@ describe('is_credential_used(campaignId) SQL function', () => {
     await JobQueue.create({
       campaignId: anotherEmailCampaign.id,
       status: JobStatus.Sending,
+    } as JobQueue)
+    await JobQueue.create({
+      campaignId: anotherEmailCampaign.id,
+      status: JobStatus.Logged,
+    } as JobQueue)
+    await JobQueue.create({
+      campaignId: anotherEmailCampaign.id,
+      status: JobStatus.Logged,
     } as JobQueue)
     const campaign = await Campaign.create({
       name: 'campaign-3',
