@@ -74,10 +74,7 @@ export default class MailClient {
         replyTo: input.replyTo,
         html: input.body,
         headers,
-      }
-
-      if (input.attachments) {
-        options.attachments = input.attachments
+        attachments: input.attachments,
       }
 
       this.mailer.sendMail(options, (err, info) => {
