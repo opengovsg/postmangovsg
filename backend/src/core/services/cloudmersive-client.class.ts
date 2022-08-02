@@ -35,7 +35,7 @@ export default class CloudmersiveClient {
     return this.isSafe(fileBuffer)
   }
 
-  isSafe: (fileBuffer: Buffer) => Promise<boolean> = (fileBuffer) =>
+  private isSafe: (fileBuffer: Buffer) => Promise<boolean> = (fileBuffer) =>
     new Promise((res) => {
       this.api.scanFile(fileBuffer, (err: any, data: VirusScanResult) => {
         if (err) {
