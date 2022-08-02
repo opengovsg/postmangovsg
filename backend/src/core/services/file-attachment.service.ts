@@ -1,6 +1,5 @@
 import CloudmersiveClient from '@core/services/cloudmersive-client.class'
 import config from '@core/config'
-import { Promise as BluebirdPromise } from 'bluebird'
 import _ from 'lodash'
 import { MailAttachment } from '@shared/clients/mail-client.class'
 import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
@@ -9,8 +8,8 @@ import { FileExtensionService } from '@core/services'
 const checkExtensions = async (
   files: { data: Buffer; name: string }[]
 ): Promise<boolean> => {
-  const isAllowed = await BluebirdPromise.map(files, (file) =>
-    FileExtensionService.hasAllowedExtensions(file)
+  const isAllowed = await Promise.all(
+    files.map((file) => FileExtensionService.hasAllowedExtensions(file))
   )
   return _.every(isAllowed)
 }
@@ -20,8 +19,8 @@ const virusScan = async (
 ): Promise<boolean> => {
   const client = new CloudmersiveClient(config.get('file.cloudmersiveKey'))
 
-  const isSafe = await BluebirdPromise.map(files, (file) =>
-    client.scanFile(file.data)
+  const isSafe = await Promise.all(
+    files.map((file) => client.scanFile(file.data))
   )
   return _.every(isSafe)
 }
