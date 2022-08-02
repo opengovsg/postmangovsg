@@ -24,7 +24,8 @@ class Email {
     this.mailService = new MailClient(
       config.get('mailOptions'),
       config.get('mailOptions.callbackHashSecret'),
-      config.get('emailFallback.activate') ? config.get('mailFrom') : undefined
+      config.get('emailFallback.activate') ? config.get('mailFrom') : undefined,
+      config.get('mailConfigurationSet')
     )
   }
 
