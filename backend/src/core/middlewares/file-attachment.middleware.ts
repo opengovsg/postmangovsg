@@ -2,10 +2,16 @@ import { Request, Response, NextFunction } from 'express'
 import fileUpload from 'express-fileupload'
 import config from '@core/config'
 
+const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
+const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
+
 const fileUploadHandler = fileUpload({
   limits: {
-    fileSize: config.get('file.maxAttachmentSize'), // 5MB
-    files: config.get('file.maxAttachmentNum'), // 10
+    fileSize: FILE_ATTACHMENT_MAX_SIZE,
+  },
+  abortOnLimit: true,
+  limitHandler: function (_: Request, res: Response) {
+    res.status(413).json({ message: 'Size of attachments exceeds limit' })
   },
 })
 
@@ -15,7 +21,7 @@ const fileUploadHandler = fileUpload({
  */
 function preprocessPotentialIncomingFile(
   req: Request,
-  _: Response,
+  res: Response,
   next: NextFunction
 ) {
   if (req.files && req.files.attachments) {
@@ -25,6 +31,14 @@ function preprocessPotentialIncomingFile(
       req.body.attachments = [attachments]
     } else {
       req.body.attachments = attachments
+    }
+    /**
+     * Throw explicit error for exceeding num files.
+     * express-fileupload does not throw error if num files
+     * exceeded, instead truncates array to specified num
+     */
+    if (req.body.attachments.length > FILE_ATTACHMENT_MAX_NUM) {
+      res.status(413).json({ message: 'Number of attachments exceeds limit' })
     }
   }
   next()
