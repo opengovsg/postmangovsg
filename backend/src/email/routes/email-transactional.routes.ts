@@ -40,6 +40,9 @@ export const InitEmailTransactionalRoute = (
    * paths:
    *   /transactional/email/send:
    *     post:
+   *       security:
+   *         - bearerAuth: []
+   *         - cookieAuth: []
    *       summary: "Send a transactional email"
    *       tags:
    *         - Email
@@ -63,16 +66,31 @@ export const InitEmailTransactionalRoute = (
    *                 reply_to:
    *                   type: string
    *                   nullable: true
+   *           multipart/form-data:
+   *             schema:
+   *               type: object
+   *               required:
+   *                 - subject
+   *                 - body
+   *                 - recipient
+   *               properties:
+   *                 subject:
+   *                   type: string
+   *                 body:
+   *                   type: string
+   *                 recipient:
+   *                   type: string
+   *                 from:
+   *                   type: string
+   *                 reply_to:
+   *                   type: string
+   *                   nullable: true
    *                 attachments:
    *                   type: array
    *                   nullable: true
    *                   items:
-   *                     type: object
-   *                     properties:
-   *                       name:
-   *                         type: string
-   *                       data:
-   *                         type: Buffer
+   *                     type: string
+   *                     format: binary
    *       responses:
    *         "202":
    *           description: Accepted. The message is being sent.
@@ -80,6 +98,8 @@ export const InitEmailTransactionalRoute = (
    *           description: Bad Request. Message is malformed, or attachments are rejected.
    *         "401":
    *           description: Unauthorized
+   *         "413":
+   *           description: Number of attachments or size of attachments exceeded limit.
    *         "429":
    *           description: Too many requests. Please try again later.
    *         "500":
