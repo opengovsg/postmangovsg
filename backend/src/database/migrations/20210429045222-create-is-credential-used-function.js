@@ -1,9 +1,9 @@
-// NOTE: THIS FILE IS OUTDATED PLEASE SEE MORE RECENT MIGRATIONS
 'use strict'
 
 module.exports = {
   up: async (queryInterface, _) => {
     await queryInterface.createFunction(
+      // NOTE: THIS FILE IS OUTDATED PLEASE SEE MORE RECENT MIGRATIONS
       'is_credential_used',
       [{ type: 'integer', name: 'campaignId' }],
       'boolean',
