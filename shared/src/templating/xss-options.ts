@@ -1,4 +1,9 @@
-import { IFilterXSSOptions, cssFilter, safeAttrValue } from 'xss'
+import {
+  IFilterXSSOptions,
+  cssFilter,
+  safeAttrValue,
+  getDefaultCSSWhiteList,
+} from 'xss'
 import { TemplateError } from './errors'
 
 const URL =
@@ -77,6 +82,14 @@ export const XSS_EMAIL_OPTION = {
     return safeAttrValue(tag, name, value, cssFilter)
   },
   stripIgnoreTag: true,
+  // Allow CSS style attributes filtering
+  // https://github.com/leizongmin/js-xss#customize-css-filter
+  css: {
+    whiteList: {
+      ...getDefaultCSSWhiteList(),
+      'white-space': true,
+    },
+  },
 }
 
 export const XSS_SMS_OPTION = {
