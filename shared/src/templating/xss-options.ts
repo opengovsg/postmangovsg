@@ -33,7 +33,7 @@ export const XSS_EMAIL_OPTION = {
     br: DEFAULT_EMAIL_ATTRS,
     p: DEFAULT_EMAIL_ATTRS,
     ul: DEFAULT_EMAIL_ATTRS,
-    ol: DEFAULT_EMAIL_ATTRS,
+    ol: ['start', 'type', ...DEFAULT_EMAIL_ATTRS],
     li: DEFAULT_EMAIL_ATTRS,
     h1: DEFAULT_EMAIL_ATTRS,
     h2: DEFAULT_EMAIL_ATTRS,
@@ -55,7 +55,10 @@ export const XSS_EMAIL_OPTION = {
     tbody: [],
     table: DEFAULT_EMAIL_ATTRS,
     tr: DEFAULT_EMAIL_ATTRS,
-    td: DEFAULT_EMAIL_ATTRS,
+    td: ['colspan', 'rowspan', ...DEFAULT_EMAIL_ATTRS],
+    th: DEFAULT_EMAIL_ATTRS,
+    sup: DEFAULT_EMAIL_ATTRS,
+    caption: DEFAULT_EMAIL_ATTRS,
   },
   safeAttrValue: (tag: string, name: string, value: string): string => {
     // Note: value has already been auto-trimmed of whitespaces
