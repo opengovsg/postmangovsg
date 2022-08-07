@@ -38,6 +38,9 @@ export const InitEmailTransactionalRoute = (
    * paths:
    *   /transactional/email/send:
    *     post:
+   *       security:
+   *         - bearerAuth: []
+   *         - cookieAuth: []
    *       summary: "Send a transactional email"
    *       tags:
    *         - Email
@@ -61,6 +64,31 @@ export const InitEmailTransactionalRoute = (
    *                 reply_to:
    *                   type: email
    *                   nullable: true
+   *           multipart/form-data:
+   *             schema:
+   *               type: object
+   *               required:
+   *                 - subject
+   *                 - body
+   *                 - recipient
+   *               properties:
+   *                 subject:
+   *                   type: string
+   *                 body:
+   *                   type: string
+   *                 recipient:
+   *                   type: string
+   *                 from:
+   *                   type: string
+   *                 reply_to:
+   *                   type: string
+   *                   nullable: true
+   *                 attachments:
+   *                   type: array
+   *                   nullable: true
+   *                   items:
+   *                     type: string
+   *                     format: binary
    *       responses:
    *         "202":
    *           description: Accepted. The message is being sent.
@@ -69,20 +97,34 @@ export const InitEmailTransactionalRoute = (
    *                type: string
    *                example: Accepted
    *         "400":
-   *           description: Bad Request
+   *           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
    *           content:
    *              text/plain:
    *                type: string
    *                examples:
-   *                  Blacklist:
+   *                  InvalidRecipientError:
    *                    value: Recipient email is blacklisted
-   *                  InvalidMessage:
+   *                  TemplateError:
    *                    value: Message is invalid as the subject or body only contains invalid HTML tags.
+   *                  MaliciousFileError:
+   *                    value: "Error: One or more attachments may be potentially malicious. Please check the attached files."
+   *                  UnsupportedFileTypeError:
+   *                    value: "Error: One or more attachments may be an unsupported file type. Please check the attached files."
    *              application/json:
    *                schema:
    *                  oneOf:
    *                    - $ref: '#/components/schemas/ValidationError'
-   *                    - $ref: '#/components/schemas/FromError'
+   *                    - $ref: '#/components/schemas/Error'
+   *                examples:
+   *                  ValidationError:
+   *                    value:
+   *                        statusCode: 400
+   *                        error: Bad Request
+   *                        message: |-
+   *                          "from" must be a valid email
+   *                        validation: {source: body, keys: [from]}
+   *                  FromError:
+   *                    value: {message: Invalid 'from' email address.}
    *
    *         "401":
    *           description: Unauthorized.
@@ -92,15 +134,25 @@ export const InitEmailTransactionalRoute = (
    *                example: Unauthorized
    *         "403":
    *           description: Forbidden. Request violates firewall rules.
-   *         "429":
-   *           description: Rate limit exceeded
+   *         "413":
+   *           description: Number of attachments or size of attachments exceeded limit.
    *           content:
-   *              text/plain:
-   *                type: string
-   *                example: Too many requests, please try again later.
    *              application/json:
    *                schema:
-   *                  $ref: '#/components/schemas/RateLimit'
+   *                  $ref: '#/components/schemas/Error'
+   *                examples:
+   *                  AttachmentQtyLimit:
+   *                    value: {message: Number of attachments exceeds limit}
+   *                  AttachmentSizeLimit:
+   *                    value: {message: Size of attachments exceeds limit}
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
    *           content:
@@ -130,17 +182,6 @@ export const InitEmailTransactionalRoute = (
    *
    * components:
    *  schemas:
-   *    RateLimit:
-   *      description: rate limit exceeded
-   *      type: object
-   *      properties:
-   *        status:
-   *          type: integer
-   *          example: 429
-   *        message:
-   *          type: string
-   *          example: Too many requests. Please try again later.
-   *
    *    ValidationError:
    *      description: any one of the params failed validation
    *      type: object
@@ -167,13 +208,20 @@ export const InitEmailTransactionalRoute = (
    *                type: string
    *                example: from
    *
-   *    FromError:
-   *      description: from address passed email validation but is neither the users email nor the default app email
+   *    Error:
    *      type: object
    *      properties:
    *        message:
    *          type: string
-   *          example: Invalid 'from' email address.
+   *
+   *    ErrorStatus:
+   *      type: object
+   *      properties:
+   *        status:
+   *          type: integer
+   *        message:
+   *          type: string
+   *
    */
   router.use(
     '/send',
