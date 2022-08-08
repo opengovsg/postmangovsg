@@ -1,5 +1,6 @@
 import {
   IFilterXSSOptions,
+  ICSSFilter,
   cssFilter,
   safeAttrValue,
   getDefaultCSSWhiteList,
@@ -65,7 +66,12 @@ export const XSS_EMAIL_OPTION = {
     sup: DEFAULT_EMAIL_ATTRS,
     caption: DEFAULT_EMAIL_ATTRS,
   },
-  safeAttrValue: (tag: string, name: string, value: string): string => {
+  safeAttrValue: (
+    tag: string,
+    name: string,
+    value: string,
+    cssFilter: ICSSFilter
+  ): string => {
     // Note: value has already been auto-trimmed of whitespaces
 
     // Do not sanitize keyword when it's a href link, eg: <a href="{{protectedlink}}">link</a>
@@ -110,7 +116,12 @@ export const XSS_TELEGRAM_OPTION = {
     pre: [],
     a: ['href'],
   },
-  safeAttrValue: (tag: string, name: string, value: string): string => {
+  safeAttrValue: (
+    tag: string,
+    name: string,
+    value: string,
+    cssFilter: ICSSFilter
+  ): string => {
     // Handle Telegram mention as xss-js does not recognize it as a valid url.
     if (
       tag === 'a' &&
