@@ -4,6 +4,7 @@ import { escapeFromAddress } from '../../utils/from-address'
 import { getSha256Hash } from '../../utils/crypto'
 
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
+const CONFIGURATION_SET_HEADER = 'X-SES-CONFIGURATION-SET' // Case sensitive
 
 export * from './interfaces'
 
@@ -11,11 +12,13 @@ export default class MailClient {
   private mailer: nodemailer.Transporter
   private email: string
   private hashSecret: string
+  private configSet: string | undefined
 
   constructor(
     credentials: MailCredentials,
     hashSecret: string,
-    email?: string
+    email?: string,
+    configSet?: string
   ) {
     const { host, port, auth } = credentials
     this.hashSecret = hashSecret
@@ -28,6 +31,7 @@ export default class MailClient {
         pass: auth.pass,
       },
     })
+    this.configSet = configSet
   }
 
   public sendMail(input: MailToSend): Promise<string | void> {
@@ -46,15 +50,30 @@ export default class MailClient {
           message_id: input.referenceId,
         }
       }
+      let headers: any = {
+        [REFERENCE_ID_HEADER]: JSON.stringify(xSmtpHeader),
+      }
+      if (this.configSet) {
+        headers = {
+          ...headers,
+          // Specify this to configure callback endpoint for notifications other
+          // than delivery and bounce through SES configuration set
+          [CONFIGURATION_SET_HEADER]: this.configSet,
+        }
+      }
+      if (input.unsubLink) {
+        headers = {
+          ...headers,
+          ['List-Unsubscribe']: `<${input.unsubLink}>`,
+        }
+      }
       const options = {
         from: this.email || escapeFromAddress(input.from as string),
         to: input.recipients,
         subject: input.subject,
         replyTo: input.replyTo,
         html: input.body,
-        headers: {
-          [REFERENCE_ID_HEADER]: JSON.stringify(xSmtpHeader),
-        },
+        headers,
       }
 
       this.mailer.sendMail(options, (err, info) => {
