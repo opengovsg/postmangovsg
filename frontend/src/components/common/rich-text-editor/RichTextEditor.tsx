@@ -44,6 +44,7 @@ import 'draft-js/dist/Draft.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
 const MAX_LIST_DEPTH = 4
+let hidePlaceholder = false
 
 const ExtendedEditor = (props: any) => <Editor {...props} />
 
@@ -151,6 +152,25 @@ const RichTextEditor = ({
     const currentContent = editorState.getCurrentContent()
     const html = Converter.convertToHTML(convertToRaw(currentContent))
     onChange(html)
+
+    //hide placeholder if block type is changed
+    //list bullets and unaligned cursor would otherwise appear on top of preview
+    if (!currentContent.hasText()) {
+      const firstBlockType = currentContent.getBlockMap().first().getType()
+      const firstBlockAlignment = currentContent
+        .getBlockMap()
+        .first()
+        .getData()
+        .get('text-align')
+      if (
+        firstBlockType !== 'unstyled' ||
+        (firstBlockAlignment && firstBlockAlignment != 'left')
+      ) {
+        hidePlaceholder = true
+      } else {
+        hidePlaceholder = false
+      }
+    }
   }, [editorState, onChange])
 
   function renderBlock(block: ContentBlock): any | void {
@@ -246,6 +266,33 @@ const RichTextEditor = ({
         selection.getAnchorOffset() === 0 &&
         blockBefore?.getType() === 'table-cell'
       ) {
+        return 'handled'
+      }
+
+      //handle deletion of list item when it is the first block,
+      //would otherwise not be deleted
+      if (
+        ['unordered-list-item', 'ordered-list-item'].includes(
+          anchor.getType()
+        ) &&
+        !blockBefore &&
+        !anchor.getText()
+      ) {
+        //set list block to unstyled
+        let blockMap = editorState.getCurrentContent().getBlockMap()
+        blockMap = blockMap.set(
+          anchorKey,
+          anchor.set('type', 'unstyled') as ContentBlock
+        )
+        const newContent = editorState
+          .getCurrentContent()
+          .set('blockMap', blockMap) as ContentState
+        const newEditorState = EditorState.push(
+          editorState,
+          newContent,
+          'change-block-type'
+        )
+        setEditorState(newEditorState)
         return 'handled'
       }
     }
@@ -358,7 +405,9 @@ const RichTextEditor = ({
     <ExtendedEditor
       wrapperClassName={styles.wrapper}
       toolbarClassName={styles.toolbar}
-      editorClassName={styles.editor}
+      editorClassName={cx(styles.editor, {
+        [styles.hidePlaceholder]: hidePlaceholder,
+      })}
       placeholder={placeholder}
       editorState={editorState}
       onEditorStateChange={setEditorState}

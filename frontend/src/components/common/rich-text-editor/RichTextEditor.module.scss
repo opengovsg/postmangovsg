@@ -248,6 +248,14 @@
     }
   }
 
+  &.hidePlaceholder {
+    :global {
+      .public-DraftEditorPlaceholder-root {
+        display: none;
+      }
+    }
+  }
+
   .link {
     display: inline-block;
     position: relative;
@@ -295,18 +303,22 @@
 
   :global {
     .rdw-center-aligned-block .public-DraftStyleDefault-block {
+      display: block;
       text-align: center;
     }
 
     .rdw-left-aligned-block .public-DraftStyleDefault-block {
+      display: block;
       text-align: left;
     }
 
     .rdw-right-aligned-block .public-DraftStyleDefault-block {
+      display: block;
       text-align: right;
     }
 
     .rdw-justify-aligned-block .public-DraftStyleDefault-block {
+      display: block;
       text-align: justify;
     }
   }
