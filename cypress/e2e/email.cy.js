@@ -1,5 +1,6 @@
 describe('Email Test', () => {
-
+    
+    const MODE = "email"
     const CSV_FILENAME = "testfile_email.csv"
     const NUM_RECIPIENTS = '1'
 
@@ -10,7 +11,7 @@ describe('Email Test', () => {
                 + CUR_DATE.getHours() + ":" 
                 + CUR_DATE.getMinutes() + ":" 
                 + CUR_DATE.getSeconds();
-    const CAMPAIGN_NAME = "email_".concat(DATETIME)
+    const CAMPAIGN_NAME = MODE.concat("_").concat(DATETIME)
     const RANDOM_STRING = "_".concat((Math.floor((Math.random() * 1000000) + 1)).toString())
     const SUBJECT_NAME = "sub_".concat(DATETIME).concat(RANDOM_STRING)
     const MSG_CONTENT = Cypress.env('MSG_CONTENT').concat(RANDOM_STRING)
@@ -20,6 +21,7 @@ describe('Email Test', () => {
     const EMAIL = Cypress.env('EMAIL')
     const MAIL_SENDER = Cypress.env('MAIL_SENDER')
     const WAIT_TIME = Cypress.env('WAIT_TIME')
+    const REPORT_WAIT_TIME = Cypress.env('REPORT_WAIT_TIME')
 
     const EMAIL_TO_EXPECT = 2 //both test and actual emails
 
@@ -44,7 +46,6 @@ describe('Email Test', () => {
             const LOGIN_EMAIL_CONTENT = email[0].body.html
             const OTP_RE = /\<b\>([^]+)\<\/b\>/;
             const OTP = LOGIN_EMAIL_CONTENT.match(OTP_RE)[1]
-            cy.log(OTP)
             cy.get('input[type=tel]').type(OTP)
             cy.get('button[type=submit]').click()
         })
@@ -97,9 +98,33 @@ describe('Email Test', () => {
                 if (msg != null && msg === MSG_TO_VERIFY){
                     msg_cnt += 1
                 }
+                if (i == 0) { //actual email
+                    //load gmail tracking pixel to mark email as read
+                    const TRACKING_IMG_RE = /\<img alt="" src="([^]+)" /;
+                    var tracking_img = sent_email_content.match(TRACKING_IMG_RE)[1]
+                    cy.request(tracking_img)
+                }
             }
             assert.equal(msg_cnt, EMAIL_TO_EXPECT, "test and/or actual email has incorrect content")
         })
+
+        //wait for report to be generated and download it
+        cy.wait(REPORT_WAIT_TIME)
+        cy.contains(":button", "Report").click()
+        
+        //check report, status should be READ
+        cy.wait(WAIT_TIME)
+        const downloadPath = Cypress.config('downloadsFolder')
+        cy.task("findDownloaded", downloadPath)
+        .then(file_names => {
+            file_names.forEach(name => {
+                if (name.startsWith(MODE)) {
+                    cy.readFile(downloadPath + '/' + name).should('contain', 'READ')
+                }
+            })
+        })
+
+
     })
 
 })
