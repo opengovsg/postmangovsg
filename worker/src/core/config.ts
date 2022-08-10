@@ -2,7 +2,7 @@
  * @file Configuration
  * All defaults can be changed
  */
-import convict from 'convict'
+import convict, { Config } from 'convict'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
@@ -26,7 +26,53 @@ convict.addFormats({
   },
 })
 
-const config = convict({
+export interface ConfigSchema {
+  env: string
+  aws: {
+    awsRegion: string
+    awsEndpoint: null
+    secretManagerSalt: string
+    serviceName: string
+    metadataUri: string
+  }
+  database: {
+    databaseUri: string
+    dialectOptions: {
+      ssl: {
+        require: boolean
+        rejectUnauthorized: {
+          valueOf: any
+        }
+        ca: Buffer[]
+      }
+    }
+    poolOptions: {
+      max: number
+      min: number
+      acquire: number
+    }
+    useIam: boolean
+  }
+  mailOptions: {
+    host: string
+    port: number
+    auth: { user: string; pass: string }
+    callbackHashSecret: string
+  }
+  mailFrom: string
+  mailConfigurationSet: string
+  defaultCountry: string
+  callbackSecret: string
+  backendUrl: string
+  messageWorker: { numSender: number; numLogger: number }
+  unsubscribeHmac: { version: string; v1: { algo: string; key: string } }
+  unsubscribeUrl: string
+  smsFallback: { activate: boolean; senderId: string }
+  emailFallback: { activate: boolean }
+  showMastheadDomain: string
+}
+
+const config: Config<ConfigSchema> = convict({
   env: {
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
