@@ -71,7 +71,7 @@ const ApiKey: FunctionComponent<ApiKeyProps> = ({ hasApiKey, onGenerate }) => {
             />
           )
         } else {
-          onGenerateConfirm()
+          await onGenerateConfirm()
         }
         break
       case ApiKeyState.COPY:

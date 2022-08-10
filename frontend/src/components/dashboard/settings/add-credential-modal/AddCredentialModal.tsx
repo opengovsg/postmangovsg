@@ -93,7 +93,7 @@ const AddCredentialModal = ({
 
   useEffect(() => {
     if (credType) {
-      loadCredLabels(credType)
+      void loadCredLabels(credType)
     }
   }, [credType])
 

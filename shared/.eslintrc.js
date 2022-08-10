@@ -12,12 +12,19 @@ module.exports = {
   ],
   parserOptions: {
     sourceType: 'module',
+    project: ['./tsconfig.json'],
   },
   env: {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['build', 'dist', 'node_modules'],
+  ignorePatterns: [
+    'build',
+    'dist',
+    'node_modules',
+    'jest.config.js',
+    '.eslintrc.js',
+  ],
   rules: {
     '@typescript-eslint/naming-convention': [
       'error',
@@ -55,6 +62,7 @@ module.exports = {
     ],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-floating-promises': ['error'],
 
     'no-console': [
       'warn',
