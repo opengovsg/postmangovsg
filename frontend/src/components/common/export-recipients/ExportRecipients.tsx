@@ -1,5 +1,3 @@
-import { Trans } from '@lingui/macro'
-
 import cx from 'classnames'
 
 import download from 'downloadjs'
@@ -12,7 +10,7 @@ import styles from './ExportRecipients.module.scss'
 
 import type { ChannelType } from 'classes/Campaign'
 import { Status } from 'classes/Campaign'
-import { ActionButton, InfoBlock } from 'components/common'
+import { ActionButton } from 'components/common'
 import { exportCampaignStats } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
@@ -203,11 +201,9 @@ const ExportRecipients = ({
     <>
       {isButton ? (
         <div className={styles.actionButton}>
-          <InfoBlock className={styles.notice}>
-            <Trans>
-              Delivery report will expire 14 days after sending is completed.
-            </Trans>
-          </InfoBlock>
+          <strong>
+            Delivery report will expire 30 days after sending is completed.
+          </strong>
           <ActionButton
             disabled={exportStatus !== CampaignExportStatus.Ready}
             className={cx(styles.exportButton, {

@@ -6,6 +6,7 @@ import { CampaignStats } from '@core/interfaces'
 
 import { EmailOp, EmailMessage } from '@email/models'
 import { Writable } from 'stream'
+import { Unsubscriber } from '@core/models'
 
 const logger = loggerWithLabel(module)
 
@@ -13,8 +14,19 @@ const logger = loggerWithLabel(module)
  * Gets stats for email project
  * @param campaignId
  */
-const getStats = (campaignId: number): Promise<CampaignStats> => {
-  return StatsService.getCurrentStats(campaignId, EmailOp)
+const getStats = async (campaignId: number): Promise<CampaignStats> => {
+  const [commonStats, unsubCount] = await Promise.all([
+    StatsService.getCurrentStats(campaignId, EmailOp),
+    Unsubscriber.count({
+      where: {
+        campaignId,
+      },
+    }),
+  ])
+  return {
+    ...commonStats,
+    unsubscribed: unsubCount,
+  }
 }
 
 /**
@@ -50,8 +62,20 @@ const getDeliveredRecipients = async (
   return StatsService.getDeliveredRecipients(campaignId, EmailMessage, stream)
 }
 
+const getUnsubscribers = async (
+  campaignId: number
+): Promise<Unsubscriber[]> => {
+  return Unsubscriber.findAll({
+    where: {
+      campaignId,
+    },
+    useMaster: false,
+  })
+}
+
 export const EmailStatsService = {
   getStats,
   getDeliveredRecipients,
   refreshStats,
+  getUnsubscribers,
 }

@@ -72,6 +72,7 @@ export interface CampaignStatsCount {
   sent: number
   invalid: number
   updated_at: Date
+  unsubscribed?: number // only applicable for email stats
 }
 
 export interface CampaignRecipient {
@@ -113,7 +114,7 @@ export interface DuplicateCampaignDetails {
  *          updated_at:
  *            type: string
  *            format: date-time
- *      CampaignInvalidRecipient:
+ *      CampaignRecipient:
  *        type: object
  *        properties:
  *          recipient:
@@ -123,4 +124,6 @@ export interface DuplicateCampaignDetails {
  *          updated_at:
  *            type: string
  *            format: date-time
+ *          error_code:
+ *            type: string
  */

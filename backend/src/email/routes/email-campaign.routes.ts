@@ -637,7 +637,7 @@ export const InitEmailCampaignRoute = (
    *    get:
    *      tags:
    *        - Email
-   *      summary: Get recipients of unsuccessful emails in campaign
+   *      summary: Get recipients of campaign
    *      parameters:
    *        - name: campaignId
    *          in: path
@@ -652,7 +652,7 @@ export const InitEmailCampaignRoute = (
    *              schema:
    *                type: array
    *                items:
-   *                  $ref: '#/components/schemas/CampaignInvalidRecipient'
+   *                  $ref: '#/components/schemas/CampaignRecipient'
    *        "401":
    *           description: Unauthorized
    *        "403":
@@ -666,6 +666,44 @@ export const InitEmailCampaignRoute = (
     '/export',
     CampaignMiddleware.isCampaignRedacted,
     EmailStatsMiddleware.getDeliveredRecipients
+  )
+
+  /**
+   * @swagger
+   * paths:
+   *  /campaign/{campaignId}/email/export-unsubscribe:
+   *    get:
+   *      tags:
+   *        - Email
+   *      summary: Get unsubscribers of in campaign
+   *      parameters:
+   *        - name: campaignId
+   *          in: path
+   *          required: true
+   *          schema:
+   *            type: string
+   *
+   *      responses:
+   *        200:
+   *          content:
+   *            application/json:
+   *              schema:
+   *                type: array
+   *                items:
+   *                  $ref: '#/components/schemas/CampaignRecipient'
+   *        "401":
+   *           description: Unauthorized
+   *        "403":
+   *           description: Forbidden, campaign not owned by user
+   *        "410":
+   *           description: Campaign has been redacted
+   *        "500":
+   *           description: Internal Server Error
+   */
+  router.get(
+    '/export-unsubscribe',
+    CampaignMiddleware.isCampaignRedacted,
+    EmailStatsMiddleware.getUnsubscribers
   )
 
   /**

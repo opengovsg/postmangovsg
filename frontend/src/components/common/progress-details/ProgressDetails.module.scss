@@ -88,3 +88,17 @@
 .notice {
   margin: 3rem 0;
 }
+
+.linkLike {
+  background: transparent;
+  border: none;
+  color: #2c2cdc;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.textUnderline {
+  text-decoration: underline;
+}
+.grayText {
+  color: $light-grey;
+}

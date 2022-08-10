@@ -78,6 +78,7 @@ export class CampaignStats {
   halted?: boolean
   waitTime?: number
   redacted?: boolean
+  unsubscribed?: number
 
   constructor(input: any) {
     this.error = +input['error']
@@ -89,6 +90,7 @@ export class CampaignStats {
     this.updatedAt = input['updated_at']
     this.halted = input['halted']
     this.waitTime = input['wait_time']
+    this.unsubscribed = input['unsubscribed']
   }
 }
 
@@ -106,4 +108,18 @@ export abstract class CampaignRecipient {
   }
 
   protected abstract formatErrorCode(errorCode: string): string
+}
+
+export class EmailUnsubscriber {
+  recipient: string
+  reason: string
+  unsubscribedAt: string
+
+  constructor(input: any) {
+    this.recipient = input['recipient']
+    this.reason = input['reason']
+    this.unsubscribedAt = moment(input['createdAt'])
+      .format('LLL')
+      .replace(',', '')
+  }
 }
