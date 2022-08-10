@@ -163,6 +163,19 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/protect', protectedMailRoutes)
   router.use('/unsubscribe', unsubscriberRoutes)
 
+  /**
+   * @swagger
+   * components:
+   *   securitySchemes:
+   *     bearerAuth:
+   *       type: http
+   *       scheme: bearer
+   *     cookieAuth:
+   *       type: apiKey
+   *       in: cookie
+   *       name: postmangovsg
+   */
+
   router.use(
     '/campaigns',
     authMiddleware.isCookieOrApiKeyAuthenticated,
