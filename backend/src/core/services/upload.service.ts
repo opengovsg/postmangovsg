@@ -248,6 +248,11 @@ const onComplete = ({
 const getUploadQueue = async (): Promise<Queue<Upload>> => {
   if (!uploadQueue) {
     uploadQueue = new Queue<Upload>(config.get('upload.queueName'), {
+      // campaigns with super large recipient list to generate messages from usually cause queue
+      // stalls and get reprocessed while the previous attempt is still being worked on => resulting
+      // in duplicate messages.
+      // temporarily increase the stall interval to 120s til a long term solution is found
+      stallInterval: 120000,
       redis: config.get('upload.redisUri'),
       removeOnSuccess: true,
     })

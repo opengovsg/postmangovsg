@@ -86,15 +86,27 @@ const getMessages = async (jobId: number, rate: number): Promise<Message[]> => {
 
 const sendMessage = tracer.wrap(
   'message-worker',
-  {
-    tags: {
-      'resource.name': 'sendMessage',
-    },
-  },
-  (message: Message): Promise<void> => {
+  (
+    message: Message,
+    metadata: {
+      campaignType: string
+      campaignId: number
+      workerId: string
+      jobId: number
+    }
+  ): Promise<void> => {
+    const span = tracer.scope().active()
+    span?.addTags({
+      'resource.name': `send_message_${metadata.campaignType.toLowerCase()}`,
+      campaign_type: metadata.campaignType.toLowerCase(),
+      campaign_id: metadata.campaignId,
+      worker_id: metadata.workerId,
+      job_id: metadata.jobId,
+    })
     logger.info({
       message: 'Start sending message',
       messageValue: message,
+      ...metadata,
     })
     return service().sendMessage(message)
   }
@@ -208,7 +220,16 @@ const enqueueAndSend = async (): Promise<void> => {
         })
 
         const start = Date.now()
-        await Promise.all(messages.map((m) => sendMessage(m)))
+        await Promise.all(
+          messages.map((m) =>
+            sendMessage(m, {
+              campaignType: currentCampaignType,
+              campaignId,
+              workerId,
+              jobId,
+            })
+          )
+        )
         // Make sure at least 1 second has elapsed
         const wait = Math.max(0, 1000 - (Date.now() - start))
         await waitForMs(wait)
