@@ -248,11 +248,6 @@ const onComplete = ({
 const getUploadQueue = async (): Promise<Queue<Upload>> => {
   if (!uploadQueue) {
     uploadQueue = new Queue<Upload>(config.get('upload.queueName'), {
-      // campaigns with super large recipient list to generate messages from usually cause queue
-      // stalls and get reprocessed while the previous attempt is still being worked on => resulting
-      // in duplicate messages.
-      // temporarily increase the stall interval to 120s til a long term solution is found
-      stallInterval: 120000,
       redis: config.get('upload.redisUri'),
       removeOnSuccess: true,
     })
@@ -290,6 +285,29 @@ const getUpload = async (id: string): Promise<Upload> => {
   return job.data
 }
 
+async function pgAdvisoryLockCampaign(
+  id: number,
+  transaction: Transaction
+): Promise<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const [[isProcessingByAnother]] = await Campaign.sequelize!.query(
+    'SELECT pg_try_advisory_xact_lock(?)',
+    {
+      replacements: [id],
+      transaction,
+    }
+  )
+  const isAcquired = (
+    isProcessingByAnother as { pg_try_advisory_xact_lock: boolean }
+  ).pg_try_advisory_xact_lock
+  logger.info({
+    message: '[uploadService.pgAdvisoryLockCampaign] Acquiring advisory lock',
+    isAcquired,
+    id,
+  })
+
+  return isAcquired
+}
 /**
  * Create channel specific function for processing uploads
  * @param onPreview - Function that returns function to call to preview recipient rows
@@ -316,6 +334,20 @@ const processUpload = <Template extends AllowedTemplateTypes>(
       await retry(async (bail) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
+
+        // Our processing function somehow hog event loop resulting in the worker
+        // process not being able to send back heartbeat for the whole duration of
+        // the file upload processing. Hence, we're solving it using an advisory lock
+        // on our pg db. The reason we choose this lock over:
+        //   - in-mem lock: this won't work across multiple instances of the backend
+        //   - redis (or any external) lock: this won't be released for restarts upon
+        //     server shutdowns/crashes, which is the whole point of using bee-queue
+        //     with its external (redis) persistence
+        const isAcquired = await pgAdvisoryLockCampaign(campaignId, transaction)
+        if (!isAcquired) {
+          await transaction.rollback()
+          return
+        }
 
         const downloadStream = s3Client.download(s3Key, etag)
         const params = {

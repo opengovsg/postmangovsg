@@ -10,7 +10,6 @@
     "postbuild": "npm run copy-assets",
     "start": "node build/server",
     "copy-assets": "copyfiles -u 1 src/assets/* src/**/*.sql build",
-    "pretest": "tsc --build",
     "test": "jest --runInBand --detectOpenHandles",
     "precommit": "lint-staged",
     "db:migrate": "npx sequelize db:migrate",

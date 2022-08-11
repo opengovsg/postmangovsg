@@ -1,7 +1,7 @@
 module.exports = {
   roots: ['<rootDir>'],
-  testMatch: ['**/tests/**/*.(spec|test).+(ts|tsx|js)'],
-  // testMatch: ['**/tests/**/is-credential-used.(spec|test).+(ts|tsx|js)'],
+  // testMatch: ['**/tests/**/*.(spec|test).+(ts|tsx|js)'],
+  testMatch: ['**/tests/**/upload.service.(spec|test).+(ts|tsx|js)'],
   testPathIgnorePatterns: ['<rootDir>/build/', '<rootDir>/node_modules/'],
   moduleNameMapper: {
     '@core/(.*)': '<rootDir>/src/core/$1',
