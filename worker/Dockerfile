@@ -1,4 +1,4 @@
-FROM public.ecr.aws/l6t0w2g1/node:12-alpine
+FROM public.ecr.aws/docker/library/node:16-alpine
 
 # required for node-gyp
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \

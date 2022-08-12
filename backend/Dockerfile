@@ -1,4 +1,4 @@
-FROM public.ecr.aws/l6t0w2g1/node:12-alpine 
+FROM public.ecr.aws/docker/library/node:16-alpine
 # postman public ecr
 
 # required for node-gyp
