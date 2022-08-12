@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM public.ecr.aws/docker/library/node:16-alpine
 
 RUN apk update && apk upgrade
 RUN apk add postgresql
