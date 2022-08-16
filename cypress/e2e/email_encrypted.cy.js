@@ -1,5 +1,6 @@
 describe('Encrypted Email Test', () => {
 
+    const MODE = 'encrypted'
     const CSV_FILENAME = "testfile_encrypted.csv"
     const NUM_RECIPIENTS = '1'
 
@@ -10,7 +11,7 @@ describe('Encrypted Email Test', () => {
                 + CUR_DATE.getHours() + ":"  
                 + CUR_DATE.getMinutes() + ":" 
                 + CUR_DATE.getSeconds();
-    const CAMPAIGN_NAME = "encrypted_".concat(DATETIME)
+    const CAMPAIGN_NAME = MODE.concat("_").concat(DATETIME)
     const RANDOM_STRING = "_".concat((Math.floor((Math.random() * 1000000) + 1)).toString())
     const SUBJECT_NAME = "sub_enc_".concat(DATETIME).concat(RANDOM_STRING)
     const MSG_CONTENT = Cypress.env('MSG_CONTENT').concat(RANDOM_STRING)
@@ -22,8 +23,19 @@ describe('Encrypted Email Test', () => {
     const REDIRECTION_MSG = Cypress.env('REDIRECTION_MSG')
     const DUMMY_ENC = Cypress.env('DUMMY_ENC')
     const WAIT_TIME = Cypress.env('WAIT_TIME')
+    const REPORT_WAIT_TIME = Cypress.env('REPORT_WAIT_TIME')
 
     const EMAIL_TO_EXPECT = 2 //both test and actual emails
+
+    //function to check content of protected emails 
+    Cypress.Commands.add('checkProtectedMails', (links) => {
+        links.forEach(link => {
+            cy.visit("/".concat(link))
+            cy.get('input[type="password"]').type(DUMMY_ENC)
+            cy.get('button[type="submit"]').click()
+            cy.contains(MSG_TO_VERIFY)
+        })
+    })
 
     it('initiate email campaign', () => {
         //write csv test file
@@ -45,7 +57,6 @@ describe('Encrypted Email Test', () => {
             const LOGIN_EMAIL_CONTENT = email[0].body.html
             const OTP_RE = /\<b\>([^)]+)\<\/b\>/;
             const OTP = LOGIN_EMAIL_CONTENT.match(OTP_RE)[1]
-            cy.log(OTP)
             cy.get('input[type=tel]').type(OTP)
             cy.get('button[type=submit]').click()
         })
@@ -89,26 +100,46 @@ describe('Encrypted Email Test', () => {
         cy.wait(WAIT_TIME)
 
         //Verify that email is being received
+        var links = []
         cy.task("gmail:check", {
             from: MAIL_SENDER,
             to: EMAIL,
             subject: SUBJECT_NAME
         }).then(email => {
-            cy.log(email.length)
-            cy.log(email)
             assert(email.length == EMAIL_TO_EXPECT, 'test and/or actual email was not found')
 
             const LINK_RE = /postman\.gov\.sg\/([^\<]+)/;
             for (let i = 0; i < EMAIL_TO_EXPECT; i ++){
                 var sent_email_content = email[i].body.html
                 var link = sent_email_content.match(LINK_RE)[1]
-                cy.log(link)
-                cy.visit("/".concat(link))
-                cy.get('input[type="password"]').type(DUMMY_ENC)
-                cy.get('button[type="submit"]').click()
-                cy.contains(MSG_TO_VERIFY)
+                links.push(link)
+                if (i == 0) { //actual email
+                    //load gmail tracking pixel to mark email as read
+                    const TRACKING_IMG_RE = /\<img alt="" src="([^]+)" /;
+                    var tracking_img = sent_email_content.match(TRACKING_IMG_RE)[1]
+                    cy.request(tracking_img)
+                }
             }
         })
+
+        //wait for report to be generated and download it
+        cy.wait(REPORT_WAIT_TIME)
+        cy.contains(":button", "Report").click()
+       
+        //check report, status should be READ
+        cy.wait(WAIT_TIME)
+        const downloadPath = Cypress.config('downloadsFolder')
+        cy.task("findDownloaded", downloadPath)
+        .then(file_names => {
+            file_names.forEach(name => {
+                if (name.startsWith(MODE)) {
+                    cy.readFile(downloadPath + '/' + name).should('contain', 'READ')
+                }
+            })
+        })
+
+        //check email content
+        cy.checkProtectedMails(links)
     })
 
 })
