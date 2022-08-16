@@ -7,7 +7,8 @@ require('dotenv').config();
 
 module.exports = defineConfig({
   e2e: {
-    baseUrl: process.env.CYPRESS_BASE_URL || 'https://staging.postman.gov.sg/',
+    //baseUrl: process.env.CYPRESS_BASE_URL || 'https://staging.postman.gov.sg/',
+    baseUrl: 'https://postman.gov.sg/',
     video: false,
     defaultCommandTimeout: 20000,
     retries: 2,
