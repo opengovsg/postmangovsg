@@ -144,6 +144,11 @@ interface ConfigSchema {
     concurrency: number
     checkStalledInterval: number
   }
+  file: {
+    cloudmersiveKey: string
+    maxAttachmentSize: number
+    maxAttachmentNum: number
+  }
 }
 
 convict.addFormats({
