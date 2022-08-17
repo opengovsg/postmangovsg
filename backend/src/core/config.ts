@@ -144,6 +144,11 @@ interface ConfigSchema {
     concurrency: number
     checkStalledInterval: number
   }
+  file: {
+    cloudmersiveKey: string
+    maxAttachmentSize: number
+    maxAttachmentNum: number
+  }
 }
 
 convict.addFormats({
@@ -657,6 +662,27 @@ const config: Config<ConfigSchema> = convict({
       doc: 'How often to check for stalled jobs in milliseconds',
       default: 5000,
       env: 'UPLOAD_CHECK_STALLED_INTERVAL',
+      format: Number,
+    },
+  },
+  file: {
+    cloudmersiveKey: {
+      doc: 'API key for Cloudmersive file scanning service',
+      default: '',
+      env: 'FILE_CLOUDMERSIVE_KEY',
+      format: 'required-string',
+      sensitive: true,
+    },
+    maxAttachmentSize: {
+      doc: 'Maximum accepted file attachment size in MB',
+      default: 5 * 1024 * 1024, // 5 MB
+      env: 'FILE_ATTACHMENT_MAX_SIZE',
+      format: Number,
+    },
+    maxAttachmentNum: {
+      doc: 'Maximum number of file attachments',
+      default: 10,
+      env: 'FILE_ATTACHMENT_MAX_NUM',
       format: Number,
     },
   },

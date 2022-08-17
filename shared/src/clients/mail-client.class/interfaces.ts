@@ -1,3 +1,8 @@
+export interface MailAttachment {
+  filename: string
+  content: Buffer
+}
+
 export interface MailToSend {
   recipients: Array<string>
   subject: string
@@ -6,6 +11,7 @@ export interface MailToSend {
   referenceId?: string
   from?: string
   unsubLink?: string
+  attachments?: Array<MailAttachment>
 }
 
 export interface MailCredentials {
