@@ -1,6 +1,7 @@
 const { defineConfig } = require('cypress');
 const path = require('path');
 const gmail = require('gmail-tester');
+const fs = require('fs')
 
 require('dotenv').config();
 
@@ -8,7 +9,9 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: process.env.CYPRESS_BASE_URL || 'https://staging.postman.gov.sg/',
     video: false,
-    defaultCommandTimeout: 100000,
+    defaultCommandTimeout: 20000,
+    retries: 2,
+    trashAssetsBeforeRuns: true,
     env: {
       MSG_TO_VERIFY: 'Dear postman',
       MSG_CONTENT: 'Dear {{}{{}name{}}{}}',
@@ -17,6 +20,7 @@ module.exports = defineConfig({
       OTP_SUBJECT: 'One-Time Password (OTP) for Postman.gov.sg',
       DUMMY_ENC: 'hello',
       WAIT_TIME: 10000,
+      REPORT_WAIT_TIME: 70000,
       MAIL_SENDER: 'donotreply@mail.postman.gov.sg',
       EMAIL: process.env.CYPRESS_EMAIL,
       SMS_NUMBER: process.env.CYPRESS_SMS_NUMBER,
@@ -40,6 +44,9 @@ module.exports = defineConfig({
             }, // Maximum poll interval (in seconds). If reached, return null, indicating the completion of the task().
           );
           return email;
+        },
+        'findDownloaded': async (path) => {
+          return fs.readdirSync(path)
         },
       });
       return config;

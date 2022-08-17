@@ -1,4 +1,6 @@
 describe('SMS Test', () => {
+  
+  const MODE = 'sms'
   const CSV_FILENAME = 'testfile_sms.csv';
   const NUM_RECIPIENTS = '1';
   const TWILIO_CRED_SAVED = 'default-postman';
@@ -16,7 +18,7 @@ describe('SMS Test', () => {
     CUR_DATE.getMinutes() +
     ':' +
     CUR_DATE.getSeconds();
-  const CAMPAIGN_NAME = 'sms_'.concat(DATETIME);
+  const CAMPAIGN_NAME = MODE.concat('_').concat(DATETIME);
   const RANDOM_STRING = '_'.concat(
     Math.floor(Math.random() * 1000000 + 1).toString(),
   );
@@ -30,6 +32,7 @@ describe('SMS Test', () => {
   const TWILIO_ACC_SID = Cypress.env('TWILIO_ACC_SID');
   const TWILIO_AUTH_TOKEN = Cypress.env('TWILIO_AUTH_TOKEN');
   const WAIT_TIME = Cypress.env('WAIT_TIME');
+  const REPORT_WAIT_TIME = Cypress.env('REPORT_WAIT_TIME')
 
   const MSG_TO_SEARCH = 15;
   const MSG_TO_EXPECT = 2; //both test and actual sms
@@ -54,7 +57,6 @@ describe('SMS Test', () => {
       const EMAIL_CONTENT = email[0].body.html;
       const re = /\<b\>([^)]+)\<\/b\>/;
       const OTP = EMAIL_CONTENT.match(re)[1];
-      cy.log(OTP);
       cy.get('input[type=tel]').type(OTP);
       cy.get('button[type=submit]').click();
     });
@@ -120,5 +122,21 @@ describe('SMS Test', () => {
           'test and/or actual sms not received',
         );
       });
+
+    //wait for report to be generated and download it
+    cy.wait(REPORT_WAIT_TIME)
+    cy.contains(":button", "Report").click()
+    
+    //check report, status should be SUCCESS
+    cy.wait(WAIT_TIME)
+    const downloadPath = Cypress.config('downloadsFolder')
+    cy.task("findDownloaded", downloadPath)
+    .then(file_names => {
+        file_names.forEach(name => {
+            if (name.startsWith(MODE)) {
+                cy.readFile(downloadPath + '/' + name).should('contain', 'SUCCESS')
+            }
+        })
+    })
   });
 });
