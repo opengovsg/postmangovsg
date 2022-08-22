@@ -1,0 +1,43 @@
+name: Deploy serverless-antivirus-scanner
+
+on:
+  push:
+    branches:
+      - staging
+      - master
+
+# Making sure that the current deployment is completed before the next one
+concurrency: deploy-serverless-antivirus-scanner-${{ github.ref }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  virus-scanner:
+    name: virus scanner serverless
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          aws-region: "${{ secrets.AWS_DEFAULT_REGION }}"
+
+      - name: Install node dependencies
+        working-directory: ./serverless/antivirus-scanner
+        run: npm ci
+
+      - name: Deploy with Serverless Framework
+        working-directory: ./serverless/antivirus-scanner
+        env:
+          ENV: ${{ needs.set_environment.outputs.current_env }}
+        run: npm run deploy

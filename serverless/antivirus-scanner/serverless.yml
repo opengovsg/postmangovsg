@@ -1,0 +1,39 @@
+service: antivirus-scanner
+frameworkVersion: "3"
+useDotenv: true
+
+provider:
+  name: aws
+  region: ap-southeast-1
+  stage: ${opt:stage}
+  logs:
+    httpApi: true
+
+  ecr:
+    images:
+      antivirus-scanner:
+        path: ./
+        platform: linux/amd64
+
+plugins:
+  - serverless-add-api-key
+
+custom:
+  apiKeys:
+    - name: apikey
+      value: ${env:VIRUSSCAN_API_KEY}
+
+functions:
+  antivirus-scanner:
+    handler: index.handler
+    image:
+      name: antivirus-scanner
+    # max timeout per invocation 
+    timeout: 30
+    # allocate more memory as the default 1028 MB size will cause lambda to crash
+    memorySize: 2048
+    events:
+      - httpApi:
+          method: POST
+          path: /virus-scan
+          private: true
