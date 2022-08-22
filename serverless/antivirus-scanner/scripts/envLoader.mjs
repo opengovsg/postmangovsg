@@ -54,6 +54,8 @@ async function saveAllParameters() {
     .concat(`\nNODE_ENV=${process.env.ENV}`)
 
   await fs.promises.writeFile(`.env.${process.env.ENV}`, envString)
+
+  console.log(`Retrieved parameters for ENV=${process.env.ENV}`)
 }
 
 await saveAllParameters()
