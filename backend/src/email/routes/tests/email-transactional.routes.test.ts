@@ -142,6 +142,28 @@ describe('POST /transactional/email/send', () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
+  test('Should send a message with a valid attachment', async () => {
+    const mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
+
+    // request.send() cannot be used with file attachments
+    // substitute form values with request.field(). refer to
+    // https://visionmedia.github.io/superagent/#multipart-requests
+    const res = await request(app)
+      .post('/transactional/email/send')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', 'recipient@agency.gov.sg')
+      .field('subject', 'subject')
+      .field('body', '<p>body</p>')
+      .field('from', 'Postman <donotreply@mail.postman.gov.sg>')
+      .field('reply_to', 'user@agency.gov.sg')
+      .attach('attachments', Buffer.from('hello world'), 'hi.txt')
+
+    expect(res.status).toBe(202)
+    expect(mockSendEmail).toBeCalledTimes(1)
+  })
+
   test('Requests should be rate limited', async () => {
     const mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
