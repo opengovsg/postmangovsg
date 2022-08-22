@@ -86,8 +86,8 @@ test('displays an error when attempting to view a messagge with an invalid ID', 
   const passwordTextbox = await screen.findByPlaceholderText(/password/i)
 
   // Enter and submit a password
-  userEvent.type(passwordTextbox, TEST_PASSWORD)
-  userEvent.click(screen.getByRole('button', { name: /access/i }))
+  await userEvent.type(passwordTextbox, TEST_PASSWORD)
+  await userEvent.click(screen.getByRole('button', { name: /access/i }))
 
   // Assert that an error is displayed
   expect(
@@ -110,8 +110,8 @@ test('displays an error when attempting to view a message with an invalid passwo
   const passwordTextbox = await screen.findByPlaceholderText(/password/i)
 
   // Enter and submit a password
-  userEvent.type(passwordTextbox, 'invalid password')
-  userEvent.click(screen.getByRole('button', { name: /access/i }))
+  await userEvent.type(passwordTextbox, 'invalid password')
+  await userEvent.click(screen.getByRole('button', { name: /access/i }))
 
   // Assert that an error is displayed
   expect(

@@ -55,7 +55,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         }
       )
     }
-    initialChecks()
+    void initialChecks()
   }, [])
 
   return (

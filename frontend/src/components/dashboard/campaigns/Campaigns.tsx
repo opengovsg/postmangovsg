@@ -165,7 +165,7 @@ const Campaigns = () => {
   )
 
   useEffect(() => {
-    fetchCampaigns(selectedPage)
+    void fetchCampaigns(selectedPage)
   }, [selectedPage])
 
   useEffect(() => {
@@ -183,7 +183,7 @@ const Campaigns = () => {
       setNumDemosTelegram(demo?.numDemosTelegram)
       displayNewAnnouncement(announcementVersion, latestAnnouncementVersion)
     }
-    getNumDemosAndAnnouncementVersion()
+    void getNumDemosAndAnnouncementVersion()
   }, [displayNewAnnouncement, isMounted])
 
   useEffect(() => {

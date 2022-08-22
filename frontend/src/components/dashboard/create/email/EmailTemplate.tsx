@@ -139,7 +139,7 @@ const EmailTemplate = ({
       setFromAddress((prev) => prev || fromAddress)
     }
 
-    populateFromAddresses()
+    void populateFromAddresses()
   }, [])
 
   // Set callback for finish later button

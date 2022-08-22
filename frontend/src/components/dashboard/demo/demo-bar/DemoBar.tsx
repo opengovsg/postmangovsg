@@ -23,7 +23,7 @@ const DemoBar = ({
   const [isMenuVisible, setIsMenuVisible] = useState(isDisplayed)
   const [hasDemo, setHasDemo] = useState(false)
   const toggleMenu = useCallback(() => {
-    updateDemoDisplayed(!isMenuVisible)
+    void updateDemoDisplayed(!isMenuVisible)
     setIsMenuVisible((state) => !state)
   }, [isMenuVisible])
 

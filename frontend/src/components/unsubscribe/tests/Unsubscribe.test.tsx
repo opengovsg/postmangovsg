@@ -53,7 +53,7 @@ test('successfully unsubscribes user from a campaign', async () => {
   })
 
   // Click on the unsubscribe button
-  userEvent.click(unsubscribeButton)
+  await userEvent.click(unsubscribeButton)
 
   // Assert that the unsubscription succeeded
   const heading = await screen.findByRole('heading', {
@@ -73,7 +73,7 @@ test('displays thank you page when user does not unsubscribe', async () => {
   })
 
   // Click on the stay button
-  userEvent.click(stayButton)
+  await userEvent.click(stayButton)
 
   // Assert that the thank you page is fully displayed
   expect(

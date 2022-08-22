@@ -49,7 +49,7 @@ const Create = () => {
         setIsInvalid(true)
       }
     }
-    loadProject(id)
+    void loadProject(id)
   }, [id, setCampaign, setIsInvalid])
 
   async function handleFinishLater() {
