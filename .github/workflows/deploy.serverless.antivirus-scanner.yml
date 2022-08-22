@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   virus-scanner:
+    needs: [set_environment]
     name: virus scanner serverless
     runs-on: ubuntu-latest
     steps:
