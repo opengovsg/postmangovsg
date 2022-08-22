@@ -67,7 +67,7 @@ jobs:
           npm run lint-no-fix
           npm test
 
-  build_deploy_application:
+  build_application:
     needs: [set_environment, lint-test]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
@@ -75,6 +75,8 @@ jobs:
       IMAGE_TAG: "github-actions-backend-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
       BRANCH: ${{ needs.set_environment.outputs.current_env }}
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
@@ -132,24 +134,40 @@ jobs:
           --source-bundle S3Bucket=$BUCKET_NAME,S3Key=$IMAGE_TAG.zip \
           --description "$TRUNCATED_DESC"
 
-      - name: Update EB environment
-        id: update-eb-1
-        env:
-          APP_NAME: ${{ secrets.EB_APP_NAME }}
-          DEPLOY_ENV: ${{ secrets.EB_ENV_NAME }}
-        run: |
-          cd backend
-          aws elasticbeanstalk update-environment --application-name $APP_NAME \
-            --environment-name $DEPLOY_ENV \
-            --version-label $IMAGE_TAG
+      - name: Set image tag
+        id: set-image-tag
+        run: echo "::set-output name=image_tag::$IMAGE_TAG"
 
-      - name: Update EB2 environment
-        id: update-eb-2
-        env:
-          APP_NAME: ${{ secrets.EB_APP_NAME }}
-          DEPLOY_ENV: ${{ secrets.EB_ENV_NAME_2 }}
-        run: |
-          cd backend
-          aws elasticbeanstalk update-environment --application-name $APP_NAME \
-            --environment-name $DEPLOY_ENV \
-            --version-label $IMAGE_TAG
+  deploy_backend:
+    needs: [set_environment, lint-test, build_application]
+    environment:
+      name: ${{ needs.set_environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.EB_APP_NAME }}
+          environment_name: ${{ secrets.EB_ENV_NAME }}
+          version_label: ${{ needs.build_application.outputs.image_tag }}
+          region: ${{ secrets.AWS_DEFAULT_REGION }}
+          wait_for_environment_recovery: 300 # 5 minutes
+
+  deploy_callback:
+    needs: [set_environment, lint-test, build_application]
+    environment:
+      name: ${{ needs.set_environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.EB_APP_NAME }}
+          environment_name: ${{ secrets.EB_ENV_NAME_2 }}
+          version_label: ${{ needs.build_application.outputs.image_tag }}
+          region: ${{ secrets.AWS_DEFAULT_REGION }}
+          wait_for_environment_recovery: 300 # 5 minutes
