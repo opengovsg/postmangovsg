@@ -3,13 +3,13 @@ import cx from 'classnames'
 import { capitalize, debounce } from 'lodash'
 
 import {
-  useEffect,
-  useState,
-  useContext,
-  useCallback,
   MouseEvent as ReactMouseEvent,
-  useRef,
+  useCallback,
+  useContext,
+  useEffect,
   useMemo,
+  useRef,
+  useState,
 } from 'react'
 
 import Moment from 'react-moment'
@@ -33,19 +33,19 @@ import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
 import {
   Campaign,
   channelIcons,
-  SortField,
-  Ordering,
   ChannelType,
+  Ordering,
+  SortField,
   StatusFilter,
 } from 'classes'
 import {
-  Pagination,
-  TitleBar,
-  PrimaryButton,
   ConfirmModal,
-  TextInputWithButton,
+  Pagination,
+  PrimaryButton,
   TextButton,
   TextInput,
+  TextInputWithButton,
+  TitleBar,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import CreateCampaign from 'components/dashboard/create/create-modal'
@@ -75,7 +75,8 @@ const Campaigns = () => {
     new Array<Campaign>()
   )
   const [selectedPage, setSelectedPage] = useState(0)
-  const [campaignCount, setCampaignCount] = useState(-1)
+  const [hasFetchedCampaigns, setHasFetchedCampaigns] = useState(false)
+  const [campaignCount, setCampaignCount] = useState(0)
   const [isDemoDisplayed, setIsDemoDisplayed] = useState(false)
   const [numDemosSms, setNumDemosSms] = useState(0)
   const [numDemosTelegram, setNumDemosTelegram] = useState(0)
@@ -93,8 +94,6 @@ const Campaigns = () => {
 
   const filterInit = 'All'
   const searchInit = ''
-  const [createdOrder, setCreatedOrder] = useState(Ordering.DESC)
-  const [sentOrder, setSentOrder] = useState(Ordering.DESC)
   const [sortBy, setSortBy] = useState(SortField.Created)
   const [orderBy, setOrderBy] = useState(Ordering.DESC)
   const [statusFilter, setStatusFilter] = useState<
@@ -114,8 +113,12 @@ const Campaigns = () => {
       .join(' ')
   }
 
-  function CamelCaseWord(word: string): string {
-    return word.charAt(0) + word.slice(1).toLowerCase()
+  function displayChannelType(selected: string): string {
+    if (selected === ChannelType.SMS) {
+      return selected.toUpperCase()
+    } else {
+      return selected.charAt(0).toUpperCase() + selected.slice(1).toLowerCase()
+    }
   }
 
   async function fetchCampaigns(
@@ -147,6 +150,7 @@ const Campaigns = () => {
     setCampaignsDisplayed(campaigns)
     setSearching(false)
     setSelectedPage(selectedPage)
+    if (!hasFetchedCampaigns) setHasFetchedCampaigns(true)
   }
 
   function toggleMenu(campaignId: number): void {
@@ -254,22 +258,46 @@ const Campaigns = () => {
   }, [campaignIdWithRenameOpen])
 
   function handleCreatedAtHeader() {
-    const newOrder =
-      createdOrder === Ordering.DESC ? Ordering.ASC : Ordering.DESC
+    // const newOrder = ((orderBy, sortBy, newSort) => {
+    //   return orderBy === Ordering.ASC ? Ordering.DESC : Ordering.ASC
+    // })()
     const newSort = SortField.Created
-    setCreatedOrder(newOrder)
+    let newOrder
+    if (sortBy === SortField.Created) {
+      newOrder = orderBy === Ordering.DESC ? Ordering.ASC : Ordering.DESC
+    } else {
+      newOrder = Ordering.ASC
+    }
     setOrderBy(newOrder)
     setSortBy(newSort)
-    fetchCampaigns(0, newSort, newOrder, statusFilter, modeFilter, nameFilter)
+    void fetchCampaigns(
+      0,
+      newSort,
+      newOrder,
+      statusFilter,
+      modeFilter,
+      nameFilter
+    )
   }
 
   function handleSentAtHeader() {
-    const newOrder = sentOrder === Ordering.DESC ? Ordering.ASC : Ordering.DESC
     const newSort = SortField.Sent
-    setSentOrder(newOrder)
+    let newOrder
+    if (sortBy === SortField.Sent) {
+      newOrder = orderBy === Ordering.DESC ? Ordering.ASC : Ordering.DESC
+    } else {
+      newOrder = Ordering.ASC
+    }
     setOrderBy(newOrder)
     setSortBy(newSort)
-    fetchCampaigns(0, newSort, newOrder, statusFilter, modeFilter, nameFilter)
+    void fetchCampaigns(
+      0,
+      newSort,
+      newOrder,
+      statusFilter,
+      modeFilter,
+      nameFilter
+    )
   }
 
   function handleStatusFilter(status: StatusFilter | typeof filterInit) {
@@ -307,7 +335,7 @@ const Campaigns = () => {
   }
 
   /* eslint-disable react/display-name */
-  const headers = [
+  const columns = [
     {
       name: 'Mode',
       render: (campaign: Campaign) => (
@@ -331,14 +359,14 @@ const Campaigns = () => {
           <DropdownFilter
             onSelect={handleModeFilter}
             options={[filterInit, ...Object.values(ChannelType)].map((opt) => ({
-              label: CamelCaseWord(opt),
+              label: displayChannelType(opt),
               value: opt,
             }))}
             defaultLabel={
-              modeFilter === filterInit ? name : CamelCaseWord(modeFilter)
+              modeFilter === filterInit ? name : displayChannelType(modeFilter)
             }
             aria-label={name}
-          ></DropdownFilter>
+          />
         </th>
       ),
     },
@@ -397,11 +425,13 @@ const Campaigns = () => {
             overrideStyles={overrideStylesTextButton}
           >
             {name}
-            {createdOrder === Ordering.ASC ? (
-              <i className={cx('bx bx-up-arrow-alt', styles.i)} />
-            ) : (
-              <i className={cx('bx bx-down-arrow-alt', styles.i)} />
-            )}
+            {sortBy === SortField.Created ? (
+              orderBy === Ordering.ASC ? (
+                <i className={cx('bx bx-up-arrow-alt', styles.i)} />
+              ) : (
+                <i className={cx('bx bx-down-arrow-alt', styles.i)} />
+              )
+            ) : null}
           </TextButton>
         </th>
       ),
@@ -426,11 +456,13 @@ const Campaigns = () => {
             overrideStyles={overrideStylesTextButton}
           >
             {name}
-            {sentOrder === Ordering.ASC ? (
-              <i className={cx('bx bx-up-arrow-alt', styles.i)} />
-            ) : (
-              <i className={cx('bx bx-down-arrow-alt', styles.i)} />
-            )}
+            {sortBy === SortField.Sent ? (
+              orderBy === Ordering.ASC ? (
+                <i className={cx('bx bx-up-arrow-alt', styles.i)} />
+              ) : (
+                <i className={cx('bx bx-down-arrow-alt', styles.i)} />
+              )
+            ) : null}
           </TextButton>
         </th>
       ),
@@ -499,7 +531,7 @@ const Campaigns = () => {
   function renderRow(campaign: Campaign, key: number) {
     return (
       <tr key={key}>
-        {headers.map(({ render, width }, key) => (
+        {columns.map(({ render, width }, key) => (
           <td className={width} key={key}>
             {render(campaign)}
           </td>
@@ -562,9 +594,6 @@ const Campaigns = () => {
   }
 
   function removeFilter() {
-    setCreatedOrder(Ordering.DESC)
-    setSentOrder(Ordering.DESC)
-    setSortBy(SortField.Created)
     setOrderBy(Ordering.DESC)
     setStatusFilter(filterInit)
     setModeFilter(filterInit)
@@ -647,7 +676,7 @@ const Campaigns = () => {
             <table className={styles.campaignTable}>
               <thead>
                 <tr>
-                  {headers.map(({ name, width, renderHeader }, key) =>
+                  {columns.map(({ name, width, renderHeader }, key) =>
                     renderHeader(name, width, key)
                   )}
                 </tr>
@@ -658,6 +687,17 @@ const Campaigns = () => {
           {campaignCount > 0 ? renderPagination() : renderNoMatch()}
         </div>
       </>
+    )
+  }
+
+  function isNewUser() {
+    return (
+      campaignCount === 0 &&
+      !isSearching &&
+      // to avoid mistakenly determining new user while searching
+      nameFilter === searchInit &&
+      statusFilter === filterInit &&
+      modeFilter === filterInit
     )
   }
 
@@ -672,16 +712,12 @@ const Campaigns = () => {
           Create new campaign
         </PrimaryButton>
       </TitleBar>
-      {campaignCount < 0 ? (
+      {!hasFetchedCampaigns ? (
         <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')} />
-      ) : isSearching ||
-        campaignCount > 0 ||
-        nameFilter !== searchInit ||
-        statusFilter !== filterInit ||
-        modeFilter !== filterInit ? (
-        renderCampaign()
-      ) : (
+      ) : isNewUser() ? (
         renderEmptyDashboard()
+      ) : (
+        renderCampaign()
       )}
     </>
   )

@@ -157,8 +157,8 @@ const listCampaigns = ({
   orderBy,
 }: {
   userId: number
-  offset: number
-  limit: number
+  offset?: number
+  limit?: number
   type?: ChannelType
   status?: Status
   name?: string
@@ -213,19 +213,28 @@ const listCampaigns = ({
         break
       }
     }
-    const statusFilter = { '$job_queue.status$': operation }
+    const statusFilter = { '$job_queue.status$': operation } //join query
     whereFilter = { ...whereFilter, ...statusFilter }
   }
 
-  let orderOpt: any = [['created_at', 'DESC']]
-  if (sortBy) {
-    const order = orderBy ?? 'ASC'
-    if (sortBy == SortField.Sent) {
-      orderOpt = [[literal('"job_queue.sent_at"'), order]].concat(orderOpt)
-    } else {
-      orderOpt = [[sortBy, order]].concat(orderOpt)
+  const orderOpt = (() => {
+    let orderArr: any = [['created_at', 'DESC']] // latest created as default sorting
+    const order = orderBy ?? Ordering.ASC // ascending as default ordering
+    if (sortBy) {
+      switch (sortBy) {
+        case SortField.Sent: {
+          // sort by join queried sent_at
+          orderArr = [[literal('"job_queue.sent_at"'), order]].concat(orderArr)
+          break
+        }
+        default: {
+          // sort by field in Campaigns table
+          orderArr = [[sortBy, order]].concat(orderArr)
+        }
+      }
     }
-  }
+    return orderArr
+  })()
 
   const options: {
     where: any

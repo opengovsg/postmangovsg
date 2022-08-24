@@ -4,7 +4,13 @@ import initialiseServer from '@test-utils/server'
 import { Campaign, User, UserDemo, JobQueue } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { UploadService } from '@core/services'
-import { ChannelType, JobStatus } from '@core/constants'
+import {
+  ChannelType,
+  JobStatus,
+  Ordering,
+  SortField,
+  Status,
+} from '@core/constants'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
@@ -31,14 +37,14 @@ describe('GET /campaigns', () => {
     await Campaign.create({
       name: 'campaign-1',
       userId: 1,
-      type: 'SMS',
+      type: ChannelType.SMS,
       valid: false,
       protect: false,
     } as Campaign)
     await Campaign.create({
       name: 'campaign-2',
       userId: 1,
-      type: 'SMS',
+      type: ChannelType.SMS,
       valid: false,
       protect: false,
     } as Campaign)
@@ -58,7 +64,7 @@ describe('GET /campaigns', () => {
       await Campaign.create({
         name: `campaign-${i}`,
         userId: 1,
-        type: 'SMS',
+        type: ChannelType.SMS,
         valid: false,
         protect: false,
       } as Campaign)
@@ -81,7 +87,7 @@ describe('GET /campaigns', () => {
       await Campaign.create({
         name: `campaign-${i}`,
         userId: 1,
-        type: 'SMS',
+        type: ChannelType.SMS,
         valid: false,
         protect: false,
       } as Campaign)
@@ -89,7 +95,7 @@ describe('GET /campaigns', () => {
 
     const resAsc = await request(app)
       .get('/campaigns')
-      .query({ order_by: 'ASC', sort_by: 'created_at' })
+      .query({ order_by: Ordering.ASC, sort_by: SortField.Created })
     expect(resAsc.status).toBe(200)
     expect(resAsc.body.total_count).toEqual(3)
     for (let i = 1; i <= 3; i++) {
@@ -98,7 +104,7 @@ describe('GET /campaigns', () => {
 
     const resDesc = await request(app)
       .get('/campaigns')
-      .query({ order_by: 'DESC', sort_by: 'created_at' })
+      .query({ order_by: Ordering.DESC, sort_by: SortField.Created })
     expect(resDesc.status).toBe(200)
     expect(resDesc.body.total_count).toEqual(3)
     for (let i = 1; i <= 3; i++) {
@@ -113,10 +119,11 @@ describe('GET /campaigns', () => {
       const campaign = await Campaign.create({
         name: `campaign-${i}`,
         userId: 1,
-        type: 'SMS',
+        type: ChannelType.SMS,
         valid: false,
         protect: false,
       } as Campaign)
+      // adding a Sending entry in JobQueue sets the sent time
       await JobQueue.create({
         campaignId: campaign.id,
         status: JobStatus.Sending,
@@ -125,7 +132,7 @@ describe('GET /campaigns', () => {
 
     const resSentAsc = await request(app)
       .get('/campaigns')
-      .query({ order_by: 'ASC', sort_by: 'sent_at' })
+      .query({ order_by: Ordering.ASC, sort_by: SortField.Sent })
     expect(resSentAsc.status).toBe(200)
     expect(resSentAsc.body.total_count).toEqual(3)
     for (let i = 1; i <= 3; i++) {
@@ -134,7 +141,7 @@ describe('GET /campaigns', () => {
 
     const resSentDesc = await request(app)
       .get('/campaigns')
-      .query({ order_by: 'DESC', sort_by: 'sent_at' })
+      .query({ order_by: Ordering.DESC, sort_by: SortField.Sent })
     expect(resSentDesc.status).toBe(200)
     expect(resSentDesc.body.total_count).toEqual(3)
     for (let i = 1; i <= 3; i++) {
@@ -171,17 +178,20 @@ describe('GET /campaigns', () => {
   })
 
   test('List campaigns filter by status', async () => {
+    // create campaign-1 with the default job status Draft
     await Campaign.create({
       name: 'campaign-1',
       userId: 1,
-      type: 'SMS',
+      type: ChannelType.SMS,
       valid: false,
       protect: false,
     } as Campaign)
+
+    //create campaign-2 with job status Sent by having a LOGGED entry in JobQueue
     const campaign = await Campaign.create({
       name: 'campaign-2',
       userId: 1,
-      type: 'SMS',
+      type: ChannelType.SMS,
       valid: false,
       protect: false,
     } as Campaign)
@@ -192,7 +202,7 @@ describe('GET /campaigns', () => {
 
     const resDraft = await request(app)
       .get('/campaigns')
-      .query({ status: 'Draft' })
+      .query({ status: Status.Draft })
     expect(resDraft.status).toBe(200)
     expect(resDraft.body).toEqual({
       total_count: 1,
@@ -203,7 +213,7 @@ describe('GET /campaigns', () => {
 
     const resSent = await request(app)
       .get('/campaigns')
-      .query({ status: 'Sent' })
+      .query({ status: Status.Sent })
     expect(resSent.status).toBe(200)
     expect(resSent.body).toEqual({
       total_count: 1,
@@ -218,7 +228,7 @@ describe('GET /campaigns', () => {
       await Campaign.create({
         name: `campaign-${i}`,
         userId: 1,
-        type: 'SMS',
+        type: ChannelType.SMS,
         valid: false,
         protect: false,
       } as Campaign)
@@ -358,7 +368,7 @@ describe('POST /campaigns', () => {
   test('Unable to create protected campaign for unsupported channel', async () => {
     const res = await request(app).post('/campaigns').send({
       name: 'test',
-      type: 'SMS',
+      type: ChannelType.SMS,
       protect: true,
     })
     expect(res.status).toBe(403)
@@ -370,7 +380,7 @@ describe('DELETE /campaigns/:campaignId', () => {
     const c = await Campaign.create({
       name: 'campaign-1',
       userId: 1,
-      type: 'SMS',
+      type: ChannelType.SMS,
       valid: false,
       protect: false,
     } as Campaign)
