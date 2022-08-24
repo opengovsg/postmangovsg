@@ -72,7 +72,7 @@ const DropdownFilter = ({
     } else {
       setSelectedLabel('Select an option')
     }
-  }, [onSelect])
+  }, [onSelect, defaultLabel])
 
   return (
     <div
@@ -85,7 +85,6 @@ const DropdownFilter = ({
         className={cx(styles.select)}
         onClick={() => {
           setIsOpen(!isOpen)
-          recalculateMenuStyle
         }}
         role="listbox"
         aria-label={ariaLabel}

@@ -302,16 +302,23 @@ const Campaigns = () => {
 
   function handleStatusFilter(status: StatusFilter | typeof filterInit) {
     setStatusFilter(status)
-    fetchCampaigns(0, sortBy, orderBy, status, modeFilter, nameFilter)
+    void fetchCampaigns(0, sortBy, orderBy, status, modeFilter, nameFilter)
   }
 
   function handleModeFilter(mode: ChannelType | typeof filterInit) {
     setModeFilter(mode)
-    fetchCampaigns(0, sortBy, orderBy, statusFilter, mode, nameFilter)
+    void fetchCampaigns(0, sortBy, orderBy, statusFilter, mode, nameFilter)
   }
 
   function handlePageChange(index: number) {
-    fetchCampaigns(index, sortBy, orderBy, statusFilter, modeFilter, nameFilter)
+    void void void void fetchCampaigns(
+      index,
+      sortBy,
+      orderBy,
+      statusFilter,
+      modeFilter,
+      nameFilter
+    )
   }
 
   const debouncedChangeHandler = useMemo(
@@ -324,7 +331,7 @@ const Campaigns = () => {
     // set isSearching to true upon input even though actual search is debounced
     // this is to prevent UI from jumping to no matches found too early
     setSearching(true)
-    debouncedChangeHandler(
+    void debouncedChangeHandler(
       0,
       sortBy,
       orderBy,
@@ -598,7 +605,7 @@ const Campaigns = () => {
     setStatusFilter(filterInit)
     setModeFilter(filterInit)
     setNameFilter(searchInit)
-    fetchCampaigns(
+    void fetchCampaigns(
       0,
       SortField.Created,
       Ordering.DESC,
