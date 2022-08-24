@@ -68,6 +68,7 @@ export class Campaign {
   getStatus(jobs: Array<{ status: string }>): Status {
     if (jobs) {
       const jobSet = new Set(jobs.map((x) => x.status))
+      // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 2/2)
       if (
         ['READY', 'ENQUEUED', 'SENDING', 'SENT', 'STOPPED'].some((s) =>
           jobSet.has(s)

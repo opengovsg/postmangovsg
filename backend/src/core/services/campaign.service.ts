@@ -193,6 +193,7 @@ const listCampaigns = ({
         operation = { [Op.is]: null }
         break
       }
+      // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 1/2)
       case Status.Sending: {
         operation = {
           [Op.in]: [
