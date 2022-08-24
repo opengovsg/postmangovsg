@@ -19,7 +19,6 @@
     "sourceMap": true,
     "outDir": "./build",
     "rootDir": "./src",
-
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,

@@ -7,7 +7,11 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from '@shared/templating'
 import { AuthService } from '@core/services/auth.service'
-import { InvalidRecipientError } from '@core/errors'
+import {
+  InvalidRecipientError,
+  MaliciousFileError,
+  UnsupportedFileTypeError,
+} from '@core/errors'
 
 export interface EmailTransactionalMiddleware {
   sendMessage: Handler
@@ -28,7 +32,14 @@ export const InitEmailTransactionalMiddleware = (
     const ACTION = 'sendMessage'
 
     try {
-      const { subject, body, from, recipient, reply_to: replyTo } = req.body
+      const {
+        subject,
+        body,
+        from,
+        recipient,
+        reply_to: replyTo,
+        attachments,
+      } = req.body
 
       logger.info({ message: 'Sending email', action: ACTION })
       await EmailTransactionalService.sendMessage({
@@ -38,6 +49,7 @@ export const InitEmailTransactionalMiddleware = (
         recipient,
         replyTo:
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
+        attachments,
       })
       res.sendStatus(202)
     } catch (err) {
@@ -47,7 +59,12 @@ export const InitEmailTransactionalMiddleware = (
         error: err,
       })
 
-      const BAD_REQUEST_ERRORS = [TemplateError, InvalidRecipientError]
+      const BAD_REQUEST_ERRORS = [
+        TemplateError,
+        InvalidRecipientError,
+        MaliciousFileError,
+        UnsupportedFileTypeError,
+      ]
       if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
         res.status(400).json({ message: (err as Error).message })
         return

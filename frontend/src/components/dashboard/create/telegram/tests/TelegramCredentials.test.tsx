@@ -118,11 +118,11 @@ test('displays an error when attempting to validate an invalid credential', asyn
   })
 
   // Select the invalid credential label
-  userEvent.click(credentialDropdown)
-  userEvent.click(credentialLabelText)
+  await userEvent.click(credentialDropdown)
+  await userEvent.click(credentialLabelText)
 
   // Attempt to validate the credential
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /validate credentials/i,
     })

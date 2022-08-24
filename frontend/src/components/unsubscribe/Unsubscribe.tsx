@@ -11,10 +11,18 @@ import styles from './Unsubscribe.module.scss'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import cancelRequestHero from 'assets/img/unsubscribe/cancel-request.png'
 import landingHero from 'assets/img/unsubscribe/request-unsubscribe.png'
-import { ErrorBlock, PrimaryButton, TextButton } from 'components/common'
+import {
+  ErrorBlock,
+  PrimaryButton,
+  TextButton,
+  TextInput,
+} from 'components/common'
 import Banner from 'components/landing/banner'
 
-import { unsubscribeRequest } from 'services/unsubscribe.service'
+import {
+  subscribeAgain,
+  unsubscribeRequest,
+} from 'services/unsubscribe.service'
 
 const Unsubscribe = () => {
   const location = useLocation()
@@ -22,6 +30,8 @@ const Unsubscribe = () => {
   const [errorMsg, setErrorMsg] = useState('')
   const [isUnsubscribed, setUnsubscribed] = useState(false)
   const [isStaying, setStaying] = useState(false)
+  const [reason, setReason] = useState('')
+  const [otherReason, setOtherReason] = useState('')
 
   function validateParams(params: querystring.ParsedUrlQuery): void {
     // Ensure that all required params exists and are strings and not []strings
@@ -49,6 +59,7 @@ const Unsubscribe = () => {
           recipient: recipient as string,
           hash: hash as string,
           version: version as string,
+          reason: reason !== 'other' ? reason : otherReason,
         })
       }
       setUnsubscribed(true)
@@ -57,14 +68,43 @@ const Unsubscribe = () => {
     }
   }
 
+  async function onSubscribeAgain() {
+    try {
+      // Version is set to 'test' when the unsub link is generated from a campaign
+      // test email. As such, we should not make any API calls.
+      if (version !== 'test') {
+        const query = location.search.substring(1)
+        const params = querystring.parse(query)
+        validateParams(params)
+
+        const { c: campaignId, r: recipient, h: hash } = params
+
+        await subscribeAgain({
+          campaignId: +campaignId,
+          recipient: recipient as string,
+          hash: hash as string,
+          version: version as string,
+        })
+      }
+      setStaying(true)
+    } catch (err) {
+      setErrorMsg('Something went wrong. Please try again')
+    }
+  }
+
   function renderUnsubscribeSection() {
     if (isStaying) {
       return (
         <>
+          <img
+            src={cancelRequestHero}
+            alt="Landing hero"
+            className={styles.landingHero}
+          />
           <h2>Excellent choice!</h2>
           <p>
-            Thank you for staying subscribed to this campaign. Happy that we are
-            still keeping in touch.
+            Thank you for staying subscribed. Happy that we are still keeping in
+            touch.
           </p>
         </>
       )
@@ -72,34 +112,71 @@ const Unsubscribe = () => {
     if (isUnsubscribed) {
       return (
         <>
+          <img
+            src={landingHero}
+            alt="Landing hero"
+            className={styles.landingHero}
+          />
           <h2>Unsubscribed successfully.</h2>
           <p>
-            You have been removed from the agency’s mailing list. If you have
-            unsubscribed by mistake, you can send a request email to the agency.
+            We will inform the sender about your wish to unsubscribe to this
+            campaign. If you have unsubscribed from this campaign by mistake,
+            please subscribe back.
           </p>
+          <TextButton minButtonWidth onClick={onSubscribeAgain}>
+            <Trans>Subscribe me back</Trans>
+          </TextButton>
         </>
       )
     } else {
       return (
         <>
-          <h2>We&#39;re sad to see you go!</h2>
-          <p>
-            We will inform the agency that sent you this campaign about your
-            wish to unsubscribe. You will be removed from their mailing list.
-          </p>
+          <div className={styles.optionContainer}>
+            <h2>Let us know your reason</h2>
+
+            {[
+              'I no longer want to receive this type of email campaign',
+              'I never signed up for this mailing list',
+              'The emails are inappropriate',
+              'The emails are spam and should be reported',
+            ].map((r) => (
+              <label key={r}>
+                <input
+                  type="radio"
+                  name="reason"
+                  value={r}
+                  checked={r === reason}
+                  onChange={() => setReason(r)}
+                />
+                {r}
+              </label>
+            ))}
+            <label>
+              <input
+                type="radio"
+                name="reason"
+                value="other"
+                checked={reason === 'other'}
+                onChange={() => setReason('other')}
+              />
+              Other (please specify)
+            </label>
+            {reason === 'other' && (
+              <TextInput
+                value={otherReason}
+                onChange={setOtherReason}
+                placeholder="Describe here"
+              />
+            )}
+          </div>
           <div className={styles.options}>
             <PrimaryButton
-              onClick={() => {
-                setStaying(true)
-                setErrorMsg('')
-              }}
-              loadingPlaceholder="Processing"
+              loadingPlaceholder="Processing unsubscribe request"
+              disabled={!reason || (reason === 'other' && !otherReason)}
+              onClick={onConfirmation}
             >
-              <Trans>I&#39;d rather stay</Trans>
+              <Trans>Proceed to unsubscribe</Trans>
             </PrimaryButton>
-            <TextButton minButtonWidth onClick={onConfirmation}>
-              <Trans>Unsubscribe me</Trans>
-            </TextButton>
           </div>
         </>
       )
@@ -113,11 +190,6 @@ const Unsubscribe = () => {
         <div className={styles.inner}>
           <>
             <img src={appLogo} alt="Postman logo" className={styles.appLogo} />
-            <img
-              src={isStaying ? cancelRequestHero : landingHero}
-              alt="Landing hero"
-              className={styles.landingHero}
-            />
             {renderUnsubscribeSection()}
             <ErrorBlock>{errorMsg}</ErrorBlock>
           </>

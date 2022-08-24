@@ -80,7 +80,7 @@ const TelegramCredentials = ({
       }
     }
     const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
-    populateStoredCredentials(defaultLabels)
+    void populateStoredCredentials(defaultLabels)
   }, [isDemo])
 
   function toggleInputMode() {

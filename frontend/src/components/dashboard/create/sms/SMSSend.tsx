@@ -53,11 +53,11 @@ const SMSSend = ({
 
   useEffect(() => {
     if (!campaignId) return
-    loadPreview(campaignId)
+    void loadPreview(campaignId)
   }, [campaignId])
 
   const onModalConfirm = () => {
-    confirmSendCampaign({
+    void confirmSendCampaign({
       campaignId: +campaignId,
       sendRate: +sendRate,
       channelType: ChannelType.SMS,

@@ -67,13 +67,14 @@ export default class MailClient {
           ['List-Unsubscribe']: `<${input.unsubLink}>`,
         }
       }
-      const options = {
+      const options: nodemailer.SendMailOptions = {
         from: this.email || escapeFromAddress(input.from as string),
         to: input.recipients,
         subject: input.subject,
         replyTo: input.replyTo,
         html: input.body,
         headers,
+        attachments: input.attachments,
       }
 
       this.mailer.sendMail(options, (err, info) => {

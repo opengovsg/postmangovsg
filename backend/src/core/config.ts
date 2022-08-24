@@ -2,7 +2,7 @@
  * @file Configuration
  * All defaults can be changed
  */
-import convict from 'convict'
+import convict, { Config } from 'convict'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
@@ -15,6 +15,142 @@ const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
  *    format: 'required-string',
  *    sensitive: true,
  */
+interface ConfigSchema {
+  env: string
+  APP_NAME: string
+  aws: {
+    awsRegion: string
+    awsEndpoint: null
+    logGroupName: string
+    uploadBucket: string
+    secretManagerSalt: string
+  }
+  database: {
+    databaseUri: string
+    databaseReadReplicaUri: string
+    dialectOptions: {
+      ssl: {
+        require: boolean
+        rejectUnauthorized: {
+          valueOf: any
+        }
+        ca: Buffer[]
+      }
+    }
+    poolOptions: {
+      max: number
+      min: number
+      acquire: number
+    }
+    useIam: boolean
+  }
+  jwtSecret: string
+  frontendUrl: string
+  protectedUrl: string
+  unsubscribeUrl: string
+  session: {
+    cookieName: string
+    secret: string
+    cookieSettings: {
+      httpOnly: boolean
+      secure: boolean
+      maxAge: number
+      sameSite: boolean
+      domain: string
+      path: string
+    }
+  }
+  otp: {
+    retries: number
+    expiry: number
+    resendTimeout: number
+  }
+  redisOtpUri: string
+  redisSessionUri: string
+  redisRateLimitUri: string
+  redisCredentialUri: string
+  mailOptions: {
+    host: string
+    port: number
+    auth: {
+      user: string
+      pass: string
+    }
+  }
+  mailFrom: string
+  mailVia: string
+  mailDefaultRate: number
+  transactionalEmail: {
+    rate: number
+    window: number
+  }
+  defaultCountry: string
+  defaultCountryCode: string
+  telegramOptions: {
+    webhookUrl: string
+  }
+  maxRatePerJob: number
+  apiKey: {
+    salt: string
+    version: string
+  }
+  domains: string
+  csvProcessingTimeout: number
+  sentryDsn: string
+  unsubscribeHmac: {
+    version: string
+    v1: {
+      algo: string
+      key: string
+    }
+  }
+  emailCallback: {
+    minHaltNumber: number
+    minHaltPercentage: number
+    sendgridPublicKey: string
+    callbackSecret: string
+    hashSecret: string
+  }
+  smsCallback: {
+    callbackSecret: string
+  }
+  telegramCallback: {
+    contactUsUrl: string
+    guideUrl: string
+  }
+  twilio: {
+    usdToSgdRate: number
+  }
+  redaction: {
+    maxAge: number
+  }
+  twilioCredentialCache: {
+    maxAge: number
+  }
+  smsFallback: {
+    activate: boolean
+    senderId: string
+  }
+  emailFallback: {
+    activate: boolean
+  }
+  defaultAgency: {
+    name: string
+  }
+  showMastheadDomain: string
+  upload: {
+    redisUri: string
+    queueName: string
+    concurrency: number
+    checkStalledInterval: number
+  }
+  file: {
+    cloudmersiveKey: string
+    maxAttachmentSize: number
+    maxAttachmentNum: number
+  }
+}
+
 convict.addFormats({
   'required-string': {
     validate: (val: any): void => {
@@ -41,7 +177,7 @@ convict.addFormats({
   },
 })
 
-const config = convict({
+const config: Config<ConfigSchema> = convict({
   env: {
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
@@ -526,6 +662,27 @@ const config = convict({
       doc: 'How often to check for stalled jobs in milliseconds',
       default: 5000,
       env: 'UPLOAD_CHECK_STALLED_INTERVAL',
+      format: Number,
+    },
+  },
+  file: {
+    cloudmersiveKey: {
+      doc: 'API key for Cloudmersive file scanning service',
+      default: '',
+      env: 'FILE_CLOUDMERSIVE_KEY',
+      format: 'required-string',
+      sensitive: true,
+    },
+    maxAttachmentSize: {
+      doc: 'Maximum accepted file attachment size in MB',
+      default: 5 * 1024 * 1024, // 5 MB
+      env: 'FILE_ATTACHMENT_MAX_SIZE',
+      format: Number,
+    },
+    maxAttachmentNum: {
+      doc: 'Maximum number of file attachments',
+      default: 10,
+      env: 'FILE_ATTACHMENT_MAX_NUM',
       format: Number,
     },
   },

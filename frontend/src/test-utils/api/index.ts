@@ -717,6 +717,27 @@ function mockUnsubscribeApis(state: State) {
 
       return res(ctx.status(200))
     }),
+    rest.delete('/unsubscribe/:campaignId/:recipient', (req, res, ctx) => {
+      // Possible todo: validate the hash
+      const { campaignId } = req.params
+      const { h, v } = req.body as {
+        h?: string
+        v?: string
+      }
+
+      if (!h || !v) {
+        return res(ctx.status(400))
+      }
+
+      if (+campaignId <= 0 || +campaignId > state.campaigns.length) {
+        return res(
+          ctx.status(400),
+          ctx.json({ message: 'Invalid unsubscribe request' })
+        )
+      }
+
+      return res(ctx.status(204))
+    }),
   ]
 }
 
