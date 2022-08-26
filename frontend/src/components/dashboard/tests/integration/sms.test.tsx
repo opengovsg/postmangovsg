@@ -5,7 +5,6 @@ import { mockApis, renderDashboard, CAMPAIGN_NAME, MESSAGE_TEXT } from '../util'
 import {
   server,
   screen,
-  waitFor,
   TWILIO_CREDENTIAL,
   VALID_CSV_FILENAME,
   RECIPIENT_NUMBER,
@@ -209,13 +208,9 @@ test('successfully creates and sends a new SMS campaign', async () => {
   ).toBeInTheDocument()
 
   // Click the refresh stats button
-  const refreshStatsButton = screen.getByRole('button', {
-    name: /refresh stats/i,
-  })
+  const refreshStatsButton = screen.getByText(/refresh statistics/i)
 
   await userEvent.click(refreshStatsButton, { delay: null })
-  expect(refreshStatsButton).toBeDisabled()
-  await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 
   // Cleanup
   jest.runOnlyPendingTimers()
