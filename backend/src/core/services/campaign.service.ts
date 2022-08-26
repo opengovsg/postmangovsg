@@ -1,6 +1,12 @@
 import { Op, literal, Transaction, Includeable } from 'sequelize'
 import config from '@core/config'
-import { ChannelType, JobStatus } from '@core/constants'
+import {
+  ChannelType,
+  JobStatus,
+  Status,
+  SortField,
+  Ordering,
+} from '@core/constants'
 import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
@@ -144,13 +150,92 @@ const listCampaigns = ({
   userId,
   offset,
   limit,
+  type,
+  status,
+  name,
+  sortBy,
+  orderBy,
 }: {
   userId: number
-  offset: number
-  limit: number
+  offset?: number
+  limit?: number
+  type?: ChannelType
+  status?: Status
+  name?: string
+  sortBy?: SortField
+  orderBy?: Ordering
 }): Promise<{ rows: Array<Campaign>; count: number }> => {
   const campaignJobs = '(PARTITION BY "job_queue"."campaign_id")'
   const maxAge = config.get('redaction.maxAge')
+
+  let whereFilter: {
+    user_id: number
+    type?: ChannelType
+  } = { user_id: userId }
+
+  if (type) {
+    whereFilter.type = type
+  }
+
+  if (name) {
+    const nameMatch = {
+      name: {
+        [Op.iLike]: '%' + name + '%',
+      },
+    }
+    whereFilter = { ...whereFilter, ...nameMatch }
+  }
+
+  if (status) {
+    let operation: any = {}
+    switch (status) {
+      case Status.Draft: {
+        operation = { [Op.is]: null }
+        break
+      }
+      // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 1/2)
+      case Status.Sending: {
+        operation = {
+          [Op.in]: [
+            JobStatus.Ready,
+            JobStatus.Enqueued,
+            JobStatus.Sending,
+            JobStatus.Sent,
+            JobStatus.Stopped,
+          ],
+        }
+        break
+      }
+      case Status.Sent: {
+        operation = { [Op.eq]: JobStatus.Logged }
+        break
+      }
+      default: {
+        break
+      }
+    }
+    const statusFilter = { '$job_queue.status$': operation } //join query
+    whereFilter = { ...whereFilter, ...statusFilter }
+  }
+
+  const orderOpt = (() => {
+    let orderArr: any = [['created_at', 'DESC']] // latest created as default sorting
+    const order = orderBy ?? Ordering.DESC // descending as default ordering
+    if (sortBy) {
+      switch (sortBy) {
+        case SortField.Sent: {
+          // sort by join queried sent_at
+          orderArr = [[literal('"job_queue.sent_at"'), order]]
+          break
+        }
+        default: {
+          // sort by field in Campaigns table
+          orderArr = [[sortBy, order]]
+        }
+      }
+    }
+    return orderArr
+  })()
 
   const options: {
     where: any
@@ -158,11 +243,12 @@ const listCampaigns = ({
     order: any
     include: any
     subQuery: boolean
+    distinct: boolean
     offset?: number
     limit?: number
   } = {
     where: {
-      userId,
+      [Op.and]: whereFilter,
     },
     attributes: [
       'id',
@@ -184,7 +270,7 @@ const listCampaigns = ({
       ],
       'demo_message_limit',
     ],
-    order: [['created_at', 'DESC']],
+    order: orderOpt,
     // Set limit and offset at the end of the main query so that the window function will have access to the job_queue table
     subQuery: false,
     include: [
@@ -201,6 +287,7 @@ const listCampaigns = ({
         attributes: [],
       },
     ],
+    distinct: true,
   }
   if (offset) {
     options.offset = +offset
