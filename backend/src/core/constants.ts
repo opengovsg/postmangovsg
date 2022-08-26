@@ -34,7 +34,6 @@ export enum DefaultCredentialName {
 }
 
 export enum SortField {
-  Name = 'name',
   Created = 'created_at',
   Sent = 'sent_at',
 }

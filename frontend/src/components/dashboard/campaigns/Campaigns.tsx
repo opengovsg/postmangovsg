@@ -257,47 +257,24 @@ const Campaigns = () => {
     renameInputRef.current?.focus()
   }, [campaignIdWithRenameOpen])
 
-  function handleCreatedAtHeader() {
-    // const newOrder = ((orderBy, sortBy, newSort) => {
-    //   return orderBy === Ordering.ASC ? Ordering.DESC : Ordering.ASC
-    // })()
-    const newSort = SortField.Created
-    let newOrder
-    if (sortBy === SortField.Created) {
-      newOrder = orderBy === Ordering.DESC ? Ordering.ASC : Ordering.DESC
-    } else {
-      newOrder = Ordering.ASC
+  function getSortSwitchHandle(chosenSortField: SortField) {
+    return () => {
+      const newSort = chosenSortField
+      let newOrder = Ordering.DESC
+      if (sortBy === chosenSortField) {
+        newOrder = orderBy === Ordering.DESC ? Ordering.ASC : Ordering.DESC
+      }
+      setOrderBy(newOrder)
+      setSortBy(newSort)
+      void fetchCampaigns(
+        0,
+        newSort,
+        newOrder,
+        statusFilter,
+        modeFilter,
+        nameFilter
+      )
     }
-    setOrderBy(newOrder)
-    setSortBy(newSort)
-    void fetchCampaigns(
-      0,
-      newSort,
-      newOrder,
-      statusFilter,
-      modeFilter,
-      nameFilter
-    )
-  }
-
-  function handleSentAtHeader() {
-    const newSort = SortField.Sent
-    let newOrder
-    if (sortBy === SortField.Sent) {
-      newOrder = orderBy === Ordering.DESC ? Ordering.ASC : Ordering.DESC
-    } else {
-      newOrder = Ordering.ASC
-    }
-    setOrderBy(newOrder)
-    setSortBy(newSort)
-    void fetchCampaigns(
-      0,
-      newSort,
-      newOrder,
-      statusFilter,
-      modeFilter,
-      nameFilter
-    )
   }
 
   function handleStatusFilter(status: StatusFilter | typeof filterInit) {
@@ -428,7 +405,7 @@ const Campaigns = () => {
           <TextButton
             noUnderline
             className={width}
-            onClick={handleCreatedAtHeader}
+            onClick={getSortSwitchHandle(SortField.Created)}
             overrideStyles={overrideStylesTextButton}
           >
             {name}
@@ -459,7 +436,7 @@ const Campaigns = () => {
           <TextButton
             noUnderline
             className={width}
-            onClick={handleSentAtHeader}
+            onClick={getSortSwitchHandle(SortField.Sent)}
             overrideStyles={overrideStylesTextButton}
           >
             {name}

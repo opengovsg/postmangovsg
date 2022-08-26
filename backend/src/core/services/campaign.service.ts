@@ -220,17 +220,17 @@ const listCampaigns = ({
 
   const orderOpt = (() => {
     let orderArr: any = [['created_at', 'DESC']] // latest created as default sorting
-    const order = orderBy ?? Ordering.ASC // ascending as default ordering
+    const order = orderBy ?? Ordering.DESC // descending as default ordering
     if (sortBy) {
       switch (sortBy) {
         case SortField.Sent: {
           // sort by join queried sent_at
-          orderArr = [[literal('"job_queue.sent_at"'), order]].concat(orderArr)
+          orderArr = [[literal('"job_queue.sent_at"'), order]]
           break
         }
         default: {
           // sort by field in Campaigns table
-          orderArr = [[sortBy, order]].concat(orderArr)
+          orderArr = [[sortBy, order]]
         }
       }
     }

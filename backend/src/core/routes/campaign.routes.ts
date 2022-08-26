@@ -94,7 +94,8 @@ const updateCampaignValidator = {
  *          required: false
  *          schema:
  *            type: string
- *            enum: [name, created_at, sent_at]
+ *            enum: [created_at, sent_at]
+ *            default: created_at
  *        - in: query
  *          name: order_by
  *          description: order to sort campaigns by
@@ -102,6 +103,7 @@ const updateCampaignValidator = {
  *          schema:
  *            type: string
  *            enum: [ASC, DESC]
+ *            default: DESC
  *      responses:
  *        "200":
  *          content:
