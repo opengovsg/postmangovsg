@@ -44,16 +44,13 @@ const findOrCreateUnsubscriber = ({
   campaignId: number
   recipient: string
   reason: string
-}): Promise<[Unsubscriber, boolean]> => {
-  return Unsubscriber.findOrCreate({
-    defaults: {
-      reason,
-    } as Unsubscriber,
-    where: {
-      campaignId,
-      recipient,
-    },
-  })
+}): Promise<[Unsubscriber, boolean | null]> => {
+  return Unsubscriber.upsert({
+    reason,
+    deletedAt: null,
+    campaignId,
+    recipient,
+  } as Unsubscriber)
 }
 
 const deleteUnsubscriber = async ({
