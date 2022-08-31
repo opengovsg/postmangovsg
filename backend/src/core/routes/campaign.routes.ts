@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ChannelType } from '@core/constants'
+import { ChannelType, Status, SortField, Ordering } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { CampaignMiddleware } from '@core/middlewares'
 const router = Router()
@@ -9,6 +9,11 @@ const listCampaignsValidator = {
   [Segments.QUERY]: Joi.object({
     limit: Joi.number().integer().min(1).max(100).default(10),
     offset: Joi.number().integer().min(0).default(0),
+    type: Joi.string().valid(...Object.values(ChannelType)),
+    status: Joi.string().valid(...Object.values(Status)),
+    name: Joi.string().max(255).trim(),
+    sort_by: Joi.string().valid(...Object.values(SortField)),
+    order_by: Joi.string().valid(...Object.values(Ordering)),
   }),
 }
 
@@ -63,6 +68,42 @@ const updateCampaignValidator = {
  *            type: integer
  *            minimum: 0
  *            default: 0
+ *        - in: query
+ *          name: type
+ *          description: mode of campaigns to filter for
+ *          required: false
+ *          schema:
+ *            type: string
+ *            enum: [EMAIL, SMS, TELEGRAM]
+ *        - in: query
+ *          name: status
+ *          description: status of campaigns to filter for
+ *          required: false
+ *          schema:
+ *            type: string
+ *            enum: [Draft, Sending, Sent]
+ *        - in: query
+ *          name: name
+ *          description: name of campaigns to filter for
+ *          required: false
+ *          schema:
+ *            type: string
+ *        - in: query
+ *          name: sort_by
+ *          description: field used to sort campaigns
+ *          required: false
+ *          schema:
+ *            type: string
+ *            enum: [created_at, sent_at]
+ *            default: created_at
+ *        - in: query
+ *          name: order_by
+ *          description: order to sort campaigns by
+ *          required: false
+ *          schema:
+ *            type: string
+ *            enum: [ASC, DESC]
+ *            default: DESC
  *      responses:
  *        "200":
  *          content:
