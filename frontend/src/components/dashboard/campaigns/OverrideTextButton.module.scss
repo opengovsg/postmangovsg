@@ -1,0 +1,33 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.textButton {
+  @include button(transparent, transparent, transparent);
+  color: $secondary;
+  display: inline-flex;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.75rem;
+  font-weight: 400;
+
+  &.noMinWidth {
+    min-width: unset;
+    text-align: left;
+  }
+
+  &.underline {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &:disabled {
+    background-color: unset;
+    color: $grey;
+    cursor: not-allowed;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}

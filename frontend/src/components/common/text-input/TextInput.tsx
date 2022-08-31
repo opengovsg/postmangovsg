@@ -3,13 +3,22 @@ import { forwardRef } from 'react'
 
 import type { ReactNode, ChangeEvent } from 'react'
 
-import styles from './TextInput.module.scss'
+import defaultStyles from './TextInput.module.scss'
 
 const TextInput = forwardRef((props: any, ref: ReactNode) => {
-  const { onChange, className, badge, ...otherProps } = props
+  const {
+    onChange,
+    className,
+    badge,
+    iconLabel,
+    overrideStyles,
+    ...otherProps
+  } = props
+  const styles = overrideStyles || defaultStyles
 
   return (
     <div className={cx(styles.textInput, className)}>
+      {iconLabel}
       <input
         ref={ref}
         onChange={(e: ChangeEvent<HTMLInputElement>) =>

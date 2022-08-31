@@ -1,0 +1,83 @@
+@import 'styles/_variables';
+
+.icon {
+  font-size: 1.5rem;
+  margin: 0.25rem;
+}
+
+.textInput {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  height: $button-height;
+  border: 1px solid $light-grey;
+  border-radius: $border-radius;
+  box-shadow: none;
+  width: 100%;
+  background: transparent;
+
+  &:focus,
+  &:hover {
+    outline: none;
+    border-color: $primary;
+  }
+
+  &:hover {
+    border-width: 1.5px;
+  }
+
+  &:focus {
+    border-width: 1px;
+  }
+
+  *:first-child {
+    padding-left: $border-radius;
+    border-top-left-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+  }
+
+  *:last-child {
+    padding-right: $border-radius;
+    border-top-right-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+  }
+
+  input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    line-height: 1rem;
+    font-size: 1rem;
+    color: $secondary;
+    background: transparent;
+
+    &:focus,
+    &:hover {
+      outline: none;
+      border-color: $primary;
+    }
+
+    &::placeholder {
+      color: $neutral;
+    }
+  }
+
+  .badge {
+    margin-left: $spacing-1;
+    border-radius: 0px;
+
+    span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      @extend %overline;
+      color: $grey-700;
+      border-radius: 0.25rem;
+      padding: 0 $spacing-2;
+      height: 1.5rem;
+      background: #eceef0;
+    }
+  }
+}

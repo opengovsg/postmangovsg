@@ -42,18 +42,25 @@ function renderUnsubscribe() {
   )
 }
 
+async function unsubscribe() {
+  // Wait for the component to fully load
+  const radioInput = await screen.findByLabelText(
+    'The emails are inappropriate'
+  )
+  const unsubscribeButton = await screen.findByRole('button', {
+    name: /proceed to unsubscribe/i,
+  })
+
+  await userEvent.click(radioInput)
+  await userEvent.click(unsubscribeButton)
+}
+
 test('successfully unsubscribes user from a campaign', async () => {
   // Setup
   server.use(...mockApis())
   renderUnsubscribe()
 
-  // Wait for the component to fully load
-  const unsubscribeButton = await screen.findByRole('button', {
-    name: /unsubscribe me/i,
-  })
-
-  // Click on the unsubscribe button
-  await userEvent.click(unsubscribeButton)
+  await unsubscribe()
 
   // Assert that the unsubscription succeeded
   const heading = await screen.findByRole('heading', {
@@ -62,14 +69,16 @@ test('successfully unsubscribes user from a campaign', async () => {
   expect(heading).toBeInTheDocument()
 })
 
-test('displays thank you page when user does not unsubscribe', async () => {
+test('displays thank you page when user resubscribe', async () => {
   // Setup
   server.use(...mockApis())
   renderUnsubscribe()
 
+  await unsubscribe()
+
   // Wait for the component to fully load
   const stayButton = await screen.findByRole('button', {
-    name: /stay/i,
+    name: /subscribe me back/i,
   })
 
   // Click on the stay button

@@ -48,6 +48,61 @@
     text-align: center;
     margin-bottom: 2rem;
   }
+
+  .optionContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 50px;
+    margin-bottom: 70px;
+
+    label {
+      margin-bottom: 20px;
+      display: flex;
+
+      input[type='radio'] {
+        /* Add if not using autoprefixer */
+        -webkit-appearance: none;
+        /* Remove most all native input styles */
+        appearance: none;
+        /* For iOS < 15 */
+        background: transparent;
+        /* Not removed via appearance */
+        margin: 0.35em 20px 0 0;
+
+        font: inherit;
+        color: #040651;
+        width: 1.15em;
+        height: 1.15em;
+        border: 0.15em solid #040651;
+        border-radius: 50%;
+        transform: translateY(-0.075em);
+
+        display: grid;
+        place-content: center;
+      }
+
+      input[type='radio']::before {
+        content: '';
+        width: 0.65em;
+        height: 0.65em;
+        border-radius: 50%;
+        transform: scale(0);
+        transition: 120ms transform ease-in-out;
+        box-shadow: inset 1em 1em #2c2cdc;
+        /* Windows High Contrast Mode */
+        background-color: CanvasText;
+      }
+
+      input[type='radio']:checked {
+        color: #2c2cdc;
+        border-color: #2c2cdc;
+      }
+      input[type='radio']:checked::before {
+        transform: scale(1);
+      }
+    }
+  }
 }
 
 .options {
