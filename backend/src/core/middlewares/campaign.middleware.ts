@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { loggerWithLabel } from '@core/logger'
-import { ChannelType } from '@core/constants'
+import { ChannelType, Status, SortField, Ordering } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
 
@@ -103,13 +103,19 @@ const listCampaigns = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { offset, limit } = req.query
+  const { offset, limit, type, status, name, sort_by, order_by } = req.query
   const userId = req.session?.user?.id
+
   try {
     const { rows, count } = await CampaignService.listCampaigns({
+      userId,
       offset: +(offset as string),
       limit: +(limit as string),
-      userId,
+      type: type as ChannelType,
+      status: status as Status,
+      name: name as string,
+      sortBy: sort_by as SortField,
+      orderBy: order_by as Ordering,
     })
 
     return res.json({

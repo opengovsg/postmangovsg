@@ -8,7 +8,12 @@ import {
 } from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 
-@Table({ tableName: 'unsubscribers', underscored: true, timestamps: true })
+@Table({
+  tableName: 'unsubscribers',
+  underscored: true,
+  timestamps: true,
+  paranoid: true,
+})
 export class Unsubscriber extends Model<Unsubscriber> {
   @ForeignKey(() => Campaign)
   @Column({
@@ -28,4 +33,12 @@ export class Unsubscriber extends Model<Unsubscriber> {
 
   @Column(DataType.DATE)
   sentAt?: Date
+
+  @Column({
+    type: DataType.STRING,
+  })
+  reason?: string
+
+  @Column(DataType.DATE)
+  deletedAt?: Date | null
 }

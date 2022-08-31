@@ -1,14 +1,13 @@
 import cx from 'classnames'
 
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import CreateDemoModal from '../create-demo-modal'
 
 import styles from './DemoBar.module.scss'
 
-import { CloseButton, TextButton } from 'components/common'
+import { TextButton } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
-import { updateDemoDisplayed } from 'services/settings.service'
 
 const DemoBar = ({
   numDemosSms,
@@ -22,10 +21,6 @@ const DemoBar = ({
   const modalContext = useContext(ModalContext)
   const [isMenuVisible, setIsMenuVisible] = useState(isDisplayed)
   const [hasDemo, setHasDemo] = useState(false)
-  const toggleMenu = useCallback(() => {
-    void updateDemoDisplayed(!isMenuVisible)
-    setIsMenuVisible((state) => !state)
-  }, [isMenuVisible])
 
   useEffect(() => {
     setHasDemo(!!numDemosTelegram || !!numDemosSms)
@@ -48,7 +43,7 @@ const DemoBar = ({
   function demoText() {
     return hasDemo
       ? `SMS: ${numDemosSms || 0}/3 left. Telegram:
-    ${numDemosTelegram || 0}/3 left.`
+    ${numDemosTelegram || 0}/3 left. `
       : `You have no demo campaigns left`
   }
   function demoLink() {
@@ -63,23 +58,16 @@ const DemoBar = ({
 
   return (
     <div className={styles.demoBar}>
-      <button className={styles.demoButton} onClick={toggleMenu}>
-        DEMO
-      </button>
       <div
         className={cx(styles.menuContainer, {
           [styles.show]: isMenuVisible,
         })}
       >
         <div className={styles.message}>
-          <div className={styles.top}>
-            <div className={styles.text}>{demoText()}</div>
-            <CloseButton
-              onClick={toggleMenu}
-              className={styles.closeButton}
-              title="Close reminder"
-            ></CloseButton>
-          </div>
+          <span className={styles.text}>
+            <span className={styles.bold}>Demo Campaign: </span>
+            {demoText()}
+          </span>
           {demoLink()}
         </div>
       </div>
