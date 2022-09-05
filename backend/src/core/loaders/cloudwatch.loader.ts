@@ -23,6 +23,7 @@ const cloudwatchLoader = async (): Promise<void> => {
       })
       addTransport(
         new WinstonCloudwatch({
+          name: config.get('aws.logGroupName'),
           logGroupName: config.get('aws.logGroupName'),
           logStreamName: instanceId,
           awsOptions: configureEndpoint(config),

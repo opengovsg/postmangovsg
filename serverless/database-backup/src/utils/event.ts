@@ -1,7 +1,7 @@
 import { RdsEvent } from '../interfaces'
 
 export const RDS_EVENTS = {
-  BACKUP_COMPLETE: 'RDS-EVENT-0002',
+  BACKUP_COMPLETE: 'RDS-EVENT-0169',
 }
 
 export const parseRdsEvents = (event: any): Array<RdsEvent> => {

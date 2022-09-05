@@ -3,7 +3,6 @@ import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
 import { Credential, UserCredential, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { ChannelType } from '@core/constants'
 import { mockTelegram } from '@mocks/telegraf'
 import { mockSecretsManager } from '@mocks/aws-sdk'
@@ -13,14 +12,14 @@ let sequelize: Sequelize
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  await User.create({ id: 1, email: 'user@agency.gov.sg' })
+  await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
 })
 
 afterAll(async () => {
   await UserCredential.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
-  await RedisService.shutdown()
+  await (app as any).cleanup()
 })
 
 describe('POST /settings/telegram/credentials', () => {
@@ -75,9 +74,10 @@ describe('POST /settings/telegram/credentials', () => {
 
     expect(res.status).toBe(200)
 
+    const secretName = `${process.env.NODE_ENV}-12345`
     expect(mockSecretsManager.createSecret).toHaveBeenCalledWith(
       expect.objectContaining({
-        Name: '12345',
+        Name: secretName,
         SecretString: VALID_API_TOKEN,
       })
     )
@@ -85,7 +85,7 @@ describe('POST /settings/telegram/credentials', () => {
     // Ensure credential was added into DB
     const dbCredential = await Credential.findOne({
       where: {
-        name: '12345',
+        name: secretName,
       },
     })
     expect(dbCredential).not.toBe(null)
@@ -94,7 +94,7 @@ describe('POST /settings/telegram/credentials', () => {
       where: {
         label: CREDENTIAL_LABEL,
         type: ChannelType.Telegram,
-        credName: '12345',
+        credName: secretName,
         userId: 1,
       },
     })

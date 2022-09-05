@@ -5,41 +5,41 @@
   "main": "index.js",
   "scripts": {
     "build": "rm -rf build && tsc && cp -r src/assets build/assets",
-    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h handler -e examples/event-cloudwatch-scheduled-event.js\""
+    "dev": "npm run build && tsc-watch --onSuccess \"npx lambda-local -l build/index.js -t 600 -h handler -e examples/event-cloudwatch-scheduled-event.js\"",
+    "test": "echo 'No tests yet for redaction-digest'"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/convict": "^5.2.1",
-    "@types/lodash": "^4.14.165",
-    "@types/nodemailer": "^6.4.0",
-    "@types/pg-connection-string": "^2.0.0",
-    "@typescript-eslint/eslint-plugin": "^4.7.0",
-    "@typescript-eslint/parser": "^4.7.0",
-    "eslint": "^7.13.0",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "lambda-local": "^1.7.4",
-    "tsc-watch": "^4.2.9",
-    "typescript": "^4.0.5"
+    "@types/bluebird": "3.5.33",
+    "@types/node": "14.14.7",
+    "@types/validator": "13.1.0",
+    "@types/convict": "5.2.1",
+    "@types/lodash": "4.14.165",
+    "@types/nodemailer": "6.4.0",
+    "@types/pg-connection-string": "2.0.0",
+    "lambda-local": "1.7.4",
+    "tsc-watch": "4.2.9",
+    "typescript": "4.7.3"
   },
   "dependencies": {
-    "@sentry/node": "^5.27.4",
-    "@types/bluebird": "^3.5.33",
-    "@types/node": "^14.14.7",
-    "@types/validator": "^13.1.0",
-    "aws-sdk": "^2.884.0",
-    "axios": "^0.21.1",
-    "convict": "^6.0.1",
-    "dotenv": "^8.2.0",
-    "lodash": "^4.17.21",
-    "moment": "^2.29.1",
-    "nodemailer": "^6.6.2",
-    "pg": "^8.5.1",
-    "pg-connection-string": "^2.4.0",
-    "reflect-metadata": "^0.1.13",
-    "sequelize": "^5.22.4",
-    "sequelize-typescript": "^1.1.0",
-    "source-map-support": "^0.5.19"
+    "@sentry/node": "5.27.4",
+    "aws-sdk": "2.1140.0",
+    "axios": "0.27.2",
+    "convict": "6.2.3",
+    "dotenv": "8.2.0",
+    "lodash": "4.17.21",
+    "module-alias": "2.2.2",
+    "moment": "2.29.4",
+    "nodemailer": "6.6.2",
+    "pg": "8.5.1",
+    "pg-connection-string": "2.4.0",
+    "reflect-metadata": "0.1.13",
+    "sequelize": "5.22.5",
+    "sequelize-typescript": "1.1.0",
+    "source-map-support": "0.5.19"
+  },
+  "_moduleAliases": {
+    "@shared": "../../shared/build"
   }
 }

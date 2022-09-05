@@ -8,47 +8,11 @@ Closes [insert issue #]
 
 _How did you solve the problem?_
 
-**Features**:
+## Deployment Checklist
 
-- Details ...
+_Any tasks that need to be done on the environment before releasing of this PR (e.g. Setting environment variables, running migrations, etc). If there's no task to be done, put "N/A"_
 
-**Improvements**:
-
-- Details ...
-
-**Bug Fixes**:
-
-- Details ...
-
-## Before & After Screenshots
-
-**BEFORE**:
-[insert screenshot here]
-
-**AFTER**:
-[insert screenshot here]
-
-## Tests
-
-_What tests should be run to confirm functionality?_
-
-## Deploy Notes
-
-_Notes regarding deployment of the contained body of work. These should note any
-new dependencies, new scripts, etc._
-
-**New environment variables**:
-
-- `env var` : env var details
-
-**New scripts**:
-
-- `script` : script details
-
-**New dependencies**:
-
-- `dependency` : dependency details
-
-**New dev dependencies**:
-
-- `dependency` : dependency details
+- [ ] First task
+  - [ ] Sub-task 1
+  - [ ] Sub-task 2
+- [ ] Second task

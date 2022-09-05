@@ -13,10 +13,25 @@ export enum Status {
   Halted = 'Halted',
 }
 
+export enum StatusFilter {
+  Draft = 'Draft',
+  Sent = 'Sent',
+}
+
+export enum SortField {
+  Created = 'created_at',
+  Sent = 'sent_at',
+}
+
+export enum Ordering {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
   [ChannelType.Email]: 'bx-envelope-open',
-  [ChannelType.Telegram]: 'bxl-telegram',
+  [ChannelType.Telegram]: 'bx-paper-plane',
 }
 
 export class Campaign {
@@ -31,6 +46,7 @@ export class Campaign {
   protect: boolean
   redacted: boolean
   demoMessageLimit: number | null
+  costPerMessage?: number
 
   constructor(input: any) {
     this.id = input['id']
@@ -46,11 +62,13 @@ export class Campaign {
     this.protect = input['protect']
     this.redacted = input['redacted']
     this.demoMessageLimit = input['demo_message_limit']
+    this.costPerMessage = input['cost_per_message']
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {
     if (jobs) {
       const jobSet = new Set(jobs.map((x) => x.status))
+      // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 2/2)
       if (
         ['READY', 'ENQUEUED', 'SENDING', 'SENT', 'STOPPED'].some((s) =>
           jobSet.has(s)

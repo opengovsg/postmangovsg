@@ -1,5 +1,6 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
+import { parseFromAddress } from '@shared/utils/from-address'
 import {
   useState,
   useEffect,
@@ -15,7 +16,6 @@ import { useParams } from 'react-router-dom'
 
 import styles from './EmailTemplate.module.scss'
 
-import { parseFromAddress } from '@shared/utils/from-address'
 import { EmailCampaign, EmailProgress } from 'classes'
 import {
   TextArea,
@@ -58,7 +58,7 @@ const EmailTemplate = ({
   } = campaign as EmailCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [errorMsg, setErrorMsg] = useState('')
   const [subject, setSubject] = useState(initialSubject)
   const [replyTo, setReplyTo] = useState(
     initialReplyTo === userEmail ? null : initialReplyTo
@@ -66,12 +66,10 @@ const EmailTemplate = ({
   const [showLogo, setShowLogo] = useState(initialShowLogo ?? true)
 
   // initialFrom is undefined for a new campaign without a saved template
-  const {
-    fromName: initialFromName,
-    fromAddress: initialFromAddress,
-  } = initialFrom
-    ? parseFromAddress(initialFrom)
-    : { fromName: '', fromAddress: '' }
+  const { fromName: initialFromName, fromAddress: initialFromAddress } =
+    initialFrom
+      ? parseFromAddress(initialFrom)
+      : { fromName: '', fromAddress: '' }
   const [fromName, setFromName] = useState(initialFromName)
   const [fromAddress, setFromAddress] = useState(initialFromAddress)
 
@@ -86,7 +84,7 @@ const EmailTemplate = ({
     'Dear {{ name }},\n\nYour next appointment at {{ clinic }} is on {{ date }} at {{ time }}\n\nMinistry of Health\n16 College Road, College of Medicine Building, Singapore 169854\n6325 9220 | www.moh.gov.sg'
 
   const handleSaveTemplate = useCallback(async (): Promise<void> => {
-    setErrorMsg(null)
+    setErrorMsg('')
     try {
       if (!campaignId) {
         throw new Error('Invalid campaign id')
@@ -112,7 +110,7 @@ const EmailTemplate = ({
         setActiveStep((s) => s + 1)
       }
     } catch (err) {
-      setErrorMsg(err.message)
+      setErrorMsg((err as Error).message)
     }
   }, [
     body,
@@ -141,7 +139,7 @@ const EmailTemplate = ({
       setFromAddress((prev) => prev || fromAddress)
     }
 
-    populateFromAddresses()
+    void populateFromAddresses()
   }, [])
 
   // Set callback for finish later button
@@ -163,7 +161,7 @@ const EmailTemplate = ({
               showLogo
             )
           } catch (err) {
-            setErrorMsg(err.message)
+            setErrorMsg((err as Error).message)
             throw err
           }
         }}
@@ -189,10 +187,8 @@ const EmailTemplate = ({
 
   const handleSelectFromAddress = useCallback(
     (selectedFrom: string) => {
-      const {
-        fromName: selectedFromName,
-        fromAddress: selectedFromAddress,
-      } = parseFromAddress(selectedFrom)
+      const { fromName: selectedFromName, fromAddress: selectedFromAddress } =
+        parseFromAddress(selectedFrom)
 
       // Use custom from name if it has already been set. For e.g.,
       // for "Custom <donotreply@mail.postman.gov.sg>"", we should

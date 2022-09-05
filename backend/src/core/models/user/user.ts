@@ -120,7 +120,7 @@ export class User extends Model<User> {
         {
           domain: emailDomain,
           agencyId: defaultAgency.id,
-        },
+        } as Domain,
         { transaction: options.transaction }
       )
     }

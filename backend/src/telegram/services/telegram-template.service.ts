@@ -1,7 +1,10 @@
 import { difference, keys } from 'lodash'
 
 import config from '@core/config'
+import { ChannelType } from '@core/constants'
 import { isSuperSet } from '@core/utils'
+import { UploadService } from '@core/services'
+import { UploadData } from '@core/interfaces'
 import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
 import { PhoneNumberService } from '@core/services'
@@ -12,7 +15,9 @@ import {
 } from '@shared/templating'
 
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
+import { TelegramService } from '@telegram/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 const client = new TemplateClient({
   xssOptions: XSS_TELEGRAM_OPTION,
   lineBreak: '\n',
@@ -35,32 +40,30 @@ const upsertTelegramTemplate = async ({
     if (
       (await TelegramTemplate.findByPk(campaignId, { transaction })) !== null
     ) {
-      const updatedTemplate: [
-        number,
-        TelegramTemplate[]
-      ] = await TelegramTemplate.update(
-        { body },
-        {
-          where: { campaignId },
-          individualHooks: true, // required so that BeforeUpdate hook runs
-          returning: true,
-          transaction,
-        }
-      )
+      const updatedTemplate: [number, TelegramTemplate[]] =
+        await TelegramTemplate.update(
+          { body },
+          {
+            where: { campaignId },
+            individualHooks: true, // required so that BeforeUpdate hook runs
+            returning: true,
+            transaction,
+          }
+        )
 
-      transaction?.commit()
+      await transaction?.commit()
       return updatedTemplate[1][0]
     }
 
     const createdTemplate = await TelegramTemplate.create(
-      { campaignId, body },
+      { campaignId, body } as TelegramTemplate,
       { transaction }
     )
 
-    transaction?.commit()
+    await transaction?.commit()
     return createdTemplate
   } catch (err) {
-    transaction?.rollback()
+    await transaction?.rollback()
     throw err
   }
 }
@@ -228,10 +231,35 @@ const testHydration = (
   client.template(templateBody, firstRecord.params)
 }
 
+/**
+ * Enqueue a new Telegram recipient list upload
+ * @param uploadData
+ */
+const enqueueUpload = (data: UploadData<TelegramTemplate>): Promise<string> => {
+  return UploadService.enqueueUpload({
+    channelType: ChannelType.Telegram,
+    data,
+  })
+}
+
+/**
+ * Process a Telegram campaign recipient list upload
+ * @param uploadData
+ */
+const processUpload = (
+  uploadData: UploadData<TelegramTemplate>
+): Promise<void> =>
+  UploadService.processUpload<TelegramTemplate>(
+    TelegramService.uploadCompleteOnPreview,
+    TelegramService.uploadCompleteOnChunk
+  )(uploadData)
+
 export const TelegramTemplateService = {
   storeTemplate,
   getFilledTemplate,
   validateAndFormatNumber,
   testHydration,
   client,
+  enqueueUpload,
+  processUpload,
 }

@@ -1,0 +1,111 @@
+name: Deploy serverless-eb-env-update
+on:
+  push:
+    branches:
+      - staging
+      - master
+
+# Making sure that the current deployment is completed before the next one
+concurrency: deploy-serverless-eb-env-update-${{ github.ref }}
+env:
+  # Update this common config
+  DIRECTORY: serverless/eb-env-update
+  FUNCTION: eb-env-update
+
+jobs:
+  set_environment:
+    outputs:
+      current_env: "${{ steps.set-environment.outputs.current_env }}"
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-environment
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "::set-output name=current_env::production"
+          else
+             echo "::set-output name=current_env::staging"
+          fi
+
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Lint lock file
+        run: cd "$DIRECTORY" && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      - name: Test app code
+        run: cd "$DIRECTORY" && npm test
+
+  build_deploy_application:
+    needs: [set_environment, lint-test]
+    environment:
+      name: "${{ needs.set_environment.outputs.current_env }}"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          aws-region: "${{ secrets.AWS_DEFAULT_REGION }}"
+      - name: Set function name according to environment
+        id: function-name
+        run: echo "::set-output name=value::$FUNCTION-${{ needs.set_environment.outputs.current_env }}"
+      - name: Build
+        id: build-lambda
+        env:
+          ZIP_FILE: code.zip
+        run: |
+          cd "$DIRECTORY"
+          npm ci 
+          npm run build
+          npm prune --production
+          sudo zip -qr "$ZIP_FILE" build package.json node_modules/
+          echo "::set-output name=zip_path::$DIRECTORY/$ZIP_FILE"
+
+      - name: Check if lambda can be updated (1)
+        run: |
+          result=$(aws lambda get-function --function-name "${{ steps.function-name.outputs.value }}" --query 'Configuration.[State, LastUpdateStatus]')
+          echo "$result"
+          if [[ ! "$result" =~ "Successful" ]] || [[ ! "$result" =~ "Active" ]]; then
+              sleep 10;
+          fi
+
+      - name: Update function code
+        run: |
+          aws lambda update-function-code --function-name "${{ steps.function-name.outputs.value }}" \
+          --zip-file=fileb://${{ steps.build-lambda.outputs.zip_path }}  --publish 2>&1
+
+      - name: Check if lambda can be updated (2)
+        run: |
+          result=$(aws lambda get-function --function-name "${{ steps.function-name.outputs.value }}" --query 'Configuration.[State, LastUpdateStatus]')
+          echo "$result"
+          if [[ ! "$result" =~ "Successful" ]] || [[ ! "$result" =~ "Active" ]]; then
+              sleep 10;
+          fi
+
+      - name: Update function config
+        env:
+          # Update the configuration
+          ROLE: "${{ secrets.EBENVUPDATE_ROLE }}"
+          RUNTIME: nodejs12.x
+          HANDLER: build/index.handler
+          TIMEOUT: 10
+          MEMORY_SIZE: 128
+          TAG: "github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
+          # Update env vars
+          NODE_ENV: "${{ needs.set_environment.outputs.current_env }}"
+          SECRET_ID: "${{ secrets.SECRET_ID }}"
+          SENTRY_DSN: "${{ secrets.SERVERLESS_SENTRY_DSN }}"
+          # Update environment variables in the command
+        run: |
+          aws lambda update-function-configuration --function-name="${{ steps.function-name.outputs.value }}" \
+          --role="$ROLE" --description="$TAG" --timeout="$TIMEOUT" --memory-size="$MEMORY_SIZE" --runtime="$RUNTIME" --handler="$HANDLER" \
+          --environment "Variables={NODE_ENV=$NODE_ENV,SECRET_ID=$SECRET_ID,SENTRY_DSN=$SENTRY_DSN}"

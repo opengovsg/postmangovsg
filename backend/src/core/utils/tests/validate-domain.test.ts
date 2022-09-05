@@ -1,6 +1,5 @@
 import { Sequelize } from 'sequelize-typescript'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { Domain } from '@core/models'
 import { validateDomain } from '../validate-domain'
 import config from '@core/config'
@@ -17,14 +16,13 @@ afterEach(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  await RedisService.shutdown()
 })
 
 describe('validateDomain', () => {
   it('should match exact domain in database', async () => {
     await Domain.create({
       domain: '@exactdomain.com',
-    })
+    } as Domain)
 
     await expect(validateDomain('user@exactdomain.com')).resolves.toBe(true)
   })
@@ -32,7 +30,7 @@ describe('validateDomain', () => {
   it('should not match subdomains in database', async () => {
     await Domain.create({
       domain: '@school.edu.sg',
-    })
+    } as Domain)
 
     await expect(validateDomain('teacher@school.edu.sg')).resolves.toBe(true)
     await expect(validateDomain('student@student.school.edu.sg')).resolves.toBe(

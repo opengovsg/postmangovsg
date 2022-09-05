@@ -27,10 +27,8 @@ const Create = () => {
   const history = useHistory()
 
   const { campaign, setCampaign } = useContext(CampaignContext)
-  const {
-    handleFinishLater: finishLaterContextHandler,
-    finishLaterContent,
-  } = useContext(FinishLaterModalContext)
+  const { handleFinishLater: finishLaterContextHandler, finishLaterContent } =
+    useContext(FinishLaterModalContext)
   const [isLoading, setLoading] = useState(true)
   const [isInvalid, setIsInvalid] = useState(false)
 
@@ -51,7 +49,7 @@ const Create = () => {
         setIsInvalid(true)
       }
     }
-    loadProject(id)
+    void loadProject(id)
   }, [id, setCampaign, setIsInvalid])
 
   async function handleFinishLater() {

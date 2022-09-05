@@ -7,6 +7,7 @@ import SMSCredentials from '../SMSCredentials'
 import { SMSCampaign } from 'classes'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
+import 'locales'
 import {
   mockCommonApis,
   render,
@@ -120,12 +121,12 @@ test('displays an error when attempting to validate an invalid credential', asyn
   const sendTestButton = screen.getByRole('button', { name: /send test sms/i })
 
   // Select the invalid credential label
-  userEvent.click(credentialDropdown)
-  userEvent.click(credentialLabelText)
+  await userEvent.click(credentialDropdown)
+  await userEvent.click(credentialLabelText)
 
   // Attempt to validate the credential
-  userEvent.type(testNumberTextbox, '89898989')
-  userEvent.click(sendTestButton)
+  await userEvent.type(testNumberTextbox, '89898989')
+  await userEvent.click(sendTestButton)
 
   // Assert that an error is displayed
   expect(

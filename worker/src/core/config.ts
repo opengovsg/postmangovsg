@@ -2,7 +2,7 @@
  * @file Configuration
  * All defaults can be changed
  */
-import convict from 'convict'
+import convict, { Config } from 'convict'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
@@ -26,7 +26,53 @@ convict.addFormats({
   },
 })
 
-const config = convict({
+export interface ConfigSchema {
+  env: string
+  aws: {
+    awsRegion: string
+    awsEndpoint: null
+    secretManagerSalt: string
+    serviceName: string
+    metadataUri: string
+  }
+  database: {
+    databaseUri: string
+    dialectOptions: {
+      ssl: {
+        require: boolean
+        rejectUnauthorized: {
+          valueOf: any
+        }
+        ca: Buffer[]
+      }
+    }
+    poolOptions: {
+      max: number
+      min: number
+      acquire: number
+    }
+    useIam: boolean
+  }
+  mailOptions: {
+    host: string
+    port: number
+    auth: { user: string; pass: string }
+    callbackHashSecret: string
+  }
+  mailFrom: string
+  mailConfigurationSet: string
+  defaultCountry: string
+  callbackSecret: string
+  backendUrl: string
+  messageWorker: { numSender: number; numLogger: number }
+  unsubscribeHmac: { version: string; v1: { algo: string; key: string } }
+  unsubscribeUrl: string
+  smsFallback: { activate: boolean; senderId: string }
+  emailFallback: { activate: boolean }
+  showMastheadDomain: string
+}
+
+const config: Config<ConfigSchema> = convict({
   env: {
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
@@ -40,15 +86,13 @@ const config = convict({
       env: 'AWS_REGION',
     },
     awsEndpoint: {
-      doc:
-        'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      doc: 'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
       format: '*',
       default: null,
       env: 'AWS_ENDPOINT',
     },
     secretManagerSalt: {
-      doc:
-        'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
+      doc: 'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
       default: '',
       env: 'SECRET_MANAGER_SALT',
       format: 'required-string',
@@ -104,8 +148,7 @@ const config = convict({
         format: 'int',
       },
       acquire: {
-        doc:
-          'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
+        doc: 'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
         default: 600000,
         env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
         format: 'int',
@@ -145,6 +188,12 @@ const config = convict({
         sensitive: true,
         format: 'required-string',
       },
+    },
+    callbackHashSecret: {
+      doc: 'Callback secret for email',
+      default: '',
+      env: 'EMAIL_CALLBACK_HASH_SECRET',
+      format: 'required-string',
     },
   },
   mailFrom: {
@@ -233,15 +282,13 @@ const config = convict({
   },
   emailFallback: {
     activate: {
-      doc:
-        'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
+      doc: 'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
       default: false,
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
   },
   showMastheadDomain: {
-    doc:
-      'Show masthead within email template if logged-in user has email ending with this domain',
+    doc: 'Show masthead within email template if logged-in user has email ending with this domain',
     default: '.gov.sg',
     env: 'SHOW_MASTHEAD_DOMAIN',
   },

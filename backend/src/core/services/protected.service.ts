@@ -6,6 +6,10 @@ import { ProtectedMessage, Campaign } from '@core/models'
 import config from '@core/config'
 import { CSVParams } from '@core/types'
 import { loggerWithLabel } from '@core/logger'
+import {
+  MessageBulkInsertInterface,
+  ProtectedMessageRecordInterface,
+} from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 const PROTECTED_URL = config.get('protectedUrl')
@@ -92,20 +96,23 @@ const storeProtectedMessages = async ({
     }
   )
   // START populate template
-  await ProtectedMessage.bulkCreate(protectedMessages, {
-    transaction,
-    logging: (_message, benchmark) => {
-      if (benchmark) {
-        logger.info({
-          message:
-            'uploadProtectedCompleteOnChunk - ElapsedTime for ProtectedMessage in ms',
-          benchmark,
-          action: 'storeProtectedMessages',
-        })
-      }
-    },
-    benchmark: true,
-  })
+  await ProtectedMessage.bulkCreate(
+    protectedMessages as unknown as ProtectedMessage[],
+    {
+      transaction,
+      logging: (_message, benchmark) => {
+        if (benchmark) {
+          logger.info({
+            message:
+              'uploadProtectedCompleteOnChunk - ElapsedTime for ProtectedMessage in ms',
+            benchmark,
+            action: 'storeProtectedMessages',
+          })
+        }
+      },
+      benchmark: true,
+    }
+  )
 
   const messages = protectedMessages.map(({ campaignId, recipient, id }) => ({
     campaignId,

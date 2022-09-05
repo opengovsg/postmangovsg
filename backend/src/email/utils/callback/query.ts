@@ -43,9 +43,9 @@ export const updateMessageWithError = async (
     {
       errorCode: errorCode,
       errorSubType,
-      receivedAt: timestamp,
+      receivedAt: new Date(timestamp),
       status: 'INVALID_RECIPIENT',
-    },
+    } as Partial<EmailMessage>,
     {
       where: {
         [Op.and]: [
@@ -81,9 +81,9 @@ export const updateMessageWithSuccess = async (
   // Should not overwrite a READ status for the message
   const [, result] = await EmailMessage.update(
     {
-      receivedAt: timestamp,
+      receivedAt: new Date(timestamp),
       status: 'SUCCESS',
-    },
+    } as EmailMessage,
     {
       where: {
         [Op.and]: [
@@ -120,9 +120,9 @@ export const updateMessageWithRead = async (
   // Since open event supercedes error or success notification types, overwrite any previous status
   const [, result] = await EmailMessage.update(
     {
-      receivedAt: timestamp,
+      receivedAt: new Date(timestamp),
       status: 'READ',
-    },
+    } as EmailMessage,
     {
       where: { id },
       returning: true,
@@ -148,6 +148,7 @@ export const haltCampaignIfThresholdExceeded = async (
       [fn('sum', cast({ error_code: 'Hard bounce' }, 'int')), 'invalid'],
       [fn('count', 1), 'running_total'],
     ],
+    useMaster: false,
   })) as any[]
   const {
     invalid,

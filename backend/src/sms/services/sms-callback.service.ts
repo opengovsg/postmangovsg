@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import config from '@core/config'
 import { SmsMessage } from '@sms/models'
 import { loggerWithLabel } from '@core/logger'
+import { compareSha256Hash } from '@shared/utils/crypto'
 
 const logger = loggerWithLabel(module)
 const FINALIZED_STATUS = ['sent', 'delivered', 'undelivered', 'failed']
@@ -21,17 +22,36 @@ const isAuthenticated = (
 
   const credentials = Buffer.from(secret, 'base64').toString('utf8')
   const [username, password] = credentials.split(':')
-  const plainTextPassword =
-    username + messageId + campaignId + config.get('smsCallback.callbackSecret')
-  return bcrypt.compareSync(plainTextPassword, password)
+  const plainTextPassword = username + messageId + campaignId
+  let isAuthenticated = compareSha256Hash(
+    config.get('smsCallback.callbackSecret'),
+    plainTextPassword,
+    password
+  )
+  // if not passed with the new hash, retry with the old way
+  // TODO: remove this after all campaigns sent with the old way have completed
+  if (!isAuthenticated) {
+    logger.info({
+      message: 'Incorrect sms callback hash',
+      hash: password,
+      messageId,
+      campaignId,
+      username,
+    })
+    const bcryptPlainTextPassword =
+      username +
+      messageId +
+      campaignId +
+      config.get('smsCallback.callbackSecret')
+    isAuthenticated = bcrypt.compareSync(bcryptPlainTextPassword, password)
+  }
+  return isAuthenticated
 }
 
 const parseEvent = async (req: Request): Promise<void> => {
   const { messageId, campaignId } = req.params
-  const {
-    MessageStatus: twilioMessageStatus,
-    ErrorCode: twilioErrorCode,
-  } = req.body
+  const { MessageStatus: twilioMessageStatus, ErrorCode: twilioErrorCode } =
+    req.body
   // Do not process message if it's not of a finalized delivery status
   if (FINALIZED_STATUS.indexOf(twilioMessageStatus as string) === -1) {
     return
@@ -47,7 +67,7 @@ const parseEvent = async (req: Request): Promise<void> => {
       {
         errorCode: twilioErrorCode,
         status: 'ERROR',
-      },
+      } as SmsMessage,
       {
         where: {
           id: messageId,
@@ -63,7 +83,7 @@ const parseEvent = async (req: Request): Promise<void> => {
       {
         receivedAt: new Date(),
         status: 'SUCCESS',
-      },
+      } as SmsMessage,
       {
         where: {
           id: messageId,

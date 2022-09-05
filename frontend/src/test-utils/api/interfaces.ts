@@ -62,6 +62,7 @@ export interface Campaign {
   type: string
   valid: boolean
   has_credential: boolean
+  cost_per_message?: number
 
   // Templates
   sms_templates?: SMSTemplate

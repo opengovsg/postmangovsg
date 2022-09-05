@@ -1,7 +1,14 @@
+// eslint-disable-next-line import/order
 import { useContext } from 'react'
 
+import { EmailCampaign } from 'classes'
+
 import { Status, ChannelType } from 'classes/Campaign'
-import { StepHeader, ProgressDetails } from 'components/common'
+import {
+  StepHeader,
+  ProgressDetails,
+  EmailPreviewBlock,
+} from 'components/common'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import { CampaignContext } from 'contexts/campaign.context'
 
@@ -12,6 +19,8 @@ const EmailDetail = () => {
   const { campaign } = useContext(CampaignContext)
   const { id } = campaign
   const { stats, refreshCampaignStats } = usePollCampaignStats()
+
+  const emailCampaign = campaign as EmailCampaign
 
   async function handleRefreshStats() {
     try {
@@ -83,6 +92,15 @@ const EmailDetail = () => {
   function renderProgressDetails() {
     return (
       <>
+        <div className="separator"></div>
+        <h3>Email Template</h3>
+        <EmailPreviewBlock
+          body={emailCampaign.body}
+          themedBody={emailCampaign.themedBody}
+          subject={emailCampaign.subject}
+          replyTo={emailCampaign.replyTo}
+          from={emailCampaign.from}
+        />
         <div className="separator"></div>
         {stats.status && (
           <ProgressDetails

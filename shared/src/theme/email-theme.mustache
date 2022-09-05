@@ -150,10 +150,17 @@
 
     <!--[if false]><!-->
       <div class="masthead"
-        style="text-align: center; font-size: 11px; line-height: 28px; height: 28px; background-color: #E8EBEE;
+        style="text-align: center; font-size: 11px; height: 28px; background-color: #E8EBEE;
           border-top-left-radius: 8px; border-top-right-radius: 8px; white-space: nowrap;">
     <!--<![endif]-->
-        <span>Singapore government emails are sent from .gov.sg addresses</span>
+        <table style="margin:auto;height: 28px"><tbody>
+          <td>
+            <img width="16" height="16" style="width: 16px;height: 16px; vertical-align: middle; margin-right: 6px" src="https://file.go.gov.sg/masthead-lion.png" alt="Masthead Lion Symbol" >
+          </td>
+          <td>
+            <span style="vertical-align:middle;line-height:16px">Singapore government emails are sent from .gov.sg addresses</span>
+          </td>
+        </tbody></table>
     <!--[if false]><!-->
       </div>
     <!--<![endif]-->
@@ -202,14 +209,17 @@
           not the intended recipient, please delete this email, refrain from disclosing the contents to any person, and notify the
           agency or organisation that sent this to you.
           <br />
-          <br />          
-          If you wish to unsubscribe from similar emails, please click <a href="{{unsubLink}}">here</a> to inform the sender of your email preference.
-          Alternatively, you may also contact the sender agency or organisation directly through their public contact channels.
           <br />
+          Powered by <a href="https://postman.gov.sg">Postman</a>, the official communication tool trusted by government agencies.
           <br />
-          Powered by <a href="https://postman.gov.sg">Postman</a>
+          <br />    
+          <a href="{{{unsubLink}}}">Unsubscribe</a>
           <div class="footer-vertical-spacer-top" style="line-height: 16px; height: 16px;">&#8202;</div>
-          <img src="https://file.go.gov.sg/postmanlogo-grey.png" alt="Postman.gov.sg Logo" height="24" style="height: 24px; width: 109.55px;">
+          <div>
+            <img src="https://file.go.gov.sg/postmanlogo-grey.png" alt="Postman.gov.sg Logo" height="24" style="height: 24px; width: 109.55px;">
+            <div style="margin: 0 10px; border-left: 1px solid #B5C4FF; height: 24px; display: inline-block;width: 0;"></div>
+            <img src="https://file.go.gov.sg/ogp-logo-rect.png" alt="Open Government Products Logo" style="height:24px; width:91.5px;">
+          </div>
         </div>
         <div class="footer-vertical-spacer-bottom" style="line-height: 24px; height: 24px;">&#8202;</div>
       </div>

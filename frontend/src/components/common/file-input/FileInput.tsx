@@ -21,7 +21,7 @@ const FileInput = ({
         disabled={disabled || isProcessing}
         onClick={(e) => ((e.target as HTMLInputElement).value = '')} // reset target value to allow selecting of new files
         onChange={(e) => {
-          if (e.target.files) onFileSelected(e.target.files)
+          if (e.target.files) void onFileSelected(e.target.files)
         }}
       />
       <label role="button" htmlFor="recipient-upload-input">

@@ -9,7 +9,7 @@ import type {
   FormEvent,
 } from 'react'
 
-import styles from './TextInputWithButton.module.scss'
+import defaultStyles from './TextInputWithButton.module.scss'
 
 import { PrimaryButton, TextInput } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
@@ -24,6 +24,7 @@ interface TextInputWithButtonProps
   buttonLabel?: ReactNode
   loadingButtonLabel?: ReactNode
   errorMessage?: string | null
+  overrideStyles?: { readonly [key: string]: string }
 }
 
 const TextInputWithButton: FunctionComponent<TextInputWithButtonProps> = ({
@@ -40,7 +41,9 @@ const TextInputWithButton: FunctionComponent<TextInputWithButtonProps> = ({
   buttonLabel,
   loadingButtonLabel,
   errorMessage,
+  overrideStyles,
 }) => {
+  const styles = overrideStyles || defaultStyles
   const [asyncLoading, setAsyncLoading] = useState(false)
   const isMounted = useIsMounted()
 

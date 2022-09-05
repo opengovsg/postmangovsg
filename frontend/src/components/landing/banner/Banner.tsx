@@ -1,16 +1,16 @@
 import cx from 'classnames'
 
-import { useState } from 'react'
+import { RefObject, useState } from 'react'
 
 import styles from './Banner.module.scss'
 
-const Banner = () => {
+const Banner = ({ innerRef }: { innerRef?: RefObject<HTMLDivElement> }) => {
   const [open, setOpen] = useState(false)
 
   const toggleOpen = () => setOpen((open) => !open)
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} ref={innerRef}>
       <div className={styles.banner}>
         <div className={styles.icon}>
           <span className={cx(styles.sgdsIcon, styles.sgCrestIcon)}></span>
@@ -45,7 +45,7 @@ const Banner = () => {
                 <br />
                 (e.g. go.gov.sg/open).{' '}
                 <a
-                  href="http://www.go.gov.sg/trusted-websites"
+                  href="https://go.gov.sg/trusted-sites"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

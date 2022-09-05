@@ -63,8 +63,9 @@ const getDeliveredRecipients = async (
 ): Promise<Response | void> => {
   const { campaignId } = req.params
   try {
-    const recipients = await SmsStatsService.getDeliveredRecipients(+campaignId)
-    return res.json(recipients)
+    res.set('Content-Type', 'application/json')
+    await SmsStatsService.getDeliveredRecipients(+campaignId, res)
+    return res.end()
   } catch (err) {
     next(err)
   }

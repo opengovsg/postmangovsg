@@ -90,13 +90,13 @@ const TelegramRecipients = ({
           timeoutId = setTimeout(pollStatus, 2000)
         }
       } catch (e) {
-        setErrorMessage(e.message)
+        setErrorMessage((e as Error).message)
       }
     }
 
     // Retrieve status regardless of isCsvProcessing to retrieve csvError if any
     // If completed, it will only poll once
-    pollStatus()
+    void pollStatus()
 
     return () => clearTimeout(timeoutId)
   }, [campaignId, isCsvProcessing, isMounted])
@@ -128,7 +128,7 @@ const TelegramRecipients = ({
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename }))
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     }
     setIsUploading(false)
   }
@@ -137,7 +137,7 @@ const TelegramRecipients = ({
   function clearCsvStatus() {
     if (campaignId) {
       setCsvInfo((info) => ({ ...info, csvError: undefined }))
-      deleteCsvStatus(+campaignId)
+      void deleteCsvStatus(+campaignId)
     }
   }
 

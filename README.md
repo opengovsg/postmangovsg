@@ -47,11 +47,21 @@ Just want to use the API? See [api-usage.md](docs/api-usage.md) for details.
 
 ### Install and run required services
 
-Set up a **postgresql@11** database, **redis** cache and **localstack** server. Postgresql and redis can be started either natively or using Docker.
+Set up a **postgresql@11** database, **redis** cache and **localstack** server. PostgreSQL and Redis can be started either natively or using Docker. We recommend using Docker.
 
-Starting postgresql and redis natively:
+#### Starting all services using Docker
 
-```bash
+```zsh
+export AWS_ENDPOINT=http://localhost:4566
+export FILE_STORAGE_BUCKET_NAME=localstack-upload
+export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
+
+npm run dev:services
+```
+
+#### Starting postgresql and redis natively
+
+```zsh
 # Install postgres
 brew install postgresql@11
 brew services start postgresql@11
@@ -77,19 +87,9 @@ export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
 npm run dev:localstack
 ```
 
-Starting all services using Docker:
+#### Optionally, run the following to install and use `cw` to tail Cloudwatch logs
 
-```bash
-export AWS_ENDPOINT=http://localhost:4566
-export FILE_STORAGE_BUCKET_NAME=localstack-upload
-export AWS_LOG_GROUP_NAME=postmangovsg-beanstalk-localstack
-
-npm run dev:services
-```
-
-Optionally, run the following to install and use `cw` to tail Cloudwatch logs:
-
-```bash
+```zsh
 brew tap lucagrulla/tap
 brew install cw
 
@@ -100,11 +100,19 @@ cw tail -r ap-northeast-1 -u $AWS_ENDPOINT -f $AWS_LOG_GROUP_NAME:`node --eval='
 ### Secrets detection
 
 This project makes of [detect-secrets](https://github.com/Yelp/detect-secrets) to prevent secrets and credentials from being committed to the repository.
-It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo. Run the following to install:
+It runs as a pre-commit hook and it needs to be installed if you intend to make commits to the repo.
+**Note**: The reason we're running `detect-secrets` through `detect-secrets:precommit` instead of using `lint-staged` is because `detect-secrets-hook` doesn't work well with the combination of output of staged files by `lint-staged` and baseline supplied.
 
-```bash
-pip install detect-secrets
+Run the following to install:
+
+```zsh
+pip install detect-secrets==1.2.0
 ```
+
+Upon blockage by `detect-secrets-hook`, please take these steps:
+
+- Go into each of the locations pointed out by `detect-secrets-hook` and remove accidentally added secrets
+- If some of these detections are false positive (please be super sure about this, when not sure check with teammates), update the secrets baseline by running `npm run detect-secrets:update
 
 ### Set environment variables
 
@@ -113,30 +121,50 @@ Example environment variables can be found in
 - [backend/.env-example](backend/.env-example)
 - [frontend/.env-example](frontend/.env-example)
 - [worker/.env-example](worker/.env-example)
+- [.env-example](.env-example)
 
-Set the environment variables in a file named `.env` in each folder
+Set the environment variables in a file named `.env` in each folder. If you're a developer at OGP, ask your friendly colleague for their env variables. (Please help to ensure the `.env-example` file stays up-to-date though!)
 
 ### Install dependencies
 
-```bash
-cd postmangovsg
+```zsh
 npm install
 ```
+
+### Database migration
+
+#### Local database
+
+This step needs to be run if you have made a change to the database schema, or if you are setting up the project for the first time.
+
+```zsh
+cd backend
+npm run db:migrate # run all pending migrations
+npm run db:seed # seed database with dummy data
+```
+
+If you need to undo any database migrations:
+
+```zsh
+cd backend
+npm run db:undo # undo most recent migration
+```
+
+You can find more info on undoing migrations using Sequelize [here](https://sequelize.org/docs/v6/other-topics/migrations/#undoing-migrations).
 
 ### Compile frontend translations
 
 [lingui](https://lingui.js.org/) is used for internationalization. Read [this](frontend/src/locales/README.md) for more info.
 
-```bash
-cd postmangovsg/frontend
+```zsh
+cd frontend
 npm run extract
 npm run compile
 ```
 
 ### Run the app
 
-```bash
-cd postmangovsg
+```zsh
 npm run dev
 ```
 
@@ -146,30 +174,22 @@ You should find the
 - Express backend at [localhost:4000](http://localhost:4000)
 - Swagger docs at [localhost:4000/docs](http://localhost:4000/docs)
 
+Alternatively, if you would like to develop locally against staging database and workers, ensure that you have set up the necessary variables in `./backend/.env` and run the following:
+
+```zsh
+npm run lazydev
+```
+
+Your frontend and backend will still be on `localhost` but you will be able to use staging database and workers.
+
 ## Deployment
 
-We use TravisCI to simplify our deployment process:
+We use Github Actions to simplify our deployment process:
 
-- `backend` is deployed on Elastic Beanstalk
-- `frontend` is deployed on AWS Amplify
-- `worker` is deployed on Elastic Container Service
+- `backend` is deployed on [Elastic Beanstalk](.github/workflows/deploy-eb.yml)
+- `frontend` is deployed on [AWS Amplify](.github/workflows/deploy-frontend.yml)
+- `worker` is deployed on [Elastic Container Service](.github/workflows/deploy-worker.yml)
 - `serverless` is deployed on AWS Lambda
-
-The environment variables on Travis are:
-
-- `AWS_ACCESS_KEY_ID` : access key for the travis IAM user
-- `AWS_SECRET_ACCESS_KEY` : access key for the travis IAM user
-- `AWS_DEFAULT_REGION` : region where your infrastructure is deployed (`ap-northeast-1` for us)
-- `REPO`: Path to the elastic container registry (`<account_id>.dkr.ecr.ap-northeast-1.amazonaws.com/<repo_name>`)
-- `PRODUCTION_BRANCH` : branch that is deployed to production
-- `STAGING_BRANCH`: branch that is deployed to staging. Change this variable to test different branches.
-
-To deploy workers, trigger a custom build on Travis with the Custom Config set to
-
-```
-env:
-  - DEPLOY_WORKER=true
-```
 
 ## Releasing
 
@@ -186,7 +206,7 @@ env:
 
 **Example:**
 
-```bash
+```zsh
 # Create a new release branch for a new minor version (e.g. v1.6.0 -> v1.7.0)
 $ git checkout develop
 $ git checkout -b release-v1.7.0
@@ -251,7 +271,6 @@ Create a cluster with four services. These names are currently hardcoded for dep
 | Cluster Name: postmangovsg-workers |
 | ---------------------------------- |
 
-
 | Service Name    | LaunchType | Platform version |
 | --------------- | ---------- | ---------------- |
 | staging-sending | FARGATE    | 1.4.0            |
@@ -286,6 +305,18 @@ See [configure/frontend](docs/configure/frontend.md) for details
 ### Worker
 
 See [configure/worker](docs/configure/worker.md) for details
+
+### Product Dashboards on Grafana
+
+We currently have created two Grafana product metrics dashboards hosted on an EC2 instance. You can access them by connecting to the OGP VPN and following the URLs below. In order to SSH into the EC2 instance:
+
+1. Update the following env variables on `/backend/.env`:`GRAFANA_KEY_FOLDER` (get the `.pem` file from 1Password and store it in your `~/.ssh/` folder) and `GRAFANA_EC2_HOST_URL` (this should be `ec2-user@<EC2_instance_Public_IPv4_DNS>`, which you can find from 1Password too).
+2. Connect to the OGP VPN first, then run `npm run grafana`.
+
+The URLs of the Grafana dashboards are:
+
+- [PostmanSG Executive Dashboard](http://13.213.17.36:3000/d/ghhtH9W4z/postmansg-executive-dashboard?orgId=1&from=1588291200000&to=1661990400000)
+- [PostmanSG Internal Dashboard](http://13.213.17.36:3000/d/a0GW6CmVk/postmansg-product-metrics-dashboard-internal?orgId=1)
 
 ## Contributions
 

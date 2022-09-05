@@ -1,8 +1,32 @@
-import axios from 'axios'
-
-import type { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 
 export async function unsubscribeRequest({
+  campaignId,
+  recipient,
+  hash,
+  version,
+  reason,
+}: {
+  campaignId: number
+  recipient: string
+  hash: string
+  version: string
+  reason: string
+}): Promise<void> {
+  try {
+    recipient = window.encodeURIComponent(recipient)
+    await axios.put(`/unsubscribe/${campaignId}/${recipient}`, {
+      h: hash,
+      v: version,
+      reason,
+    })
+    return
+  } catch (e) {
+    errorHandler(e, 'Error unsubscribing')
+  }
+}
+
+export async function subscribeAgain({
   campaignId,
   recipient,
   hash,
@@ -15,9 +39,11 @@ export async function unsubscribeRequest({
 }): Promise<void> {
   try {
     recipient = window.encodeURIComponent(recipient)
-    await axios.put(`/unsubscribe/${campaignId}/${recipient}`, {
-      h: hash,
-      v: version,
+    await axios.delete(`/unsubscribe/${campaignId}/${recipient}`, {
+      data: {
+        h: hash,
+        v: version,
+      },
     })
     return
   } catch (e) {
@@ -25,10 +51,15 @@ export async function unsubscribeRequest({
   }
 }
 
-function errorHandler(e: AxiosError, defaultMsg?: string): never {
+function errorHandler(e: unknown, defaultMsg?: string): never {
   console.error(e)
-  if (e.response && e.response.data && e.response.data.message) {
+  if (
+    axios.isAxiosError(e) &&
+    e.response &&
+    e.response.data &&
+    e.response.data.message
+  ) {
     throw new Error(e.response.data.message)
   }
-  throw new Error(defaultMsg || e.response?.statusText)
+  throw new Error(defaultMsg || (e as AxiosError).response?.statusText)
 }

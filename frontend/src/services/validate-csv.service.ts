@@ -1,10 +1,9 @@
 import { i18n } from '@lingui/core'
 
+import { TemplateClient, TemplateError } from '@shared/templating'
 import { keys, difference, uniq } from 'lodash'
-
 import Papa from 'papaparse'
 
-import { TemplateClient, TemplateError } from '@shared/templating'
 import { ALLOWED_IMAGE_SOURCES } from 'config'
 
 export interface ProtectedCsvInfo {
@@ -76,8 +75,8 @@ export async function validateCsv({
             )
           }
 
+          errors.push(`Line ${count}: ${(e as Error).message}`)
           // If there is errors, append to the errors array
-          errors.push(`Line ${count}: ${e.message}`)
           if (errors.length === 3) {
             // abort when there are 3 errors
             parser.abort()

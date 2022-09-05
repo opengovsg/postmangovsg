@@ -31,7 +31,7 @@ enum ApiKeyState {
 
 const ApiKey: FunctionComponent<ApiKeyProps> = ({ hasApiKey, onGenerate }) => {
   const [apiKey, setApiKey] = useState('')
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [errorMsg, setErrorMsg] = useState('')
   const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(
     ApiKeyState.GENERATE
   )
@@ -71,7 +71,7 @@ const ApiKey: FunctionComponent<ApiKeyProps> = ({ hasApiKey, onGenerate }) => {
             />
           )
         } else {
-          onGenerateConfirm()
+          await onGenerateConfirm()
         }
         break
       case ApiKeyState.COPY:
@@ -86,13 +86,13 @@ const ApiKey: FunctionComponent<ApiKeyProps> = ({ hasApiKey, onGenerate }) => {
   }
 
   async function onGenerateConfirm() {
-    setErrorMsg(null)
+    setErrorMsg('')
     try {
       const newApiKey = await regenerateApiKey()
       setApiKey(newApiKey)
       setApiKeyState(ApiKeyState.COPY)
     } catch (e) {
-      setErrorMsg(e.message)
+      setErrorMsg((e as Error).message)
     }
     if (onGenerate) onGenerate()
   }

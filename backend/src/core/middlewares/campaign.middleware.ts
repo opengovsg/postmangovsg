@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { loggerWithLabel } from '@core/logger'
-import { ChannelType } from '@core/constants'
+import { ChannelType, Status, SortField, Ordering } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
+import { Campaign } from '@core/models'
 
 const logger = loggerWithLabel(module)
 
@@ -102,13 +103,19 @@ const listCampaigns = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const { offset, limit } = req.query
+  const { offset, limit, type, status, name, sort_by, order_by } = req.query
   const userId = req.session?.user?.id
+
   try {
     const { rows, count } = await CampaignService.listCampaigns({
-      offset: +offset!,
-      limit: +limit!,
       userId,
+      offset: +(offset as string),
+      limit: +(limit as string),
+      type: type as ChannelType,
+      status: status as Status,
+      name: name as string,
+      sortBy: sort_by as SortField,
+      orderBy: order_by as Ordering,
     })
 
     return res.json({
@@ -151,9 +158,67 @@ const isCampaignRedacted = async (
   }
 }
 
+const deleteCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const campaignId = +req.params.campaignId
+    const deletedRows = await CampaignService.deleteCampaign(campaignId)
+    if (deletedRows < 1) {
+      logger.error({
+        message: 'Campaign not found',
+        campaignId: campaignId,
+        action: 'deleteCampaign',
+      })
+
+      return res
+        .status(404)
+        .json({ message: `Campaign ${campaignId} not found` })
+    }
+
+    res.json({})
+  } catch (e) {
+    console.error(e)
+    return next(e)
+  }
+}
+
+const updateCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const [count, rows] = await CampaignService.updateCampaign({
+      id: +campaignId,
+      name: req.body.name,
+    } as Campaign)
+    if (count < 1) {
+      logger.error({
+        message: 'Campaign not found',
+        campaignId: campaignId,
+        action: 'updateCampaign',
+      })
+
+      return res
+        .status(404)
+        .json({ message: `Campaign ${campaignId} not found` })
+    }
+
+    res.json(rows[0])
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const CampaignMiddleware = {
   canEditCampaign,
   createCampaign,
   listCampaigns,
   isCampaignRedacted,
+  deleteCampaign,
+  updateCampaign,
 }

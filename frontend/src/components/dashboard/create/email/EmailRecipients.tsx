@@ -100,13 +100,13 @@ const EmailRecipients = ({
           timeoutId = setTimeout(pollStatus, 2000)
         }
       } catch (e) {
-        setErrorMessage(e.message)
+        setErrorMessage((e as Error).message)
       }
     }
 
     // Retrieve status regardless of isCsvProcessing to retrieve csvError if any
     // If completed, it will only poll once
-    pollStatus()
+    void pollStatus()
 
     return () => clearTimeout(timeoutId)
   }, [campaignId, csvFilename, forceReset, isCsvProcessing, isMounted])
@@ -142,7 +142,7 @@ const EmailRecipients = ({
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
     }
     setIsUploading(false)
   }
@@ -151,7 +151,7 @@ const EmailRecipients = ({
   function clearCsvStatus() {
     if (campaignId) {
       setCsvInfo((info) => ({ ...info, csvError: undefined }))
-      deleteCsvStatus(+campaignId)
+      void deleteCsvStatus(+campaignId)
     }
   }
 

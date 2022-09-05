@@ -1,3 +1,5 @@
-module.exports = async function () {
-  await global.sequelize.close()
+import { sequelize } from './global-setup'
+
+module.exports = async function (): Promise<void> {
+  await sequelize.close()
 }

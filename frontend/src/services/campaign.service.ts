@@ -4,6 +4,9 @@ import {
   Campaign,
   CampaignStats,
   ChannelType,
+  StatusFilter,
+  SortField,
+  Ordering,
   Status,
   SMSCampaign,
   EmailCampaign,
@@ -27,6 +30,11 @@ function getJobTimestamps(
 export async function getCampaigns(params: {
   offset: number
   limit: number
+  type?: ChannelType
+  status?: StatusFilter
+  name?: string
+  sort_by?: SortField
+  order_by?: Ordering
 }): Promise<{
   campaigns: Array<Campaign>
   totalCount: number
@@ -191,5 +199,18 @@ export async function exportCampaignStats(
     })
 
     return campaignRecipients
+  })
+}
+
+export async function deleteCampaignById(campaignId: number): Promise<void> {
+  return axios.delete(`/campaigns/${campaignId}`)
+}
+
+export async function renameCampaign(
+  campaignId: number,
+  name: string
+): Promise<void> {
+  return axios.put(`/campaigns/${campaignId}`, {
+    name,
   })
 }

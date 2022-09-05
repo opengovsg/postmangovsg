@@ -19,9 +19,11 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
   try {
     // There isn't a reason to test migrations, so just use sync() here.
     await sequelize.sync()
+    // eslint-disable-next-line no-console
     console.log({ message: 'Test Database loaded.' })
   } catch (error) {
-    console.log(error.message)
+    // eslint-disable-next-line no-console
+    console.log((error as Error).message)
     console.error({ message: 'Unable to connect to test database', error })
     process.exit(1)
   }
@@ -40,8 +42,10 @@ const sequelizeLoader = async (dbName: string): Promise<Sequelize> => {
 
   try {
     await umzugSeeder.up()
+    // eslint-disable-next-line no-console
     console.log({ message: 'Test database seeded.' })
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.log(error)
     console.error({
       message: 'Unable to seed test database',

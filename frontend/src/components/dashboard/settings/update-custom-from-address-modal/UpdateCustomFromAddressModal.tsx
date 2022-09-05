@@ -1,10 +1,9 @@
+import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
 import { useState, useContext, useEffect } from 'react'
 
 import isEmail from 'validator/lib/isEmail'
 
 import styles from './UpdateCustomFromAddressModal.module.scss'
-
-import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
 
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
@@ -59,7 +58,7 @@ const UpdateCustomFromAddressModal = ({
       onSuccess()
     } catch (e) {
       console.error(e)
-      setErrorMessage(e.message)
+      setErrorMessage((e as Error).message)
       setStep(UpdateFromAddressStep.Failure)
     }
   }

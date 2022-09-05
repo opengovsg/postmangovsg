@@ -1,6 +1,14 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+.linkUnderline {
+  text-decoration: underline;
+}
+
+.buttonSpace {
+  min-width: 142px;
+}
+
 .content {
   @include flex-vertical;
   padding: $content-top-padding $site-padding $content-bottom-padding;
@@ -20,7 +28,13 @@
 .tableContainer {
   display: block;
   max-width: 100%;
-  overflow: auto;
+  overflow-x: scroll;
+  overflow-y: hidden;
+
+  .i {
+    font-size: 1.2rem !important;
+    margin: 0.25rem !important;
+  }
 
   table.campaignTable {
     min-width: calc(
@@ -37,11 +51,6 @@
     }
 
     tbody tr {
-      &:hover {
-        cursor: pointer;
-        background-color: $neutral-light;
-      }
-
       &:active {
         opacity: 0.5;
       }
@@ -113,6 +122,7 @@
 
 .spinner {
   @include spinner;
+  position: relative;
 }
 
 .emptyDashboard {
@@ -144,8 +154,10 @@
       @include flex-vertical;
     }
   }
-}
-
-.expired {
-  color: $neutral;
+  .removeFilter {
+    @extend %body-2;
+    height: auto;
+    color: $blue-500;
+    text-decoration: underline;
+  }
 }

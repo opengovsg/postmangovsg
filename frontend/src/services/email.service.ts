@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import type { AxiosError } from 'axios'
-
 import type { EmailPreview } from 'classes'
 
 export async function saveTemplate(
@@ -33,10 +31,8 @@ export async function saveTemplate(
       from,
       show_logo: showLogo,
     })
-    const {
-      num_recipients: numRecipients,
-      template: updatedTemplate,
-    } = response.data
+    const { num_recipients: numRecipients, template: updatedTemplate } =
+      response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template')
@@ -70,7 +66,7 @@ export async function getPreviewMessage(
       subject,
       reply_to: replyTo,
       from,
-    } = response.data?.preview
+    } = response.data?.preview || {}
     return { body, themedBody, subject, replyTo, from }
   } catch (e) {
     errorHandler(e, 'Unable to get preview message')
@@ -91,10 +87,15 @@ export async function verifyFromAddress(
   }
 }
 
-function errorHandler(e: AxiosError, defaultMsg: string): never {
+function errorHandler(e: unknown, defaultMsg: string): never {
   console.error(e)
-  if (e.response && e.response.data && e.response.data.message) {
+  if (
+    axios.isAxiosError(e) &&
+    e.response &&
+    e.response.data &&
+    e.response.data.message
+  ) {
     throw new Error(e.response.data.message)
   }
-  throw new Error(defaultMsg || e.response?.statusText)
+  throw new Error(defaultMsg)
 }

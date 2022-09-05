@@ -106,7 +106,7 @@ const ProtectedEmailRecipients = ({
       setProtectedCsvInfo(validationInfo)
       setPhase(ProtectPhase.PREVIEW)
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
       setPhase(ProtectPhase.READY)
     }
   }
@@ -135,7 +135,7 @@ const ProtectedEmailRecipients = ({
       )
       setPhase(ProtectPhase.PROCESSING)
     } catch (err) {
-      setErrorMessage(err.message)
+      setErrorMessage((err as Error).message)
       setPhase(ProtectPhase.PREVIEW)
     }
   }

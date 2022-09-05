@@ -1,7 +1,6 @@
 import { Sequelize } from 'sequelize-typescript'
 import { TelegrafContext } from 'telegraf/typings/context'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { RedisService } from '@core/services'
 import { BotSubscriber, TelegramSubscriber } from '@telegram/models'
 import { contactMessageHandler } from '../contact'
 
@@ -12,7 +11,6 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await sequelize.close()
-  await RedisService.shutdown()
 })
 
 describe('contactMessageHandler', () => {
@@ -47,11 +45,11 @@ describe('contactMessageHandler', () => {
     await TelegramSubscriber.create({
       phoneNumber,
       telegramId,
-    })
+    } as TelegramSubscriber)
     await BotSubscriber.create({
       botId,
       telegramId,
-    })
+    } as BotSubscriber)
   }
 
   afterEach(async () => {
@@ -74,9 +72,7 @@ describe('contactMessageHandler', () => {
     })
     expect(botSubscriber).not.toBeNull()
 
-    expect(
-      ctx.reply
-    ).toBeCalledWith(
+    expect(ctx.reply).toBeCalledWith(
       'You are now subscribed. Your phone number and Telegram ID have been updated.',
       { reply_markup: { remove_keyboard: true } }
     )
@@ -99,9 +95,7 @@ describe('contactMessageHandler', () => {
     })
     expect(botSubscriber).not.toBeNull()
 
-    expect(
-      ctx.reply
-    ).toBeCalledWith(
+    expect(ctx.reply).toBeCalledWith(
       'You were already subscribed. Your phone number and Telegram ID have been updated.',
       { reply_markup: { remove_keyboard: true } }
     )
@@ -124,9 +118,7 @@ describe('contactMessageHandler', () => {
     })
     expect(botSubscriber).not.toBeNull()
 
-    expect(
-      ctx.reply
-    ).toBeCalledWith(
+    expect(ctx.reply).toBeCalledWith(
       'You were already subscribed. Your phone number and Telegram ID have been updated.',
       { reply_markup: { remove_keyboard: true } }
     )

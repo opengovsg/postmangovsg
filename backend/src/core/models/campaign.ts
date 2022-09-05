@@ -20,7 +20,12 @@ import { EmailTemplate } from '@email/models'
 import { SmsTemplate } from '@sms/models'
 import { TelegramTemplate } from '@telegram/models'
 
-@Table({ tableName: 'campaigns', underscored: true, timestamps: true })
+@Table({
+  tableName: 'campaigns',
+  underscored: true,
+  timestamps: true,
+  paranoid: true,
+})
 export class Campaign extends Model<Campaign> {
   @HasMany(() => JobQueue, { as: 'job_queue' })
   @HasOne(() => EmailTemplate, { as: 'email_templates' })
@@ -54,7 +59,7 @@ export class Campaign extends Model<Campaign> {
 
   @ForeignKey(() => Credential)
   @Column(DataType.STRING)
-  credName?: string
+  credName!: string | null
 
   @BelongsTo(() => Credential)
   credential?: Credential
@@ -78,12 +83,13 @@ export class Campaign extends Model<Campaign> {
   @HasOne(() => Statistic)
   statistic?: Statistic
 
+  // this allows for manual override of halting: if halted is set to null, campaign will not be halted
   @Default(false)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: true,
   })
-  halted?: boolean
+  halted!: boolean | null
 
   @Default(null)
   @Column({

@@ -6,7 +6,7 @@ module.exports = {
     'eslint:recommended', // Recommended ESLint rules
     'plugin:@typescript-eslint/recommended', // Recommended TypeScript rules
     'plugin:react/recommended', // Recommended React rules
-    'prettier/@typescript-eslint', // Disables rules from `@typescript-eslint/recommended` that are covered by Prettier
+    'prettier', // Disables rules from `@typescript-eslint/recommended` that are covered by Prettier
     'plugin:prettier/recommended', // Recommended Prettier rules
   ],
   settings: {
@@ -19,11 +19,16 @@ module.exports = {
   },
   parserOptions: {
     sourceType: 'module',
+    project: ['./tsconfig.json'],
   },
   ignorePatterns: [
     'build',
     'dist',
     'node_modules',
+    'jest.config.js',
+    '.eslintrc.js',
+    'config-overrides.js',
+    'sentry.js',
     'locales/_build/',
     'locales/**/*.js',
   ],
@@ -39,6 +44,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-floating-promises': ['error'],
 
     'no-console': [
       'warn',

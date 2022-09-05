@@ -8,12 +8,11 @@ export const getRequestIp: (req: Request) => string = (req: Request) => {
   return req.get('cf-connecting-ip') ?? req.ip
 }
 
-export const redirectTo = (path: string) => (
-  req: Request,
-  res: Response
-): void => {
-  const { baseUrl: campaignUrl, originalUrl } = req
-  const parsedUrl = new URL(originalUrl, 'https://base')
-  const redirectToPath = `${campaignUrl}${path}${parsedUrl.search}`
-  return res.redirect(307, redirectToPath)
-}
+export const redirectTo =
+  (path: string) =>
+  (req: Request, res: Response): void => {
+    const { baseUrl: campaignUrl, originalUrl } = req
+    const parsedUrl = new URL(originalUrl, 'https://base')
+    const redirectToPath = `${campaignUrl}${path}${parsedUrl.search}`
+    return res.redirect(307, redirectToPath)
+  }

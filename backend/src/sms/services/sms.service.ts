@@ -17,6 +17,7 @@ import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
 
 import TwilioClient from './twilio-client.class'
 import SnsSmsClient from './sns-sms-client.class'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -50,7 +51,10 @@ const getHydratedMessage = async (
   if (params === null || template === null) return null
 
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
-  const body = SmsTemplateService.client.template(template?.body!, params)
+  const body = SmsTemplateService.client.template(
+    template?.body as string,
+    params
+  )
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
   return { body }
 }
@@ -128,7 +132,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.SMS },
-  })
+  }) as Promise<Campaign>
 }
 
 /**
@@ -139,7 +143,7 @@ const findCampaign = (
 const setCampaignCredential = (
   campaignId: number,
   credentialName: string
-): Promise<[number, Campaign[]]> => {
+): Promise<[number]> => {
   return Campaign.update(
     {
       credName: credentialName,
@@ -154,16 +158,29 @@ const setCampaignCredential = (
 /**
  * Gets details of a campaign
  * @param campaignId
+ * @param credentials
  */
 const getCampaignDetails = async (
-  campaignId: number
+  campaignId: number,
+  credentials?: TwilioCredentials
 ): Promise<CampaignDetails> => {
-  return await CampaignService.getCampaignDetails(campaignId, [
-    {
-      model: SmsTemplate,
-      attributes: ['body', 'params'],
-    },
-  ])
+  const processes: Array<Promise<any>> = [
+    CampaignService.getCampaignDetails(campaignId, [
+      {
+        model: SmsTemplate,
+        attributes: ['body', 'params'],
+      },
+    ]),
+  ]
+  if (credentials) {
+    processes.push(
+      SmsService.getTwilioCostPerOutgoingSMSSegmentUSD(credentials)
+    )
+  }
+  const [campaignDetails, costPerSmsUSD] = await Promise.all(processes)
+  const USD_TO_SGD = config.get('twilio').usdToSgdRate // for future extension: fetch via API
+  const costPerSms = costPerSmsUSD * USD_TO_SGD
+  return { ...campaignDetails, cost_per_message: costPerSms }
 }
 
 /**
@@ -219,7 +236,7 @@ const uploadCompleteOnChunk = ({
       }
     })
     // START populate template
-    await SmsMessage.bulkCreate(records, {
+    await SmsMessage.bulkCreate(records as Array<SmsMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -253,7 +270,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as SmsDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as SmsDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -273,7 +290,7 @@ const duplicateCampaign = async ({
             {
               campaignId: duplicate.id,
               body: template.body,
-            },
+            } as SmsTemplate,
             { transaction }
           )
         }
@@ -284,6 +301,13 @@ const duplicateCampaign = async ({
   }
 
   return
+}
+
+const getTwilioCostPerOutgoingSMSSegmentUSD = async (
+  credentials: TwilioCredentials
+): Promise<number> => {
+  const twilioClient = new TwilioClient(credentials)
+  return twilioClient.getOutgoingSMSPriceSingaporeUSD()
 }
 
 export const SmsService = {
@@ -298,4 +322,5 @@ export const SmsService = {
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
   duplicateCampaign,
+  getTwilioCostPerOutgoingSMSSegmentUSD,
 }

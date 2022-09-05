@@ -58,20 +58,31 @@ const isUnsubscribeRequestValid = async (
  * @param next
  */
 const findOrCreateUnsubscriber = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<Response | void> => {
   const { campaignId, recipient } = res.locals.unsubscriber
   const { 1: created } = await UnsubscriberService.findOrCreateUnsubscriber({
     campaignId,
     recipient,
+    reason: req.body.reason,
   })
 
   const statusCode = created ? 201 : 200
   return res.sendStatus(statusCode)
 }
 
+const subscribeAgain = async (
+  _req: Request,
+  res: Response
+): Promise<Response | void> => {
+  const { campaignId, recipient } = res.locals.unsubscriber
+  await UnsubscriberService.deleteUnsubscriber({ campaignId, recipient })
+  return res.sendStatus(204)
+}
+
 export const UnsubscriberMiddleware = {
   isUnsubscribeRequestValid,
   findOrCreateUnsubscriber,
+  subscribeAgain,
 }

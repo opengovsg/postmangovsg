@@ -6,7 +6,10 @@ import config from '@core/config'
 import { EmailFromAddress } from '@email/models'
 import { MailService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
-import { formatFromAddress } from '@shared/utils/from-address'
+import {
+  extractDomainFromEmail,
+  formatFromAddress,
+} from '@shared/utils/from-address'
 
 const logger = loggerWithLabel(module)
 const [, region] = config.get('mailOptions.host').split('.')
@@ -48,30 +51,42 @@ const verifyCnames = async (
  * @throws Error if the domain's dns do not have the cname records
  */
 const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
-  // Get the dkim attributes for the email address
+  // Get the dkim attributes for the email address and domain
+  const emailDomain = extractDomainFromEmail(email)
   const params = {
-    Identities: [email],
+    Identities: [email, emailDomain],
   }
   const { DkimAttributes } = await ses
     .getIdentityDkimAttributes(params)
     .promise()
 
-  const verificationStatus = DkimAttributes[email]?.DkimVerificationStatus
-  const dkimTokens = DkimAttributes[email]?.DkimTokens
+  if (
+    !DkimAttributes ||
+    (!DkimAttributes[email] && !DkimAttributes[emailDomain])
+  ) {
+    return logVerificationAWSFailureAndThrowError(email)
+  }
+
+  // prioritize email address over domain
+  const { DkimVerificationStatus: verificationStatus, DkimTokens: dkimTokens } =
+    DkimAttributes[email] || DkimAttributes[emailDomain]
 
   // Check verification status & make sure dkim tokens are present
-  if (!verificationStatus || verificationStatus !== 'Success' || !dkimTokens) {
-    logger.error({
-      message: 'Verification on AWS failed',
-      email,
-      action: 'verifyEmailWithAWS',
-    })
-    throw new Error(
-      `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
-    )
+  if (verificationStatus !== 'Success' || !dkimTokens) {
+    return logVerificationAWSFailureAndThrowError(email)
   }
-  // Make sure the dkim tokens are there.
   return dkimTokens
+}
+
+const logVerificationAWSFailureAndThrowError = (email: string) => {
+  logger.error({
+    message: 'Verification on AWS failed',
+    email,
+    action: 'verifyEmailWithAWS',
+  })
+  throw new Error(
+    `This From Address cannot be used to send emails. Select another email address to send from, or contact us to investigate.`
+  )
 }
 
 /**
@@ -110,7 +125,7 @@ const storeFromAddress = async (
     await EmailFromAddress.upsert({
       name,
       email,
-    })
+    } as EmailFromAddress)
   } catch (err) {
     logger.error({
       message: 'Failed to store email address in EmailFromAddress table',
@@ -139,7 +154,7 @@ const sendValidationMessage = async (
 ): Promise<void> => {
   const fromAddress = from || config.get('mailFrom')
   const appName = config.get('APP_NAME')
-  MailService.mailClient.sendMail({
+  await MailService.mailClient.sendMail({
     from: fromAddress,
     recipients: [recipient],
     subject: `Your From Address has been validated on ${appName}`,

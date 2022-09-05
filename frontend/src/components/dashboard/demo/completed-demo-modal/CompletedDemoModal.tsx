@@ -32,7 +32,7 @@ const CompletedDemoModal = ({
       const { demo } = await getUserSettings()
       setDemoInfo(demo)
     }
-    getNumDemos()
+    void getNumDemos()
   }, [])
 
   function numDemosLeft() {

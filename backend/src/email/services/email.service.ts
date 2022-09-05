@@ -11,7 +11,8 @@ import {
   ProtectedService,
   UnsubscriberService,
 } from '@core/services'
-import { MailToSend, CampaignDetails } from '@core/interfaces'
+import { CampaignDetails } from '@core/interfaces'
+import { MailToSend } from '@shared/clients/mail-client.class'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
@@ -19,6 +20,7 @@ import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
 
 import { ThemeClient } from '@shared/theme'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -62,10 +64,13 @@ const getHydratedMessage = async (
 
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
   const subject = EmailTemplateService.client.template(
-    template?.subject!,
+    template?.subject as string,
     params
   )
-  const body = EmailTemplateService.client.template(template?.body!, params)
+  const body = EmailTemplateService.client.template(
+    template?.body as string,
+    params
+  )
 
   // Get agency details (if exists) from campaign user
   const campaign = await Campaign.findOne({
@@ -95,7 +100,7 @@ const getHydratedMessage = async (
     body,
     subject,
     replyTo: template.replyTo || null,
-    from: template?.from!,
+    from: template?.from as string,
     agencyName,
     agencyLogoURI,
     showMasthead,
@@ -170,7 +175,7 @@ const findCampaign = (
 ): Promise<Campaign> => {
   return Campaign.findOne({
     where: { id: +campaignId, userId, type: ChannelType.Email },
-  })
+  }) as Promise<Campaign>
 }
 
 /**
@@ -197,9 +202,7 @@ const sendCampaignMessage = async (
  * update the credential column for the campaign with the default credential
  * @param campaignId
  */
-const setCampaignCredential = (
-  campaignId: number
-): Promise<[number, Campaign[]]> => {
+const setCampaignCredential = (campaignId: number): Promise<[number]> => {
   return Campaign.update(
     { credName: DefaultCredentialName.Email },
     { where: { id: campaignId } }
@@ -287,7 +290,7 @@ const uploadCompleteOnChunk = ({
       }
     })
     // START populate template
-    await EmailMessage.bulkCreate(records, {
+    await EmailMessage.bulkCreate(records as Array<EmailMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -350,7 +353,7 @@ const uploadProtectedCompleteOnChunk = ({
       campaignId,
       data,
     })
-    await EmailMessage.bulkCreate(messages, {
+    await EmailMessage.bulkCreate(messages as Array<EmailMessage>, {
       transaction,
       logging: (_message, benchmark) => {
         if (benchmark) {
@@ -384,7 +387,7 @@ const duplicateCampaign = async ({
         },
       ],
     })
-  )?.get({ plain: true }) as EmailDuplicateCampaignDetails
+  )?.get({ plain: true }) as unknown as EmailDuplicateCampaignDetails
 
   if (campaign) {
     const duplicatedCampaign = await Campaign.sequelize?.transaction(
@@ -407,7 +410,7 @@ const duplicateCampaign = async ({
               subject: template.subject,
               from: template.from,
               replyTo: template.reply_to,
-            },
+            } as EmailTemplate,
             { transaction }
           )
         }

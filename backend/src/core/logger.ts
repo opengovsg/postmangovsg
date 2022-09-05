@@ -1,5 +1,5 @@
 import winston from 'winston'
-import requestTracer from 'cls-rtracer'
+import config from '@core/config'
 
 const getModuleLabel = (callingModule: NodeModule): string => {
   const moduleName = callingModule.filename
@@ -14,21 +14,19 @@ const logger = winston.createLogger({
   level: 'debug',
   levels: winston.config.npm.levels,
   format: winston.format.combine(
-    winston.format((info) => {
-      const requestTracerMeta = requestTracer.id() as any
-      return { ...requestTracerMeta, ...info }
-    })(),
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
     winston.format.splat(),
     winston.format.metadata(),
-    winston.format.json()
+    winston.format.json({
+      space: config.get('env') === 'development' ? 2 : 0,
+    })
   ),
   transports: [new winston.transports.Console()],
 })
 
 logger.stream = {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   write: (message: string, _encoding: any): void => {
     // use the 'info' log level so the output will be picked up by both transports
@@ -36,11 +34,11 @@ logger.stream = {
   },
 }
 
-const getStream = () => {
+export const getStream = () => {
   return logger.stream
 }
 
-const addTransport = (transport: any) => {
+export const addTransport = (transport: any) => {
   logger.add(transport)
 }
 
@@ -52,9 +50,10 @@ const truncate = (message: string, length: number, suffix = true): string => {
     ? `${message.substring(0, length)}${suffix ? '...<TRUNCATED>' : ''}`
     : message
 }
-const loggerWithLabel = (module: NodeModule): any => {
+export const loggerWithLabel = (module: NodeModule): any => {
   const label = getModuleLabel(module)
   return {
+    log: (logMeta: any): winston.Logger => logger.log({ label, ...logMeta }),
     info: (logMeta: any): winston.Logger => logger.info({ label, ...logMeta }),
     error: (logMeta: any): winston.Logger => {
       if (logMeta.error && logMeta.error instanceof Error) {
@@ -68,5 +67,3 @@ const loggerWithLabel = (module: NodeModule): any => {
     warn: (logMeta: any): winston.Logger => logger.warn({ label, ...logMeta }),
   }
 }
-
-export { getStream, addTransport, loggerWithLabel }

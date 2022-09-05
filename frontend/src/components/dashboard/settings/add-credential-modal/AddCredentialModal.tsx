@@ -93,7 +93,7 @@ const AddCredentialModal = ({
 
   useEffect(() => {
     if (credType) {
-      loadCredLabels(credType)
+      void loadCredLabels(credType)
     }
   }, [credType])
 
@@ -209,7 +209,7 @@ const AddCredentialModal = ({
     } catch (e) {
       console.error(e)
       setError({
-        message: e.message,
+        message: (e as Error).message,
         editStep: AddCredentialStep.Input,
         editLabel: 'Edit Credentials',
       })
@@ -243,7 +243,7 @@ const AddCredentialModal = ({
       onSuccess()
     } catch (e) {
       console.error(e)
-      error.message = e.message
+      error.message = (e as Error).message
       setError(error)
       setCredStep(AddCredentialStep.Failure)
     }

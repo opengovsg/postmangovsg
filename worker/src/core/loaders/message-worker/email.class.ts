@@ -6,7 +6,7 @@ import validator from 'validator'
 
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
-import MailClient from '@email/services/mail-client.class'
+import MailClient from '@shared/clients/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import { ThemeClient } from '@shared/theme'
 import { Message } from './interface'
@@ -21,7 +21,12 @@ class Email {
   constructor(workerId: string, connection: Sequelize) {
     this.workerId = workerId
     this.connection = connection
-    this.mailService = new MailClient(config.get('mailOptions'))
+    this.mailService = new MailClient(
+      config.get('mailOptions'),
+      config.get('mailOptions.callbackHashSecret'),
+      config.get('emailFallback.activate') ? config.get('mailFrom') : undefined,
+      config.get('mailConfigurationSet')
+    )
   }
 
   enqueueMessages(jobId: number, campaignId: number): Promise<void> {
@@ -140,6 +145,7 @@ class Email {
         subject: hydratedSubject,
         body: themedHTMLEmail,
         referenceId: String(id),
+        unsubLink,
         ...(replyTo ? { replyTo } : {}),
       })
 
@@ -151,7 +157,10 @@ class Email {
       await this.connection.query(
         `UPDATE email_ops SET status='ERROR', delivered_at=clock_timestamp(), error_code=:error, updated_at=clock_timestamp() WHERE id=:id;`,
         {
-          replacements: { id, error: error.message.substring(0, 255) },
+          replacements: {
+            id,
+            error: (error as Error).message.substring(0, 255),
+          },
           type: QueryTypes.UPDATE,
         }
       )

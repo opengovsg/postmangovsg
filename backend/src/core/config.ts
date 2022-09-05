@@ -2,7 +2,7 @@
  * @file Configuration
  * All defaults can be changed
  */
-import convict from 'convict'
+import convict, { Config } from 'convict'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
@@ -15,6 +15,142 @@ const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
  *    format: 'required-string',
  *    sensitive: true,
  */
+interface ConfigSchema {
+  env: string
+  APP_NAME: string
+  aws: {
+    awsRegion: string
+    awsEndpoint: null
+    logGroupName: string
+    uploadBucket: string
+    secretManagerSalt: string
+  }
+  database: {
+    databaseUri: string
+    databaseReadReplicaUri: string
+    dialectOptions: {
+      ssl: {
+        require: boolean
+        rejectUnauthorized: {
+          valueOf: any
+        }
+        ca: Buffer[]
+      }
+    }
+    poolOptions: {
+      max: number
+      min: number
+      acquire: number
+    }
+    useIam: boolean
+  }
+  jwtSecret: string
+  frontendUrl: string
+  protectedUrl: string
+  unsubscribeUrl: string
+  session: {
+    cookieName: string
+    secret: string
+    cookieSettings: {
+      httpOnly: boolean
+      secure: boolean
+      maxAge: number
+      sameSite: boolean
+      domain: string
+      path: string
+    }
+  }
+  otp: {
+    retries: number
+    expiry: number
+    resendTimeout: number
+  }
+  redisOtpUri: string
+  redisSessionUri: string
+  redisRateLimitUri: string
+  redisCredentialUri: string
+  mailOptions: {
+    host: string
+    port: number
+    auth: {
+      user: string
+      pass: string
+    }
+  }
+  mailFrom: string
+  mailVia: string
+  mailDefaultRate: number
+  transactionalEmail: {
+    rate: number
+    window: number
+  }
+  defaultCountry: string
+  defaultCountryCode: string
+  telegramOptions: {
+    webhookUrl: string
+  }
+  maxRatePerJob: number
+  apiKey: {
+    salt: string
+    version: string
+  }
+  domains: string
+  csvProcessingTimeout: number
+  sentryDsn: string
+  unsubscribeHmac: {
+    version: string
+    v1: {
+      algo: string
+      key: string
+    }
+  }
+  emailCallback: {
+    minHaltNumber: number
+    minHaltPercentage: number
+    sendgridPublicKey: string
+    callbackSecret: string
+    hashSecret: string
+  }
+  smsCallback: {
+    callbackSecret: string
+  }
+  telegramCallback: {
+    contactUsUrl: string
+    guideUrl: string
+  }
+  twilio: {
+    usdToSgdRate: number
+  }
+  redaction: {
+    maxAge: number
+  }
+  twilioCredentialCache: {
+    maxAge: number
+  }
+  smsFallback: {
+    activate: boolean
+    senderId: string
+  }
+  emailFallback: {
+    activate: boolean
+  }
+  defaultAgency: {
+    name: string
+  }
+  showMastheadDomain: string
+  upload: {
+    redisUri: string
+    queueName: string
+    concurrency: number
+    checkStalledInterval: number
+  }
+  file: {
+    cloudmersiveKey: string
+    maxAttachmentSize: number
+    maxAttachmentNum: number
+  }
+}
+
 convict.addFormats({
   'required-string': {
     validate: (val: any): void => {
@@ -41,7 +177,7 @@ convict.addFormats({
   },
 })
 
-const config = convict({
+const config: Config<ConfigSchema> = convict({
   env: {
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
@@ -60,8 +196,7 @@ const config = convict({
       env: 'AWS_REGION',
     },
     awsEndpoint: {
-      doc:
-        'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
+      doc: 'The endpoint to send AWS requests to. If not specified, a default one is made with AWS_REGION',
       format: '*',
       default: null,
       env: 'AWS_ENDPOINT',
@@ -77,8 +212,7 @@ const config = convict({
       env: 'FILE_STORAGE_BUCKET_NAME',
     },
     secretManagerSalt: {
-      doc:
-        'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
+      doc: 'Secret used to generate names of credentials to be stored in AWS Secrets Manager',
       default: '',
       env: 'SECRET_MANAGER_SALT',
       format: 'required-string',
@@ -130,8 +264,7 @@ const config = convict({
         format: 'int',
       },
       acquire: {
-        doc:
-          'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
+        doc: 'The maximum time, in milliseconds, that pool will try to get connection before throwing error',
         default: 600000,
         env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
         format: 'int',
@@ -144,18 +277,11 @@ const config = convict({
     },
   },
   jwtSecret: {
-    doc:
-      'Secret used to sign pre-signed urls for uploading CSV files to AWS S3',
+    doc: 'Secret used to sign pre-signed urls for uploading CSV files to AWS S3',
     default: '',
     env: 'JWT_SECRET',
     format: 'required-string',
     sensitive: true,
-  },
-  MORGAN_LOG_FORMAT: {
-    doc: 'Format for logging requests to server',
-    default:
-      ':client-ip - :user-id [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :response-time ms',
-    env: 'MORGAN_LOG_FORMAT',
   },
   frontendUrl: {
     doc: 'CORS: accept requests from this origin. Can be a string, or regex',
@@ -187,8 +313,7 @@ const config = convict({
     },
     cookieSettings: {
       httpOnly: {
-        doc:
-          'Specifies the boolean value for the HttpOnly Set-Cookie attribute.',
+        doc: 'Specifies the boolean value for the HttpOnly Set-Cookie attribute.',
         default: true,
         env: 'COOKIE_HTTP_ONLY',
       },
@@ -198,15 +323,13 @@ const config = convict({
         env: 'COOKIE_SECURE',
       },
       maxAge: {
-        doc:
-          'Specifies the number (in milliseconds) to use when calculating the Expires Set-Cookie attribute',
+        doc: 'Specifies the number (in milliseconds) to use when calculating the Expires Set-Cookie attribute',
         default: 24 * 60 * 60 * 1000,
         env: 'COOKIE_MAX_AGE',
         format: 'int',
       },
       sameSite: {
-        doc:
-          'true will set the SameSite attribute to Strict for strict same site enforcement.',
+        doc: 'true will set the SameSite attribute to Strict for strict same site enforcement.',
         default: true,
         env: 'COOKIE_SAME_SITE',
       },
@@ -224,8 +347,7 @@ const config = convict({
   },
   otp: {
     retries: {
-      doc:
-        'Number of attempts a user can enter otp before a new otp is required',
+      doc: 'Number of attempts a user can enter otp before a new otp is required',
       default: 4,
       env: 'OTP_RETRIES',
     },
@@ -310,14 +432,13 @@ const config = convict({
   },
   mailDefaultRate: {
     doc: 'The default rate at which an email campaign will be sent',
-    default: 35,
+    default: 225,
     env: 'EMAIL_DEFAULT_RATE',
     format: 'int',
   },
   transactionalEmail: {
     rate: {
-      doc:
-        'The max number of transactional emails that can be requested per window per user',
+      doc: 'The max number of transactional emails that can be requested per window per user',
       default: 10,
       env: 'TRANSACTIONAL_EMAIL_RATE',
       format: 'int',
@@ -375,8 +496,7 @@ const config = convict({
     env: 'DOMAIN_WHITELIST',
   },
   csvProcessingTimeout: {
-    doc:
-      'Max duration for csv processing before timeout. Prevent campaigns from being stuck in csv processing state if server dies.',
+    doc: 'Max duration for csv processing before timeout. Prevent campaigns from being stuck in csv processing state if server dies.',
     default: 10 * 60 * 1000, // 10 minutes
     env: 'CSV_PROCESSING_TIMEOUT_IN_MS',
     format: 'int',
@@ -411,15 +531,13 @@ const config = convict({
   },
   emailCallback: {
     minHaltNumber: {
-      doc:
-        'Halt if there is this minimum number of invalid recipients, and it exceeds the percentage threshold',
+      doc: 'Halt if there is this minimum number of invalid recipients, and it exceeds the percentage threshold',
       default: 10,
       env: 'MIN_HALT_NUMBER',
       format: 'int',
     },
     minHaltPercentage: {
-      doc:
-        'Halt if the percentage of invalid recipients exceeds this threshold. Supply a float from 0 to 1',
+      doc: 'Halt if the percentage of invalid recipients exceeds this threshold. Supply a float from 0 to 1',
       default: 0.1,
       env: 'MIN_HALT_PERCENTAGE',
       format: 'float-percent',
@@ -435,11 +553,16 @@ const config = convict({
       env: 'CALLBACK_SECRET',
       default: '',
     },
+    hashSecret: {
+      doc: 'Secret for email callback hash',
+      env: 'EMAIL_CALLBACK_HASH_SECRET',
+      default: '',
+      format: 'required-string',
+    },
   },
   smsCallback: {
     callbackSecret: {
-      doc:
-        'Secret used to generate the basic auth credentials for twilio callback',
+      doc: 'Secret used to generate the basic auth credentials for twilio callback',
       default: '',
       env: 'TWILIO_CALLBACK_SECRET',
       format: 'required-string',
@@ -458,6 +581,15 @@ const config = convict({
       default: '',
       env: 'TELEGRAM_BOT_GUIDE_URL',
       format: 'required-string',
+    },
+  },
+  twilio: {
+    // for future extension: fetch via API
+    usdToSgdRate: {
+      doc: 'Rate of USD to SGD',
+      default: 1.4,
+      env: 'USD_TO_SGD_RATE',
+      format: Number,
     },
   },
   redaction: {
@@ -490,8 +622,7 @@ const config = convict({
   },
   emailFallback: {
     activate: {
-      doc:
-        'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
+      doc: 'Switch to true to use the SendGrid fallback for emails. Ensure that the SMTP settings are properly configured as well.',
       default: false,
       env: 'EMAIL_FALLBACK_ACTIVATE',
     },
@@ -504,10 +635,56 @@ const config = convict({
     },
   },
   showMastheadDomain: {
-    doc:
-      'Show masthead within email template if logged-in user has email ending with this domain',
+    doc: 'Show masthead within email template if logged-in user has email ending with this domain',
     default: '.gov.sg',
     env: 'SHOW_MASTHEAD_DOMAIN',
+  },
+  upload: {
+    redisUri: {
+      doc: 'URI to the redis database for recipient list upload job queue',
+      default: '',
+      env: 'REDIS_UPLOAD_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
+    queueName: {
+      doc: 'Name of queue used to store upload jobs',
+      default: 'uploads',
+      env: 'UPLOAD_QUEUE_NAME',
+    },
+    concurrency: {
+      doc: 'Maximum number of simultaneous active jobs',
+      default: 3,
+      env: 'UPLOAD_CONCURRENCY',
+      format: Number,
+    },
+    checkStalledInterval: {
+      doc: 'How often to check for stalled jobs in milliseconds',
+      default: 5000,
+      env: 'UPLOAD_CHECK_STALLED_INTERVAL',
+      format: Number,
+    },
+  },
+  file: {
+    cloudmersiveKey: {
+      doc: 'API key for Cloudmersive file scanning service',
+      default: '',
+      env: 'FILE_CLOUDMERSIVE_KEY',
+      format: 'required-string',
+      sensitive: true,
+    },
+    maxAttachmentSize: {
+      doc: 'Maximum accepted file attachment size in MB',
+      default: 5 * 1024 * 1024, // 5 MB
+      env: 'FILE_ATTACHMENT_MAX_SIZE',
+      format: Number,
+    },
+    maxAttachmentNum: {
+      doc: 'Maximum number of file attachments',
+      default: 10,
+      env: 'FILE_ATTACHMENT_MAX_NUM',
+      format: Number,
+    },
   },
 })
 

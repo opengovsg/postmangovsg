@@ -1,6 +1,3 @@
-import retry from 'async-retry'
-import S3Client from '@core/services/s3-client.class'
-
 import { Request, Response, NextFunction } from 'express'
 import {
   MissingTemplateKeysError,
@@ -10,18 +7,12 @@ import {
   UserError,
 } from '@core/errors'
 import { TemplateError } from '@shared/templating'
-import { UploadService, StatsService, ParseCsvService } from '@core/services'
-import { Campaign } from '@core/models'
+import { UploadService, StatsService } from '@core/services'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
-const RETRY_CONFIG = {
-  retries: 3,
-  minTimeout: 1000,
-  maxTimeout: 3 * 1000,
-  factor: 1,
-}
+
 /**
  * Store template subject and body in Telegram template table.
  * If an existing csv has been uploaded for this campaign but whose columns do not match the
@@ -40,14 +31,11 @@ const storeTemplate = async (
   const { body } = req.body
   const logMeta = { campaignId, action: 'storeTemplate' }
   try {
-    const {
-      check,
-      valid,
-      updatedTemplate,
-    } = await TelegramTemplateService.storeTemplate({
-      campaignId: +campaignId,
-      body,
-    })
+    const { check, valid, updatedTemplate } =
+      await TelegramTemplateService.storeTemplate({
+        campaignId: +campaignId,
+        body,
+      })
 
     if (check?.reupload) {
       logger.info({
@@ -118,61 +106,17 @@ const uploadCompleteHandler = async (
     // Store temp filename
     await UploadService.storeS3TempFilename(+campaignId, filename)
 
+    // Enqueue upload job to be processed
+    await TelegramTemplateService.enqueueUpload({
+      campaignId: +campaignId,
+      template,
+      s3Key,
+      etag,
+      filename,
+    })
+
     // Return early because bulk insert is slow
     res.sendStatus(202)
-
-    try {
-      // - download from s3
-      const s3Client = new S3Client()
-      await retry(async (bail) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const transaction = await Campaign.sequelize!.transaction()
-        const campaign = await Campaign.findByPk(campaignId, {
-          attributes: [['demo_message_limit', 'demoMessageLimit']],
-        })
-        const downloadStream = s3Client.download(s3Key, etag)
-        const params = {
-          transaction,
-          template,
-          campaignId: +campaignId,
-        }
-        await ParseCsvService.parseAndProcessCsv(
-          downloadStream,
-          TelegramService.uploadCompleteOnPreview(params),
-          TelegramService.uploadCompleteOnChunk(params),
-          UploadService.uploadCompleteOnComplete({
-            ...params,
-            key: s3Key,
-            filename,
-          }),
-          campaign?.demoMessageLimit ? campaign.demoMessageLimit : undefined
-        ).catch((e) => {
-          transaction.rollback()
-          if (e.code !== 'NoSuchKey') {
-            bail(e)
-          } else {
-            throw e
-          }
-        })
-      }, RETRY_CONFIG)
-    } catch (err) {
-      // Do not return any response since it has already been sent
-      logger.error({
-        message: 'Error storing messages for campaign',
-        s3Key,
-        error: err,
-        ...logMeta,
-      })
-
-      // Precondition failure is caused by ETag mismatch. Convert to a more user-friendly error message.
-      if (err.code === 'PreconditionFailed') {
-        err.message =
-          'Please try again. Error processing the recipient list. Please contact the Postman team if this problem persists.'
-      }
-
-      // Store error to return on poll
-      UploadService.storeS3Error(+campaignId, err.message)
-    }
   } catch (err) {
     logger.error({
       message: 'Failed to complete upload to s3',
@@ -187,7 +131,7 @@ const uploadCompleteHandler = async (
     ]
 
     if (userErrors.some((errType) => err instanceof errType)) {
-      return res.status(400).json({ message: err.message })
+      return res.status(400).json({ message: (err as Error).message })
     }
     return next(err)
   }
@@ -203,12 +147,8 @@ const pollCsvStatusHandler = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
-    const {
-      isCsvProcessing,
-      filename,
-      tempFilename,
-      error,
-    } = await UploadService.getCsvStatus(+campaignId)
+    const { isCsvProcessing, filename, tempFilename, error } =
+      await UploadService.getCsvStatus(+campaignId)
 
     // If done processing, returns num recipients and preview msg
     let numRecipients, preview

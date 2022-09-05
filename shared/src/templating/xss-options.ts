@@ -1,7 +1,14 @@
-import { IFilterXSSOptions, cssFilter, safeAttrValue } from 'xss'
+import {
+  IFilterXSSOptions,
+  ICSSFilter,
+  cssFilter,
+  safeAttrValue,
+  getDefaultCSSWhiteList,
+} from 'xss'
 import { TemplateError } from './errors'
 
 const URL =
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   typeof window !== 'undefined' && window.URL ? window.URL : require('url').URL
 
 const KEYWORD_REGEX = /^{{\s*?\w+\s*?}}$/
@@ -32,7 +39,7 @@ export const XSS_EMAIL_OPTION = {
     br: DEFAULT_EMAIL_ATTRS,
     p: DEFAULT_EMAIL_ATTRS,
     ul: DEFAULT_EMAIL_ATTRS,
-    ol: DEFAULT_EMAIL_ATTRS,
+    ol: ['start', 'type', ...DEFAULT_EMAIL_ATTRS],
     li: DEFAULT_EMAIL_ATTRS,
     h1: DEFAULT_EMAIL_ATTRS,
     h2: DEFAULT_EMAIL_ATTRS,
@@ -54,9 +61,17 @@ export const XSS_EMAIL_OPTION = {
     tbody: [],
     table: DEFAULT_EMAIL_ATTRS,
     tr: DEFAULT_EMAIL_ATTRS,
-    td: DEFAULT_EMAIL_ATTRS,
+    td: ['colspan', 'rowspan', ...DEFAULT_EMAIL_ATTRS],
+    th: DEFAULT_EMAIL_ATTRS,
+    sup: DEFAULT_EMAIL_ATTRS,
+    caption: DEFAULT_EMAIL_ATTRS,
   },
-  safeAttrValue: (tag: string, name: string, value: string): string => {
+  safeAttrValue: (
+    tag: string,
+    name: string,
+    value: string,
+    cssFilter: ICSSFilter
+  ): string => {
     // Note: value has already been auto-trimmed of whitespaces
 
     // Do not sanitize keyword when it's a href link, eg: <a href="{{protectedlink}}">link</a>
@@ -73,6 +88,14 @@ export const XSS_EMAIL_OPTION = {
     return safeAttrValue(tag, name, value, cssFilter)
   },
   stripIgnoreTag: true,
+  // Allow CSS style attributes filtering
+  // https://github.com/leizongmin/js-xss#customize-css-filter
+  css: {
+    whiteList: {
+      ...getDefaultCSSWhiteList(),
+      'white-space': true,
+    },
+  },
 }
 
 export const XSS_SMS_OPTION = {
@@ -93,7 +116,12 @@ export const XSS_TELEGRAM_OPTION = {
     pre: [],
     a: ['href'],
   },
-  safeAttrValue: (tag: string, name: string, value: string): string => {
+  safeAttrValue: (
+    tag: string,
+    name: string,
+    value: string,
+    cssFilter: ICSSFilter
+  ): string => {
     // Handle Telegram mention as xss-js does not recognize it as a valid url.
     if (
       tag === 'a' &&

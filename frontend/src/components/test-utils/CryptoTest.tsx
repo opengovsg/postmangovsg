@@ -1,3 +1,6 @@
+// require buffer with trailing slash to ensure use of the npm module named buffer
+// instead of the node.js core module named buffer
+import { Buffer } from 'buffer/'
 import { useState } from 'react'
 
 import { uuid } from 'uuidv4'
@@ -57,7 +60,7 @@ const CryptoTest = () => {
       const end = performance.now()
       setTimeTaken(`${end - start} ms`)
     } catch (e) {
-      setErrorMsg(e.message)
+      setErrorMsg((e as Error).message)
     }
     setSpinning(false)
   }
@@ -73,7 +76,7 @@ const CryptoTest = () => {
       const end = performance.now()
       setTimeTaken(`${end - start} ms`)
     } catch (e) {
-      setErrorMsg(e.message)
+      setErrorMsg((e as Error).message)
     }
     setSpinning(false)
   }

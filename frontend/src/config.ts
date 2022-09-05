@@ -96,6 +96,8 @@ export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
 export const SENTRY_ENVIRONMENT =
   (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
+export const INFO_BANNER_COLOR = process.env
+  .REACT_APP_INFO_BANNER_COLOR as string
 
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user

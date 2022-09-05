@@ -1,12 +1,28 @@
 # Using the API
 
-Currently, use of the API is limited to non-password protected campaigns only.
+## Table of Contents
+
+1. [Getting started](#getting-started)
+2. [Campaign-based API](#campaign-based-integration)
+3. [Transactional API](#transactional-api)
 
 ## Getting Started
 
 The swagger docs are available at [https://api.postman.gov.sg/docs/](https://api.postman.gov.sg/docs/).
-Using the console, **create an authorization token**. This token will be passed to all the following network requests. The examples below will create and send an Email campaign.
-Try the other endpoints listed in the swagger docs to save credentials, create other types of campaigns, preview the campaign, stop and resume campaign.
+
+Using the console, **create an authorization token**. This token will need to be be passed to all API calls.
+
+This guide covers how to send emails using either the _transactional_ or _campaign-based_ API. Note that currently the use of the API is limited to non-password protected campaigns only.
+
+Try out the other endpoints listed in the swagger docs to save credentials, create other types of campaigns, preview the campaign, stop and resume campaign.
+
+## Campaign-based API
+
+Usage of the campaign-based API is recommended if you need the following features:
+
+- Delivery report
+- Email template with variables substitution
+- Send messages to multiple receipients at once
 
 ### 1. Create a campaign
 
@@ -265,5 +281,32 @@ curl --location --request POST 'https://api.postman.gov.sg/v1/campaign/100/send'
 --header 'Authorization: Bearer your_api_key' \
 --data-raw '{
 	"rate": 10
+}'
+```
+
+## Transactional API
+
+Usage of the transactional API is recommended if you need the following features:
+
+- Single API call to send email
+- Reuse Postman.gov.sg's whitelisting to ensure deliverability to SGMail
+
+Emails sent using the transactional API have the following limitations:
+
+- There will be no delivery status available
+- Email template will not be applied
+- No variable substitution
+
+### 1. Send email
+
+```bash
+curl --location --request POST 'https://api.postman.gov.sg/v1/transactional/email/send' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer your_api_key' \
+--data-raw '{
+	"subject": "Test email",
+	"body": "<p>Hello <b>there</b></p>",
+	"recipient": "user@agency.gov.sg",
+	"from": "test@agency.gov.sg",
 }'
 ```

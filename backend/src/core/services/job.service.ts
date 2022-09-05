@@ -3,10 +3,12 @@ import get from 'lodash/get'
 
 import config from '@core/config'
 import { Campaign } from '@core/models'
+import { CampaignService } from './campaign.service'
+import { ChannelType } from '@core/constants'
 
 /**
  * Inserts a job into the job_queue table.
- * @see ../worker/src/core/resources/sql/insert-job.sql
+ * @see ../backend/src/database/migrations/20210429044423-create-insert-job-function.js
  */
 const createJob = async ({
   campaignId,
@@ -51,7 +53,17 @@ const sendCampaign = async ({
 }: {
   campaignId: number
   rate: number
-}): Promise<(number | undefined)[]> => {
+}): Promise<(number | undefined)[] | (number | undefined)> => {
+  const campaign = await CampaignService.getCampaignDetails(campaignId, [])
+  if (campaign.type === ChannelType.Email) {
+    // For email type, we only want to take up a single worker at a time at the
+    // preconfigured mailDefaultRate to avoid hogging resources from other campaigns
+    return createJob({
+      campaignId: +campaignId,
+      rate: config.get('mailDefaultRate'),
+    })
+  }
+
   // Split jobs if the supplied send rate is higher than the rate 1 worker can support
   // The rate is distributed evenly across workers.
   const jobs = []
@@ -71,7 +83,7 @@ const sendCampaign = async ({
 }
 
 /**
- * @see ../worker/src/core/resources/sql/stop-jobs.sql
+ * @see ../backend/src/database/migrations/20210501121338-create-stop-jobs-function.js
  * @param campaignId
  */
 const stopCampaign = (campaignId: number): Promise<any> | undefined => {
@@ -82,7 +94,7 @@ const stopCampaign = (campaignId: number): Promise<any> | undefined => {
 }
 
 /**
- * @see ../worker/src/core/resources/sql/retry-jobs.sql
+ * @see ../backend/src/database/migrations/20210501120857-create-retry-jobs-function.js
  * @param campaignId
  */
 const retryCampaign = (campaignId: number): Promise<any> | undefined => {

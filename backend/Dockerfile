@@ -1,8 +1,9 @@
-FROM node:12-alpine
+FROM public.ecr.aws/docker/library/node:16-alpine
+# postman public ecr
 
 # required for node-gyp
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
-  g++ make python3 python3-dev tini
+  g++ make python3 python3-dev py3-pip tini
 
 RUN apk add jq
 

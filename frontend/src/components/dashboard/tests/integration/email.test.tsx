@@ -33,7 +33,7 @@ test('successfully creates and sends a new email campaign', async () => {
   })
 
   // Click on the "Create new campaign" button
-  userEvent.click(newCampaignButton)
+  await userEvent.click(newCampaignButton, { delay: null })
 
   // Wait for the CreateModal to load
   const campaignNameTextbox = await screen.findByRole('textbox', {
@@ -41,14 +41,14 @@ test('successfully creates and sends a new email campaign', async () => {
   })
 
   // Fill in the campaign title
-  userEvent.type(campaignNameTextbox, CAMPAIGN_NAME)
+  await userEvent.type(campaignNameTextbox, CAMPAIGN_NAME, { delay: null })
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
   // Click on the email channel button
   const emailChannelButton = screen.getByRole('button', {
     name: /^email$/i,
   })
-  userEvent.click(emailChannelButton)
+  await userEvent.click(emailChannelButton, { delay: null })
   expect(emailChannelButton).toHaveClass('active')
   expect(screen.getByRole('button', { name: /^telegram$/i })).not.toHaveClass(
     'active'
@@ -58,7 +58,10 @@ test('successfully creates and sends a new email campaign', async () => {
   )
 
   // Click on the "Create campaign" button
-  userEvent.click(screen.getByRole('button', { name: /create campaign/i }))
+  await userEvent.click(
+    screen.getByRole('button', { name: /create campaign/i }),
+    { delay: null }
+  )
 
   // Wait for the message template to load
   expect(
@@ -69,11 +72,12 @@ test('successfully creates and sends a new email campaign', async () => {
   const customFromDropdown = screen.getByRole('listbox', {
     name: /custom from/i,
   })
-  userEvent.click(customFromDropdown)
-  userEvent.click(
+  await userEvent.click(customFromDropdown, { delay: null })
+  await userEvent.click(
     await screen.findByRole('option', {
       name: DEFAULT_FROM_ADDRESS,
-    })
+    }),
+    { delay: null }
   )
   expect(customFromDropdown).toHaveTextContent(DEFAULT_FROM_ADDRESS)
 
@@ -82,7 +86,7 @@ test('successfully creates and sends a new email campaign', async () => {
     name: /subject/i,
   })
   for (const char of SUBJECT_TEXT) {
-    userEvent.type(subjectTextbox, char)
+    await userEvent.type(subjectTextbox, char, { delay: null })
   }
   expect(subjectTextbox).toHaveTextContent(SUBJECT_TEXT)
 
@@ -99,10 +103,11 @@ test('successfully creates and sends a new email campaign', async () => {
   expect(messageTextbox).toHaveTextContent(MESSAGE_TEXT)
 
   // Go to upload recipients page and wait for it to load
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByRole('button', {
@@ -115,7 +120,7 @@ test('successfully creates and sends a new email campaign', async () => {
   const fileUploadInput = screen.getByLabelText(
     /upload file/i
   ) as HTMLInputElement
-  userEvent.upload(fileUploadInput, VALID_EMAIL_CSV_FILE)
+  await userEvent.upload(fileUploadInput, VALID_EMAIL_CSV_FILE, { delay: null })
   expect(fileUploadInput?.files).toHaveLength(1)
   expect(fileUploadInput?.files?.[0]).toBe(VALID_EMAIL_CSV_FILE)
 
@@ -129,10 +134,11 @@ test('successfully creates and sends a new email campaign', async () => {
   expect(screen.getAllByText(REPLY_TO)).toHaveLength(2)
 
   // Go to the send test email page and wait for it to load
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByRole('heading', {
@@ -154,20 +160,22 @@ test('successfully creates and sends a new email campaign', async () => {
   expect(testEmailTextbox).toHaveValue(RECIPIENT_EMAIL)
 
   // Send the test email and wait for validation
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /send/i,
-    })
+    }),
+    { delay: null }
   )
   expect(
     await screen.findByText(/credentials have been validated/i)
   ).toBeInTheDocument()
 
   // Go to the preview and send page
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /next/i,
-    })
+    }),
+    { delay: null }
   )
 
   // Wait for the page to load and ensure the necessary elements are shown
@@ -177,10 +185,11 @@ test('successfully creates and sends a new email campaign', async () => {
   expect(screen.getAllByText(REPLY_TO)).toHaveLength(2)
 
   // Click the send campaign button
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /send campaign now/i,
-    })
+    }),
+    { delay: null }
   )
 
   // Wait for the confirmation modal to load
@@ -191,10 +200,11 @@ test('successfully creates and sends a new email campaign', async () => {
   ).toBeInTheDocument()
 
   // Click on the confirm send now button
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('button', {
       name: /confirm send now/i,
-    })
+    }),
+    { delay: null }
   )
 
   // Wait for the campaign to be sent and ensure
@@ -222,7 +232,7 @@ test('successfully creates and sends a new email campaign', async () => {
     name: /refresh stats/i,
   })
 
-  userEvent.click(refreshStatsButton)
+  await userEvent.click(refreshStatsButton, { delay: null })
   expect(refreshStatsButton).toBeDisabled()
   await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 

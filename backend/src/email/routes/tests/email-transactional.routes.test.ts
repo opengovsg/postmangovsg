@@ -2,7 +2,6 @@ import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
 import { User } from '@core/models'
-import { RedisService } from '@core/services'
 import { EmailService } from '@email/services'
 
 import initialiseServer from '@test-utils/server'
@@ -19,7 +18,7 @@ beforeEach(async () => {
   user = await User.create({
     id: userId,
     email: `user_${userId}@agency.gov.sg`,
-  })
+  } as User)
   apiKey = await user.regenerateAndSaveApiKey()
   userId += 1
 })
@@ -27,7 +26,9 @@ beforeEach(async () => {
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   // Flush the rate limit redis database
-  await new Promise((resolve) => RedisService.rateLimitClient.flushdb(resolve))
+  await new Promise((resolve) =>
+    (app as any).redisService.rateLimitClient.flushdb(resolve)
+  )
 })
 
 afterEach(() => jest.resetAllMocks())
@@ -36,8 +37,10 @@ afterAll(async () => {
   await User.destroy({ where: {} })
   await sequelize.close()
 
-  await new Promise((resolve) => RedisService.rateLimitClient.flushdb(resolve))
-  await RedisService.shutdown()
+  await new Promise((resolve) =>
+    (app as any).redisService.rateLimitClient.flushdb(resolve)
+  )
+  await (app as any).cleanup()
 })
 
 describe('POST /transactional/email/send', () => {
@@ -137,6 +140,28 @@ describe('POST /transactional/email/send', () => {
 
     expect(res.status).toBe(400)
     expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should send a message with a valid attachment', async () => {
+    const mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
+
+    // request.send() cannot be used with file attachments
+    // substitute form values with request.field(). refer to
+    // https://visionmedia.github.io/superagent/#multipart-requests
+    const res = await request(app)
+      .post('/transactional/email/send')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', 'recipient@agency.gov.sg')
+      .field('subject', 'subject')
+      .field('body', '<p>body</p>')
+      .field('from', 'Postman <donotreply@mail.postman.gov.sg>')
+      .field('reply_to', 'user@agency.gov.sg')
+      .attach('attachments', Buffer.from('hello world'), 'hi.txt')
+
+    expect(res.status).toBe(202)
+    expect(mockSendEmail).toBeCalledTimes(1)
   })
 
   test('Requests should be rate limited', async () => {

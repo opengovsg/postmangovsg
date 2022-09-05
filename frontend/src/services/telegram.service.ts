@@ -1,5 +1,4 @@
 import axios from 'axios'
-import type { AxiosError } from 'axios'
 import Papa from 'papaparse'
 
 // Telegram states that the total character limit is 4096.
@@ -32,10 +31,8 @@ export async function saveTemplate(
         body,
       }
     )
-    const {
-      num_recipients: numRecipients,
-      template: updatedTemplate,
-    } = response.data
+    const { num_recipients: numRecipients, template: updatedTemplate } =
+      response.data
     return { numRecipients, updatedTemplate }
   } catch (e) {
     errorHandler(e, 'Error saving template.')
@@ -176,10 +173,8 @@ export async function getPresignedUrl({
         },
       }
     )
-    const {
-      transaction_id: transactionId,
-      presigned_url: presignedUrl,
-    } = response.data
+    const { transaction_id: transactionId, presigned_url: presignedUrl } =
+      response.data
     return { transactionId, presignedUrl } as PresignedUrlResponse
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
@@ -230,9 +225,14 @@ export async function getStoredCredentials(): Promise<string[]> {
   }
 }
 
-function errorHandler(e: AxiosError, defaultMsg: string): never {
+function errorHandler(e: unknown, defaultMsg: string): never {
   console.error(e)
-  if (e.response && e.response.data && e.response.data.message) {
+  if (
+    axios.isAxiosError(e) &&
+    e.response &&
+    e.response.data &&
+    e.response.data.message
+  ) {
     throw new Error(e.response.data.message)
   }
   throw new Error(defaultMsg)

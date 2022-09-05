@@ -1,7 +1,8 @@
+// eslint-disable-next-line import/order
 import { useEffect, useContext } from 'react'
 
 import { Status, ChannelType } from 'classes/Campaign'
-import { StepHeader, ProgressDetails } from 'components/common'
+import { StepHeader, ProgressDetails, PreviewBlock } from 'components/common'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 import { CampaignContext } from 'contexts/campaign.context'
@@ -98,6 +99,9 @@ const SMSDetail = () => {
   function renderProgressDetails() {
     return (
       <>
+        <div className="separator"></div>
+        <h3>Message Template</h3>
+        <PreviewBlock body={campaign.body} />
         <div className="separator"></div>
         {stats.status && (
           <ProgressDetails

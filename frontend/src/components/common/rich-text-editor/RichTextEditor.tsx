@@ -9,6 +9,7 @@ import {
   Modifier,
   SelectionState,
   KeyBindingUtil,
+  getDefaultKeyBinding,
 } from 'draft-js'
 import Immutable from 'immutable'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -20,6 +21,7 @@ import type {
 import { Editor } from 'react-draft-wysiwyg'
 
 import styles from './RichTextEditor.module.scss'
+import { addHtmlToState } from './RichTextPasting'
 import { ImageBlock, TableWrapper } from './blocks'
 import {
   LinkControl,
@@ -40,6 +42,9 @@ import { Converter } from './utils'
 
 import 'draft-js/dist/Draft.css'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+
+const MAX_LIST_DEPTH = 4
+let hidePlaceholder = false
 
 const ExtendedEditor = (props: any) => <Editor {...props} />
 
@@ -139,15 +144,33 @@ const RichTextEditor = ({
       wrapper: <TableWrapper />,
     },
   })
-  const extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(
-    blockRenderMap
-  )
+  const extendedBlockRenderMap =
+    DefaultDraftBlockRenderMap.merge(blockRenderMap)
 
   useEffect(() => {
     // Normalise HTML whenever editor state is initialised or updated
     const currentContent = editorState.getCurrentContent()
     const html = Converter.convertToHTML(convertToRaw(currentContent))
     onChange(html)
+
+    //hide placeholder if block type is changed
+    //list bullets and unaligned cursor would otherwise appear on top of preview
+    if (!currentContent.hasText()) {
+      const firstBlockType = currentContent.getBlockMap().first().getType()
+      const firstBlockAlignment = currentContent
+        .getBlockMap()
+        .first()
+        .getData()
+        .get('text-align')
+      if (
+        firstBlockType !== 'unstyled' ||
+        (firstBlockAlignment && firstBlockAlignment != 'left')
+      ) {
+        hidePlaceholder = true
+      } else {
+        hidePlaceholder = false
+      }
+    }
   }, [editorState, onChange])
 
   function renderBlock(block: ContentBlock): any | void {
@@ -167,7 +190,45 @@ const RichTextEditor = ({
     }
   }
 
+  // customise command from key press
+  function keyBindingFn(e: any): string | null {
+    if (e.keyCode === 9) {
+      // tab key
+      const selection = editorState.getSelection()
+      const startKey = selection.getStartKey()
+      const block = editorState.getCurrentContent().getBlockForKey(startKey)
+      const blockType = block.getType()
+
+      // handle indent on list separately
+      if (['unordered-list-item', 'ordered-list-item'].includes(blockType)) {
+        const blockBefore = editorState
+          .getCurrentContent()
+          .getBlockBefore(startKey)
+        let MAX_DEPTH = 0
+        if (blockBefore && blockBefore.getType() === blockType) {
+          MAX_DEPTH = Math.min(blockBefore.getDepth() + 1, MAX_LIST_DEPTH)
+        }
+        setEditorState(RichUtils.onTab(e, editorState, MAX_DEPTH))
+        return null
+      }
+      return 'indent'
+    }
+    return getDefaultKeyBinding(e)
+  }
+
   function handleKeyCommand(command: string): 'handled' | 'not-handled' {
+    if (command === 'indent') {
+      const newContentState = Modifier.replaceText(
+        editorState.getCurrentContent(),
+        editorState.getSelection(),
+        '\t'
+      )
+      setEditorState(
+        EditorState.push(editorState, newContentState, 'insert-characters')
+      )
+      return 'handled'
+    }
+
     if (command === 'backspace') {
       const selection = editorState.getSelection()
       const anchorKey = selection.getAnchorKey()
@@ -205,6 +266,33 @@ const RichTextEditor = ({
         selection.getAnchorOffset() === 0 &&
         blockBefore?.getType() === 'table-cell'
       ) {
+        return 'handled'
+      }
+
+      //handle deletion of list item when it is the first block,
+      //would otherwise not be deleted
+      if (
+        ['unordered-list-item', 'ordered-list-item'].includes(
+          anchor.getType()
+        ) &&
+        !blockBefore &&
+        !anchor.getText()
+      ) {
+        //set list block to unstyled
+        let blockMap = editorState.getCurrentContent().getBlockMap()
+        blockMap = blockMap.set(
+          anchorKey,
+          anchor.set('type', 'unstyled') as ContentBlock
+        )
+        const newContent = editorState
+          .getCurrentContent()
+          .set('blockMap', blockMap) as ContentState
+        const newEditorState = EditorState.push(
+          editorState,
+          newContent,
+          'change-block-type'
+        )
+        setEditorState(newEditorState)
         return 'handled'
       }
     }
@@ -267,7 +355,7 @@ const RichTextEditor = ({
 
   function handlePastedText(
     text: string,
-    _html: string,
+    html: string,
     editorState: EditorState
   ): boolean {
     let contentState = editorState.getCurrentContent()
@@ -303,7 +391,13 @@ const RichTextEditor = ({
       return true
     }
 
-    // Return false so that default behaviour will run
+    // call custom paste handling function if html is pasted
+    if (html) {
+      setEditorState(addHtmlToState(html, editorState))
+      return true
+    }
+
+    // return false to proceed with default if plain text is pasted
     return false
   }
 
@@ -311,7 +405,9 @@ const RichTextEditor = ({
     <ExtendedEditor
       wrapperClassName={styles.wrapper}
       toolbarClassName={styles.toolbar}
-      editorClassName={styles.editor}
+      editorClassName={cx(styles.editor, {
+        [styles.hidePlaceholder]: hidePlaceholder,
+      })}
       placeholder={placeholder}
       editorState={editorState}
       onEditorStateChange={setEditorState}
@@ -321,9 +417,9 @@ const RichTextEditor = ({
       customBlockRenderFunc={renderBlock}
       blockRenderMap={extendedBlockRenderMap}
       handleKeyCommand={handleKeyCommand}
+      keyBindingFn={keyBindingFn}
       handleReturn={handleReturn}
       handlePastedText={handlePastedText}
-      stripPastedStyles
     />
   )
 }
@@ -337,9 +433,8 @@ const RichTextPreview = ({ placeholder }: { placeholder: string }) => {
       wrapper: <TableWrapper />,
     },
   })
-  const extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(
-    blockRenderMap
-  )
+  const extendedBlockRenderMap =
+    DefaultDraftBlockRenderMap.merge(blockRenderMap)
 
   function renderBlock(block: ContentBlock): any | void {
     if (block.getType() === 'atomic') {

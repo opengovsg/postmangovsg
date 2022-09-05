@@ -59,7 +59,7 @@ const TelegramCredentials = ({
     !hasCredential
   )
   const [isManual, setIsManual] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
   const [sendSuccess, setSendSuccess] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
   const { id: campaignId } = useParams<{ id: string }>()
@@ -76,11 +76,11 @@ const TelegramCredentials = ({
         }
       } catch (e) {
         console.error(e)
-        setErrorMessage(e.message)
+        setErrorMessage((e as Error).message)
       }
     }
     const defaultLabels = isDemo ? [DEMO_CREDENTIAL] : []
-    populateStoredCredentials(defaultLabels)
+    void populateStoredCredentials(defaultLabels)
   }, [isDemo])
 
   function toggleInputMode() {
@@ -92,13 +92,13 @@ const TelegramCredentials = ({
   }
 
   function toggleReplaceCredentials() {
-    setErrorMessage(null)
+    setErrorMessage('')
     setSendSuccess(false)
     setShowCredentialFields(true)
   }
 
   async function handleValidateCredentials() {
-    setErrorMessage(null)
+    setErrorMessage('')
     setIsValidating(true)
 
     try {
@@ -126,14 +126,14 @@ const TelegramCredentials = ({
       // Saves hasCredential property but do not advance to next step
       updateCampaign({ hasCredential: true })
     } catch (e) {
-      setErrorMessage(e.message)
+      setErrorMessage((e as Error).message)
     }
 
     setIsValidating(false)
   }
 
   async function handleSendValidationMessage(recipient: string) {
-    setErrorMessage(null)
+    setErrorMessage('')
     setSendSuccess(false)
     try {
       if (!campaignId) {
@@ -146,7 +146,7 @@ const TelegramCredentials = ({
       })
       setSendSuccess(true)
     } catch (e) {
-      setErrorMessage(e.message)
+      setErrorMessage((e as Error).message)
     }
   }
 

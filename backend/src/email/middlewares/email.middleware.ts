@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction, Handler } from 'express'
 import { EmailService, CustomDomainService } from '@email/services'
 import { isDefaultFromAddress } from '@core/utils/from-address'
 import { parseFromAddress } from '@shared/utils/from-address'
@@ -7,380 +7,410 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { ThemeClient } from '@shared/theme'
 
-const logger = loggerWithLabel(module)
+export interface EmailMiddleware {
+  isEmailCampaignOwnedByUser: Handler
+  validateAndStoreCredentials: Handler
+  getCampaignDetails: Handler
+  previewFirstMessage: Handler
+  verifyFromAddress: Handler
+  storeFromAddress: Handler
+  getCustomFromAddress: Handler
+  existsFromAddress: Handler
+  isCustomFromAddressAllowed: Handler
+  isFromAddressAccepted: Handler
+  sendValidationMessage: Handler
+  duplicateCampaign: Handler
+}
 
-/**
- * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
- * @param req
- * @param res
- * @param next
- */
-const isEmailCampaignOwnedByUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { campaignId } = req.params
-  const userId = req.session?.user?.id
-  try {
-    const campaign = await EmailService.findCampaign(+campaignId, +userId)
-    if (campaign) {
-      return next()
-    } else {
-      return res.sendStatus(403)
+export const InitEmailMiddleware = (
+  authService: AuthService
+): EmailMiddleware => {
+  const logger = loggerWithLabel(module)
+
+  /**
+   * Checks if the campaign id supplied is indeed a campaign of the 'Email' type, and belongs to the user
+   * @param req
+   * @param res
+   * @param next
+   */
+  const isEmailCampaignOwnedByUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const { campaignId } = req.params
+    const userId = req.session?.user?.id
+    try {
+      const campaign = await EmailService.findCampaign(+campaignId, +userId)
+      if (campaign) {
+        return next()
+      } else {
+        return res.sendStatus(403)
+      }
+    } catch (err) {
+      return next(err)
     }
-  } catch (err) {
-    return next(err)
   }
-}
 
-/**
- * Sends a test message. If the test message succeeds, store the credentials
- * @param req
- * @param res
- */
-const validateAndStoreCredentials = async (
-  req: Request,
-  res: Response
-): Promise<Response | void> => {
-  const { campaignId } = req.params
-  const { recipient } = req.body
-  const logMeta = {
-    campaignId,
-    recipient,
-    action: 'validateAndStoreCredentials',
-  }
-  try {
-    await EmailService.sendCampaignMessage(+campaignId, recipient)
-    await EmailService.setCampaignCredential(+campaignId)
-  } catch (err) {
-    logger.error({
-      message: 'Failed to validate and store credentials',
-      error: err,
-      ...logMeta,
-    })
-    return res.status(400).json({ message: `${err.message}` })
-  }
-  return res.json({ message: 'OK' })
-}
-
-/**
- * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
- * @param req
- * @param res
- * @param next
- */
-const getCampaignDetails = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
+  /**
+   * Sends a test message. If the test message succeeds, store the credentials
+   * @param req
+   * @param res
+   */
+  const validateAndStoreCredentials = async (
+    req: Request,
+    res: Response
+  ): Promise<Response | void> => {
     const { campaignId } = req.params
-    const result = await EmailService.getCampaignDetails(+campaignId)
-    return res.json(result)
-  } catch (err) {
-    return next(err)
+    const { recipient } = req.body
+    const logMeta = {
+      campaignId,
+      recipient,
+      action: 'validateAndStoreCredentials',
+    }
+    try {
+      await EmailService.sendCampaignMessage(+campaignId, recipient)
+      await EmailService.setCampaignCredential(+campaignId)
+    } catch (err) {
+      logger.error({
+        message: 'Failed to validate and store credentials',
+        error: err,
+        ...logMeta,
+      })
+      return res.status(400).json({ message: `${(err as Error).message}` })
+    }
+    return res.json({ message: 'OK' })
   }
-}
 
-/**
- * Retrieves a message for this campaign
- * @param req
- * @param res
- * @param next
- */
-const previewFirstMessage = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const message = await EmailService.getHydratedMessage(+campaignId)
+  /**
+   * Gets details of a campaign and the number of recipients that have been uploaded for this campaign
+   * @param req
+   * @param res
+   * @param next
+   */
+  const getCampaignDetails = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    try {
+      const { campaignId } = req.params
+      const result = await EmailService.getCampaignDetails(+campaignId)
+      const themedBody = await ThemeClient.generateThemedBody({
+        body: result.email_templates?.body as string,
+        agencyName: result.user?.domain?.agency?.name as string,
+        agencyLogoURI: result.user?.domain?.agency?.logo_uri as string,
+        unsubLink: '/unsubscribe/test',
+        showMasthead: true,
+      })
+      return res.json({
+        ...result,
+        email_templates: {
+          ...result.email_templates,
+          themed_body: themedBody,
+        },
+      })
+    } catch (err) {
+      return next(err)
+    }
+  }
 
-    if (!message) return res.json({})
+  /**
+   * Retrieves a message for this campaign
+   * @param req
+   * @param res
+   * @param next
+   */
+  const previewFirstMessage = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    try {
+      const { campaignId } = req.params
+      const message = await EmailService.getHydratedMessage(+campaignId)
 
-    const {
-      body,
-      subject,
-      replyTo,
-      from,
-      agencyName,
-      agencyLogoURI,
-      showMasthead,
-    } = message
-    const themedBody = await ThemeClient.generateThemedBody({
-      body,
-      unsubLink: UnsubscriberService.generateTestUnsubLink(),
-      agencyName,
-      agencyLogoURI,
-      showMasthead,
-    })
+      if (!message) return res.json({})
 
-    return res.json({
-      preview: {
+      const {
         body,
         subject,
-        reply_to: replyTo,
+        replyTo,
         from,
-        themed_body: themedBody,
-      },
-    })
-  } catch (err) {
-    return next(err)
-  }
-}
-
-/**
- * Checks if the from address is custom and rejects it if necessary.
- */
-const isCustomFromAddressAllowed = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  const { from } = req.body
-  if (isDefaultFromAddress(from)) return next()
-
-  // We don't allow custom from address for the SendGrid fallback
-  // since they aren't DKIM-authenticated currently
-  if (config.get('emailFallback.activate')) {
-    res.status(503).json({
-      message:
-        'Unable to use a custom from address due to downtime. Please use the default from address instead.',
-    })
-    return
-  }
-
-  next()
-}
-
-/**
- * Checks that the from address is either the user's email or the default app email
- */
-const isFromAddressAccepted = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  // Since from addresses with display name are accepted, we need to extract just the email address
-  const { from } = req.body
-  const { fromName, fromAddress } = parseFromAddress(from)
-
-  // Retrieve logged in user's email
-  const userEmail =
-    req.session?.user?.email ||
-    (await AuthService.findUser(req.session?.user?.id))?.email
-
-  // Get default mail address for comparison
-  const {
-    fromName: defaultFromName,
-    fromAddress: defaultFromAddress,
-  } = parseFromAddress(config.get('mailFrom'))
-
-  if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
-    logger.error({
-      message: "Invalid 'from' email address",
-      from,
-      userEmail,
-      defaultFromName,
-      defaultFromAddress,
-      fromAddress,
-      action: 'isFromAddressAccepted',
-    })
-    return res.status(400).json({ message: "Invalid 'from' email address." })
-  }
-
-  res.locals.fromName = fromName
-  res.locals.fromAddress = fromAddress
-
-  return next()
-}
-
-/**
- * Verifies that the 'from' address provided is valid
- */
-const existsFromAddress = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { from } = req.body
-  if (isDefaultFromAddress(from)) return next()
-
-  const { fromName, fromAddress } = res.locals
-  try {
-    const exists = await CustomDomainService.existsFromAddress(fromAddress)
-    if (!exists) throw new Error('From Address has not been verified.')
-  } catch (err) {
-    logger.error({
-      message: "Invalid 'from' email address",
-      from,
-      defaultEmail: config.get('mailFrom'),
-      fromName,
-      fromAddress,
-      error: err,
-      action: 'existsFromAddress',
-    })
-    return res.status(400).json({ message: err.message })
-  }
-  return next()
-}
-
-/**
- * Verifies the user's email address to see if it can be used as custom 'from' address
- */
-const verifyFromAddress = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { from } = req.body
-  if (isDefaultFromAddress(from)) return next()
-
-  const { fromAddress } = res.locals
-  try {
-    await CustomDomainService.verifyFromAddress(fromAddress)
-  } catch (err) {
-    logger.error({
-      message: "Failed to verify 'from' email address",
-      from,
-      defaultEmail: config.get('mailFrom'),
-      fromAddress,
-      error: err,
-      action: 'verifyFromAddress',
-    })
-    return res.status(400).json({ message: err.message })
-  }
-  return next()
-}
-
-/**
- * Stores the verified email address that we can use to send out emails.
- */
-const storeFromAddress = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { from } = req.body
-  const defaultEmail = config.get('mailFrom')
-  if (from === defaultEmail) {
-    return res.sendStatus(200)
-  }
-  const { fromName, fromAddress } = res.locals
-
-  try {
-    await CustomDomainService.storeFromAddress(fromName, fromAddress)
-  } catch (err) {
-    return next(err)
-  }
-  return res.status(200).json({ email: from })
-}
-
-/**
- * Verifies if the user's email address can be used as custom 'from' address
- */
-const getCustomFromAddress = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const email =
-    req.session?.user?.email ||
-    (await AuthService.findUser(req.session?.user?.id))?.email
-  const defaultEmail = config.get('mailFrom')
-  const result = []
-
-  try {
-    const fromAddress = await CustomDomainService.getCustomFromAddress(email)
-    if (fromAddress) result.push(fromAddress)
-    result.push(defaultEmail)
-  } catch (err) {
-    return next(err)
-  }
-
-  return res.status(200).json({ from: result })
-}
-
-/**
- * Sends a test email from the specified from address
- */
-const sendValidationMessage = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { recipient, from } = req.body
-  try {
-    await CustomDomainService.sendValidationMessage(recipient, from)
-  } catch (err) {
-    logger.error({
-      message:
-        "Failed to send validation email from the specified 'from' email address",
-      recipient,
-      from,
-      error: err,
-      action: 'sendValidationMessage',
-    })
-    return res.status(400).json({ message: err.message })
-  }
-  return next()
-}
-
-/**
- *  duplicate a campaign and its template
- * @param req
- * @param res
- * @param next
- */
-const duplicateCampaign = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const { name } = req.body
-    const campaign = await EmailService.duplicateCampaign({
-      campaignId: +campaignId,
-      name,
-    })
-    if (!campaign) {
-      return res.status(400).json({
-        message: `Unable to duplicate campaign with these parameters`,
+        agencyName,
+        agencyLogoURI,
+        showMasthead,
+      } = message
+      const themedBody = await ThemeClient.generateThemedBody({
+        body,
+        unsubLink: UnsubscriberService.generateTestUnsubLink(),
+        agencyName,
+        agencyLogoURI,
+        showMasthead,
       })
-    }
-    logger.info({
-      message: 'Successfully copied campaign',
-      campaignId: campaign.id,
-      action: 'duplicateCampaign',
-    })
-    return res.status(201).json({
-      id: campaign.id,
-      name: campaign.name,
-      created_at: campaign.createdAt,
-      type: campaign.type,
-      protect: campaign.protect,
-      demo_message_limit: campaign.demoMessageLimit,
-    })
-  } catch (err) {
-    return next(err)
-  }
-}
 
-export const EmailMiddleware = {
-  isEmailCampaignOwnedByUser,
-  validateAndStoreCredentials,
-  getCampaignDetails,
-  previewFirstMessage,
-  verifyFromAddress,
-  storeFromAddress,
-  getCustomFromAddress,
-  existsFromAddress,
-  isCustomFromAddressAllowed,
-  isFromAddressAccepted,
-  sendValidationMessage,
-  duplicateCampaign,
+      return res.json({
+        preview: {
+          body,
+          subject,
+          reply_to: replyTo,
+          from,
+          themed_body: themedBody,
+        },
+      })
+    } catch (err) {
+      return next(err)
+    }
+  }
+
+  /**
+   * Checks if the from address is custom and rejects it if necessary.
+   */
+  const isCustomFromAddressAllowed = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void => {
+    const { from } = req.body
+    if (isDefaultFromAddress(from)) return next()
+
+    // We don't allow custom from address for the SendGrid fallback
+    // since they aren't DKIM-authenticated currently
+    if (config.get('emailFallback.activate')) {
+      res.status(503).json({
+        message:
+          'Unable to use a custom from address due to downtime. Please use the default from address instead.',
+      })
+      return
+    }
+
+    next()
+  }
+
+  /**
+   * Checks that the from address is either the user's email or the default app email
+   */
+  const isFromAddressAccepted = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    // Since from addresses with display name are accepted, we need to extract just the email address
+    const { from } = req.body
+    const { fromName, fromAddress } = parseFromAddress(from)
+
+    // Retrieve logged in user's email
+    const userEmail =
+      req.session?.user?.email ||
+      (await authService.findUser(req.session?.user?.id))?.email
+
+    // Get default mail address for comparison
+    const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
+      parseFromAddress(config.get('mailFrom'))
+
+    if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
+      logger.error({
+        message: "Invalid 'from' email address",
+        from,
+        userEmail,
+        defaultFromName,
+        defaultFromAddress,
+        fromAddress,
+        action: 'isFromAddressAccepted',
+      })
+      return res.status(400).json({ message: "Invalid 'from' email address." })
+    }
+
+    res.locals.fromName = fromName
+    res.locals.fromAddress = fromAddress
+
+    return next()
+  }
+
+  /**
+   * Verifies that the 'from' address provided is valid
+   */
+  const existsFromAddress = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const { from } = req.body
+    if (isDefaultFromAddress(from)) return next()
+
+    const { fromName, fromAddress } = res.locals
+    try {
+      const exists = await CustomDomainService.existsFromAddress(fromAddress)
+      if (!exists) throw new Error('From Address has not been verified.')
+    } catch (err) {
+      logger.error({
+        message: "Invalid 'from' email address",
+        from,
+        defaultEmail: config.get('mailFrom'),
+        fromName,
+        fromAddress,
+        error: err,
+        action: 'existsFromAddress',
+      })
+      return res.status(400).json({ message: (err as Error).message })
+    }
+    return next()
+  }
+
+  /**
+   * Verifies the user's email address to see if it can be used as custom 'from' address
+   */
+  const verifyFromAddress = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const { from } = req.body
+    if (isDefaultFromAddress(from)) return next()
+
+    const { fromAddress } = res.locals
+    try {
+      await CustomDomainService.verifyFromAddress(fromAddress)
+    } catch (err) {
+      logger.error({
+        message: "Failed to verify 'from' email address",
+        from,
+        defaultEmail: config.get('mailFrom'),
+        fromAddress,
+        error: err,
+        action: 'verifyFromAddress',
+      })
+      return res.status(400).json({ message: (err as Error).message })
+    }
+    return next()
+  }
+
+  /**
+   * Stores the verified email address that we can use to send out emails.
+   */
+  const storeFromAddress = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const { from } = req.body
+    const defaultEmail = config.get('mailFrom')
+    if (from === defaultEmail) {
+      return res.sendStatus(200)
+    }
+    const { fromName, fromAddress } = res.locals
+
+    try {
+      await CustomDomainService.storeFromAddress(fromName, fromAddress)
+    } catch (err) {
+      return next(err)
+    }
+    return res.status(200).json({ email: from })
+  }
+
+  /**
+   * Verifies if the user's email address can be used as custom 'from' address
+   */
+  const getCustomFromAddress = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const email =
+      req.session?.user?.email ||
+      (await authService.findUser(req.session?.user?.id))?.email
+    const defaultEmail = config.get('mailFrom')
+    const result = []
+
+    try {
+      const fromAddress = await CustomDomainService.getCustomFromAddress(email)
+      if (fromAddress) result.push(fromAddress)
+      result.push(defaultEmail)
+    } catch (err) {
+      return next(err)
+    }
+
+    return res.status(200).json({ from: result })
+  }
+
+  /**
+   * Sends a test email from the specified from address
+   */
+  const sendValidationMessage = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const { recipient, from } = req.body
+    try {
+      await CustomDomainService.sendValidationMessage(recipient, from)
+    } catch (err) {
+      logger.error({
+        message:
+          "Failed to send validation email from the specified 'from' email address",
+        recipient,
+        from,
+        error: err,
+        action: 'sendValidationMessage',
+      })
+      return res.status(400).json({ message: (err as Error).message })
+    }
+    return next()
+  }
+
+  /**
+   *  duplicate a campaign and its template
+   * @param req
+   * @param res
+   * @param next
+   */
+  const duplicateCampaign = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    try {
+      const { campaignId } = req.params
+      const { name } = req.body
+      const campaign = await EmailService.duplicateCampaign({
+        campaignId: +campaignId,
+        name,
+      })
+      if (!campaign) {
+        return res.status(400).json({
+          message: `Unable to duplicate campaign with these parameters`,
+        })
+      }
+      logger.info({
+        message: 'Successfully copied campaign',
+        campaignId: campaign.id,
+        action: 'duplicateCampaign',
+      })
+      return res.status(201).json({
+        id: campaign.id,
+        name: campaign.name,
+        created_at: campaign.createdAt,
+        type: campaign.type,
+        protect: campaign.protect,
+        demo_message_limit: campaign.demoMessageLimit,
+      })
+    } catch (err) {
+      return next(err)
+    }
+  }
+
+  return {
+    isEmailCampaignOwnedByUser,
+    validateAndStoreCredentials,
+    getCampaignDetails,
+    previewFirstMessage,
+    verifyFromAddress,
+    storeFromAddress,
+    getCustomFromAddress,
+    existsFromAddress,
+    isCustomFromAddressAllowed,
+    isFromAddressAccepted,
+    sendValidationMessage,
+    duplicateCampaign,
+  }
 }

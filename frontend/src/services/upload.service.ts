@@ -1,5 +1,8 @@
-import axios from 'axios'
-import type { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
+
+// require buffer with trailing slash to ensure use of the npm module named buffer
+// instead of the node.js core module named buffer
+import { Buffer } from 'buffer/'
 
 import Papa from 'papaparse'
 import SparkMD5 from 'spark-md5'
@@ -97,10 +100,8 @@ export async function getPresignedUrl({
         md5,
       },
     })
-    const {
-      transaction_id: transactionId,
-      presigned_url: presignedUrl,
-    } = response.data
+    const { transaction_id: transactionId, presigned_url: presignedUrl } =
+      response.data
     return { transactionId, presignedUrl } as PresignedUrlResponse
   } catch (e) {
     errorHandler(e, 'Error completing file upload')
@@ -256,10 +257,8 @@ export async function beginMultipartUpload({
         },
       }
     )
-    const {
-      transaction_id: transactionId,
-      presigned_urls: presignedUrls,
-    } = response.data
+    const { transaction_id: transactionId, presigned_urls: presignedUrls } =
+      response.data
     return { transactionId, presignedUrls }
   } catch (e) {
     errorHandler(e, 'Failed to begin multipart upload.')
@@ -320,10 +319,15 @@ export async function completeMultiPartUpload({
   }
 }
 
-function errorHandler(e: AxiosError, defaultMsg?: string): never {
+function errorHandler(e: unknown, defaultMsg?: string): never {
   console.error(e)
-  if (e.response && e.response.data && e.response.data.message) {
+  if (
+    axios.isAxiosError(e) &&
+    e.response &&
+    e.response.data &&
+    e.response.data.message
+  ) {
     throw new Error(e.response.data.message)
   }
-  throw new Error(defaultMsg || e.response?.statusText)
+  throw new Error(defaultMsg || (e as AxiosError).response?.statusText)
 }
