@@ -47,7 +47,7 @@ const ImageWithFallback = forwardRef<HTMLImageElement, ImageWithFallbackProps>(
           setLoading(false)
         }
       }
-      if (!isExternal) verifyImage()
+      if (!isExternal) void verifyImage()
     }, [src, isExternal])
 
     if (loading) {

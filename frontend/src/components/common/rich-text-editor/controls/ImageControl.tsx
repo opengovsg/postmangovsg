@@ -129,7 +129,7 @@ const ImageForm = ({
             onChange={(e) => {
               setImgSrc(e.target.value)
               setPreviewState(ImagePreviewState.Loading)
-              debouncedUpdatePreviewState(e.target.value)
+              void debouncedUpdatePreviewState(e.target.value)
             }}
             onBlur={async (e) => {
               // If updatePreviewState is queued (due to debounce), cancel and immediately run validation

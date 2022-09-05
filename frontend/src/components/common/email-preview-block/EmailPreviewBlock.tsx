@@ -86,7 +86,7 @@ const EmailPreviewBlock: FC<EmailPreviewBlockProps> = ({
       setPreprocessed(formatted)
     }
 
-    if (themedBody) formatHtml(themedBody)
+    if (themedBody) void formatHtml(themedBody)
   }, [themedBody])
 
   if (!body && !subject && !preprocessed) {

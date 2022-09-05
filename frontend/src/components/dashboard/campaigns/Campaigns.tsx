@@ -232,6 +232,7 @@ const Campaigns = () => {
       modeFilter,
       nameFilter
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPage])
 
   useEffect(() => {
@@ -300,6 +301,7 @@ const Campaigns = () => {
 
   const debouncedChangeHandler = useMemo(
     () => debounce(fetchCampaigns, 300),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
