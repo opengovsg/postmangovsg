@@ -59,9 +59,23 @@ $border-radius: calc($button-height / 2);
 }
 
 %outline-btn {
-  @include button(transparent, $neutral-light, $primary);
+  @include button(transparent, rgba($primary-light, 0.5), $primary);
   border: 1px solid $primary;
   color: $primary;
+
+  &:active {
+    color: $white;
+
+    * {
+      color: $white;
+    }
+  }
+}
+
+%outline-secondary-btn {
+  @include button(transparent, rgba($primary-light, 0.5), $secondary);
+  border: 1px solid $secondary;
+  color: $secondary;
 
   &:active {
     color: $white;

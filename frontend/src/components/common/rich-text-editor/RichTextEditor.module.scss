@@ -112,31 +112,78 @@
     top: 35px;
     left: 5px;
     background: $white;
-    padding: $spacing-2;
-    border-radius: 5px;
+    padding: $spacing-3 $spacing-4;
+    border-radius: 4px;
     box-shadow: 0px 0px 20px rgba(193, 199, 205, 0.7);
+
+    .top {
+      @include flex-horizontal;
+      margin-bottom: $spacing-1;
+      justify-content: space-between;
+
+      .header {
+        @extend %body-2;
+        line-height: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0;
+
+        .infoIcon {
+          margin-left: 0.5rem;
+
+          :global {
+            i.bx {
+              line-height: 1.5rem;
+            }
+          }
+        }
+      }
+
+      .closeButton {
+        color: $grey-700;
+        font-size: 1.5rem;
+        height: 1.5rem;
+        width: 1.5rem;
+        margin-right: -$spacing-1;
+      }
+    }
+
+    $label-width: 3rem;
+    $item-width: 18rem;
 
     .item {
       @include flex-horizontal;
       margin-bottom: $spacing-1;
-      width: 300px;
+      width: $item-width;
 
       label {
         @extend %caption;
-        width: 50px;
+        width: $label-width;
       }
 
       .control {
         @include flex-horizontal;
         justify-content: space-between;
         flex: 1;
+
+        &.errorControl input {
+          border-color: $red;
+        }
       }
 
       input {
+        height: 1.75rem;
         width: 100%;
         padding: 0.25rem $spacing-1;
         border: solid 1px $neutral;
         border-radius: 0.25rem;
+        color: $secondary;
+        font-size: 0.75rem;
+        line-height: 1rem;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+        }
 
         &::placeholder {
           color: $neutral;
@@ -144,9 +191,93 @@
       }
     }
 
+    .controlErrorMsg {
+      margin-top: -0.375rem;
+      margin-bottom: 0.5rem;
+      margin-left: $label-width;
+      font-size: 0.65rem;
+      line-height: 1rem;
+      color: $red;
+    }
+
+    .loadingIcon {
+      text-align: center;
+      padding: 0.5rem;
+
+      :global {
+        i.bx {
+          font-size: 2rem;
+        }
+      }
+    }
+
+    .imagePreview {
+      text-align: center;
+      margin: $spacing-3 0;
+
+      img {
+        max-width: $item-width;
+        max-height: 154px;
+      }
+    }
+
+    .externalImagePreview {
+      text-align: center;
+      background: $neutral-light;
+      padding: $spacing-6;
+      margin: $spacing-3 0;
+
+      p {
+        @extend %caption;
+        margin: $spacing-1;
+
+        :global {
+          i.bx {
+            font-size: 32px;
+          }
+
+          i.bx-x {
+            font-size: 12px;
+            margin-left: -6px;
+            background: $neutral-light;
+          }
+        }
+      }
+    }
+
     .submit {
       @extend .item;
-      flex-direction: row-reverse;
+      margin-bottom: 0;
+      justify-content: flex-end;
+
+      .guideLink {
+        color: $secondary;
+        font-size: 0.65rem;
+        font-weight: 500;
+        line-height: 1rem;
+        margin-right: 0.75rem;
+
+        &:hover {
+          color: $primary;
+          text-decoration: underline;
+        }
+
+        :global {
+          i.bx {
+            font-size: 0.75rem;
+            line-height: 1rem;
+          }
+        }
+      }
+
+      button {
+        @extend %secondary-btn;
+        @extend %caption;
+        height: 1.75rem;
+        min-width: 0;
+        border-radius: 4px;
+        padding: 6px 8px;
+      }
     }
   }
 
@@ -185,6 +316,7 @@
 
   .tableSelector {
     $grid-size: $height-1;
+    padding: $spacing-3;
 
     table {
       border-top: solid 1px $neutral;
