@@ -24,7 +24,6 @@ import S3Client from '@core/services/s3-client.class'
 import { StatsService, CampaignService, ParseCsvService } from '.'
 
 const logger = loggerWithLabel(module)
-const MAX_PROCESSING_TIME = config.get('csvProcessingTimeout')
 
 const RETRY_CONFIG = {
   retries: 3,
@@ -169,24 +168,9 @@ const getCsvStatus = async (
   }
   // s3Object is nullable
   const { filename, temp_filename: tempFilename } = campaign.s3Object || {}
-  let { error } = campaign.s3Object || {}
+  const { error } = campaign.s3Object || {}
+  const isCsvProcessing = !!tempFilename && !error
 
-  let isCsvProcessing = !!tempFilename && !error
-
-  // Check if still stuck in processing but past timeout threshold
-  if (
-    isCsvProcessing &&
-    Date.now() - campaign.updatedAt > MAX_PROCESSING_TIME
-  ) {
-    isCsvProcessing = false
-    error = 'Csv processing timeout. Please contact us if this persists.'
-    logger.info({
-      message: error,
-      campaignId,
-      action: 'getCsvStatus',
-    })
-    await storeS3Error(campaignId, error)
-  }
   return {
     isCsvProcessing,
     filename,
