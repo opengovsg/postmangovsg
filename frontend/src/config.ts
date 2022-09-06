@@ -64,6 +64,7 @@ axios.defaults.timeout = 100000 // 100 sec
 export const LINKS = {
   guideUrl: t`link.guideUrl`,
   guideEmailPasswordProtectedUrl: t`link.guideEmailPasswordProtectedUrl`,
+  guideEmailImageUrl: t`link.guideEmailImageUrl`,
   guideSmsUrl: t`link.guideSmsUrl`,
   guideSmsAccountSidUrl: t`link.guideSmsAccountSidUrl`,
   guideSmsApiKeyUrl: t`link.guideSmsApiKeyUrl`,

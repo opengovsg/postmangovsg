@@ -30,7 +30,7 @@
     "typescript": "4.0.2"
   },
   "dependencies": {
-    "@google-cloud/kms": "2.11.1",
+    "@google-cloud/kms": "3.0.1",
     "@google-cloud/storage": "5.20.5",
     "@sentry/node": "5.30.0",
     "aws-sdk": "2.1153.0",

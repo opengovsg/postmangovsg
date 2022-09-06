@@ -89,4 +89,41 @@
   p {
     @extend %email-body;
   }
+
+  .imagePlaceholder {
+    @extend %body-2;
+    background: $neutral-light;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+    padding: $layout-3 $layout-5;
+
+    p {
+      font-family: $font-stack;
+      max-width: 100%;
+      margin: 0px;
+      text-align: center;
+      color: $grey-700;
+      word-wrap: break-word;
+    }
+
+    :global {
+      i.bx {
+        font-size: 32px;
+      }
+
+      i.bx-x {
+        font-size: 12px;
+        margin-left: -10px;
+        background: $neutral-light;
+      }
+    }
+
+    a {
+      @extend %body-2;
+      text-decoration: underline;
+    }
+  }
 }
