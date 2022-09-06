@@ -95,7 +95,6 @@ interface ConfigSchema {
     version: string
   }
   domains: string
-  csvProcessingTimeout: number
   sentryDsn: string
   unsubscribeHmac: {
     version: string
@@ -494,12 +493,6 @@ const config: Config<ConfigSchema> = convict({
     doc: 'Semi-colon separated list of domains that can sign in to the app.',
     default: '.gov.sg',
     env: 'DOMAIN_WHITELIST',
-  },
-  csvProcessingTimeout: {
-    doc: 'Max duration for csv processing before timeout. Prevent campaigns from being stuck in csv processing state if server dies.',
-    default: 10 * 60 * 1000, // 10 minutes
-    env: 'CSV_PROCESSING_TIMEOUT_IN_MS',
-    format: 'int',
   },
   sentryDsn: {
     doc: 'Sentry DSN for backend',
