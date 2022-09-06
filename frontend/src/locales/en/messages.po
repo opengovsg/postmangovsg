@@ -208,7 +208,7 @@ msgstr "https://go.gov.sg/postman-demo-guide"
 
 #: config.ts:68
 msgid "link.guideEmailImageUrl"
-msgstr "https://guide.postman.gov.sg/quick-start/email/format-bar#embedding-an-image-in-email"
+msgstr "https://go.gov.sg/embed-image-guide"
 
 #: config.ts:67
 msgid "link.guideEmailPasswordProtectedUrl"
