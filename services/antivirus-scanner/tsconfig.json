@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "build", "envloader.js"],
+  "files": [
+    "./src/index.ts"
+  ],
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "allowJs": true,
+    "sourceMap": true,
+    "outDir": "./build",
+    "rootDir": "./src",
+    "downlevelIteration": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
