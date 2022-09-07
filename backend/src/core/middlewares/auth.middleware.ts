@@ -123,6 +123,11 @@ export const InitAuthMiddleware = (authService: AuthService) => {
   ): Promise<Response | void> => {
     try {
       if (authService.checkCookie(req)) {
+        logger.info({
+          message: 'User authenticated by cookie',
+          action: 'isCookieOrApiKeyAuthenticated',
+          user: req.session?.user,
+        })
         return next()
       }
 
@@ -136,6 +141,7 @@ export const InitAuthMiddleware = (authService: AuthService) => {
         logger.info({
           message: 'User authenticated by API key',
           action: 'isCookieOrApiKeyAuthenticated',
+          user,
         })
         return next()
       }
