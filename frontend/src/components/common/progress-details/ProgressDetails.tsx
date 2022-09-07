@@ -230,18 +230,20 @@ const ProgressDetails = ({
           )}
         </tbody>
       </table>
-      <InfoBlock className={styles.notice}>
-        <strong>Remove unsubscribers from your recipient list</strong>, to avoid
-        campaigns being marked as spam and affecting the reputation of your
-        agency.{' '}
-        <a
-          href="https://go.gov.sg/postman-unsubscribe-guide"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Learn more
-        </a>
-      </InfoBlock>
+      {type === ChannelType.Email && (
+        <InfoBlock className={styles.notice}>
+          <strong>Remove unsubscribers from your recipient list</strong>, to
+          avoid campaigns being marked as spam and affecting the reputation of
+          your agency.{' '}
+          <a
+            href="https://go.gov.sg/postman-unsubscribe-guide"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Learn more
+          </a>
+        </InfoBlock>
+      )}
       {renderUpdateStats()}
     </div>
   )

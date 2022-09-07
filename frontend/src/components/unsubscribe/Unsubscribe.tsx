@@ -117,7 +117,7 @@ const Unsubscribe = () => {
             alt="Landing hero"
             className={styles.landingHero}
           />
-          <h2>Unsubscribed successfully.</h2>
+          <h2>Unsubscribe request successful</h2>
           <p>
             We will inform the sender about your wish to unsubscribe to this
             campaign. If you have unsubscribed from this campaign by mistake,

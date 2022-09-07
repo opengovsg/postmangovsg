@@ -40,8 +40,6 @@ export class EmailCampaign extends Campaign {
   agencyLogoURI: string
   themedBody: string
   progress: EmailProgress = EmailProgress.CreateTemplate
-  unsubscriber: string
-  unsubscribeReason: string
 
   constructor(input: any) {
     super(input)
@@ -57,8 +55,6 @@ export class EmailCampaign extends Campaign {
     this.hasCredential = input['has_credential']
     this.agencyName = input['user']?.domain?.agency?.name
     this.agencyLogoURI = input['user']?.domain?.agency?.logo_uri
-    this.unsubscriber = input['unsubscriber.recipient']
-    this.unsubscribeReason = input['unsubscriber.reason'] || ''
     this.setProgress()
   }
 
@@ -76,6 +72,15 @@ export class EmailCampaign extends Campaign {
 }
 
 export class EmailCampaignRecipient extends CampaignRecipient {
+  unsubscriber: string
+  unsubscribeReason: string
+
+  constructor(input: any) {
+    super(input)
+    this.unsubscriber = input['unsubscriber.recipient']
+    this.unsubscribeReason = input['unsubscriber.reason'] || ''
+  }
+
   formatErrorCode(errorCode: string): string {
     const blacklistMsg = t`errors.email.blacklist`
     let formatted = ''
