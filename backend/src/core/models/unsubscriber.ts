@@ -38,4 +38,7 @@ export class Unsubscriber extends Model<Unsubscriber> {
     type: DataType.STRING,
   })
   reason?: string
+
+  @Column(DataType.DATE)
+  deletedAt?: Date | null
 }

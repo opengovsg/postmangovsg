@@ -1,12 +1,5 @@
 name: Deploy worker to AWS Elastic Container Service
-on:
-  push:
-    branches:
-      - staging
-      - master
-
-# Making sure that the current deployment is completed before the next one
-concurrency: deploy-worker-${{ github.ref }}
+on: workflow_call
 env:
   # Update this common config
   DIRECTORY: worker

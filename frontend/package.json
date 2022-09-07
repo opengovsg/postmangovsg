@@ -100,8 +100,8 @@
     "msw": "0.39.2",
     "prettier": "2.6.2",
     "react-app-rewire-alias": "1.1.7",
-    "react-app-rewired": "2.1.11",
-    "react-scripts": "5.0.0",
+    "react-app-rewired": "2.2.1",
+    "react-scripts": "5.0.1",
     "sass": "1.49.7"
   },
   "eslintConfig": {

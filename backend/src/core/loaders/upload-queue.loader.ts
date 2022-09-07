@@ -10,6 +10,8 @@ import { UploadData } from '@core/interfaces'
 import { SmsTemplate } from '@sms/models'
 import { TelegramTemplate } from '@telegram/models'
 
+import trace from 'dd-trace'
+
 const logger = loggerWithLabel(module)
 enum QueueEvent {
   FAILED = 'job failed',
@@ -37,30 +39,34 @@ const initUploadQueue = async (): Promise<void> => {
 
   uploadQueue.process(
     config.get('upload.concurrency'),
-    async (job): Promise<void> => {
-      const { channelType, data, protect } = job.data
+    trace.wrap(
+      'upload-queue',
+      { tags: { resource_name: 'process' } },
+      async (job): Promise<void> => {
+        const { channelType, data, protect } = job.data
 
-      switch (channelType) {
-        case ChannelType.Email:
-          return protect
-            ? EmailTemplateService.processProtectedUpload(
-                data as UploadData<EmailTemplate>
-              )
-            : EmailTemplateService.processUpload(
-                data as UploadData<EmailTemplate>
-              )
+        switch (channelType) {
+          case ChannelType.Email:
+            return protect
+              ? EmailTemplateService.processProtectedUpload(
+                  data as UploadData<EmailTemplate>
+                )
+              : EmailTemplateService.processUpload(
+                  data as UploadData<EmailTemplate>
+                )
 
-        case ChannelType.SMS:
-          return SmsTemplateService.processUpload(
-            data as UploadData<SmsTemplate>
-          )
+          case ChannelType.SMS:
+            return SmsTemplateService.processUpload(
+              data as UploadData<SmsTemplate>
+            )
 
-        case ChannelType.Telegram:
-          return TelegramTemplateService.processUpload(
-            data as UploadData<TelegramTemplate>
-          )
+          case ChannelType.Telegram:
+            return TelegramTemplateService.processUpload(
+              data as UploadData<TelegramTemplate>
+            )
+        }
       }
-    }
+    )
   )
 
   uploadQueue.on(QueueEvent.FAILED, UploadService.handleFailedUpload)

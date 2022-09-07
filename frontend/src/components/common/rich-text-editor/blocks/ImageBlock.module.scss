@@ -1,0 +1,90 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+// Include both "div" and class ".popover" for selector priority
+div.popover {
+  padding: 8px 12px;
+  font-family: $font-stack;
+
+  .sizeButton {
+    @extend %outline-secondary-btn;
+    @extend %caption;
+    padding: 6px 8px;
+  }
+
+  .textButton {
+    @include button(transparent, rgba($primary-light, 0.5), $primary-light);
+    color: $secondary;
+    font-size: 0.9rem;
+    padding: 2px 4px;
+
+    :global {
+      i.bx {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1rem;
+        padding: 0 4px;
+        width: 1rem;
+      }
+    }
+  }
+
+  .sizeButton,
+  .textButton {
+    font-family: inherit;
+    height: 1.75rem;
+    min-width: 0;
+    border-radius: 4px;
+    margin-left: 12px;
+    font-weight: 400;
+
+    &:first-of-type {
+      margin-left: 0;
+    }
+  }
+}
+
+.loading {
+  color: $grey-700;
+  :global {
+    i.bx {
+      margin-right: $spacing-1;
+    }
+  }
+}
+
+.fallback {
+  @extend %body-2;
+  background: $neutral-light;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0px;
+  padding: $layout-3 $layout-5;
+
+  p {
+    max-width: 100%;
+    margin-bottom: 0px;
+    text-align: center;
+    color: $grey-700;
+    word-wrap: break-word;
+  }
+
+  :global {
+    i.bx {
+      font-size: 32px;
+    }
+
+    i.bx-x {
+      font-size: 12px;
+      margin-left: -6px;
+      background: $neutral-light;
+    }
+  }
+
+  a {
+    @extend %body-2;
+    text-decoration: underline;
+  }
+}
