@@ -125,17 +125,3 @@ export abstract class CampaignRecipient {
 
   protected abstract formatErrorCode(errorCode: string): string
 }
-
-export class EmailUnsubscriber {
-  recipient: string
-  reason: string
-  unsubscribedAt: string
-
-  constructor(input: any) {
-    this.recipient = input['recipient']
-    this.reason = input['reason']
-    this.unsubscribedAt = moment(input['createdAt'])
-      .format('LLL')
-      .replace(',', '')
-  }
-}

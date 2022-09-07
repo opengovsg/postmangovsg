@@ -63,23 +63,8 @@ const getDeliveredRecipients = async (
   }
 }
 
-const getUnsubscribers = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  const { campaignId } = req.params
-  try {
-    const unsubscribers = await EmailStatsService.getUnsubscribers(+campaignId)
-    return res.json(unsubscribers)
-  } catch (e) {
-    next(e)
-  }
-}
-
 export const EmailStatsMiddleware = {
   getStats,
   getDeliveredRecipients,
   updateAndGetStats,
-  getUnsubscribers,
 }

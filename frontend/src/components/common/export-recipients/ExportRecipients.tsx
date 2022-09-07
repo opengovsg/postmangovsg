@@ -93,14 +93,23 @@ const ExportRecipients = ({
 
       // Handle the edge case where the display wait time is reached but none of the status are updated yet in the message table.
       if (list.length > 0) {
-        const headers = Object.keys(list[0])
+        const keys = Object.keys(list[0]).filter((k) => k !== 'unsubscriber') // this field is only used to detect whether the person has unsub-ed
+        const headers = keys
           .map((key) => `"${key}"`)
           .join(',')
           .concat('\n')
 
         const recipients = list.map((row) => {
-          const values = Object.values(row)
-          return `${values.map((value) => `"${value}"`).join(',')}\n`
+          return `${keys
+            .map((k) => {
+              const rowAsAny = row as any
+              if (k === 'status' && rowAsAny['unsubscriber']) {
+                return `"UNSUBSCRIBED"`
+              }
+              const value = rowAsAny[k] as string
+              return `"${value}"`
+            })
+            .join(',')}\n`
         })
 
         content = content.concat(headers, recipients)

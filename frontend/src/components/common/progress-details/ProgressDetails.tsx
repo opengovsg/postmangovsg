@@ -2,7 +2,6 @@ import { i18n } from '@lingui/core'
 
 import cx from 'classnames'
 
-import download from 'downloadjs'
 import { useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import Moment from 'react-moment'
@@ -18,7 +17,6 @@ import {
 } from 'components/common'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-import { exportEmailUnsubscribers } from 'services/campaign.service'
 
 const ProgressDetails = ({
   stats,
@@ -119,24 +117,6 @@ const ProgressDetails = ({
     }
   }
 
-  async function exportUnsubscribers() {
-    const list = await exportEmailUnsubscribers(id)
-
-    const headers = ['Recipient', 'Reason', 'Unsubscribed At']
-    const rows = list.map((r) => [r.recipient, r.reason, r.unsubscribedAt])
-    const content = [headers, ...rows].map(toCsvRow).join('\n')
-    const exportedAt = new Date()
-
-    download(
-      new Blob([content]),
-      `${name}_unsubscribers_${exportedAt.toLocaleDateString()}_${exportedAt.toLocaleTimeString()}.csv`,
-      'text/csv'
-    )
-  }
-  function toCsvRow(data: string[]) {
-    return data.map((d) => `"${d}"`).join(',')
-  }
-
   return (
     <div className={styles.progress}>
       <table>
@@ -183,7 +163,7 @@ const ProgressDetails = ({
         />
       ) : (
         <strong>
-          Delivery report has expired and is no longer available for download.\
+          Delivery report has expired and is no longer available for download.
         </strong>
       )}
 
@@ -244,31 +224,16 @@ const ProgressDetails = ({
                 ></i>
                 Unsubscribers
               </td>
-              {redacted ? (
-                <td className={cx('md', styles.grayText)}>Report redacted</td>
-              ) : (
-                <td
-                  className={'md'}
-                  style={{ cursor: 'pointer' }}
-                  onClick={exportUnsubscribers}
-                >
-                  <span className={cx(styles.linkLike, styles.textUnderline)}>
-                    Unsubscribe list
-                  </span>
-                  <i
-                    className={cx(styles.icon, styles.blue, 'bx bx-download')}
-                    style={{ marginLeft: '5px' }}
-                  ></i>
-                </td>
-              )}
+              <td className={'md'}>Recipient indicated to unsubscribe</td>
               <td className={'sm'}>{unsubscribed}</td>
             </tr>
           )}
         </tbody>
       </table>
       <InfoBlock className={styles.notice}>
-        We recommend that you remove unsubscribers from your campaign to avoid
-        being marked as spam.{' '}
+        <strong>Remove unsubscribers from your recipient list</strong>, to avoid
+        campaigns being marked as spam and affecting the reputation of your
+        agency.{' '}
         <a
           href="https://go.gov.sg/postman-unsubscribe-guide"
           target="_blank"

@@ -14,7 +14,6 @@ import {
   EmailCampaignRecipient,
   SMSCampaignRecipient,
   TelegramCampaignRecipient,
-  EmailUnsubscriber,
 } from 'classes'
 
 import type { CampaignRecipient } from 'classes'
@@ -201,16 +200,6 @@ export async function exportCampaignStats(
 
     return campaignRecipients
   })
-}
-
-export async function exportEmailUnsubscribers(
-  campaignId: number
-): Promise<EmailUnsubscriber[]> {
-  return axios
-    .get(`/campaign/${campaignId}/email/export-unsubscribe`)
-    .then((response) => {
-      return response.data.map((u: any) => new EmailUnsubscriber(u))
-    })
 }
 
 export async function deleteCampaignById(campaignId: number): Promise<void> {
