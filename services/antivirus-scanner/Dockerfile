@@ -41,4 +41,4 @@ EXPOSE 8080
 RUN echo $(ls)
 
 # Starts the ClamAV daemon, then starts Express Node server
-CMD ["bash", "src/run.sh"]
+CMD ["bash", "./run.sh"]
