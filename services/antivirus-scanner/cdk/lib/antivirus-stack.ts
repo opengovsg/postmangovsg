@@ -1,35 +1,37 @@
 import { Duration, Stack, StackProps } from 'aws-cdk-lib'
-import { EcsApplication } from 'aws-cdk-lib/aws-codedeploy'
-import {
-  ISubnet,
-  Peer,
-  Port,
-  SecurityGroup,
-  Subnet,
-  Vpc,
-} from 'aws-cdk-lib/aws-ec2'
-import {
-  Cluster,
-  ContainerImage,
-  CpuArchitecture,
-  DeploymentControllerType,
-  FargatePlatformVersion,
-  FargateTaskDefinition,
-  // LogDriver,
-  OperatingSystemFamily,
-} from 'aws-cdk-lib/aws-ecs'
-import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns'
-import {
-  ApplicationLoadBalancer,
-  ApplicationProtocol,
-} from 'aws-cdk-lib/aws-elasticloadbalancingv2'
-import {
-  PolicyDocument,
-  PolicyStatement,
-  Role,
-  ServicePrincipal,
-} from 'aws-cdk-lib/aws-iam'
-import { Construct } from 'constructs'
+ import { EcsApplication } from 'aws-cdk-lib/aws-codedeploy'
+ import {
+   ISubnet,
+   Peer,
+   Port,
+   SecurityGroup,
+   Subnet,
+   Vpc,
+ } from 'aws-cdk-lib/aws-ec2'
+ import {
+   Cluster,
+   ContainerImage,
+   CpuArchitecture,
+   DeploymentControllerType,
+   FargatePlatformVersion,
+   FargateTaskDefinition,
+   // LogDriver,
+   OperatingSystemFamily,
+ } from 'aws-cdk-lib/aws-ecs'
+ import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns'
+ import {
+   ApplicationLoadBalancer,
+   ApplicationProtocol,
+   ApplicationTargetGroup,
+   TargetType,
+ } from 'aws-cdk-lib/aws-elasticloadbalancingv2'
+ import {
+   PolicyDocument,
+   PolicyStatement,
+   Role,
+   ServicePrincipal,
+ } from 'aws-cdk-lib/aws-iam'
+ import { Construct } from 'constructs'
 import * as dotenv from 'dotenv' 
 dotenv.config()
 
@@ -156,18 +158,18 @@ export default class AntivirusStack extends Stack {
       },
     })
 
-    // const blueGreenTargetGroup = new ApplicationTargetGroup(this, 'tg2', {
-    //   targetType: TargetType.IP,
-    //   /**
-    //   * This port setting is meaningless when used in conjunction with ECS.
-    //   * This is great because our initial app is a hello-world on port 80 but
-    //   * our main app is on 8080.
-    //   *
-    //   * Https://stackoverflow.com/a/42823808.
-    //   */
-    //   port: APPLICATION_PORT,
-    //   vpc,
-    // })
+    const blueGreenTargetGroup = new ApplicationTargetGroup(this, 'tg2', {
+      targetType: TargetType.IP,
+      /**
+      * This port setting is meaningless when used in conjunction with ECS.
+      * This is great because our initial app is a hello-world on port 80 but
+      * our main app is on 8080.
+      *
+      * Https://stackoverflow.com/a/42823808.
+      */
+      port: APPLICATION_PORT,
+      vpc,
+    })
 
     const service = new ApplicationLoadBalancedFargateService(this, 'Service', {
       /**
