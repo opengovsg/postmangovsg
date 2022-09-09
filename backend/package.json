@@ -43,6 +43,7 @@
     "express-session": "1.17.0",
     "express-winston": "4.2.0",
     "file-type": "^16.5.4",
+    "form-data": "^4.0.0",
     "helmet": "3.23.3",
     "jsonwebtoken": "8.5.1",
     "libphonenumber-js": "1.10.6",
