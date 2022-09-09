@@ -5,6 +5,7 @@ import { TemplateError } from '@shared/templating'
 import { isBlacklisted } from '@email/utils/query'
 import { InvalidRecipientError } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
+import { UploadedFile } from 'express-fileupload'
 
 const logger = loggerWithLabel(module)
 
@@ -28,7 +29,7 @@ async function sendMessage({
   from: string
   recipient: string
   replyTo?: string
-  attachments?: { data: Buffer; name: string }[]
+  attachments?: UploadedFile[]
 }): Promise<void> {
   const sanitizedSubject =
     EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
