@@ -105,6 +105,15 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       responseWhitelist: ['body', 'statusCode'],
       headerBlacklist: ['authorization'],
       metaField: null, // flatten this log to root instead of nesting under `meta`
+      // fix for files to prevent entire file buffer from logging out in logs
+      requestFilter: function (req, propName) {
+        return propName == 'attachments'
+          ? req[propName].map((attachment: any) => ({
+              ...attachment,
+              data: '[truncated]',
+            }))
+          : req[propName]
+      },
     })
   )
 
