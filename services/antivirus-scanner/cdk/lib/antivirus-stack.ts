@@ -1,37 +1,37 @@
 import { Duration, Stack, StackProps } from 'aws-cdk-lib'
- import { EcsApplication } from 'aws-cdk-lib/aws-codedeploy'
- import {
-   ISubnet,
-   Peer,
-   Port,
-   SecurityGroup,
-   Subnet,
-   Vpc,
- } from 'aws-cdk-lib/aws-ec2'
- import {
-   Cluster,
-   ContainerImage,
-   CpuArchitecture,
-   DeploymentControllerType,
-   FargatePlatformVersion,
-   FargateTaskDefinition,
-   // LogDriver,
-   OperatingSystemFamily,
- } from 'aws-cdk-lib/aws-ecs'
- import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns'
- import {
-   ApplicationLoadBalancer,
-   ApplicationProtocol,
-   ApplicationTargetGroup,
-   TargetType,
- } from 'aws-cdk-lib/aws-elasticloadbalancingv2'
- import {
-   PolicyDocument,
-   PolicyStatement,
-   Role,
-   ServicePrincipal,
- } from 'aws-cdk-lib/aws-iam'
- import { Construct } from 'constructs'
+import { EcsApplication } from 'aws-cdk-lib/aws-codedeploy'
+import {
+  ISubnet,
+  Peer,
+  Port,
+  SecurityGroup,
+  Subnet,
+  Vpc,
+} from 'aws-cdk-lib/aws-ec2'
+import {
+  Cluster,
+  ContainerImage,
+  CpuArchitecture,
+  DeploymentControllerType,
+  FargatePlatformVersion,
+  FargateTaskDefinition,
+  // LogDriver,
+  OperatingSystemFamily,
+} from 'aws-cdk-lib/aws-ecs'
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns'
+import {
+  ApplicationLoadBalancer,
+  ApplicationProtocol,
+  ApplicationTargetGroup,
+  TargetType,
+} from 'aws-cdk-lib/aws-elasticloadbalancingv2'
+import {
+  PolicyDocument,
+  PolicyStatement,
+  Role,
+  ServicePrincipal,
+} from 'aws-cdk-lib/aws-iam'
+import { Construct } from 'constructs'
 import * as dotenv from 'dotenv' 
 dotenv.config()
 
