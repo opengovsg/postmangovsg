@@ -145,7 +145,7 @@ interface ConfigSchema {
     checkStalledInterval: number
   }
   file: {
-    cloudmersiveKey: string
+    scannerEndpoint: string
     maxAttachmentSize: number
     maxAttachmentNum: number
   }
@@ -666,10 +666,10 @@ const config: Config<ConfigSchema> = convict({
     },
   },
   file: {
-    cloudmersiveKey: {
-      doc: 'API key for Cloudmersive file scanning service',
+    scannerEndpoint: {
+      doc: 'File scanning server endpoint',
       default: '',
-      env: 'FILE_CLOUDMERSIVE_KEY',
+      env: 'FILE_SCANNING_ENDPOINT',
       format: 'required-string',
       sensitive: true,
     },
