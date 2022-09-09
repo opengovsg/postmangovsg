@@ -2,6 +2,7 @@ import { logger } from './logger'
 import { Request, Response } from 'express'
 import { exec } from 'child_process'
 import util from 'util'
+import fs from 'fs'
 
 const execPromise = util.promisify(exec);
 
@@ -15,6 +16,12 @@ const scanFromFilePath = async (filePath: string) => {
   } catch (error: any) {
     if (error.code === 1) {
       console.log('file has virus')
+      
+      // delete file
+      fs.unlink(filePath, function(err) {
+        if(err) console.log(err)
+        else console.log('file deleted')
+      })
       return { isMalicious: true }
     } 
 
