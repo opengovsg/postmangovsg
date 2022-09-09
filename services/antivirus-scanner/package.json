@@ -8,6 +8,7 @@
     "tsc": "tsc",
     "lint-no-fix": "tsc --noEmit && eslint --ext .js,.ts --cache . --ignore-pattern 'cdk/*'",
     "lint": "npm run lint-no-fix -- --fix",
+    "precommit": "lint-staged",
     "dev": "npm run env && docker-compose -f docker-compose.dev.yml up --build",
     "start": "node build/index"
   },
@@ -29,6 +30,7 @@
     "@types/node": "^18.7.13",
     "@types/watch": "^1.0.3",
     "dotenv-cli": "^6.0.0",
+    "lint-staged": "^13.0.3",
     "typescript": "^4.7.4"
   }
 }
