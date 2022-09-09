@@ -11,6 +11,7 @@ import {
   InvalidRecipientError,
   MaliciousFileError,
   UnsupportedFileTypeError,
+  UnableToScanFileError,
 } from '@core/errors'
 
 export interface EmailTransactionalMiddleware {
@@ -64,6 +65,7 @@ export const InitEmailTransactionalMiddleware = (
         InvalidRecipientError,
         MaliciousFileError,
         UnsupportedFileTypeError,
+        UnableToScanFileError,
       ]
       if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
         res.status(400).json({ message: (err as Error).message })

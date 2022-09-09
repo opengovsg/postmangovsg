@@ -1,8 +1,12 @@
-import CloudmersiveClient from '@core/services/cloudmersive-client.class'
+import FileScannerClient from '@core/services/filescanner-client.class'
 import config from '@core/config'
 import _ from 'lodash'
 import { MailAttachment } from '@shared/clients/mail-client.class'
-import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
+import {
+  MaliciousFileError,
+  UnsupportedFileTypeError,
+  UnableToScanFileError,
+} from '@core/errors'
 import { FileExtensionService } from '@core/services'
 
 const checkExtensions = async (
@@ -17,11 +21,9 @@ const checkExtensions = async (
 const virusScan = async (
   files: { data: Buffer; name: string }[]
 ): Promise<boolean> => {
-  const client = new CloudmersiveClient(config.get('file.cloudmersiveKey'))
+  const client = new FileScannerClient(config.get('file.scannerEndpoint'))
 
-  const isSafe = await Promise.all(
-    files.map((file) => client.scanFile(file.data))
-  )
+  const isSafe = await Promise.all(files.map((file) => client.scanFile(file)))
   return _.every(isSafe)
 }
 
@@ -41,7 +43,12 @@ const sanitizeFiles = async (
   if (!isAcceptedType) {
     throw new UnsupportedFileTypeError()
   }
-  const isSafe = await virusScan(files)
+  let isSafe = false
+  try {
+    isSafe = await virusScan(files)
+  } catch (err) {
+    throw new UnableToScanFileError()
+  }
   if (!isSafe) {
     throw new MaliciousFileError()
   }

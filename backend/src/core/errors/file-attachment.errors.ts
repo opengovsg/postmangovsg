@@ -17,3 +17,13 @@ export class UnsupportedFileTypeError extends Error {
     Error.captureStackTrace(this)
   }
 }
+
+export class UnableToScanFileError extends Error {
+  constructor(
+    message = 'Error: We were unable to scan your messages. Please try again later.'
+  ) {
+    super(message)
+    Object.setPrototypeOf(this, new.target.prototype) // restore prototype chain
+    Error.captureStackTrace(this)
+  }
+}
