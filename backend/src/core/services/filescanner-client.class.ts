@@ -42,7 +42,7 @@ export default class FileScannerClient {
     data,
     name,
   }) => {
-    logger.info({ message: `scanning ${name}` })
+    logger.info({ message: `scanning ${name} via ${this.endpoint}` })
     const form = new FormData()
     form.append('file', data)
     const { data: virusResult } = await axios.post<FileScanResult>(
