@@ -50,7 +50,7 @@ const Landing = () => {
         setSentMessages(stats.toLocaleString())
       }
     }
-    getSentMessages()
+    void getSentMessages()
   }, [isAuthenticated])
 
   useEffect(() => {

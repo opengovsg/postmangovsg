@@ -1,0 +1,36 @@
+# This action is to orchestrate the non-serverless stuffs deployment
+# to make sure cypress e2e test is run post-deployments.
+# The reason we need to do this hack is because there's currently no way
+# to use `workflow_run` trigger with requirement being all depdency workflows'
+# complete. More here: https://github.com/community/community/discussions/16059
+# Side note: we need to follow .github/workflows convention https://docs.github.com/en/actions/using-workflows/reusing-workflows
+name: Deploy and E2E test non-serverless stuffs
+on:
+  push:
+    branches:
+      - staging
+      - master
+
+concurrency: deploy-non-serverless-${{ github.ref }}
+
+jobs:
+  deploy-backend:
+    name: Deploy backend to AWS Elastic Beanstalk
+    uses: ./.github/workflows/deploy-eb.yml
+    secrets: inherit
+  deploy-worker:
+    name: Deploy worker to AWS Elastic Container Service
+    uses: ./.github/workflows/deploy-worker.yml
+    secrets: inherit
+  deploy-frontend:
+    name: Deploy frontend to AWS Amplify
+    uses: ./.github/workflows/deploy-frontend.yml
+    secrets: inherit
+  e2e-test:
+    needs:
+      - deploy-backend
+      - deploy-frontend
+      - deploy-worker
+    name: Cypress Test
+    uses: ./.github/workflows/cypress.yml
+    secrets: inherit

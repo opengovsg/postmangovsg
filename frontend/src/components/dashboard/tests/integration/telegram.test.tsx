@@ -5,7 +5,6 @@ import { mockApis, renderDashboard, CAMPAIGN_NAME, MESSAGE_TEXT } from '../util'
 import {
   server,
   screen,
-  waitFor,
   TELEGRAM_CREDENTIAL,
   VALID_CSV_FILENAME,
   VALID_MOBILE_CSV_FILE,
@@ -221,15 +220,6 @@ test('successfully creates and sends a new Telegram campaign', async () => {
       name: /the delivery report is being generated/i,
     })
   ).toBeInTheDocument()
-
-  // Click the refresh stats button
-  const refreshStatsButton = screen.getByRole('button', {
-    name: /refresh stats/i,
-  })
-
-  await userEvent.click(refreshStatsButton, { delay: null })
-  expect(refreshStatsButton).toBeDisabled()
-  await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 
   // Teardown
   jest.runOnlyPendingTimers()

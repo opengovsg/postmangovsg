@@ -4,6 +4,12 @@ export enum ChannelType {
   Telegram = 'TELEGRAM',
 }
 
+export enum Status {
+  Draft = 'Draft',
+  Sending = 'Sending',
+  Sent = 'Sent',
+}
+
 export enum JobStatus {
   Ready = 'READY',
   Enqueued = 'ENQUEUED',
@@ -25,6 +31,16 @@ export enum DefaultCredentialName {
   Email = 'EMAIL_DEFAULT',
   SMS = 'Postman_SMS_Demo',
   Telegram = 'Postman_Telegram_Demo',
+}
+
+export enum SortField {
+  Created = 'created_at',
+  Sent = 'sent_at',
+}
+
+export enum Ordering {
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
 /**

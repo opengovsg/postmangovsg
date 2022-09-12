@@ -13,10 +13,25 @@ export enum Status {
   Halted = 'Halted',
 }
 
+export enum StatusFilter {
+  Draft = 'Draft',
+  Sent = 'Sent',
+}
+
+export enum SortField {
+  Created = 'created_at',
+  Sent = 'sent_at',
+}
+
+export enum Ordering {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
 export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
   [ChannelType.Email]: 'bx-envelope-open',
-  [ChannelType.Telegram]: 'bxl-telegram',
+  [ChannelType.Telegram]: 'bx-paper-plane',
 }
 
 export class Campaign {
@@ -53,6 +68,7 @@ export class Campaign {
   getStatus(jobs: Array<{ status: string }>): Status {
     if (jobs) {
       const jobSet = new Set(jobs.map((x) => x.status))
+      // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 2/2)
       if (
         ['READY', 'ENQUEUED', 'SENDING', 'SENT', 'STOPPED'].some((s) =>
           jobSet.has(s)
@@ -78,6 +94,7 @@ export class CampaignStats {
   halted?: boolean
   waitTime?: number
   redacted?: boolean
+  unsubscribed?: number
 
   constructor(input: any) {
     this.error = +input['error']
@@ -89,6 +106,7 @@ export class CampaignStats {
     this.updatedAt = input['updated_at']
     this.halted = input['halted']
     this.waitTime = input['wait_time']
+    this.unsubscribed = input['unsubscribed']
   }
 }
 

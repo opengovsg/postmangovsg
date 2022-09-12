@@ -10,6 +10,7 @@ import {
   updatenumberCommandHandler,
 } from '@telegram/utils/callback/handlers'
 import { PostmanTelegramError } from '@telegram/utils/callback/PostmanTelegramError'
+import { Op } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 
@@ -17,7 +18,14 @@ const logger = loggerWithLabel(module)
  * Verifies that the given bot id is registered
  */
 const verifyBotIdRegistered = async (botId: string): Promise<boolean> => {
-  const botIdExists = await Credential.findOne({ where: { name: botId } })
+  const botIdExists = await Credential.findOne({
+    where: {
+      // before this change https://github.com/opengovsg/postmangovsg/pull/1414
+      // we used to save only the secret by botId, hence there must be an or condition
+      // here to support the legacy credentials as well
+      [Op.or]: [{ name: botId }, { name: `${process.env.NODE_ENV}-${botId}` }],
+    },
+  })
   return !!botIdExists
 }
 

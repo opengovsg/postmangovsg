@@ -3,7 +3,9 @@
 name: Cypress Test
 
 # Controls when the workflow will run
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  workflow_call:
 
 jobs:
   cypress-run:
@@ -26,7 +28,7 @@ jobs:
           CYPRESS_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg/' || 'https://staging.postman.gov.sg/' }}
           CYPRESS_TWILIO_ACC_SID: ${{ secrets.CYPRESS_TWILIO_ACC_SID }}
           CYPRESS_TWILIO_AUTH_TOKEN: ${{ secrets.CYPRESS_TWILIO_AUTH_TOKEN }}
-          CYPRESS_EMAIL: "internal-use@open.gov.sg"
+          CYPRESS_EMAIL: "internal-testing@open.gov.sg"
           CYPRESS_SMS_NUMBER: "+6582410222"
         uses: cypress-io/github-action@v4
         with:

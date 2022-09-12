@@ -1,5 +1,13 @@
-import { fn, cast, Transaction, Op, literal, FindOptions } from 'sequelize'
-import { Statistic, JobQueue, Campaign } from '@core/models'
+import {
+  fn,
+  cast,
+  Transaction,
+  Op,
+  literal,
+  FindOptions,
+  Sequelize,
+} from 'sequelize'
+import { Statistic, JobQueue, Campaign, Unsubscriber } from '@core/models'
 import {
   CampaignStats,
   CampaignStatsCount,
@@ -8,6 +16,7 @@ import {
 import { MessageStatus, JobStatus } from '@core/constants'
 import { Writable } from 'stream'
 import { waitForMs } from '@shared/utils/wait-for-ms'
+import { EmailMessage } from '@email/models'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -239,6 +248,18 @@ const getDeliveredRecipients = async (
         },
       },
       attributes: ['recipient', 'status', 'error_code', 'updated_at'],
+      include:
+        logsTable === EmailMessage
+          ? [
+              {
+                model: Unsubscriber,
+                on: Sequelize.literal(
+                  '"EmailMessage".campaign_id = "unsubscriber".campaign_id AND "EmailMessage".recipient = "unsubscriber".recipient'
+                ),
+                attributes: ['recipient', 'reason'],
+              },
+            ]
+          : undefined,
       useMaster: false,
       limit,
       offset,

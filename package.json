@@ -32,6 +32,7 @@
     "postinstall:frontend": "cd frontend && npm install --legacy-peer-deps",
     "postinstall:backend": "cd backend && npm install",
     "postinstall:worker": "cd worker && npm install",
+    "grafana": "cd backend && npm run grafana",
     "precommit": "npm run precommit:frontend && npm run precommit:backend && npm run precommit:worker && npm run precommit:shared && npm run precommit:root",
     "precommit:frontend": "cd frontend && npm run precommit",
     "precommit:backend": "cd backend && npm run precommit",
@@ -59,7 +60,7 @@
   "homepage": "https://github.com/datagovsg/postmangovsg#readme",
   "devDependencies": {
     "concurrently": "^7.2.1",
-    "cypress": "^10.0.3",
+    "cypress": "^10.2.0",
     "cypress-file-upload": "^5.0.8",
     "dotenv": "^16.0.1",
     "gmail-tester": "^1.3.5",

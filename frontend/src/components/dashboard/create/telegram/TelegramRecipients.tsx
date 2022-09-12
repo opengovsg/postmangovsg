@@ -96,7 +96,7 @@ const TelegramRecipients = ({
 
     // Retrieve status regardless of isCsvProcessing to retrieve csvError if any
     // If completed, it will only poll once
-    pollStatus()
+    void pollStatus()
 
     return () => clearTimeout(timeoutId)
   }, [campaignId, isCsvProcessing, isMounted])
@@ -137,7 +137,7 @@ const TelegramRecipients = ({
   function clearCsvStatus() {
     if (campaignId) {
       setCsvInfo((info) => ({ ...info, csvError: undefined }))
-      deleteCsvStatus(+campaignId)
+      void deleteCsvStatus(+campaignId)
     }
   }
 

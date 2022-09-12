@@ -306,6 +306,18 @@ See [configure/frontend](docs/configure/frontend.md) for details
 
 See [configure/worker](docs/configure/worker.md) for details
 
+### Product Dashboards on Grafana
+
+We currently have created two Grafana product metrics dashboards hosted on an EC2 instance. You can access them by connecting to the OGP VPN and following the URLs below. In order to SSH into the EC2 instance:
+
+1. Update the following env variables on `/backend/.env`:`GRAFANA_KEY_FOLDER` (get the `.pem` file from 1Password and store it in your `~/.ssh/` folder) and `GRAFANA_EC2_HOST_URL` (this should be `ec2-user@<EC2_instance_Public_IPv4_DNS>`, which you can find from 1Password too).
+2. Connect to the OGP VPN first, then run `npm run grafana`.
+
+The URLs of the Grafana dashboards are:
+
+- [PostmanSG Executive Dashboard](http://13.213.17.36:3000/d/ghhtH9W4z/postmansg-executive-dashboard?orgId=1&from=1588291200000&to=1661990400000)
+- [PostmanSG Internal Dashboard](http://13.213.17.36:3000/d/a0GW6CmVk/postmansg-product-metrics-dashboard-internal?orgId=1)
+
 ## Contributions
 
 The production branch is `master`, and the development branch is `develop`.

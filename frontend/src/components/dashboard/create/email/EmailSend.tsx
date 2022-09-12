@@ -62,11 +62,11 @@ const EmailSend = ({
 
   useEffect(() => {
     if (!campaignId) return
-    loadPreview(campaignId)
+    void loadPreview(campaignId)
   }, [campaignId])
 
   const onModalConfirm = () => {
-    confirmSendCampaign({
+    void confirmSendCampaign({
       campaignId: +campaignId,
       sendRate: 0,
       channelType: ChannelType.Email,

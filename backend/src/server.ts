@@ -27,6 +27,6 @@ const start = async (): Promise<void> => {
 
 // Use throng to create a cluster and make full use of all the cores in underlying
 // machine. The default counts is os.cpus().length
-throng({
+void throng({
   start,
 })
