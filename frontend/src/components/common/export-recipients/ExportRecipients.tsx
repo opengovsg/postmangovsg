@@ -8,7 +8,7 @@ import type { MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from './ExportRecipients.module.scss'
 
-import type { ChannelType } from 'classes/Campaign'
+import { ChannelType } from 'classes/Campaign'
 import { Status } from 'classes/Campaign'
 import { ActionButton } from 'components/common'
 import { exportCampaignStats } from 'services/campaign.service'
@@ -93,7 +93,16 @@ const ExportRecipients = ({
 
       // Handle the edge case where the display wait time is reached but none of the status are updated yet in the message table.
       if (list.length > 0) {
-        const keys = Object.keys(list[0]).filter((k) => k !== 'unsubscriber') // this field is only used to detect whether the person has unsub-ed
+        let keys = Object.keys(list[0]).filter((k) => k !== 'unsubscriber') // this field is only used to detect whether the person has unsub-ed
+        if (campaignType === ChannelType.Email) {
+          keys = [
+            'recipient',
+            'status',
+            'unsubscribeReason',
+            'errorCode',
+            'updatedAt',
+          ]
+        }
         const headers = keys
           .map((key) => `"${key}"`)
           .join(',')
