@@ -1,5 +1,3 @@
-import { Trans } from '@lingui/macro'
-
 import cx from 'classnames'
 
 import download from 'downloadjs'
@@ -10,9 +8,9 @@ import type { MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from './ExportRecipients.module.scss'
 
-import type { ChannelType } from 'classes/Campaign'
+import { ChannelType } from 'classes/Campaign'
 import { Status } from 'classes/Campaign'
-import { ActionButton, InfoBlock } from 'components/common'
+import { ActionButton } from 'components/common'
 import { exportCampaignStats } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
@@ -95,14 +93,32 @@ const ExportRecipients = ({
 
       // Handle the edge case where the display wait time is reached but none of the status are updated yet in the message table.
       if (list.length > 0) {
-        const headers = Object.keys(list[0])
+        let keys = Object.keys(list[0]).filter((k) => k !== 'unsubscriber') // this field is only used to detect whether the person has unsub-ed
+        if (campaignType === ChannelType.Email) {
+          keys = [
+            'recipient',
+            'status',
+            'unsubscribeReason',
+            'errorCode',
+            'updatedAt',
+          ]
+        }
+        const headers = keys
           .map((key) => `"${key}"`)
           .join(',')
           .concat('\n')
 
         const recipients = list.map((row) => {
-          const values = Object.values(row)
-          return `${values.map((value) => `"${value}"`).join(',')}\n`
+          return `${keys
+            .map((k) => {
+              const rowAsAny = row as any
+              if (k === 'status' && rowAsAny['unsubscriber']) {
+                return `"UNSUBSCRIBED"`
+              }
+              const value = rowAsAny[k] as string
+              return `"${value}"`
+            })
+            .join(',')}\n`
         })
 
         content = content.concat(headers, recipients)
@@ -203,11 +219,9 @@ const ExportRecipients = ({
     <>
       {isButton ? (
         <div className={styles.actionButton}>
-          <InfoBlock className={styles.notice}>
-            <Trans>
-              Delivery report will expire 14 days after sending is completed.
-            </Trans>
-          </InfoBlock>
+          <strong>
+            Delivery report will expire 30 days after sending is completed.
+          </strong>
           <ActionButton
             disabled={exportStatus !== CampaignExportStatus.Ready}
             className={cx(styles.exportButton, {

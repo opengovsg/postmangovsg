@@ -72,6 +72,15 @@ export class EmailCampaign extends Campaign {
 }
 
 export class EmailCampaignRecipient extends CampaignRecipient {
+  unsubscriber: string
+  unsubscribeReason: string
+
+  constructor(input: any) {
+    super(input)
+    this.unsubscriber = input['unsubscriber.recipient']
+    this.unsubscribeReason = input['unsubscriber.reason'] || ''
+  }
+
   formatErrorCode(errorCode: string): string {
     const blacklistMsg = t`errors.email.blacklist`
     let formatted = ''

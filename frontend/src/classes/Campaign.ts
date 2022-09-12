@@ -94,6 +94,7 @@ export class CampaignStats {
   halted?: boolean
   waitTime?: number
   redacted?: boolean
+  unsubscribed?: number
 
   constructor(input: any) {
     this.error = +input['error']
@@ -105,6 +106,7 @@ export class CampaignStats {
     this.updatedAt = input['updated_at']
     this.halted = input['halted']
     this.waitTime = input['wait_time']
+    this.unsubscribed = input['unsubscribed']
   }
 }
 

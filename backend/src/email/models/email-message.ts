@@ -8,6 +8,7 @@ import {
 } from 'sequelize-typescript'
 import { Campaign } from '@core/models/campaign'
 import { MessageStatus } from '@core/constants'
+import { Unsubscriber } from '@core/models'
 
 @Table({ tableName: 'email_messages', underscored: true, timestamps: true })
 export class EmailMessage extends Model<EmailMessage> {
@@ -19,14 +20,19 @@ export class EmailMessage extends Model<EmailMessage> {
   id!: number
 
   @ForeignKey(() => Campaign)
+  @ForeignKey(() => Unsubscriber)
   @Column(DataType.INTEGER)
   campaignId!: number
 
   @BelongsTo(() => Campaign)
   campaign!: Campaign
 
+  @ForeignKey(() => Unsubscriber)
   @Column(DataType.STRING)
   recipient!: string
+
+  @BelongsTo(() => Unsubscriber)
+  unsubscriber?: Unsubscriber
 
   @Column(DataType.JSON)
   params!: object

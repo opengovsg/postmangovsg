@@ -637,7 +637,7 @@ export const InitEmailCampaignRoute = (
    *    get:
    *      tags:
    *        - Email
-   *      summary: Get recipients of unsuccessful emails in campaign
+   *      summary: Get recipients of campaign
    *      parameters:
    *        - name: campaignId
    *          in: path
@@ -652,7 +652,7 @@ export const InitEmailCampaignRoute = (
    *              schema:
    *                type: array
    *                items:
-   *                  $ref: '#/components/schemas/CampaignInvalidRecipient'
+   *                  $ref: '#/components/schemas/CampaignRecipient'
    *        "401":
    *           description: Unauthorized
    *        "403":

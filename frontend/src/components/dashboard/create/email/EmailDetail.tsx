@@ -22,14 +22,6 @@ const EmailDetail = () => {
 
   const emailCampaign = campaign as EmailCampaign
 
-  async function handleRefreshStats() {
-    try {
-      await refreshCampaignStats(true)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   async function handlePause() {
     try {
       sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.Email)
@@ -108,7 +100,6 @@ const EmailDetail = () => {
             redacted={campaign.redacted}
             handlePause={handlePause}
             handleRetry={handleRetry}
-            handleRefreshStats={handleRefreshStats}
           />
         )}
       </>

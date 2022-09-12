@@ -14,7 +14,6 @@ import {
   server,
   screen,
   fireEvent,
-  waitFor,
   DEFAULT_FROM,
   DEFAULT_FROM_ADDRESS,
   VALID_CSV_FILENAME,
@@ -248,15 +247,6 @@ test('successfully creates and sends a new protected email campaign', async () =
       name: /the delivery report is being generated/i,
     })
   ).toBeInTheDocument()
-
-  // Click the refresh stats button
-  const refreshStatsButton = screen.getByRole('button', {
-    name: /refresh stats/i,
-  })
-
-  await userEvent.click(refreshStatsButton, { delay: null })
-  expect(refreshStatsButton).toBeDisabled()
-  await waitFor(() => expect(refreshStatsButton).toBeEnabled())
 
   // Teardown
   jest.runOnlyPendingTimers()

@@ -1,5 +1,3 @@
-import { ChannelType } from '@core/constants'
-
 export interface CampaignS3ObjectInterface {
   key?: string
   bucket?: string
@@ -13,15 +11,6 @@ export interface CsvStatusInterface {
   filename?: string
   tempFilename?: string
   error?: string
-}
-
-export interface CampaignInterface {
-  name: string
-  userId: number
-  type: ChannelType
-  credName?: string
-  s3Object?: CampaignS3ObjectInterface
-  valid: boolean
 }
 
 export interface CampaignDetails {
@@ -72,6 +61,7 @@ export interface CampaignStatsCount {
   sent: number
   invalid: number
   updated_at: Date
+  unsubscribed?: number // only applicable for email stats
 }
 
 export interface CampaignRecipient {
@@ -113,7 +103,7 @@ export interface DuplicateCampaignDetails {
  *          updated_at:
  *            type: string
  *            format: date-time
- *      CampaignInvalidRecipient:
+ *      CampaignRecipient:
  *        type: object
  *        properties:
  *          recipient:
@@ -123,4 +113,6 @@ export interface DuplicateCampaignDetails {
  *          updated_at:
  *            type: string
  *            format: date-time
+ *          error_code:
+ *            type: string
  */

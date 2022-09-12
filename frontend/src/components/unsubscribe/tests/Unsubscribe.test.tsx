@@ -51,6 +51,7 @@ async function unsubscribe() {
     name: /proceed to unsubscribe/i,
   })
 
+  // Click on the unsubscribe button
   await userEvent.click(radioInput)
   await userEvent.click(unsubscribeButton)
 }
@@ -64,7 +65,7 @@ test('successfully unsubscribes user from a campaign', async () => {
 
   // Assert that the unsubscription succeeded
   const heading = await screen.findByRole('heading', {
-    name: /unsubscribed successfully/i,
+    name: /unsubscribe request successful/i,
   })
   expect(heading).toBeInTheDocument()
 })
