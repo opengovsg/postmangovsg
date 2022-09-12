@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event'
-import { Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 
 import Unsubscribe from '../Unsubscribe'
 
@@ -30,9 +30,9 @@ function mockApis() {
 
 function renderUnsubscribe() {
   render(
-    <Route path="/unsubscribe/:version">
-      <Unsubscribe />
-    </Route>,
+    <Routes>
+      <Route path="/unsubscribe/:version" element={<Unsubscribe />} />
+    </Routes>,
     {
       router: {
         initialIndex: 0,

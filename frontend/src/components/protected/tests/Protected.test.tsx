@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event'
-import { Route } from 'react-router'
+import { Route, Routes } from 'react-router-dom'
 
 import Protected from '../Protected'
 
@@ -23,9 +23,9 @@ function mockApis() {
 
 function renderProtected(id = TEST_PROTECTED_MESSAGE.id) {
   render(
-    <Route path="/p/:version/:id">
-      <Protected />
-    </Route>,
+    <Routes>
+      <Route path="/p/:version/:id" element={<Protected />} />
+    </Routes>,
     {
       router: {
         initialIndex: 0,

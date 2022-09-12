@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
 
-import { Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { SegmentedMessage } from 'sms-segments-calculator'
 
 import BodyTemplate from '../BodyTemplate'
@@ -44,18 +44,23 @@ function renderSmsTemplatePage(
   const setActiveStep = jest.fn()
 
   render(
-    <Route path="/campaigns/:id">
-      <CampaignContextProvider initialCampaign={new SMSCampaign({})}>
-        <FinishLaterModalContextProvider>
-          <BodyTemplate
-            setActiveStep={setActiveStep}
-            saveTemplate={saveTemplate}
-            warnCharacterCount={5}
-            errorCharacterCount={10}
-          />
-        </FinishLaterModalContextProvider>
-      </CampaignContextProvider>
-    </Route>,
+    <Routes>
+      <Route
+        path="/campaigns/:id/*"
+        element={
+          <CampaignContextProvider initialCampaign={new SMSCampaign({})}>
+            <FinishLaterModalContextProvider>
+              <BodyTemplate
+                setActiveStep={setActiveStep}
+                saveTemplate={saveTemplate}
+                warnCharacterCount={5}
+                errorCharacterCount={10}
+              />
+            </FinishLaterModalContextProvider>
+          </CampaignContextProvider>
+        }
+      />
+    </Routes>,
     {
       router: { initialIndex: 0, initialEntries: ['/campaigns/1'] },
     }
