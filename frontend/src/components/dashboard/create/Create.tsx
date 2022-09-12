@@ -2,7 +2,7 @@ import cx from 'classnames'
 
 import { useEffect, useState, useContext } from 'react'
 
-import { useParams, useHistory } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import styles from './Create.module.scss'
 
@@ -24,7 +24,7 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const Create = () => {
   const { id } = useParams<{ id: string }>()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { handleFinishLater: finishLaterContextHandler, finishLaterContent } =
@@ -57,7 +57,7 @@ const Create = () => {
       sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
       if (finishLaterContent) return finishLaterContextHandler()
     }
-    history.push('/campaigns')
+    navigate('/campaigns')
   }
 
   function renderCreateChannel() {

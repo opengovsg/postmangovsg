@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react'
 
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
@@ -12,14 +12,14 @@ const SaveDraftModal = ({
   onSave?: () => Promise<void> | undefined
   saveable?: boolean
 }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const modalContext = useContext(ModalContext)
   const [error, setError] = useState('')
 
   async function handleOnSaveClicked(): Promise<void> {
     try {
       if (onSave) await onSave()
-      history.push('/campaigns')
+      navigate('/campaigns')
     } catch (err) {
       setError((err as Error).message)
       // Propagate error so that ConfirmModal will display the error message
@@ -39,14 +39,14 @@ const SaveDraftModal = ({
       buttonText={error ? 'Edit draft' : 'Save draft'}
       cancelText="Skip saving draft"
       onConfirm={error ? handleEditDraft : handleOnSaveClicked}
-      onCancel={() => history.push('/campaigns')}
+      onCancel={() => navigate('/campaigns')}
     />
   ) : (
     <ConfirmModal
       title="Draft cannot be saved"
       subtitle="Drafts for encrypted messages are not saved. Make sure you have stored the template draft somewhere if you would like to keep it."
       buttonText="Back to campaigns"
-      onConfirm={() => history.push('/campaigns')}
+      onConfirm={() => navigate('/campaigns')}
     />
   )
 }

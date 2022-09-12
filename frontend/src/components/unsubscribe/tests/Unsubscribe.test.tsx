@@ -30,7 +30,7 @@ function mockApis() {
 
 function renderUnsubscribe() {
   render(
-    <Route exact path="/unsubscribe/:version">
+    <Route path="/unsubscribe/:version">
       <Unsubscribe />
     </Route>,
     {

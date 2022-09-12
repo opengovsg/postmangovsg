@@ -23,7 +23,7 @@ function mockApis() {
 
 function renderProtected(id = TEST_PROTECTED_MESSAGE.id) {
   render(
-    <Route exact path="/p/:version/:id">
+    <Route path="/p/:version/:id">
       <Protected />
     </Route>,
     {
