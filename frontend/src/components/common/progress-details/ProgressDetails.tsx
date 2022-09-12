@@ -23,13 +23,11 @@ const ProgressDetails = ({
   redacted,
   handlePause,
   handleRetry,
-  handleRefreshStats,
 }: {
   stats: CampaignStats
   redacted: boolean
   handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
-  handleRefreshStats: () => Promise<void>
 }) => {
   const { campaign } = useContext(CampaignContext)
   const { id, name, type, sentAt, numRecipients } = campaign
@@ -107,10 +105,7 @@ const ProgressDetails = ({
             <Moment format="LLL" interval={0}>
               {updatedAt}
             </Moment>
-            .{' '}
-            <span onClick={handleRefreshStats} className={styles.linkLike}>
-              Refresh statistics
-            </span>
+            .
           </span>
         </div>
       )

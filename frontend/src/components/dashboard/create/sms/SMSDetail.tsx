@@ -18,14 +18,6 @@ const SMSDetail = () => {
   const isDemo = !!demoMessageLimit
   const { stats, refreshCampaignStats } = usePollCampaignStats()
 
-  async function handleRefreshStats() {
-    try {
-      await refreshCampaignStats(true)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   async function handlePause() {
     try {
       sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.SMS)
@@ -109,7 +101,6 @@ const SMSDetail = () => {
             redacted={campaign.redacted}
             handlePause={handlePause}
             handleRetry={handleRetry}
-            handleRefreshStats={handleRefreshStats}
           />
         )}
       </>

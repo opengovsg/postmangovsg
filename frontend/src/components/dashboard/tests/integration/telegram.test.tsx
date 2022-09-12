@@ -221,11 +221,6 @@ test('successfully creates and sends a new Telegram campaign', async () => {
     })
   ).toBeInTheDocument()
 
-  // Click the refresh stats button
-  const refreshStatsButton = screen.getByText(/refresh statistics/i)
-
-  await userEvent.click(refreshStatsButton, { delay: null })
-
   // Teardown
   jest.runOnlyPendingTimers()
   jest.useRealTimers()
