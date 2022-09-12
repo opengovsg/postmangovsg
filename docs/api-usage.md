@@ -310,3 +310,50 @@ curl --location --request POST 'https://api.postman.gov.sg/v1/transactional/emai
 	"from": "test@agency.gov.sg",
 }'
 ```
+## Send attachment
+
+Postman API allows the sending of attachment. Here are a few things to note: 
+- Your attachment has to pass our antivirus scan.
+- Attachment should not exceed 2MB in size per email.
+- It must be within the list of file types supported below.
+
+**List of supported file types**
+'asc',
+  'avi',
+  'bmp',
+  'csv',
+  'dgn',
+  'doc',
+  'docx',
+  'dwf',
+  'dwg',
+  'dxf',
+  'ent',
+  'gif',
+  'jpeg',
+  'jpg',
+  'mpeg',
+  'mpg',
+  'mpp',
+  'odb',
+  'odf',
+  'odg',
+  'ods',
+  'pdf',
+  'png',
+  'ppt',
+  'pptx',
+  'rtf',
+  'sxc',
+  'sxd',
+  'sxi',
+  'sxw',
+  'tif',
+  'tiff',
+  'txt',
+  'wmv',
+  'xls',
+  'xlsx'
+  
+  
+
