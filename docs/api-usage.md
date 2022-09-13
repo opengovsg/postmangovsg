@@ -315,9 +315,9 @@ curl --location --request POST 'https://api.postman.gov.sg/v1/transactional/emai
 Postman API allows the sending of attachment. Here are a few things to note: 
 - Your attachment has to pass our antivirus scan.
 - Attachment should not exceed 2MB in size per email.
-- You can only attach a maximum of 2 attachment per email.
+- You can only attach a maximum of 2 attachments per email.
 - All attributes in your HTML will be stripped, except what is listed [here](https://github.com/opengovsg/postmangovsg/blob/15d1d853aa32457f17f400beef3e93249797f520/shared/src/templating/xss-options.ts#L30).
-- It must be within the list of file types supported below.
+- Attachment format must be within the list of file types supported below.
 
 **List of supported file types**
 - asc
