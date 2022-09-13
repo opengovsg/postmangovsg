@@ -106,3 +106,6 @@ dist
 # files for Cypress test
 credentials.json
 gmail_token.json
+
+# IDE config files
+.idea
