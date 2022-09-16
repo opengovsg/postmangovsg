@@ -230,6 +230,8 @@ export const InitEmailTransactionalRoute = (
     FileAttachmentMiddleware.fileUploadHandler,
     FileAttachmentMiddleware.preprocessPotentialIncomingFile,
     celebrate(sendValidator),
+    // can move saveMessage to an earlier step if we want to capture errors that might arise earlier too
+    emailTransactionalMiddleware.saveMessage,
     emailMiddleware.isFromAddressAccepted,
     emailTransactionalMiddleware.rateLimit,
     emailTransactionalMiddleware.sendMessage

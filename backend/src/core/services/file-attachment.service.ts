@@ -4,6 +4,7 @@ import _ from 'lodash'
 import { MailAttachment } from '@shared/clients/mail-client.class'
 import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
 import { FileExtensionService } from '@core/services'
+import { EmailMessageTx, TransactionalEmailMessageStatus } from '@email/models'
 
 const checkExtensions = async (
   files: { data: Buffer; name: string }[]
@@ -35,14 +36,33 @@ const parseFiles = async (
 }
 
 const sanitizeFiles = async (
-  files: { data: Buffer; name: string }[]
+  files: { data: Buffer; name: string }[],
+  emailMessageTxId: number
 ): Promise<MailAttachment[]> => {
   const isAcceptedType = await checkExtensions(files)
   if (!isAcceptedType) {
+    await EmailMessageTx.update(
+      {
+        status: TransactionalEmailMessageStatus.UnsupportedFileTypeError,
+        errorCode: '400',
+      },
+      {
+        where: { id: emailMessageTxId },
+      }
+    )
     throw new UnsupportedFileTypeError()
   }
   const isSafe = await virusScan(files)
   if (!isSafe) {
+    await EmailMessageTx.update(
+      {
+        status: TransactionalEmailMessageStatus.MaliciousFileError,
+        errorCode: '400',
+      },
+      {
+        where: { id: emailMessageTxId },
+      }
+    )
     throw new MaliciousFileError()
   }
   return parseFiles(files)
