@@ -5,6 +5,7 @@ import { MailAttachment } from '@shared/clients/mail-client.class'
 import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
 import { FileExtensionService } from '@core/services'
 import { EmailMessageTx, TransactionalEmailMessageStatus } from '@email/models'
+// import { UploadedFile } from 'express-fileupload'
 
 const checkExtensions = async (
   files: { data: Buffer; name: string }[]
@@ -56,7 +57,7 @@ const sanitizeFiles = async (
   if (!isSafe) {
     await EmailMessageTx.update(
       {
-        status: TransactionalEmailMessageStatus.MaliciousFileError,
+        status: TransactionalEmailMessageStatus.UnsupportedFileTypeError,
         errorCode: '400',
       },
       {
@@ -67,7 +68,14 @@ const sanitizeFiles = async (
   }
   return parseFiles(files)
 }
+//
+// const uploadAttachments = async (
+//   attachments: UploadedFile[]
+// ): Promise<void> => {
+//   // TODO
+// }
 
 export const FileAttachmentService = {
   sanitizeFiles,
+  // uploadAttachments,
 }

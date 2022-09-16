@@ -234,6 +234,9 @@ export const InitEmailTransactionalRoute = (
     emailTransactionalMiddleware.saveMessage,
     emailMiddleware.isFromAddressAccepted,
     emailTransactionalMiddleware.rateLimit,
+    // TODO this later; ideally, would want to upload attachments to S3 directly via backend, rather than send pre-signed URL to user?
+    // also, uploading attachments to S3 should not stand in the way of sending the email and should be done asynchronously?
+    // FileAttachmentMiddleware.uploadAttachments,
     emailTransactionalMiddleware.sendMessage
   )
 
