@@ -20,6 +20,7 @@ import {
   EmailOp,
   EmailBlacklist,
   EmailFromAddress,
+  EmailMessageTx,
 } from '@email/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import {
@@ -47,6 +48,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
   ]
   const emailModels = [
     EmailMessage,
+    EmailMessageTx,
     EmailTemplate,
     EmailOp,
     EmailBlacklist,
