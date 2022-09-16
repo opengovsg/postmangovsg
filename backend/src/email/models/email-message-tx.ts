@@ -6,7 +6,6 @@ import {
   Table,
 } from 'sequelize-typescript'
 import { User } from '@core/models'
-import { MessageStatus } from '@core/constants'
 
 // identical to CampaignS3ObjectInterface; to tweak and abstract if necessary
 interface AttachmentS3ObjectInterface {
@@ -72,13 +71,8 @@ export class EmailMessageTx extends Model<EmailMessageTx> {
   // @Column(DataType.STRING)
   // messageId: string | null
 
-  // supported statuses:
-  // 1. null (upon first creation)
-  // 2. ERROR (if error out at any point along the way)
-  // 3. SENDING (if API is successfully called without error on backend)
-  // other statuses requires callback, which will be handled in a later PR
   @Column({
-    type: DataType.ENUM(...Object.values(MessageStatus)),
+    type: DataType.ENUM(...Object.values(TransactionalEmailMessageStatus)),
     allowNull: false,
   })
   status!: TransactionalEmailMessageStatus

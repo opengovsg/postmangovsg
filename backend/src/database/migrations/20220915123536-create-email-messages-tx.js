@@ -46,15 +46,7 @@ module.exports = {
       },
       status: {
         type: Sequelize.DataTypes.ENUM(
-          TransactionalEmailMessageStatus.Unsent,
-          TransactionalEmailMessageStatus.InvalidFromAddressError,
-          TransactionalEmailMessageStatus.RateLimitError,
-          TransactionalEmailMessageStatus.InvalidMessageError,
-          TransactionalEmailMessageStatus.UnsupportedFileTypeError,
-          TransactionalEmailMessageStatus.MaliciousFileError,
-          TransactionalEmailMessageStatus.BlacklistedRecipientError,
-          TransactionalEmailMessageStatus.Accepted,
-          TransactionalEmailMessageStatus.Sent
+          ...Object.values(TransactionalEmailMessageStatus)
         ),
         allowNull: false,
       },

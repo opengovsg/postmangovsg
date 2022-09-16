@@ -67,7 +67,6 @@ function preprocessPotentialIncomingFile(
 // }
 
 export const FileAttachmentMiddleware = {
-  // not sure whether to amend to
   fileUploadHandler,
   preprocessPotentialIncomingFile,
   // uploadAttachments,
