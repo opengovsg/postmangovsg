@@ -143,6 +143,8 @@ npm run db:migrate # run all pending migrations
 npm run db:seed # seed database with dummy data
 ```
 
+If you run into errors at the `db:migrate` step, this is likely because you have created a new model in TypeScript that has not been compiled to JavaScript. Run `npm run build` to fix this error.
+
 If you need to undo any database migrations:
 
 ```zsh
