@@ -307,46 +307,7 @@ Postman API allows the sending of attachment. Here are a few things to note:
 - Your attachment has to pass our antivirus scan
 - Attachment should not exceed 2MB in size
 - You can only attach a maximum of 2 attachments per email
-- Attachment format must be within the list of file types supported below
-
-**List of supported file types**
-
-- asc
-- avi
-- bmp
-- csv
-- dgn
-- doc
-- docx
-- dwf
-- dwg
-- dxf
-- ent
-- gif
-- jpeg
-- jpg
-- mpeg
-- mpg
-- mpp
-- odb
-- odf
-- odg
-- ods
-- pdf
-- png
-- ppt
-- pptx
-- rtf
-- sxc
-- sxd
-- sxi
-- sxw
-- tif
-- tiff
-- txt
-- wmv
-- xls
-- xlsx
+- Attachment format must be within the list of file types (see [here](https://github.com/opengovsg/postmangovsg/blob/docs/transactional/docs/supported-file-types.md) for full list)
 
 For more details on usage, refer to our Swagger docs [here](https://api.postman.gov.sg/docs/#/Email/post_transactional_email_send)
 
