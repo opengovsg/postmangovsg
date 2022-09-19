@@ -8,6 +8,10 @@ const app: Application = express()
 
 app.use(express.json())
 
+app.get('/', (_, res) => {  // health
+  res.status(200).send('ok') 
+})
+
 app.post('/scan', 
   // TODO: introduce authentication layer
   FileMiddleware.fileUploadMiddleware, 

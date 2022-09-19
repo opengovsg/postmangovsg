@@ -7,6 +7,10 @@ RUN echo "Prepping ClamAV"
 ARG FUNCTION_DIR="/home"
 WORKDIR ${FUNCTION_DIR}
 
+RUN apt-get update && \
+  apt-get install -y \
+  curl
+
 # install clamav
 RUN apt-get update && \
   apt-get install -y \
@@ -39,6 +43,9 @@ RUN { \
 
 EXPOSE 8080
 RUN echo $(ls)
+
+HEALTHCHECK --interval=12s --timeout=12s --start-period=60s \ 
+  CMD curl --fail http://localhost:8080 || exit 1  
 
 # Starts the ClamAV daemon, then starts Express Node server
 CMD ["bash", "./run.sh"]
