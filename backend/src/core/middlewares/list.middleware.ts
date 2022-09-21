@@ -26,9 +26,6 @@ const getAllLists = async (
       return { id: list.id, name: list.name }
     })
     return res.status(200).json({ lists: cleanedLists })
-
-    // TODO: remove this
-    logger.info(req)
   } catch (err) {
     return next(err)
   }
