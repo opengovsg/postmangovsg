@@ -10,10 +10,12 @@ import {
   AfterCreate,
   ForeignKey,
   BelongsTo,
+  BelongsToMany,
 } from 'sequelize-typescript'
 import { UserCredential } from './user-credential'
 import { UserDemo } from './user-demo'
 import { UserFeature } from './user-feature'
+import { UserList, List } from '@core/models'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
@@ -53,6 +55,14 @@ export class User extends Model<User> {
 
   @BelongsTo(() => Domain)
   domain?: Domain
+
+  @BelongsToMany(() => List, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+    through: () => UserList,
+    as: 'lists',
+  })
+  lists!: Array<List & { UserList: UserList }>
 
   // Wrapper function around validation and population of domains
   // to enforce that validation happens before creation of user
