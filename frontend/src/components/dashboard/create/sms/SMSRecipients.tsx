@@ -10,7 +10,8 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import type { SMSCampaign, SMSPreview, SMSProgress, List } from 'classes'
+import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
+import { ChannelType, List } from 'classes'
 import {
   FileInput,
   CsvUpload,
@@ -31,7 +32,7 @@ import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { sendTiming } from 'services/ga.service'
-import { selectList, getLists } from 'services/list.service'
+import { selectList, getListsByChannel } from 'services/list.service'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -76,7 +77,9 @@ const SMSRecipients = ({
   useEffect(() => {
     const getManagedLists = async () => {
       try {
-        const managedLists = await getLists()
+        const managedLists = await getListsByChannel({
+          channel: ChannelType.SMS,
+        })
         setManagedLists(managedLists)
       } catch (e) {
         setErrorMessage((e as Error).message)

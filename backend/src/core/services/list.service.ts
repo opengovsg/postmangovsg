@@ -1,5 +1,6 @@
 import { User, List } from '@core/models'
 import { loggerWithLabel } from '@core/logger'
+import { ChannelType } from '@core/constants'
 
 const logger = loggerWithLabel(module)
 /**
@@ -7,8 +8,10 @@ const logger = loggerWithLabel(module)
  */
 const listLists = async ({
   userId,
+  channel,
 }: {
   userId: number
+  channel: ChannelType
 }): Promise<{ id: List['id']; name: List['name'] }[]> => {
   try {
     const user = await User.findOne({
@@ -16,6 +19,9 @@ const listLists = async ({
       include: [
         {
           model: List,
+          where: {
+            channel,
+          },
         },
       ],
     })
@@ -30,18 +36,21 @@ const listLists = async ({
 }
 
 /**
- * Get a specified list belonging to a user
+ * Get a specified list of a specific channel type belonging to a user
  */
 const getList = async ({
   userId,
   listId,
+  channel,
 }: {
   userId: number
   listId: number
+  channel: ChannelType
 }): Promise<List | null> => {
   return List.findOne({
     where: {
       id: listId,
+      channel,
     },
     include: [
       {

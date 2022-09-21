@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { ListService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { ChannelType } from '@core/constants'
 
 const logger = loggerWithLabel(module)
 
@@ -10,18 +11,22 @@ const logger = loggerWithLabel(module)
  * @param res
  * @param next
  */
-const getAllLists = async (
+const getListsByChannel = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   try {
     logger.info({
-      message: 'Get all lists',
-      action: 'getAllLists',
+      message: 'Get lists by channel',
+      action: 'getListsByChannel',
     })
     const userId = req.session?.user?.id
-    const rawLists = await ListService.listLists({ userId })
+    const { channel } = req.params
+    const rawLists = await ListService.listLists({
+      userId,
+      channel: channel as ChannelType,
+    })
     const cleanedLists = rawLists.map((list) => {
       return { id: list.id, name: list.name }
     })
@@ -32,5 +37,5 @@ const getAllLists = async (
 }
 
 export const ListMiddleware = {
-  getAllLists,
+  getListsByChannel,
 }

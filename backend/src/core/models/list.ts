@@ -6,6 +6,7 @@ import {
   BelongsToMany,
 } from 'sequelize-typescript'
 import { User, UserList } from '@core/models'
+import { ChannelType } from '@core/constants'
 
 @Table({ tableName: 'lists', underscored: true, timestamps: true })
 export class List extends Model<List> {
@@ -39,6 +40,12 @@ export class List extends Model<List> {
     allowNull: false,
   })
   filename!: string
+
+  @Column({
+    type: DataType.ENUM(...Object.values(ChannelType)),
+    allowNull: false,
+  })
+  channel!: ChannelType
 
   @BelongsToMany(() => User, {
     onUpdate: 'CASCADE',

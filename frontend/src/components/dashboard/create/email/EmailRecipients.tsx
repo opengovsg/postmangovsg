@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import { EmailPreview, EmailProgress, List } from 'classes'
+import { EmailPreview, EmailProgress, List, ChannelType } from 'classes'
 import {
   FileInput,
   CsvUpload,
@@ -34,7 +34,7 @@ import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { sendTiming } from 'services/ga.service'
-import { selectList, getLists } from 'services/list.service'
+import { selectList, getListsByChannel } from 'services/list.service'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -81,7 +81,9 @@ const EmailRecipients = ({
   useEffect(() => {
     const getManagedLists = async () => {
       try {
-        const managedLists = await getLists()
+        const managedLists = await getListsByChannel({
+          channel: ChannelType.Email,
+        })
         setManagedLists(managedLists)
       } catch (e) {
         setErrorMessage((e as Error).message)

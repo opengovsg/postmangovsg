@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 
-import { List } from 'classes'
+import { ChannelType, List } from 'classes'
 
 export async function selectList({
   campaignId,
@@ -18,9 +18,13 @@ export async function selectList({
   }
 }
 
-export async function getLists(): Promise<List[]> {
+export async function getListsByChannel({
+  channel,
+}: {
+  channel: ChannelType
+}): Promise<List[]> {
   try {
-    const lists = (await axios.get(`/lists`)).data.lists as List[]
+    const lists = (await axios.get(`/lists/${channel}`)).data.lists as List[]
     return lists
   } catch (e) {
     errorHandler(e, 'Error getting lists')

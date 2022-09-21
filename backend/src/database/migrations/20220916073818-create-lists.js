@@ -25,6 +25,14 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING,
       },
+      channel: {
+        type: Sequelize.DataTypes.ENUM(
+          'SMS',
+          'EMAIL',
+          'TELEGRAM'
+        ),
+        allowNull: false,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,

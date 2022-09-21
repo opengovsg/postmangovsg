@@ -18,6 +18,7 @@ import { EmailTemplateService, EmailService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { ThemeClient } from '@shared/theme'
+import { ChannelType } from '@core/constants'
 
 export interface EmailTemplateMiddleware {
   storeTemplate: Handler
@@ -188,6 +189,7 @@ export const InitEmailTemplateMiddleware = (
     res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
+    const CHANNEL_TYPE = ChannelType.Email
     const userId = req.session?.user?.id
     const { campaignId } = req.params
 
@@ -195,7 +197,11 @@ export const InitEmailTemplateMiddleware = (
     const logMeta = { campaignId, action: 'selectListHandler' }
 
     try {
-      const list = await ListService.getList({ listId, userId })
+      const list = await ListService.getList({
+        listId,
+        userId,
+        channel: CHANNEL_TYPE,
+      })
       if (!list) throw new Error('Error: List not found')
 
       const { s3key: s3Key, etag, filename } = list
