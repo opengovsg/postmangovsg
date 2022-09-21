@@ -1,6 +1,15 @@
+import { Dispatch, SetStateAction } from 'react'
+
+import { List } from 'classes'
 import { Dropdown } from 'components/common'
 
-const ManagedListSection = () => {
+const ManagedListSection = ({
+  managedLists,
+  setSelectedListId,
+}: {
+  managedLists: List[]
+  setSelectedListId: Dispatch<SetStateAction<number | undefined>>
+}) => {
   return (
     <>
       <h3>Choose recipient list</h3>
@@ -16,9 +25,14 @@ const ManagedListSection = () => {
       </p>
 
       <Dropdown
-        disabled={true}
-        options={[]} // TODO: Actually implement the managed list dropdown selector
-        onSelect={() => null} // TODO: Actually implement the managed list dropdown selector
+        disabled={!managedLists.length}
+        options={managedLists.map((list) => {
+          return {
+            label: list.name,
+            value: list.id.toString(),
+          }
+        })}
+        onSelect={(value) => setSelectedListId(+value)}
         defaultLabel="Select existing recipient list"
         aria-label="Managed list selector"
       />

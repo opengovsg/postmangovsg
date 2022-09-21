@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
+import type { SMSCampaign, SMSPreview, SMSProgress, List } from 'classes'
 import {
   FileInput,
   CsvUpload,
@@ -31,6 +31,7 @@ import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { sendTiming } from 'services/ga.service'
+import { selectList, getLists } from 'services/list.service'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -57,6 +58,8 @@ const SMSRecipients = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
+  const [managedLists, setManagedLists] = useState<List[]>([])
+  const [selectedListId, setSelectedListId] = useState<number>()
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({
@@ -68,6 +71,36 @@ const SMSRecipients = ({
 
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
+
+  // Retrieve managed lists - just once on component load
+  useEffect(() => {
+    const getManagedLists = async () => {
+      try {
+        const managedLists = await getLists()
+        setManagedLists(managedLists)
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void getManagedLists()
+  }, [])
+
+  // Select managed list
+  useEffect(() => {
+    const setSelectedList = async () => {
+      try {
+        if (selectedListId) {
+          await selectList({ campaignId: +campaignId, listId: selectedListId })
+          setIsCsvProcessing(true)
+        }
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void setSelectedList()
+  }, [campaignId, selectedListId])
 
   // Poll csv status
   useEffect(() => {
@@ -198,7 +231,10 @@ const SMSRecipients = ({
             </span>
           </InfoBlock>
         )}
-        <ManagedListSection />
+        <ManagedListSection
+          managedLists={managedLists}
+          setSelectedListId={setSelectedListId}
+        />
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 

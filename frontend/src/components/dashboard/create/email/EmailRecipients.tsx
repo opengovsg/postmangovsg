@@ -72,7 +72,7 @@ const EmailRecipients = ({
   })
   const [preview, setPreview] = useState({} as EmailPreview)
   const [managedLists, setManagedLists] = useState<List[]>([])
-  const [selectedListId, setSelectedListId] = useState<number | null>(null)
+  const [selectedListId, setSelectedListId] = useState<number>()
   const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
@@ -254,7 +254,10 @@ const EmailRecipients = ({
             </>
           )}
         </CsvUpload>
-        <ManagedListSection />
+        <ManagedListSection
+          managedLists={managedLists}
+          setSelectedListId={setSelectedListId}
+        />
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 
