@@ -5,7 +5,7 @@ const ManagedListSection = () => {
     <>
       <h3>Choose recipient list</h3>
       <p>
-        Reuse an existing list for your future campaigns.{' '}
+        Reuse an existing list for your campaign.{' '}
         <a
           href="https://go.gov.sg/postman-list"
           target="_blank"
