@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import { EmailPreview, EmailProgress } from 'classes'
+import { EmailPreview, EmailProgress, List } from 'classes'
 import {
   FileInput,
   CsvUpload,
@@ -34,6 +34,7 @@ import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { sendTiming } from 'services/ga.service'
+import { selectList, getLists } from 'services/list.service'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -70,9 +71,41 @@ const EmailRecipients = ({
     csvFilename: initialCsvFilename,
   })
   const [preview, setPreview] = useState({} as EmailPreview)
+  const [managedLists, setManagedLists] = useState<List[]>([])
+  const [selectedListId, setSelectedListId] = useState<number | null>(null)
   const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
+
+  // Retrieve managed lists - just once on component load
+  useEffect(() => {
+    const getManagedLists = async () => {
+      try {
+        const managedLists = await getLists()
+        setManagedLists(managedLists)
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void getManagedLists()
+  }, [])
+
+  // Select managed list
+  useEffect(() => {
+    const setSelectedList = async () => {
+      try {
+        if (selectedListId) {
+          await selectList({ campaignId: +campaignId, listId: selectedListId })
+          setIsCsvProcessing(true)
+        }
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void setSelectedList()
+  }, [campaignId, selectedListId])
 
   // Poll csv status
   useEffect(() => {
@@ -160,7 +193,7 @@ const EmailRecipients = ({
     <>
       <StepSection>
         <StepHeader
-          title="Upload recipient list in CSV format"
+          title="Upload or select existing recipient list"
           subtitle={protect ? '' : 'Step 2'}
         >
           <p>
