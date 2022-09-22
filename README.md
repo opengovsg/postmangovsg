@@ -143,6 +143,8 @@ npm run db:migrate # run all pending migrations
 npm run db:seed # seed database with dummy data
 ```
 
+If you run into errors at the `db:migrate` step, this is likely because you have created a new model in TypeScript that has not been compiled to JavaScript. Run `npm run build` to fix this error.
+
 If you need to undo any database migrations:
 
 ```zsh
@@ -151,6 +153,13 @@ npm run db:undo # undo most recent migration
 ```
 
 You can find more info on undoing migrations using Sequelize [here](https://sequelize.org/docs/v6/other-topics/migrations/#undoing-migrations).
+
+If you wish to create a new migration, run:
+
+```zsh
+cd backend
+npx sequelize-cli migration:create --name migration-name-in-kebab-case
+```
 
 ### Compile frontend translations
 
