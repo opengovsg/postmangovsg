@@ -87,7 +87,7 @@ msgstr "Verifying OTP..."
 
 #: config.ts:90
 msgid "allowedImageSources"
-msgstr "file.go.gov.sg"
+msgstr "file.go.gov.sg;file.for.sg"
 
 #: config.ts:106
 msgid "announcement.mediaUrl"
