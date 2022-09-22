@@ -26,6 +26,7 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { ManagedListSection } from 'components/experimental'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
@@ -197,6 +198,7 @@ const SMSRecipients = ({
             </span>
           </InfoBlock>
         )}
+        <ManagedListSection />
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 
