@@ -62,6 +62,9 @@ export class EmailMessageTx extends Model<EmailMessageTx> {
   @Column({ type: DataType.JSON, allowNull: false })
   params!: Record<string, string>
 
+  @Column(DataType.STRING)
+  messageId?: string
+
   @Column({ type: DataType.BOOLEAN, allowNull: false })
   hasAttachment!: boolean
 

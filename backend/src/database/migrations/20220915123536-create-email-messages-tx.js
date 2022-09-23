@@ -36,6 +36,10 @@ module.exports = {
         type: Sequelize.DataTypes.JSON,
         allowNull: false,
       },
+      message_id: {
+        type: Sequelize.DataTypes.STRING(255),
+        allowNull: true,
+      },
       has_attachment: {
         type: Sequelize.DataTypes.BOOLEAN,
         allowNull: false,
