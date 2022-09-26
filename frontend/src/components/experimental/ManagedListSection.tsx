@@ -1,6 +1,6 @@
 import { Dropdown } from 'components/common'
 
-const ManagedListSection = () => {
+export const ManagedListSection = () => {
   return (
     <>
       <h3>Choose recipient list</h3>
@@ -16,5 +16,3 @@ const ManagedListSection = () => {
     </>
   )
 }
-
-export default ManagedListSection

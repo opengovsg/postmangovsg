@@ -1,7 +1,7 @@
 import { InfoBlock } from 'components/common'
 import styles from 'components/dashboard/create/Create.module.scss'
 
-const ManagedListInfoBlock = () => {
+export const ManagedListInfoBlock = () => {
   return (
     <InfoBlock className={styles.notice}>
       We&apos;re working on a new feature! If you would like to manage your
@@ -13,5 +13,3 @@ const ManagedListInfoBlock = () => {
     </InfoBlock>
   )
 }
-
-export default ManagedListInfoBlock

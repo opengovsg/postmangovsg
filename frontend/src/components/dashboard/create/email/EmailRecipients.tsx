@@ -29,8 +29,10 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import ManagedListInfoBlock from 'components/experimental/ManagedListInfoBlock'
-import ManagedListSection from 'components/experimental/ManagedListSection'
+import {
+  ManagedListInfoBlock,
+  ManagedListSection,
+} from 'components/experimental'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
