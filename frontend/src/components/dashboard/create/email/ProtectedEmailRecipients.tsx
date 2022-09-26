@@ -18,13 +18,13 @@ import { EmailCampaign, EmailProgress } from 'classes'
 import {
   PrimaryButton,
   TextButton,
-  TextArea,
   DetailBlock,
   ErrorBlock,
   ProtectedPreview,
   Checkbox,
   StepHeader,
   StepSection,
+  RichTextEditor,
 } from 'components/common'
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { CampaignContext } from 'contexts/campaign.context'
@@ -165,12 +165,10 @@ const ProtectedEmailRecipients = ({
             protected messages. You will lose the content below if you refresh
             your tab or go back to Step 1 to edit.
           </p>
-          <TextArea
-            id="protectedMessage"
-            highlight={true}
-            placeholder="Enter password protected message here"
+          <RichTextEditor
             value={template}
             onChange={setTemplate}
+            placeholder="Enter password protected message here"
           />
           <Checkbox checked={removeEmptyLines} onChange={setRemoveEmptyLines}>
             <p>
@@ -216,14 +214,7 @@ const ProtectedEmailRecipients = ({
           <div>
             <h4>Message B</h4>
           </div>
-          <DetailBlock className={styles.protectedPreview}>
-            <li>
-              <b>Results</b>
-            </li>
-            <li>
-              <ProtectedPreview html={protectedCsvInfo?.preview} />
-            </li>
-          </DetailBlock>
+          <ProtectedPreview html={protectedCsvInfo?.preview} />
         </StepSection>
       )}
       <div className="progress-button">

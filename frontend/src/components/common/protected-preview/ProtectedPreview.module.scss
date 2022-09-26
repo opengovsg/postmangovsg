@@ -1,8 +1,12 @@
 @import 'styles/_mixins';
 @import 'styles/_variables';
+@import 'styles/_email_typography';
 
 .container {
   padding: $spacing-6;
+  box-shadow: 0.5px 0.5px 1px 1px rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background-color: #fff;
 }
 
 .preview {
@@ -81,17 +85,109 @@
       margin-bottom: 0;
     }
   }
-}
 
-.footer {
-  @include flex-horizontal;
-  @extend %body-2;
-  color: $neutral;
-  justify-content: center;
-  width: 100%;
-  padding: $layout-5 0 $spacing-6 0;
+  // Override app.scss
+  ul {
+    list-style: disc;
+    list-style-type: disc;
+  }
 
-  .caption {
-    margin-right: $spacing-3;
+  ul ul {
+    list-style: circle;
+  }
+
+  ul ul ul {
+    list-style: square;
+  }
+
+  // Reset site-wide styles so tables render correctly
+  table {
+    width: auto;
+    border: solid 1px #b5c4ff;
+    tr {
+      height: auto;
+      display: table-row;
+      td,
+      th {
+        display: table-cell;
+        border: solid 1px #b5c4ff;
+      }
+    }
+  }
+
+  // Typography styles to match email theme
+  color: $email-font-color;
+
+  * {
+    font-family: $email-font-stack;
+    color: inherit;
+    // revert is a new (2019) feature, keeping inherit above for backwards compat
+    color: revert;
+  }
+
+  a {
+    color: blue;
+    text-decoration: underline;
+    // revert is a new (2019) feature, keeping blue above for backwards compat
+    color: revert;
+  }
+
+  p,
+  a,
+  span {
+    font-size: inherit;
+  }
+
+  h1 {
+    @extend %email-heading-1;
+  }
+
+  h2 {
+    @extend %email-heading-2;
+  }
+
+  h4 {
+    @extend %email-heading-4;
+  }
+
+  p {
+    @extend %email-body;
+  }
+
+  .imagePlaceholder {
+    @extend %body-2;
+    background: $neutral-light;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+    padding: $layout-3 $layout-5;
+
+    p {
+      font-family: $font-stack;
+      max-width: 100%;
+      margin: 0px;
+      text-align: center;
+      color: $grey-700;
+      word-wrap: break-word;
+    }
+
+    :global {
+      i.bx {
+        font-size: 32px;
+      }
+
+      i.bx-x {
+        font-size: 12px;
+        margin-left: -10px;
+        background: $neutral-light;
+      }
+    }
+
+    a {
+      @extend %body-2;
+      text-decoration: underline;
+    }
   }
 }
