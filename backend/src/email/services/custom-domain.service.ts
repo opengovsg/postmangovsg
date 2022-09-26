@@ -12,8 +12,10 @@ import {
 } from '@shared/utils/from-address'
 
 const logger = loggerWithLabel(module)
-const [, region] = config.get('mailOptions.host').split('.')
-const ses = new AWS.SES({ region: region })
+const backendSesRegion = config.get('mailOptions.host').split('.')[1]
+const backendSes = new AWS.SES({ region: backendSesRegion })
+const workerSesRegion = config.get('mailOptions.workerHost').split('.')[1]
+const workerSes = new AWS.SES({ region: workerSesRegion })
 /**
  * Verifies if the cname records are in the email's domain dns
  * @throws Error if verification fails
@@ -50,7 +52,11 @@ const verifyCnames = async (
  * @returns DKIM tokens generated for the email address
  * @throws Error if the domain's dns do not have the cname records
  */
-const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
+const verifyEmailWithAWS = async (
+  email: string,
+  ses: AWS.SES,
+  region: string
+): Promise<Array<string>> => {
   // Get the dkim attributes for the email address and domain
   const emailDomain = extractDomainFromEmail(email)
   const params = {
@@ -64,7 +70,7 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
     !DkimAttributes ||
     (!DkimAttributes[email] && !DkimAttributes[emailDomain])
   ) {
-    return logVerificationAWSFailureAndThrowError(email)
+    return logVerificationAWSFailureAndThrowError(email, region)
   }
 
   // prioritize email address over domain
@@ -73,15 +79,19 @@ const verifyEmailWithAWS = async (email: string): Promise<Array<string>> => {
 
   // Check verification status & make sure dkim tokens are present
   if (verificationStatus !== 'Success' || !dkimTokens) {
-    return logVerificationAWSFailureAndThrowError(email)
+    return logVerificationAWSFailureAndThrowError(email, region)
   }
   return dkimTokens
 }
 
-const logVerificationAWSFailureAndThrowError = (email: string) => {
+const logVerificationAWSFailureAndThrowError = (
+  email: string,
+  region: string
+) => {
   logger.error({
     message: 'Verification on AWS failed',
     email,
+    region,
     action: 'verifyEmailWithAWS',
   })
   throw new Error(
@@ -143,9 +153,18 @@ const storeFromAddress = async (
  * 3. Checks the domain's dns to ensure that the cnames are there
  */
 const verifyFromAddress = async (email: string): Promise<void> => {
-  const dkimTokens = await verifyEmailWithAWS(email)
+  const dkimTokensBackend = await verifyEmailWithAWS(
+    email,
+    backendSes,
+    backendSesRegion
+  )
+  const dkimTokensWorker = await verifyEmailWithAWS(
+    email,
+    workerSes,
+    workerSesRegion
+  )
 
-  await verifyCnames(dkimTokens, email)
+  await verifyCnames([...dkimTokensBackend, ...dkimTokensWorker], email)
 }
 
 const sendValidationMessage = async (
