@@ -18,9 +18,6 @@ interface AttachmentS3ObjectInterface {
 
 export enum TransactionalEmailMessageStatus {
   Unsent = 'UNSENT',
-  // AttachmentTooLargeError = 'ATTACHMENT_TOO_LARGE_ERROR', // unused
-  // TooManyAttachmentsError = 'TOO_MANY_ATTACHMENTS_ERROR', // unused
-  // InvalidParamsError = 'INVALID_PARAMS_ERROR', // unused; these are errors caught by Joi
   InvalidFromAddressError = 'INVALID_FROM_ADDRESS_ERROR',
   RateLimitError = 'RATE_LIMIT_ERROR',
   InvalidMessageError = 'INVALID_MESSAGE_ERROR',

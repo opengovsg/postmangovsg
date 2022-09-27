@@ -50,7 +50,15 @@ module.exports = {
       },
       status: {
         type: Sequelize.DataTypes.ENUM(
-          ...Object.values(TransactionalEmailMessageStatus)
+          TransactionalEmailMessageStatus.Sent,
+          TransactionalEmailMessageStatus.InvalidFromAddressError,
+          TransactionalEmailMessageStatus.RateLimitError,
+          TransactionalEmailMessageStatus.InvalidMessageError,
+          TransactionalEmailMessageStatus.UnsupportedFileTypeError,
+          TransactionalEmailMessageStatus.MaliciousFileError,
+          TransactionalEmailMessageStatus.BlacklistedRecipientError,
+          TransactionalEmailMessageStatus.Accepted,
+          TransactionalEmailMessageStatus.Sent
         ),
         allowNull: false,
       },
@@ -73,11 +81,9 @@ module.exports = {
     })
   },
   down: async (queryInterface, _) => {
-    await Promise.all([
-      queryInterface.dropTable('email_messages_tx'),
-      queryInterface.sequelize.query(
-        'DROP TYPE "enum_email_messages_tx_status";'
-      ),
-    ])
+    await queryInterface.dropTable('email_messages_tx')
+    await queryInterface.sequelize.query(
+      'DROP TYPE "enum_email_messages_tx_status";'
+    )
   },
 }

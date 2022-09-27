@@ -57,7 +57,7 @@ const sanitizeFiles = async (
   if (!isSafe) {
     await EmailMessageTx.update(
       {
-        status: TransactionalEmailMessageStatus.UnsupportedFileTypeError,
+        status: TransactionalEmailMessageStatus.MaliciousFileError,
         errorCode: '400',
       },
       {

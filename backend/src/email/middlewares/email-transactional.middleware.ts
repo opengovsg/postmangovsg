@@ -37,7 +37,7 @@ export const InitEmailTransactionalMiddleware = (
 
   async function saveMessage(
     req: Request,
-    res: Response,
+    _: Response,
     next: NextFunction
   ): Promise<void> {
     const action = 'saveMessage'
@@ -72,15 +72,10 @@ export const InitEmailTransactionalMiddleware = (
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTx)
     if (!emailMessageTx) {
-      // TODO: log error, etc.
-      res.status(500).json({
-        message: 'Unable to create entry in email_message_tx',
-      })
       throw new Error('Unable to create entry in email_message_tx')
     }
-    // attach to body for subsequent middlewares
-    req.body.userEmail = userEmail
-    req.body.emailMessageTxId = emailMessageTx.id
+    req.body.userEmail = userEmail // in order to avoid a db call
+    req.body.emailMessageTxId = emailMessageTx.id // for subsequent middlewares to distinguish whether this is a transactional email
     next()
   }
 
@@ -172,7 +167,9 @@ export const InitEmailTransactionalMiddleware = (
           where: { id: req.body.emailMessageTxId },
         }
       )
-      res.sendStatus(429)
+      res
+        .status(429)
+        .json({ message: 'Too many requests. Please try again later.' })
     },
   })
 
