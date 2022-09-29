@@ -24,7 +24,7 @@
     "module-alias": "2.2.2",
     "nodemailer": "6.6.2",
     "pg": "8.5.1",
-    "pg-connection-string": "2.4.0",
+    "pg-connection-string": "2.5.0",
     "reflect-metadata": "0.1.13",
     "sequelize": "5.22.5",
     "sequelize-typescript": "1.1.0",
