@@ -153,17 +153,10 @@ const storeFromAddress = async (
  * 3. Checks the domain's dns to ensure that the cnames are there
  */
 const verifyFromAddress = async (email: string): Promise<void> => {
-  const dkimTokensBackend = await verifyEmailWithAWS(
-    email,
-    backendSes,
-    backendSesRegion
-  )
-  const dkimTokensWorker = await verifyEmailWithAWS(
-    email,
-    workerSes,
-    workerSesRegion
-  )
-
+  const [dkimTokensBackend, dkimTokensWorker] = await Promise.all([
+    verifyEmailWithAWS(email, backendSes, backendSesRegion),
+    verifyEmailWithAWS(email, workerSes, workerSesRegion),
+  ])
   await verifyCnames([...dkimTokensBackend, ...dkimTokensWorker], email)
 }
 
