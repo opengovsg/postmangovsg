@@ -23,7 +23,7 @@
     "lodash": "4.17.21",
     "module-alias": "2.2.2",
     "nodemailer": "6.6.2",
-    "pg": "8.5.1",
+    "pg": "8.8.0",
     "pg-connection-string": "2.4.0",
     "reflect-metadata": "0.1.13",
     "sequelize": "5.22.5",
