@@ -37,14 +37,14 @@ export class EmailMessage extends Model<EmailMessage> {
   @Column(DataType.JSON)
   params!: object
 
-  @Column(DataType.STRING)
-  messageId?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  messageId!: string | null
 
-  @Column(DataType.STRING)
-  errorCode?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  errorCode!: string | null
 
-  @Column(DataType.STRING)
-  errorSubType?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  errorSubType!: string | null
 
   @Column({
     type: DataType.ENUM(...Object.values(MessageStatus)),
@@ -52,15 +52,15 @@ export class EmailMessage extends Model<EmailMessage> {
   })
   status!: MessageStatus | null
 
-  @Column(DataType.DATE)
-  dequeuedAt?: Date
+  @Column({ type: DataType.DATE, allowNull: true })
+  dequeuedAt!: Date | null
 
-  @Column(DataType.DATE)
-  sentAt?: Date
+  @Column({ type: DataType.DATE, allowNull: true })
+  sentAt!: Date | null
 
-  @Column(DataType.DATE)
-  deliveredAt?: Date
+  @Column({ type: DataType.DATE, allowNull: true })
+  deliveredAt!: Date | null
 
-  @Column(DataType.DATE)
+  @Column({ type: DataType.DATE, allowNull: true })
   receivedAt!: Date | null
 }
