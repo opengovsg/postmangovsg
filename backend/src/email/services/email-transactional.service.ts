@@ -4,7 +4,7 @@ import { loggerWithLabel } from '@core/logger'
 import { isBlacklisted } from '@email/utils/query'
 import { InvalidMessageError, InvalidRecipientError } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
-import { EmailMessageTx, TransactionalEmailMessageStatus } from '@email/models'
+import { EmailMessageTransactional } from '@email/models'
 
 const logger = loggerWithLabel(module)
 
@@ -22,7 +22,7 @@ async function sendMessage({
   recipient,
   replyTo,
   attachments,
-  emailMessageTxId,
+  emailMessageTransactionalId,
 }: {
   subject: string
   body: string
@@ -30,37 +30,38 @@ async function sendMessage({
   recipient: string
   replyTo?: string
   attachments?: { data: Buffer; name: string }[]
-  emailMessageTxId: number
+  emailMessageTransactionalId: number
 }): Promise<void> {
   const sanitizedSubject =
     EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
   const sanitizedBody = EmailTemplateService.client.filterXSS(body)
   if (!sanitizedSubject || !sanitizedBody) {
-    await EmailMessageTx.update(
+    void EmailMessageTransactional.update(
       {
-        status: TransactionalEmailMessageStatus.InvalidMessageError,
-        errorCode: '400',
+        errorCode: 'Error 400: Message contains invalid HTML tags',
       },
       {
-        where: { id: emailMessageTxId },
+        where: { id: emailMessageTransactionalId },
       }
     )
     throw new InvalidMessageError()
   }
 
   const sanitizedAttachments = attachments
-    ? await FileAttachmentService.sanitizeFiles(attachments, emailMessageTxId)
+    ? await FileAttachmentService.sanitizeFiles(
+        attachments,
+        emailMessageTransactionalId
+      )
     : undefined
 
   const blacklisted = await isBlacklisted(recipient)
   if (blacklisted) {
-    await EmailMessageTx.update(
+    void EmailMessageTransactional.update(
       {
-        status: TransactionalEmailMessageStatus.BlacklistedRecipientError,
-        errorCode: '400',
+        errorCode: 'Error 400: Blacklisted recipient',
       },
       {
-        where: { id: emailMessageTxId },
+        where: { id: emailMessageTransactionalId },
       }
     )
     throw new InvalidRecipientError('Recipient email is blacklisted')

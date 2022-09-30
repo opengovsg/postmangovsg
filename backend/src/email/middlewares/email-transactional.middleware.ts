@@ -12,7 +12,10 @@ import {
   MaliciousFileError,
   UnsupportedFileTypeError,
 } from '@core/errors'
-import { EmailMessageTx, TransactionalEmailMessageStatus } from '@email/models'
+import {
+  EmailMessageTransactional,
+  TransactionalEmailMessageStatus,
+} from '@email/models'
 import { parseFromAddress } from '@shared/utils/from-address'
 
 export interface EmailTransactionalMiddleware {
@@ -53,7 +56,7 @@ export const InitEmailTransactionalMiddleware = (
 
     const { fromName, fromAddress } = parseFromAddress(from)
     const userEmail = (await authService.findUser(req.session?.user?.id))?.email
-    const emailMessageTx = await EmailMessageTx.create({
+    const emailMessageTransactional = await EmailMessageTransactional.create({
       userEmail,
       fromName,
       fromAddress,
@@ -64,18 +67,29 @@ export const InitEmailTransactionalMiddleware = (
         from,
         replyTo,
       },
-      hasAttachment: !!attachments,
-      attachmentS3Object: null,
+      messageId: null,
+      attachmentsMetadata: null,
       status: TransactionalEmailMessageStatus.Unsent,
-      sentAt: null,
       errorCode: null,
+      sentAt: null,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
-    } as unknown as EmailMessageTx)
-    if (!emailMessageTx) {
+    } as unknown as EmailMessageTransactional)
+    if (!emailMessageTransactional) {
       throw new Error('Unable to create entry in email_message_tx')
     }
+    if (attachments) {
+      void EmailMessageTransactional.update(
+        {
+          attachmentsMetadata: [],
+        },
+        {
+          where: { id: emailMessageTransactional.id },
+        }
+      )
+    }
+    // TODO: process attachments metadata
     req.body.userEmail = userEmail // in order to avoid a db call
-    req.body.emailMessageTxId = emailMessageTx.id // for subsequent middlewares to distinguish whether this is a transactional email
+    req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
     next()
   }
 
@@ -94,8 +108,11 @@ export const InitEmailTransactionalMiddleware = (
       reply_to: replyTo,
       attachments,
       userEmail, // added by saveMessage; avoid unnecessary DB query
-      emailMessageTxId, // added by saveMessage
-    }: ReqBody & { userEmail: string; emailMessageTxId: number } = req.body
+      emailMessageTransactionalId, // added by saveMessage
+    }: ReqBody & {
+      userEmail: string
+      emailMessageTransactionalId: number
+    } = req.body
 
     try {
       await EmailTransactionalService.sendMessage({
@@ -105,15 +122,15 @@ export const InitEmailTransactionalMiddleware = (
         recipient,
         replyTo: replyTo ?? userEmail,
         attachments,
-        emailMessageTxId,
+        emailMessageTransactionalId,
       })
-      await EmailMessageTx.update(
+      await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Accepted,
           sentAt: new Date(),
         },
         {
-          where: { id: emailMessageTxId },
+          where: { id: emailMessageTransactionalId },
         }
       )
       res.sendStatus(202)
@@ -157,14 +174,12 @@ export const InitEmailTransactionalMiddleware = (
         message: 'Rate limited request to send transactional email',
         userId: req?.session?.user.id,
       })
-      // think we can use void here? not using return value, no need to wait
-      void EmailMessageTx.update(
+      void EmailMessageTransactional.update(
         {
-          status: TransactionalEmailMessageStatus.RateLimitError,
-          errorCode: '429',
+          errorCode: 'Error 429: Too many requests, rate limit reached',
         },
         {
-          where: { id: req.body.emailMessageTxId },
+          where: { id: req.body.emailMessageTransactionalId },
         }
       )
       res

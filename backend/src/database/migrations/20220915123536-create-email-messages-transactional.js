@@ -4,7 +4,7 @@ const { TransactionalEmailMessageStatus } = require('@email/models')
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('email_messages_tx', {
+    await queryInterface.createTable('email_messages_transactional', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -40,35 +40,23 @@ module.exports = {
         type: Sequelize.DataTypes.STRING(255),
         allowNull: true,
       },
-      has_attachment: {
-        type: Sequelize.DataTypes.BOOLEAN,
-        allowNull: false,
-      },
-      attachment_s3_object: {
-        type: Sequelize.DataTypes.JSON,
+      attachments_metadata: {
+        type: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.JSON),
         allowNull: true,
       },
       status: {
         type: Sequelize.DataTypes.ENUM(
-          TransactionalEmailMessageStatus.Sent,
-          TransactionalEmailMessageStatus.InvalidFromAddressError,
-          TransactionalEmailMessageStatus.RateLimitError,
-          TransactionalEmailMessageStatus.InvalidMessageError,
-          TransactionalEmailMessageStatus.UnsupportedFileTypeError,
-          TransactionalEmailMessageStatus.MaliciousFileError,
-          TransactionalEmailMessageStatus.BlacklistedRecipientError,
-          TransactionalEmailMessageStatus.Accepted,
-          TransactionalEmailMessageStatus.Sent
+          Object.values(TransactionalEmailMessageStatus)
         ),
         allowNull: false,
-      },
-      sent_at: {
-        allowNull: true,
-        type: Sequelize.DataTypes.DATE,
       },
       error_code: {
         allowNull: true,
         type: Sequelize.DataTypes.STRING(255),
+      },
+      sent_at: {
+        allowNull: true,
+        type: Sequelize.DataTypes.DATE,
       },
       created_at: {
         allowNull: false,
@@ -81,9 +69,9 @@ module.exports = {
     })
   },
   down: async (queryInterface, _) => {
-    await queryInterface.dropTable('email_messages_tx')
+    await queryInterface.dropTable('email_messages_transactional')
     await queryInterface.sequelize.query(
-      'DROP TYPE "enum_email_messages_tx_status";'
+      'DROP TYPE "enum_email_messages_transactional_status";'
     )
   },
 }

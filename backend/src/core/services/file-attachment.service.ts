@@ -4,8 +4,7 @@ import _ from 'lodash'
 import { MailAttachment } from '@shared/clients/mail-client.class'
 import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
 import { FileExtensionService } from '@core/services'
-import { EmailMessageTx, TransactionalEmailMessageStatus } from '@email/models'
-// import { UploadedFile } from 'express-fileupload'
+import { EmailMessageTransactional } from '@email/models'
 
 const checkExtensions = async (
   files: { data: Buffer; name: string }[]
@@ -38,44 +37,35 @@ const parseFiles = async (
 
 const sanitizeFiles = async (
   files: { data: Buffer; name: string }[],
-  emailMessageTxId: number
+  emailMessageTransactionalId: number
 ): Promise<MailAttachment[]> => {
   const isAcceptedType = await checkExtensions(files)
   if (!isAcceptedType) {
-    await EmailMessageTx.update(
+    await EmailMessageTransactional.update(
       {
-        status: TransactionalEmailMessageStatus.UnsupportedFileTypeError,
-        errorCode: '400',
+        errorCode: 'Error 400: Unsupported file type',
       },
       {
-        where: { id: emailMessageTxId },
+        where: { id: emailMessageTransactionalId },
       }
     )
     throw new UnsupportedFileTypeError()
   }
   const isSafe = await virusScan(files)
   if (!isSafe) {
-    await EmailMessageTx.update(
+    await EmailMessageTransactional.update(
       {
-        status: TransactionalEmailMessageStatus.MaliciousFileError,
-        errorCode: '400',
+        errorCode: 'Error 400: Malicious file',
       },
       {
-        where: { id: emailMessageTxId },
+        where: { id: emailMessageTransactionalId },
       }
     )
     throw new MaliciousFileError()
   }
   return parseFiles(files)
 }
-//
-// const uploadAttachments = async (
-//   attachments: UploadedFile[]
-// ): Promise<void> => {
-//   // TODO
-// }
 
 export const FileAttachmentService = {
   sanitizeFiles,
-  // uploadAttachments,
 }
