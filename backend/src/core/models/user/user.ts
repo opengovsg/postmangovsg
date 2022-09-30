@@ -37,6 +37,8 @@ export class User extends Model<User> {
   })
   email!: string
 
+  // to be accurate, this should be api_key_ash
+  // should I rename this for clarity?
   @Column(DataType.STRING)
   apiKey?: string
 
