@@ -290,14 +290,30 @@ Usage of the transactional API is recommended if you need the following features
 
 - Single API call to send email
 - Reuse Postman.gov.sg's whitelisting to ensure deliverability to SGMail
+- File attachments (more on this below)
 
 Emails sent using the transactional API have the following limitations:
 
 - There will be no delivery status available
 - Email template will not be applied
 - No variable substitution
+- Only whitelisted HTML attributes will be allowed (see [here](https://github.com/opengovsg/postmangovsg/blob/15d1d853aa32457f17f400beef3e93249797f520/shared/src/templating/xss-options.ts#L30) for full list)
+- Rate limited to 10 mails/s (429 error thrown if rate limit is exceeded)
+
+### File attachments
+
+Postman API allows the sending of attachment. Here are a few things to note:
+
+- Your attachment has to pass our antivirus scan
+- Attachment should not exceed 2MB in size
+- You can only attach a maximum of 2 attachments per email
+- Attachment format must be within the list of file types (see [here](https://github.com/opengovsg/postmangovsg/blob/docs/transactional/docs/supported-file-types.md) for full list)
+
+For more details on usage, refer to our Swagger docs [here](https://api.postman.gov.sg/docs/#/Email/post_transactional_email_send)
 
 ### 1. Send email
+
+Without attachments
 
 ```bash
 curl --location --request POST 'https://api.postman.gov.sg/v1/transactional/email/send' \
@@ -309,4 +325,15 @@ curl --location --request POST 'https://api.postman.gov.sg/v1/transactional/emai
 	"recipient": "user@agency.gov.sg",
 	"from": "test@agency.gov.sg",
 }'
+```
+
+With attachments
+
+```bash
+curl --location --request POST 'https://api.postman.gov.sg/v1/transactional/email/send' \
+--header 'Authorization: Bearer your_api_key' \
+--form 'body="<p>Hello <b>there</b></p>"' \
+--form 'recipient="user@agency.gov.sg"' \
+--form 'attachments=@"/your/local/path-to-file"' \
+--form 'subject="Test email"'
 ```
