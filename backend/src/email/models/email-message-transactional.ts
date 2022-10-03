@@ -41,7 +41,7 @@ export class EmailMessageTransactional extends Model<EmailMessageTransactional> 
 
   @ForeignKey(() => User)
   @Column({ type: DataType.STRING, allowNull: false })
-  userEmail: string
+  userId: string
 
   @Column({ type: DataType.STRING, allowNull: false })
   fromName: string

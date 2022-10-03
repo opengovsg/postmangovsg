@@ -11,14 +11,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.BIGINT,
       },
-      user_email: {
-        type: Sequelize.DataTypes.TEXT,
+      user_id: {
+        type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: 'users',
-          key: 'email',
+          key: 'id',
         },
-        onUpdate: 'CASCADE',
       },
       from_name: {
         allowNull: false,

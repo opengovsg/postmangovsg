@@ -57,9 +57,8 @@ export const InitEmailTransactionalMiddleware = (
     }: ReqBody = req.body
 
     const { fromName, fromAddress } = parseFromAddress(from)
-    const userEmail = (await authService.findUser(req.session?.user?.id))?.email
     const emailMessageTransactional = await EmailMessageTransactional.create({
-      userEmail,
+      userId: req.session?.user?.id,
       fromName,
       fromAddress,
       recipient,
@@ -93,8 +92,6 @@ export const InitEmailTransactionalMiddleware = (
         }
       )
     }
-    // TODO: process attachments metadata
-    req.body.userEmail = userEmail // in order to avoid a db call
     req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
     next()
   }
@@ -118,10 +115,8 @@ export const InitEmailTransactionalMiddleware = (
       recipient,
       reply_to: replyTo,
       attachments,
-      userEmail, // added by saveMessage; avoid unnecessary DB query
       emailMessageTransactionalId, // added by saveMessage
     }: ReqBody & {
-      userEmail: string
       emailMessageTransactionalId: number
     } = req.body
 
@@ -131,7 +126,8 @@ export const InitEmailTransactionalMiddleware = (
         body,
         from,
         recipient,
-        replyTo: replyTo ?? userEmail,
+        replyTo:
+          replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
         emailMessageTransactionalId,
       })
