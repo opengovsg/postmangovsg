@@ -18,6 +18,8 @@ import {
 } from '@email/models'
 import { parseFromAddress } from '@shared/utils/from-address'
 
+import crypto from 'crypto'
+
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler
   sendMessage: Handler
@@ -35,7 +37,7 @@ export const InitEmailTransactionalMiddleware = (
     from: string
     recipient: string
     reply_to: string
-    attachments?: { data: Buffer; name: string }[]
+    attachments?: { data: Buffer; name: string; size: number }[]
   }
 
   async function saveMessage(
@@ -80,7 +82,11 @@ export const InitEmailTransactionalMiddleware = (
     if (attachments) {
       void EmailMessageTransactional.update(
         {
-          attachmentsMetadata: [],
+          attachmentsMetadata: attachments.map((a) => ({
+            fileName: a.name,
+            fileSize: a.size,
+            hash: getAttachmentHash(a.data),
+          })),
         },
         {
           where: { id: emailMessageTransactional.id },
@@ -91,6 +97,11 @@ export const InitEmailTransactionalMiddleware = (
     req.body.userEmail = userEmail // in order to avoid a db call
     req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
     next()
+  }
+
+  function getAttachmentHash(content: Buffer): string {
+    const hasher = crypto.createHash('md5')
+    return hasher.update(content).digest('hex')
   }
 
   async function sendMessage(
@@ -127,7 +138,7 @@ export const InitEmailTransactionalMiddleware = (
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Accepted,
-          sentAt: new Date(),
+          acceptedAt: new Date(),
         },
         {
           where: { id: emailMessageTransactionalId },

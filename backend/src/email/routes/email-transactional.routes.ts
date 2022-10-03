@@ -233,7 +233,6 @@ export const InitEmailTransactionalRoute = (
     emailTransactionalMiddleware.saveMessage,
     emailMiddleware.isFromAddressAccepted,
     emailTransactionalMiddleware.rateLimit,
-    // FileAttachmentMiddleware.uploadAttachments,
     emailTransactionalMiddleware.sendMessage
   )
 

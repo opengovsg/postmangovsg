@@ -54,7 +54,19 @@ module.exports = {
         allowNull: true,
         type: Sequelize.DataTypes.STRING(255),
       },
+      accepted_at: {
+        allowNull: true,
+        type: Sequelize.DataTypes.DATE,
+      },
       sent_at: {
+        allowNull: true,
+        type: Sequelize.DataTypes.DATE,
+      },
+      delivered_at: {
+        allowNull: true,
+        type: Sequelize.DataTypes.DATE,
+      },
+      opened_at: {
         allowNull: true,
         type: Sequelize.DataTypes.DATE,
       },

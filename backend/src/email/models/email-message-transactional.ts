@@ -58,8 +58,6 @@ export class EmailMessageTransactional extends Model<EmailMessageTransactional> 
   @Column({ type: DataType.STRING, allowNull: true })
   messageId: string | null
 
-  // null means this column has yet to be processed
-  // empty array means there are no attachments
   @Column({ type: DataType.ARRAY(DataType.JSON), allowNull: true })
   attachmentsMetadata: AttachmentsMetadata | null
 
@@ -85,13 +83,19 @@ export class EmailMessageTransactional extends Model<EmailMessageTransactional> 
    * TODO: capture key timestamps in email's lifecycle and align with email_messages table
    * https://www.notion.so/opengov/Support-callbacks-in-transactional-emails-cade9647b2264a28a9a4d7eca301846a
    * */
-  // will be null upon first creation
+  // this is equivalent to `sent_at` from `email_messages` table
+  // TODO: remove above comment once the fields have been aligned for the 2 tables
+  @Column({ type: DataType.DATE, allowNull: true })
+  acceptedAt: Date | null
+
+  // Note: This is not the same as `sent_at` from `email_messages` table, this is
+  // to handle `Send` events from SES callbacks
   @Column({ type: DataType.DATE, allowNull: true })
   sentAt: Date | null
 
-  // @Column({ type: DataType.DATE, allowNull: true })
-  // deliveredAt: Date | null
+  @Column({ type: DataType.DATE, allowNull: true })
+  deliveredAt: Date | null
 
-  // @Column({ type: DataType.DATE, allowNull: true })
-  // receivedAt: Date | null
+  @Column({ type: DataType.DATE, allowNull: true })
+  openedAt: Date | null
 }
