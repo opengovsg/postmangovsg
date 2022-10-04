@@ -1,19 +1,27 @@
-import type { Request, Response, NextFunction, Handler } from 'express'
+import type { Handler, NextFunction, Request, Response } from 'express'
 import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { RedisService } from '@core/services'
 import { EmailTransactionalService } from '@email/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { TemplateError } from '@shared/templating'
 import { AuthService } from '@core/services/auth.service'
 import {
+  InvalidMessageError,
   InvalidRecipientError,
   MaliciousFileError,
   UnsupportedFileTypeError,
 } from '@core/errors'
+import {
+  EmailMessageTransactional,
+  TransactionalEmailMessageStatus,
+} from '@email/models'
+import { parseFromAddress } from '@shared/utils/from-address'
+
+import crypto from 'crypto'
 
 export interface EmailTransactionalMiddleware {
+  saveMessage: Handler
   sendMessage: Handler
   rateLimit: Handler
 }
@@ -23,25 +31,96 @@ export const InitEmailTransactionalMiddleware = (
   authService: AuthService
 ): EmailTransactionalMiddleware => {
   const logger = loggerWithLabel(module)
+  interface ReqBody {
+    subject: string
+    body: string
+    from: string
+    recipient: string
+    reply_to: string
+    attachments?: { data: Buffer; name: string; size: number }[]
+  }
+
+  async function saveMessage(
+    req: Request,
+    _: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const action = 'saveMessage'
+    logger.info({ message: 'Saving email', action })
+    const {
+      subject,
+      body,
+      from,
+      recipient,
+      reply_to: replyTo,
+      attachments,
+    }: ReqBody = req.body
+
+    const { fromName, fromAddress } = parseFromAddress(from)
+    const emailMessageTransactional = await EmailMessageTransactional.create({
+      userId: req.session?.user?.id,
+      fromName,
+      fromAddress,
+      recipient,
+      params: {
+        subject,
+        body,
+        from,
+        replyTo,
+      },
+      messageId: null,
+      attachmentsMetadata: null,
+      status: TransactionalEmailMessageStatus.Unsent,
+      errorCode: null,
+      sentAt: null,
+      // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
+    } as unknown as EmailMessageTransactional)
+    if (!emailMessageTransactional) {
+      throw new Error('Unable to create entry in email_message_tx')
+    }
+    if (attachments) {
+      void EmailMessageTransactional.update(
+        {
+          attachmentsMetadata: attachments.map((a) => ({
+            fileName: a.name,
+            fileSize: a.size,
+            hash: getAttachmentHash(a.data),
+          })),
+        },
+        {
+          where: { id: emailMessageTransactional.id },
+        }
+      )
+    }
+    req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
+    next()
+  }
+
+  function getAttachmentHash(content: Buffer): string {
+    const hasher = crypto.createHash('md5')
+    return hasher.update(content).digest('hex')
+  }
 
   async function sendMessage(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    const ACTION = 'sendMessage'
+    const action = 'sendMessage'
+    logger.info({ message: 'Sending email', action })
+    const {
+      subject,
+      body,
+      from,
+      recipient,
+      reply_to: replyTo,
+      attachments,
+      emailMessageTransactionalId, // added by saveMessage
+    }: ReqBody & {
+      emailMessageTransactionalId: number
+    } = req.body
 
     try {
-      const {
-        subject,
-        body,
-        from,
-        recipient,
-        reply_to: replyTo,
-        attachments,
-      } = req.body
-
-      logger.info({ message: 'Sending email', action: ACTION })
       await EmailTransactionalService.sendMessage({
         subject,
         body,
@@ -50,26 +129,36 @@ export const InitEmailTransactionalMiddleware = (
         replyTo:
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
+        emailMessageTransactionalId,
       })
+      await EmailMessageTransactional.update(
+        {
+          status: TransactionalEmailMessageStatus.Accepted,
+          acceptedAt: new Date(),
+        },
+        {
+          where: { id: emailMessageTransactionalId },
+        }
+      )
       res.sendStatus(202)
-    } catch (err) {
+    } catch (error) {
       logger.error({
         message: 'Failed to send email',
-        action: ACTION,
-        error: err,
+        action,
+        error,
       })
 
       const BAD_REQUEST_ERRORS = [
-        TemplateError,
+        InvalidMessageError,
         InvalidRecipientError,
         MaliciousFileError,
         UnsupportedFileTypeError,
       ]
-      if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
-        res.status(400).json({ message: (err as Error).message })
+      if (BAD_REQUEST_ERRORS.some((errType) => error instanceof errType)) {
+        res.status(400).json({ message: (error as Error).message })
         return
       }
-      next(err)
+      next(error)
     }
   }
 
@@ -92,11 +181,22 @@ export const InitEmailTransactionalMiddleware = (
         message: 'Rate limited request to send transactional email',
         userId: req?.session?.user.id,
       })
-      res.sendStatus(429)
+      void EmailMessageTransactional.update(
+        {
+          errorCode: 'Error 429: Too many requests, rate limit reached',
+        },
+        {
+          where: { id: req.body.emailMessageTransactionalId },
+        }
+      )
+      res
+        .status(429)
+        .json({ message: 'Too many requests. Please try again later.' })
     },
   })
 
   return {
+    saveMessage,
     sendMessage,
     rateLimit,
   }
