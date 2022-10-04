@@ -16,7 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-sns": "3.95.0",
+    "@aws-sdk/client-sns": "3.169.0",
     "@types/bcrypt": "3.0.0",
     "@types/convict": "5.2.1",
     "@types/validator": "13.1.3",
