@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@sentry/node": "5.27.4",
-    "aws-sdk": "2.1140.0",
+    "aws-sdk": "2.1214.0",
     "axios": "0.27.2",
     "convict": "6.2.3",
     "dotenv": "8.2.0",
