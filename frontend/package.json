@@ -59,7 +59,7 @@
     "util": "0.12.4",
     "uuidv4": "6.1.1",
     "validator": "13.7.0",
-    "webcrypto-shim": "0.1.5"
+    "webcrypto-shim": "0.1.7"
   },
   "devDependencies": {
     "@babel/core": "7.18.2",
