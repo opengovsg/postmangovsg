@@ -19,7 +19,7 @@
     "test": "react-app-rewired test --passWithNoTests"
   },
   "dependencies": {
-    "@lingui/react": "3.13.3",
+    "@lingui/react": "3.14.0",
     "@sentry/browser": "5.27.6",
     "@types/bcryptjs": "2.4.2",
     "@types/papaparse": "5.2.5",
