@@ -9,7 +9,9 @@ import { User, UserList } from '@core/models'
 import { ChannelType } from '@core/constants'
 
 @Table({ tableName: 'lists', underscored: true, timestamps: true })
-export class List extends Model<List> {
+// <Model<Partial<List>> is required to resolve errors in the model.create()
+// method call. https://github.com/sequelize/sequelize-typescript/issues/939
+export class List extends Model<Partial<List>> {
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
@@ -28,12 +30,6 @@ export class List extends Model<List> {
     allowNull: false,
   })
   etag!: string
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  name!: string
 
   @Column({
     type: DataType.STRING,

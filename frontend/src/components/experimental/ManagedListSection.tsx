@@ -28,7 +28,7 @@ const ManagedListSection = ({
         disabled={!managedLists.length}
         options={managedLists.map((list) => {
           return {
-            label: list.name,
+            label: list.filename,
             value: list.id.toString(),
           }
         })}

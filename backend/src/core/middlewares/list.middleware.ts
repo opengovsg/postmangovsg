@@ -28,7 +28,7 @@ const getListsByChannel = async (
       channel: channel as ChannelType,
     })
     const cleanedLists = rawLists.map((list) => {
-      return { id: list.id, name: list.name }
+      return { id: list.id, filename: list.filename }
     })
     return res.status(200).json({ lists: cleanedLists })
   } catch (err) {
