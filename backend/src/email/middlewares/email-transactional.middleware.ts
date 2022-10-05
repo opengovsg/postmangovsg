@@ -16,7 +16,6 @@ import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
 } from '@email/models'
-import { parseFromAddress } from '@shared/utils/from-address'
 
 import crypto from 'crypto'
 
@@ -56,11 +55,9 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
     }: ReqBody = req.body
 
-    const { fromName, fromAddress } = parseFromAddress(from)
     const emailMessageTransactional = await EmailMessageTransactional.create({
       userId: req.session?.user?.id,
-      fromName,
-      fromAddress,
+      from,
       recipient,
       params: {
         subject,

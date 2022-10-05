@@ -43,11 +43,8 @@ export class EmailMessageTransactional extends Model<EmailMessageTransactional> 
   @Column({ type: DataType.STRING, allowNull: false })
   userId: string
 
-  @Column({ type: DataType.STRING, allowNull: false })
-  fromName: string
-
-  @Column({ type: DataType.STRING, allowNull: false })
-  fromAddress: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  from: string
 
   @Column({ type: DataType.STRING, allowNull: false })
   recipient: string
