@@ -25,6 +25,7 @@ import {
   StepHeader,
   InfoBlock,
   WarningBlock,
+  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { ManagedListSection } from 'components/experimental'
@@ -53,12 +54,14 @@ const SMSRecipients = ({
     csvFilename: initialCsvFilename,
     demoMessageLimit,
     params,
+    shouldSaveList: initialShouldSaveList,
   } = campaign as SMSCampaign
   const isDemo = !!demoMessageLimit
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
+  const [shouldSaveList, setShouldSaveList] = useState(initialShouldSaveList)
   const [managedLists, setManagedLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<number>()
   const [csvInfo, setCsvInfo] = useState<
@@ -140,8 +143,19 @@ const SMSRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
-  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
+    updateCampaign({
+      isCsvProcessing,
+      csvFilename,
+      numRecipients,
+      shouldSaveList,
+    })
+  }, [
+    isCsvProcessing,
+    csvFilename,
+    numRecipients,
+    updateCampaign,
+    shouldSaveList,
+  ])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -226,6 +240,9 @@ const SMSRecipients = ({
             setErrorMsg={setErrorMessage}
           />
         </CsvUpload>
+        <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
+          Save this file as a managed list
+        </Checkbox>
         {isDemo && (
           <InfoBlock title="Limited to 20 recipients">
             <span>

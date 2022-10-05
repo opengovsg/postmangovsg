@@ -1,6 +1,9 @@
-import { User, List } from '@core/models'
+import { User, List, UserList } from '@core/models'
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
+import { Op } from 'sequelize'
+
+const DAYS_TO_LIST_EXPIRY = 14
 
 const logger = loggerWithLabel(module)
 /**
@@ -12,7 +15,8 @@ const listLists = async ({
 }: {
   userId: number
   channel: ChannelType
-}): Promise<{ id: List['id']; name: List['name'] }[]> => {
+}): Promise<{ id: List['id']; filename: List['filename'] }[]> => {
+  const currentDateTime = new Date()
   try {
     const user = await User.findOne({
       where: { id: userId },
@@ -21,6 +25,12 @@ const listLists = async ({
           model: List,
           where: {
             channel,
+            createdAt: {
+              // We currently only want to retrieve managed lists that were uploaded fewer than <DAYS_TO_LIST_EXPIRY> ago
+              [Op.gte]: currentDateTime.setDate(
+                currentDateTime.getDate() - DAYS_TO_LIST_EXPIRY
+              ),
+            },
           },
         },
       ],
@@ -47,10 +57,17 @@ const getList = async ({
   listId: number
   channel: ChannelType
 }): Promise<List | null> => {
+  const currentDateTime = new Date()
   return List.findOne({
     where: {
       id: listId,
       channel,
+      createdAt: {
+        // We currently only want to retrieve managed lists that were uploaded fewer than <DAYS_TO_LIST_EXPIRY> ago
+        [Op.gte]: currentDateTime.setDate(
+          currentDateTime.getDate() - DAYS_TO_LIST_EXPIRY
+        ),
+      },
     },
     include: [
       {
@@ -64,7 +81,41 @@ const getList = async ({
   })
 }
 
+const createList = async ({
+  s3key,
+  etag,
+  filename,
+  channel,
+}: {
+  s3key: string
+  etag: string
+  filename: string
+  channel: ChannelType
+}): Promise<List> => {
+  return List.create({
+    s3key,
+    etag,
+    filename,
+    channel,
+  })
+}
+
+const addUserToList = async ({
+  userId,
+  listId,
+}: {
+  userId: number
+  listId: number
+}): Promise<UserList> => {
+  return UserList.create({
+    userId,
+    listId,
+  })
+}
+
 export const ListService = {
   listLists,
   getList,
+  createList,
+  addUserToList,
 }

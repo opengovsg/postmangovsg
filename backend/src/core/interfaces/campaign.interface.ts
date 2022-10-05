@@ -21,9 +21,18 @@ export interface CampaignDetails {
   valid: boolean
   has_credential: boolean
   csv_filename: string
+  s3_object: {
+    key: string | null
+    filename: string | null
+    bucket: string | null
+    temp_filename: string | null
+    error: string | null
+    etag: string | null
+  } | null
   is_csv_processing: boolean
   protect: boolean
   demo_message_limit: number | null
+  should_save_list: boolean
   num_recipients: number
   redacted?: boolean
   email_templates?: {

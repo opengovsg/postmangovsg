@@ -17,6 +17,7 @@ const sendCampaign = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
+    const userId = req.session?.user?.id
     const { campaignId } = req.params
     const { rate } = req.body
     const logMeta = { action: 'sendCampaign', campaignId }
@@ -25,6 +26,7 @@ const sendCampaign = async (
       const jobIds = await JobService.sendCampaign({
         campaignId: +campaignId,
         rate: +rate,
+        userId,
       })
       logger.info({ message: 'Sending campaign', jobIds, ...logMeta })
       return res.status(200).json({ campaign_id: campaignId, job_id: jobIds })

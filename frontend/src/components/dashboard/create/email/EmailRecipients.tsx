@@ -27,6 +27,7 @@ import {
   StepHeader,
   StepSection,
   WarningBlock,
+  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { ManagedListSection } from 'components/experimental'
@@ -58,12 +59,14 @@ const EmailRecipients = ({
     csvFilename: initialCsvFilename,
     isCsvProcessing: initialIsProcessing,
     numRecipients: initialNumRecipients,
+    shouldSaveList: initialShouldSaveList,
     params,
     protect,
   } = campaign
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
+  const [shouldSaveList, setShouldSaveList] = useState(initialShouldSaveList)
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({
@@ -149,8 +152,19 @@ const EmailRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
-  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
+    updateCampaign({
+      isCsvProcessing,
+      csvFilename,
+      numRecipients,
+      shouldSaveList,
+    })
+  }, [
+    isCsvProcessing,
+    csvFilename,
+    numRecipients,
+    updateCampaign,
+    shouldSaveList,
+  ])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -256,6 +270,9 @@ const EmailRecipients = ({
             </>
           )}
         </CsvUpload>
+        <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
+          Save this file as a managed list
+        </Checkbox>
         <ManagedListSection
           managedLists={managedLists}
           setSelectedListId={setSelectedListId}

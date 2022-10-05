@@ -31,7 +31,7 @@ const TelegramSend = ({
   setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
-  const { numRecipients } = campaign
+  const { numRecipients, shouldSaveList } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState({} as { body: string })
   const [sendRate, setSendRate] = useState('')
@@ -62,6 +62,7 @@ const TelegramSend = ({
       sendRate: +sendRate,
       channelType: ChannelType.Telegram,
       updateCampaign,
+      shouldSaveList,
     })
   }
 
