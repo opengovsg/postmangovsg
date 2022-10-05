@@ -17,11 +17,12 @@ import {
   UserList,
 } from '@core/models'
 import {
-  EmailMessage,
-  EmailTemplate,
-  EmailOp,
   EmailBlacklist,
   EmailFromAddress,
+  EmailMessage,
+  EmailMessageTransactional,
+  EmailOp,
+  EmailTemplate,
 } from '@email/models'
 import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
 import {
@@ -50,12 +51,13 @@ export const initializeModels = (sequelize: Sequelize): void => {
     UserList,
   ]
   const emailModels = [
-    EmailMessage,
-    EmailTemplate,
-    EmailOp,
     EmailBlacklist,
-    ProtectedMessage,
     EmailFromAddress,
+    EmailMessage,
+    EmailMessageTransactional,
+    EmailOp,
+    EmailTemplate,
+    ProtectedMessage,
   ]
   const smsModels = [SmsMessage, SmsTemplate, SmsOp]
   const telegramModels = [

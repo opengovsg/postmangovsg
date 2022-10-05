@@ -1,1 +1,2 @@
-export { default as ManagedListSection } from './ManagedListSection'
+export * from './ManagedListSection'
+export * from './ManagedListInfoBlock'

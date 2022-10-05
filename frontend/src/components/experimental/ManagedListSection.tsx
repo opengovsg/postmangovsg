@@ -13,16 +13,7 @@ const ManagedListSection = ({
   return (
     <>
       <h3>Choose recipient list</h3>
-      <p>
-        Reuse an existing list for your campaign.{' '}
-        <a
-          href="https://go.gov.sg/postman-list"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <u>Learn more.</u>
-        </a>
-      </p>
+      <p>Reuse an existing list for your campaign.</p>
 
       <Dropdown
         disabled={!managedLists.length}
@@ -39,5 +30,3 @@ const ManagedListSection = ({
     </>
   )
 }
-
-export default ManagedListSection

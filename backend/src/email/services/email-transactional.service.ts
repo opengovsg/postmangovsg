@@ -1,10 +1,10 @@
-import { EmailTemplateService, EmailService } from '@email/services'
+import { EmailService, EmailTemplateService } from '@email/services'
 import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
-import { TemplateError } from '@shared/templating'
 import { isBlacklisted } from '@email/utils/query'
-import { InvalidRecipientError } from '@core/errors'
+import { InvalidMessageError, InvalidRecipientError } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
+import { EmailMessageTransactional } from '@email/models'
 
 const logger = loggerWithLabel(module)
 
@@ -22,6 +22,7 @@ async function sendMessage({
   recipient,
   replyTo,
   attachments,
+  emailMessageTransactionalId,
 }: {
   subject: string
   body: string
@@ -29,25 +30,40 @@ async function sendMessage({
   recipient: string
   replyTo?: string
   attachments?: { data: Buffer; name: string }[]
+  emailMessageTransactionalId: number
 }): Promise<void> {
   const sanitizedSubject =
     EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
   const sanitizedBody = EmailTemplateService.client.filterXSS(body)
   if (!sanitizedSubject || !sanitizedBody) {
-    throw new TemplateError(
-      'Message is invalid as the subject or body only contains invalid HTML tags.'
+    void EmailMessageTransactional.update(
+      {
+        errorCode: 'Error 400: Message contains invalid HTML tags',
+      },
+      {
+        where: { id: emailMessageTransactionalId },
+      }
     )
+    throw new InvalidMessageError()
   }
 
-  let sanitizedAttachments
-  if (attachments) {
-    sanitizedAttachments = await FileAttachmentService.sanitizeFiles(
-      attachments
-    )
-  }
+  const sanitizedAttachments = attachments
+    ? await FileAttachmentService.sanitizeFiles(
+        attachments,
+        emailMessageTransactionalId
+      )
+    : undefined
 
   const blacklisted = await isBlacklisted(recipient)
   if (blacklisted) {
+    void EmailMessageTransactional.update(
+      {
+        errorCode: 'Error 400: Blacklisted recipient',
+      },
+      {
+        where: { id: emailMessageTransactionalId },
+      }
+    )
     throw new InvalidRecipientError('Recipient email is blacklisted')
   }
 

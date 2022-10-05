@@ -12,10 +12,9 @@ import {
   BelongsTo,
   BelongsToMany,
 } from 'sequelize-typescript'
-import { UserCredential } from './user-credential'
+import { UserCredential } from '@core/models'
 import { UserDemo } from './user-demo'
-import { UserFeature } from './user-feature'
-import { UserList, List } from '@core/models'
+import { UserList, List, UserFeature } from '@core/models'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
@@ -34,6 +33,7 @@ export class User extends Model<User> {
       isEmail: true,
       isLowercase: true,
     },
+    unique: true,
   })
   email!: string
 

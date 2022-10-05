@@ -30,7 +30,10 @@ import {
   Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import { ManagedListSection } from 'components/experimental'
+import {
+  ManagedListInfoBlock,
+  ManagedListSection,
+} from 'components/experimental'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
@@ -212,6 +215,7 @@ const EmailRecipients = ({
           title="Upload or select existing recipient list"
           subtitle={protect ? '' : 'Step 2'}
         >
+          <ManagedListInfoBlock />
           <p>
             Only CSV format files are allowed. If you have an Excel file, please
             convert it by going to File &gt; Save As &gt; CSV (Comma delimited).

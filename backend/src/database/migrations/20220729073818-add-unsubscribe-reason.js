@@ -12,7 +12,7 @@ module.exports = {
     })
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface, _) => {
     await queryInterface.removeColumn('unsubscribers', 'deleted_at')
     await queryInterface.removeColumn('unsubscribers', 'reason')
   },
