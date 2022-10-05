@@ -8,7 +8,10 @@ import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
 } from '@email/models'
+<<<<<<< HEAD
 import { SesEventType } from '@email/interfaces/callback.interface'
+=======
+>>>>>>> 46f12888 (feat(backend): handle status callbacks for transactional emails)
 
 const logger = loggerWithLabel(module)
 
@@ -104,12 +107,20 @@ type CallbackMetaData = {
   }
 }
 async function handleStatusCallbacks(
+<<<<<<< HEAD
   type: SesEventType,
+=======
+  type: string,
+>>>>>>> 46f12888 (feat(backend): handle status callbacks for transactional emails)
   id: string,
   metadata: CallbackMetaData
 ): Promise<void> {
   switch (type) {
+<<<<<<< HEAD
     case SesEventType.Delivery:
+=======
+    case 'Delivery':
+>>>>>>> 46f12888 (feat(backend): handle status callbacks for transactional emails)
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Delivered,
@@ -120,7 +131,11 @@ async function handleStatusCallbacks(
         }
       )
       break
+<<<<<<< HEAD
     case SesEventType.Bounce:
+=======
+    case 'Bounce':
+>>>>>>> 46f12888 (feat(backend): handle status callbacks for transactional emails)
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Bounced,
@@ -135,7 +150,11 @@ async function handleStatusCallbacks(
         }
       )
       break
+<<<<<<< HEAD
     case SesEventType.Complaint:
+=======
+    case 'Complaint':
+>>>>>>> 46f12888 (feat(backend): handle status callbacks for transactional emails)
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Complaint,
@@ -147,7 +166,11 @@ async function handleStatusCallbacks(
         }
       )
       break
+<<<<<<< HEAD
     case SesEventType.Open:
+=======
+    case 'Open':
+>>>>>>> 46f12888 (feat(backend): handle status callbacks for transactional emails)
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Opened,
@@ -158,7 +181,11 @@ async function handleStatusCallbacks(
         }
       )
       break
+<<<<<<< HEAD
     case SesEventType.Send:
+=======
+    case 'Send':
+>>>>>>> 46f12888 (feat(backend): handle status callbacks for transactional emails)
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Sent,

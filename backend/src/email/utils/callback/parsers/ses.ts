@@ -13,7 +13,10 @@ import { addToBlacklist } from '@email/utils/callback/query'
 import config from '@core/config'
 import { compareSha256Hash } from '@shared/utils/crypto'
 import { EmailTransactionalService } from '@email/services/email-transactional.service'
+<<<<<<< HEAD
 import { SesEventType } from '@email/interfaces/callback.interface'
+=======
+>>>>>>> 46f12888 (feat(backend): handle status callbacks for transactional emails)
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
