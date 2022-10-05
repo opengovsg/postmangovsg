@@ -12,6 +12,7 @@ import {
 import { addToBlacklist } from '@email/utils/callback/query'
 import config from '@core/config'
 import { compareSha256Hash } from '@shared/utils/crypto'
+import { EmailTransactionalService } from '@email/services/email-transactional.service'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
@@ -38,6 +39,7 @@ type SmtpApiHeader = {
     username?: string
     hash?: string
   }
+  isTransactional?: boolean
 }
 /**
  * Parses the message to find the matching email_message id
@@ -222,6 +224,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   await blacklistIfNeeded(message)
 
   const id = smtpApiHeader?.unique_args?.message_id
+  const isTransactional = smtpApiHeader?.isTransactional
   const messageId = message?.mail?.commonHeaders?.messageId
   const logMeta = { messageId, action: 'parseRecord' }
   const type = message?.notificationType || message?.eventType
@@ -233,6 +236,13 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       type,
       ...logMeta,
     })
+    if (isTransactional) {
+      return EmailTransactionalService.handleStatusCallbacks(type, id, {
+        timestamp: new Date(record.Timestamp),
+        bounce: message.bounce,
+        complaint: message.complaint,
+      })
+    }
     return parseNotificationAndEvent(type, message, metadata)
   }
 }
