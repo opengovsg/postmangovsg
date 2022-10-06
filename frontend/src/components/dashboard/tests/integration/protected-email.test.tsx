@@ -120,10 +120,14 @@ test('successfully creates and sends a new protected email campaign', async () =
 
   // Type in protected message
   const protectedMessageTextbox = screen.getByRole('textbox', {
-    name: /message b/i,
+    name: /rdw-editor/i,
   })
-  await userEvent.type(protectedMessageTextbox, MESSAGE_TEXT, { delay: null })
-  expect(protectedMessageTextbox).toHaveValue(MESSAGE_TEXT)
+  fireEvent.paste(protectedMessageTextbox, {
+    clipboardData: {
+      getData: () => MESSAGE_TEXT,
+    },
+  })
+  expect(protectedMessageTextbox).toHaveTextContent(MESSAGE_TEXT)
 
   // Upload the file
   // Note: we cannot select files via the file picker
@@ -136,7 +140,6 @@ test('successfully creates and sends a new protected email campaign', async () =
 
   // Wait for CSV to be processed and ensure that protected message preview is shown
   expect(await screen.findByText(/1 recipient/i)).toBeInTheDocument()
-  expect(screen.getByText(/results/i)).toBeInTheDocument()
   expect(screen.getByText(MESSAGE_TEXT)).toBeInTheDocument()
 
   // Click the confirm button

@@ -1,7 +1,7 @@
 const { defineConfig } = require('cypress');
 const path = require('path');
 const gmail = require('gmail-tester');
-const fs = require('fs')
+const fs = require('fs');
 
 require('dotenv').config();
 
@@ -45,8 +45,8 @@ module.exports = defineConfig({
           );
           return email;
         },
-        'findDownloaded': async (path) => {
-          return fs.readdirSync(path)
+        findDownloaded: async (path) => {
+          return fs.readdirSync(path);
         },
       });
       return config;
