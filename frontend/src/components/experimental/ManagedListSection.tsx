@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { List } from 'classes'
 import { Dropdown } from 'components/common'
 
-const ManagedListSection = ({
+export const ManagedListSection = ({
   managedLists,
   setSelectedListId,
 }: {
