@@ -1,46 +1,48 @@
 describe('SMS Test', () => {
-  
-  const MODE = 'sms'
-  const CSV_FILENAME = 'testfile_sms.csv';
-  const NUM_RECIPIENTS = '1';
-  const TWILIO_CRED_SAVED = 'default-postman';
+  it.skip('initiate email campaign', () => {
+    // have these vars here so it won't affect retry results
+    // (e.g. messages received from previous try being counted in the latest one
+    // as they share the same content)
+    const MODE = 'sms';
+    const CSV_FILENAME = 'testfile_sms.csv';
+    const NUM_RECIPIENTS = '1';
+    const TWILIO_CRED_SAVED = 'default-postman';
 
-  const CUR_DATE = new Date();
-  const DATETIME =
-    CUR_DATE.getDate() +
-    '/' +
-    (CUR_DATE.getMonth() + 1) +
-    '/' +
-    CUR_DATE.getFullYear() +
-    '@' +
-    CUR_DATE.getHours() +
-    ':' +
-    CUR_DATE.getMinutes() +
-    ':' +
-    CUR_DATE.getSeconds();
-  const CAMPAIGN_NAME = MODE.concat('_').concat(DATETIME);
-  const RANDOM_STRING = '_'.concat(
-    Math.floor(Math.random() * 1000000 + 1).toString(),
-  );
-  const MSG_CONTENT = Cypress.env('MSG_CONTENT').concat(RANDOM_STRING);
-  const MSG_TO_VERIFY = Cypress.env('MSG_TO_VERIFY').concat(RANDOM_STRING);
+    const CUR_DATE = new Date();
+    const DATETIME =
+      CUR_DATE.getDate() +
+      '/' +
+      (CUR_DATE.getMonth() + 1) +
+      '/' +
+      CUR_DATE.getFullYear() +
+      '@' +
+      CUR_DATE.getHours() +
+      ':' +
+      CUR_DATE.getMinutes() +
+      ':' +
+      CUR_DATE.getSeconds();
+    const CAMPAIGN_NAME = MODE.concat('_').concat(DATETIME);
+    const RANDOM_STRING = '_'.concat(
+      Math.floor(Math.random() * 1000000 + 1).toString(),
+    );
+    const MSG_CONTENT = Cypress.env('MSG_CONTENT').concat(RANDOM_STRING);
+    const MSG_TO_VERIFY = Cypress.env('MSG_TO_VERIFY').concat(RANDOM_STRING);
 
-  const OTP_SUBJECT = Cypress.env('OTP_SUBJECT');
-  const EMAIL = Cypress.env('EMAIL');
-  const MAIL_SENDER = Cypress.env('MAIL_SENDER');
-  const SMS_NUMBER = Cypress.env('SMS_NUMBER');
-  const TWILIO_ACC_SID = Cypress.env('TWILIO_ACC_SID');
-  const TWILIO_AUTH_TOKEN = Cypress.env('TWILIO_AUTH_TOKEN');
-  const WAIT_TIME = Cypress.env('WAIT_TIME');
-  const REPORT_WAIT_TIME = Cypress.env('REPORT_WAIT_TIME')
+    const OTP_SUBJECT = Cypress.env('OTP_SUBJECT');
+    const EMAIL = Cypress.env('EMAIL');
+    const MAIL_SENDER = Cypress.env('MAIL_SENDER');
+    const SMS_NUMBER = Cypress.env('SMS_NUMBER');
+    const TWILIO_ACC_SID = Cypress.env('TWILIO_ACC_SID');
+    const TWILIO_AUTH_TOKEN = Cypress.env('TWILIO_AUTH_TOKEN');
+    const WAIT_TIME = Cypress.env('WAIT_TIME');
+    const REPORT_WAIT_TIME = Cypress.env('REPORT_WAIT_TIME');
 
-  const MSG_TO_SEARCH = 15;
-  const MSG_TO_EXPECT = 2; //both test and actual sms
+    const MSG_TO_SEARCH = 15;
+    const MSG_TO_EXPECT = 2; //both test and actual sms
 
-  it('initiate email campaign', () => {
     //write csv test file
-    const CSV_CONTENT = "recipient,name\n" + SMS_NUMBER + ",postman"
-    cy.writeFile('cypress/fixtures/'.concat(CSV_FILENAME), CSV_CONTENT)
+    const CSV_CONTENT = 'recipient,name\n' + SMS_NUMBER + ',postman';
+    cy.writeFile('cypress/fixtures/'.concat(CSV_FILENAME), CSV_CONTENT);
 
     //log in via OTP
     cy.visit('/login');
@@ -63,7 +65,7 @@ describe('SMS Test', () => {
 
     //initiate campaign
     cy.contains(':button', 'Create').click();
-    cy.get('input[type="text"]').type(CAMPAIGN_NAME);
+    cy.get('input[id="nameCampaign"]').type(CAMPAIGN_NAME);
     cy.contains(':button', 'SMS').click();
     cy.contains(':button', 'Create').click();
 
@@ -124,19 +126,18 @@ describe('SMS Test', () => {
       });
 
     //wait for report to be generated and download it
-    cy.wait(REPORT_WAIT_TIME)
-    cy.contains(":button", "Report").click()
-    
+    cy.wait(REPORT_WAIT_TIME);
+    cy.contains(':button', 'Report').click();
+
     //check report, status should be SUCCESS
-    cy.wait(WAIT_TIME)
-    const downloadPath = Cypress.config('downloadsFolder')
-    cy.task("findDownloaded", downloadPath)
-    .then(file_names => {
-        file_names.forEach(name => {
-            if (name.startsWith(MODE)) {
-                cy.readFile(downloadPath + '/' + name).should('contain', 'SUCCESS')
-            }
-        })
-    })
+    cy.wait(WAIT_TIME);
+    const downloadPath = Cypress.config('downloadsFolder');
+    cy.task('findDownloaded', downloadPath).then((file_names) => {
+      file_names.forEach((name) => {
+        if (name.startsWith(MODE)) {
+          cy.readFile(downloadPath + '/' + name).should('contain', 'SUCCESS');
+        }
+      });
+    });
   });
 });

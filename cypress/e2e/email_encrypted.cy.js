@@ -1,5 +1,8 @@
 describe('Encrypted Email Test', () => {
   it('initiate email campaign', () => {
+    // have these vars here so it won't affect retry results
+    // (e.g. emails received from previous try being counted in the latest one
+    // as they share the same subject line)
     const MODE = 'encrypted';
     const CSV_FILENAME = 'testfile_encrypted.csv';
     const NUM_RECIPIENTS = '1';
@@ -70,18 +73,20 @@ describe('Encrypted Email Test', () => {
 
     //initiate campaign
     cy.contains(':button', 'Create').click();
-    cy.get('input[type="text"]').type(CAMPAIGN_NAME);
+    cy.get('input[id="nameCampaign"]').type(CAMPAIGN_NAME);
     cy.contains(':button', 'Email').click();
     cy.get('i[class*="checkbox"]').click();
     cy.contains(':button', 'Create').click();
 
     //step 1 : enter subject and redirection message template
     cy.get('textarea[id="subject"]').type(SUBJECT_NAME);
-    cy.contains('Dear').type(REDIRECTION_MSG);
+    cy.get('div[aria-label="rdw-editor"]').type(REDIRECTION_MSG);
     cy.contains(':button', 'Next').click();
 
     //step 2 : enter message template for encryption and upload csv file
-    cy.get('.rdw-editor-main').type(MSG_CONTENT);
+    // somehow we gotta wait for a bit here before the rich text editor is typeable
+    cy.wait(1000);
+    cy.get('div[aria-label="rdw-editor"]').type(MSG_CONTENT);
     cy.get('input[type="file"]').attachFile(CSV_FILENAME);
     cy.contains('Message B');
     cy.contains(CSV_FILENAME);
