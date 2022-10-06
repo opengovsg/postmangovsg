@@ -230,6 +230,7 @@ export const InitEmailTransactionalRoute = (
     FileAttachmentMiddleware.fileUploadHandler,
     FileAttachmentMiddleware.preprocessPotentialIncomingFile,
     celebrate(sendValidator),
+    emailTransactionalMiddleware.saveMessage,
     emailMiddleware.isFromAddressAccepted,
     emailTransactionalMiddleware.rateLimit,
     emailTransactionalMiddleware.sendMessage
