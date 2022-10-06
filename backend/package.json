@@ -23,7 +23,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-cloudwatch-logs": "3.145.0",
+    "@aws-sdk/client-cloudwatch-logs": "3.171.0",
     "@aws-sdk/client-sns": "3.112.0",
     "@sentry/node": "5.30.0",
     "@types/cloudmersive-virus-api-client": "^1.1.1",
