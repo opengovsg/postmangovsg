@@ -234,6 +234,7 @@ export const InitEmailTransactionalRoute = (
     emailTransactionalMiddleware.rateLimit,
     emailTransactionalMiddleware.sendMessage
   )
+
   /**
    * @swagger
    * paths:
@@ -390,5 +391,87 @@ export const InitEmailTransactionalRoute = (
    *           description: Invalid SSL certificate
    */
 
+  /**
+   * @swagger
+   * paths:
+   *   /transactional/email/{emailId}:
+   *     get:
+   *       security:
+   *         - bearerAuth: []
+   *         - cookieAuth: []
+   *       tags:
+   *         - Email
+   *       summary: "Get transactional email by ID"
+   *       parameters:
+   *         - in: path
+   *           name: emailId
+   *           required: true
+   *           schema:
+   *             type: string
+   *             example: 69
+   *       responses:
+   *         200:
+   *            description: Succcessfully retrieve transactional email with corresponding ID
+   *         "400":
+   *           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
+   *           content:
+   *             text/plain:
+   *               type: string
+   *         "401":
+   *           description: Unauthorized.
+   *           content:
+   *             text/plain:
+   *               type: string
+   *               example: Unauthorized
+   *         "403":
+   *           description: Forbidden. Request violates firewall rules.
+   *         "404":
+   *           description: Not Found. No transactional message with such ID found
+   *         "413":
+   *           description: Number of attachments or size of attachments exceeded limit.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/Error'
+   *                examples:
+   *                  AttachmentQtyLimit:
+   *                    value: {message: Number of attachments exceeds limit}
+   *                  AttachmentSizeLimit:
+   *                    value: {message: Size of attachments exceeds limit}
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
+   *         "500":
+   *           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
+   */
   return router
 }
