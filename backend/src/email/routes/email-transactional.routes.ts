@@ -234,6 +234,161 @@ export const InitEmailTransactionalRoute = (
     emailTransactionalMiddleware.rateLimit,
     emailTransactionalMiddleware.sendMessage
   )
+  /**
+   * @swagger
+   * paths:
+   *   /transactional/email:
+   *     get:
+   *       security:
+   *         - bearerAuth: []
+   *         - cookieAuth: []
+   *       tags:
+   *         - Email
+   *       summary: "List transactional emails"
+   *       parameters:
+   *         - in: query
+   *           name: limit
+   *           description: max number of messages returned
+   *           required: false
+   *           schema:
+   *             type: integer
+   *             minimum: 1
+   *             maximum: 100
+   *             default: 10
+   *         - in: query
+   *           name: offset
+   *           description: offset to begin returning messages from
+   *           required: false
+   *           schema:
+   *             type: integer
+   *             minimum: 0
+   *             default: 0
+   *         - in: query
+   *           name: status
+   *           description: status of messages to filter for
+   *           required: false
+   *           schema:
+   *             type: array
+   *             items:
+   *               type: string
+   *               enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, COMPLAINT]
+   *           style: form
+   *           explode: true
+   *         - in: query
+   *           name: created_at
+   *           description: >
+   *              Filter for created_at timestamp of messages:
+   *                - gt: greater than
+   *                - gte: greater than or equal
+   *                - lt: less than
+   *                - lte: less than or equal
+   *           required: false
+   *           schema:
+   *             type: object
+   *             minProperties: 1
+   *             properties:
+   *               gt:
+   *                 type: string
+   *                 format: date-time
+   *               gte:
+   *                 type: string
+   *                 format: date-time
+   *               lt:
+   *                 type: string
+   *                 format: date-time
+   *               lte:
+   *                 type: string
+   *                 format: date-time
+   *         - in: query
+   *           name: sort_by
+   *           description: >
+   *             Array of fields to sort by, default order is desc, but can be configured by adding a prefix of:
+   *              - plus sign (+) for ascending order
+   *              - minus sign (-) for descending order
+   *           required: false
+   *           schema:
+   *             type: array
+   *             default: [created_at]
+   *             items:
+   *               type: string
+   *               enum: [created_at, +created_at, -created_at, updated_at, -updated_at, +updated_at]
+   *
+   *       responses:
+   *         200:
+   *           description: Succcessfully retrieve a list of messages
+   *           content:
+   *             application/json:
+   *               schema:
+   *                 type: object
+   *                 required:
+   *                   - has_more
+   *                   - data
+   *                 properties:
+   *                   has_more:
+   *                     type: boolean
+   *                   data:
+   *                     type: array
+   *                     items:
+   *                       $ref: '#/components/schemas/EmailMessageTransactional'
+   *         "400":
+   *           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
+   *           content:
+   *             text/plain:
+   *               type: string
+   *         "401":
+   *           description: Unauthorized.
+   *           content:
+   *             text/plain:
+   *               type: string
+   *               example: Unauthorized
+   *         "403":
+   *           description: Forbidden. Request violates firewall rules.
+   *         "413":
+   *           description: Number of attachments or size of attachments exceeded limit.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/Error'
+   *                examples:
+   *                  AttachmentQtyLimit:
+   *                    value: {message: Number of attachments exceeds limit}
+   *                  AttachmentSizeLimit:
+   *                    value: {message: Size of attachments exceeds limit}
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
+   *         "500":
+   *           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
+   */
 
   return router
 }
