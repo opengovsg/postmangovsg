@@ -13,8 +13,8 @@ import {
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { loggerWithLabel } from '@core/logger'
 import { TwilioCredentials } from '@sms/interfaces'
-import { UserSettings } from '@core/interfaces'
 import { RedisService } from './redis.service'
+import { SettingsInterface } from '@shared/api/interfaces/settings.interface'
 
 export interface CredentialService {
   // Credentials (cred_name)
@@ -23,8 +23,11 @@ export interface CredentialService {
     secret: string,
     restrictEnvironment: boolean
   ): Promise<void>
+
   getTwilioCredentials(name: string): Promise<TwilioCredentials>
+
   getTelegramCredential(name: string): Promise<string>
+
   // User credentials (user - label - cred_name)
   createUserCredential(
     label: string,
@@ -32,18 +35,26 @@ export interface CredentialService {
     credName: string,
     userId: number
   ): Promise<UserCredential>
+
   deleteUserCredential(userId: number, label: string): Promise<number>
+
   getUserCredential(userId: number, label: string): Promise<UserCredential>
+
   getSmsUserCredentialLabels(userId: number): Promise<string[]>
+
   getTelegramUserCredentialLabels(userId: number): Promise<string[]>
-  getUserSettings(userId: number): Promise<UserSettings | null>
+
+  getUserSettings(userId: number): Promise<SettingsInterface | null>
+
   // Api Key
   regenerateApiKey(userId: number): Promise<string>
+
   // User metadata
   updateDemoDisplayed(
     userId: number,
     isDisplayed: boolean
   ): Promise<{ isDisplayed: boolean }>
+
   updateAnnouncementVersion(
     userId: number,
     announcementVersion: string
@@ -292,7 +303,7 @@ export const InitCredentialService = (redisService: RedisService) => {
   // TODO: refactor demo and announcement version features out
   const getUserSettings = async (
     userId: number
-  ): Promise<UserSettings | null> => {
+  ): Promise<SettingsInterface | null> => {
     const user = await User.findOne({
       where: {
         id: userId,
@@ -324,7 +335,7 @@ export const InitCredentialService = (redisService: RedisService) => {
         hasApiKey: !!user.apiKey,
         creds: user.creds,
         demo: user.demo,
-        userFeature: user.userFeature,
+        announcementVersion: user.userFeature.announcementVersion,
       }
     } else {
       return null

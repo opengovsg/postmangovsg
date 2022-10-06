@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, Handler } from 'express'
 import { ChannelType } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { SettingsInterface } from '@shared/api/interfaces/settings.interface'
 
 export interface SettingsMiddleware {
   getUserSettings: Handler
@@ -25,7 +26,7 @@ export const InitSettingsMiddleware = (
    */
   const getUserSettings = async (
     req: Request,
-    res: Response,
+    res: Response<SettingsInterface>,
     next: NextFunction
   ): Promise<void | Response> => {
     try {
@@ -34,16 +35,7 @@ export const InitSettingsMiddleware = (
       if (!userSettings) {
         throw new Error('User not found')
       }
-      return res.json({
-        has_api_key: userSettings.hasApiKey,
-        creds: userSettings.creds,
-        demo: {
-          num_demos_sms: userSettings.demo?.numDemosSms,
-          num_demos_telegram: userSettings.demo?.numDemosTelegram,
-          is_displayed: userSettings.demo?.isDisplayed,
-        },
-        announcement_version: userSettings.userFeature?.announcementVersion,
-      })
+      return res.json(userSettings)
     } catch (err) {
       next(err)
     }

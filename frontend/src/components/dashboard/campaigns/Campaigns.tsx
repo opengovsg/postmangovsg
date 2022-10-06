@@ -238,7 +238,9 @@ const Campaigns = () => {
   useEffect(() => {
     // TODO: refactor out num demos processing
     async function getNumDemosAndAnnouncementVersion() {
-      const { demo, announcementVersion } = await getUserSettings()
+      const payload = await getUserSettings()
+      const demo = payload.demo
+      const announcementVersion = payload.announcementVersion
       const latestAnnouncementVersion = await getAnnouncementVersion()
 
       if (!isMounted.current) {
@@ -250,6 +252,7 @@ const Campaigns = () => {
       setNumDemosTelegram(demo?.numDemosTelegram)
       displayNewAnnouncement(announcementVersion, latestAnnouncementVersion)
     }
+
     void getNumDemosAndAnnouncementVersion()
   }, [displayNewAnnouncement, isMounted])
 
@@ -512,6 +515,7 @@ const Campaigns = () => {
       ),
     },
   ]
+
   /* eslint-enable react/display-name */
 
   function renderRow(campaign: Campaign, key: number) {

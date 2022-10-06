@@ -1,3 +1,4 @@
+import { UserCredential } from '@shared/api/interfaces/settings.interface'
 import cx from 'classnames'
 
 import { useContext } from 'react'
@@ -15,8 +16,6 @@ import { PrimaryButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 
 import { deleteCredential } from 'services/settings.service'
-
-import type { UserCredential } from 'services/settings.service'
 
 const Credentials = ({
   creds,

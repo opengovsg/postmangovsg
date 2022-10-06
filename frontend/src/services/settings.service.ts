@@ -1,40 +1,10 @@
+import { SettingsInterface } from '@shared/api/interfaces/settings.interface'
 import axios from 'axios'
 
-import type { ChannelType } from 'classes'
-
-export interface UserCredential {
-  label: string
-  type: ChannelType
-}
-
-async function getUserSettings(): Promise<{
-  hasApiKey: boolean
-  creds: UserCredential[]
-  demo: {
-    numDemosSms: number
-    numDemosTelegram: number
-    isDisplayed: boolean
-  }
-  announcementVersion: string
-}> {
+async function getUserSettings() {
   try {
-    const response = await axios.get('/settings')
-    const {
-      has_api_key: hasApiKey,
-      creds,
-      demo,
-      announcement_version: announcementVersion,
-    } = response.data
-    return {
-      hasApiKey,
-      creds,
-      demo: {
-        numDemosSms: demo?.num_demos_sms,
-        numDemosTelegram: demo?.num_demos_telegram,
-        isDisplayed: demo?.is_displayed,
-      },
-      announcementVersion,
-    }
+    const response = await axios.get<SettingsInterface>('/settings')
+    return response.data
   } catch (e) {
     errorHandler(e, 'Error fetching credentials')
   }

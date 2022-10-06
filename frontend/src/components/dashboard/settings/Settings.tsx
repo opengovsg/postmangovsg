@@ -1,3 +1,4 @@
+import { UserCredential } from '@shared/api/interfaces/settings.interface'
 import cx from 'classnames'
 
 import { useContext, useState, useEffect } from 'react'
@@ -14,7 +15,6 @@ import CredentialsImage from 'assets/img/credentials.svg'
 import { ChannelType, channelIcons } from 'classes'
 import { SideNav, TitleBar } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
-import type { UserCredential } from 'services/settings.service'
 import {
   getUserSettings,
   getCustomFromAddresses,
