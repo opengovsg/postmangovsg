@@ -12,6 +12,7 @@ import campaignRoutes from './campaign.routes'
 import { InitSettingsRoute } from './settings.routes'
 import statsRoutes from './stats.routes'
 import unsubscriberRoutes from './unsubscriber.routes'
+import listRoutes from './list.routes'
 
 // Import channel-specific routes
 import {
@@ -162,6 +163,7 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/stats', statsRoutes)
   router.use('/protect', protectedMailRoutes)
   router.use('/unsubscribe', unsubscriberRoutes)
+  router.use('/lists', listRoutes)
 
   /**
    * @swagger

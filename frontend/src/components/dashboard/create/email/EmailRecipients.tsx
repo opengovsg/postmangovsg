@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import { EmailPreview, EmailProgress } from 'classes'
+import { EmailPreview, EmailProgress, List, ChannelType } from 'classes'
 import {
   FileInput,
   CsvUpload,
@@ -27,6 +27,7 @@ import {
   StepHeader,
   StepSection,
   WarningBlock,
+  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import {
@@ -37,6 +38,7 @@ import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { sendTiming } from 'services/ga.service'
+import { selectList, getListsByChannel } from 'services/list.service'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -60,12 +62,14 @@ const EmailRecipients = ({
     csvFilename: initialCsvFilename,
     isCsvProcessing: initialIsProcessing,
     numRecipients: initialNumRecipients,
+    shouldSaveList: initialShouldSaveList,
     params,
     protect,
   } = campaign
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
+  const [shouldSaveList, setShouldSaveList] = useState(initialShouldSaveList)
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({
@@ -73,9 +77,43 @@ const EmailRecipients = ({
     csvFilename: initialCsvFilename,
   })
   const [preview, setPreview] = useState({} as EmailPreview)
+  const [managedLists, setManagedLists] = useState<List[]>([])
+  const [selectedListId, setSelectedListId] = useState<number>()
   const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
+
+  // Retrieve managed lists - just once on component load
+  useEffect(() => {
+    const getManagedLists = async () => {
+      try {
+        const managedLists = await getListsByChannel({
+          channel: ChannelType.Email,
+        })
+        setManagedLists(managedLists)
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void getManagedLists()
+  }, [])
+
+  // Select managed list
+  useEffect(() => {
+    const setSelectedList = async () => {
+      try {
+        if (selectedListId) {
+          await selectList({ campaignId: +campaignId, listId: selectedListId })
+          setIsCsvProcessing(true)
+        }
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void setSelectedList()
+  }, [campaignId, selectedListId])
 
   // Poll csv status
   useEffect(() => {
@@ -117,8 +155,19 @@ const EmailRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
-  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
+    updateCampaign({
+      isCsvProcessing,
+      csvFilename,
+      numRecipients,
+      shouldSaveList,
+    })
+  }, [
+    isCsvProcessing,
+    csvFilename,
+    numRecipients,
+    updateCampaign,
+    shouldSaveList,
+  ])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -163,7 +212,7 @@ const EmailRecipients = ({
     <>
       <StepSection>
         <StepHeader
-          title="Upload recipient list in CSV format"
+          title="Upload or select existing recipient list"
           subtitle={protect ? '' : 'Step 2'}
         >
           <ManagedListInfoBlock />
@@ -225,7 +274,13 @@ const EmailRecipients = ({
             </>
           )}
         </CsvUpload>
-        <ManagedListSection />
+        <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
+          Save this file as a managed list
+        </Checkbox>
+        <ManagedListSection
+          managedLists={managedLists}
+          setSelectedListId={setSelectedListId}
+        />
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 

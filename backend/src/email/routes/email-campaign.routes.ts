@@ -83,6 +83,12 @@ export const InitEmailCampaignRoute = (
     }),
   }
 
+  const selectListValidator = {
+    [Segments.BODY]: Joi.object({
+      list_id: Joi.number().required(),
+    }),
+  }
+
   // Routes
 
   // Check if campaign belongs to user for this router
@@ -821,6 +827,46 @@ export const InitEmailCampaignRoute = (
     '/duplicate',
     celebrate(duplicateCampaignValidator),
     emailMiddleware.duplicateCampaign
+  )
+
+  /**
+   * @swagger
+   * paths:
+   *  /campaign/{campaignId}/email/select-list:
+   *    post:
+   *      tags:
+   *        - Email
+   *      summary: Select the list of recipients from an existing managed list
+   *      parameters:
+   *        - name: campaignId
+   *          in: path
+   *          required: true
+   *          schema:
+   *            type: string
+   *      requestBody:
+   *        required: true
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                list_id:
+   *                  type: number
+   *
+   *      responses:
+   *        "201":
+   *           description: A duplicate of the campaign was created
+   *        "401":
+   *           description: Unauthorized
+   *        "403":
+   *           description: Forbidden, campaign not owned by user
+   *        "500":
+   *           description: Internal Server Error
+   */
+  router.post(
+    '/select-list',
+    celebrate(selectListValidator),
+    emailTemplateMiddleware.selectListHandler
   )
 
   return router

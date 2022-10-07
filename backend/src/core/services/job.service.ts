@@ -5,6 +5,7 @@ import config from '@core/config'
 import { Campaign } from '@core/models'
 import { CampaignService } from './campaign.service'
 import { ChannelType } from '@core/constants'
+import { ListService } from '.'
 
 /**
  * Inserts a job into the job_queue table.
@@ -50,11 +51,29 @@ const canSendCampaign = async (campaignId: number): Promise<boolean> => {
 const sendCampaign = async ({
   campaignId,
   rate,
+  userId,
 }: {
   campaignId: number
   rate: number
+  userId: number
 }): Promise<(number | undefined)[] | (number | undefined)> => {
   const campaign = await CampaignService.getCampaignDetails(campaignId, [])
+
+  // If campaign was set to `should_save_list`, create a new managed list in the database.
+  // Add the campaign sender as an owner of the list.
+  if (campaign.should_save_list) {
+    const list = await ListService.createList({
+      s3key: campaign.s3_object?.key || '',
+      etag: campaign.s3_object?.etag || '',
+      filename: campaign.s3_object?.filename || '',
+      channel: campaign.type as ChannelType,
+    })
+    await ListService.grantListAccessToUser({
+      userId,
+      listId: list.id,
+    })
+  }
+
   if (campaign.type === ChannelType.Email) {
     // For email type, we only want to take up a single worker at a time at the
     // preconfigured mailDefaultRate to avoid hogging resources from other campaigns

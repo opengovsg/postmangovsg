@@ -4,6 +4,7 @@ import {
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
 } from '@shared/templating'
+
 import { union, difference } from 'lodash'
 import { rest } from 'msw'
 
@@ -24,6 +25,8 @@ import type {
   SMSTemplate,
   TelegramTemplate,
 } from './interfaces'
+
+import { ChannelType } from 'classes'
 
 const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
@@ -68,6 +71,9 @@ function mockCommonApis(initialState?: Partial<State>) {
     // Protected messages
     protectedMessages: [], // Start with zero protected messages
 
+    // Lists
+    lists: [], // Start with no managed lists
+
     ...initialState, // Allow tests to override the initial state
   }
 
@@ -83,6 +89,7 @@ function mockCommonApis(initialState?: Partial<State>) {
       ...mockCampaignUploadApis(state),
       ...mockUnsubscribeApis(state),
       ...mockProtectApis(state),
+      ...mockListApis(state),
     ],
   }
 }
@@ -260,6 +267,20 @@ function mockBaseCampaignApis(state: State) {
           status_updated_at: new Date(),
         })
       )
+    }),
+    rest.put('/campaigns/:campaignId', (req, res, ctx) => {
+      // TODO: scope this test out more
+      const { campaignId } = req.params
+      const { should_save_list: shouldSaveList, name } = req.body as {
+        should_save_list?: boolean
+        name?: string
+      }
+
+      if (name) state.campaigns[+campaignId - 1].name = name
+      if (shouldSaveList)
+        state.campaigns[+campaignId - 1].should_save_list = shouldSaveList
+
+      return res(ctx.status(200), ctx.json(state.campaigns[0]))
     }),
   ]
 }
@@ -767,6 +788,22 @@ function mockProtectApis(state: State) {
 
       const { payload } = message
       return res(ctx.status(200), ctx.json({ payload }))
+    }),
+  ]
+}
+
+function mockListApis(state: State) {
+  return [
+    rest.get('/lists/:channel', (req, res, ctx) => {
+      const { channel } = req.params
+
+      if (
+        !Object.values(ChannelType).includes(channel as unknown as ChannelType)
+      ) {
+        return res(ctx.status(400))
+      }
+
+      return res(ctx.status(200), ctx.json({ lists: state.lists }))
     }),
   ]
 }

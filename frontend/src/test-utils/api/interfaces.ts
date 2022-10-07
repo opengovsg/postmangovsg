@@ -1,3 +1,5 @@
+import { List } from 'classes'
+
 export interface State {
   // Stats
   totalMessagesSent: number
@@ -14,6 +16,8 @@ export interface State {
 
   // Custom from addresses
   customFroms?: string[]
+
+  lists: List[]
 }
 
 interface User {
@@ -63,6 +67,7 @@ export interface Campaign {
   valid: boolean
   has_credential: boolean
   cost_per_message?: number
+  should_save_list?: boolean
 
   // Templates
   sms_templates?: SMSTemplate
