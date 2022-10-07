@@ -156,7 +156,6 @@ export const InitEmailTemplateMiddleware = (
         filename,
       })
 
-      // Return early because bulk insert is slow
       res.sendStatus(202)
     } catch (err) {
       logger.error({
@@ -226,7 +225,6 @@ export const InitEmailTemplateMiddleware = (
         filename,
       })
 
-      // Return early because bulk insert is slow
       res.sendStatus(202)
     } catch (err) {
       logger.error({
@@ -363,7 +361,6 @@ export const InitEmailTemplateMiddleware = (
         true
       )
 
-      // Return early because bulk insert is slow
       res.sendStatus(202)
     } catch (err) {
       logger.error({
