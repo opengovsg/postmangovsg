@@ -68,7 +68,7 @@ const sendCampaign = async ({
       filename: campaign.s3_object?.filename || '',
       channel: campaign.type as ChannelType,
     })
-    await ListService.addUserToList({
+    await ListService.grantListAccessToUser({
       userId,
       listId: list.id,
     })

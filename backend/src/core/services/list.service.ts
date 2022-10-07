@@ -100,7 +100,7 @@ const createList = async ({
   })
 }
 
-const addUserToList = async ({
+const grantListAccessToUser = async ({
   userId,
   listId,
 }: {
@@ -117,5 +117,5 @@ export const ListService = {
   listLists,
   getList,
   createList,
-  addUserToList,
+  grantListAccessToUser,
 }
