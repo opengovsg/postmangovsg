@@ -37,7 +37,7 @@ const deleteCampaignValidator = {
 const updateCampaignValidator = {
   [Segments.BODY]: Joi.object({
     name: Joi.string().max(255).trim(),
-    should_save_list: Joi.boolean(),
+    should_save_list: Joi.boolean().allow(null),
   }),
 }
 
