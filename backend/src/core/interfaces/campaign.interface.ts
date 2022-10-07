@@ -4,6 +4,7 @@ export interface CampaignS3ObjectInterface {
   filename?: string
   temp_filename?: string
   error?: string
+  etag?: string
 }
 
 export interface CsvStatusInterface {
@@ -21,14 +22,7 @@ export interface CampaignDetails {
   valid: boolean
   has_credential: boolean
   csv_filename: string
-  s3_object: {
-    key: string | null
-    filename: string | null
-    bucket: string | null
-    temp_filename: string | null
-    error: string | null
-    etag: string | null
-  } | null
+  s3_object?: CampaignS3ObjectInterface
   is_csv_processing: boolean
   protect: boolean
   demo_message_limit: number | null
