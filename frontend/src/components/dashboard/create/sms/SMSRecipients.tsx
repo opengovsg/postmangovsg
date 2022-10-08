@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom'
 import styles from '../Create.module.scss'
 
 import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
+import { ChannelType, List } from 'classes'
 import {
   FileInput,
   CsvUpload,
@@ -24,12 +25,18 @@ import {
   StepHeader,
   InfoBlock,
   WarningBlock,
+  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import {
+  ManagedListInfoBlock,
+  ManagedListSection,
+} from 'components/experimental'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { sendTiming } from 'services/ga.service'
+import { selectList, getListsByChannel } from 'services/list.service'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -50,12 +57,16 @@ const SMSRecipients = ({
     csvFilename: initialCsvFilename,
     demoMessageLimit,
     params,
+    shouldSaveList: initialShouldSaveList,
   } = campaign as SMSCampaign
   const isDemo = !!demoMessageLimit
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
+  const [shouldSaveList, setShouldSaveList] = useState(initialShouldSaveList)
+  const [managedLists, setManagedLists] = useState<List[]>([])
+  const [selectedListId, setSelectedListId] = useState<number>()
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({
@@ -67,6 +78,38 @@ const SMSRecipients = ({
 
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
+
+  // Retrieve managed lists - just once on component load
+  useEffect(() => {
+    const getManagedLists = async () => {
+      try {
+        const managedLists = await getListsByChannel({
+          channel: ChannelType.SMS,
+        })
+        setManagedLists(managedLists)
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void getManagedLists()
+  }, [])
+
+  // Select managed list
+  useEffect(() => {
+    const setSelectedList = async () => {
+      try {
+        if (selectedListId) {
+          await selectList({ campaignId: +campaignId, listId: selectedListId })
+          setIsCsvProcessing(true)
+        }
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void setSelectedList()
+  }, [campaignId, selectedListId])
 
   // Poll csv status
   useEffect(() => {
@@ -103,8 +146,19 @@ const SMSRecipients = ({
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
-    updateCampaign({ isCsvProcessing, csvFilename, numRecipients })
-  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
+    updateCampaign({
+      isCsvProcessing,
+      csvFilename,
+      numRecipients,
+      shouldSaveList,
+    })
+  }, [
+    isCsvProcessing,
+    csvFilename,
+    numRecipients,
+    updateCampaign,
+    shouldSaveList,
+  ])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -151,6 +205,7 @@ const SMSRecipients = ({
           title="Upload recipient list in CSV format"
           subtitle="Step 2"
         >
+          <ManagedListInfoBlock />
           <p>
             Only CSV format files are allowed. If you have an Excel file, please
             convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
@@ -189,6 +244,9 @@ const SMSRecipients = ({
             setErrorMsg={setErrorMessage}
           />
         </CsvUpload>
+        <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
+          Save this file as a managed list
+        </Checkbox>
         {isDemo && (
           <InfoBlock title="Limited to 20 recipients">
             <span>
@@ -197,6 +255,10 @@ const SMSRecipients = ({
             </span>
           </InfoBlock>
         )}
+        <ManagedListSection
+          managedLists={managedLists}
+          setSelectedListId={setSelectedListId}
+        />
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 

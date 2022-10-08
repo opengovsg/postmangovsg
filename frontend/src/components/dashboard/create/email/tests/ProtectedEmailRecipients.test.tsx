@@ -16,6 +16,7 @@ import {
   USER_EMAIL,
   DEFAULT_FROM,
   INVALID_EMAIL_CSV_FILE,
+  fireEvent,
 } from 'test-utils'
 
 const TEST_EMAIL_CAMPAIGN: Campaign = {
@@ -106,11 +107,15 @@ test('displays an error message after uploading an invalid recipients list', asy
     /upload file/i
   )) as HTMLInputElement
   const messageTextbox = screen.getByRole('textbox', {
-    name: /message b/i,
+    name: /rdw-editor/i,
   })
 
   // Type in a message
-  await userEvent.type(messageTextbox, 'test message')
+  fireEvent.paste(messageTextbox, {
+    clipboardData: {
+      getData: () => 'test message',
+    },
+  })
   // Upload the file
   // Note: we cannot select files via the file picker
   await userEvent.upload(fileUploadInput, INVALID_EMAIL_CSV_FILE)

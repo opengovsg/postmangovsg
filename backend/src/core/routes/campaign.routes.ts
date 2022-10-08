@@ -36,7 +36,8 @@ const deleteCampaignValidator = {
 
 const updateCampaignValidator = {
   [Segments.BODY]: Joi.object({
-    name: Joi.string().max(255).trim().required(),
+    name: Joi.string().max(255).trim(),
+    should_save_list: Joi.boolean().allow(null),
   }),
 }
 
@@ -240,6 +241,8 @@ router.delete(
  *                type: number
  *              name:
  *                type: string
+ *              should_save_list:
+ *                type: boolean
  *    responses:
  *      "200":
  *        content:

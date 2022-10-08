@@ -18,9 +18,12 @@
 .inner {
   width: 800px;
   margin: $layout-3 0;
-  background-color: white;
-  border-radius: $border-radius;
-  box-shadow: 0.2rem 0.2rem 1rem 0 lighten($light-grey, 20%);
+
+  &.forPwPrompt {
+    border-radius: $border-radius;
+    box-shadow: 0.2rem 0.2rem 1rem 0 lighten($light-grey, 20%);
+    background-color: white;
+  }
 
   @include mobile() {
     width: 100%;
@@ -55,5 +58,23 @@
     @include mobile() {
       max-width: 70%;
     }
+  }
+}
+
+.reminderText {
+  font-weight: 700;
+  color: #535353;
+}
+
+.footer {
+  @include flex-horizontal;
+  @extend %body-2;
+  color: $neutral;
+  justify-content: center;
+  width: 100%;
+  padding: $layout-5 0 $spacing-6 0;
+
+  .caption {
+    margin-right: $spacing-3;
   }
 }

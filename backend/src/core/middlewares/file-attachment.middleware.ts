@@ -23,8 +23,8 @@ function preprocessPotentialIncomingFile(
   req: Request,
   res: Response,
   next: NextFunction
-) {
-  if (req.files && req.files.attachments) {
+): void {
+  if (req.files?.attachments) {
     const { attachments } = req.files
 
     if (!Array.isArray(attachments)) {
@@ -39,6 +39,7 @@ function preprocessPotentialIncomingFile(
      */
     if (req.body.attachments.length > FILE_ATTACHMENT_MAX_NUM) {
       res.status(413).json({ message: 'Number of attachments exceeds limit' })
+      return
     }
   }
   next()

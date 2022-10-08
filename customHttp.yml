@@ -29,7 +29,7 @@ customHeaders:
           default-src 'self' https://*.postman.gov.sg;
           object-src 'none';
           script-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
-          img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://file.go.gov.sg;
+          img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://file.go.gov.sg https://file.for.sg https://file.for.edu.sg;
           media-src 'self' https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/;
           child-src 'self' https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/"
       - key: "Content-Security-Policy-Report-Only"

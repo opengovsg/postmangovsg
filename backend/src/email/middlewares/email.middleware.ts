@@ -6,6 +6,7 @@ import { AuthService, UnsubscriberService } from '@core/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { ThemeClient } from '@shared/theme'
+import { EmailMessageTransactional } from '@email/models'
 
 export interface EmailMiddleware {
   isEmailCampaignOwnedByUser: Handler
@@ -218,6 +219,17 @@ export const InitEmailMiddleware = (
         fromAddress,
         action: 'isFromAddressAccepted',
       })
+      // db update is only required for transactional email
+      if (req.body.emailMessageTransactionalId) {
+        void EmailMessageTransactional.update(
+          {
+            errorCode: 'Error 400: Invalid from address',
+          },
+          {
+            where: { id: req.body.emailMessageTransactionalId },
+          }
+        )
+      }
       return res.status(400).json({ message: "Invalid 'from' email address." })
     }
 

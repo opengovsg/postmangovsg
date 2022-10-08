@@ -14,12 +14,12 @@ msgstr ""
 "Plural-Forms: \n"
 
 #: components/common/progress-details/ProgressDetails.tsx:100
-msgid "Delivery report has expired and is no longer available for download."
-msgstr "Delivery report has expired and is no longer available for download."
+#~ msgid "Delivery report has expired and is no longer available for download."
+#~ msgstr "Delivery report has expired and is no longer available for download."
 
 #: components/common/export-recipients/ExportRecipients.tsx:141
-msgid "Delivery report will expire 14 days after sending is completed."
-msgstr "Delivery report will expire 14 days after sending is completed."
+#~ msgid "Delivery report will expire 14 days after sending is completed."
+#~ msgstr "Delivery report will expire 14 days after sending is completed."
 
 #: components/dashboard/create/email/EmailTemplate.tsx:148
 #~ msgid "E.g. MOH Appointment"
@@ -38,14 +38,18 @@ msgid "Get OTP"
 msgstr "Get OTP"
 
 #: components/unsubscribe/Unsubscribe.tsx:89
-msgid "I'd rather stay"
-msgstr "I'd rather stay"
+#~ msgid "I'd rather stay"
+#~ msgstr "I'd rather stay"
 
 #: components/login/login-input/LoginInput.tsx:81
 msgid "One-Time Password"
 msgstr "One-Time Password"
 
-#: components/dashboard/campaigns/Campaigns.tsx:141
+#: components/unsubscribe/Unsubscribe.tsx:132
+msgid "Proceed to unsubscribe"
+msgstr "Proceed to unsubscribe"
+
+#: components/dashboard/campaigns/actions-button/ActionsButton.tsx:83
 msgid "Report expired"
 msgstr "Report expired"
 
@@ -69,9 +73,13 @@ msgstr "Sign In"
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
 
+#: components/unsubscribe/Unsubscribe.tsx:106
+msgid "Subscribe me back"
+msgstr "Subscribe me back"
+
 #: components/unsubscribe/Unsubscribe.tsx:92
-msgid "Unsubscribe me"
-msgstr "Unsubscribe me"
+#~ msgid "Unsubscribe me"
+#~ msgstr "Unsubscribe me"
 
 #: components/login/login-input/LoginInput.tsx:88
 msgid "Verifying OTP..."
@@ -79,33 +87,33 @@ msgstr "Verifying OTP..."
 
 #: config.ts:90
 msgid "allowedImageSources"
-msgstr "file.go.gov.sg"
+msgstr "file.go.gov.sg;file.for.sg;file.for.edu.sg"
 
-#: config.ts:104
+#: config.ts:106
 msgid "announcement.mediaUrl"
 msgstr "https://file.go.gov.sg/dz52q4.png"
 
-#: config.ts:106
+#: config.ts:108
 msgid "announcement.primaryButtonText"
 msgstr "Read guide"
 
-#: config.ts:105
+#: config.ts:107
 msgid "announcement.primaryButtonUrl"
 msgstr "https://guide.postman.gov.sg/release-notes"
 
-#: config.ts:108
+#: config.ts:110
 msgid "announcement.secondaryButtonText"
 msgstr "null"
 
-#: config.ts:107
+#: config.ts:109
 msgid "announcement.secondaryButtonUrl"
 msgstr "null"
 
-#: config.ts:103
+#: config.ts:105
 msgid "announcement.subtext"
 msgstr "Thanks for using Postman and joining us every step of the way while we mature as a product. We'll be releasing exciting new features this year. For instance, this is an announcement modal that will keep you up-to-date about our new features! Watch this space for things that are brewing. Learn more about Postman's releases by reading our guide."
 
-#: config.ts:102
+#: config.ts:104
 msgid "announcement.title"
 msgstr "Happy New Year! Congrats on making it through 2020."
 
@@ -134,7 +142,7 @@ msgstr "e.g. Ministry of Health"
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
 
-#: classes/EmailCampaign.ts:53
+#: classes/EmailCampaign.ts:59
 msgid "errors.email.blacklist"
 msgstr "Blacklisted: Your email will not be delivered to this recipient because Postman.gov.sg has determined that this recipient is not valid and might not exist."
 
@@ -154,11 +162,12 @@ msgstr "Error: Incorrect email formatting. Please check for typos, spaces, and s
 msgid "errors.email.softBounce"
 msgstr "Soft bounce: The email inbox might be full or the recipient might have an out-of-office message."
 
-#: components/common/rich-text-editor/controls/ImageControl.tsx:56
+#: components/common/rich-text-editor/controls/ImageControl.tsx:61
 msgid "errors.insertImage.invalidUrl"
 msgstr "This does not seem to be an image"
 
 #: components/common/rich-text-editor/controls/ImageControl.tsx:51
+#: components/common/rich-text-editor/controls/ImageControl.tsx:66
 msgid "errors.insertImage.notImage"
 msgstr "Enter a link to an image"
 
@@ -263,7 +272,7 @@ msgid "link.uploadLogoUrl"
 msgstr "https://go.gov.sg/postman-upload-logo-request"
 
 #: components/dashboard/create/email/EmailTemplate.tsx:138
-#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:267
-#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:269
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:277
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:279
 msgid "mailVia"
 msgstr "via Postman"

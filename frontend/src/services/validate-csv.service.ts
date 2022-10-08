@@ -1,6 +1,10 @@
 import { i18n } from '@lingui/core'
 
-import { TemplateClient, TemplateError } from '@shared/templating'
+import {
+  TemplateClient,
+  TemplateError,
+  XSS_EMAIL_OPTION,
+} from '@shared/templating'
 import { keys, difference, uniq } from 'lodash'
 import Papa from 'papaparse'
 
@@ -17,6 +21,7 @@ export const PROTECTED_CSV_HEADERS = ['recipient', 'password']
 const getTemplateClient = (): TemplateClient => {
   return new TemplateClient({
     allowedImageSources: i18n._(ALLOWED_IMAGE_SOURCES).split(';'),
+    xssOptions: XSS_EMAIL_OPTION,
   })
 }
 

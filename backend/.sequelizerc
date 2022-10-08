@@ -2,9 +2,12 @@ const path = require('path')
 
 const BASE_PATH = './build/database'
 
+const SRC_BASE_PATH = './src/database'
+
 module.exports = {
 	config: path.resolve(BASE_PATH, 'config.js'),
 	'models-path': path.resolve(BASE_PATH, 'models'),
 	'seeders-path': path.resolve(BASE_PATH, 'seeders'),
-	'migrations-path': path.resolve(BASE_PATH, 'migrations'),
+	// this works as migrations are already written in JS
+	'migrations-path': path.resolve(SRC_BASE_PATH, 'migrations'),
 }

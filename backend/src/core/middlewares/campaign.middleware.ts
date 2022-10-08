@@ -192,9 +192,11 @@ const updateCampaign = async (
 ): Promise<Response | void> => {
   try {
     const { campaignId } = req.params
+    const { name, should_save_list } = req.body
     const [count, rows] = await CampaignService.updateCampaign({
       id: +campaignId,
-      name: req.body.name,
+      name,
+      shouldSaveList: should_save_list,
     } as Campaign)
     if (count < 1) {
       logger.error({

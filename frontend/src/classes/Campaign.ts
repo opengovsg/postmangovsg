@@ -47,6 +47,7 @@ export class Campaign {
   redacted: boolean
   demoMessageLimit: number | null
   costPerMessage?: number
+  shouldSaveList: boolean
 
   constructor(input: any) {
     this.id = input['id']
@@ -63,6 +64,7 @@ export class Campaign {
     this.redacted = input['redacted']
     this.demoMessageLimit = input['demo_message_limit']
     this.costPerMessage = input['cost_per_message']
+    this.shouldSaveList = input['should_save_list']
   }
 
   getStatus(jobs: Array<{ status: string }>): Status {
