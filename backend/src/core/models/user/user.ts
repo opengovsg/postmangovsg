@@ -34,26 +34,26 @@ export class User extends Model<User> {
     },
     unique: true,
   })
-  email!: string
+  email: string
 
   @Column(DataType.STRING)
   apiKeyHash?: string
 
   @HasMany(() => UserCredential)
-  creds!: UserCredential[]
+  creds: UserCredential[]
 
   @HasOne(() => UserDemo)
-  demo!: UserDemo
+  demo: UserDemo
 
   @HasOne(() => UserFeature)
-  userFeature!: UserFeature
+  userFeature: UserFeature
 
   @ForeignKey(() => Domain)
-  @Column(DataType.STRING)
-  emailDomain?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  emailDomain: string | null
 
   @BelongsTo(() => Domain)
-  domain?: Domain
+  domain: Domain
 
   @BelongsToMany(() => List, {
     onUpdate: 'CASCADE',
@@ -61,7 +61,7 @@ export class User extends Model<User> {
     through: () => UserList,
     as: 'lists',
   })
-  lists!: Array<List & { UserList: UserList }>
+  lists: Array<List & { UserList: UserList }>
 
   // Wrapper function around validation and population of domains
   // to enforce that validation happens before creation of user

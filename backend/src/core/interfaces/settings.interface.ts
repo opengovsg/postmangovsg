@@ -12,6 +12,6 @@ export interface UserSettings {
     isDisplayed: boolean
   }
   userFeature: {
-    announcementVersion: string
+    announcementVersion: string | null
   }
 }

@@ -46,7 +46,7 @@ export interface CredentialService {
   ): Promise<{ isDisplayed: boolean }>
   updateAnnouncementVersion(
     userId: number,
-    announcementVersion: string
+    announcementVersion: string | null
   ): Promise<{ announcementVersion: string }>
 }
 
@@ -395,7 +395,8 @@ export const InitCredentialService = (redisService: RedisService) => {
     }
 
     return {
-      announcementVersion: rowUpserted.announcementVersion,
+      // safe to cast as we know the row was upserted
+      announcementVersion: rowUpserted.announcementVersion as string,
     }
   }
 
