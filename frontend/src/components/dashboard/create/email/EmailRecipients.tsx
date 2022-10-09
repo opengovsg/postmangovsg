@@ -104,7 +104,10 @@ const EmailRecipients = ({
     const setSelectedList = async () => {
       try {
         if (selectedListId) {
-          await selectList({ campaignId: +campaignId, listId: selectedListId })
+          await selectList({
+            campaignId: +(campaignId as string),
+            listId: selectedListId,
+          })
           setIsCsvProcessing(true)
         }
       } catch (e) {
