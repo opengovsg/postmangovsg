@@ -173,7 +173,7 @@ const EmailRecipients = ({
   // If shouldSaveList is modified, send info to backend
   useEffect(() => {
     void setCampaignToSaveList(+campaignId, shouldSaveList)
-  }, [shouldSaveList])
+  }, [campaignId, shouldSaveList])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
