@@ -1,20 +1,19 @@
 import config from '@core/config'
 import {
-  Column,
-  DataType,
-  Model,
-  Table,
-  BeforeCreate,
-  HasMany,
-  HasOne,
   AfterCreate,
-  ForeignKey,
+  BeforeCreate,
   BelongsTo,
   BelongsToMany,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  HasOne,
+  Model,
+  Table,
 } from 'sequelize-typescript'
-import { UserCredential } from '@core/models'
+import { List, UserCredential, UserFeature, UserList } from '@core/models'
 import { UserDemo } from './user-demo'
-import { UserList, List, UserFeature } from '@core/models'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
@@ -38,7 +37,7 @@ export class User extends Model<User> {
   email!: string
 
   @Column(DataType.STRING)
-  apiKey?: string
+  apiKeyHash?: string
 
   @HasMany(() => UserCredential)
   creds!: UserCredential[]
@@ -151,8 +150,7 @@ export class User extends Model<User> {
   async regenerateAndSaveApiKey(): Promise<string> {
     const name = this.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
     const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
-    const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
-    this.apiKey = apiKeyHash
+    this.apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
     await this.save()
     return apiKeyPlainText
   }
