@@ -27,13 +27,15 @@ const verifyCnames = async (
   // get email domain
   const domain = email.slice(email.lastIndexOf('@') + 1)
   try {
-    for (const token of tokens) {
-      const cname = `${token}._domainkey.${domain}`
-      const [result] = await dns.promises.resolve(cname, 'CNAME')
-      if (result !== `${token}.dkim.amazonses.com`) {
-        throw new Error(`Dkim record doesn't match for ${email}`)
-      }
-    }
+    await Promise.all(
+      tokens.map(async (token) => {
+        const cname = `${token}._domainkey.${domain}`
+        const [result] = await dns.promises.resolve(cname, 'CNAME')
+        if (result !== `${token}.dkim.amazonses.com`) {
+          throw new Error(`Dkim record doesn't match for ${email}`)
+        }
+      })
+    )
   } catch (e) {
     logger.error({
       message: 'Verification of dkim records failed',
