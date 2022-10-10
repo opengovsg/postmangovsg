@@ -283,6 +283,10 @@ const EmailRecipients = ({
         <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
           Save this file as a managed list
         </Checkbox>
+        <p>
+          Note: managed recipient list will only be saved after you have sent
+          the campaign
+        </p>
         <ManagedListSection
           managedLists={managedLists}
           setSelectedListId={setSelectedListId}
