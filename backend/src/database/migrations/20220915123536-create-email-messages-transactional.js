@@ -19,6 +19,7 @@ module.exports = {
           key: 'id',
         },
       },
+      // superseded by 20221005070028-email-messages-transactional-make-from-nullable.js
       from_name: {
         allowNull: false,
         type: Sequelize.DataTypes.STRING(255),
