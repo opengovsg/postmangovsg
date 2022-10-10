@@ -173,11 +173,6 @@ export const InitV1Route = (app: Application): Router => {
    *       type: http
    *       scheme: bearer
    *       bearerFormat: username_versionNumber_apiKey
-   *     cookieAuth:
-   *       description: while this description (is correct)[https://swagger.io/docs/specification/authentication/cookie-authentication/], do note that cookie authentication is currently not supported for "try it out" requests due to browser security restrictions.
-   *       type: apiKey
-   *       in: cookie
-   *       name: postmangovsg
    */
 
   router.use(
