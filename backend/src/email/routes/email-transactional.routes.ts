@@ -411,7 +411,11 @@ export const InitEmailTransactionalRoute = (
    *             example: 69
    *       responses:
    *         200:
-   *            description: Succcessfully retrieve transactional email with corresponding ID
+   *           description: Succcessfully retrieve transactional email with corresponding ID
+   *           content:
+   *            application/json:
+   *              schema:
+   *                $ref: '#/components/schemas/EmailMessageTransactional'
    *         "400":
    *           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
    *           content:
