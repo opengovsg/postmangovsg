@@ -7,7 +7,7 @@ type EmailThemeFields = {
   body: string
   agencyName?: string
   agencyLogoURI?: string
-  unsubLink: string
+  unsubLink?: string
   showMasthead?: boolean
 }
 
