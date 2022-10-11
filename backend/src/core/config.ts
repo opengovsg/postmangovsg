@@ -15,6 +15,8 @@ const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
  *    format: 'required-string',
  *    sensitive: true,
  */
+
+// NB ensure no naming clash with worker/src/core/config.ts as they share a single secrets set
 interface ConfigSchema {
   env: string
   APP_NAME: string
@@ -76,6 +78,7 @@ interface ConfigSchema {
       user: string
       pass: string
     }
+    workerHost: string
   }
   mailFrom: string
   mailVia: string
@@ -391,7 +394,7 @@ const config: Config<ConfigSchema> = convict({
   },
   mailOptions: {
     host: {
-      doc: 'Amazon SES SMTP endpoint.',
+      doc: 'Amazon SES SMTP endpoint used by backend to send emails (e.g. OTPs, API emails)',
       default: '',
       env: 'BACKEND_SES_HOST',
       format: 'required-string',
@@ -417,6 +420,12 @@ const config: Config<ConfigSchema> = convict({
         format: 'required-string',
         sensitive: true,
       },
+    },
+    workerHost: {
+      doc: 'Amazon SES SMTP endpoint used by workers to send emails (e.g. campaign emails)',
+      default: '',
+      env: 'WORKER_SES_HOST',
+      format: 'required-string',
     },
   },
   mailFrom: {

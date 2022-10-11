@@ -26,6 +26,7 @@ convict.addFormats({
   },
 })
 
+// NB ensure no naming clash with backend/src/core/config.ts as they share a single secrets set
 export interface ConfigSchema {
   env: string
   aws: {
@@ -162,7 +163,7 @@ const config: Config<ConfigSchema> = convict({
   },
   mailOptions: {
     host: {
-      doc: 'Amazon SES SMTP endpoint.',
+      doc: 'Amazon SES SMTP endpoint used by workers to send emails (e.g. campaign emails)',
       default: '',
       env: 'WORKER_SES_HOST',
       format: 'required-string',
