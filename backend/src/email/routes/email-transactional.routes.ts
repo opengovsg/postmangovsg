@@ -91,12 +91,12 @@ export const InitEmailTransactionalRoute = (
    *                     type: string
    *                     format: binary
    *       responses:
-   *         "202":
+   *         "201":
    *           description: Accepted. The message is being sent.
    *           content:
-   *              text/plain:
-   *                type: string
-   *                example: Accepted
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/EmailMessageTransactional'
    *         "400":
    *           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
    *           content:

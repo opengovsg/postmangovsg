@@ -39,6 +39,23 @@ export const InitEmailTransactionalMiddleware = (
     attachments?: { data: Buffer; name: string; size: number }[]
   }
 
+  function convertMessageModalToResponse(message: EmailMessageTransactional) {
+    return {
+      id: message.id,
+      from: message.from,
+      recipient: message.recipient,
+      params: message.params,
+      attachments_metadata: message.attachmentsMetadata,
+      status: message.status,
+      error_code: message.errorCode,
+      error_sub_type: message.errorSubType,
+      accepted_at: message.acceptedAt?.toISOString() || null,
+      sent_at: message.sentAt?.toISOString() || null,
+      delivered_at: message.deliveredAt?.toISOString() || null,
+      opened_at: message.openedAt?.toISOString() || null,
+    }
+  }
+
   async function saveMessage(
     req: Request,
     _: Response,
@@ -128,16 +145,26 @@ export const InitEmailTransactionalMiddleware = (
         attachments,
         emailMessageTransactionalId,
       })
-      await EmailMessageTransactional.update(
-        {
-          status: TransactionalEmailMessageStatus.Accepted,
-          acceptedAt: new Date(),
-        },
+      const emailMessageTransactional = await EmailMessageTransactional.findOne(
         {
           where: { id: emailMessageTransactionalId },
         }
       )
-      res.sendStatus(202)
+      if (!emailMessageTransactional) {
+        // practically this will never happen but adding to fulfill TypeScript
+        // type-safety requirement
+        throw new Error('Failed to save transactional message')
+      }
+      emailMessageTransactional.set(
+        'status',
+        TransactionalEmailMessageStatus.Accepted
+      )
+      emailMessageTransactional.set('acceptedAt', new Date())
+      await emailMessageTransactional.save()
+      res
+        .status(201)
+        .json(convertMessageModalToResponse(emailMessageTransactional))
+      return
     } catch (error) {
       logger.error({
         message: 'Failed to send email',
