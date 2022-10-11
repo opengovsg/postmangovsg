@@ -23,6 +23,7 @@ export interface EmailTransactionalMiddleware {
   saveMessage: Handler
   sendMessage: Handler
   rateLimit: Handler
+  getById: Handler
 }
 
 export const InitEmailTransactionalMiddleware = (
@@ -186,6 +187,21 @@ export const InitEmailTransactionalMiddleware = (
     }
   }
 
+  async function getById(req: Request, res: Response): Promise<void> {
+    const { emailId } = req.params
+    const message = await EmailMessageTransactional.findOne({
+      where: { id: emailId, userId: req.session?.user?.id },
+    })
+    if (!message) {
+      res
+        .status(404)
+        .json({ message: `Email message with ID ${emailId} not found.` })
+      return
+    }
+
+    res.status(200).json(convertMessageModalToResponse(message))
+  }
+
   const rateLimit = expressRateLimit({
     store: new RedisStore({
       prefix: 'transactionalEmail:',
@@ -223,5 +239,6 @@ export const InitEmailTransactionalMiddleware = (
     saveMessage,
     sendMessage,
     rateLimit,
+    getById,
   }
 }

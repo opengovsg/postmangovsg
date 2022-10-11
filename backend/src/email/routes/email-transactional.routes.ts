@@ -32,6 +32,11 @@ export const InitEmailTransactionalRoute = (
       attachments: Joi.array().items(Joi.object().keys().required()),
     }),
   }
+  const getByIdValidator = {
+    [Segments.PARAMS]: Joi.object({
+      emailId: Joi.number().required(),
+    }),
+  }
 
   // Routes
 
@@ -477,5 +482,11 @@ export const InitEmailTransactionalRoute = (
    *         "526":
    *           description: Invalid SSL certificate
    */
+  router.get(
+    '/:emailId',
+    celebrate(getByIdValidator),
+    emailTransactionalMiddleware.getById
+  )
+
   return router
 }
