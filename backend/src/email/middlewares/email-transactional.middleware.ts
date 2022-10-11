@@ -113,8 +113,10 @@ export const InitEmailTransactionalMiddleware = (
       reply_to: replyTo,
       attachments,
       emailMessageTransactionalId, // added by saveMessage
+      use_template: useTemplate,
     }: ReqBody & {
       emailMessageTransactionalId: number
+      use_template?: boolean
     } = req.body
 
     try {
@@ -127,6 +129,7 @@ export const InitEmailTransactionalMiddleware = (
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
         emailMessageTransactionalId,
+        useTemplate,
       })
       await EmailMessageTransactional.update(
         {

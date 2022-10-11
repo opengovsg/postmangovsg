@@ -30,6 +30,7 @@ export const InitEmailTransactionalRoute = (
         .options({ convert: true })
         .lowercase(),
       attachments: Joi.array().items(Joi.object().keys().required()),
+      use_template: Joi.boolean().default(false).optional(),
     }),
   }
 

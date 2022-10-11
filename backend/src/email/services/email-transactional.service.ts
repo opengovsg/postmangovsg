@@ -5,6 +5,7 @@ import { isBlacklisted } from '@email/utils/query'
 import { InvalidMessageError, InvalidRecipientError } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import { EmailMessageTransactional } from '@email/models'
+import { ThemeClient } from '@shared/theme'
 
 const logger = loggerWithLabel(module)
 
@@ -23,6 +24,7 @@ async function sendMessage({
   replyTo,
   attachments,
   emailMessageTransactionalId,
+  useTemplate,
 }: {
   subject: string
   body: string
@@ -30,11 +32,18 @@ async function sendMessage({
   recipient: string
   replyTo?: string
   attachments?: { data: Buffer; name: string }[]
+  useTemplate?: boolean
   emailMessageTransactionalId: number
 }): Promise<void> {
   const sanitizedSubject =
     EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
-  const sanitizedBody = EmailTemplateService.client.filterXSS(body)
+  let sanitizedBody = EmailTemplateService.client.filterXSS(body)
+  if (useTemplate) {
+    sanitizedBody = await ThemeClient.generateThemedHTMLEmail({
+      body: sanitizedBody,
+    })
+  }
+
   if (!sanitizedSubject || !sanitizedBody) {
     void EmailMessageTransactional.update(
       {
