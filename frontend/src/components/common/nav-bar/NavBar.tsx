@@ -97,6 +97,14 @@ const NavBar = () => {
         >
           Feature Request
         </OutboundLink>
+        <OutboundLink
+          className={styles.link}
+          eventLabel={i18n._(LINKS.contactUsUrl)}
+          to={i18n._(LINKS.contactUsUrl)}
+          target="_blank"
+        >
+          Contact Us
+        </OutboundLink>
 
         <div className={styles.separator}></div>
 
