@@ -36,8 +36,8 @@ export class User extends Model<User> {
   })
   email: string
 
-  @Column(DataType.STRING)
-  apiKeyHash?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  apiKey: string | null
 
   @HasMany(() => UserCredential)
   creds: UserCredential[]
@@ -150,7 +150,7 @@ export class User extends Model<User> {
   async regenerateAndSaveApiKey(): Promise<string> {
     const name = this.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
     const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
-    this.apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
+    this.apiKey = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
     await this.save()
     return apiKeyPlainText
   }

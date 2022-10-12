@@ -297,7 +297,7 @@ export const InitCredentialService = (redisService: RedisService) => {
       where: {
         id: userId,
       },
-      attributes: ['apiKeyHash'],
+      attributes: ['apiKey'],
       // include as 'creds'
       include: [
         {
@@ -321,7 +321,7 @@ export const InitCredentialService = (redisService: RedisService) => {
     })
     if (user) {
       return {
-        hasApiKey: !!user.apiKeyHash,
+        hasApiKey: !!user.apiKey,
         creds: user.creds,
         demo: user.demo,
         userFeature: user.userFeature,

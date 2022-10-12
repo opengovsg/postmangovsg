@@ -2,7 +2,6 @@
 
 module.exports = {
   up: async (queryInterface, _) => {
-    // this is obsoleted by 20221009082120-rename-users-api-key-hash.js
     await queryInterface.createFunction(
       'format_user_on_insert', // actually a misnomer, since activates on UPDATE too, but stick to existing naming
       [],
