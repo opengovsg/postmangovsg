@@ -18,6 +18,10 @@
     "db:undo": "npx sequelize db:migrate:undo",
     "tunneldb:staging": "source .env && ssh -i $STAGING_JUMPHOST_KEY_FOLDER -N -L $STAGING_AURORA_PORT_URL_HOST $STAGING_AURORA_SSH_HOST",
     "tunneldb:stagingreadonly": "source .env && ssh -i $STAGING_JUMPHOST_KEY_FOLDER -N -L $STAGING_AURORA_PORT_URL_HOST_READONLY $STAGING_AURORA_SSH_HOST",
+    "tunneldb:production": "source .env && ssh -i $PRODUCTION_JUMPHOST_KEY_FOLDER -N -L $PRODUCTION_AURORA_PORT_URL_HOST $PRODUCTION_AURORA_SSH_HOST",
+    "tunneldb:productionreadonly": "source .env && ssh -i $PRODUCTION_JUMPHOST_KEY_FOLDER -N -L $PRODUCTION_AURORA_PORT_URL_HOST_READONLY $PRODUCTION_AURORA_SSH_HOST",
+    "connectjumphost:staging": "source .nv && ssh -i $STAGING_JUMPHOST_KEY_FOLDER $STAGING_AURORA_SSH_HOST",
+    "connectjumphost:production": "source .nv && ssh -i $PRODUCTION_JUMPHOST_KEY_FOLDER $PRODUCTION_AURORA_SSH_HOST",
     "grafana": "source .env && ssh -i $GRAFANA_KEY_FOLDER $GRAFANA_EC2_HOST_URL"
   },
   "author": "",
