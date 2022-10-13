@@ -41,7 +41,7 @@ export interface EmailDuplicateCampaignDetails
  *          - status
  *        properties:
  *          id:
- *            type: number
+ *            type: string
  *            example: 69
  *          from:
  *            type: string

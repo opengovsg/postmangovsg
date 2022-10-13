@@ -229,7 +229,7 @@ export const InitEmailTransactionalRoute = (
    *          type: string
    *
    */
-  router.use(
+  router.post(
     '/send',
     FileAttachmentMiddleware.fileUploadHandler,
     FileAttachmentMiddleware.preprocessPotentialIncomingFile,

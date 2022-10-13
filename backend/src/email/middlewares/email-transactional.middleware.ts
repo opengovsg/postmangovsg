@@ -190,7 +190,7 @@ export const InitEmailTransactionalMiddleware = (
   async function getById(req: Request, res: Response): Promise<void> {
     const { emailId } = req.params
     const message = await EmailMessageTransactional.findOne({
-      where: { id: emailId, userId: req.session?.user?.id },
+      where: { id: emailId, userId: req.session?.user?.id.toString() },
     })
     if (!message) {
       res
