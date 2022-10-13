@@ -35,7 +35,7 @@ export class TelegramMessage extends Model<TelegramMessage> {
   })
   recipient!: string
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   params!: object
 
   @Column(DataType.STRING)
