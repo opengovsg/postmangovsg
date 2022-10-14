@@ -2,7 +2,11 @@ import { EmailService, EmailTemplateService } from '@email/services'
 import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
 import { isBlacklisted } from '@email/utils/query'
-import { InvalidMessageError, InvalidRecipientError } from '@core/errors'
+import {
+  EMPTY_MESSAGE_ERROR,
+  EmptyMessageError,
+  InvalidRecipientError,
+} from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import {
   EmailMessageTransactional,
@@ -19,6 +23,9 @@ const logger = loggerWithLabel(module)
  * @throws UnsupportedFileTypeError if file attachment is unsupported file type
  * @throws Error if the message could not be sent.
  */
+
+export const EMPTY_MESSAGE_ERROR_CODE = `Error 400: ${EMPTY_MESSAGE_ERROR}`
+
 async function sendMessage({
   subject,
   body,
@@ -39,16 +46,18 @@ async function sendMessage({
   const sanitizedSubject =
     EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
   const sanitizedBody = EmailTemplateService.client.filterXSS(body)
+  // this only triggers if the subject or body is empty after sanitization
+  // highly unlikely in practice
   if (!sanitizedSubject || !sanitizedBody) {
     void EmailMessageTransactional.update(
       {
-        errorCode: 'Error 400: Message contains invalid HTML tags',
+        errorCode: EMPTY_MESSAGE_ERROR_CODE,
       },
       {
         where: { id: emailMessageTransactionalId },
       }
     )
-    throw new InvalidMessageError()
+    throw new EmptyMessageError()
   }
 
   const sanitizedAttachments = attachments

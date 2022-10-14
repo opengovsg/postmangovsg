@@ -2,12 +2,15 @@ import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
 import { User } from '@core/models'
-import { RATE_LIMIT_ERROR_MESSAGE } from '@email/middlewares'
+import {
+  getMd5HashFromAttachment,
+  RATE_LIMIT_ERROR_MESSAGE,
+} from '@email/middlewares'
 import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
 } from '@email/models'
-import { EmailService } from '@email/services'
+import { EmailService, EMPTY_MESSAGE_ERROR_CODE } from '@email/services'
 
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
@@ -48,13 +51,17 @@ afterAll(async () => {
 
 describe('POST /transactional/email/send', () => {
   const endpoint = '/transactional/email/send'
-  const genericApiCallFields = {
+  const validApiCall = {
     recipient: 'recipient@agency.gov.sg',
     subject: 'subject',
     body: '<p>body</p>',
     from: 'Postman <donotreply@mail.postman.gov.sg>',
     reply_to: 'user@agency.gov.sg',
   }
+  const validAttachment = Buffer.from('hello world')
+  const validAttachmentName = 'hi.txt'
+  const validAttachmentHash = getMd5HashFromAttachment(validAttachment)
+  const validAttachmentSize = Buffer.byteLength(validAttachment)
 
   test('Should throw an error if API key is invalid', async () => {
     const res = await request(app)
@@ -78,7 +85,7 @@ describe('POST /transactional/email/send', () => {
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
-      .send(genericApiCallFields)
+      .send(validApiCall)
 
     expect(res.status).toBe(201)
     expect(res.body).toBeDefined()
@@ -89,15 +96,16 @@ describe('POST /transactional/email/send', () => {
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
-      from: genericApiCallFields.from,
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(transactionalEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
-      from: genericApiCallFields.from,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
     })
   })
 
@@ -127,15 +135,16 @@ describe('POST /transactional/email/send', () => {
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
+      recipient: validApiCall.recipient,
       from: 'Hello <donotreply@mail.postman.gov.sg>',
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(transactionalEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
       from: 'Hello <donotreply@mail.postman.gov.sg>',
+      replyTo: user.email,
     })
   })
 
@@ -167,15 +176,16 @@ describe('POST /transactional/email/send', () => {
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
+      recipient: validApiCall.recipient,
       from: `Hello <${user.email}>`,
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(transactionalEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
       from: `Hello <${user.email}>`,
+      replyTo: user.email,
     })
   })
 
@@ -184,7 +194,7 @@ describe('POST /transactional/email/send', () => {
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
       .send({
-        ...genericApiCallFields,
+        ...validApiCall,
         from: 'Hello <invalid@agency.gov.sg>',
         reply_to: user.email,
       })
@@ -193,6 +203,42 @@ describe('POST /transactional/email/send', () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
+  // test Error 400: Message contains invalid HTML tags
+  test('Should throw an error if message contains invalid HTML tags', async () => {
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        subject: '\n\n\n',
+        body: '<script></script>',
+      })
+
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
+      status: TransactionalEmailMessageStatus.Unsent,
+    })
+    expect(transactionalEmail?.params).toMatchObject({
+      // NB sanitisation only occurs at sending step, doesn't affect saving in params
+      subject: '\n\n\n',
+      body: '<script></script>',
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
+    })
+    expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
+  })
+  // test Error 400: Unsupported file type
+  // test Error 400: Malicious file
+  // test Error 400: Blacklisted recipient
+
   test('Should send a message with a valid attachment', async () => {
     // request.send() cannot be used with file attachments
     // substitute form values with request.field(). refer to
@@ -200,12 +246,12 @@ describe('POST /transactional/email/send', () => {
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', genericApiCallFields.recipient)
-      .field('subject', genericApiCallFields.subject)
-      .field('body', genericApiCallFields.body)
-      .field('from', genericApiCallFields.from)
-      .field('reply_to', genericApiCallFields.reply_to)
-      .attach('attachments', Buffer.from('hello world'), 'hi.txt')
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('body', validApiCall.body)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .attach('attachments', validAttachment, validAttachmentName)
 
     expect(res.status).toBe(201)
     expect(res.body).toBeDefined()
@@ -216,25 +262,110 @@ describe('POST /transactional/email/send', () => {
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
-      from: genericApiCallFields.from,
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(transactionalEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
-      from: genericApiCallFields.from,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
     })
-    // TODO add attachment related fields
+    expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
+    expect(transactionalEmail?.attachmentsMetadata).toHaveLength(1)
+    expect(transactionalEmail?.attachmentsMetadata).toMatchObject([
+      {
+        fileName: validAttachmentName,
+        fileSize: validAttachmentSize,
+        hash: validAttachmentHash,
+      },
+    ])
   })
+
+  test('Message with too big attachment should fail', async () => {
+    const invalidAttachmentTooBig = Buffer.alloc(1024 * 1024 * 10, '.') // 10MB
+    const invalidAttachmentTooBigName = 'too big.txt'
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('body', validApiCall.body)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .attach(
+        'attachments',
+        invalidAttachmentTooBig,
+        invalidAttachmentTooBigName
+      )
+
+    expect(res.status).toBe(413)
+    expect(mockSendEmail).not.toBeCalled()
+    // no need to check EmailMessageTransactional since this is rejected before db record is saved
+  })
+
+  test('Should send a message with multiple valid attachments', async () => {
+    const validAttachment2 = Buffer.from('wassup dog')
+    const validAttachment2Name = 'hey.txt'
+    const validAttachment2Hash = getMd5HashFromAttachment(validAttachment2)
+    const validAttachment2Size = Buffer.byteLength(validAttachment2)
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('body', validApiCall.body)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .attach('attachments', validAttachment, validAttachmentName)
+      .attach('attachments', validAttachment2, validAttachment2Name)
+
+    expect(res.status).toBe(202)
+    expect(mockSendEmail).toBeCalledTimes(1)
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
+      status: TransactionalEmailMessageStatus.Accepted,
+      errorCode: null,
+    })
+    expect(transactionalEmail?.params).toMatchObject({
+      subject: validApiCall.subject,
+      body: validApiCall.body,
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
+    })
+    expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
+    expect(transactionalEmail?.attachmentsMetadata).toHaveLength(2)
+    expect(transactionalEmail?.attachmentsMetadata).toMatchObject([
+      {
+        fileName: validAttachmentName,
+        fileSize: validAttachmentSize,
+        hash: validAttachmentHash,
+      },
+      {
+        fileName: validAttachment2Name,
+        fileSize: validAttachment2Size,
+        hash: validAttachment2Hash,
+      },
+    ])
+  })
+
+  // test('Message with too many attachments should fail', async () => {
 
   test('Requests should be rate limited', async () => {
     const send = (): Promise<request.Response> => {
       return request(app)
         .post(endpoint)
         .set('Authorization', `Bearer ${apiKey}`)
-        .send(genericApiCallFields)
+        .send(validApiCall)
     }
 
     // First request passes
@@ -248,15 +379,16 @@ describe('POST /transactional/email/send', () => {
     })
     expect(firstEmail).not.toBeNull()
     expect(firstEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
-      from: genericApiCallFields.from,
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(firstEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
-      from: genericApiCallFields.from,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
     })
 
     // Second request rate limited
@@ -264,22 +396,23 @@ describe('POST /transactional/email/send', () => {
     expect(res.status).toBe(429)
     expect(mockSendEmail).not.toBeCalled()
     mockSendEmail.mockClear()
-    // second email is created, but error code 429
+    // second email is saved in db but has error code 429
     const secondEmail = await EmailMessageTransactional.findOne({
       where: { userId: user.id.toString() },
       order: [['createdAt', 'DESC']],
     })
     expect(secondEmail).not.toBeNull()
     expect(secondEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
-      from: genericApiCallFields.from,
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
       status: TransactionalEmailMessageStatus.Unsent,
       errorCode: RATE_LIMIT_ERROR_MESSAGE,
     })
     expect(secondEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
-      from: genericApiCallFields.from,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
     })
   })
 
@@ -288,7 +421,7 @@ describe('POST /transactional/email/send', () => {
       return request(app)
         .post(endpoint)
         .set('Authorization', `Bearer ${apiKey}`)
-        .send(genericApiCallFields)
+        .send(validApiCall)
     }
 
     // First request passes
@@ -301,15 +434,15 @@ describe('POST /transactional/email/send', () => {
     })
     expect(firstEmail).not.toBeNull()
     expect(firstEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
-      from: genericApiCallFields.from,
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(firstEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
-      from: genericApiCallFields.from,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
+      from: validApiCall.from,
     })
 
     // Second request rate limited
@@ -323,15 +456,16 @@ describe('POST /transactional/email/send', () => {
     })
     expect(secondEmail).not.toBeNull()
     expect(secondEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
-      from: genericApiCallFields.from,
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
       status: TransactionalEmailMessageStatus.Unsent,
       errorCode: RATE_LIMIT_ERROR_MESSAGE,
     })
     expect(secondEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
-      from: genericApiCallFields.from,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
     })
 
     // Third request passes after 1s
@@ -346,15 +480,16 @@ describe('POST /transactional/email/send', () => {
     })
     expect(thirdEmail).not.toBeNull()
     expect(thirdEmail).toMatchObject({
-      recipient: genericApiCallFields.recipient,
-      from: genericApiCallFields.from,
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(thirdEmail?.params).toMatchObject({
-      subject: genericApiCallFields.subject,
-      body: genericApiCallFields.body,
-      from: genericApiCallFields.from,
+      subject: validApiCall.subject,
+      body: validApiCall.body,
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
     })
   })
 })

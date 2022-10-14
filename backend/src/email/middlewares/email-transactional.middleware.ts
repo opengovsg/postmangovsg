@@ -7,7 +7,7 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
-  InvalidMessageError,
+  EmptyMessageError,
   InvalidRecipientError,
   MaliciousFileError,
   UnsupportedFileTypeError,
@@ -28,6 +28,11 @@ export interface EmailTransactionalMiddleware {
 
 export const RATE_LIMIT_ERROR_MESSAGE =
   'Error 429: Too many requests, rate limit reached'
+
+export const getMd5HashFromAttachment = (content: Buffer): string => {
+  const hash = crypto.createHash('md5')
+  return hash.update(content).digest('hex')
+}
 
 export const InitEmailTransactionalMiddleware = (
   redisService: RedisService,
@@ -102,7 +107,7 @@ export const InitEmailTransactionalMiddleware = (
           attachmentsMetadata: attachments.map((a) => ({
             fileName: a.name,
             fileSize: a.size,
-            hash: getAttachmentHash(a.data),
+            hash: getMd5HashFromAttachment(a.data),
           })),
         },
         {
@@ -112,11 +117,6 @@ export const InitEmailTransactionalMiddleware = (
     }
     req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
     next()
-  }
-
-  function getAttachmentHash(content: Buffer): string {
-    const hasher = crypto.createHash('md5')
-    return hasher.update(content).digest('hex')
   }
 
   async function sendMessage(
@@ -177,7 +177,7 @@ export const InitEmailTransactionalMiddleware = (
       })
 
       const BAD_REQUEST_ERRORS = [
-        InvalidMessageError,
+        EmptyMessageError,
         InvalidRecipientError,
         MaliciousFileError,
         UnsupportedFileTypeError,
