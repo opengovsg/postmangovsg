@@ -15,7 +15,7 @@ const checkExtensions = async (
   return _.every(isAllowed)
 }
 
-const virusScan = async (
+const areFilesSafe = async (
   files: { data: Buffer; name: string }[]
 ): Promise<boolean> => {
   const client = new CloudmersiveClient(config.get('file.cloudmersiveKey'))
@@ -35,6 +35,11 @@ const parseFiles = async (
   return parsedFiles
 }
 
+export const UNSUPPORTED_FILE_TYPE_ERROR_CODE =
+  'Error 400: Unsupported file type'
+
+export const MALICIOUS_FILE_ERROR_CODE = 'Error 400: Malicious file'
+
 const sanitizeFiles = async (
   files: { data: Buffer; name: string }[],
   emailMessageTransactionalId: number
@@ -43,7 +48,7 @@ const sanitizeFiles = async (
   if (!isAcceptedType) {
     await EmailMessageTransactional.update(
       {
-        errorCode: 'Error 400: Unsupported file type',
+        errorCode: UNSUPPORTED_FILE_TYPE_ERROR_CODE,
       },
       {
         where: { id: emailMessageTransactionalId },
@@ -51,11 +56,11 @@ const sanitizeFiles = async (
     )
     throw new UnsupportedFileTypeError()
   }
-  const isSafe = await virusScan(files)
+  const isSafe = await FileAttachmentService.areFilesSafe(files)
   if (!isSafe) {
     await EmailMessageTransactional.update(
       {
-        errorCode: 'Error 400: Malicious file',
+        errorCode: MALICIOUS_FILE_ERROR_CODE,
       },
       {
         where: { id: emailMessageTransactionalId },
@@ -68,4 +73,5 @@ const sanitizeFiles = async (
 
 export const FileAttachmentService = {
   sanitizeFiles,
+  areFilesSafe,
 }

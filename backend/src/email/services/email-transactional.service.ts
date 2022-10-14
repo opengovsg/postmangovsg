@@ -1,7 +1,6 @@
 import { EmailService, EmailTemplateService } from '@email/services'
 import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
-import { isBlacklisted } from '@email/utils/query'
 import {
   EMPTY_MESSAGE_ERROR,
   EmptyMessageError,
@@ -25,6 +24,8 @@ const logger = loggerWithLabel(module)
  */
 
 export const EMPTY_MESSAGE_ERROR_CODE = `Error 400: ${EMPTY_MESSAGE_ERROR}`
+export const BLACKLISTED_RECIPIENT_ERROR_CODE =
+  'Error 400: Blacklisted recipient'
 
 async function sendMessage({
   subject,
@@ -67,11 +68,11 @@ async function sendMessage({
       )
     : undefined
 
-  const blacklisted = await isBlacklisted(recipient)
+  const blacklisted = await EmailService.isRecipientBlacklisted(recipient)
   if (blacklisted) {
     void EmailMessageTransactional.update(
       {
-        errorCode: 'Error 400: Blacklisted recipient',
+        errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
       },
       {
         where: { id: emailMessageTransactionalId },

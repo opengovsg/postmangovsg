@@ -3,6 +3,12 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { User } from '@core/models'
 import {
+  FileAttachmentService,
+  FileExtensionService,
+  MALICIOUS_FILE_ERROR_CODE,
+  UNSUPPORTED_FILE_TYPE_ERROR_CODE,
+} from '@core/services'
+import {
   getMd5HashFromAttachment,
   RATE_LIMIT_ERROR_MESSAGE,
 } from '@email/middlewares'
@@ -10,7 +16,11 @@ import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
 } from '@email/models'
-import { EmailService, EMPTY_MESSAGE_ERROR_CODE } from '@email/services'
+import {
+  BLACKLISTED_RECIPIENT_ERROR_CODE,
+  EmailService,
+  EMPTY_MESSAGE_ERROR_CODE,
+} from '@email/services'
 
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
@@ -203,15 +213,18 @@ describe('POST /transactional/email/send', () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  // test Error 400: Message contains invalid HTML tags
-  test('Should throw an error if message contains invalid HTML tags', async () => {
+  test('Should throw an error if message is empty after removing invalid HTML tags', async () => {
+    const invalidHtmlTagsSubjectAndBody = {
+      subject: '\n\n\n',
+      body: '<script></script>',
+    }
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
       .send({
         ...validApiCall,
-        subject: '\n\n\n',
-        body: '<script></script>',
+        subject: invalidHtmlTagsSubjectAndBody.subject,
+        body: invalidHtmlTagsSubjectAndBody.body,
       })
 
     expect(res.status).toBe(400)
@@ -228,16 +241,133 @@ describe('POST /transactional/email/send', () => {
     })
     expect(transactionalEmail?.params).toMatchObject({
       // NB sanitisation only occurs at sending step, doesn't affect saving in params
-      subject: '\n\n\n',
-      body: '<script></script>',
+      subject: invalidHtmlTagsSubjectAndBody.subject,
+      body: invalidHtmlTagsSubjectAndBody.body,
       from: validApiCall.from,
       replyTo: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
   })
-  // test Error 400: Unsupported file type
-  // test Error 400: Malicious file
-  // test Error 400: Blacklisted recipient
+
+  test('Should throw an error if file type is not supported', async () => {
+    // not actually an invalid file type; FileExtensionService checks magic number
+    const invalidFileTypeAttachment = Buffer.alloc(1024 * 1024, '.')
+    const invalidFileTypeAttachmentName = 'invalid.exe'
+    // instead, we just mock the service to return false
+    const mockFileTypeCheck = jest
+      .spyOn(FileExtensionService, 'hasAllowedExtensions')
+      .mockResolvedValue(false)
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('body', validApiCall.body)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .attach(
+        'attachments',
+        invalidFileTypeAttachment,
+        invalidFileTypeAttachmentName
+      )
+
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+    expect(mockFileTypeCheck).toBeCalledTimes(1)
+    mockFileTypeCheck.mockClear()
+
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
+      status: TransactionalEmailMessageStatus.Unsent,
+    })
+    expect(transactionalEmail?.params).toMatchObject({
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
+    })
+    expect(transactionalEmail?.errorCode).toBe(UNSUPPORTED_FILE_TYPE_ERROR_CODE)
+  })
+
+  test('Should throw an error if file is malicious', async () => {
+    // not actually a malicious file
+    const maliciousAttachment = Buffer.alloc(1024 * 1024, '.')
+    const maliciousAttachmentName = 'malicious.txt'
+    // instead we mock areFilesSafe to return false
+    const mockAreFilesSafe = jest
+      .spyOn(FileAttachmentService, 'areFilesSafe')
+      .mockResolvedValue(false)
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('body', validApiCall.body)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .attach('attachments', maliciousAttachment, maliciousAttachmentName)
+
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+    expect(mockAreFilesSafe).toBeCalledTimes(1)
+    mockAreFilesSafe.mockClear()
+
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
+      status: TransactionalEmailMessageStatus.Unsent,
+    })
+    expect(transactionalEmail?.params).toMatchObject({
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
+    })
+    expect(transactionalEmail?.errorCode).toBe(MALICIOUS_FILE_ERROR_CODE)
+  })
+
+  test('Should throw an error if recipient is blacklisted', async () => {
+    // not actually a blacklisted recipient
+    const blacklistedRecipient = 'blacklisted@baddomain.com'
+    // instead, mock to return recipient as blacklisted
+    const mockIsBlacklisted = jest
+      .spyOn(EmailService, 'isRecipientBlacklisted')
+      .mockResolvedValue(true)
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        recipient: blacklistedRecipient,
+      })
+
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+    expect(mockIsBlacklisted).toBeCalledTimes(1)
+    mockIsBlacklisted.mockClear()
+
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: blacklistedRecipient,
+      from: validApiCall.from,
+      status: TransactionalEmailMessageStatus.Unsent,
+    })
+    expect(transactionalEmail?.params).toMatchObject({
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
+    })
+    expect(transactionalEmail?.errorCode).toBe(BLACKLISTED_RECIPIENT_ERROR_CODE)
+  })
 
   test('Should send a message with a valid attachment', async () => {
     // request.send() cannot be used with file attachments
