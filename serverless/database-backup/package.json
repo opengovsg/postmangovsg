@@ -13,13 +13,13 @@
   "author": "",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/datagovsg/postmangovsg.git"
+    "url": "git+https://github.com/opengovsg/postmangovsg.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/datagovsg/postmangovsg/issues"
+    "url": "https://github.com/opengovsg/postmangovsg/issues"
   },
-  "homepage": "https://github.com/datagovsg/postmangovsg#readme",
+  "homepage": "https://github.com/opengovsg/postmangovsg#readme",
   "devDependencies": {
     "@types/convict": "5.2.1",
     "@types/node": "14.6.4",
