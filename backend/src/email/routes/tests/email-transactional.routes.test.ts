@@ -91,7 +91,7 @@ describe('POST /transactional/email/send', () => {
     expect(res.status).toBe(400)
   })
 
-  test('Should send a message successfully', async () => {
+  test('Should send email successfully', async () => {
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -213,7 +213,7 @@ describe('POST /transactional/email/send', () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  test('Should throw an error if message is empty after removing invalid HTML tags', async () => {
+  test('Should throw an error if email subject or body is empty after removing invalid HTML tags', async () => {
     const invalidHtmlTagsSubjectAndBody = {
       subject: '\n\n\n',
       body: '<script></script>',
@@ -249,7 +249,7 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
   })
 
-  test('Should throw an error if file type is not supported', async () => {
+  test('Should throw an error if file type of attachment is not supported', async () => {
     // not actually an invalid file type; FileExtensionService checks magic number
     const invalidFileTypeAttachment = Buffer.alloc(1024 * 1024, '.')
     const invalidFileTypeAttachmentName = 'invalid.exe'
@@ -293,7 +293,7 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(UNSUPPORTED_FILE_TYPE_ERROR_CODE)
   })
 
-  test('Should throw an error if file is malicious', async () => {
+  test('Should throw an error if attached file is malicious', async () => {
     // not actually a malicious file
     const maliciousAttachment = Buffer.alloc(1024 * 1024, '.')
     const maliciousAttachmentName = 'malicious.txt'
@@ -369,7 +369,7 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(BLACKLISTED_RECIPIENT_ERROR_CODE)
   })
 
-  test('Should send a message with a valid attachment', async () => {
+  test('Should send email with a valid attachment', async () => {
     // request.send() cannot be used with file attachments
     // substitute form values with request.field(). refer to
     // https://visionmedia.github.io/superagent/#multipart-requests
@@ -414,7 +414,7 @@ describe('POST /transactional/email/send', () => {
     ])
   })
 
-  test('Message with too big attachment should fail', async () => {
+  test('Email with attachment that exceeds limit should fail', async () => {
     const invalidAttachmentTooBig = Buffer.alloc(1024 * 1024 * 10, '.') // 10MB
     const invalidAttachmentTooBigName = 'too big.txt'
 
@@ -437,7 +437,7 @@ describe('POST /transactional/email/send', () => {
     // no need to check EmailMessageTransactional since this is rejected before db record is saved
   })
 
-  test('Should send a message with multiple valid attachments', async () => {
+  test('Should send email with two valid attachments', async () => {
     const validAttachment2 = Buffer.from('wassup dog')
     const validAttachment2Name = 'hey.txt'
     const validAttachment2Hash = getMd5HashFromAttachment(validAttachment2)
@@ -488,7 +488,32 @@ describe('POST /transactional/email/send', () => {
     ])
   })
 
-  // test('Message with too many attachments should fail', async () => {
+  test('Email with more than two attachments should fail', async () => {
+    // at time of writing this test default value of FILE_ATTACHMENT_MAX_NUM is 2
+    // not sure how to create a variable number of attachments + API call (probably not possible?)
+    const attachment2 = Buffer.from('wassup dog')
+    const attachment2Name = 'hey.txt'
+    const attachment3 = Buffer.from('wassup pal')
+    const attachment3Name = 'hi there.txt'
+    const attachment4 = Buffer.from('hello there')
+    const attachment4Name = 'hello friends.txt'
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('body', validApiCall.body)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .attach('attachments', validAttachment, validAttachmentName)
+      .attach('attachments', attachment2, attachment2Name)
+      .attach('attachments', attachment3, attachment3Name)
+      .attach('attachments', attachment4, attachment4Name)
+
+    expect(res.status).toBe(413)
+    expect(mockSendEmail).not.toBeCalled()
+    // no need to check EmailMessageTransactional since this is rejected before db record is saved
+  })
 
   test('Requests should be rate limited', async () => {
     const send = (): Promise<request.Response> => {
