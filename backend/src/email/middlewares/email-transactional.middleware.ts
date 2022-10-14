@@ -26,6 +26,9 @@ export interface EmailTransactionalMiddleware {
   getById: Handler
 }
 
+export const RATE_LIMIT_ERROR_MESSAGE =
+  'Error 429: Too many requests, rate limit reached'
+
 export const InitEmailTransactionalMiddleware = (
   redisService: RedisService,
   authService: AuthService
@@ -223,7 +226,7 @@ export const InitEmailTransactionalMiddleware = (
       })
       void EmailMessageTransactional.update(
         {
-          errorCode: 'Error 429: Too many requests, rate limit reached',
+          errorCode: RATE_LIMIT_ERROR_MESSAGE,
         },
         {
           where: { id: req.body.emailMessageTransactionalId },
