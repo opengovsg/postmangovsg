@@ -528,7 +528,6 @@ describe('POST /transactional/email/send', () => {
     expect(res.status).toBe(201)
     expect(mockSendEmail).toBeCalledTimes(1)
     mockSendEmail.mockClear()
-    // should only return 1
     const firstEmail = await EmailMessageTransactional.findOne({
       where: { userId: user.id.toString() },
     })
