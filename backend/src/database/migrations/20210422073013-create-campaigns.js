@@ -35,6 +35,7 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
       },
+      // superseded by 20221009141317-change-json-to-jsonb-everywhere.js
       s3_object: {
         type: Sequelize.DataTypes.JSON,
         allowNull: true,

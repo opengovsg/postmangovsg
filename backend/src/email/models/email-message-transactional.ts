@@ -49,13 +49,13 @@ export class EmailMessageTransactional extends Model<EmailMessageTransactional> 
   @Column({ type: DataType.STRING, allowNull: false })
   recipient: string
 
-  @Column({ type: DataType.JSON, allowNull: false })
+  @Column({ type: DataType.JSONB, allowNull: false })
   params: Record<string, string>
 
   @Column({ type: DataType.STRING, allowNull: true })
   messageId: string | null
 
-  @Column({ type: DataType.ARRAY(DataType.JSON), allowNull: true })
+  @Column({ type: DataType.ARRAY(DataType.JSONB), allowNull: true })
   attachmentsMetadata: AttachmentsMetadata | null
 
   @Column({
