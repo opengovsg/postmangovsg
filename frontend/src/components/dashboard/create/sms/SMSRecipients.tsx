@@ -166,7 +166,7 @@ const SMSRecipients = ({
 
   // If shouldSaveList is modified, send info to backend
   useEffect(() => {
-    void setCampaignToSaveList(+campaignId, shouldSaveList)
+    void setCampaignToSaveList(campaignId as string, shouldSaveList)
   }, [campaignId, shouldSaveList])
 
   // Handle file upload
