@@ -34,7 +34,7 @@ export class TelegramOp extends Model<TelegramOp> {
   })
   recipient!: number
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   params!: object
 
   @Column(DataType.STRING)

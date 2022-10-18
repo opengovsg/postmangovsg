@@ -183,11 +183,10 @@ You should find the
 - Express backend at [localhost:4000](http://localhost:4000)
 - Swagger docs at [localhost:4000/docs](http://localhost:4000/docs)
 
-Alternatively, if you would like to develop locally against staging database and workers, ensure that you have set up the necessary variables in `./backend/.env` and run the following:
+Alternatively, if you would like to develop locally against staging database and workers, ensure that you have set up the necessary variables in `./backend/.env` and run either:
 
-```zsh
-npm run lazydev
-```
+- `npm run dev:connectstagingdb` (to make a read + write connection with the staging db); or
+- `npm run dev:connectstagingdbreadonly` (to make a readonly connection with the staging db.).
 
 Your frontend and backend will still be on `localhost` but you will be able to use staging database and workers.
 

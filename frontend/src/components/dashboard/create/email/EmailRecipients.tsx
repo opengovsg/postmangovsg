@@ -37,6 +37,7 @@ import {
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
+import { setCampaignToSaveList } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
 import { selectList, getListsByChannel } from 'services/list.service'
 import {
@@ -172,6 +173,11 @@ const EmailRecipients = ({
     shouldSaveList,
   ])
 
+  // If shouldSaveList is modified, send info to backend
+  useEffect(() => {
+    void setCampaignToSaveList(+campaignId, shouldSaveList)
+  }, [campaignId, shouldSaveList])
+
   // Handle file upload
   async function uploadFile(files: FileList) {
     setIsUploading(true)
@@ -280,6 +286,10 @@ const EmailRecipients = ({
         <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
           Save this file as a managed list
         </Checkbox>
+        <p>
+          Note: managed recipient list will only be saved after you have sent
+          the campaign
+        </p>
         <ManagedListSection
           managedLists={managedLists}
           setSelectedListId={setSelectedListId}

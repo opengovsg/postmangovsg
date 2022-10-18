@@ -50,14 +50,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/datagovsg/postmangovsg.git"
+    "url": "git+https://github.com/opengovsg/postmangovsg.git"
   },
   "author": "Open Government Products, GovTech Singapore (https://open.gov.sg)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/datagovsg/postmangovsg/issues"
+    "url": "https://github.com/opengovsg/postmangovsg/issues"
   },
-  "homepage": "https://github.com/datagovsg/postmangovsg#readme",
+  "homepage": "https://github.com/opengovsg/postmangovsg#readme",
   "devDependencies": {
     "concurrently": "^7.2.1",
     "cypress": "^10.2.0",
