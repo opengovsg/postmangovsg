@@ -217,7 +217,7 @@ export async function renameCampaign(
 
 // TODO: Combine with renameCampaign into an updateCampaign service method
 export async function setCampaignToSaveList(
-  campaignId: number,
+  campaignId: string,
   shouldSaveList: boolean
 ): Promise<void> {
   return axios.put(`/campaigns/${campaignId}`, {

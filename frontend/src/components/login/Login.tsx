@@ -4,7 +4,7 @@ import { createRef, useEffect, useContext } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 
 import styles from './Login.module.scss'
 
@@ -41,7 +41,7 @@ const Login = () => {
   })
 
   if (authContext.isAuthenticated) {
-    return <Redirect to="/campaigns"></Redirect>
+    return <Navigate to="/campaigns" />
   }
 
   return (

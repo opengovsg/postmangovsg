@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { useHistory, NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 import styles from './SideNav.module.scss'
 
@@ -18,8 +18,9 @@ const NavItem = ({
   return (
     <NavLink
       to={location}
-      activeClassName={styles.active}
-      className={styles.navItem}
+      className={({ isActive }) =>
+        cx(styles.navItem, isActive ? styles.active : '')
+      }
     >
       <span>
         <i className={cx('bx', styles.icon, icon)}></i>
@@ -35,7 +36,7 @@ const SideNav = ({
 }: {
   links: Array<{ label: string; location: string; icon: string }>
 }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const options = links.map(
     (link: { label: string; location: string; icon: string }) => ({
       label: link.label,
@@ -44,7 +45,7 @@ const SideNav = ({
   )
 
   function onSelectLink(location: string) {
-    history.push(location)
+    navigate(location)
   }
 
   return (

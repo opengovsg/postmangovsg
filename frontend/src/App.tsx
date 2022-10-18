@@ -1,7 +1,7 @@
 // Components
 import { Suspense, lazy } from 'react'
 
-import { Route, Switch } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 
 import Landing from 'components/landing'
 import Login from 'components/login'
@@ -19,20 +19,25 @@ const Dashboard = lazy(() => import('components/dashboard'))
 
 const App = () => {
   return (
-    <Switch>
-      <Route exact path="/" component={Landing}></Route>
-      <Route exact path="/login" component={Login}></Route>
-      <Route path="/test" component={TestUtils}></Route>
-      <Route exact path="/p/:version/:id" component={ProtectedPage}></Route>
-      <Route exact path="/unsubscribe/:version" component={Unsubscribe}></Route>
-      <ProtectedRoute>
-        <Suspense
-          fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
-        >
-          <Dashboard></Dashboard>
-        </Suspense>
-      </ProtectedRoute>
-    </Switch>
+    <Routes>
+      <Route path="/" element={<Landing />}></Route>
+      <Route path="/login" element={<Login />}></Route>
+      <Route path="/test/*" element={<TestUtils />}></Route>
+      <Route path="/p/:version/:id" element={<ProtectedPage />}></Route>
+      <Route path="/unsubscribe/:version" element={<Unsubscribe />}></Route>
+      <Route
+        path="*"
+        element={
+          <ProtectedRoute>
+            <Suspense
+              fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
+            >
+              <Dashboard></Dashboard>
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   )
 }
 

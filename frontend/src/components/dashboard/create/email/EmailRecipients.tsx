@@ -105,7 +105,10 @@ const EmailRecipients = ({
     const setSelectedList = async () => {
       try {
         if (selectedListId) {
-          await selectList({ campaignId: +campaignId, listId: selectedListId })
+          await selectList({
+            campaignId: +(campaignId as string),
+            listId: selectedListId,
+          })
           setIsCsvProcessing(true)
         }
       } catch (e) {
@@ -172,7 +175,7 @@ const EmailRecipients = ({
 
   // If shouldSaveList is modified, send info to backend
   useEffect(() => {
-    void setCampaignToSaveList(+campaignId, shouldSaveList)
+    void setCampaignToSaveList(campaignId as string, shouldSaveList)
   }, [campaignId, shouldSaveList])
 
   // Handle file upload

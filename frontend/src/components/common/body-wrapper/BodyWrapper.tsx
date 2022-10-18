@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import type { FunctionComponent } from 'react'
+import type { FunctionComponent, ReactNode } from 'react'
 
 import styles from './BodyWrapper.module.scss'
 
@@ -10,6 +10,7 @@ interface BodyWrapperProps {
    * This prevents an external scrollbar from appearing when the modal is open.
    */
   wrap?: boolean
+  children: ReactNode
 }
 
 const BodyWrapper: FunctionComponent<BodyWrapperProps> = ({
