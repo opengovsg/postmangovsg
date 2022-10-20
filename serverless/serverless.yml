@@ -1,0 +1,22 @@
+service: postmangovsg
+
+frameworkVersion: "3"
+
+plugins:
+  # serverless-plugin-typescript needs to precede serverless-offline
+  - serverless-plugin-typescript
+  - serverless-offline-lambda
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: ap-southeast-1
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /hello
+          method: get

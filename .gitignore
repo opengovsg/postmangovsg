@@ -109,3 +109,6 @@ gmail_token.json
 
 # IDE config files
 .idea
+
+# Serverless build
+.build/
