@@ -2,6 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, _) => {
+    // NB superseded by 20221012054742-remove-api-key-column-from-user-table.js
     await queryInterface.createFunction(
       'format_user_on_insert', // actually a misnomer, since activates on UPDATE too, but stick to existing naming
       [],
