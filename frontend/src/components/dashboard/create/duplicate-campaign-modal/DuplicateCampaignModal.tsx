@@ -6,7 +6,7 @@ import { useState, useContext } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import styles from './DuplicateCampaignModal.module.scss'
 
@@ -25,7 +25,7 @@ import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   const { close } = useContext(ModalContext)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedName, setSelectedName] = useState(
     // Only prepend 'Copy of' if the campaign name doesn't already have one
@@ -41,7 +41,7 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
       sendUserEvent(GA_USER_EVENTS.COMPLETE_DUPLICATE, campaign.type)
       // close modal and go to create view
       close()
-      history.push(`/campaigns/${duplicate.id}`)
+      navigate(`/campaigns/${duplicate.id}`)
     } catch (err) {
       console.error(err)
       setErrorMessage((err as Error).message)

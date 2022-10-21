@@ -1,5 +1,5 @@
 import { createRef, useEffect } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 
 import Campaigns from './campaigns'
 
@@ -39,18 +39,21 @@ const Dashboard = () => {
     <ModalContextProvider>
       <InfoBanner innerRef={infoBannerRef} />
       <NavBar></NavBar>
-      <Switch>
-        <Route exact path="/campaigns" component={Campaigns}></Route>
-        <Route path="/campaigns/:id">
-          <CampaignContextProvider>
-            <FinishLaterContextProvider>
-              <Create />
-            </FinishLaterContextProvider>
-          </CampaignContextProvider>
-        </Route>
-        <Route path="/settings" component={Settings}></Route>
-        <Route component={Error} />
-      </Switch>
+      <Routes>
+        <Route path="/campaigns" element={<Campaigns />}></Route>
+        <Route
+          path="/campaigns/:id/*"
+          element={
+            <CampaignContextProvider>
+              <FinishLaterContextProvider>
+                <Create />
+              </FinishLaterContextProvider>
+            </CampaignContextProvider>
+          }
+        />
+        <Route path="/settings/*" element={<Settings />} />
+        <Route element={<Error />} />
+      </Routes>
     </ModalContextProvider>
   )
 }

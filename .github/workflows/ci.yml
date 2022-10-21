@@ -130,9 +130,7 @@ jobs:
       - run: npm run build
         working-directory: ./shared
 
-      # using legacy-peer-deps as some dependencies are broken
-      # more info see https://github.com/opengovsg/postmangovsg/pull/1578
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci
       - run: npm run compile
       - name: Lint app code
         run: npm run lint-no-fix

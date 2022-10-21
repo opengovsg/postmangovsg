@@ -1,7 +1,7 @@
 import cx from 'classnames'
 
 import { useContext, useState, useEffect } from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 
 import styles from './Settings.module.scss'
 import AddApiKeyModal from './add-api-key-modal'
@@ -130,36 +130,43 @@ const Settings = () => {
           }
         />
         <div className={styles.detailsContainer}>
-          <Switch>
-            <Route exact path="/settings/api">
-              <ApiKey hasApiKey={hasApiKey} />
-            </Route>
+          <Routes>
+            <Route path="/api" element={<ApiKey hasApiKey={hasApiKey} />} />
             {hasCustomFromAddresses && (
-              <Route exact path="/settings/email">
-                <CustomFromAddress
-                  customFromAddresses={customFromAddresses}
-                  onSuccess={fetchCustomFromAddresses}
-                />
-              </Route>
+              <Route
+                path="/email"
+                element={
+                  <CustomFromAddress
+                    customFromAddresses={customFromAddresses}
+                    onSuccess={fetchCustomFromAddresses}
+                  />
+                }
+              />
             )}
-            <Route exact path="/settings/sms">
-              <Credentials
-                credType={ChannelType.SMS}
-                title="Twilio Credentials"
-                creds={creds}
-                refresh={fetchUserSettings}
-              />
-            </Route>
-            <Route exact path="/settings/telegram">
-              <Credentials
-                credType={ChannelType.Telegram}
-                title="Telegram Credentials"
-                creds={creds}
-                refresh={fetchUserSettings}
-              />
-            </Route>
-            <Redirect to="/settings/api" />
-          </Switch>
+            <Route
+              path="/sms"
+              element={
+                <Credentials
+                  credType={ChannelType.SMS}
+                  title="Twilio Credentials"
+                  creds={creds}
+                  refresh={fetchUserSettings}
+                />
+              }
+            />
+            <Route
+              path="/telegram"
+              element={
+                <Credentials
+                  credType={ChannelType.Telegram}
+                  title="Telegram Credentials"
+                  creds={creds}
+                  refresh={fetchUserSettings}
+                />
+              }
+            />
+            <Route path="*" element={<Navigate to="/settings/api" />} />
+          </Routes>
         </div>
       </div>
     )

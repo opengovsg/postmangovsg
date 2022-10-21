@@ -1,14 +1,14 @@
 version: 0.1
 env:
   variables:
-    BACKEND_URL_PRODUCTION: "https://api.postman.gov.sg/v1"
-    BACKEND_URL_PRODUCTION_MOM: "https://api-mom.postman.gov.sg/v1"
-    BACKEND_URL_STAGING: "https://api-staging.postman.gov.sg/v1"
-    SENTRY_ORG: "open-government-products-re"
-    SENTRY_PROJECT: "postmangovsg-frontend"
-    REACT_APP_SENTRY_DSN: "https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024"
-    REACT_APP_TITLE: "Postman.gov.sg"
-    REACT_APP_DESCRIPTION: "Postman.gov.sg enables public officers to send templated messages to many recipients"
+    BACKEND_URL_PRODUCTION: 'https://api.postman.gov.sg/v1'
+    BACKEND_URL_PRODUCTION_MOM: 'https://api-mom.postman.gov.sg/v1'
+    BACKEND_URL_STAGING: 'https://api-staging.postman.gov.sg/v1'
+    SENTRY_ORG: 'open-government-products-re'
+    SENTRY_PROJECT: 'postmangovsg-frontend'
+    REACT_APP_SENTRY_DSN: 'https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024'
+    REACT_APP_TITLE: 'Postman.gov.sg'
+    REACT_APP_DESCRIPTION: 'Postman.gov.sg enables public officers to send templated messages to many recipients'
 frontend:
   phases:
     preBuild:
@@ -25,10 +25,8 @@ frontend:
           export REACT_APP_SENTRY_ENVIRONMENT="staging";
           fi
         - cd shared && npm ci && cd ..
-        
-        # using legacy-peer-deps as lottie-react only declares to support til v17 for now
-        # more info https://github.com/Gamote/lottie-react/issues/61
-        - cd frontend && npm ci --legacy-peer-deps
+
+        - cd frontend && npm ci
         - export REACT_APP_SENTRY_RELEASE=$(npm run --silent get-sentry-release)
     build:
       commands:
@@ -38,4 +36,4 @@ frontend:
     # IMPORTANT - Please verify your build output directory
     baseDirectory: frontend/build
     files:
-      - "**/*"
+      - '**/*'

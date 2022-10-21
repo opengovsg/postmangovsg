@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
 
-import { Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 
 import TelegramRecipients from '../TelegramRecipients'
 
@@ -50,15 +50,22 @@ function renderRecipients() {
   const setActiveStep = jest.fn()
 
   render(
-    <Route path="/campaigns/:id">
-      <CampaignContextProvider
-        initialCampaign={new TelegramCampaign({ ...TEST_TELEGRAM_CAMPAIGN })}
-      >
-        <FinishLaterModalContextProvider>
-          <TelegramRecipients setActiveStep={setActiveStep} />
-        </FinishLaterModalContextProvider>
-      </CampaignContextProvider>
-    </Route>,
+    <Routes>
+      <Route
+        path="/campaigns/:id"
+        element={
+          <CampaignContextProvider
+            initialCampaign={
+              new TelegramCampaign({ ...TEST_TELEGRAM_CAMPAIGN })
+            }
+          >
+            <FinishLaterModalContextProvider>
+              <TelegramRecipients setActiveStep={setActiveStep} />
+            </FinishLaterModalContextProvider>
+          </CampaignContextProvider>
+        }
+      />
+    </Routes>,
     {
       router: { initialIndex: 0, initialEntries: ['/campaigns/1'] },
     }

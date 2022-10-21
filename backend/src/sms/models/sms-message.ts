@@ -28,7 +28,7 @@ export class SmsMessage extends Model<SmsMessage> {
   @Column(DataType.STRING)
   recipient!: string
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   params!: object
 
   @Column(DataType.STRING)
