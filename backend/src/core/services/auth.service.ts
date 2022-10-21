@@ -5,7 +5,7 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { User } from '@core/models'
 import { validateDomain } from '@core/utils/validate-domain'
-import { RedisService, ApiKeyService, MailService } from '@core/services'
+import { ApiKeyService, MailService, RedisService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import { Transaction } from 'sequelize/types'
 
@@ -179,11 +179,10 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     const apiKey = getApiKey(req)
     if (apiKey !== null) {
       const hash = await ApiKeyService.getApiKeyHash(apiKey)
-      const user = await User.findOne({
+      return await User.findOne({
         where: { apiKey: hash },
         attributes: ['id', 'email'],
       })
-      return user
     }
     return null
   }
