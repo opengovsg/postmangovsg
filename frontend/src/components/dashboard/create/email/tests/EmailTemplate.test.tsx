@@ -3,7 +3,7 @@ import { t } from '@lingui/macro'
 import { fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 
 import EmailTemplate from '../EmailTemplate'
 
@@ -47,13 +47,18 @@ function renderTemplatePage() {
   const setActiveStep = jest.fn()
 
   render(
-    <Route path="/campaigns/:id">
-      <CampaignContextProvider>
-        <FinishLaterModalContextProvider>
-          <EmailTemplate setActiveStep={setActiveStep} />
-        </FinishLaterModalContextProvider>
-      </CampaignContextProvider>
-    </Route>,
+    <Routes>
+      <Route
+        path="/campaigns/:id/*"
+        element={
+          <CampaignContextProvider>
+            <FinishLaterModalContextProvider>
+              <EmailTemplate setActiveStep={setActiveStep} />
+            </FinishLaterModalContextProvider>
+          </CampaignContextProvider>
+        }
+      />
+    </Routes>,
     {
       router: { initialIndex: 0, initialEntries: ['/campaigns/1'] },
     }

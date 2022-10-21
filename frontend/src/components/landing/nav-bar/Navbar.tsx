@@ -2,7 +2,7 @@ import { i18n } from '@lingui/core'
 
 import { OutboundLink } from 'react-ga'
 
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import styles from './NavBar.module.scss'
 
@@ -12,10 +12,10 @@ import PrimaryButton from 'components/common/primary-button'
 import { LINKS } from 'config'
 
 const NavBar = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
 
   function directToSignIn() {
-    history.push('/login')
+    navigate('/login')
   }
 
   return (

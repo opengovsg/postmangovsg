@@ -6,7 +6,7 @@ import Lottie from 'lottie-react'
 import { createRef, useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
-import { Redirect, useHistory } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 
 import styles from './Landing.module.scss'
 import Banner from './banner'
@@ -37,7 +37,7 @@ const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 const Landing = () => {
   const { isAuthenticated } = useContext(AuthContext)
   const [sentMessages, setSentMessages] = useState('0')
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const bannerRef = createRef<HTMLDivElement>()
   const infoBannerRef = createRef<HTMLDivElement>()
@@ -77,11 +77,11 @@ const Landing = () => {
   })
 
   if (isAuthenticated) {
-    return <Redirect to="/campaigns" />
+    return <Navigate to="/campaigns" />
   }
 
   function directToSignIn() {
-    history.push('/login')
+    navigate('/login')
   }
 
   const trustedAgencies = [
