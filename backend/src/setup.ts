@@ -1,10 +1,12 @@
+/* eslint-disable import/first */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-// This needs to be done before all traced packages (like express) 's imports
+require('dotenv').config()
+require('module-alias/register')
+
+// This needs to be done before all traced packages (like express) are imported
 import '@shared/tracing'
 
 import config from '@core/config'
 
-require('dotenv').config()
-require('module-alias/register')
 // Validate to make sure all the required env vars have been set
 config.validate()

@@ -1,11 +1,4 @@
-import { EmailTemplate } from '@email/models'
-import { waitForMs } from '@shared/utils/wait-for-ms'
-import sequelizeLoader from '@test-utils/sequelize-loader'
-
-import { Sequelize, Transaction } from 'sequelize/types'
-
-import { UploadService } from '../upload.service'
-
+/* eslint-disable import/first */
 jest.mock('@core/services/s3-client.class')
 
 const parseCsvMock = {
@@ -21,6 +14,15 @@ const parseCsvMock = {
 jest.mock('../', () => ({
   ParseCsvService: parseCsvMock,
 }))
+
+import { EmailTemplate } from '@email/models'
+import { waitForMs } from '@shared/utils/wait-for-ms'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+
+import { Sequelize, Transaction } from 'sequelize/types'
+
+// for reasons I don't understand, if I change this to '@core/services' the test will fail
+import { UploadService } from '../upload.service'
 
 let sequelize: Sequelize
 beforeEach(async () => {
