@@ -96,7 +96,9 @@ module.exports = {
     'simple-import-sort/exports': 'error',
     'import/first': 'error',
     'import/newline-after-import': 'error',
-    'import/no-duplicates': 'error',
-    // 'import/no-extraneous-dependencies': 'error',
+    'import/no-duplicates': 'error', 
+    // fixed errors flagged by import/no-extraneous-dependencies, but keep getting 
+    // 'shared' should be listed in the project's dependencies
+    // 'import/no-extraneous-dependencies': 'error'*,
   },
 }
