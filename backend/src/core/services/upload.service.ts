@@ -1,27 +1,27 @@
-import Queue from 'bee-queue'
-import { v4 as uuid } from 'uuid'
-import { difference, keys } from 'lodash'
-import retry from 'async-retry'
-
-import S3 from 'aws-sdk/clients/s3'
-import { Transaction } from 'sequelize'
-
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
-import { isSuperSet } from '@core/utils'
 import { MissingTemplateKeysError } from '@core/errors/template.errors'
+import {
+  AllowedTemplateTypes,
+  CsvStatusInterface,
+  Upload,
+  UploadData,
+} from '@core/interfaces'
+import { loggerWithLabel } from '@core/logger'
+import { Campaign } from '@core/models'
+import S3Client from '@core/services/s3-client.class'
+import { CSVParams } from '@core/types'
+import { isSuperSet } from '@core/utils'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
-import { Campaign } from '@core/models'
-import {
-  CsvStatusInterface,
-  UploadData,
-  Upload,
-  AllowedTemplateTypes,
-} from '@core/interfaces'
-import { CSVParams } from '@core/types'
-import S3Client from '@core/services/s3-client.class'
-import { StatsService, CampaignService, ParseCsvService } from '.'
+import retry from 'async-retry'
+import Queue from 'bee-queue'
+import { difference, keys } from 'lodash'
+import { Transaction } from 'sequelize'
+import { v4 as uuid } from 'uuid'
+
+import S3 from 'aws-sdk/clients/s3'
+
+import { CampaignService, ParseCsvService, StatsService } from '.'
 
 const logger = loggerWithLabel(module)
 

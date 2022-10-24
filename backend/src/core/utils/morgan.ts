@@ -1,5 +1,5 @@
-import { Request, Response } from 'express'
 import { getRequestIp } from '@core/utils/request'
+import { Request, Response } from 'express'
 
 const clientIp = (req: Request, _res: Response): string => getRequestIp(req)
 

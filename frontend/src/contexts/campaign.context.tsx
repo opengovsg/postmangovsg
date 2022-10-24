@@ -1,9 +1,7 @@
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import { createContext, useCallback, useState } from 'react'
+import { Campaign, EmailCampaign, SMSCampaign, TelegramCampaign } from 'classes'
 import { cloneDeep } from 'lodash'
-import { createContext, useState, useCallback } from 'react'
-
-import type { ReactNode, Dispatch, SetStateAction } from 'react'
-
-import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
 
 type PossibleCampaign = SMSCampaign | EmailCampaign | TelegramCampaign
 

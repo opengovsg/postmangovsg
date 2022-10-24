@@ -1,15 +1,14 @@
-import dns from 'dns'
-import AWS from 'aws-sdk'
-import escapeHTML from 'escape-html'
 import config from '@core/config'
-
-import { EmailFromAddress } from '@email/models'
-import { MailService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { MailService } from '@core/services'
+import { EmailFromAddress } from '@email/models'
 import {
   extractDomainFromEmail,
   formatFromAddress,
 } from '@shared/utils/from-address'
+import AWS from 'aws-sdk'
+import dns from 'dns'
+import escapeHTML from 'escape-html'
 
 const logger = loggerWithLabel(module)
 const backendSesRegion = config.get('mailOptions.host').split('.')[1]

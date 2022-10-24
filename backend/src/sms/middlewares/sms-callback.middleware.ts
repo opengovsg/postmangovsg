@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express'
-import { SmsCallbackService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
+import { SmsCallbackService } from '@sms/services'
+import { NextFunction, Request, Response } from 'express'
 
 const logger = loggerWithLabel(module)
 

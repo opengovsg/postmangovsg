@@ -1,10 +1,11 @@
+import { ChannelType } from '@core/constants'
+import { Campaign, User } from '@core/models'
+import { InitAuthService, RedisService } from '@core/services'
+import { EmailMiddleware } from '@email/middlewares/email.middleware'
+import sequelizeLoader from '@test-utils/sequelize-loader'
 import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
-import { Campaign, User } from '@core/models'
-import sequelizeLoader from '@test-utils/sequelize-loader'
-import { InitAuthService, RedisService } from '@core/services'
-import { ChannelType } from '@core/constants'
-import { EmailMiddleware } from '@email/middlewares/email.middleware'
+
 import { InitEmailMiddleware } from '..'
 
 let sequelize: Sequelize

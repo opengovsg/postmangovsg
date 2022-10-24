@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction, Handler } from 'express'
-import { EmailService, CustomDomainService } from '@email/services'
-import { isDefaultFromAddress } from '@core/utils/from-address'
-import { parseFromAddress } from '@shared/utils/from-address'
-import { AuthService, UnsubscriberService } from '@core/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { ThemeClient } from '@shared/theme'
+import { AuthService, UnsubscriberService } from '@core/services'
+import { isDefaultFromAddress } from '@core/utils/from-address'
 import { EmailMessageTransactional } from '@email/models'
+import { CustomDomainService, EmailService } from '@email/services'
+import { ThemeClient } from '@shared/theme'
+import { parseFromAddress } from '@shared/utils/from-address'
+import { Handler, NextFunction, Request, Response } from 'express'
 
 export interface EmailMiddleware {
   isEmailCampaignOwnedByUser: Handler

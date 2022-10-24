@@ -1,24 +1,17 @@
-import { i18n } from '@lingui/core'
-
-import cx from 'classnames'
-
-import { useEffect, useState, useContext } from 'react'
-
+import { useContext, useEffect, useState } from 'react'
 import { OutboundLink } from 'react-ga'
-
-import styles from './AddCredentialModal.module.scss'
-
+import { i18n } from '@lingui/core'
 import ChooseChannelsImage from 'assets/img/choose-channels.svg'
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
-import { ChannelType, channelIcons } from 'classes'
-
+import { channelIcons, ChannelType } from 'classes'
+import cx from 'classnames'
 import {
+  CredLabelInput,
+  ErrorBlock,
   PrimaryButton,
   TextButton,
-  ErrorBlock,
-  CredLabelInput,
 } from 'components/common'
 import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
 import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
@@ -27,16 +20,17 @@ import TelegramCredentialsInput from 'components/dashboard/create/telegram/Teleg
 import TelegramValidationInput from 'components/dashboard/create/telegram/TelegramValidationInput'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
-
 import {
   getStoredCredentials as getSmsStoredCredentials,
   storeCredentials as storeSmsCredentials,
 } from 'services/sms.service'
 import {
   getStoredCredentials as getTelegramStoredCredentials,
-  verifyUserCredentials as verifyUserTelegramCredentials,
   storeCredentials as storeTelegramCredentials,
+  verifyUserCredentials as verifyUserTelegramCredentials,
 } from 'services/telegram.service'
+
+import styles from './AddCredentialModal.module.scss'
 
 enum AddCredentialStep {
   SelectType,

@@ -1,27 +1,21 @@
-import { i18n } from '@lingui/core'
-
-import cx from 'classnames'
-
-import { useState, useContext } from 'react'
-
+import { useContext, useState } from 'react'
 import { OutboundLink } from 'react-ga'
-
 import { useNavigate } from 'react-router-dom'
-
-import styles from './DuplicateCampaignModal.module.scss'
-
-import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
+import { i18n } from '@lingui/core'
+import { Campaign, channelIcons, ChannelType } from 'classes/Campaign'
+import cx from 'classnames'
 import {
-  TextInput,
-  PrimaryButton,
   Checkbox,
   ErrorBlock,
+  PrimaryButton,
+  TextInput,
 } from 'components/common'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
-
 import { duplicateCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+
+import styles from './DuplicateCampaignModal.module.scss'
 
 const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   const { close } = useContext(ModalContext)

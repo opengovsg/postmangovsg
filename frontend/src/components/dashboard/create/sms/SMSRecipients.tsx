@@ -1,31 +1,24 @@
-import { i18n } from '@lingui/core'
-
-import { useState, useEffect, useContext } from 'react'
-
 import type { Dispatch, SetStateAction } from 'react'
-
+import { useContext, useEffect, useState } from 'react'
 import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
-
-import styles from '../Create.module.scss'
-
+import { i18n } from '@lingui/core'
 import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import { ChannelType, List } from 'classes'
 import {
-  FileInput,
+  ButtonGroup,
+  Checkbox,
   CsvUpload,
   ErrorBlock,
-  PreviewBlock,
-  NextButton,
-  SampleCsv,
-  ButtonGroup,
-  TextButton,
-  StepSection,
-  StepHeader,
+  FileInput,
   InfoBlock,
+  NextButton,
+  PreviewBlock,
+  SampleCsv,
+  StepHeader,
+  StepSection,
+  TextButton,
   WarningBlock,
-  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import {
@@ -34,17 +27,17 @@ import {
 } from 'components/experimental'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-
 import { setCampaignToSaveList } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
-import { selectList, getListsByChannel } from 'services/list.service'
+import { getListsByChannel, selectList } from 'services/list.service'
+import type { CsvStatusResponse } from 'services/upload.service'
 import {
-  uploadFileToS3,
   deleteCsvStatus,
   getCsvStatus,
+  uploadFileToS3,
 } from 'services/upload.service'
 
-import type { CsvStatusResponse } from 'services/upload.service'
+import styles from '../Create.module.scss'
 
 const SMSRecipients = ({
   setActiveStep,

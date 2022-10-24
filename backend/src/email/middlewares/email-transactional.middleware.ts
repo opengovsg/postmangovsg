@@ -1,23 +1,22 @@
-import type { Handler, NextFunction, Request, Response } from 'express'
-import expressRateLimit from 'express-rate-limit'
-import RedisStore from 'rate-limit-redis'
-import { RedisService } from '@core/services'
-import { EmailTransactionalService } from '@email/services'
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
-import { AuthService } from '@core/services/auth.service'
 import {
   InvalidMessageError,
   InvalidRecipientError,
   MaliciousFileError,
   UnsupportedFileTypeError,
 } from '@core/errors'
+import { loggerWithLabel } from '@core/logger'
+import { RedisService } from '@core/services'
+import { AuthService } from '@core/services/auth.service'
 import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
 } from '@email/models'
-
+import { EmailTransactionalService } from '@email/services'
 import crypto from 'crypto'
+import type { Handler, NextFunction, Request, Response } from 'express'
+import expressRateLimit from 'express-rate-limit'
+import RedisStore from 'rate-limit-redis'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler

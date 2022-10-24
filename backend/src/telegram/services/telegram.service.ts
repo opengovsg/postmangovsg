@@ -1,28 +1,26 @@
-import { Transaction } from 'sequelize'
-
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
-import { Campaign } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
-
-import {
-  TelegramMessage,
-  TelegramTemplate,
-  BotSubscriber,
-  TelegramSubscriber,
-} from '@telegram/models'
-import { TelegramTemplateService } from '@telegram/services'
-
-import TelegramClient from './telegram-client.class'
-import { CSVParams } from '@core/types'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { loggerWithLabel } from '@core/logger'
+import { Campaign } from '@core/models'
 import {
   CampaignService,
   PhoneNumberService,
   UploadService,
 } from '@core/services'
-import { loggerWithLabel } from '@core/logger'
+import { CSVParams } from '@core/types'
 import { TelegramDuplicateCampaignDetails } from '@telegram/interfaces'
-import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import {
+  BotSubscriber,
+  TelegramMessage,
+  TelegramSubscriber,
+  TelegramTemplate,
+} from '@telegram/models'
+import { TelegramTemplateService } from '@telegram/services'
+import { Transaction } from 'sequelize'
+
+import TelegramClient from './telegram-client.class'
 
 const logger = loggerWithLabel(module)
 

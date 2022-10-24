@@ -1,24 +1,22 @@
-import cx from 'classnames'
-
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import CredentialsImage from 'assets/img/credentials.svg'
+import { channelIcons, ChannelType } from 'classes'
+import cx from 'classnames'
+import { SideNav, TitleBar } from 'components/common'
+import { ModalContext } from 'contexts/modal.context'
+import type { UserCredential } from 'services/settings.service'
+import {
+  getCustomFromAddresses,
+  getUserSettings,
+} from 'services/settings.service'
 
-import styles from './Settings.module.scss'
 import AddApiKeyModal from './add-api-key-modal'
 import AddCredentialModal from './add-credential-modal'
 import ApiKey from './api-key'
 import Credentials from './credentials'
 import CustomFromAddress from './custom-from-address'
-
-import CredentialsImage from 'assets/img/credentials.svg'
-import { ChannelType, channelIcons } from 'classes'
-import { SideNav, TitleBar } from 'components/common'
-import { ModalContext } from 'contexts/modal.context'
-import type { UserCredential } from 'services/settings.service'
-import {
-  getUserSettings,
-  getCustomFromAddresses,
-} from 'services/settings.service'
+import styles from './Settings.module.scss'
 
 const SETTINGS_LINKS_WITHOUT_EMAIL = [
   {

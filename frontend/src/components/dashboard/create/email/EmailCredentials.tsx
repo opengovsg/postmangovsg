@@ -1,22 +1,19 @@
-import { useContext, useState, Dispatch, SetStateAction } from 'react'
-
+import { Dispatch, SetStateAction, useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
-
-import EmailValidationInput from './EmailValidationInput'
-
 import { EmailProgress } from 'classes'
 import {
-  NextButton,
+  ButtonGroup,
   DetailBlock,
   ErrorBlock,
-  ButtonGroup,
-  TextButton,
+  NextButton,
   StepHeader,
   StepSection,
+  TextButton,
 } from 'components/common'
 import { CampaignContext } from 'contexts/campaign.context'
-
 import { sendPreviewMessage } from 'services/email.service'
+
+import EmailValidationInput from './EmailValidationInput'
 
 const EmailCredentials = ({
   setActiveStep,

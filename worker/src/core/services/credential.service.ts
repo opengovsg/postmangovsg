@@ -1,10 +1,10 @@
-import AWS from 'aws-sdk'
-import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
+import { loggerWithLabel } from '@core/logger'
+import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { TwilioCredentials } from '@sms/interfaces'
 import { TelegramCredentials } from '@telegram/interfaces'
+import AWS from 'aws-sdk'
 import { get } from 'lodash'
-import { configureEndpoint } from '@core/utils/aws-endpoint'
 
 const logger = loggerWithLabel(module)
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))

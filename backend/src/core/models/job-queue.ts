@@ -1,12 +1,13 @@
+import { JobStatus } from '@core/constants'
 import {
+  BelongsTo,
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
-  BelongsTo,
 } from 'sequelize-typescript'
-import { JobStatus } from '@core/constants'
+
 import { Campaign } from './campaign'
 import { Worker } from './worker'
 

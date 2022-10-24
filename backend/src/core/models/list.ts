@@ -1,12 +1,12 @@
+import { ChannelType } from '@core/constants'
+import { User, UserList } from '@core/models'
 import {
+  BelongsToMany,
+  Column,
   DataType,
   Model,
-  Column,
   Table,
-  BelongsToMany,
 } from 'sequelize-typescript'
-import { User, UserList } from '@core/models'
-import { ChannelType } from '@core/constants'
 
 @Table({ tableName: 'lists', underscored: true, timestamps: true })
 // <Model<Partial<List>> is required to resolve errors in the model.create()

@@ -1,9 +1,8 @@
-import cx from 'classnames'
 import { RefObject } from 'react'
+import cx from 'classnames'
+import { INFO_BANNER, INFO_BANNER_COLOR } from 'config'
 
 import styles from './InfoBanner.module.scss'
-
-import { INFO_BANNER, INFO_BANNER_COLOR } from 'config'
 
 export enum BannerColors {
   Primary = 'primary',

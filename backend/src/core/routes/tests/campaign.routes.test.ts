@@ -1,9 +1,3 @@
-import request from 'supertest'
-import { Sequelize } from 'sequelize-typescript'
-import initialiseServer from '@test-utils/server'
-import { Campaign, User, UserDemo, JobQueue } from '@core/models'
-import sequelizeLoader from '@test-utils/sequelize-loader'
-import { UploadService } from '@core/services'
 import {
   ChannelType,
   JobStatus,
@@ -11,6 +5,12 @@ import {
   SortField,
   Status,
 } from '@core/constants'
+import { Campaign, JobQueue, User, UserDemo } from '@core/models'
+import { UploadService } from '@core/services'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+import initialiseServer from '@test-utils/server'
+import { Sequelize } from 'sequelize-typescript'
+import request from 'supertest'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize

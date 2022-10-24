@@ -1,14 +1,14 @@
+import { MessageStatus } from '@core/constants'
+import { Unsubscriber } from '@core/models'
+import { Campaign } from '@core/models/campaign'
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
   Model,
   Table,
-  BelongsTo,
 } from 'sequelize-typescript'
-import { Campaign } from '@core/models/campaign'
-import { MessageStatus } from '@core/constants'
-import { Unsubscriber } from '@core/models'
 
 @Table({ tableName: 'email_messages', underscored: true, timestamps: true })
 export class EmailMessage extends Model<EmailMessage> {

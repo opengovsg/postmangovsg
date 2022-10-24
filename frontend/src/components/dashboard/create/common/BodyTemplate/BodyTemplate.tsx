@@ -1,11 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { useCallback, useContext, useEffect, useState } from 'react'
-
 import { useParams } from 'react-router-dom'
-import { SegmentedMessage } from 'sms-segments-calculator'
-
-import styles from './BodyTemplate.module.scss'
-
 import { SMSCampaign, SMSProgress, TelegramProgress } from 'classes'
 import {
   ErrorBlock,
@@ -17,6 +12,9 @@ import {
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { SegmentedMessage } from 'sms-segments-calculator'
+
+import styles from './BodyTemplate.module.scss'
 
 // correct as at 12 Jun 2022; to use if costPerSMS from backend unavailable
 export const FALLBACK_COST_PER_SMS_SGD = 0.0395 * 1.4

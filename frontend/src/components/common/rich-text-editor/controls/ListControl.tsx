@@ -1,5 +1,5 @@
-import cx from 'classnames'
 import { useContext } from 'react'
+import cx from 'classnames'
 
 import { EditorContext } from '../RichTextEditor'
 

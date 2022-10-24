@@ -1,13 +1,11 @@
+import type { ReactElement } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render as _render, RenderOptions } from '@testing-library/react'
-
+import AuthContextProvider from 'contexts/auth.context'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
-import type { ReactElement } from 'react'
-import { MemoryRouter } from 'react-router-dom'
-
-import AuthContextProvider from 'contexts/auth.context'
 
 interface RouterOptions {
   initialIndex?: number
@@ -34,6 +32,6 @@ const render = (
 
 const server = setupServer()
 
-export * from '@testing-library/react'
 export * from './api'
-export { render, server, rest }
+export * from '@testing-library/react'
+export { render, rest, server }

@@ -1,10 +1,8 @@
-import { QueryTypes } from 'sequelize'
-
+import { CampaignStats } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { StatsService } from '@core/services'
-import { CampaignStats } from '@core/interfaces'
-
-import { SmsOp, SmsMessage } from '@sms/models'
+import { SmsMessage, SmsOp } from '@sms/models'
+import { QueryTypes } from 'sequelize'
 import { Writable } from 'stream'
 
 const logger = loggerWithLabel(module)

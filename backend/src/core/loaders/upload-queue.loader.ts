@@ -1,15 +1,14 @@
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
-import { UploadService } from '@core/services'
-import { EmailTemplateService } from '@email/services'
-import { SmsTemplateService } from '@sms/services'
-import { TelegramTemplateService } from '@telegram/services'
-import { loggerWithLabel } from '@core/logger'
-import { EmailTemplate } from '@email/models'
 import { UploadData } from '@core/interfaces'
+import { loggerWithLabel } from '@core/logger'
+import { UploadService } from '@core/services'
+import { EmailTemplate } from '@email/models'
+import { EmailTemplateService } from '@email/services'
 import { SmsTemplate } from '@sms/models'
+import { SmsTemplateService } from '@sms/services'
 import { TelegramTemplate } from '@telegram/models'
-
+import { TelegramTemplateService } from '@telegram/services'
 import trace from 'dd-trace'
 
 const logger = loggerWithLabel(module)

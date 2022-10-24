@@ -1,14 +1,13 @@
-import { useState, useContext } from 'react'
-
-import styles from './VerifyCustomFromAddressModal.module.scss'
-
+import { useContext, useState } from 'react'
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
-import { PrimaryButton, ErrorBlock } from 'components/common'
+import { ErrorBlock, PrimaryButton } from 'components/common'
 import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
 import { ModalContext } from 'contexts/modal.context'
 import { verifyFromAddress } from 'services/email.service'
+
+import styles from './VerifyCustomFromAddressModal.module.scss'
 
 enum VerifyEmailStep {
   Verify,

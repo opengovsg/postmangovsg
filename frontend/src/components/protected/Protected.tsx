@@ -1,17 +1,14 @@
-import cx from 'classnames'
 import { useState } from 'react'
-
 import { useParams } from 'react-router-dom'
+import appLogo from 'assets/img/brand/app-logo.svg'
+import appLogoGrey from 'assets/img/brand/app-logo-grey.svg'
+import landingHero from 'assets/img/landing/landing-hero.png'
+import cx from 'classnames'
+import { ProtectedPreview, TextInputWithButton } from 'components/common'
+import Banner from 'components/landing/banner'
+import { fetchMessage } from 'services/decrypt-mail.service'
 
 import styles from './Protected.module.scss'
-
-import appLogoGrey from 'assets/img/brand/app-logo-grey.svg'
-import appLogo from 'assets/img/brand/app-logo.svg'
-import landingHero from 'assets/img/landing/landing-hero.png'
-import { TextInputWithButton, ProtectedPreview } from 'components/common'
-import Banner from 'components/landing/banner'
-
-import { fetchMessage } from 'services/decrypt-mail.service'
 
 const Protected = () => {
   const { id } = useParams<{ id: string }>()

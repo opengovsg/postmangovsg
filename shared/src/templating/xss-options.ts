@@ -1,10 +1,11 @@
 import {
-  IFilterXSSOptions,
-  ICSSFilter,
   cssFilter,
-  safeAttrValue,
   getDefaultCSSWhiteList,
+  ICSSFilter,
+  IFilterXSSOptions,
+  safeAttrValue,
 } from 'xss'
+
 import { TemplateError } from './errors'
 
 const URL =

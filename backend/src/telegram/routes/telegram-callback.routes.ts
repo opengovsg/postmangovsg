@@ -1,5 +1,6 @@
-import { Router } from 'express'
 import { TelegramCallbackMiddleware } from '@telegram/middlewares'
+import { Router } from 'express'
+
 const router = Router()
 
 /**

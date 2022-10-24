@@ -1,10 +1,11 @@
-import { TelegrafContext } from 'telegraf/typings/context'
-import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
+import { loggerWithLabel } from '@core/logger'
+import { BotSubscriber, TelegramSubscriber } from '@telegram/models'
 import { QueryTypes } from 'sequelize'
 
-import { loggerWithLabel } from '@core/logger'
+import { TelegrafContext } from 'telegraf/typings/context'
+import { ExtraReplyMessage, Message } from 'telegraf/typings/telegram-types'
+
 import { PostmanTelegramError } from '../PostmanTelegramError'
-import { TelegramSubscriber, BotSubscriber } from '@telegram/models'
 
 const logger = loggerWithLabel(module)
 

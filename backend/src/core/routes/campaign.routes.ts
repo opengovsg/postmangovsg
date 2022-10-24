@@ -1,7 +1,8 @@
-import { Router } from 'express'
-import { ChannelType, Status, SortField, Ordering } from '@core/constants'
-import { celebrate, Joi, Segments } from 'celebrate'
+import { ChannelType, Ordering, SortField, Status } from '@core/constants'
 import { CampaignMiddleware } from '@core/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
+
 const router = Router()
 
 // validators

@@ -1,7 +1,6 @@
-import cx from 'classnames'
-import { ForwardedRef, forwardRef } from 'react'
-
 import type { ChangeEvent } from 'react'
+import { ForwardedRef, forwardRef } from 'react'
+import cx from 'classnames'
 
 import defaultStyles from './TextInput.module.scss'
 

@@ -1,12 +1,9 @@
-import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
-
 import config from '@core/config'
-import { initializeModels } from '@core/models'
-
 import { loggerWithLabel } from '@core/logger'
-import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
-
+import { initializeModels } from '@core/models'
+import { generateRdsIamAuthToken, MutableConfig } from '@core/utils/rds-iam'
 import { dbConfig as masterConfig, parseDBUri } from '@database/util'
+import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 
 const logger = loggerWithLabel(module)
 const DB_READ_REPLICA_URI = config.get('database.databaseReadReplicaUri')

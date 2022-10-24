@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react'
+import { DetailBlock, ErrorBlock } from 'components/common'
 
 import styles from './CsvUpload.module.scss'
-
-import { DetailBlock, ErrorBlock } from 'components/common'
 
 const CsvUpload = ({
   isCsvProcessing,

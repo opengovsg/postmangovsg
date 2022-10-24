@@ -1,20 +1,18 @@
-import userEvent from '@testing-library/user-event'
-
 import { Route, Routes } from 'react-router-dom'
-
-import SMSRecipients from '../SMSRecipients'
-
+import userEvent from '@testing-library/user-event'
 import { SMSCampaign } from 'classes'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import {
-  screen,
-  mockCommonApis,
-  server,
-  render,
   Campaign,
   INVALID_MOBILE_CSV_FILE,
+  mockCommonApis,
+  render,
+  screen,
+  server,
 } from 'test-utils'
+
+import SMSRecipients from '../SMSRecipients'
 
 const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,

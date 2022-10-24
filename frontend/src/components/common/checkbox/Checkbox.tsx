@@ -1,7 +1,5 @@
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import cx from 'classnames'
-import type { Dispatch, SetStateAction } from 'react'
-
-import type { ReactNode } from 'react'
 
 import styles from './Checkbox.module.scss'
 

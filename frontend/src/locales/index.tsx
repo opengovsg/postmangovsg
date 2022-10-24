@@ -5,7 +5,6 @@ import { en } from 'make-plural/plurals'
  * To create a new language or translation, for example, `en-custom`:
  * Add it to the `locales` array in `.linguirc` and run `npm run extract`
  */
-
 import catalogEn from './en/messages.js'
 
 i18n.loadLocaleData('en', { plurals: en })

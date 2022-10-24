@@ -1,12 +1,11 @@
-import cors from 'cors'
-import express, { Request, Response, NextFunction } from 'express'
-import { errors as celebrateErrorMiddleware } from 'celebrate'
-import * as Sentry from '@sentry/node'
-import expressWinston from 'express-winston'
-
 import config from '@core/config'
-import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
+import { InitV1Route } from '@core/routes'
+import * as Sentry from '@sentry/node'
+import { errors as celebrateErrorMiddleware } from 'celebrate'
+import cors from 'cors'
+import express, { NextFunction, Request, Response } from 'express'
+import expressWinston from 'express-winston'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')

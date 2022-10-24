@@ -1,8 +1,8 @@
-import validator from 'validator'
-import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
+import { loggerWithLabel } from '@core/logger'
 import { Domain } from '@core/models'
 import { Transaction } from 'sequelize'
+import validator from 'validator'
 
 const logger = loggerWithLabel(module)
 

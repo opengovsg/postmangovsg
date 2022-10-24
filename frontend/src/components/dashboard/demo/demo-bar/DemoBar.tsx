@@ -1,13 +1,11 @@
-import cx from 'classnames'
-
 import { useContext, useEffect, useState } from 'react'
+import cx from 'classnames'
+import { TextButton } from 'components/common'
+import { ModalContext } from 'contexts/modal.context'
 
 import CreateDemoModal from '../create-demo-modal'
 
 import styles from './DemoBar.module.scss'
-
-import { TextButton } from 'components/common'
-import { ModalContext } from 'contexts/modal.context'
 
 const DemoBar = ({
   numDemosSms,

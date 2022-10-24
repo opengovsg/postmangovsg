@@ -1,7 +1,9 @@
-import { Sequelize } from 'sequelize-typescript'
-import { TelegrafContext } from 'telegraf/typings/context'
-import sequelizeLoader from '@test-utils/sequelize-loader'
 import { BotSubscriber, TelegramSubscriber } from '@telegram/models'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+import { Sequelize } from 'sequelize-typescript'
+
+import { TelegrafContext } from 'telegraf/typings/context'
+
 import { contactMessageHandler } from '../contact'
 
 let sequelize: Sequelize

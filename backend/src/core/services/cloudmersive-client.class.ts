@@ -1,9 +1,9 @@
+import { loggerWithLabel } from '@core/logger'
 import {
-  ScanApi,
   ApiClient,
+  ScanApi,
   VirusScanResult,
 } from 'cloudmersive-virus-api-client'
-import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 

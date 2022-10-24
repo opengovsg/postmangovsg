@@ -1,22 +1,20 @@
 import axios from 'axios'
-
+import type { CampaignRecipient } from 'classes'
 import {
   Campaign,
   CampaignStats,
   ChannelType,
-  StatusFilter,
-  SortField,
-  Ordering,
-  Status,
-  SMSCampaign,
   EmailCampaign,
-  TelegramCampaign,
   EmailCampaignRecipient,
+  Ordering,
+  SMSCampaign,
   SMSCampaignRecipient,
+  SortField,
+  Status,
+  StatusFilter,
+  TelegramCampaign,
   TelegramCampaignRecipient,
 } from 'classes'
-
-import type { CampaignRecipient } from 'classes'
 
 function getJobTimestamps(
   jobs: Array<{ sent_at: string; status_updated_at: string }>

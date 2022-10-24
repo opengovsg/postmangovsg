@@ -1,6 +1,5 @@
-import { ContentBlock, ContentState, DraftDecorator } from 'draft-js'
-
 import type { PropsWithChildren } from 'react'
+import { ContentBlock, ContentState, DraftDecorator } from 'draft-js'
 
 const HIGHLIGHT_REGEX = /{{\s*?\w+\s*?}}/g
 

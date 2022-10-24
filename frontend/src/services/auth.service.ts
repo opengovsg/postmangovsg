@@ -68,4 +68,4 @@ function errorHandler(e: unknown, customHandlers: any = {}) {
   throw new Error(`${e}`)
 }
 
-export { getOtpWithEmail, loginWithOtp, getUser, logout, setUserAnalytics }
+export { getOtpWithEmail, getUser, loginWithOtp, logout, setUserAnalytics }

@@ -1,23 +1,17 @@
-import { i18n } from '@lingui/core'
-
-import cx from 'classnames'
-
-import { useState, useContext } from 'react'
-
+import { useContext, useState } from 'react'
 import { OutboundLink } from 'react-ga'
-
 import { NavLink, useLocation } from 'react-router-dom'
-
-import styles from './NavBar.module.scss'
-
+import { i18n } from '@lingui/core'
 import AppLogo from 'assets/img/brand/app-logo-reverse.svg'
+import cx from 'classnames'
 import { TextButton } from 'components/common'
 import CreateModal from 'components/dashboard/create/create-modal'
 import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
-
 import { logout } from 'services/auth.service'
+
+import styles from './NavBar.module.scss'
 
 const NavBar = () => {
   const { setAuthenticated, email } = useContext(AuthContext)

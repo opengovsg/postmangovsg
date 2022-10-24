@@ -1,26 +1,23 @@
-import { Transaction } from 'sequelize'
-import { CSVParams } from '@core/types'
-
-import { loggerWithLabel } from '@core/logger'
+import config from '@core/config'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
+import { CampaignDetails } from '@core/interfaces'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { loggerWithLabel } from '@core/logger'
 import { Agency, Campaign, Domain, ProtectedMessage, User } from '@core/models'
 import {
-  MailService,
   CampaignService,
-  UploadService,
+  MailService,
   ProtectedService,
   UnsubscriberService,
+  UploadService,
 } from '@core/services'
-import { CampaignDetails } from '@core/interfaces'
-import { MailToSend } from '@shared/clients/mail-client.class'
-
-import { EmailTemplate, EmailMessage } from '@email/models'
-import { EmailTemplateService } from '@email/services'
-import config from '@core/config'
+import { CSVParams } from '@core/types'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
-
+import { EmailMessage, EmailTemplate } from '@email/models'
+import { EmailTemplateService } from '@email/services'
+import { MailToSend } from '@shared/clients/mail-client.class'
 import { ThemeClient } from '@shared/theme'
-import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { Transaction } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 

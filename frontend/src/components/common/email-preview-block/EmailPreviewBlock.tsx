@@ -1,9 +1,9 @@
-import cx from 'classnames'
-import { useState, useEffect } from 'react'
 import type { FC } from 'react'
+import { useEffect, useState } from 'react'
+import cx from 'classnames'
 
 import DetailBlock from '../detail-block'
-import { isImgSrcValid, isExternalImage } from '../rich-text-editor/utils/image'
+import { isExternalImage, isImgSrcValid } from '../rich-text-editor/utils/image'
 
 import styles from './EmailPreviewBlock.module.scss'
 

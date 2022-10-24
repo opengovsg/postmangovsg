@@ -1,5 +1,4 @@
 import axios, { AxiosError } from 'axios'
-
 import { ChannelType, List } from 'classes'
 
 export async function selectList({

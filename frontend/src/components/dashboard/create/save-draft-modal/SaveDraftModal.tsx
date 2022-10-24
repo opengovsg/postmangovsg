@@ -1,7 +1,5 @@
-import { useState, useContext } from 'react'
-
+import { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
 import { ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 

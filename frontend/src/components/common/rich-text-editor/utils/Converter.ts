@@ -1,17 +1,17 @@
 import {
-  ContentState,
-  ContentBlock,
   CharacterMetadata,
+  ContentBlock,
+  ContentState,
   DraftInlineStyle,
   genKey,
-  RawDraftContentState,
   RawDraftContentBlock,
-  RawDraftInlineStyleRange,
-  RawDraftEntityRange,
+  RawDraftContentState,
   RawDraftEntity,
+  RawDraftEntityRange,
+  RawDraftInlineStyleRange,
 } from 'draft-js'
 import immutable from 'immutable'
-import { orderBy, findIndex } from 'lodash'
+import { findIndex, orderBy } from 'lodash'
 
 import { HTMLTree } from './HTMLTree'
 

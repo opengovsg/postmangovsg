@@ -1,22 +1,22 @@
+import {
+  forwardRef,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import cx from 'classnames'
 import {
   ContentBlock,
   ContentState,
   EditorState,
-  SelectionState,
   Modifier,
+  SelectionState,
 } from 'draft-js'
-import {
-  useRef,
-  useState,
-  useContext,
-  useEffect,
-  useMemo,
-  forwardRef,
-} from 'react'
 
 import { EditorContext } from '../RichTextEditor'
-import { isImgSrcValid, isExternalImage } from '../utils/image'
+import { isExternalImage, isImgSrcValid } from '../utils/image'
 
 import styles from './ImageBlock.module.scss'
 

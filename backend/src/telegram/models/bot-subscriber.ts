@@ -1,10 +1,11 @@
 import {
   Column,
-  Model,
-  Table,
   DataType,
   ForeignKey,
+  Model,
+  Table,
 } from 'sequelize-typescript'
+
 import { TelegramSubscriber } from './telegram-subscriber'
 
 @Table({ tableName: 'bot_subscribers', underscored: true, timestamps: true })

@@ -1,7 +1,7 @@
-import S3 from 'aws-sdk/clients/s3'
-
 import config from '@core/config'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
+
+import S3 from 'aws-sdk/clients/s3'
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 

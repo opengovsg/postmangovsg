@@ -1,18 +1,7 @@
-import { i18n } from '@lingui/core'
-
-import cx from 'classnames'
-
-import Lottie from 'lottie-react'
 import { createRef, useContext, useEffect, useState } from 'react'
-
 import { OutboundLink } from 'react-ga'
 import { Navigate, useNavigate } from 'react-router-dom'
-
-import styles from './Landing.module.scss'
-import Banner from './banner'
-
-import Navbar from './nav-bar'
-
+import { i18n } from '@lingui/core'
 import companyLogo from 'assets/img/brand/company-logo.svg'
 import channelsImg from 'assets/img/landing/channels.png'
 import landingHeroImg from 'assets/img/landing/landing-hero.png'
@@ -21,16 +10,20 @@ import moeAgencyImg from 'assets/img/landing/moe-gray.png'
 import mohAgencyImg from 'assets/img/landing/moh-gray.png'
 import momAgencyImg from 'assets/img/landing/mom-gray.png'
 import onboardingImg from 'assets/img/landing/onboard.png'
-
 import landingAnimation from 'assets/lottie/landing.json'
 import whyUse1 from 'assets/mp4/why-use-1.mp4'
 import whyUse2 from 'assets/mp4/why-use-2.mp4'
 import whyUse3 from 'assets/mp4/why-use-3.mp4'
+import cx from 'classnames'
 import { InfoBanner, PrimaryButton } from 'components/common'
 import { LINKS } from 'config'
-
 import { AuthContext } from 'contexts/auth.context'
+import Lottie from 'lottie-react'
 import { getLandingStats } from 'services/stats.service'
+
+import Banner from './banner'
+import styles from './Landing.module.scss'
+import Navbar from './nav-bar'
 
 const isIE11 = !!window.MSInputMethodContext && !!(document as any).documentMode
 

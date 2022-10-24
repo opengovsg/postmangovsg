@@ -1,15 +1,14 @@
+import type { MouseEvent as ReactMouseEvent } from 'react'
+import { useEffect, useState } from 'react'
 import cx from 'classnames'
 import {
-  Modifier,
-  EditorState,
-  ContentState,
   ContentBlock,
+  ContentState,
+  EditorState,
   genKey,
+  Modifier,
 } from 'draft-js'
 import { Map } from 'immutable'
-import { useState, useEffect } from 'react'
-
-import type { MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from '../RichTextEditor.module.scss'
 

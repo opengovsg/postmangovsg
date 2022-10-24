@@ -1,11 +1,12 @@
 import {
   Column,
   DataType,
+  Default,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
-  Default,
 } from 'sequelize-typescript'
+
 import { User } from './user'
 
 @Table({ tableName: 'user_demos', underscored: true, timestamps: true })

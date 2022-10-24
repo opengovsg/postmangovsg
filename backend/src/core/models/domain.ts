@@ -1,14 +1,15 @@
 import {
-  DataType,
-  Model,
-  Column,
-  Table,
   BelongsTo,
+  Column,
+  DataType,
   ForeignKey,
   HasMany,
+  Model,
+  Table,
 } from 'sequelize-typescript'
-import { Agency } from './agency'
+
 import { User } from './user/user'
+import { Agency } from './agency'
 
 @Table({ tableName: 'domains', underscored: true, timestamps: true })
 export class Domain extends Model<Domain> {

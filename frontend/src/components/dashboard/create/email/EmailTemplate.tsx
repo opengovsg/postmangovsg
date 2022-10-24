@@ -1,43 +1,38 @@
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
+import { OutboundLink } from 'react-ga'
+import { useParams } from 'react-router-dom'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { parseFromAddress } from '@shared/utils/from-address'
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from 'react'
-
-import { OutboundLink } from 'react-ga'
-
-import { useParams } from 'react-router-dom'
-
-import styles from './EmailTemplate.module.scss'
-
 import { EmailCampaign, EmailProgress } from 'classes'
 import {
-  TextArea,
-  NextButton,
-  ErrorBlock,
-  TextInput,
   Dropdown,
+  ErrorBlock,
+  InfoBlock,
+  NextButton,
+  RichTextEditor,
   StepHeader,
   StepSection,
-  RichTextEditor,
-  InfoBlock,
+  TextArea,
+  TextInput,
   ToggleSwitch,
 } from 'components/common'
-
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
-
 import { saveTemplate } from 'services/email.service'
 import { getCustomFromAddresses } from 'services/settings.service'
+
+import styles from './EmailTemplate.module.scss'
 
 const EmailTemplate = ({
   setActiveStep,

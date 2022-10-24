@@ -1,6 +1,5 @@
-import { parse } from 'pg-connection-string'
-
 import config from '@core/config'
+import { parse } from 'pg-connection-string'
 
 export const parseDBUri = (uri: string): any => {
   const config = parse(uri)

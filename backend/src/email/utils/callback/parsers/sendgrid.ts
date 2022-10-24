@@ -1,15 +1,15 @@
+import config from '@core/config'
+import { loggerWithLabel } from '@core/logger'
+import { addToBlacklist } from '@email/utils/callback/query'
+import {
+  updateBouncedStatus,
+  updateComplaintStatus,
+  updateDeliveredStatus,
+} from '@email/utils/callback/update-status'
 import { Request } from 'express'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa'
-import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
-import {
-  updateDeliveredStatus,
-  updateBouncedStatus,
-  updateComplaintStatus,
-} from '@email/utils/callback/update-status'
-import { addToBlacklist } from '@email/utils/callback/query'
+import { Ecdsa, PublicKey, Signature } from 'starkbank-ecdsa'
 
 const logger = loggerWithLabel(module)
 const PUBLIC_KEY = PublicKey.fromPem(
@@ -106,4 +106,4 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
       return
   }
 }
-export { SendgridEvent, isEvent, parseRecord }
+export { isEvent, parseRecord, SendgridEvent }

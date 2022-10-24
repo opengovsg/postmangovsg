@@ -1,11 +1,11 @@
 import cheerio from 'cheerio'
 import { mapKeys } from 'lodash'
-import { IFilterXSSOptions, filterXSS } from 'xss'
+import mustache from 'mustache'
+import { filterXSS, IFilterXSSOptions } from 'xss'
+
 import { TemplateError } from './errors'
 import { TemplatingConfig, TemplatingConfigDefault } from './interfaces'
 import { filterImageSources } from './xss-options'
-
-import mustache from 'mustache'
 
 export class TemplateClient {
   xssOptions: IFilterXSSOptions

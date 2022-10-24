@@ -1,17 +1,14 @@
 import { createRef, useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
-
-import Campaigns from './campaigns'
-
-import Create from './create'
-
-import Settings from './settings'
-
 import { InfoBanner, NavBar } from 'components/common'
 import Error from 'components/error'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterContextProvider from 'contexts/finish-later.modal.context'
 import ModalContextProvider from 'contexts/modal.context'
+
+import Campaigns from './campaigns'
+import Create from './create'
+import Settings from './settings'
 
 const Dashboard = () => {
   const infoBannerRef = createRef<HTMLDivElement>()

@@ -1,7 +1,8 @@
-import process from 'process'
-import worker from './message-worker'
-import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
+import { loggerWithLabel } from '@core/logger'
+import process from 'process'
+
+import worker from './message-worker'
 
 const logger = loggerWithLabel(module)
 

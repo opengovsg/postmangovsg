@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction, Handler } from 'express'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
+import { Handler, NextFunction, Request, Response } from 'express'
 
 export interface AuthMiddleware {
   getOtp: Handler

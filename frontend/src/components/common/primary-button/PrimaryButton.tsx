@@ -1,16 +1,13 @@
-import cx from 'classnames'
-
-import { useState, useMemo } from 'react'
-
 import type {
   ButtonHTMLAttributes,
-  ReactElement,
   FunctionComponent,
+  ReactElement,
 } from 'react'
+import { useMemo, useState } from 'react'
+import cx from 'classnames'
+import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
 import styles from './PrimaryButton.module.scss'
-
-import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
 interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   alignRight?: boolean

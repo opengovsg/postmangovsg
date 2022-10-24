@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import isEmail from 'validator/lib/isEmail'
-
 import { TextInputWithButton } from 'components/common'
+import isEmail from 'validator/lib/isEmail'
 
 const EmailValidationInput = ({
   onClick,

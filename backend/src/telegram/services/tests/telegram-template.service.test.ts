@@ -1,15 +1,12 @@
-import { Sequelize } from 'sequelize-typescript'
-import sequelizeLoader from '@test-utils/sequelize-loader'
-
-import S3Client from '@core/services/s3-client.class'
 import { ChannelType } from '@core/constants'
 import { Campaign, User } from '@core/models'
 import { UploadService } from '@core/services'
-
-import { TelegramTemplate, TelegramMessage } from '@telegram/models'
+import S3Client from '@core/services/s3-client.class'
+import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { TelegramTemplateService } from '@telegram/services'
-
 import { createDownloadStream } from '@test-utils/create-download-stream'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+import { Sequelize } from 'sequelize-typescript'
 
 let sequelize: Sequelize
 let campaign: Campaign

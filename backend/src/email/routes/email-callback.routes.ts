@@ -1,5 +1,6 @@
-import { Router } from 'express'
 import { EmailCallbackMiddleware } from '@email/middlewares'
+import { Router } from 'express'
+
 const router = Router()
 /**
  * @swagger

@@ -1,16 +1,17 @@
-import Telegraf from 'telegraf'
-import { Update } from 'telegraf/typings/telegram-types'
-import { TelegrafContext } from 'telegraf/typings/context'
-import { Credential } from '@core/models'
 import { loggerWithLabel } from '@core/logger'
+import { Credential } from '@core/models'
 import {
-  startCommandHandler,
   contactMessageHandler,
   helpCommandHandler,
+  startCommandHandler,
   updatenumberCommandHandler,
 } from '@telegram/utils/callback/handlers'
 import { PostmanTelegramError } from '@telegram/utils/callback/PostmanTelegramError'
 import { Op } from 'sequelize'
+import Telegraf from 'telegraf'
+
+import { TelegrafContext } from 'telegraf/typings/context'
+import { Update } from 'telegraf/typings/telegram-types'
 
 const logger = loggerWithLabel(module)
 

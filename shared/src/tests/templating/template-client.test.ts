@@ -1,10 +1,9 @@
 import { TemplateClient, TemplateError } from '../../templating'
-
 import {
+  filterImageSources,
   XSS_EMAIL_OPTION,
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
-  filterImageSources,
 } from '../../templating/xss-options'
 
 describe('template', () => {

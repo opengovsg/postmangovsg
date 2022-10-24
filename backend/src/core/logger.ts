@@ -1,5 +1,5 @@
-import winston from 'winston'
 import config from '@core/config'
+import winston from 'winston'
 
 const getModuleLabel = (callingModule: NodeModule): string => {
   const moduleName = callingModule.filename

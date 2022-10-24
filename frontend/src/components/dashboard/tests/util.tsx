@@ -1,6 +1,6 @@
-import Dashboard from '../Dashboard'
-
 import { mockCommonApis, render } from 'test-utils'
+
+import Dashboard from '../Dashboard'
 
 export const REPLY_TO = 'testEmail@open.gov.sg'
 export const MESSAGE_TEXT = 'Test message'

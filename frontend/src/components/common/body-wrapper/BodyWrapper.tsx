@@ -1,6 +1,5 @@
-import cx from 'classnames'
-
 import type { FunctionComponent, ReactNode } from 'react'
+import cx from 'classnames'
 
 import styles from './BodyWrapper.module.scss'
 

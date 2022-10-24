@@ -1,5 +1,4 @@
 import axios from 'axios'
-
 import type { ChannelType } from 'classes'
 
 export interface UserCredential {
@@ -107,10 +106,10 @@ function errorHandler(e: unknown, defaultMsg: string): never {
 }
 
 export {
-  regenerateApiKey,
-  getUserSettings,
   deleteCredential,
   getCustomFromAddresses,
-  updateDemoDisplayed,
+  getUserSettings,
+  regenerateApiKey,
   updateAnnouncementVersion,
+  updateDemoDisplayed,
 }

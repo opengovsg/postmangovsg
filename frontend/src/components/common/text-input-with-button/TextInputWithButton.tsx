@@ -1,18 +1,15 @@
-import cx from 'classnames'
-
-import { useState, MutableRefObject } from 'react'
-
 import type {
+  FormEvent,
+  FunctionComponent,
   InputHTMLAttributes,
   ReactNode,
-  FunctionComponent,
-  FormEvent,
 } from 'react'
-
-import defaultStyles from './TextInputWithButton.module.scss'
-
+import { MutableRefObject, useState } from 'react'
+import cx from 'classnames'
 import { PrimaryButton, TextInput } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+
+import defaultStyles from './TextInputWithButton.module.scss'
 
 interface TextInputWithButtonProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {

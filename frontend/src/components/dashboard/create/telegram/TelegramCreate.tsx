@@ -1,23 +1,21 @@
+import { useContext, useEffect, useState } from 'react'
+import { Status, TelegramCampaign, TelegramProgress } from 'classes'
 import cx from 'classnames'
+import { ProgressPane } from 'components/common'
+import { CampaignContext } from 'contexts/campaign.context'
+import {
+  saveTemplate,
+  TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD,
+  TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD,
+} from 'services/telegram.service'
 
-import { useState, useEffect, useContext } from 'react'
-
-import styles from '../Create.module.scss'
 import BodyTemplate from '../common/BodyTemplate'
+import styles from '../Create.module.scss'
 
 import TelegramCredentials from './TelegramCredentials'
 import TelegramDetail from './TelegramDetail'
 import TelegramRecipients from './TelegramRecipients'
 import TelegramSend from './TelegramSend'
-
-import { TelegramProgress, Status, TelegramCampaign } from 'classes'
-import { ProgressPane } from 'components/common'
-import { CampaignContext } from 'contexts/campaign.context'
-import {
-  TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD,
-  TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD,
-  saveTemplate,
-} from 'services/telegram.service'
 
 const TELEGRAM_PROGRESS_STEPS = [
   'Create message',

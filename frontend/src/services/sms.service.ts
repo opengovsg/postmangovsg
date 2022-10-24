@@ -1,5 +1,4 @@
 import axios from 'axios'
-
 import type { SMSPreview } from 'classes'
 
 // Twilio states that the total character limit for sms is 1600 characters.

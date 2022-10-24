@@ -1,7 +1,7 @@
-import { TemplateError } from '@shared/templating'
-import { SmsService, SmsTemplateService } from '@sms/services'
-import { TwilioCredentials } from '@sms/interfaces'
 import { loggerWithLabel } from '@core/logger'
+import { TemplateError } from '@shared/templating'
+import { TwilioCredentials } from '@sms/interfaces'
+import { SmsService, SmsTemplateService } from '@sms/services'
 
 const logger = loggerWithLabel(module)
 

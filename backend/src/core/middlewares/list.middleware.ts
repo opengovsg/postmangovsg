@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express'
-import { ListService } from '@core/services'
-import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
+import { loggerWithLabel } from '@core/logger'
+import { ListService } from '@core/services'
+import { NextFunction, Request, Response } from 'express'
 
 const logger = loggerWithLabel(module)
 

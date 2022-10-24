@@ -1,8 +1,9 @@
 import config from '@core/config'
+import { loggerWithLabel } from '@core/logger'
+import axios from 'axios'
+
 import ECS from 'aws-sdk/clients/ecs'
 import { AWSError } from 'aws-sdk/lib/error'
-import axios from 'axios'
-import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 const ECSClient = new ECS({ region: config.get('aws.awsRegion') })

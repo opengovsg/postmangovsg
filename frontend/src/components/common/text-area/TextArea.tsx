@@ -1,7 +1,7 @@
+import { useEffect, useRef } from 'react'
+import TextareaAutosize from 'react-textarea-autosize'
 import cx from 'classnames'
 import escapeHTML from 'escape-html'
-import { useRef, useEffect } from 'react'
-import TextareaAutosize from 'react-textarea-autosize'
 
 import styles from './TextArea.module.scss'
 

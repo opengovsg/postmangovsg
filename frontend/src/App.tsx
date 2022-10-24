@@ -1,16 +1,13 @@
 // Components
-import { Suspense, lazy } from 'react'
+import './styles/app.scss'
 
+import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
-
 import Landing from 'components/landing'
 import Login from 'components/login'
 import ProtectedPage from 'components/protected'
 import TestUtils from 'components/test-utils'
 import Unsubscribe from 'components/unsubscribe'
-
-import './styles/app.scss'
-
 // HOC
 import ProtectedRoute from 'routes/protected.route'
 

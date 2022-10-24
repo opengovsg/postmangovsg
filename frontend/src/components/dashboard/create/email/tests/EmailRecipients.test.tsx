@@ -1,22 +1,20 @@
-import userEvent from '@testing-library/user-event'
-
 import { Route, Routes } from 'react-router-dom'
-
-import EmailRecipients from '../EmailRecipients'
-
+import userEvent from '@testing-library/user-event'
 import { EmailCampaign } from 'classes'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import {
-  screen,
-  mockCommonApis,
-  server,
-  render,
   Campaign,
-  USER_EMAIL,
   DEFAULT_FROM,
   INVALID_EMAIL_CSV_FILE,
+  mockCommonApis,
+  render,
+  screen,
+  server,
+  USER_EMAIL,
 } from 'test-utils'
+
+import EmailRecipients from '../EmailRecipients'
 
 const TEST_EMAIL_CAMPAIGN: Campaign = {
   id: 1,

@@ -1,6 +1,6 @@
+import config from '@core/config'
 import AWS from 'aws-sdk'
 import { Config } from 'sequelize'
-import config from '@core/config'
 
 const rdsSigner = new AWS.RDS.Signer({
   region: config.get('aws.awsRegion'),

@@ -1,6 +1,6 @@
+import { loggerWithLabel } from '@core/logger'
 import express from 'express'
 import helmet from 'helmet'
-import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 

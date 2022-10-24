@@ -1,22 +1,19 @@
-import { i18n } from '@lingui/core'
-
-import cx from 'classnames'
-
 import { useContext } from 'react'
 import { OutboundLink } from 'react-ga'
 import Moment from 'react-moment'
-
-import styles from './ProgressDetails.module.scss'
-
+import { i18n } from '@lingui/core'
 import { CampaignStats, ChannelType, Status } from 'classes/Campaign'
+import cx from 'classnames'
 import {
-  ProgressBar,
-  PrimaryButton,
   ExportRecipients,
   InfoBlock,
+  PrimaryButton,
+  ProgressBar,
 } from 'components/common'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
+
+import styles from './ProgressDetails.module.scss'
 
 const ProgressDetails = ({
   stats,

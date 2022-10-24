@@ -5,8 +5,8 @@
 import convict, { Config } from 'convict'
 import crypto from 'crypto'
 import fs from 'fs'
-import path from 'path'
 import { isSupportedCountry } from 'libphonenumber-js'
+import path from 'path'
 
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 

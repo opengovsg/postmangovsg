@@ -1,10 +1,8 @@
-import cx from 'classnames'
-
 import { NavLink, useNavigate } from 'react-router-dom'
+import cx from 'classnames'
+import { Dropdown } from 'components/common'
 
 import styles from './SideNav.module.scss'
-
-import { Dropdown } from 'components/common'
 
 const NavItem = ({
   label,

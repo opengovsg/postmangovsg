@@ -1,23 +1,20 @@
+import { Route, Routes } from 'react-router-dom'
 import { t } from '@lingui/macro'
-
 import { fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-
-import { Route, Routes } from 'react-router-dom'
-
-import EmailTemplate from '../EmailTemplate'
-
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import {
   Campaign,
-  screen,
-  mockCommonApis,
-  server,
-  render,
-  DEFAULT_FROM_NAME,
   DEFAULT_FROM_ADDRESS,
+  DEFAULT_FROM_NAME,
+  mockCommonApis,
+  render,
+  screen,
+  server,
 } from 'test-utils'
+
+import EmailTemplate from '../EmailTemplate'
 
 function mockApis(protect: boolean, customFroms: string[] = []) {
   const campaign: Campaign = {

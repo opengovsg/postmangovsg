@@ -6,11 +6,13 @@
  * This means that the new worker has to find out which stopped worker it was meant to replace.
  */
 
-import { QueryTypes } from 'sequelize'
-import { loggerWithLabel } from '@core/logger'
-import { Sequelize } from 'sequelize-typescript'
-import difference from 'lodash/difference'
 import config from '@core/config'
+import { loggerWithLabel } from '@core/logger'
+import { QueryTypes } from 'sequelize'
+import { Sequelize } from 'sequelize-typescript'
+
+import difference from 'lodash/difference'
+
 import ECSLoader from './ecs'
 
 const logger = loggerWithLabel(module)

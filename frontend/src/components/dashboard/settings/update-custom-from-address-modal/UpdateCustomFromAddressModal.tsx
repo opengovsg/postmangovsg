@@ -1,21 +1,19 @@
-import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
-import { useState, useContext, useEffect } from 'react'
-
-import isEmail from 'validator/lib/isEmail'
-
-import styles from './UpdateCustomFromAddressModal.module.scss'
-
+import { useContext, useEffect, useState } from 'react'
+import { formatFromAddress, parseFromAddress } from '@shared/utils/from-address'
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
 import {
-  PrimaryButton,
   ErrorBlock,
   NextButton,
+  PrimaryButton,
   TextInput,
 } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 import { verifyFromAddress } from 'services/email.service'
+import isEmail from 'validator/lib/isEmail'
+
+import styles from './UpdateCustomFromAddressModal.module.scss'
 
 enum UpdateFromAddressStep {
   Update,

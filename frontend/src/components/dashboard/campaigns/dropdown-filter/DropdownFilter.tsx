@@ -1,5 +1,5 @@
+import { createRef, useEffect, useRef, useState } from 'react'
 import cx from 'classnames'
-import { useState, useEffect, useRef, createRef } from 'react'
 
 import styles from './DropdownFilter.module.scss'
 

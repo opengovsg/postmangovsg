@@ -1,31 +1,27 @@
 import {
-  useContext,
-  useState,
-  useEffect,
   Dispatch,
   SetStateAction,
+  useContext,
+  useEffect,
+  useState,
 } from 'react'
-
 import { useParams } from 'react-router-dom'
-
-import styles from '../Create.module.scss'
-
-import { confirmSendCampaign } from '../util'
-
 import { ChannelType, EmailProgress } from 'classes'
 import {
+  ButtonGroup,
+  ConfirmModal,
   EmailPreviewBlock,
   PrimaryButton,
-  ConfirmModal,
-  ButtonGroup,
-  TextButton,
   StepHeader,
   StepSection,
+  TextButton,
 } from 'components/common'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
-
 import { getPreviewMessage } from 'services/email.service'
+
+import styles from '../Create.module.scss'
+import { confirmSendCampaign } from '../util'
 
 const EmailSend = ({
   setActiveStep,

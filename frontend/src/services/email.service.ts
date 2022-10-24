@@ -1,5 +1,4 @@
 import axios from 'axios'
-
 import type { EmailPreview } from 'classes'
 
 export async function saveTemplate(

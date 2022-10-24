@@ -1,33 +1,27 @@
-import { i18n } from '@lingui/core'
-
 import {
-  useState,
-  useEffect,
-  useContext,
   Dispatch,
   SetStateAction,
+  useContext,
+  useEffect,
+  useState,
 } from 'react'
-
 import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
-
-import styles from '../Create.module.scss'
-
-import { EmailPreview, EmailProgress, List, ChannelType } from 'classes'
+import { i18n } from '@lingui/core'
+import { ChannelType, EmailPreview, EmailProgress, List } from 'classes'
 import {
-  FileInput,
+  ButtonGroup,
+  Checkbox,
   CsvUpload,
-  ErrorBlock,
   EmailPreviewBlock,
+  ErrorBlock,
+  FileInput,
   NextButton,
   SampleCsv,
-  ButtonGroup,
-  TextButton,
   StepHeader,
   StepSection,
+  TextButton,
   WarningBlock,
-  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import {
@@ -36,16 +30,17 @@ import {
 } from 'components/experimental'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-
 import { setCampaignToSaveList } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
-import { selectList, getListsByChannel } from 'services/list.service'
+import { getListsByChannel, selectList } from 'services/list.service'
 import {
-  uploadFileToS3,
+  CsvStatusResponse,
   deleteCsvStatus,
   getCsvStatus,
-  CsvStatusResponse,
+  uploadFileToS3,
 } from 'services/upload.service'
+
+import styles from '../Create.module.scss'
 
 const EmailRecipients = ({
   setActiveStep,

@@ -1,15 +1,13 @@
-import request from 'supertest'
-import { Sequelize } from 'sequelize-typescript'
-
-import { User, Credential, UserCredential } from '@core/models'
 import { ChannelType } from '@core/constants'
-import { RateLimitError, InvalidRecipientError } from '@core/errors'
+import { InvalidRecipientError, RateLimitError } from '@core/errors'
+import { Credential, User, UserCredential } from '@core/models'
+import { mockSecretsManager } from '@mocks/aws-sdk'
 import { TemplateError } from '@shared/templating'
 import { SmsService } from '@sms/services'
-
-import { mockSecretsManager } from '@mocks/aws-sdk'
-import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
+import initialiseServer from '@test-utils/server'
+import { Sequelize } from 'sequelize-typescript'
+import request from 'supertest'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',

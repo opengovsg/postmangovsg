@@ -1,29 +1,24 @@
-import { useContext, useState, useEffect } from 'react'
-
 import type { Dispatch, SetStateAction } from 'react'
-
+import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-
-import styles from '../Create.module.scss'
-
-import { confirmSendCampaign } from '../util'
-
-import { ChannelType } from 'classes'
 import type { SMSProgress } from 'classes'
+import { ChannelType } from 'classes'
 import {
+  ButtonGroup,
+  ConfirmModal,
   PreviewBlock,
   PrimaryButton,
   SendRate,
-  ConfirmModal,
-  ButtonGroup,
-  TextButton,
   StepHeader,
   StepSection,
+  TextButton,
 } from 'components/common'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
-
 import { getPreviewMessage } from 'services/sms.service'
+
+import styles from '../Create.module.scss'
+import { confirmSendCampaign } from '../util'
 
 const SMSSend = ({
   setActiveStep,

@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express'
 import { StatsService } from '@core/services'
+import { NextFunction, Request, Response } from 'express'
 
 // Return global stats
 const getGlobalStats = async (

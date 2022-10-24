@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express'
 import { EmailStatsService } from '@email/services'
+import { NextFunction, Request, Response } from 'express'
 
 /**
  * Gets stats for email campaign

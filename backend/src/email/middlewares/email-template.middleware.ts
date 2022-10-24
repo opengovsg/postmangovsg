@@ -1,24 +1,24 @@
-import { Request, Response, NextFunction, Handler } from 'express'
+import { ChannelType } from '@core/constants'
 import {
-  MissingTemplateKeysError,
   HydrationError,
-  RecipientColumnMissing,
   InvalidRecipientError,
+  MissingTemplateKeysError,
+  RecipientColumnMissing,
   UserError,
 } from '@core/errors'
-import { TemplateError } from '@shared/templating'
+import { loggerWithLabel } from '@core/logger'
 import {
   AuthService,
-  UploadService,
+  ListService,
   StatsService,
   UnsubscriberService,
-  ListService,
+  UploadService,
 } from '@core/services'
-import { EmailTemplateService, EmailService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
-import { loggerWithLabel } from '@core/logger'
+import { EmailService, EmailTemplateService } from '@email/services'
+import { TemplateError } from '@shared/templating'
 import { ThemeClient } from '@shared/theme'
-import { ChannelType } from '@core/constants'
+import { Handler, NextFunction, Request, Response } from 'express'
 
 export interface EmailTemplateMiddleware {
   storeTemplate: Handler

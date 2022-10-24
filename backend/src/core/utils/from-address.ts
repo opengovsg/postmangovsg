@@ -1,11 +1,11 @@
 import config from '@core/config'
-import validator from 'validator'
-import { Joi } from 'celebrate'
 import {
-  parseFromAddress,
-  formatFromAddress,
   escapeFromAddress,
+  formatFromAddress,
+  parseFromAddress,
 } from '@shared/utils/from-address'
+import { Joi } from 'celebrate'
+import validator from 'validator'
 
 /**
  * Determine if a from is using the default from email address

@@ -1,47 +1,47 @@
+import 'draft-js/dist/Draft.css'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+
+import type {
+  Dispatch,
+  KeyboardEvent as ReactKeyboardEvent,
+  SetStateAction,
+} from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { Editor } from 'react-draft-wysiwyg'
 import cx from 'classnames'
 import {
-  EditorState,
   ContentBlock,
   ContentState,
   convertToRaw,
   DefaultDraftBlockRenderMap,
-  RichUtils,
-  Modifier,
-  SelectionState,
-  KeyBindingUtil,
+  EditorState,
   getDefaultKeyBinding,
+  KeyBindingUtil,
+  Modifier,
+  RichUtils,
+  SelectionState,
 } from 'draft-js'
 import Immutable from 'immutable'
-import { createContext, useContext, useEffect, useState } from 'react'
-import type {
-  KeyboardEvent as ReactKeyboardEvent,
-  Dispatch,
-  SetStateAction,
-} from 'react'
-import { Editor } from 'react-draft-wysiwyg'
 
-import styles from './RichTextEditor.module.scss'
-import { addHtmlToState } from './RichTextPasting'
 import { ImageBlock, TableWrapper } from './blocks'
 import {
-  LinkControl,
-  ImageControl,
-  TableControl,
-  ListControl,
   BlockTypeControl,
-  TextAlignControl,
-  InlineControl,
   FontColorControl,
+  ImageControl,
+  InlineControl,
+  LinkControl,
+  ListControl,
+  TableControl,
+  TextAlignControl,
 } from './controls'
 import {
-  VariableDecorator,
   LinkDecorator,
   PreviewLinkDecorator,
+  VariableDecorator,
 } from './decorators'
+import styles from './RichTextEditor.module.scss'
+import { addHtmlToState } from './RichTextPasting'
 import { Converter } from './utils'
-
-import 'draft-js/dist/Draft.css'
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
 const MAX_LIST_DEPTH = 4
 let hidePlaceholder = false

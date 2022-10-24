@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction, Handler } from 'express'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { CredentialService } from '@core/services'
-import { TelegramService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
+import { CredentialService } from '@core/services'
 import { formatDefaultCredentialName } from '@core/utils'
+import { TelegramService } from '@telegram/services'
+import { Handler, NextFunction, Request, Response } from 'express'
 
 export interface TelegramMiddleware {
   getCredentialsFromBody: Handler

@@ -1,15 +1,14 @@
-import request from 'supertest'
-import { Sequelize } from 'sequelize-typescript'
-import initialiseServer from '@test-utils/server'
-import { Campaign, User, Credential } from '@core/models'
-import sequelizeLoader from '@test-utils/sequelize-loader'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
+import { Campaign, Credential, User } from '@core/models'
 import { UploadService } from '@core/services'
-import { DefaultCredentialName } from '@core/constants'
 import { formatDefaultCredentialName } from '@core/utils'
-import { SmsMessage, SmsTemplate } from '@sms/models'
-import { ChannelType } from '@core/constants'
 import { mockSecretsManager } from '@mocks/aws-sdk'
+import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsService } from '@sms/services'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+import initialiseServer from '@test-utils/server'
+import { Sequelize } from 'sequelize-typescript'
+import request from 'supertest'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize

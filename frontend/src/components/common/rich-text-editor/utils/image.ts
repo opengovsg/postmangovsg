@@ -1,5 +1,4 @@
 import { i18n } from '@lingui/core'
-
 import { ALLOWED_IMAGE_SOURCES } from 'config'
 
 /**

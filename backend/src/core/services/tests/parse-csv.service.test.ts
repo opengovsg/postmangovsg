@@ -1,7 +1,6 @@
+import { RecipientColumnMissing, UserError } from '@core/errors'
 import { ParseCsvService } from '@core/services/parse-csv.service'
 import { CSVParams } from '@core/types'
-import { RecipientColumnMissing, UserError } from '@core/errors'
-
 import { Readable } from 'stream'
 
 const createStream = (

@@ -1,24 +1,23 @@
 import userEvent from '@testing-library/user-event'
-
 import {
-  mockApis,
-  renderDashboard,
-  CAMPAIGN_NAME,
-  SUBJECT_TEXT,
-  MESSAGE_TEXT,
-  REPLY_TO,
-} from '../util'
-
-import {
-  server,
-  screen,
-  fireEvent,
   DEFAULT_FROM,
   DEFAULT_FROM_ADDRESS,
-  VALID_CSV_FILENAME,
+  fireEvent,
   RECIPIENT_EMAIL,
+  screen,
+  server,
+  VALID_CSV_FILENAME,
   VALID_EMAIL_CSV_FILE,
 } from 'test-utils'
+
+import {
+  CAMPAIGN_NAME,
+  MESSAGE_TEXT,
+  mockApis,
+  renderDashboard,
+  REPLY_TO,
+  SUBJECT_TEXT,
+} from '../util'
 
 test('successfully creates and sends a new email campaign', async () => {
   // Setup

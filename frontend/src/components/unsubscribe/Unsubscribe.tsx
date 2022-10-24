@@ -1,13 +1,6 @@
-import querystring from 'querystring'
-
-import { Trans } from '@lingui/macro'
-
 import { useState } from 'react'
-
-import { useParams, useLocation } from 'react-router-dom'
-
-import styles from './Unsubscribe.module.scss'
-
+import { useLocation, useParams } from 'react-router-dom'
+import { Trans } from '@lingui/macro'
 import appLogo from 'assets/img/brand/app-logo.svg'
 import cancelRequestHero from 'assets/img/unsubscribe/cancel-request.png'
 import landingHero from 'assets/img/unsubscribe/request-unsubscribe.png'
@@ -18,11 +11,13 @@ import {
   TextInput,
 } from 'components/common'
 import Banner from 'components/landing/banner'
-
+import querystring from 'querystring'
 import {
   subscribeAgain,
   unsubscribeRequest,
 } from 'services/unsubscribe.service'
+
+import styles from './Unsubscribe.module.scss'
 
 const Unsubscribe = () => {
   const location = useLocation()

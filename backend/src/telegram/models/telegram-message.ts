@@ -1,3 +1,5 @@
+import { MessageStatus } from '@core/constants'
+import { Campaign } from '@core/models'
 import {
   BelongsTo,
   Column,
@@ -6,9 +8,6 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
-
-import { Campaign } from '@core/models'
-import { MessageStatus } from '@core/constants'
 
 @Table({ tableName: 'telegram_messages', underscored: true, timestamps: true })
 export class TelegramMessage extends Model<TelegramMessage> {

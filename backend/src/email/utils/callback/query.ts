@@ -1,12 +1,12 @@
-import { QueryTypes, Op, cast, fn } from 'sequelize'
-import {
-  UpdateMessageWithErrorMetadata,
-  Metadata,
-} from '@email/interfaces/callback.interface'
-import { EmailBlacklist, EmailMessage } from '@email/models'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
+import {
+  Metadata,
+  UpdateMessageWithErrorMetadata,
+} from '@email/interfaces/callback.interface'
+import { EmailBlacklist, EmailMessage } from '@email/models'
+import { cast, fn, Op, QueryTypes } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 

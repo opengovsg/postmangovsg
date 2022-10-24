@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express'
+import { ChannelType, Ordering, SortField, Status } from '@core/constants'
 import { loggerWithLabel } from '@core/logger'
-import { ChannelType, Status, SortField, Ordering } from '@core/constants'
-import { CampaignService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
+import { CampaignService, UploadService } from '@core/services'
+import { NextFunction, Request, Response } from 'express'
 
 const logger = loggerWithLabel(module)
 

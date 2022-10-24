@@ -1,4 +1,5 @@
-import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript'
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript'
+
 import { BotSubscriber } from '.'
 
 @Table({

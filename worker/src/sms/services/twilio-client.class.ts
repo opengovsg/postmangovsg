@@ -1,8 +1,8 @@
-import twilio from 'twilio'
-import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
-import { TwilioCredentials } from '@sms/interfaces'
+import { loggerWithLabel } from '@core/logger'
 import { getSha256Hash } from '@shared/utils/crypto'
+import { TwilioCredentials } from '@sms/interfaces'
+import twilio from 'twilio'
 
 const logger = loggerWithLabel(module)
 

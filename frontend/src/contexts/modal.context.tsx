@@ -1,7 +1,5 @@
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import { createContext, useState } from 'react'
-
-import type { ReactNode, Dispatch, SetStateAction } from 'react'
-
 import BodyWrapper from 'components/common/body-wrapper'
 import Modal from 'components/common/modal'
 

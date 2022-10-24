@@ -1,8 +1,7 @@
-import AWS from 'aws-sdk'
-import { Config } from 'sequelize'
-
 import config from '@core/config'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
+import AWS from 'aws-sdk'
+import { Config } from 'sequelize'
 
 const rdsSigner = new AWS.RDS.Signer(configureEndpoint(config))
 

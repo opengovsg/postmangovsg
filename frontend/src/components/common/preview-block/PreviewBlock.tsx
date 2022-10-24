@@ -1,7 +1,6 @@
+import type { FunctionComponent } from 'react'
 import cx from 'classnames'
 import escapeHTML from 'escape-html'
-
-import type { FunctionComponent } from 'react'
 
 import DetailBlock from '../detail-block'
 

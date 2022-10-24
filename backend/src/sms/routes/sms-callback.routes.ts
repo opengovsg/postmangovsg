@@ -1,5 +1,6 @@
-import { Router } from 'express'
 import { SmsCallbackMiddleware } from '@sms/middlewares'
+import { Router } from 'express'
+
 const router = Router()
 
 /**

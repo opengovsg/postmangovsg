@@ -1,15 +1,12 @@
-import { Sequelize } from 'sequelize-typescript'
-import sequelizeLoader from '@test-utils/sequelize-loader'
-
-import S3Client from '@core/services/s3-client.class'
 import { ChannelType } from '@core/constants'
-import { Campaign, User, ProtectedMessage } from '@core/models'
+import { Campaign, ProtectedMessage, User } from '@core/models'
 import { UploadService } from '@core/services'
-
-import { EmailTemplate, EmailMessage } from '@email/models'
+import S3Client from '@core/services/s3-client.class'
+import { EmailMessage, EmailTemplate } from '@email/models'
 import { EmailTemplateService } from '@email/services'
-
 import { createDownloadStream } from '@test-utils/create-download-stream'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+import { Sequelize } from 'sequelize-typescript'
 
 let sequelize: Sequelize
 let campaign: Campaign

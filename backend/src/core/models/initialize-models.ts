@@ -1,20 +1,19 @@
-import { Sequelize } from 'sequelize-typescript'
 import {
-  Credential,
-  JobQueue,
+  Agency,
   Campaign,
-  Worker,
+  Credential,
+  Domain,
+  JobQueue,
+  List,
+  ProtectedMessage,
+  Statistic,
+  Unsubscriber,
   User,
-  UserFeature,
   UserCredential,
   UserDemo,
-  Statistic,
-  ProtectedMessage,
-  Unsubscriber,
-  Agency,
-  Domain,
-  List,
+  UserFeature,
   UserList,
+  Worker,
 } from '@core/models'
 import {
   EmailBlacklist,
@@ -24,7 +23,7 @@ import {
   EmailOp,
   EmailTemplate,
 } from '@email/models'
-import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
+import { SmsMessage, SmsOp, SmsTemplate } from '@sms/models'
 import {
   BotSubscriber,
   TelegramMessage,
@@ -32,6 +31,7 @@ import {
   TelegramSubscriber,
   TelegramTemplate,
 } from '@telegram/models'
+import { Sequelize } from 'sequelize-typescript'
 
 export const initializeModels = (sequelize: Sequelize): void => {
   const coreModels = [

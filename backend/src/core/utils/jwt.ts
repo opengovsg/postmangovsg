@@ -1,6 +1,5 @@
-import jwt from 'jsonwebtoken'
-
 import config from '@core/config'
+import jwt from 'jsonwebtoken'
 
 const JWT_SECRET = config.get('jwtSecret')
 

@@ -1,16 +1,17 @@
-import { Application } from 'express'
-import securityHeadersLoader from './security-headers.loader'
-import expressLoader from './express.loader'
-import swaggerLoader from './swagger.loader'
-import sessionLoader from './session.loader'
-import sequelizeLoader from './sequelize.loader'
-import cloudwatchLoader from './cloudwatch.loader'
-import uploadQueueLoader from './upload-queue.loader'
 import {
   InitAuthService,
   InitCredentialService,
   RedisService,
 } from '@core/services'
+import { Application } from 'express'
+
+import cloudwatchLoader from './cloudwatch.loader'
+import expressLoader from './express.loader'
+import securityHeadersLoader from './security-headers.loader'
+import sequelizeLoader from './sequelize.loader'
+import sessionLoader from './session.loader'
+import swaggerLoader from './swagger.loader'
+import uploadQueueLoader from './upload-queue.loader'
 
 const loaders = async ({ app }: { app: Application }): Promise<void> => {
   const redisService = new RedisService()

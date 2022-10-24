@@ -1,3 +1,11 @@
+import { EmailTemplate } from '@email/models'
+import { waitForMs } from '@shared/utils/wait-for-ms'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+
+import { Sequelize, Transaction } from 'sequelize/types'
+
+import { UploadService } from '../upload.service'
+
 jest.mock('@core/services/s3-client.class')
 
 const parseCsvMock = {
@@ -13,12 +21,6 @@ const parseCsvMock = {
 jest.mock('../', () => ({
   ParseCsvService: parseCsvMock,
 }))
-
-import { EmailTemplate } from '@email/models'
-import { waitForMs } from '@shared/utils/wait-for-ms'
-import sequelizeLoader from '@test-utils/sequelize-loader'
-import { Sequelize, Transaction } from 'sequelize/types'
-import { UploadService } from '../upload.service'
 
 let sequelize: Sequelize
 beforeEach(async () => {

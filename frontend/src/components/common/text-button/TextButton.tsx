@@ -1,6 +1,5 @@
-import cx from 'classnames'
-
 import type { ButtonHTMLAttributes } from 'react'
+import cx from 'classnames'
 
 import defaultStyles from './TextButton.module.scss'
 

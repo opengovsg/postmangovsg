@@ -1,4 +1,4 @@
-import { parsePhoneNumber, CountryCode } from 'libphonenumber-js/max'
+import { CountryCode, parsePhoneNumber } from 'libphonenumber-js/max'
 
 const SG_NUMBER_FORMAT = /^(\+?65)?(8|9)\d{7}$/
 

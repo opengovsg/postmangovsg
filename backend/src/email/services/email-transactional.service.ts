@@ -1,10 +1,10 @@
-import { EmailService, EmailTemplateService } from '@email/services'
-import { MailToSend } from '@shared/clients/mail-client.class'
-import { loggerWithLabel } from '@core/logger'
-import { isBlacklisted } from '@email/utils/query'
 import { InvalidMessageError, InvalidRecipientError } from '@core/errors'
+import { loggerWithLabel } from '@core/logger'
 import { FileAttachmentService } from '@core/services'
 import { EmailMessageTransactional } from '@email/models'
+import { EmailService, EmailTemplateService } from '@email/services'
+import { isBlacklisted } from '@email/utils/query'
+import { MailToSend } from '@shared/clients/mail-client.class'
 
 const logger = loggerWithLabel(module)
 

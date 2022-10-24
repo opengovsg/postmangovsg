@@ -1,6 +1,6 @@
-import { Router } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
 import { AuthMiddleware } from '@core/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
 
 export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
   const router = Router()

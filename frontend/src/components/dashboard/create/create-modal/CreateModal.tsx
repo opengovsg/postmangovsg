@@ -1,27 +1,21 @@
-import { i18n } from '@lingui/core'
-
-import cx from 'classnames'
-
-import { useState, useContext, useEffect } from 'react'
-
+import { useContext, useEffect, useState } from 'react'
 import { OutboundLink } from 'react-ga'
-
 import { useNavigate } from 'react-router-dom'
-
-import styles from './CreateModal.module.scss'
-
-import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
+import { i18n } from '@lingui/core'
+import { Campaign, channelIcons, ChannelType } from 'classes/Campaign'
+import cx from 'classnames'
 import {
-  TextInput,
-  PrimaryButton,
   Checkbox,
   ErrorBlock,
+  PrimaryButton,
+  TextInput,
 } from 'components/common'
 import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
-
 import { createCampaign } from 'services/campaign.service'
+
+import styles from './CreateModal.module.scss'
 
 const CreateModal = ({
   name = '',

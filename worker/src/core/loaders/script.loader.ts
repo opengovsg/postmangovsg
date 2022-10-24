@@ -1,6 +1,6 @@
-import { Sequelize } from 'sequelize-typescript'
 import config from '@core/config'
-import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
+import { generateRdsIamAuthToken, MutableConfig } from '@core/utils/rds-iam'
+import { Sequelize } from 'sequelize-typescript'
 
 const scriptLoader = async (): Promise<void> => {
   const dialectOptions =

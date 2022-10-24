@@ -1,24 +1,25 @@
+import { ChannelType } from '@core/constants'
+import { CampaignS3ObjectInterface } from '@core/interfaces'
+import { EmailTemplate } from '@email/models'
+import { SmsTemplate } from '@sms/models'
+import { TelegramTemplate } from '@telegram/models'
 import { mapKeys } from 'lodash'
 import {
   BelongsTo,
   Column,
   DataType,
+  Default,
   ForeignKey,
-  Model,
-  Table,
   HasMany,
   HasOne,
-  Default,
+  Model,
+  Table,
 } from 'sequelize-typescript'
-import { ChannelType } from '@core/constants'
-import { CampaignS3ObjectInterface } from '@core/interfaces'
-import { Credential } from './credential'
+
 import { User } from './user/user'
+import { Credential } from './credential'
 import { JobQueue } from './job-queue'
 import { Statistic } from './statistic'
-import { EmailTemplate } from '@email/models'
-import { SmsTemplate } from '@sms/models'
-import { TelegramTemplate } from '@telegram/models'
 
 @Table({
   tableName: 'campaigns',

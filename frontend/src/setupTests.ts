@@ -1,8 +1,9 @@
 import '@testing-library/jest-dom' // Idiomatic DOM matchers for Jest
 import 'jest-canvas-mock' // Mock Canvas API
+import 'locales' // Locales necessary for I18nProvider
+
 import { Crypto } from '@peculiar/webcrypto'
 
-import 'locales' // Locales necessary for I18nProvider
 import { server } from './test-utils'
 
 // Some tests take longer than the default 5s to run.

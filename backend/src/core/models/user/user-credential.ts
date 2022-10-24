@@ -1,13 +1,14 @@
+import { ChannelType } from '@core/constants'
+import { Credential } from '@core/models/credential'
 import {
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
 } from 'sequelize-typescript'
+
 import { User } from './user'
-import { Credential } from '@core/models/credential'
-import { ChannelType } from '@core/constants'
 
 @Table({ tableName: 'user_credentials', underscored: true, timestamps: true })
 export class UserCredential extends Model<UserCredential> {

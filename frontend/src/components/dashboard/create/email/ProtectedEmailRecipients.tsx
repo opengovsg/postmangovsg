@@ -1,38 +1,34 @@
 import {
-  useState,
-  useEffect,
-  useContext,
   Dispatch,
   SetStateAction,
+  useContext,
+  useEffect,
+  useState,
 } from 'react'
-
 import { useParams } from 'react-router-dom'
-
+import { EmailCampaign, EmailProgress } from 'classes'
+import {
+  Checkbox,
+  DetailBlock,
+  ErrorBlock,
+  PrimaryButton,
+  ProtectedPreview,
+  RichTextEditor,
+  StepHeader,
+  StepSection,
+  TextButton,
+} from 'components/common'
+import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
+import { CampaignContext } from 'contexts/campaign.context'
+import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { sendTiming } from 'services/ga.service'
+import { protectAndUploadCsv } from 'services/protect-csv.service'
+import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 import isEmail from 'validator/lib/isEmail'
 
 import styles from '../Create.module.scss'
 
 import EmailRecipients from './EmailRecipients'
-
-import { EmailCampaign, EmailProgress } from 'classes'
-import {
-  PrimaryButton,
-  TextButton,
-  DetailBlock,
-  ErrorBlock,
-  ProtectedPreview,
-  Checkbox,
-  StepHeader,
-  StepSection,
-  RichTextEditor,
-} from 'components/common'
-import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
-import { CampaignContext } from 'contexts/campaign.context'
-import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
-
-import { sendTiming } from 'services/ga.service'
-import { protectAndUploadCsv } from 'services/protect-csv.service'
-import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 
 enum ProtectPhase {
   READY,

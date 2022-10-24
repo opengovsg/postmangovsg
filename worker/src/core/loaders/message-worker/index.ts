@@ -1,18 +1,22 @@
-import tracer from 'dd-trace'
-import { Sequelize } from 'sequelize-typescript'
-import { QueryTypes } from 'sequelize'
-import get from 'lodash/get'
-require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
+// to resolve aliased paths like @core, @sms, @email
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
+import { generateRdsIamAuthToken, MutableConfig } from '@core/utils/rds-iam'
 import { waitForMs } from '@shared/utils/wait-for-ms'
+import tracer from 'dd-trace'
+import { QueryTypes } from 'sequelize'
+import { Sequelize } from 'sequelize-typescript'
+
+import get from 'lodash/get'
+
+import assignment from './util/assignment'
+import ECSUtil from './util/ecs'
 import Email from './email.class'
+import { Message } from './interface'
 import SMS from './sms.class'
 import Telegram from './telegram.class'
-import ECSUtil from './util/ecs'
-import assignment from './util/assignment'
-import { Message } from './interface'
+
+require('module-alias/register')
 
 const logger = loggerWithLabel(module)
 let connection: Sequelize,

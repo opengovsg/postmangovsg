@@ -1,7 +1,9 @@
 import nodemailer from 'nodemailer'
-import { MailToSend, MailCredentials } from './interfaces'
-import { escapeFromAddress } from '../../utils/from-address'
+
 import { getSha256Hash } from '../../utils/crypto'
+import { escapeFromAddress } from '../../utils/from-address'
+
+import { MailCredentials, MailToSend } from './interfaces'
 
 const REFERENCE_ID_HEADER = 'X-SMTPAPI' // Case sensitive
 const CONFIGURATION_SET_HEADER = 'X-SES-CONFIGURATION-SET' // Case sensitive

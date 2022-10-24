@@ -1,12 +1,12 @@
+import { Campaign } from '@core/models/campaign'
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
   Model,
   Table,
-  BelongsTo,
 } from 'sequelize-typescript'
-import { Campaign } from '@core/models/campaign'
 
 @Table({
   tableName: 'unsubscribers',

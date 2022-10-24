@@ -1,10 +1,11 @@
 import './setup'
-
 /** Load the app after all env vars are set */
 import 'source-map-support/register'
-import express from 'express'
+
 import { loaders } from '@core/loaders'
+import express from 'express'
 import throng from 'throng'
+
 const port = Number(process.env.PORT) || 4000
 const app: express.Application = express()
 

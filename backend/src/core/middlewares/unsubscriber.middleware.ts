@@ -1,7 +1,6 @@
-import { Request, Response, NextFunction } from 'express'
-
-import { CampaignService, UnsubscriberService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { CampaignService, UnsubscriberService } from '@core/services'
+import { NextFunction, Request, Response } from 'express'
 
 const logger = loggerWithLabel(module)
 

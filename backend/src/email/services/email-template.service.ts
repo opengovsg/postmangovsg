@@ -1,23 +1,20 @@
-import { difference, keys } from 'lodash'
-
 import config from '@core/config'
-import { isSuperSet } from '@core/utils'
+import { ChannelType } from '@core/constants'
 import { HydrationError } from '@core/errors'
-import { CustomDomainService } from '@email/services'
+import { UploadData } from '@core/interfaces'
 import { Campaign, Statistic } from '@core/models'
+import { UploadService } from '@core/services'
+import { isSuperSet } from '@core/utils'
+import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
+import { EmailMessage, EmailTemplate } from '@email/models'
+import { CustomDomainService, EmailService } from '@email/services'
 import {
   TemplateClient,
-  XSS_EMAIL_OPTION,
   TemplateError,
+  XSS_EMAIL_OPTION,
 } from '@shared/templating'
-
-import { EmailTemplate, EmailMessage } from '@email/models'
-import { EmailService } from '@email/services'
-import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
-import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
-import { UploadService } from '@core/services'
-import { UploadData } from '@core/interfaces'
-import { ChannelType } from '@core/constants'
+import { formatFromAddress, parseFromAddress } from '@shared/utils/from-address'
+import { difference, keys } from 'lodash'
 
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 

@@ -1,15 +1,15 @@
-import { Op, literal, Transaction, Includeable } from 'sequelize'
 import config from '@core/config'
 import {
   ChannelType,
   JobStatus,
-  Status,
-  SortField,
   Ordering,
+  SortField,
+  Status,
 } from '@core/constants'
-import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
+import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
+import { Includeable, literal, Op, Transaction } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 /**

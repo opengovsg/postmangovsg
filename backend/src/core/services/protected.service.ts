@@ -1,15 +1,14 @@
-import { Transaction } from 'sequelize'
-import { difference } from 'lodash'
-import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
-
-import { ProtectedMessage, Campaign } from '@core/models'
 import config from '@core/config'
-import { CSVParams } from '@core/types'
-import { loggerWithLabel } from '@core/logger'
 import {
   MessageBulkInsertInterface,
   ProtectedMessageRecordInterface,
 } from '@core/interfaces/message.interface'
+import { loggerWithLabel } from '@core/logger'
+import { Campaign, ProtectedMessage } from '@core/models'
+import { CSVParams } from '@core/types'
+import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
+import { difference } from 'lodash'
+import { Transaction } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 const PROTECTED_URL = config.get('protectedUrl')

@@ -1,6 +1,6 @@
+import config from '@core/config'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
-import config from '@core/config'
 
 /**
  * Generates a random base64 string as an api key

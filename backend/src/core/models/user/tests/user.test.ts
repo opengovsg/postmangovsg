@@ -1,8 +1,8 @@
-import { Sequelize } from 'sequelize-typescript'
-import sequelizeLoader from '@test-utils/sequelize-loader'
-import { User, Domain, Agency } from '@core/models'
-import { validateDomain } from '@core/utils/validate-domain'
 import config from '@core/config'
+import { Agency, Domain, User } from '@core/models'
+import { validateDomain } from '@core/utils/validate-domain'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+import { Sequelize } from 'sequelize-typescript'
 
 let sequelize: Sequelize
 

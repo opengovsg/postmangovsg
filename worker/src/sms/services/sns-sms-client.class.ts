@@ -1,8 +1,8 @@
 import {
-  SNSClient,
+  MessageAttributeValue,
   PublishCommand,
   PublishInput,
-  MessageAttributeValue,
+  SNSClient,
 } from '@aws-sdk/client-sns'
 import config from '@core/config'
 

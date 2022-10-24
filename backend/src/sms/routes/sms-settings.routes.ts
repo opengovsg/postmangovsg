@@ -1,9 +1,7 @@
-import { Request, Response } from 'express'
-import { Router } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
-
-import { SmsMiddleware } from '@sms/middlewares'
 import { SettingsMiddleware } from '@core/middlewares'
+import { SmsMiddleware } from '@sms/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Request, Response, Router } from 'express'
 
 export const InitSmsSettingsRoute = (
   smsMiddleware: SmsMiddleware,

@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction, Handler } from 'express'
-import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { CredentialService } from '@core/services'
-import { SmsService } from '@sms/services'
 import config from '@core/config'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { loggerWithLabel } from '@core/logger'
+import { CredentialService } from '@core/services'
 import { formatDefaultCredentialName } from '@core/utils'
+import { SmsService } from '@sms/services'
+import { Handler, NextFunction, Request, Response } from 'express'
 
 export interface SmsMiddleware {
   getCredentialsFromBody: Handler

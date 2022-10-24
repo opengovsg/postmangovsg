@@ -1,10 +1,8 @@
-import { useState } from 'react'
-
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
+import { useState } from 'react'
+import CloseButton from 'components/common/close-button'
 
 import styles from '../RichTextEditor.module.scss'
-
-import CloseButton from 'components/common/close-button'
 
 interface LinkControlProps {
   currentState: any

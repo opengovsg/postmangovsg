@@ -1,13 +1,13 @@
-import request from 'supertest'
-import { Sequelize } from 'sequelize-typescript'
-import initialiseServer from '@test-utils/server'
 import config from '@core/config'
+import { ChannelType } from '@core/constants'
 import { Campaign, User } from '@core/models'
-import sequelizeLoader from '@test-utils/sequelize-loader'
 import { UploadService } from '@core/services'
 import { EmailFromAddress, EmailMessage } from '@email/models'
 import { CustomDomainService } from '@email/services'
-import { ChannelType } from '@core/constants'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+import initialiseServer from '@test-utils/server'
+import { Sequelize } from 'sequelize-typescript'
+import request from 'supertest'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize

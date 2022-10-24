@@ -1,5 +1,5 @@
-import { Router } from 'express'
 import { StatsMiddleware } from '@core/middlewares'
+import { Router } from 'express'
 
 const router = Router()
 

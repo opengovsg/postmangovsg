@@ -1,7 +1,3 @@
-import cx from 'classnames'
-
-import { capitalize, debounce } from 'lodash'
-
 import {
   MouseEvent as ReactMouseEvent,
   useCallback,
@@ -11,23 +7,8 @@ import {
   useRef,
   useState,
 } from 'react'
-
 import Moment from 'react-moment'
-
 import { Link } from 'react-router-dom'
-
-import styles from './Campaigns.module.scss'
-import overrideStylesTextButton from './OverrideTextButton.module.scss'
-import overrideStylesTextInput from './OverrideTextInput.module.scss'
-import overrideStylesTextInputWithButton from './OverrideTextInputWithButton.module.scss'
-import overrideStylesTitleBar from './OverrideTitleBar.module.scss'
-
-import ActionsButton from './actions-button'
-
-import AnnouncementModal from './announcement-modal'
-
-import DropdownFilter from './dropdown-filter'
-
 import EmptyDashboardImg from 'assets/img/empty-dashboard.png'
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
 import {
@@ -38,6 +19,7 @@ import {
   SortField,
   StatusFilter,
 } from 'classes'
+import cx from 'classnames'
 import {
   ConfirmModal,
   Pagination,
@@ -54,15 +36,23 @@ import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
-
+import { capitalize, debounce } from 'lodash'
 import {
   deleteCampaignById,
   getCampaigns,
   renameCampaign,
 } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-
 import { getUserSettings } from 'services/settings.service'
+
+import ActionsButton from './actions-button'
+import AnnouncementModal from './announcement-modal'
+import styles from './Campaigns.module.scss'
+import DropdownFilter from './dropdown-filter'
+import overrideStylesTextButton from './OverrideTextButton.module.scss'
+import overrideStylesTextInput from './OverrideTextInput.module.scss'
+import overrideStylesTextInputWithButton from './OverrideTextInputWithButton.module.scss'
+import overrideStylesTitleBar from './OverrideTitleBar.module.scss'
 
 const ITEMS_PER_PAGE = 10
 

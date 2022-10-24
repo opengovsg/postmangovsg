@@ -1,17 +1,17 @@
-import { Request } from 'express'
-import url from 'url'
-import crypto, { Encoding } from 'crypto'
-import https from 'https'
+import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
+import { addToBlacklist } from '@email/utils/callback/query'
 import {
-  updateDeliveredStatus,
   updateBouncedStatus,
   updateComplaintStatus,
+  updateDeliveredStatus,
   updateReadStatus,
 } from '@email/utils/callback/update-status'
-import { addToBlacklist } from '@email/utils/callback/query'
-import config from '@core/config'
 import { compareSha256Hash } from '@shared/utils/crypto'
+import crypto, { Encoding } from 'crypto'
+import { Request } from 'express'
+import https from 'https'
+import url from 'url'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
@@ -237,4 +237,4 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   }
 }
 
-export { HttpEvent, SesRecord, isEvent, parseRecord, validateSignature }
+export { HttpEvent, isEvent, parseRecord, SesRecord, validateSignature }

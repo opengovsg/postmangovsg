@@ -1,23 +1,21 @@
-import { difference, keys } from 'lodash'
-
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
-import { isSuperSet } from '@core/utils'
-import { UploadService } from '@core/services'
+import { HydrationError, InvalidRecipientError } from '@core/errors'
 import { UploadData } from '@core/interfaces'
-import { InvalidRecipientError, HydrationError } from '@core/errors'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 import { Campaign, Statistic } from '@core/models'
-import { PhoneNumberService } from '@core/services'
+import { PhoneNumberService, UploadService } from '@core/services'
+import { isSuperSet } from '@core/utils'
 import {
   TemplateClient,
-  XSS_TELEGRAM_OPTION,
   TemplateError,
+  XSS_TELEGRAM_OPTION,
 } from '@shared/templating'
-
+import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
 import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { TelegramService } from '@telegram/services'
-import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
-import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { difference, keys } from 'lodash'
+
 const client = new TemplateClient({
   xssOptions: XSS_TELEGRAM_OPTION,
   lineBreak: '\n',

@@ -1,15 +1,14 @@
 import download from 'downloadjs'
-import { without, times, constant } from 'lodash'
+import { constant, times, without } from 'lodash'
+import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+import {
+  extractParams,
+  PROTECTED_CSV_HEADERS,
+} from 'services/validate-csv.service'
 
 import TextButton from '../text-button'
 
 import styles from './SampleCsv.module.scss'
-
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import {
-  PROTECTED_CSV_HEADERS,
-  extractParams,
-} from 'services/validate-csv.service'
 
 const SampleCsv = ({
   defaultRecipient,

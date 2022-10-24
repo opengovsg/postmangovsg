@@ -4,29 +4,26 @@ import {
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
 } from '@shared/templating'
-
-import { union, difference } from 'lodash'
+import { ChannelType } from 'classes'
+import { difference, union } from 'lodash'
 import { rest } from 'msw'
 
 import {
-  USER_EMAIL,
-  TWILIO_CREDENTIAL,
-  TELEGRAM_CREDENTIAL,
   DEFAULT_FROM,
-  PRESIGNED_URL,
+  INVALID_CSV_FILENAME,
   INVALID_TELEGRAM_CREDENTIAL,
   INVALID_TWILIO_CREDENTIAL,
-  INVALID_CSV_FILENAME,
+  PRESIGNED_URL,
+  TELEGRAM_CREDENTIAL,
+  TWILIO_CREDENTIAL,
+  USER_EMAIL,
 } from './constants'
-
 import type {
-  State,
   EmailTemplate,
   SMSTemplate,
+  State,
   TelegramTemplate,
 } from './interfaces'
-
-import { ChannelType } from 'classes'
 
 const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })

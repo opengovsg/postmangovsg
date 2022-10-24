@@ -1,14 +1,15 @@
 import {
-  updateMessageWithError,
-  updateMessageWithSuccess,
-  updateMessageWithRead,
-  haltCampaignIfThresholdExceeded,
-} from './query'
-import {
   BounceMetadata,
   ComplaintMetadata,
   Metadata,
 } from '@email/interfaces/callback.interface'
+
+import {
+  haltCampaignIfThresholdExceeded,
+  updateMessageWithError,
+  updateMessageWithRead,
+  updateMessageWithSuccess,
+} from './query'
 
 export const updateDeliveredStatus = async (
   metadata: Metadata

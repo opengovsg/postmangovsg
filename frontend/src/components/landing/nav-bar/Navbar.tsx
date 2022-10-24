@@ -1,15 +1,12 @@
-import { i18n } from '@lingui/core'
-
 import { OutboundLink } from 'react-ga'
-
 import { useNavigate } from 'react-router-dom'
-
-import styles from './NavBar.module.scss'
-
+import { i18n } from '@lingui/core'
 import AppBrandmark from 'assets/img/brand/app-brandmark.svg'
 import AppLogo from 'assets/img/brand/app-logo.svg'
 import PrimaryButton from 'components/common/primary-button'
 import { LINKS } from 'config'
+
+import styles from './NavBar.module.scss'
 
 const NavBar = () => {
   const navigate = useNavigate()

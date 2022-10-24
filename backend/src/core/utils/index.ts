@@ -14,4 +14,4 @@ const isSuperSet = <T>(_superset: Array<T>, subset: Array<T>): boolean => {
 const formatDefaultCredentialName = (name: DefaultCredentialName): string =>
   `demo/${config.get('env')}/${name}`
 
-export { isSuperSet, formatDefaultCredentialName }
+export { formatDefaultCredentialName, isSuperSet }

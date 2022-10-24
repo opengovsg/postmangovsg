@@ -1,14 +1,12 @@
 import { i18n } from '@lingui/core'
-
 import {
   TemplateClient,
   TemplateError,
   XSS_EMAIL_OPTION,
 } from '@shared/templating'
-import { keys, difference, uniq } from 'lodash'
-import Papa from 'papaparse'
-
 import { ALLOWED_IMAGE_SOURCES } from 'config'
+import { difference, keys, uniq } from 'lodash'
+import Papa from 'papaparse'
 
 export interface ProtectedCsvInfo {
   csvFilename: string

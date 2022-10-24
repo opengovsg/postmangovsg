@@ -1,20 +1,18 @@
 // require buffer with trailing slash to ensure use of the npm module named buffer
 // instead of the node.js core module named buffer
-import { Buffer } from 'buffer/'
 import { useState } from 'react'
-
+import { Buffer } from 'buffer/'
+import {
+  Checkbox,
+  ErrorBlock,
+  PrimaryButton,
+  TextArea,
+  TextInput,
+} from 'components/common'
+import { encryptData, sha256 } from 'services/crypto.service'
 import { uuid } from 'uuidv4'
 
 import styles from './CryptoTest.module.scss'
-
-import {
-  TextArea,
-  TextInput,
-  PrimaryButton,
-  ErrorBlock,
-  Checkbox,
-} from 'components/common'
-import { encryptData, sha256 } from 'services/crypto.service'
 
 const LOREM_DIMSUM = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lobortis dolor at ex mollis, in pulvinar justo tincidunt. Cras dictum lorem eu sapien ultricies aliquet. Integer mollis ante non est sollicitudin placerat. Nam dolor sem, ultrices eu posuere et, fringilla et nisi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque sit amet massa mi. Sed vitae diam dapibus, maximus elit in, mattis lectus. Donec nec lacinia mauris. Morbi non mollis lacus, sit amet dapibus est. Ut nibh ex, dapibus sed nulla at, consequat lacinia quam.
 

@@ -1,22 +1,18 @@
+import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
+import { OutboundLink } from 'react-ga'
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
-
 import cx from 'classnames'
-import { AtomicBlockUtils } from 'draft-js'
-import { debounce } from 'lodash'
-import { useContext, useState, useMemo, useCallback } from 'react'
-
-import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
-
-import { OutboundLink } from 'react-ga'
-
-import { EditorContext } from '../RichTextEditor'
-import styles from '../RichTextEditor.module.scss'
-import { isImgSrcValid, isExternalImage } from '../utils/image'
-
 import CloseButton from 'components/common/close-button'
 import Tooltip from 'components/common/tooltip'
 import { LINKS } from 'config'
+import { AtomicBlockUtils } from 'draft-js'
+import { debounce } from 'lodash'
+
+import { EditorContext } from '../RichTextEditor'
+import styles from '../RichTextEditor.module.scss'
+import { isExternalImage, isImgSrcValid } from '../utils/image'
 
 const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
 

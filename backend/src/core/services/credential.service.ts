@@ -1,19 +1,19 @@
-import AWS from 'aws-sdk'
-import { get } from 'lodash'
-
 import config from '@core/config'
 import { ChannelType } from '@core/constants'
+import { UserSettings } from '@core/interfaces'
+import { loggerWithLabel } from '@core/logger'
 import {
   Credential,
-  UserCredential,
   User,
+  UserCredential,
   UserDemo,
   UserFeature,
 } from '@core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
-import { loggerWithLabel } from '@core/logger'
 import { TwilioCredentials } from '@sms/interfaces'
-import { UserSettings } from '@core/interfaces'
+import AWS from 'aws-sdk'
+import { get } from 'lodash'
+
 import { RedisService } from './redis.service'
 
 export interface CredentialService {

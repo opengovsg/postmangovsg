@@ -1,9 +1,10 @@
-import { v4 as uuid } from 'uuid'
-import S3 from 'aws-sdk/clients/s3'
 import config from '@core/config'
+import { UploadService } from '@core/services'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
-import { UploadService } from '@core/services'
+import { v4 as uuid } from 'uuid'
+
+import S3 from 'aws-sdk/clients/s3'
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
 const s3 = new S3({

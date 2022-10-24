@@ -1,8 +1,7 @@
-import { Router } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
-
-import { TelegramMiddleware } from '@telegram/middlewares'
 import { SettingsMiddleware } from '@core/middlewares'
+import { TelegramMiddleware } from '@telegram/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
 
 export const InitTelegramSettingsRoute = (
   telegramMiddleware: TelegramMiddleware,

@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express'
-import fileUpload from 'express-fileupload'
 import config from '@core/config'
+import { NextFunction, Request, Response } from 'express'
+import fileUpload from 'express-fileupload'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')

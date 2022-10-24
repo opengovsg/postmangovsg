@@ -1,11 +1,11 @@
-import { Router } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
-import {
-  EmailTransactionalMiddleware,
-  EmailMiddleware,
-} from '@email/middlewares'
-import { fromAddressValidator } from '@core/utils/from-address'
 import { FileAttachmentMiddleware } from '@core/middlewares'
+import { fromAddressValidator } from '@core/utils/from-address'
+import {
+  EmailMiddleware,
+  EmailTransactionalMiddleware,
+} from '@email/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
 
 export const InitEmailTransactionalRoute = (
   emailTransactionalMiddleware: EmailTransactionalMiddleware,

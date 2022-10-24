@@ -9,9 +9,8 @@
  * html generated from the new editor state.
  */
 
+import { convertToRaw, EditorState } from 'draft-js'
 import { readFileSync } from 'fs'
-
-import { EditorState, convertToRaw } from 'draft-js'
 
 import { addHtmlToState } from '../RichTextPasting'
 import { Converter } from '../utils'

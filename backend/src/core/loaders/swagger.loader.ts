@@ -1,8 +1,7 @@
-import { Application, Request, Response, NextFunction } from 'express'
+import { loggerWithLabel } from '@core/logger'
+import { Application, NextFunction, Request, Response } from 'express'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
-
-import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 const options = {

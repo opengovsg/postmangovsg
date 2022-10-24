@@ -1,11 +1,10 @@
+import { useCallback, useEffect, useState } from 'react'
+import { Checkbox, ProtectedPreview, TextArea } from 'components/common'
 import { debounce } from 'lodash'
 import { parse } from 'papaparse'
-import { useState, useEffect, useCallback } from 'react'
+import { hydrateTemplate } from 'services/validate-csv.service'
 
 import styles from './TemplateTest.module.scss'
-
-import { TextArea, ProtectedPreview, Checkbox } from 'components/common'
-import { hydrateTemplate } from 'services/validate-csv.service'
 
 const TemplateTest = () => {
   const [body, setBody] = useState('')

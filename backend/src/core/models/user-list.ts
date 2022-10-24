@@ -1,12 +1,11 @@
+import { List, User } from '@core/models'
 import {
-  DataType,
-  Model,
   Column,
-  Table,
+  DataType,
   ForeignKey,
+  Model,
+  Table,
 } from 'sequelize-typescript'
-
-import { User, List } from '@core/models'
 
 @Table({ tableName: 'user_lists', underscored: true, timestamps: true })
 // <Model<Partial<List>> is required to resolve errors in the model.create()

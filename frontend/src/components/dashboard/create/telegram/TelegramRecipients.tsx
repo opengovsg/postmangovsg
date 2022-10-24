@@ -1,42 +1,35 @@
-import { i18n } from '@lingui/core'
-
-import { useState, useEffect, useContext } from 'react'
-
 import type { Dispatch, SetStateAction } from 'react'
-
+import { useContext, useEffect, useState } from 'react'
 import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
-
-import styles from '../Create.module.scss'
-
+import { i18n } from '@lingui/core'
 import type { TelegramPreview, TelegramProgress } from 'classes'
 import {
-  FileInput,
+  ButtonGroup,
   CsvUpload,
   ErrorBlock,
-  PreviewBlock,
+  FileInput,
+  InfoBlock,
   NextButton,
-  TextButton,
+  PreviewBlock,
   SampleCsv,
-  ButtonGroup,
   StepHeader,
   StepSection,
-  InfoBlock,
+  TextButton,
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-
 import { sendTiming } from 'services/ga.service'
+import type { CsvStatusResponse } from 'services/upload.service'
 import {
-  uploadFileToS3,
   deleteCsvStatus,
   getCsvStatus,
+  uploadFileToS3,
 } from 'services/upload.service'
 
-import type { CsvStatusResponse } from 'services/upload.service'
+import styles from '../Create.module.scss'
 
 const TelegramRecipients = ({
   setActiveStep,

@@ -4,8 +4,8 @@ import { uuid } from 'uuidv4'
 import { encryptData, sha256 } from './crypto.service'
 import {
   beginMultipartUpload,
-  uploadPartWithPresignedUrl,
   completeMultiPartUpload,
+  uploadPartWithPresignedUrl,
 } from './upload.service'
 import { hydrateTemplate } from './validate-csv.service'
 

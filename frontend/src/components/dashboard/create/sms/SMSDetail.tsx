@@ -1,14 +1,12 @@
 // eslint-disable-next-line import/order
-import { useEffect, useContext } from 'react'
-
-import { Status, ChannelType } from 'classes/Campaign'
-import { StepHeader, ProgressDetails, PreviewBlock } from 'components/common'
+import { useContext, useEffect } from 'react'
+import { ChannelType, Status } from 'classes/Campaign'
+import { PreviewBlock, ProgressDetails, StepHeader } from 'components/common'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
-
-import { stopCampaign, retryCampaign } from 'services/campaign.service'
+import { retryCampaign, stopCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const SMSDetail = () => {

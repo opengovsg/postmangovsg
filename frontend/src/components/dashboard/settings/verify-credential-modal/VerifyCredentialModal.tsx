@@ -1,19 +1,17 @@
-import { useState, useContext } from 'react'
-
-import styles from './VerifyCredentialModal.module.scss'
-
+import { useContext, useState } from 'react'
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
 import { ChannelType } from 'classes'
-
-import { PrimaryButton, ErrorBlock } from 'components/common'
+import { ErrorBlock, PrimaryButton } from 'components/common'
 import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
 import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'
 import TelegramValidationInput from 'components/dashboard/create/telegram/TelegramValidationInput'
 import { ModalContext } from 'contexts/modal.context'
 import { verifyUserCredentials as VerifyUserSmsCredentials } from 'services/sms.service'
 import { verifyUserCredentials as VerifyUserTelegramCredentials } from 'services/telegram.service'
+
+import styles from './VerifyCredentialModal.module.scss'
 
 enum VerifyCredentialStep {
   Verify,

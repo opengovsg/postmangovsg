@@ -1,8 +1,6 @@
-import { i18n } from '@lingui/core'
-
 import { useEffect, useState } from 'react'
-
-import { TextInput, LabelWithExternalLink } from 'components/common'
+import { i18n } from '@lingui/core'
+import { LabelWithExternalLink, TextInput } from 'components/common'
 import { LINKS } from 'config'
 
 const TelegramCredentialsInput = ({

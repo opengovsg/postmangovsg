@@ -1,7 +1,6 @@
-import { Router } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
-
 import { UnsubscriberMiddleware } from '@core/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
 
 const router = Router()
 

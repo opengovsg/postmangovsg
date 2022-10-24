@@ -1,17 +1,15 @@
-import userEvent from '@testing-library/user-event'
-
 import { Route, Routes } from 'react-router-dom'
-import { SegmentedMessage } from 'sms-segments-calculator'
-
-import BodyTemplate from '../BodyTemplate'
-
+import userEvent from '@testing-library/user-event'
 import { EmailCampaign, SMSCampaign } from 'classes'
 import { FALLBACK_COST_PER_SMS_SGD } from 'components/dashboard/create/common/BodyTemplate/BodyTemplate'
 import CampaignContextProvider from 'contexts/campaign.context'
 import FinishLaterModalContextProvider from 'contexts/finish-later.modal.context'
 import { saveTemplate as saveSmsTemplate } from 'services/sms.service'
 import { saveTemplate as saveTelegramTemplate } from 'services/telegram.service'
-import { screen, mockCommonApis, server, render, Campaign } from 'test-utils'
+import { SegmentedMessage } from 'sms-segments-calculator'
+import { Campaign, mockCommonApis, render, screen, server } from 'test-utils'
+
+import BodyTemplate from '../BodyTemplate'
 
 const TEST_SMS_CAMPAIGN: Campaign = {
   id: 1,

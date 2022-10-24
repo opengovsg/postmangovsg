@@ -1,16 +1,16 @@
-import { Router } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
-  UploadMiddleware,
   JobMiddleware,
   SettingsMiddleware,
+  UploadMiddleware,
 } from '@core/middlewares'
 import {
   TelegramMiddleware,
   TelegramStatsMiddleware,
   TelegramTemplateMiddleware,
 } from '@telegram/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
 
 export const InitTelegramCampaignMiddleware = (
   settingsMiddleware: SettingsMiddleware,

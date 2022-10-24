@@ -1,6 +1,6 @@
-import { Router } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
 import { SmsMiddleware, SmsTransactionalMiddleware } from '@sms/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
 
 export const InitSmsTransactionalRoute = (
   smsMiddleware: SmsMiddleware

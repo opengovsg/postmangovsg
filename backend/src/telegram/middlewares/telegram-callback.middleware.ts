@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express'
-import { TelegramCallbackService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
+import { TelegramCallbackService } from '@telegram/services'
+import { NextFunction, Request, Response } from 'express'
 
 const logger = loggerWithLabel(module)
 

@@ -1,12 +1,13 @@
-import { authenticator } from 'otplib'
-import bcrypt from 'bcrypt'
-import { Request } from 'express'
 import config from '@core/config'
+import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { User } from '@core/models'
-import { validateDomain } from '@core/utils/validate-domain'
 import { ApiKeyService, MailService, RedisService } from '@core/services'
-import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
+import { validateDomain } from '@core/utils/validate-domain'
+import bcrypt from 'bcrypt'
+import { Request } from 'express'
+import { authenticator } from 'otplib'
+
 import { Transaction } from 'sequelize/types'
 
 export interface AuthService {

@@ -1,44 +1,43 @@
-import { Router, Request, Response, NextFunction, Application } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
 import { ChannelType } from '@core/constants'
-import { Campaign } from '@core/models'
-import { InitAuthMiddleware, InitSettingsMiddleware } from '@core/middlewares'
 import { loggerWithLabel } from '@core/logger'
-
-// Core routes
-import { InitAuthRoutes } from './auth.routes'
-import protectedMailRoutes from './protected.routes'
-import campaignRoutes from './campaign.routes'
-import { InitSettingsRoute } from './settings.routes'
-import statsRoutes from './stats.routes'
-import unsubscriberRoutes from './unsubscriber.routes'
-import listRoutes from './list.routes'
-
-// Import channel-specific routes
+import { InitAuthMiddleware, InitSettingsMiddleware } from '@core/middlewares'
+import { Campaign } from '@core/models'
 import {
-  smsCallbackRoutes,
-  InitSmsCampaignRoute,
-  InitSmsSettingsRoute,
-  InitSmsTransactionalRoute,
-} from '@sms/routes'
+  InitEmailMiddleware,
+  InitEmailTemplateMiddleware,
+  InitEmailTransactionalMiddleware,
+} from '@email/middlewares'
 import {
   emailCallbackRoutes,
   InitEmailCampaignRoute,
   InitEmailSettingsRoute,
   InitEmailTransactionalRoute,
 } from '@email/routes'
+import { InitSmsMiddleware } from '@sms/middlewares'
+// Import channel-specific routes
 import {
-  telegramCallbackRoutes,
+  InitSmsCampaignRoute,
+  InitSmsSettingsRoute,
+  InitSmsTransactionalRoute,
+  smsCallbackRoutes,
+} from '@sms/routes'
+import { InitTelegramMiddleware } from '@telegram/middlewares'
+import {
   InitTelegramCampaignMiddleware,
   InitTelegramSettingsRoute,
+  telegramCallbackRoutes,
 } from '@telegram/routes'
-import { InitSmsMiddleware } from '@sms/middlewares'
-import {
-  InitEmailMiddleware,
-  InitEmailTemplateMiddleware,
-  InitEmailTransactionalMiddleware,
-} from '@email/middlewares'
-import { InitTelegramMiddleware } from '@telegram/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Application, NextFunction, Request, Response, Router } from 'express'
+
+// Core routes
+import { InitAuthRoutes } from './auth.routes'
+import campaignRoutes from './campaign.routes'
+import listRoutes from './list.routes'
+import protectedMailRoutes from './protected.routes'
+import { InitSettingsRoute } from './settings.routes'
+import statsRoutes from './stats.routes'
+import unsubscriberRoutes from './unsubscriber.routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)

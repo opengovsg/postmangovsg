@@ -1,13 +1,13 @@
+import { MessageStatus } from '@core/constants'
+import { Campaign } from '@core/models/campaign'
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
   Model,
   Table,
-  BelongsTo,
 } from 'sequelize-typescript'
-import { Campaign } from '@core/models/campaign'
-import { MessageStatus } from '@core/constants'
 
 @Table({ tableName: 'sms_messages', underscored: true, timestamps: true })
 export class SmsMessage extends Model<SmsMessage> {

@@ -1,7 +1,8 @@
 // require buffer with trailing slash to ensure use of the npm module named buffer
 // instead of the node.js core module named buffer
-import { Buffer } from 'buffer/'
 import 'webcrypto-shim/webcrypto-shim'
+
+import { Buffer } from 'buffer/'
 
 const ENCRYPTION_METHOD = 'AES-GCM'
 const KEY_DERIVATION_FUNCTION = 'PBKDF2'

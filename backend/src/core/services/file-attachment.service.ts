@@ -1,10 +1,10 @@
-import CloudmersiveClient from '@core/services/cloudmersive-client.class'
 import config from '@core/config'
-import _ from 'lodash'
-import { MailAttachment } from '@shared/clients/mail-client.class'
 import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
 import { FileExtensionService } from '@core/services'
+import CloudmersiveClient from '@core/services/cloudmersive-client.class'
 import { EmailMessageTransactional } from '@email/models'
+import { MailAttachment } from '@shared/clients/mail-client.class'
+import _ from 'lodash'
 
 const checkExtensions = async (
   files: { data: Buffer; name: string }[]

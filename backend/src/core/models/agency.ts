@@ -1,4 +1,5 @@
-import { DataType, Model, Column, Table, HasMany } from 'sequelize-typescript'
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript'
+
 import { Domain } from './domain'
 
 @Table({ tableName: 'agencies', underscored: true, timestamps: true })

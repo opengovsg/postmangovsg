@@ -1,7 +1,7 @@
-import mustache from 'mustache'
-import { filterXSS } from 'xss'
 import fs from 'fs'
+import mustache from 'mustache'
 import path from 'path'
+import { filterXSS } from 'xss'
 
 type EmailThemeFields = {
   body: string

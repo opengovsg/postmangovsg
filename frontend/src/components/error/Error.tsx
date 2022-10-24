@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-
-import styles from './Error.module.scss'
-
 import heroImg from 'assets/img/not-found.png'
 import { PrimaryButton, TextButton } from 'components/common'
+
+import styles from './Error.module.scss'
 
 const Error = () => {
   const navigate = useNavigate()

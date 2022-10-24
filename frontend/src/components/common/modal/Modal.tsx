@@ -1,10 +1,8 @@
-import cx from 'classnames'
-
 import type { ReactNode } from 'react'
+import cx from 'classnames'
+import { CloseButton } from 'components/common'
 
 import styles from './Modal.module.scss'
-
-import { CloseButton } from 'components/common'
 
 const Modal = ({
   onClose,

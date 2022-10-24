@@ -1,3 +1,5 @@
+import { Campaign } from '@core/models/campaign'
+import { TelegramTemplateService } from '@telegram/services'
 import {
   BeforeCreate,
   BeforeUpdate,
@@ -8,9 +10,6 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
-
-import { Campaign } from '@core/models/campaign'
-import { TelegramTemplateService } from '@telegram/services'
 
 @Table({ tableName: 'telegram_templates', underscored: true, timestamps: true })
 export class TelegramTemplate extends Model<TelegramTemplate> {

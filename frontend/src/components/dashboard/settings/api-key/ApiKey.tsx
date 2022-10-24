@@ -1,19 +1,15 @@
-import cx from 'classnames'
-
-import { useState, useRef, useContext, useEffect } from 'react'
-
 import type { FunctionComponent } from 'react'
-
-import styles from './ApiKey.module.scss'
-
+import { useContext, useEffect, useRef, useState } from 'react'
+import cx from 'classnames'
 import {
-  TextInputWithButton,
   ConfirmModal,
   StepHeader,
+  TextInputWithButton,
 } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
-
 import { regenerateApiKey } from 'services/settings.service'
+
+import styles from './ApiKey.module.scss'
 
 const RESET_COPY_TIMEOUT = 1000
 

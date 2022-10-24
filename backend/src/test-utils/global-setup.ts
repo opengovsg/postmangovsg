@@ -1,4 +1,5 @@
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
+
 import config from '../core/config'
 
 // fix PGUSER and PGPASSWORD inside this global test setup to dictate test db

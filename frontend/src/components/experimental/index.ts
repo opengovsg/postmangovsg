@@ -1,2 +1,2 @@
-export * from './ManagedListSection'
 export * from './ManagedListInfoBlock'
+export * from './ManagedListSection'

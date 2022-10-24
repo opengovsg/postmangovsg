@@ -1,10 +1,11 @@
-import { QueryTypes, Op } from 'sequelize'
+import config from '@core/config'
+import { ChannelType } from '@core/constants'
+import { Campaign } from '@core/models'
+import { Op, QueryTypes } from 'sequelize'
+
 import get from 'lodash/get'
 
-import config from '@core/config'
-import { Campaign } from '@core/models'
 import { CampaignService } from './campaign.service'
-import { ChannelType } from '@core/constants'
 import { ListService } from '.'
 
 /**

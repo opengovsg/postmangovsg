@@ -1,14 +1,15 @@
-import { Sequelize } from 'sequelize-typescript'
-import { QueryTypes, Transaction } from 'sequelize'
-import map from 'lodash/map'
-import crypto from 'crypto'
-import validator from 'validator'
-
-import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
+import { loggerWithLabel } from '@core/logger'
 import MailClient from '@shared/clients/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import { ThemeClient } from '@shared/theme'
+import crypto from 'crypto'
+import { QueryTypes, Transaction } from 'sequelize'
+import { Sequelize } from 'sequelize-typescript'
+import validator from 'validator'
+
+import map from 'lodash/map'
+
 import { Message } from './interface'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })

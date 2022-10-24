@@ -1,18 +1,14 @@
+import type { MouseEvent as ReactMouseEvent } from 'react'
+import { useEffect, useState } from 'react'
+import { ChannelType, Status } from 'classes/Campaign'
 import cx from 'classnames'
-
+import { ActionButton } from 'components/common'
 import download from 'downloadjs'
 import moment from 'moment'
-import { useState, useEffect } from 'react'
-
-import type { MouseEvent as ReactMouseEvent } from 'react'
-
-import styles from './ExportRecipients.module.scss'
-
-import { ChannelType } from 'classes/Campaign'
-import { Status } from 'classes/Campaign'
-import { ActionButton } from 'components/common'
 import { exportCampaignStats } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+
+import styles from './ExportRecipients.module.scss'
 
 export enum CampaignExportStatus {
   Unavailable = 'Unavailable',

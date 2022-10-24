@@ -1,7 +1,7 @@
+import config from '@core/config'
+import connectRedis from 'connect-redis'
 import express from 'express'
 import session from 'express-session'
-import connectRedis from 'connect-redis'
-import config from '@core/config'
 
 /**
  * Initializes a session manager for logins

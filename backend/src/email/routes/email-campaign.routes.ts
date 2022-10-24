@@ -1,17 +1,17 @@
-import { Router } from 'express'
-import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
-  UploadMiddleware,
   JobMiddleware,
   ProtectedMiddleware,
+  UploadMiddleware,
 } from '@core/middlewares'
-import {
-  EmailTemplateMiddleware,
-  EmailStatsMiddleware,
-  EmailMiddleware,
-} from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
+import {
+  EmailMiddleware,
+  EmailStatsMiddleware,
+  EmailTemplateMiddleware,
+} from '@email/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
 
 export const InitEmailCampaignRoute = (
   emailTemplateMiddleware: EmailTemplateMiddleware,

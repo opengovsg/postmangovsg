@@ -1,10 +1,11 @@
 import {
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
 } from 'sequelize-typescript'
+
 import { Campaign } from './campaign'
 
 @Table({ tableName: 'statistics', underscored: true, timestamps: true })

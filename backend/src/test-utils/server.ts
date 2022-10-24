@@ -1,5 +1,3 @@
-import express, { Request, Response, NextFunction } from 'express'
-import { errors as celebrateErrorMiddleware } from 'celebrate'
 import sessionLoader from '@core/loaders/session.loader'
 import { InitV1Route } from '@core/routes'
 import {
@@ -7,6 +5,8 @@ import {
   InitCredentialService,
   RedisService,
 } from '@core/services'
+import { errors as celebrateErrorMiddleware } from 'celebrate'
+import express, { NextFunction, Request, Response } from 'express'
 
 const initialiseServer = (session?: boolean): express.Application => {
   const app: express.Application = express()

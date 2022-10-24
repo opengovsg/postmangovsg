@@ -1,8 +1,7 @@
-import { Router } from 'express'
 import { ChannelType } from '@core/constants'
-import { celebrate, Joi, Segments } from 'celebrate'
-
 import { SettingsMiddleware } from '@core/middlewares'
+import { celebrate, Joi, Segments } from 'celebrate'
+import { Router } from 'express'
 
 export const InitSettingsRoute = (
   settingsMiddleware: SettingsMiddleware

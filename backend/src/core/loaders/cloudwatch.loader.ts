@@ -1,10 +1,9 @@
-import WinstonCloudwatch from 'winston-cloudwatch'
-import { hostname } from 'os'
-
 import config from '@core/config'
-import { loggerWithLabel, addTransport } from '@core/logger'
-import { getInstanceId } from '@core/utils/ec2'
+import { addTransport, loggerWithLabel } from '@core/logger'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
+import { getInstanceId } from '@core/utils/ec2'
+import { hostname } from 'os'
+import WinstonCloudwatch from 'winston-cloudwatch'
 
 const logger = loggerWithLabel(module)
 

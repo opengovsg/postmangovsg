@@ -1,18 +1,15 @@
 // eslint-disable-next-line import/order
 import { useContext } from 'react'
-
 import { EmailCampaign } from 'classes'
-
-import { Status, ChannelType } from 'classes/Campaign'
+import { ChannelType, Status } from 'classes/Campaign'
 import {
-  StepHeader,
-  ProgressDetails,
   EmailPreviewBlock,
+  ProgressDetails,
+  StepHeader,
 } from 'components/common'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import { CampaignContext } from 'contexts/campaign.context'
-
-import { stopCampaign, retryCampaign } from 'services/campaign.service'
+import { retryCampaign, stopCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const EmailDetail = () => {

@@ -1,16 +1,15 @@
+import type { MouseEvent as ReactMouseEvent } from 'react'
+import { ReactNode, useContext, useRef, useState } from 'react'
+import ReactDOM from 'react-dom'
 import {
   ContentBlock,
   ContentState,
   DraftDecorator,
-  SelectionState,
   RichUtils,
+  SelectionState,
 } from 'draft-js'
-import { ReactNode, useContext, useRef, useState } from 'react'
-import type { MouseEvent as ReactMouseEvent } from 'react'
-import ReactDOM from 'react-dom'
 
 import { EditorContext } from '../RichTextEditor'
-
 import styles from '../RichTextEditor.module.scss'
 
 const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)

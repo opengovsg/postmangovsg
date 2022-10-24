@@ -1,6 +1,6 @@
-import { User, List, UserList } from '@core/models'
-import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
+import { loggerWithLabel } from '@core/logger'
+import { List, User, UserList } from '@core/models'
 import { Op } from 'sequelize'
 
 const DAYS_TO_LIST_EXPIRY = 14

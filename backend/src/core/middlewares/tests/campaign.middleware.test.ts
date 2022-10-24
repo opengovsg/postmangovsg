@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response } from 'express'
-import { Sequelize } from 'sequelize-typescript'
-import { Campaign, JobQueue, User } from '@core/models'
-import sequelizeLoader from '@test-utils/sequelize-loader'
 import { ChannelType, JobStatus } from '@core/constants'
 import { CampaignMiddleware } from '@core/middlewares/campaign.middleware'
+import { Campaign, JobQueue, User } from '@core/models'
+import sequelizeLoader from '@test-utils/sequelize-loader'
+import { NextFunction, Request, Response } from 'express'
+import { Sequelize } from 'sequelize-typescript'
 
 let sequelize: Sequelize
 let mockRequest: Partial<Request>

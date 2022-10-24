@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express'
-import { ProtectedService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { ProtectedService } from '@core/services'
+import { NextFunction, Request, Response } from 'express'
 
 const logger = loggerWithLabel(module)
 

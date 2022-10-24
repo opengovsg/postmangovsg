@@ -1,21 +1,18 @@
-import { Trans } from '@lingui/macro'
-import cx from 'classnames'
 import {
   createRef,
   MouseEvent as ReactMouseEvent,
   useEffect,
   useState,
 } from 'react'
-
-import styles from './ActionsButton.module.scss'
-
+import { Trans } from '@lingui/macro'
 import { Campaign, ChannelType } from 'classes'
-
+import cx from 'classnames'
 import { ExportRecipients } from 'components/common'
 import DuplicateCampaignModal from 'components/dashboard/create/duplicate-campaign-modal'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
-
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+
+import styles from './ActionsButton.module.scss'
 
 const ActionsButton = ({
   campaign,

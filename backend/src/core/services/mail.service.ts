@@ -1,5 +1,5 @@
-import MailClient from '@shared/clients/mail-client.class'
 import config from '@core/config'
+import MailClient from '@shared/clients/mail-client.class'
 
 const mailClient = new MailClient(
   config.get('mailOptions'),

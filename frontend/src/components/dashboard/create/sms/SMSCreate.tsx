@@ -1,24 +1,22 @@
+import { useContext, useEffect, useState } from 'react'
+import type { SMSCampaign } from 'classes'
+import { SMSProgress, Status } from 'classes'
 import cx from 'classnames'
+import { ProgressPane } from 'components/common'
+import { CampaignContext } from 'contexts/campaign.context'
+import {
+  saveTemplate,
+  SMS_ERROR_EXCEED_CHARACTER_THRESHOLD,
+  SMS_WARN_EXCEED_CHARACTER_THRESHOLD,
+} from 'services/sms.service'
 
-import { useState, useEffect, useContext } from 'react'
-
-import styles from '../Create.module.scss'
 import BodyTemplate from '../common/BodyTemplate'
+import styles from '../Create.module.scss'
 
 import SMSCredentials from './SMSCredentials'
 import SMSDetail from './SMSDetail'
 import SMSRecipients from './SMSRecipients'
 import SMSSend from './SMSSend'
-
-import type { SMSCampaign } from 'classes'
-import { SMSProgress, Status } from 'classes'
-import { ProgressPane } from 'components/common'
-import { CampaignContext } from 'contexts/campaign.context'
-import {
-  SMS_WARN_EXCEED_CHARACTER_THRESHOLD,
-  SMS_ERROR_EXCEED_CHARACTER_THRESHOLD,
-  saveTemplate,
-} from 'services/sms.service'
 
 const SMS_PROGRESS_STEPS = [
   'Create message',

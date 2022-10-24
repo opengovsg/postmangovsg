@@ -1,8 +1,7 @@
-import axios from 'axios'
-import { createContext, useState, useEffect } from 'react'
-import type { ReactNode, Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-
+import axios from 'axios'
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
 import { initializeGA, sendPageView } from 'services/ga.service'
 

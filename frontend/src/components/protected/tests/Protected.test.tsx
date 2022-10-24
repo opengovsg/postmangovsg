@@ -1,9 +1,8 @@
-import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
+import userEvent from '@testing-library/user-event'
+import { mockCommonApis, render, screen, server } from 'test-utils'
 
 import Protected from '../Protected'
-
-import { screen, mockCommonApis, render, server } from 'test-utils'
 
 const TEST_MESSAGE = 'test message'
 const TEST_PASSWORD = 'test password'

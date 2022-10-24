@@ -1,7 +1,7 @@
 import {
-  parseFromAddress,
-  formatFromAddress,
   escapeFromAddress,
+  formatFromAddress,
+  parseFromAddress,
 } from '../../utils/from-address'
 
 describe('parseFromAddress', () => {

@@ -1,11 +1,9 @@
-import request from 'supertest'
-import { Sequelize } from 'sequelize-typescript'
-
 import { User } from '@core/models'
 import { EmailService } from '@email/services'
-
-import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
+import initialiseServer from '@test-utils/server'
+import { Sequelize } from 'sequelize-typescript'
+import request from 'supertest'
 
 let sequelize: Sequelize
 let user: User
