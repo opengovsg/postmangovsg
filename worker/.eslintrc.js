@@ -2,7 +2,7 @@
 module.exports = {
   root: false,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'simple-import-sort', 'import'],
   extends: [
     'eslint:recommended', // Recommended ESLint rules
     'plugin:@typescript-eslint/eslint-recommended', // Disables rules from `eslint:recommended` that are already covered by the TypeScript typechecker
@@ -67,5 +67,30 @@ module.exports = {
         allow: ['warn', 'error'],
       },
     ],
+    // Rules for auto sort of imports
+    'simple-import-sort/imports': [
+      'error',
+      {
+        groups: [
+          // Side effect imports.
+          ['^\\u0000'],
+          // Packages.
+          // Things that start with a letter (or digit or underscore), or
+          // `@` followed by a letter.
+          ['^@?\\w'],
+          // Absolute imports, must include `/` and cannot include `@`
+          ['^([\\w-]+)/'],
+          // Parent imports. Put `..` last.
+          ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+          // Other relative imports. Put same-folder imports and `.` last.
+          ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+        ],
+      },
+    ],
+    'simple-import-sort/exports': 'error',
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
+    // 'import/no-extraneous-dependencies': 'error',
   },
 }

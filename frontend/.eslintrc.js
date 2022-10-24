@@ -1,7 +1,12 @@
 // eslint-disable-next-line no-undef
 module.exports = {
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'react-hooks', 'import'],
+  plugins: [
+    '@typescript-eslint',
+    'react-hooks',
+    'import',
+    'simple-import-sort',
+  ],
   extends: [
     'eslint:recommended', // Recommended ESLint rules
     'plugin:@typescript-eslint/recommended', // Recommended TypeScript rules
@@ -54,14 +59,44 @@ module.exports = {
       },
     ],
 
-    'import/order': [
+    // Rules for auto sort of imports
+    'simple-import-sort/imports': [
       'error',
       {
-        'newlines-between': 'always-and-inside-groups',
-        alphabetize: {
-          order: 'asc',
-        },
+        groups: [
+          // Side effect imports.
+          ['^\\u0000'],
+          // Packages.
+          // Packages. `react` related packages come first.
+          // Things that start with a letter (or digit or underscore), or
+          // `@` followed by a letter.
+          ['^react', '^@?\\w'],
+          // Root imports
+          // Shared imports should be separate from application imports.
+          ['^(shared)(/.*|$)'],
+          [
+            '^(~assets)(/.*|$)',
+            '^(~classes)(/.*|$)',
+            '^(~components)(/.*|$)',
+            '^(~contexts)(/.*|$)',
+            '^(~locales)(/.*|$)',
+            '^(~routes)(/.*|$)',
+            '^(~services)(/.*|$)',
+            '^(~styles)(/.*|$)',
+            '^(~types)(/.*|$)',
+          ],
+          ['^(~pages)(/.*|$)'],
+          // Parent imports. Put `..` last.
+          ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+          // Other relative imports. Put same-folder imports and `.` last.
+          ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+        ],
       },
     ],
+    'simple-import-sort/exports': 'error',
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
+    // 'import/no-extraneous-dependencies': 'error',
   },
 }

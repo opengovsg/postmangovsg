@@ -26,6 +26,8 @@
     "convict": "6.2.3",
     "dd-trace": "2.12.2",
     "dotenv": "8.2.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
     "libphonenumber-js": "1.10.6",
     "lodash": "4.17.21",
     "module-alias": "2.2.2",
