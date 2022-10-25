@@ -1,6 +1,6 @@
 import { ContentBlock, ContentState, DraftDecorator } from 'draft-js'
 
-import type { Props } from 'react'
+import type { PropsWithChildren } from 'react'
 
 const HIGHLIGHT_REGEX = /{{\s*?\w+\s*?}}/g
 
@@ -17,7 +17,7 @@ const variableStrategy = (
   }
 }
 
-const VariableSpan = (props: Props<any>) => {
+const VariableSpan = (props: PropsWithChildren<any>) => {
   return <mark>{props.children}</mark>
 }
 

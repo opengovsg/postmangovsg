@@ -1,16 +1,16 @@
-import { Switch, Route, useRouteMatch } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 
 import CryptoTest from './CryptoTest'
 import TemplateTest from './TemplateTest'
 
 const TestUtils = () => {
-  const { url } = useRouteMatch()
+  const { pathname } = useLocation()
 
   return (
-    <Switch>
-      <Route path={`${url}/crypto`} component={CryptoTest}></Route>
-      <Route path={`${url}/template`} component={TemplateTest}></Route>
-    </Switch>
+    <Routes>
+      <Route path={`${pathname}/crypto/*`} element={<CryptoTest />}></Route>
+      <Route path={`${pathname}/template/*`} element={<TemplateTest />}></Route>
+    </Routes>
   )
 }
 

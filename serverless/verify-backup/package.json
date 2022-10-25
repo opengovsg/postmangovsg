@@ -15,11 +15,11 @@
   "author": "",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/datagovsg/postmangovsg.git"
+    "url": "git+https://github.com/opengovsg/postmangovsg.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/datagovsg/postmangovsg/issues"
+    "url": "https://github.com/opengovsg/postmangovsg/issues"
   },
   "dependencies": {
     "@google-cloud/kms": "2.11.1",

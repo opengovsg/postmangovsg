@@ -35,6 +35,7 @@ import {
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
+import { setCampaignToSaveList } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
 import { selectList, getListsByChannel } from 'services/list.service'
 import {
@@ -100,7 +101,10 @@ const SMSRecipients = ({
     const setSelectedList = async () => {
       try {
         if (selectedListId) {
-          await selectList({ campaignId: +campaignId, listId: selectedListId })
+          await selectList({
+            campaignId: +(campaignId as string),
+            listId: selectedListId,
+          })
           setIsCsvProcessing(true)
         }
       } catch (e) {
@@ -159,6 +163,11 @@ const SMSRecipients = ({
     updateCampaign,
     shouldSaveList,
   ])
+
+  // If shouldSaveList is modified, send info to backend
+  useEffect(() => {
+    void setCampaignToSaveList(campaignId as string, shouldSaveList)
+  }, [campaignId, shouldSaveList])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -247,6 +256,10 @@ const SMSRecipients = ({
         <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
           Save this file as a managed list
         </Checkbox>
+        <p>
+          Note: managed recipient list will only be saved after you have sent
+          the campaign
+        </p>
         {isDemo && (
           <InfoBlock title="Limited to 20 recipients">
             <span>

@@ -60,9 +60,9 @@ const NavBar = () => {
       </div>
       <div className={cx(styles.navbarLinks, { [styles.isActive]: menuOpen })}>
         <NavLink
-          className={styles.link}
-          activeClassName={styles.active}
-          exact
+          className={({ isActive }) =>
+            cx(styles.link, isActive ? styles.active : '')
+          }
           to="/campaigns"
         >
           Campaigns
@@ -83,8 +83,9 @@ const NavBar = () => {
           Guide
         </OutboundLink>
         <NavLink
-          className={styles.link}
-          activeClassName={styles.active}
+          className={({ isActive }) =>
+            cx(styles.link, isActive ? styles.active : '')
+          }
           to="/settings"
         >
           Settings
@@ -96,6 +97,14 @@ const NavBar = () => {
           target="_blank"
         >
           Feature Request
+        </OutboundLink>
+        <OutboundLink
+          className={styles.link}
+          eventLabel={i18n._(LINKS.contactUsUrl)}
+          to={i18n._(LINKS.contactUsUrl)}
+          target="_blank"
+        >
+          Contact Us
         </OutboundLink>
 
         <div className={styles.separator}></div>

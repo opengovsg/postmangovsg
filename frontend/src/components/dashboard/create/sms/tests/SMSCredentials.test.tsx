@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
 
-import { Route } from 'react-router'
+import { Route, Routes } from 'react-router-dom'
 
 import SMSCredentials from '../SMSCredentials'
 
@@ -50,15 +50,20 @@ function renderSMSCredentials() {
   const setActiveStep = jest.fn()
 
   render(
-    <Route path="/campaigns/:id">
-      <CampaignContextProvider
-        initialCampaign={new SMSCampaign({ ...TEST_SMS_CAMPAIGN })}
-      >
-        <FinishLaterModalContextProvider>
-          <SMSCredentials setActiveStep={setActiveStep} />
-        </FinishLaterModalContextProvider>
-      </CampaignContextProvider>
-    </Route>,
+    <Routes>
+      <Route
+        path="/campaigns/:id/*"
+        element={
+          <CampaignContextProvider
+            initialCampaign={new SMSCampaign({ ...TEST_SMS_CAMPAIGN })}
+          >
+            <FinishLaterModalContextProvider>
+              <SMSCredentials setActiveStep={setActiveStep} />
+            </FinishLaterModalContextProvider>
+          </CampaignContextProvider>
+        }
+      />
+    </Routes>,
     {
       router: {
         initialIndex: 0,

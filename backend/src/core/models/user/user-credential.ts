@@ -17,27 +17,25 @@ export class UserCredential extends Model<UserCredential> {
     allowNull: false,
     primaryKey: true,
   })
-  userId!: number
+  userId: number
 
   @Column({
     type: DataType.STRING,
     primaryKey: true,
     allowNull: false,
   })
-  label!: string
+  label: string
 
   @ForeignKey(() => Credential)
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  credName!: string
-
-  cred!: Credential
+  credName: string
 
   @Column({
     type: DataType.ENUM(...Object.values(ChannelType)),
     allowNull: false,
   })
-  type!: ChannelType
+  type: ChannelType
 }

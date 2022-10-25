@@ -5,8 +5,8 @@ import {
   SelectionState,
   RichUtils,
 } from 'draft-js'
-import { useContext, useRef, useState } from 'react'
-import type { ReactChildren, MouseEvent as ReactMouseEvent } from 'react'
+import { ReactNode, useContext, useRef, useState } from 'react'
+import type { MouseEvent as ReactMouseEvent } from 'react'
 import ReactDOM from 'react-dom'
 
 import { EditorContext } from '../RichTextEditor'
@@ -31,7 +31,7 @@ const linkStrategy = (
 
 const LinkSpan = (props: {
   blockKey: string
-  children: ReactChildren
+  children: ReactNode
   entityKey: string
   contentState: ContentState
   start: number
@@ -128,7 +128,7 @@ const PreviewLinkSpan = ({
   contentState,
   entityKey,
 }: {
-  children: ReactChildren
+  children: ReactNode
   contentState: ContentState
   entityKey: string
 }) => {

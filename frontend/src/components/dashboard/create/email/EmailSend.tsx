@@ -33,7 +33,7 @@ const EmailSend = ({
   setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
-  const { numRecipients, shouldSaveList } = campaign
+  const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
   const [preview, setPreview] = useState(
     {} as {
@@ -71,7 +71,6 @@ const EmailSend = ({
       sendRate: 0,
       channelType: ChannelType.Email,
       updateCampaign,
-      shouldSaveList,
     })
   }
 
