@@ -1,27 +1,27 @@
 @import 'styles/_mixins';
 
 .disclaimer {
-  font-family: SansSerif, serif;
-  font-size: 15px;
-  color: white;
   opacity: 0.9;
   padding-top: 5px;
   padding-bottom: 8px;
 }
 
+.disclaimer_url {
+  font-size: unset;
+}
+
 .frame {
   width: 100%;
   height: 500px;
+  border-radius: 16px;
 }
 
 .footer {
   font-family: Sans-Serif, serif;
   font-size: 12px;
-  color: #999;
   opacity: 0.5;
   padding-top: 5px;
 }
 
 .url {
-  color: #999;
 }

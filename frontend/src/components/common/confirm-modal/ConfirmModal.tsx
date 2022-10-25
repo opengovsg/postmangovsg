@@ -7,6 +7,7 @@ import styles from './ConfirmModal.module.scss'
 import ConfirmImage from 'assets/img/confirm-modal.svg'
 
 import { PrimaryButton, TextButton, ErrorBlock } from 'components/common'
+import FeedbackModal from 'components/common/feedback-modal'
 import { ModalContext } from 'contexts/modal.context'
 
 const ConfirmModal = ({
@@ -19,6 +20,8 @@ const ConfirmModal = ({
   onConfirm,
   onCancel,
   disableImage,
+  needFeedback,
+  feedbackUrl,
 }: {
   title: string
   subtitle: string
@@ -29,15 +32,32 @@ const ConfirmModal = ({
   onConfirm: () => Promise<any> | any
   onCancel?: () => Promise<any> | any
   disableImage?: boolean
+  needFeedback?: boolean
+  feedbackUrl?: string
 }) => {
   const modalContext = useContext(ModalContext)
   const [errorMessage, setErrorMessage] = useState('')
+
+  // feedback modal is built directly into confirm modal as confirm modal is the component that is commonly used across the campaigns
+  const openFeedbackModal = () => {
+    if (feedbackUrl !== null && needFeedback) {
+      const mustExistUrl = String(feedbackUrl)
+      modalContext.setModalContent(<FeedbackModal url={mustExistUrl} />)
+    } else {
+      // dismiss cuz the url is invalid / malformed
+      modalContext.close()
+    }
+  }
 
   async function onConfirmedClicked(): Promise<void> {
     try {
       await onConfirm()
       // Closes the modal
-      modalContext.close()
+      if (needFeedback) {
+        openFeedbackModal()
+      } else {
+        modalContext.close()
+      }
     } catch (err) {
       setErrorMessage((err as Error).message)
     }

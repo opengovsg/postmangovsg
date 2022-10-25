@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import { confirmSendCampaign } from '../util'
+import { campaignFeedbackUrl, confirmSendCampaign } from '../util'
 
 import { ChannelType } from 'classes'
 import type { SMSProgress } from 'classes'
@@ -73,6 +73,8 @@ const SMSSend = ({
         buttonText="Confirm send now"
         buttonIcon="bx-send"
         onConfirm={onModalConfirm}
+        needFeedback={true}
+        feedbackUrl={campaignFeedbackUrl}
       />
     )
   }
