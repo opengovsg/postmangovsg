@@ -103,7 +103,14 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       ignoredRoutes: ['/'],
       requestWhitelist: ['method', 'url', 'body', 'headers'],
       responseWhitelist: ['body', 'statusCode'],
-      headerBlacklist: ['authorization'],
+      requestFilter: (req: Request, propName: string) => {
+        if (propName === 'headers' && req.headers.authorization) {
+          // we do this instead of adding it to `headerBlacklist` so we can view
+          // if this `authorization` header was present
+          req.headers.authorization = '[REDACTED]'
+        }
+        return (req as any)[propName]
+      },
       metaField: null, // flatten this log to root instead of nesting under `meta`
     })
   )
