@@ -180,7 +180,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     if (apiKey !== null) {
       const hash = await ApiKeyService.getApiKeyHash(apiKey)
       return await User.findOne({
-        where: { apiKey: hash },
+        where: { apiKeyHash: hash },
         attributes: ['id', 'email'],
       })
     }
