@@ -172,10 +172,7 @@ export const InitV1Route = (app: Application): Router => {
    *     bearerAuth:
    *       type: http
    *       scheme: bearer
-   *     cookieAuth:
-   *       type: apiKey
-   *       in: cookie
-   *       name: postmangovsg
+   *       bearerFormat: username_versionNumber_apiKey
    */
 
   router.use(
