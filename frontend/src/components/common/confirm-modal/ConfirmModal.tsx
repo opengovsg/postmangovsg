@@ -8,6 +8,7 @@ import ConfirmImage from 'assets/img/confirm-modal.svg'
 
 import { PrimaryButton, TextButton, ErrorBlock } from 'components/common'
 import FeedbackModal from 'components/common/feedback-modal'
+import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
 
 const ConfirmModal = ({
@@ -36,13 +37,15 @@ const ConfirmModal = ({
   feedbackUrl?: string
 }) => {
   const modalContext = useContext(ModalContext)
+  const { email } = useContext(AuthContext)
   const [errorMessage, setErrorMessage] = useState('')
 
   // feedback modal is built directly into confirm modal as confirm modal is the component that is commonly used across the campaigns
   const openFeedbackModal = () => {
     if (feedbackUrl !== null && needFeedback) {
       const mustExistUrl = String(feedbackUrl)
-      modalContext.setModalContent(<FeedbackModal url={mustExistUrl} />)
+      // just append email at the back
+      modalContext.setModalContent(<FeedbackModal url={mustExistUrl + email} />)
     } else {
       // dismiss cuz the url is invalid / malformed
       modalContext.close()

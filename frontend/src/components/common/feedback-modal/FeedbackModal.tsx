@@ -5,7 +5,12 @@ const FeedbackModal = ({ url }: { url: string }) => {
     <>
       <div className={styles.disclaimer}>
         If the form below is not loaded, you can also fill it in{' '}
-        <a className={styles.disclaimer_url} href={url}>
+        <a
+          className={styles.disclaimer_url}
+          href={url}
+          target={'_blank'}
+          rel="noreferrer"
+        >
           here
         </a>
         .
