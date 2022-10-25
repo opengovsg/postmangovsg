@@ -2,6 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, _) => {
+    // NB superseded by 20221012051800-add-api-key-hash-column-to-user.js
     await queryInterface.createFunction(
       'format_user_on_insert', // actually a misnomer, since activates on UPDATE too, but stick to existing naming
       [],
