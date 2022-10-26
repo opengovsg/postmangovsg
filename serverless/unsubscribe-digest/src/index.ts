@@ -43,7 +43,7 @@ const handler = async (): Promise<{ statusCode: number }> => {
     Sentry.captureException(err)
     await Sentry.flush(2000)
 
-    await cronitor?.fail(err.message)
+    await cronitor?.fail((err as Error).message)
 
     // Rethrow error so that Lambda will recognize this as a failed invocation
     throw err
