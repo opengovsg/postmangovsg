@@ -88,6 +88,9 @@ describe("Email Test", () => {
     cy.contains(":button", "Send").click();
     cy.contains(":button", "Confirm").click();
 
+    //step 5 : dismiss feedback form
+    cy.contains(":button", "Close").click();
+
     //check stats for success
     cy.contains("Sending completed");
     cy.contains("Sent to recipient").siblings().contains(NUM_RECIPIENTS);
