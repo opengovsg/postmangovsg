@@ -26,7 +26,15 @@ export const InitEmailSettingsRoute = (
    * paths:
    *  /settings/email/from/verify:
    *    post:
-   *      summary: Verifies the user's email address to see if it can be used to send out emails
+   *      security:
+   *        - bearerAuth: []
+   *      summary: Verifies a custom from email address
+   *      description: >
+   *        Verifies a custom from email address to see if it can be used to send out emails.
+   *        This endpoint will:
+   *          - Check if the custom email is the same as the account's email
+   *          - Verify DKIM records of the custom domains to match required ones from AWS
+   *          - Send a confirmation email to the `recipient` address from the custom address
    *      tags:
    *        - Settings
    *      requestBody:
@@ -36,18 +44,86 @@ export const InitEmailSettingsRoute = (
    *            schema:
    *              type: object
    *              properties:
+   *                from:
+   *                  description: >
+   *                    The custom email address to verify. Accepted formats:
+   *                      - email@custom-address.tld
+   *                      - "Custom Name<email@custom-address.tld>"
+   *                  type: string
+   *                  example: "Example <example@postman.gov.sg>"
    *                recipient:
    *                  type: string
-   *                from:
-   *                  type: string
+   *                  description: The email to receive success confirmation
+   *                  example: example@example.com
    *
    *      responses:
    *        200:
-   *          description: OK
+   *          description: Successfully verify custom from email address
+   *          content:
+   *            application/json:
+   *              schema:
+   *                type: object
+   *                required:
+   *                  - email
+   *                properties:
+   *                  email:
+   *                    type: string
+   *                    example: "Example <example@postman.gov.sg>"
    *        400:
    *          description: Bad Request (verification fails)
-   *        503:
-   *          description: Service Unavailable. Try using the default from address instead.
+   *        "401":
+   *          description: Unauthorized.
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Unauthorized
+   *        "403":
+   *          description: Forbidden. Request violates firewall rules.
+   *        "413":
+   *          description: Number of attachments or size of attachments exceeded limit.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/Error'
+   *               examples:
+   *                 AttachmentQtyLimit:
+   *                   value: {message: Number of attachments exceeds limit}
+   *                 AttachmentSizeLimit:
+   *                   value: {message: Size of attachments exceeds limit}
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
+   *        "500":
+   *          description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    *
    */
   router.post(

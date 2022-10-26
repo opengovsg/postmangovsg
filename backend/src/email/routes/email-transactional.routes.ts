@@ -42,7 +42,6 @@ export const InitEmailTransactionalRoute = (
    *     post:
    *       security:
    *         - bearerAuth: []
-   *         - cookieAuth: []
    *       summary: "Send a transactional email"
    *       tags:
    *         - Email
