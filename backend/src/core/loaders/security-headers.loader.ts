@@ -30,6 +30,7 @@ const securityHeadersLoader = ({ app }: { app: express.Application }): void => {
         fontSrc: ["'none'"],
         objectSrc: ["'none'"],
         scriptSrc: ["'self'"],
+        frameSrc: ["'self', 'https://form.gov.sg/*'"],
       },
     })
   )
