@@ -8,6 +8,7 @@ import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
 } from '@email/models'
+import { SesEventType } from '@email/interfaces/callback.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -103,12 +104,12 @@ type CallbackMetaData = {
   }
 }
 async function handleStatusCallbacks(
-  type: string,
+  type: SesEventType,
   id: string,
   metadata: CallbackMetaData
 ): Promise<void> {
   switch (type) {
-    case 'Delivery':
+    case SesEventType.Delivery:
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Delivered,
@@ -119,7 +120,7 @@ async function handleStatusCallbacks(
         }
       )
       break
-    case 'Bounce':
+    case SesEventType.Bounce:
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Bounced,
@@ -134,7 +135,7 @@ async function handleStatusCallbacks(
         }
       )
       break
-    case 'Complaint':
+    case SesEventType.Complaint:
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Complaint,
@@ -146,7 +147,7 @@ async function handleStatusCallbacks(
         }
       )
       break
-    case 'Open':
+    case SesEventType.Open:
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Opened,
@@ -157,7 +158,7 @@ async function handleStatusCallbacks(
         }
       )
       break
-    case 'Send':
+    case SesEventType.Send:
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Sent,
