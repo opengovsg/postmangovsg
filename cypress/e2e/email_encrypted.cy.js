@@ -106,7 +106,7 @@ describe("Encrypted Email Test", () => {
     cy.contains(":button", "Confirm").click();
 
     // step 5 : dismiss feedback modal
-    cy.contains(":button", "Close").click();
+    cy.get('button[title="Close modal"]').click();
 
     //check stats for success
     cy.contains("Sending completed");
