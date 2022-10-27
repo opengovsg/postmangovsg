@@ -2,8 +2,8 @@ import { EmailService, EmailTemplateService } from '@email/services'
 import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
 import {
-  EMPTY_MESSAGE_ERROR,
-  EmptyMessageError,
+  EMPTY_SANITIZED_EMAIL,
+  MessageError,
   InvalidRecipientError,
 } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
@@ -23,7 +23,7 @@ const logger = loggerWithLabel(module)
  * @throws Error if the message could not be sent.
  */
 
-export const EMPTY_MESSAGE_ERROR_CODE = `Error 400: ${EMPTY_MESSAGE_ERROR}`
+export const EMPTY_MESSAGE_ERROR_CODE = `Error 400: ${EMPTY_SANITIZED_EMAIL}`
 export const BLACKLISTED_RECIPIENT_ERROR_CODE =
   'Error 400: Blacklisted recipient'
 
@@ -58,7 +58,7 @@ async function sendMessage({
         where: { id: emailMessageTransactionalId },
       }
     )
-    throw new EmptyMessageError()
+    throw new MessageError()
   }
 
   const sanitizedAttachments = attachments

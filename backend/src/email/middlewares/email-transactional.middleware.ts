@@ -7,7 +7,7 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
-  EmptyMessageError,
+  MessageError,
   InvalidRecipientError,
   MaliciousFileError,
   UnsupportedFileTypeError,
@@ -177,7 +177,7 @@ export const InitEmailTransactionalMiddleware = (
       })
 
       const BAD_REQUEST_ERRORS = [
-        EmptyMessageError,
+        MessageError,
         InvalidRecipientError,
         MaliciousFileError,
         UnsupportedFileTypeError,

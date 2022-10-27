@@ -249,6 +249,43 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
   })
 
+  test('Should send email if subject and body are not empty after removing invalid HTML tags', async () => {
+    const invalidHtmlTagsSubjectAndBody = {
+      subject: '\nHELLO\n',
+      body: '<script> alert("hello") </script>',
+    }
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        subject: invalidHtmlTagsSubjectAndBody.subject,
+        body: invalidHtmlTagsSubjectAndBody.body,
+      })
+
+    expect(res.status).toBe(202)
+    expect(mockSendEmail).toBeCalled()
+
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: validApiCall.recipient,
+      from: validApiCall.from,
+      status: TransactionalEmailMessageStatus.Accepted,
+    })
+    expect(transactionalEmail?.params).toMatchObject({
+      // NB sanitisation only occurs at sending step, doesn't affect saving in params
+      subject: invalidHtmlTagsSubjectAndBody.subject,
+      body: invalidHtmlTagsSubjectAndBody.body,
+      from: validApiCall.from,
+      replyTo: validApiCall.reply_to,
+    })
+    expect(transactionalEmail?.errorCode).toBe(null)
+  })
+
   test('Should throw an error if file type of attachment is not supported', async () => {
     // not actually an invalid file type; FileExtensionService checks magic number
     const invalidFileTypeAttachment = Buffer.alloc(1024 * 1024, '.')
