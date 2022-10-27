@@ -12,6 +12,8 @@ import {
 import { addToBlacklist } from '@email/utils/callback/query'
 import config from '@core/config'
 import { compareSha256Hash } from '@shared/utils/crypto'
+import { EmailTransactionalService } from '@email/services/email-transactional.service'
+import { SesEventType } from '@email/interfaces/callback.interface'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
@@ -38,6 +40,7 @@ type SmtpApiHeader = {
     username?: string
     hash?: string
   }
+  isTransactional?: boolean
 }
 /**
  * Parses the message to find the matching email_message id
@@ -126,7 +129,7 @@ const shouldBlacklist = ({
 }
 
 const parseNotificationAndEvent = async (
-  type: string,
+  type: SesEventType,
   message: any,
   metadata: any
 ): Promise<void> => {
@@ -134,10 +137,10 @@ const parseNotificationAndEvent = async (
   const logMeta = { messageId, action: 'parseNotification' }
 
   switch (type) {
-    case 'Delivery':
+    case SesEventType.Delivery:
       await updateDeliveredStatus(metadata)
       break
-    case 'Bounce':
+    case SesEventType.Bounce:
       await updateBouncedStatus({
         ...metadata,
         bounceType: message?.bounce?.bounceType,
@@ -145,7 +148,7 @@ const parseNotificationAndEvent = async (
         to: message?.mail?.commonHeaders?.to,
       })
       break
-    case 'Complaint':
+    case SesEventType.Complaint:
       await updateComplaintStatus({
         ...metadata,
         complaintType: message?.complaint?.complaintFeedbackType,
@@ -153,7 +156,7 @@ const parseNotificationAndEvent = async (
         to: message?.mail?.commonHeaders?.to,
       })
       break
-    case 'Open':
+    case SesEventType.Open:
       await updateReadStatus(metadata)
       break
     default:
@@ -222,6 +225,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   await blacklistIfNeeded(message)
 
   const id = smtpApiHeader?.unique_args?.message_id
+  const isTransactional = smtpApiHeader?.isTransactional
   const messageId = message?.mail?.commonHeaders?.messageId
   const logMeta = { messageId, action: 'parseRecord' }
   const type = message?.notificationType || message?.eventType
@@ -233,6 +237,13 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       type,
       ...logMeta,
     })
+    if (isTransactional) {
+      return EmailTransactionalService.handleStatusCallbacks(type, id, {
+        timestamp: new Date(record.Timestamp),
+        bounce: message.bounce,
+        complaint: message.complaint,
+      })
+    }
     return parseNotificationAndEvent(type, message, metadata)
   }
 }

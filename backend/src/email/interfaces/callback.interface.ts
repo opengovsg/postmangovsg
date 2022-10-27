@@ -20,3 +20,11 @@ export interface UpdateMessageWithErrorMetadata extends Metadata {
   errorCode: string
   errorSubType?: string
 }
+
+export enum SesEventType {
+  Delivery = 'Delivery',
+  Bounce = 'Bounce',
+  Complaint = 'Complaint',
+  Open = 'Open',
+  Send = 'Send',
+}
