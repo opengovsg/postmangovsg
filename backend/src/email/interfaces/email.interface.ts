@@ -32,7 +32,59 @@ export interface EmailDuplicateCampaignDetails
  * @swagger
  *  components:
  *    schemas:
- *
+ *      EmailMessageTransactional:
+ *        type: object
+ *        required:
+ *          - id
+ *          - recipient
+ *          - params
+ *          - status
+ *        properties:
+ *          id:
+ *            type: number
+ *            example: 69
+ *          from:
+ *            type: string
+ *            example: "Postman <donotreply@mail.postman.gov.sg>"
+ *          recipient:
+ *            type: string
+ *            example: hello@example.com
+ *          params:
+ *            type: object
+ *          attachments_metadata:
+ *            type: array
+ *            items:
+ *              type: object
+ *              required:
+ *                - fileName
+ *                - fileSize
+ *                - hash
+ *              properties:
+ *                fileName:
+ *                  type: string
+ *                fileSize:
+ *                  type: number
+ *                hash:
+ *                  type: string
+ *          status:
+ *            type: string
+ *            enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, COMPLAINT]
+ *          error_code:
+ *            type: string
+ *          error_sub_type:
+ *            type: string
+ *          accepted_at:
+ *            type: string
+ *            format: date-time
+ *          sent_at:
+ *            type: string
+ *            format: date-time
+ *          delivered_at:
+ *            type: string
+ *            format: date-time
+ *          opened_at:
+ *            type: string
+ *            format: date-time
  *      EmailCampaign:
  *       type: object
  *       properties:

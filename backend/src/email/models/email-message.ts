@@ -34,8 +34,8 @@ export class EmailMessage extends Model<EmailMessage> {
   @BelongsTo(() => Unsubscriber)
   unsubscriber?: Unsubscriber
 
-  @Column(DataType.JSON)
-  params: object
+  @Column(DataType.JSONB)
+  params!: object
 
   @Column({ type: DataType.STRING, allowNull: true })
   messageId: string | null

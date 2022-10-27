@@ -8,6 +8,10 @@ const CONFIGURATION_SET_HEADER = 'X-SES-CONFIGURATION-SET' // Case sensitive
 
 export * from './interfaces'
 
+export type SendEmailOpts = {
+  extraSmtpHeaders: Record<string, any>
+}
+
 export default class MailClient {
   private mailer: nodemailer.Transporter
   private email: string
@@ -34,7 +38,10 @@ export default class MailClient {
     this.configSet = configSet
   }
 
-  public sendMail(input: MailToSend): Promise<string | void> {
+  public sendMail(
+    input: MailToSend,
+    option?: SendEmailOpts
+  ): Promise<string | void> {
     return new Promise<string | void>((resolve, reject) => {
       const username = Math.random().toString(36).substring(2, 15) // random string
       const xSmtpHeader: { [key: string]: any } = {
@@ -42,6 +49,7 @@ export default class MailClient {
           username,
           hash: getSha256Hash(this.hashSecret, username),
         },
+        ...(option?.extraSmtpHeaders || {}), // guard against undefined extraSmtpHeaders value
       } as { [key: string]: any }
       if (input.referenceId !== undefined) {
         // Signature expected by Sendgrid

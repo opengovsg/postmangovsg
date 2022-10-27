@@ -22,6 +22,7 @@ module.exports = {
         type: Sequelize.DataTypes.STRING(255),
         allowNull: true,
       },
+      // superseded by 20221009141317-change-json-to-jsonb-everywhere.js
       params: {
         type: Sequelize.DataTypes.JSON,
         allowNull: true,

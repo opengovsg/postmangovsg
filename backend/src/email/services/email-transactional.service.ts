@@ -4,7 +4,11 @@ import { loggerWithLabel } from '@core/logger'
 import { isBlacklisted } from '@email/utils/query'
 import { InvalidMessageError, InvalidRecipientError } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
-import { EmailMessageTransactional } from '@email/models'
+import {
+  EmailMessageTransactional,
+  TransactionalEmailMessageStatus,
+} from '@email/models'
+import { SesEventType } from '@email/interfaces/callback.interface'
 
 const logger = loggerWithLabel(module)
 
@@ -74,17 +78,108 @@ async function sendMessage({
     recipients: [recipient],
     replyTo,
     attachments: sanitizedAttachments,
+    referenceId: emailMessageTransactionalId.toString(),
   }
   logger.info({
     message: 'Sending transactional email',
     action: 'sendMessage',
   })
-  const messageId = await EmailService.sendEmail(mailToSend)
+  const messageId = await EmailService.sendEmail(mailToSend, {
+    extraSmtpHeaders: { isTransactional: true },
+  })
   if (!messageId) {
     throw new Error('Failed to send transactional email')
   }
 }
 
+type CallbackMetaData = {
+  timestamp: Date
+  bounce?: {
+    bounceType: string
+    bounceSubType: string
+  }
+  complaint?: {
+    complaintFeedbackType: string
+    complaintSubType: string
+  }
+}
+async function handleStatusCallbacks(
+  type: SesEventType,
+  id: string,
+  metadata: CallbackMetaData
+): Promise<void> {
+  switch (type) {
+    case SesEventType.Delivery:
+      await EmailMessageTransactional.update(
+        {
+          status: TransactionalEmailMessageStatus.Delivered,
+          deliveredAt: metadata.timestamp,
+        },
+        {
+          where: { id },
+        }
+      )
+      break
+    case SesEventType.Bounce:
+      await EmailMessageTransactional.update(
+        {
+          status: TransactionalEmailMessageStatus.Bounced,
+          errorCode:
+            metadata.bounce?.bounceType === 'Permanent'
+              ? 'Hard bounce'
+              : 'Soft bounce',
+          errorSubType: metadata.bounce?.bounceSubType,
+        },
+        {
+          where: { id },
+        }
+      )
+      break
+    case SesEventType.Complaint:
+      await EmailMessageTransactional.update(
+        {
+          status: TransactionalEmailMessageStatus.Complaint,
+          errorCode: metadata.complaint?.complaintFeedbackType,
+          errorSubType: metadata.complaint?.complaintSubType,
+        },
+        {
+          where: { id },
+        }
+      )
+      break
+    case SesEventType.Open:
+      await EmailMessageTransactional.update(
+        {
+          status: TransactionalEmailMessageStatus.Opened,
+          openedAt: metadata.timestamp,
+        },
+        {
+          where: { id },
+        }
+      )
+      break
+    case SesEventType.Send:
+      await EmailMessageTransactional.update(
+        {
+          status: TransactionalEmailMessageStatus.Sent,
+          sentAt: metadata.timestamp,
+        },
+        {
+          where: { id },
+        }
+      )
+      break
+    default:
+      logger.error({
+        message: 'Unable to handle messages with this type',
+        type,
+        id,
+        metadata,
+      })
+  }
+}
+
 export const EmailTransactionalService = {
   sendMessage,
+  handleStatusCallbacks,
 }

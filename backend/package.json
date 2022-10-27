@@ -137,10 +137,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/datagovsg/postmangovsg.git"
+    "url": "git+https://github.com/opengovsg/postmangovsg.git"
   },
   "bugs": {
-    "url": "https://github.com/datagovsg/postmangovsg/issues"
+    "url": "https://github.com/opengovsg/postmangovsg/issues"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix"

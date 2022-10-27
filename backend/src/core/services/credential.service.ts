@@ -46,7 +46,7 @@ export interface CredentialService {
   ): Promise<{ isDisplayed: boolean }>
   updateAnnouncementVersion(
     userId: number,
-    announcementVersion: string
+    announcementVersion: string | null
   ): Promise<{ announcementVersion: string }>
 }
 
@@ -297,7 +297,7 @@ export const InitCredentialService = (redisService: RedisService) => {
       where: {
         id: userId,
       },
-      attributes: ['apiKey'],
+      attributes: ['apiKeyHash'],
       // include as 'creds'
       include: [
         {
@@ -321,7 +321,7 @@ export const InitCredentialService = (redisService: RedisService) => {
     })
     if (user) {
       return {
-        hasApiKey: !!user.apiKey,
+        hasApiKey: !!user.apiKeyHash,
         creds: user.creds,
         demo: user.demo,
         userFeature: user.userFeature,
@@ -332,7 +332,7 @@ export const InitCredentialService = (redisService: RedisService) => {
   }
 
   /**
-   * Gnerates an api key for the specified user
+   * Generates an api key for the specified user
    * @param userId
    * @throws Error if user is not found
    */
@@ -395,7 +395,8 @@ export const InitCredentialService = (redisService: RedisService) => {
     }
 
     return {
-      announcementVersion: rowUpserted.announcementVersion,
+      // safe to cast as we know the row was upserted
+      announcementVersion: rowUpserted.announcementVersion as string,
     }
   }
 

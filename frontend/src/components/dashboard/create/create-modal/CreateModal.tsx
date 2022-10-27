@@ -6,7 +6,7 @@ import { useState, useContext, useEffect } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import styles from './CreateModal.module.scss'
 
@@ -31,7 +31,7 @@ const CreateModal = ({
   channelType?: ChannelType
 }) => {
   const modalContext = useContext(ModalContext)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedChannel, setSelectedChannel] = useState(channelType)
   const [selectedName, setSelectedName] = useState(name)
@@ -50,7 +50,7 @@ const CreateModal = ({
       })
       // close modal and go to create view
       modalContext.close()
-      history.push(`/campaigns/${campaign.id}`)
+      navigate(`/campaigns/${campaign.id}`)
     } catch (err) {
       console.error(err)
       setErrorMessage((err as Error).message)

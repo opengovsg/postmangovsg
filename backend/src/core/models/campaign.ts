@@ -64,7 +64,7 @@ export class Campaign extends Model<Campaign> {
   @BelongsTo(() => Credential)
   credential?: Credential
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   s3Object?: CampaignS3ObjectInterface
 
   @Column({

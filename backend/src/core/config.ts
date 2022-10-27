@@ -81,6 +81,7 @@ interface ConfigSchema {
     workerHost: string
   }
   mailFrom: string
+  mailConfigurationSet: string
   mailVia: string
   mailDefaultRate: number
   transactionalEmail: {
@@ -432,6 +433,11 @@ const config: Config<ConfigSchema> = convict({
     doc: 'The email address that appears in the From field of an email',
     default: '',
     env: 'BACKEND_SES_FROM',
+  },
+  mailConfigurationSet: {
+    doc: 'The configuration set specified when sending an email',
+    default: 'postman-email-open',
+    env: 'BACKEND_SES_CONFIGURATION_SET',
   },
   mailVia: {
     doc: 'Text to appended to custom sender name',

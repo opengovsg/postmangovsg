@@ -2,7 +2,7 @@ import cx from 'classnames'
 
 import { useContext, useEffect, useState } from 'react'
 
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import styles from './CreateDemoModal.module.scss'
 
@@ -29,7 +29,7 @@ const CreateDemoModal = ({
   duplicateCampaign?: { name: string; type: ChannelType }
 }) => {
   const { close, setModalTitle, setModalContent } = useContext(ModalContext)
-  const history = useHistory()
+  const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedChannel, setSelectedChannel] = useState(
     duplicateCampaign?.type || ChannelType.SMS
@@ -88,7 +88,7 @@ const CreateDemoModal = ({
       })
       // close modal and go to create view
       close()
-      history.push(`/campaigns/${campaign.id}`)
+      navigate(`/campaigns/${campaign.id}`)
     } catch (err) {
       setErrorMessage((err as Error).message)
     }
