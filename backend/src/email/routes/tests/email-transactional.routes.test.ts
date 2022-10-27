@@ -92,6 +92,9 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should send email successfully', async () => {
+    mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -200,6 +203,7 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should thrown an error with invalid custom from address', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -214,6 +218,7 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should throw an error if email subject or body is empty after removing invalid HTML tags', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const invalidHtmlTagsSubjectAndBody = {
       subject: '\n\n\n',
       body: '<script></script>',
@@ -250,6 +255,9 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should send email if subject and body are not empty after removing invalid HTML tags', async () => {
+    mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
     const invalidHtmlTagsSubjectAndBody = {
       subject: '\nHELLO\n',
       body: '<script> alert("hello") </script>',
@@ -287,6 +295,7 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should throw an error if file type of attachment is not supported', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually an invalid file type; FileExtensionService checks magic number
     const invalidFileTypeAttachment = Buffer.alloc(1024 * 1024, '.')
     const invalidFileTypeAttachmentName = 'invalid.exe'
@@ -331,6 +340,7 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should throw an error if attached file is malicious', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually a malicious file
     const maliciousAttachment = Buffer.alloc(1024 * 1024, '.')
     const maliciousAttachmentName = 'malicious.txt'
@@ -371,6 +381,7 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should throw an error if recipient is blacklisted', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually a blacklisted recipient
     const blacklistedRecipient = 'blacklisted@baddomain.com'
     // instead, mock to return recipient as blacklisted
@@ -407,6 +418,10 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should send email with a valid attachment', async () => {
+    mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
+
     // request.send() cannot be used with file attachments
     // substitute form values with request.field(). refer to
     // https://visionmedia.github.io/superagent/#multipart-requests
@@ -452,6 +467,7 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Email with attachment that exceeds limit should fail', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const invalidAttachmentTooBig = Buffer.alloc(1024 * 1024 * 10, '.') // 10MB
     const invalidAttachmentTooBigName = 'too big.txt'
 
@@ -475,6 +491,10 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Should send email with two valid attachments', async () => {
+    mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
+
     const validAttachment2 = Buffer.from('wassup dog')
     const validAttachment2Name = 'hey.txt'
     const validAttachment2Hash = getMd5HashFromAttachment(validAttachment2)
@@ -526,6 +546,7 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Email with more than two attachments should fail', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // at time of writing this test default value of FILE_ATTACHMENT_MAX_NUM is 2
     // not sure how to create a variable number of attachments + API call (probably not possible?)
     const attachment2 = Buffer.from('wassup dog')
@@ -553,6 +574,9 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Requests should be rate limited', async () => {
+    mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
     const send = (): Promise<request.Response> => {
       return request(app)
         .post(endpoint)
@@ -608,13 +632,15 @@ describe('POST /transactional/email/send', () => {
   })
 
   test('Requests should not be rate limited after window elasped', async () => {
+    mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue('message_id')
     const send = (): Promise<request.Response> => {
       return request(app)
         .post(endpoint)
         .set('Authorization', `Bearer ${apiKey}`)
         .send(validApiCall)
     }
-
     // First request passes
     let res = await send()
     expect(res.status).toBe(201)
