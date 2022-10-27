@@ -91,7 +91,7 @@ describe('POST /transactional/email/send', () => {
     expect(res.status).toBe(400)
   })
 
-  test('Should send email successfully', async () => {
+  test('Should send email successfully and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
@@ -217,7 +217,7 @@ describe('POST /transactional/email/send', () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  test('Should throw an error if email subject or body is empty after removing invalid HTML tags', async () => {
+  test('Should throw an error if email subject or body is empty after removing invalid HTML tags and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const invalidHtmlTagsSubjectAndBody = {
       subject: '\n\n\n',
@@ -254,7 +254,7 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
   })
 
-  test('Should send email if subject and body are not empty after removing invalid HTML tags', async () => {
+  test('Should send email if subject and body are not empty after removing invalid HTML tags and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
@@ -294,7 +294,7 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(null)
   })
 
-  test('Should throw an error if file type of attachment is not supported', async () => {
+  test('Should throw an error if file type of attachment is not supported and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually an invalid file type; FileExtensionService checks magic number
     const invalidFileTypeAttachment = Buffer.alloc(1024 * 1024, '.')
@@ -339,7 +339,7 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(UNSUPPORTED_FILE_TYPE_ERROR_CODE)
   })
 
-  test('Should throw an error if attached file is malicious', async () => {
+  test('Should throw an error if attached file is malicious and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually a malicious file
     const maliciousAttachment = Buffer.alloc(1024 * 1024, '.')
@@ -380,7 +380,7 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(MALICIOUS_FILE_ERROR_CODE)
   })
 
-  test('Should throw an error if recipient is blacklisted', async () => {
+  test('Should throw an error if recipient is blacklisted and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually a blacklisted recipient
     const blacklistedRecipient = 'blacklisted@baddomain.com'
@@ -417,7 +417,7 @@ describe('POST /transactional/email/send', () => {
     expect(transactionalEmail?.errorCode).toBe(BLACKLISTED_RECIPIENT_ERROR_CODE)
   })
 
-  test('Should send email with a valid attachment', async () => {
+  test('Should send email with a valid attachment and attachment metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
@@ -490,7 +490,7 @@ describe('POST /transactional/email/send', () => {
     // no need to check EmailMessageTransactional since this is rejected before db record is saved
   })
 
-  test('Should send email with two valid attachments', async () => {
+  test('Should send email with two valid attachments and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
@@ -573,7 +573,7 @@ describe('POST /transactional/email/send', () => {
     // no need to check EmailMessageTransactional since this is rejected before db record is saved
   })
 
-  test('Requests should be rate limited', async () => {
+  test('Requests should be rate limited and metadata and error code is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
@@ -631,7 +631,7 @@ describe('POST /transactional/email/send', () => {
     })
   })
 
-  test('Requests should not be rate limited after window elasped', async () => {
+  test('Requests should not be rate limited after window elasped and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
