@@ -82,7 +82,6 @@ const EmailSend = ({
         buttonText="Confirm send now"
         buttonIcon="bx-send"
         onConfirm={onModalConfirm}
-        needFeedback={true}
         feedbackUrl={campaignFeedbackUrl}
       />
     )

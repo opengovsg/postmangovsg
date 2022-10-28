@@ -21,7 +21,6 @@ const ConfirmModal = ({
   onConfirm,
   onCancel,
   disableImage,
-  needFeedback,
   feedbackUrl,
 }: {
   title: string
@@ -33,7 +32,6 @@ const ConfirmModal = ({
   onConfirm: () => Promise<any> | any
   onCancel?: () => Promise<any> | any
   disableImage?: boolean
-  needFeedback?: boolean
   feedbackUrl?: string
 }) => {
   const modalContext = useContext(ModalContext)
@@ -42,21 +40,15 @@ const ConfirmModal = ({
 
   // feedback modal is built directly into confirm modal as confirm modal is the component that is commonly used across the campaigns
   const openFeedbackModal = () => {
-    if (feedbackUrl !== null && needFeedback) {
-      const mustExistUrl = String(feedbackUrl)
-      // just append email at the back
-      modalContext.setModalContent(<FeedbackModal url={mustExistUrl + email} />)
-    } else {
-      // dismiss cuz the url is invalid / malformed
-      modalContext.close()
-    }
+    // just append email at the back
+    modalContext.setModalContent(<FeedbackModal url={feedbackUrl + email} />)
   }
 
   async function onConfirmedClicked(): Promise<void> {
     try {
       await onConfirm()
       // Closes the modal
-      if (needFeedback) {
+      if (feedbackUrl) {
         openFeedbackModal()
       } else {
         modalContext.close()
