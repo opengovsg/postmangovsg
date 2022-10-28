@@ -259,8 +259,8 @@ describe('POST /transactional/email/send', () => {
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
     const invalidHtmlTagsSubjectAndBody = {
-      subject: '\nHELLO\n',
-      body: '<script> alert("hello") </script>',
+      subject: 'HELLO',
+      body: '<script>alert("hello")</script>',
     }
 
     const res = await request(app)
@@ -292,6 +292,21 @@ describe('POST /transactional/email/send', () => {
       replyTo: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(null)
+
+    expect(mockSendEmail).toBeCalledWith(
+      {
+        subject: 'HELLO',
+        from: validApiCall.from,
+        body: 'alert("hello")',
+        recipients: [validApiCall.recipient],
+        replyTo: validApiCall.reply_to,
+        referenceId: (
+          transactionalEmail as EmailMessageTransactional
+        ).id.toString(),
+        attachments: undefined,
+      },
+      { extraSmtpHeaders: { isTransactional: true } }
+    )
   })
 
   test('Should throw an error if file type of attachment is not supported and correct error is saved in db', async () => {
