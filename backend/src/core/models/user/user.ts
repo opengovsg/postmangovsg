@@ -1,20 +1,19 @@
 import config from '@core/config'
 import {
-  Column,
-  DataType,
-  Model,
-  Table,
-  BeforeCreate,
-  HasMany,
-  HasOne,
   AfterCreate,
-  ForeignKey,
+  BeforeCreate,
   BelongsTo,
   BelongsToMany,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  HasOne,
+  Model,
+  Table,
 } from 'sequelize-typescript'
-import { UserCredential } from '@core/models'
+import { List, UserCredential, UserFeature, UserList } from '@core/models'
 import { UserDemo } from './user-demo'
-import { UserList, List, UserFeature } from '@core/models'
 import { ApiKeyService } from '@core/services'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
@@ -35,26 +34,26 @@ export class User extends Model<User> {
     },
     unique: true,
   })
-  email!: string
+  email: string
 
-  @Column(DataType.STRING)
-  apiKey?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  apiKeyHash: string | null
 
   @HasMany(() => UserCredential)
-  creds!: UserCredential[]
+  creds: UserCredential[]
 
   @HasOne(() => UserDemo)
-  demo!: UserDemo
+  demo: UserDemo
 
   @HasOne(() => UserFeature)
-  userFeature!: UserFeature
+  userFeature: UserFeature
 
   @ForeignKey(() => Domain)
-  @Column(DataType.STRING)
-  emailDomain?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  emailDomain: string | null
 
   @BelongsTo(() => Domain)
-  domain?: Domain
+  domain: Domain
 
   @BelongsToMany(() => List, {
     onUpdate: 'CASCADE',
@@ -62,7 +61,7 @@ export class User extends Model<User> {
     through: () => UserList,
     as: 'lists',
   })
-  lists!: Array<List & { UserList: UserList }>
+  lists: Array<List & { UserList: UserList }>
 
   // Wrapper function around validation and population of domains
   // to enforce that validation happens before creation of user
@@ -151,8 +150,7 @@ export class User extends Model<User> {
   async regenerateAndSaveApiKey(): Promise<string> {
     const name = this.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
     const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
-    const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
-    this.apiKey = apiKeyHash
+    this.apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
     await this.save()
     return apiKeyPlainText
   }

@@ -12,7 +12,7 @@ import {
   UnsubscriberService,
 } from '@core/services'
 import { CampaignDetails } from '@core/interfaces'
-import { MailToSend } from '@shared/clients/mail-client.class'
+import { MailToSend, SendEmailOpts } from '@shared/clients/mail-client.class'
 
 import { EmailTemplate, EmailMessage } from '@email/models'
 import { EmailTemplateService } from '@email/services'
@@ -151,9 +151,12 @@ const getCampaignMessage = async (
  * Sends message
  * @param mail
  */
-const sendEmail = async (mail: MailToSend): Promise<string | void> => {
+const sendEmail = async (
+  mail: MailToSend,
+  opts?: SendEmailOpts
+): Promise<string | void> => {
   try {
-    return MailService.mailClient.sendMail(mail)
+    return MailService.mailClient.sendMail(mail, opts)
   } catch (e) {
     logger.error({
       message: 'Error while sending test email',
