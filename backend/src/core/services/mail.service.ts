@@ -4,7 +4,8 @@ import config from '@core/config'
 const mailClient = new MailClient(
   config.get('mailOptions'),
   config.get('emailCallback.hashSecret'),
-  config.get('emailFallback.activate') ? config.get('mailFrom') : undefined
+  config.get('emailFallback.activate') ? config.get('mailFrom') : undefined,
+  config.get('mailConfigurationSet')
 )
 
 export const MailService = {
