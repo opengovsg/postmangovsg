@@ -40,7 +40,7 @@ export const InitEmailTransactionalMiddleware = (
     attachments?: { data: Buffer; name: string; size: number }[]
   }
 
-  function convertMessageModalToResponse(message: EmailMessageTransactional) {
+  function convertMessageModelToResponse(message: EmailMessageTransactional) {
     return {
       id: message.id,
       from: message.from,
@@ -164,7 +164,7 @@ export const InitEmailTransactionalMiddleware = (
       await emailMessageTransactional.save()
       res
         .status(201)
-        .json(convertMessageModalToResponse(emailMessageTransactional))
+        .json(convertMessageModelToResponse(emailMessageTransactional))
       return
     } catch (error) {
       logger.error({
@@ -199,7 +199,7 @@ export const InitEmailTransactionalMiddleware = (
       return
     }
 
-    res.status(200).json(convertMessageModalToResponse(message))
+    res.status(200).json(convertMessageModelToResponse(message))
   }
 
   const rateLimit = expressRateLimit({

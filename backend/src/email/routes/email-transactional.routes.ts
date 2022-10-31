@@ -436,17 +436,6 @@ export const InitEmailTransactionalRoute = (
    *           description: Forbidden. Request violates firewall rules.
    *         "404":
    *           description: Not Found. No transactional message with such ID found
-   *         "413":
-   *           description: Number of attachments or size of attachments exceeded limit.
-   *           content:
-   *              application/json:
-   *                schema:
-   *                  $ref: '#/components/schemas/Error'
-   *                examples:
-   *                  AttachmentQtyLimit:
-   *                    value: {message: Number of attachments exceeds limit}
-   *                  AttachmentSizeLimit:
-   *                    value: {message: Size of attachments exceeds limit}
    *         "429":
    *           description: Rate limit exceeded. Too many requests.
    *           content:
