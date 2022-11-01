@@ -19,3 +19,6 @@ export const confirmSendCampaign = async ({
   }
   updateCampaign({ status: Status.Sending })
 }
+
+export const campaignFeedbackUrl =
+  'https://form.gov.sg/6344cf65bb320400137b59dc?6357af36c23cd700125f9d7c='

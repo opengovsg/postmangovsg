@@ -92,6 +92,9 @@ describe("SMS Test", () => {
     cy.contains(":button", "Send").click();
     cy.contains(":button", "Confirm").click();
 
+    // step 5 : dismiss feedback modal
+    cy.get('button[title="Close modal"]').click();
+
     //check feedback for success
     cy.contains("Sending completed");
     cy.contains("Sent to recipient").siblings().contains(NUM_RECIPIENTS);
