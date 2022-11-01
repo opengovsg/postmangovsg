@@ -31,7 +31,8 @@ customHeaders:
           script-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
           img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://file.go.gov.sg https://file.for.sg https://file.for.edu.sg;
           media-src 'self' https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/;
-          child-src 'self' https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/"
+          child-src 'self' https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/;
+          frame-src 'self' https://form.gov.sg/;"
       - key: "Content-Security-Policy-Report-Only"
         value: report-uri https://b7b979b458ee470a86efff9ef1653b50@o399364.ingest.sentry.io/5261024;
   - pattern: "/static/**/*"

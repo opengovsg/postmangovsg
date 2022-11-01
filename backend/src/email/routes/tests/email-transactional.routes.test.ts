@@ -278,7 +278,7 @@ describe('GET /transactional/email/:emailId', () => {
       id: 2,
       email: 'user_2@agency.gov.sg',
     } as User)
-    apiKey = await anotherUser.regenerateAndSaveApiKey()
+    const anotherApiKey = await anotherUser.regenerateAndSaveApiKey()
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',
@@ -292,7 +292,7 @@ describe('GET /transactional/email/:emailId', () => {
     } as unknown as EmailMessageTransactional)
     const res = await request(app)
       .get(`/transactional/email/${message.id}`)
-      .set('Authorization', `Bearer ${apiKey}`)
+      .set('Authorization', `Bearer ${anotherApiKey}`)
     expect(res.status).toBe(404)
     expect(res.body.message).toBe(
       `Email message with ID ${message.id} not found.`
