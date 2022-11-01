@@ -43,13 +43,13 @@ beforeEach(async () => {
   )
   user = await User.create({
     id: 1,
-    email: `user_1@agency.gov.sg`,
+    email: 'user_1@agency.gov.sg',
   } as User)
   apiKey = await user.regenerateAndSaveApiKey()
 })
 
 afterEach(async () => {
-  jest.resetAllMocks()
+  jest.restoreAllMocks()
   await EmailMessageTransactional.destroy({ where: {} })
   await User.destroy({ where: {} })
   await sequelize.close()
@@ -164,8 +164,6 @@ describe('POST /transactional/email/send', () => {
     })
   })
 
-  // something I don't understand — is the verification of the from address mocked? or added to `email_from_address`?
-  // afaict, user.email is not added to `email_from_address` in the test setup, yet somehow the test passes
   test('Should send a message with valid custom from address', async () => {
     const mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
@@ -275,7 +273,7 @@ describe('POST /transactional/email/send', () => {
         body: invalidHtmlTagsSubjectAndBody.body,
       })
 
-    expect(res.status).toBe(202)
+    expect(res.status).toBe(201)
     expect(mockSendEmail).toBeCalled()
 
     const transactionalEmail = await EmailMessageTransactional.findOne({
@@ -524,7 +522,7 @@ describe('POST /transactional/email/send', () => {
       .attach('attachments', validAttachment, validAttachmentName)
       .attach('attachments', validAttachment2, validAttachment2Name)
 
-    expect(res.status).toBe(202)
+    expect(res.status).toBe(201)
     expect(mockSendEmail).toBeCalledTimes(1)
     const transactionalEmail = await EmailMessageTransactional.findOne({
       where: { userId: user.id.toString() },
