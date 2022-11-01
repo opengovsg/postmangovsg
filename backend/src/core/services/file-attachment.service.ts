@@ -56,8 +56,8 @@ const sanitizeFiles = async (
     )
     throw new UnsupportedFileTypeError()
   }
-  const isSafe = await FileAttachmentService.areFilesSafe(files)
-  if (!isSafe) {
+  const filesSafe = await areFilesSafe(files)
+  if (!filesSafe) {
     await EmailMessageTransactional.update(
       {
         errorCode: MALICIOUS_FILE_ERROR_CODE,
@@ -73,5 +73,4 @@ const sanitizeFiles = async (
 
 export const FileAttachmentService = {
   sanitizeFiles,
-  areFilesSafe,
 }

@@ -29,7 +29,7 @@ export interface EmailTransactionalMiddleware {
 export const RATE_LIMIT_ERROR_MESSAGE =
   'Error 429: Too many requests, rate limit reached'
 
-export const getMd5HashFromAttachment = (content: Buffer): string => {
+const getAttachmentHash = (content: Buffer): string => {
   const hash = crypto.createHash('md5')
   return hash.update(content).digest('hex')
 }
@@ -107,7 +107,7 @@ export const InitEmailTransactionalMiddleware = (
           attachmentsMetadata: attachments.map((a) => ({
             fileName: a.name,
             fileSize: a.size,
-            hash: getMd5HashFromAttachment(a.data),
+            hash: getAttachmentHash(a.data),
           })),
         },
         {
