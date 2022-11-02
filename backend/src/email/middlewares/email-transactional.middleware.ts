@@ -45,6 +45,7 @@ export const InitEmailTransactionalMiddleware = (
   authService: AuthService
 ): EmailTransactionalMiddleware => {
   const logger = loggerWithLabel(module)
+
   interface ReqBody {
     subject: string
     body: string
@@ -230,15 +231,15 @@ export const InitEmailTransactionalMiddleware = (
     const orderBy = sort_by?.toString().includes('+')
       ? Ordering.ASC
       : Ordering.DESC // default to descending order even without '-' prefix
-    const { hasMore, messages } = await EmailTransactionalService.listMessages(
+    const { hasMore, messages } = await EmailTransactionalService.listMessages({
       userId,
-      +(limit as string),
-      +(offset as string),
-      sortBy as TransactionalEmailSortField,
+      limit: +(limit as string),
+      offset: +(offset as string),
+      sortBy: sortBy as TransactionalEmailSortField,
       orderBy,
-      status as TransactionalEmailMessageStatus,
-      filter as unknown as TimestampFilter
-    )
+      status: status as TransactionalEmailMessageStatus,
+      filterByTimestamp: filter as unknown as TimestampFilter,
+    })
     res.status(200).json({
       has_more: hasMore,
       data: messages.map(convertMessageModelToResponse),

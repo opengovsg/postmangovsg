@@ -13,8 +13,8 @@ import {
 } from '@email/models'
 import { SesEventType } from '@email/interfaces/callback.interface'
 import {
-  TimestampFilter,
   Ordering,
+  TimestampFilter,
   TransactionalEmailSortField,
 } from '@core/constants'
 import { Order } from 'sequelize/types/model'
@@ -120,6 +120,7 @@ type CallbackMetaData = {
     complaintSubType: string
   }
 }
+
 async function handleStatusCallbacks(
   type: SesEventType,
   id: string,
@@ -196,15 +197,27 @@ async function handleStatusCallbacks(
   }
 }
 
-async function listMessages(
-  userId: number,
-  limit: number,
-  offset: number,
-  sortBy: TransactionalEmailSortField,
-  orderBy: Ordering,
-  status?: TransactionalEmailMessageStatus,
+async function listMessages({
+  userId,
+  limit,
+  offset,
+  sortBy,
+  orderBy,
+  status,
+  filterByTimestamp,
+}: {
+  userId: number
+  limit?: number
+  offset?: number
+  sortBy?: TransactionalEmailSortField
+  orderBy?: Ordering
+  status?: TransactionalEmailMessageStatus
   filterByTimestamp?: TimestampFilter
-): Promise<{ hasMore: boolean; messages: EmailMessageTransactional[] }> {
+}): Promise<{ hasMore: boolean; messages: EmailMessageTransactional[] }> {
+  limit = limit || 10
+  offset = offset || 0
+  sortBy = sortBy || TransactionalEmailSortField.Created
+  orderBy = orderBy || Ordering.DESC
   const order: Order = [[sortBy, orderBy]]
   const where = ((userId, status, filterByTimestamp) => {
     const where: WhereOptions = { userId }
