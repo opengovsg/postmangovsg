@@ -12,6 +12,11 @@ import {
   TransactionalEmailMessageStatus,
 } from '@email/models'
 import { SesEventType } from '@email/interfaces/callback.interface'
+import {
+  TimestampFilter,
+  Ordering,
+  TransactionalEmailSortField,
+} from '@core/constants'
 
 const logger = loggerWithLabel(module)
 
@@ -189,7 +194,32 @@ async function handleStatusCallbacks(
   }
 }
 
+async function listMessages(
+  userId: number,
+  limit: number,
+  offset: number,
+  sortBy: TransactionalEmailSortField,
+  orderBy: Ordering,
+  status?: TransactionalEmailMessageStatus,
+  filterBy?: TimestampFilter
+): Promise<EmailMessageTransactional[]> {
+  console.log('userId', userId)
+  console.log('limit', limit)
+  console.log('offset', offset)
+  console.log('status', status)
+  console.log('filterBy', filterBy)
+  console.log('sortBy', sortBy)
+  console.log('orderBy', orderBy)
+  // TODO
+  // const messages = await EmailMessageTransactional.findAll({
+  //   limit: limit ? Number(limit) : undefined,
+  //   offset: offset ? Number(offset) : undefined,
+  // })
+  return []
+}
+
 export const EmailTransactionalService = {
   sendMessage,
   handleStatusCallbacks,
+  listMessages,
 }

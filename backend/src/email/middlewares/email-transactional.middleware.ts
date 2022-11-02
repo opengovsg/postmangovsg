@@ -18,12 +18,18 @@ import {
 } from '@email/models'
 
 import crypto from 'crypto'
+import {
+  Ordering,
+  TimestampFilter,
+  TransactionalEmailSortField,
+} from '@core/constants'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler
   sendMessage: Handler
   rateLimit: Handler
   getById: Handler
+  listMessages: Handler
 }
 
 export const RATE_LIMIT_ERROR_MESSAGE =
@@ -212,6 +218,30 @@ export const InitEmailTransactionalMiddleware = (
     res.status(200).json(convertMessageModelToResponse(message))
   }
 
+  async function listMessages(req: Request, res: Response): Promise<void> {
+    console.log(req.query)
+    res.status(200)
+    // validation from Joi doesn't carry over into type safety here
+    // following code transforms query params into type-safe arguments for EmailTransactionalService
+    const { limit, offset, status, created_at, sort_by } = req.query
+    const userId = req.session?.user?.id
+    const filter = created_at ? { createdAt: created_at } : undefined
+    const sortBy = sort_by!.toString().replace(/[+-]/, '')
+    const orderBy = sort_by!.toString().includes('+')
+      ? Ordering.ASC
+      : Ordering.DESC // default to descending order even without '-' prefix
+    const messages = await EmailTransactionalService.listMessages(
+      userId,
+      +(limit as string),
+      +(offset as string),
+      sortBy as TransactionalEmailSortField,
+      orderBy,
+      status as TransactionalEmailMessageStatus,
+      filter as unknown as TimestampFilter
+    )
+    res.status(200).json(messages.map(convertMessageModelToResponse))
+  }
+
   const rateLimit = expressRateLimit({
     store: new RedisStore({
       prefix: 'transactionalEmail:',
@@ -250,5 +280,6 @@ export const InitEmailTransactionalMiddleware = (
     sendMessage,
     rateLimit,
     getById,
+    listMessages,
   }
 }

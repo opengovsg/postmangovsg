@@ -6,6 +6,8 @@ import {
 } from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
 import { FileAttachmentMiddleware } from '@core/middlewares'
+import { TransactionalEmailMessageStatus } from '@email/models'
+import { TransactionalEmailSortField } from '@core/constants'
 
 export const InitEmailTransactionalRoute = (
   emailTransactionalMiddleware: EmailTransactionalMiddleware,
@@ -35,6 +37,30 @@ export const InitEmailTransactionalRoute = (
   const getByIdValidator = {
     [Segments.PARAMS]: Joi.object({
       emailId: Joi.number().required(),
+    }),
+  }
+
+  const listMessagesValidator = {
+    [Segments.QUERY]: Joi.object({
+      limit: Joi.number().integer().min(1).max(100).default(10),
+      offset: Joi.number().integer().min(0).default(0),
+      status: Joi.string()
+        .uppercase()
+        .valid(...Object.values(TransactionalEmailMessageStatus)),
+      created_at: Joi.object({
+        gt: Joi.date().iso(),
+        gte: Joi.date().iso(),
+        lt: Joi.date().iso(),
+        lte: Joi.date().iso(),
+      }),
+      sort_by: Joi.string()
+        // accepts TransactionalEmailSortField values with +/- prefix
+        .pattern(
+          new RegExp(
+            `([+-]?${Object.values(TransactionalEmailSortField).join('|')})`
+          )
+        )
+        .default(TransactionalEmailSortField.Created),
     }),
   }
 
@@ -383,6 +409,11 @@ export const InitEmailTransactionalRoute = (
    *         "526":
    *           description: Invalid SSL certificate
    */
+  router.get(
+    '/',
+    celebrate(listMessagesValidator),
+    emailTransactionalMiddleware.listMessages
+  )
 
   /**
    * @swagger

@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
 import { loggerWithLabel } from '@core/logger'
-import { ChannelType, Status, SortField, Ordering } from '@core/constants'
+import {
+  ChannelType,
+  Status,
+  CampaignSortField,
+  Ordering,
+} from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
 
@@ -114,7 +119,7 @@ const listCampaigns = async (
       type: type as ChannelType,
       status: status as Status,
       name: name as string,
-      sortBy: sort_by as SortField,
+      sortBy: sort_by as CampaignSortField,
       orderBy: order_by as Ordering,
     })
 

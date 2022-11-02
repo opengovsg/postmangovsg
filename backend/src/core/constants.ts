@@ -33,7 +33,7 @@ export enum DefaultCredentialName {
   Telegram = 'Postman_Telegram_Demo',
 }
 
-export enum SortField {
+export enum CampaignSortField {
   Created = 'created_at',
   Sent = 'sent_at',
 }
@@ -43,6 +43,23 @@ export enum Ordering {
   DESC = 'DESC',
 }
 
+export enum TransactionalEmailSortField {
+  Created = 'created_at',
+  Updated = 'updated_at',
+  // can extend if we want to sort by other fields (to remove and write in PR)
+}
+
+export interface TimestampFilter {
+  createdAt: DateOperator
+  // can extend if we filter by other timestamp (to remove and write in PR)s
+}
+
+export interface DateOperator {
+  gt: Date
+  gte: Date
+  lt: Date
+  lte: Date
+}
 /**
  * @swagger
  * components:
