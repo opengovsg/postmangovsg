@@ -46,19 +46,17 @@ export enum Ordering {
 export enum TransactionalEmailSortField {
   Created = 'created_at',
   Updated = 'updated_at',
-  // can extend if we want to sort by other fields (to remove and write in PR)
 }
 
 export interface TimestampFilter {
-  createdAt: DateOperator
-  // can extend if we filter by other timestamp (to remove and write in PR)s
+  createdAt: TimestampOperator
 }
 
-export interface DateOperator {
-  gt: Date
-  gte: Date
-  lt: Date
-  lte: Date
+export interface TimestampOperator {
+  gt?: Date
+  gte?: Date
+  lt?: Date
+  lte?: Date
 }
 /**
  * @swagger

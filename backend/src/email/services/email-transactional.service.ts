@@ -17,6 +17,8 @@ import {
   Ordering,
   TransactionalEmailSortField,
 } from '@core/constants'
+import { Order } from 'sequelize/types/model'
+import { Op, WhereOptions } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 
@@ -201,21 +203,41 @@ async function listMessages(
   sortBy: TransactionalEmailSortField,
   orderBy: Ordering,
   status?: TransactionalEmailMessageStatus,
-  filterBy?: TimestampFilter
+  filterByTimestamp?: TimestampFilter
 ): Promise<{ hasMore: boolean; messages: EmailMessageTransactional[] }> {
-  console.log('userId', userId)
-  console.log('limit', limit)
-  console.log('offset', offset)
-  console.log('status', status)
-  console.log('filterBy', filterBy)
-  console.log('sortBy', sortBy)
-  console.log('orderBy', orderBy)
-  // TODO
-  // const messages = await EmailMessageTransactional.findAll({
-  //   limit: limit ? Number(limit) : undefined,
-  //   offset: offset ? Number(offset) : undefined,
-  // })
-  return { hasMore: false, messages: [] }
+  const order: Order = [[sortBy, orderBy]]
+  const where = ((userId, status, filterByTimestamp) => {
+    const where: WhereOptions = { userId }
+    if (status) {
+      where.status = status
+    }
+    if (filterByTimestamp) {
+      if (filterByTimestamp.createdAt) {
+        const { gt, gte, lt, lte } = filterByTimestamp.createdAt
+        if (gt) {
+          where.createdAt = { [Op.gt]: gt }
+        }
+        if (gte) {
+          where.createdAt = { [Op.gte]: gte }
+        }
+        if (lt) {
+          where.createdAt = { [Op.lt]: lt }
+        }
+        if (lte) {
+          where.createdAt = { [Op.lte]: lte }
+        }
+      }
+    }
+    return where
+  })(userId, status, filterByTimestamp)
+  const { count, rows } = await EmailMessageTransactional.findAndCountAll({
+    limit,
+    offset,
+    where,
+    order,
+  })
+  const hasMore = count > offset + limit
+  return { hasMore, messages: rows }
 }
 
 export const EmailTransactionalService = {

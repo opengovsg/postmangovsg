@@ -68,6 +68,8 @@ export const InitEmailTransactionalMiddleware = (
       sent_at: message.sentAt?.toISOString() || null,
       delivered_at: message.deliveredAt?.toISOString() || null,
       opened_at: message.openedAt?.toISOString() || null,
+      created_at: message.createdAt.toISOString(),
+      updated_at: message.updatedAt.toISOString(),
     }
   }
 
