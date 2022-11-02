@@ -7,7 +7,7 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
-  InvalidMessageError,
+  MessageError,
   InvalidRecipientError,
   MaliciousFileError,
   UnsupportedFileTypeError,
@@ -24,6 +24,14 @@ export interface EmailTransactionalMiddleware {
   sendMessage: Handler
   rateLimit: Handler
   getById: Handler
+}
+
+export const RATE_LIMIT_ERROR_MESSAGE =
+  'Error 429: Too many requests, rate limit reached'
+
+const getAttachmentHash = (content: Buffer): string => {
+  const hash = crypto.createHash('md5')
+  return hash.update(content).digest('hex')
 }
 
 export const InitEmailTransactionalMiddleware = (
@@ -111,11 +119,6 @@ export const InitEmailTransactionalMiddleware = (
     next()
   }
 
-  function getAttachmentHash(content: Buffer): string {
-    const hasher = crypto.createHash('md5')
-    return hasher.update(content).digest('hex')
-  }
-
   async function sendMessage(
     req: Request,
     res: Response,
@@ -174,7 +177,7 @@ export const InitEmailTransactionalMiddleware = (
       })
 
       const BAD_REQUEST_ERRORS = [
-        InvalidMessageError,
+        MessageError,
         InvalidRecipientError,
         MaliciousFileError,
         UnsupportedFileTypeError,
@@ -223,7 +226,7 @@ export const InitEmailTransactionalMiddleware = (
       })
       void EmailMessageTransactional.update(
         {
-          errorCode: 'Error 429: Too many requests, rate limit reached',
+          errorCode: RATE_LIMIT_ERROR_MESSAGE,
         },
         {
           where: { id: req.body.emailMessageTransactionalId },
