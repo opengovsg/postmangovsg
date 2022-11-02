@@ -54,9 +54,9 @@ export const InitEmailTransactionalRoute = (
         lte: Joi.date().iso(),
       }),
       sort_by: Joi.string()
-        // accepts TransactionalEmailSortField values with +/- prefix
         .pattern(
           new RegExp(
+            // accepts TransactionalEmailSortField values with optional +/- prefix
             `([+-]?${Object.values(TransactionalEmailSortField).join('|')})`
           )
         )
@@ -320,16 +320,16 @@ export const InitEmailTransactionalRoute = (
    *             properties:
    *               gt:
    *                 type: string
-   *                 format: date-time
+   *                 format: date-time (ISO 8601)
    *               gte:
    *                 type: string
-   *                 format: date-time
+   *                 format: date-time (ISO 8601)
    *               lt:
    *                 type: string
-   *                 format: date-time
+   *                 format: date-time (ISO 8601)
    *               lte:
    *                 type: string
-   *                 format: date-time
+   *                 format: date-time (ISO 8601)
    *         - in: query
    *           name: sort_by
    *           description: >

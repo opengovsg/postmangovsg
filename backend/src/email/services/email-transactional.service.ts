@@ -202,7 +202,7 @@ async function listMessages(
   orderBy: Ordering,
   status?: TransactionalEmailMessageStatus,
   filterBy?: TimestampFilter
-): Promise<EmailMessageTransactional[]> {
+): Promise<{ hasMore: boolean; messages: EmailMessageTransactional[] }> {
   console.log('userId', userId)
   console.log('limit', limit)
   console.log('offset', offset)
@@ -215,7 +215,7 @@ async function listMessages(
   //   limit: limit ? Number(limit) : undefined,
   //   offset: offset ? Number(offset) : undefined,
   // })
-  return []
+  return { hasMore: false, messages: [] }
 }
 
 export const EmailTransactionalService = {

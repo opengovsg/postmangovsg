@@ -219,18 +219,16 @@ export const InitEmailTransactionalMiddleware = (
   }
 
   async function listMessages(req: Request, res: Response): Promise<void> {
-    console.log(req.query)
-    res.status(200)
     // validation from Joi doesn't carry over into type safety here
     // following code transforms query params into type-safe arguments for EmailTransactionalService
     const { limit, offset, status, created_at, sort_by } = req.query
     const userId = req.session?.user?.id
     const filter = created_at ? { createdAt: created_at } : undefined
-    const sortBy = sort_by!.toString().replace(/[+-]/, '')
-    const orderBy = sort_by!.toString().includes('+')
+    const sortBy = sort_by?.toString().replace(/[+-]/, '')
+    const orderBy = sort_by?.toString().includes('+')
       ? Ordering.ASC
       : Ordering.DESC // default to descending order even without '-' prefix
-    const messages = await EmailTransactionalService.listMessages(
+    const { hasMore, messages } = await EmailTransactionalService.listMessages(
       userId,
       +(limit as string),
       +(offset as string),
@@ -239,7 +237,10 @@ export const InitEmailTransactionalMiddleware = (
       status as TransactionalEmailMessageStatus,
       filter as unknown as TimestampFilter
     )
-    res.status(200).json(messages.map(convertMessageModelToResponse))
+    res.status(200).json({
+      has_more: hasMore,
+      data: messages.map(convertMessageModelToResponse),
+    })
   }
 
   const rateLimit = expressRateLimit({
