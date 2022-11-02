@@ -32,6 +32,11 @@ export const InitEmailTransactionalRoute = (
       attachments: Joi.array().items(Joi.object().keys().required()),
     }),
   }
+  const getByIdValidator = {
+    [Segments.PARAMS]: Joi.object({
+      emailId: Joi.number().required(),
+    }),
+  }
 
   // Routes
 
@@ -91,12 +96,12 @@ export const InitEmailTransactionalRoute = (
    *                     type: string
    *                     format: binary
    *       responses:
-   *         "202":
+   *         "201":
    *           description: Accepted. The message is being sent.
    *           content:
-   *              text/plain:
-   *                type: string
-   *                example: Accepted
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/EmailMessageTransactional'
    *         "400":
    *           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
    *           content:
@@ -224,7 +229,7 @@ export const InitEmailTransactionalRoute = (
    *          type: string
    *
    */
-  router.use(
+  router.post(
     '/send',
     FileAttachmentMiddleware.fileUploadHandler,
     FileAttachmentMiddleware.preprocessPotentialIncomingFile,
@@ -431,17 +436,6 @@ export const InitEmailTransactionalRoute = (
    *           description: Forbidden. Request violates firewall rules.
    *         "404":
    *           description: Not Found. No transactional message with such ID found
-   *         "413":
-   *           description: Number of attachments or size of attachments exceeded limit.
-   *           content:
-   *              application/json:
-   *                schema:
-   *                  $ref: '#/components/schemas/Error'
-   *                examples:
-   *                  AttachmentQtyLimit:
-   *                    value: {message: Number of attachments exceeds limit}
-   *                  AttachmentSizeLimit:
-   *                    value: {message: Size of attachments exceeds limit}
    *         "429":
    *           description: Rate limit exceeded. Too many requests.
    *           content:
@@ -477,5 +471,11 @@ export const InitEmailTransactionalRoute = (
    *         "526":
    *           description: Invalid SSL certificate
    */
+  router.get(
+    '/:emailId',
+    celebrate(getByIdValidator),
+    emailTransactionalMiddleware.getById
+  )
+
   return router
 }

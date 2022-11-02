@@ -41,7 +41,7 @@ export interface EmailDuplicateCampaignDetails
  *          - status
  *        properties:
  *          id:
- *            type: number
+ *            type: string
  *            example: 69
  *          from:
  *            type: string
@@ -52,6 +52,7 @@ export interface EmailDuplicateCampaignDetails
  *          params:
  *            type: object
  *          attachments_metadata:
+ *            nullable: true
  *            type: array
  *            items:
  *              type: object
@@ -70,19 +71,25 @@ export interface EmailDuplicateCampaignDetails
  *            type: string
  *            enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, COMPLAINT]
  *          error_code:
+ *            nullable: true
  *            type: string
  *          error_sub_type:
+ *            nullable: true
  *            type: string
  *          accepted_at:
+ *            nullable: true
  *            type: string
  *            format: date-time
  *          sent_at:
+ *            nullable: true
  *            type: string
  *            format: date-time
  *          delivered_at:
+ *            nullable: true
  *            type: string
  *            format: date-time
  *          opened_at:
+ *            nullable: true
  *            type: string
  *            format: date-time
  *      EmailCampaign:
