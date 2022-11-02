@@ -160,7 +160,7 @@ export const InitEmailTransactionalRoute = (
    *                example:
    *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
-   *           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
+   *           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect; see https://github.com/opengovsg/postmangovsg/issues/1837)
    *           content:
    *              text/plain:
    *                type: string
@@ -247,7 +247,6 @@ export const InitEmailTransactionalRoute = (
    *     get:
    *       security:
    *         - bearerAuth: []
-   *         - cookieAuth: []
    *       tags:
    *         - Email
    *       summary: "List transactional emails"
@@ -321,7 +320,7 @@ export const InitEmailTransactionalRoute = (
    *
    *       responses:
    *         200:
-   *           description: Succcessfully retrieve a list of messages
+   *           description: Successfully retrieved a list of messages
    *           content:
    *             application/json:
    *               schema:
@@ -337,7 +336,7 @@ export const InitEmailTransactionalRoute = (
    *                     items:
    *                       $ref: '#/components/schemas/EmailMessageTransactional'
    *         "400":
-   *           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
+   *           description: Bad Request. Failed parameter validations.
    *           content:
    *             text/plain:
    *               type: string
@@ -349,17 +348,6 @@ export const InitEmailTransactionalRoute = (
    *               example: Unauthorized
    *         "403":
    *           description: Forbidden. Request violates firewall rules.
-   *         "413":
-   *           description: Number of attachments or size of attachments exceeded limit.
-   *           content:
-   *              application/json:
-   *                schema:
-   *                  $ref: '#/components/schemas/Error'
-   *                examples:
-   *                  AttachmentQtyLimit:
-   *                    value: {message: Number of attachments exceeds limit}
-   *                  AttachmentSizeLimit:
-   *                    value: {message: Size of attachments exceeds limit}
    *         "429":
    *           description: Rate limit exceeded. Too many requests.
    *           content:
@@ -369,7 +357,7 @@ export const InitEmailTransactionalRoute = (
    *                example:
    *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
-   *           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
+   *           description: Internal Server Error
    *           content:
    *              text/plain:
    *                type: string
@@ -403,7 +391,6 @@ export const InitEmailTransactionalRoute = (
    *     get:
    *       security:
    *         - bearerAuth: []
-   *         - cookieAuth: []
    *       tags:
    *         - Email
    *       summary: "Get transactional email by ID"
@@ -416,13 +403,13 @@ export const InitEmailTransactionalRoute = (
    *             example: 69
    *       responses:
    *         200:
-   *           description: Succcessfully retrieve transactional email with corresponding ID
+   *           description: Successfully retrieved transactional email with corresponding ID
    *           content:
    *            application/json:
    *              schema:
    *                $ref: '#/components/schemas/EmailMessageTransactional'
    *         "400":
-   *           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
+   *           description: Bad Request. Failed parameter validations.
    *           content:
    *             text/plain:
    *               type: string
@@ -445,7 +432,7 @@ export const InitEmailTransactionalRoute = (
    *                example:
    *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
-   *           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
+   *           description: Internal Server Error
    *           content:
    *              text/plain:
    *                type: string
