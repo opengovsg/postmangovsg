@@ -152,6 +152,7 @@ interface ConfigSchema {
     maxAttachmentSize: number
     maxAttachmentNum: number
   }
+  legacyTransactional202Users: string
 }
 
 convict.addFormats({
@@ -693,6 +694,11 @@ const config: Config<ConfigSchema> = convict({
       env: 'FILE_ATTACHMENT_MAX_NUM',
       format: Number,
     },
+  },
+  legacyTransactional202Users: {
+    doc: 'Comma-separated list of user IDs that still need 202 responses for transactional send endpoint',
+    default: '',
+    env: 'LEGACY_TRANSACTIONAL_202_USERS',
   },
 })
 
