@@ -169,7 +169,7 @@ export const InitEmailTransactionalMiddleware = (
       const resStatus = config
         .get('legacyTransactional202Users')
         .split(',')
-        .includes(req.session?.user?.id)
+        .includes(req.session?.user?.id.toString())
         ? 202
         : 201
       res
