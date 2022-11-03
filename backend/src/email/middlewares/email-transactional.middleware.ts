@@ -166,7 +166,7 @@ export const InitEmailTransactionalMiddleware = (
       emailMessageTransactional.set('acceptedAt', new Date())
       await emailMessageTransactional.save()
       res
-        .status(201)
+        .status(202)
         .json(convertMessageModelToResponse(emailMessageTransactional))
       return
     } catch (error) {

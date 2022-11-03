@@ -96,7 +96,7 @@ export const InitEmailTransactionalRoute = (
    *                     type: string
    *                     format: binary
    *       responses:
-   *         "201":
+   *         "202":
    *           description: Accepted. The message is being sent.
    *           content:
    *              application/json:
