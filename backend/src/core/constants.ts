@@ -49,14 +49,14 @@ export enum TransactionalEmailSortField {
 }
 
 export interface TimestampFilter {
-  createdAt: TimestampOperator
+  createdAt: ComparisonOperator<Date>
 }
 
-export interface TimestampOperator {
-  gt?: Date
-  gte?: Date
-  lt?: Date
-  lte?: Date
+export interface ComparisonOperator<T> {
+  gt?: T
+  gte?: T
+  lt?: T
+  lte?: T
 }
 /**
  * @swagger
