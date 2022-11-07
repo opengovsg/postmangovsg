@@ -97,8 +97,13 @@ export class TemplateClient {
             let templated = dict[key]
             // if there is the string "url" or "link" in the provided template key
             // transform the template key into hyperlink
-            if (key.includes('url') || key.includes('link')) {
-              templated = '[' + templated + '](' + templated + ')'
+            if (key.endsWith('_url') || key.endsWith('_link')) {
+              templated =
+                '<a href="' +
+                templated +
+                '" target="_blank">' +
+                templated +
+                '</a>'
             }
             tokens.push(templated)
             continue
