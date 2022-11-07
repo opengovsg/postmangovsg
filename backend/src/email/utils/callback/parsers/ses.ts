@@ -160,7 +160,7 @@ const parseNotificationAndEvent = async (
       await updateReadStatus(metadata)
       break
     default:
-      logger.error({
+      logger.warn({
         message: 'Unable to handle messages with this type',
         type,
         ...logMeta,
