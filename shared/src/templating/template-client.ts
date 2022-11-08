@@ -1,6 +1,6 @@
 import cheerio from 'cheerio'
 import { mapKeys } from 'lodash'
-import { IFilterXSSOptions, filterXSS } from 'xss'
+import { filterXSS, IFilterXSSOptions } from 'xss'
 import { TemplateError } from './errors'
 import { TemplatingConfig, TemplatingConfigDefault } from './interfaces'
 import { filterImageSources } from './xss-options'
@@ -94,7 +94,17 @@ export class TemplateClient {
           if (!params) continue
 
           if (dict[key]) {
-            const templated = dict[key]
+            let templated = dict[key]
+            // if there is the string "url" or "link" in the provided template key
+            // transform the template key into hyperlink
+            if (key.endsWith('_url') || key.endsWith('_link')) {
+              templated =
+                '<a href="' +
+                templated +
+                '" target="_blank">' +
+                templated +
+                '</a>'
+            }
             tokens.push(templated)
             continue
           }
