@@ -14,7 +14,7 @@ import {
 import { CampaignDetails } from '@core/interfaces'
 import { MailToSend, SendEmailOpts } from '@shared/clients/mail-client.class'
 
-import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailTemplate, EmailMessage, EmailBlacklist } from '@email/models'
 import { EmailTemplateService } from '@email/services'
 import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
@@ -426,12 +426,24 @@ const duplicateCampaign = async ({
   return
 }
 
+const isRecipientBlacklisted = async (
+  recipientEmail: string
+): Promise<boolean> => {
+  const result = await EmailBlacklist.findOne({
+    where: {
+      recipient: recipientEmail,
+    },
+  })
+  return !!result
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
   setCampaignCredential,
   getCampaignDetails,
   getHydratedMessage,
+  isRecipientBlacklisted,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
   uploadProtectedCompleteOnPreview,
