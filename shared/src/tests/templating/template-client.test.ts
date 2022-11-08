@@ -38,6 +38,26 @@ describe('template', () => {
         'Your postal code: 123456'
       )
     })
+
+    test('link conversion only if param ends with _url or _link', () => {
+      const params = {
+        test_url: 'www.google.com',
+        test_link: 'www.yahoo.com',
+        notalink: 'www.youtube.com',
+      }
+      let body = 'Your link is: {{test_url}}'
+      expect(templateClient.template(body, params)).toEqual(
+        'Your link is: <a href target="_blank">www.google.com</a>'
+      )
+      body = 'Your new link is: {{test_link}}'
+      expect(templateClient.template(body, params)).toEqual(
+        'Your new link is: <a href target="_blank">www.yahoo.com</a>'
+      )
+      body = 'Your final link is: {{notalink}}'
+      expect(templateClient.template(body, params)).toEqual(
+        'Your final link is: www.youtube.com'
+      )
+    })
   })
 
   describe('parsing errors', () => {
