@@ -80,8 +80,8 @@ const EmailCredentials = ({
                 <li>
                   <i className="bx bx-check-circle"></i>
                   <span>
-                    Email credentials have been validated but you may continue
-                    to send test messages.
+                    Email credentials have been validated. You may continue to
+                    send test messages.
                   </span>
                 </li>
               </DetailBlock>
