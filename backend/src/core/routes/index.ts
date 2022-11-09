@@ -211,22 +211,22 @@ export const InitV1Route = (app: Application): Router => {
 
   router.use(
     '/settings/email',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     emailSettingsRoutes
   )
   router.use(
     '/settings/sms',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     smsSettingsRoutes
   )
   router.use(
     '/settings/telegram',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     telegramSettingsRoutes
   )
   router.use(
     '/settings',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     settingsRoutes
   )
 
