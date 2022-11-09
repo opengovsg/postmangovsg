@@ -8,8 +8,13 @@ export interface AuthMiddleware {
   getOtp: Handler
   verifyOtp: Handler
   getUser: Handler
-  isCookieOrApiKeyAuthenticated: Handler
+  getAuthMiddleware: (authTypes: AuthType[]) => Handler
   logout: Handler
+}
+
+export enum AuthType {
+  Cookie = 'COOKIE',
+  ApiKey = 'API_KEY',
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -110,47 +115,69 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     return res.json({})
   }
 
-  /**
-   * Checks that request has a valid cookie (based on session), or a valid Authorization header
-   * @param req
-   * @param res
-   * @param next
-   */
-  const isCookieOrApiKeyAuthenticated = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> => {
-    try {
-      if (authService.checkCookie(req)) {
-        logger.info({
-          message: 'User authenticated by cookie',
-          action: 'isCookieOrApiKeyAuthenticated',
-          user: req.session?.user,
-        })
-        return next()
+  type AuthenticatorType = (req: Request) => Promise<boolean>
+  const authenticators: Record<AuthType, AuthenticatorType> = {
+    [AuthType.Cookie]: async (req: Request) => {
+      const authenticated = authService.checkCookie(req)
+      if (!authenticated) {
+        return false
       }
 
+      logger.info({
+        message: 'User authenticated by cookie',
+        action: 'authenticators[AuthType.Cookie]',
+        user: req.session?.user,
+      })
+      return true
+    },
+    [AuthType.ApiKey]: async (req: Request) => {
       const user = await authService.getUserForApiKey(req)
-      if (user !== null && req.session) {
-        // Ideally, we store the user id in res.locals for api key, because theoretically, no session was created.
-        // Practically, we have to check multiple places for the user id when we want to retrieve the id
-        // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
-        req.session.user = user
-        req.session.apiKey = true
-        logger.info({
-          message: 'User authenticated by API key',
-          action: 'isCookieOrApiKeyAuthenticated',
-          user,
-        })
-        return next()
+      if (user === null || !req.session) {
+        return false
       }
 
-      return res.sendStatus(401)
-    } catch (err) {
-      return next(err)
-    }
+      // Ideally, we store the user id in res.locals for api key, because theoretically, no session was created.
+      // Practically, we have to check multiple places for the user id when we want to retrieve the id
+      // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
+      req.session.user = user
+      req.session.apiKey = true
+      logger.info({
+        message: 'User authenticated by API key',
+        action: 'authenticators[AuthType.ApiKey]',
+        user,
+      })
+      return true
+    },
   }
+
+  /**
+   * - Generate an express middleware that authenticate requests if it passes the
+   *   authenticator for one of the provided types in `acceptedAuthTypes`
+   * - The generated middleware will attempt to authenticate requests using
+   *   authenticators corresponding with `authType` in the same order as provided
+   *   in `acceptedAuthTypes` array
+   * @param acceptedAuthTypes
+   */
+  const getAuthMiddleware =
+    (acceptedAuthTypes: AuthType[]) =>
+    async (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ): Promise<Response | void> => {
+      try {
+        for (const authType of acceptedAuthTypes) {
+          const authenticated = await authenticators[authType](req)
+          if (authenticated) {
+            return next()
+          }
+        }
+
+        return res.sendStatus(401)
+      } catch (e) {
+        return next(e)
+      }
+    }
 
   /**
    * Destroys user's session
@@ -185,7 +212,7 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     getOtp,
     verifyOtp,
     getUser,
-    isCookieOrApiKeyAuthenticated,
+    getAuthMiddleware,
     logout,
   }
 }
