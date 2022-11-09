@@ -33,7 +33,6 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
   // actual routes here
 
   /**
-   * @swagger
    * paths:
    *  /auth/otp:
    *    post:
@@ -64,7 +63,6 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
   router.post('/otp', celebrate(getOtpValidator), authMiddleware.getOtp)
 
   /**
-   * @swagger
    * paths:
    *  /auth/login:
    *    post:
@@ -103,7 +101,6 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
   router.post('/login', celebrate(verifyOtpValidator), authMiddleware.verifyOtp)
 
   /**
-   * @swagger
    * paths:
    *  /auth/userinfo:
    *    get:
@@ -125,7 +122,6 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
   router.get('/userinfo', authMiddleware.getUser)
 
   /**
-   * @swagger
    * paths:
    *  /auth/logout:
    *    get:

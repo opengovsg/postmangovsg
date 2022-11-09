@@ -11,7 +11,6 @@ const protectVerifyValidator = {
 }
 
 /**
- * @swagger
  * paths:
  *   /protect/{id}:
  *     post:

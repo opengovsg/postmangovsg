@@ -2,7 +2,6 @@ import { Router } from 'express'
 import { EmailCallbackMiddleware } from '@email/middlewares'
 const router = Router()
 /**
- * @swagger
  * paths:
  *   /callback/email:
  *    post:

@@ -33,7 +33,6 @@ export const InitTelegramSettingsRoute = (
   // Routes
 
   /**
-   * @swagger
    * paths:
    *  /settings/telegram/credentials:
    *    post:
@@ -73,7 +72,6 @@ export const InitTelegramSettingsRoute = (
   )
 
   /**
-   * @swagger
    * paths:
    *  /settings/telegram/credentials/verify:
    *    post:

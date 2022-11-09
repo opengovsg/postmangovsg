@@ -167,7 +167,6 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/stats', statsRoutes)
   router.use('/protect', protectedMailRoutes)
   router.use('/unsubscribe', unsubscriberRoutes)
-  router.use('/lists', listRoutes)
 
   /**
    * @swagger
@@ -247,5 +246,11 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/sms', smsCallbackRoutes)
 
   router.use('/callback/telegram', telegramCallbackRoutes)
+
+  router.use(
+    '/lists',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    listRoutes
+  )
   return router
 }

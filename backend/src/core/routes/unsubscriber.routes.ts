@@ -24,7 +24,6 @@ const subscribeAgainValidator = {
 }
 
 /**
- * @swagger
  * paths:
  *  /unsubscribe/{campaignId}/{recipient}:
  *    put:
@@ -79,7 +78,6 @@ router.put(
 )
 
 /**
- * @swagger
  * paths:
  *  /unsubscribe/{campaignId}/{recipient}:
  *    delete:

@@ -34,7 +34,6 @@ export const InitSmsSettingsRoute = (
   }
 
   /**
-   * @swagger
    * paths:
    *  /settings/sms/credentials:
    *    post:
@@ -77,7 +76,6 @@ export const InitSmsSettingsRoute = (
   )
 
   /**
-   * @swagger
    * paths:
    *  /settings/sms/credentials/verify:
    *    post:

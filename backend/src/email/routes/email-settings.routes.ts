@@ -22,7 +22,6 @@ export const InitEmailSettingsRoute = (
   }
 
   /**
-   * @swagger
    * paths:
    *  /settings/email/from/verify:
    *    post:
@@ -137,7 +136,6 @@ export const InitEmailSettingsRoute = (
   )
 
   /**
-   * @swagger
    * paths:
    *  /settings/email/from:
    *    get:

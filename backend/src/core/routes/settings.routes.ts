@@ -38,7 +38,6 @@ export const InitSettingsRoute = (
   }
 
   /**
-   * @swagger
    * paths:
    *  /settings:
    *    get:
@@ -69,7 +68,6 @@ export const InitSettingsRoute = (
   router.get('/', settingsMiddleware.getUserSettings)
 
   /**
-   * @swagger
    * paths:
    *  /settings/regen:
    *    post:
@@ -92,7 +90,6 @@ export const InitSettingsRoute = (
   router.post('/regen', settingsMiddleware.regenerateApiKey)
 
   /**
-   * @swagger
    * paths:
    *  /settings/credentials:
    *    delete:
@@ -123,7 +120,6 @@ export const InitSettingsRoute = (
   )
 
   /**
-   * @swagger
    * paths:
    *  /settings/{channelType}/credentials:
    *    get:
@@ -155,7 +151,6 @@ export const InitSettingsRoute = (
   )
 
   /**
-   * @swagger
    * paths:
    *  /settings/demo:
    *    put:
@@ -195,7 +190,6 @@ export const InitSettingsRoute = (
   )
 
   /**
-   * @swagger
    * paths:
    *  /settings/announcement-version:
    *    put:

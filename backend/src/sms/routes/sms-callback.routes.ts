@@ -3,7 +3,6 @@ import { SmsCallbackMiddleware } from '@sms/middlewares'
 const router = Router()
 
 /**
- * @swagger
  * paths:
  *  /callback/sms/{campaignId}/{messageId}:
  *    post:

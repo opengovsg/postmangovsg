@@ -3,7 +3,6 @@ import { TelegramCallbackMiddleware } from '@telegram/middlewares'
 const router = Router()
 
 /**
- * @swagger
  * paths:
  *  /callback/telegram/{botToken}:
  *    post:
