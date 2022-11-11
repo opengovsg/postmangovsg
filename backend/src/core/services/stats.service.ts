@@ -7,16 +7,21 @@ import {
   FindOptions,
   Sequelize,
 } from 'sequelize'
-import { Statistic, JobQueue, Campaign, Unsubscriber } from '@core/models'
+import {
+  Statistic,
+  JobQueue,
+  Campaign,
+  Unsubscriber,
+} from '@shared/core/models'
 import {
   CampaignStats,
   CampaignStatsCount,
   CampaignRecipient,
-} from '@core/interfaces'
-import { MessageStatus, JobStatus } from '@core/constants'
+} from '@shared/core/interfaces'
+import { MessageStatus, JobStatus } from '@shared/core/constants'
 import { Writable } from 'stream'
 import { waitForMs } from '@shared/utils/wait-for-ms'
-import { EmailMessage } from '@email/models'
+import { EmailMessage } from '@shared/core/models/email'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.

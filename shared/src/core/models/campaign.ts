@@ -10,15 +10,15 @@ import {
   HasOne,
   Default,
 } from 'sequelize-typescript'
-import { ChannelType } from '@core/constants'
-import { CampaignS3ObjectInterface } from '@core/interfaces'
+import { ChannelType } from '../constants'
+import { CampaignS3ObjectInterface } from '@interfaces/campaign.interface'
 import { Credential } from './credential'
 import { User } from './user/user'
 import { JobQueue } from './job-queue'
 import { Statistic } from './statistic'
-import { EmailTemplate } from '@email/models'
-import { SmsTemplate } from '@sms/models'
-import { TelegramTemplate } from '@telegram/models'
+import { EmailTemplate } from '@models/email'
+import { SmsTemplate } from '@models/sms'
+import { TelegramTemplate } from '@models/telegram'
 
 @Table({
   tableName: 'campaigns',

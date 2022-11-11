@@ -1,7 +1,7 @@
 import { celebrate, Joi, Segments } from 'celebrate'
 import { Router } from 'express'
 import { ListMiddleware } from '@core/middlewares/list.middleware'
-import { ChannelType } from '@core/constants'
+import { ChannelType } from '@shared/core/constants'
 
 const router = Router()
 

@@ -5,9 +5,9 @@ import {
   Status,
   CampaignSortField,
   Ordering,
-} from '@core/constants'
+} from '@shared/core/constants'
 import { CampaignService, UploadService } from '@core/services'
-import { Campaign } from '@core/models'
+import { Campaign } from '@shared/core/models'
 
 const logger = loggerWithLabel(module)
 

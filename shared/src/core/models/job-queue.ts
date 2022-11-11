@@ -6,7 +6,7 @@ import {
   ForeignKey,
   BelongsTo,
 } from 'sequelize-typescript'
-import { JobStatus } from '@core/constants'
+import { JobStatus } from '../constants'
 import { Campaign } from './campaign'
 import { Worker } from './worker'
 

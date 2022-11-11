@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { ChannelType } from '@core/constants'
+import { ChannelType } from '@shared/core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
 
 import { SettingsMiddleware } from '@core/middlewares'

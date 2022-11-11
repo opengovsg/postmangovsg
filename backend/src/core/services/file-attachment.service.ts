@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { MailAttachment } from '@shared/clients/mail-client.class'
 import { MaliciousFileError, UnsupportedFileTypeError } from '@core/errors'
 import { FileExtensionService } from '@core/services'
-import { EmailMessageTransactional } from '@email/models'
+import { EmailMessageTransactional } from '@shared/core/models/email'
 
 const checkExtensions = async (
   files: { data: Buffer; name: string }[]

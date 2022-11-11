@@ -3,7 +3,7 @@ import AWS from 'aws-sdk'
 import escapeHTML from 'escape-html'
 import config from '@core/config'
 
-import { EmailFromAddress } from '@email/models'
+import { EmailFromAddress } from '@shared/core/models/email'
 import { MailService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 import {

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Handler } from 'express'
-import { ChannelType, DefaultCredentialName } from '@core/constants'
+import { ChannelType, DefaultCredentialName } from '@shared/core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 import config from '@core/config'

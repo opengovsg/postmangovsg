@@ -1,8 +1,8 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
-import { User, Credential, UserCredential } from '@core/models'
-import { ChannelType } from '@core/constants'
+import { User, Credential, UserCredential } from '@shared/core/models'
+import { ChannelType } from '@shared/core/constants'
 import { RateLimitError, InvalidRecipientError } from '@core/errors'
 import { TemplateError } from '@shared/templating'
 import { SmsService } from '@sms/services'

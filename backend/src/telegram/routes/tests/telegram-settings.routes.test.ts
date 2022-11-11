@@ -1,9 +1,9 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
-import { Credential, UserCredential, User } from '@core/models'
+import { Credential, UserCredential, User } from '@shared/core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { ChannelType } from '@core/constants'
+import { ChannelType } from '@shared/core/constants'
 import { mockTelegram } from '@mocks/telegraf'
 import { mockSecretsManager } from '@mocks/aws-sdk'
 

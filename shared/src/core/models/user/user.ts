@@ -1,4 +1,4 @@
-import config from '@core/config'
+import config from 'backend/src/core/config'
 import {
   AfterCreate,
   BeforeCreate,
@@ -12,14 +12,14 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
-import { List, UserCredential, UserFeature, UserList } from '@core/models'
+import { List, UserCredential, UserFeature, UserList } from 'core/models/index'
 import { UserDemo } from './user-demo'
-import { ApiKeyService } from '@core/services'
-import { validateDomain } from '@core/utils/validate-domain'
+import { ApiKeyService } from 'backend/src/core/services'
+import { validateDomain } from 'backend/src/core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
 import { Domain } from '../domain'
 import { Agency } from '../agency'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from 'backend/src/core/logger'
 
 const logger = loggerWithLabel(module)
 

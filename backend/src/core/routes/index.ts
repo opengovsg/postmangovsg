@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction, Application } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { ChannelType } from '@core/constants'
-import { Campaign } from '@core/models'
+import { ChannelType } from '@shared/core/constants'
+import { Campaign } from '@shared/core/models'
 import {
   AuthType,
   InitAuthMiddleware,

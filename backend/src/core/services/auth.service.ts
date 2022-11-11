@@ -3,10 +3,10 @@ import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { User } from '@core/models'
+import { User } from '@shared/core/models'
 import { validateDomain } from '@core/utils/validate-domain'
 import { ApiKeyService, MailService, RedisService } from '@core/services'
-import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
+import { HashedOtp, VerifyOtpInput } from '@shared/core/interfaces'
 import { Transaction } from 'sequelize/types'
 
 export interface AuthService {

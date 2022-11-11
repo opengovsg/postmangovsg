@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
-import { Campaign, User } from '@core/models'
+import { Campaign, User } from '@shared/core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { InitCredentialService, RedisService } from '@core/services'
-import { ChannelType } from '@core/constants'
+import { ChannelType } from '@shared/core/constants'
 import { TelegramMiddleware } from '@telegram/middlewares/telegram.middleware'
 import { InitTelegramMiddleware } from '..'
 

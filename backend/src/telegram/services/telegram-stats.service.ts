@@ -1,9 +1,9 @@
 import { QueryTypes } from 'sequelize'
 import { loggerWithLabel } from '@core/logger'
 import { StatsService } from '@core/services'
-import { CampaignStats } from '@core/interfaces'
+import { CampaignStats } from '@shared/core/interfaces'
 
-import { TelegramOp, TelegramMessage } from '@telegram/models'
+import { TelegramOp, TelegramMessage } from '@shared/core/models/telegram'
 import { Writable } from 'stream'
 
 const logger = loggerWithLabel(module)

@@ -1,5 +1,5 @@
-import { DuplicateCampaignDetails } from '@core/interfaces/campaign.interface'
-import { SmsTemplate } from '@sms/models'
+import { DuplicateCampaignDetails } from '@shared/core/interfaces/campaign.interface'
+import { SmsTemplate } from '@shared/core/models/sms'
 
 export interface StoreTemplateInput {
   campaignId: number

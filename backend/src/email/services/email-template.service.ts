@@ -4,20 +4,20 @@ import config from '@core/config'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { CustomDomainService } from '@email/services'
-import { Campaign, Statistic } from '@core/models'
+import { Campaign, Statistic } from '@shared/core/models'
 import {
   TemplateClient,
   XSS_EMAIL_OPTION,
   TemplateError,
 } from '@shared/templating'
 
-import { EmailTemplate, EmailMessage } from '@email/models'
+import { EmailTemplate, EmailMessage } from '@shared/core/models/email'
 import { EmailService } from '@email/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@email/interfaces'
 import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
 import { UploadService } from '@core/services'
-import { UploadData } from '@core/interfaces'
-import { ChannelType } from '@core/constants'
+import { UploadData } from '@shared/core/interfaces'
+import { ChannelType } from '@shared/core/constants'
 
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 

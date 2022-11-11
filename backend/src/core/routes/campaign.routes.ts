@@ -4,7 +4,7 @@ import {
   Status,
   CampaignSortField,
   Ordering,
-} from '@core/constants'
+} from '@shared/core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { CampaignMiddleware } from '@core/middlewares'
 const router = Router()

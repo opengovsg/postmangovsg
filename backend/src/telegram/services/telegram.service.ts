@@ -1,16 +1,16 @@
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-import { ChannelType } from '@core/constants'
-import { Campaign } from '@core/models'
-import { CampaignDetails } from '@core/interfaces'
+import { ChannelType } from '@shared/core/constants'
+import { Campaign } from '@shared/core/models'
+import { CampaignDetails } from '@shared/core/interfaces'
 
 import {
   TelegramMessage,
   TelegramTemplate,
   BotSubscriber,
   TelegramSubscriber,
-} from '@telegram/models'
+} from '@shared/core/models/telegram'
 import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
@@ -22,7 +22,7 @@ import {
 } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 import { TelegramDuplicateCampaignDetails } from '@telegram/interfaces'
-import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { MessageBulkInsertInterface } from '@shared/core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 

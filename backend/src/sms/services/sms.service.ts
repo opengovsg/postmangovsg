@@ -4,20 +4,20 @@ import { Transaction } from 'sequelize'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { CSVParams } from '@core/types'
-import { ChannelType } from '@core/constants'
-import { Campaign } from '@core/models'
-import { CampaignDetails } from '@core/interfaces'
+import { ChannelType } from '@shared/core/constants'
+import { Campaign } from '@shared/core/models'
+import { CampaignDetails } from '@shared/core/interfaces'
 import { CampaignService, UploadService } from '@core/services'
 import { InvalidRecipientError } from '@core/errors'
 import { PhoneNumberService } from '@core/services'
 
-import { SmsMessage, SmsTemplate } from '@sms/models'
+import { SmsMessage, SmsTemplate } from '@shared/core/models/sms'
 import { SmsTemplateService } from '@sms/services'
 import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
 
 import TwilioClient from './twilio-client.class'
 import SnsSmsClient from './sns-sms-client.class'
-import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { MessageBulkInsertInterface } from '@shared/core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 

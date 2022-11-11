@@ -2,7 +2,7 @@ import { Request } from 'express'
 import { Op } from 'sequelize'
 import bcrypt from 'bcrypt'
 import config from '@core/config'
-import { SmsMessage } from '@sms/models'
+import { SmsMessage } from '@shared/core/models/sms'
 import { loggerWithLabel } from '@core/logger'
 import { compareSha256Hash } from '@shared/utils/crypto'
 

@@ -8,7 +8,7 @@ jest.mock('@core/services/cloudmersive-client.class', () => {
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
-import { User } from '@core/models'
+import { User } from '@core/../../../../../shared/src/core/models'
 import {
   FileExtensionService,
   MALICIOUS_FILE_ERROR_CODE,
@@ -18,7 +18,7 @@ import { RATE_LIMIT_ERROR_MESSAGE } from '@email/middlewares'
 import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
-} from '@email/models'
+} from '@email/../../../../../shared/src/email/models'
 import {
   BLACKLISTED_RECIPIENT_ERROR_CODE,
   EmailService,

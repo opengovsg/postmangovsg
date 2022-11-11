@@ -15,7 +15,7 @@ import {
 import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
-} from '@email/models'
+} from '@shared/core/models/email'
 
 import crypto from 'crypto'
 import {

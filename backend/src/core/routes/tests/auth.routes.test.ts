@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { MailService } from '@core/services'
-import { User } from '@core/models'
+import { User } from '@shared/core/models'
 
 const app = initialiseServer()
 const appWithUserSession = initialiseServer(true)

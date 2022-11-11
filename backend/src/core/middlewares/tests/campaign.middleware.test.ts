@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
-import { Campaign, JobQueue, User } from '@core/models'
+import { Campaign, JobQueue, User } from '@shared/core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { ChannelType, JobStatus } from '@core/constants'
+import { ChannelType, JobStatus } from '@shared/core/constants'
 import { CampaignMiddleware } from '@core/middlewares/campaign.middleware'
 
 let sequelize: Sequelize

@@ -2,11 +2,11 @@ import { QueryTypes } from 'sequelize'
 
 import { loggerWithLabel } from '@core/logger'
 import { StatsService } from '@core/services'
-import { CampaignStats } from '@core/interfaces'
+import { CampaignStats } from '@shared/core/interfaces'
 
-import { EmailOp, EmailMessage } from '@email/models'
+import { EmailOp, EmailMessage } from '@shared/core/models/email'
 import { Writable } from 'stream'
-import { Unsubscriber } from '@core/models'
+import { Unsubscriber } from '@shared/core/models'
 
 const logger = loggerWithLabel(module)
 

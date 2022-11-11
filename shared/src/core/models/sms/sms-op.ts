@@ -6,8 +6,8 @@ import {
   Table,
   BelongsTo,
 } from 'sequelize-typescript'
-import { Campaign } from '@core/models/campaign'
-import { MessageStatus } from '@core/constants'
+import { Campaign } from '@models/campaign'
+import { MessageStatus } from 'core/constants'
 
 @Table({ tableName: 'sms_ops', underscored: true, timestamps: true })
 export class SmsOp extends Model<SmsOp> {

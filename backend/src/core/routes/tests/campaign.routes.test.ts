@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
-import { Campaign, User, UserDemo, JobQueue } from '@core/models'
+import { Campaign, User, UserDemo, JobQueue } from '@shared/core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { UploadService } from '@core/services'
 import {
@@ -10,7 +10,7 @@ import {
   Ordering,
   CampaignSortField,
   Status,
-} from '@core/constants'
+} from '@shared/core/constants'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize

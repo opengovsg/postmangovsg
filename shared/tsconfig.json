@@ -28,6 +28,10 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "baseUrl": "./src",
+    "paths": {
+      "@models/*": ["core/models/*"],
+      "@interfaces/*": ["core/interfaces/*"],
+    },
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

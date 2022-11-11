@@ -1,17 +1,16 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
   Model,
   Table,
+  BelongsTo,
 } from 'sequelize-typescript'
+import { Campaign } from '@models/campaign'
+import { MessageStatus } from 'core/constants'
 
-import { Campaign } from '@core/models'
-import { MessageStatus } from '@core/constants'
-
-@Table({ tableName: 'telegram_messages', underscored: true, timestamps: true })
-export class TelegramMessage extends Model<TelegramMessage> {
+@Table({ tableName: 'telegram_ops', underscored: true, timestamps: true })
+export class TelegramOp extends Model<TelegramOp> {
   @Column({
     type: DataType.BIGINT,
     autoIncrement: true,
@@ -30,10 +29,10 @@ export class TelegramMessage extends Model<TelegramMessage> {
   campaign!: Campaign
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.BIGINT,
     allowNull: false,
   })
-  recipient!: string
+  recipient!: number
 
   @Column(DataType.JSONB)
   params!: object

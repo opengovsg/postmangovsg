@@ -10,7 +10,7 @@ import { FileAttachmentService } from '@core/services'
 import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
-} from '@email/models'
+} from '@shared/core/models/email'
 import { SesEventType } from '@email/interfaces/callback.interface'
 import {
   Ordering,

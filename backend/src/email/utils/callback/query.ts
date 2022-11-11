@@ -3,10 +3,10 @@ import {
   UpdateMessageWithErrorMetadata,
   Metadata,
 } from '@email/interfaces/callback.interface'
-import { EmailBlacklist, EmailMessage } from '@email/models'
+import { EmailBlacklist, EmailMessage } from '@shared/core/models/email'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { Campaign } from '@core/models'
+import { Campaign } from '@shared/core/models'
 
 const logger = loggerWithLabel(module)
 

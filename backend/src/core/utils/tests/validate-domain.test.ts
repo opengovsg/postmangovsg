@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { Domain } from '@core/models'
+import { Domain } from '@shared/core/models'
 import { validateDomain } from '../validate-domain'
 import config from '@core/config'
 

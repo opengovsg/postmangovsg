@@ -1,7 +1,7 @@
 import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
-import { Domain } from '@core/models'
+import { Domain } from '@shared/core/models'
 import { Transaction } from 'sequelize'
 
 const logger = loggerWithLabel(module)

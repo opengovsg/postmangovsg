@@ -1,18 +1,18 @@
 import { difference, keys } from 'lodash'
 
-import { ChannelType } from '@core/constants'
+import { ChannelType } from '@shared/core/constants'
 import { isSuperSet } from '@core/utils'
 import { HydrationError } from '@core/errors'
 import { UploadService } from '@core/services'
-import { UploadData } from '@core/interfaces'
-import { Campaign, Statistic } from '@core/models'
+import { UploadData } from '@shared/core/interfaces'
+import { Campaign, Statistic } from '@shared/core/models'
 import {
   TemplateClient,
   XSS_SMS_OPTION,
   TemplateError,
 } from '@shared/templating'
 
-import { SmsTemplate, SmsMessage } from '@sms/models'
+import { SmsTemplate, SmsMessage } from '@shared/core/models/sms'
 import { SmsService } from '@sms/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@sms/interfaces'
 

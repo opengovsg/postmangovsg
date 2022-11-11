@@ -1,9 +1,9 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import initialiseServer from '@test-utils/server'
-import { Campaign, ProtectedMessage, User } from '@core/models'
+import { Campaign, ProtectedMessage, User } from '@shared/core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { ChannelType } from '@core/constants'
+import { ChannelType } from '@shared/core/constants'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize

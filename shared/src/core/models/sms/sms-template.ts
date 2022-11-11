@@ -9,8 +9,8 @@ import {
   Table,
 } from 'sequelize-typescript'
 
-import { Campaign } from '@core/models/campaign'
-import { SmsTemplateService } from '@sms/services'
+import { Campaign } from '@models/campaign'
+import { SmsTemplateService } from 'backend/src/sms/services'
 
 @Table({ tableName: 'sms_templates', underscored: true, timestamps: true })
 export class SmsTemplate extends Model<SmsTemplate> {

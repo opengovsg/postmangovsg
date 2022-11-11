@@ -1,6 +1,8 @@
 'use strict'
 
-const { TransactionalEmailMessageStatus } = require('@email/models')
+const {
+  TransactionalEmailMessageStatus,
+} = require('@email/../../../../shared/src/email/models')
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {

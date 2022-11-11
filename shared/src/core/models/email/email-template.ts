@@ -9,8 +9,8 @@ import {
   BelongsTo,
 } from 'sequelize-typescript'
 import { union } from 'lodash'
-import { Campaign } from '@core/models/campaign'
-import { EmailTemplateService } from '@email/services'
+import { Campaign } from '@models/campaign'
+import { EmailTemplateService } from 'backend/src/email/services'
 
 @Table({ tableName: 'email_templates', underscored: true, timestamps: true })
 export class EmailTemplate extends Model<EmailTemplate> {

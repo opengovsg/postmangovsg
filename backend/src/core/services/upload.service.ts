@@ -12,13 +12,13 @@ import { isSuperSet } from '@core/utils'
 import { MissingTemplateKeysError } from '@core/errors/template.errors'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
-import { Campaign } from '@core/models'
+import { Campaign } from '@shared/core/models'
 import {
   CsvStatusInterface,
   UploadData,
   Upload,
   AllowedTemplateTypes,
-} from '@core/interfaces'
+} from '@shared/core/interfaces'
 import { CSVParams } from '@core/types'
 import S3Client from '@core/services/s3-client.class'
 import { StatsService, CampaignService, ParseCsvService } from '.'

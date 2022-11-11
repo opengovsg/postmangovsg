@@ -1,5 +1,5 @@
 import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript'
-import { BotSubscriber } from '.'
+import { BotSubscriber } from './index'
 
 @Table({
   tableName: 'telegram_subscribers',

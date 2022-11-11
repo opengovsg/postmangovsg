@@ -11,7 +11,7 @@ import { UploadService, StatsService, ListService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { loggerWithLabel } from '@core/logger'
-import { ChannelType } from '@core/constants'
+import { ChannelType } from '@shared/core/constants'
 
 const logger = loggerWithLabel(module)
 /**

@@ -1,8 +1,8 @@
 import { Sequelize } from 'sequelize-typescript'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 
-import { Campaign, Credential, JobQueue, User } from '@core/models'
-import { ChannelType, JobStatus } from '@core/constants'
+import { Campaign, Credential, JobQueue, User } from '@shared/core/models'
+import { ChannelType, JobStatus } from '@shared/core/constants'
 import { get } from 'lodash'
 import { QueryTypes } from 'sequelize'
 import {

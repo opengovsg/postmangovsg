@@ -6,7 +6,7 @@ import { AuthService, UnsubscriberService } from '@core/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { ThemeClient } from '@shared/theme'
-import { EmailMessageTransactional } from '@email/models'
+import { EmailMessageTransactional } from '@shared/core/models/email'
 
 export interface EmailMiddleware {
   isEmailCampaignOwnedByUser: Handler

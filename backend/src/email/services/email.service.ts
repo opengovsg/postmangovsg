@@ -2,8 +2,14 @@ import { Transaction } from 'sequelize'
 import { CSVParams } from '@core/types'
 
 import { loggerWithLabel } from '@core/logger'
-import { ChannelType, DefaultCredentialName } from '@core/constants'
-import { Agency, Campaign, Domain, ProtectedMessage, User } from '@core/models'
+import { ChannelType, DefaultCredentialName } from '@shared/core/constants'
+import {
+  Agency,
+  Campaign,
+  Domain,
+  ProtectedMessage,
+  User,
+} from '@shared/core/models'
 import {
   MailService,
   CampaignService,
@@ -11,16 +17,20 @@ import {
   ProtectedService,
   UnsubscriberService,
 } from '@core/services'
-import { CampaignDetails } from '@core/interfaces'
+import { CampaignDetails } from '@shared/core/interfaces'
 import { MailToSend, SendEmailOpts } from '@shared/clients/mail-client.class'
 
-import { EmailTemplate, EmailMessage, EmailBlacklist } from '@email/models'
+import {
+  EmailTemplate,
+  EmailMessage,
+  EmailBlacklist,
+} from '@shared/core/models/email'
 import { EmailTemplateService } from '@email/services'
 import config from '@core/config'
 import { EmailDuplicateCampaignDetails } from '@email/interfaces'
 
 import { ThemeClient } from '@shared/theme'
-import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { MessageBulkInsertInterface } from '@shared/core/interfaces/message.interface'
 
 const logger = loggerWithLabel(module)
 

@@ -1,5 +1,5 @@
-import { DuplicateCampaignDetails } from '@core/interfaces/campaign.interface'
-import { TelegramTemplate } from '@telegram/models'
+import { DuplicateCampaignDetails } from '@shared/core/interfaces/campaign.interface'
+import { TelegramTemplate } from '@shared/core/models/telegram'
 
 export interface StoreTemplateInput {
   campaignId: number

@@ -6,9 +6,9 @@ import {
   Status,
   CampaignSortField,
   Ordering,
-} from '@core/constants'
-import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
-import { CampaignDetails } from '@core/interfaces'
+} from '@shared/core/constants'
+import { Campaign, JobQueue, Statistic, UserDemo } from '@shared/core/models'
+import { CampaignDetails } from '@shared/core/interfaces'
 import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
@@ -18,6 +18,7 @@ const logger = loggerWithLabel(module)
  */
 const hasJobInProgress = (campaignId: number): Promise<JobQueue | null> => {
   return JobQueue.findOne({
+    include: {},
     where: { campaignId, status: { [Op.not]: JobStatus.Logged } },
   })
 }

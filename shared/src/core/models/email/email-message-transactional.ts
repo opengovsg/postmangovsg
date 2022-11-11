@@ -5,7 +5,7 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
-import { User } from '@core/models'
+import { User } from '@models/index'
 
 export enum TransactionalEmailMessageStatus {
   Unsent = 'UNSENT',

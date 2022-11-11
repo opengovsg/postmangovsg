@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Handler } from 'express'
-import { ChannelType } from '@core/constants'
+import { ChannelType } from '@shared/core/constants'
 import { CredentialService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 

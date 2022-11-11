@@ -14,11 +14,11 @@ jest.mock('../', () => ({
   ParseCsvService: parseCsvMock,
 }))
 
-import { EmailTemplate } from '@email/models'
+import { EmailTemplate } from '@shared/core/models/email'
 import { waitForMs } from '@shared/utils/wait-for-ms'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { Sequelize, Transaction } from 'sequelize/types'
-import { UploadService } from '../upload.service'
+import { UploadService } from '@core/services'
 
 let sequelize: Sequelize
 beforeEach(async () => {

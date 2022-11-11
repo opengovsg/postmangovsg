@@ -6,7 +6,7 @@ import {
   Table,
   BelongsTo,
 } from 'sequelize-typescript'
-import { Campaign } from '@core/models/campaign'
+import { Campaign } from 'core/models/campaign'
 
 @Table({ tableName: 'protected_messages', underscored: true, timestamps: true })
 export class ProtectedMessage extends Model<ProtectedMessage> {

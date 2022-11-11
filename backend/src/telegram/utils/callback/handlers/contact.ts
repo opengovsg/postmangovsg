@@ -4,7 +4,7 @@ import { QueryTypes } from 'sequelize'
 
 import { loggerWithLabel } from '@core/logger'
 import { PostmanTelegramError } from '../PostmanTelegramError'
-import { TelegramSubscriber, BotSubscriber } from '@telegram/models'
+import { TelegramSubscriber, BotSubscriber } from '@shared/core/models/telegram'
 
 const logger = loggerWithLabel(module)
 

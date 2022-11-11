@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import config from '@core/config'
-import { Unsubscriber } from '@core/models'
+import { Unsubscriber } from '@shared/core/models'
 
 const UNSUBSCRIBE_URL = config.get('unsubscribeUrl')
 

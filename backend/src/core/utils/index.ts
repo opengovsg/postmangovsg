@@ -1,5 +1,5 @@
 import config from '@core/config'
-import { DefaultCredentialName } from '@core/constants'
+import { DefaultCredentialName } from '@shared/core/constants'
 
 /**
  * returns true if `_superset` is superset of `subset`
