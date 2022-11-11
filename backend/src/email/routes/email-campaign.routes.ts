@@ -120,8 +120,42 @@ export const InitEmailCampaignRoute = (
    *           description: Invalid campaign type or not owned by user
    *        "401":
    *           description: Unauthorized
+   *        "403":
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get('/', emailMiddleware.getCampaignDetails)
 
@@ -145,6 +179,11 @@ export const InitEmailCampaignRoute = (
    *           application/json:
    *             schema:
    *               type: object
+   *               required:
+   *                 - subject
+   *                 - body
+   *                 - reply_to
+   *                 - from
    *               properties:
    *                 subject:
    *                   type: string
@@ -157,6 +196,9 @@ export const InitEmailCampaignRoute = (
    *                   nullable: true
    *                 from:
    *                   type: string
+   *                 show_logo:
+   *                   type: boolean
+   *                   default: true
    *       responses:
    *         200:
    *           description: Success
@@ -200,11 +242,41 @@ export const InitEmailCampaignRoute = (
    *         "401":
    *           description: Unauthorized
    *         "403":
-   *           description: Forbidden as there is a job in progress
+   *           description: Forbidden. Request violates firewall rules.
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
    *         "503":
-   *           description: Service Unavailable. Try using the default from address instead.
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.put(
     '/template',
@@ -249,6 +321,9 @@ export const InitEmailCampaignRoute = (
    *             application/json:
    *               schema:
    *                 type: object
+   *                 required:
+   *                   - presigned_url
+   *                   - transaction_id
    *                 properties:
    *                   presigned_url:
    *                     type: string
@@ -259,9 +334,41 @@ export const InitEmailCampaignRoute = (
    *         "401":
    *           description: Unauthorized
    *         "403":
-   *           description: Forbidden as there is a job in progress
+   *           description: Forbidden. Request violates firewall rules.
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.get(
     '/upload/start',
@@ -306,9 +413,41 @@ export const InitEmailCampaignRoute = (
    *         "401":
    *           description: Unauthorized
    *         "403":
-   *           description: Forbidden as there is a job in progress
+   *           description: Forbidden. Request violates firewall rules.
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.post(
     '/upload/complete',
@@ -350,28 +489,77 @@ export const InitEmailCampaignRoute = (
    *                     type: number
    *                   preview:
    *                     type: object
+   *                     required:
+   *                       - subject
+   *                       - body
+   *                       - from
    *                     properties:
    *                       subject:
    *                         type: string
    *                       body:
    *                         type: string
-   *                       reply_to:
+   *                       replyTo:
    *                         type: string
    *                         nullable: true
+   *                       from:
+   *                         type: string
+   *                         example: 'Postman <donotreply@mail.postman.gov.sg>'
+   *                       showMasthead:
+   *                         type: boolean
+   *                       agencyLogoURI:
+   *                         type: string
+   *                         example: "https://file.go.gov.sg/postman-ogp.png"
+   *                       agencyName:
+   *                         type: string
+   *                         example: Open Government Products
+   *                       themedBody:
+   *                         type: string
    *         "400" :
    *           description: Bad Request
    *         "401":
    *           description: Unauthorized
    *         "403":
-   *           description: Forbidden as there is a job in progress
+   *           description: Forbidden. Request violates firewall rules.
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.get('/upload/status', emailTemplateMiddleware.pollCsvStatusHandler)
 
   /**
    * @swagger
-   * post:
+   * paths:
    *   /campaign/{campaignId}/email/upload/status:
    *     delete:
    *       description: "Deletes error status from previous failed upload"
@@ -389,9 +577,41 @@ export const InitEmailCampaignRoute = (
    *         "401":
    *           description: Unauthorized
    *         "403":
-   *           description: Forbidden as there is a job in progress
+   *           description: Forbidden. Request violates firewall rules.
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.delete(
     '/upload/status',
@@ -427,9 +647,41 @@ export const InitEmailCampaignRoute = (
    *        "401":
    *           description: Unauthorized
    *        "403":
-   *           description: Forbidden as there is a job in progress
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/credentials',
@@ -462,6 +714,10 @@ export const InitEmailCampaignRoute = (
    *                properties:
    *                  preview:
    *                    type: object
+   *                    required:
+   *                      - body
+   *                      - subject
+   *                      - from
    *                    properties:
    *                      body:
    *                        type: string
@@ -470,10 +726,49 @@ export const InitEmailCampaignRoute = (
    *                      reply_to:
    *                        type: string
    *                        nullable: true
+   *                      from:
+   *                        type: string
+   *                        example: 'Postman <donotreply@mail.postman.gov.sg>'
+   *                      themed_body:
+   *                        type: string
    *        "401":
    *           description: Unauthorized
+   *        "403":
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get('/preview', emailMiddleware.previewFirstMessage)
 
@@ -485,16 +780,6 @@ export const InitEmailCampaignRoute = (
    *      tags:
    *        - Email
    *      summary: Start sending campaign
-   *      requestBody:
-   *        required: true
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              properties:
-   *                rate:
-   *                  type: integer
-   *                  minimum: 1
    *
    *      responses:
    *        200:
@@ -514,9 +799,41 @@ export const InitEmailCampaignRoute = (
    *        "401":
    *           description: Unauthorized
    *        "403":
-   *           description: Forbidden as there is a job in progress
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/send',
@@ -544,8 +861,42 @@ export const InitEmailCampaignRoute = (
    *                  type: integer
    *        "401":
    *           description: Unauthorized
+   *        "403":
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post('/stop', JobMiddleware.stopCampaign)
 
@@ -571,8 +922,40 @@ export const InitEmailCampaignRoute = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden as there is a job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/retry',
@@ -600,11 +983,52 @@ export const InitEmailCampaignRoute = (
    *          content:
    *            application/json:
    *              schema:
-   *                $ref: '#/components/schemas/CampaignStats'
+   *                allOf:
+   *                  - $ref: '#/components/schemas/CampaignStats'
+   *                  - type: object
+   *                    required:
+   *                      - unsubscribed
+   *                    properties:
+   *                      unsubscribed:
+   *                        type: number
    *        "401":
    *           description: Unauthorized
+   *        "403":
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get('/stats', EmailStatsMiddleware.getStats)
 
@@ -628,11 +1052,52 @@ export const InitEmailCampaignRoute = (
    *          content:
    *            application/json:
    *              schema:
-   *                $ref: '#/components/schemas/CampaignStats'
+   *                allOf:
+   *                  - $ref: '#/components/schemas/CampaignStats'
+   *                  - type: object
+   *                    required:
+   *                      - unsubscribed
+   *                    properties:
+   *                      unsubscribed:
+   *                        type: number
    *        "401":
    *           description: Unauthorized
+   *        "403":
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post('/refresh-stats', EmailStatsMiddleware.updateAndGetStats)
 
@@ -658,15 +1123,54 @@ export const InitEmailCampaignRoute = (
    *              schema:
    *                type: array
    *                items:
-   *                  $ref: '#/components/schemas/CampaignRecipient'
+   *                  allOf:
+   *                    - $ref: '#/components/schemas/CampaignRecipient'
+   *                    - type: object
+   *                      properties:
+   *                        'unsubscriber.recipient':
+   *                          type: string
+   *                        'unsubscriber.reason':
+   *                          type: string
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
    *        "410":
    *           description: Campaign has been redacted
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get(
     '/export',
@@ -719,8 +1223,42 @@ export const InitEmailCampaignRoute = (
    *           description: Invalid campaign type, not owned by user
    *        "401":
    *           description: Unauthorized
+   *        "403":
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get(
     '/protect/upload/start',
@@ -777,8 +1315,42 @@ export const InitEmailCampaignRoute = (
    *           description: Bad Request
    *         "401":
    *           description: Unauthorized
+   *         "403":
+   *           description: Forbidden. Request violates firewall rules.
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.post(
     '/protect/upload/complete',
@@ -809,6 +1381,8 @@ export const InitEmailCampaignRoute = (
    *          application/json:
    *            schema:
    *              type: object
+   *              required:
+   *                - name
    *              properties:
    *                name:
    *                  type: string
@@ -816,12 +1390,48 @@ export const InitEmailCampaignRoute = (
    *      responses:
    *        "201":
    *           description: A duplicate of the campaign was created
+   *           content:
+   *            application/json:
+   *              schema:
+   *                $ref: '#/components/schemas/CampaignDuplicateMeta'
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/duplicate',
@@ -856,12 +1466,46 @@ export const InitEmailCampaignRoute = (
    *      responses:
    *        "201":
    *           description: A duplicate of the campaign was created
+   *           schema:
+   *             $ref: '#/components/schemas/CampaignMeta'
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/select-list',

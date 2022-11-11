@@ -120,9 +120,43 @@ const updateCampaignValidator = {
  *                    type: integer
  *
  *        "401":
- *           description: Unauthorized
+ *          description: Unauthorized
+ *        "403":
+ *          description: Forbidden. Request violates firewall rules.
+ *        "429":
+ *          description: Rate limit exceeded. Too many requests.
+ *          content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/ErrorStatus'
+ *               example:
+ *                 {status: 429, message: Too many requests. Please try again later.}
  *        "500":
- *           description: Internal Server Error
+ *          description: Internal Server Error
+ *          content:
+ *             text/plain:
+ *               type: string
+ *               example: Internal Server Error
+ *        "502":
+ *          description: Bad Gateway
+ *        "504":
+ *          description: Gateway Timeout
+ *        "503":
+ *          description: Service Temporarily Unavailable
+ *        "520":
+ *          description: Web Server Returns An Unknown Error
+ *        "521":
+ *          description: Web Server Is Down
+ *        "522":
+ *          description: Connection Timed Out
+ *        "523":
+ *          description: Origin Is Unreachable
+ *        "524":
+ *          description: A Timeout occurred
+ *        "525":
+ *          description: SSL handshake failed
+ *        "526":
+ *          description: Invalid SSL certificate
  */
 router.get(
   '/',
@@ -133,7 +167,7 @@ router.get(
 /**
  * @swagger
  * paths:
- *  /campaigns/{campaignId}:
+ *  /campaigns:
  *    post:
  *      summary: Create a new campaign
  *      tags:
@@ -158,21 +192,45 @@ router.get(
  *          content:
  *            application/json:
  *              schema:
- *                type: object
- *                properties:
- *                 id:
- *                  type: number
- *                 name:
- *                  type: string
- *                 created_at:
- *                  type: string
- *                  format: date-time
- *                 type:
- *                  $ref: '#/components/schemas/ChannelType'
+ *                $ref: '#/components/schemas/CampaignMeta'
  *        "401":
  *           description: Unauthorized
+ *        "403":
+ *          description: Forbidden. Request violates firewall rules.
+ *        "429":
+ *          description: Rate limit exceeded. Too many requests.
+ *          content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/ErrorStatus'
+ *               example:
+ *                 {status: 429, message: Too many requests. Please try again later.}
  *        "500":
- *           description: Internal Server Error
+ *          description: Internal Server Error
+ *          content:
+ *             text/plain:
+ *               type: string
+ *               example: Internal Server Error
+ *        "502":
+ *          description: Bad Gateway
+ *        "504":
+ *          description: Gateway Timeout
+ *        "503":
+ *          description: Service Temporarily Unavailable
+ *        "520":
+ *          description: Web Server Returns An Unknown Error
+ *        "521":
+ *          description: Web Server Is Down
+ *        "522":
+ *          description: Connection Timed Out
+ *        "523":
+ *          description: Origin Is Unreachable
+ *        "524":
+ *          description: A Timeout occurred
+ *        "525":
+ *          description: SSL handshake failed
+ *        "526":
+ *          description: Invalid SSL certificate
  */
 router.post(
   '/',
@@ -206,8 +264,42 @@ router.post(
  *          description: Unauthorized
  *        "404":
  *          description: Campaign not found
+ *        "403":
+ *          description: Forbidden. Request violates firewall rules.
+ *        "429":
+ *          description: Rate limit exceeded. Too many requests.
+ *          content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/ErrorStatus'
+ *               example:
+ *                 {status: 429, message: Too many requests. Please try again later.}
  *        "500":
  *          description: Internal Server Error
+ *          content:
+ *             text/plain:
+ *               type: string
+ *               example: Internal Server Error
+ *        "502":
+ *          description: Bad Gateway
+ *        "504":
+ *          description: Gateway Timeout
+ *        "503":
+ *          description: Service Temporarily Unavailable
+ *        "520":
+ *          description: Web Server Returns An Unknown Error
+ *        "521":
+ *          description: Web Server Is Down
+ *        "522":
+ *          description: Connection Timed Out
+ *        "523":
+ *          description: Origin Is Unreachable
+ *        "524":
+ *          description: A Timeout occurred
+ *        "525":
+ *          description: SSL handshake failed
+ *        "526":
+ *          description: Invalid SSL certificate
  */
 router.delete(
   '/:campaignId',
@@ -216,6 +308,7 @@ router.delete(
 )
 
 /**
+ * @swagger
  * paths:
  *  /campaigns/{campaignId}:
  *   put:
@@ -234,11 +327,7 @@ router.delete(
  *        application/json:
  *          schema:
  *            type: object
- *            required:
- *              - id
  *            properties:
- *              id:
- *                type: number
  *              name:
  *                type: string
  *              should_save_list:
@@ -248,13 +337,47 @@ router.delete(
  *        content:
  *          application/json:
  *            schema:
- *             type: object
+ *              $ref: '#/components/schemas/CampaignMeta'
  *      "401":
  *        description: Unauthorized
  *      "404":
  *        description: Not found
+ *      "403":
+ *        description: Forbidden. Request violates firewall rules.
+ *      "429":
+ *        description: Rate limit exceeded. Too many requests.
+ *        content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorStatus'
+ *             example:
+ *               {status: 429, message: Too many requests. Please try again later.}
  *      "500":
  *        description: Internal Server Error
+ *        content:
+ *           text/plain:
+ *             type: string
+ *             example: Internal Server Error
+ *      "502":
+ *        description: Bad Gateway
+ *      "504":
+ *        description: Gateway Timeout
+ *      "503":
+ *        description: Service Temporarily Unavailable
+ *      "520":
+ *        description: Web Server Returns An Unknown Error
+ *      "521":
+ *        description: Web Server Is Down
+ *      "522":
+ *        description: Connection Timed Out
+ *      "523":
+ *        description: Origin Is Unreachable
+ *      "524":
+ *        description: A Timeout occurred
+ *      "525":
+ *        description: SSL handshake failed
+ *      "526":
+ *        description: Invalid SSL certificate
  */
 router.put(
   '/:campaignId',

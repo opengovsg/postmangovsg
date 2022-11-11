@@ -110,8 +110,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *        "403" :
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get('/', telegramMiddleware.getCampaignDetails)
 
@@ -178,8 +210,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *         "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.put(
     '/template',
@@ -230,8 +294,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *         "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.get(
     '/upload/start',
@@ -269,28 +365,48 @@ export const InitTelegramCampaignMiddleware = (
    *                 etag:
    *                   type: string
    *       responses:
-   *         200:
-   *           description: Success
-   *           content:
-   *             application/json:
-   *               schema:
-   *                 properties:
-   *                   num_recipients:
-   *                     type: number
-   *                   preview:
-   *                     type: object
-   *                     properties:
-   *                       body:
-   *                         type: string
-   *
+   *         "202" :
+   *           description: Accepted. The uploaded file is being processed.
    *         "400" :
    *           description: Bad Request
    *         "401":
    *           description: Unauthorized
    *         "403":
    *          description: Forbidden, campaign not owned by user or job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.post(
     '/upload/complete',
@@ -333,8 +449,6 @@ export const InitTelegramCampaignMiddleware = (
    *                   preview:
    *                     type: object
    *                     properties:
-   *                       subject:
-   *                         type: string
    *                       body:
    *                         type: string
    *         "400" :
@@ -343,8 +457,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *         "403":
    *           description: Forbidden as there is a job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.get('/upload/status', TelegramTemplateMiddleware.pollCsvStatusHandler)
 
@@ -369,8 +515,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *         "403":
    *           description: Forbidden as there is a job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.delete(
     '/upload/status',
@@ -407,8 +585,42 @@ export const InitTelegramCampaignMiddleware = (
    *                        type: string
    *        "401":
    *           description: Unauthorized
+   *        "403":
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get('/preview', telegramMiddleware.previewFirstMessage)
 
@@ -449,14 +661,52 @@ export const InitTelegramCampaignMiddleware = (
    *            application/json:
    *              schema:
    *                type: object
+   *                required:
+   *                  - message
+   *                properties:
+   *                  message:
+   *                    type: string
+   *                    example: OK
    *        "400" :
    *           description: Bad Request
    *        "401":
    *           description: Unauthorized
    *        "403":
-   *           description: Forbidden, campaign not owned by user or job in progress
+   *          description: Forbidden. Request violates firewall rules.
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/new-credentials',
@@ -500,14 +750,52 @@ export const InitTelegramCampaignMiddleware = (
    *            application/json:
    *              schema:
    *                type: object
+   *                required:
+   *                  - message
+   *                properties:
+   *                  message:
+   *                    type: string
+   *                    example: OK
    *        "400" :
    *           description: Bad Request
    *        "401":
    *           description: Unauthorized
    *        "403":
-   *           description: Forbidden, campaign not owned by user or job in progress
+   *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/credentials',
@@ -549,14 +837,52 @@ export const InitTelegramCampaignMiddleware = (
    *            application/json:
    *              schema:
    *                type: object
+   *                required:
+   *                  - message
+   *                properties:
+   *                  message:
+   *                    type: string
+   *                    example: OK
    *        "400" :
    *           description: Bad Request
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/credentials/verify',
@@ -612,8 +938,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL c
    */
   router.post(
     '/send',
@@ -644,8 +1002,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL c
    */
   router.post('/stop', JobMiddleware.stopCampaign)
 
@@ -671,8 +1061,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL c
    */
   router.post(
     '/retry',
@@ -705,8 +1127,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL c
    */
   router.get('/stats', TelegramStatsMiddleware.getStats)
 
@@ -735,8 +1189,40 @@ export const InitTelegramCampaignMiddleware = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL c
    */
   router.post('/refresh-stats', TelegramStatsMiddleware.updateAndGetStats)
 
@@ -762,15 +1248,47 @@ export const InitTelegramCampaignMiddleware = (
    *              schema:
    *                type: array
    *                items:
-   *                  $ref: '#/components/schemas/CampaignInvalidRecipient'
+   *                  $ref: '#/components/schemas/CampaignRecipient'
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
    *        "410":
    *           description: Campaign has been redacted
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL c
    */
   router.get(
     '/export',
@@ -805,12 +1323,48 @@ export const InitTelegramCampaignMiddleware = (
    *      responses:
    *        "201":
    *           description: A duplicate of the campaign was created
+   *           content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/CampaignDuplicateMeta'
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL c
    */
   router.post(
     '/duplicate',
