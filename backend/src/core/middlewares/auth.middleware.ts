@@ -115,8 +115,8 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     return res.json({})
   }
 
-  type AuthenticatorType = (req: Request) => Promise<boolean>
-  const authenticators: Record<AuthType, AuthenticatorType> = {
+  type Authenticator = (req: Request) => Promise<boolean>
+  const authenticators: Record<AuthType, Authenticator> = {
     [AuthType.Cookie]: async (req: Request) => {
       const authenticated = authService.checkCookie(req)
       if (!authenticated) {

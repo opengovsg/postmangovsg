@@ -99,6 +99,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Get email campaign details
@@ -164,6 +166,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/email/template:
    *     put:
+   *       security:
+   *         - bearerAuth: []
    *       tags:
    *         - Email
    *       summary: Stores body template for email campaign
@@ -295,6 +299,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/email/upload/start:
    *     get:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Get a presigned URL for upload with Content-MD5 header"
    *       tags:
    *         - Email
@@ -382,6 +388,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/email/upload/complete:
    *     post:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Complete upload session with ETag verification"
    *       tags:
    *         - Email
@@ -461,6 +469,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/email/upload/status:
    *     get:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Get csv processing status"
    *       tags:
    *         - Email
@@ -562,6 +572,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/email/upload/status:
    *     delete:
+   *       security:
+   *         - bearerAuth: []
    *       description: "Deletes error status from previous failed upload"
    *       tags:
    *         - Email
@@ -624,6 +636,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/credentials:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Sends a test message and defaults to Postman's credentials for the campaign
@@ -695,6 +709,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/preview:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Preview templated message
@@ -777,6 +793,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/send:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Start sending campaign
@@ -846,6 +864,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/stop:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Stop sending campaign
@@ -905,6 +925,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/retry:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Retry sending campaign
@@ -968,6 +990,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/stats:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Get email campaign stats
@@ -1037,6 +1061,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/refresh-stats:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Get email campaign stats
@@ -1106,6 +1132,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/export:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Get recipients of campaign
@@ -1183,6 +1211,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/protect/upload/start:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Start multipart upload
@@ -1273,6 +1303,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/email/protect/upload/complete:
    *     post:
+   *       security:
+   *         - bearerAuth: []
    *       summary: Complete multipart upload
    *       tags:
    *         - Email
@@ -1366,6 +1398,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/duplicate:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Duplicate the campaign and its template
@@ -1444,6 +1478,8 @@ export const InitEmailCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/email/select-list:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Email
    *      summary: Select the list of recipients from an existing managed list

@@ -48,6 +48,8 @@ const updateCampaignValidator = {
  * paths:
  *  /campaigns:
  *    get:
+ *      security:
+ *        - bearerAuth: []
  *      tags:
  *        - Campaigns
  *      summary: List all campaigns for user
@@ -169,6 +171,8 @@ router.get(
  * paths:
  *  /campaigns:
  *    post:
+ *      security:
+ *        - bearerAuth: []
  *      summary: Create a new campaign
  *      tags:
  *        - Campaigns
@@ -243,6 +247,8 @@ router.post(
  * paths:
  *  /campaigns/{campaignId}:
  *    delete:
+ *      security:
+ *        - bearerAuth: []
  *      tags:
  *        - Campaigns
  *      summary: Delete a campaign using its ID
@@ -312,6 +318,8 @@ router.delete(
  * paths:
  *  /campaigns/{campaignId}:
  *   put:
+ *    security:
+ *      - bearerAuth: []
  *    summary: Rename campaign
  *    tags:
  *      - Campaigns

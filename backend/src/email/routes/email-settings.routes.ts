@@ -25,8 +25,6 @@ export const InitEmailSettingsRoute = (
    * paths:
    *  /settings/email/from/verify:
    *    post:
-   *      security:
-   *        - bearerAuth: []
    *      summary: Verifies a custom from email address
    *      description: >
    *        Verifies a custom from email address to see if it can be used to send out emails.

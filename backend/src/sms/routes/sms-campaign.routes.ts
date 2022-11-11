@@ -90,6 +90,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Get sms campaign details
@@ -158,6 +160,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/sms/template:
    *     put:
+   *       security:
+   *         - bearerAuth: []
    *       tags:
    *         - SMS
    *       summary: Stores body template for sms campaign
@@ -263,6 +267,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/sms/upload/start:
    *     get:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Get a presigned URL for upload with Content-MD5 header"
    *       tags:
    *         - SMS
@@ -347,6 +353,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/sms/upload/complete:
    *     post:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Complete upload session with ETag verification"
    *       tags:
    *         - SMS
@@ -426,6 +434,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/sms/upload/status:
    *     get:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Get csv processing status"
    *       tags:
    *         - SMS
@@ -473,6 +483,8 @@ export const InitSmsCampaignRoute = (
    * post:
    *   /campaign/{campaignId}/sms/upload/status:
    *     delete:
+   *       security:
+   *         - bearerAuth: []
    *       description: "Deletes error status from previous failed upload"
    *       tags:
    *         - SMS
@@ -535,6 +547,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/new-credentials:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Validate twilio credentials and assign to campaign, if label is provided - store credentials for user
@@ -633,6 +647,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/credentials:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Validate stored credentials and assign to campaign
@@ -722,6 +738,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/preview:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Preview templated message
@@ -790,6 +808,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/send:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Start sending campaign
@@ -877,6 +897,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/stop:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Stop sending campaign
@@ -936,6 +958,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/retry:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Retry sending campaign
@@ -999,6 +1023,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/stats:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Get sms campaign stats
@@ -1061,6 +1087,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/refresh-stats:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Forcibly refresh sms campaign stats, then retrieves them
@@ -1123,6 +1151,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/export:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Get invalid recipients in campaign
@@ -1193,6 +1223,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/duplicate:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Duplicate the campaign and its template
@@ -1270,6 +1302,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/select-list:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Select the list of recipients from an existing managed list

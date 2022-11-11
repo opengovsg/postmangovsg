@@ -85,6 +85,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Get telegram campaign details
@@ -152,6 +154,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *   /campaign/{campaignId}/telegram/template:
    *     put:
+   *       security:
+   *         - bearerAuth: []
    *       tags:
    *         - Telegram
    *       summary: Stores body template for telegram campaign
@@ -257,6 +261,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *   /campaign/{campaignId}/telegram/upload/start:
    *     get:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Get a presigned URL for upload with Content-MD5 header"
    *       tags:
    *         - Telegram
@@ -341,6 +347,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *   /campaign/{campaignId}/telegram/upload/complete:
    *     post:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Complete upload session with ETag verification"
    *       tags:
    *         - Telegram
@@ -420,6 +428,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *   /campaign/{campaignId}/telegram/upload/status:
    *     get:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Get csv processing status"
    *       tags:
    *         - Telegram
@@ -499,6 +509,8 @@ export const InitTelegramCampaignMiddleware = (
    * post:
    *   /campaign/{campaignId}/telegram/upload/status:
    *     delete:
+   *       security:
+   *         - bearerAuth: []
    *       description: "Deletes error status from previous failed upload"
    *       tags:
    *         - Telegram
@@ -561,6 +573,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/preview:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Preview templated message
@@ -629,6 +643,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/new-credentials:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Validate Telegram bot token and assign to campaign, if label is provided store new telegram credentials for user
@@ -724,6 +740,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/credentials:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Validate stored credentials and assign to campaign
@@ -811,6 +829,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/credentials/verify:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Send a validation message using the campaign credentials.
@@ -897,6 +917,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/send:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Start sending campaign
@@ -985,6 +1007,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/stop:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Stop sending campaign
@@ -1044,6 +1068,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/retry:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Retry sending campaign
@@ -1107,6 +1133,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/stats:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Get telegram campaign stats
@@ -1169,6 +1197,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/update-stats:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Get telegram campaign stats
@@ -1231,6 +1261,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/export:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Get invalid recipients in campaign
@@ -1301,6 +1333,8 @@ export const InitTelegramCampaignMiddleware = (
    * paths:
    *  /campaign/{campaignId}/telegram/duplicate:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - Telegram
    *      summary: Duplicate the campaign and its template
