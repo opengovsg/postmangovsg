@@ -37,38 +37,38 @@ export class EmailMessageTransactional extends Model<EmailMessageTransactional> 
     primaryKey: true,
     allowNull: false,
   })
-  id: string
+  id!: string
 
   @ForeignKey(() => User)
   @Column({ type: DataType.STRING, allowNull: false })
-  userId: string
+  userId!: string
 
   @Column({ type: DataType.STRING, allowNull: true })
-  from: string | null
+  from?: string | null
 
   @Column({ type: DataType.STRING, allowNull: false })
-  recipient: string
+  recipient!: string
 
   @Column({ type: DataType.JSONB, allowNull: false })
-  params: Record<string, string>
+  params!: Record<string, string>
 
   @Column({ type: DataType.STRING, allowNull: true })
-  messageId: string | null
+  messageId?: string | null
 
   @Column({ type: DataType.ARRAY(DataType.JSONB), allowNull: true })
-  attachmentsMetadata: AttachmentsMetadata | null
+  attachmentsMetadata?: AttachmentsMetadata | null
 
   @Column({
     type: DataType.ENUM(...Object.values(TransactionalEmailMessageStatus)),
     allowNull: false,
   })
-  status: TransactionalEmailMessageStatus
+  status!: TransactionalEmailMessageStatus
 
   @Column({ type: DataType.STRING, allowNull: true })
-  errorCode: string | null
+  errorCode?: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })
-  errorSubType: string | null
+  errorSubType?: string | null
 
   /*
    * https://www.notion.so/opengov/Support-callbacks-in-transactional-emails-cade9647b2264a28a9a4d7eca301846a
@@ -76,16 +76,16 @@ export class EmailMessageTransactional extends Model<EmailMessageTransactional> 
   // this is equivalent to `sent_at` from `email_messages` table
   // TODO: remove above comment once the fields have been aligned for the 2 tables
   @Column({ type: DataType.DATE, allowNull: true })
-  acceptedAt: Date | null
+  acceptedAt?: Date | null
 
   // Note: This is not the same as `sent_at` from `email_messages` table, this is
   // to handle `Send` events from SES callbacks
   @Column({ type: DataType.DATE, allowNull: true })
-  sentAt: Date | null
+  sentAt?: Date | null
 
   @Column({ type: DataType.DATE, allowNull: true })
-  deliveredAt: Date | null
+  deliveredAt?: Date | null
 
   @Column({ type: DataType.DATE, allowNull: true })
-  openedAt: Date | null
+  openedAt?: Date | null
 }

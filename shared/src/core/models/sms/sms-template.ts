@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript'
 
 import { Campaign } from '@models/campaign'
-import { SmsTemplateService } from 'backend/src/sms/services'
+import { TemplateClient, XSS_SMS_OPTION } from 'templating'
 
 @Table({ tableName: 'sms_templates', underscored: true, timestamps: true })
 export class SmsTemplate extends Model<SmsTemplate> {
@@ -41,9 +41,8 @@ export class SmsTemplate extends Model<SmsTemplate> {
   @BeforeCreate
   static generateParams(instance: SmsTemplate): void {
     if (!instance.body) return
-    const parsedTemplate = SmsTemplateService.client.parseTemplate(
-      instance.body
-    )
+    const templateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
+    const parsedTemplate = templateClient.parseTemplate(instance.body)
     instance.params = parsedTemplate.variables
   }
 }

@@ -10,7 +10,8 @@ import {
 } from 'sequelize-typescript'
 import { union } from 'lodash'
 import { Campaign } from '@models/campaign'
-import { EmailTemplateService } from 'backend/src/email/services'
+import { TemplateClient } from 'templating/template-client'
+import { XSS_EMAIL_OPTION } from '../../../templating'
 
 @Table({ tableName: 'email_templates', underscored: true, timestamps: true })
 export class EmailTemplate extends Model<EmailTemplate> {
@@ -60,12 +61,13 @@ export class EmailTemplate extends Model<EmailTemplate> {
   @BeforeUpdate
   @BeforeCreate
   static generateParams(instance: EmailTemplate): void {
+    const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
     if (!instance.body) return
     if (!instance.subject) return
-    const parsedTemplateVariables = EmailTemplateService.client.parseTemplate(
+    const parsedTemplateVariables = templateClient.parseTemplate(
       instance.body
     ).variables
-    const parsedSubjectVariables = EmailTemplateService.client.parseTemplate(
+    const parsedSubjectVariables = templateClient.parseTemplate(
       instance.subject
     ).variables
     instance.params = union(parsedTemplateVariables, parsedSubjectVariables)

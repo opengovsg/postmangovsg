@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { Sequelize } from 'sequelize-typescript'
-import { Campaign, User } from '@core/../../../../../shared/src/core/models'
+import { Campaign, User } from '@shared/core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { InitAuthService, RedisService } from '@core/services'
 import { ChannelType } from '@shared/core/constants'

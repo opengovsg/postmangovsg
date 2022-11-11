@@ -11,13 +11,13 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
-import { List, UserCredential, UserFeature, UserList } from 'core/models/index'
+import { List, UserCredential, UserFeature, UserList } from '../../models/index'
 import { UserDemo } from './user-demo'
-import { validateDomain } from 'core/utils/validate-domain'
+import { validateDomain } from '../../utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
 import { Domain } from '../domain'
 import { Agency } from '../agency'
-import { loggerWithLabel } from 'core/logger'
+import { loggerWithLabel } from '../../logger'
 
 const logger = loggerWithLabel(module)
 

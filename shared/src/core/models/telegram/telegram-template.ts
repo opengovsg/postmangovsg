@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript'
 
 import { Campaign } from '@models/campaign'
-import { TelegramTemplateService } from 'backend/src/telegram/services'
+import { TemplateClient, XSS_TELEGRAM_OPTION } from 'templating'
 
 @Table({ tableName: 'telegram_templates', underscored: true, timestamps: true })
 export class TelegramTemplate extends Model<TelegramTemplate> {
@@ -39,9 +39,11 @@ export class TelegramTemplate extends Model<TelegramTemplate> {
   @BeforeCreate
   static generateParams(instance: TelegramTemplate): void {
     if (!instance.body) return
-    const parsedTemplate = TelegramTemplateService.client.parseTemplate(
-      instance.body
-    )
+    const templateClient = new TemplateClient({
+      xssOptions: XSS_TELEGRAM_OPTION,
+    })
+
+    const parsedTemplate = templateClient.parseTemplate(instance.body)
     instance.params = parsedTemplate.variables
   }
 }

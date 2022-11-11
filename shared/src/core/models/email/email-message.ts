@@ -22,14 +22,14 @@ export class EmailMessage extends Model<EmailMessage> {
   @ForeignKey(() => Campaign)
   @ForeignKey(() => Unsubscriber)
   @Column(DataType.INTEGER)
-  campaignId: number
+  campaignId!: number
 
   @BelongsTo(() => Campaign)
-  campaign: Campaign
+  campaign!: Campaign
 
   @ForeignKey(() => Unsubscriber)
   @Column(DataType.STRING)
-  recipient: string
+  recipient!: string
 
   @BelongsTo(() => Unsubscriber)
   unsubscriber?: Unsubscriber
@@ -38,29 +38,29 @@ export class EmailMessage extends Model<EmailMessage> {
   params!: object
 
   @Column({ type: DataType.STRING, allowNull: true })
-  messageId: string | null
+  messageId?: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })
-  errorCode: string | null
+  errorCode?: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })
-  errorSubType: string | null
+  errorSubType?: string | null
 
   @Column({
     type: DataType.ENUM(...Object.values(MessageStatus)),
     allowNull: true,
   })
-  status: MessageStatus | null
+  status?: MessageStatus | null
 
   @Column({ type: DataType.DATE, allowNull: true })
-  dequeuedAt: Date | null
+  dequeuedAt?: Date | null
 
   @Column({ type: DataType.DATE, allowNull: true })
-  sentAt: Date | null
+  sentAt?: Date | null
 
   @Column({ type: DataType.DATE, allowNull: true })
-  deliveredAt: Date | null
+  deliveredAt?: Date | null
 
   @Column({ type: DataType.DATE, allowNull: true })
-  receivedAt: Date | null
+  receivedAt?: Date | null
 }
