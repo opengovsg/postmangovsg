@@ -13,6 +13,10 @@ import Banner from 'components/landing/banner'
 
 import { fetchMessage } from 'services/decrypt-mail.service'
 
+interface CSSStylesWithZoom extends CSSStyleDeclaration {
+  zoom: number
+}
+
 const Protected = () => {
   const { id } = useParams<{ id: string }>()
   const [password, setPassword] = useState('')
@@ -24,6 +28,10 @@ const Protected = () => {
     try {
       const data = await fetchMessage(id, password)
       setDecryptedMessage(data)
+      // reset possible zooming in on iOS
+      ;(window.parent.document.body.style as CSSStylesWithZoom).zoom = 1
+      // reset page position caused by text input field focusing on mobiles
+      window.scrollTo(0, 0)
     } catch (err) {
       setErrorMsg((err as Error).message)
     }
