@@ -11,10 +11,11 @@ import {
   UserFeature,
 } from '@shared/core/models'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { TwilioCredentials } from '@sms/interfaces'
 import { UserSettings } from '@shared/core/interfaces'
 import { RedisService } from './redis.service'
+import { ApiKeyService } from '@core/services/api-key.service'
 
 export interface CredentialService {
   // Credentials (cred_name)
@@ -341,7 +342,7 @@ export const InitCredentialService = (redisService: RedisService) => {
     if (!user) {
       throw new Error('User not found')
     }
-    return user.regenerateAndSaveApiKey()
+    return ApiKeyService.regenerateAndSaveApiKey(user)
   }
 
   const updateDemoDisplayed = async (

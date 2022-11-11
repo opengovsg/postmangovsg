@@ -20,7 +20,7 @@ import {
   PhoneNumberService,
   UploadService,
 } from '@core/services'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { TelegramDuplicateCampaignDetails } from '@telegram/interfaces'
 import { MessageBulkInsertInterface } from '@shared/core/interfaces/message.interface'
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import axios, { AxiosResponse } from 'axios'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 const logger = loggerWithLabel(module)
 

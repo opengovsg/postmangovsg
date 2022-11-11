@@ -1,4 +1,3 @@
-import config from 'backend/src/core/config'
 import {
   AfterCreate,
   BeforeCreate,
@@ -14,12 +13,11 @@ import {
 } from 'sequelize-typescript'
 import { List, UserCredential, UserFeature, UserList } from 'core/models/index'
 import { UserDemo } from './user-demo'
-import { ApiKeyService } from 'backend/src/core/services'
-import { validateDomain } from 'backend/src/core/utils/validate-domain'
+import { validateDomain } from 'core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
 import { Domain } from '../domain'
 import { Agency } from '../agency'
-import { loggerWithLabel } from 'backend/src/core/logger'
+import { loggerWithLabel } from 'core/logger'
 
 const logger = loggerWithLabel(module)
 
@@ -34,26 +32,26 @@ export class User extends Model<User> {
     },
     unique: true,
   })
-  email: string
+  email!: string
 
   @Column({ type: DataType.STRING, allowNull: true })
-  apiKeyHash: string | null
+  apiKeyHash!: string | null
 
   @HasMany(() => UserCredential)
-  creds: UserCredential[]
+  creds!: UserCredential[]
 
   @HasOne(() => UserDemo)
-  demo: UserDemo
+  demo!: UserDemo
 
   @HasOne(() => UserFeature)
-  userFeature: UserFeature
+  userFeature!: UserFeature
 
   @ForeignKey(() => Domain)
   @Column({ type: DataType.STRING, allowNull: true })
-  emailDomain: string | null
+  emailDomain!: string | null
 
   @BelongsTo(() => Domain)
-  domain: Domain
+  domain?: Domain
 
   @BelongsToMany(() => List, {
     onUpdate: 'CASCADE',
@@ -61,7 +59,7 @@ export class User extends Model<User> {
     through: () => UserList,
     as: 'lists',
   })
-  lists: Array<List & { UserList: UserList }>
+  lists!: Array<List & { UserList: UserList }>
 
   // Wrapper function around validation and population of domains
   // to enforce that validation happens before creation of user
@@ -78,7 +76,7 @@ export class User extends Model<User> {
   // During programmatic creation of users (users signing up by themselves), emails must end in a whitelisted domain
   // If we manually insert the user into the database, then this hook is bypassed.
   // This enables us to whitelist specific emails that do not end in a whitelisted domain, which can sign in, but not sign up.
-  // Since updating of email is never done programtically, we are not adding this as a BeforeUpdate hook
+  // Since updating of email is never done programmatically, we are not adding this as a BeforeUpdate hook
   static async validateEmail(
     instance: User,
     options: CreateOptions
@@ -121,7 +119,8 @@ export class User extends Model<User> {
 
       const [defaultAgency] = await Agency.findOrCreate({
         where: {
-          name: config.get('defaultAgency.name'),
+          // temporarily hardcode this to not let shared use backend-only envvars
+          name: 'Singapore Government',
         },
         transaction: options.transaction,
       })
@@ -146,12 +145,5 @@ export class User extends Model<User> {
       where: { userId: instance.id },
       transaction: options.transaction,
     })
-  }
-  async regenerateAndSaveApiKey(): Promise<string> {
-    const name = this.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
-    const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
-    this.apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
-    await this.save()
-    return apiKeyPlainText
   }
 }

@@ -2,7 +2,7 @@ import Telegraf from 'telegraf'
 import { Update } from 'telegraf/typings/telegram-types'
 import { TelegrafContext } from 'telegraf/typings/context'
 import { Credential } from '@shared/core/models'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import {
   startCommandHandler,
   contactMessageHandler,

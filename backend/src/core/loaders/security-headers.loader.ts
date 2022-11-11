@@ -1,6 +1,6 @@
 import express from 'express'
 import helmet from 'helmet'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 const logger = loggerWithLabel(module)
 

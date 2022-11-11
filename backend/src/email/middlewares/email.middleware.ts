@@ -4,7 +4,7 @@ import { isDefaultFromAddress } from '@core/utils/from-address'
 import { parseFromAddress } from '@shared/utils/from-address'
 import { AuthService, UnsubscriberService } from '@core/services'
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { ThemeClient } from '@shared/theme'
 import { EmailMessageTransactional } from '@shared/core/models/email'
 

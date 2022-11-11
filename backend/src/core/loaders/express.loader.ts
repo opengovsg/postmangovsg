@@ -6,7 +6,7 @@ import expressWinston from 'express-winston'
 
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')

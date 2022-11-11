@@ -3,7 +3,7 @@ import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 import config from '@core/config'
 import { initializeModels } from '@shared/core/models'
 
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
 
 import { dbConfig as masterConfig, parseDBUri } from '@database/util'

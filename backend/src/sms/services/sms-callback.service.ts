@@ -3,7 +3,7 @@ import { Op } from 'sequelize'
 import bcrypt from 'bcrypt'
 import config from '@core/config'
 import { SmsMessage } from '@shared/core/models/sms'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { compareSha256Hash } from '@shared/utils/crypto'
 
 const logger = loggerWithLabel(module)

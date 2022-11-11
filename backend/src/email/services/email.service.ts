@@ -1,7 +1,7 @@
 import { Transaction } from 'sequelize'
 import { CSVParams } from '@core/types'
 
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { ChannelType, DefaultCredentialName } from '@shared/core/constants'
 import {
   Agency,

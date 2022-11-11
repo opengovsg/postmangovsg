@@ -9,7 +9,7 @@ import {
 } from '@shared/core/constants'
 import { Campaign, JobQueue, Statistic, UserDemo } from '@shared/core/models'
 import { CampaignDetails } from '@shared/core/interfaces'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 const logger = loggerWithLabel(module)
 /**

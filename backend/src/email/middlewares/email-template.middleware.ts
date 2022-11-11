@@ -16,7 +16,7 @@ import {
 } from '@core/services'
 import { EmailTemplateService, EmailService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { ThemeClient } from '@shared/theme'
 import { ChannelType } from '@shared/core/constants'
 

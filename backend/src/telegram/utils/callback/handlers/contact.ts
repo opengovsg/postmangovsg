@@ -2,7 +2,7 @@ import { TelegrafContext } from 'telegraf/typings/context'
 import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 import { QueryTypes } from 'sequelize'
 
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { PostmanTelegramError } from '../PostmanTelegramError'
 import { TelegramSubscriber, BotSubscriber } from '@shared/core/models/telegram'
 

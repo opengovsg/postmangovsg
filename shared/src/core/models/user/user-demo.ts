@@ -16,26 +16,26 @@ export class UserDemo extends Model<UserDemo> {
     allowNull: false,
     primaryKey: true,
   })
-  userId: number
+  userId!: number
 
   @Default(3)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  numDemosSms: number
+  numDemosSms!: number
 
   @Default(3)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  numDemosTelegram: number
+  numDemosTelegram!: number
 
   @Default(true)
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
   })
-  isDisplayed: boolean
+  isDisplayed!: boolean
 }

@@ -1,5 +1,5 @@
 import { User, List, UserList } from '@shared/core/models'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { ChannelType } from '@shared/core/constants'
 import { Op } from 'sequelize'
 

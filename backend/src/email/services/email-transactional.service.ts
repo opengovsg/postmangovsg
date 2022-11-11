@@ -1,6 +1,6 @@
 import { EmailService, EmailTemplateService } from '@email/services'
 import { MailToSend } from '@shared/clients/mail-client.class'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import {
   EMPTY_SANITIZED_EMAIL,
   MessageError,

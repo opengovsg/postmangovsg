@@ -10,6 +10,7 @@ import { SmsService } from '@sms/services'
 import { mockSecretsManager } from '@mocks/aws-sdk'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
+import { ApiKeyService } from '@core/services'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',
@@ -32,7 +33,7 @@ beforeEach(async () => {
     id: userId,
     email: `user_${userId}@agency.gov.sg`,
   } as User)
-  apiKey = await user.regenerateAndSaveApiKey()
+  apiKey = await ApiKeyService.regenerateAndSaveApiKey(user)
   userCredential = await UserCredential.create({
     label: `twilio-${userId}`,
     type: ChannelType.SMS,

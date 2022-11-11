@@ -7,7 +7,7 @@ import {
   InitAuthMiddleware,
   InitSettingsMiddleware,
 } from '@core/middlewares'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 // Core routes
 import { InitAuthRoutes } from './auth.routes'

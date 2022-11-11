@@ -7,7 +7,7 @@ import S3 from 'aws-sdk/clients/s3'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { isSuperSet } from '@core/utils'
 import { MissingTemplateKeysError } from '@core/errors/template.errors'
 import { configureEndpoint } from '@core/utils/aws-endpoint'

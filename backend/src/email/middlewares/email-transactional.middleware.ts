@@ -4,7 +4,7 @@ import RedisStore from 'rate-limit-redis'
 import { RedisService } from '@core/services'
 import { EmailTransactionalService } from '@email/services'
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
   MessageError,

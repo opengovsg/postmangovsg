@@ -3,7 +3,7 @@ import {
   ApiClient,
   VirusScanResult,
 } from 'cloudmersive-virus-api-client'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 const logger = loggerWithLabel(module)
 

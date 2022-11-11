@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { CSVParams } from '@core/types'
 import { ChannelType } from '@shared/core/constants'
 import { Campaign } from '@shared/core/models'

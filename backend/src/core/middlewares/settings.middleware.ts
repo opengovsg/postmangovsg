@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Handler } from 'express'
 import { ChannelType } from '@shared/core/constants'
 import { CredentialService } from '@core/services'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 export interface SettingsMiddleware {
   getUserSettings: Handler

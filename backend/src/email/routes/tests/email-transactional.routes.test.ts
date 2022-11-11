@@ -8,8 +8,9 @@ jest.mock('@core/services/cloudmersive-client.class', () => {
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
-import { User } from '@core/../../../../../shared/src/core/models'
+import { User } from '@shared/core/models'
 import {
+  ApiKeyService,
   FileExtensionService,
   MALICIOUS_FILE_ERROR_CODE,
   UNSUPPORTED_FILE_TYPE_ERROR_CODE,
@@ -18,7 +19,7 @@ import { RATE_LIMIT_ERROR_MESSAGE } from '@email/middlewares'
 import {
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
-} from '@email/../../../../../shared/src/email/models'
+} from '@shared/core/models/email'
 import {
   BLACKLISTED_RECIPIENT_ERROR_CODE,
   EmailService,
@@ -45,7 +46,7 @@ beforeEach(async () => {
     id: 1,
     email: 'user_1@agency.gov.sg',
   } as User)
-  apiKey = await user.regenerateAndSaveApiKey()
+  apiKey = await ApiKeyService.regenerateAndSaveApiKey(user)
 })
 
 afterEach(async () => {
@@ -1117,7 +1118,9 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
       id: 2,
       email: 'user_2@agency.gov.sg',
     } as User)
-    const anotherApiKey = await anotherUser.regenerateAndSaveApiKey()
+    const anotherApiKey = await ApiKeyService.regenerateAndSaveApiKey(
+      anotherUser
+    )
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',

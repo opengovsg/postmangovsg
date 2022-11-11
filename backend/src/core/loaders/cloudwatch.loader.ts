@@ -2,7 +2,7 @@ import WinstonCloudwatch from 'winston-cloudwatch'
 import { hostname } from 'os'
 
 import config from '@core/config'
-import { loggerWithLabel, addTransport } from '@core/logger'
+import { loggerWithLabel, addTransport } from '@shared/core/logger'
 import { getInstanceId } from '@core/utils/ec2'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 

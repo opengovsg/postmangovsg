@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { UploadService, MultipartUploadService } from '@core/services'
 
 const logger = loggerWithLabel(module)

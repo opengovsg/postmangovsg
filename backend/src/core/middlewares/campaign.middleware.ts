@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import {
   ChannelType,
   Status,

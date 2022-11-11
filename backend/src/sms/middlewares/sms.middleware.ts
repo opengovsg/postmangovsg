@@ -3,7 +3,7 @@ import { ChannelType, DefaultCredentialName } from '@shared/core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { formatDefaultCredentialName } from '@core/utils'
 
 export interface SmsMiddleware {

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Handler } from 'express'
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { AuthService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
 

@@ -16,12 +16,12 @@ export class UserFeature extends Model<UserFeature> {
     allowNull: false,
     primaryKey: true,
   })
-  userId: number
+  userId!: number
 
   @Default(null)
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-  announcementVersion: string | null
+  announcementVersion!: string | null
 }

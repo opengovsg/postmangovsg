@@ -1,7 +1,6 @@
 import validator from 'validator'
-import { loggerWithLabel } from '@core/logger'
-import config from '@core/config'
-import { Domain } from '@shared/core/models'
+import { loggerWithLabel } from 'core/logger'
+import { Domain } from '@models/index'
 import { Transaction } from 'sequelize'
 
 const logger = loggerWithLabel(module)
@@ -51,13 +50,13 @@ const validateDomain = async (
   }
 
   // If not, check env var for matches (either wildcard or exact)
-  const configDomains = config.get('domains').split(';')
+  // for now, remove env var dep for shared. shouldn't have fallback to envvar...
+  const configDomains = '.gov.sg;@gmail.com'.split(';')
   const domainsToWhitelist = configDomains.filter(isValidDomain)
 
   if (domainsToWhitelist.length === 0) {
     throw new Error(
-      `No domains were whitelisted - the supplied DOMAIN_WHITELIST is ${config.get(
-        'domains'
+      `No domains were whitelisted - the supplied DOMAIN_WHITELIST is '.gov.sg;@gmail.com'
       )}`
     )
   } else {

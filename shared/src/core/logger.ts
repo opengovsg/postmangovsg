@@ -1,5 +1,4 @@
 import winston from 'winston'
-import config from '@core/config'
 
 const getModuleLabel = (callingModule: NodeModule): string => {
   const moduleName = callingModule.filename
@@ -19,7 +18,7 @@ const logger = winston.createLogger({
     winston.format.splat(),
     winston.format.metadata(),
     winston.format.json({
-      space: config.get('env') === 'development' ? 2 : 0,
+      space: 0,
     })
   ),
   transports: [new winston.transports.Console()],

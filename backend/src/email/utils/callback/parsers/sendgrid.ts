@@ -3,7 +3,7 @@ import { Request } from 'express'
 // @ts-ignore
 import { Ecdsa, Signature, PublicKey } from 'starkbank-ecdsa'
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import {
   updateDeliveredStatus,
   updateBouncedStatus,

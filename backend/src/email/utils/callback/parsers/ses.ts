@@ -2,7 +2,7 @@ import { Request } from 'express'
 import url from 'url'
 import crypto, { Encoding } from 'crypto'
 import https from 'https'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import {
   updateDeliveredStatus,
   updateBouncedStatus,

@@ -9,7 +9,7 @@ import {
 import { TemplateError } from '@shared/templating'
 import { UploadService, StatsService } from '@core/services'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 const logger = loggerWithLabel(module)
 

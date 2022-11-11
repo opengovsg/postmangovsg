@@ -1,6 +1,6 @@
 import redis, { RedisClient } from 'redis'
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 if (!config.get('redisOtpUri')) {
   throw new Error('otpClient: redisOtpUri not found')

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { ProtectedService } from '@core/services'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 
 const logger = loggerWithLabel(module)
 

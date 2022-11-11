@@ -5,7 +5,7 @@ import {
 } from '@email/interfaces/callback.interface'
 import { EmailBlacklist, EmailMessage } from '@shared/core/models/email'
 import config from '@core/config'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { Campaign } from '@shared/core/models'
 
 const logger = loggerWithLabel(module)

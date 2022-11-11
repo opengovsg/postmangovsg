@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import { SmsTransactionalService } from '@sms/services'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { TemplateError } from '@shared/templating'
 import { RateLimitError, InvalidRecipientError } from '@core/errors'
 

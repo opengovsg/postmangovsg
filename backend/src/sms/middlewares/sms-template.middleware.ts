@@ -10,7 +10,7 @@ import { TemplateError } from '@shared/templating'
 import { UploadService, StatsService, ListService } from '@core/services'
 import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { ChannelType } from '@shared/core/constants'
 
 const logger = loggerWithLabel(module)

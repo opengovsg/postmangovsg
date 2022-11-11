@@ -5,7 +5,7 @@ import config from '@core/config'
 
 import { EmailFromAddress } from '@shared/core/models/email'
 import { MailService } from '@core/services'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import {
   extractDomainFromEmail,
   formatFromAddress,

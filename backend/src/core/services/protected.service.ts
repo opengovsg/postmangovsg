@@ -5,7 +5,7 @@ import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import { ProtectedMessage, Campaign } from '@shared/core/models'
 import config from '@core/config'
 import { CSVParams } from '@core/types'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import {
   MessageBulkInsertInterface,
   ProtectedMessageRecordInterface,

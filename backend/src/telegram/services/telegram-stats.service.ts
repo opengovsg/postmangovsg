@@ -1,5 +1,5 @@
 import { QueryTypes } from 'sequelize'
-import { loggerWithLabel } from '@core/logger'
+import { loggerWithLabel } from '@shared/core/logger'
 import { StatsService } from '@core/services'
 import { CampaignStats } from '@shared/core/interfaces'
 
