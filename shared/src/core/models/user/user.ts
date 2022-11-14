@@ -11,7 +11,7 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
-import { List, UserCredential, UserFeature, UserList } from '../../models/index'
+import { List, UserCredential, UserFeature, UserList } from '@models/index'
 import { UserDemo } from './user-demo'
 import { validateDomain } from '../../utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'

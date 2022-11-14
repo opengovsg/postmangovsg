@@ -10,8 +10,7 @@ import {
 } from 'sequelize-typescript'
 import { union } from 'lodash'
 import { Campaign } from '@models/campaign'
-import { TemplateClient } from 'templating/template-client'
-import { XSS_EMAIL_OPTION } from '../../../templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from '../../../templating'
 
 @Table({ tableName: 'email_templates', underscored: true, timestamps: true })
 export class EmailTemplate extends Model<EmailTemplate> {

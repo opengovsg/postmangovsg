@@ -15,7 +15,7 @@ import {
   Domain,
   List,
   UserList,
-} from 'core/models/index'
+} from '@models/index'
 import {
   EmailBlacklist,
   EmailFromAddress,

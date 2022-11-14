@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript'
 
 import { Campaign } from '@models/campaign'
-import { TemplateClient, XSS_TELEGRAM_OPTION } from 'templating'
+import { TemplateClient, XSS_TELEGRAM_OPTION } from '../../../templating'
 
 @Table({ tableName: 'telegram_templates', underscored: true, timestamps: true })
 export class TelegramTemplate extends Model<TelegramTemplate> {

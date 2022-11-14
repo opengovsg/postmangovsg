@@ -6,7 +6,7 @@ import {
   Table,
   BelongsTo,
 } from 'sequelize-typescript'
-import { Campaign } from 'core/models/campaign'
+import { Campaign } from '@models/campaign'
 
 @Table({
   tableName: 'unsubscribers',

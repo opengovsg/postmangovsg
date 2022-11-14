@@ -7,7 +7,7 @@ import {
   BelongsTo,
 } from 'sequelize-typescript'
 import { Campaign } from '@models/campaign'
-import { MessageStatus } from 'core/constants'
+import { MessageStatus } from '../../constants'
 
 @Table({ tableName: 'telegram_ops', underscored: true, timestamps: true })
 export class TelegramOp extends Model<TelegramOp> {

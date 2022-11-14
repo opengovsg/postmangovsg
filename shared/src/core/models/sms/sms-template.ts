@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript'
 
 import { Campaign } from '@models/campaign'
-import { TemplateClient, XSS_SMS_OPTION } from 'templating'
+import { TemplateClient, XSS_SMS_OPTION } from '../../../templating'
 
 @Table({ tableName: 'sms_templates', underscored: true, timestamps: true })
 export class SmsTemplate extends Model<SmsTemplate> {

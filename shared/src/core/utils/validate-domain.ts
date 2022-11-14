@@ -1,5 +1,5 @@
 import validator from 'validator'
-import { loggerWithLabel } from 'core/logger'
+import { loggerWithLabel } from '../logger'
 import { Domain } from '@models/index'
 import { Transaction } from 'sequelize'
 
