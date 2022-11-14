@@ -225,7 +225,7 @@ export const InitEmailTransactionalMiddleware = (
     // validation from Joi doesn't carry over into type safety here
     // following code transforms query params into type-safe arguments for EmailTransactionalService
     const { limit, offset, status, created_at, sort_by } = req.query
-    const userId = req.session?.user?.id
+    const userId: string = req.session?.user?.id.toString() // id is number in session; convert to string for tests to pass (weird)
     const filter = created_at ? { createdAt: created_at } : undefined
     const sortBy = sort_by?.toString().replace(/[+-]/, '')
     const orderBy = sort_by?.toString().includes('+')

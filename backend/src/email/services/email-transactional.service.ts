@@ -206,7 +206,7 @@ async function listMessages({
   status,
   filterByTimestamp,
 }: {
-  userId: number
+  userId: string
   limit?: number
   offset?: number
   sortBy?: TransactionalEmailSortField
@@ -220,7 +220,7 @@ async function listMessages({
   orderBy = orderBy || Ordering.DESC
   const order: Order = [[sortBy, orderBy]]
   const where = ((userId, status, filterByTimestamp) => {
-    const where: WhereOptions = { userId }
+    const where: WhereOptions = { userId } // pre-fill with userId for authentication
     if (status) {
       where.status = status
     }

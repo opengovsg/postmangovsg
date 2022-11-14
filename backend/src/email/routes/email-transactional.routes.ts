@@ -57,7 +57,7 @@ export const InitEmailTransactionalRoute = (
         .pattern(
           new RegExp(
             // accepts TransactionalEmailSortField values with optional +/- prefix
-            `([+-]?${Object.values(TransactionalEmailSortField).join('|')})`
+            `^[+-]?${Object.values(TransactionalEmailSortField).join('|')}$`
           )
         )
         .default(TransactionalEmailSortField.Created),
