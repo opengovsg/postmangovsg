@@ -13,7 +13,6 @@ const listByChannelValidator = {
   }),
 }
 /**
- * @swagger
  * paths:
  *   /lists/{channel}:
  *     get:

@@ -4,7 +4,6 @@ import { StatsMiddleware } from '@core/middlewares'
 const router = Router()
 
 /**
- * @swagger
  * paths:
  *  /stats:
  *    get:

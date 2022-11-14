@@ -90,6 +90,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Get sms campaign details
@@ -105,14 +107,51 @@ export const InitSmsCampaignRoute = (
    *          content:
    *            application/json:
    *              schema:
-   *                $ref: '#/components/schemas/SMSCampaign'
+   *                allOf:
+   *                - $ref: '#/components/schemas/SMSCampaign'
+   *                - type: object
+   *                  properties:
+   *                    cost_per_message:
+   *                      type: number
    *
    *        "401":
    *           description: Unauthorized
    *        "403" :
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get('/', smsMiddleware.getCampaignDetails)
 
@@ -121,6 +160,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/sms/template:
    *     put:
+   *       security:
+   *         - bearerAuth: []
    *       tags:
    *         - SMS
    *       summary: Stores body template for sms campaign
@@ -179,8 +220,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *         "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.put(
     '/template',
@@ -194,6 +267,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/sms/upload/start:
    *     get:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Get a presigned URL for upload with Content-MD5 header"
    *       tags:
    *         - SMS
@@ -231,8 +306,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *         "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.get(
     '/upload/start',
@@ -246,6 +353,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/sms/upload/complete:
    *     post:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Complete upload session with ETag verification"
    *       tags:
    *         - SMS
@@ -278,8 +387,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *         "403":
    *          description: Forbidden, campaign not owned by user or job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.post(
     '/upload/complete',
@@ -293,6 +434,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *   /campaign/{campaignId}/sms/upload/status:
    *     get:
+   *       security:
+   *         - bearerAuth: []
    *       summary: "Get csv processing status"
    *       tags:
    *         - SMS
@@ -322,8 +465,6 @@ export const InitSmsCampaignRoute = (
    *                   preview:
    *                     type: object
    *                     properties:
-   *                       subject:
-   *                         type: string
    *                       body:
    *                         type: string
    *         "400" :
@@ -342,6 +483,8 @@ export const InitSmsCampaignRoute = (
    * post:
    *   /campaign/{campaignId}/sms/upload/status:
    *     delete:
+   *       security:
+   *         - bearerAuth: []
    *       description: "Deletes error status from previous failed upload"
    *       tags:
    *         - SMS
@@ -358,8 +501,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *         "403":
    *           description: Forbidden as there is a job in progress
+   *         "429":
+   *           description: Rate limit exceeded. Too many requests.
+   *           content:
+   *              application/json:
+   *                schema:
+   *                  $ref: '#/components/schemas/ErrorStatus'
+   *                example:
+   *                  {status: 429, message: Too many requests. Please try again later.}
    *         "500":
    *           description: Internal Server Error
+   *           content:
+   *              text/plain:
+   *                type: string
+   *                example: Internal Server Error
+   *         "502":
+   *           description: Bad Gateway
+   *         "504":
+   *           description: Gateway Timeout
+   *         "503":
+   *           description: Service Temporarily Unavailable
+   *         "520":
+   *           description: Web Server Returns An Unknown Error
+   *         "521":
+   *           description: Web Server Is Down
+   *         "522":
+   *           description: Connection Timed Out
+   *         "523":
+   *           description: Origin Is Unreachable
+   *         "524":
+   *           description: A Timeout occurred
+   *         "525":
+   *           description: SSL handshake failed
+   *         "526":
+   *           description: Invalid SSL certificate
    */
   router.delete(
     '/upload/status',
@@ -372,6 +547,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/new-credentials:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Validate twilio credentials and assign to campaign, if label is provided - store credentials for user
@@ -406,14 +583,52 @@ export const InitSmsCampaignRoute = (
    *            application/json:
    *              schema:
    *                type: object
+   *                required:
+   *                  - message
+   *                properties:
+   *                  message:
+   *                    type: string
+   *                    example: OK
    *        "400" :
    *           description: Bad Request
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/new-credentials',
@@ -432,6 +647,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/credentials:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Validate stored credentials and assign to campaign
@@ -460,14 +677,52 @@ export const InitSmsCampaignRoute = (
    *            application/json:
    *              schema:
    *                type: object
+   *                required:
+   *                  - message
+   *                properties:
+   *                  message:
+   *                    type: string
+   *                    example: OK
    *        "400" :
    *           description: Bad Request
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/credentials',
@@ -483,6 +738,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/preview:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Preview templated message
@@ -507,8 +764,42 @@ export const InitSmsCampaignRoute = (
    *                        type: string
    *        "401":
    *           description: Unauthorized
+   *        "403":
+   *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get('/preview', smsMiddleware.previewFirstMessage)
 
@@ -517,6 +808,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/send:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Start sending campaign
@@ -557,8 +850,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/send',
@@ -572,6 +897,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/stop:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Stop sending campaign
@@ -588,9 +915,41 @@ export const InitSmsCampaignRoute = (
    *        "401":
    *           description: Unauthorized
    *        "403":
-   *           description: Forbidden, campaign not owned by user
+   *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post('/stop', JobMiddleware.stopCampaign)
 
@@ -599,6 +958,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/retry:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Retry sending campaign
@@ -616,8 +977,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user or job in progress
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/retry',
@@ -630,6 +1023,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/stats:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Get sms campaign stats
@@ -650,8 +1045,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get('/stats', SmsStatsMiddleware.getStats)
 
@@ -660,6 +1087,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/refresh-stats:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Forcibly refresh sms campaign stats, then retrieves them
@@ -680,8 +1109,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post('/refresh-stats', SmsStatsMiddleware.updateAndGetStats)
 
@@ -690,6 +1151,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/export:
    *    get:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Get invalid recipients in campaign
@@ -707,15 +1170,47 @@ export const InitSmsCampaignRoute = (
    *              schema:
    *                type: array
    *                items:
-   *                  $ref: '#/components/schemas/CampaignInvalidRecipient'
+   *                  $ref: '#/components/schemas/CampaignRecipient'
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
    *        "410":
    *           description: Campaign has been redacted
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.get(
     '/export',
@@ -728,6 +1223,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/duplicate:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Duplicate the campaign and its template
@@ -743,18 +1240,56 @@ export const InitSmsCampaignRoute = (
    *          application/json:
    *            schema:
    *              type: object
+   *              required:
+   *                - name
    *              properties:
    *                name:
    *                  type: string
    *      responses:
    *        "201":
    *           description: A duplicate of the campaign was created
+   *           content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/CampaignDuplicateMeta'
    *        "401":
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/duplicate',
@@ -767,6 +1302,8 @@ export const InitSmsCampaignRoute = (
    * paths:
    *  /campaign/{campaignId}/sms/select-list:
    *    post:
+   *      security:
+   *        - bearerAuth: []
    *      tags:
    *        - SMS
    *      summary: Select the list of recipients from an existing managed list
@@ -793,8 +1330,40 @@ export const InitSmsCampaignRoute = (
    *           description: Unauthorized
    *        "403":
    *           description: Forbidden, campaign not owned by user
+   *        "429":
+   *          description: Rate limit exceeded. Too many requests.
+   *          content:
+   *             application/json:
+   *               schema:
+   *                 $ref: '#/components/schemas/ErrorStatus'
+   *               example:
+   *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *           description: Internal Server Error
+   *          description: Internal Server Error
+   *          content:
+   *             text/plain:
+   *               type: string
+   *               example: Internal Server Error
+   *        "502":
+   *          description: Bad Gateway
+   *        "504":
+   *          description: Gateway Timeout
+   *        "503":
+   *          description: Service Temporarily Unavailable
+   *        "520":
+   *          description: Web Server Returns An Unknown Error
+   *        "521":
+   *          description: Web Server Is Down
+   *        "522":
+   *          description: Connection Timed Out
+   *        "523":
+   *          description: Origin Is Unreachable
+   *        "524":
+   *          description: A Timeout occurred
+   *        "525":
+   *          description: SSL handshake failed
+   *        "526":
+   *          description: Invalid SSL certificate
    */
   router.post(
     '/select-list',

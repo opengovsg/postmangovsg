@@ -75,12 +75,36 @@ export enum Ordering {
  *           type: boolean
  *         redacted:
  *           type: boolean
+ *         should_save_list:
+ *           type: boolean
  *         type:
  *           $ref: '#/components/schemas/ChannelType'
  *         job_queue:
  *           type: array
  *           items:
  *            $ref: '#/components/schemas/JobQueue'
+ *
+ *     CampaignDuplicateMeta:
+ *       type: object
+ *       required:
+ *         - name
+ *         - id
+ *         - created_at
+ *         - type
+ *         - protect
+ *       properties:
+ *         id:
+ *           type: number
+ *         name:
+ *           type: string
+ *         type:
+ *           $ref: '#/components/schemas/ChannelType'
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *         protect:
+ *           type: boolean
+ *           example: false
  *
  *     JobQueue:
  *        type: object

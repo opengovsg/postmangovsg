@@ -2,7 +2,11 @@ import { Router, Request, Response, NextFunction, Application } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
-import { InitAuthMiddleware, InitSettingsMiddleware } from '@core/middlewares'
+import {
+  AuthType,
+  InitAuthMiddleware,
+  InitSettingsMiddleware,
+} from '@core/middlewares'
 import { loggerWithLabel } from '@core/logger'
 
 // Core routes
@@ -163,7 +167,6 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/stats', statsRoutes)
   router.use('/protect', protectedMailRoutes)
   router.use('/unsubscribe', unsubscriberRoutes)
-  router.use('/lists', listRoutes)
 
   /**
    * @swagger
@@ -177,64 +180,64 @@ export const InitV1Route = (app: Application): Router => {
 
   router.use(
     '/campaigns',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     campaignRoutes
   )
   router.use(
     '/campaign/:campaignId/sms',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     celebrate(campaignIdValidator),
     smsCampaignRoutes
   )
   router.use(
     '/campaign/:campaignId/email',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     celebrate(campaignIdValidator),
     emailCampaignRoutes
   )
   router.use(
     '/campaign/:campaignId/telegram',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     celebrate(campaignIdValidator),
     telegramCampaignRoutes
   )
   router.use(
     '/campaign/:campaignId',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     celebrate(campaignIdValidator),
     redirectToChannelRoute
   )
 
   router.use(
     '/settings/email',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     emailSettingsRoutes
   )
   router.use(
     '/settings/sms',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     smsSettingsRoutes
   )
   router.use(
     '/settings/telegram',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     telegramSettingsRoutes
   )
   router.use(
     '/settings',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     settingsRoutes
   )
 
   router.use(
     '/transactional/sms',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     smsTransactionalRoutes
   )
 
   router.use(
     '/transactional/email',
-    authMiddleware.isCookieOrApiKeyAuthenticated,
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     emailTransactionalRoutes
   )
 
@@ -243,5 +246,11 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/sms', smsCallbackRoutes)
 
   router.use('/callback/telegram', telegramCallbackRoutes)
+
+  router.use(
+    '/lists',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    listRoutes
+  )
   return router
 }

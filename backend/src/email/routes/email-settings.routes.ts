@@ -22,12 +22,9 @@ export const InitEmailSettingsRoute = (
   }
 
   /**
-   * @swagger
    * paths:
    *  /settings/email/from/verify:
    *    post:
-   *      security:
-   *        - bearerAuth: []
    *      summary: Verifies a custom from email address
    *      description: >
    *        Verifies a custom from email address to see if it can be used to send out emails.
@@ -137,7 +134,6 @@ export const InitEmailSettingsRoute = (
   )
 
   /**
-   * @swagger
    * paths:
    *  /settings/email/from:
    *    get:
