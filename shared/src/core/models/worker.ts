@@ -1,5 +1,5 @@
 import { Model, Table, Column, DataType, HasMany } from 'sequelize-typescript'
-import { JobQueue } from '@models/job-queue'
+import { JobQueue } from './job-queue'
 
 @Table({ tableName: 'workers', underscored: true, timestamps: true })
 export class Worker extends Model<Worker> {

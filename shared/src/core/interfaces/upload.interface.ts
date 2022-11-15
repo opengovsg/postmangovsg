@@ -1,4 +1,4 @@
-import { ChannelType } from 'core/constants'
+import { ChannelType } from '../constants'
 import { EmailTemplate } from '@models/email'
 import { SmsTemplate } from '@models/sms'
 import { TelegramTemplate } from '@models/telegram'

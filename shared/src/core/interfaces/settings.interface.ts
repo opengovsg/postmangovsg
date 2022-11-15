@@ -1,4 +1,4 @@
-import { ChannelType } from 'core/constants'
+import { ChannelType } from '../constants'
 export interface CredentialLabel {
   label: string
   type: ChannelType

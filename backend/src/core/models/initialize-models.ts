@@ -15,7 +15,7 @@ import {
   Domain,
   List,
   UserList,
-} from '@models/index'
+} from '@shared/core/models/index'
 import {
   EmailBlacklist,
   EmailFromAddress,
@@ -23,15 +23,15 @@ import {
   EmailMessageTransactional,
   EmailOp,
   EmailTemplate,
-} from '@models/email'
-import { SmsMessage, SmsTemplate, SmsOp } from '@models/sms'
+} from '@shared/core/models/email'
+import { SmsMessage, SmsTemplate, SmsOp } from '@shared/core/models/sms'
 import {
   BotSubscriber,
   TelegramMessage,
   TelegramOp,
   TelegramSubscriber,
   TelegramTemplate,
-} from '@models/telegram'
+} from '@shared/core/models/telegram'
 
 export const initializeModels = (sequelize: Sequelize): void => {
   const coreModels = [
