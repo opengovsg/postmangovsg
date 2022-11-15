@@ -228,16 +228,16 @@ async function listMessages({
       if (filterByTimestamp.createdAt) {
         const { gt, gte, lt, lte } = filterByTimestamp.createdAt
         if (gt) {
-          where.createdAt = { [Op.gt]: gt }
+          where.createdAt = { ...where.createdAt, [Op.gt]: gt }
         }
         if (gte) {
-          where.createdAt = { [Op.gte]: gte }
+          where.createdAt = { ...where.createdAt, [Op.gte]: gte }
         }
         if (lt) {
-          where.createdAt = { [Op.lt]: lt }
+          where.createdAt = { ...where.createdAt, [Op.lt]: lt }
         }
         if (lte) {
-          where.createdAt = { [Op.lte]: lte }
+          where.createdAt = { ...where.createdAt, [Op.lte]: lte }
         }
       }
     }

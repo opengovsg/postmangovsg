@@ -966,7 +966,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
       .set('Authorization', `Bearer ${apiKey}`)
     expect(res2.status).toBe(200)
     expect(res2.body.has_more).toBe(false)
-    expect(res2.body.data.length).toBe(4) // not sure why this is 4 and not 3
+    expect(res2.body.data.length).toBe(3)
 
     // repeated operators should throw an error
     const res3 = await request(app)
