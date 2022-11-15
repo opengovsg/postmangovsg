@@ -238,7 +238,7 @@ export const InitEmailTransactionalMiddleware = (
       sortBy: sortBy as TransactionalEmailSortField,
       orderBy,
       status: status as TransactionalEmailMessageStatus,
-      filterByTimestamp: filter as unknown as TimestampFilter,
+      filterByTimestamp: filter as TimestampFilter,
     })
     res.status(200).json({
       has_more: hasMore,

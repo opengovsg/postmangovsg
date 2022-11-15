@@ -779,8 +779,6 @@ describe(`GET ${emailTransactionalRoute}`, () => {
       .set('Authorization', `Bearer ${apiKey}`)
     expect(res.status).toBe(200)
     expect(res.body.has_more).toBe(false)
-    console.log('message', message)
-    console.log('res.body.data', res.body.data)
     expect(res.body.data).toMatchObject([
       // descending by default
       {
@@ -975,6 +973,15 @@ describe(`GET ${emailTransactionalRoute}`, () => {
       )
       .set('Authorization', `Bearer ${apiKey}`)
     expect(res3.status).toBe(400)
+    // if gt and lt are used, gte and lte should be ignored
+    const res4 = await request(app)
+      .get(
+        `${endpoint}?created_at[gt]=${messages[0].createdAt.toISOString()}&created_at[lt]=${messages[4].createdAt.toISOString()}&created_at[gte]=${messages[0].createdAt.toISOString()}`
+      )
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res4.status).toBe(200)
+    expect(res4.body.has_more).toBe(false)
+    expect(res4.body.data.length).toBe(3)
   })
   test('sort_by should work', async () => {
     const messages = []
@@ -1019,6 +1026,58 @@ describe(`GET ${emailTransactionalRoute}`, () => {
     expect(res3.body.data.length).toBe(10)
     expect(res3.body.data[0].id).toBe(messages[9].id)
     expect(res3.body.data[9].id).toBe(messages[0].id)
+
+    const res4 = await request(app)
+      .get(endpoint)
+      // this is basically testing for repeating sort_by params twice, e.g. endpoint?sort_by=+created_at&sort_by=created_at
+      .query({ sort_by: ['created_at', '+created_at'] })
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res4.status).toBe(400)
+  })
+  test('combination of query params should work', async () => {
+    const messages = []
+    const now = new Date()
+    for (let i = 0; i < 15; i++) {
+      // mixing up different messages
+      const messageParams =
+        i % 3 === 0
+          ? deliveredMessage
+          : i % 3 === 1
+          ? sentMessage
+          : acceptedMessage
+      const message = await EmailMessageTransactional.create({
+        ...messageParams,
+        userId: user.id,
+        createdAt: new Date(now.getTime() - 100000 + i * 1000), // inserting in chronological order
+      } as unknown as EmailMessageTransactional)
+      messages.push(message)
+    }
+    const res = await request(app)
+      .get(
+        `${endpoint}?created_at[gte]=${messages[0].createdAt.toISOString()}&created_at[lte]=${messages[4].createdAt.toISOString()}&sort_by=created_at`
+      )
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.body.has_more).toBe(false)
+    expect(res.body.data.length).toBe(5)
+    expect(res.body.data[0].id).toBe(messages[4].id)
+    expect(res.body.data[4].id).toBe(messages[0].id)
+
+    const res2 = await request(app)
+      .get(endpoint)
+      .query({ status: 'delivered', sort_by: '+created_at', limit: '4' })
+      .set('Authorization', `Bearer ${apiKey}`)
+
+    expect(res2.status).toBe(200)
+    expect(res2.body.has_more).toBe(true)
+    expect(res2.body.data.length).toBe(4)
+    res2.body.data.forEach((message: EmailMessageTransactional) => {
+      expect(message.status).toBe(TransactionalEmailMessageStatus.Delivered)
+    })
+    expect(new Date(res2.body.data[3].created_at).getTime()).toBeGreaterThan(
+      // check that it is ascending
+      new Date(res2.body.data[2].created_at).getTime()
+    )
   })
 })
 
