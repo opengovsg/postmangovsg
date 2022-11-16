@@ -5,7 +5,7 @@ import {
   Table,
   BelongsToMany,
 } from 'sequelize-typescript'
-import { User, UserList } from '@shared_models/index'
+import { User, UserList } from '@models/index'
 import { ChannelType } from '../constants'
 
 @Table({ tableName: 'lists', underscored: true, timestamps: true })

@@ -6,7 +6,7 @@ import {
   ForeignKey,
 } from 'sequelize-typescript'
 import { User } from './user'
-import { Credential } from '@shared_models/credential'
+import { Credential } from '@models/credential'
 import { ChannelType } from '../../constants'
 
 @Table({ tableName: 'user_credentials', underscored: true, timestamps: true })

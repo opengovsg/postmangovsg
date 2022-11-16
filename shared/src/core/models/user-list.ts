@@ -6,7 +6,7 @@ import {
   ForeignKey,
 } from 'sequelize-typescript'
 
-import { User, List } from '@shared_models/index'
+import { User, List } from '@models/index'
 
 @Table({ tableName: 'user_lists', underscored: true, timestamps: true })
 // <Model<Partial<List>> is required to resolve errors in the model.create()
