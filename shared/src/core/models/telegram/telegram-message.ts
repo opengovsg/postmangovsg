@@ -7,7 +7,7 @@ import {
   Table,
 } from 'sequelize-typescript'
 
-import { Campaign } from '@models/index'
+import { Campaign } from '@shared/core/models/index'
 import { MessageStatus } from '../../constants'
 
 @Table({ tableName: 'telegram_messages', underscored: true, timestamps: true })

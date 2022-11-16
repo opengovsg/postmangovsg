@@ -29,8 +29,7 @@
     "moduleResolution": "node",
     "baseUrl": "./src",
     "paths": {
-      "@models/*": ["core/models/*"],
-      "@interfaces/*": ["core/interfaces/*"],
+      "@shared/*": ["*"],
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,

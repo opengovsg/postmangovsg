@@ -1,7 +1,7 @@
 import { ChannelType } from '../constants'
-import { EmailTemplate } from '@models/email'
-import { SmsTemplate } from '@models/sms'
-import { TelegramTemplate } from '@models/telegram'
+import { EmailTemplate } from '@shared/core/models/email'
+import { SmsTemplate } from '@shared/core/models/sms'
+import { TelegramTemplate } from '@shared/core/models/telegram'
 
 export type AllowedTemplateTypes =
   | EmailTemplate

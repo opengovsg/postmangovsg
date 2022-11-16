@@ -9,7 +9,7 @@ import {
   Table,
 } from 'sequelize-typescript'
 
-import { Campaign } from '@models/campaign'
+import { Campaign } from '@shared/core/models/campaign'
 import { TemplateClient, XSS_SMS_OPTION } from '../../../templating'
 
 @Table({ tableName: 'sms_templates', underscored: true, timestamps: true })
