@@ -49,7 +49,7 @@ module.exports = defineConfig({
           );
           return email;
         },
-        findDownloaded: async (path) => {
+        findDownloaded: (path) => {
           return fs.readdirSync(path);
         },
       });
