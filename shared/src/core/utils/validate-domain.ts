@@ -1,6 +1,6 @@
 import validator from 'validator'
 import { loggerWithLabel } from '../logger'
-import { Domain } from '@models/index'
+import { Domain } from '@shared_models/index'
 import { Transaction } from 'sequelize'
 
 const logger = loggerWithLabel(module)

@@ -1,5 +1,5 @@
 // import { Sequelize } from 'sequelize-typescript'
-// import { User, Domain, Agency } from '@models/index'
+// import { User, Domain, Agency } from '@shared_models/index'
 // import { validateDomain } from 'core/utils/validate-domain'
 //
 // // eslint-disable-next-line @typescript-eslint/ban-ts-comment

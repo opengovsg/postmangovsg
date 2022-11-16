@@ -9,7 +9,7 @@ import {
   BelongsTo,
 } from 'sequelize-typescript'
 import { union } from 'lodash'
-import { Campaign } from '@models/campaign'
+import { Campaign } from '@shared_models/campaign'
 import { TemplateClient, XSS_EMAIL_OPTION } from '../../../templating'
 
 @Table({ tableName: 'email_templates', underscored: true, timestamps: true })

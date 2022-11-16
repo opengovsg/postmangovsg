@@ -5,8 +5,8 @@ module.exports = {
   testPathIgnorePatterns: ['<rootDir>/build/', '<rootDir>/node_modules/'],
   moduleNameMapper: {
     '@core/(.*)': '<rootDir>/src/core/$1',
-    '@models/(.*)': '<rootDir>/../shared/src/core/models/$1',
-    '@interfaces/(.*)': '<rootDir>/../shared/src/core/interfaces/$1',
+    '@shared_models/(.*)': '<rootDir>/../shared/src/core/models/$1',
+    '@shared_interfaces/(.*)': '<rootDir>/../shared/src/core/interfaces/$1',
     '@sms/(.*)': '<rootDir>/src/sms/$1',
     '@email/(.*)': '<rootDir>/src/email/$1',
     '@telegram/(.*)': '<rootDir>/src/telegram/$1',
