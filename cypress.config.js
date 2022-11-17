@@ -3,7 +3,7 @@ const path = require('path');
 const gmail = require('gmail-tester');
 const fs = require('fs');
 
-require('dotenv').config();
+require('dotenv').config( { path: 'cypress/.env'});
 
 module.exports = defineConfig({
   e2e: {
@@ -12,6 +12,7 @@ module.exports = defineConfig({
     defaultCommandTimeout: 20000,
     retries: 2,
     trashAssetsBeforeRuns: true,
+    experimentalSessionAndOrigin: true,
     env: {
       MSG_TO_VERIFY: 'Dear postman',
       MSG_CONTENT: 'Dear {{}{{}name{}}{}}',
@@ -36,8 +37,8 @@ module.exports = defineConfig({
         'gmail:check': async (args) => {
           const { from, to, subject } = args;
           const email = await gmail.check_inbox(
-            path.resolve(__dirname, 'credentials.json'), // credentials.json is inside plugins/ directory.
-            path.resolve(__dirname, 'gmail_token.json'), // gmail_token.json is inside plugins/ directory.
+            path.resolve(__dirname, 'credentials.json'),
+            path.resolve(__dirname, 'gmail_token.json'),
             {
               subject: subject,
               from: from,
