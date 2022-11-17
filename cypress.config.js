@@ -26,6 +26,10 @@ module.exports = defineConfig({
       SMS_NUMBER: process.env.CYPRESS_SMS_NUMBER,
       TWILIO_ACC_SID: process.env.CYPRESS_TWILIO_ACC_SID,
       TWILIO_AUTH_TOKEN: process.env.CYPRESS_TWILIO_AUTH_TOKEN,
+      API_BASE_URL:
+        process.env.CYPRESS_API_BASE_URL ||
+        'https://api-staging.postman.gov.sg/',
+      API_KEY: process.env.CYPRESS_API_KEY,
     },
     setupNodeEvents(on, config) {
       on('task', {
@@ -45,7 +49,7 @@ module.exports = defineConfig({
           );
           return email;
         },
-        findDownloaded: async (path) => {
+        findDownloaded: (path) => {
           return fs.readdirSync(path);
         },
       });
