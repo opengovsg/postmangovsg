@@ -19,14 +19,19 @@ const sendCampaign = async (
   try {
     const userId = req.session?.user?.id
     const { campaignId } = req.params
-    const { rate } = req.body
+    // also need to retrieve if its to be scheduled
+    const { rate, scheduledTiming } = req.body
     const logMeta = { action: 'sendCampaign', campaignId }
 
+    // convert scheduled timing to date object
+    // if passed in then convert, if not just pass empty / undefined
+    const formattedTiming = scheduledTiming ?? new Date(scheduledTiming)
     if (await JobService.canSendCampaign(+campaignId)) {
       const jobIds = await JobService.sendCampaign({
         campaignId: +campaignId,
         rate: +rate,
         userId,
+        scheduledTiming: formattedTiming,
       })
       logger.info({ message: 'Sending campaign', jobIds, ...logMeta })
       return res.status(200).json({ campaign_id: campaignId, job_id: jobIds })
