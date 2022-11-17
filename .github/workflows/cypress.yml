@@ -8,12 +8,27 @@ on:
   workflow_call:
 
 jobs:
+  set_environment:
+    outputs:
+      current_env: ${{ steps.set-environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-environment
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "::set-output name=current_env::production"
+          else
+             echo "::set-output name=current_env::staging"
+          fi
   cypress-run:
     runs-on: ubuntu-latest
+    needs: [set_environment]
+    environment:
+      name: ${{ needs.set_environment.outputs.current_env }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Write gmail credentials file
         env:
           GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
@@ -26,10 +41,12 @@ jobs:
       - name: Cypress.io
         env:
           CYPRESS_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg/' || 'https://staging.postman.gov.sg/' }}
+          CYPRESS_API_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://api.postman.gov.sg/' || 'https://api-staging.postman.gov.sg/' }}
           CYPRESS_TWILIO_ACC_SID: ${{ secrets.CYPRESS_TWILIO_ACC_SID }}
           CYPRESS_TWILIO_AUTH_TOKEN: ${{ secrets.CYPRESS_TWILIO_AUTH_TOKEN }}
           CYPRESS_EMAIL: "internal-testing@open.gov.sg"
           CYPRESS_SMS_NUMBER: "+6582410222"
+          CYPRESS_API_KEY: ${{ secrets.CYPRESS_API_KEY }}
         uses: cypress-io/github-action@v4
         with:
           config-file: cypress.config.js
