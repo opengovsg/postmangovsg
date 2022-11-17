@@ -14,14 +14,20 @@ import { ListService } from '.'
 const createJob = async ({
   campaignId,
   rate,
+  scheduledTiming = undefined,
 }: {
   campaignId: number
   rate: number
+  scheduledTiming?: Date
 }): Promise<number | undefined> => {
+  if (!scheduledTiming) {
+    // if its not a scheduled campaign, just throw in current timing. will not affect main flow of logic
+    scheduledTiming = new Date()
+  }
   const job = await Campaign.sequelize?.query(
-    'SELECT insert_job(:campaignId, :rate);',
+    'SELECT insert_job(:campaignId, :rate, :scheduledTiming);',
     {
-      replacements: { campaignId, rate },
+      replacements: { campaignId, rate, scheduledTiming },
       type: QueryTypes.SELECT,
     }
   )
@@ -52,10 +58,14 @@ const sendCampaign = async ({
   campaignId,
   rate,
   userId,
+  scheduledTiming = undefined,
 }: {
   campaignId: number
   rate: number
   userId: number
+  // scheduled timing is intended to be a pass through variable. just pass and don't handle
+  // let the createJob handle it.
+  scheduledTiming?: Date
 }): Promise<(number | undefined)[] | (number | undefined)> => {
   const campaign = await CampaignService.getCampaignDetails(campaignId, [])
 
@@ -80,6 +90,7 @@ const sendCampaign = async ({
     return createJob({
       campaignId: +campaignId,
       rate: config.get('mailDefaultRate'),
+      scheduledTiming,
     })
   }
 
@@ -95,7 +106,9 @@ const sendCampaign = async ({
     const sendRate =
       workerIndex + 1 < workersNeeded ? averageWorkerRate : lastWorkerRate
 
-    jobs.push(createJob({ campaignId: +campaignId, rate: sendRate }))
+    jobs.push(
+      createJob({ campaignId: +campaignId, rate: sendRate, scheduledTiming })
+    )
   }
 
   return Promise.all(jobs)

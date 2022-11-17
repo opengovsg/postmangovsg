@@ -830,6 +830,9 @@ export const InitSmsCampaignRoute = (
    *                  example: 10
    *                  type: integer
    *                  minimum: 1
+   *                scheduled_timing:
+   *                  example: "2014-09-15T09:00:00"
+   *                  type: string
    *
    *      responses:
    *        200:

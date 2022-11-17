@@ -34,4 +34,10 @@ export class JobQueue extends Model<JobQueue> {
     allowNull: false,
   })
   status!: JobStatus
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
+  visibleAt?: Date
 }
