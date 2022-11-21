@@ -1,0 +1,40 @@
+@import 'styles/_mixins';
+@import 'styles/_variables';
+
+.title {
+  flex: 1;
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: $blue-900;
+
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: $blue-900;
+}
+
+.datetimeWrapper {
+  margin-top: 48px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dateWrapper {
+}
+.timeWrapper {
+}
+
+.dateInput {
+}
+
+.timeInput {
+}
+
+.actionButton {
+  float: right;
+  margin: 3rem 0;
+}
