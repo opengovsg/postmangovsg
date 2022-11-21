@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "@lingui/core": "3.14.0",
+    "@chakra-ui/react": "^2.4.1",
     "@lingui/react": "3.14.0",
+    "@opengovsg/design-system-react": "^0.0.12",
     "@sentry/browser": "5.27.6",
     "@types/bcryptjs": "2.4.2",
     "@types/papaparse": "5.2.5",

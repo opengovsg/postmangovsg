@@ -1,3 +1,5 @@
+import { ThemeProvider } from '@opengovsg/design-system-react'
+
 // Components
 import { Suspense, lazy } from 'react'
 
@@ -19,25 +21,27 @@ const Dashboard = lazy(() => import('components/dashboard'))
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />}></Route>
-      <Route path="/login" element={<Login />}></Route>
-      <Route path="/test/*" element={<TestUtils />}></Route>
-      <Route path="/p/:version/:id" element={<ProtectedPage />}></Route>
-      <Route path="/unsubscribe/:version" element={<Unsubscribe />}></Route>
-      <Route
-        path="*"
-        element={
-          <ProtectedRoute>
-            <Suspense
-              fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
-            >
-              <Dashboard></Dashboard>
-            </Suspense>
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <ThemeProvider>
+      <Routes>
+        <Route path="/" element={<Landing />}></Route>
+        <Route path="/login" element={<Login />}></Route>
+        <Route path="/test/*" element={<TestUtils />}></Route>
+        <Route path="/p/:version/:id" element={<ProtectedPage />}></Route>
+        <Route path="/unsubscribe/:version" element={<Unsubscribe />}></Route>
+        <Route
+          path="*"
+          element={
+            <ProtectedRoute>
+              <Suspense
+                fallback={<i className="spinner bx bx-loader-alt bx-spin"></i>}
+              >
+                <Dashboard></Dashboard>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </ThemeProvider>
   )
 }
 

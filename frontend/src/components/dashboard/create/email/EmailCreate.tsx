@@ -47,7 +47,7 @@ const CreateEmail = () => {
       case EmailProgress.SendTestMessage:
         return <EmailCredentials setActiveStep={setActiveStep} />
       case EmailProgress.Send:
-        return <EmailSend setActiveStep={setActiveStep} />
+        return <EmailSend />
       default:
         return <p>Invalid step</p>
     }
@@ -56,6 +56,7 @@ const CreateEmail = () => {
   return (
     <div className={styles.createContainer}>
       {status !== Status.Draft ? (
+        // now i have to differentiate between scheduled and detail
         <div className={cx(styles.stepContainer, styles.detailContainer)}>
           <EmailDetail></EmailDetail>
         </div>
