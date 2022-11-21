@@ -166,9 +166,12 @@ export async function duplicateCampaign({
 
 export async function sendCampaign(
   campaignId: number,
-  sendRate: number
+  sendRate: number,
+  scheduledTiming?: Date
 ): Promise<void> {
-  const body = sendRate ? { rate: sendRate } : null
+  const body = sendRate
+    ? { rate: sendRate, scheduledTiming: scheduledTiming }
+    : { scheduledTiming: scheduledTiming }
   await axios.post(`/campaign/${campaignId}/send`, body)
 }
 
