@@ -7,13 +7,15 @@ export const confirmSendCampaign = async ({
   sendRate,
   channelType,
   updateCampaign,
+  scheduledTiming,
 }: {
   campaignId: number
   sendRate: number
   channelType: ChannelType
   updateCampaign: (campaign: Partial<Campaign>) => void
+  scheduledTiming?: Date
 }) => {
-  await sendCampaign(campaignId, sendRate)
+  await sendCampaign(campaignId, sendRate, scheduledTiming)
   if (sendRate) {
     sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, channelType)
   }
