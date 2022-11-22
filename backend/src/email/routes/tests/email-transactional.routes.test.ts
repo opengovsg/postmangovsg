@@ -62,8 +62,10 @@ afterAll(async () => {
   await (app as any).cleanup()
 })
 
-describe('POST /transactional/email/send', () => {
-  const endpoint = '/transactional/email/send'
+const emailTransactionalRoute = '/transactional/email'
+
+describe(`${emailTransactionalRoute}/send`, () => {
+  const endpoint = `${emailTransactionalRoute}/send`
   const validApiCall = {
     recipient: 'recipient@agency.gov.sg',
     subject: 'subject',
@@ -722,7 +724,365 @@ describe('POST /transactional/email/send', () => {
   })
 })
 
-describe('GET /transactional/email/:emailId', () => {
+describe(`GET ${emailTransactionalRoute}`, () => {
+  const endpoint = emailTransactionalRoute
+  const acceptedMessage = {
+    recipient: 'recipient@gmail.com',
+    from: 'Postman <donotreply@mail.postman.gov.sg>',
+    params: {
+      from: 'Postman <donotreply@mail.postman.gov.sg>',
+      subject: 'Test',
+      body: 'Test Body',
+    },
+    status: TransactionalEmailMessageStatus.Accepted,
+  }
+  const sentMessage = {
+    recipient: 'recipient@agency.gov.sg',
+    from: 'Postman <donotreply@mail.postman.gov.sg>',
+    params: {
+      from: 'Postman <donotreply@mail.postman.gov.sg>',
+      subject: 'Test',
+      body: 'Test Body',
+    },
+    status: TransactionalEmailMessageStatus.Sent,
+  }
+  const deliveredMessage = {
+    recipient: 'recipient3@agency.gov.sg',
+    from: 'Postman <donotreply@mail.postman.gov.sg>',
+    params: {
+      from: 'Postman <donotreply@mail.postman.gov.sg>',
+      subject: 'Test',
+      body: 'Test Body',
+    },
+    status: TransactionalEmailMessageStatus.Delivered,
+  }
+  test('Should return 200 with empty array when no messages are found', async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.body.has_more).toBe(false)
+    expect(res.body.data).toEqual([])
+  })
+
+  test('Should return 200 with descending array of messages when messages are found', async () => {
+    const message = await EmailMessageTransactional.create({
+      ...deliveredMessage,
+      userId: user.id,
+    } as unknown as EmailMessageTransactional)
+    const message2 = await EmailMessageTransactional.create({
+      ...acceptedMessage,
+      userId: user.id,
+    } as unknown as EmailMessageTransactional)
+    const res = await request(app)
+      .get(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.body.has_more).toBe(false)
+    expect(res.body.data).toMatchObject([
+      // descending by default
+      {
+        id: message2.id,
+        recipient: message2.recipient,
+        from: message2.from,
+        params: message2.params,
+        status: message2.status,
+      },
+      {
+        id: message.id,
+        recipient: message.recipient,
+        from: message.from,
+        params: message.params,
+        status: message.status,
+      },
+    ])
+  })
+  test('Should return 400 when invalid query params are provided', async () => {
+    const resInvalidLimit = await request(app)
+      .get(`${endpoint}?limit=invalid`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidLimit.status).toBe(400)
+    const resInvalidLimitTooLarge = await request(app)
+      .get(`${endpoint}?limit=1000`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidLimitTooLarge.status).toBe(400)
+    const resInvalidOffset = await request(app)
+      .get(`${endpoint}?offset=blahblah`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidOffset.status).toBe(400)
+    const resInvalidOffsetNegative = await request(app)
+      .get(`${endpoint}?offset=-1`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidOffsetNegative.status).toBe(400)
+    const resInvalidStatus = await request(app)
+      .get(`${endpoint}?status=blacksheep`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidStatus.status).toBe(400)
+    // repeated params should throw an error too
+    const resInvalidStatus2 = await request(app)
+      .get(`${endpoint}?status=sent&status=delivered`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidStatus2.status).toBe(400)
+    const resInvalidCreatedAt = await request(app)
+      .get(`${endpoint}?created_at=haveyouanywool`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidCreatedAt.status).toBe(400)
+    const resInvalidCreatedAtDateFormat = await request(app)
+      .get(`${endpoint}?created_at[gte]=20200101`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidCreatedAtDateFormat.status).toBe(400)
+    const resInvalidSortBy = await request(app)
+      .get(`${endpoint}?sort_by=threebagsfull`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidSortBy.status).toBe(400)
+    const resInvalidSortByPrefix = await request(app)
+      .get(endpoint)
+      // need to use query() instead of get() for operator to be processed correctly
+      .query({ sort_by: '*created_at' })
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(resInvalidSortByPrefix.status).toBe(400)
+  })
+  test('default values of limit and offset should be 10 and 0 respectively', async () => {
+    for (let i = 0; i < 15; i++) {
+      await EmailMessageTransactional.create({
+        ...deliveredMessage,
+        userId: user.id,
+      } as unknown as EmailMessageTransactional)
+    }
+    const res = await request(app)
+      .get(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.body.has_more).toBe(true)
+    expect(res.body.data.length).toBe(10)
+
+    const res2 = await request(app)
+      .get(`${endpoint}?offset=10`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res2.status).toBe(200)
+    expect(res2.body.has_more).toBe(false)
+    expect(res2.body.data.length).toBe(5)
+
+    const res3 = await request(app)
+      .get(`${endpoint}?offset=15`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res3.status).toBe(200)
+    expect(res3.body.has_more).toBe(false)
+    expect(res3.body.data.length).toBe(0)
+
+    const res4 = await request(app)
+      .get(`${endpoint}?limit=5`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res4.status).toBe(200)
+    expect(res4.body.has_more).toBe(true)
+    expect(res4.body.data.length).toBe(5)
+
+    const res5 = await request(app)
+      .get(`${endpoint}?limit=15`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res5.status).toBe(200)
+    expect(res5.body.has_more).toBe(false)
+    expect(res5.body.data.length).toBe(15)
+  })
+
+  test('status filter should work', async () => {
+    for (let i = 0; i < 5; i++) {
+      await EmailMessageTransactional.create({
+        ...deliveredMessage,
+        userId: user.id,
+      } as unknown as EmailMessageTransactional)
+    }
+    for (let i = 0; i < 5; i++) {
+      await EmailMessageTransactional.create({
+        ...acceptedMessage,
+        userId: user.id,
+      } as unknown as EmailMessageTransactional)
+    }
+    for (let i = 0; i < 5; i++) {
+      await EmailMessageTransactional.create({
+        ...sentMessage,
+        userId: user.id,
+      } as unknown as EmailMessageTransactional)
+    }
+    const res = await request(app)
+      .get(`${endpoint}?status=delivered`) // case-insensitive
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.body.has_more).toBe(false)
+    expect(res.body.data.length).toBe(5)
+    res.body.data.forEach((message: EmailMessageTransactional) => {
+      expect(message.status).toBe(TransactionalEmailMessageStatus.Delivered)
+    })
+    const res2 = await request(app)
+      .get(`${endpoint}?status=aCcEPteD`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res2.status).toBe(200)
+    expect(res2.body.has_more).toBe(false)
+    expect(res2.body.data.length).toBe(5)
+    res2.body.data.forEach((message: EmailMessageTransactional) => {
+      expect(message.status).toBe(TransactionalEmailMessageStatus.Accepted)
+    })
+    const res3 = await request(app)
+      .get(`${endpoint}?status=SENT`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res3.status).toBe(200)
+    expect(res3.body.has_more).toBe(false)
+    expect(res3.body.data.length).toBe(5)
+    res3.body.data.forEach((message: EmailMessageTransactional) => {
+      expect(message.status).toBe(TransactionalEmailMessageStatus.Sent)
+    })
+    // duplicate status params should throw an error
+    const res4 = await request(app)
+      .get(`${endpoint}?status=SENT&status=ACCEPTED`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res4.status).toBe(400)
+  })
+  test('created_at filter range should work', async () => {
+    const messages = []
+    const now = new Date()
+    for (let i = 0; i < 10; i++) {
+      const message = await EmailMessageTransactional.create({
+        ...deliveredMessage,
+        userId: user.id,
+        createdAt: new Date(now.getTime() - 100000 + i * 1000), // inserting in chronological order
+      } as unknown as EmailMessageTransactional)
+      messages.push(message)
+    }
+    const res = await request(app)
+      .get(
+        `${endpoint}?created_at[gte]=${messages[0].createdAt.toISOString()}&created_at[lte]=${messages[4].createdAt.toISOString()}`
+      )
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.body.has_more).toBe(false)
+    expect(res.body.data.length).toBe(5)
+
+    const res2 = await request(app)
+      .get(
+        `${endpoint}?created_at[gt]=${messages[0].createdAt.toISOString()}&created_at[lt]=${messages[4].createdAt.toISOString()}`
+      )
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res2.status).toBe(200)
+    expect(res2.body.has_more).toBe(false)
+    expect(res2.body.data.length).toBe(3)
+
+    // repeated operators should throw an error
+    const res3 = await request(app)
+      .get(
+        `${endpoint}?created_at[gte]=${messages[0].createdAt.toISOString()}&created_at[lte]=${messages[4].createdAt.toISOString()}&created_at[gte]=${messages[0].createdAt.toISOString()}`
+      )
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res3.status).toBe(400)
+    // if gt and lt are used, gte and lte should be ignored
+    const res4 = await request(app)
+      .get(
+        `${endpoint}?created_at[gt]=${messages[0].createdAt.toISOString()}&created_at[lt]=${messages[4].createdAt.toISOString()}&created_at[gte]=${messages[0].createdAt.toISOString()}`
+      )
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res4.status).toBe(200)
+    expect(res4.body.has_more).toBe(false)
+    expect(res4.body.data.length).toBe(3)
+  })
+  test('sort_by should work', async () => {
+    const messages = []
+    const now = new Date()
+    for (let i = 0; i < 10; i++) {
+      const message = await EmailMessageTransactional.create({
+        ...deliveredMessage,
+        userId: user.id,
+        createdAt: new Date(now.getTime() - 100000 + i * 1000), // inserting in chronological order
+      } as unknown as EmailMessageTransactional)
+      messages.push(message)
+    }
+
+    const res = await request(app)
+      .get(`${endpoint}?sort_by=created_at`)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.body.has_more).toBe(false)
+    expect(res.body.data.length).toBe(10)
+    // default descending order
+    expect(res.body.data[0].id).toBe(messages[9].id)
+    expect(res.body.data[9].id).toBe(messages[0].id)
+
+    const res2 = await request(app)
+      .get(endpoint)
+      // need to use query() instead of get() for operator to be processed correctly
+      .query({ sort_by: '+created_at' })
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res2.status).toBe(200)
+    expect(res2.body.has_more).toBe(false)
+    expect(res2.body.data.length).toBe(10)
+    expect(res2.body.data[0].id).toBe(messages[0].id)
+    expect(res2.body.data[9].id).toBe(messages[9].id)
+
+    const res3 = await request(app)
+      .get(endpoint)
+      // need to use query() instead of get() for operator to be processed correctly
+      .query({ sort_by: '-created_at' })
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res3.status).toBe(200)
+    expect(res3.body.has_more).toBe(false)
+    expect(res3.body.data.length).toBe(10)
+    expect(res3.body.data[0].id).toBe(messages[9].id)
+    expect(res3.body.data[9].id).toBe(messages[0].id)
+
+    const res4 = await request(app)
+      .get(endpoint)
+      // this is basically testing for repeating sort_by params twice, e.g. endpoint?sort_by=+created_at&sort_by=created_at
+      .query({ sort_by: ['created_at', '+created_at'] })
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res4.status).toBe(400)
+  })
+  test('combination of query params should work', async () => {
+    const messages = []
+    const now = new Date()
+    for (let i = 0; i < 15; i++) {
+      // mixing up different messages
+      const messageParams =
+        i % 3 === 0
+          ? deliveredMessage
+          : i % 3 === 1
+          ? sentMessage
+          : acceptedMessage
+      const message = await EmailMessageTransactional.create({
+        ...messageParams,
+        userId: user.id,
+        createdAt: new Date(now.getTime() - 100000 + i * 1000), // inserting in chronological order
+      } as unknown as EmailMessageTransactional)
+      messages.push(message)
+    }
+    const res = await request(app)
+      .get(
+        `${endpoint}?created_at[gte]=${messages[0].createdAt.toISOString()}&created_at[lte]=${messages[4].createdAt.toISOString()}&sort_by=created_at`
+      )
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.body.has_more).toBe(false)
+    expect(res.body.data.length).toBe(5)
+    expect(res.body.data[0].id).toBe(messages[4].id)
+    expect(res.body.data[4].id).toBe(messages[0].id)
+
+    const res2 = await request(app)
+      .get(endpoint)
+      .query({ status: 'delivered', sort_by: '+created_at', limit: '4' })
+      .set('Authorization', `Bearer ${apiKey}`)
+
+    expect(res2.status).toBe(200)
+    expect(res2.body.has_more).toBe(true)
+    expect(res2.body.data.length).toBe(4)
+    res2.body.data.forEach((message: EmailMessageTransactional) => {
+      expect(message.status).toBe(TransactionalEmailMessageStatus.Delivered)
+    })
+    expect(new Date(res2.body.data[3].created_at).getTime()).toBeGreaterThan(
+      // check that it is ascending
+      new Date(res2.body.data[2].created_at).getTime()
+    )
+  })
+})
+
+describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
+  const endpoint = emailTransactionalRoute
   test('should return a transactional email message with corresponding ID', async () => {
     const message = await EmailMessageTransactional.create({
       userId: user.id,
@@ -736,7 +1096,7 @@ describe('GET /transactional/email/:emailId', () => {
       status: TransactionalEmailMessageStatus.Delivered,
     } as unknown as EmailMessageTransactional)
     const res = await request(app)
-      .get(`/transactional/email/${message.id}`)
+      .get(`${endpoint}/${message.id}`)
       .set('Authorization', `Bearer ${apiKey}`)
     expect(res.status).toBe(200)
     expect(res.body).toBeDefined()
@@ -746,7 +1106,7 @@ describe('GET /transactional/email/:emailId', () => {
   test('should return 404 if the transactional email message ID not found', async () => {
     const id = 69
     const res = await request(app)
-      .get(`/transactional/email/${id}`)
+      .get(`${endpoint}/${id}`)
       .set('Authorization', `Bearer ${apiKey}`)
     expect(res.status).toBe(404)
     expect(res.body.message).toBe(`Email message with ID ${id} not found.`)
@@ -770,7 +1130,7 @@ describe('GET /transactional/email/:emailId', () => {
       status: TransactionalEmailMessageStatus.Delivered,
     } as unknown as EmailMessageTransactional)
     const res = await request(app)
-      .get(`/transactional/email/${message.id}`)
+      .get(`${endpoint}/${message.id}`)
       .set('Authorization', `Bearer ${anotherApiKey}`)
     expect(res.status).toBe(404)
     expect(res.body.message).toBe(

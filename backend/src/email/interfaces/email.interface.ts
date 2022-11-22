@@ -76,6 +76,14 @@ export interface EmailDuplicateCampaignDetails
  *          error_sub_type:
  *            nullable: true
  *            type: string
+ *          created_at:
+ *            nullable: false
+ *            type: string
+ *            format: date-time
+ *          updated_at:
+ *            nullable: true
+ *            type: string
+ *            format: date-time
  *          accepted_at:
  *            nullable: true
  *            type: string
