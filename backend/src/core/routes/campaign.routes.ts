@@ -1,5 +1,10 @@
 import { Router } from 'express'
-import { ChannelType, Status, SortField, Ordering } from '@core/constants'
+import {
+  ChannelType,
+  Status,
+  CampaignSortField,
+  Ordering,
+} from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { CampaignMiddleware } from '@core/middlewares'
 const router = Router()
@@ -12,7 +17,7 @@ const listCampaignsValidator = {
     type: Joi.string().valid(...Object.values(ChannelType)),
     status: Joi.string().valid(...Object.values(Status)),
     name: Joi.string().max(255).trim(),
-    sort_by: Joi.string().valid(...Object.values(SortField)),
+    sort_by: Joi.string().valid(...Object.values(CampaignSortField)),
     order_by: Joi.string().valid(...Object.values(Ordering)),
   }),
 }

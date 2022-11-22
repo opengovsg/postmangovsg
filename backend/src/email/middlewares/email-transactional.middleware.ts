@@ -18,12 +18,18 @@ import {
 } from '@email/models'
 
 import crypto from 'crypto'
+import {
+  Ordering,
+  TimestampFilter,
+  TransactionalEmailSortField,
+} from '@core/constants'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler
   sendMessage: Handler
   rateLimit: Handler
   getById: Handler
+  listMessages: Handler
 }
 
 export const RATE_LIMIT_ERROR_MESSAGE =
@@ -39,6 +45,7 @@ export const InitEmailTransactionalMiddleware = (
   authService: AuthService
 ): EmailTransactionalMiddleware => {
   const logger = loggerWithLabel(module)
+
   interface ReqBody {
     subject: string
     body: string
@@ -62,6 +69,8 @@ export const InitEmailTransactionalMiddleware = (
       sent_at: message.sentAt?.toISOString() || null,
       delivered_at: message.deliveredAt?.toISOString() || null,
       opened_at: message.openedAt?.toISOString() || null,
+      created_at: message.createdAt.toISOString(),
+      updated_at: message.updatedAt.toISOString(),
     }
   }
 
@@ -212,6 +221,31 @@ export const InitEmailTransactionalMiddleware = (
     res.status(200).json(convertMessageModelToResponse(message))
   }
 
+  async function listMessages(req: Request, res: Response): Promise<void> {
+    // validation from Joi doesn't carry over into type safety here
+    // following code transforms query params into type-safe arguments for EmailTransactionalService
+    const { limit, offset, status, created_at, sort_by } = req.query
+    const userId: string = req.session?.user?.id.toString() // id is number in session; convert to string for tests to pass (weird)
+    const filter = created_at ? { createdAt: created_at } : undefined
+    const sortBy = sort_by?.toString().replace(/[+-]/, '')
+    const orderBy = sort_by?.toString().includes('+')
+      ? Ordering.ASC
+      : Ordering.DESC // default to descending order even without '-' prefix
+    const { hasMore, messages } = await EmailTransactionalService.listMessages({
+      userId,
+      limit: +(limit as string),
+      offset: +(offset as string),
+      sortBy: sortBy as TransactionalEmailSortField,
+      orderBy,
+      status: status as TransactionalEmailMessageStatus,
+      filterByTimestamp: filter as TimestampFilter,
+    })
+    res.status(200).json({
+      has_more: hasMore,
+      data: messages.map(convertMessageModelToResponse),
+    })
+  }
+
   const rateLimit = expressRateLimit({
     store: new RedisStore({
       prefix: 'transactionalEmail:',
@@ -250,5 +284,6 @@ export const InitEmailTransactionalMiddleware = (
     sendMessage,
     rateLimit,
     getById,
+    listMessages,
   }
 }

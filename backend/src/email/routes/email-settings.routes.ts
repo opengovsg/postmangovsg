@@ -76,17 +76,6 @@ export const InitEmailSettingsRoute = (
    *               example: Unauthorized
    *        "403":
    *          description: Forbidden. Request violates firewall rules.
-   *        "413":
-   *          description: Number of attachments or size of attachments exceeded limit.
-   *          content:
-   *             application/json:
-   *               schema:
-   *                 $ref: '#/components/schemas/Error'
-   *               examples:
-   *                 AttachmentQtyLimit:
-   *                   value: {message: Number of attachments exceeds limit}
-   *                 AttachmentSizeLimit:
-   *                   value: {message: Size of attachments exceeds limit}
    *        "429":
    *          description: Rate limit exceeded. Too many requests.
    *          content:
@@ -96,7 +85,7 @@ export const InitEmailSettingsRoute = (
    *               example:
    *                 {status: 429, message: Too many requests. Please try again later.}
    *        "500":
-   *          description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect)
+   *          description: Internal Server Error
    *          content:
    *             text/plain:
    *               type: string

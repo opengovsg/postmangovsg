@@ -4,7 +4,7 @@ import {
   ChannelType,
   JobStatus,
   Status,
-  SortField,
+  CampaignSortField,
   Ordering,
 } from '@core/constants'
 import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
@@ -162,7 +162,7 @@ const listCampaigns = ({
   type?: ChannelType
   status?: Status
   name?: string
-  sortBy?: SortField
+  sortBy?: CampaignSortField
   orderBy?: Ordering
 }): Promise<{ rows: Array<Campaign>; count: number }> => {
   const campaignJobs = '(PARTITION BY "job_queue"."campaign_id")'
@@ -223,7 +223,7 @@ const listCampaigns = ({
     const order = orderBy ?? Ordering.DESC // descending as default ordering
     if (sortBy) {
       switch (sortBy) {
-        case SortField.Sent: {
+        case CampaignSortField.Sent: {
           // sort by join queried sent_at
           orderArr = [[literal('"job_queue.sent_at"'), order]]
           break
