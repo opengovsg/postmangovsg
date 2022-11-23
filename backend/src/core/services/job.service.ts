@@ -27,7 +27,11 @@ const createJob = async ({
   const job = await Campaign.sequelize?.query(
     'SELECT insert_job(:campaignId, :rate, :scheduledTiming);',
     {
-      replacements: { campaignId, rate, scheduledTiming },
+      replacements: {
+        campaignId,
+        rate,
+        scheduledTiming: scheduledTiming.toLocaleString(),
+      },
       type: QueryTypes.SELECT,
     }
   )
