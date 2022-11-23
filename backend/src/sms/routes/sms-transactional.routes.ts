@@ -23,7 +23,7 @@ export const InitSmsTransactionalRoute = (
    * paths:
    *   /transactional/sms/send:
    *     post:
-          security:
+   *       security:
    *         - bearerAuth: []
    *       summary: "Send a transactional SMS"
    *       tags:
