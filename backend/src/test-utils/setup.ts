@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 global.console = {
   ...global.console,
-  log: jest.fn(), // console.log are ignored in tests
+  // log: jest.fn(), // console.log are ignored in tests
   error: console.error,
   warn: console.warn,
   info: console.log,

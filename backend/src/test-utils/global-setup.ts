@@ -1,3 +1,7 @@
+// need to import this as globalSetup does not recognize moduleNameMapper
+// https://github.com/facebook/jest/issues/11644
+import 'tsconfig-paths/register'
+
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 import config from '../core/config'
 

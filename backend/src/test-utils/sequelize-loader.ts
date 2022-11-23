@@ -3,7 +3,7 @@ import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 import Umzug from 'umzug'
 
 import config from '@core/config'
-import { initializeModels } from '@core/models'
+import { initializeModels } from '@shared/core/models'
 
 const DB_TEST_URI = config.get('database.databaseUri')
 

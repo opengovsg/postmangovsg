@@ -6,8 +6,8 @@ import {
 } from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
 import { FileAttachmentMiddleware } from '@core/middlewares'
-import { TransactionalEmailMessageStatus } from '@email/models'
-import { TransactionalEmailSortField } from '@core/constants'
+import { TransactionalEmailMessageStatus } from '@shared/core/models/email'
+import { TransactionalEmailSortField } from '@shared/core/constants'
 
 export const InitEmailTransactionalRoute = (
   emailTransactionalMiddleware: EmailTransactionalMiddleware,

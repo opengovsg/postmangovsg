@@ -6,9 +6,9 @@ import {
   Table,
   BelongsTo,
 } from 'sequelize-typescript'
-import { Campaign } from '@shared/core/models/campaign'
+import { Campaign } from '../../models/campaign'
 import { MessageStatus } from '../../constants'
-import { Unsubscriber } from '@shared/core/models/unsubscriber'
+import { Unsubscriber } from '../../models/unsubscriber'
 
 @Table({ tableName: 'email_messages', underscored: true, timestamps: true })
 export class EmailMessage extends Model<EmailMessage> {

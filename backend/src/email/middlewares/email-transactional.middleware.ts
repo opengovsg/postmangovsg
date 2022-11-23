@@ -22,7 +22,7 @@ import {
   Ordering,
   TimestampFilter,
   TransactionalEmailSortField,
-} from '@core/constants'
+} from '@shared/core/constants'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler

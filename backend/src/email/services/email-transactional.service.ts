@@ -16,7 +16,7 @@ import {
   Ordering,
   TimestampFilter,
   TransactionalEmailSortField,
-} from '@core/constants'
+} from '@shared/core/constants'
 import { Order } from 'sequelize/types/model'
 import { Op, WhereOptions } from 'sequelize'
 

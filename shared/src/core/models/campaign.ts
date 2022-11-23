@@ -11,14 +11,14 @@ import {
   Default,
 } from 'sequelize-typescript'
 import { ChannelType } from '../constants'
-import { CampaignS3ObjectInterface } from '@shared/core/interfaces/campaign.interface'
+import { CampaignS3ObjectInterface } from '../interfaces/campaign.interface'
 import { Credential } from './credential'
 import { User } from './user/user'
 import { JobQueue } from './job-queue'
 import { Statistic } from './statistic'
-import { EmailTemplate } from '@shared/core/models/email'
-import { SmsTemplate } from '@shared/core/models/sms'
-import { TelegramTemplate } from '@shared/core/models/telegram'
+import { EmailTemplate } from './email'
+import { SmsTemplate } from './sms'
+import { TelegramTemplate } from './telegram'
 
 @Table({
   tableName: 'campaigns',
