@@ -1,4 +1,4 @@
-import { DatePicker } from '@opengovsg/design-system-react'
+import { DateInput } from '@opengovsg/design-system-react'
 import cx from 'classnames'
 import moment from 'moment'
 import React, { useCallback, useContext, useState } from 'react'
@@ -15,14 +15,12 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
   // const modalContext = useContext(ModalContext)
   const { updateCampaign } = useContext(CampaignContext)
 
-  const [scheduledDate, setScheduledDate] = useState<Date>()
+  const [scheduledDate, setScheduledDate] = useState<string>()
   const [scheduledTime, setScheduledTime] = useState<string>()
 
   const scheduleTheSend = useCallback(() => {
     // combine date and time
-    const scheduledDatetime = moment(
-      moment(scheduledDate).format('YYYY-MM-DD') + 'T' + scheduledTime
-    )
+    const scheduledDatetime = moment(scheduledDate + 'T' + scheduledTime)
     void confirmSendCampaign({
       campaignId: +campaign.id,
       sendRate: 0,
@@ -41,8 +39,8 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
     return
   }
 
-  async function handleDateChange(d: Date) {
-    setScheduledDate(d)
+  async function handleDateChange(s: string) {
+    setScheduledDate(s)
     return
   }
 
@@ -60,21 +58,19 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
       </div>
       <div className={styles.datetimeWrapper}>
         <div className={styles.dateWrapper}>
-          <DatePicker
-            className={styles.dateInput}
-            defaultValue={scheduledDate?.toDateString()}
-            isDateUnavailable={(d) => d < new Date(Date.now() - 86400000)}
-            onSelectDate={handleDateChange}
-          />
-          {/*<DateInput*/}
+          {/*<DatePicker*/}
           {/*  className={styles.dateInput}*/}
-          {/*  value={scheduledDate?.toDateString()}*/}
+          {/*  defaultValue={scheduledDate?.toDateString()}*/}
           {/*  isDateUnavailable={(d) => d < new Date(Date.now() - 86400000)}*/}
-          {/*  onChange={function Ol() {*/}
-          {/*    return*/}
-          {/*  }}*/}
-          {/*  name={'Date'}*/}
+          {/*  onSelectDate={handleDateChange}*/}
           {/*/>*/}
+          <DateInput
+            className={styles.dateInput}
+            value={scheduledDate}
+            isDateUnavailable={(d) => d < new Date(Date.now() - 86400000)}
+            onChange={handleDateChange}
+            name={'Date'}
+          />
         </div>
         <div className={styles.timeWrapper}>
           <input
