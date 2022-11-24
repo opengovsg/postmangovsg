@@ -16,7 +16,7 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
   const { updateCampaign } = useContext(CampaignContext)
 
   const [scheduledDate, setScheduledDate] = useState<string>()
-  const [scheduledTime, setScheduledTime] = useState<string>()
+  const [scheduledTime, setScheduledTime] = useState<string>('HH:mm')
 
   const scheduleTheSend = useCallback(() => {
     // combine date and time
@@ -58,12 +58,7 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
       </div>
       <div className={styles.datetimeWrapper}>
         <div className={styles.dateWrapper}>
-          {/*<DatePicker*/}
-          {/*  className={styles.dateInput}*/}
-          {/*  defaultValue={scheduledDate?.toDateString()}*/}
-          {/*  isDateUnavailable={(d) => d < new Date(Date.now() - 86400000)}*/}
-          {/*  onSelectDate={handleDateChange}*/}
-          {/*/>*/}
+          <div>Date</div>
           <DateInput
             className={styles.dateInput}
             value={scheduledDate}
@@ -73,11 +68,12 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
           />
         </div>
         <div className={styles.timeWrapper}>
+          <div>Time</div>
           <input
             type="time"
             className={styles.timeInput}
-            placeholder="Time"
             onChange={handleTimeChange}
+            value={scheduledTime}
           />
         </div>
       </div>

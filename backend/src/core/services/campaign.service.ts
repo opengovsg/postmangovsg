@@ -188,9 +188,11 @@ const listCampaigns = ({
 
   if (status) {
     let operation: any = {}
+    let checkField = ''
     switch (status) {
       case Status.Draft: {
         operation = { [Op.is]: null }
+        checkField = '$job_queue.status$'
         break
       }
       // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 1/2)
@@ -204,17 +206,29 @@ const listCampaigns = ({
             JobStatus.Stopped,
           ],
         }
+        checkField = '$job_queue.status$'
+
         break
       }
       case Status.Sent: {
         operation = { [Op.eq]: JobStatus.Logged }
+        checkField = '$job_queue.status$'
+
+        break
+      }
+      case Status.Scheduled: {
+        operation = {
+          [Op.gte]: new Date(),
+        }
+        checkField = '$job_queue.visible_at$'
         break
       }
       default: {
         break
       }
     }
-    const statusFilter = { '$job_queue.status$': operation } //join query
+    const statusFilter: { [key: string]: any } = {} //join query
+    statusFilter[checkField] = operation
     whereFilter = { ...whereFilter, ...statusFilter }
   }
 
@@ -278,6 +292,7 @@ const listCampaigns = ({
         model: JobQueue,
         attributes: [
           'status',
+          'visible_at',
           ['created_at', 'sent_at'],
           ['updated_at', 'status_updated_at'],
         ],
@@ -350,7 +365,7 @@ const getCampaignDetails = async (
     include: [
       {
         model: JobQueue,
-        attributes: ['status', ['created_at', 'sent_at']],
+        attributes: ['status', 'visible_at', ['created_at', 'sent_at']],
       },
       {
         model: Statistic,

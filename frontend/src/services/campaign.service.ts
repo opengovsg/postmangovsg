@@ -19,12 +19,21 @@ import {
 import type { CampaignRecipient } from 'classes'
 
 function getJobTimestamps(
-  jobs: Array<{ sent_at: string; status_updated_at: string }>
-): { sentAt: string; statusUpdatedAt: string } {
+  jobs: Array<{
+    sent_at: string
+    status_updated_at: string
+    visible_at: string
+  }>
+): { sentAt: string; statusUpdatedAt: string; visibleAt: string } {
   const jobsSentAt = jobs.map((x) => x.sent_at).sort()
   const jobsUpdatedAt = jobs.map((x) => x.status_updated_at).sort()
+  const jobsVisibleAt = jobs.map((x) => x.visible_at).sort()
   // returns job with the earliest sentAt time
-  return { sentAt: jobsSentAt[0], statusUpdatedAt: jobsUpdatedAt[0] }
+  return {
+    sentAt: jobsSentAt[0],
+    statusUpdatedAt: jobsUpdatedAt[0],
+    visibleAt: jobsVisibleAt[0],
+  }
 }
 
 export async function getCampaigns(params: {
@@ -42,11 +51,14 @@ export async function getCampaigns(params: {
   return axios.get('/campaigns', { params }).then((response) => {
     const { campaigns, total_count } = response.data
     const campaignList: Campaign[] = campaigns.map((data: any) => {
-      const { sentAt, statusUpdatedAt } = getJobTimestamps(data.job_queue)
+      const { sentAt, statusUpdatedAt, visibleAt } = getJobTimestamps(
+        data.job_queue
+      )
       const details = {
         ...data,
         sentAt,
         statusUpdatedAt,
+        visibleAt,
       }
 
       return new Campaign(details)
@@ -59,7 +71,8 @@ export async function getCampaigns(params: {
   })
 }
 
-function parseStatus(status: string): Status {
+function parseStatus(status: string, visibleAt: Date): Status {
+  const validVisibleAt = visibleAt > new Date()
   switch (status) {
     case 'LOGGED':
       return Status.Sent
@@ -68,7 +81,7 @@ function parseStatus(status: string): Status {
     case 'SENDING':
     case 'SENT':
     case 'STOPPED':
-      return Status.Sending
+      return validVisibleAt ? Status.Scheduled : Status.Sending
     default:
       return Status.Draft
   }
@@ -82,20 +95,20 @@ export async function getCampaignStats(
     return axios
       .post(`/campaign/${campaignId}/refresh-stats`)
       .then((response) => {
-        const { status, updatedAt, ...counts } = response.data
+        const { status, updatedAt, visibleAt, ...counts } = response.data
         return new CampaignStats({
           ...counts,
-          status: parseStatus(status),
+          status: parseStatus(status, visibleAt),
           updatedAt,
         })
       })
   }
 
   return axios.get(`/campaign/${campaignId}/stats`).then((response) => {
-    const { status, updatedAt, ...counts } = response.data
+    const { status, updatedAt, visibleAt, ...counts } = response.data
     return new CampaignStats({
       ...counts,
-      status: parseStatus(status),
+      status: parseStatus(status, visibleAt),
       updatedAt,
     })
   })
@@ -106,10 +119,11 @@ export async function getCampaignDetails(
 ): Promise<EmailCampaign | SMSCampaign | TelegramCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
     const campaign = response.data
-    const { sentAt } = getJobTimestamps(campaign.job_queue)
+    const { sentAt, visibleAt } = getJobTimestamps(campaign.job_queue)
     const details = {
       ...campaign,
       sentAt,
+      visibleAt,
     }
 
     switch (campaign.type) {
