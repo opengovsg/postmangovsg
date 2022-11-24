@@ -39,6 +39,7 @@ export interface CampaignDetails {
   }
   job_queue?: {
     status: string
+    visible_at?: Date
   }
   user?: {
     domain?: {

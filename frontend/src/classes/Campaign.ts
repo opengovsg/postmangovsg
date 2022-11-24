@@ -17,6 +17,7 @@ export enum Status {
 export enum StatusFilter {
   Draft = 'Draft',
   Sent = 'Sent',
+  Scheduled = 'Scheduled',
 }
 
 export enum SortField {
@@ -70,11 +71,13 @@ export class Campaign {
     this.visibleAt = input['visible_at']
   }
 
-  getStatus(jobs: Array<{ status: string; visible_at: Date }>): Status {
+  getStatus(jobs: Array<{ status: string; visible_at: string }>): Status {
     if (jobs) {
       // get a valid visible_at column
       const validVisibleAt =
-        jobs.filter((x) => x.status == 'READY')[0]?.visible_at > new Date()
+        moment(
+          jobs.filter((x) => x.status == 'READY')[0]?.visible_at
+        ).toDate() > new Date()
       const jobSet = new Set(jobs.map((x) => x.status))
       // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 2/2)
       if (
@@ -104,6 +107,7 @@ export class CampaignStats {
   waitTime?: number
   redacted?: boolean
   unsubscribed?: number
+  visibleAt?: string
 
   constructor(input: any) {
     this.error = +input['error']
@@ -116,6 +120,7 @@ export class CampaignStats {
     this.halted = input['halted']
     this.waitTime = input['wait_time']
     this.unsubscribed = input['unsubscribed']
+    this.visibleAt = input['visible_at']
   }
 }
 

@@ -8,6 +8,7 @@ export enum Status {
   Draft = 'Draft',
   Sending = 'Sending',
   Sent = 'Sent',
+  Scheduled = 'Scheduled',
 }
 
 export enum JobStatus {

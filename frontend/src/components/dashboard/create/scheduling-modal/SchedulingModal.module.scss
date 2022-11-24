@@ -32,9 +32,27 @@
 }
 
 .timeInput {
+  line-height: 2.5rem;
+  border-radius: 4px;
+  border: 1px solid #c9cccf;
+  font-weight: 400;
+  letter-spacing: -0.011rem;
+  width: 120px;
+}
+.timeInput::-webkit-datetime-edit-hour-field {
+  padding-left: 16px;
+}
+.timeInput::-webkit-datetime-edit-minute {
+  padding-right: 16px;
 }
 
 .actionButton {
   float: right;
   margin: 3rem 0;
+}
+
+:global {
+  .chakra-popover__popper {
+    z-index: 121 !important;
+  }
 }
