@@ -38,6 +38,7 @@ export class JobQueue extends Model<JobQueue> {
   @Column({
     type: DataType.DATE,
     allowNull: false,
+    defaultValue: new Date(),
   })
   visibleAt?: Date
 }
