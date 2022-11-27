@@ -1,4 +1,3 @@
-import { DateInput } from '@opengovsg/design-system-react'
 import cx from 'classnames'
 import moment from 'moment'
 import React, { useCallback, useContext, useState } from 'react'
@@ -15,7 +14,7 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
   // const modalContext = useContext(ModalContext)
   const { updateCampaign } = useContext(CampaignContext)
 
-  const [scheduledDate, setScheduledDate] = useState<string>()
+  const [scheduledDate, setScheduledDate] = useState<string>('dd/mm/yyyy')
   const [scheduledTime, setScheduledTime] = useState<string>('HH:mm')
 
   const scheduleTheSend = useCallback(() => {
@@ -39,8 +38,9 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
     return
   }
 
-  async function handleDateChange(s: string) {
-    setScheduledDate(s)
+  async function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
+    console.log('date changing:', e.target.value)
+    setScheduledDate(e.target.value)
     return
   }
 
@@ -59,10 +59,11 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
       <div className={styles.datetimeWrapper}>
         <div className={styles.dateWrapper}>
           <div>Date</div>
-          <DateInput
+          <input
+            type={'date'}
             className={styles.dateInput}
             value={scheduledDate}
-            isDateUnavailable={(d) => d < new Date(Date.now() - 86400000)}
+            min={new Date().toLocaleString('en-sg')}
             onChange={handleDateChange}
             name={'Date'}
           />
