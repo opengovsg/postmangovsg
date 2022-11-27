@@ -73,11 +73,6 @@ export class Campaign {
 
   getStatus(jobs: Array<{ status: string; visible_at: string }>): Status {
     if (jobs) {
-      // get a valid visible_at column
-      const validVisibleAt =
-        moment(
-          jobs.filter((x) => x.status == 'READY')[0]?.visible_at
-        ).toDate() > new Date()
       const jobSet = new Set(jobs.map((x) => x.status))
       // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 2/2)
       if (
@@ -86,7 +81,14 @@ export class Campaign {
         )
       ) {
         // scheduled? check visible_at after today
-        return validVisibleAt ? Status.Scheduled : Status.Sending
+        if (
+          jobs.every(
+            ({ visible_at }) => visible_at && new Date(visible_at) > new Date()
+          )
+        ) {
+          return Status.Scheduled
+        }
+        return Status.Sending
       } else if (jobSet.has('LOGGED')) {
         return Status.Sent
       }
