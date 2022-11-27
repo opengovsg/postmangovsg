@@ -29,6 +29,20 @@
 }
 
 .dateInput {
+  line-height: 2.5rem;
+  border-radius: 4px;
+  border: 1px solid #c9cccf;
+  font-weight: 400;
+  letter-spacing: -0.011rem;
+  width: 200px;
+}
+
+.dateInput::-webkit-datetime-edit-day-field {
+  padding-left: 16px;
+}
+
+.dateInput::-webkit-datetime-edit-year-field {
+  padding-right: 16px;
 }
 
 .timeInput {
