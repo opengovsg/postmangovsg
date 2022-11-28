@@ -148,7 +148,7 @@ export const InitEmailTransactionalMiddleware = (
     } = req.body
 
     try {
-      await EmailTransactionalService.sendMessage({
+      const messageId = await EmailTransactionalService.sendMessage({
         subject,
         body,
         from,
@@ -173,6 +173,7 @@ export const InitEmailTransactionalMiddleware = (
         TransactionalEmailMessageStatus.Accepted
       )
       emailMessageTransactional.set('acceptedAt', new Date())
+      emailMessageTransactional.set('messageId', messageId)
       await emailMessageTransactional.save()
 
       const resStatus = config

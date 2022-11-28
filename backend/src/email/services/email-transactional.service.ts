@@ -50,7 +50,7 @@ async function sendMessage({
   replyTo?: string
   attachments?: { data: Buffer; name: string }[]
   emailMessageTransactionalId: number
-}): Promise<void> {
+}): Promise<string> {
   const sanitizedSubject =
     EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
   const sanitizedBody = EmailTemplateService.client.filterXSS(body)
@@ -107,6 +107,7 @@ async function sendMessage({
   if (!messageId) {
     throw new Error('Failed to send transactional email')
   }
+  return messageId
 }
 
 type CallbackMetaData = {
