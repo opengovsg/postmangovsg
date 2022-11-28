@@ -8,10 +8,10 @@ import { Campaign } from 'classes'
 import { ActionButton } from 'components/common'
 import { confirmSendCampaign } from 'components/dashboard/create/util'
 import { CampaignContext } from 'contexts/campaign.context'
-// import { ModalContext } from 'contexts/modal.context'
+import { ModalContext } from 'contexts/modal.context'
 
 const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
-  // const modalContext = useContext(ModalContext)
+  const modalContext = useContext(ModalContext)
   const { updateCampaign } = useContext(CampaignContext)
 
   const [scheduledDate, setScheduledDate] = useState<string>('dd/mm/yyyy')
@@ -27,19 +27,24 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
       updateCampaign,
       scheduledTiming: scheduledDatetime.toDate(),
     })
+    modalContext.close()
     return
-  }, [scheduledDate, scheduledTime, campaign.id, campaign.type, updateCampaign])
+  }, [
+    scheduledDate,
+    scheduledTime,
+    campaign.id,
+    campaign.type,
+    updateCampaign,
+    modalContext,
+  ])
 
   async function handleScheduleCampaign(_: React.MouseEvent<HTMLDivElement>) {
     // form the payload from the date and time.
-    // modalContext.close()
     scheduleTheSend()
-
     return
   }
 
   async function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log('date changing:', e.target.value)
     setScheduledDate(e.target.value)
     return
   }

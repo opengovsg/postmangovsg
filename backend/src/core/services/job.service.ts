@@ -24,13 +24,28 @@ const createJob = async ({
     // if its not a scheduled campaign, just throw in current timing. will not affect main flow of logic
     scheduledTiming = new Date()
   }
+
+  //format scheduled Timing to a formatted string
+  // i think i needa offset 8 hrs man
+  const stringTiming =
+    scheduledTiming.getUTCDate() +
+    '/' +
+    (scheduledTiming.getUTCMonth() + 1) +
+    '/' +
+    scheduledTiming.getUTCFullYear() +
+    ' ' +
+    scheduledTiming.getUTCHours() +
+    ':' +
+    scheduledTiming.getUTCMinutes() +
+    ':' +
+    scheduledTiming.getUTCSeconds()
   const job = await Campaign.sequelize?.query(
     'SELECT insert_job(:campaignId, :rate, :scheduledTiming);',
     {
       replacements: {
         campaignId,
         rate,
-        scheduledTiming: scheduledTiming.toLocaleString(),
+        scheduledTiming: stringTiming,
       },
       type: QueryTypes.SELECT,
     }

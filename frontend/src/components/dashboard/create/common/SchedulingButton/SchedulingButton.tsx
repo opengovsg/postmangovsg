@@ -16,7 +16,6 @@ const SchedulingButton = ({ campaign }: { campaign: Campaign }) => {
     event: ReactMouseEvent<HTMLDivElement, MouseEvent>
   ) {
     event.stopPropagation()
-    console.log(event)
     modalContext.setModalContent(<SchedulingModal campaign={campaign} />)
   }
   return (
