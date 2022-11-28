@@ -15,7 +15,7 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
   const { updateCampaign } = useContext(CampaignContext)
 
   const [scheduledDate, setScheduledDate] = useState<string>('dd/mm/yyyy')
-  const [scheduledTime, setScheduledTime] = useState<string>('HH:mm')
+  const [scheduledTime, setScheduledTime] = useState<string>()
 
   const scheduleTheSend = useCallback(() => {
     // combine date and time
@@ -63,7 +63,7 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
             type={'date'}
             className={styles.dateInput}
             value={scheduledDate}
-            min={new Date().toLocaleString('en-sg')}
+            min={moment().format('yyyy-M-D')}
             onChange={handleDateChange}
             name={'Date'}
           />
