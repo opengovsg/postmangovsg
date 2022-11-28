@@ -19,7 +19,7 @@ module.exports = {
           AND q.campaign_id = p.id
           AND p.cred_name = c.name
           AND is_credential_used(p.id) IS NULL
-          AND q.visible_at >= clock_timestamp()
+          AND q.visible_at <= clock_timestamp()
           ORDER BY id ASC
           LIMIT 1
           FOR UPDATE SKIP LOCKED
