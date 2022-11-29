@@ -1,14 +1,8 @@
 import { useEffect, useContext } from 'react'
 
-import Moment from 'react-moment'
-
 import { Status, ChannelType } from 'classes/Campaign'
-import {
-  StepHeader,
-  ProgressDetails,
-  PreviewBlock,
-  TextButton,
-} from 'components/common'
+import { StepHeader, ProgressDetails, PreviewBlock } from 'components/common'
+import CampaignScheduledInfo from 'components/common/CampaignScheduledInfo'
 import ScheduleDetails from 'components/common/schedule-details'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
@@ -80,25 +74,7 @@ const TelegramDetail = () => {
         </StepHeader>
       )
     } else if (campaign.status === Status.Scheduled) {
-      return (
-        <StepHeader title="Your campaign has been scheduled!">
-          <p>
-            Your campaign has been scheduled to be sent on{' '}
-            <Moment format="LLL" interval={0}>
-              {campaign.scheduledAt}
-            </Moment>
-            .
-          </p>
-          <p>
-            Please note that for larger campaigns with many recipients, it may
-            take a while for your campaign to fully complete sending to all
-            recipients.
-          </p>
-          <TextButton onClick={() => console.log('Cancel clicked')}>
-            Cancel scheduling
-          </TextButton>
-        </StepHeader>
-      )
+      return <CampaignScheduledInfo />
     } else {
       return (
         <StepHeader title="Your campaign has been sent!">
@@ -122,7 +98,7 @@ const TelegramDetail = () => {
         <h3>Message Template</h3>
         <PreviewBlock body={campaign.body} />
         <div className="separator"></div>
-        {stats.status && (
+        {stats.status && stats.status !== Status.Scheduled && (
           <ProgressDetails
             stats={stats}
             redacted={campaign.redacted}

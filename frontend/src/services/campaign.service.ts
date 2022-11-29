@@ -72,7 +72,6 @@ export async function getCampaigns(params: {
 }
 
 function parseStatus(status: string, visibleAt: string): Status {
-  console.log('parsing status...', status, visibleAt)
   const validVisibleAt = visibleAt && new Date(visibleAt) >= new Date()
   switch (status) {
     case 'LOGGED':
