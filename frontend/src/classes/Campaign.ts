@@ -8,10 +8,10 @@ export enum ChannelType {
 
 export enum Status {
   Draft = 'Draft',
+  Scheduled = 'Scheduled',
   Sending = 'Sending',
   Sent = 'Sent',
   Halted = 'Halted',
-  Scheduled = 'Scheduled',
 }
 
 export enum StatusFilter {
@@ -50,7 +50,7 @@ export class Campaign {
   demoMessageLimit: number | null
   costPerMessage?: number
   shouldSaveList: boolean
-  visibleAt: Date
+  scheduledAt?: Date
 
   constructor(input: any) {
     this.id = input['id']
@@ -68,10 +68,16 @@ export class Campaign {
     this.demoMessageLimit = input['demo_message_limit']
     this.costPerMessage = input['cost_per_message']
     this.shouldSaveList = input['should_save_list']
-    this.visibleAt = input['visible_at']
+    if (this.status === Status.Scheduled) {
+      const jobs = input['job_queue'] as Array<{ visible_at: string }>
+      const jobsVisibleTime = jobs
+        .map(({ visible_at: visibleAt }) => new Date(visibleAt))
+        .sort()
+      this.scheduledAt = jobsVisibleTime[0]
+    }
   }
 
-  getStatus(jobs: Array<{ status: string; visible_at: string }>): Status {
+  getStatus(jobs: Array<{ status: string; visible_at?: string }>): Status {
     if (jobs) {
       const jobSet = new Set(jobs.map((x) => x.status))
       // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 2/2)
@@ -80,7 +86,6 @@ export class Campaign {
           jobSet.has(s)
         )
       ) {
-        // scheduled? check visible_at after today
         if (
           jobs.every(
             ({ visible_at }) => visible_at && new Date(visible_at) > new Date()

@@ -8,7 +8,7 @@ import {
   ChannelType,
   JobStatus,
   Ordering,
-  SortField,
+  CampaignSortField,
   Status,
 } from '@core/constants'
 
@@ -95,7 +95,7 @@ describe('GET /campaigns', () => {
 
     const resAsc = await request(app)
       .get('/campaigns')
-      .query({ order_by: Ordering.ASC, sort_by: SortField.Created })
+      .query({ order_by: Ordering.ASC, sort_by: CampaignSortField.Created })
     expect(resAsc.status).toBe(200)
     expect(resAsc.body.total_count).toEqual(3)
     for (let i = 1; i <= 3; i++) {
@@ -104,7 +104,7 @@ describe('GET /campaigns', () => {
 
     const resDesc = await request(app)
       .get('/campaigns')
-      .query({ order_by: Ordering.DESC, sort_by: SortField.Created })
+      .query({ order_by: Ordering.DESC, sort_by: CampaignSortField.Created })
     expect(resDesc.status).toBe(200)
     expect(resDesc.body.total_count).toEqual(3)
     for (let i = 1; i <= 3; i++) {
@@ -132,7 +132,7 @@ describe('GET /campaigns', () => {
 
     const resSentAsc = await request(app)
       .get('/campaigns')
-      .query({ order_by: Ordering.ASC, sort_by: SortField.Sent })
+      .query({ order_by: Ordering.ASC, sort_by: CampaignSortField.Sent })
     expect(resSentAsc.status).toBe(200)
     expect(resSentAsc.body.total_count).toEqual(3)
     for (let i = 1; i <= 3; i++) {
@@ -141,7 +141,7 @@ describe('GET /campaigns', () => {
 
     const resSentDesc = await request(app)
       .get('/campaigns')
-      .query({ order_by: Ordering.DESC, sort_by: SortField.Sent })
+      .query({ order_by: Ordering.DESC, sort_by: CampaignSortField.Sent })
     expect(resSentDesc.status).toBe(200)
     expect(resSentDesc.body.total_count).toEqual(3)
     for (let i = 1; i <= 3; i++) {

@@ -19,9 +19,10 @@
     "test": "react-app-rewired test --passWithNoTests"
   },
   "dependencies": {
-    "@emotion/is-prop-valid": "^1.2.0",
+    "@emotion/is-prop-valid": "1.2.0",
     "@emotion/react": "11.10.5",
     "@emotion/styled": "11.10.5",
+    "@lingui/core": "3.14.0",
     "@lingui/react": "3.14.0",
     "@sentry/browser": "5.27.6",
     "@types/bcryptjs": "2.4.2",
@@ -38,8 +39,10 @@
     "draftjs-to-html": "0.9.1",
     "escape-html": "1.0.3",
     "html-to-draftjs": "1.5.0",
+    "immutable": "3.8.2",
     "lodash": "4.17.21",
     "lottie-react": "2.3.0",
+    "make-plural": "6.2.2",
     "moment": "2.29.4",
     "papaparse": "5.2.0",
     "querystring": "0.2.1",
