@@ -87,6 +87,7 @@ interface ConfigSchema {
   transactionalEmail: {
     rate: number
     window: number
+    bodySizeLimit: number
   }
   defaultCountry: string
   defaultCountryCode: string
@@ -461,6 +462,12 @@ const config: Config<ConfigSchema> = convict({
       doc: 'The duration of each window for transactional emails in seconds.',
       default: 1,
       env: 'TRANSACTIONAL_EMAIL_WINDOW',
+      format: 'int',
+    },
+    bodySizeLimit: {
+      doc: 'The maximum size of the body of a transactional email in bytes',
+      default: 1048576, // 1 mebibyte; 2^20 bytes
+      env: 'TRANSACTIONAL_EMAIL_BODY_SIZE_LIMIT_BYTES',
       format: 'int',
     },
   },
