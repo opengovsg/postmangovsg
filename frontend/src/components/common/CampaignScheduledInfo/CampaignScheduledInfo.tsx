@@ -5,15 +5,18 @@ import Moment from 'react-moment'
 import styles from './CampaignScheduledInfo.module.scss'
 
 import { StepHeader, TextButton } from 'components/common'
+import CancelSchedulingModal from 'components/dashboard/create/cancel-scheduling-modal'
 import SchedulingButton from 'components/dashboard/create/common/SchedulingButton'
 import { CampaignContext } from 'contexts/campaign.context'
+import { ModalContext } from 'contexts/modal.context'
 
 const CampaignScheduledInfo = () => {
   const { campaign } = useContext(CampaignContext)
+  const modalContext = useContext(ModalContext)
 
   // open cancel confirm modal
   async function handleCancelSchedule() {
-    console.log('cancel clicked')
+    modalContext.setModalContent(<CancelSchedulingModal campaign={campaign} />)
     return
   }
 
