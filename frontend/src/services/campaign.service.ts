@@ -71,8 +71,9 @@ export async function getCampaigns(params: {
   })
 }
 
-function parseStatus(status: string, visibleAt: Date): Status {
-  const validVisibleAt = visibleAt > new Date()
+function parseStatus(status: string, visibleAt: string): Status {
+  console.log('parsing status...', status, visibleAt)
+  const validVisibleAt = visibleAt && new Date(visibleAt) >= new Date()
   switch (status) {
     case 'LOGGED':
       return Status.Sent
@@ -105,10 +106,10 @@ export async function getCampaignStats(
   }
 
   return axios.get(`/campaign/${campaignId}/stats`).then((response) => {
-    const { status, updatedAt, visibleAt, ...counts } = response.data
+    const { status, updatedAt, visible_at, ...counts } = response.data
     return new CampaignStats({
       ...counts,
-      status: parseStatus(status, visibleAt),
+      status: parseStatus(status, visible_at),
       updatedAt,
     })
   })

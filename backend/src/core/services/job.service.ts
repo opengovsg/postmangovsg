@@ -28,9 +28,10 @@ const createJob = async ({
   //format scheduled Timing to a formatted string
   // i think i needa offset 8 hrs man
   const stringTiming =
-    scheduledTiming.getUTCDate() +
+    scheduledTiming.getUTCMonth() +
+    1 +
     '/' +
-    (scheduledTiming.getUTCMonth() + 1) +
+    scheduledTiming.getUTCDate() +
     '/' +
     scheduledTiming.getUTCFullYear() +
     ' ' +

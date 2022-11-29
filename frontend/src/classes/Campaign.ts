@@ -51,6 +51,7 @@ export class Campaign {
   costPerMessage?: number
   shouldSaveList: boolean
   scheduledAt?: Date
+  visibleAt?: string
 
   constructor(input: any) {
     this.id = input['id']
@@ -68,6 +69,7 @@ export class Campaign {
     this.demoMessageLimit = input['demo_message_limit']
     this.costPerMessage = input['cost_per_message']
     this.shouldSaveList = input['should_save_list']
+    this.visibleAt = input['visible_at']
     if (this.status === Status.Scheduled) {
       const jobs = input['job_queue'] as Array<{ visible_at: string }>
       const jobsVisibleTime = jobs
@@ -87,9 +89,9 @@ export class Campaign {
         )
       ) {
         if (
-          jobs.every(
-            ({ visible_at }) => visible_at && new Date(visible_at) > new Date()
-          )
+          jobs.every(({ visible_at }) => {
+            return visible_at && new Date(visible_at) >= new Date()
+          })
         ) {
           return Status.Scheduled
         }
