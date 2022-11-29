@@ -1,8 +1,8 @@
 import cors from 'cors'
-import express, { Request, Response, NextFunction } from 'express'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
-import * as Sentry from '@sentry/node'
+import express, { Request, Response, NextFunction } from 'express'
 import expressWinston from 'express-winston'
+import * as Sentry from '@sentry/node'
 
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
@@ -73,7 +73,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
 
   app.use(
     express.json({
-      // this must be bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
       // will get 404 error informing them of the size of the limit, instead of 500 error
       limit: config.get('transactionalEmail.bodySizeLimit') * 10,
     })

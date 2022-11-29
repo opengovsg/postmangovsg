@@ -29,7 +29,7 @@ export const InitEmailTransactionalRoute = (
       body: Joi.string()
         .max(config.get('transactionalEmail.bodySizeLimit'), 'utf8')
         .required()
-        // custom error message because Joi's default message doesn't fully reflect the requirements
+        // custom error message because Joi's default message doesn't fully reflect the validation rules
         .error(
           new Error(
             `body is a required string whose size must be less than or equal to ${bytes.format(
