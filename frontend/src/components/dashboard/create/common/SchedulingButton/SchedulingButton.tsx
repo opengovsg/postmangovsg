@@ -9,7 +9,13 @@ import styles from 'components/common/export-recipients/ExportRecipients.module.
 import SchedulingModal from 'components/dashboard/create/scheduling-modal'
 import { ModalContext } from 'contexts/modal.context'
 
-const SchedulingButton = ({ campaign }: { campaign: Campaign }) => {
+const SchedulingButton = ({
+  campaign,
+  buttonText,
+}: {
+  campaign: Campaign
+  buttonText: string
+}) => {
   const modalContext = useContext(ModalContext)
 
   async function openSchedulingModal(
@@ -26,7 +32,7 @@ const SchedulingButton = ({ campaign }: { campaign: Campaign }) => {
             await openSchedulingModal(e)
           }}
         >
-          Schedule for later
+          {buttonText}
           <div>
             <i className={cx(styles.icon, 'bx bx-calendar-event')}></i>
           </div>

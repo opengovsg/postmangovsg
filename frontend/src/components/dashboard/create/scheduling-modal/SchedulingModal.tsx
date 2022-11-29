@@ -13,9 +13,14 @@ import { ModalContext } from 'contexts/modal.context'
 const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
   const modalContext = useContext(ModalContext)
   const { updateCampaign } = useContext(CampaignContext)
-
-  const [scheduledDate, setScheduledDate] = useState<string>('dd/mm/yyyy')
-  const [scheduledTime, setScheduledTime] = useState<string>()
+  // initial visibleAt
+  const scheduledAt = campaign.scheduledAt
+  const [scheduledDate, setScheduledDate] = useState<string>(
+    scheduledAt ? moment(scheduledAt).format('yyyy-M-DD') : ''
+  )
+  const [scheduledTime, setScheduledTime] = useState<string>(
+    scheduledAt ? scheduledAt.toLocaleTimeString() : ''
+  )
 
   const scheduleTheSend = useCallback(() => {
     // combine date and time
@@ -53,6 +58,7 @@ const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
     setScheduledTime(e.target.value)
     return
   }
+
   return (
     <>
       <div className={styles.title}>

@@ -1,19 +1,19 @@
-import cx from 'classnames'
 import React, { useContext } from 'react'
 
 import Moment from 'react-moment'
 
 import styles from './CampaignScheduledInfo.module.scss'
 
-import { ActionButton, StepHeader, TextButton } from 'components/common'
+import { StepHeader, TextButton } from 'components/common'
+import SchedulingButton from 'components/dashboard/create/common/SchedulingButton'
 import { CampaignContext } from 'contexts/campaign.context'
 
 const CampaignScheduledInfo = () => {
   const { campaign } = useContext(CampaignContext)
 
-  async function handleEditCampaign() {
-    // break down scheduled at and split it up
-    console.log('edit clicked')
+  // open cancel confirm modal
+  async function handleCancelSchedule() {
+    console.log('cancel clicked')
     return
   }
 
@@ -34,17 +34,13 @@ const CampaignScheduledInfo = () => {
         </p>
       </StepHeader>
       <div className={styles.buttonWrapper}>
-        <TextButton onClick={() => console.log('Cancel clicked')}>
+        <TextButton onClick={handleCancelSchedule}>
           Cancel scheduling
         </TextButton>
-        <ActionButton>
-          <div onClick={handleEditCampaign}>
-            Reschedule campaign
-            <div>
-              <i className={cx(styles.icon, 'bx bx-calendar-event')}></i>
-            </div>
-          </div>
-        </ActionButton>
+        <SchedulingButton
+          campaign={campaign}
+          buttonText={'Reschedule Campaign'}
+        />
       </div>
     </>
   )

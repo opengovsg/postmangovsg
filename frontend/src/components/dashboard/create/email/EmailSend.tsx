@@ -108,7 +108,10 @@ const EmailSend = () => {
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-        <SchedulingButton campaign={campaign} />
+        <SchedulingButton
+          campaign={campaign}
+          buttonText={'Schedule for later'}
+        />
       </ButtonGroup>
     </>
   )
