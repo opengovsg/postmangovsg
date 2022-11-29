@@ -2,6 +2,12 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    // drop all existing instances of insert_job
+    await queryInterface.dropFunction('insert_job', [
+      { type: 'integer', name: 'selected_campaign_id' },
+      { type: 'integer', name: 'selected_send_rate' },
+      { type: 'integer', direction: 'OUT', name: 'selected_job_id' },
+    ])
     await queryInterface.createFunction(
       'insert_job',
       [
