@@ -335,6 +335,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         ...validApiCall,
         body,
       })
+    // note: in practice, the response given to the user is a 500 error with PayloadTooLargeError
     expect(res.status).toBe(413)
     expect(mockSendEmail).not.toBeCalled()
   })
