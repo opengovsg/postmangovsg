@@ -3,12 +3,12 @@ import {
   BelongsTo,
   Column,
   DataType,
+  Default,
   ForeignKey,
-  Model,
-  Table,
   HasMany,
   HasOne,
-  Default,
+  Model,
+  Table,
 } from 'sequelize-typescript'
 import { ChannelType } from '@core/constants'
 import { CampaignS3ObjectInterface } from '@core/interfaces'
@@ -103,6 +103,12 @@ export class Campaign extends Model<Campaign> {
     allowNull: true,
   })
   demoMessageLimit!: number
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  visibleAt?: Date
 
   // Sets key in s3Object json
   static async updateS3ObjectKey(

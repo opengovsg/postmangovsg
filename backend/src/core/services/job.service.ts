@@ -1,4 +1,4 @@
-import { QueryTypes, Op } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 import get from 'lodash/get'
 
 import config from '@core/config'
@@ -103,6 +103,18 @@ const sendCampaign = async ({
       listId: list.id,
     })
   }
+
+  // save visible at into campaign as well
+  // if undefined passed then so be it, campaign allows nullable visible_at
+  await Campaign.update(
+    {
+      visibleAt: scheduledTiming,
+    },
+    {
+      where: { id: campaignId },
+      returning: false,
+    }
+  )
 
   if (campaign.type === ChannelType.Email) {
     // For email type, we only want to take up a single worker at a time at the

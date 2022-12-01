@@ -13,9 +13,8 @@ import ECSUtil from './util/ecs'
 import assignment from './util/assignment'
 import { Message } from './interface'
 import { NotificationService } from '@core/services/notification.service'
-import { MailToSend } from '@shared/clients/mail-client.class'
-import { ThemeClient } from '@shared/theme'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
+import MailClient from '@shared/clients/mail-client.class'
 
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 
@@ -281,19 +280,30 @@ const sendFinalizedNotification = (campaignId: number): void => {
         // craft and send mail here
         // for scheduled, visible_at must be after created_at
         if (new Date(createdAt) < new Date(visibleAt)) {
-          const mail = await generateScheduledCampaignNotificationEmail(
-            notificationEmail,
-            campaignName,
-            unsentCount,
-            errorCount,
-            sentCount,
-            invalidCount
-          )
+          const mail =
+            await NotificationService.generateScheduledCampaignNotificationEmail(
+              client,
+              notificationEmail,
+              campaignName,
+              unsentCount,
+              errorCount,
+              sentCount,
+              invalidCount
+            )
           if (!mail) {
             throw new Error('No message to send')
           }
           // Send email using node mailer
-          const isEmailSent = await NotificationService.sendEmail(mail)
+          const mailClient = new MailClient(
+            config.get('mailOptions'),
+            config.get('mailOptions.callbackHashSecret'),
+            config.get('mailFrom'),
+            config.get('mailConfigurationSet')
+          )
+          const isEmailSent = await NotificationService.sendEmail(
+            mailClient,
+            mail
+          )
           if (isEmailSent) {
             logger.info({
               message: 'Get notification data successful',
@@ -312,45 +322,6 @@ const sendFinalizedNotification = (campaignId: number): void => {
       }
     })
   return
-}
-
-const generateScheduledCampaignNotificationEmail = async (
-  recipient: string,
-  campaignName: string,
-  unsentCount: number,
-  errorCount: number,
-  sentCount: number,
-  invalidCount: number
-): Promise<MailToSend | void> => {
-  const subject = ''
-  // hardcode the email body for notification
-  const totalCount = unsentCount + errorCount + sentCount + invalidCount
-  // manually build the params set
-  const params: { [key: string]: string } = {
-    recipient: recipient,
-    campaignName: campaignName,
-    totalCount: totalCount.toString(),
-    unsentCount: unsentCount.toString(),
-    errorCount: errorCount.toString(),
-    sentCount: sentCount.toString(),
-    invalidCount: invalidCount.toString(),
-  }
-  const templateBody =
-    '<p>Hey {{recipient}}, your scheduled campaign {{campaignName}} has been sent!</p>' +
-    '<p>Out of {{totalCount}} messages, {{sentCount}} messages were successfully sent and {{unsentCount}} were unsent </p>' +
-    '<p>This campaign had {{invalidCount}} invalid recipients, and met with {{errorCount}} errors.</p>'
-  const body = client.template(templateBody as string, params)
-  const mailToSend: MailToSend = {
-    from: config.get('mailFrom'),
-    recipients: [recipient],
-    body: await ThemeClient.generateThemedHTMLEmail({
-      unsubLink: '',
-      body,
-    }),
-    subject,
-    ...(config.get('mailFrom') ? { replyTo: config.get('mailFrom') } : {}),
-  }
-  return mailToSend
 }
 
 /**
