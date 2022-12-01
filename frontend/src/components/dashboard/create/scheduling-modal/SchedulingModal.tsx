@@ -13,7 +13,6 @@ import { ModalContext } from 'contexts/modal.context'
 const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
   const modalContext = useContext(ModalContext)
   const { updateCampaign } = useContext(CampaignContext)
-  // initial visibleAt
   const scheduledAt = campaign.scheduledAt
   const [scheduledDate, setScheduledDate] = useState<string>(
     scheduledAt ? moment(scheduledAt).format('yyyy-M-DD') : ''

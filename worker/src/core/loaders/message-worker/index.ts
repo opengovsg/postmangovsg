@@ -2,10 +2,9 @@ import tracer from 'dd-trace'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
+import { generateRdsIamAuthToken, MutableConfig } from '@core/utils/rds-iam'
 import { waitForMs } from '@shared/utils/wait-for-ms'
 import Email from './email.class'
 import SMS from './sms.class'
@@ -13,8 +12,16 @@ import Telegram from './telegram.class'
 import ECSUtil from './util/ecs'
 import assignment from './util/assignment'
 import { Message } from './interface'
+import { NotificationService } from '@core/services/notification.service'
+import { MailToSend } from '@shared/clients/mail-client.class'
+import { ThemeClient } from '@shared/theme'
+import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
+
+require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 
 const logger = loggerWithLabel(module)
+const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
+
 let connection: Sequelize,
   workerId: string,
   currentCampaignType: string,
@@ -158,6 +165,8 @@ const finalize = tracer.wrap(
             campaignId,
             action: 'finalize',
           })
+          // for each campaign id, send email confirmation
+          sendFinalizedNotification(campaignId)
         })
       }
     )
@@ -246,6 +255,102 @@ const enqueueAndSend = async (): Promise<void> => {
     }
     await service().destroySendingService()
   }
+}
+
+const sendFinalizedNotification = (campaignId: number): void => {
+  void connection
+    .query('SELECT get_notification_data_by_campaign_id(:campaign_id)', {
+      replacements: { campaign_id: campaignId },
+      type: QueryTypes.SELECT,
+    })
+    .then(async (result) => {
+      const jsonRes =
+        get(result, '[0].get_notification_data_by_campaign_id') || {}
+      const {
+        id: campaignId,
+        campaign_name: campaignName,
+        visible_at: visibleAt,
+        created_at: createdAt,
+        unsent_count: unsentCount,
+        error_count: errorCount,
+        sent_count: sentCount,
+        invalid_count: invalidCount,
+        notification_email: notificationEmail,
+      } = jsonRes
+      if (campaignId) {
+        // craft and send mail here
+        // for scheduled, visible_at must be after created_at
+        if (new Date(createdAt) < new Date(visibleAt)) {
+          const mail = await generateScheduledCampaignNotificationEmail(
+            notificationEmail,
+            campaignName,
+            unsentCount,
+            errorCount,
+            sentCount,
+            invalidCount
+          )
+          if (!mail) {
+            throw new Error('No message to send')
+          }
+          // Send email using node mailer
+          const isEmailSent = await NotificationService.sendEmail(mail)
+          if (isEmailSent) {
+            logger.info({
+              message: 'Get notification data successful',
+              campaignId,
+              visibleAt,
+              createdAt,
+              unsentCount,
+              errorCount,
+              sentCount,
+              invalidCount,
+              notificationEmail,
+              action: 'sendFinalizedNotification',
+            })
+          }
+        }
+      }
+    })
+  return
+}
+
+const generateScheduledCampaignNotificationEmail = async (
+  recipient: string,
+  campaignName: string,
+  unsentCount: number,
+  errorCount: number,
+  sentCount: number,
+  invalidCount: number
+): Promise<MailToSend | void> => {
+  const subject = ''
+  // hardcode the email body for notification
+  const totalCount = unsentCount + errorCount + sentCount + invalidCount
+  // manually build the params set
+  const params: { [key: string]: string } = {
+    recipient: recipient,
+    campaignName: campaignName,
+    totalCount: totalCount.toString(),
+    unsentCount: unsentCount.toString(),
+    errorCount: errorCount.toString(),
+    sentCount: sentCount.toString(),
+    invalidCount: invalidCount.toString(),
+  }
+  const templateBody =
+    '<p>Hey {{recipient}}, your scheduled campaign {{campaignName}} has been sent!</p>' +
+    '<p>Out of {{totalCount}} messages, {{sentCount}} messages were successfully sent and {{unsentCount}} were unsent </p>' +
+    '<p>This campaign had {{invalidCount}} invalid recipients, and met with {{errorCount}} errors.</p>'
+  const body = client.template(templateBody as string, params)
+  const mailToSend: MailToSend = {
+    from: config.get('mailFrom'),
+    recipients: [recipient],
+    body: await ThemeClient.generateThemedHTMLEmail({
+      unsubLink: '',
+      body,
+    }),
+    subject,
+    ...(config.get('mailFrom') ? { replyTo: config.get('mailFrom') } : {}),
+  }
+  return mailToSend
 }
 
 /**
