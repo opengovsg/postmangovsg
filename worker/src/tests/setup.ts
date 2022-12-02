@@ -1,3 +1,6 @@
+import { config } from 'dotenv'
+// manually import config here
+config()
 /* eslint-disable no-console */
 global.console = {
   ...global.console,
