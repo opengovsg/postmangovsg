@@ -21,7 +21,8 @@ SELECT json_build_object('id', c.id,
 'error_count', s.errored,
 'sent_count', s.sent,
 'invalid_count', s.invalid,
-'notification_email', u.email) INTO result FROM campaigns c INNER JOIN statistics s ON c.id=s.campaign_id INNER JOIN users u ON c.user_id=u.id WHERE c.id=campaign_id_input;
+'notification_email', u.email,
+'halted', c.halted) INTO result FROM campaigns c INNER JOIN statistics s ON c.id=s.campaign_id INNER JOIN users u ON c.user_id=u.id WHERE c.id=campaign_id_input;
       RETURN result;
       `,
       [],

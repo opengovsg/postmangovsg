@@ -14,7 +14,7 @@ import assignment from './util/assignment'
 import { Message } from './interface'
 import { NotificationService } from '@core/services/notification.service'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
-import MailClient from '@shared/clients/mail-client.class'
+import MailClient, { MailToSend } from '@shared/clients/mail-client.class'
 
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 
@@ -275,24 +275,36 @@ const sendFinalizedNotification = (campaignId: number): void => {
         sent_count: sentCount,
         invalid_count: invalidCount,
         notification_email: notificationEmail,
+        halted: halted,
       } = jsonRes
+
+      let mail: MailToSend | void
       if (campaignId) {
         // craft and send mail here
-        // for scheduled, visible_at must be after created_at
-        if (new Date(createdAt) < new Date(visibleAt)) {
-          const mail =
-            await NotificationService.generateScheduledCampaignNotificationEmail(
+        // if halted, send halted notif
+        if (halted) {
+          mail =
+            await NotificationService.generateHaltedCampaignNotificationEmail(
               client,
               notificationEmail,
-              campaignName,
-              unsentCount,
-              errorCount,
-              sentCount,
-              invalidCount
+              campaignName
             )
-          if (!mail) {
-            throw new Error('No message to send')
+        } else {
+          // for scheduled, visible_at must be after created_at
+          if (new Date(createdAt) < new Date(visibleAt)) {
+            mail =
+              await NotificationService.generateScheduledCampaignNotificationEmail(
+                client,
+                notificationEmail,
+                campaignName,
+                unsentCount,
+                errorCount,
+                sentCount,
+                invalidCount
+              )
           }
+        }
+        if (mail) {
           // Send email using node mailer
           const mailClient = new MailClient(
             config.get('mailOptions'),
@@ -306,7 +318,7 @@ const sendFinalizedNotification = (campaignId: number): void => {
           )
           if (isEmailSent) {
             logger.info({
-              message: 'Get notification data successful',
+              message: 'Notification email successfully sent',
               campaignId,
               visibleAt,
               createdAt,
@@ -315,6 +327,7 @@ const sendFinalizedNotification = (campaignId: number): void => {
               sentCount,
               invalidCount,
               notificationEmail,
+              halted,
               action: 'sendFinalizedNotification',
             })
           }

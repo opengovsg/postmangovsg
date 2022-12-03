@@ -2,6 +2,9 @@ import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import { NotificationService } from '@core/services/notification.service'
 import config from '@core/config'
 import MailClient from '@shared/clients/mail-client.class'
+// import { Sequelize } from 'sequelize-typescript'
+// import { QueryTypes } from 'sequelize'
+// import get from 'lodash/get'
 
 let templateClient: TemplateClient
 let mailClient: MailClient
@@ -61,30 +64,51 @@ describe('notification', () => {
     //       sent_count: sentCount,
     //       invalid_count: invalidCount,
     //       notification_email: notificationEmail,
+    //       halted: halted,
     //     } = jsonRes
     //     if (campaignId) {
     //       // craft and send mail here
     //       // for scheduled, visible_at must be after created_at
-    //       if (new Date(createdAt) < new Date(visibleAt)) {
-    //         const mail =
-    //           await NotificationService.generateScheduledCampaignNotificationEmail(
-    //             templateClient,
-    //             notificationEmail,
-    //             campaignName,
-    //             unsentCount,
-    //             errorCount,
-    //             sentCount,
-    //             invalidCount
-    //           )
-    //         if (!mail) {
-    //           throw new Error('No message to send')
+    //       let mail: MailToSend | void
+    //       if (campaignId) {
+    //         // craft and send mail here
+    //         // if halted, send halted notif
+    //         if (halted) {
+    //           mail =
+    //             await NotificationService.generateHaltedCampaignNotificationEmail(
+    //               templateClient,
+    //               notificationEmail,
+    //               campaignName
+    //             )
+    //         } else {
+    //           // for scheduled, visible_at must be after created_at
+    //           if (new Date(createdAt) < new Date(visibleAt)) {
+    //             mail =
+    //               await NotificationService.generateScheduledCampaignNotificationEmail(
+    //                 templateClient,
+    //                 notificationEmail,
+    //                 campaignName,
+    //                 unsentCount,
+    //                 errorCount,
+    //                 sentCount,
+    //                 invalidCount
+    //               )
+    //           }
     //         }
-    //         // Send email using node mailer
-    //         const isEmailSent = await NotificationService.sendEmail(
-    //           mailClient,
-    //           mail
-    //         )
-    //         expect(isEmailSent).toBeTruthy()
+    //         if (mail) {
+    //           // Send email using node mailer
+    //           const mailClient = new MailClient(
+    //             config.get('mailOptions'),
+    //             config.get('mailOptions.callbackHashSecret'),
+    //             config.get('mailFrom'),
+    //             config.get('mailConfigurationSet')
+    //           )
+    //           const isEmailSent = await NotificationService.sendEmail(
+    //             mailClient,
+    //             mail
+    //           )
+    //           expect(isEmailSent).toBeTruthy()
+    //         }
     //       }
     //     }
     //   }) // init a client
