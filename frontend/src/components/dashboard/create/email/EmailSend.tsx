@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { useParams } from 'react-router-dom'
 
@@ -8,10 +8,10 @@ import { campaignFeedbackUrl, confirmSendCampaign } from '../util'
 
 import { ChannelType } from 'classes'
 import {
+  ButtonGroup,
+  ConfirmModal,
   EmailPreviewBlock,
   PrimaryButton,
-  ConfirmModal,
-  ButtonGroup,
   StepHeader,
   StepSection,
 } from 'components/common'
@@ -110,6 +110,7 @@ const EmailSend = () => {
         </PrimaryButton>
         <SchedulingButton
           campaign={campaign}
+          updateCampaign={updateCampaign}
           buttonText={'Schedule for later'}
         />
       </ButtonGroup>

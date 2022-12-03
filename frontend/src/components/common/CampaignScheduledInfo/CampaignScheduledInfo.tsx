@@ -11,7 +11,7 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 
 const CampaignScheduledInfo = () => {
-  const { campaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const modalContext = useContext(ModalContext)
 
   // open cancel confirm modal
@@ -42,6 +42,7 @@ const CampaignScheduledInfo = () => {
         </TextButton>
         <SchedulingButton
           campaign={campaign}
+          updateCampaign={updateCampaign}
           buttonText={'Reschedule Campaign'}
         />
       </div>

@@ -7,12 +7,16 @@ import styles from './SchedulingModal.module.scss'
 import { Campaign } from 'classes'
 import { ActionButton } from 'components/common'
 import { confirmSendCampaign } from 'components/dashboard/create/util'
-import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 
-const SchedulingModal = ({ campaign }: { campaign: Campaign }) => {
+const SchedulingModal = ({
+  campaign,
+  updateCampaign,
+}: {
+  campaign: Campaign
+  updateCampaign: (campaign: Partial<Campaign>) => void
+}) => {
   const modalContext = useContext(ModalContext)
-  const { updateCampaign } = useContext(CampaignContext)
   const scheduledAt = campaign.scheduledAt
   const [scheduledDate, setScheduledDate] = useState<string>(
     scheduledAt ? moment(scheduledAt).format('yyyy-M-DD') : ''

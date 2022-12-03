@@ -11,9 +11,11 @@ import { ModalContext } from 'contexts/modal.context'
 
 const SchedulingButton = ({
   campaign,
+  updateCampaign,
   buttonText,
 }: {
   campaign: Campaign
+  updateCampaign: (campaign: Partial<Campaign>) => void
   buttonText: string
 }) => {
   const modalContext = useContext(ModalContext)
@@ -22,8 +24,11 @@ const SchedulingButton = ({
     event: ReactMouseEvent<HTMLDivElement, MouseEvent>
   ) {
     event.stopPropagation()
-    modalContext.setModalContent(<SchedulingModal campaign={campaign} />)
+    modalContext.setModalContent(
+      <SchedulingModal campaign={campaign} updateCampaign={updateCampaign} />
+    )
   }
+
   return (
     <>
       <ActionButton>
