@@ -258,8 +258,8 @@ const enqueueAndSend = async (): Promise<void> => {
 
 const sendFinalizedNotification = (campaignId: number): void => {
   void connection
-    .query('SELECT get_notification_data_by_campaign_id(:campaign_id)', {
-      replacements: { campaign_id: campaignId },
+    .query('SELECT get_notification_data_by_campaign_id(:campaign_id_input)', {
+      replacements: { campaign_id_input: campaignId },
       type: QueryTypes.SELECT,
     })
     .then(async (result) => {
