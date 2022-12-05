@@ -1,15 +1,15 @@
-import { useState, useEffect, useCallback, useContext } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 
 import { CampaignStats, Status } from 'classes'
 import { CampaignContext } from 'contexts/campaign.context'
-import { getCampaignStats, getCampaignDetails } from 'services/campaign.service'
+import { getCampaignDetails, getCampaignStats } from 'services/campaign.service'
 
 function usePollCampaignStats() {
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { id } = campaign
   const [stats, setStats] = useState(new CampaignStats({}))
   // one time flag to enforce that it refreshes once per poll only. if not you will have state jumping problems.
-  const [oneTime, setOneTime] = useState<boolean>(false)
+  // const [oneTime, setOneTime] = useState<boolean>(false)
 
   const refreshCampaignStats = useCallback(
     async (forceRefresh = false) => {
@@ -25,15 +25,21 @@ function usePollCampaignStats() {
 
     async function poll() {
       const { status } = await refreshCampaignStats()
-      if (status !== Status.Sent && oneTime) {
+      // if scheduled, just load once and exit.
+      if (status === Status.Scheduled) {
+        const updatedCampaign = await getCampaignDetails(id)
+        setCampaign(updatedCampaign)
+        return
+      }
+      // if anything else, do infinite polling
+      if (status !== Status.Sent) {
         timeoutId = setTimeout(poll, 2000)
-        setOneTime(false)
       } else {
         const updatedCampaign = await getCampaignDetails(id)
         setCampaign(updatedCampaign)
       }
-      setOneTime(true)
     }
+
     void poll()
 
     return () => clearTimeout(timeoutId)
