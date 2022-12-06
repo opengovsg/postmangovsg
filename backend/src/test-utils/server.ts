@@ -23,7 +23,14 @@ const initialiseServer = (session?: boolean): express.Application => {
       limit: config.get('transactionalEmail.bodySizeLimit') * 10,
     })
   )
-  app.use(express.urlencoded({ extended: false }))
+  app.use(
+    express.urlencoded({
+      extended: false,
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
+      // will get 400 error informing them of the size of the limit, instead of 500 error
+      limit: config.get('transactionalEmail.bodySizeLimit') * 10,
+    })
+  )
 
   app.use((req: Request, _res: Response, next: NextFunction): void => {
     if (session && req.session) {
