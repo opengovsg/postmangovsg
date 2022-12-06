@@ -335,9 +335,40 @@ describe(`${emailTransactionalRoute}/send`, () => {
         ...validApiCall,
         body,
       })
-    // note: in practice, the response given to the user is a 500 error with PayloadTooLargeError
+    // note: in practice, the response given to the user is a 500 error (with PayloadTooLargeError logged on our backend)
     expect(res.status).toBe(413)
     expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw 400 error if body size is too large (URL encoded payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
+    // const body = 'a'.repeat(1000)
+    const res = await request(app)
+      .post(endpoint)
+      .type('form')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    expect(res.status).toBe(400)
+  })
+
+  test('Should throw 413 error if body size is wayy too large (URL encoded payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    // const body = 'a'.repeat(1000)
+    const res = await request(app)
+      .post(endpoint)
+      .type('form')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    // note: in practice, the response given to the user is a 500 error (with PayloadTooLargeError logged on our backend)
+    expect(res.status).toBe(413)
   })
 
   test('Should throw a 400 error if the body size is too large (multipart payload)', async () => {
