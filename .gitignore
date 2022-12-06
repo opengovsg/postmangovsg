@@ -108,6 +108,7 @@ credentials.json
 gmail_token.json
 
 cypress/fixtures/*.csv
+cypress/downloads/*.csv
 
 # IDE config files
 .idea
