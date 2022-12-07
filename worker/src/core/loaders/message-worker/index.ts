@@ -306,6 +306,8 @@ const sendFinalizedNotification = (campaignId: number): void => {
         }
         if (mail) {
           // Send email using node mailer
+          // cannot use singleton mailclient like backend cuz worker will self destruct
+          // instantiate it only when needed
           const mailClient = new MailClient(
             config.get('mailOptions'),
             config.get('mailOptions.callbackHashSecret'),

@@ -56,17 +56,7 @@ const generateScheduledCampaignNotificationEmail = async (
     '<p>Thank you,</p>' +
     '<p>Postman.gov.sg</p>'
   const body = client.template(templateBody as string, params)
-  const mailToSend: MailToSend = {
-    from: config.get('mailFrom'),
-    recipients: [recipient],
-    body: await ThemeClient.generateThemedHTMLEmail({
-      unsubLink: '',
-      body,
-    }),
-    subject,
-    ...(config.get('mailFrom') ? { replyTo: config.get('mailFrom') } : {}),
-  }
-  return mailToSend
+  return assembleNotificationMail(recipient, subject, body)
 }
 
 const generateHaltedCampaignNotificationEmail = async (
@@ -86,7 +76,15 @@ const generateHaltedCampaignNotificationEmail = async (
     '<p>Thank you,</p>' +
     '<p>Postman.gov.sg</p>'
   const body = client.template(templateBody as string, params)
-  const mailToSend: MailToSend = {
+  return assembleNotificationMail(recipient, subject, body)
+}
+
+const assembleNotificationMail = async (
+  recipient: string,
+  subject: string,
+  body: string
+): Promise<MailToSend> => {
+  return {
     from: config.get('mailFrom'),
     recipients: [recipient],
     body: await ThemeClient.generateThemedHTMLEmail({
@@ -96,7 +94,6 @@ const generateHaltedCampaignNotificationEmail = async (
     subject,
     ...(config.get('mailFrom') ? { replyTo: config.get('mailFrom') } : {}),
   }
-  return mailToSend
 }
 
 export const NotificationService = {
