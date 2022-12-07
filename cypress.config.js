@@ -28,7 +28,7 @@ module.exports = defineConfig({
       TWILIO_AUTH_TOKEN: process.env.CYPRESS_TWILIO_AUTH_TOKEN,
       API_BASE_URL:
         process.env.CYPRESS_API_BASE_URL ||
-        "https://api-staging.postman.gov.sg/",
+        'https://api-staging.postman.gov.sg/',
       API_KEY: process.env.CYPRESS_API_KEY,
     },
     setupNodeEvents(on, config) {

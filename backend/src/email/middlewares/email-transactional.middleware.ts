@@ -175,14 +175,8 @@ export const InitEmailTransactionalMiddleware = (
       emailMessageTransactional.set('acceptedAt', new Date())
       await emailMessageTransactional.save()
 
-      const resStatus = config
-        .get('legacyTransactional202Users')
-        .split(',')
-        .includes(req.session?.user?.id.toString())
-        ? 202
-        : 201
       res
-        .status(resStatus)
+        .status(201)
         .json(convertMessageModelToResponse(emailMessageTransactional))
       return
     } catch (error) {
