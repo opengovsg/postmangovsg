@@ -122,10 +122,13 @@ const shouldBlacklist = ({
   bounceType?: string
   complaintType?: string
 }): boolean => {
-  return (
-    (notificationType === 'Bounce' && bounceType === 'Permanent') ||
-    (notificationType === 'Complaint' && !!complaintType)
-  )
+  const isHardBounced =
+    notificationType === 'Bounce' && bounceType === 'Permanent'
+  const isNegativelyCompplained =
+    notificationType === 'Complaint' &&
+    !!complaintType &&
+    complaintType !== 'not-spam'
+  return isHardBounced || isNegativelyCompplained
 }
 
 const parseNotificationAndEvent = async (
