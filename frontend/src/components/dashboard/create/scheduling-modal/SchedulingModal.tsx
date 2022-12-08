@@ -12,9 +12,11 @@ import { ModalContext } from 'contexts/modal.context'
 const SchedulingModal = ({
   campaign,
   updateCampaign,
+  scheduledCallback,
 }: {
   campaign: Campaign
   updateCampaign: (campaign: Partial<Campaign>) => void
+  scheduledCallback: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const scheduledAt = campaign.scheduledAt
@@ -25,17 +27,18 @@ const SchedulingModal = ({
     scheduledAt ? scheduledAt.toLocaleTimeString() : ''
   )
 
-  const scheduleTheSend = useCallback(() => {
+  const scheduleTheSend = useCallback(async () => {
     // combine date and time
     const scheduledDatetime = moment(scheduledDate + 'T' + scheduledTime)
-    void confirmSendCampaign({
+    void (await confirmSendCampaign({
       campaignId: +campaign.id,
       sendRate: 0,
       channelType: campaign.type,
       updateCampaign,
       scheduledTiming: scheduledDatetime.toDate(),
-    })
+    }))
     modalContext.close()
+    scheduledCallback()
     return
   }, [
     scheduledDate,
@@ -48,7 +51,7 @@ const SchedulingModal = ({
 
   async function handleScheduleCampaign(_: React.MouseEvent<HTMLDivElement>) {
     // form the payload from the date and time.
-    scheduleTheSend()
+    await scheduleTheSend()
     return
   }
 

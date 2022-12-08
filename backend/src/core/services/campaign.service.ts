@@ -1,11 +1,11 @@
-import { Op, literal, Transaction, Includeable } from 'sequelize'
+import { Includeable, literal, Op, Transaction } from 'sequelize'
 import config from '@core/config'
 import {
+  CampaignSortField,
   ChannelType,
   JobStatus,
-  Status,
-  CampaignSortField,
   Ordering,
+  Status,
 } from '@core/constants'
 import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
@@ -14,11 +14,29 @@ import { loggerWithLabel } from '@core/logger'
 const logger = loggerWithLabel(module)
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress
+ * For scheduled campaigns, the identifier is that the job should be "ready" and also have a visible_at AFTER now.
+ * This means that if it's before, then it's a running progress
  * @param campaignId
  */
 const hasJobInProgress = (campaignId: number): Promise<JobQueue | null> => {
   return JobQueue.findOne({
-    where: { campaignId, status: { [Op.not]: JobStatus.Logged } },
+    where: {
+      [Op.and]: {
+        campaignId,
+
+        status: {
+          [Op.not]: JobStatus.Logged,
+        },
+        [Op.and]: {
+          status: {
+            [Op.eq]: JobStatus.Ready,
+          },
+          visibleAt: {
+            [Op.lte]: new Date(),
+          },
+        },
+      },
+    },
   })
 }
 

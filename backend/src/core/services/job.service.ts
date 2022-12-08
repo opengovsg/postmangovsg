@@ -2,9 +2,9 @@ import { Op, QueryTypes } from 'sequelize'
 import get from 'lodash/get'
 
 import config from '@core/config'
-import { Campaign } from '@core/models'
+import { Campaign, JobQueue } from '@core/models'
 import { CampaignService } from './campaign.service'
-import { ChannelType } from '@core/constants'
+import { ChannelType, JobStatus } from '@core/constants'
 import { ListService } from '.'
 
 /**
@@ -26,7 +26,6 @@ const createJob = async ({
   }
 
   //format scheduled Timing to a formatted string
-  // i think i needa offset 8 hrs man
   const stringTiming =
     scheduledTiming.getUTCMonth() +
     1 +
@@ -168,9 +167,31 @@ const retryCampaign = (campaignId: number): Promise<any> | undefined => {
   })
 }
 
+const updateScheduledCampaign = async (
+  campaignId: number,
+  scheduledTiming: Date
+): Promise<number> => {
+  const jobCount = await JobQueue.count({
+    where: { campaignId, status: { [Op.eq]: JobStatus.Ready } },
+  })
+  if (jobCount > 0) {
+    await JobQueue.update(
+      {
+        visibleAt: scheduledTiming,
+      },
+      {
+        where: { campaignId },
+        returning: true,
+      }
+    )
+  }
+  return jobCount
+}
+
 export const JobService = {
   canSendCampaign,
   sendCampaign,
   stopCampaign,
   retryCampaign,
+  updateScheduledCampaign,
 }

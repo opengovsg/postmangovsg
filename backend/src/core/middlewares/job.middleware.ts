@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { JobService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 
@@ -29,12 +29,25 @@ const sendCampaign = async (
       ? new Date(scheduledTiming)
       : undefined
     if (await JobService.canSendCampaign(+campaignId)) {
-      const jobIds = await JobService.sendCampaign({
-        campaignId: +campaignId,
-        rate: +rate,
-        userId,
-        scheduledTiming: formattedTiming,
-      })
+      let jobIds
+      let jobCount = 0
+      if (formattedTiming) {
+        // this is a scheduled campaign, it is trying to update the existing jobs.
+        // directly update the DB, do not go into esnding again.
+        // check if existing jobs exists
+        jobCount = await JobService.updateScheduledCampaign(
+          +campaignId,
+          formattedTiming
+        )
+      }
+      if (jobCount == 0) {
+        jobIds = await JobService.sendCampaign({
+          campaignId: +campaignId,
+          rate: +rate,
+          userId,
+          scheduledTiming: formattedTiming,
+        })
+      }
       logger.info({ message: 'Sending campaign', jobIds, ...logMeta })
       return res.status(200).json({ campaign_id: campaignId, job_id: jobIds })
     }

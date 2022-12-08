@@ -13,10 +13,12 @@ const SchedulingButton = ({
   campaign,
   updateCampaign,
   buttonText,
+  scheduledCallback,
 }: {
   campaign: Campaign
   updateCampaign: (campaign: Partial<Campaign>) => void
   buttonText: string
+  scheduledCallback: () => void
 }) => {
   const modalContext = useContext(ModalContext)
 
@@ -25,7 +27,11 @@ const SchedulingButton = ({
   ) {
     event.stopPropagation()
     modalContext.setModalContent(
-      <SchedulingModal campaign={campaign} updateCampaign={updateCampaign} />
+      <SchedulingModal
+        campaign={campaign}
+        updateCampaign={updateCampaign}
+        scheduledCallback={scheduledCallback}
+      />
     )
   }
 

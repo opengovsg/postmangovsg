@@ -3,26 +3,31 @@ import { useContext } from 'react'
 
 import { EmailCampaign } from 'classes'
 
-import { Status, ChannelType } from 'classes/Campaign'
+import { ChannelType, Status } from 'classes/Campaign'
 import {
-  StepHeader,
-  ProgressDetails,
   EmailPreviewBlock,
+  ProgressDetails,
+  StepHeader,
 } from 'components/common'
 import CampaignScheduledInfo from 'components/common/CampaignScheduledInfo'
 import ScheduleDetails from 'components/common/schedule-details'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import { CampaignContext } from 'contexts/campaign.context'
 
-import { stopCampaign, retryCampaign } from 'services/campaign.service'
+import { retryCampaign, stopCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const EmailDetail = () => {
-  const { campaign } = useContext(CampaignContext)
+  const { campaign, updateCampaign } = useContext(CampaignContext)
   const { id } = campaign
   const { stats, refreshCampaignStats } = usePollCampaignStats()
 
   const emailCampaign = campaign as EmailCampaign
+
+  async function handleScheduledCallback() {
+    await refreshCampaignStats()
+    await window.location.reload()
+  }
 
   async function handlePause() {
     try {
@@ -68,7 +73,13 @@ const EmailDetail = () => {
         </StepHeader>
       )
     } else if (campaign.status === Status.Scheduled) {
-      return <CampaignScheduledInfo />
+      return (
+        <CampaignScheduledInfo
+          scheduledCallback={handleScheduledCallback}
+          campaign={campaign}
+          updateCampaign={updateCampaign}
+        />
+      )
     } else {
       return (
         <StepHeader title="Your campaign has been sent!">
@@ -115,6 +126,7 @@ const EmailDetail = () => {
       </>
     )
   }
+
   return (
     <>
       {renderProgressHeader()}

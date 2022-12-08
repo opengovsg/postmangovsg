@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { loggerWithLabel } from '@core/logger'
 import {
-  ChannelType,
-  Status,
   CampaignSortField,
+  ChannelType,
   Ordering,
+  Status,
 } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
@@ -28,6 +28,12 @@ const canEditCampaign = async (
       CampaignService.hasJobInProgress(+campaignId),
       UploadService.getCsvStatus(+campaignId),
     ])
+    logger.info({
+      message: 'Successfully created new campaign',
+      hasJob,
+      csvStatus,
+      action: 'createCampaign',
+    })
     if (!hasJob && !csvStatus?.isCsvProcessing) {
       return next()
     }

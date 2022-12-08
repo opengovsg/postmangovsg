@@ -111,6 +111,9 @@ const TelegramSend = () => {
           campaign={campaign}
           updateCampaign={updateCampaign}
           buttonText={'Schedule for later'}
+          scheduledCallback={function handle() {
+            return
+          }}
         />
       </ButtonGroup>
     </>

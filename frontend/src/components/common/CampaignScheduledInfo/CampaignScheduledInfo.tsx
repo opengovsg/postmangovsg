@@ -4,14 +4,21 @@ import Moment from 'react-moment'
 
 import styles from './CampaignScheduledInfo.module.scss'
 
+import { Campaign } from 'classes'
 import { StepHeader, TextButton } from 'components/common'
 import CancelSchedulingModal from 'components/dashboard/create/cancel-scheduling-modal'
 import SchedulingButton from 'components/dashboard/create/common/SchedulingButton'
-import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 
-const CampaignScheduledInfo = () => {
-  const { campaign, updateCampaign } = useContext(CampaignContext)
+const CampaignScheduledInfo = ({
+  scheduledCallback,
+  campaign,
+  updateCampaign,
+}: {
+  scheduledCallback: () => void
+  campaign: Campaign
+  updateCampaign: (changes: Partial<Campaign>) => void
+}) => {
   const modalContext = useContext(ModalContext)
 
   // open cancel confirm modal
@@ -44,6 +51,7 @@ const CampaignScheduledInfo = () => {
           campaign={campaign}
           updateCampaign={updateCampaign}
           buttonText={'Reschedule Campaign'}
+          scheduledCallback={scheduledCallback}
         />
       </div>
     </>
