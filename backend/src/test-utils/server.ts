@@ -19,7 +19,7 @@ const initialiseServer = (session?: boolean): express.Application => {
   app.use(
     express.json({
       // this must be bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
-      // will get 404 error informing them of the size of the limit, instead of 500 error
+      // will get 400 error informing them of the size of the limit, instead of 500 error
       limit: config.get('transactionalEmail.bodySizeLimit') * 10,
     })
   )
