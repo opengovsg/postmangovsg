@@ -23,17 +23,11 @@ const hasJobInProgress = (campaignId: number): Promise<JobQueue | null> => {
     where: {
       [Op.and]: {
         campaignId,
-
         status: {
           [Op.not]: JobStatus.Logged,
         },
-        [Op.and]: {
-          status: {
-            [Op.eq]: JobStatus.Ready,
-          },
-          visibleAt: {
-            [Op.lte]: new Date(),
-          },
+        visibleAt: {
+          [Op.lte]: new Date(),
         },
       },
     },

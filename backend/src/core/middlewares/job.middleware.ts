@@ -118,8 +118,28 @@ const retryCampaign = async (
   }
 }
 
+const cancelScheduledCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const logMeta = { campaignId, action: 'cancelScheduledCampaign' }
+    logger.info({
+      message: 'Cancel Scheduled Campaign...',
+      logMeta,
+    })
+    await JobService.cancelScheduledCampaign(+campaignId)
+    return res.status(200).json({ campaignId })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const JobMiddleware = {
   sendCampaign,
   stopCampaign,
   retryCampaign,
+  cancelScheduledCampaign,
 }

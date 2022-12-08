@@ -1,22 +1,21 @@
 import axios from 'axios'
 
+import type { CampaignRecipient } from 'classes'
 import {
   Campaign,
   CampaignStats,
   ChannelType,
-  StatusFilter,
-  SortField,
-  Ordering,
-  Status,
-  SMSCampaign,
   EmailCampaign,
-  TelegramCampaign,
   EmailCampaignRecipient,
+  Ordering,
+  SMSCampaign,
   SMSCampaignRecipient,
+  SortField,
+  Status,
+  StatusFilter,
+  TelegramCampaign,
   TelegramCampaignRecipient,
 } from 'classes'
-
-import type { CampaignRecipient } from 'classes'
 
 function getJobTimestamps(
   jobs: Array<{
@@ -240,4 +239,10 @@ export async function setCampaignToSaveList(
   return axios.put(`/campaigns/${campaignId}`, {
     should_save_list: shouldSaveList,
   })
+}
+
+export async function cancelScheduledCampaign(
+  campaignId: number
+): Promise<void> {
+  return axios.post(`/campaign/${campaignId}/cancel`)
 }
