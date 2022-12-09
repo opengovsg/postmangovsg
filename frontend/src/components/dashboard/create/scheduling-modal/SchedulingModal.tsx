@@ -62,25 +62,18 @@ const SchedulingModal = ({
       return
     }
     await scheduleTheSend()
-    return
   }
 
   async function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setScheduledDate(() => {
-      const newDate = e.target.value
-      handleDatetime(newDate, scheduledTime)
-      return newDate
-    })
-    return
+    const newDate = e.target.value
+    setScheduledDate(newDate)
+    handleDatetime(newDate, scheduledTime)
   }
 
   async function handleTimeChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setScheduledTime(() => {
-      const newTime = e.target.value
-      handleDatetime(scheduledDate, newTime)
-      return newTime
-    })
-    return
+    const newTime = e.target.value
+    handleDatetime(scheduledDate, newTime)
+    setScheduledTime(newTime)
   }
 
   function handleDatetime(scheduledDate: string, scheduledTime: string) {
