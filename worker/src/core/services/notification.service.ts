@@ -90,6 +90,7 @@ const assembleNotificationMail = async (
     body: await ThemeClient.generateThemedHTMLEmail({
       unsubLink: '',
       body,
+      showMasthead: true,
     }),
     subject,
     ...(config.get('mailFrom') ? { replyTo: config.get('mailFrom') } : {}),
