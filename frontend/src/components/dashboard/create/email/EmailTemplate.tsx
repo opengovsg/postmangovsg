@@ -28,6 +28,7 @@ import {
   RichTextEditor,
   InfoBlock,
   ToggleSwitch,
+  Checkbox,
 } from 'components/common'
 
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
@@ -36,6 +37,7 @@ import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 
+import { updateCampaign as apiUpdateCampaign } from 'services/campaign.service'
 import { saveTemplate } from 'services/email.service'
 import { getCustomFromAddresses } from 'services/settings.service'
 
@@ -55,6 +57,7 @@ const EmailTemplate = ({
     agencyName,
     agencyLogoURI,
     protect,
+    shouldBccToMe: originalShouldBccToMe,
   } = campaign as EmailCampaign
   const { setFinishLaterContent } = useContext(FinishLaterModalContext)
   const [body, setBody] = useState(replaceNewLines(initialBody))
@@ -64,6 +67,9 @@ const EmailTemplate = ({
     initialReplyTo === userEmail ? null : initialReplyTo
   )
   const [showLogo, setShowLogo] = useState(initialShowLogo ?? true)
+  const [shouldBccToMe, setShouldBccToMe] = useState(
+    originalShouldBccToMe ?? false
+  )
 
   // initialFrom is undefined for a new campaign without a saved template
   const { fromName: initialFromName, fromAddress: initialFromAddress } =
@@ -225,6 +231,20 @@ const EmailTemplate = ({
     return props
   }
 
+  const handleBccToMeChange = async () => {
+    const newBccValue = !shouldBccToMe
+    // set here first so user with slow internet won't see a lag and keep clicking
+    setShouldBccToMe(newBccValue)
+    try {
+      await apiUpdateCampaign(campaignId as string, {
+        shouldBccToMe: newBccValue,
+      })
+    } catch (e) {
+      // revert back to original value if update fails
+      setShouldBccToMe(!newBccValue)
+    }
+  }
+
   return (
     <>
       <StepSection>
@@ -246,6 +266,9 @@ const EmailTemplate = ({
             aria-label="Custom from"
             disabled={customFromAddresses.length <= 1}
           ></Dropdown>
+          <Checkbox checked={shouldBccToMe} onChange={handleBccToMeChange}>
+            BCC to me
+          </Checkbox>
         </div>
 
         <div>

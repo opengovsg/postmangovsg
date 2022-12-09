@@ -43,6 +43,8 @@ const updateCampaignValidator = {
   [Segments.BODY]: Joi.object({
     name: Joi.string().max(255).trim(),
     should_save_list: Joi.boolean().allow(null),
+    // only applicable to email campaigns
+    should_bcc_to_me: Joi.boolean().allow(null),
   }),
 }
 
