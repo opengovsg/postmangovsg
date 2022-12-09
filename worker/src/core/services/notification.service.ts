@@ -36,7 +36,7 @@ const generateScheduledCampaignNotificationEmail = async (
   invalidCount: number
 ): Promise<MailToSend | void> => {
   const subject =
-    'Your scheduled campaign ' + campaignName + ' was successfully sent out'
+    'Your scheduled campaign "' + campaignName + '" was successfully sent out'
   // hardcode the email body for notification
   const totalCount = unsentCount + errorCount + sentCount + invalidCount
   // manually build the params set
@@ -51,7 +51,7 @@ const generateScheduledCampaignNotificationEmail = async (
   }
   const templateBody =
     '<p>Greetings,</p>' +
-    '<p>Your scheduled campaign {{campaignName}} has been sent!</p>' +
+    '<p>Your scheduled campaign <b>{{campaignName}}</b> has been sent!</p>' +
     '<p>You may log in to Postman.gov.sg to view your campaign statistics and download your delivery report.</p>' +
     '<p>Thank you,</p>' +
     '<p>Postman.gov.sg</p>'
@@ -68,10 +68,10 @@ const generateHaltedCampaignNotificationEmail = async (
     recipient: recipient,
     campaignName: campaignName,
   }
-  const subject = 'Your scheduled campaign ' + campaignName + ' was not sent.'
+  const subject = 'Your scheduled campaign "' + campaignName + '" was not sent.'
   const templateBody =
     '<p>Greetings,</p>' +
-    '<p>Your scheduled campaign {{campaignTitle}} was not sent because it was halted. This is likely due to the high number bounces caused by the invalid emails. </p>' +
+    '<p>Your scheduled campaign <b>{{campaignTitle}}</b> was not sent because it was halted. This is likely due to the high number bounces caused by the invalid emails. </p>' +
     '<p>Please reply to this email so that we can resolve it for you</p>' +
     '<p>Thank you,</p>' +
     '<p>Postman.gov.sg</p>'

@@ -5,7 +5,7 @@ import React, { useCallback, useContext, useState } from 'react'
 import styles from './SchedulingModal.module.scss'
 
 import { Campaign } from 'classes'
-import { ActionButton } from 'components/common'
+import { ActionButton, ErrorBlock } from 'components/common'
 import { confirmSendCampaign } from 'components/dashboard/create/util'
 import { ModalContext } from 'contexts/modal.context'
 
@@ -27,9 +27,12 @@ const SchedulingModal = ({
     scheduledAt ? scheduledAt.toLocaleTimeString() : ''
   )
 
+  const [scheduledDatetime, setScheduledDatetime] = useState<moment.Moment>(
+    moment()
+  )
+
   const scheduleTheSend = useCallback(async () => {
     // combine date and time
-    const scheduledDatetime = moment(scheduledDate + 'T' + scheduledTime)
     void (await confirmSendCampaign({
       campaignId: +campaign.id,
       sendRate: 0,
@@ -41,27 +44,49 @@ const SchedulingModal = ({
     scheduledCallback()
     return
   }, [
-    scheduledDate,
-    scheduledTime,
+    scheduledDatetime,
     campaign.id,
     campaign.type,
     updateCampaign,
     modalContext,
+    scheduledCallback,
   ])
 
   async function handleScheduleCampaign(_: React.MouseEvent<HTMLDivElement>) {
     // form the payload from the date and time.
+    if (
+      !scheduledDate ||
+      !scheduledTime ||
+      scheduledDatetime.isBefore(moment())
+    ) {
+      return
+    }
     await scheduleTheSend()
     return
   }
 
   async function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setScheduledDate(e.target.value)
+    setScheduledDate(() => {
+      const newDate = e.target.value
+      handleDatetime(newDate, scheduledTime)
+      return newDate
+    })
     return
   }
 
   async function handleTimeChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setScheduledTime(e.target.value)
+    setScheduledTime(() => {
+      const newTime = e.target.value
+      handleDatetime(scheduledDate, newTime)
+      return newTime
+    })
+    return
+  }
+
+  function handleDatetime(scheduledDate: string, scheduledTime: string) {
+    if (scheduledDate && scheduledTime) {
+      setScheduledDatetime(moment(scheduledDate + 'T' + scheduledTime))
+    }
     return
   }
 
@@ -75,18 +100,18 @@ const SchedulingModal = ({
       </div>
       <div className={styles.datetimeWrapper}>
         <div className={styles.dateWrapper}>
-          <div>Date</div>
+          <div className={styles.dateText}>Date</div>
           <input
             type={'date'}
             className={styles.dateInput}
             value={scheduledDate}
-            min={moment().format('yyyy-M-D')}
+            min={moment().format('yyyy-M-DD')}
             onChange={handleDateChange}
             name={'Date'}
           />
         </div>
         <div className={styles.timeWrapper}>
-          <div>Time</div>
+          <div className={styles.timeText}>Time</div>
           <input
             type="time"
             className={styles.timeInput}
@@ -95,10 +120,30 @@ const SchedulingModal = ({
           />
         </div>
       </div>
+      {scheduledDate &&
+        scheduledTime &&
+        scheduledDatetime.isBefore(moment()) && (
+          <ErrorBlock>Select a time that is after the current time.</ErrorBlock>
+        )}
+
       <div className="separator"></div>
       <div className={styles.actionButton}>
-        <ActionButton disabled={!scheduledDate || !scheduledTime}>
-          <div onClick={handleScheduleCampaign}>
+        <ActionButton
+          disabled={
+            !scheduledDate ||
+            !scheduledTime ||
+            scheduledDatetime.isBefore(moment())
+          }
+        >
+          <div
+            onClick={handleScheduleCampaign}
+            className={cx({
+              [styles.disabledContent]:
+                !scheduledDate ||
+                !scheduledTime ||
+                scheduledDatetime.isBefore(moment()),
+            })}
+          >
             Schedule campaign
             <div>
               <i className={cx(styles.icon, 'bx bx-calendar-event')}></i>

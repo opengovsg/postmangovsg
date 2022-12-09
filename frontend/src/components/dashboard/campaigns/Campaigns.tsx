@@ -14,7 +14,7 @@ import {
 
 import Moment from 'react-moment'
 
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import styles from './Campaigns.module.scss'
 import overrideStylesTextButton from './OverrideTextButton.module.scss'
@@ -91,6 +91,7 @@ const Campaigns = () => {
 
   const name = getNameFromEmail(email)
   const title = `Welcome, ${name}`
+  const navigate = useNavigate()
 
   const filterInit = 'All'
   const searchInit = ''
@@ -250,6 +251,7 @@ const Campaigns = () => {
       setNumDemosTelegram(demo?.numDemosTelegram)
       displayNewAnnouncement(announcementVersion, latestAnnouncementVersion)
     }
+
     void getNumDemosAndAnnouncementVersion()
   }, [displayNewAnnouncement, isMounted])
 
@@ -501,6 +503,13 @@ const Campaigns = () => {
               setCampaignIdWithRenameOpen(campaign.id)
               closeMenu()
             }}
+            onReschedule={(
+              e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>
+            ) => {
+              e.stopPropagation()
+              navigate(`/campaigns/${campaign.id}`)
+              closeMenu()
+            }}
           />
         )
       },
@@ -512,6 +521,7 @@ const Campaigns = () => {
       ),
     },
   ]
+
   /* eslint-enable react/display-name */
 
   function renderRow(campaign: Campaign, key: number) {
