@@ -81,38 +81,3 @@ export interface DuplicateCampaignDetails {
   protect: boolean
   demo_message_limit: number | null
 }
-
-/**
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
