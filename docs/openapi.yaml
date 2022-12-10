@@ -13,7 +13,7 @@ paths:
   /campaigns:
     get:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       tags:
         - Campaigns
       summary: List all campaigns for user
@@ -41,14 +41,14 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ EMAIL, SMS, TELEGRAM ]
+            enum: [EMAIL, SMS, TELEGRAM]
         - in: query
           name: status
           description: status of campaigns to filter for
           required: false
           schema:
             type: string
-            enum: [ Draft, Sending, Sent ]
+            enum: [Draft, Sending, Sent]
         - in: query
           name: name
           description: name of campaigns to filter for
@@ -61,7 +61,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ created_at, sent_at ]
+            enum: [created_at, sent_at]
             default: created_at
         - in: query
           name: order_by
@@ -69,7 +69,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ ASC, DESC ]
+            enum: [ASC, DESC]
             default: DESC
       responses:
         "200":
@@ -82,7 +82,7 @@ paths:
                   campaigns:
                     type: array
                     items:
-                      $ref: '#/components/schemas/CampaignMeta'
+                      $ref: "#/components/schemas/CampaignMeta"
                   total_count:
                     type: integer
         "401":
@@ -94,9 +94,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
-                { status: 429, message: Too many requests. Please try again later. }
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
         "500":
           description: Internal Server Error
           content:
@@ -124,7 +127,7 @@ paths:
           description: Invalid SSL certificate
     post:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       summary: Create a new campaign
       tags:
         - Campaigns
@@ -138,7 +141,7 @@ paths:
                 name:
                   type: string
                 type:
-                  $ref: '#/components/schemas/ChannelType'
+                  $ref: "#/components/schemas/ChannelType"
               required:
                 - name
                 - type
@@ -149,7 +152,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignMeta'
+                $ref: "#/components/schemas/CampaignMeta"
         "401":
           description: Unauthorized
         "403":
@@ -159,9 +162,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
-                { status: 429, message: Too many requests. Please try again later. }
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
         "500":
           description: Internal Server Error
           content:
@@ -218,9 +224,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
-                {status: 429, message: Too many requests. Please try again later.}
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
         "500":
           description: Internal Server Error
           content:
@@ -248,7 +257,7 @@ paths:
           description: Invalid SSL certificate
     put:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       summary: Rename campaign
       tags:
         - Campaigns
@@ -275,7 +284,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignMeta'
+                $ref: "#/components/schemas/CampaignMeta"
         "401":
           description: Unauthorized
         "404":
@@ -287,9 +296,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
-                { status: 429, message: Too many requests. Please try again later. }
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
         "500":
           description: Internal Server Error
           content:
@@ -318,5 +330,120 @@ paths:
 
 components:
   schemas:
-  # TODO
+    ChannelType:
+      type: string
+      enum:
+        - SMS
+        - EMAIL
+        - TELEGRAM
 
+    CampaignMeta:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        has_credential:
+          type: boolean
+        valid:
+          type: boolean
+        halted:
+          type: boolean
+        protect:
+          type: boolean
+        redacted:
+          type: boolean
+        should_save_list:
+          type: boolean
+        type:
+          $ref: "#/components/schemas/ChannelType"
+        job_queue:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobQueue"
+
+    CampaignDuplicateMeta:
+      type: object
+      required:
+        - name
+        - id
+        - created_at
+        - type
+        - protect
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        type:
+          $ref: "#/components/schemas/ChannelType"
+        created_at:
+          type: string
+          format: date-time
+        protect:
+          type: boolean
+          example: false
+
+    JobQueue:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/JobStatus"
+        sent_at:
+          type: string
+          format: date-time
+        status_updated_at:
+          type: string
+          format: date-time
+
+    JobStatus:
+      type: string
+      enum:
+        - READY
+        - ENQUEUED
+        - SENDING
+        - SENT
+        - STOPPED
+        - LOGGED
+
+    ValidationError:
+      description: any one of the params failed validation
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: |-
+            "from" must be a valid email
+        validation:
+          type: object
+          properties:
+            source:
+              type: string
+              example: body
+            keys:
+              type: array
+              items:
+                type: string
+                example: from
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    ErrorStatus:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string

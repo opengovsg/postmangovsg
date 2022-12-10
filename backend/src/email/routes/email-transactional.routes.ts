@@ -211,49 +211,6 @@ export const InitEmailTransactionalRoute = (
    *           description: SSL handshake failed
    *         "526":
    *           description: Invalid SSL certificate
-   *
-   * components:
-   *  schemas:
-   *    ValidationError:
-   *      description: any one of the params failed validation
-   *      type: object
-   *      properties:
-   *        statusCode:
-   *          type: integer
-   *          example: 400
-   *        error:
-   *          type: string
-   *          example: Bad Request
-   *        message:
-   *          type: string
-   *          example: |-
-   *            "from" must be a valid email
-   *        validation:
-   *          type: object
-   *          properties:
-   *            source:
-   *              type: string
-   *              example: body
-   *            keys:
-   *              type: array
-   *              items:
-   *                type: string
-   *                example: from
-   *
-   *    Error:
-   *      type: object
-   *      properties:
-   *        message:
-   *          type: string
-   *
-   *    ErrorStatus:
-   *      type: object
-   *      properties:
-   *        status:
-   *          type: integer
-   *        message:
-   *          type: string
-   *
    */
   router.post(
     '/send',
