@@ -24,11 +24,6 @@ const EmailDetail = () => {
 
   const emailCampaign = campaign as EmailCampaign
 
-  async function handleScheduledCallback() {
-    await refreshCampaignStats()
-    await window.location.reload()
-  }
-
   async function handlePause() {
     try {
       sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.Email)
@@ -75,7 +70,6 @@ const EmailDetail = () => {
     } else if (campaign.status === Status.Scheduled) {
       return (
         <CampaignScheduledInfo
-          scheduledCallback={handleScheduledCallback}
           campaign={campaign}
           updateCampaign={updateCampaign}
         />

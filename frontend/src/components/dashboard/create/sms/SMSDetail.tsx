@@ -20,11 +20,6 @@ const SMSDetail = () => {
   const isDemo = !!demoMessageLimit
   const { stats, refreshCampaignStats } = usePollCampaignStats()
 
-  async function handleScheduledCallback() {
-    await refreshCampaignStats()
-    await window.location.reload()
-  }
-
   async function handlePause() {
     try {
       sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.SMS)
@@ -83,7 +78,6 @@ const SMSDetail = () => {
     } else if (campaign.status === Status.Scheduled) {
       return (
         <CampaignScheduledInfo
-          scheduledCallback={handleScheduledCallback}
           campaign={campaign}
           updateCampaign={updateCampaign}
         />

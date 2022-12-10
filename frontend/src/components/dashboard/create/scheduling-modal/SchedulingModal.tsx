@@ -12,11 +12,9 @@ import { ModalContext } from 'contexts/modal.context'
 const SchedulingModal = ({
   campaign,
   updateCampaign,
-  scheduledCallback,
 }: {
   campaign: Campaign
   updateCampaign: (campaign: Partial<Campaign>) => void
-  scheduledCallback: () => void
 }) => {
   const modalContext = useContext(ModalContext)
   const scheduledAt = campaign.scheduledAt
@@ -41,7 +39,6 @@ const SchedulingModal = ({
       scheduledTiming: scheduledDatetime.toDate(),
     }))
     modalContext.close()
-    scheduledCallback()
     return
   }, [
     scheduledDatetime,
@@ -49,7 +46,6 @@ const SchedulingModal = ({
     campaign.type,
     updateCampaign,
     modalContext,
-    scheduledCallback,
   ])
 
   async function handleScheduleCampaign(_: React.MouseEvent<HTMLDivElement>) {

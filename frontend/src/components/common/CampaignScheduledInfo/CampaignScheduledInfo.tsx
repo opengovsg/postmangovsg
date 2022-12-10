@@ -11,11 +11,9 @@ import SchedulingButton from 'components/dashboard/create/common/SchedulingButto
 import { ModalContext } from 'contexts/modal.context'
 
 const CampaignScheduledInfo = ({
-  scheduledCallback,
   campaign,
   updateCampaign,
 }: {
-  scheduledCallback: () => void
   campaign: Campaign
   updateCampaign: (changes: Partial<Campaign>) => void
 }) => {
@@ -23,7 +21,12 @@ const CampaignScheduledInfo = ({
 
   // open cancel confirm modal
   async function handleCancelSchedule() {
-    modalContext.setModalContent(<CancelSchedulingModal campaign={campaign} />)
+    modalContext.setModalContent(
+      <CancelSchedulingModal
+        campaign={campaign}
+        updateCampaign={updateCampaign}
+      />
+    )
     return
   }
 
@@ -51,7 +54,6 @@ const CampaignScheduledInfo = ({
           campaign={campaign}
           updateCampaign={updateCampaign}
           buttonText={'Reschedule Campaign'}
-          scheduledCallback={scheduledCallback}
         />
       </div>
     </>

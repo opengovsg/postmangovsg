@@ -5,16 +5,21 @@ import styles from './CancelSchedulingModal.module.scss'
 import EmptyDashboardImg from 'assets/img/empty-dashboard.png'
 import { Campaign } from 'classes'
 import { ActionButton } from 'components/common'
+import { confirmCancelScheduledCampaign } from 'components/dashboard/create/util'
 import { ModalContext } from 'contexts/modal.context'
-import { cancelScheduledCampaign } from 'services/campaign.service'
 
-const CancelSchedulingModal = ({ campaign }: { campaign: Campaign }) => {
+const CancelSchedulingModal = ({
+  campaign,
+  updateCampaign,
+}: {
+  campaign: Campaign
+  updateCampaign: (changes: Partial<Campaign>) => void
+}) => {
   const { id } = campaign
   const { close } = useContext(ModalContext)
 
   async function handleCancelSchedule() {
-    await cancelScheduledCampaign(id)
-    await window.location.reload()
+    await confirmCancelScheduledCampaign({ campaignId: id, updateCampaign })
     close()
   }
 
