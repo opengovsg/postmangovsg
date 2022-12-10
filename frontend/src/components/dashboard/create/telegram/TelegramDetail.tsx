@@ -110,7 +110,7 @@ const TelegramDetail = () => {
         <h3>Message Template</h3>
         <PreviewBlock body={campaign.body} />
         <div className="separator"></div>
-        {stats.status && stats.status !== Status.Scheduled && (
+        {stats.status && campaign.status !== Status.Scheduled && (
           <ProgressDetails
             stats={stats}
             redacted={campaign.redacted}

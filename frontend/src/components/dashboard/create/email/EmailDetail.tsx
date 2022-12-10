@@ -109,7 +109,7 @@ const EmailDetail = () => {
           from={emailCampaign.from}
         />
         <div className="separator"></div>
-        {stats.status && stats.status !== Status.Scheduled && (
+        {stats.status && campaign.status !== Status.Scheduled && (
           <ProgressDetails
             stats={stats}
             redacted={campaign.redacted}
