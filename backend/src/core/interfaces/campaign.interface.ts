@@ -83,39 +83,36 @@ export interface DuplicateCampaignDetails {
 }
 
 /**
- * @swagger
- *  components:
- *    schemas:
- *      CampaignStats:
- *        type: object
- *        properties:
- *          error:
- *            type: number
- *          unsent:
- *            type: number
- *          sent:
- *            type: number
- *          invalid:
- *            type: number
- *          halted:
- *            type: boolean
- *          redacted:
- *            type: boolean
- *          status:
- *            $ref: '#/components/schemas/JobStatus'
- *          updated_at:
- *            type: string
- *            format: date-time
- *      CampaignRecipient:
- *        type: object
- *        properties:
- *          recipient:
- *            type: string
- *          status:
- *            type: string
- *          updated_at:
- *            type: string
- *            format: date-time
- *          error_code:
- *            type: string
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
