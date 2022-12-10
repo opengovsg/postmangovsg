@@ -113,11 +113,13 @@ const SchedulingModal = ({
           />
         </div>
       </div>
-      {scheduledDate &&
-        scheduledTime &&
-        scheduledDatetime.isBefore(moment()) && (
-          <ErrorBlock>Select a time that is after the current time.</ErrorBlock>
-        )}
+      {scheduledDate && scheduledTime && scheduledDatetime.isBefore(moment()) && (
+        <ErrorBlock>
+          <div>
+            Select a <b>future time</b> to schedule your campaign.
+          </div>
+        </ErrorBlock>
+      )}
 
       <div className="separator"></div>
       <div className={styles.actionButton}>
