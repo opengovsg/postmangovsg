@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import moment from 'moment'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
 
 import styles from './SchedulingModal.module.scss'
 
@@ -25,9 +25,14 @@ const SchedulingModal = ({
     scheduledAt ? scheduledAt.toLocaleTimeString() : ''
   )
 
-  const [scheduledDatetime, setScheduledDatetime] = useState<moment.Moment>(
-    moment()
-  )
+  const scheduledDatetime = useMemo(() => {
+    if (scheduledDate && scheduledTime) {
+      return moment(scheduledDate + 'T' + scheduledTime)
+    }
+    return moment()
+  }, [scheduledDate, scheduledTime])
+
+  console.log('scheduled datetime: ', scheduledDatetime)
 
   const scheduleTheSend = useCallback(async () => {
     // combine date and time
@@ -63,20 +68,11 @@ const SchedulingModal = ({
   async function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newDate = e.target.value
     setScheduledDate(newDate)
-    handleDatetime(newDate, scheduledTime)
   }
 
   async function handleTimeChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newTime = e.target.value
-    handleDatetime(scheduledDate, newTime)
     setScheduledTime(newTime)
-  }
-
-  function handleDatetime(scheduledDate: string, scheduledTime: string) {
-    if (scheduledDate && scheduledTime) {
-      setScheduledDatetime(moment(scheduledDate + 'T' + scheduledTime))
-    }
-    return
   }
 
   return (
