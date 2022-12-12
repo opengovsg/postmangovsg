@@ -95,6 +95,7 @@ const SchedulingModal = ({
             className={styles.dateInput}
             value={scheduledDate}
             min={moment().format('yyyy-M-DD')}
+            max={'2999-12-31'}
             onChange={handleDateChange}
             name={'Date'}
           />
@@ -109,13 +110,18 @@ const SchedulingModal = ({
           />
         </div>
       </div>
-      {scheduledDate && scheduledTime && scheduledDatetime.isBefore(moment()) && (
-        <ErrorBlock>
-          <div>
-            Select a <b>future time</b> to schedule your campaign.
-          </div>
-        </ErrorBlock>
-      )}
+      <ErrorBlock
+        className={cx({
+          [styles.errorControl]:
+            !scheduledDate ||
+            !scheduledTime ||
+            scheduledDatetime.isAfter(moment()),
+        })}
+      >
+        <div>
+          Select a <b>future time</b> to schedule your campaign.
+        </div>
+      </ErrorBlock>
 
       <div className="separator"></div>
       <div className={styles.actionButton}>
