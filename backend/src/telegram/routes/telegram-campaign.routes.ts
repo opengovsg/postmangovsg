@@ -999,6 +999,7 @@ export const InitTelegramCampaignMiddleware = (
     '/send',
     celebrate(sendCampaignValidator),
     CampaignMiddleware.canEditCampaign,
+    CampaignMiddleware.canSendCampaign,
     JobMiddleware.sendCampaign
   )
 

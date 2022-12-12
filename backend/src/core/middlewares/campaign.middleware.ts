@@ -13,6 +13,7 @@ const logger = loggerWithLabel(module)
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
+ *  If a campaign already has successful jobs, also cannot be modified
  * @param req
  * @param res
  * @param next
@@ -35,6 +36,30 @@ const canEditCampaign = async (
       action: 'createCampaign',
     })
     if (!hasJob && !csvStatus?.isCsvProcessing) {
+      return next()
+    }
+    return res.sendStatus(403)
+  } catch (err) {
+    return next(err)
+  }
+}
+
+const canSendCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const [sentJobs] = await Promise.all([
+      CampaignService.hasAlreadyBeenSent(+campaignId),
+    ])
+    logger.info({
+      message: 'Checking can send campaign',
+      sentJobs,
+      action: 'sendCampaign',
+    })
+    if (sentJobs <= 0) {
       return next()
     }
     return res.sendStatus(403)
@@ -229,6 +254,7 @@ const updateCampaign = async (
 
 export const CampaignMiddleware = {
   canEditCampaign,
+  canSendCampaign,
   createCampaign,
   listCampaigns,
   isCampaignRedacted,

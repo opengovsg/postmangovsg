@@ -34,6 +34,19 @@ const hasJobInProgress = (campaignId: number): Promise<JobQueue | null> => {
   })
 }
 
+const hasAlreadyBeenSent = (campaignId: number): Promise<number> => {
+  return JobQueue.count({
+    where: {
+      [Op.and]: {
+        campaignId,
+        status: {
+          [Op.eq]: JobStatus.Logged,
+        },
+      },
+    },
+  })
+}
+
 const createDemoCampaign = async ({
   name,
   type,
@@ -437,6 +450,7 @@ const updateCampaign = (campaign: Campaign): Promise<[number, Campaign[]]> =>
 
 export const CampaignService = {
   hasJobInProgress,
+  hasAlreadyBeenSent,
   createCampaign,
   createCampaignWithTransaction,
   listCampaigns,

@@ -32,18 +32,22 @@ const SchedulingModal = ({
     return moment()
   }, [scheduledDate, scheduledTime])
 
-  console.log('scheduled datetime: ', scheduledDatetime)
-
   const scheduleTheSend = useCallback(async () => {
     // combine date and time
-    void (await confirmSendCampaign({
+    await confirmSendCampaign({
       campaignId: +campaign.id,
       sendRate: 0,
       channelType: campaign.type,
       updateCampaign,
       scheduledTiming: scheduledDatetime.toDate(),
-    }))
-    modalContext.close()
+    })
+      .then(() => {
+        //if no error, then close the modal
+        modalContext.close()
+      })
+      .catch(() => {
+        window.location.reload()
+      })
     return
   }, [
     scheduledDatetime,

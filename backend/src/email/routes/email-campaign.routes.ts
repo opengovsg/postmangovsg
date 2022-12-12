@@ -856,6 +856,7 @@ export const InitEmailCampaignRoute = (
   router.post(
     '/send',
     CampaignMiddleware.canEditCampaign,
+    CampaignMiddleware.canSendCampaign,
     JobMiddleware.sendCampaign
   )
 

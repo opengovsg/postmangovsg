@@ -892,6 +892,7 @@ export const InitSmsCampaignRoute = (
     '/send',
     celebrate(sendCampaignValidator),
     CampaignMiddleware.canEditCampaign,
+    CampaignMiddleware.canSendCampaign,
     JobMiddleware.sendCampaign
   )
 
