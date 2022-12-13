@@ -1,4 +1,5 @@
 import { Application, Request, Response, NextFunction } from 'express'
+import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
 
@@ -20,7 +21,9 @@ const removeCspHeader = (
   next()
 }
 
-const swaggerDocument = YAML.load('../docs/openapi.yaml')
+const swaggerDocument = YAML.load(
+  path.resolve(__dirname, '../../../openapi.yaml')
+)
 
 const swaggerLoader = ({ app }: { app: Application }): void => {
   app.use(
