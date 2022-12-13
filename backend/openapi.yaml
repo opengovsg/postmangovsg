@@ -9,6 +9,8 @@ info:
 servers:
   - url: /v1
     description: Postman API v1
+security:
+  - bearerAuth: []
 paths:
   /campaigns:
     get:
@@ -4430,6 +4432,12 @@ paths:
           description: Invalid SSL c
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: apiKey
+      description: API key to authorize requests.
+      name: appid
+      in: query
   schemas:
     ChannelType:
       type: string
