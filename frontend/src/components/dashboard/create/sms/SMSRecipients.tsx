@@ -35,7 +35,7 @@ import {
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
-import { setCampaignToSaveList } from 'services/campaign.service'
+import { updateCampaign as apiUpdateCampaign } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
 import { selectList, getListsByChannel } from 'services/list.service'
 import {
@@ -166,7 +166,7 @@ const SMSRecipients = ({
 
   // If shouldSaveList is modified, send info to backend
   useEffect(() => {
-    void setCampaignToSaveList(campaignId as string, shouldSaveList)
+    void apiUpdateCampaign(campaignId as string, { shouldSaveList })
   }, [campaignId, shouldSaveList])
 
   // Handle file upload

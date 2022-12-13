@@ -12,6 +12,7 @@ export interface MailToSend {
   from?: string
   unsubLink?: string
   attachments?: Array<MailAttachment>
+  bcc?: Array<string>
 }
 
 export interface MailCredentials {

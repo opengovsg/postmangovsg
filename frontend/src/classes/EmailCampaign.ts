@@ -40,6 +40,7 @@ export class EmailCampaign extends Campaign {
   agencyLogoURI: string
   themedBody: string
   progress: EmailProgress = EmailProgress.CreateTemplate
+  shouldBccToMe: boolean
 
   constructor(input: any) {
     super(input)
@@ -56,6 +57,7 @@ export class EmailCampaign extends Campaign {
     this.agencyName = input['user']?.domain?.agency?.name
     this.agencyLogoURI = input['user']?.domain?.agency?.logo_uri
     this.setProgress()
+    this.shouldBccToMe = input.should_bcc_to_me || false
   }
 
   setProgress() {
