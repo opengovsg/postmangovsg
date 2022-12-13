@@ -284,12 +284,18 @@ const uploadCompleteOnChunk = ({
   campaignId: number
 }): ((data: CSVParams[]) => Promise<void>) => {
   return async (data: CSVParams[]): Promise<void> => {
+    const { shouldBccToMe, user } = (await Campaign.findOne({
+      where: {
+        id: campaignId,
+      },
+      include: User,
+    })) as Campaign
     const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
       const { recipient } = entry
       return {
         campaignId,
         recipient: recipient.trim().toLowerCase(),
-        params: entry,
+        params: shouldBccToMe ? { ...entry, bcc: user.email } : entry,
       }
     })
     // START populate template
