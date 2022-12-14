@@ -90,6 +90,14 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
     }: ReqBody = req.body
 
+    const attachmentsMetadata = attachments
+      ? attachments.map((a) => ({
+          fileName: a.name,
+          fileSize: a.size,
+          hash: getAttachmentHash(a.data),
+        }))
+      : null
+
     const emailMessageTransactional = await EmailMessageTransactional.create({
       userId: req.session?.user?.id,
       from,
@@ -101,29 +109,12 @@ export const InitEmailTransactionalMiddleware = (
         replyTo,
       },
       messageId: null,
-      attachmentsMetadata: null,
+      attachmentsMetadata,
       status: TransactionalEmailMessageStatus.Unsent,
       errorCode: null,
       sentAt: null,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTransactional)
-    if (!emailMessageTransactional) {
-      throw new Error('Unable to create entry in email_message_tx')
-    }
-    if (attachments) {
-      void EmailMessageTransactional.update(
-        {
-          attachmentsMetadata: attachments.map((a) => ({
-            fileName: a.name,
-            fileSize: a.size,
-            hash: getAttachmentHash(a.data),
-          })),
-        },
-        {
-          where: { id: emailMessageTransactional.id },
-        }
-      )
-    }
     req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
     next()
   }
