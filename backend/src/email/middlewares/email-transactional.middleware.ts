@@ -139,6 +139,13 @@ export const InitEmailTransactionalMiddleware = (
     } = req.body
 
     try {
+      const emailMessageTransactional =
+        await EmailMessageTransactional.findByPk(emailMessageTransactionalId)
+      if (!emailMessageTransactional) {
+        // practically this will never happen but adding to fulfill TypeScript
+        // type-safety requirement
+        throw new Error('Unable to find entry in email_messages_transactional')
+      }
       await EmailTransactionalService.sendMessage({
         subject,
         body,
@@ -149,16 +156,6 @@ export const InitEmailTransactionalMiddleware = (
         attachments,
         emailMessageTransactionalId,
       })
-      const emailMessageTransactional = await EmailMessageTransactional.findOne(
-        {
-          where: { id: emailMessageTransactionalId },
-        }
-      )
-      if (!emailMessageTransactional) {
-        // practically this will never happen but adding to fulfill TypeScript
-        // type-safety requirement
-        throw new Error('Failed to save transactional message')
-      }
       emailMessageTransactional.set(
         'status',
         TransactionalEmailMessageStatus.Accepted
