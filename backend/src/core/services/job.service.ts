@@ -25,27 +25,27 @@ const createJob = async ({
     scheduledTiming = new Date()
   }
 
-  //format scheduled Timing to a formatted string
-  const stringTiming =
-    scheduledTiming.getUTCMonth() +
-    1 +
-    '/' +
-    scheduledTiming.getUTCDate() +
-    '/' +
-    scheduledTiming.getUTCFullYear() +
-    ' ' +
-    scheduledTiming.getUTCHours() +
-    ':' +
-    scheduledTiming.getUTCMinutes() +
-    ':' +
-    scheduledTiming.getUTCSeconds()
+  // //format scheduled Timing to a formatted string
+  // const stringTiming =
+  //   scheduledTiming.getUTCMonth() +
+  //   1 +
+  //   '/' +
+  //   scheduledTiming.getUTCDate() +
+  //   '/' +
+  //   scheduledTiming.getUTCFullYear() +
+  //   ' ' +
+  //   scheduledTiming.getUTCHours() +
+  //   ':' +
+  //   scheduledTiming.getUTCMinutes() +
+  //   ':' +
+  //   scheduledTiming.getUTCSeconds()
   const job = await Campaign.sequelize?.query(
     'SELECT insert_job(:campaignId, :rate, :scheduledTiming);',
     {
       replacements: {
         campaignId,
         rate,
-        scheduledTiming: stringTiming,
+        scheduledTiming: scheduledTiming,
       },
       type: QueryTypes.SELECT,
     }
