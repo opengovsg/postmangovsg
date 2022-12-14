@@ -241,6 +241,25 @@ export async function setCampaignToSaveList(
   })
 }
 
+export async function updateCampaign(
+  campaignId: string | number,
+  {
+    name,
+    shouldBccToMe,
+    shouldSaveList,
+  }: {
+    name?: string
+    shouldSaveList?: boolean
+    shouldBccToMe?: boolean
+  }
+): Promise<void> {
+  return axios.put(`/campaigns/${campaignId}`, {
+    name,
+    should_save_list: shouldSaveList,
+    should_bcc_to_me: shouldBccToMe,
+  })
+}
+
 export async function cancelScheduledCampaign(
   campaignId: number
 ): Promise<void> {

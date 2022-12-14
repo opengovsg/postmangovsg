@@ -105,6 +105,12 @@ export class Campaign extends Model<Campaign> {
   demoMessageLimit!: number
 
   @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  shouldBccToMe!: boolean
+
+  @Column({
     type: DataType.DATE,
     allowNull: true,
   })

@@ -58,7 +58,7 @@ import { ModalContext } from 'contexts/modal.context'
 import {
   deleteCampaignById,
   getCampaigns,
-  renameCampaign,
+  updateCampaign,
 } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
@@ -196,7 +196,9 @@ const Campaigns = () => {
   )
 
   async function handleRename(): Promise<void> {
-    await renameCampaign(campaignIdWithRenameOpen as number, campaignNewName)
+    await updateCampaign(campaignIdWithRenameOpen as number, {
+      name: campaignNewName,
+    })
     setCampaignsDisplayed(
       campaignsDisplayed.map((c) => {
         if (c.id === campaignIdWithRenameOpen) {
