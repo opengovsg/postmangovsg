@@ -93,7 +93,7 @@ describe('POST /transactional/sms/send', () => {
         label: userCredential.label,
       })
 
-    expect(res.status).toBe(202)
+    expect(res.status).toBe(201)
     expect(mockSendMessage).toBeCalledTimes(1)
     mockSendMessage.mockReset()
   })

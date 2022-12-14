@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -33,10 +33,18 @@ module.exports = {
         type: Sequelize.DataTypes.STRING(255),
         allowNull: true,
       },
+      created_at: {
+        allowNull: false,
+        type: Sequelize.DataTypes.DATE,
+      },
+      updated_at: {
+        allowNull: false,
+        type: Sequelize.DataTypes.DATE,
+      },
     })
   },
 
   down: async (queryInterface, _) => {
     await queryInterface.dropTable('sms_messages_transactional')
-  }
-};
+  },
+}
