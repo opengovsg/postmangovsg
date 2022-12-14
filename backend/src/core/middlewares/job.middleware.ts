@@ -33,7 +33,7 @@ const sendCampaign = async (
       let jobCount = 0
       if (formattedTiming) {
         // this is a scheduled campaign, it is trying to update the existing jobs.
-        // directly update the DB, do not go into esnding again.
+        // directly update the DB, do not go into sending again.
         // check if existing jobs exists
         jobCount = await JobService.updateScheduledCampaign(
           +campaignId,

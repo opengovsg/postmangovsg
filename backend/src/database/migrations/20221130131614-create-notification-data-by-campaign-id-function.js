@@ -1,5 +1,6 @@
 'use strict'
 
+// to change to application raw query
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     queryInterface.createFunction(

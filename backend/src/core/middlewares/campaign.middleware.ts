@@ -13,7 +13,6 @@ const logger = loggerWithLabel(module)
 
 /**
  *  If a campaign already has an existing running job in the job queue, then it cannot be modified.
- *  If a campaign already has successful jobs, also cannot be modified
  * @param req
  * @param res
  * @param next
