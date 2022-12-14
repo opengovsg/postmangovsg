@@ -35,9 +35,11 @@ const CampaignScheduledInfo = ({
       <StepHeader title="Your campaign has been scheduled!">
         <p>
           Your campaign has been scheduled to be sent on{' '}
-          <Moment format="LLL" interval={0}>
-            {campaign.scheduledAt}
-          </Moment>
+          <b>
+            <Moment format="LLL" interval={0}>
+              {campaign.scheduledAt}
+            </Moment>
+          </b>
           .
         </p>
         <p>
