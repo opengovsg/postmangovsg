@@ -256,19 +256,29 @@ const enqueueAndSend = async (): Promise<void> => {
   }
 }
 
+// refactor to use actual raw queries
 const sendFinalizedNotification = (campaignId: number): void => {
   void connection
-    .query('SELECT get_notification_data_by_campaign_id(:campaign_id_input)', {
-      replacements: { campaign_id_input: campaignId },
-      type: QueryTypes.SELECT,
-    })
+    .query(
+      "SELECT json_build_object('id', c.id," +
+        "'campaign_name', c.name," +
+        "'created_at', c.created_at," +
+        "'unsent_count', s.unsent," +
+        "'error_count', s.errored," +
+        "'sent_count', s.sent," +
+        "'invalid_count', s.invalid," +
+        "'notification_email', u.email," +
+        "'halted', c.halted) as result FROM campaigns c INNER JOIN statistics s ON c.id=s.campaign_id INNER JOIN users u ON c.user_id=u.id WHERE c.id=:campaign_id_input;",
+      {
+        replacements: { campaign_id_input: campaignId },
+        type: QueryTypes.SELECT,
+      }
+    )
     .then(async (result) => {
-      const jsonRes =
-        get(result, '[0].get_notification_data_by_campaign_id') || {}
+      const jsonRes = get(result, '[0].result') || {}
       const {
         id: campaignId,
         campaign_name: campaignName,
-        visible_at: visibleAt,
         created_at: createdAt,
         unsent_count: unsentCount,
         error_count: errorCount,
@@ -291,6 +301,19 @@ const sendFinalizedNotification = (campaignId: number): void => {
             )
         } else {
           // for scheduled, visible_at must be after created_at
+          // normal flow, pull out visibleAt from job_queue table.
+
+          const visibleAt = await connection
+            .query(
+              "select visible_at from job_queue where campaign_id=:campaign_id_input and status = 'LOGGED' order by created_at desc limit 1;",
+              {
+                replacements: { campaign_id_input: campaignId },
+                type: QueryTypes.SELECT,
+              }
+            )
+            .then(async (result) => {
+              return result.toString()
+            })
           if (new Date(createdAt) < new Date(visibleAt)) {
             mail =
               await NotificationService.generateScheduledCampaignNotificationEmail(
@@ -322,7 +345,6 @@ const sendFinalizedNotification = (campaignId: number): void => {
             logger.info({
               message: 'Notification email successfully sent',
               campaignId,
-              visibleAt,
               createdAt,
               unsentCount,
               errorCount,
