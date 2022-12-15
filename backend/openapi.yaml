@@ -1773,7 +1773,7 @@ paths:
                     format: binary
       responses:
         '201':
-          description: Accepted. The message is being sent.
+          description: Created. The message is being sent.
           content:
             application/json:
               schema:
@@ -2020,7 +2020,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 69
+            example: 42
       responses:
         200:
           description: Successfully retrieved transactional email with corresponding ID
@@ -4689,25 +4689,30 @@ components:
           format: date-time
         error_code:
           type: string
-    EmailMessageTransactional: # TODO I think this is outdated
+    EmailMessageTransactional:
       type: object
-      required:
-        - id
-        - recipient
-        - params
-        - status
       properties:
         id:
           type: string
-          example: 69
+          example: 42
         from:
           type: string
-          example: 'Postman <donotreply@mail.postman.gov.sg>'
+          example: Postman <donotreply@mail.postman.gov.sg>
         recipient:
           type: string
           example: hello@example.com
         params:
           type: object
+          properties:
+            body:
+              type: string
+              example: Hello World
+            from:
+              type: string
+              example: Postman <donotreply@mail.postman.gov.sg>
+            subject:
+              type: string
+              example: Hello World
         attachments_metadata:
           nullable: true
           type: array
@@ -4726,7 +4731,7 @@ components:
                 type: string
         status:
           type: string
-          enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, LAINT]
+          enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, COMPLAINT]
         error_code:
           nullable: true
           type: string
