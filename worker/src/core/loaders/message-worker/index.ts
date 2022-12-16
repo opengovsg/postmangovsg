@@ -312,9 +312,9 @@ const sendFinalizedNotification = (campaignId: number): void => {
               }
             )
             .then(async (result) => {
-              return result.toString()
+              return get(result, '[0].visible_at')
             })
-          if (new Date(createdAt) < new Date(visibleAt)) {
+          if (new Date(createdAt) < visibleAt) {
             mail =
               await NotificationService.generateScheduledCampaignNotificationEmail(
                 client,

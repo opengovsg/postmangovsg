@@ -46,11 +46,10 @@ describe('notification', () => {
     const copyConfig = config
     expect(copyConfig.has('mailOptions')).toBeTruthy()
     // mock a campaign
-    await connection
+    void connection
       .query(
         "SELECT json_build_object('id', c.id," +
           "'campaign_name', c.name," +
-          "'visible_at', c.visible_at," +
           "'created_at', c.created_at," +
           "'unsent_count', s.unsent," +
           "'error_count', s.errored," +
@@ -68,7 +67,6 @@ describe('notification', () => {
         const {
           id: campaignId,
           campaign_name: campaignName,
-          visible_at: visibleAt,
           created_at: createdAt,
           unsent_count: unsentCount,
           error_count: errorCount,
@@ -93,7 +91,18 @@ describe('notification', () => {
                 )
             } else {
               // for scheduled, visible_at must be after created_at
-              if (new Date(createdAt) < new Date(visibleAt)) {
+              const visibleAt = await connection
+                .query(
+                  "select visible_at from job_queue where campaign_id=:campaign_id_input and status = 'LOGGED' order by created_at desc limit 1;",
+                  {
+                    replacements: { campaign_id_input: campaignId },
+                    type: QueryTypes.SELECT,
+                  }
+                )
+                .then(async (result) => {
+                  return get(result, '[0].visible_at')
+                })
+              if (new Date(createdAt) < visibleAt) {
                 mail =
                   await NotificationService.generateScheduledCampaignNotificationEmail(
                     templateClient,
