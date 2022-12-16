@@ -57,7 +57,6 @@ export interface CampaignStats extends CampaignStatsCount {
   halted: boolean | null
   status_updated_at?: Date
   wait_time?: number
-  visible_at?: Date
 }
 
 export interface CampaignStatsCount {

@@ -110,12 +110,6 @@ export class Campaign extends Model<Campaign> {
   })
   shouldBccToMe!: boolean
 
-  @Column({
-    type: DataType.DATE,
-    allowNull: true,
-  })
-  visibleAt?: Date
-
   // Sets key in s3Object json
   static async updateS3ObjectKey(
     id: number,

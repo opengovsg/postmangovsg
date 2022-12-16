@@ -89,18 +89,6 @@ const sendCampaign = async ({
     })
   }
 
-  // save visible at into campaign as well
-  // if undefined passed then so be it, campaign allows nullable visible_at
-  await Campaign.update(
-    {
-      visibleAt: scheduledTiming,
-    },
-    {
-      where: { id: campaignId },
-      returning: false,
-    }
-  )
-
   if (campaign.type === ChannelType.Email) {
     // For email type, we only want to take up a single worker at a time at the
     // preconfigured mailDefaultRate to avoid hogging resources from other campaigns
