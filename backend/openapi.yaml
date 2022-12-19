@@ -1,0 +1,4783 @@
+openapi: 3.0.0
+info:
+  title: Postman
+  version: v1
+  description: Postman API
+  license:
+    name: MIT
+    url: https://choosealicense.com/licenses/mit/
+servers:
+  - url: /v1
+    description: Postman API v1
+security:
+  - bearerAuth: []
+paths:
+  /campaigns:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Campaigns
+      summary: List all campaigns for user
+      parameters:
+        - in: query
+          name: limit
+          description: max number of campaigns returned
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - in: query
+          name: offset
+          description: offset to begin returning campaigns from
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: type
+          description: mode of campaigns to filter for
+          required: false
+          schema:
+            type: string
+            enum: [EMAIL, SMS, TELEGRAM]
+        - in: query
+          name: status
+          description: status of campaigns to filter for
+          required: false
+          schema:
+            type: string
+            enum: [Draft, Sending, Sent]
+        - in: query
+          name: name
+          description: name of campaigns to filter for
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: sort_by
+          description: field used to sort campaigns
+          required: false
+          schema:
+            type: string
+            enum: [created_at, sent_at]
+            default: created_at
+        - in: query
+          name: order_by
+          description: order to sort campaigns by
+          required: false
+          schema:
+            type: string
+            enum: [ASC, DESC]
+            default: DESC
+      responses:
+        '200':
+          description: List of campaigns
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaigns:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CampaignMeta'
+                  total_count:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+    post:
+      security:
+        - bearerAuth: []
+      summary: Create a new campaign
+      tags:
+        - Campaigns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  $ref: '#/components/schemas/ChannelType'
+              required:
+                - name
+                - type
+
+      responses:
+        '201':
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignMeta'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificateÏ
+  /campaigns/{campaignId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Campaigns
+      summary: Delete a campaign using its ID
+      parameters:
+        - in: path
+          name: campaignId
+          description: ID of the campaign
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Successfully deleted
+          content:
+            schema: {} # TODO
+        '401':
+          description: Unauthorized
+        '404':
+          description: Campaign not found
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+    put:
+      security:
+        - bearerAuth: []
+      summary: Rename campaign
+      tags:
+        - Campaigns
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                should_save_list:
+                  type: boolean
+      responses:
+        '200':
+          description: Campaign renamed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignMeta'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificateÏ
+  /campaign/{campaignId}/email:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Get email campaign details
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email campaign details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailCampaign'
+        '400':
+          description: Invalid campaign type or not owned by user
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/template:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Stores body template for email campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subject
+                - body
+                - reply_to
+                - from
+              properties:
+                subject:
+                  type: string
+                body:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                reply_to:
+                  type: string
+                  nullable: true
+                from:
+                  type: string
+                show_logo:
+                  type: boolean
+                  default: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                required:
+                  - message
+                  - valid
+                  - num_recipients
+                properties:
+                  message:
+                    type: string
+                  extra_keys:
+                    type: array
+                    items:
+                      type: string
+                  valid:
+                    type: boolean
+                  num_recipients:
+                    type: integer
+                  template:
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                      body:
+                        type: string
+                      reply_to:
+                        type: string
+                        nullable: true
+                      params:
+                        type: array
+                        items:
+                          type: string
+                      from:
+                        type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/upload/start:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 'Get a presigned URL for upload with Content-MD5 header'
+      tags:
+        - Email
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: mime_type
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: md5
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - presigned_url
+                  - transaction_id
+                properties:
+                  presigned_url:
+                    type: string
+                  transaction_id:
+                    type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/upload/complete:
+    post:
+      security:
+        - bearerAuth: []
+      summary: 'Complete upload session with ETag verification'
+      tags:
+        - Email
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - transaction_id
+                - filename
+              properties:
+                transaction_id:
+                  type: string
+                filename:
+                  type: string
+                etag:
+                  type: string
+      responses:
+        '202':
+          description: Accepted. The uploaded file is being processed.
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/upload/status:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 'Get csv processing status'
+      tags:
+        - Email
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  is_csv_processing:
+                    type: boolean
+                  csv_filename:
+                    type: string
+                  temp_csv_filename:
+                    type: string
+                  csv_error:
+                    type: string
+                  num_recipients:
+                    type: number
+                  preview:
+                    type: object
+                    required:
+                      - subject
+                      - body
+                      - from
+                    properties:
+                      subject:
+                        type: string
+                      body:
+                        type: string
+                      replyTo:
+                        type: string
+                        nullable: true
+                      from:
+                        type: string
+                        example: 'Postman <donotreply@mail.postman.gov.sg>'
+                      showMasthead:
+                        type: boolean
+                      agencyLogoURI:
+                        type: string
+                        example: 'https://file.go.gov.sg/postman-ogp.png'
+                      agencyName:
+                        type: string
+                        example: Open Government Products
+                      themedBody:
+                        type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+    delete:
+      security:
+        - bearerAuth: []
+      description: 'Deletes error status from previous failed upload'
+      tags:
+        - Email
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/email/credentials:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Sends a test message and defaults to Postman's credentials for the campaign
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - recipient
+              properties:
+                recipient:
+                  type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/email/preview:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Preview templated message
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preview:
+                    type: object
+                    required:
+                      - body
+                      - subject
+                      - from
+                    properties:
+                      body:
+                        type: string
+                      subject:
+                        type: string
+                      reply_to:
+                        type: string
+                        nullable: true
+                      from:
+                        type: string
+                        example: 'Postman <donotreply@mail.postman.gov.sg>'
+                      themed_body:
+                        type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/send:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Start sending campaign
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+                  job_id:
+                    type: array
+                    items:
+                      type: number
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/stop:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Stop sending campaign
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/retry:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Retry sending campaign
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden as there is a job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/stats:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Get email campaign stats
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CampaignStats'
+                  - type: object
+                    required:
+                      - unsubscribed
+                    properties:
+                      unsubscribed:
+                        type: number
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/refresh-stats:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Get email campaign stats
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CampaignStats'
+                  - type: object
+                    required:
+                      - unsubscribed
+                    properties:
+                      unsubscribed:
+                        type: number
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/export:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Get recipients of campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/CampaignRecipient'
+                    - type: object
+                      properties:
+                        'unsubscriber.recipient':
+                          type: string
+                        'unsubscriber.reason':
+                          type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '410':
+          description: Campaign has been redacted
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/protect/upload/start:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Start multipart upload
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: mime_type
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: part_count
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction_id:
+                    type: string
+                  presigned_urls:
+                    type: array
+                    items:
+                      type: string
+
+        '400':
+          description: Invalid campaign type, not owned by user
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/protect/upload/complete:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Complete multipart upload
+      tags:
+        - Email
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - filename
+                - transaction_id
+                - part_count
+                - etags
+              properties:
+                filename:
+                  type: string
+                transaction_id:
+                  type: string
+                part_count:
+                  type: integer
+                etags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction_id:
+                    type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/duplicate:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Duplicate the campaign and its template
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+
+      responses:
+        '201':
+          description: A duplicate of the campaign was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignDuplicateMeta'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/email/select-list:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: Select the list of recipients from an existing managed list
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                list_id:
+                  type: number
+      responses:
+        '201':
+          description: A duplicate of the campaign was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignMeta'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /transactional/email/send:
+    post:
+      security:
+        - bearerAuth: []
+      summary: 'Send a transactional email'
+      tags:
+        - Email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - subject
+                - body
+                - recipient
+              properties:
+                subject:
+                  type: string
+                body:
+                  type: string
+                recipient:
+                  type: string
+                from:
+                  type: string
+                reply_to:
+                  type: string
+                  nullable: true
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - subject
+                - body
+                - recipient
+              properties:
+                subject:
+                  type: string
+                body:
+                  type: string
+                recipient:
+                  type: string
+                from:
+                  type: string
+                reply_to:
+                  type: string
+                  nullable: true
+                attachments:
+                  type: array
+                  nullable: true
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Accepted. The message is being sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailMessageTransactional'
+        '400':
+          description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
+          content:
+            text/plain:
+              examples:
+                InvalidRecipientError:
+                  value: Recipient email is blacklisted
+                TemplateError:
+                  value: Message is invalid as the subject or body only contains invalid HTML tags.
+                MaliciousFileError:
+                  value: 'Error: One or more attachments may be potentially malicious. Please check the attached files.'
+                UnsupportedFileTypeError:
+                  value: 'Error: One or more attachments may be an unsupported file type. Please check the attached files.'
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/Error'
+              examples:
+                ValidationError:
+                  value:
+                    statusCode: 400
+                    error: Bad Request
+                    message: |-
+                      "from" must be a valid email
+                    validation: { source: body, keys: [from] }
+                FromError:
+                  value: { message: Invalid 'from' email address. }
+
+        '401':
+          description: Unauthorized.
+          content:
+            text/plain:
+              example: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '413':
+          description: Number of attachments or size of attachments exceeded limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                AttachmentQtyLimit:
+                  value: { message: Number of attachments exceeds limit }
+                AttachmentSizeLimit:
+                  value: { message: Size of attachments exceeds limit }
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect; see https://github.com/opengovsg/postmangovsg/issues/1837)
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /transactional/email:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: 'List transactional emails'
+      parameters:
+        - in: query
+          name: limit
+          description: max number of messages returned
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - in: query
+          name: offset
+          description: offset to begin returning messages from
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: status
+          description: status of messages to filter for
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, COMPLAINT]
+          style: form
+          explode: true
+        - in: query
+          name: created_at
+          description: >
+            Filter for created_at timestamp of messages:
+              - gt: greater than
+              - gte: greater than or equal
+              - lt: less than
+              - lte: less than or equal
+          required: false
+          schema:
+            type: object
+            minProperties: 1
+            properties:
+              gt:
+                type: string
+                format: date-time (ISO 8601)
+              gte:
+                type: string
+                format: date-time (ISO 8601)
+              lt:
+                type: string
+                format: date-time (ISO 8601)
+              lte:
+                type: string
+                format: date-time (ISO 8601)
+        - in: query
+          name: sort_by
+          description: >
+            Array of fields to sort by, default order is desc, but can be configured by adding a prefix of:
+             - plus sign (+) for ascending order
+             - minus sign (-) for descending order
+          required: false
+          schema:
+            type: array
+            default: [created_at]
+            items:
+              type: string
+              enum:
+                [
+                  created_at,
+                  +created_at,
+                  -created_at,
+                  updated_at,
+                  -updated_at,
+                  +updated_at,
+                ]
+
+      responses:
+        200:
+          description: Successfully retrieved a list of messages
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - has_more
+                  - data
+                properties:
+                  has_more:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailMessageTransactional'
+        '400':
+          description: Bad Request. Failed parameter validations.
+        '401':
+          description: Unauthorized.
+          content:
+            text/plain:
+              example: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /transactional/email/{emailId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Email
+      summary: 'Get transactional email by ID'
+      parameters:
+        - in: path
+          name: emailId
+          required: true
+          schema:
+            type: string
+            example: 69
+      responses:
+        200:
+          description: Successfully retrieved transactional email with corresponding ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailMessageTransactional'
+        '400':
+          description: Bad Request. Failed parameter validations.
+        '401':
+          description: Unauthorized.
+          content:
+            text/plain:
+              example: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '404':
+          description: Not Found. No transactional message with such ID found
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Get sms campaign details
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Successfully retrieved sms campaign details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SMSCampaign'
+                  - type: object
+                    properties:
+                      cost_per_message:
+                        type: number
+
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/template:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Stores body template for sms campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                required:
+                  - message
+                  - valid
+                  - num_recipients
+                  - template
+                properties:
+                  message:
+                    type: string
+                  extra_keys:
+                    type: array
+                    items:
+                      type: string
+                  valid:
+                    type: boolean
+                  num_recipients:
+                    type: integer
+                  template:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+                      params:
+                        type: array
+                        items:
+                          type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/upload/start:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 'Get a presigned URL for upload with Content-MD5 header'
+      tags:
+        - SMS
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: mime_type
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: md5
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  presigned_url:
+                    type: string
+                  transaction_id:
+                    type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/upload/complete:
+    post:
+      security:
+        - bearerAuth: []
+      summary: 'Complete upload session with ETag verification'
+      tags:
+        - SMS
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - transaction_id
+                - filename
+              properties:
+                transaction_id:
+                  type: string
+                filename:
+                  type: string
+                etag:
+                  type: string
+      responses:
+        '202':
+          description: Accepted. The uploaded file is being processed.
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/upload/status:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 'Get csv processing status'
+      tags:
+        - SMS
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  is_csv_processing:
+                    type: boolean
+                  csv_filename:
+                    type: string
+                  temp_csv_filename:
+                    type: string
+                  csv_error:
+                    type: string
+                  num_recipients:
+                    type: number
+                  preview:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden as there is a job in progress
+        '500':
+          description: Internal Server Error
+    delete:
+      security:
+        - bearerAuth: []
+      description: 'Deletes error status from previous failed upload'
+      tags:
+        - SMS
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden as there is a job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/new-credentials:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Validate twilio credentials and assign to campaign, if label is provided - store credentials for user
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/TwilioCredentials'
+                - type: object
+                  properties:
+                    recipient:
+                      type: string
+                    label:
+                      type: string
+                      pattern: '/^[a-z0-9-]+$/'
+                      minLength: 1
+                      maxLength: 50
+                      description: should only consist of lowercase alphanumeric characters and dashes
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/credentials:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Validate stored credentials and assign to campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipient:
+                  type: string
+                label:
+                  type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/preview:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Preview templated message
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Successnm
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preview:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/send:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Start sending campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rate:
+                  example: 10
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+                  job_id:
+                    type: array
+                    items:
+                      type: number
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/stop:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Stop sending campaign
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/retry:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Retry sending campaign
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/stats:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Get sms campaign stats
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStats'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/refresh-stats:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Forcibly refresh sms campaign stats, then retrieves them
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStats'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/export:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Get invalid recipients in campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CampaignRecipient'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '410':
+          description: Campaign has been redacted
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/duplicate:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Duplicate the campaign and its template
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: A duplicate of the campaign was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignDuplicateMeta'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /campaign/{campaignId}/sms/select-list:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: Select the list of recipients from an existing managed list
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                list_id:
+                  type: number
+
+      responses:
+        '201':
+          description: A duplicate of the campaign was created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /transactional/sms/send:
+    post:
+      security:
+        - bearerAuth: []
+      summary: 'Send a transactional SMS'
+      tags:
+        - SMS
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - body
+                - recipient
+                - label
+              properties:
+                body:
+                  type: string
+                recipient:
+                  type: string
+                label:
+                  type: string
+      # TODO feels like this is lacking a schema component?
+      responses:
+        '202':
+          description: Accepted. The message is being sent.
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '429':
+          description: Too many requests. Please try again later.
+        '500':
+          description: Internal Server Error
+
+  /campaign/{campaignId}/telegram:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Get telegram campaign details
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign:
+                    $ref: '#/components/schemas/TelegramCampaign'
+                  num_recipients:
+                    type: number
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/template:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Stores body template for telegram campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                required:
+                  - message
+                  - valid
+                  - num_recipients
+                  - template
+                properties:
+                  message:
+                    type: string
+                  extra_keys:
+                    type: array
+                    items:
+                      type: string
+                  valid:
+                    type: boolean
+                  num_recipients:
+                    type: integer
+                  template:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+                      params:
+                        type: array
+                        items:
+                          type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/upload/start:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 'Get a presigned URL for upload with Content-MD5 header'
+      tags:
+        - Telegram
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: mime_type
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: md5
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  presigned_url:
+                    type: string
+                  transaction_id:
+                    type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/upload/complete:
+    post:
+      security:
+        - bearerAuth: []
+      summary: 'Complete upload session with ETag verification'
+      tags:
+        - Telegram
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - transaction_id
+                - filename
+              properties:
+                transaction_id:
+                  type: string
+                filename:
+                  type: string
+                etag:
+                  type: string
+      responses:
+        '202':
+          description: Accepted. The uploaded file is being processed.
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/upload/status:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 'Get csv processing status'
+      tags:
+        - Telegram
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  is_csv_processing:
+                    type: boolean
+                  csv_filename:
+                    type: string
+                  temp_csv_filename:
+                    type: string
+                  csv_error:
+                    type: string
+                  num_recipients:
+                    type: number
+                  preview:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden as there is a job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+    delete:
+      security:
+        - bearerAuth: []
+      description: 'Deletes error status from previous failed upload'
+      tags:
+        - Telegram
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden as there is a job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/preview:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Preview templated message
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preview:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/new-credentials:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Validate Telegram bot token and assign to campaign, if label is provided store new telegram credentials for user
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                telegram_bot_token:
+                  type: string
+                label:
+                  type: string
+                  pattern: '/^[a-z0-9-]+$/'
+                  minLength: 1
+                  maxLength: 50
+                  description: should only consist of lowercase alphanumeric characters and dashes
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/credentials:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Validate stored credentials and assign to campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/credentials/verify:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Send a validation message using the campaign credentials.
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipient:
+                  type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+
+  /campaign/{campaignId}/telegram/send:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Start sending campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rate:
+                  type: integer
+                  default: 30
+                  minimum: 1
+                  maximum: 30
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+                  job_id:
+                    type: array
+                    items:
+                      type: number
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL c
+
+  /campaign/{campaignId}/telegram/stop:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Stop sending campaign
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL c
+
+  /campaign/{campaignId}/telegram/retry:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Retry sending campaign
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user or job in progress
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL c
+
+  /campaign/{campaignId}/telegram/stats:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Get telegram campaign stats
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStats'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL c
+
+  /campaign/{campaignId}/telegram/update-stats:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Get telegram campaign stats
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStats'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL c
+
+  /campaign/{campaignId}/telegram/export:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Get invalid recipients in campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CampaignRecipient'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '410':
+          description: Campaign has been redacted
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL c
+
+  /campaign/{campaignId}/telegram/duplicate:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Telegram
+      summary: Duplicate the campaign and its template
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+
+      responses:
+        '201':
+          description: A duplicate of the campaign was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignDuplicateMeta'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL c
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: apiKey
+      description: API key to authorize requests.
+      name: appid
+      in: query
+  schemas:
+    ChannelType:
+      type: string
+      enum:
+        - SMS
+        - EMAIL
+        - TELEGRAM
+
+    CampaignMeta:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        has_credential:
+          type: boolean
+        valid:
+          type: boolean
+        halted:
+          type: boolean
+        protect:
+          type: boolean
+        redacted:
+          type: boolean
+        should_save_list:
+          type: boolean
+        type:
+          $ref: '#/components/schemas/ChannelType'
+        job_queue:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobQueue'
+
+    CampaignDuplicateMeta:
+      type: object
+      required:
+        - name
+        - id
+        - created_at
+        - type
+        - protect
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/ChannelType'
+        created_at:
+          type: string
+          format: date-time
+        protect:
+          type: boolean
+          example: false
+
+    JobQueue:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        sent_at:
+          type: string
+          format: date-time
+        status_updated_at:
+          type: string
+          format: date-time
+
+    JobStatus:
+      type: string
+      enum:
+        - READY
+        - ENQUEUED
+        - SENDING
+        - SENT
+        - STOPPED
+        - LOGGED
+
+    ValidationError:
+      description: any one of the params failed validation
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: |-
+            "from" must be a valid email
+        validation:
+          type: object
+          properties:
+            source:
+              type: string
+              example: body
+            keys:
+              type: array
+              items:
+                type: string
+                example: from
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    ErrorStatus:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+    EmailCampaign:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        has_credential:
+          type: boolean
+        valid:
+          type: boolean
+        protect:
+          type: boolean
+        redacted:
+          type: boolean
+        csv_filename:
+          type: string
+        is_csv_processing:
+          type: boolean
+        num_recipients:
+          type: number
+        type:
+          $ref: '#/components/schemas/ChannelType'
+          default: 'EMAIL'
+        job_queue:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobQueue'
+        email_templates:
+          type: object
+          properties:
+            body:
+              type: string
+            subject:
+              type: string
+            params:
+              type: array
+              items:
+                type: string
+    CampaignStats:
+      type: object
+      properties:
+        error:
+          type: number
+        unsent:
+          type: number
+        sent:
+          type: number
+        invalid:
+          type: number
+        halted:
+          type: boolean
+        redacted:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        updated_at:
+          type: string
+          format: date-time
+    CampaignRecipient:
+      type: object
+      properties:
+        recipient:
+          type: string
+        status:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        error_code:
+          type: string
+    EmailMessageTransactional: # TODO I think this is outdated
+      type: object
+      required:
+        - id
+        - recipient
+        - params
+        - status
+      properties:
+        id:
+          type: string
+          example: 69
+        from:
+          type: string
+          example: 'Postman <donotreply@mail.postman.gov.sg>'
+        recipient:
+          type: string
+          example: hello@example.com
+        params:
+          type: object
+        attachments_metadata:
+          nullable: true
+          type: array
+          items:
+            type: object
+            required:
+              - fileName
+              - fileSize
+              - hash
+            properties:
+              fileName:
+                type: string
+              fileSize:
+                type: number
+              hash:
+                type: string
+        status:
+          type: string
+          enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, LAINT]
+        error_code:
+          nullable: true
+          type: string
+        error_sub_type:
+          nullable: true
+          type: string
+        created_at:
+          nullable: false
+          type: string
+          format: date-time
+        updated_at:
+          nullable: true
+          type: string
+          format: date-time
+        accepted_at:
+          nullable: true
+          type: string
+          format: date-time
+        sent_at:
+          nullable: true
+          type: string
+          format: date-time
+        delivered_at:
+          nullable: true
+          type: string
+          format: date-time
+        opened_at:
+          nullable: true
+          type: string
+          format: date-time
+    TwilioCredentials:
+      type: object
+      properties:
+        twilio_account_sid:
+          type: string
+        twilio_api_key:
+          type: string
+        twilio_api_secret:
+          type: string
+        twilio_messaging_service_sid:
+          type: string
+    SMSCampaign:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        has_credential:
+          type: boolean
+        valid:
+          type: boolean
+        redacted:
+          type: boolean
+        csv_filename:
+          type: string
+        is_csv_processing:
+          type: boolean
+        num_recipients:
+          type: number
+        type:
+          $ref: '#/components/schemas/ChannelType'
+          default: 'SMS'
+        job_queue:
+          type: array
+          items:
+          $ref: '#/components/schemas/JobQueue'
+        sms_templates:
+          type: object
+          properties:
+            body:
+              type: string
+            params:
+              type: array
+              items:
+                type: string
+    TelegramCampaign:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        has_credential:
+          type: boolean
+        valid:
+          type: boolean
+        redacted:
+          type: boolean
+        csv_filename:
+          type: string
+        type:
+          $ref: '#/components/schemas/ChannelType'
+          default: 'TELEGRAM'
+        job_queue:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobQueue'
+        telegram_templates:
+          type: object
+          properties:
+            body:
+              type: string
+            params:
+              type: array
+              items:
+                type: string
