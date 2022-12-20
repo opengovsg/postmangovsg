@@ -1,20 +1,17 @@
 import { Sequelize } from 'sequelize-typescript'
-import { Agency, Domain, User } from '../../../models'
-import { validateDomain } from '../../../utils/validate-domain'
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { SequelizeMock } from 'sequelize-mock'
+import { Agency, Domain, User } from '@shared/core/models'
+import { validateDomain } from '@shared/core/utils/validate-domain'
+import sequelizeLoader from '@test-utils/sequelize-loader'
 
 let sequelize: Sequelize
-jest.mock('../../../utils/validate-domain')
+jest.mock('@shared/core/utils/validate-domain')
 const mockValidateDomain = validateDomain as jest.MockedFunction<
   typeof validateDomain
 >
 const defaultAgencyName = 'Singapore Government'
 
 beforeAll(async () => {
-  sequelize = new SequelizeMock()
+  sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
 })
 
 afterEach(async () => {
