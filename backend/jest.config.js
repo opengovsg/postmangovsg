@@ -10,6 +10,7 @@ module.exports = {
     '@telegram/(.*)': '<rootDir>/src/telegram/$1',
     '@test-utils/(.*)': '<rootDir>/src/test-utils/$1',
     '@shared/(.*)': '<rootDir>/../shared/src/$1',
+    sequelize: '<rootDir>/../shared/node_modules/sequelize',
     // had to do this as we need to use the exact same installation of sequelize-ts
     // https://github.com/sequelize/sequelize-typescript/issues/729
     'sequelize-typescript':
