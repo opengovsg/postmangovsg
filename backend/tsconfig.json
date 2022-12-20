@@ -63,10 +63,13 @@
       ],
       "sequelize-typescript": [
         "../../shared/node_modules/sequelize-typescript"
+      ],
+      "sequelize": [
+        "../../shared/node_modules/sequelize"
       ]
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": true
   }
 }

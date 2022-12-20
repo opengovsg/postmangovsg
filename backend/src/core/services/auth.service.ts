@@ -7,15 +7,21 @@ import { User } from '@shared/core/models'
 import { validateDomain } from '@shared/core/utils/validate-domain'
 import { ApiKeyService, MailService, RedisService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@shared/core/interfaces'
-import { Transaction } from 'sequelize/types'
+import { Transaction } from 'sequelize'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
+
   sendOtp(email: string, ipAddress: string): Promise<string | void>
+
   verifyOtp(input: VerifyOtpInput): Promise<boolean>
+
   findOrCreateUser(email: string): Promise<User>
+
   findUser(id: number): Promise<User>
+
   checkCookie(req: Request): boolean
+
   getUserForApiKey(req: Request): Promise<User | null>
 }
 

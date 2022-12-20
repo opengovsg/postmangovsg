@@ -63,7 +63,6 @@
     "rate-limit-redis": "2.1.0",
     "redis": "3.1.2",
     "reflect-metadata": "0.1.13",
-    "sequelize": "6.21.2",
     "source-map-support": "0.5.19",
     "starkbank-ecdsa": "1.1.4",
     "swagger-ui-express": "4.4.0",
@@ -134,7 +133,8 @@
     "@telegram": "build/telegram",
     "@database": "build/database",
     "@shared": "../shared/build/",
-    "sequelize-typescript": "../shared/node_modules/sequelize-typescript"
+    "sequelize-typescript": "../shared/node_modules/sequelize-typescript",
+    "sequelize": "../shared/node_modules/sequelize"
   },
   "repository": {
     "type": "git",

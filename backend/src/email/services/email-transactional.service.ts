@@ -3,8 +3,8 @@ import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@shared/core/logger'
 import {
   EMPTY_SANITIZED_EMAIL,
-  MessageError,
   InvalidRecipientError,
+  MessageError,
 } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import {
@@ -17,8 +17,7 @@ import {
   TimestampFilter,
   TransactionalEmailSortField,
 } from '@shared/core/constants'
-import { Order } from 'sequelize/types/model'
-import { Op, WhereOptions } from 'sequelize'
+import { Op, Order, WhereOptions } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 

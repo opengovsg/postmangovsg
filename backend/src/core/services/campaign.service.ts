@@ -1,11 +1,11 @@
-import { Op, literal, Transaction, Includeable } from 'sequelize'
+import { Includeable, literal, Op, Transaction } from 'sequelize'
 import config from '@core/config'
 import {
+  CampaignSortField,
   ChannelType,
   JobStatus,
-  Status,
-  CampaignSortField,
   Ordering,
+  Status,
 } from '@shared/core/constants'
 import { Campaign, JobQueue, Statistic, UserDemo } from '@shared/core/models'
 import { CampaignDetails } from '@shared/core/interfaces'

@@ -17,7 +17,7 @@ jest.mock('../', () => ({
 import { EmailTemplate } from '@shared/core/models/email'
 import { waitForMs } from '@shared/utils/wait-for-ms'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { Sequelize, Transaction } from 'sequelize/types'
+import { Sequelize, Transaction } from 'sequelize'
 import { UploadService } from '@core/services'
 
 let sequelize: Sequelize
