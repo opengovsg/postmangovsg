@@ -104,6 +104,12 @@ export class Campaign extends Model<Campaign> {
   })
   demoMessageLimit!: number
 
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  shouldBccToMe!: boolean
+
   // Sets key in s3Object json
   static async updateS3ObjectKey(
     id: number,

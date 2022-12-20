@@ -109,6 +109,15 @@ const expressApp = ({ app }: { app: express.Application }): void => {
           // if this `authorization` header was present
           req.headers.authorization = '[REDACTED]'
         }
+        if (propName === 'body' && req.body.attachments) {
+          // truncate attachment data so the whole file won't get logged and take
+          // up our disk space
+          const truncatedAttachments: any[] = []
+          req.body.attachments.forEach((attachment: any) =>
+            truncatedAttachments.push({ ...attachment, data: '[TRUNCATED]' })
+          )
+          req.body.attachments = truncatedAttachments
+        }
         return (req as any)[propName]
       },
       metaField: null, // flatten this log to root instead of nesting under `meta`
@@ -134,7 +143,11 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     ) => {
       logger.error({
         message: 'Unexpected error occured',
-        error: `${err.stack}`,
+        error: {
+          message: `${err.stack}`,
+          parent: (err as any).parent,
+          original: (err as any).original,
+        },
       })
       return res.sendStatus(500)
     }
