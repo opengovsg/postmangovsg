@@ -261,67 +261,6 @@ export const InitSmsCampaignRoute = (
     celebrate(selectListValidator),
     SmsTemplateMiddleware.selectListHandler
   )
-
-  /**
-   * @swagger
-   * paths:
-   *  /campaign/{campaignId}/email/cancel:
-   *    post:
-   *      security:
-   *        - bearerAuth: []
-   *      tags:
-   *        - Email
-   *      summary: Select the list of recipients from an existing managed list
-   *      parameters:
-   *        - name: campaignId
-   *          in: path
-   *          required: true
-   *          schema:
-   *            type: string
-   *      responses:
-   *        "200":
-   *           description: Successfully cancelled scheduled campaign
-   *           schema:
-   *             $ref: '#/components/schemas/CampaignMeta'
-   *        "401":
-   *           description: Unauthorized
-   *        "403":
-   *           description: Forbidden, campaign not owned by user
-   *        "429":
-   *          description: Rate limit exceeded. Too many requests.
-   *          content:
-   *             application/json:
-   *               schema:
-   *                 $ref: '#/components/schemas/ErrorStatus'
-   *               example:
-   *                 {status: 429, message: Too many requests. Please try again later.}
-   *        "500":
-   *          description: Internal Server Error
-   *          content:
-   *             text/plain:
-   *               type: string
-   *               example: Internal Server Error
-   *        "502":
-   *          description: Bad Gateway
-   *        "504":
-   *          description: Gateway Timeout
-   *        "503":
-   *          description: Service Temporarily Unavailable
-   *        "520":
-   *          description: Web Server Returns An Unknown Error
-   *        "521":
-   *          description: Web Server Is Down
-   *        "522":
-   *          description: Connection Timed Out
-   *        "523":
-   *          description: Origin Is Unreachable
-   *        "524":
-   *          description: A Timeout occurred
-   *        "525":
-   *          description: SSL handshake failed
-   *        "526":
-   *          description: Invalid SSL certificate
-   */
   router.post('/cancel', JobMiddleware.cancelScheduledCampaign)
   return router
 }
