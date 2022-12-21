@@ -1,10 +1,10 @@
 import {
+  BelongsTo,
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
-  BelongsTo,
 } from 'sequelize-typescript'
 import { JobStatus } from '@core/constants'
 import { Campaign } from './campaign'
@@ -40,5 +40,5 @@ export class JobQueue extends Model<JobQueue> {
     allowNull: false,
     defaultValue: new Date(),
   })
-  visibleAt?: Date
+  visibleAt: Date
 }

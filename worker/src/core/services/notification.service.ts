@@ -99,6 +99,7 @@ const assembleNotificationMail = async (
 
 export const NotificationService = {
   sendEmail,
+  // eventually to move to a theme folder for all relevant transactional maielrs
   generateScheduledCampaignNotificationEmail,
   generateHaltedCampaignNotificationEmail,
 }

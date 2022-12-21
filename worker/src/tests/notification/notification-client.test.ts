@@ -132,7 +132,7 @@ describe('notification', () => {
           }
         }
       }) // init a client
-    const notificationEmail = 'richardyak@open.gov.sg'
+    const notificationEmail = 'internal-testing@open.gov.sg'
     const campaignName = 'Test campaign from jest'
     const unsentCount = 10
     const errorCount = 5

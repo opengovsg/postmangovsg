@@ -256,7 +256,7 @@ const enqueueAndSend = async (): Promise<void> => {
   }
 }
 
-// refactor to use actual raw queries
+// to refactor to use orm
 const sendFinalizedNotification = (campaignId: number): void => {
   void connection
     .query(

@@ -19,6 +19,7 @@ module.exports = {
           AND q.campaign_id = p.id
           AND p.cred_name = c.name
           AND is_credential_used(p.id) IS NULL
+          -- Key change is here, added visible at checker
           AND q.visible_at <= clock_timestamp()
           ORDER BY id ASC
           LIMIT 1
