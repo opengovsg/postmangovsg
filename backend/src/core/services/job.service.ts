@@ -14,14 +14,14 @@ import { ListService } from '.'
 const createJob = async ({
   campaignId,
   rate,
-  scheduledTiming = undefined,
+  scheduledTiming = null,
 }: {
   campaignId: number
   rate: number
-  scheduledTiming?: Date
+  scheduledTiming: Date | null
 }): Promise<number | undefined> => {
   if (!scheduledTiming) {
-    // if its not a scheduled campaign, just throw in current timing. will not affect main flow of logic
+    // if it's not a scheduled campaign, just throw in current timing. will not affect main flow of logic
     scheduledTiming = new Date()
   }
 
@@ -63,14 +63,14 @@ const sendCampaign = async ({
   campaignId,
   rate,
   userId,
-  scheduledTiming = undefined,
+  scheduledTiming = null,
 }: {
   campaignId: number
   rate: number
   userId: number
   // scheduled timing is intended to be a pass through variable. just pass and don't handle
   // let the createJob handle it.
-  scheduledTiming?: Date
+  scheduledTiming: Date | null
 }): Promise<(number | undefined)[] | (number | undefined)> => {
   const campaign = await CampaignService.getCampaignDetails(campaignId, [])
 

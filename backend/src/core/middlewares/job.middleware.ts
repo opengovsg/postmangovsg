@@ -25,9 +25,7 @@ const sendCampaign = async (
 
     // convert scheduled timing to date object
     // if passed in then convert, if not just pass empty / undefined
-    const formattedTiming = scheduledTiming
-      ? new Date(scheduledTiming)
-      : undefined
+    const formattedTiming = scheduledTiming ? new Date(scheduledTiming) : null
     if (await JobService.canSendCampaign(+campaignId)) {
       let jobIds
       let jobCount = 0

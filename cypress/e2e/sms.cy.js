@@ -1,5 +1,5 @@
-describe("SMS Test", () => {
-  it("initiate sms campaign", () => {
+describe('SMS Test', () => {
+  it('initiate sms campaign', () => {
     // have these vars here so it won't affect retry results
     // (e.g. messages received from previous try being counted in the latest one
     // as they share the same content)
@@ -7,7 +7,6 @@ describe("SMS Test", () => {
     const CSV_FILENAME = 'testfile_sms.csv';
     const NUM_RECIPIENTS = '1';
     const TWILIO_CRED_SAVED = 'default-postman';
-
     const CUR_DATE = new Date();
     const DATETIME =
       CUR_DATE.getDate() +
@@ -23,7 +22,7 @@ describe("SMS Test", () => {
       CUR_DATE.getSeconds();
     const CAMPAIGN_NAME = MODE.concat('_').concat(DATETIME);
     const RANDOM_STRING = '_'.concat(
-      Math.floor(Math.random() * 1000000 + 1).toString(),
+      Math.floor(Math.random() * 1000000 + 1).toString()
     );
     const MSG_CONTENT = Cypress.env('MSG_CONTENT').concat(RANDOM_STRING);
     const MSG_TO_VERIFY = Cypress.env('MSG_TO_VERIFY').concat(RANDOM_STRING);
@@ -69,7 +68,7 @@ describe("SMS Test", () => {
     cy.contains(':button', 'SMS').click();
     cy.contains(':button', 'Create').click();
 
-    //step 1 : enter message template
+    //step 1 : enter message templat
     cy.get('#message').type(MSG_CONTENT);
     cy.contains(':button', 'Next').click();
 
@@ -124,7 +123,7 @@ describe("SMS Test", () => {
         assert.equal(
           messageCount,
           MSG_TO_EXPECT,
-          'test and/or actual sms not received',
+          'test and/or actual sms not received'
         );
       });
 

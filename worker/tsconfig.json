@@ -1,13 +1,7 @@
 {
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "files": [
-    "./src/server.ts"
-  ],
+  "include": ["src"],
+  "exclude": ["node_modules"],
+  "files": ["./src/server.ts"],
   "references": [
     {
       "path": "../shared/tsconfig.build.json"
@@ -36,21 +30,11 @@
     "moduleResolution": "node",
     "baseUrl": "./src",
     "paths": {
-      "@core/*": [
-        "core/*"
-      ],
-      "@sms/*": [
-        "sms/*"
-      ],
-      "@email/*": [
-        "email/*"
-      ],
-      "@telegram/*": [
-        "telegram/*"
-      ],
-      "@shared/*": [
-        "../../shared/src/*"
-      ]
+      "@core/*": ["core/*"],
+      "@sms/*": ["sms/*"],
+      "@email/*": ["email/*"],
+      "@telegram/*": ["telegram/*"],
+      "@shared/*": ["../../shared/src/*"]
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,
