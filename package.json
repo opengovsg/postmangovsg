@@ -71,8 +71,5 @@
   },
   "lint-staged": {
     "*.{yml,md}": "prettier --write"
-  },
-  "prettier": {
-    "singleQuote": true
   }
 }
