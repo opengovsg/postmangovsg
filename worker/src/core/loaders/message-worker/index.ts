@@ -165,7 +165,7 @@ const finalize = tracer.wrap(
             action: 'finalize',
           })
           // for each campaign id, send email confirmation
-          sendFinalizedNotification(campaignId)
+          void sendFinalizedNotification(campaignId)
         })
       }
     )
@@ -257,105 +257,94 @@ const enqueueAndSend = async (): Promise<void> => {
 }
 
 // to refactor to use orm
-const sendFinalizedNotification = (campaignId: number): void => {
-  void connection
-    .query(
-      "SELECT json_build_object('id', c.id," +
-        "'campaign_name', c.name," +
-        "'created_at', c.created_at," +
-        "'unsent_count', s.unsent," +
-        "'error_count', s.errored," +
-        "'sent_count', s.sent," +
-        "'invalid_count', s.invalid," +
-        "'notification_email', u.email," +
-        "'halted', c.halted) as result FROM campaigns c INNER JOIN statistics s ON c.id=s.campaign_id INNER JOIN users u ON c.user_id=u.id WHERE c.id=:campaign_id_input;",
+const sendFinalizedNotification = async (campaignId: number): Promise<void> => {
+  const result = await connection.query(
+    "SELECT json_build_object('id', c.id," +
+      "'campaign_name', c.name," +
+      "'created_at', c.created_at," +
+      "'unsent_count', s.unsent," +
+      "'error_count', s.errored," +
+      "'sent_count', s.sent," +
+      "'invalid_count', s.invalid," +
+      "'notification_email', u.email," +
+      "'halted', c.halted) as result FROM campaigns c INNER JOIN statistics s ON c.id=s.campaign_id INNER JOIN users u ON c.user_id=u.id WHERE c.id=:campaign_id_input;",
+    {
+      replacements: { campaign_id_input: campaignId },
+      type: QueryTypes.SELECT,
+    }
+  )
+
+  const jsonRes = get(result, '[0].result') || {}
+  const {
+    campaign_name: campaignName,
+    created_at: createdAt,
+    unsent_count: unsentCount,
+    error_count: errorCount,
+    sent_count: sentCount,
+    invalid_count: invalidCount,
+    notification_email: notificationEmail,
+    halted: halted,
+  } = jsonRes
+
+  let mail: MailToSend | void
+  // craft and send mail here
+  // if halted, send halted notif
+  if (halted) {
+    mail = await NotificationService.generateHaltedCampaignNotificationEmail(
+      client,
+      notificationEmail,
+      campaignName
+    )
+  } else {
+    // for scheduled, visible_at must be after created_at
+    // normal flow, pull out visibleAt from job_queue table.
+    const result = await connection.query(
+      "select visible_at from job_queue where campaign_id=:campaign_id_input and status = 'LOGGED' order by created_at desc limit 1;",
       {
         replacements: { campaign_id_input: campaignId },
         type: QueryTypes.SELECT,
       }
     )
-    .then(async (result) => {
-      const jsonRes = get(result, '[0].result') || {}
-      const {
-        id: campaignId,
-        campaign_name: campaignName,
-        created_at: createdAt,
-        unsent_count: unsentCount,
-        error_count: errorCount,
-        sent_count: sentCount,
-        invalid_count: invalidCount,
-        notification_email: notificationEmail,
-        halted: halted,
-      } = jsonRes
-
-      let mail: MailToSend | void
-      // craft and send mail here
-      // if halted, send halted notif
-      if (halted) {
-        mail =
-          await NotificationService.generateHaltedCampaignNotificationEmail(
-            client,
-            notificationEmail,
-            campaignName
-          )
-      } else {
-        // for scheduled, visible_at must be after created_at
-        // normal flow, pull out visibleAt from job_queue table.
-        const visibleAt = await connection
-          .query(
-            "select visible_at from job_queue where campaign_id=:campaign_id_input and status = 'LOGGED' order by created_at desc limit 1;",
-            {
-              replacements: { campaign_id_input: campaignId },
-              type: QueryTypes.SELECT,
-            }
-          )
-          .then(async (result) => {
-            return get(result, '[0].visible_at')
-          })
-        if (new Date(createdAt) < visibleAt) {
-          mail =
-            await NotificationService.generateScheduledCampaignNotificationEmail(
-              client,
-              notificationEmail,
-              campaignName,
-              unsentCount,
-              errorCount,
-              sentCount,
-              invalidCount
-            )
-        }
-      }
-      if (mail) {
-        // Send email using node mailer
-        // cannot use singleton mailclient like backend cuz worker will self destruct
-        // instantiate it only when needed
-        const mailClient = new MailClient(
-          config.get('mailOptions'),
-          config.get('mailOptions.callbackHashSecret'),
-          config.get('mailFrom'),
-          config.get('mailConfigurationSet')
+    const visibleAt = get(result, '[0].visible_at')
+    if (new Date(createdAt) < visibleAt) {
+      mail =
+        await NotificationService.generateScheduledCampaignNotificationEmail(
+          client,
+          notificationEmail,
+          campaignName,
+          unsentCount,
+          errorCount,
+          sentCount,
+          invalidCount
         )
-        const isEmailSent = await NotificationService.sendEmail(
-          mailClient,
-          mail
-        )
-        if (isEmailSent) {
-          logger.info({
-            message: 'Notification email successfully sent',
-            campaignId,
-            createdAt,
-            unsentCount,
-            errorCount,
-            sentCount,
-            invalidCount,
-            notificationEmail,
-            halted,
-            action: 'sendFinalizedNotification',
-          })
-        }
-      }
-    })
-  return
+    }
+  }
+  if (mail) {
+    // Send email using node mailer
+    // cannot use singleton mailclient like backend cuz worker will self destruct
+    // instantiate it only when needed
+    const mailClient = new MailClient(
+      config.get('mailOptions'),
+      config.get('mailOptions.callbackHashSecret'),
+      config.get('mailFrom'),
+      config.get('mailConfigurationSet')
+    )
+    const isEmailSent = await NotificationService.sendEmail(mailClient, mail)
+    if (isEmailSent) {
+      logger.info({
+        message: 'Notification email successfully sent',
+        campaignId,
+        createdAt,
+        unsentCount,
+        errorCount,
+        sentCount,
+        invalidCount,
+        notificationEmail,
+        halted,
+        action: 'sendFinalizedNotification',
+      })
+    }
+  }
 }
 
 /**
