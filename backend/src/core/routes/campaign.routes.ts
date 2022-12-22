@@ -1,12 +1,13 @@
 import { Router } from 'express'
 import {
-  ChannelType,
-  Status,
   CampaignSortField,
+  ChannelType,
   Ordering,
+  Status,
 } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
-import { CampaignMiddleware } from '@core/middlewares'
+import { CampaignMiddleware, JobMiddleware } from '@core/middlewares'
+
 const router = Router()
 
 // validators
@@ -72,5 +73,7 @@ router.put(
   celebrate(updateCampaignValidator),
   CampaignMiddleware.updateCampaign
 )
+
+router.post('/:campaignId/cancel', JobMiddleware.cancelScheduledCampaign)
 
 export default router

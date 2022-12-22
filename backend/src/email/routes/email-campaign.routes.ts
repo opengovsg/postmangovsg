@@ -193,7 +193,5 @@ export const InitEmailCampaignRoute = (
     emailTemplateMiddleware.selectListHandler
   )
 
-  router.post('/cancel', JobMiddleware.cancelScheduledCampaign)
-
   return router
 }

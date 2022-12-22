@@ -263,5 +263,5 @@ export async function updateCampaign(
 export async function cancelScheduledCampaign(
   campaignId: number
 ): Promise<void> {
-  return axios.post(`/campaign/${campaignId}/cancel`)
+  return axios.post(`/campaigns/${campaignId}/cancel`)
 }

@@ -172,8 +172,5 @@ export const InitTelegramCampaignMiddleware = (
     celebrate(duplicateCampaignValidator),
     telegramMiddleware.duplicateCampaign
   )
-
-  router.post('/cancel', JobMiddleware.cancelScheduledCampaign)
-
   return router
 }

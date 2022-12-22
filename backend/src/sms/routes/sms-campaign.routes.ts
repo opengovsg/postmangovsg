@@ -261,6 +261,5 @@ export const InitSmsCampaignRoute = (
     celebrate(selectListValidator),
     SmsTemplateMiddleware.selectListHandler
   )
-  router.post('/cancel', JobMiddleware.cancelScheduledCampaign)
   return router
 }
