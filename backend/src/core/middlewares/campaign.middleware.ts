@@ -28,12 +28,6 @@ const canEditCampaign = async (
       CampaignService.hasJobInProgress(+campaignId),
       UploadService.getCsvStatus(+campaignId),
     ])
-    logger.info({
-      message: 'Successfully created new campaign',
-      hasJob,
-      csvStatus,
-      action: 'createCampaign',
-    })
     if (!hasJob && !csvStatus?.isCsvProcessing) {
       return next()
     }
@@ -56,7 +50,7 @@ const canSendCampaign = async (
     logger.info({
       message: 'Checking can send campaign',
       sentJobs,
-      action: 'sendCampaign',
+      action: 'canSendCampaign',
     })
     if (sentJobs <= 0) {
       return next()

@@ -330,7 +330,7 @@ paths:
         '526':
           description: Invalid SSL certificate
 
-  /campaign/{campaignId}/cancel:
+  /campaigns/{campaignId}/cancel:
     post:
       security:
         - bearerAuth: []

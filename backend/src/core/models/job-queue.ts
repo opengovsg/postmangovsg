@@ -39,6 +39,7 @@ export class JobQueue extends Model<JobQueue> {
     type: DataType.DATE,
     allowNull: false,
     defaultValue: new Date(),
+    comment: 'Column Identifier to see if this job is scheduled',
   })
   visibleAt: Date
 }

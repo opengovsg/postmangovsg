@@ -289,72 +289,69 @@ const sendFinalizedNotification = (campaignId: number): void => {
       } = jsonRes
 
       let mail: MailToSend | void
-      if (campaignId) {
-        // craft and send mail here
-        // if halted, send halted notif
-        if (halted) {
+      // craft and send mail here
+      // if halted, send halted notif
+      if (halted) {
+        mail =
+          await NotificationService.generateHaltedCampaignNotificationEmail(
+            client,
+            notificationEmail,
+            campaignName
+          )
+      } else {
+        // for scheduled, visible_at must be after created_at
+        // normal flow, pull out visibleAt from job_queue table.
+        const visibleAt = await connection
+          .query(
+            "select visible_at from job_queue where campaign_id=:campaign_id_input and status = 'LOGGED' order by created_at desc limit 1;",
+            {
+              replacements: { campaign_id_input: campaignId },
+              type: QueryTypes.SELECT,
+            }
+          )
+          .then(async (result) => {
+            return get(result, '[0].visible_at')
+          })
+        if (new Date(createdAt) < visibleAt) {
           mail =
-            await NotificationService.generateHaltedCampaignNotificationEmail(
+            await NotificationService.generateScheduledCampaignNotificationEmail(
               client,
               notificationEmail,
-              campaignName
-            )
-        } else {
-          // for scheduled, visible_at must be after created_at
-          // normal flow, pull out visibleAt from job_queue table.
-
-          const visibleAt = await connection
-            .query(
-              "select visible_at from job_queue where campaign_id=:campaign_id_input and status = 'LOGGED' order by created_at desc limit 1;",
-              {
-                replacements: { campaign_id_input: campaignId },
-                type: QueryTypes.SELECT,
-              }
-            )
-            .then(async (result) => {
-              return get(result, '[0].visible_at')
-            })
-          if (new Date(createdAt) < visibleAt) {
-            mail =
-              await NotificationService.generateScheduledCampaignNotificationEmail(
-                client,
-                notificationEmail,
-                campaignName,
-                unsentCount,
-                errorCount,
-                sentCount,
-                invalidCount
-              )
-          }
-        }
-        if (mail) {
-          // Send email using node mailer
-          // cannot use singleton mailclient like backend cuz worker will self destruct
-          // instantiate it only when needed
-          const mailClient = new MailClient(
-            config.get('mailOptions'),
-            config.get('mailOptions.callbackHashSecret'),
-            config.get('mailFrom'),
-            config.get('mailConfigurationSet')
-          )
-          const isEmailSent = await NotificationService.sendEmail(
-            mailClient,
-            mail
-          )
-          if (isEmailSent) {
-            logger.info({
-              message: 'Notification email successfully sent',
-              campaignId,
-              createdAt,
+              campaignName,
               unsentCount,
               errorCount,
               sentCount,
-              invalidCount,
-              notificationEmail,
-              halted,
-              action: 'sendFinalizedNotification',
-            })
-          }
+              invalidCount
+            )
+        }
+      }
+      if (mail) {
+        // Send email using node mailer
+        // cannot use singleton mailclient like backend cuz worker will self destruct
+        // instantiate it only when needed
+        const mailClient = new MailClient(
+          config.get('mailOptions'),
+          config.get('mailOptions.callbackHashSecret'),
+          config.get('mailFrom'),
+          config.get('mailConfigurationSet')
+        )
+        const isEmailSent = await NotificationService.sendEmail(
+          mailClient,
+          mail
+        )
+        if (isEmailSent) {
+          logger.info({
+            message: 'Notification email successfully sent',
+            campaignId,
+            createdAt,
+            unsentCount,
+            errorCount,
+            sentCount,
+            invalidCount,
+            notificationEmail,
+            halted,
+            action: 'sendFinalizedNotification',
+          })
         }
       }
     })

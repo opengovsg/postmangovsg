@@ -18,7 +18,7 @@ const sendEmail = async (
     return mailClient.sendMail(mail, opts)
   } catch (e) {
     logger.error({
-      message: 'Error while sending test email',
+      message: 'Error while sending notification email',
       error: e,
       action: 'sendEmail',
     })
@@ -35,8 +35,7 @@ const generateScheduledCampaignNotificationEmail = async (
   sentCount: number,
   invalidCount: number
 ): Promise<MailToSend | void> => {
-  const subject =
-    'Your scheduled campaign "' + campaignName + '" was successfully sent out'
+  const subject = `Your scheduled campaign "${campaignName}" was successfully sent out`
   // hardcode the email body for notification
   const totalCount = unsentCount + errorCount + sentCount + invalidCount
   // manually build the params set
@@ -99,7 +98,7 @@ const assembleNotificationMail = async (
 
 export const NotificationService = {
   sendEmail,
-  // eventually to move to a theme folder for all relevant transactional maielrs
+  // eventually to move to a theme folder for all relevant transactional mailers
   generateScheduledCampaignNotificationEmail,
   generateHaltedCampaignNotificationEmail,
 }
