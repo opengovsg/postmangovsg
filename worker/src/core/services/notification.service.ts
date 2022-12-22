@@ -34,7 +34,7 @@ const generateScheduledCampaignNotificationEmail = async (
   errorCount: number,
   sentCount: number,
   invalidCount: number
-): Promise<MailToSend | void> => {
+): Promise<MailToSend> => {
   const subject = `Your scheduled campaign "${campaignName}" was successfully sent out`
   // hardcode the email body for notification
   const totalCount = unsentCount + errorCount + sentCount + invalidCount
@@ -62,7 +62,7 @@ const generateHaltedCampaignNotificationEmail = async (
   client: TemplateClient,
   recipient: string,
   campaignName: string
-): Promise<MailToSend | void> => {
+): Promise<MailToSend> => {
   const params: { [key: string]: string } = {
     recipient: recipient,
     campaignName: campaignName,
