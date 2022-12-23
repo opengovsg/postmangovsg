@@ -5,7 +5,6 @@
 - bmp
 - csv
 - dgn
-- doc
 - docx
 - dwf
 - dwg
@@ -23,7 +22,6 @@
 - ods
 - pdf
 - png
-- ppt
 - pptx
 - rtf
 - sxc
@@ -34,5 +32,4 @@
 - tiff
 - txt
 - wmv
-- xls
 - xlsx

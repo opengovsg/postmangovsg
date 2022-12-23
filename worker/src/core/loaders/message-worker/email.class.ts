@@ -146,6 +146,7 @@ class Email {
         body: themedHTMLEmail,
         referenceId: String(id),
         unsubLink,
+        bcc: params.bcc ? params.bcc.split(',') : undefined,
         ...(replyTo ? { replyTo } : {}),
       })
 
