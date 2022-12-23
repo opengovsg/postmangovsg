@@ -95,7 +95,7 @@ msgstr "https://file.go.gov.sg/dz52q4.png"
 
 #: config.ts:108
 msgid "announcement.primaryButtonText"
-msgstr "Read guide"
+msgstr "Read our guide here"
 
 #: config.ts:107
 msgid "announcement.primaryButtonUrl"
@@ -111,11 +111,11 @@ msgstr "null"
 
 #: config.ts:105
 msgid "announcement.subtext"
-msgstr "Thanks for using Postman and joining us every step of the way while we mature as a product. We'll be releasing exciting new features this year. For instance, this is an announcement modal that will keep you up-to-date about our new features! Watch this space for things that are brewing. Learn more about Postman's releases by reading our guide."
+msgstr "You can now prepare your campaign in advance and schedule it to be sent at a later time."
 
 #: config.ts:104
 msgid "announcement.title"
-msgstr "Happy New Year! Congrats on making it through 2020."
+msgstr "Scheduled sending is here!"
 
 #: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
 #: config.ts:88
