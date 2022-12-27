@@ -111,11 +111,11 @@ msgstr "null"
 
 #: config.ts:105
 msgid "announcement.subtext"
-msgstr "Say goodbye to sending your campaigns after work hours! You can now prepare your campaign in advance, schedule and sit back while we send your campaign at a later time."
+msgstr "Say goodbye to sending your campaigns after work hours! \n You can now prepare your campaign in advance, schedule and sit back while we send your campaign at a later time."
 
 #: config.ts:104
 msgid "announcement.title"
-msgstr "Scheduled campaigns is here!"
+msgstr "Scheduled campaign is here!"
 
 #: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
 #: config.ts:88
