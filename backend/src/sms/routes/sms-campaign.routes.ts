@@ -2,9 +2,9 @@ import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
-  UploadMiddleware,
   JobMiddleware,
   SettingsMiddleware,
+  UploadMiddleware,
 } from '@core/middlewares'
 import {
   SmsMiddleware,
@@ -143,6 +143,7 @@ export const InitSmsCampaignRoute = (
     '/send',
     celebrate(sendCampaignValidator),
     CampaignMiddleware.canEditCampaign,
+    CampaignMiddleware.canSendCampaign,
     JobMiddleware.sendCampaign
   )
 
@@ -175,6 +176,5 @@ export const InitSmsCampaignRoute = (
     celebrate(selectListValidator),
     SmsTemplateMiddleware.selectListHandler
   )
-
   return router
 }

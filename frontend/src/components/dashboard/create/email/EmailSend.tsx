@@ -1,10 +1,4 @@
-import {
-  useContext,
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-} from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { useParams } from 'react-router-dom'
 
@@ -12,26 +6,22 @@ import styles from '../Create.module.scss'
 
 import { campaignFeedbackUrl, confirmSendCampaign } from '../util'
 
-import { ChannelType, EmailProgress } from 'classes'
+import { ChannelType } from 'classes'
 import {
+  ButtonGroup,
+  ConfirmModal,
   EmailPreviewBlock,
   PrimaryButton,
-  ConfirmModal,
-  ButtonGroup,
-  TextButton,
   StepHeader,
   StepSection,
 } from 'components/common'
+import SchedulingButton from 'components/dashboard/create/common/SchedulingButton'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 
 import { getPreviewMessage } from 'services/email.service'
 
-const EmailSend = ({
-  setActiveStep,
-}: {
-  setActiveStep: Dispatch<SetStateAction<EmailProgress>>
-}) => {
+const EmailSend = () => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
@@ -118,9 +108,11 @@ const EmailSend = ({
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
-          Previous
-        </TextButton>
+        <SchedulingButton
+          campaign={campaign}
+          updateCampaign={updateCampaign}
+          buttonText={'Schedule for later'}
+        />
       </ButtonGroup>
     </>
   )

@@ -2,10 +2,9 @@ import tracer from 'dd-trace'
 import { Sequelize } from 'sequelize-typescript'
 import { QueryTypes } from 'sequelize'
 import get from 'lodash/get'
-require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { MutableConfig, generateRdsIamAuthToken } from '@core/utils/rds-iam'
+import { generateRdsIamAuthToken, MutableConfig } from '@core/utils/rds-iam'
 import { waitForMs } from '@shared/utils/wait-for-ms'
 import Email from './email.class'
 import SMS from './sms.class'
@@ -13,8 +12,15 @@ import Telegram from './telegram.class'
 import ECSUtil from './util/ecs'
 import assignment from './util/assignment'
 import { Message } from './interface'
+import { NotificationService } from '@core/services/notification.service'
+import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
+import MailClient, { MailToSend } from '@shared/clients/mail-client.class'
+
+require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 
 const logger = loggerWithLabel(module)
+const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
+
 let connection: Sequelize,
   workerId: string,
   currentCampaignType: string,
@@ -158,6 +164,8 @@ const finalize = tracer.wrap(
             campaignId,
             action: 'finalize',
           })
+          // for each campaign id, send email confirmation
+          void sendFinalizedNotification(campaignId)
         })
       }
     )
@@ -245,6 +253,97 @@ const enqueueAndSend = async (): Promise<void> => {
       }
     }
     await service().destroySendingService()
+  }
+}
+
+// to refactor to use orm
+const sendFinalizedNotification = async (campaignId: number): Promise<void> => {
+  const result = await connection.query(
+    "SELECT json_build_object('id', c.id," +
+      "'campaign_name', c.name," +
+      "'created_at', c.created_at," +
+      "'unsent_count', s.unsent," +
+      "'error_count', s.errored," +
+      "'sent_count', s.sent," +
+      "'invalid_count', s.invalid," +
+      "'notification_email', u.email," +
+      "'halted', c.halted) as result FROM campaigns c INNER JOIN statistics s ON c.id=s.campaign_id INNER JOIN users u ON c.user_id=u.id WHERE c.id=:campaign_id_input;",
+    {
+      replacements: { campaign_id_input: campaignId },
+      type: QueryTypes.SELECT,
+    }
+  )
+
+  const jsonRes = get(result, '[0].result') || {}
+  const {
+    campaign_name: campaignName,
+    created_at: createdAt,
+    unsent_count: unsentCount,
+    error_count: errorCount,
+    sent_count: sentCount,
+    invalid_count: invalidCount,
+    notification_email: notificationEmail,
+    halted: halted,
+  } = jsonRes
+
+  let mail: MailToSend | void
+  // craft and send mail here
+  // if halted, send halted notif
+  if (halted) {
+    mail = await NotificationService.generateHaltedCampaignNotificationEmail(
+      client,
+      notificationEmail,
+      campaignName
+    )
+  } else {
+    // for scheduled, visible_at must be after created_at
+    // normal flow, pull out visibleAt from job_queue table.
+    const result = await connection.query(
+      "select visible_at from job_queue where campaign_id=:campaign_id_input and status = 'LOGGED' order by created_at desc limit 1;",
+      {
+        replacements: { campaign_id_input: campaignId },
+        type: QueryTypes.SELECT,
+      }
+    )
+    const visibleAt = get(result, '[0].visible_at')
+    if (new Date(createdAt) < visibleAt) {
+      mail =
+        await NotificationService.generateScheduledCampaignNotificationEmail(
+          client,
+          notificationEmail,
+          campaignName,
+          unsentCount,
+          errorCount,
+          sentCount,
+          invalidCount
+        )
+    }
+  }
+  if (mail) {
+    // Send email using node mailer
+    // cannot use singleton mailclient like backend cuz worker will self destruct
+    // instantiate it only when needed
+    const mailClient = new MailClient(
+      config.get('mailOptions'),
+      config.get('mailOptions.callbackHashSecret'),
+      config.get('mailFrom'),
+      config.get('mailConfigurationSet')
+    )
+    const isEmailSent = await NotificationService.sendEmail(mailClient, mail)
+    if (isEmailSent) {
+      logger.info({
+        message: 'Notification email successfully sent',
+        campaignId,
+        createdAt,
+        unsentCount,
+        errorCount,
+        sentCount,
+        invalidCount,
+        notificationEmail,
+        halted,
+        action: 'sendFinalizedNotification',
+      })
+    }
   }
 }
 

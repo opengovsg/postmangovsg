@@ -9,7 +9,7 @@ import {
 
 import styles from './ActionsButton.module.scss'
 
-import { Campaign, ChannelType } from 'classes'
+import { Campaign, ChannelType, Status } from 'classes'
 
 import { ExportRecipients } from 'components/common'
 import DuplicateCampaignModal from 'components/dashboard/create/duplicate-campaign-modal'
@@ -27,6 +27,7 @@ const ActionsButton = ({
   onDelete,
   onClose,
   onRename,
+  onReschedule,
 }: {
   campaign: Campaign
   numDemosSms: number
@@ -37,6 +38,9 @@ const ActionsButton = ({
   onDelete?: (e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>) => void
   onClose?: () => void
   onRename?: (e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>) => void
+  onReschedule?: (
+    e: ReactMouseEvent<HTMLButtonElement | HTMLDivElement>
+  ) => void
 }) => {
   const btnGroupRef = createRef<HTMLDivElement>()
   const [dropdownMenuStyle, setDropdownMenuStyle] = useState<object>()
@@ -139,6 +143,13 @@ const ActionsButton = ({
         style={dropdownMenuStyle}
         ref={menuRef}
       >
+        {campaign.status === Status.Scheduled && (
+          <div className={styles.dropdownItem} onClick={onReschedule}>
+            <button className={cx(styles.btn, styles.btnPrimary)}>
+              Reschedule or cancel <i className="bx bx-calendar-event"></i>
+            </button>
+          </div>
+        )}
         {campaign.redacted ? (
           <span
             className={styles.expired}

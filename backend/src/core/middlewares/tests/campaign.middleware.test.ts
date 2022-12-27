@@ -67,7 +67,6 @@ describe('canEditCampaign middleware', () => {
       protect: false,
       s3Object: { temp_filename: 'file' },
     } as Campaign)
-
     mockRequest = {
       params: { campaignId: String(campaign.id) },
     }

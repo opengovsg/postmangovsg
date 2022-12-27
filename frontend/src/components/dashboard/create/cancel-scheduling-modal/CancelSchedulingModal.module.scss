@@ -1,0 +1,11 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.modalWrapper {
+  text-align: center;
+}
+
+.image {
+  width: 240px;
+  margin-bottom: $spacing-7;
+}
