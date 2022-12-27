@@ -91,15 +91,15 @@ msgstr "file.go.gov.sg;file.for.sg;file.for.edu.sg"
 
 #: config.ts:106
 msgid "announcement.mediaUrl"
-msgstr "https://file.go.gov.sg/dz52q4.png"
+msgstr "https://file.go.gov.sg/scheduled-send-modal.png"
 
 #: config.ts:108
 msgid "announcement.primaryButtonText"
-msgstr "Read our guide here"
+msgstr "Find out how"
 
 #: config.ts:107
 msgid "announcement.primaryButtonUrl"
-msgstr "https://guide.postman.gov.sg/release-notes"
+msgstr "https://go.gov.sg/postman-scheduled-send"
 
 #: config.ts:110
 msgid "announcement.secondaryButtonText"
@@ -111,11 +111,11 @@ msgstr "null"
 
 #: config.ts:105
 msgid "announcement.subtext"
-msgstr "You can now prepare your campaign in advance and schedule it to be sent at a later time."
+msgstr "Say goodbye to sending your campaigns after work hours! You can now prepare your campaign in advance, schedule and sit back while we send your campaign at a later time."
 
 #: config.ts:104
 msgid "announcement.title"
-msgstr "Scheduled sending is here!"
+msgstr "Scheduled campaigns is here!"
 
 #: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
 #: config.ts:88
