@@ -65,6 +65,7 @@ export const InitSmsCampaignRoute = (
   const sendCampaignValidator = {
     [Segments.BODY]: Joi.object({
       rate: Joi.number().integer().positive().default(10),
+      scheduledTiming: Joi.string().optional(),
     }),
   }
 
