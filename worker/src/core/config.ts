@@ -67,6 +67,10 @@ export interface ConfigSchema {
   backendUrl: string
   messageWorker: { numSender: number; numLogger: number }
   unsubscribeHmac: { version: string; v1: { algo: string; key: string } }
+  emailCallback: {
+    callbackSecret: string
+    hashSecret: string
+  }
   unsubscribeUrl: string
   smsFallback: { activate: boolean; senderId: string }
   emailFallback: { activate: boolean }
@@ -264,6 +268,19 @@ const config: Config<ConfigSchema> = convict({
       },
     },
   },
+  emailCallback: {
+    callbackSecret: {
+      doc: 'Secret for basic auth',
+      env: 'CALLBACK_SECRET',
+      default: '',
+    },
+    hashSecret: {
+      doc: 'Secret for email callback hash',
+      env: 'EMAIL_CALLBACK_HASH_SECRET',
+      default: '',
+      format: 'required-string',
+    },
+  },
   unsubscribeUrl: {
     doc: 'Used to generate unsubscribe url',
     default: 'https://postman.gov.sg', // prod only
@@ -326,11 +343,11 @@ if (config.get('env') === 'staging') {
 const numSender = config.get('messageWorker.numSender')
 const numLogger = config.get('messageWorker.numLogger')
 
-if (numSender < 1 && numLogger < 1) {
+if (numSender < 1 && numLogger < 1 && process.env.NODE_ENV !== 'JEST') {
   throw new Error(`Worker must be either a sender or logger`)
 }
 
-if (numSender + numLogger !== 1) {
+if (numSender + numLogger !== 1 && process.env.NODE_ENV !== 'JEST') {
   throw new Error(`Only 1 worker of 1 variant per task supported in production.
 		You supplied MESSAGE_WORKER_SENDER=${numSender}, MESSAGE_WORKER_LOGGER=${numLogger}`)
 }

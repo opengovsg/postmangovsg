@@ -1,0 +1,10 @@
+@import 'styles/_mixins';
+@import 'styles/_variables';
+
+.buttonWrapper {
+  display: flex;
+  justify-content: space-between;
+  p {
+    margin: unset;
+  }
+}

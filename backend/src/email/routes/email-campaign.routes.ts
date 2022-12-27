@@ -2,14 +2,14 @@ import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
-  UploadMiddleware,
   JobMiddleware,
   ProtectedMiddleware,
+  UploadMiddleware,
 } from '@core/middlewares'
 import {
-  EmailTemplateMiddleware,
-  EmailStatsMiddleware,
   EmailMiddleware,
+  EmailStatsMiddleware,
+  EmailTemplateMiddleware,
 } from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
 
@@ -142,6 +142,7 @@ export const InitEmailCampaignRoute = (
   router.post(
     '/send',
     CampaignMiddleware.canEditCampaign,
+    CampaignMiddleware.canSendCampaign,
     JobMiddleware.sendCampaign
   )
 

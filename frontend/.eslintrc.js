@@ -37,6 +37,7 @@ module.exports = {
     'react/prop-types': 'off', // No need proptypes since we're using TypeScript
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
+    'react/no-unescaped-entities': 0,
     'react-hooks/rules-of-hooks': 'error', // Checks rules of Hooks
     'react-hooks/exhaustive-deps': 'warn', // Checks effect dependencies
 

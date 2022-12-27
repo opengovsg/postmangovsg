@@ -1,10 +1,10 @@
 import {
+  BelongsTo,
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
-  ForeignKey,
-  BelongsTo,
 } from 'sequelize-typescript'
 import { JobStatus } from '@core/constants'
 import { Campaign } from './campaign'
@@ -34,4 +34,12 @@ export class JobQueue extends Model<JobQueue> {
     allowNull: false,
   })
   status!: JobStatus
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    defaultValue: new Date(),
+    comment: 'Column Identifier to see if this job is scheduled',
+  })
+  visibleAt: Date
 }

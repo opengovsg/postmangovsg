@@ -8,6 +8,7 @@ export enum ChannelType {
 
 export enum Status {
   Draft = 'Draft',
+  Scheduled = 'Scheduled',
   Sending = 'Sending',
   Sent = 'Sent',
   Halted = 'Halted',
@@ -16,6 +17,7 @@ export enum Status {
 export enum StatusFilter {
   Draft = 'Draft',
   Sent = 'Sent',
+  Scheduled = 'Scheduled',
 }
 
 export enum SortField {
@@ -48,6 +50,8 @@ export class Campaign {
   demoMessageLimit: number | null
   costPerMessage?: number
   shouldSaveList: boolean
+  scheduledAt?: Date
+  visibleAt?: string
 
   constructor(input: any) {
     this.id = input['id']
@@ -65,9 +69,17 @@ export class Campaign {
     this.demoMessageLimit = input['demo_message_limit']
     this.costPerMessage = input['cost_per_message']
     this.shouldSaveList = input['should_save_list']
+    this.visibleAt = input['visible_at']
+    if (this.status === Status.Scheduled) {
+      const jobs = input['job_queue'] as Array<{ visible_at: string }>
+      const jobsVisibleTime = jobs
+        .map(({ visible_at: visibleAt }) => new Date(visibleAt))
+        .sort()
+      this.scheduledAt = jobsVisibleTime[0]
+    }
   }
 
-  getStatus(jobs: Array<{ status: string }>): Status {
+  getStatus(jobs: Array<{ status: string; visible_at?: string }>): Status {
     if (jobs) {
       const jobSet = new Set(jobs.map((x) => x.status))
       // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 2/2)
@@ -76,6 +88,13 @@ export class Campaign {
           jobSet.has(s)
         )
       ) {
+        if (
+          jobs.every(({ visible_at }) => {
+            return visible_at && new Date(visible_at) >= new Date()
+          })
+        ) {
+          return Status.Scheduled
+        }
         return Status.Sending
       } else if (jobSet.has('LOGGED')) {
         return Status.Sent
@@ -97,6 +116,7 @@ export class CampaignStats {
   waitTime?: number
   redacted?: boolean
   unsubscribed?: number
+  visibleAt?: string
 
   constructor(input: any) {
     this.error = +input['error']
@@ -109,6 +129,7 @@ export class CampaignStats {
     this.halted = input['halted']
     this.waitTime = input['wait_time']
     this.unsubscribed = input['unsubscribed']
+    this.visibleAt = input['visible_at']
   }
 }
 

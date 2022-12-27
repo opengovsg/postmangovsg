@@ -1,11 +1,11 @@
-import { Op, literal, Transaction, Includeable } from 'sequelize'
+import { Includeable, literal, Op, Transaction } from 'sequelize'
 import config from '@core/config'
 import {
+  CampaignSortField,
   ChannelType,
   JobStatus,
-  Status,
-  CampaignSortField,
   Ordering,
+  Status,
 } from '@core/constants'
 import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
@@ -14,11 +14,36 @@ import { loggerWithLabel } from '@core/logger'
 const logger = loggerWithLabel(module)
 /**
  * Checks whether a campaign has any jobs in the job queue that are not logged, meaning that they are in progress
+ * For scheduled campaigns, the identifier is that the job should be "ready" and also have a visible_at AFTER now.
+ * This means that if it's before, then it's a running progress
  * @param campaignId
  */
 const hasJobInProgress = (campaignId: number): Promise<JobQueue | null> => {
   return JobQueue.findOne({
-    where: { campaignId, status: { [Op.not]: JobStatus.Logged } },
+    where: {
+      [Op.and]: {
+        campaignId,
+        status: {
+          [Op.not]: JobStatus.Logged,
+        },
+        visibleAt: {
+          [Op.lte]: new Date(),
+        },
+      },
+    },
+  })
+}
+
+const hasAlreadyBeenSent = (campaignId: number): Promise<number> => {
+  return JobQueue.count({
+    where: {
+      [Op.and]: {
+        campaignId,
+        status: {
+          [Op.eq]: JobStatus.Logged,
+        },
+      },
+    },
   })
 }
 
@@ -188,9 +213,11 @@ const listCampaigns = ({
 
   if (status) {
     let operation: any = {}
+    let checkField = ''
     switch (status) {
       case Status.Draft: {
         operation = { [Op.is]: null }
+        checkField = '$job_queue.status$'
         break
       }
       // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 1/2)
@@ -204,17 +231,29 @@ const listCampaigns = ({
             JobStatus.Stopped,
           ],
         }
+        checkField = '$job_queue.status$'
+
         break
       }
       case Status.Sent: {
         operation = { [Op.eq]: JobStatus.Logged }
+        checkField = '$job_queue.status$'
+
+        break
+      }
+      case Status.Scheduled: {
+        operation = {
+          [Op.gte]: new Date(),
+        }
+        checkField = '$job_queue.visible_at$'
         break
       }
       default: {
         break
       }
     }
-    const statusFilter = { '$job_queue.status$': operation } //join query
+    const statusFilter: { [key: string]: any } = {} //join query
+    statusFilter[checkField] = operation
     whereFilter = { ...whereFilter, ...statusFilter }
   }
 
@@ -278,6 +317,7 @@ const listCampaigns = ({
         model: JobQueue,
         attributes: [
           'status',
+          'visible_at',
           ['created_at', 'sent_at'],
           ['updated_at', 'status_updated_at'],
         ],
@@ -351,7 +391,7 @@ const getCampaignDetails = async (
     include: [
       {
         model: JobQueue,
-        attributes: ['status', ['created_at', 'sent_at']],
+        attributes: ['status', 'visible_at', ['created_at', 'sent_at']],
       },
       {
         model: Statistic,
@@ -411,6 +451,7 @@ const updateCampaign = (campaign: Campaign): Promise<[number, Campaign[]]> =>
 
 export const CampaignService = {
   hasJobInProgress,
+  hasAlreadyBeenSent,
   createCampaign,
   createCampaignWithTransaction,
   listCampaigns,

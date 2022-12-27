@@ -1,10 +1,10 @@
-import { QueryTypes, Op } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 import get from 'lodash/get'
 
 import config from '@core/config'
-import { Campaign } from '@core/models'
+import { Campaign, JobQueue } from '@core/models'
 import { CampaignService } from './campaign.service'
-import { ChannelType } from '@core/constants'
+import { ChannelType, JobStatus } from '@core/constants'
 import { ListService } from '.'
 
 /**
@@ -14,14 +14,25 @@ import { ListService } from '.'
 const createJob = async ({
   campaignId,
   rate,
+  scheduledTiming = null,
 }: {
   campaignId: number
   rate: number
+  scheduledTiming: Date | null
 }): Promise<number | undefined> => {
+  if (!scheduledTiming) {
+    // if it's not a scheduled campaign, just throw in current timing. will not affect main flow of logic
+    scheduledTiming = new Date()
+  }
+
   const job = await Campaign.sequelize?.query(
-    'SELECT insert_job(:campaignId, :rate);',
+    'SELECT insert_job(:campaignId, :rate, :scheduledTiming);',
     {
-      replacements: { campaignId, rate },
+      replacements: {
+        campaignId,
+        rate,
+        scheduledTiming: scheduledTiming,
+      },
       type: QueryTypes.SELECT,
     }
   )
@@ -52,10 +63,14 @@ const sendCampaign = async ({
   campaignId,
   rate,
   userId,
+  scheduledTiming = null,
 }: {
   campaignId: number
   rate: number
   userId: number
+  // scheduled timing is intended to be a pass through variable. just pass and don't handle
+  // let the createJob handle it.
+  scheduledTiming: Date | null
 }): Promise<(number | undefined)[] | (number | undefined)> => {
   const campaign = await CampaignService.getCampaignDetails(campaignId, [])
 
@@ -80,6 +95,7 @@ const sendCampaign = async ({
     return createJob({
       campaignId: +campaignId,
       rate: config.get('mailDefaultRate'),
+      scheduledTiming,
     })
   }
 
@@ -95,7 +111,9 @@ const sendCampaign = async ({
     const sendRate =
       workerIndex + 1 < workersNeeded ? averageWorkerRate : lastWorkerRate
 
-    jobs.push(createJob({ campaignId: +campaignId, rate: sendRate }))
+    jobs.push(
+      createJob({ campaignId: +campaignId, rate: sendRate, scheduledTiming })
+    )
   }
 
   return Promise.all(jobs)
@@ -123,9 +141,36 @@ const retryCampaign = (campaignId: number): Promise<any> | undefined => {
   })
 }
 
+const updateScheduledCampaign = async (
+  campaignId: number,
+  scheduledTiming: Date
+): Promise<number> => {
+  const jobCount = await JobQueue.count({
+    where: { campaignId, status: { [Op.eq]: JobStatus.Ready } },
+  })
+  if (jobCount > 0) {
+    await JobQueue.update(
+      {
+        visibleAt: scheduledTiming,
+      },
+      {
+        where: { campaignId },
+        returning: true,
+      }
+    )
+  }
+  return jobCount
+}
+// indiscriminately delete JobQueue records that have the campaignId
+const cancelScheduledCampaign = async (campaignId: number) => {
+  await JobQueue.destroy({ where: { campaignId } })
+}
+
 export const JobService = {
   canSendCampaign,
   sendCampaign,
   stopCampaign,
   retryCampaign,
+  updateScheduledCampaign,
+  cancelScheduledCampaign,
 }
