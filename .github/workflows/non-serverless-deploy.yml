@@ -1,7 +1,7 @@
 # This action is to orchestrate the non-serverless stuffs deployment
 # to make sure cypress e2e test is run post-deployments.
 # The reason we need to do this hack is because there's currently no way
-# to use `workflow_run` trigger with requirement being all depdency workflows'
+# to use "workflow_run" trigger with requirement being all depdency workflows'
 # complete. More here: https://github.com/community/community/discussions/16059
 # Side note: we need to follow .github/workflows convention https://docs.github.com/en/actions/using-workflows/reusing-workflows
 name: Deploy and E2E test non-serverless stuffs
@@ -11,9 +11,57 @@ on:
       - staging
       - master
 
+env:
+  SLACK_CHANNEL_ID: C04H0FTGS5P # postman-deploys
+
 concurrency: deploy-non-serverless-${{ github.ref }}
 
 jobs:
+  slack-started:
+    name: Send slack message when deployment starts
+    runs-on: ubuntu-latest
+    outputs:
+      message_id: ${{ steps.slack.outputs.ts }}
+    steps:
+      - uses: slackapi/slack-github-action@v1.23.0
+        id: slack
+        with:
+          channel-id: ${{ env.SLACK_CHANNEL_ID }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "warning",
+                  "fields": [
+                      {
+                        "title": "Deployment",
+                        "value": "Non serverless stuffs",
+                        "short": true
+                      },
+                      {
+                        "title": "Status",
+                        "value": "STARTED",
+                        "short": true
+                      },
+                      {
+                        "title": "Workflow Run",
+                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ github.event.head_commit.message }}>",
+                        "short": true
+                      },
+                      {
+                        "title": "Environment",
+                        "value": "${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}",
+                        "short": true
+                      }
+                  ],
+                  "footer_icon": "https://github.githubassets.com/favicon.ico",
+                  "footer": "<https://github.com/opengovsg/postmangovsg | opengovsg/postmangovsg>"
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
   deploy-backend:
     name: Deploy backend to AWS Elastic Beanstalk
     uses: ./.github/workflows/deploy-eb.yml
@@ -59,3 +107,103 @@ jobs:
             ${{ needs.deploy-backend.outputs.revert_command_backend }}
             ${{ needs.deploy-backend.outputs.revert_command_callback }}
           fi
+  slack-success:
+    needs:
+      - slack-started
+      - deploy-backend
+      - deploy-frontend
+      - deploy-worker
+      - e2e-test
+    if: success()
+    name: Send Slack message about successful build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: ${{ env.SLACK_CHANNEL_ID }}
+          update-ts: ${{ needs.slack-started.outputs.message_id }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "good",
+                  "fields": [
+                      {
+                        "title": "Deployment",
+                        "value": "Non serverless stuffs",
+                        "short": true
+                      },
+                      {
+                        "title": "Status",
+                        "value": "SUCCESSFUL",
+                        "short": true
+                      },
+                      {
+                        "title": "Workflow Run",
+                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ github.event.head_commit.message }}>",
+                        "short": true
+                      },
+                      {
+                        "title": "Environment",
+                        "value": "${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}",
+                        "short": true
+                      }
+                  ],
+                  "footer_icon": "https://github.githubassets.com/favicon.ico",
+                  "footer": "<https://github.com/opengovsg/postmangovsg | opengovsg/postmangovsg>"
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  slack-failure:
+    needs:
+      - slack-started
+      - deploy-backend
+      - deploy-frontend
+      - deploy-worker
+      - e2e-test
+    if: failure()
+    name: Send Slack message about failed build and tag engineers if it's prod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: slackapi/slack-github-action@v1.23.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          DEPLOY_ENV: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
+        with:
+          channel-id: ${{ env.SLACK_CHANNEL_ID }}
+          update-ts: ${{ needs.slack-started.outputs.message_id }}
+          payload: |
+            {
+              "text": "${{ env.DEPLOY_ENV == 'production' && '<@postmangineers>' || '' }}",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "fields": [
+                      {
+                        "title": "Deployment",
+                        "value": "Non serverless stuffs",
+                        "short": true
+                      },
+                      {
+                        "title": "Status",
+                        "value": "SUCCESSFUL",
+                        "short": true
+                      },
+                      {
+                        "title": "Workflow Run",
+                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ github.event.head_commit.message }}>",
+                        "short": true
+                      },
+                      {
+                        "title": "Environment",
+                        "value": "${{ env.DEPLOY_ENV }}",
+                        "short": true
+                      }
+                  ],
+                  "footer_icon": "https://github.githubassets.com/favicon.ico",
+                  "footer": "<https://github.com/opengovsg/postmangovsg | opengovsg/postmangovsg>"
+                }
+              ]
+            }
