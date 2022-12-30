@@ -9,9 +9,9 @@ WORKDIR /usr/home/postmangovsg
 COPY ./package* ./
 RUN npm ci
 
-COPY src ./src
 COPY scripts ./scripts
 COPY tsconfig.json ./
+COPY src ./src
 
 RUN npm run build
 RUN npm prune --production

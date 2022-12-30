@@ -1,5 +1,4 @@
 FROM public.ecr.aws/docker/library/node:16-alpine
-# postman public ecr
 
 # required for node-gyp
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \

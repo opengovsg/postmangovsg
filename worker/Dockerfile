@@ -18,8 +18,8 @@ RUN cd ../shared && npm ci
 COPY ./package* ./
 RUN npm ci
 
-COPY src ./src
 COPY tsconfig.json ./
+COPY src ./src
 
 RUN npm run build
 RUN cd ../shared && npm run postbuild
