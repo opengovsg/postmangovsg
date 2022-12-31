@@ -4713,6 +4713,9 @@ components:
             subject:
               type: string
               example: Hello World
+            reply_to:
+              type: string
+              example: hello@example.com
         attachments_metadata:
           nullable: true
           type: array

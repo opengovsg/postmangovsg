@@ -106,7 +106,7 @@ export const InitEmailTransactionalMiddleware = (
         subject,
         body,
         from,
-        replyTo,
+        reply_to: replyTo,
       },
       messageId: null,
       attachmentsMetadata,
