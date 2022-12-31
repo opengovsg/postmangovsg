@@ -74,7 +74,7 @@ paths:
             enum: [ASC, DESC]
             default: DESC
       responses:
-        '200':
+        "200":
           description: List of campaigns
           content:
             application/json:
@@ -84,48 +84,48 @@ paths:
                   campaigns:
                     type: array
                     items:
-                      $ref: '#/components/schemas/CampaignMeta'
+                      $ref: "#/components/schemas/CampaignMeta"
                   total_count:
                     type: integer
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
     post:
       security:
@@ -143,57 +143,57 @@ paths:
                 name:
                   type: string
                 type:
-                  $ref: '#/components/schemas/ChannelType'
+                  $ref: "#/components/schemas/ChannelType"
               required:
                 - name
                 - type
 
       responses:
-        '201':
+        "201":
           description: Campaign created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignMeta'
-        '401':
+                $ref: "#/components/schemas/CampaignMeta"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificateÏ
   /campaigns/{campaignId}:
     delete:
@@ -211,51 +211,51 @@ paths:
             type: integer
             minimum: 1
       responses:
-        '200':
+        "200":
           description: Successfully deleted
           content:
             schema: {} # TODO
-        '401':
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Campaign not found
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
     put:
       security:
@@ -281,53 +281,53 @@ paths:
                 should_save_list:
                   type: boolean
       responses:
-        '200':
+        "200":
           description: Campaign renamed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignMeta'
-        '401':
+                $ref: "#/components/schemas/CampaignMeta"
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Not found
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaigns/{campaignId}/cancel:
@@ -344,49 +344,48 @@ paths:
           schema:
             type: string
       responses:
-        '201':
+        "201":
           description: Successfully cancelled the campaign
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
-          description:
-            Invalid SSL certificate
+        "526":
+          description: Invalid SSL certificate
   /campaign/{campaignId}/email:
     get:
       security:
@@ -401,53 +400,53 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Email campaign details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EmailCampaign'
-        '400':
+                $ref: "#/components/schemas/EmailCampaign"
+        "400":
           description: Invalid campaign type or not owned by user
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/template:
     put:
@@ -525,53 +524,53 @@ paths:
                           type: string
                       from:
                         type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/upload/start:
     get:
       security:
         - bearerAuth: []
-      summary: 'Get a presigned URL for upload with Content-MD5 header'
+      summary: "Get a presigned URL for upload with Content-MD5 header"
       tags:
         - Email
       parameters:
@@ -605,53 +604,53 @@ paths:
                     type: string
                   transaction_id:
                     type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/upload/complete:
     post:
       security:
         - bearerAuth: []
-      summary: 'Complete upload session with ETag verification'
+      summary: "Complete upload session with ETag verification"
       tags:
         - Email
       parameters:
@@ -675,55 +674,55 @@ paths:
                 etag:
                   type: string
       responses:
-        '202':
+        "202":
           description: Accepted. The uploaded file is being processed.
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/upload/status:
     get:
       security:
         - bearerAuth: []
-      summary: 'Get csv processing status'
+      summary: "Get csv processing status"
       tags:
         - Email
       parameters:
@@ -765,63 +764,63 @@ paths:
                         nullable: true
                       from:
                         type: string
-                        example: 'Postman <donotreply@mail.postman.gov.sg>'
+                        example: "Postman <donotreply@mail.postman.gov.sg>"
                       showMasthead:
                         type: boolean
                       agencyLogoURI:
                         type: string
-                        example: 'https://file.go.gov.sg/postman-ogp.png'
+                        example: "https://file.go.gov.sg/postman-ogp.png"
                       agencyName:
                         type: string
                         example: Open Government Products
                       themedBody:
                         type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
     delete:
       security:
         - bearerAuth: []
-      description: 'Deletes error status from previous failed upload'
+      description: "Deletes error status from previous failed upload"
       tags:
         - Email
       parameters:
@@ -833,45 +832,45 @@ paths:
       responses:
         200:
           description: Success
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/email/credentials:
@@ -891,53 +890,53 @@ paths:
                 recipient:
                   type: string
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: object
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/email/preview:
@@ -955,7 +954,7 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -978,48 +977,48 @@ paths:
                         nullable: true
                       from:
                         type: string
-                        example: 'Postman <donotreply@mail.postman.gov.sg>'
+                        example: "Postman <donotreply@mail.postman.gov.sg>"
                       themed_body:
                         type: string
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/send:
     post:
@@ -1030,7 +1029,7 @@ paths:
       summary: Start sending campaign
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -1043,47 +1042,47 @@ paths:
                     type: array
                     items:
                       type: number
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/stop:
     post:
@@ -1094,7 +1093,7 @@ paths:
       summary: Stop sending campaign
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -1103,45 +1102,45 @@ paths:
                 properties:
                   campaign_id:
                     type: integer
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/retry:
     post:
@@ -1152,7 +1151,7 @@ paths:
       summary: Retry sending campaign
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -1161,45 +1160,45 @@ paths:
                 properties:
                   campaign_id:
                     type: integer
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden as there is a job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/stats:
     get:
@@ -1216,58 +1215,58 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/CampaignStats'
+                  - $ref: "#/components/schemas/CampaignStats"
                   - type: object
                     required:
                       - unsubscribed
                     properties:
                       unsubscribed:
                         type: number
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/refresh-stats:
     post:
@@ -1284,58 +1283,58 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/CampaignStats'
+                  - $ref: "#/components/schemas/CampaignStats"
                   - type: object
                     required:
                       - unsubscribed
                     properties:
                       unsubscribed:
                         type: number
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/export:
     get:
@@ -1352,7 +1351,7 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -1360,54 +1359,54 @@ paths:
                 type: array
                 items:
                   allOf:
-                    - $ref: '#/components/schemas/CampaignRecipient'
+                    - $ref: "#/components/schemas/CampaignRecipient"
                     - type: object
                       properties:
-                        'unsubscriber.recipient':
+                        "unsubscriber.recipient":
                           type: string
-                        'unsubscriber.reason':
+                        "unsubscriber.reason":
                           type: string
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '410':
+        "410":
           description: Campaign has been redacted
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/protect/upload/start:
     get:
@@ -1436,7 +1435,7 @@ paths:
             maximum: 100
             default: 1
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -1450,47 +1449,47 @@ paths:
                     items:
                       type: string
 
-        '400':
+        "400":
           description: Invalid campaign type, not owned by user
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/protect/upload/complete:
     post:
@@ -1526,7 +1525,7 @@ paths:
                   items:
                     type: string
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -1535,47 +1534,47 @@ paths:
                 properties:
                   transaction_id:
                     type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/duplicate:
     post:
@@ -1603,51 +1602,51 @@ paths:
                   type: string
 
       responses:
-        '201':
+        "201":
           description: A duplicate of the campaign was created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignDuplicateMeta'
-        '401':
+                $ref: "#/components/schemas/CampaignDuplicateMeta"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/email/select-list:
     post:
@@ -1672,58 +1671,58 @@ paths:
                 list_id:
                   type: number
       responses:
-        '201':
+        "201":
           description: A duplicate of the campaign was created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignMeta'
-        '401':
+                $ref: "#/components/schemas/CampaignMeta"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /transactional/email/send:
     post:
       security:
         - bearerAuth: []
-      summary: 'Send a transactional email'
+      summary: "Send a transactional email"
       tags:
         - Email
       requestBody:
@@ -1772,13 +1771,13 @@ paths:
                     type: string
                     format: binary
       responses:
-        '201':
+        "201":
           description: Created. The message is being sent.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EmailMessageTransactional'
-        '400':
+                $ref: "#/components/schemas/EmailMessageTransactional"
+        "400":
           description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
           content:
             text/plain:
@@ -1788,14 +1787,14 @@ paths:
                 TemplateError:
                   value: Message is invalid as the subject or body only contains invalid HTML tags.
                 MaliciousFileError:
-                  value: 'Error: One or more attachments may be potentially malicious. Please check the attached files.'
+                  value: "Error: One or more attachments may be potentially malicious. Please check the attached files."
                 UnsupportedFileTypeError:
-                  value: 'Error: One or more attachments may be an unsupported file type. Please check the attached files.'
+                  value: "Error: One or more attachments may be an unsupported file type. Please check the attached files."
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/ValidationError'
-                  - $ref: '#/components/schemas/Error'
+                  - $ref: "#/components/schemas/ValidationError"
+                  - $ref: "#/components/schemas/Error"
               examples:
                 ValidationError:
                   value:
@@ -1803,63 +1802,63 @@ paths:
                     error: Bad Request
                     message: |-
                       "from" must be a valid email
-                    validation: {source: body, keys: [from]}
+                    validation: { source: body, keys: [from] }
                 FromError:
-                  value: {message: Invalid 'from' email address.}
+                  value: { message: Invalid 'from' email address. }
 
-        '401':
+        "401":
           description: Unauthorized.
           content:
             text/plain:
               example: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '413':
+        "413":
           description: Number of attachments or size of attachments exceeded limit.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
               examples:
                 AttachmentQtyLimit:
-                  value: {message: Number of attachments exceeds limit}
+                  value: { message: Number of attachments exceeds limit }
                 AttachmentSizeLimit:
-                  value: {message: Size of attachments exceeds limit}
-        '429':
+                  value: { message: Size of attachments exceeds limit }
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect; see https://github.com/opengovsg/postmangovsg/issues/1837)
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /transactional/email:
     get:
@@ -1867,7 +1866,7 @@ paths:
         - bearerAuth: []
       tags:
         - Email
-      summary: 'List transactional emails'
+      summary: "List transactional emails"
       parameters:
         - in: query
           name: limit
@@ -1961,51 +1960,51 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/EmailMessageTransactional'
-        '400':
+                      $ref: "#/components/schemas/EmailMessageTransactional"
+        "400":
           description: Bad Request. Failed parameter validations.
-        '401':
+        "401":
           description: Unauthorized.
           content:
             text/plain:
               example: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /transactional/email/{emailId}:
     get:
@@ -2013,7 +2012,7 @@ paths:
         - bearerAuth: []
       tags:
         - Email
-      summary: 'Get transactional email by ID'
+      summary: "Get transactional email by ID"
       parameters:
         - in: path
           name: emailId
@@ -2027,53 +2026,53 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EmailMessageTransactional'
-        '400':
+                $ref: "#/components/schemas/EmailMessageTransactional"
+        "400":
           description: Bad Request. Failed parameter validations.
-        '401':
+        "401":
           description: Unauthorized.
           content:
             text/plain:
               example: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '404':
+        "404":
           description: Not Found. No transactional message with such ID found
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms:
     get:
@@ -2090,57 +2089,57 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Successfully retrieved sms campaign details
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SMSCampaign'
+                  - $ref: "#/components/schemas/SMSCampaign"
                   - type: object
                     properties:
                       cost_per_message:
                         type: number
 
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/template:
     put:
@@ -2198,53 +2197,53 @@ paths:
                         type: array
                         items:
                           type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/upload/start:
     get:
       security:
         - bearerAuth: []
-      summary: 'Get a presigned URL for upload with Content-MD5 header'
+      summary: "Get a presigned URL for upload with Content-MD5 header"
       tags:
         - SMS
       parameters:
@@ -2275,53 +2274,53 @@ paths:
                     type: string
                   transaction_id:
                     type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/upload/complete:
     post:
       security:
         - bearerAuth: []
-      summary: 'Complete upload session with ETag verification'
+      summary: "Complete upload session with ETag verification"
       tags:
         - SMS
       parameters:
@@ -2345,55 +2344,55 @@ paths:
                 etag:
                   type: string
       responses:
-        '202':
+        "202":
           description: Accepted. The uploaded file is being processed.
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/upload/status:
     get:
       security:
         - bearerAuth: []
-      summary: 'Get csv processing status'
+      summary: "Get csv processing status"
       tags:
         - SMS
       parameters:
@@ -2424,18 +2423,18 @@ paths:
                     properties:
                       body:
                         type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden as there is a job in progress
-        '500':
+        "500":
           description: Internal Server Error
     delete:
       security:
         - bearerAuth: []
-      description: 'Deletes error status from previous failed upload'
+      description: "Deletes error status from previous failed upload"
       tags:
         - SMS
       parameters:
@@ -2447,45 +2446,45 @@ paths:
       responses:
         200:
           description: Success
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden as there is a job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/new-credentials:
     post:
@@ -2506,14 +2505,14 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/TwilioCredentials'
+                - $ref: "#/components/schemas/TwilioCredentials"
                 - type: object
                   properties:
                     recipient:
                       type: string
                     label:
                       type: string
-                      pattern: '/^[a-z0-9-]+$/'
+                      pattern: "/^[a-z0-9-]+$/"
                       minLength: 1
                       maxLength: 50
                       description: should only consist of lowercase alphanumeric characters and dashes
@@ -2530,47 +2529,47 @@ paths:
                   message:
                     type: string
                     example: OK
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/credentials:
     post:
@@ -2609,47 +2608,47 @@ paths:
                   message:
                     type: string
                     example: OK
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/preview:
     get:
@@ -2666,7 +2665,7 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Successnm
           content:
             application/json:
@@ -2678,45 +2677,45 @@ paths:
                     properties:
                       body:
                         type: string
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/send:
     post:
@@ -2743,7 +2742,7 @@ paths:
                   type: integer
                   minimum: 1
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -2756,47 +2755,47 @@ paths:
                     type: array
                     items:
                       type: number
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/stop:
     post:
@@ -2806,7 +2805,7 @@ paths:
         - SMS
       summary: Stop sending campaign
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -2815,45 +2814,45 @@ paths:
                 properties:
                   campaign_id:
                     type: integer
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/retry:
     post:
@@ -2863,7 +2862,7 @@ paths:
         - SMS
       summary: Retry sending campaign
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -2872,45 +2871,45 @@ paths:
                 properties:
                   campaign_id:
                     type: integer
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/stats:
     get:
@@ -2926,51 +2925,51 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignStats'
-        '401':
+                $ref: "#/components/schemas/CampaignStats"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/refresh-stats:
     post:
@@ -2986,51 +2985,51 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignStats'
-        '401':
+                $ref: "#/components/schemas/CampaignStats"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/export:
     get:
@@ -3047,55 +3046,55 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CampaignRecipient'
-        '401':
+                  $ref: "#/components/schemas/CampaignRecipient"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '410':
+        "410":
           description: Campaign has been redacted
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/duplicate:
     post:
@@ -3122,51 +3121,51 @@ paths:
                 name:
                   type: string
       responses:
-        '201':
+        "201":
           description: A duplicate of the campaign was created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignDuplicateMeta'
-        '401':
+                $ref: "#/components/schemas/CampaignDuplicateMeta"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /campaign/{campaignId}/sms/select-list:
     post:
@@ -3192,53 +3191,53 @@ paths:
                   type: number
 
       responses:
-        '201':
+        "201":
           description: A duplicate of the campaign was created
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
   /transactional/sms/send:
     post:
       security:
         - bearerAuth: []
-      summary: 'Send a transactional SMS'
+      summary: "Send a transactional SMS"
       tags:
         - SMS
       requestBody:
@@ -3258,15 +3257,15 @@ paths:
                   type: string
       # TODO feels like this is lacking a schema component?
       responses:
-        '202':
+        "202":
           description: Accepted. The message is being sent.
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '429':
+        "429":
           description: Too many requests. Please try again later.
-        '500':
+        "500":
           description: Internal Server Error
 
   /campaign/{campaignId}/telegram:
@@ -3284,7 +3283,7 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -3292,48 +3291,48 @@ paths:
                 type: object
                 properties:
                   campaign:
-                    $ref: '#/components/schemas/TelegramCampaign'
+                    $ref: "#/components/schemas/TelegramCampaign"
                   num_recipients:
                     type: number
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/template:
@@ -3392,54 +3391,54 @@ paths:
                         type: array
                         items:
                           type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/upload/start:
     get:
       security:
         - bearerAuth: []
-      summary: 'Get a presigned URL for upload with Content-MD5 header'
+      summary: "Get a presigned URL for upload with Content-MD5 header"
       tags:
         - Telegram
       parameters:
@@ -3470,54 +3469,54 @@ paths:
                     type: string
                   transaction_id:
                     type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/upload/complete:
     post:
       security:
         - bearerAuth: []
-      summary: 'Complete upload session with ETag verification'
+      summary: "Complete upload session with ETag verification"
       tags:
         - Telegram
       parameters:
@@ -3541,56 +3540,56 @@ paths:
                 etag:
                   type: string
       responses:
-        '202':
+        "202":
           description: Accepted. The uploaded file is being processed.
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/upload/status:
     get:
       security:
         - bearerAuth: []
-      summary: 'Get csv processing status'
+      summary: "Get csv processing status"
       tags:
         - Telegram
       parameters:
@@ -3621,52 +3620,52 @@ paths:
                     properties:
                       body:
                         type: string
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden as there is a job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
     delete:
       security:
         - bearerAuth: []
-      description: 'Deletes error status from previous failed upload'
+      description: "Deletes error status from previous failed upload"
       tags:
         - Telegram
       parameters:
@@ -3678,45 +3677,45 @@ paths:
       responses:
         200:
           description: Success
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden as there is a job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/preview:
@@ -3734,7 +3733,7 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -3746,45 +3745,45 @@ paths:
                     properties:
                       body:
                         type: string
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/new-credentials:
@@ -3811,7 +3810,7 @@ paths:
                   type: string
                 label:
                   type: string
-                  pattern: '/^[a-z0-9-]+$/'
+                  pattern: "/^[a-z0-9-]+$/"
                   minLength: 1
                   maxLength: 50
                   description: should only consist of lowercase alphanumeric characters and dashes
@@ -3828,47 +3827,47 @@ paths:
                   message:
                     type: string
                     example: OK
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden. Request violates firewall rules.
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/credentials:
@@ -3907,47 +3906,47 @@ paths:
                   message:
                     type: string
                     example: OK
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/credentials/verify:
@@ -3985,47 +3984,47 @@ paths:
                   message:
                     type: string
                     example: OK
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/send:
@@ -4055,7 +4054,7 @@ paths:
                   maximum: 30
 
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -4068,47 +4067,47 @@ paths:
                     type: array
                     items:
                       type: number
-        '400':
+        "400":
           description: Bad Request
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL c
 
   /campaign/{campaignId}/telegram/stop:
@@ -4120,7 +4119,7 @@ paths:
       summary: Stop sending campaign
 
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -4129,45 +4128,45 @@ paths:
                 properties:
                   campaign_id:
                     type: integer
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL c
 
   /campaign/{campaignId}/telegram/retry:
@@ -4179,7 +4178,7 @@ paths:
       summary: Retry sending campaign
 
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -4188,45 +4187,45 @@ paths:
                 properties:
                   campaign_id:
                     type: integer
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL c
 
   /campaign/{campaignId}/telegram/stats:
@@ -4244,51 +4243,51 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignStats'
-        '401':
+                $ref: "#/components/schemas/CampaignStats"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL c
 
   /campaign/{campaignId}/telegram/update-stats:
@@ -4306,51 +4305,51 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignStats'
-        '401':
+                $ref: "#/components/schemas/CampaignStats"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL c
 
   /campaign/{campaignId}/telegram/export:
@@ -4368,55 +4367,55 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CampaignRecipient'
-        '401':
+                  $ref: "#/components/schemas/CampaignRecipient"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '410':
+        "410":
           description: Campaign has been redacted
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL c
 
   /campaign/{campaignId}/telegram/duplicate:
@@ -4443,51 +4442,51 @@ paths:
                   type: string
 
       responses:
-        '201':
+        "201":
           description: A duplicate of the campaign was created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CampaignDuplicateMeta'
-        '401':
+                $ref: "#/components/schemas/CampaignDuplicateMeta"
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Forbidden, campaign not owned by user
-        '429':
+        "429":
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
+                $ref: "#/components/schemas/ErrorStatus"
               example:
                 {
                   status: 429,
                   message: Too many requests. Please try again later.,
                 }
-        '500':
+        "500":
           description: Internal Server Error
           content:
             text/plain:
               example: Internal Server Error
-        '502':
+        "502":
           description: Bad Gateway
-        '504':
+        "504":
           description: Gateway Timeout
-        '503':
+        "503":
           description: Service Temporarily Unavailable
-        '520':
+        "520":
           description: Web Server Returns An Unknown Error
-        '521':
+        "521":
           description: Web Server Is Down
-        '522':
+        "522":
           description: Connection Timed Out
-        '523':
+        "523":
           description: Origin Is Unreachable
-        '524':
+        "524":
           description: A Timeout occurred
-        '525':
+        "525":
           description: SSL handshake failed
-        '526':
+        "526":
           description: Invalid SSL certificate
 
 components:
@@ -4527,11 +4526,11 @@ components:
         should_save_list:
           type: boolean
         type:
-          $ref: '#/components/schemas/ChannelType'
+          $ref: "#/components/schemas/ChannelType"
         job_queue:
           type: array
           items:
-            $ref: '#/components/schemas/JobQueue'
+            $ref: "#/components/schemas/JobQueue"
 
     CampaignDuplicateMeta:
       type: object
@@ -4547,7 +4546,7 @@ components:
         name:
           type: string
         type:
-          $ref: '#/components/schemas/ChannelType'
+          $ref: "#/components/schemas/ChannelType"
         created_at:
           type: string
           format: date-time
@@ -4559,7 +4558,7 @@ components:
       type: object
       properties:
         status:
-          $ref: '#/components/schemas/JobStatus'
+          $ref: "#/components/schemas/JobStatus"
         sent_at:
           type: string
           format: date-time
@@ -4639,12 +4638,12 @@ components:
         num_recipients:
           type: number
         type:
-          $ref: '#/components/schemas/ChannelType'
-          default: 'EMAIL'
+          $ref: "#/components/schemas/ChannelType"
+          default: "EMAIL"
         job_queue:
           type: array
           items:
-            $ref: '#/components/schemas/JobQueue'
+            $ref: "#/components/schemas/JobQueue"
         email_templates:
           type: object
           properties:
@@ -4672,7 +4671,7 @@ components:
         redacted:
           type: boolean
         status:
-          $ref: '#/components/schemas/JobStatus'
+          $ref: "#/components/schemas/JobStatus"
         updated_at:
           type: string
           format: date-time
@@ -4734,6 +4733,20 @@ components:
         status:
           type: string
           enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, COMPLAINT]
+          description: >
+            * `UNSENT` - initial state of a newly created EmailMessageTransactional
+
+            * `ACCEPTED` - email has been accepted by our email provider; this state is returned upon a successful API request
+
+            * `SENT` - the send request to our email provider was successful and our email provider will attempt to deliver the message to the recipient’s mail server
+
+            * `BOUNCED` - the recipient's mail server rejected the email
+
+            * `DELIVERED` - the email provider has successfully delivered the email to the recipient's mail server
+
+            * `OPENED` - the recipient received the message and opened it in their email client
+
+            * `COMPLAINT` - the email was successfully delivered to the recipient’s mail server, but the recipient marked it as spam
         error_code:
           nullable: true
           type: string
@@ -4798,12 +4811,12 @@ components:
         num_recipients:
           type: number
         type:
-          $ref: '#/components/schemas/ChannelType'
-          default: 'SMS'
+          $ref: "#/components/schemas/ChannelType"
+          default: "SMS"
         job_queue:
           type: array
           items:
-          $ref: '#/components/schemas/JobQueue'
+          $ref: "#/components/schemas/JobQueue"
         sms_templates:
           type: object
           properties:
@@ -4832,12 +4845,12 @@ components:
         csv_filename:
           type: string
         type:
-          $ref: '#/components/schemas/ChannelType'
-          default: 'TELEGRAM'
+          $ref: "#/components/schemas/ChannelType"
+          default: "TELEGRAM"
         job_queue:
           type: array
           items:
-            $ref: '#/components/schemas/JobQueue'
+            $ref: "#/components/schemas/JobQueue"
         telegram_templates:
           type: object
           properties:
