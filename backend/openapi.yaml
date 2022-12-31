@@ -4493,10 +4493,9 @@ paths:
 components:
   securitySchemes:
     bearerAuth:
-      type: apiKey
+      type: http
       description: API key to authorize requests.
-      name: appid
-      in: query
+      scheme: bearer
   schemas:
     ChannelType:
       type: string
