@@ -33,7 +33,10 @@ export interface CredentialService {
     userId: number
   ): Promise<UserCredential>
   deleteUserCredential(userId: number, label: string): Promise<number>
-  getUserCredential(userId: number, label: string): Promise<UserCredential>
+  getUserCredential(
+    userId: number,
+    label: string
+  ): Promise<UserCredential | null>
   getSmsUserCredentialLabels(userId: number): Promise<string[]>
   getTelegramUserCredentialLabels(userId: number): Promise<string[]>
   getUserSettings(userId: number): Promise<UserSettings | null>
@@ -241,14 +244,14 @@ export const InitCredentialService = (redisService: RedisService) => {
   const getUserCredential = (
     userId: number,
     label: string
-  ): Promise<UserCredential> => {
+  ): Promise<UserCredential | null> => {
     return UserCredential.findOne({
       where: {
         userId,
         label,
       },
       attributes: ['credName'],
-    }) as Promise<UserCredential>
+    })
   }
 
   /**
