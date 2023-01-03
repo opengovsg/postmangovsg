@@ -152,7 +152,8 @@ export const InitSmsMiddleware = (
       const campaign = campaignId
         ? await SmsService.findCampaign(+campaignId, userId)
         : null
-      const canUseDemoCredentials = !!campaign?.demoMessageLimit // false if (1) campaign is null or (2) demoMessageLimit is 0
+      const canUseDemoCredentials =
+        campaign?.demoMessageLimit && campaign?.demoMessageLimit > 0
       if (!canUseDemoCredentials && label === DefaultCredentialName.SMS) {
         throw new Error(
           `Campaign cannot use demo credentials. ${label} is not allowed.`
