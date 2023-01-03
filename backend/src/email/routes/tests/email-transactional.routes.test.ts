@@ -123,7 +123,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
   })
 
@@ -162,7 +162,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: 'Hello <donotreply@mail.postman.gov.sg>',
-      replyTo: user.email,
+      reply_to: user.email,
     })
   })
 
@@ -201,7 +201,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: `Hello <${user.email}>`,
-      replyTo: user.email,
+      reply_to: user.email,
     })
   })
 
@@ -252,7 +252,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: invalidHtmlTagsSubjectAndBody.subject,
       body: invalidHtmlTagsSubjectAndBody.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
   })
@@ -292,7 +292,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: invalidHtmlTagsSubjectAndBody.subject,
       body: invalidHtmlTagsSubjectAndBody.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(null)
 
@@ -352,7 +352,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
     expect(transactionalEmail?.params).toMatchObject({
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(UNSUPPORTED_FILE_TYPE_ERROR_CODE)
   })
@@ -389,7 +389,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
     expect(transactionalEmail?.params).toMatchObject({
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(MALICIOUS_FILE_ERROR_CODE)
   })
@@ -426,7 +426,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
     expect(transactionalEmail?.params).toMatchObject({
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(BLACKLISTED_RECIPIENT_ERROR_CODE)
   })
@@ -467,7 +467,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
     expect(transactionalEmail?.attachmentsMetadata).toHaveLength(1)
@@ -540,7 +540,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
     expect(transactionalEmail?.attachmentsMetadata).toHaveLength(2)
@@ -616,7 +616,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
 
     // Second request rate limited
@@ -640,7 +640,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
   })
 
@@ -695,7 +695,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
 
     // Third request passes after 1s
@@ -719,7 +719,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
   })
 })
