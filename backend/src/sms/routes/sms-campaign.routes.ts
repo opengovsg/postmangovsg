@@ -133,7 +133,7 @@ export const InitSmsCampaignRoute = (
     '/credentials',
     celebrate(useCredentialsValidator),
     CampaignMiddleware.canEditCampaign,
-    smsMiddleware.getCredentialsFromLabelCampaign,
+    smsMiddleware.getCredentialsFromLabel,
     smsMiddleware.validateAndStoreCredentials,
     smsMiddleware.setCampaignCredential
   )

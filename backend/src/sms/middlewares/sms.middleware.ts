@@ -1,4 +1,4 @@
-import { Handler, NextFunction, Request, Response } from 'express'
+import { Request, Response, NextFunction, Handler } from 'express'
 import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { CredentialService } from '@core/services'
 import { SmsService } from '@sms/services'
@@ -8,8 +8,7 @@ import { formatDefaultCredentialName } from '@core/utils'
 
 export interface SmsMiddleware {
   getCredentialsFromBody: Handler
-  getCredentialsFromLabelCampaign: Handler
-  getCredentialsFromLabelTransactional: Handler
+  getCredentialsFromLabel: Handler
   isSmsCampaignOwnedByUser: Handler
   validateAndStoreCredentials: Handler
   setCampaignCredential: Handler
@@ -120,11 +119,20 @@ export const InitSmsMiddleware = (
     userId: number
   ): Promise<string> => {
     // Non-demo campaigns cannot use default credentials
-    const userCred = await credentialService.getUserCredential(userId, label)
-    if (!userCred) {
-      throw new Error('User credential cannot be found')
+    if (label === DefaultCredentialName.SMS) {
+      throw new Error(
+        `Campaign cannot use demo credentials. ${label} is not allowed.`
+      )
+    } else {
+      // if label provided, fetch from aws secrets
+      const userCred = await credentialService.getUserCredential(userId, label)
+
+      if (!userCred) {
+        throw new Error('User credential cannot be found')
+      }
+
+      return userCred.credName
     }
-    return userCred.credName
   }
 
   /**
@@ -134,7 +142,7 @@ export const InitSmsMiddleware = (
    * @param res
    * @param next
    */
-  const getCredentialsFromLabelCampaign = async (
+  const getCredentialsFromLabel = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -145,59 +153,22 @@ export const InitSmsMiddleware = (
     const logMeta = {
       campaignId,
       label,
-      action: 'getCredentialsFromLabelCampaign',
+      action: 'getCredentialsFromLabel',
     }
     try {
       /* Determine if credential name can be used */
       const campaign = campaignId
         ? await SmsService.findCampaign(+campaignId, userId)
         : null
-      const canUseDemoCredentials =
-        campaign?.demoMessageLimit && campaign?.demoMessageLimit > 0
-      if (!canUseDemoCredentials && label === DefaultCredentialName.SMS) {
-        throw new Error(
-          `Campaign cannot use demo credentials. ${label} is not allowed.`
-        )
-      }
-      const credentialName = canUseDemoCredentials
+      const credentialName = campaign?.demoMessageLimit
         ? getDemoCredentialName(label)
         : await getCredentialName(label, +userId)
 
       /* Get credential from the name */
-      res.locals.credentials = await credentialService.getTwilioCredentials(
+      const credentials = await credentialService.getTwilioCredentials(
         credentialName
       )
-      res.locals.credentialName = credentialName
-      return next()
-    } catch (err) {
-      const errAsError = err as Error
-      logger.error({
-        ...logMeta,
-        message: `${errAsError.stack}`,
-      })
-      return res.status(400).json({ message: `${errAsError.message}` })
-    }
-  }
-
-  const getCredentialsFromLabelTransactional = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void | Response> => {
-    const { label } = req.body
-    const userId = req.session?.user?.id
-    const logMeta = {
-      label,
-      action: 'getCredentialsFromLabelTransactional',
-    }
-    try {
-      /* Determine if credential name can be used */
-      const credentialName = await getCredentialName(label, +userId)
-
-      /* Get credential from the name */
-      res.locals.credentials = await credentialService.getTwilioCredentials(
-        credentialName
-      )
+      res.locals.credentials = credentials
       res.locals.credentialName = credentialName
       return next()
     } catch (err) {
@@ -216,7 +187,6 @@ export const InitSmsMiddleware = (
    * Set the credentialName and channelType in res.locals to be passed downstream
    * @param req
    * @param res
-   * @param next
    */
   const validateAndStoreCredentials = async (
     req: Request,
@@ -418,8 +388,7 @@ export const InitSmsMiddleware = (
 
   return {
     getCredentialsFromBody,
-    getCredentialsFromLabelCampaign,
-    getCredentialsFromLabelTransactional,
+    getCredentialsFromLabel,
     isSmsCampaignOwnedByUser,
     validateAndStoreCredentials,
     setCampaignCredential,

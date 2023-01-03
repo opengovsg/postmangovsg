@@ -21,8 +21,7 @@ export const InitSmsTransactionalRoute = (
   router.post(
     '/send',
     celebrate(sendValidator),
-    SmsTransactionalMiddleware.saveMessage,
-    smsMiddleware.getCredentialsFromLabelTransactional,
+    smsMiddleware.getCredentialsFromLabel,
     SmsTransactionalMiddleware.sendMessage
   )
 

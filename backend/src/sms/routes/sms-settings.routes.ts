@@ -105,7 +105,7 @@ export const InitSmsSettingsRoute = (
     '/credentials/verify',
     celebrate(verifyCredentialValidator),
     smsMiddleware.canValidateCredentials,
-    smsMiddleware.getCredentialsFromLabelCampaign,
+    smsMiddleware.getCredentialsFromLabel,
     smsMiddleware.validateAndStoreCredentials,
     (_req: Request, res: Response) => res.sendStatus(200)
   )

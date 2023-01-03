@@ -18,7 +18,7 @@ async function sendMessage({
   credentials: TwilioCredentials
   body: string
   recipient: string
-}): Promise<string | void> {
+}): Promise<void> {
   const sanitizedBody =
     SmsTemplateService.client.replaceNewLinesAndSanitize(body)
   if (!sanitizedBody) {
@@ -28,10 +28,10 @@ async function sendMessage({
   }
 
   logger.info({
-    message: 'Sending transactional SMS (service)',
+    message: 'Sending transactional SMS',
     action: 'sendMessage',
   })
-  return await SmsService.sendMessage(credentials, recipient, sanitizedBody)
+  await SmsService.sendMessage(credentials, recipient, sanitizedBody)
 }
 
 export const SmsTransactionalService = {

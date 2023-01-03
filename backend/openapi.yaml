@@ -3255,14 +3255,11 @@ paths:
                   type: string
                 label:
                   type: string
+      # TODO feels like this is lacking a schema component?
       responses:
-        '201':
-          description: Created. The message is being sent.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SmsMessageTransactional'
-        '400':
+        "202":
+          description: Accepted. The message is being sent.
+        "400":
           description: Bad Request
         "401":
           description: Unauthorized
@@ -4829,30 +4826,6 @@ components:
               type: array
               items:
                 type: string
-    SmsMessageTransactional:
-      type: object
-      properties:
-        id:
-          type: string
-          example: 42
-        credentials_label:
-          type: string
-          example: "ogp-twilio-creds"
-        recipient:
-          type: string
-          example: "98765432"
-        body:
-          type: string
-          example: "Hello world"
-        message_id:
-          type: string
-          example: "SM12345678901234567890123456789012"
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
     TelegramCampaign:
       type: object
       properties:
