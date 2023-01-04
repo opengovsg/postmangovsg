@@ -29,7 +29,6 @@
   - [Infrastructure customizations](#infrastructure-customizations)
     - [Amplify rewrite rule](#amplify-rewrite-rule)
     - [Elastic Container Service](#elastic-container-service)
-  - [Architecture](#architecture)
   - [Local node module](#local-node-module)
   - [How messages are sent](#how-messages-are-sent)
   - [Forking and configuring this product](#forking-and-configuring-this-product)
@@ -249,10 +248,6 @@ Create a cluster with four services. These names are currently hardcoded for dep
 | staging-logger  | FARGATE    | 1.4.0            |
 | prod-sending    | FARGATE    | 1.4.0            |
 | prod-logger     | FARGATE    | 1.4.0            |
-
-## Architecture
-
-See [architecture](docs/architecture/index.md) for details
 
 ## Local node module
 
