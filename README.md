@@ -6,30 +6,38 @@
 
 ## Table of Contents
 
-- [Features](#features)
-- [API Usage](#api-usage)
-- [Development](#development)
-  - [Install and run required services](#install-and-run-required-services)
-  - [Secrets detection](#secrets-detection)
-  - [Set environment variables](#set-environment-variables)
-  - [Install dependencies](#install-dependencies)
-  - [Compile frontend translations](#compile-frontend-translations)
-  - [Run the app](#run-the-app)
-- [Deployment](#deployment)
-- [Releasing](#releasing)
-- [Serverless](#serverless)
-- [Downtime procedure](#downtime-procedure)
-- [Infrastructure customizations](#infrastructure-customizations)
-  - [Amplify rewrite rule](#amplify-rewrite-rule)
-  - [Elastic Container Service](#elastic-container-service)
-- [Architecture](#architecture)
-- [Local node module](#local-node-module)
-- [How messages are sent](#how-messages-are-sent)
-- [Forking and configuring this product](#forking-and-configuring-this-product)
-  - [Backend](#backend)
-  - [Frontend](#frontend)
-  - [Worker](#worker)
-- [Contributions](#contributions)
+- [Postman.gov.sg](#postmangovsg)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [API Usage](#api-usage)
+  - [Development](#development)
+    - [Install and run required services](#install-and-run-required-services)
+      - [Starting all services using Docker](#starting-all-services-using-docker)
+      - [Starting postgresql and redis natively](#starting-postgresql-and-redis-natively)
+      - [Optionally, run the following to install and use `cw` to tail Cloudwatch logs](#optionally-run-the-following-to-install-and-use-cw-to-tail-cloudwatch-logs)
+    - [Secrets detection](#secrets-detection)
+    - [Set environment variables](#set-environment-variables)
+    - [Install dependencies](#install-dependencies)
+    - [Database migration](#database-migration)
+      - [Local database](#local-database)
+    - [Compile frontend translations](#compile-frontend-translations)
+    - [Run the app](#run-the-app)
+  - [Deployment](#deployment)
+  - [Releasing](#releasing)
+  - [Serverless](#serverless)
+  - [Downtime procedure](#downtime-procedure)
+  - [Infrastructure customizations](#infrastructure-customizations)
+    - [Amplify rewrite rule](#amplify-rewrite-rule)
+    - [Elastic Container Service](#elastic-container-service)
+  - [Architecture](#architecture)
+  - [Local node module](#local-node-module)
+  - [How messages are sent](#how-messages-are-sent)
+  - [Forking and configuring this product](#forking-and-configuring-this-product)
+    - [Backend](#backend)
+    - [Frontend](#frontend)
+    - [Worker](#worker)
+    - [Product Dashboards on Grafana](#product-dashboards-on-grafana)
+  - [Contributions](#contributions)
 
 ## Features
 
@@ -201,51 +209,7 @@ We use Github Actions to simplify our deployment process:
 
 ## Releasing
 
-1. Checkout a new release branch from `develop`.
-2. Bump the version of each of the subpackages (frontend, backend, worker).
-3. Stage changes for subpackage `package.json` and `package-lock.json`.
-4. Bump the version of the main package.
-   - You will need to use `--force` as the working directory is not clean.
-5. Push both the version commit and tag to GitHub.
-6. Open a new pull request and consolidate changelist from the commits made since the previous release.
-7. Merge pull request into master to trigger Travis build and deploy. Note that we do not squash commits when merging into master.
-   - Manually trigger a custom build on Travis if there were changes made to the worker.
-8. Create a new pull request to merge release branch back into `develop` branch.
-
-**Example:**
-
-```zsh
-# Create a new release branch for a new minor version (e.g. v1.6.0 -> v1.7.0)
-$ git checkout develop
-$ git checkout -b release-v1.7.0
-
-# Bump shared module version
-$ cd ../ && cd shared/
-$ npm version minor
-
-# Bump frontend version
-$ cd frontend/
-$ npm version minor
-
-# Bump backend version
-$ cd ../ && cd backend/
-$ npm version minor
-
-# Bump worker version
-$ cd ../ && cd worker/
-$ npm version minor
-
-# Stage changes for subpackage package.json and package-lock.json
-$ cd ../
-$ git add */package.json */package-lock.json
-
-# Create a version commit for main package
-$ npm version minor --force
-
-# Push version commit and tag to GitHub
-$ git push -u origin release-v1.7.0
-$ git push origin v1.7.0
-```
+When a pull request is merged to `master`, it will be deployed automatically.
 
 ## Serverless
 
@@ -328,14 +292,14 @@ The URLs of the Grafana dashboards are:
 
 ## Contributions
 
-The production branch is `master`, and the development branch is `develop`.
+The production branch is `master` and each PR is deployed when it is merged into `master`.
 
 **If you have write access to this repository**
 
-- Check out your feature branch from `develop`
+- Check out your feature branch from `master`
 - Make changes, and commit those changes
 - Push these changes to Github
-- Submit a pull request against `develop`, filling in the standard template
+- Submit a pull request against `master`, filling in the standard template
 
 **If you do not have write access to this repository**
 
