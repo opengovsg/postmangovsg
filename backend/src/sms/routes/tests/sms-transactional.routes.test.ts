@@ -10,6 +10,7 @@ import { SmsService } from '@sms/services'
 import { mockSecretsManager } from '@mocks/aws-sdk'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
+import { SmsMessageTransactional } from '@sms/models'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',
@@ -20,26 +21,24 @@ const TEST_TWILIO_CREDENTIALS = {
 
 let sequelize: Sequelize
 let user: User
-let userId = 1
 let apiKey: string
 let credential: Credential
-let userCredential: UserCredential
 
 const app = initialiseServer(false)
 
 beforeEach(async () => {
   user = await User.create({
-    id: userId,
-    email: `user_${userId}@agency.gov.sg`,
+    id: 1,
+    email: 'user_1@agency.gov.sg',
   } as User)
+  const userId = user.id
   apiKey = await user.regenerateAndSaveApiKey()
-  userCredential = await UserCredential.create({
+  await UserCredential.create({
     label: `twilio-${userId}`,
     type: ChannelType.SMS,
     credName: credential.name,
     userId,
   } as UserCredential)
-  userId += 1
 })
 
 beforeAll(async () => {
@@ -47,17 +46,25 @@ beforeAll(async () => {
   credential = await Credential.create({ name: 'twilio' } as Credential)
 })
 
-afterEach(() => jest.clearAllMocks())
+afterEach(async () => {
+  jest.clearAllMocks()
+  await SmsMessageTransactional.destroy({ where: {} })
+  await User.destroy({ where: {} })
+  await UserCredential.destroy({ where: {} })
+})
 
 afterAll(async () => {
-  await Credential.destroy({ where: {} })
-  await UserCredential.destroy({ where: {} })
-  await User.destroy({ where: {} })
   await sequelize.close()
   await (app as any).cleanup()
 })
 
 describe('POST /transactional/sms/send', () => {
+  const validApiCall = {
+    body: 'Hello world',
+    recipient: '98765432',
+    label: 'twilio-1',
+  }
+
   test('Should throw an error if API key is invalid', async () => {
     const res = await request(app)
       .post('/transactional/sms/send')
@@ -77,9 +84,10 @@ describe('POST /transactional/sms/send', () => {
   })
 
   test('Should send a message successfully', async () => {
+    const mockSendMessageResolvedValue = 'message_id'
     const mockSendMessage = jest
       .spyOn(SmsService, 'sendMessage')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(mockSendMessageResolvedValue)
     mockSecretsManager.getSecretValue().promise.mockResolvedValueOnce({
       SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
     })
@@ -87,14 +95,21 @@ describe('POST /transactional/sms/send', () => {
     const res = await request(app)
       .post('/transactional/sms/send')
       .set('Authorization', `Bearer ${apiKey}`)
-      .send({
-        recipient: '91234567',
-        body: 'body',
-        label: userCredential.label,
-      })
+      .send(validApiCall)
 
-    expect(res.status).toBe(202)
+    expect(res.status).toBe(201)
     expect(mockSendMessage).toBeCalledTimes(1)
+    const transactionalSms = await SmsMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalSms).not.toBeNull()
+    expect(transactionalSms).toMatchObject({
+      recipient: validApiCall.recipient,
+      body: validApiCall.body,
+      userId: user.id.toString(),
+      credentialsLabel: validApiCall.label,
+      messageId: mockSendMessageResolvedValue,
+    })
     mockSendMessage.mockReset()
   })
 
@@ -109,11 +124,7 @@ describe('POST /transactional/sms/send', () => {
     const res = await request(app)
       .post('/transactional/sms/send')
       .set('Authorization', `Bearer ${apiKey}`)
-      .send({
-        recipient: '91234567',
-        body: 'body',
-        label: userCredential.label,
-      })
+      .send(validApiCall)
 
     expect(res.status).toBe(400)
     expect(mockSendMessage).toBeCalledTimes(1)
@@ -131,11 +142,7 @@ describe('POST /transactional/sms/send', () => {
     const res = await request(app)
       .post('/transactional/sms/send')
       .set('Authorization', `Bearer ${apiKey}`)
-      .send({
-        recipient: '91234567',
-        body: 'body',
-        label: userCredential.label,
-      })
+      .send(validApiCall)
 
     expect(res.status).toBe(400)
     expect(mockSendMessage).toBeCalledTimes(1)
@@ -153,11 +160,7 @@ describe('POST /transactional/sms/send', () => {
     const res = await request(app)
       .post('/transactional/sms/send')
       .set('Authorization', `Bearer ${apiKey}`)
-      .send({
-        recipient: '91234567',
-        body: 'body',
-        label: userCredential.label,
-      })
+      .send(validApiCall)
 
     expect(res.status).toBe(429)
     expect(mockSendMessage).toBeCalledTimes(1)

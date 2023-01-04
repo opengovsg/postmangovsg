@@ -24,7 +24,12 @@ import {
   EmailOp,
   EmailTemplate,
 } from '@email/models'
-import { SmsMessage, SmsTemplate, SmsOp } from '@sms/models'
+import {
+  SmsMessage,
+  SmsMessageTransactional,
+  SmsTemplate,
+  SmsOp,
+} from '@sms/models'
 import {
   BotSubscriber,
   TelegramMessage,
@@ -59,7 +64,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     EmailTemplate,
     ProtectedMessage,
   ]
-  const smsModels = [SmsMessage, SmsTemplate, SmsOp]
+  const smsModels = [SmsMessage, SmsMessageTransactional, SmsTemplate, SmsOp]
   const telegramModels = [
     BotSubscriber,
     TelegramOp,
