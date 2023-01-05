@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import bytes from 'bytes'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   EmailTransactionalMiddleware,
@@ -8,6 +9,7 @@ import { fromAddressValidator } from '@core/utils/from-address'
 import { FileAttachmentMiddleware } from '@core/middlewares'
 import { TransactionalEmailMessageStatus } from '@email/models'
 import { TransactionalEmailSortField } from '@core/constants'
+import config from '@core/config'
 
 export const InitEmailTransactionalRoute = (
   emailTransactionalMiddleware: EmailTransactionalMiddleware,
@@ -24,7 +26,17 @@ export const InitEmailTransactionalRoute = (
         .lowercase()
         .required(),
       subject: Joi.string().required(),
-      body: Joi.string().required(),
+      body: Joi.string()
+        .max(config.get('transactionalEmail.bodySizeLimit'), 'utf8')
+        .required()
+        // custom error message because Joi's default message doesn't fully reflect the validation rules
+        .error(
+          new Error(
+            `body is a required string whose size must be less than or equal to ${bytes.format(
+              config.get('transactionalEmail.bodySizeLimit')
+            )} in UTF-8 encoding`
+          )
+        ),
       from: fromAddressValidator,
       reply_to: Joi.string()
         .trim()

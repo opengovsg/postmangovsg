@@ -1,8 +1,8 @@
 import cors from 'cors'
-import express, { Request, Response, NextFunction } from 'express'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
-import * as Sentry from '@sentry/node'
+import express, { Request, Response, NextFunction } from 'express'
 import expressWinston from 'express-winston'
+import * as Sentry from '@sentry/node'
 
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
@@ -71,8 +71,21 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   // in the parseEvent() handle before parsing the SES event.
   app.use('/v1/callback/email', express.text({ type: 'application/json' }))
 
-  app.use(express.json())
-  app.use(express.urlencoded({ extended: false }))
+  app.use(
+    express.json({
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
+      // will get 400 error informing them of the size of the limit, instead of 500 error
+      limit: config.get('transactionalEmail.bodySizeLimit') * 10,
+    })
+  )
+  app.use(
+    express.urlencoded({
+      extended: false,
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
+      // will get 400 error informing them of the size of the limit, instead of 500 error
+      limit: config.get('transactionalEmail.bodySizeLimit') * 10,
+    })
+  )
   // ref: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
   // Default CORS setting:
   // {
