@@ -7,6 +7,7 @@ import {
   InitCredentialService,
   RedisService,
 } from '@core/services'
+import config from '@core/config'
 
 const initialiseServer = (session?: boolean): express.Application => {
   const app: express.Application = express()
@@ -15,8 +16,21 @@ const initialiseServer = (session?: boolean): express.Application => {
   ;(app as any).authService = InitAuthService(redisService)
   ;(app as any).credentialService = InitCredentialService(redisService)
   sessionLoader({ app })
-  app.use(express.json())
-  app.use(express.urlencoded({ extended: false }))
+  app.use(
+    express.json({
+      // this must be bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
+      // will get 400 error informing them of the size of the limit, instead of 500 error
+      limit: config.get('transactionalEmail.bodySizeLimit') * 10,
+    })
+  )
+  app.use(
+    express.urlencoded({
+      extended: false,
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
+      // will get 400 error informing them of the size of the limit, instead of 500 error
+      limit: config.get('transactionalEmail.bodySizeLimit') * 10,
+    })
+  )
 
   app.use((req: Request, _res: Response, next: NextFunction): void => {
     if (session && req.session) {

@@ -87,6 +87,7 @@ interface ConfigSchema {
   transactionalEmail: {
     rate: number
     window: number
+    bodySizeLimit: number
   }
   defaultCountry: string
   defaultCountryCode: string
@@ -463,6 +464,12 @@ const config: Config<ConfigSchema> = convict({
       env: 'TRANSACTIONAL_EMAIL_WINDOW',
       format: 'int',
     },
+    bodySizeLimit: {
+      doc: 'The maximum size of the body of a transactional email in bytes',
+      default: 1048576, // 1 mebibyte; 2^20 bytes
+      env: 'TRANSACTIONAL_EMAIL_BODY_SIZE_LIMIT_BYTES',
+      format: 'int',
+    },
   },
   defaultCountry: {
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
@@ -682,7 +689,7 @@ const config: Config<ConfigSchema> = convict({
       sensitive: true,
     },
     maxAttachmentSize: {
-      doc: 'Maximum accepted file attachment size in MB',
+      doc: 'Maximum accepted file attachment size in bytes',
       default: 2 * 1024 * 1024, // 2MB, i.e. limit set in docs/api-usage.md
       env: 'FILE_ATTACHMENT_MAX_SIZE',
       format: Number,

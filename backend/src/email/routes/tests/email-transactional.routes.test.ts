@@ -123,7 +123,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
   })
 
@@ -162,7 +162,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: 'Hello <donotreply@mail.postman.gov.sg>',
-      replyTo: user.email,
+      reply_to: user.email,
     })
   })
 
@@ -201,7 +201,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: `Hello <${user.email}>`,
-      replyTo: user.email,
+      reply_to: user.email,
     })
   })
 
@@ -252,7 +252,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: invalidHtmlTagsSubjectAndBody.subject,
       body: invalidHtmlTagsSubjectAndBody.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
   })
@@ -292,7 +292,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: invalidHtmlTagsSubjectAndBody.subject,
       body: invalidHtmlTagsSubjectAndBody.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(null)
 
@@ -310,6 +310,95 @@ describe(`${emailTransactionalRoute}/send`, () => {
       },
       { extraSmtpHeaders: { isTransactional: true } }
     )
+  })
+  test('Should throw a 400 error if the body size is too large (JSON payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw a 413 error if body size is wayyy too large (JSON payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    // note: in practice, the response given to the user is a 500 error (with PayloadTooLargeError logged on our backend)
+    expect(res.status).toBe(413)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw 400 error if body size is too large (URL encoded payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
+    // const body = 'a'.repeat(1000)
+    const res = await request(app)
+      .post(endpoint)
+      .type('form')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    expect(res.status).toBe(400)
+  })
+
+  test('Should throw 413 error if body size is wayy too large (URL encoded payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    // const body = 'a'.repeat(1000)
+    const res = await request(app)
+      .post(endpoint)
+      .type('form')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    // note: in practice, the response given to the user is a 500 error (with PayloadTooLargeError logged on our backend)
+    expect(res.status).toBe(413)
+  })
+
+  test('Should throw a 400 error if the body size is too large (multipart payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .field('body', body)
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw a 400 error even if body size is wayyy too large because of truncation (multipart payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .field('body', body)
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
   })
 
   test('Should throw an error if file type of attachment is not supported and correct error is saved in db', async () => {
@@ -352,7 +441,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
     expect(transactionalEmail?.params).toMatchObject({
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(UNSUPPORTED_FILE_TYPE_ERROR_CODE)
   })
@@ -389,7 +478,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
     expect(transactionalEmail?.params).toMatchObject({
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(MALICIOUS_FILE_ERROR_CODE)
   })
@@ -426,7 +515,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
     expect(transactionalEmail?.params).toMatchObject({
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(BLACKLISTED_RECIPIENT_ERROR_CODE)
   })
@@ -467,7 +556,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
     expect(transactionalEmail?.attachmentsMetadata).toHaveLength(1)
@@ -540,7 +629,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
     expect(transactionalEmail?.attachmentsMetadata).toHaveLength(2)
@@ -616,7 +705,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
 
     // Second request rate limited
@@ -640,7 +729,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
   })
 
@@ -695,7 +784,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
 
     // Third request passes after 1s
@@ -719,7 +808,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
   })
 })

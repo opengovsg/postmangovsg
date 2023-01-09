@@ -90,6 +90,14 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
     }: ReqBody = req.body
 
+    const attachmentsMetadata = attachments
+      ? attachments.map((a) => ({
+          fileName: a.name,
+          fileSize: a.size,
+          hash: getAttachmentHash(a.data),
+        }))
+      : null
+
     const emailMessageTransactional = await EmailMessageTransactional.create({
       userId: req.session?.user?.id,
       from,
@@ -98,32 +106,15 @@ export const InitEmailTransactionalMiddleware = (
         subject,
         body,
         from,
-        replyTo,
+        reply_to: replyTo,
       },
       messageId: null,
-      attachmentsMetadata: null,
+      attachmentsMetadata,
       status: TransactionalEmailMessageStatus.Unsent,
       errorCode: null,
       sentAt: null,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTransactional)
-    if (!emailMessageTransactional) {
-      throw new Error('Unable to create entry in email_message_tx')
-    }
-    if (attachments) {
-      void EmailMessageTransactional.update(
-        {
-          attachmentsMetadata: attachments.map((a) => ({
-            fileName: a.name,
-            fileSize: a.size,
-            hash: getAttachmentHash(a.data),
-          })),
-        },
-        {
-          where: { id: emailMessageTransactional.id },
-        }
-      )
-    }
     req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
     next()
   }
@@ -148,6 +139,13 @@ export const InitEmailTransactionalMiddleware = (
     } = req.body
 
     try {
+      const emailMessageTransactional =
+        await EmailMessageTransactional.findByPk(emailMessageTransactionalId)
+      if (!emailMessageTransactional) {
+        // practically this will never happen but adding to fulfill TypeScript
+        // type-safety requirement
+        throw new Error('Unable to find entry in email_messages_transactional')
+      }
       await EmailTransactionalService.sendMessage({
         subject,
         body,
@@ -158,16 +156,6 @@ export const InitEmailTransactionalMiddleware = (
         attachments,
         emailMessageTransactionalId,
       })
-      const emailMessageTransactional = await EmailMessageTransactional.findOne(
-        {
-          where: { id: emailMessageTransactionalId },
-        }
-      )
-      if (!emailMessageTransactional) {
-        // practically this will never happen but adding to fulfill TypeScript
-        // type-safety requirement
-        throw new Error('Failed to save transactional message')
-      }
       emailMessageTransactional.set(
         'status',
         TransactionalEmailMessageStatus.Accepted
