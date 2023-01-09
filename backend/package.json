@@ -52,7 +52,7 @@
     "express-winston": "4.2.0",
     "file-type": "^16.5.4",
     "helmet": "3.23.3",
-    "jsonwebtoken": "8.5.1",
+    "jsonwebtoken": "9.0.0",
     "libphonenumber-js": "1.10.6",
     "lodash": "4.17.21",
     "module-alias": "2.2.2",
