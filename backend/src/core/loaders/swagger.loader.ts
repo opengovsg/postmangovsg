@@ -10,6 +10,7 @@ const logger = loggerWithLabel(module)
 const swaggerUiOptions = {
   explorer: false,
   customCss: '.swagger-ui .topbar { display: none; }',
+  url: '/v1/swagger.json',
 }
 
 const removeCspHeader = (
@@ -26,6 +27,7 @@ const swaggerDocument = YAML.load(
 )
 
 const swaggerLoader = ({ app }: { app: Application }): void => {
+  app.get('/v1/swagger.json', (_req, res) => res.json(swaggerDocument))
   app.use(
     '/docs',
     removeCspHeader,
