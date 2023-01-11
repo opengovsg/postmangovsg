@@ -1,9 +1,6 @@
-export interface MailAttachment {
-  filename: string
-  content: Buffer
-  // TODO: refactor into optional field?
-  cid: string // automatically generated for all attachments; for use as content-id images
-}
+import { Attachment } from 'nodemailer/lib/mailer'
+
+export type MailAttachment = Pick<Attachment, 'filename' | 'content' | 'cid'>
 
 export interface MailToSend {
   recipients: Array<string>
