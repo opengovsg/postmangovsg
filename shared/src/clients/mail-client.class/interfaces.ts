@@ -1,6 +1,8 @@
 export interface MailAttachment {
   filename: string
   content: Buffer
+  // TODO: refactor into optional field?
+  cid: string // automatically generated for all attachments; for use as content-id images
 }
 
 export interface MailToSend {
