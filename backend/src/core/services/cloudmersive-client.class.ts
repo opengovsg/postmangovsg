@@ -14,6 +14,7 @@ export default class CloudmersiveClient {
   constructor(cloudmersiveKey: string) {
     this.apiKey = cloudmersiveKey
     const client = ApiClient.instance
+    client.timeout = 300000
     const ApiKey = client.authentications.Apikey
     ApiKey.apiKey = cloudmersiveKey
     this.api = new ScanApi()
