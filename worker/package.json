@@ -26,7 +26,7 @@
     "axios": "0.21.4",
     "bcrypt": "5.0.1",
     "cheerio": "1.0.0-rc.10",
-    "convict": "6.2.3",
+    "convict": "6.2.4",
     "dd-trace": "2.12.2",
     "dotenv": "8.2.0",
     "jest": "27.5.1",
