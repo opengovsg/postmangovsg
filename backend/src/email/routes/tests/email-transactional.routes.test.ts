@@ -542,6 +542,26 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.body).toBeDefined()
     expect(res.body.attachments_metadata).toBeDefined()
     expect(mockSendEmail).toBeCalledTimes(1)
+    expect(mockSendEmail).toBeCalledWith(
+      {
+        body: validApiCall.body,
+        from: validApiCall.from,
+        replyTo: validApiCall.reply_to,
+        subject: validApiCall.subject,
+        recipients: [validApiCall.recipient],
+        referenceId: expect.any(String),
+        attachments: [
+          {
+            cid: '0',
+            content: expect.any(Buffer),
+            filename: validAttachmentName,
+          },
+        ],
+      },
+      {
+        extraSmtpHeaders: { isTransactional: true },
+      }
+    )
     const transactionalEmail = await EmailMessageTransactional.findOne({
       where: { userId: user.id.toString() },
     })
@@ -615,6 +635,31 @@ describe(`${emailTransactionalRoute}/send`, () => {
 
     expect(res.status).toBe(201)
     expect(mockSendEmail).toBeCalledTimes(1)
+    expect(mockSendEmail).toBeCalledWith(
+      {
+        body: validApiCall.body,
+        from: validApiCall.from,
+        replyTo: validApiCall.reply_to,
+        subject: validApiCall.subject,
+        recipients: [validApiCall.recipient],
+        referenceId: expect.any(String),
+        attachments: [
+          {
+            cid: '0',
+            content: expect.any(Buffer),
+            filename: validAttachmentName,
+          },
+          {
+            cid: '1',
+            content: expect.any(Buffer),
+            filename: validAttachment2Name,
+          },
+        ],
+      },
+      {
+        extraSmtpHeaders: { isTransactional: true },
+      }
+    )
     const transactionalEmail = await EmailMessageTransactional.findOne({
       where: { userId: user.id.toString() },
     })
