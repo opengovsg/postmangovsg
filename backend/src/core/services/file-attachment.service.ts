@@ -30,7 +30,7 @@ const parseFiles = async (
   files: { data: Buffer; name: string }[]
 ): Promise<MailAttachment[]> => {
   return files.map(({ data, name }, index) => {
-    // TODO: refactor
+    // include cid field to support content-id images; see PR #1905
     return { filename: name, content: data, cid: index.toString() }
   })
 }

@@ -87,7 +87,7 @@ export const XSS_EMAIL_OPTION = {
     if (tag === 'img' && name === 'src' && value.match(KEYWORD_REGEX)) {
       return value
     }
-    // Do not sanitize keyword if eg: <img src="cid:attachment1">, to support content-id images
+    // Do not sanitize keyword if eg: <img src="cid:attachment">, to support content-id images
     if (tag === 'img' && name === 'src' && isCid(value)) {
       return value
     }
