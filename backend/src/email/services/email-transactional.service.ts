@@ -51,6 +51,10 @@ async function sendMessage({
   attachments?: { data: Buffer; name: string }[]
   emailMessageTransactionalId: number
 }): Promise<void> {
+  // TODO: flagging this coupling for future refactoring:
+  // currently, we are using EmailTemplateService to sanitize both tx emails and campaign emails
+  // while this works for now, in the future, we might want to have more liberal rules for tx emails
+  // to allow API users the freedom to customize the look and feel of their emails
   const sanitizedSubject =
     EmailTemplateService.client.replaceNewLinesAndSanitize(subject)
   const sanitizedBody = EmailTemplateService.client.filterXSS(body)

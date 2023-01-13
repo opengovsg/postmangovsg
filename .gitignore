@@ -112,3 +112,4 @@ cypress/downloads/*.csv
 
 # IDE config files
 .idea
+.vscode

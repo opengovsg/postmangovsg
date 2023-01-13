@@ -29,10 +29,10 @@ const areFilesSafe = async (
 const parseFiles = async (
   files: { data: Buffer; name: string }[]
 ): Promise<MailAttachment[]> => {
-  const parsedFiles = files.map(({ data, name }) => {
-    return { filename: name, content: data }
+  return files.map(({ data, name }, index) => {
+    // include cid field to support content-id images; see PR #1905
+    return { filename: name, content: data, cid: index.toString() }
   })
-  return parsedFiles
 }
 
 export const UNSUPPORTED_FILE_TYPE_ERROR_CODE =
