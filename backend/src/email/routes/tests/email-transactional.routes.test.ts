@@ -1,10 +1,3 @@
-const mockScanFile = jest.fn().mockResolvedValue(true)
-jest.mock('@core/services/cloudmersive-client.class', () => {
-  return jest.fn().mockImplementation(() => {
-    return { scanFile: mockScanFile }
-  })
-})
-
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
