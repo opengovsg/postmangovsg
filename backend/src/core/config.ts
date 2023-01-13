@@ -149,7 +149,6 @@ interface ConfigSchema {
     checkStalledInterval: number
   }
   file: {
-    cloudmersiveKey: string
     maxAttachmentSize: number
     maxAttachmentNum: number
   }
@@ -681,13 +680,6 @@ const config: Config<ConfigSchema> = convict({
     },
   },
   file: {
-    cloudmersiveKey: {
-      doc: 'API key for Cloudmersive file scanning service',
-      default: '',
-      env: 'FILE_CLOUDMERSIVE_KEY',
-      format: 'required-string',
-      sensitive: true,
-    },
     maxAttachmentSize: {
       doc: 'Maximum accepted file attachment size in bytes',
       default: 2 * 1024 * 1024, // 2MB, i.e. limit set in docs/api-usage.md
