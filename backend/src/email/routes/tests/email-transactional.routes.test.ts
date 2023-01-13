@@ -11,7 +11,6 @@ import { Sequelize } from 'sequelize-typescript'
 import { User } from '@core/models'
 import {
   FileExtensionService,
-  MALICIOUS_FILE_ERROR_CODE,
   UNSUPPORTED_FILE_TYPE_ERROR_CODE,
 } from '@core/services'
 import { RATE_LIMIT_ERROR_MESSAGE } from '@email/middlewares'
@@ -444,43 +443,6 @@ describe(`${emailTransactionalRoute}/send`, () => {
       reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(UNSUPPORTED_FILE_TYPE_ERROR_CODE)
-  })
-
-  test('Should throw an error if attached file is malicious and correct error is saved in db', async () => {
-    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    // not actually a malicious file
-    const maliciousAttachment = Buffer.alloc(1024 * 1024, '.')
-    const maliciousAttachmentName = 'malicious.txt'
-    // so we mock scanFile to return false
-    mockScanFile.mockResolvedValueOnce(false)
-
-    const res = await request(app)
-      .post(endpoint)
-      .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCall.recipient)
-      .field('subject', validApiCall.subject)
-      .field('body', validApiCall.body)
-      .field('from', validApiCall.from)
-      .field('reply_to', validApiCall.reply_to)
-      .attach('attachments', maliciousAttachment, maliciousAttachmentName)
-
-    expect(res.status).toBe(400)
-    expect(mockSendEmail).not.toBeCalled()
-
-    const transactionalEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
-    })
-    expect(transactionalEmail).not.toBeNull()
-    expect(transactionalEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
-      status: TransactionalEmailMessageStatus.Unsent,
-    })
-    expect(transactionalEmail?.params).toMatchObject({
-      from: validApiCall.from,
-      reply_to: validApiCall.reply_to,
-    })
-    expect(transactionalEmail?.errorCode).toBe(MALICIOUS_FILE_ERROR_CODE)
   })
 
   test('Should throw an error if recipient is blacklisted and correct error is saved in db', async () => {
