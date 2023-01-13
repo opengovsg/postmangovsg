@@ -9,7 +9,6 @@ import { AuthService } from '@core/services/auth.service'
 import {
   MessageError,
   InvalidRecipientError,
-  MaliciousFileError,
   UnsupportedFileTypeError,
 } from '@core/errors'
 import {
@@ -177,7 +176,6 @@ export const InitEmailTransactionalMiddleware = (
       const BAD_REQUEST_ERRORS = [
         MessageError,
         InvalidRecipientError,
-        MaliciousFileError,
         UnsupportedFileTypeError,
       ]
       if (BAD_REQUEST_ERRORS.some((errType) => error instanceof errType)) {
