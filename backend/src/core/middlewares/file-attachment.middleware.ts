@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import fileUpload from 'express-fileupload'
 import config from '@core/config'
+import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
@@ -33,12 +34,7 @@ function preprocessPotentialIncomingFile(
 ): void {
   if (req.files?.attachments) {
     const { attachments } = req.files
-
-    if (!Array.isArray(attachments)) {
-      req.body.attachments = [attachments]
-    } else {
-      req.body.attachments = attachments
-    }
+    req.body.attachments = ensureAttachmentsFieldIsArray(attachments)
     /**
      * Throw explicit error for exceeding num files.
      * express-fileupload does not throw error if num files

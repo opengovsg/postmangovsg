@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/node'
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
+import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
@@ -123,13 +124,15 @@ const expressApp = ({ app }: { app: express.Application }): void => {
           req.headers.authorization = '[REDACTED]'
         }
         if (propName === 'body' && req.body.attachments) {
-          // truncate attachment data so the whole file won't get logged and take
-          // up our disk space
-          const truncatedAttachments: any[] = []
-          req.body.attachments.forEach((attachment: any) =>
-            truncatedAttachments.push({ ...attachment, data: '[TRUNCATED]' })
+          const { attachments } = req.body
+          req.body.attachments = ensureAttachmentsFieldIsArray(attachments).map(
+            (attachment) => ({
+              // truncate attachment data so the whole file won't get logged and take
+              // up our disk space
+              ...attachment,
+              data: '[REDACTED]',
+            })
           )
-          req.body.attachments = truncatedAttachments
         }
         return (req as any)[propName]
       },
