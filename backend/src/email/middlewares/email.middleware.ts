@@ -199,6 +199,8 @@ export const InitEmailMiddleware = (
     // Since from addresses with display name are accepted, we need to extract just the email address
     const { from } = req.body
     const { fromName, fromAddress } = parseFromAddress(from)
+    const errorMessage =
+      "Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more."
 
     // Retrieve logged in user's email
     const userEmail =
@@ -211,7 +213,7 @@ export const InitEmailMiddleware = (
 
     if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
       logger.error({
-        message: "Invalid 'from' email address",
+        message: errorMessage,
         from,
         userEmail,
         defaultFromName,
@@ -230,7 +232,7 @@ export const InitEmailMiddleware = (
           }
         )
       }
-      return res.status(400).json({ message: "Invalid 'from' email address." })
+      return res.status(400).json({ message: errorMessage })
     }
 
     res.locals.fromName = fromName
