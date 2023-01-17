@@ -213,11 +213,9 @@ export const InitEmailMiddleware = (
       parseFromAddress(config.get('mailFrom'))
 
     if (
-      // first scenario: user enters an email there is neither their own nor donotreply@mail.postman.gov.sg
-      (fromAddress !== userEmail && fromAddress !== defaultFromAddress) ||
-      // second scenario: user enters their own email, but they've not gone through the setup with us, so we've not added their email into `email-from-address` table
-      (fromAddress === userEmail &&
-        (await CustomDomainService.existsFromAddress(fromAddress)))
+      //  user enters an email that is neither their own nor donotreply@mail.postman.gov.sg
+      fromAddress !== userEmail &&
+      fromAddress !== defaultFromAddress
     ) {
       logger.error({
         message: INVALID_FROM_ADDRESS_ERROR_MESSAGE,
@@ -260,9 +258,12 @@ export const InitEmailMiddleware = (
   ): Promise<Response | void> => {
     const { from } = req.body
     if (isDefaultFromAddress(from)) return next()
-
     const { fromName, fromAddress } = res.locals
     try {
+      // can only reach here if user supplied own email
+      // if user supplied a different email, error from isFromAddressAccepted will be thrown
+      // therefore, can simply check whether own email is in the list of verified emails
+      // this is not great as the function is impure and relies on the order of middleware...
       const exists = await CustomDomainService.existsFromAddress(fromAddress)
       if (!exists) throw new Error('From Address has not been verified.')
     } catch (err) {

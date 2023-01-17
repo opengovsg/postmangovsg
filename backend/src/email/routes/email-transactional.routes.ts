@@ -85,6 +85,7 @@ export const InitEmailTransactionalRoute = (
     celebrate(sendValidator),
     emailTransactionalMiddleware.saveMessage,
     emailMiddleware.isFromAddressAccepted,
+    emailMiddleware.existsFromAddress,
     emailTransactionalMiddleware.rateLimit,
     emailTransactionalMiddleware.sendMessage
   )
