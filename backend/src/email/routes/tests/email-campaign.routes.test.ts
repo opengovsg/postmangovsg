@@ -8,6 +8,7 @@ import { UploadService } from '@core/services'
 import { EmailFromAddress, EmailMessage } from '@email/models'
 import { CustomDomainService } from '@email/services'
 import { ChannelType } from '@core/constants'
+import { INVALID_FROM_ADDRESS_ERROR_MESSAGE } from '@email/middlewares'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
@@ -59,7 +60,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         reply_to: 'user@agency.gov.sg',
       })
     expect(res.status).toBe(400)
-    expect(res.body).toEqual({ message: "Invalid 'from' email address." })
+    expect(res.body).toEqual({ message: INVALID_FROM_ADDRESS_ERROR_MESSAGE })
   })
 
   test('Invalid values for email is not accepted', async () => {

@@ -23,6 +23,9 @@ export interface EmailMiddleware {
   duplicateCampaign: Handler
 }
 
+export const INVALID_FROM_ADDRESS_ERROR_MESSAGE =
+  "Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more."
+
 export const InitEmailMiddleware = (
   authService: AuthService
 ): EmailMiddleware => {
@@ -199,8 +202,6 @@ export const InitEmailMiddleware = (
     // Since from addresses with display name are accepted, we need to extract just the email address
     const { from } = req.body
     const { fromName, fromAddress } = parseFromAddress(from)
-    const errorMessage =
-      "Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more."
 
     // Retrieve logged in user's email
     const userEmail =
@@ -211,9 +212,15 @@ export const InitEmailMiddleware = (
     const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
       parseFromAddress(config.get('mailFrom'))
 
-    if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
+    if (
+      // first scenario: user enters an email there is neither their own nor donotreply@mail.postman.gov.sg
+      (fromAddress !== userEmail && fromAddress !== defaultFromAddress) ||
+      // second scenario: user enters their own email, but they've not gone through the setup with us, so we've not added their email into `email-from-address` table
+      (fromAddress === userEmail &&
+        (await CustomDomainService.existsFromAddress(fromAddress)))
+    ) {
       logger.error({
-        message: errorMessage,
+        message: INVALID_FROM_ADDRESS_ERROR_MESSAGE,
         from,
         userEmail,
         defaultFromName,
@@ -232,7 +239,9 @@ export const InitEmailMiddleware = (
           }
         )
       }
-      return res.status(400).json({ message: errorMessage })
+      return res
+        .status(400)
+        .json({ message: INVALID_FROM_ADDRESS_ERROR_MESSAGE })
     }
 
     res.locals.fromName = fromName

@@ -1825,7 +1825,8 @@ paths:
                       "from" must be a valid email
                     validation: { source: body, keys: [from] }
                 FromError:
-                  value: { message: Invalid 'from' email address. }
+                  # align with message in backend/src/email/middlewares/email.middleware.ts
+                  value: { message: Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more. }
 
         "401":
           description: Unauthorized.
