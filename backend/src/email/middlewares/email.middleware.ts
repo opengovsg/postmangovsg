@@ -252,7 +252,8 @@ export const InitEmailMiddleware = (
   }
 
   /**
-   * Verifies that the 'from' address provided is valid
+   * Verifies that the 'from' address exists in the EmailFromAddress table
+   * NOTE: Must be called AFTER isFromAddressAccepted, which sets the required res.locals.fromName and res.locals.fromAddress
    */
   const existsFromAddress = async (
     req: Request,
