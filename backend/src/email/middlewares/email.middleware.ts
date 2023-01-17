@@ -26,6 +26,9 @@ export interface EmailMiddleware {
 export const INVALID_FROM_ADDRESS_ERROR_MESSAGE =
   "Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more."
 
+export const UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE =
+  'From Address has not been verified.'
+
 export const InitEmailMiddleware = (
   authService: AuthService
 ): EmailMiddleware => {
@@ -265,7 +268,7 @@ export const InitEmailMiddleware = (
       // therefore, can simply check whether own email is in the list of verified emails
       // this is not great as the function is impure and relies on the order of middleware...
       const exists = await CustomDomainService.existsFromAddress(fromAddress)
-      if (!exists) throw new Error('From Address has not been verified.')
+      if (!exists) throw new Error(UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE)
     } catch (err) {
       logger.error({
         message: "Invalid 'from' email address",
