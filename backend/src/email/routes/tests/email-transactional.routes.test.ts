@@ -8,6 +8,7 @@ import {
 } from '@core/services'
 import { RATE_LIMIT_ERROR_MESSAGE } from '@email/middlewares'
 import {
+  EmailFromAddress,
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
 } from '@email/models'
@@ -163,6 +164,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
 
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
     const from = `Hello <${user.email}>`
     const res = await request(app)
       .post(endpoint)
@@ -195,9 +200,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
       from: `Hello <${user.email}>`,
       reply_to: user.email,
     })
+    await EmailFromAddress.destroy({ where: {} })
   })
 
-  test('Should thrown an error with invalid custom from address', async () => {
+  test('Should throw an error with invalid custom from address (not user email)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const res = await request(app)
       .post(endpoint)
@@ -205,6 +211,24 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .send({
         ...validApiCall,
         from: 'Hello <invalid@agency.gov.sg>',
+        reply_to: user.email,
+      })
+
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw an error with invalid custom from address (user email not added into EmailFromAddress table)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const from = `Hello <${user.email}>`
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        recipient: 'recipient@agency.gov.sg',
+        subject: 'subject',
+        body: '<p>body</p>',
+        from,
         reply_to: user.email,
       })
 

@@ -23,6 +23,12 @@ export interface EmailMiddleware {
   duplicateCampaign: Handler
 }
 
+export const INVALID_FROM_ADDRESS_ERROR_MESSAGE =
+  "Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more."
+
+export const UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE =
+  'From Address has not been verified.'
+
 export const InitEmailMiddleware = (
   authService: AuthService
 ): EmailMiddleware => {
@@ -209,9 +215,13 @@ export const InitEmailMiddleware = (
     const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
       parseFromAddress(config.get('mailFrom'))
 
-    if (fromAddress !== userEmail && fromAddress !== defaultFromAddress) {
+    if (
+      //  user enters an email that is neither their own nor donotreply@mail.postman.gov.sg
+      fromAddress !== userEmail &&
+      fromAddress !== defaultFromAddress
+    ) {
       logger.error({
-        message: "Invalid 'from' email address",
+        message: INVALID_FROM_ADDRESS_ERROR_MESSAGE,
         from,
         userEmail,
         defaultFromName,
@@ -230,7 +240,9 @@ export const InitEmailMiddleware = (
           }
         )
       }
-      return res.status(400).json({ message: "Invalid 'from' email address." })
+      return res
+        .status(400)
+        .json({ message: INVALID_FROM_ADDRESS_ERROR_MESSAGE })
     }
 
     res.locals.fromName = fromName
@@ -240,7 +252,8 @@ export const InitEmailMiddleware = (
   }
 
   /**
-   * Verifies that the 'from' address provided is valid
+   * Verifies that the 'from' address exists in the EmailFromAddress table
+   * NOTE: Must be called AFTER isFromAddressAccepted, which sets the required res.locals.fromName and res.locals.fromAddress
    */
   const existsFromAddress = async (
     req: Request,
@@ -249,11 +262,14 @@ export const InitEmailMiddleware = (
   ): Promise<Response | void> => {
     const { from } = req.body
     if (isDefaultFromAddress(from)) return next()
-
     const { fromName, fromAddress } = res.locals
     try {
+      // can only reach here if user supplied own email
+      // if user supplied a different email, error from isFromAddressAccepted will be thrown
+      // therefore, can simply check whether own email is in the list of verified emails
+      // this is not great as the function is impure and relies on the order of middleware...
       const exists = await CustomDomainService.existsFromAddress(fromAddress)
-      if (!exists) throw new Error('From Address has not been verified.')
+      if (!exists) throw new Error(UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE)
     } catch (err) {
       logger.error({
         message: "Invalid 'from' email address",
@@ -271,6 +287,8 @@ export const InitEmailMiddleware = (
 
   /**
    * Verifies the user's email address to see if it can be used as custom 'from' address
+   * - if it is the default donotreply@mail.postman.gov.sg, return immediately
+   * - else, make network calls to AWS SES and the user's domain to verify DNS settings are set up properly.
    */
   const verifyFromAddress = async (
     req: Request,
