@@ -38,6 +38,24 @@ const sentrySessionMiddleware = (
   next()
 }
 
+interface ErrorWithType extends Error {
+  type: string
+}
+function isBodyParserError(error: ErrorWithType) {
+  const bodyParserCommonErrorsTypes = [
+    'encoding.unsupported',
+    'entity.parse.failed',
+    'entity.verify.failed',
+    'request.aborted',
+    'request.size.invalid',
+    'stream.encoding.set',
+    'parameters.too.many',
+    'charset.unsupported',
+    'entity.too.large',
+  ]
+  return bodyParserCommonErrorsTypes.includes(error.type)
+}
+
 Sentry.init({
   dsn: config.get('sentryDsn'),
   environment: config.get('env'),
@@ -157,6 +175,16 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       res: express.Response,
       _next: express.NextFunction
     ) => {
+      if (isBodyParserError(err as ErrorWithType)) {
+        logger.info({
+          message: 'Malformed request',
+          error: {
+            message: err.message,
+            type: (err as ErrorWithType).type,
+          },
+        })
+        return res.status(400).json({ message: 'Malformed request body' })
+      }
       logger.error({
         message: 'Unexpected error occured',
         error: {
