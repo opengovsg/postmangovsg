@@ -287,6 +287,8 @@ export const InitEmailMiddleware = (
 
   /**
    * Verifies the user's email address to see if it can be used as custom 'from' address
+   * - if it is the default donotreply@mail.postman.gov.sg, return immediately
+   * - else, make network calls to AWS SES and the user's domain to verify DNS settings are set up properly.
    */
   const verifyFromAddress = async (
     req: Request,
