@@ -439,21 +439,6 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  test('Show throw 403 error is user is sending attachment but email is not added to email_from_address table', async () => {
-    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    const res = await request(app)
-      .post(endpoint)
-      .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCallAttachment.recipient)
-      .field('subject', validApiCallAttachment.subject)
-      .field('body', validApiCallAttachment.body)
-      .field('from', validApiCallAttachment.from)
-      .field('reply_to', validApiCallAttachment.reply_to)
-      .attach('attachments', validAttachment, validAttachmentName)
-    expect(res.status).toBe(403)
-    expect(mockSendEmail).not.toBeCalled()
-  })
-
   test('Should throw an error if file type of attachment is not supported and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually an invalid file type; FileExtensionService checks magic number

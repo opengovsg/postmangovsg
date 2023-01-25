@@ -3,8 +3,6 @@ import fileUpload from 'express-fileupload'
 import config from '@core/config'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
-import { parseFromAddress } from '@shared/utils/from-address'
-import { CustomDomainService } from '@email/services'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
@@ -51,30 +49,19 @@ function preprocessPotentialIncomingFile(
   next()
 }
 
-// allow attachment only if (1) the user is not using default email address; (2) user's email has been added to the email_from_address table
-// attachment is a high-cost and high-risk feature that we want to limit to users who have been vetted
+// forbid user from sending attachments from default from address to minimize risk
 async function checkAttachmentPermission(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  if (req.files?.attachments) {
-    const { from } = req.body
-    if (isDefaultFromAddress(from)) {
-      res.status(403).json({
-        message: 'Attachments are not allowed for default email address',
-      })
-      return
-    }
-    const { fromAddress } = parseFromAddress(from)
-    const exists = await CustomDomainService.existsFromAddress(fromAddress)
-    if (!exists) {
-      res.status(403).json({
-        message:
-          'Attachments are not allowed for this email address. Contact the Postman team to whitelist your email address',
-      })
-      return
-    }
+  const { from } = req.body
+  if (req.files?.attachments && isDefaultFromAddress(from)) {
+    res.status(403).json({
+      message:
+        'Attachments are not allowed for Postman default from email address',
+    })
+    return
   }
   next()
 }
