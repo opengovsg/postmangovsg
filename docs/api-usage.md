@@ -320,10 +320,9 @@ curl --location --request POST 'https://api.postman.gov.sg/v1/transactional/emai
 --header 'Content-Type: application/json' \
 --header 'Authorization: Bearer your_api_key' \
 --data-raw '{
-	"subject": "Test email",
-	"body": "<p>Hello <b>there</b></p>",
-	"recipient": "user@agency.gov.sg",
-	"from": "test@agency.gov.sg",
+  "subject": "Test email",
+  "body": "<p>Hello <b>there</b></p>",
+  "recipient": "user@agency.gov.sg"
 }'
 ```
 

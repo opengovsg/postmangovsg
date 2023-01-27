@@ -33,7 +33,7 @@ export class SmsMessageTransactional extends Model<SmsMessageTransactional> {
   @Column({ type: DataType.STRING, allowNull: false })
   recipient: string
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.TEXT, allowNull: false })
   body: string
 
   @Column({ type: DataType.STRING, allowNull: true })
