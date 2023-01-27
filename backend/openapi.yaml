@@ -880,6 +880,12 @@ paths:
       tags:
         - Email
       summary: Sends a test message and defaults to Postman's credentials for the campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -1027,7 +1033,12 @@ paths:
       tags:
         - Email
       summary: Start sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Success
@@ -1091,7 +1102,12 @@ paths:
       tags:
         - Email
       summary: Stop sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Success
@@ -1149,7 +1165,12 @@ paths:
       tags:
         - Email
       summary: Retry sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Success
@@ -1804,7 +1825,8 @@ paths:
                       "from" must be a valid email
                     validation: { source: body, keys: [from] }
                 FromError:
-                  value: { message: Invalid 'from' email address. }
+                  # align with message in backend/src/email/middlewares/email.middleware.ts
+                  value: { message: Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more. }
 
         "401":
           description: Unauthorized.
@@ -2804,6 +2826,12 @@ paths:
       tags:
         - SMS
       summary: Stop sending campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Success
@@ -2861,6 +2889,12 @@ paths:
       tags:
         - SMS
       summary: Retry sending campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Success
@@ -4120,7 +4154,12 @@ paths:
       tags:
         - Telegram
       summary: Stop sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -4179,7 +4218,12 @@ paths:
       tags:
         - Telegram
       summary: Retry sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: OK
@@ -4819,7 +4863,7 @@ components:
         job_queue:
           type: array
           items:
-          $ref: "#/components/schemas/JobQueue"
+            $ref: "#/components/schemas/JobQueue"
         sms_templates:
           type: object
           properties:

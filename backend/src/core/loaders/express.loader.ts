@@ -1,12 +1,13 @@
 import cors from 'cors'
-import express, { Request, Response, NextFunction } from 'express'
 import { errors as celebrateErrorMiddleware } from 'celebrate'
-import * as Sentry from '@sentry/node'
+import express, { Request, Response, NextFunction } from 'express'
 import expressWinston from 'express-winston'
+import * as Sentry from '@sentry/node'
 
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
+import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
@@ -35,6 +36,24 @@ const sentrySessionMiddleware = (
     Sentry.setTag('usesApiKey', 'true')
   }
   next()
+}
+
+interface ErrorWithType extends Error {
+  type: string
+}
+function isBodyParserError(error: ErrorWithType) {
+  const bodyParserCommonErrorsTypes = [
+    'encoding.unsupported',
+    'entity.parse.failed',
+    'entity.verify.failed',
+    'request.aborted',
+    'request.size.invalid',
+    'stream.encoding.set',
+    'parameters.too.many',
+    'charset.unsupported',
+    'entity.too.large',
+  ]
+  return bodyParserCommonErrorsTypes.includes(error.type)
 }
 
 Sentry.init({
@@ -71,8 +90,21 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   // in the parseEvent() handle before parsing the SES event.
   app.use('/v1/callback/email', express.text({ type: 'application/json' }))
 
-  app.use(express.json())
-  app.use(express.urlencoded({ extended: false }))
+  app.use(
+    express.json({
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
+      // will get 400 error informing them of the size of the limit, instead of 500 error
+      limit: config.get('transactionalEmail.bodySizeLimit') * 10,
+    })
+  )
+  app.use(
+    express.urlencoded({
+      extended: false,
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
+      // will get 400 error informing them of the size of the limit, instead of 500 error
+      limit: config.get('transactionalEmail.bodySizeLimit') * 10,
+    })
+  )
   // ref: https://expressjs.com/en/resources/middleware/cors.html#configuration-options
   // Default CORS setting:
   // {
@@ -110,13 +142,15 @@ const expressApp = ({ app }: { app: express.Application }): void => {
           req.headers.authorization = '[REDACTED]'
         }
         if (propName === 'body' && req.body.attachments) {
-          // truncate attachment data so the whole file won't get logged and take
-          // up our disk space
-          const truncatedAttachments: any[] = []
-          req.body.attachments.forEach((attachment: any) =>
-            truncatedAttachments.push({ ...attachment, data: '[TRUNCATED]' })
+          const { attachments } = req.body
+          req.body.attachments = ensureAttachmentsFieldIsArray(attachments).map(
+            (attachment) => ({
+              // truncate attachment data so the whole file won't get logged and take
+              // up our disk space
+              ...attachment,
+              data: '[REDACTED]',
+            })
           )
-          req.body.attachments = truncatedAttachments
         }
         return (req as any)[propName]
       },
@@ -141,6 +175,16 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       res: express.Response,
       _next: express.NextFunction
     ) => {
+      if (isBodyParserError(err as ErrorWithType)) {
+        logger.info({
+          message: 'Malformed request',
+          error: {
+            message: err.message,
+            type: (err as ErrorWithType).type,
+          },
+        })
+        return res.status(400).json({ message: 'Malformed request body' })
+      }
       logger.error({
         message: 'Unexpected error occured',
         error: {
