@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import fileUpload from 'express-fileupload'
 import config from '@core/config'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import { isDefaultFromAddress } from '@core/utils/from-address'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
@@ -48,7 +49,25 @@ function preprocessPotentialIncomingFile(
   next()
 }
 
+// forbid user from sending attachments from default from address to minimize risk
+async function checkAttachmentPermission(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { from } = req.body
+  if (req.files?.attachments && isDefaultFromAddress(from)) {
+    res.status(403).json({
+      message:
+        'Attachments are not allowed for Postman default from email address',
+    })
+    return
+  }
+  next()
+}
+
 export const FileAttachmentMiddleware = {
+  checkAttachmentPermission,
   fileUploadHandler,
   preprocessPotentialIncomingFile,
 }

@@ -83,6 +83,7 @@ export const InitEmailTransactionalRoute = (
     FileAttachmentMiddleware.fileUploadHandler,
     FileAttachmentMiddleware.preprocessPotentialIncomingFile,
     celebrate(sendValidator),
+    FileAttachmentMiddleware.checkAttachmentPermission,
     emailTransactionalMiddleware.saveMessage,
     emailMiddleware.isFromAddressAccepted,
     emailMiddleware.existsFromAddress, // future todo: put a cache to reduce db hits
