@@ -194,7 +194,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL certificateÏ
+          description: Invalid SSL certificate
   /campaigns/{campaignId}:
     delete:
       security:
@@ -3459,7 +3459,7 @@ paths:
         - bearerAuth: []
       tags:
         - SMS
-      summary: 'Get transactional sms by ID'
+      summary: 'Get transactional SMS by ID'
       parameters:
         - in: path
           name: smsId
@@ -4361,7 +4361,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/stop:
     post:
@@ -4425,7 +4425,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/retry:
     post:
@@ -4489,7 +4489,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/stats:
     get:
@@ -4551,7 +4551,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/update-stats:
     post:
@@ -4613,7 +4613,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/export:
     get:
@@ -4679,7 +4679,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/duplicate:
     post:
@@ -5129,15 +5129,15 @@ components:
           type: string
           enum: [UNSENT, ACCEPTED, SENT, DELIVERED, ERROR]
           description: >
-            * `UNSENT` - initial state of a newly created transactional sms (this status is not returned in the course of a successful request to send an email)
+            * `UNSENT` - initial state of a newly created transactional SMS (this status is not returned in the course of a successful request to send an SMS)
 
-            * `ACCEPTED` - email has been accepted by our sms provider (this status is returned in the course of a successful request to send an sms)
+            * `ACCEPTED` - SMS has been accepted by our SMS provider (this status is returned in the course of a successful request to send an SMS)
 
-            * `SENT` - the send request was successfully forwarded to our sms provider and our sms provider will attempt to deliver the message to the recipient’s phone number (API user can check this and all subsequent statuses via the `/transactional/sms/{smsId}` endpoint)
+            * `SENT` - the send request was successfully forwarded to our SMS provider and our SMS provider will attempt to deliver the message to the recipient’s phone number (API user can check this and all subsequent statuses via the `/transactional/sms/{smsId}` endpoint)
 
-            * `DELIVERED` - the sms provider has successfully delivered the sms to the recipient's phone number
+            * `DELIVERED` - the SMS provider has successfully delivered the SMS to the recipient's phone number
 
-            * `ERROR` - an error happens when the sms provider is trying to deliver the message
+            * `ERROR` - an error happened when the SMS provider is trying to deliver the message
     TelegramCampaign:
       type: object
       properties:
