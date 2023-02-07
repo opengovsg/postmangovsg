@@ -34,6 +34,7 @@ const DEFAULT_EMAIL_ATTRS = ['style']
 export const XSS_EMAIL_OPTION = {
   whiteList: {
     span: DEFAULT_EMAIL_ATTRS,
+    body: DEFAULT_EMAIL_ATTRS,
     b: DEFAULT_EMAIL_ATTRS,
     strong: DEFAULT_EMAIL_ATTRS,
     i: DEFAULT_EMAIL_ATTRS,
