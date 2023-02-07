@@ -40,7 +40,7 @@
     "precommit:shared": "cd shared && npm run precommit",
     "precommit:root": "lint-staged && npm run detect-secrets:precommit && sh check-env-format.sh",
     "lint-no-fix": "prettier --check '**/*.{yml,md}'",
-    "lint": "prettier --write '**/*.{yml,md}' --loglevel warn",
+    "lint": "prettier --write '**/*.{yml,yaml,md}' --loglevel warn",
     "wait:backend": "wait-on http-get://localhost:4000",
     "detect-secrets:update": "detect-secrets scan --baseline .secrets.baseline",
     "detect-secrets:check": "git ls-files -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline",
@@ -70,6 +70,6 @@
     "wait-on": "^6.0.1"
   },
   "lint-staged": {
-    "*.{yml,md}": "prettier --write"
+    "*.{yml,yaml,md}": "prettier --write"
   }
 }
