@@ -233,15 +233,13 @@ const listCampaigns = ({
           }
         }
       })(status)
-      const checkField = CampaignStatus.Scheduled
-        ? '$job_queue.visible_at$'
-        : '$job_queue.status$'
-      // TODO: refactor this monstrosity
-      const statusFilter: { [key: string]: any } = {} //join query
-      statusFilter[checkField] = operation
+      const checkField =
+        status === CampaignStatus.Scheduled
+          ? '$job_queue.visible_at$'
+          : '$job_queue.status$'
       return {
         ...where,
-        ...statusFilter,
+        [checkField]: operation,
       }
     }
     return where
