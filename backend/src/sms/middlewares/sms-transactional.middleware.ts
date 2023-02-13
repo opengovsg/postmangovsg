@@ -1,8 +1,8 @@
-import type { Request, Response, NextFunction } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from '@shared/templating'
-import { RateLimitError, InvalidRecipientError } from '@core/errors'
+import { InvalidRecipientError, RateLimitError } from '@core/errors'
 import { SmsMessageTransactional } from '@sms/models/sms-message-transactional'
 
 const logger = loggerWithLabel(module)
@@ -94,7 +94,28 @@ async function sendMessage(
   }
 }
 
+async function listMessages(): Promise<void> {
+  return
+}
+
+async function getById(req: Request, res: Response): Promise<void> {
+  const { smsId } = req.params
+  const message = await SmsMessageTransactional.findOne({
+    where: {
+      id: smsId,
+      userId: req.session?.user?.id.toString(),
+    },
+  })
+  if (!message) {
+    res.status(404).json({ message: `Sms message with ID ${smsId} not found.` })
+    return
+  }
+  res.status(200).json(convertMessageModelToResponse(message))
+}
+
 export const SmsTransactionalMiddleware = {
   saveMessage,
   sendMessage,
+  listMessages,
+  getById,
 }
