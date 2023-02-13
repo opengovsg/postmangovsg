@@ -1,11 +1,18 @@
-import { Includeable, literal, Op, Transaction } from 'sequelize'
+import {
+  Includeable,
+  literal,
+  Op,
+  Order,
+  Transaction,
+  WhereOptions,
+} from 'sequelize'
 import config from '@core/config'
 import {
   CampaignSortField,
+  CampaignStatus,
   ChannelType,
   JobStatus,
   Ordering,
-  Status,
 } from '@core/constants'
 import { Campaign, JobQueue, Statistic, UserDemo } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
@@ -156,7 +163,7 @@ const createCampaignWithTransaction = async ({
   demoMessageLimit: number | null
 }): Promise<Campaign | void> => {
   return Campaign.sequelize?.transaction(async (transaction) => {
-    const campaign = await createCampaign({
+    return await createCampaign({
       name,
       type,
       userId,
@@ -164,7 +171,6 @@ const createCampaignWithTransaction = async ({
       demoMessageLimit,
       transaction,
     })
-    return campaign
   })
 }
 
@@ -185,156 +191,131 @@ const listCampaigns = ({
   offset?: number
   limit?: number
   type?: ChannelType
-  status?: Status
+  status?: CampaignStatus
   name?: string
   sortBy?: CampaignSortField
   orderBy?: Ordering
 }): Promise<{ rows: Array<Campaign>; count: number }> => {
   const campaignJobs = '(PARTITION BY "job_queue"."campaign_id")'
   const maxAge = config.get('redaction.maxAge')
+  offset = offset || 0
+  limit = limit || 10
 
-  let whereFilter: {
-    user_id: number
-    type?: ChannelType
-  } = { user_id: userId }
-
-  if (type) {
-    whereFilter.type = type
-  }
-
-  if (name) {
-    const nameMatch = {
-      name: {
-        [Op.iLike]: '%' + name + '%',
-      },
-    }
-    whereFilter = { ...whereFilter, ...nameMatch }
-  }
-
-  if (status) {
-    let operation: any = {}
-    let checkField = ''
-    switch (status) {
-      case Status.Draft: {
-        operation = { [Op.is]: null }
-        checkField = '$job_queue.status$'
-        break
-      }
-      // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 1/2)
-      case Status.Sending: {
-        operation = {
-          [Op.in]: [
-            JobStatus.Ready,
-            JobStatus.Enqueued,
-            JobStatus.Sending,
-            JobStatus.Sent,
-            JobStatus.Stopped,
-          ],
+  const where = ((userId, type, name, status) => {
+    const where: WhereOptions = { user_id: userId }
+    if (type) where.type = type
+    if (name) where.name = { [Op.iLike]: `%${name}%` }
+    if (status) {
+      const operation = ((status) => {
+        switch (status) {
+          case CampaignStatus.Draft: {
+            return { [Op.is]: null }
+          }
+          // TODO: frontend and backend are misaligned in how they determine if a campaign has been sent (part 1/2)
+          case CampaignStatus.Sending: {
+            return {
+              [Op.in]: [
+                JobStatus.Ready,
+                JobStatus.Enqueued,
+                JobStatus.Sending,
+                JobStatus.Sent,
+                JobStatus.Stopped,
+              ],
+            }
+          }
+          case CampaignStatus.Sent: {
+            return { [Op.eq]: JobStatus.Logged }
+          }
+          case CampaignStatus.Scheduled: {
+            return {
+              [Op.gte]: new Date(),
+            }
+          }
         }
-        checkField = '$job_queue.status$'
-
-        break
-      }
-      case Status.Sent: {
-        operation = { [Op.eq]: JobStatus.Logged }
-        checkField = '$job_queue.status$'
-
-        break
-      }
-      case Status.Scheduled: {
-        operation = {
-          [Op.gte]: new Date(),
-        }
-        checkField = '$job_queue.visible_at$'
-        break
-      }
-      default: {
-        break
+      })(status)
+      const checkField = CampaignStatus.Scheduled
+        ? '$job_queue.visible_at$'
+        : '$job_queue.status$'
+      // TODO: refactor this monstrosity
+      const statusFilter: { [key: string]: any } = {} //join query
+      statusFilter[checkField] = operation
+      return {
+        ...where,
+        ...statusFilter,
       }
     }
-    const statusFilter: { [key: string]: any } = {} //join query
-    statusFilter[checkField] = operation
-    whereFilter = { ...whereFilter, ...statusFilter }
-  }
+    return where
+  })(userId, type, name, status)
 
-  const orderOpt = (() => {
-    let orderArr: any = [['created_at', 'DESC']] // latest created as default sorting
-    const order = orderBy ?? Ordering.DESC // descending as default ordering
-    if (sortBy) {
-      switch (sortBy) {
-        case CampaignSortField.Sent: {
-          // sort by join queried sent_at
-          orderArr = [[literal('"job_queue.sent_at"'), order]]
-          break
-        }
-        default: {
-          // sort by field in Campaigns table
-          orderArr = [[sortBy, order]]
-        }
+  const order: Order = ((sortBy, orderBy) => {
+    orderBy = orderBy || Ordering.DESC // default to descending
+    if (!sortBy) return [[CampaignSortField.Created, orderBy]]
+    switch (sortBy) {
+      case CampaignSortField.Sent: {
+        return [[literal('"job_queue.sent_at"'), orderBy]]
+      }
+      case CampaignSortField.Created: {
+        return [[CampaignSortField.Created, orderBy]]
       }
     }
-    return orderArr
-  })()
+  })(sortBy, orderBy)
 
   const options: {
-    where: any
+    where: WhereOptions
     attributes: any
-    order: any
-    include: any
+    order: Order
+    include: Includeable[]
     subQuery: boolean
     distinct: boolean
     offset?: number
     limit?: number
-  } = {
-    where: {
-      [Op.and]: whereFilter,
-    },
-    attributes: [
-      'id',
-      'name',
-      'type',
-      'created_at',
-      'valid',
-      [literal('"cred_name" IS NOT NULL'), 'has_credential'],
-      'halted',
-      'protect',
-      [
-        literal(
-          // Campaigns with all messages sent and were sent more than maxAge days ago will be redacted.
-          `CASE WHEN Statistic.unsent = 0 ` +
-            `THEN DATE_PART('days', NOW() - MAX("job_queue"."updated_at") OVER ${campaignJobs}) > ${maxAge} ` +
-            `ELSE FALSE END`
-        ),
-        'redacted',
-      ],
-      'demo_message_limit',
-    ],
-    order: orderOpt,
-    // Set limit and offset at the end of the main query so that the window function will have access to the job_queue table
-    subQuery: false,
-    include: [
-      {
-        model: JobQueue,
-        attributes: [
-          'status',
-          'visible_at',
-          ['created_at', 'sent_at'],
-          ['updated_at', 'status_updated_at'],
+  } = ((campaignJobs, maxAge, where, order, offset, limit) => {
+    return {
+      where: {
+        [Op.and]: where,
+      },
+      attributes: [
+        'id',
+        'name',
+        'type',
+        'created_at',
+        'valid',
+        [literal('"cred_name" IS NOT NULL'), 'has_credential'],
+        'halted',
+        'protect',
+        [
+          literal(
+            // Campaigns with all messages sent and were sent more than maxAge days ago will be redacted.
+            `CASE WHEN Statistic.unsent = 0 ` +
+              `THEN DATE_PART('days', NOW() - MAX("job_queue"."updated_at") OVER ${campaignJobs}) > ${maxAge} ` +
+              `ELSE FALSE END`
+          ),
+          'redacted',
         ],
-      },
-      {
-        model: Statistic,
-        attributes: [],
-      },
-    ],
-    distinct: true,
-  }
-  if (offset) {
-    options.offset = +offset
-  }
-  if (limit) {
-    options.limit = +limit
-  }
+        'demo_message_limit',
+      ],
+      order,
+      // Set limit and offset at the end of the main query so that the window function will have access to the job_queue table
+      subQuery: false,
+      include: [
+        {
+          model: JobQueue,
+          attributes: [
+            'status',
+            ['created_at', 'sent_at'],
+            ['updated_at', 'status_updated_at'],
+          ],
+        },
+        {
+          model: Statistic,
+          attributes: [],
+        },
+      ],
+      distinct: true,
+      offset: +offset,
+      limit: +limit,
+    }
+  })(campaignJobs, maxAge, where, order, offset, limit)
 
   return Campaign.findAndCountAll(options)
 }
@@ -421,7 +402,6 @@ const setInvalid = (campaignId: number): Promise<[number]> => {
 
 /**
  * Helper method to set a campaign to valid
- * @param campaignId
  */
 const setValid = (
   campaignId: number,

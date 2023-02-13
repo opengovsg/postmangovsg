@@ -9,7 +9,7 @@ import {
   JobStatus,
   Ordering,
   CampaignSortField,
-  Status,
+  CampaignStatus,
 } from '@core/constants'
 
 const app = initialiseServer(true)
@@ -202,7 +202,7 @@ describe('GET /campaigns', () => {
 
     const resDraft = await request(app)
       .get('/campaigns')
-      .query({ status: Status.Draft })
+      .query({ status: CampaignStatus.Draft })
     expect(resDraft.status).toBe(200)
     expect(resDraft.body).toEqual({
       total_count: 1,
@@ -213,7 +213,7 @@ describe('GET /campaigns', () => {
 
     const resSent = await request(app)
       .get('/campaigns')
-      .query({ status: Status.Sent })
+      .query({ status: CampaignStatus.Sent })
     expect(resSent.status).toBe(200)
     expect(resSent.body).toEqual({
       total_count: 1,
