@@ -4,7 +4,7 @@ import {
   CampaignSortField,
   ChannelType,
   Ordering,
-  Status,
+  CampaignStatus,
 } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
@@ -130,7 +130,7 @@ const createCampaign = async (
 const listCampaigns = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction // todo: remove the error handling?
 ): Promise<Response | void> => {
   const { offset, limit, type, status, name, sort_by, order_by } = req.query
   const userId = req.session?.user?.id
@@ -141,7 +141,7 @@ const listCampaigns = async (
       offset: +(offset as string),
       limit: +(limit as string),
       type: type as ChannelType,
-      status: status as Status,
+      status: status as CampaignStatus,
       name: name as string,
       sortBy: sort_by as CampaignSortField,
       orderBy: order_by as Ordering,
@@ -152,7 +152,7 @@ const listCampaigns = async (
       total_count: count,
     })
   } catch (err) {
-    return next(err)
+    return next(err) // todo: remove the error handling?
   }
 }
 
