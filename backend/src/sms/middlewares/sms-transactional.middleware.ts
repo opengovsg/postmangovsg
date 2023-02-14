@@ -4,6 +4,11 @@ import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from '@shared/templating'
 import { InvalidRecipientError, RateLimitError } from '@core/errors'
 import { SmsMessageTransactional } from '@sms/models/sms-message-transactional'
+import {
+  Ordering,
+  TimestampFilter,
+  TransactionalEmailSortField,
+} from '@core/constants'
 
 const logger = loggerWithLabel(module)
 
@@ -94,8 +99,28 @@ async function sendMessage(
   }
 }
 
-async function listMessages(): Promise<void> {
-  return
+async function listMessages(req: Request, res: Response): Promise<void> {
+  const { limit, offset, created_at, sort_by } = req.query
+
+  const userId: string = req.session?.user?.id.toString() // id is number in session; convert to string for tests to pass (weird)
+  const filter = created_at ? { createdAt: created_at } : undefined
+  const sortBy = sort_by?.toString().replace(/[+-]/, '')
+  const orderBy = sort_by?.toString().includes('+')
+    ? Ordering.ASC
+    : Ordering.DESC // default to descending order even without '-' prefix
+
+  const { hasMore, messages } = await SmsTransactionalService.listMessages({
+    userId,
+    limit: +(limit as string),
+    offset: +(offset as string),
+    sortBy: sortBy as TransactionalEmailSortField,
+    orderBy,
+    filterByTimestamp: filter as TimestampFilter,
+  })
+  res.status(200).json({
+    has_more: hasMore,
+    data: messages.map(convertMessageModelToResponse),
+  })
 }
 
 async function getById(req: Request, res: Response): Promise<void> {
