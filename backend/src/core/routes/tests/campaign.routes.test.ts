@@ -82,6 +82,97 @@ describe('GET /campaigns', () => {
     })
   })
 
+  test('List campaign with offset exceeding number of campaigns', async () => {
+    for (let i = 1; i <= 3; i++) {
+      await Campaign.create({
+        name: `campaign-${i}`,
+        userId: 1,
+        type: ChannelType.SMS,
+        valid: false,
+        protect: false,
+      } as Campaign)
+    }
+
+    const res = await request(app)
+      .get('/campaigns')
+      .query({ limit: 1, offset: 4 })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({
+      total_count: 3,
+      campaigns: [],
+    })
+  })
+
+  test('List campaign with limit exceeding number of campaigns', async () => {
+    for (let i = 1; i <= 3; i++) {
+      await Campaign.create({
+        name: `campaign-${i}`,
+        userId: 1,
+        type: ChannelType.SMS,
+        valid: false,
+        protect: false,
+      } as Campaign)
+    }
+
+    const res = await request(app)
+      .get('/campaigns')
+      .query({ limit: 4, offset: 0 })
+    expect(res.status).toBe(200)
+    expect(res.body.total_count).toEqual(3)
+    for (let i = 1; i <= 3; i++) {
+      expect(res.body.campaigns[i - 1].name).toEqual(
+        `campaign-${3 - i + 1}` // default orderBy is desc
+      )
+    }
+  })
+
+  test('List campaign with offset and default limit', async () => {
+    for (let i = 1; i <= 15; i++) {
+      await Campaign.create({
+        name: `campaign-${i}`,
+        userId: 1,
+        type: ChannelType.SMS,
+        valid: false,
+        protect: false,
+      } as Campaign)
+    }
+
+    const res = await request(app).get('/campaigns').query({ offset: 2 })
+    expect(res.status).toBe(200)
+    expect(res.body.total_count).toEqual(15)
+    for (let i = 1; i <= 10; i++) {
+      expect(res.body.campaigns[i - 1].name).toEqual(
+        `campaign-${15 - (i + 1)}` // default orderBy is desc
+      )
+    }
+  })
+
+  test('List campaign with offset and type filter', async () => {
+    for (let i = 1; i <= 10; i++) {
+      await Campaign.create({
+        name: `campaign-${i}`,
+        userId: 1,
+        type: i > 5 ? ChannelType.Email : ChannelType.SMS,
+        valid: false,
+        protect: false,
+      } as Campaign)
+    }
+
+    const res = await request(app)
+      .get('/campaigns')
+      .query({ offset: 4, type: ChannelType.Email })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({
+      total_count: 5,
+      campaigns: expect.arrayContaining([
+        expect.objectContaining({
+          name: `campaign-6`,
+          type: ChannelType.Email,
+        }),
+      ]),
+    })
+  })
+
   test('List campaigns order by created at', async () => {
     for (let i = 1; i <= 3; i++) {
       await Campaign.create({
