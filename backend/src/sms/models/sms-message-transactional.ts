@@ -7,6 +7,7 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
+import { MessageStatus } from '@core/constants'
 
 @Table({
   tableName: 'sms_messages_transactional',
@@ -38,4 +39,13 @@ export class SmsMessageTransactional extends Model<SmsMessageTransactional> {
 
   @Column({ type: DataType.STRING, allowNull: true })
   messageId: string | null
+
+  @Column({
+    type: DataType.ENUM(...Object.values(MessageStatus)),
+    allowNull: false,
+  })
+  status: MessageStatus
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  errorCode: string | null
 }

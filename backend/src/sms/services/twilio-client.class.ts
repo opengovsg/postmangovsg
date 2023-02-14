@@ -1,6 +1,6 @@
 import twilio from 'twilio'
 import { TwilioCredentials } from '@sms/interfaces'
-import { RateLimitError, InvalidRecipientError } from '@core/errors'
+import { InvalidRecipientError, RateLimitError } from '@core/errors'
 
 // find details on API here: https://www.twilio.com/docs/sms/api/pricing
 interface MessageCountryPricing {
@@ -31,6 +31,7 @@ export default class TwilioClient {
     this.messagingServiceSid = messagingServiceSid
   }
 
+  // refactor to use worker class with callback url
   async send(
     recipient: string,
     message: string,
