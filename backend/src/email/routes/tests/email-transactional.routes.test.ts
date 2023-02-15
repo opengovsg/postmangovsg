@@ -6,7 +6,10 @@ import {
   FileExtensionService,
   UNSUPPORTED_FILE_TYPE_ERROR_CODE,
 } from '@core/services'
-import { RATE_LIMIT_ERROR_MESSAGE } from '@email/middlewares'
+import {
+  RATE_LIMIT_ERROR_MESSAGE,
+  TRANSACTIONAL_EMAIL_WINDOW,
+} from '@email/middlewares'
 import {
   EmailFromAddress,
   EmailMessageTransactional,
@@ -38,6 +41,7 @@ beforeEach(async () => {
   user = await User.create({
     id: 1,
     email: userEmail,
+    rateLimit: 1, // for ease of testing, so second API call within a second would fail
   } as User)
   apiKey = await user.regenerateAndSaveApiKey()
 })
@@ -859,7 +863,9 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
 
     // Third request passes after 1s
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) =>
+      setTimeout(resolve, TRANSACTIONAL_EMAIL_WINDOW * 1000)
+    )
     res = await send()
     expect(res.status).toBe(201)
     expect(mockSendEmail).toBeCalledTimes(1)
