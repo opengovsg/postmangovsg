@@ -108,7 +108,6 @@ export const InitEmailTransactionalMiddleware = (
         from,
         reply_to: replyTo,
       },
-      messageId: null,
       attachmentsMetadata,
       status: TransactionalEmailMessageStatus.Unsent,
       errorCode: null,

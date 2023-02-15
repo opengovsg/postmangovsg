@@ -5,7 +5,7 @@ import { hydrateTemplate } from './validate-csv.service'
 
 /**
  * This function should hash the password with salt in url
- * Use messageId and hashpassword to fetch encrypted message
+ * Use id and hashpassword to fetch encrypted message
  * Then decrypt with password
  * Decrypted html is sanitized again in case it was bypassed during encryption
  * @param id

@@ -90,6 +90,7 @@ export default class MailClient {
         if (err !== null) {
           reject(new Error(`${err}`))
         } else {
+          // not sure what the messageId here refers to
           resolve(info.messageId)
         }
       })

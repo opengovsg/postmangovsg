@@ -32,9 +32,6 @@ export class EmailOp extends Model<EmailOp> {
   params!: object
 
   @Column(DataType.STRING)
-  messageId?: string
-
-  @Column(DataType.STRING)
   errorCode?: string
 
   @Column(DataType.STRING)

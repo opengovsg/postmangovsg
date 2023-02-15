@@ -131,6 +131,7 @@ const shouldBlacklist = ({
   return isHardBounced || isNegativelyComplained
 }
 
+// get rid of the anys
 const parseNotificationAndEvent = async (
   type: SesEventType,
   message: any,
@@ -227,14 +228,16 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   // relevant email addresses before everything else
   await blacklistIfNeeded(message)
 
+  // primary key
   const id = smtpApiHeader?.unique_args?.message_id
   const isTransactional = smtpApiHeader?.isTransactional
+  // we are not using this at all
   const messageId = message?.mail?.commonHeaders?.messageId
   const logMeta = { messageId, action: 'parseRecord' }
   const type = message?.notificationType || message?.eventType
 
   if (id && type) {
-    const metadata = { id, timestamp: record.Timestamp, messageId: messageId }
+    const metadata = { id, timestamp: record.Timestamp, messageId }
     logger.info({
       message: 'Update for notification/event type',
       type,

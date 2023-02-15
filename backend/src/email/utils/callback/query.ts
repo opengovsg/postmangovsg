@@ -76,8 +76,9 @@ export const updateMessageWithSuccess = async (
     metadata,
     action: 'updateMessageWithSuccess',
   })
+  // here id is extracted
   const { timestamp, id } = metadata
-  // Since notifications for the same messageId can be interleaved, we only update that message if this notification is newer than the previous.
+  // Since notifications for the same id can be interleaved, we only update that message if this notification is newer than the previous.
   // Should not overwrite a READ status for the message
   const [, result] = await EmailMessage.update(
     {
@@ -87,6 +88,7 @@ export const updateMessageWithSuccess = async (
     {
       where: {
         [Op.and]: [
+          // used here
           { id },
           {
             [Op.or]: [
@@ -174,8 +176,8 @@ export const haltCampaignIfThresholdExceeded = async (
       exceedsHaltPercentage,
       action: 'haltCampaignIfThresholdExceeded',
     })
-    /* With default MIN_HALT_NUMBER=10, MIN_HALT_PERCENTAGE=0.1, 
-      it means that 
+    /* With default MIN_HALT_NUMBER=10, MIN_HALT_PERCENTAGE=0.1,
+      it means that
       - if there were 11 messages sent thus far, and 11 invalid recipients, the campaign would halt immediately since 11/11 > MIN_HALT_PERCENTAGE
       - if there were 110 messages sent thus far, and 11 invalid recipients, the campaign would not halt, since 11/110 <= MIN_HALT_PERCENTAGE
       */

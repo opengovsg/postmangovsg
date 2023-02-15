@@ -139,6 +139,7 @@ class Email {
         showMasthead,
       })
 
+      // refactor to remove messageId → this is where the info is added to the database
       const messageId = await this.mailService.sendMail({
         from: from || config.get('mailFrom'),
         recipients: [recipient],

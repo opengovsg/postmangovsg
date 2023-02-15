@@ -105,6 +105,7 @@ async function sendMessage({
     message: 'Sending transactional email',
     action: 'sendMessage',
   })
+  // receive from SES, but not saving to DB
   const messageId = await EmailService.sendEmail(mailToSend, {
     extraSmtpHeaders: { isTransactional: true },
   })
