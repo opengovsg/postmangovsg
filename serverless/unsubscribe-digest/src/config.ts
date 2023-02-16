@@ -143,7 +143,8 @@ const config = convict({
   },
   guideUrl: {
     doc: 'URL to unsubscribe guide',
-    default: 'https://guide.postman.gov.sg',
+    default:
+      'https://guide.postman.gov.sg/quick-start/email/weekly-digest-of-unsubscription',
     env: 'UNSUBSCRIBE_GUIDE_URL',
     format: 'required-string',
   },

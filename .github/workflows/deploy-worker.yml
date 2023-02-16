@@ -68,7 +68,7 @@ jobs:
       - name: Replace id of secret to be used for retrieving env vars from secrets manager
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
-          SECRET_ID: ${{ env.SECRET_ID }}
+          SECRET_ID: ${{ vars.SECRET_ID }}
         run: |
           cd $DIRECTORY
           cp -R ../shared ./
@@ -87,7 +87,7 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
-          ECR_REPOSITORY: 454894717801.dkr.ecr.ap-southeast-1.amazonaws.com/postmangovsg
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
         run: |
           cd $DIRECTORY
           docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
@@ -114,10 +114,10 @@ jobs:
       - name: (Sending) Download task definition
         id: get-task-definition-sending
         env:
-          TASK_DEFINITION: ${{ env.WORKER_TASK_DEFINITION_SENDING }}
+          TASK_DEFINITION: ${{ vars.WORKER_TASK_DEFINITION_SENDING }}
           OUT: task-definition-sending.json
-          SERVICE: ${{ env.WORKER_SERVICE_SENDING }}
-          CLUSTER: ${{ env.WORKER_CLUSTER }}
+          SERVICE: ${{ vars.WORKER_SERVICE_SENDING }}
+          CLUSTER: ${{ vars.WORKER_CLUSTER }}
         run: |
           aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > $OUT
           echo "task-definition=$OUT" >> $GITHUB_OUTPUT
@@ -136,8 +136,8 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def-sending.outputs.task-definition }}
-          service: ${{ env.WORKER_SERVICE_SENDING }}
-          cluster: ${{ env.WORKER_CLUSTER }}
+          service: ${{ vars.WORKER_SERVICE_SENDING }}
+          cluster: ${{ vars.WORKER_CLUSTER }}
           wait-for-service-stability: true
 
   deploy_logging:
@@ -158,10 +158,10 @@ jobs:
       - name: (Logging) Download task definition
         id: get-task-definition-logging
         env:
-          TASK_DEFINITION: ${{ env.WORKER_TASK_DEFINITION_LOGGING }}
+          TASK_DEFINITION: ${{ vars.WORKER_TASK_DEFINITION_LOGGING }}
           OUT: task-definition-logging.json
-          SERVICE: ${{ env.WORKER_SERVICE_LOGGING }}
-          CLUSTER: ${{ env.WORKER_CLUSTER }}
+          SERVICE: ${{ vars.WORKER_SERVICE_LOGGING }}
+          CLUSTER: ${{ vars.WORKER_CLUSTER }}
         run: |
           aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > $OUT
           echo "task-definition=$OUT" >> $GITHUB_OUTPUT
@@ -180,6 +180,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def-logging.outputs.task-definition }}
-          service: ${{ env.WORKER_SERVICE_LOGGING }}
-          cluster: ${{ env.WORKER_CLUSTER }}
+          service: ${{ vars.WORKER_SERVICE_LOGGING }}
+          cluster: ${{ vars.WORKER_CLUSTER }}
           wait-for-service-stability: true

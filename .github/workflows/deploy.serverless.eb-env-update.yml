@@ -102,7 +102,7 @@ jobs:
           TAG: "github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
           # Update env vars
           NODE_ENV: "${{ needs.set_environment.outputs.current_env }}"
-          SECRET_ID: "${{ env.SECRET_ID }}"
+          SECRET_ID: "${{ vars.SECRET_ID }}"
           SENTRY_DSN: "${{ secrets.SERVERLESS_SENTRY_DSN }}"
           # Update environment variables in the command
         run: |

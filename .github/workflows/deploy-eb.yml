@@ -85,7 +85,7 @@ jobs:
           node-version: "16"
       - name: Before deploy
         env:
-          SECRET_ID: ${{ env.SECRET_ID }}
+          SECRET_ID: ${{ vars.SECRET_ID }}
           DD_API_KEY: ${{ secrets.DD_API_KEY }}
         run: |
           cd $DIRECTORY
@@ -98,7 +98,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
+          aws-region: ${{ vars.AWS_DEFAULT_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -106,7 +106,7 @@ jobs:
 
       - name: Build, tag, and push image to Amazon ECR
         env:
-          ECR_REPOSITORY: 454894717801.dkr.ecr.ap-southeast-1.amazonaws.com/postmangovsg
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
         run: |
           cd $DIRECTORY
           sed -i -e "s|@TAG|$IMAGE_TAG|g" Dockerrun.aws.json
@@ -152,12 +152,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
+          aws-region: ${{ vars.AWS_DEFAULT_REGION }}
       - name: Generate revert commands
         id: generate-revert-command
         env:
           APP_NAME: postmangovsg
-          EB_ENV_NAME: ${{ env.EB_BACKEND_ENV_NAME }}
+          EB_ENV_NAME: ${{ vars.EB_BACKEND_ENV_NAME }}
         run: |
           CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
           echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
@@ -167,7 +167,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: postmangovsg
-          environment_name: ${{ env.EB_BACKEND_ENV_NAME }}
+          environment_name: ${{ vars.EB_BACKEND_ENV_NAME }}
           version_label: ${{ needs.build_application.outputs.image_tag }}
           region: ap-southeast-1
           wait_for_environment_recovery: 480 # 8 minutes
@@ -185,12 +185,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
+          aws-region: ${{ vars.AWS_DEFAULT_REGION }}
       - name: Generate revert commands
         id: generate-revert-command
         env:
           APP_NAME: postmangovsg
-          EB_ENV_NAME: ${{ env.EB_CALLBACK_ENV_NAME }}
+          EB_ENV_NAME: ${{ vars.EB_CALLBACK_ENV_NAME }}
         run: |
           CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
           echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
@@ -200,7 +200,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: postmangovsg
-          environment_name: ${{ env.EB_CALLBACK_ENV_NAME }}
+          environment_name: ${{ vars.EB_CALLBACK_ENV_NAME }}
           version_label: ${{ needs.build_application.outputs.image_tag }}
           region: ap-southeast-1
           wait_for_environment_recovery: 480 # 8 minutes
