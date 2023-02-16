@@ -107,6 +107,8 @@ jobs:
     needs: [set_environment, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
+    env:
+      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       revert_cmd: ${{ steps.get-task-definition-sending.outputs.revert_cmd }}
       test_value: ${{ steps.get-task-definition-sending.outputs.test_value }}
@@ -164,6 +166,8 @@ jobs:
     needs: [set_environment, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
+    env:
+      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       revert_cmd: ${{ steps.get-task-definition-logging.outputs.revert_cmd }}
     runs-on: ubuntu-latest

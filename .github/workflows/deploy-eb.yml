@@ -143,6 +143,8 @@ jobs:
     needs: [set_environment, lint-test, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
+    env:
+      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     runs-on: ubuntu-latest
@@ -178,12 +180,14 @@ jobs:
           environment_name: ${{ env.EB_ENV_NAME }}
           version_label: ${{ needs.build_application.outputs.image_tag }}
           region: ap-southeast-1
-          wait_for_environment_recovery: 300 # 5 minutes
+          wait_for_environment_recovery: 480 # 8 minutes
 
   deploy_callback:
     needs: [set_environment, lint-test, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
+    env:
+      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     runs-on: ubuntu-latest
@@ -219,4 +223,4 @@ jobs:
           environment_name: ${{ env.EB_ENV_NAME }}
           version_label: ${{ needs.build_application.outputs.image_tag }}
           region: ap-southeast-1
-          wait_for_environment_recovery: 300 # 5 minutes
+          wait_for_environment_recovery: 480 # 8 minutes
