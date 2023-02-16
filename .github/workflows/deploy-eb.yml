@@ -74,7 +74,7 @@ jobs:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
       IMAGE_TAG: "github-actions-backend-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
-      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
+      BRANCH: ${{ needs.set_environment.outputs.current_env }}
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
@@ -112,7 +112,7 @@ jobs:
           sed -i -e "s|@TAG|$IMAGE_TAG|g" Dockerrun.aws.json
           sed -i -e "s|@REPO|$ECR_REPOSITORY|g" Dockerrun.aws.json 
           docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$CURRENT_ENV
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$BRANCH
           docker push -a $ECR_REPOSITORY
           zip -r "$IMAGE_TAG.zip" .ebextensions .platform Dockerrun.aws.json
 
@@ -143,20 +143,10 @@ jobs:
     needs: [set_environment, lint-test, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
-    env:
-      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment variables
-        run: |
-          if [$CURRENT_ENV == 'production']
-          then
-            echo "EB_ENV_NAME=postmangovsg-production-amz2" >> $GITHUB_ENV
-          else
-            echo "EB_ENV_NAME=postmangovsg-staging-amz2" >> $GITHUB_ENV
-          fi
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -167,7 +157,7 @@ jobs:
         id: generate-revert-command
         env:
           APP_NAME: postmangovsg
-          EB_ENV_NAME: ${{ env.EB_ENV_NAME }}
+          EB_ENV_NAME: ${{ env.EB_BACKEND_ENV_NAME }}
         run: |
           CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
           echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
@@ -177,7 +167,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: postmangovsg
-          environment_name: ${{ env.EB_ENV_NAME }}
+          environment_name: ${{ env.EB_BACKEND_ENV_NAME }}
           version_label: ${{ needs.build_application.outputs.image_tag }}
           region: ap-southeast-1
           wait_for_environment_recovery: 480 # 8 minutes
@@ -186,20 +176,10 @@ jobs:
     needs: [set_environment, lint-test, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
-    env:
-      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment variables
-        run: |
-          if [$CURRENT_ENV == 'production']
-          then
-            echo "EB_ENV_NAME=postmangovsg-production-amz2-callback" >> $GITHUB_ENV
-          else
-            echo "EB_ENV_NAME=postmangovsg-staging-amz2-callback" >> $GITHUB_ENV
-          fi
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -210,7 +190,7 @@ jobs:
         id: generate-revert-command
         env:
           APP_NAME: postmangovsg
-          EB_ENV_NAME: ${{ env.EB_ENV_NAME }}
+          EB_ENV_NAME: ${{ env.EB_CALLBACK_ENV_NAME }}
         run: |
           CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
           echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
@@ -220,7 +200,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: postmangovsg
-          environment_name: ${{ env.EB_ENV_NAME }}
+          environment_name: ${{ env.EB_CALLBACK_ENV_NAME }}
           version_label: ${{ needs.build_application.outputs.image_tag }}
           region: ap-southeast-1
           wait_for_environment_recovery: 480 # 8 minutes

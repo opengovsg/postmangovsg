@@ -52,19 +52,11 @@ jobs:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
       IMAGE_TAG: "github-actions-worker-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
-      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
+      BRANCH: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       image: ${{ steps.build-image.outputs.image }}
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment variables
-        run: |
-          if [$CURRENT_ENV == 'production']
-          then
-            echo "SECRET_ID=env/eb/postmangovsg-production-amz2" >> $GITHUB_ENV
-          else
-            echo "SECRET_ID=env/eb/postmangovsg-staging-amz2" >> $GITHUB_ENV
-          fi
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
         with:
@@ -99,7 +91,7 @@ jobs:
         run: |
           cd $DIRECTORY
           docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$CURRENT_ENV
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$BRANCH
           docker push -a $ECR_REPOSITORY
           echo "image=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
@@ -107,25 +99,11 @@ jobs:
     needs: [set_environment, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
-    env:
-      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       revert_cmd: ${{ steps.get-task-definition-sending.outputs.revert_cmd }}
       test_value: ${{ steps.get-task-definition-sending.outputs.test_value }}
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment variables
-        run: |
-          if [$CURRENT_ENV == 'production']
-          then
-            echo "WORKER_TASK_DEFINITION_SENDING=postmangovsg-production-sending-06f404f5" >> $GITHUB_ENV
-            echo "WORKER_SERVICE_SENDING=prod-sending" >> $GITHUB_ENV
-          else
-            echo "WORKER_TASK_DEFINITION_SENDING=postmangovsg-staging-sending-39eb9204" >> $GITHUB_ENV
-            echo "WORKER_SERVICE_SENDING=staging-sending" >> $GITHUB_ENV
-          fi
-          echo "WORKER_CLUSTER=postmangovsg-workers" >> $GITHUB_ENV
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -166,24 +144,10 @@ jobs:
     needs: [set_environment, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
-    env:
-      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     outputs:
       revert_cmd: ${{ steps.get-task-definition-logging.outputs.revert_cmd }}
     runs-on: ubuntu-latest
     steps:
-      - name: Set environment variables
-        run: |
-          if [$CURRENT_ENV == 'production']
-          then
-            echo "WORKER_TASK_DEFINITION_LOGGING=postmangovsg-production-logging-06f404f5" >> $GITHUB_ENV
-            echo "WORKER_SERVICE_LOGGING=prod-logging" >> $GITHUB_ENV
-          else
-            echo "WORKER_TASK_DEFINITION_LOGGING=postmangovsg-staging-logging-39eb9204" >> $GITHUB_ENV
-            echo "WORKER_SERVICE_LOGGING=staging-logging" >> $GITHUB_ENV
-          fi
-          echo "WORKER_CLUSTER=postmangovsg-workers" >> $GITHUB_ENV
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
