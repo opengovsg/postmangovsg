@@ -1,5 +1,13 @@
 name: Deploy backend to AWS Elastic Beanstalk
-on: workflow_call
+on:
+  workflow_call:
+    outputs:
+      revert_command_backend:
+        description: "Command to revert backend deployment"
+        value: ${{ jobs.deploy_backend.outputs.revert_cmd }}
+      revert_command_callback:
+        description: "Command to revert callback server deployment"
+        value: ${{ jobs.deploy_callback.outputs.revert_cmd }}
 env:
   # Update this common config
   DIRECTORY: backend
@@ -14,9 +22,9 @@ jobs:
         run: |
           echo "Running on branch ${{ github.ref }}"
           if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            echo "::set-output name=current_env::production"
+            echo "current_env=production" >> $GITHUB_OUTPUT
           else
-             echo "::set-output name=current_env::staging"
+             echo "current_env=staging" >> $GITHUB_OUTPUT
           fi
 
   lint-test:
@@ -51,7 +59,7 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
-          cd shared 
+          cd shared
           npm ci
           cd ..
           cd $DIRECTORY
@@ -66,7 +74,7 @@ jobs:
       name: ${{ needs.set_environment.outputs.current_env }}
     env:
       IMAGE_TAG: "github-actions-backend-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
-      BRANCH: ${{ needs.set_environment.outputs.current_env }}
+      CURRENT_ENV: ${{ needs.set_environment.outputs.current_env }}
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
@@ -90,7 +98,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+          aws-region: ap-southeast-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -98,27 +106,27 @@ jobs:
 
       - name: Build, tag, and push image to Amazon ECR
         env:
-          ECR_REPOSITORY: ${{ secrets.REPO }}
+          ECR_REPOSITORY: 454894717801.dkr.ecr.ap-southeast-1.amazonaws.com/postmangovsg
         run: |
           cd $DIRECTORY
           sed -i -e "s|@TAG|$IMAGE_TAG|g" Dockerrun.aws.json
           sed -i -e "s|@REPO|$ECR_REPOSITORY|g" Dockerrun.aws.json 
           docker build -f Dockerfile -t $ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$BRANCH
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REPOSITORY:$CURRENT_ENV
           docker push -a $ECR_REPOSITORY
           zip -r "$IMAGE_TAG.zip" .ebextensions .platform Dockerrun.aws.json
 
       - name: Copy to S3
         env:
-          BUCKET_NAME: ${{ secrets.EB_BUCKET_NAME }}
+          BUCKET_NAME: postmangovsg-elasticbeanstalk-appversion
         run: |
           cd backend
           aws s3 cp $IMAGE_TAG.zip s3://$BUCKET_NAME/$IMAGE_TAG.zip
 
       - name: Create application version
         env:
-          BUCKET_NAME: ${{ secrets.EB_BUCKET_NAME }}
-          APP_NAME: ${{ secrets.EB_APP_NAME }}
+          BUCKET_NAME: postmangovsg-elasticbeanstalk-appversion
+          APP_NAME: postmangovsg
         run: |
           cd backend
           TRUNCATED_DESC=$(echo "${{github.event.head_commit.message}}" | head -n 1 | cut -b1-180)
@@ -129,38 +137,86 @@ jobs:
 
       - name: Set image tag
         id: set-image-tag
-        run: echo "::set-output name=image_tag::$IMAGE_TAG"
+        run: echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   deploy_backend:
     needs: [set_environment, lint-test, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
+    outputs:
+      revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     runs-on: ubuntu-latest
     steps:
+      - name: Set environment variables
+        run: |
+          if [$CURRENT_ENV == 'production']
+          then
+            echo "EB_ENV_NAME=postmangovsg-production-amz2" >> $GITHUB_ENV
+          else
+            echo "EB_ENV_NAME=postmangovsg-staging-amz2" >> $GITHUB_ENV
+          fi
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-1
+      - name: Generate revert commands
+        id: generate-revert-command
+        env:
+          APP_NAME: postmangovsg
+          EB_ENV_NAME: ${{ env.EB_ENV_NAME }}
+        run: |
+          CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
+          echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v20
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: ${{ secrets.EB_APP_NAME }}
-          environment_name: ${{ secrets.EB_ENV_NAME }}
+          application_name: postmangovsg
+          environment_name: ${{ env.EB_ENV_NAME }}
           version_label: ${{ needs.build_application.outputs.image_tag }}
-          region: ${{ secrets.AWS_DEFAULT_REGION }}
+          region: ap-southeast-1
           wait_for_environment_recovery: 300 # 5 minutes
 
   deploy_callback:
     needs: [set_environment, lint-test, build_application]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
+    outputs:
+      revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     runs-on: ubuntu-latest
     steps:
+      - name: Set environment variables
+        run: |
+          if [$CURRENT_ENV == 'production']
+          then
+            echo "EB_ENV_NAME=postmangovsg-production-amz2-callback" >> $GITHUB_ENV
+          else
+            echo "EB_ENV_NAME=postmangovsg-staging-amz2-callback" >> $GITHUB_ENV
+          fi
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-1
+      - name: Generate revert commands
+        id: generate-revert-command
+        env:
+          APP_NAME: postmangovsg
+          EB_ENV_NAME: ${{ env.EB_ENV_NAME }}
+        run: |
+          CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
+          echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v20
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: ${{ secrets.EB_APP_NAME }}
-          environment_name: ${{ secrets.EB_ENV_NAME_2 }}
+          application_name: postmangovsg
+          environment_name: ${{ env.EB_ENV_NAME }}
           version_label: ${{ needs.build_application.outputs.image_tag }}
-          region: ${{ secrets.AWS_DEFAULT_REGION }}
+          region: ap-southeast-1
           wait_for_environment_recovery: 300 # 5 minutes
