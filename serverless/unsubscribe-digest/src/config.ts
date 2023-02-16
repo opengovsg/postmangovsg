@@ -82,15 +82,13 @@ const config = convict({
         format: 'int',
       },
       acquire: {
-        doc:
-          'Number of milliseconds to try getting a connection from the pool before throwing error',
+        doc: 'Number of milliseconds to try getting a connection from the pool before throwing error',
         default: 600000,
         env: 'SEQUELIZE_POOL_ACQUIRE_IN_MILLISECONDS',
         format: 'int',
       },
       connectionTimeoutMillis: {
-        doc:
-          'Number of milliseconds to wait before timing out when connecting a new client',
+        doc: 'Number of milliseconds to wait before timing out when connecting a new client',
         default: 30000,
         env: 'SEQUELIZE_POOL_CONNECTION_TIMEOUT',
         format: 'int',
@@ -145,7 +143,7 @@ const config = convict({
   },
   guideUrl: {
     doc: 'URL to unsubscribe guide',
-    default: '',
+    default: 'https://guide.postman.gov.sg',
     env: 'UNSUBSCRIBE_GUIDE_URL',
     format: 'required-string',
   },

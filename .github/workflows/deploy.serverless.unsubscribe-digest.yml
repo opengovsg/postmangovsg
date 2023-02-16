@@ -118,7 +118,6 @@ jobs:
           SES_PASS: "${{ secrets.SES_PASS }}"
           SES_USER: "${{ secrets.SES_USER }}"
           SES_PORT: "${{ secrets.SES_PORT }}"
-          UNSUBSCRIBE_GUIDE_URL: "${{ secrets.UNSUBSCRIBE_GUIDE_URL }}"
           EMAIL_CALLBACK_HASH_SECRET: "${{ secrets.EMAIL_CALLBACK_HASH_SECRET }}"
           # Update environment variables in the command
         run: |

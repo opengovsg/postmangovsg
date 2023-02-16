@@ -85,7 +85,7 @@ jobs:
           node-version: "16"
       - name: Before deploy
         env:
-          SECRET_ID: ${{ secrets.SECRET_ID }}
+          SECRET_ID: ${{ env.SECRET_ID }}
           DD_API_KEY: ${{ secrets.DD_API_KEY }}
         run: |
           cd $DIRECTORY
