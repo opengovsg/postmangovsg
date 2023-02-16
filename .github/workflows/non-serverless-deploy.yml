@@ -176,7 +176,7 @@ jobs:
           update-ts: ${{ needs.slack-started.outputs.message_id }}
           payload: |
             {
-              "text": "${{ env.DEPLOY_ENV == 'production' && '<@postmangineers>' || '' }}",
+              "text": "${{ env.DEPLOY_ENV == 'production' && '<!subteam^S03JWLMTBTK|postmangineers>' || '' }}",
               "attachments": [
                 {
                   "color": "danger",
@@ -188,7 +188,7 @@ jobs:
                       },
                       {
                         "title": "Status",
-                        "value": "SUCCESSFUL",
+                        "value": "FAILED",
                         "short": true
                       },
                       {
