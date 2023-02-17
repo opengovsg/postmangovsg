@@ -11,7 +11,7 @@ import { Transaction } from 'sequelize/types'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
-  sendOtp(email: string, ipAddress: string): Promise<string | void>
+  sendOtp(email: string, ipAddress: string): Promise<boolean>
   verifyOtp(input: VerifyOtpInput): Promise<boolean>
   findOrCreateUser(email: string): Promise<User>
   findUser(id: number): Promise<User>
@@ -213,7 +213,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   const sendOtp = async (
     email: string,
     ipAddress: string
-  ): Promise<string | void> => {
+  ): Promise<boolean> => {
     const otp = generateOtp()
     const hashValue = await bcrypt.hash(otp, SALT_ROUNDS)
     const hashedOtp: HashedOtp = {

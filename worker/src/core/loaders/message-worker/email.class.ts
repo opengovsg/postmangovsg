@@ -139,21 +139,20 @@ class Email {
         showMasthead,
       })
 
-      // refactor to remove messageId → this is where the info is added to the database
-      const messageId = await this.mailService.sendMail({
+      await this.mailService.sendMail({
         from: from || config.get('mailFrom'),
         recipients: [recipient],
         subject: hydratedSubject,
         body: themedHTMLEmail,
-        referenceId: String(id),
+        messageId: String(id),
         unsubLink,
         bcc: params.bcc ? params.bcc.split(',') : undefined,
         ...(replyTo ? { replyTo } : {}),
       })
 
       await this.connection.query(
-        `UPDATE email_ops SET status='SENDING', delivered_at=clock_timestamp(), message_id=:messageId, updated_at=clock_timestamp() WHERE id=:id;`,
-        { replacements: { id, messageId }, type: QueryTypes.UPDATE }
+        `UPDATE email_ops SET status='SENDING', delivered_at=clock_timestamp(), updated_at=clock_timestamp() WHERE id=:id;`,
+        { replacements: { id }, type: QueryTypes.UPDATE }
       )
     } catch (error) {
       await this.connection.query(

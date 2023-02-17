@@ -13,13 +13,13 @@ import { addToBlacklist } from '@email/utils/callback/query'
 import config from '@core/config'
 import { compareSha256Hash } from '@shared/utils/crypto'
 import { EmailTransactionalService } from '@email/services/email-transactional.service'
-import { SesEventType } from '@email/interfaces/callback.interface'
+import { SesEventType, Metadata } from '@email/interfaces/callback.interface'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
 const certCache: { [key: string]: string } = {}
 type SesRecord = {
-  Message: string
+  Message: any
   MessageId: string
   Subject?: string
   Timestamp: string
@@ -135,11 +135,8 @@ const shouldBlacklist = ({
 const parseNotificationAndEvent = async (
   type: SesEventType,
   message: any,
-  metadata: any
+  metadata: Metadata
 ): Promise<void> => {
-  const messageId = message?.mail?.commonHeaders?.messageId
-  const logMeta = { messageId, action: 'parseNotification' }
-
   switch (type) {
     case SesEventType.Delivery:
       await updateDeliveredStatus(metadata)
@@ -166,8 +163,8 @@ const parseNotificationAndEvent = async (
     default:
       logger.warn({
         message: 'Unable to handle messages with this type',
+        action: 'parseNotification',
         type,
-        ...logMeta,
       })
       return
   }
@@ -229,22 +226,20 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   await blacklistIfNeeded(message)
 
   // primary key
-  const id = smtpApiHeader?.unique_args?.message_id
+  const messageId = smtpApiHeader?.unique_args?.message_id
   const isTransactional = smtpApiHeader?.isTransactional
-  // we are not using this at all
-  const messageId = message?.mail?.commonHeaders?.messageId
-  const logMeta = { messageId, action: 'parseRecord' }
   const type = message?.notificationType || message?.eventType
 
-  if (id && type) {
-    const metadata = { id, timestamp: record.Timestamp, messageId }
+  if (messageId && type) {
+    const metadata = { messageId, timestamp: record.Timestamp }
     logger.info({
       message: 'Update for notification/event type',
+      action: 'parseRecord',
+      messageId,
       type,
-      ...logMeta,
     })
     if (isTransactional) {
-      return EmailTransactionalService.handleStatusCallbacks(type, id, {
+      return EmailTransactionalService.handleStatusCallbacks(type, messageId, {
         timestamp: new Date(record.Timestamp),
         bounce: message.bounce,
         complaint: message.complaint,

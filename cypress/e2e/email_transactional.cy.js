@@ -54,7 +54,7 @@ describe('Transactional Email Test', () => {
 
       // Somehow if we send requests with formData body the response body won't
       // be automatically parsed as a JSON object
-      // rename this away from messageId to prevent confusion?
+
       const { id: messageId } = JSON.parse(
         String.fromCharCode.apply(null, new Uint8Array(response.body)),
       );

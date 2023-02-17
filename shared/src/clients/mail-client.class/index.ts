@@ -38,11 +38,8 @@ export default class MailClient {
     this.configSet = configSet
   }
 
-  public sendMail(
-    input: MailToSend,
-    option?: SendEmailOpts
-  ): Promise<string | void> {
-    return new Promise<string | void>((resolve, reject) => {
+  public sendMail(input: MailToSend, option?: SendEmailOpts): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
       const username = Math.random().toString(36).substring(2, 15) // random string
       const xSmtpHeader: { [key: string]: any } = {
         auth: {
@@ -51,11 +48,11 @@ export default class MailClient {
         },
         ...(option?.extraSmtpHeaders || {}), // guard against undefined extraSmtpHeaders value
       } as { [key: string]: any }
-      if (input.referenceId !== undefined) {
+      if (input.messageId !== undefined) {
         // Signature expected by Sendgrid
         // https://sendgrid.com/docs/for-developers/tracking-events/event/#unique-arguments
         xSmtpHeader['unique_args'] = {
-          message_id: input.referenceId,
+          message_id: input.messageId,
         }
       }
       let headers: any = {
@@ -86,12 +83,11 @@ export default class MailClient {
         bcc: input.bcc,
       }
 
-      this.mailer.sendMail(options, (err, info) => {
+      this.mailer.sendMail(options, (err, _info) => {
         if (err !== null) {
           reject(new Error(`${err}`))
         } else {
-          // not sure what the messageId here refers to
-          resolve(info.messageId)
+          resolve(true)
         }
       })
     })

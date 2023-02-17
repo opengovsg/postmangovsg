@@ -39,7 +39,7 @@ export const updateBouncedStatus = async (
     errorCode,
     errorSubType,
     timestamp: metadata.timestamp,
-    id: metadata.id,
+    messageId: metadata.messageId,
   })
   await haltCampaignIfThresholdExceeded(campaignId)
 }
@@ -60,7 +60,7 @@ export const updateComplaintStatus = async (
       errorCode,
       errorSubType,
       timestamp: metadata.timestamp,
-      id: metadata.id,
+      messageId: metadata.messageId,
     })
     await haltCampaignIfThresholdExceeded(campaignId)
   }
