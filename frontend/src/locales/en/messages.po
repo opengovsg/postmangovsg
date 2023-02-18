@@ -29,11 +29,11 @@ msgstr ""
 #~ msgid "E.g. Ministry of Health"
 #~ msgstr "E.g. Ministry of Health"
 
-#: components/login/login-input/LoginInput.tsx:88
+#: components/login/login-input/LoginInput.tsx:126
 msgid "Enter OTP"
 msgstr "Enter OTP"
 
-#: components/login/login-input/LoginInput.tsx:88
+#: components/login/login-input/LoginInput.tsx:118
 msgid "Get OTP"
 msgstr "Get OTP"
 
@@ -41,39 +41,39 @@ msgstr "Get OTP"
 #~ msgid "I'd rather stay"
 #~ msgstr "I'd rather stay"
 
-#: components/login/login-input/LoginInput.tsx:81
+#: components/login/login-input/LoginInput.tsx:93
 msgid "One-Time Password"
 msgstr "One-Time Password"
 
-#: components/unsubscribe/Unsubscribe.tsx:132
+#: components/unsubscribe/Unsubscribe.tsx:178
 msgid "Proceed to unsubscribe"
 msgstr "Proceed to unsubscribe"
 
-#: components/dashboard/campaigns/actions-button/ActionsButton.tsx:83
+#: components/dashboard/campaigns/actions-button/ActionsButton.tsx:160
 msgid "Report expired"
 msgstr "Report expired"
 
-#: components/login/login-input/LoginInput.tsx:84
+#: components/login/login-input/LoginInput.tsx:104
 msgid "Resend?"
 msgstr "Resend?"
 
-#: components/login/login-input/LoginInput.tsx:84
+#: components/login/login-input/LoginInput.tsx:102
 msgid "Resending OTP..."
 msgstr "Resending OTP..."
 
-#: components/login/login-input/LoginInput.tsx:88
+#: components/login/login-input/LoginInput.tsx:119
 msgid "Sending OTP..."
 msgstr "Sending OTP..."
 
-#: components/login/login-input/LoginInput.tsx:88
+#: components/login/login-input/LoginInput.tsx:130
 msgid "Sign In"
 msgstr "Sign In"
 
-#: components/login/login-input/LoginInput.tsx:81
+#: components/login/login-input/LoginInput.tsx:91
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
 
-#: components/unsubscribe/Unsubscribe.tsx:106
+#: components/unsubscribe/Unsubscribe.tsx:127
 msgid "Subscribe me back"
 msgstr "Subscribe me back"
 
@@ -81,198 +81,200 @@ msgstr "Subscribe me back"
 #~ msgid "Unsubscribe me"
 #~ msgstr "Unsubscribe me"
 
-#: components/login/login-input/LoginInput.tsx:88
+#: components/login/login-input/LoginInput.tsx:131
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
-#: config.ts:90
+#: config.ts:89
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg;file.for.sg;file.for.edu.sg"
 
-#: config.ts:106
+#: config.ts:108
 msgid "announcement.mediaUrl"
 msgstr "https://file.go.gov.sg/scheduled-send-modal.png"
 
-#: config.ts:108
+#: config.ts:110
 msgid "announcement.primaryButtonText"
 msgstr "Find out how"
 
-#: config.ts:107
+#: config.ts:109
 msgid "announcement.primaryButtonUrl"
 msgstr "https://go.gov.sg/postman-scheduled-send"
 
-#: config.ts:110
+#: config.ts:112
 msgid "announcement.secondaryButtonText"
 msgstr "null"
 
-#: config.ts:109
+#: config.ts:111
 msgid "announcement.secondaryButtonUrl"
 msgstr "null"
 
-#: config.ts:105
+#: config.ts:107
 msgid "announcement.subtext"
-msgstr "Say goodbye to sending your campaigns after work hours! \n You can now prepare your campaign in advance, schedule and sit back while we send your campaign at a later time."
+msgstr ""
+"Say goodbye to sending your campaigns after work hours! \n"
+" You can now prepare your campaign in advance, schedule and sit back while we send your campaign at a later time."
 
-#: config.ts:104
+#: config.ts:106
 msgid "announcement.title"
 msgstr "Scheduled campaign is here!"
 
-#: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:74
-#: config.ts:88
+#: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:112
+#: config.ts:87
 msgid "defaultMailFrom"
 msgstr "donotreply@mail.postman.gov.sg"
 
-#: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:6
+#: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:8
 msgid "demoMessage"
 msgstr "This demo campaign will be sent to a maximum of 20 recipients."
 
-#: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:5
+#: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:7
 msgid "demoMessageLabel"
 msgstr "DEMO"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:172
+#: components/dashboard/create/email/EmailTemplate.tsx:288
 msgid "e.g. Appointment Confirmation"
 msgstr "e.g. Appointment Confirmation"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:158
+#: components/dashboard/create/email/EmailTemplate.tsx:260
 msgid "e.g. Ministry of Health"
 msgstr "e.g. Ministry of Health"
 
-#: components/login/login-input/LoginInput.tsx:88
+#: components/login/login-input/LoginInput.tsx:114
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
 
-#: classes/EmailCampaign.ts:59
+#: classes/EmailCampaign.ts:87
 msgid "errors.email.blacklist"
 msgstr "Blacklisted: Your email will not be delivered to this recipient because Postman.gov.sg has determined that this recipient is not valid and might not exist."
 
-#: classes/EmailCampaign.ts:9
+#: classes/EmailCampaign.ts:11
 msgid "errors.email.complaint"
 msgstr "Hard bounce: Your email has been delivered, but the recipient marked it as spam."
 
-#: classes/EmailCampaign.ts:6
+#: classes/EmailCampaign.ts:8
 msgid "errors.email.hardBounce"
 msgstr "Hard bounce: The email recipient is not valid and might not exist. Postman.gov.sg will not send to this recipient again for future campaigns."
 
-#: classes/EmailCampaign.ts:8
+#: classes/EmailCampaign.ts:10
 msgid "errors.email.invalidFormat"
 msgstr "Error: Incorrect email formatting. Please check for typos, spaces, and symbols and amend this email address."
 
-#: classes/EmailCampaign.ts:7
+#: classes/EmailCampaign.ts:9
 msgid "errors.email.softBounce"
 msgstr "Soft bounce: The email inbox might be full or the recipient might have an out-of-office message."
 
-#: components/common/rich-text-editor/controls/ImageControl.tsx:61
+#: components/common/rich-text-editor/controls/ImageControl.tsx:74
 msgid "errors.insertImage.invalidUrl"
 msgstr "This does not seem to be an image"
 
-#: components/common/rich-text-editor/controls/ImageControl.tsx:51
-#: components/common/rich-text-editor/controls/ImageControl.tsx:66
+#: components/common/rich-text-editor/controls/ImageControl.tsx:67
+#: components/common/rich-text-editor/controls/ImageControl.tsx:78
 msgid "errors.insertImage.notImage"
 msgstr "Enter a link to an image"
 
-#: classes/SMSCampaign.ts:44
+#: classes/SMSCampaign.ts:53
 msgid "errors.sms.invalidFormat"
 msgstr "Error: Incorrect phone number format. Please check for typos, spaces, and symbols and amend this phone number."
 
-#: classes/SMSCampaign.ts:41
+#: classes/SMSCampaign.ts:51
 msgid "errors.sms.invalidPhoneNumber"
 msgstr "Invalid phone number in the recipient column."
 
-#: classes/TelegramCampaign.ts:48
+#: classes/TelegramCampaign.ts:59
 msgid "errors.telegram.blocked"
 msgstr "Bot has been blocked by the recipient. Please contact the recipient via other means to reverse the action."
 
-#: classes/TelegramCampaign.ts:46
+#: classes/TelegramCampaign.ts:57
 msgid "errors.telegram.notSubscribed"
 msgstr "Recipient has not subscribed to your agency's bot - please ask them to subscribe before sending a message."
 
-#: config.ts:77
+#: config.ts:76
 msgid "link.contactUsUrl"
 msgstr "https://go.gov.sg/postman-contact-us"
 
-#: config.ts:78
+#: config.ts:77
 msgid "link.contributeUrl"
 msgstr "https://go.gov.sg/postman-github"
 
-#: config.ts:82
+#: config.ts:81
 msgid "link.customFromAddressRequestUrl"
 msgstr "https://go.gov.sg/postman-custom-from"
 
-#: config.ts:83
+#: config.ts:82
 msgid "link.demoTelegramBotUrl"
 msgstr "https://go.gov.sg/postmangovsgbot"
 
-#: config.ts:84
+#: config.ts:83
 msgid "link.demoVideoUrl"
 msgstr "https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/Demo+Campaign+Mode.mp4"
 
-#: config.ts:85
+#: config.ts:84
 msgid "link.featureRequestUrl"
 msgstr "https://go.gov.sg/postman-featurerequest"
 
-#: config.ts:75
+#: config.ts:74
 msgid "link.guideDemoUrl"
 msgstr "https://go.gov.sg/postman-demo-guide"
 
-#: config.ts:68
+#: config.ts:67
 msgid "link.guideEmailImageUrl"
 msgstr "https://go.gov.sg/embed-image-guide"
 
-#: config.ts:67
+#: config.ts:66
 msgid "link.guideEmailPasswordProtectedUrl"
 msgstr "https://go.gov.sg/postman-password-protected-email-guide"
 
-#: config.ts:74
+#: config.ts:73
 msgid "link.guidePowerUserUrl"
 msgstr "https://go.gov.sg/postman-power-users"
 
-#: config.ts:76
+#: config.ts:75
 msgid "link.guideRemoveDuplicatesUrl"
 msgstr "https://go.gov.sg/postman-remove-dups-excel"
 
-#: config.ts:70
+#: config.ts:69
 msgid "link.guideSmsAccountSidUrl"
 msgstr "https://go.gov.sg/postman-sms-acc-sid"
 
-#: config.ts:71
+#: config.ts:70
 msgid "link.guideSmsApiKeyUrl"
 msgstr "https://go.gov.sg/postman-sms-standard-api-key"
 
-#: config.ts:72
+#: config.ts:71
 msgid "link.guideSmsMessagingServiceUrl"
 msgstr "https://go.gov.sg/postman-sms-messaging-service"
 
-#: config.ts:69
+#: config.ts:68
 msgid "link.guideSmsUrl"
 msgstr "https://go.gov.sg/postman-sms-creds"
 
-#: config.ts:73
+#: config.ts:72
 msgid "link.guideTelegramUrl"
 msgstr "https://go.gov.sg/postman-telegram-bot"
 
-#: config.ts:66
+#: config.ts:65
 msgid "link.guideUrl"
 msgstr "https://guide.postman.gov.sg/"
 
-#: config.ts:80
+#: config.ts:79
 msgid "link.privacyUrl"
 msgstr "https://go.gov.sg/postman-privacy"
 
-#: config.ts:81
+#: config.ts:80
 msgid "link.reportBugUrl"
 msgstr "https://go.gov.sg/postman-report-bug"
 
-#: config.ts:79
+#: config.ts:78
 msgid "link.tncUrl"
 msgstr "https://go.gov.sg/postman-legal-tnc"
 
-#: config.ts:86
+#: config.ts:85
 msgid "link.uploadLogoUrl"
 msgstr "https://go.gov.sg/postman-upload-logo-request"
 
-#: components/dashboard/create/email/EmailTemplate.tsx:138
-#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:277
-#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:279
+#: components/dashboard/create/email/EmailTemplate.tsx:213
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:357
+#: components/dashboard/create/email/tests/EmailTemplate.test.tsx:359
 msgid "mailVia"
 msgstr "via Postman"
