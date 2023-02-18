@@ -246,14 +246,6 @@ export const InitEmailTransactionalMiddleware = (
         message: 'Rate limited request to send transactional email',
         userId: req?.session?.user.id,
       })
-      void EmailMessageTransactional.update(
-        {
-          errorCode: RATE_LIMIT_ERROR_MESSAGE,
-        },
-        {
-          where: { id: req.body.emailMessageTransactionalId },
-        }
-      )
       res
         .status(429)
         .json({ message: 'Too many requests. Please try again later.' })
