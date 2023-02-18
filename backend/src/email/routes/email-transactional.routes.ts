@@ -80,6 +80,7 @@ export const InitEmailTransactionalRoute = (
 
   router.post(
     '/send',
+    emailTransactionalMiddleware.rateLimit,
     FileAttachmentMiddleware.fileUploadHandler,
     FileAttachmentMiddleware.preprocessPotentialIncomingFile,
     celebrate(sendValidator),
@@ -87,7 +88,6 @@ export const InitEmailTransactionalRoute = (
     emailTransactionalMiddleware.saveMessage,
     emailMiddleware.isFromAddressAccepted,
     emailMiddleware.existsFromAddress, // future todo: put a cache to reduce db hits
-    emailTransactionalMiddleware.rateLimit,
     emailTransactionalMiddleware.sendMessage
   )
 
