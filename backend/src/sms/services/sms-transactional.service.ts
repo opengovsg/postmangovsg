@@ -1,6 +1,5 @@
 import { TemplateError } from '@shared/templating'
 import { SmsService, SmsTemplateService } from '@sms/services'
-import { TwilioCredentials } from '@sms/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import {
   Ordering,
@@ -11,6 +10,8 @@ import { TransactionalEmailMessageStatus } from '@email/models'
 import { SmsMessageTransactional } from '@sms/models'
 import { Order } from 'sequelize/types/model'
 import { Op, WhereOptions } from 'sequelize'
+import { TwilioCredentials } from '@shared/clients/twilio-client.class'
+import config from '@core/config'
 
 const logger = loggerWithLabel(module)
 
@@ -40,6 +41,10 @@ async function sendMessage({
     message: 'Sending transactional SMS (service)',
     action: 'sendMessage',
   })
+
+  // append the config callback info into credentials here
+  credentials.callbackSecret = config.get('smsCallback.callbackSecret')
+  credentials.callbackBaseUrl = config.get('smsCallback.callbackUrl')
   return await SmsService.sendMessage(credentials, recipient, sanitizedBody)
 }
 

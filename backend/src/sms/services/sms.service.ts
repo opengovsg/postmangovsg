@@ -7,17 +7,22 @@ import { CSVParams } from '@core/types'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
-import { CampaignService, UploadService } from '@core/services'
+import {
+  CampaignService,
+  PhoneNumberService,
+  UploadService,
+} from '@core/services'
 import { InvalidRecipientError } from '@core/errors'
-import { PhoneNumberService } from '@core/services'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
-import { SmsDuplicateCampaignDetails, TwilioCredentials } from '@sms/interfaces'
+import { SmsDuplicateCampaignDetails } from '@sms/interfaces'
 
-import TwilioClient from './twilio-client.class'
 import SnsSmsClient from './sns-sms-client.class'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import TwilioClient, {
+  TwilioCredentials,
+} from '@shared/clients/twilio-client.class'
 
 const logger = loggerWithLabel(module)
 
@@ -65,6 +70,7 @@ const getHydratedMessage = async (
  * @param credential
  * @param recipient
  * @param message
+ * @param campaignId
  *
  * @returns Promise<string | void>
  */
@@ -82,10 +88,13 @@ const sendMessage = (
     throw new InvalidRecipientError('Invalid phone number')
   }
 
-  const client = config.get('smsFallback.activate')
-    ? new SnsSmsClient()
-    : new TwilioClient(credential)
-  return client.send(recipient, message)
+  if (config.get('smsFallback.activate')) {
+    const client = new SnsSmsClient()
+    return client.send(recipient, message)
+  } else {
+    const client = new TwilioClient(credential)
+    return client.send(recipient, message)
+  }
 }
 
 /**

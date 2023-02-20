@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { SmsCallbackMiddleware } from '@sms/middlewares'
+
 const router = Router()
 
 /**
@@ -28,6 +29,32 @@ router.post(
   '/:campaignId(\\d+)/:messageId(\\d+)',
   SmsCallbackMiddleware.isAuthenticated,
   SmsCallbackMiddleware.parseEvent
+)
+
+// This is to handle for transactional sms
+
+/**
+ * paths:
+ *  /callback/sms/{campaignId}:
+ *    post:
+ *      summary: Update status of transactional sms message
+ *      tags:
+ *        - Settings
+ *      parameters:
+ *        - c: campaignId
+ *          in: path
+ *          type: integer
+ *          required: true
+ *      responses:
+ *        200:
+ *          description: OK
+ *        400:
+ *          description: Bad Request
+ */
+router.post(
+  '/',
+  SmsCallbackMiddleware.isAuthenticatedTransactional,
+  SmsCallbackMiddleware.parseTransactionalEvent
 )
 
 export default router

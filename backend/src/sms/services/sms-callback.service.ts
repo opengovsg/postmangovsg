@@ -2,7 +2,7 @@ import { Request } from 'express'
 import { Op } from 'sequelize'
 import bcrypt from 'bcrypt'
 import config from '@core/config'
-import { SmsMessage } from '@sms/models'
+import { SmsMessage, SmsMessageTransactional } from '@sms/models'
 import { loggerWithLabel } from '@core/logger'
 import { compareSha256Hash } from '@shared/utils/crypto'
 
@@ -46,6 +46,22 @@ const isAuthenticated = (
     isAuthenticated = bcrypt.compareSync(bcryptPlainTextPassword, password)
   }
   return isAuthenticated
+}
+
+const isAuthenticatedTransactional = (authHeader?: string): boolean => {
+  const headerKey = 'Basic'
+  if (!authHeader) return false
+
+  const [header, secret] = authHeader.trim().split(' ')
+  if (headerKey !== header) return false
+
+  const credentials = Buffer.from(secret, 'base64').toString('utf8')
+  const [username, password] = credentials.split(':')
+  return compareSha256Hash(
+    config.get('smsCallback.callbackSecret'),
+    username,
+    password
+  )
 }
 
 const parseEvent = async (req: Request): Promise<void> => {
@@ -94,7 +110,55 @@ const parseEvent = async (req: Request): Promise<void> => {
     )
   }
 }
+
+const parseTransactionalEvent = async (req: Request): Promise<void> => {
+  const {
+    MessageStatus: twilioMessageStatus,
+    ErrorCode: twilioErrorCode,
+    MessageSid: messageId,
+  } = req.body
+  if (FINALIZED_STATUS.indexOf(twilioMessageStatus as string) === -1) {
+    return
+  }
+  logger.info({
+    message: 'Updating message in sms_messages_transactional',
+    messageId,
+    action: 'parseTransactionalEvent',
+  })
+
+  if (twilioErrorCode) {
+    await SmsMessageTransactional.update(
+      {
+        errorCode: twilioErrorCode,
+        status: 'ERROR',
+      } as SmsMessageTransactional,
+      {
+        where: {
+          messageId: messageId,
+        },
+      }
+    )
+  } else {
+    // longer messages are delivered in multiple segments
+    // each segment has a separate delivery status
+    // Update the message as successful only if there does not exist previous failed status
+    await SmsMessageTransactional.update(
+      {
+        updatedAt: new Date(),
+        status: 'SUCCESS',
+      } as SmsMessageTransactional,
+      {
+        where: {
+          messageId: messageId,
+          errorCode: { [Op.eq]: null },
+        },
+      }
+    )
+  }
+}
 export const SmsCallbackService = {
   isAuthenticated,
+  isAuthenticatedTransactional,
   parseEvent,
+  parseTransactionalEvent,
 }

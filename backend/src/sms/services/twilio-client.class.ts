@@ -1,6 +1,6 @@
 import twilio from 'twilio'
-import { TwilioCredentials } from '@sms/interfaces'
 import { InvalidRecipientError, RateLimitError } from '@core/errors'
+import { TwilioCredentials } from '@shared/clients/twilio-client.class'
 
 // find details on API here: https://www.twilio.com/docs/sms/api/pricing
 interface MessageCountryPricing {
