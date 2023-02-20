@@ -35,16 +35,11 @@ router.post(
 
 /**
  * paths:
- *  /callback/sms/{campaignId}:
+ *  /callback/sms:
  *    post:
  *      summary: Update status of transactional sms message
  *      tags:
  *        - Settings
- *      parameters:
- *        - c: campaignId
- *          in: path
- *          type: integer
- *          required: true
  *      responses:
  *        200:
  *          description: OK
@@ -52,9 +47,8 @@ router.post(
  *          description: Bad Request
  */
 router.post(
-  '/',
+  '',
   SmsCallbackMiddleware.isAuthenticatedTransactional,
   SmsCallbackMiddleware.parseTransactionalEvent
 )
-
 export default router
