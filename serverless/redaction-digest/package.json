@@ -12,7 +12,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/bluebird": "3.5.33",
-    "@types/convict": "5.2.1",
+    "@types/convict": "5.2.2",
     "@types/lodash": "4.14.165",
     "@types/node": "14.14.7",
     "@types/nodemailer": "6.4.0",
@@ -26,7 +26,7 @@
     "@sentry/node": "5.27.4",
     "aws-sdk": "2.1140.0",
     "axios": "0.27.2",
-    "convict": "6.2.3",
+    "convict": "6.2.4",
     "dotenv": "8.2.0",
     "lodash": "4.17.21",
     "module-alias": "2.2.2",

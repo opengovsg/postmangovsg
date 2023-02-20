@@ -18,7 +18,7 @@
     "@sentry/node": "5.30.0",
     "aws-sdk": "2.1140.0",
     "axios": "0.27.2",
-    "convict": "6.2.3",
+    "convict": "6.2.4",
     "dotenv": "8.6.0",
     "lodash": "4.17.21",
     "module-alias": "2.2.2",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@types/bluebird": "3.5.32",
-    "@types/convict": "5.2.1",
+    "@types/convict": "5.2.2",
     "@types/lodash": "4.14.157",
     "@types/node": "14.0.23",
     "@types/nodemailer": "6.4.0",
