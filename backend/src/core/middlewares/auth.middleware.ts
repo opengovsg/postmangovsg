@@ -3,6 +3,7 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
+import { DEFAULT_TX_EMAIL_RATE_LIMIT } from '@core/models'
 
 export interface AuthMiddleware {
   getOtp: Handler
@@ -128,6 +129,10 @@ export const InitAuthMiddleware = (authService: AuthService) => {
         action: 'authenticators[AuthType.Cookie]',
         user: req.session?.user,
       })
+      if (req.session) {
+        // default user to 10 requests per second if they're using cookie
+        req.session.rateLimit = DEFAULT_TX_EMAIL_RATE_LIMIT
+      }
       return true
     },
     [AuthType.ApiKey]: async (req: Request) => {
@@ -135,12 +140,12 @@ export const InitAuthMiddleware = (authService: AuthService) => {
       if (user === null || !req.session) {
         return false
       }
-
       // Ideally, we store the user id in res.locals for api key, because theoretically, no session was created.
       // Practically, we have to check multiple places for the user id when we want to retrieve the id
       // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
       req.session.user = user
       req.session.apiKey = true
+      req.session.rateLimit = user.rateLimit
       logger.info({
         message: 'User authenticated by API key',
         action: 'authenticators[AuthType.ApiKey]',

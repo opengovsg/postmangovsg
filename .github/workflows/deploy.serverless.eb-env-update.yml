@@ -54,7 +54,7 @@ jobs:
         with:
           aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
           aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          aws-region: "${{ secrets.AWS_DEFAULT_REGION }}"
+          aws-region: "${{ vars.AWS_DEFAULT_REGION }}"
       - name: Set function name according to environment
         id: function-name
         run: echo "::set-output name=value::$FUNCTION-${{ needs.set_environment.outputs.current_env }}"
@@ -102,7 +102,7 @@ jobs:
           TAG: "github-actions-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
           # Update env vars
           NODE_ENV: "${{ needs.set_environment.outputs.current_env }}"
-          SECRET_ID: "${{ secrets.SECRET_ID }}"
+          SECRET_ID: "${{ vars.SECRET_ID }}"
           SENTRY_DSN: "${{ secrets.SERVERLESS_SENTRY_DSN }}"
           # Update environment variables in the command
         run: |

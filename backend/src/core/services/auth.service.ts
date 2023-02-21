@@ -181,7 +181,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
       const hash = await ApiKeyService.getApiKeyHash(apiKey)
       return await User.findOne({
         where: { apiKeyHash: hash },
-        attributes: ['id', 'email'],
+        attributes: ['id', 'email', ['rate_limit', 'rateLimit']],
       })
     }
     return null

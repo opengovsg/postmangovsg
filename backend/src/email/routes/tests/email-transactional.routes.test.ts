@@ -6,7 +6,7 @@ import {
   FileExtensionService,
   UNSUPPORTED_FILE_TYPE_ERROR_CODE,
 } from '@core/services'
-import { RATE_LIMIT_ERROR_MESSAGE } from '@email/middlewares'
+import { TRANSACTIONAL_EMAIL_WINDOW } from '@email/middlewares'
 import {
   EmailFromAddress,
   EmailMessageTransactional,
@@ -38,6 +38,7 @@ beforeEach(async () => {
   user = await User.create({
     id: 1,
     email: userEmail,
+    rateLimit: 1, // for ease of testing, so second API call within a second would fail
   } as User)
   apiKey = await user.regenerateAndSaveApiKey()
 })
@@ -784,24 +785,6 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.status).toBe(429)
     expect(mockSendEmail).not.toBeCalled()
     mockSendEmail.mockClear()
-    // second email is saved in db but has error code 429
-    const secondEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
-      order: [['createdAt', 'DESC']],
-    })
-    expect(secondEmail).not.toBeNull()
-    expect(secondEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
-      status: TransactionalEmailMessageStatus.Unsent,
-      errorCode: RATE_LIMIT_ERROR_MESSAGE,
-    })
-    expect(secondEmail?.params).toMatchObject({
-      subject: validApiCall.subject,
-      body: validApiCall.body,
-      from: validApiCall.from,
-      reply_to: validApiCall.reply_to,
-    })
   })
 
   test('Requests should not be rate limited after window elasped and metadata is saved correctly in db', async () => {
@@ -840,26 +823,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.status).toBe(429)
     expect(mockSendEmail).not.toBeCalled()
     mockSendEmail.mockClear()
-    const secondEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
-      order: [['createdAt', 'DESC']],
-    })
-    expect(secondEmail).not.toBeNull()
-    expect(secondEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
-      status: TransactionalEmailMessageStatus.Unsent,
-      errorCode: RATE_LIMIT_ERROR_MESSAGE,
-    })
-    expect(secondEmail?.params).toMatchObject({
-      subject: validApiCall.subject,
-      body: validApiCall.body,
-      from: validApiCall.from,
-      reply_to: validApiCall.reply_to,
-    })
-
     // Third request passes after 1s
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) =>
+      setTimeout(resolve, TRANSACTIONAL_EMAIL_WINDOW * 1000)
+    )
     res = await send()
     expect(res.status).toBe(201)
     expect(mockSendEmail).toBeCalledTimes(1)

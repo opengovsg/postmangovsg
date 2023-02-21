@@ -3,7 +3,6 @@ import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { RedisService } from '@core/services'
 import { EmailTransactionalService } from '@email/services'
-import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
@@ -33,6 +32,8 @@ export interface EmailTransactionalMiddleware {
 
 export const RATE_LIMIT_ERROR_MESSAGE =
   'Error 429: Too many requests, rate limit reached'
+
+export const TRANSACTIONAL_EMAIL_WINDOW = 1 // in seconds
 
 const getAttachmentHash = (content: Buffer): string => {
   const hash = crypto.createHash('md5')
@@ -230,11 +231,11 @@ export const InitEmailTransactionalMiddleware = (
     store: new RedisStore({
       prefix: 'transactionalEmail:',
       client: redisService.rateLimitClient,
-      expiry: config.get('transactionalEmail.window'),
+      expiry: TRANSACTIONAL_EMAIL_WINDOW,
     }),
     keyGenerator: (req: Request) => req?.session?.user.id,
-    windowMs: config.get('transactionalEmail.window') * 1000,
-    max: config.get('transactionalEmail.rate'),
+    windowMs: TRANSACTIONAL_EMAIL_WINDOW * 1000,
+    max: (req: Request) => req.session?.rateLimit,
     draft_polli_ratelimit_headers: true,
     message: {
       status: 429,
@@ -245,14 +246,6 @@ export const InitEmailTransactionalMiddleware = (
         message: 'Rate limited request to send transactional email',
         userId: req?.session?.user.id,
       })
-      void EmailMessageTransactional.update(
-        {
-          errorCode: RATE_LIMIT_ERROR_MESSAGE,
-        },
-        {
-          where: { id: req.body.emailMessageTransactionalId },
-        }
-      )
       res
         .status(429)
         .json({ message: 'Too many requests. Please try again later.' })

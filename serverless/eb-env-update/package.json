@@ -11,12 +11,12 @@
   "license": "ISC",
   "dependencies": {
     "@sentry/node": "5.30.0",
-    "convict": "6.2.3",
+    "convict": "6.2.4",
     "dotenv": "8.2.0",
     "lodash": "4.17.21"
   },
   "devDependencies": {
-    "@types/convict": "5.2.1",
+    "@types/convict": "5.2.2",
     "aws-sdk": "2.1140.0",
     "typescript": "3.9.7"
   }
