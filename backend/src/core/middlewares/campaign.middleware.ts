@@ -4,7 +4,7 @@ import {
   CampaignSortField,
   ChannelType,
   Ordering,
-  Status,
+  CampaignStatus,
 } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
@@ -125,35 +125,29 @@ const createCampaign = async (
  * List campaigns for user
  * @param req
  * @param res
- * @param next
  */
 const listCampaigns = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
   const { offset, limit, type, status, name, sort_by, order_by } = req.query
   const userId = req.session?.user?.id
 
-  try {
-    const { rows, count } = await CampaignService.listCampaigns({
-      userId,
-      offset: +(offset as string),
-      limit: +(limit as string),
-      type: type as ChannelType,
-      status: status as Status,
-      name: name as string,
-      sortBy: sort_by as CampaignSortField,
-      orderBy: order_by as Ordering,
-    })
+  const { rows, count } = await CampaignService.listCampaigns({
+    userId,
+    offset: +(offset as string),
+    limit: +(limit as string),
+    type: type as ChannelType,
+    status: status as CampaignStatus,
+    name: name as string,
+    sortBy: sort_by as CampaignSortField,
+    orderBy: order_by as Ordering,
+  })
 
-    return res.json({
-      campaigns: rows,
-      total_count: count,
-    })
-  } catch (err) {
-    return next(err)
-  }
+  return res.json({
+    campaigns: rows,
+    total_count: count,
+  })
 }
 
 /**
