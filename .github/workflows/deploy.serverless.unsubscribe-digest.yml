@@ -54,7 +54,7 @@ jobs:
         with:
           aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
           aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          aws-region: "${{ secrets.AWS_DEFAULT_REGION }}"
+          aws-region: "${{ vars.AWS_DEFAULT_REGION }}"
       - name: Set function name according to environment
         id: function-name
         run: echo "::set-output name=value::$FUNCTION-${{ needs.set_environment.outputs.current_env }}"
@@ -118,7 +118,6 @@ jobs:
           SES_PASS: "${{ secrets.SES_PASS }}"
           SES_USER: "${{ secrets.SES_USER }}"
           SES_PORT: "${{ secrets.SES_PORT }}"
-          UNSUBSCRIBE_GUIDE_URL: "${{ secrets.UNSUBSCRIBE_GUIDE_URL }}"
           EMAIL_CALLBACK_HASH_SECRET: "${{ secrets.EMAIL_CALLBACK_HASH_SECRET }}"
           # Update environment variables in the command
         run: |

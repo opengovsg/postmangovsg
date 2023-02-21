@@ -163,7 +163,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     if (!authHeader) return null
 
     const [header, apiKey] = authHeader.split(' ')
-    if (headerKey !== header) return null
+    if (headerKey !== header || !apiKey) return null
 
     const [name, version, key] = apiKey.split('_')
     if (!name || !version || !key) return null
@@ -181,7 +181,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
       const hash = await ApiKeyService.getApiKeyHash(apiKey)
       return await User.findOne({
         where: { apiKeyHash: hash },
-        attributes: ['id', 'email'],
+        attributes: ['id', 'email', ['rate_limit', 'rateLimit']],
       })
     }
     return null

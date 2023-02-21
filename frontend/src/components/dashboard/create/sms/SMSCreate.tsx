@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { useState, useEffect, useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import styles from '../Create.module.scss'
 import BodyTemplate from '../common/BodyTemplate'
@@ -15,9 +15,9 @@ import { SMSProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import { CampaignContext } from 'contexts/campaign.context'
 import {
-  SMS_WARN_EXCEED_CHARACTER_THRESHOLD,
-  SMS_ERROR_EXCEED_CHARACTER_THRESHOLD,
   saveTemplate,
+  SMS_ERROR_EXCEED_CHARACTER_THRESHOLD,
+  SMS_WARN_EXCEED_CHARACTER_THRESHOLD,
 } from 'services/sms.service'
 
 const SMS_PROGRESS_STEPS = [
@@ -57,7 +57,7 @@ const CreateSMS = () => {
       case SMSProgress.InsertCredentials:
         return <SMSCredentials setActiveStep={setActiveStep} />
       case SMSProgress.Send:
-        return <SMSSend setActiveStep={setActiveStep} />
+        return <SMSSend />
       default:
         return <p>Invalid step</p>
     }

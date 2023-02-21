@@ -1,21 +1,14 @@
-const mockScanFile = jest.fn().mockResolvedValue(true)
-jest.mock('@core/services/cloudmersive-client.class', () => {
-  return jest.fn().mockImplementation(() => {
-    return { scanFile: mockScanFile }
-  })
-})
-
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
 import { User } from '@core/models'
 import {
   FileExtensionService,
-  MALICIOUS_FILE_ERROR_CODE,
   UNSUPPORTED_FILE_TYPE_ERROR_CODE,
 } from '@core/services'
-import { RATE_LIMIT_ERROR_MESSAGE } from '@email/middlewares'
+import { TRANSACTIONAL_EMAIL_WINDOW } from '@email/middlewares'
 import {
+  EmailFromAddress,
   EmailMessageTransactional,
   TransactionalEmailMessageStatus,
 } from '@email/models'
@@ -34,6 +27,7 @@ let apiKey: string
 let mockSendEmail: jest.SpyInstance
 
 const app = initialiseServer(false)
+const userEmail = 'user@agency.gov.sg'
 
 beforeEach(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
@@ -43,7 +37,8 @@ beforeEach(async () => {
   )
   user = await User.create({
     id: 1,
-    email: 'user_1@agency.gov.sg',
+    email: userEmail,
+    rateLimit: 1, // for ease of testing, so second API call within a second would fail
   } as User)
   apiKey = await user.regenerateAndSaveApiKey()
 })
@@ -52,6 +47,7 @@ afterEach(async () => {
   jest.restoreAllMocks()
   await EmailMessageTransactional.destroy({ where: {} })
   await User.destroy({ where: {} })
+  await EmailFromAddress.destroy({ where: {} })
   await sequelize.close()
 })
 
@@ -72,6 +68,12 @@ describe(`${emailTransactionalRoute}/send`, () => {
     body: '<p>body</p>',
     from: 'Postman <donotreply@mail.postman.gov.sg>',
     reply_to: 'user@agency.gov.sg',
+  }
+
+  // attachment only allowed when sent from user's own email
+  const validApiCallAttachment = {
+    ...validApiCall,
+    from: `User <${userEmail}>`,
   }
   const validAttachment = Buffer.from('hello world')
   const validAttachmentName = 'hi.txt'
@@ -123,7 +125,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
   })
 
@@ -162,7 +164,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: 'Hello <donotreply@mail.postman.gov.sg>',
-      replyTo: user.email,
+      reply_to: user.email,
     })
   })
 
@@ -171,6 +173,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
 
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
     const from = `Hello <${user.email}>`
     const res = await request(app)
       .post(endpoint)
@@ -201,11 +207,11 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: `Hello <${user.email}>`,
-      replyTo: user.email,
+      reply_to: user.email,
     })
   })
 
-  test('Should thrown an error with invalid custom from address', async () => {
+  test('Should throw an error with invalid custom from address (not user email)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const res = await request(app)
       .post(endpoint)
@@ -213,6 +219,24 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .send({
         ...validApiCall,
         from: 'Hello <invalid@agency.gov.sg>',
+        reply_to: user.email,
+      })
+
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw an error with invalid custom from address (user email not added into EmailFromAddress table)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const from = `Hello <${user.email}>`
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        recipient: 'recipient@agency.gov.sg',
+        subject: 'subject',
+        body: '<p>body</p>',
+        from,
         reply_to: user.email,
       })
 
@@ -252,7 +276,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: invalidHtmlTagsSubjectAndBody.subject,
       body: invalidHtmlTagsSubjectAndBody.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
   })
@@ -292,7 +316,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: invalidHtmlTagsSubjectAndBody.subject,
       body: invalidHtmlTagsSubjectAndBody.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(null)
 
@@ -311,6 +335,110 @@ describe(`${emailTransactionalRoute}/send`, () => {
       { extraSmtpHeaders: { isTransactional: true } }
     )
   })
+  test('Should throw a 400 error if the body size is too large (JSON payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw a 413 error if body size is wayyy too large (JSON payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    // note: in practice, the response given to the user is a 500 error (with PayloadTooLargeError logged on our backend)
+    expect(res.status).toBe(413)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw 400 error if body size is too large (URL encoded payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
+    // const body = 'a'.repeat(1000)
+    const res = await request(app)
+      .post(endpoint)
+      .type('form')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    expect(res.status).toBe(400)
+  })
+
+  test('Should throw 413 error if body size is wayy too large (URL encoded payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    // const body = 'a'.repeat(1000)
+    const res = await request(app)
+      .post(endpoint)
+      .type('form')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send({
+        ...validApiCall,
+        body,
+      })
+    // note: in practice, the response given to the user is a 500 error (with PayloadTooLargeError logged on our backend)
+    expect(res.status).toBe(413)
+  })
+
+  test('Should throw a 400 error if the body size is too large (multipart payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .field('body', body)
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Should throw a 400 error even if body size is wayyy too large because of truncation (multipart payload)', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCall.recipient)
+      .field('subject', validApiCall.subject)
+      .field('from', validApiCall.from)
+      .field('reply_to', validApiCall.reply_to)
+      .field('body', body)
+    expect(res.status).toBe(400)
+    expect(mockSendEmail).not.toBeCalled()
+  })
+
+  test('Show throw 403 error is user is sending attachment from default email address', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCallAttachment.recipient)
+      .field('subject', validApiCallAttachment.subject)
+      .field('body', validApiCallAttachment.body)
+      .field('from', 'Postman <donotreply@mail.postman.gov.sg>')
+      .field('reply_to', validApiCallAttachment.reply_to)
+      .attach('attachments', validAttachment, validAttachmentName)
+    expect(res.status).toBe(403)
+    expect(mockSendEmail).not.toBeCalled()
+  })
 
   test('Should throw an error if file type of attachment is not supported and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
@@ -322,14 +450,19 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .spyOn(FileExtensionService, 'hasAllowedExtensions')
       .mockResolvedValue(false)
 
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
+
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCall.recipient)
-      .field('subject', validApiCall.subject)
-      .field('body', validApiCall.body)
-      .field('from', validApiCall.from)
-      .field('reply_to', validApiCall.reply_to)
+      .field('recipient', validApiCallAttachment.recipient)
+      .field('subject', validApiCallAttachment.subject)
+      .field('body', validApiCallAttachment.body)
+      .field('from', validApiCallAttachment.from)
+      .field('reply_to', validApiCallAttachment.reply_to)
       .attach(
         'attachments',
         invalidFileTypeAttachment,
@@ -346,52 +479,15 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
+      recipient: validApiCallAttachment.recipient,
+      from: validApiCallAttachment.from,
       status: TransactionalEmailMessageStatus.Unsent,
     })
     expect(transactionalEmail?.params).toMatchObject({
-      from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      from: validApiCallAttachment.from,
+      reply_to: validApiCallAttachment.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(UNSUPPORTED_FILE_TYPE_ERROR_CODE)
-  })
-
-  test('Should throw an error if attached file is malicious and correct error is saved in db', async () => {
-    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    // not actually a malicious file
-    const maliciousAttachment = Buffer.alloc(1024 * 1024, '.')
-    const maliciousAttachmentName = 'malicious.txt'
-    // so we mock scanFile to return false
-    mockScanFile.mockResolvedValueOnce(false)
-
-    const res = await request(app)
-      .post(endpoint)
-      .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCall.recipient)
-      .field('subject', validApiCall.subject)
-      .field('body', validApiCall.body)
-      .field('from', validApiCall.from)
-      .field('reply_to', validApiCall.reply_to)
-      .attach('attachments', maliciousAttachment, maliciousAttachmentName)
-
-    expect(res.status).toBe(400)
-    expect(mockSendEmail).not.toBeCalled()
-
-    const transactionalEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
-    })
-    expect(transactionalEmail).not.toBeNull()
-    expect(transactionalEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
-      status: TransactionalEmailMessageStatus.Unsent,
-    })
-    expect(transactionalEmail?.params).toMatchObject({
-      from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
-    })
-    expect(transactionalEmail?.errorCode).toBe(MALICIOUS_FILE_ERROR_CODE)
   })
 
   test('Should throw an error if recipient is blacklisted and correct error is saved in db', async () => {
@@ -426,7 +522,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
     expect(transactionalEmail?.params).toMatchObject({
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
     expect(transactionalEmail?.errorCode).toBe(BLACKLISTED_RECIPIENT_ERROR_CODE)
   })
@@ -436,38 +532,63 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
 
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
+
     // request.send() cannot be used with file attachments
     // substitute form values with request.field(). refer to
     // https://visionmedia.github.io/superagent/#multipart-requests
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCall.recipient)
-      .field('subject', validApiCall.subject)
-      .field('body', validApiCall.body)
-      .field('from', validApiCall.from)
-      .field('reply_to', validApiCall.reply_to)
+      .field('recipient', validApiCallAttachment.recipient)
+      .field('subject', validApiCallAttachment.subject)
+      .field('body', validApiCallAttachment.body)
+      .field('from', validApiCallAttachment.from)
+      .field('reply_to', validApiCallAttachment.reply_to)
       .attach('attachments', validAttachment, validAttachmentName)
 
     expect(res.status).toBe(201)
     expect(res.body).toBeDefined()
     expect(res.body.attachments_metadata).toBeDefined()
     expect(mockSendEmail).toBeCalledTimes(1)
+    expect(mockSendEmail).toBeCalledWith(
+      {
+        body: validApiCallAttachment.body,
+        from: validApiCallAttachment.from,
+        replyTo: validApiCallAttachment.reply_to,
+        subject: validApiCallAttachment.subject,
+        recipients: [validApiCallAttachment.recipient],
+        referenceId: expect.any(String),
+        attachments: [
+          {
+            cid: '0',
+            content: expect.any(Buffer),
+            filename: validAttachmentName,
+          },
+        ],
+      },
+      {
+        extraSmtpHeaders: { isTransactional: true },
+      }
+    )
     const transactionalEmail = await EmailMessageTransactional.findOne({
       where: { userId: user.id.toString() },
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
+      recipient: validApiCallAttachment.recipient,
+      from: validApiCallAttachment.from,
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(transactionalEmail?.params).toMatchObject({
-      subject: validApiCall.subject,
-      body: validApiCall.body,
-      from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      subject: validApiCallAttachment.subject,
+      body: validApiCallAttachment.body,
+      from: validApiCallAttachment.from,
+      reply_to: validApiCallAttachment.reply_to,
     })
     expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
     expect(transactionalEmail?.attachmentsMetadata).toHaveLength(1)
@@ -485,14 +606,19 @@ describe(`${emailTransactionalRoute}/send`, () => {
     const invalidAttachmentTooBig = Buffer.alloc(1024 * 1024 * 10, '.') // 10MB
     const invalidAttachmentTooBigName = 'too big.txt'
 
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
+
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCall.recipient)
-      .field('subject', validApiCall.subject)
-      .field('body', validApiCall.body)
-      .field('from', validApiCall.from)
-      .field('reply_to', validApiCall.reply_to)
+      .field('recipient', validApiCallAttachment.recipient)
+      .field('subject', validApiCallAttachment.subject)
+      .field('body', validApiCallAttachment.body)
+      .field('from', validApiCallAttachment.from)
+      .field('reply_to', validApiCallAttachment.reply_to)
       .attach(
         'attachments',
         invalidAttachmentTooBig,
@@ -509,6 +635,11 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue('message_id')
 
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
+
     const validAttachment2 = Buffer.from('wassup dog')
     const validAttachment2Name = 'hey.txt'
     const validAttachment2Size = Buffer.byteLength(validAttachment2)
@@ -516,31 +647,56 @@ describe(`${emailTransactionalRoute}/send`, () => {
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCall.recipient)
-      .field('subject', validApiCall.subject)
-      .field('body', validApiCall.body)
-      .field('from', validApiCall.from)
-      .field('reply_to', validApiCall.reply_to)
+      .field('recipient', validApiCallAttachment.recipient)
+      .field('subject', validApiCallAttachment.subject)
+      .field('body', validApiCallAttachment.body)
+      .field('from', validApiCallAttachment.from)
+      .field('reply_to', validApiCallAttachment.reply_to)
       .attach('attachments', validAttachment, validAttachmentName)
       .attach('attachments', validAttachment2, validAttachment2Name)
 
     expect(res.status).toBe(201)
     expect(mockSendEmail).toBeCalledTimes(1)
+    expect(mockSendEmail).toBeCalledWith(
+      {
+        body: validApiCallAttachment.body,
+        from: validApiCallAttachment.from,
+        replyTo: validApiCallAttachment.reply_to,
+        subject: validApiCallAttachment.subject,
+        recipients: [validApiCallAttachment.recipient],
+        referenceId: expect.any(String),
+        attachments: [
+          {
+            cid: '0',
+            content: expect.any(Buffer),
+            filename: validAttachmentName,
+          },
+          {
+            cid: '1',
+            content: expect.any(Buffer),
+            filename: validAttachment2Name,
+          },
+        ],
+      },
+      {
+        extraSmtpHeaders: { isTransactional: true },
+      }
+    )
     const transactionalEmail = await EmailMessageTransactional.findOne({
       where: { userId: user.id.toString() },
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
+      recipient: validApiCallAttachment.recipient,
+      from: validApiCallAttachment.from,
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(transactionalEmail?.params).toMatchObject({
-      subject: validApiCall.subject,
-      body: validApiCall.body,
-      from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      subject: validApiCallAttachment.subject,
+      body: validApiCallAttachment.body,
+      from: validApiCallAttachment.from,
+      reply_to: validApiCallAttachment.reply_to,
     })
     expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
     expect(transactionalEmail?.attachmentsMetadata).toHaveLength(2)
@@ -560,6 +716,11 @@ describe(`${emailTransactionalRoute}/send`, () => {
 
   test('Email with more than two attachments should fail', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
+
     // at time of writing this test default value of FILE_ATTACHMENT_MAX_NUM is 2
     // not sure how to create a variable number of attachments + API call (probably not possible?)
     const attachment2 = Buffer.from('wassup dog')
@@ -571,11 +732,11 @@ describe(`${emailTransactionalRoute}/send`, () => {
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCall.recipient)
-      .field('subject', validApiCall.subject)
-      .field('body', validApiCall.body)
-      .field('from', validApiCall.from)
-      .field('reply_to', validApiCall.reply_to)
+      .field('recipient', validApiCallAttachment.recipient)
+      .field('subject', validApiCallAttachment.subject)
+      .field('body', validApiCallAttachment.body)
+      .field('from', validApiCallAttachment.from)
+      .field('reply_to', validApiCallAttachment.reply_to)
       .attach('attachments', validAttachment, validAttachmentName)
       .attach('attachments', attachment2, attachment2Name)
       .attach('attachments', attachment3, attachment3Name)
@@ -616,7 +777,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
 
     // Second request rate limited
@@ -624,24 +785,6 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.status).toBe(429)
     expect(mockSendEmail).not.toBeCalled()
     mockSendEmail.mockClear()
-    // second email is saved in db but has error code 429
-    const secondEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
-      order: [['createdAt', 'DESC']],
-    })
-    expect(secondEmail).not.toBeNull()
-    expect(secondEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
-      status: TransactionalEmailMessageStatus.Unsent,
-      errorCode: RATE_LIMIT_ERROR_MESSAGE,
-    })
-    expect(secondEmail?.params).toMatchObject({
-      subject: validApiCall.subject,
-      body: validApiCall.body,
-      from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
-    })
   })
 
   test('Requests should not be rate limited after window elasped and metadata is saved correctly in db', async () => {
@@ -680,26 +823,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.status).toBe(429)
     expect(mockSendEmail).not.toBeCalled()
     mockSendEmail.mockClear()
-    const secondEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
-      order: [['createdAt', 'DESC']],
-    })
-    expect(secondEmail).not.toBeNull()
-    expect(secondEmail).toMatchObject({
-      recipient: validApiCall.recipient,
-      from: validApiCall.from,
-      status: TransactionalEmailMessageStatus.Unsent,
-      errorCode: RATE_LIMIT_ERROR_MESSAGE,
-    })
-    expect(secondEmail?.params).toMatchObject({
-      subject: validApiCall.subject,
-      body: validApiCall.body,
-      from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
-    })
-
     // Third request passes after 1s
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) =>
+      setTimeout(resolve, TRANSACTIONAL_EMAIL_WINDOW * 1000)
+    )
     res = await send()
     expect(res.status).toBe(201)
     expect(mockSendEmail).toBeCalledTimes(1)
@@ -719,7 +846,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       subject: validApiCall.subject,
       body: validApiCall.body,
       from: validApiCall.from,
-      replyTo: validApiCall.reply_to,
+      reply_to: validApiCall.reply_to,
     })
   })
 })

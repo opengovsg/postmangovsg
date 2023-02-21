@@ -1,0 +1,105 @@
+@import 'styles/_mixins';
+@import 'styles/_variables';
+
+.title {
+  flex: 1;
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: $blue-900;
+
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: $blue-900;
+}
+
+.datetimeWrapper {
+  margin-top: 48px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dateWrapper {
+  width: 67%;
+}
+
+.dateText {
+  margin-bottom: 8px;
+}
+
+.timeWrapper {
+  width: 30%;
+}
+
+.timeText {
+  margin-bottom: 8px;
+}
+
+.dateInput {
+  line-height: 2.5rem;
+  border-radius: 4px;
+  border: 1px solid #c9cccf;
+  font-weight: 400;
+  letter-spacing: -0.011rem;
+  width: 100%;
+}
+
+.dateInput::-webkit-datetime-edit-day-field {
+  padding-left: 16px;
+}
+
+.dateInput::-webkit-datetime-edit-year-field {
+  padding-right: 16px;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  padding-right: 14px;
+  padding-left: 14px;
+}
+
+.dateInput::-webkit-datetime-edit {
+  border-right: 1px solid #c9cccf;
+}
+
+.timeInput {
+  line-height: 2.5rem;
+  border-radius: 4px;
+  border: 1px solid #c9cccf;
+  font-weight: 400;
+  letter-spacing: -0.011rem;
+  width: 100%;
+}
+
+.timeInput::-webkit-datetime-edit-hour-field {
+  padding-left: 16px;
+}
+
+.timeInput::-webkit-datetime-edit-minute {
+  padding-right: 16px;
+}
+
+.timeInput::-webkit-calendar-picker-indicator {
+  padding-right: 14px;
+  padding-left: 6px;
+}
+
+.timeInput::-webkit-datetime-edit {
+  border-right: 1px solid #c9cccf;
+}
+
+.errorControl {
+  visibility: hidden;
+}
+
+.actionButton {
+  float: right;
+  margin: 3rem 0;
+
+  .disabledContent {
+    color: $light-grey;
+  }
+}

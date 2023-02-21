@@ -21,9 +21,16 @@ const ActionButton = (props: any) => {
       <button
         type="button"
         className={cx(styles.actionButton, className)}
+        disabled={otherProps.disabled}
         {...otherProps}
       >
-        <div className={styles.content}>{children[0] || children}</div>
+        <div
+          className={cx(styles.content, {
+            [styles.disabledContent]: otherProps.disabled,
+          })}
+        >
+          {children[0] || children}
+        </div>
         {children.length > 1 && (
           <div
             className={styles.arrow}

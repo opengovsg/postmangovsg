@@ -23,6 +23,8 @@ import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 
+export const DEFAULT_TX_EMAIL_RATE_LIMIT = 10
+
 @Table({ tableName: 'users', underscored: true, timestamps: true })
 export class User extends Model<User> {
   @Column({
@@ -38,6 +40,13 @@ export class User extends Model<User> {
 
   @Column({ type: DataType.STRING, allowNull: true })
   apiKeyHash: string | null
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: DEFAULT_TX_EMAIL_RATE_LIMIT,
+  })
+  rateLimit: number
 
   @HasMany(() => UserCredential)
   creds: UserCredential[]

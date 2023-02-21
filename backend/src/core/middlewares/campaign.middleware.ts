@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { loggerWithLabel } from '@core/logger'
 import {
-  ChannelType,
-  Status,
   CampaignSortField,
+  ChannelType,
   Ordering,
+  Status,
 } from '@core/constants'
 import { CampaignService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
@@ -29,6 +29,30 @@ const canEditCampaign = async (
       UploadService.getCsvStatus(+campaignId),
     ])
     if (!hasJob && !csvStatus?.isCsvProcessing) {
+      return next()
+    }
+    return res.sendStatus(403)
+  } catch (err) {
+    return next(err)
+  }
+}
+
+const canSendCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const [sentJobs] = await Promise.all([
+      CampaignService.hasAlreadyBeenSent(+campaignId),
+    ])
+    logger.info({
+      message: 'Checking can send campaign',
+      sentJobs,
+      action: 'canSendCampaign',
+    })
+    if (sentJobs <= 0) {
       return next()
     }
     return res.sendStatus(403)
@@ -224,6 +248,7 @@ const updateCampaign = async (
 
 export const CampaignMiddleware = {
   canEditCampaign,
+  canSendCampaign,
   createCampaign,
   listCampaigns,
   isCampaignRedacted,

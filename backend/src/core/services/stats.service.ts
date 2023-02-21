@@ -1,19 +1,19 @@
 import {
-  fn,
   cast,
-  Transaction,
-  Op,
-  literal,
   FindOptions,
+  fn,
+  literal,
+  Op,
   Sequelize,
+  Transaction,
 } from 'sequelize'
-import { Statistic, JobQueue, Campaign, Unsubscriber } from '@core/models'
+import { Campaign, JobQueue, Statistic, Unsubscriber } from '@core/models'
 import {
+  CampaignRecipient,
   CampaignStats,
   CampaignStatsCount,
-  CampaignRecipient,
 } from '@core/interfaces'
-import { MessageStatus, JobStatus } from '@core/constants'
+import { JobStatus, MessageStatus } from '@core/constants'
 import { Writable } from 'stream'
 import { waitForMs } from '@shared/utils/wait-for-ms'
 import { EmailMessage } from '@email/models'
@@ -163,6 +163,7 @@ const getCurrentStats = async (
     status: job.status,
     halted: job.campaign.halted,
     status_updated_at: job.updatedAt, // Timestamp when job was logged
+    visible_at: job.visibleAt,
   }
 
   // If job is not in send queue, return archived stats

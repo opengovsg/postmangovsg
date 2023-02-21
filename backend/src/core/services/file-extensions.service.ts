@@ -6,7 +6,6 @@ const DEFAULT_ALLOWED_EXTENSIONS = [
   'bmp',
   'csv',
   'dgn',
-  'doc',
   'docx',
   'dwf',
   'dwg',
@@ -24,7 +23,6 @@ const DEFAULT_ALLOWED_EXTENSIONS = [
   'ods',
   'pdf',
   'png',
-  'ppt',
   'pptx',
   'rtf',
   'sxc',
@@ -35,7 +33,6 @@ const DEFAULT_ALLOWED_EXTENSIONS = [
   'tiff',
   'txt',
   'wmv',
-  'xls',
   'xlsx',
 ]
 

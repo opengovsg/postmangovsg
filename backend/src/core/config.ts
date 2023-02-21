@@ -85,8 +85,7 @@ interface ConfigSchema {
   mailVia: string
   mailDefaultRate: number
   transactionalEmail: {
-    rate: number
-    window: number
+    bodySizeLimit: number
   }
   defaultCountry: string
   defaultCountryCode: string
@@ -148,7 +147,6 @@ interface ConfigSchema {
     checkStalledInterval: number
   }
   file: {
-    cloudmersiveKey: string
     maxAttachmentSize: number
     maxAttachmentNum: number
   }
@@ -451,16 +449,10 @@ const config: Config<ConfigSchema> = convict({
     format: 'int',
   },
   transactionalEmail: {
-    rate: {
-      doc: 'The max number of transactional emails that can be requested per window per user',
-      default: 10,
-      env: 'TRANSACTIONAL_EMAIL_RATE',
-      format: 'int',
-    },
-    window: {
-      doc: 'The duration of each window for transactional emails in seconds.',
-      default: 1,
-      env: 'TRANSACTIONAL_EMAIL_WINDOW',
+    bodySizeLimit: {
+      doc: 'The maximum size of the body of a transactional email in bytes',
+      default: 1048576, // 1 mebibyte; 2^20 bytes
+      env: 'TRANSACTIONAL_EMAIL_BODY_SIZE_LIMIT_BYTES',
       format: 'int',
     },
   },
@@ -674,15 +666,8 @@ const config: Config<ConfigSchema> = convict({
     },
   },
   file: {
-    cloudmersiveKey: {
-      doc: 'API key for Cloudmersive file scanning service',
-      default: '',
-      env: 'FILE_CLOUDMERSIVE_KEY',
-      format: 'required-string',
-      sensitive: true,
-    },
     maxAttachmentSize: {
-      doc: 'Maximum accepted file attachment size in MB',
+      doc: 'Maximum accepted file attachment size in bytes',
       default: 2 * 1024 * 1024, // 2MB, i.e. limit set in docs/api-usage.md
       env: 'FILE_ATTACHMENT_MAX_SIZE',
       format: Number,

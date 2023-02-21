@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { useState, useEffect, useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import styles from '../Create.module.scss'
 import BodyTemplate from '../common/BodyTemplate'
@@ -10,13 +10,13 @@ import TelegramDetail from './TelegramDetail'
 import TelegramRecipients from './TelegramRecipients'
 import TelegramSend from './TelegramSend'
 
-import { TelegramProgress, Status, TelegramCampaign } from 'classes'
+import { Status, TelegramCampaign, TelegramProgress } from 'classes'
 import { ProgressPane } from 'components/common'
 import { CampaignContext } from 'contexts/campaign.context'
 import {
-  TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD,
-  TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD,
   saveTemplate,
+  TELEGRAM_ERROR_EXCEED_CHARACTER_THRESHOLD,
+  TELEGRAM_WARN_EXCEED_CHARACTER_THRESHOLD,
 } from 'services/telegram.service'
 
 const TELEGRAM_PROGRESS_STEPS = [
@@ -54,7 +54,7 @@ const CreateTelegram = () => {
       case TelegramProgress.InsertCredentials:
         return <TelegramCredentials setActiveStep={setActiveStep} />
       case TelegramProgress.Send:
-        return <TelegramSend setActiveStep={setActiveStep} />
+        return <TelegramSend />
       default:
         return <p>Invalid step</p>
     }

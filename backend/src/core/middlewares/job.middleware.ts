@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { JobService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 
@@ -19,15 +19,33 @@ const sendCampaign = async (
   try {
     const userId = req.session?.user?.id
     const { campaignId } = req.params
-    const { rate } = req.body
+    // also need to retrieve if its to be scheduled
+    const { rate, scheduledTiming } = req.body
     const logMeta = { action: 'sendCampaign', campaignId }
 
+    // convert scheduled timing to date object
+    // if passed in then convert, if not just pass null
+    const formattedTiming = scheduledTiming ? new Date(scheduledTiming) : null
     if (await JobService.canSendCampaign(+campaignId)) {
-      const jobIds = await JobService.sendCampaign({
-        campaignId: +campaignId,
-        rate: +rate,
-        userId,
-      })
+      let jobIds
+      let jobCount = 0
+      if (formattedTiming) {
+        // this is a scheduled campaign, it is trying to update the existing jobs.
+        // directly update the DB, do not go into sending again.
+        // check if existing jobs exists
+        jobCount = await JobService.updateScheduledCampaign(
+          +campaignId,
+          formattedTiming
+        )
+      }
+      if (jobCount == 0) {
+        jobIds = await JobService.sendCampaign({
+          campaignId: +campaignId,
+          rate: +rate,
+          userId,
+          scheduledTiming: formattedTiming,
+        })
+      }
       logger.info({ message: 'Sending campaign', jobIds, ...logMeta })
       return res.status(200).json({ campaign_id: campaignId, job_id: jobIds })
     }
@@ -98,8 +116,28 @@ const retryCampaign = async (
   }
 }
 
+const cancelScheduledCampaign = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  try {
+    const { campaignId } = req.params
+    const logMeta = { campaignId, action: 'cancelScheduledCampaign' }
+    logger.info({
+      message: 'Cancel Scheduled Campaign...',
+      logMeta,
+    })
+    await JobService.cancelScheduledCampaign(+campaignId)
+    return res.status(200).json({ campaignId })
+  } catch (err) {
+    return next(err)
+  }
+}
+
 export const JobMiddleware = {
   sendCampaign,
   stopCampaign,
   retryCampaign,
+  cancelScheduledCampaign,
 }

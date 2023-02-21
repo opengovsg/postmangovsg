@@ -2,9 +2,9 @@ import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
-  UploadMiddleware,
   JobMiddleware,
   SettingsMiddleware,
+  UploadMiddleware,
 } from '@core/middlewares'
 import {
   TelegramMiddleware,
@@ -66,6 +66,7 @@ export const InitTelegramCampaignMiddleware = (
   const sendCampaignValidator = {
     [Segments.BODY]: Joi.object({
       rate: Joi.number().integer().positive().max(30).default(30),
+      scheduledTiming: Joi.string().optional(),
     }),
   }
 
@@ -145,6 +146,7 @@ export const InitTelegramCampaignMiddleware = (
     '/send',
     celebrate(sendCampaignValidator),
     CampaignMiddleware.canEditCampaign,
+    CampaignMiddleware.canSendCampaign,
     JobMiddleware.sendCampaign
   )
 
@@ -171,6 +173,5 @@ export const InitTelegramCampaignMiddleware = (
     celebrate(duplicateCampaignValidator),
     telegramMiddleware.duplicateCampaign
   )
-
   return router
 }

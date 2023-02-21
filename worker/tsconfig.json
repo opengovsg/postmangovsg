@@ -1,15 +1,11 @@
 {
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "files": [
-    "./src/server.ts"
-  ],
+  "include": ["src"],
+  "exclude": ["node_modules"],
+  "files": ["./src/server.ts"],
   "references": [
-    { "path": "../shared/tsconfig.build.json" }
+    {
+      "path": "../shared/tsconfig.build.json"
+    }
   ],
   "compileOnSave": true,
   "compilerOptions": {

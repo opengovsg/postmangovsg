@@ -2,9 +2,9 @@ import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
-  UploadMiddleware,
   JobMiddleware,
   SettingsMiddleware,
+  UploadMiddleware,
 } from '@core/middlewares'
 import {
   SmsMiddleware,
@@ -65,6 +65,7 @@ export const InitSmsCampaignRoute = (
   const sendCampaignValidator = {
     [Segments.BODY]: Joi.object({
       rate: Joi.number().integer().positive().default(10),
+      scheduledTiming: Joi.string().optional(),
     }),
   }
 
@@ -132,7 +133,7 @@ export const InitSmsCampaignRoute = (
     '/credentials',
     celebrate(useCredentialsValidator),
     CampaignMiddleware.canEditCampaign,
-    smsMiddleware.getCredentialsFromLabel,
+    smsMiddleware.getCredentialsFromLabelCampaign,
     smsMiddleware.validateAndStoreCredentials,
     smsMiddleware.setCampaignCredential
   )
@@ -143,6 +144,7 @@ export const InitSmsCampaignRoute = (
     '/send',
     celebrate(sendCampaignValidator),
     CampaignMiddleware.canEditCampaign,
+    CampaignMiddleware.canSendCampaign,
     JobMiddleware.sendCampaign
   )
 
@@ -175,6 +177,5 @@ export const InitSmsCampaignRoute = (
     celebrate(selectListValidator),
     SmsTemplateMiddleware.selectListHandler
   )
-
   return router
 }

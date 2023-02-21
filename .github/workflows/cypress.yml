@@ -6,6 +6,10 @@ name: Cypress Test
 on:
   workflow_dispatch:
   workflow_call:
+    outputs:
+      cypress_result:
+        description: "Outcome of the cypress suite, enum<success, failure, skipped, cancelled>"
+        value: ${{ jobs.cypress-run.outputs.outcome }}
 
 jobs:
   set_environment:
@@ -17,15 +21,17 @@ jobs:
         run: |
           echo "Running on branch ${{ github.ref }}"
           if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            echo "::set-output name=current_env::production"
+            echo "current_env=production" >> $GITHUB_OUTPUT
           else
-             echo "::set-output name=current_env::staging"
+             echo "current_env=staging" >> $GITHUB_OUTPUT
           fi
   cypress-run:
     runs-on: ubuntu-latest
     needs: [set_environment]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
+    outputs:
+      outcome: ${{ steps.cypress.outcome }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -39,6 +45,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npx cypress install
       - name: Cypress.io
+        id: cypress
         env:
           CYPRESS_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg/' || 'https://staging.postman.gov.sg/' }}
           CYPRESS_API_BASE_URL: ${{ github.ref == 'refs/heads/master' && 'https://api.postman.gov.sg/' || 'https://api-staging.postman.gov.sg/' }}
@@ -47,7 +54,7 @@ jobs:
           CYPRESS_EMAIL: "internal-testing@open.gov.sg"
           CYPRESS_SMS_NUMBER: "+6582410222"
           CYPRESS_API_KEY: ${{ secrets.CYPRESS_API_KEY }}
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v5
         with:
           config-file: cypress.config.js
           install: false

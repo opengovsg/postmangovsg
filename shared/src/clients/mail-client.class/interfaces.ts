@@ -1,7 +1,6 @@
-export interface MailAttachment {
-  filename: string
-  content: Buffer
-}
+import { Attachment } from 'nodemailer/lib/mailer'
+
+export type MailAttachment = Pick<Attachment, 'filename' | 'content' | 'cid'>
 
 export interface MailToSend {
   recipients: Array<string>

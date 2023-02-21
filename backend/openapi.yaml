@@ -194,7 +194,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL certificateÏ
+          description: Invalid SSL certificate
   /campaigns/{campaignId}:
     delete:
       security:
@@ -328,7 +328,64 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL certificateÏ
+          description: Invalid SSL certificate
+
+  /campaigns/{campaignId}/cancel:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Campaigns
+      summary: Cancels the scheduling of the campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successfully cancelled the campaign
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden, campaign not owned by user
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
   /campaign/{campaignId}/email:
     get:
       security:
@@ -823,6 +880,12 @@ paths:
       tags:
         - Email
       summary: Sends a test message and defaults to Postman's credentials for the campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -970,7 +1033,12 @@ paths:
       tags:
         - Email
       summary: Start sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -1034,7 +1102,12 @@ paths:
       tags:
         - Email
       summary: Stop sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -1092,7 +1165,12 @@ paths:
       tags:
         - Email
       summary: Retry sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -1660,6 +1738,7 @@ paths:
           description: SSL handshake failed
         '526':
           description: Invalid SSL certificate
+
   /transactional/email/send:
     post:
       security:
@@ -1714,7 +1793,7 @@ paths:
                     format: binary
       responses:
         '201':
-          description: Accepted. The message is being sent.
+          description: Created. The message is being sent.
           content:
             application/json:
               schema:
@@ -1746,7 +1825,12 @@ paths:
                       "from" must be a valid email
                     validation: { source: body, keys: [from] }
                 FromError:
-                  value: { message: Invalid 'from' email address. }
+                  # align with message in backend/src/email/middlewares/email.middleware.ts
+                  value:
+                    {
+                      message: Invalid 'from' email address,
+                      which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more.,
+                    }
 
         '401':
           description: Unauthorized.
@@ -1854,16 +1938,16 @@ paths:
             properties:
               gt:
                 type: string
-                format: date-time (ISO 8601)
+                format: date-time
               gte:
                 type: string
-                format: date-time (ISO 8601)
+                format: date-time
               lt:
                 type: string
-                format: date-time (ISO 8601)
+                format: date-time
               lte:
                 type: string
-                format: date-time (ISO 8601)
+                format: date-time
         - in: query
           name: sort_by
           description: >
@@ -1961,7 +2045,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 69
+            example: 42
       responses:
         200:
           description: Successfully retrieved transactional email with corresponding ID
@@ -2746,6 +2830,12 @@ paths:
       tags:
         - SMS
       summary: Stop sending campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -2803,6 +2893,12 @@ paths:
       tags:
         - SMS
       summary: Retry sending campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -3197,10 +3293,13 @@ paths:
                   type: string
                 label:
                   type: string
-      # TODO feels like this is lacking a schema component?
       responses:
-        '202':
-          description: Accepted. The message is being sent.
+        '201':
+          description: Created. The message is being sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsMessageTransactional'
         '400':
           description: Bad Request
         '401':
@@ -3209,7 +3308,219 @@ paths:
           description: Too many requests. Please try again later.
         '500':
           description: Internal Server Error
+  /transactional/sms:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: 'List transactional SMSes'
+      parameters:
+        - in: query
+          name: limit
+          description: max number of messages returned
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - in: query
+          name: offset
+          description: offset to begin returning messages from
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: status
+          description: status of messages to filter for
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [UNSENT, ACCEPTED, SENT, DELIVERED, ERROR]
+          style: form
+          explode: true
+        - in: query
+          name: created_at
+          description: >
+            Filter for created_at timestamp of messages:
+              - gt: greater than
+              - gte: greater than or equal
+              - lt: less than
+              - lte: less than or equal
+          required: false
+          schema:
+            type: object
+            minProperties: 1
+            properties:
+              gt:
+                type: string
+                format: date-time
+              gte:
+                type: string
+                format: date-time
+              lt:
+                type: string
+                format: date-time
+              lte:
+                type: string
+                format: date-time
+        - in: query
+          name: sort_by
+          description: >
+            Array of fields to sort by, default order is desc, but can be configured by adding a prefix of:
+             - plus sign (+) for ascending order
+             - minus sign (-) for descending order
+          required: false
+          schema:
+            type: array
+            default: [created_at]
+            items:
+              type: string
+              enum:
+                [
+                  created_at,
+                  +created_at,
+                  -created_at,
+                  updated_at,
+                  -updated_at,
+                  +updated_at,
+                ]
 
+      responses:
+        200:
+          description: Successfully retrieved a list of messages
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - has_more
+                  - data
+                properties:
+                  has_more:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SmsMessageTransactional'
+        '400':
+          description: Bad Request. Failed parameter validations.
+        '401':
+          description: Unauthorized.
+          content:
+            text/plain:
+              example: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
+  /transactional/sms/{smsId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - SMS
+      summary: 'Get transactional SMS by ID'
+      parameters:
+        - in: path
+          name: smsId
+          required: true
+          schema:
+            type: string
+            example: 42
+      responses:
+        200:
+          description: Successfully retrieved transactional SMS with corresponding ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsMessageTransactional'
+        '400':
+          description: Bad Request. Failed parameter validations.
+        '401':
+          description: Unauthorized.
+          content:
+            text/plain:
+              example: Unauthorized
+        '403':
+          description: Forbidden. Request violates firewall rules.
+        '404':
+          description: Not Found. No transactional message with such ID found
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatus'
+              example:
+                {
+                  status: 429,
+                  message: Too many requests. Please try again later.,
+                }
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: Internal Server Error
+        '502':
+          description: Bad Gateway
+        '504':
+          description: Gateway Timeout
+        '503':
+          description: Service Temporarily Unavailable
+        '520':
+          description: Web Server Returns An Unknown Error
+        '521':
+          description: Web Server Is Down
+        '522':
+          description: Connection Timed Out
+        '523':
+          description: Origin Is Unreachable
+        '524':
+          description: A Timeout occurred
+        '525':
+          description: SSL handshake failed
+        '526':
+          description: Invalid SSL certificate
   /campaign/{campaignId}/telegram:
     get:
       security:
@@ -4050,7 +4361,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/stop:
     post:
@@ -4059,7 +4370,12 @@ paths:
       tags:
         - Telegram
       summary: Stop sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -4109,7 +4425,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/retry:
     post:
@@ -4118,7 +4434,12 @@ paths:
       tags:
         - Telegram
       summary: Retry sending campaign
-
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -4168,7 +4489,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/stats:
     get:
@@ -4230,7 +4551,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/update-stats:
     post:
@@ -4292,7 +4613,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/export:
     get:
@@ -4358,7 +4679,7 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
   /campaign/{campaignId}/telegram/duplicate:
     post:
@@ -4429,15 +4750,14 @@ paths:
         '525':
           description: SSL handshake failed
         '526':
-          description: Invalid SSL c
+          description: Invalid SSL certificate
 
 components:
   securitySchemes:
     bearerAuth:
-      type: apiKey
+      type: http
       description: API key to authorize requests.
-      name: appid
-      in: query
+      scheme: bearer
   schemas:
     ChannelType:
       type: string
@@ -4630,25 +4950,33 @@ components:
           format: date-time
         error_code:
           type: string
-    EmailMessageTransactional: # TODO I think this is outdated
+    EmailMessageTransactional:
       type: object
-      required:
-        - id
-        - recipient
-        - params
-        - status
       properties:
         id:
           type: string
-          example: 69
+          example: 42
         from:
           type: string
-          example: 'Postman <donotreply@mail.postman.gov.sg>'
+          example: Postman <donotreply@mail.postman.gov.sg>
         recipient:
           type: string
           example: hello@example.com
         params:
           type: object
+          properties:
+            body:
+              type: string
+              example: Hello World
+            from:
+              type: string
+              example: Postman <donotreply@mail.postman.gov.sg>
+            subject:
+              type: string
+              example: Hello World
+            reply_to:
+              type: string
+              example: hello@example.com
         attachments_metadata:
           nullable: true
           type: array
@@ -4667,7 +4995,21 @@ components:
                 type: string
         status:
           type: string
-          enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, LAINT]
+          enum: [UNSENT, ACCEPTED, SENT, BOUNCED, DELIVERED, OPENED, COMPLAINT]
+          description: >
+            * `UNSENT` - initial state of a newly created transactional email (this status is not returned in the course of a successful request to send an email)
+
+            * `ACCEPTED` - email has been accepted by our email provider (this status is returned in the course of a successful request to send an email)
+
+            * `SENT` - the send request was successfully forwarded to our email provider and our email provider will attempt to deliver the message to the recipient’s mail server (API user can check this and all subsequent statuses via the `/transactional/email/{emailId}` endpoint)
+
+            * `BOUNCED` - the recipient's mail server rejected the email
+
+            * `DELIVERED` - the email provider has successfully delivered the email to the recipient's mail server
+
+            * `OPENED` - the recipient received the message and opened it in their email client
+
+            * `COMPLAINT` - the email was successfully delivered to the recipient’s mail server, but the recipient marked it as spam
         error_code:
           nullable: true
           type: string
@@ -4737,7 +5079,7 @@ components:
         job_queue:
           type: array
           items:
-          $ref: '#/components/schemas/JobQueue'
+            $ref: '#/components/schemas/JobQueue'
         sms_templates:
           type: object
           properties:
@@ -4747,6 +5089,55 @@ components:
               type: array
               items:
                 type: string
+    SmsMessageTransactional:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 42
+        credentials_label:
+          type: string
+          example: 'ogp-twilio-creds'
+        recipient:
+          type: string
+          example: '98765432'
+        body:
+          type: string
+          example: 'Hello world'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        accepted_at:
+          type: string
+          format: date-time
+        sent_at:
+          type: string
+          format: date-time
+        delivered_at:
+          type: string
+          format: date-time
+        errored_at:
+          type: string
+          format: date-time
+        error_code:
+          type: string
+          description: This error code corresponds with [error codes from Twilio](https://www.twilio.com/docs/sms/api/message-resource#delivery-related-errors).
+        status:
+          type: string
+          enum: [UNSENT, ACCEPTED, SENT, DELIVERED, ERROR]
+          description: >
+            * `UNSENT` - initial state of a newly created transactional SMS (this status is not returned in the course of a successful request to send an SMS)
+
+            * `ACCEPTED` - SMS has been accepted by our SMS provider (this status is returned in the course of a successful request to send an SMS)
+
+            * `SENT` - the send request was successfully forwarded to our SMS provider and our SMS provider will attempt to deliver the message to the recipient’s phone number (API user can check this and all subsequent statuses via the `/transactional/sms/{smsId}` endpoint)
+
+            * `DELIVERED` - the SMS provider has successfully delivered the SMS to the recipient's phone number
+
+            * `ERROR` - an error happened when the SMS provider is trying to deliver the message
     TelegramCampaign:
       type: object
       properties:

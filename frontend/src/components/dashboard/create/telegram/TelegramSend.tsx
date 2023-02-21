@@ -1,6 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
-
-import type { Dispatch, SetStateAction } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { useParams } from 'react-router-dom'
 
@@ -9,27 +7,22 @@ import styles from '../Create.module.scss'
 import { campaignFeedbackUrl, confirmSendCampaign } from '../util'
 
 import { ChannelType } from 'classes'
-import type { TelegramProgress } from 'classes'
 import {
+  ButtonGroup,
+  ConfirmModal,
   PreviewBlock,
   PrimaryButton,
   SendRate,
-  ConfirmModal,
-  ButtonGroup,
-  TextButton,
   StepHeader,
   StepSection,
 } from 'components/common'
+import SchedulingButton from 'components/dashboard/create/common/SchedulingButton'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 
 import { getPreviewMessage } from 'services/telegram.service'
 
-const TelegramSend = ({
-  setActiveStep,
-}: {
-  setActiveStep: Dispatch<SetStateAction<TelegramProgress>>
-}) => {
+const TelegramSend = () => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { numRecipients } = campaign
   const modalContext = useContext(ModalContext)
@@ -114,9 +107,11 @@ const TelegramSend = ({
           Send campaign now
           <i className="bx bx-send"></i>
         </PrimaryButton>
-        <TextButton onClick={() => setActiveStep((s) => s - 1)}>
-          Previous
-        </TextButton>
+        <SchedulingButton
+          campaign={campaign}
+          updateCampaign={updateCampaign}
+          buttonText={'Schedule for later'}
+        />
       </ButtonGroup>
     </>
   )

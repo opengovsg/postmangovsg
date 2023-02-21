@@ -14,7 +14,7 @@ const URL =
 const KEYWORD_REGEX = /^{{\s*?\w+\s*?}}$/
 
 /**
- * Helper method to determine if a string is a HTTP URL
+ * Helper method to determine if a string is an HTTP URL
  * @param urlStr
  */
 const isValidHttpUrl = (urlStr: string): boolean => {
@@ -24,6 +24,10 @@ const isValidHttpUrl = (urlStr: string): boolean => {
   } catch (_) {
     return false
   }
+}
+
+const isCid = (urlStr: string): boolean => {
+  return urlStr.startsWith('cid:')
 }
 
 const DEFAULT_EMAIL_ATTRS = ['style']
@@ -81,6 +85,10 @@ export const XSS_EMAIL_OPTION = {
 
     // Do not sanitize keyword when it's a img src, eg: <img src="{{protectedImg}}">
     if (tag === 'img' && name === 'src' && value.match(KEYWORD_REGEX)) {
+      return value
+    }
+    // Do not sanitize keyword if eg: <img src="cid:attachment">, to support content-id images
+    if (tag === 'img' && name === 'src' && isCid(value)) {
       return value
     }
     // The default safeAttrValue does guard against some edge cases

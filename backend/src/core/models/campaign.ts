@@ -3,12 +3,12 @@ import {
   BelongsTo,
   Column,
   DataType,
+  Default,
   ForeignKey,
-  Model,
-  Table,
   HasMany,
   HasOne,
-  Default,
+  Model,
+  Table,
 } from 'sequelize-typescript'
 import { ChannelType } from '@core/constants'
 import { CampaignS3ObjectInterface } from '@core/interfaces'

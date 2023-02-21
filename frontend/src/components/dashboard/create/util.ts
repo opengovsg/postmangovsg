@@ -1,5 +1,8 @@
 import { Campaign, ChannelType, Status } from 'classes'
-import { sendCampaign } from 'services/campaign.service'
+import {
+  cancelScheduledCampaign,
+  sendCampaign,
+} from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 export const confirmSendCampaign = async ({
@@ -7,17 +10,38 @@ export const confirmSendCampaign = async ({
   sendRate,
   channelType,
   updateCampaign,
+  scheduledTiming,
 }: {
   campaignId: number
   sendRate: number
   channelType: ChannelType
   updateCampaign: (campaign: Partial<Campaign>) => void
+  scheduledTiming?: Date
 }) => {
-  await sendCampaign(campaignId, sendRate)
+  await sendCampaign(campaignId, sendRate, scheduledTiming)
   if (sendRate) {
     sendUserEvent(GA_USER_EVENTS.USE_SEND_RATE, channelType)
   }
-  updateCampaign({ status: Status.Sending })
+  updateCampaign({
+    status: scheduledTiming ? Status.Scheduled : Status.Sending,
+    scheduledAt: scheduledTiming,
+  })
+}
+
+export const confirmCancelScheduledCampaign = async ({
+  campaignId,
+  updateCampaign,
+}: {
+  campaignId: number
+  updateCampaign: (campaign: Partial<Campaign>) => void
+}) => {
+  await cancelScheduledCampaign(campaignId).then(() => {
+    updateCampaign({
+      status: Status.Draft,
+    })
+  })
+
+  return
 }
 
 export const campaignFeedbackUrl =
