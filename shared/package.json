@@ -46,12 +46,11 @@
     "@types/nodemailer": "6.4.0",
     "cheerio": "1.0.0-rc.10",
     "dd-trace": "2.12.2",
-    "jsonwebtoken": "^9.0.0",
     "lodash": "4.17.21",
     "mustache": "4.2.0",
     "nodemailer": "6.6.2",
     "opentracing": "0.14.7",
-    "twilio": "^3.77.3",
+    "twilio": "4.7.2",
     "xss": "1.0.13"
   },
   "lint-staged": {
