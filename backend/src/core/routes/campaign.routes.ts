@@ -3,7 +3,7 @@ import {
   CampaignSortField,
   ChannelType,
   Ordering,
-  Status,
+  CampaignStatus,
 } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { CampaignMiddleware, JobMiddleware } from '@core/middlewares'
@@ -16,7 +16,7 @@ const listCampaignsValidator = {
     limit: Joi.number().integer().min(1).max(100).default(10),
     offset: Joi.number().integer().min(0).default(0),
     type: Joi.string().valid(...Object.values(ChannelType)),
-    status: Joi.string().valid(...Object.values(Status)),
+    status: Joi.string().valid(...Object.values(CampaignStatus)),
     name: Joi.string().max(255).trim(),
     sort_by: Joi.string().valid(...Object.values(CampaignSortField)),
     order_by: Joi.string().valid(...Object.values(Ordering)),

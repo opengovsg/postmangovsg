@@ -4,7 +4,7 @@ export enum ChannelType {
   Telegram = 'TELEGRAM',
 }
 
-export enum Status {
+export enum CampaignStatus {
   Draft = 'Draft',
   Sending = 'Sending',
   Sent = 'Sent',
