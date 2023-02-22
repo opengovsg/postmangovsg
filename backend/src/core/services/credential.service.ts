@@ -15,6 +15,8 @@ import { loggerWithLabel } from '@core/logger'
 import { UserSettings } from '@core/interfaces'
 import { RedisService } from './redis.service'
 import { TwilioCredentials } from '@shared/clients/twilio-client.class'
+import { ApiKeyService } from './api-key.service'
+import { ApiKey } from '@core/models/user/api-key'
 
 export interface CredentialService {
   // Credentials (cred_name)
@@ -355,7 +357,24 @@ export const InitCredentialService = (redisService: RedisService) => {
     if (!user) {
       throw new Error('User not found')
     }
-    return user.regenerateAndSaveApiKey()
+    await ApiKey.destroy({
+      where: {
+        userId: user.id.toString(),
+      },
+    })
+    const name = user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
+    const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
+    user.apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
+    await Promise.all([
+      user.save(),
+      ApiKey.create({
+        userId: user.id.toString(),
+        hash: user.apiKeyHash,
+        lastFive: apiKeyPlainText.slice(-5),
+        label: 'default',
+      } as ApiKey),
+    ])
+    return apiKeyPlainText
   }
 
   const updateDemoDisplayed = async (

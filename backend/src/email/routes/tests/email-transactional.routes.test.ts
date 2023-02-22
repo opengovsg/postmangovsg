@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { User } from '@core/models'
 import {
+  CredentialService,
   FileExtensionService,
   UNSUPPORTED_FILE_TYPE_ERROR_CODE,
 } from '@core/services'
@@ -40,7 +41,9 @@ beforeEach(async () => {
     email: userEmail,
     rateLimit: 1, // for ease of testing, so second API call within a second would fail
   } as User)
-  apiKey = await user.regenerateAndSaveApiKey()
+  apiKey = await (
+    app as any as { credentialService: CredentialService }
+  ).credentialService.regenerateApiKey(user.id)
 })
 
 afterEach(async () => {
@@ -1244,7 +1247,9 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
       id: 2,
       email: 'user_2@agency.gov.sg',
     } as User)
-    const anotherApiKey = await anotherUser.regenerateAndSaveApiKey()
+    const anotherApiKey = await (
+      app as any as { credentialService: CredentialService }
+    ).credentialService.regenerateApiKey(anotherUser.id)
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',
