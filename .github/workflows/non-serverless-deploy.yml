@@ -17,11 +17,30 @@ env:
 concurrency: deploy-non-serverless-${{ github.ref }}
 
 jobs:
+  slack-prepare:
+    name: Escape commit message to send in slack
+    runs-on: ubuntu-latest
+    outputs:
+      commit_message: ${{ steps.extract-message.outputs.commit_message }}
+    steps:
+      - id: extract-message
+        # toJSON will wrap the value with double quotes, and we don't want that
+        # in the final value, hence we don't add double quotes here to kill 2 birds:
+        #   - double quote to make the string value assignment in bash
+        # . - removing wrapping double quotes from the final value
+        run: |
+          message=${{ toJSON(github.event.head_commit.message) }}
+          # taking only the first line and removing double quotes from string value
+          message="$(echo $message | sed -z 's/\\n.*//g; s/"//g')" 
+          echo "commit_message=$message" >> $GITHUB_OUTPUT
+
   slack-started:
     name: Send slack message when deployment starts
     runs-on: ubuntu-latest
     outputs:
       message_id: ${{ steps.slack.outputs.ts }}
+    needs:
+      - slack-prepare
     steps:
       - uses: slackapi/slack-github-action@v1.23.0
         id: slack
@@ -45,7 +64,7 @@ jobs:
                       },
                       {
                         "title": "Workflow Run",
-                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ github.event.head_commit.message }}>",
+                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ needs.slack-prepare.outputs.commit_message }}>",
                         "short": true
                       },
                       {
@@ -87,9 +106,6 @@ jobs:
   revert-on-e2e-failure:
     runs-on: ubuntu-latest
     needs:
-      - deploy-backend
-      - deploy-frontend
-      - deploy-worker
       - e2e-test
     if: always()
     steps:
@@ -109,10 +125,8 @@ jobs:
           fi
   slack-success:
     needs:
+      - slack-prepare
       - slack-started
-      - deploy-backend
-      - deploy-frontend
-      - deploy-worker
       - e2e-test
     if: success()
     name: Send Slack message about successful build
@@ -140,7 +154,7 @@ jobs:
                       },
                       {
                         "title": "Workflow Run",
-                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ github.event.head_commit.message }}>",
+                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ needs.slack-prepare.outputs.commit_message }}>",
                         "short": true
                       },
                       {
@@ -158,7 +172,11 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
   slack-failure:
     needs:
+      - slack-prepare
       - slack-started
+      # we include the deploy jobs here as we want to update the message to FAILED
+      # as well when the deploy jobs fail. We didn't need to include for succes
+      # because e2e-test has a pre-requisite of deploy jobs to have succeeded
       - deploy-backend
       - deploy-frontend
       - deploy-worker
@@ -193,7 +211,7 @@ jobs:
                       },
                       {
                         "title": "Workflow Run",
-                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ github.event.head_commit.message }}>",
+                        "value": "<https://github.com/opengovsg/postmangovsg/actions/runs/${{ github.run_id }} | ${{ needs.slack-prepare.outputs.commit_message }}>",
                         "short": true
                       },
                       {
