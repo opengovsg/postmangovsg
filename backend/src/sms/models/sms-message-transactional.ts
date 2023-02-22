@@ -9,6 +9,16 @@ import {
 } from 'sequelize-typescript'
 import { MessageStatus } from '@core/constants'
 
+export enum TransactionalSmsMessageStatus {
+  Unsent = 'UNSENT',
+  Accepted = 'ACCEPTED',
+  Sent = 'SENT',
+  Bounced = 'BOUNCED',
+  Delivered = 'DELIVERED',
+  Opened = 'OPENED',
+  Complaint = 'COMPLAINT',
+}
+
 @Table({
   tableName: 'sms_messages_transactional',
   underscored: true,

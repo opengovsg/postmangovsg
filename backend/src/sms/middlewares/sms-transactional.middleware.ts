@@ -3,12 +3,15 @@ import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 import { TemplateError } from '@shared/templating'
 import { InvalidRecipientError, RateLimitError } from '@core/errors'
-import { SmsMessageTransactional } from '@sms/models/sms-message-transactional'
+import {
+  SmsMessageTransactional,
+  TransactionalSmsMessageStatus,
+} from '@sms/models/sms-message-transactional'
 import {
   MessageStatus,
   Ordering,
   TimestampFilter,
-  TransactionalEmailSortField,
+  TransactionalSmsSortField,
 } from '@core/constants'
 
 const logger = loggerWithLabel(module)
@@ -104,7 +107,7 @@ async function sendMessage(
 }
 
 async function listMessages(req: Request, res: Response): Promise<void> {
-  const { limit, offset, created_at, sort_by } = req.query
+  const { limit, offset, created_at, status, sort_by } = req.query
 
   const userId: string = req.session?.user?.id.toString() // id is number in session; convert to string for tests to pass (weird)
   const filter = created_at ? { createdAt: created_at } : undefined
@@ -117,8 +120,9 @@ async function listMessages(req: Request, res: Response): Promise<void> {
     userId,
     limit: +(limit as string),
     offset: +(offset as string),
-    sortBy: sortBy as TransactionalEmailSortField,
+    sortBy: sortBy as TransactionalSmsSortField,
     orderBy,
+    status: status as TransactionalSmsMessageStatus,
     filterByTimestamp: filter as TimestampFilter,
   })
   res.status(200).json({

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { SmsMiddleware, SmsTransactionalMiddleware } from '@sms/middlewares'
-import { MessageStatus, TransactionalEmailSortField } from '@core/constants'
+import { MessageStatus, TransactionalSmsSortField } from '@core/constants'
 
 export const InitSmsTransactionalRoute = (
   smsMiddleware: SmsMiddleware
@@ -34,10 +34,10 @@ export const InitSmsTransactionalRoute = (
       sort_by: Joi.string()
         .pattern(
           new RegExp(
-            `^[+-]?${Object.values(TransactionalEmailSortField).join('|')}$`
+            `^[+-]?${Object.values(TransactionalSmsSortField).join('|')}$`
           )
         )
-        .default(TransactionalEmailSortField.Created),
+        .default(TransactionalSmsSortField.Created),
     }),
   }
 

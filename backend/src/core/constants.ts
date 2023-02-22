@@ -49,6 +49,11 @@ export enum TransactionalEmailSortField {
   Updated = 'updated_at',
 }
 
+export enum TransactionalSmsSortField {
+  Created = 'created_at',
+  Updated = 'updated_at',
+}
+
 export interface TimestampFilter {
   createdAt: ComparisonOperator<Date>
 }

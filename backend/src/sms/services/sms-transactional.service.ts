@@ -4,10 +4,12 @@ import { loggerWithLabel } from '@core/logger'
 import {
   Ordering,
   TimestampFilter,
-  TransactionalEmailSortField,
+  TransactionalSmsSortField,
 } from '@core/constants'
-import { TransactionalEmailMessageStatus } from '@email/models'
-import { SmsMessageTransactional } from '@sms/models'
+import {
+  SmsMessageTransactional,
+  TransactionalSmsMessageStatus,
+} from '@sms/models'
 import { Order } from 'sequelize/types/model'
 import { Op, WhereOptions } from 'sequelize'
 import { TwilioCredentials } from '@shared/clients/twilio-client.class'
@@ -60,14 +62,14 @@ async function listMessages({
   userId: string
   limit?: number
   offset?: number
-  sortBy?: TransactionalEmailSortField
+  sortBy?: TransactionalSmsSortField
   orderBy?: Ordering
-  status?: TransactionalEmailMessageStatus
+  status?: TransactionalSmsMessageStatus
   filterByTimestamp?: TimestampFilter
 }): Promise<{ hasMore: boolean; messages: SmsMessageTransactional[] }> {
   limit = limit || 10
   offset = offset || 0
-  sortBy = sortBy || TransactionalEmailSortField.Created
+  sortBy = sortBy || TransactionalSmsSortField.Created
   orderBy = orderBy || Ordering.DESC
   const order: Order = [[sortBy, orderBy]]
   const where = ((userId, status, filterByTimestamp) => {
