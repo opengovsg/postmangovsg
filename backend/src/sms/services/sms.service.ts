@@ -17,8 +17,6 @@ import { InvalidRecipientError } from '@core/errors'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { SmsTemplateService } from '@sms/services'
 import { SmsDuplicateCampaignDetails } from '@sms/interfaces'
-
-import SnsSmsClient from './sns-sms-client.class'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 import TwilioClient, {
   TwilioCredentials,
@@ -88,13 +86,8 @@ const sendMessage = (
     throw new InvalidRecipientError('Invalid phone number')
   }
 
-  if (config.get('smsFallback.activate')) {
-    const client = new SnsSmsClient()
-    return client.send(recipient, message)
-  } else {
-    const client = new TwilioClient(credential)
-    return client.send(recipient, message)
-  }
+  const client = new TwilioClient(credential)
+  return client.send(recipient, message)
 }
 
 /**
