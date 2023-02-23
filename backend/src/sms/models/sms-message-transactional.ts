@@ -7,16 +7,13 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
-import { MessageStatus } from '@core/constants'
 
 export enum TransactionalSmsMessageStatus {
   Unsent = 'UNSENT',
   Accepted = 'ACCEPTED',
   Sent = 'SENT',
-  Bounced = 'BOUNCED',
   Delivered = 'DELIVERED',
-  Opened = 'OPENED',
-  Complaint = 'COMPLAINT',
+  Error = 'ERROR',
 }
 
 @Table({
@@ -51,10 +48,10 @@ export class SmsMessageTransactional extends Model<SmsMessageTransactional> {
   messageId: string | null
 
   @Column({
-    type: DataType.ENUM(...Object.values(MessageStatus)),
+    type: DataType.ENUM(...Object.values(TransactionalSmsMessageStatus)),
     allowNull: false,
   })
-  status: MessageStatus
+  status: TransactionalSmsMessageStatus
 
   @Column({ type: DataType.STRING, allowNull: true })
   errorCode: string | null
