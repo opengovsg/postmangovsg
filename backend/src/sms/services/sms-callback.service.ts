@@ -2,7 +2,11 @@ import { Request } from 'express'
 import { Op } from 'sequelize'
 import bcrypt from 'bcrypt'
 import config from '@core/config'
-import { SmsMessage, SmsMessageTransactional } from '@sms/models'
+import {
+  SmsMessage,
+  SmsMessageTransactional,
+  TransactionalSmsMessageStatus,
+} from '@sms/models'
 import { loggerWithLabel } from '@core/logger'
 import { compareSha256Hash } from '@shared/utils/crypto'
 
@@ -111,6 +115,9 @@ const parseEvent = async (req: Request): Promise<void> => {
   }
 }
 
+// for future context: we only care about when the twilio callback is a finalized status
+// we don't want to update the status pre-emptively until we receive the finalized status
+// initial state --> UNSENT
 const parseTransactionalEvent = async (req: Request): Promise<void> => {
   const {
     MessageStatus: twilioMessageStatus,
@@ -130,7 +137,7 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
     await SmsMessageTransactional.update(
       {
         errorCode: twilioErrorCode,
-        status: 'ERROR',
+        status: TransactionalSmsMessageStatus.Error,
       } as SmsMessageTransactional,
       {
         where: {
@@ -142,18 +149,25 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
     // longer messages are delivered in multiple segments
     // each segment has a separate delivery status
     // Update the message as successful only if there does not exist previous failed status
-    await SmsMessageTransactional.update(
-      {
-        updatedAt: new Date(),
-        status: 'SUCCESS',
-      } as SmsMessageTransactional,
-      {
-        where: {
-          messageId: messageId,
-          errorCode: { [Op.eq]: null },
-        },
-      }
-    )
+    // update only if sent or delivered
+    const mappedStatus = twilioMessageStatus.toUpperCase()
+    if (
+      mappedStatus == TransactionalSmsMessageStatus.Sent ||
+      mappedStatus == TransactionalSmsMessageStatus.Delivered
+    ) {
+      await SmsMessageTransactional.update(
+        {
+          updatedAt: new Date(),
+          status: twilioMessageStatus.toUpperCase(),
+        } as SmsMessageTransactional,
+        {
+          where: {
+            messageId: messageId,
+            errorCode: { [Op.eq]: null },
+          },
+        }
+      )
+    }
   }
 }
 export const SmsCallbackService = {

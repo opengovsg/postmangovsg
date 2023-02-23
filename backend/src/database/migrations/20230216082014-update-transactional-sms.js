@@ -1,14 +1,15 @@
 'use strict';
 
 const {MessageStatus} = require('@core/constants');
+const {TransactionalSmsMessageStatus} = require('@sms/models');
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         await queryInterface.addColumn('sms_messages_transactional', 'status', {
             type: Sequelize.DataTypes.ENUM(
-                Object.values(MessageStatus)
+                Object.values(TransactionalSmsMessageStatus)
             ),
             allowNull: false,
-            defaultValue: MessageStatus.Success
+            defaultValue: TransactionalSmsMessageStatus.Delivered
         });
         await queryInterface.addColumn('sms_messages_transactional', 'error_code', {
             allowNull: true,

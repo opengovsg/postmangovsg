@@ -8,7 +8,6 @@ import {
   TransactionalSmsMessageStatus,
 } from '@sms/models/sms-message-transactional'
 import {
-  MessageStatus,
   Ordering,
   TimestampFilter,
   TransactionalSmsSortField,
@@ -45,7 +44,7 @@ async function saveMessage(
     body,
     credentialsLabel: label,
     messageId: null,
-    status: MessageStatus.Sending,
+    status: TransactionalSmsMessageStatus.Unsent,
     // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
   } as unknown as SmsMessageTransactional)
   req.body.smsMessageTransactionalId = smsMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional SMS

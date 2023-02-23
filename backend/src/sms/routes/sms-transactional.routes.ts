@@ -1,7 +1,8 @@
 import { Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { SmsMiddleware, SmsTransactionalMiddleware } from '@sms/middlewares'
-import { MessageStatus, TransactionalSmsSortField } from '@core/constants'
+import { TransactionalSmsSortField } from '@core/constants'
+import { TransactionalSmsMessageStatus } from '@sms/models'
 
 export const InitSmsTransactionalRoute = (
   smsMiddleware: SmsMiddleware
@@ -23,7 +24,7 @@ export const InitSmsTransactionalRoute = (
       offset: Joi.number().integer().min(0).default(0),
       status: Joi.string()
         .uppercase()
-        .valid(...Object.values(MessageStatus)),
+        .valid(...Object.values(TransactionalSmsMessageStatus)),
       created_at: Joi.object({
         gt: Joi.date().iso(),
         gte: Joi.date().iso(),
