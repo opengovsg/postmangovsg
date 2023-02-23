@@ -150,15 +150,16 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
     // each segment has a separate delivery status
     // Update the message as successful only if there does not exist previous failed status
     // update only if sent or delivered
-    const mappedStatus = twilioMessageStatus.toUpperCase()
+    // map here because twilio does not explicitly send "error"
+    const mappedStatus = mapTwilioMessageStatus(twilioMessageStatus)
     if (
-      mappedStatus == TransactionalSmsMessageStatus.Sent ||
-      mappedStatus == TransactionalSmsMessageStatus.Delivered
+      mappedStatus === TransactionalSmsMessageStatus.Sent ||
+      mappedStatus === TransactionalSmsMessageStatus.Delivered
     ) {
       await SmsMessageTransactional.update(
         {
           updatedAt: new Date(),
-          status: twilioMessageStatus.toUpperCase(),
+          status: mappedStatus,
         } as SmsMessageTransactional,
         {
           where: {
@@ -168,6 +169,21 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
         }
       )
     }
+  }
+}
+
+const mapTwilioMessageStatus = (
+  status: string
+): TransactionalSmsMessageStatus => {
+  switch (status) {
+    case 'sent':
+      return TransactionalSmsMessageStatus.Sent
+    case 'delivered':
+      return TransactionalSmsMessageStatus.Delivered
+    case 'accepted':
+      return TransactionalSmsMessageStatus.Accepted
+    default:
+      return TransactionalSmsMessageStatus.Unsent
   }
 }
 export const SmsCallbackService = {

@@ -47,7 +47,7 @@ router.post(
  *          description: Bad Request
  */
 router.post(
-  '',
+  '/',
   SmsCallbackMiddleware.isAuthenticatedTransactional,
   SmsCallbackMiddleware.parseTransactionalEvent
 )

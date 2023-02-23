@@ -67,19 +67,14 @@ const parseEvent = async (
 
 const parseTransactionalEvent = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
-  try {
-    await SmsCallbackService.parseTransactionalEvent(req)
-    logger.info({
-      message: 'Successfully parsed transactional event',
-      action: 'parseTransactionalEvent',
-    })
-    return res.sendStatus(200)
-  } catch (err) {
-    return next(err)
-  }
+  logger.info({
+    message: 'Processing transactional event',
+    action: 'parseTransactionalEvent',
+  })
+  await SmsCallbackService.parseTransactionalEvent(req)
+  return res.sendStatus(200)
 }
 
 export const SmsCallbackMiddleware = {
