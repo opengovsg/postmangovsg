@@ -68,7 +68,6 @@ const getHydratedMessage = async (
  * @param credential
  * @param recipient
  * @param message
- * @param campaignId
  *
  * @returns Promise<string | void>
  */

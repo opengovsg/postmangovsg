@@ -44,11 +44,11 @@ const isAuthenticatedTransactional = (
     return res.sendStatus(401)
   }
   if (
-    SmsCallbackService.isAuthenticatedTransactional(req.get('authorization'))
+    !SmsCallbackService.isAuthenticatedTransactional(req.get('authorization'))
   ) {
-    return next()
+    return res.sendStatus(403)
   }
-  return res.sendStatus(403)
+  return next()
 }
 
 const parseEvent = async (

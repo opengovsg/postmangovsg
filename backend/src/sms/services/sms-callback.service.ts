@@ -11,6 +11,7 @@ import { loggerWithLabel } from '@core/logger'
 import { compareSha256Hash } from '@shared/utils/crypto'
 
 const logger = loggerWithLabel(module)
+
 const FINALIZED_STATUS = ['sent', 'delivered', 'undelivered', 'failed']
 
 const isAuthenticated = (
@@ -124,6 +125,9 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
     ErrorCode: twilioErrorCode,
     MessageSid: messageId,
   } = req.body
+
+  // this part is not type-safe and any changes here should be treated with caution
+  // refer to twilio message status docs if you need more context
   if (FINALIZED_STATUS.indexOf(twilioMessageStatus as string) === -1) {
     return
   }
@@ -141,7 +145,7 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
       } as SmsMessageTransactional,
       {
         where: {
-          messageId: messageId,
+          messageId,
         },
       }
     )
@@ -163,7 +167,7 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
         } as SmsMessageTransactional,
         {
           where: {
-            messageId: messageId,
+            messageId,
             errorCode: { [Op.eq]: null },
           },
         }
