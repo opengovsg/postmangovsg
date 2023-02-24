@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { SmsCallbackService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
 
@@ -34,6 +34,23 @@ const isAuthenticated = (
   return res.sendStatus(403)
 }
 
+const isAuthenticatedTransactional = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Response | void => {
+  if (!req.get('authorization')) {
+    res.set('WWW-Authenticate', 'Basic realm="Twilio"')
+    return res.sendStatus(401)
+  }
+  if (
+    !SmsCallbackService.isAuthenticatedTransactional(req.get('authorization'))
+  ) {
+    return res.sendStatus(403)
+  }
+  return next()
+}
+
 const parseEvent = async (
   req: Request,
   res: Response,
@@ -48,7 +65,21 @@ const parseEvent = async (
   }
 }
 
+const parseTransactionalEvent = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  logger.info({
+    message: 'Processing transactional event',
+    action: 'parseTransactionalEvent',
+  })
+  await SmsCallbackService.parseTransactionalEvent(req)
+  return res.sendStatus(200)
+}
+
 export const SmsCallbackMiddleware = {
   isAuthenticated,
+  isAuthenticatedTransactional,
   parseEvent,
+  parseTransactionalEvent,
 }

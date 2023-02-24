@@ -2,11 +2,16 @@ import { Request } from 'express'
 import { Op } from 'sequelize'
 import bcrypt from 'bcrypt'
 import config from '@core/config'
-import { SmsMessage } from '@sms/models'
+import {
+  SmsMessage,
+  SmsMessageTransactional,
+  TransactionalSmsMessageStatus,
+} from '@sms/models'
 import { loggerWithLabel } from '@core/logger'
 import { compareSha256Hash } from '@shared/utils/crypto'
 
 const logger = loggerWithLabel(module)
+
 const FINALIZED_STATUS = ['sent', 'delivered', 'undelivered', 'failed']
 
 const isAuthenticated = (
@@ -46,6 +51,22 @@ const isAuthenticated = (
     isAuthenticated = bcrypt.compareSync(bcryptPlainTextPassword, password)
   }
   return isAuthenticated
+}
+
+const isAuthenticatedTransactional = (authHeader?: string): boolean => {
+  const headerKey = 'Basic'
+  if (!authHeader) return false
+
+  const [header, secret] = authHeader.trim().split(' ')
+  if (headerKey !== header) return false
+
+  const credentials = Buffer.from(secret, 'base64').toString('utf8')
+  const [username, password] = credentials.split(':')
+  return compareSha256Hash(
+    config.get('smsCallback.callbackSecret'),
+    username,
+    password
+  )
 }
 
 const parseEvent = async (req: Request): Promise<void> => {
@@ -94,7 +115,84 @@ const parseEvent = async (req: Request): Promise<void> => {
     )
   }
 }
+
+// for future context: we only care about when the twilio callback is a finalized status
+// we don't want to update the status pre-emptively until we receive the finalized status
+// initial state --> UNSENT
+const parseTransactionalEvent = async (req: Request): Promise<void> => {
+  const {
+    MessageStatus: twilioMessageStatus,
+    ErrorCode: twilioErrorCode,
+    MessageSid: messageId,
+  } = req.body
+
+  // this part is not type-safe and any changes here should be treated with caution
+  // refer to twilio message status docs if you need more context
+  if (FINALIZED_STATUS.indexOf(twilioMessageStatus as string) === -1) {
+    return
+  }
+  logger.info({
+    message: 'Updating message in sms_messages_transactional',
+    messageId,
+    action: 'parseTransactionalEvent',
+  })
+
+  if (twilioErrorCode) {
+    await SmsMessageTransactional.update(
+      {
+        errorCode: twilioErrorCode,
+        status: TransactionalSmsMessageStatus.Error,
+      } as SmsMessageTransactional,
+      {
+        where: {
+          messageId,
+        },
+      }
+    )
+  } else {
+    // longer messages are delivered in multiple segments
+    // each segment has a separate delivery status
+    // Update the message as successful only if there does not exist previous failed status
+    // update only if sent or delivered
+    // map here because twilio does not explicitly send "error"
+    const mappedStatus = mapTwilioMessageStatus(twilioMessageStatus)
+    if (
+      mappedStatus === TransactionalSmsMessageStatus.Sent ||
+      mappedStatus === TransactionalSmsMessageStatus.Delivered
+    ) {
+      await SmsMessageTransactional.update(
+        {
+          updatedAt: new Date(),
+          status: mappedStatus,
+        } as SmsMessageTransactional,
+        {
+          where: {
+            messageId,
+            errorCode: { [Op.eq]: null },
+          },
+        }
+      )
+    }
+  }
+}
+
+const mapTwilioMessageStatus = (
+  status: string
+): TransactionalSmsMessageStatus => {
+  switch (status) {
+    case 'sent':
+      return TransactionalSmsMessageStatus.Sent
+    case 'delivered':
+      return TransactionalSmsMessageStatus.Delivered
+    case 'accepted':
+      return TransactionalSmsMessageStatus.Accepted
+    default:
+      return TransactionalSmsMessageStatus.Unsent
+  }
+}
 export const SmsCallbackService = {
   isAuthenticated,
+  isAuthenticatedTransactional,
   parseEvent,
+  parseTransactionalEvent,
 }

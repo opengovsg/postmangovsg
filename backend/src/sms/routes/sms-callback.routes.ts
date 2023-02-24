@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { SmsCallbackMiddleware } from '@sms/middlewares'
+
 const router = Router()
 
 /**
@@ -30,4 +31,24 @@ router.post(
   SmsCallbackMiddleware.parseEvent
 )
 
+// This is to handle for transactional sms
+
+/**
+ * paths:
+ *  /callback/sms:
+ *    post:
+ *      summary: Update status of transactional sms message
+ *      tags:
+ *        - Settings
+ *      responses:
+ *        200:
+ *          description: OK
+ *        400:
+ *          description: Bad Request
+ */
+router.post(
+  '/',
+  SmsCallbackMiddleware.isAuthenticatedTransactional,
+  SmsCallbackMiddleware.parseTransactionalEvent
+)
 export default router

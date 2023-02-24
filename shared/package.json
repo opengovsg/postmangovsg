@@ -50,6 +50,7 @@
     "mustache": "4.2.0",
     "nodemailer": "6.6.2",
     "opentracing": "0.14.7",
+    "twilio": "4.7.2",
     "xss": "1.0.13"
   },
   "lint-staged": {

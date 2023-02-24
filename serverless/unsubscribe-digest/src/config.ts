@@ -146,7 +146,7 @@ const config = convict({
     default:
       'https://guide.postman.gov.sg/quick-start/email/weekly-digest-of-unsubscription',
     env: 'UNSUBSCRIBE_GUIDE_URL',
-    format: 'required-string',
+    format: String,
   },
   sentryDsn: {
     doc: 'Sentry DSN for serverless',

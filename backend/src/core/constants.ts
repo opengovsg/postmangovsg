@@ -4,7 +4,7 @@ export enum ChannelType {
   Telegram = 'TELEGRAM',
 }
 
-export enum Status {
+export enum CampaignStatus {
   Draft = 'Draft',
   Sending = 'Sending',
   Sent = 'Sent',
@@ -45,6 +45,11 @@ export enum Ordering {
 }
 
 export enum TransactionalEmailSortField {
+  Created = 'created_at',
+  Updated = 'updated_at',
+}
+
+export enum TransactionalSmsSortField {
   Created = 'created_at',
   Updated = 'updated_at',
 }
