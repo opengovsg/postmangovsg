@@ -65,9 +65,6 @@ export default class TwilioClient {
   // you dont need the message id... it is passed in the payload
   // you also dont need campaign id..
   private async generateStatusCallbackUrl(): Promise<string | undefined> {
-    console.log('callbackSecret IS: ', this.callbackSecret)
-    console.log('callbackBaseUrl IS: ', this.callbackBaseUrl)
-
     if (!this.callbackSecret || !this.callbackBaseUrl) return undefined
 
     const username = Math.random().toString(36).substring(2, 15) // random string
