@@ -1,6 +1,5 @@
 'use strict';
 
-const {MessageStatus} = require('@core/constants');
 const {TransactionalSmsMessageStatus} = require('@sms/models');
 module.exports = {
     up: async (queryInterface, Sequelize) => {
@@ -9,7 +8,7 @@ module.exports = {
                 Object.values(TransactionalSmsMessageStatus)
             ),
             allowNull: false,
-            defaultValue: TransactionalSmsMessageStatus.Delivered
+            defaultValue: TransactionalSmsMessageStatus.Unsent
         });
         await queryInterface.addColumn('sms_messages_transactional', 'error_code', {
             allowNull: true,
