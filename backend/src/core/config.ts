@@ -7,7 +7,9 @@ import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
 import { isSupportedCountry } from 'libphonenumber-js'
+
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
+
 /**
  * To require an env var without setting a default,
  * use
@@ -115,6 +117,7 @@ interface ConfigSchema {
   }
   smsCallback: {
     callbackSecret: string
+    callbackUrl: string
   }
   telegramCallback: {
     contactUsUrl: string
@@ -565,6 +568,13 @@ const config: Config<ConfigSchema> = convict({
       doc: 'Secret used to generate the basic auth credentials for twilio callback',
       default: '',
       env: 'TWILIO_CALLBACK_SECRET',
+      format: 'required-string',
+      sensitive: true,
+    },
+    callbackUrl: {
+      doc: 'Callback base url that twilio webhook will use',
+      default: '',
+      env: 'BACKEND_URL',
       format: 'required-string',
       sensitive: true,
     },
