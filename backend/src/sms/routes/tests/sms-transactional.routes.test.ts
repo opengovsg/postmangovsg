@@ -1,16 +1,19 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
-import { User, Credential, UserCredential } from '@core/models'
+import { Credential, User, UserCredential } from '@core/models'
 import { ChannelType } from '@core/constants'
-import { RateLimitError, InvalidRecipientError } from '@core/errors'
+import { InvalidRecipientError, RateLimitError } from '@core/errors'
 import { TemplateError } from '@shared/templating'
 import { SmsService } from '@sms/services'
 
 import { mockSecretsManager } from '@mocks/aws-sdk'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
-import { SmsMessageTransactional } from '@sms/models'
+import {
+  SmsMessageTransactional,
+  TransactionalSmsMessageStatus,
+} from '@sms/models'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',
@@ -110,6 +113,29 @@ describe('POST /transactional/sms/send', () => {
       credentialsLabel: validApiCall.label,
       messageId: mockSendMessageResolvedValue,
     })
+
+    const getByIdRes = await request(app)
+      .get('/transactional/sms/1')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send()
+    expect(getByIdRes.status).toBe(200)
+    expect(getByIdRes.body.status).toBe(TransactionalSmsMessageStatus.Unsent)
+    expect(getByIdRes.body.body).toEqual('Hello world')
+    expect(getByIdRes.body.recipient).toEqual('98765432')
+    expect(getByIdRes.body.credentialsLabel).toEqual('twilio-1')
+    const listRes = await request(app)
+      .get('/transactional/sms')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send()
+    expect(listRes.body.data).toHaveLength(1)
+    expect(listRes.body.data[0].status).toBe(
+      TransactionalSmsMessageStatus.Unsent
+    )
+    expect(listRes.body.data[0].body).toEqual('Hello world')
+    expect(listRes.body.data[0].recipient).toEqual('98765432')
+    expect(listRes.body.data[0].credentialsLabel).toEqual('twilio-1')
+    expect(listRes.status).toBe(200)
+
     mockSendMessage.mockReset()
   })
 
