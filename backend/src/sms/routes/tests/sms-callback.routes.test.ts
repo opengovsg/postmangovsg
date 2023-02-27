@@ -31,6 +31,7 @@ beforeEach(async () => {
   } as User)
   const userId = user.id
   apiKey = await user.regenerateAndSaveApiKey()
+  credential = await Credential.create({ name: 'twilio' } as Credential)
   await UserCredential.create({
     label: `twilio-callback-${userId}`,
     type: ChannelType.SMS,
@@ -41,7 +42,6 @@ beforeEach(async () => {
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  credential = await Credential.create({ name: 'twilio' } as Credential)
 })
 
 afterEach(async () => {
@@ -49,6 +49,7 @@ afterEach(async () => {
   await SmsMessageTransactional.destroy({ where: {} })
   await User.destroy({ where: {} })
   await UserCredential.destroy({ where: {} })
+  await Credential.destroy({ where: {} })
 })
 
 afterAll(async () => {
@@ -63,7 +64,7 @@ describe('On successful message send, status should update according to Twilio r
     label: 'twilio-callback-1',
   }
   test('Should send a message successfully', async () => {
-    const mockSendMessageResolvedValue = 'message_id'
+    const mockSendMessageResolvedValue = 'message_id_callback'
     const mockSendMessage = jest
       .spyOn(SmsService, 'sendMessage')
       .mockResolvedValue(mockSendMessageResolvedValue)
@@ -119,7 +120,7 @@ describe('On successful message send, status should update according to Twilio r
 
     expect(callbackRes.status).toBe(200)
     const postCallbackGetByIdRes = await request(app)
-      .get('/transactional/sms/1')
+      .get(`/transactional/sms/${transactionalSmsId}`)
       .set('Authorization', `Bearer ${apiKey}`)
       .send()
     expect(postCallbackGetByIdRes.status).toBe(200)
@@ -137,7 +138,7 @@ describe('On successful message send, status should update according to Twilio r
     expect(callbackRes.status).toBe(200)
 
     const errorCallbackGetByIdRes = await request(app)
-      .get('/transactional/sms/1')
+      .get(`/transactional/sms/${transactionalSmsId}`)
       .set('Authorization', `Bearer ${apiKey}`)
       .send()
     expect(errorCallbackGetByIdRes.status).toBe(200)
@@ -155,12 +156,13 @@ describe('On successful message send, status should update according to Twilio r
     expect(callbackRes.status).toBe(200)
 
     const finalCallbackGetByIdRes = await request(app)
-      .get('/transactional/sms/1')
+      .get(`/transactional/sms/${transactionalSmsId}`)
       .set('Authorization', `Bearer ${apiKey}`)
       .send()
     expect(finalCallbackGetByIdRes.status).toBe(200)
     expect(finalCallbackGetByIdRes.body.status).toBe(
       TransactionalSmsMessageStatus.Error
     )
+    mockSendMessage.mockReset()
   })
 })
