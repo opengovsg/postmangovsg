@@ -27,13 +27,12 @@ const app = initialiseServer(false)
 
 beforeEach(async () => {
   user = await User.create({
-    id: 1,
-    email: 'user_1@agency.gov.sg',
+    email: 'sms_callback@agency.gov.sg',
   } as User)
   const userId = user.id
   apiKey = await user.regenerateAndSaveApiKey()
   await UserCredential.create({
-    label: `twilio-${userId}`,
+    label: `twilio-callback-${userId}`,
     type: ChannelType.SMS,
     credName: credential.name,
     userId,
@@ -61,7 +60,7 @@ describe('On successful message send, status should update according to Twilio r
   const validApiCall = {
     body: 'Hello world',
     recipient: '98765432',
-    label: 'twilio-1',
+    label: 'twilio-callback-1',
   }
   test('Should send a message successfully', async () => {
     const mockSendMessageResolvedValue = 'message_id'
@@ -81,12 +80,20 @@ describe('On successful message send, status should update according to Twilio r
 
     const transactionalSms = await SmsMessageTransactional.findOne({
       where: { userId: user.id.toString() },
+      order: [['createdAt', 'DESC']],
     })
-    expect(transactionalSms?.id).toBe('1')
+    const transactionalSmsId = transactionalSms?.id
+
     const getByIdRes = await request(app)
-      .get('/transactional/sms/1')
+      .get(`/transactional/sms/${transactionalSmsId}`)
       .set('Authorization', `Bearer ${apiKey}`)
       .send()
+    expect(getByIdRes.status).toBe(200)
+    expect(getByIdRes.body.status).toBe(TransactionalSmsMessageStatus.Unsent)
+    expect(getByIdRes.body.body).toEqual('Hello world')
+    expect(getByIdRes.body.recipient).toEqual('98765432')
+    expect(getByIdRes.body.credentialsLabel).toEqual('twilio-callback-1')
+
     expect(getByIdRes.status).toBe(200)
     expect(getByIdRes.body.status).toBe(TransactionalSmsMessageStatus.Unsent)
     const sampleTwilioCallback = {

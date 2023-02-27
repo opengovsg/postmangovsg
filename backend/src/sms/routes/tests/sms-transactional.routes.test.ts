@@ -114,15 +114,6 @@ describe('POST /transactional/sms/send', () => {
       messageId: mockSendMessageResolvedValue,
     })
 
-    const getByIdRes = await request(app)
-      .get('/transactional/sms/1')
-      .set('Authorization', `Bearer ${apiKey}`)
-      .send()
-    expect(getByIdRes.status).toBe(200)
-    expect(getByIdRes.body.status).toBe(TransactionalSmsMessageStatus.Unsent)
-    expect(getByIdRes.body.body).toEqual('Hello world')
-    expect(getByIdRes.body.recipient).toEqual('98765432')
-    expect(getByIdRes.body.credentialsLabel).toEqual('twilio-1')
     const listRes = await request(app)
       .get('/transactional/sms')
       .set('Authorization', `Bearer ${apiKey}`)
