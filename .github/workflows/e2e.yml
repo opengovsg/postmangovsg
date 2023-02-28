@@ -1,0 +1,54 @@
+name: End-to-end Test
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      e2e_result:
+        description: "Outcome of the cypress suite, enum<success, failure, skipped, cancelled>"
+        value: ${{ jobs.puppeteer-run.outputs.outcome }}
+
+jobs:
+  set_environment:
+    outputs:
+      current_env: ${{ steps.set-environment.outputs.current_env }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: set-environment
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "current_env=production" >> $GITHUB_OUTPUT
+          else
+             echo "current_env=staging" >> $GITHUB_OUTPUT
+          fi
+  puppeteer-run:
+    runs-on: ubuntu-latest
+    needs: [set_environment]
+    environment:
+      name: ${{ needs.set_environment.outputs.current_env }}
+    outputs:
+      outcome: ${{ steps.puppeteer.outcome }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Write gmail credentials file
+        env:
+          GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
+          GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
+        run: |
+          echo $GMAIL_CREDENTIALS > credentials.json
+          echo $GMAIL_TOKEN > gmail_token.json
+        working-directory: e2e
+      - run: npm ci
+        working-directory: e2e
+      - run: npm run test
+        id: puppeteer
+        env:
+          API_URL: ${{ github.ref == 'refs/heads/master' && 'https://api.postman.gov.sg' || 'https://api-staging.postman.gov.sg' }}
+          # Reusing env var from cypress
+          # TODO: rename this once we've migrated away from Cypress
+          API_KEY: ${{ secrets.CYPRESS_API_KEY }}
+          MAILBOX: internal-testing@open.gov.sg
+        working-directory: e2e
