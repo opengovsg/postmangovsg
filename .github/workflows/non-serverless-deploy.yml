@@ -130,6 +130,7 @@ jobs:
     needs:
       - slack-prepare
       - slack-started
+      - deploy-backend # to add while e2e-test is disabled
       # - e2e-test
     if: success()
     name: Send Slack message about successful build
