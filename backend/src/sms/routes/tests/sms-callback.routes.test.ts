@@ -10,6 +10,7 @@ import {
 import request from 'supertest'
 import { SmsCallbackService, SmsService } from '@sms/services'
 import { mockSecretsManager } from '@mocks/aws-sdk'
+import { CredentialService } from '@core/services'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',
@@ -30,7 +31,9 @@ beforeEach(async () => {
     email: 'sms_callback@agency.gov.sg',
   } as User)
   const userId = user.id
-  apiKey = await user.regenerateAndSaveApiKey()
+  apiKey = await (
+    app as any as { credentialService: CredentialService }
+  ).credentialService.regenerateApiKey(user.id)
   credential = await Credential.create({ name: 'twilio' } as Credential)
   await UserCredential.create({
     label: `twilio-callback-${userId}`,
