@@ -113,7 +113,7 @@ describe('On successful message send, status should update according to Twilio r
       .mockReturnValue(true)
     let callbackRes = await request(app)
       .post('/callback/sms')
-      .set('Authorization', `Basic sampleAuthKey`)
+      .set('Authorization', 'Basic sampleAuthKey')
       .send(sampleTwilioCallback)
 
     expect(callbackRes.status).toBe(200)
@@ -133,7 +133,7 @@ describe('On successful message send, status should update according to Twilio r
 
     callbackRes = await request(app)
       .post('/callback/sms')
-      .set('Authorization', `Basic ${1234}`)
+      .set('Authorization', 'Basic sampleAuthKey')
       .send(sampleTwilioCallbackError)
 
     expect(callbackRes.status).toBe(200)
@@ -153,7 +153,7 @@ describe('On successful message send, status should update according to Twilio r
     }
     callbackRes = await request(app)
       .post('/callback/sms')
-      .set('Authorization', `Basic ${1234}`)
+      .set('Authorization', 'Basic sampleAuthKey')
       .send(sampleTwilioCallbackDelivered)
 
     expect(callbackRes.status).toBe(200)
