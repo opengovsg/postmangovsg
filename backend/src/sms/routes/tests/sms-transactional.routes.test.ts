@@ -1,9 +1,9 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 
-import { User, Credential, UserCredential } from '@core/models'
+import { Credential, User, UserCredential } from '@core/models'
 import { ChannelType } from '@core/constants'
-import { RateLimitError, InvalidRecipientError } from '@core/errors'
+import { InvalidRecipientError, RateLimitError } from '@core/errors'
 import { TemplateError } from '@shared/templating'
 import { SmsService } from '@sms/services'
 
@@ -37,6 +37,7 @@ beforeEach(async () => {
     app as any as { credentialService: CredentialService }
   ).credentialService.regenerateApiKey(user.id)
 
+  credential = await Credential.create({ name: 'twilio' } as Credential)
   await UserCredential.create({
     label: `twilio-${userId}`,
     type: ChannelType.SMS,
@@ -47,7 +48,6 @@ beforeEach(async () => {
 
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
-  credential = await Credential.create({ name: 'twilio' } as Credential)
 })
 
 afterEach(async () => {
@@ -55,6 +55,7 @@ afterEach(async () => {
   await SmsMessageTransactional.destroy({ where: {} })
   await User.destroy({ where: {} })
   await UserCredential.destroy({ where: {} })
+  await Credential.destroy({ where: {} })
 })
 
 afterAll(async () => {
@@ -114,6 +115,16 @@ describe('POST /transactional/sms/send', () => {
       credentialsLabel: validApiCall.label,
       messageId: mockSendMessageResolvedValue,
     })
+
+    const listRes = await request(app)
+      .get('/transactional/sms')
+      .set('Authorization', `Bearer ${apiKey}`)
+      .send()
+    expect(listRes.body.data[0].body).toEqual('Hello world')
+    expect(listRes.body.data[0].recipient).toEqual('98765432')
+    expect(listRes.body.data[0].credentialsLabel).toEqual('twilio-1')
+    expect(listRes.status).toBe(200)
+
     mockSendMessage.mockReset()
   })
 
