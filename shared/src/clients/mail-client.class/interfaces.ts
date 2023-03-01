@@ -7,7 +7,7 @@ export interface MailToSend {
   subject: string
   body: string
   replyTo?: string
-  referenceId?: string
+  messageId?: string
   from?: string
   unsubLink?: string
   attachments?: Array<MailAttachment>

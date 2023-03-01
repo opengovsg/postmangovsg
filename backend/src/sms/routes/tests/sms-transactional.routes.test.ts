@@ -11,6 +11,7 @@ import { mockSecretsManager } from '@mocks/aws-sdk'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { SmsMessageTransactional } from '@sms/models'
+import { CredentialService } from '@core/services'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',
@@ -32,7 +33,10 @@ beforeEach(async () => {
     email: 'user_1@agency.gov.sg',
   } as User)
   const userId = user.id
-  apiKey = await user.regenerateAndSaveApiKey()
+  apiKey = await (
+    app as any as { credentialService: CredentialService }
+  ).credentialService.regenerateApiKey(user.id)
+
   credential = await Credential.create({ name: 'twilio' } as Credential)
   await UserCredential.create({
     label: `twilio-${userId}`,

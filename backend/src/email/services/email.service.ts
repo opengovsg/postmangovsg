@@ -154,17 +154,18 @@ const getCampaignMessage = async (
 const sendEmail = async (
   mail: MailToSend,
   opts?: SendEmailOpts
-): Promise<string | void> => {
+): Promise<boolean> => {
   try {
-    return MailService.mailClient.sendMail(mail, opts)
+    await MailService.mailClient.sendMail(mail, opts)
   } catch (e) {
     logger.error({
       message: 'Error while sending test email',
       error: e,
       action: 'sendEmail',
     })
-    return
+    return false
   }
+  return true
 }
 
 /**

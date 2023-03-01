@@ -32,7 +32,7 @@ export const addToBlacklist = (
 export const updateMessageWithError = async (
   opts: UpdateMessageWithErrorMetadata
 ): Promise<number | undefined> => {
-  const { errorCode, errorSubType, timestamp, id } = opts
+  const { errorCode, errorSubType, timestamp, messageId } = opts
 
   logger.info({
     message: 'Updating email_messages table',
@@ -49,7 +49,7 @@ export const updateMessageWithError = async (
     {
       where: {
         [Op.and]: [
-          { id },
+          { id: messageId },
           {
             [Op.or]: [
               { receivedAt: null },
@@ -76,8 +76,9 @@ export const updateMessageWithSuccess = async (
     metadata,
     action: 'updateMessageWithSuccess',
   })
-  const { timestamp, id } = metadata
-  // Since notifications for the same messageId can be interleaved, we only update that message if this notification is newer than the previous.
+  // here id is extracted
+  const { timestamp, messageId } = metadata
+  // Since notifications for the same id can be interleaved, we only update that message if this notification is newer than the previous.
   // Should not overwrite a READ status for the message
   const [, result] = await EmailMessage.update(
     {
@@ -87,7 +88,8 @@ export const updateMessageWithSuccess = async (
     {
       where: {
         [Op.and]: [
-          { id },
+          // used here
+          { id: messageId },
           {
             [Op.or]: [
               { receivedAt: null },
@@ -116,7 +118,7 @@ export const updateMessageWithRead = async (
     metadata,
     action: 'updateMessageWithRead',
   })
-  const { timestamp, id } = metadata
+  const { timestamp, messageId } = metadata
   // Since open event supercedes error or success notification types, overwrite any previous status
   const [, result] = await EmailMessage.update(
     {
@@ -124,7 +126,7 @@ export const updateMessageWithRead = async (
       status: 'READ',
     } as EmailMessage,
     {
-      where: { id },
+      where: { id: messageId },
       returning: true,
     }
   )
@@ -174,8 +176,8 @@ export const haltCampaignIfThresholdExceeded = async (
       exceedsHaltPercentage,
       action: 'haltCampaignIfThresholdExceeded',
     })
-    /* With default MIN_HALT_NUMBER=10, MIN_HALT_PERCENTAGE=0.1, 
-      it means that 
+    /* With default MIN_HALT_NUMBER=10, MIN_HALT_PERCENTAGE=0.1,
+      it means that
       - if there were 11 messages sent thus far, and 11 invalid recipients, the campaign would halt immediately since 11/11 > MIN_HALT_PERCENTAGE
       - if there were 110 messages sent thus far, and 11 invalid recipients, the campaign would not halt, since 11/110 <= MIN_HALT_PERCENTAGE
       */

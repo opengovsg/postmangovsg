@@ -98,17 +98,18 @@ async function sendMessage({
     body: sanitizedBody,
     recipients: [recipient],
     replyTo,
+    messageId: emailMessageTransactionalId.toString(),
     attachments: sanitizedAttachments,
-    referenceId: emailMessageTransactionalId.toString(),
   }
   logger.info({
     message: 'Sending transactional email',
     action: 'sendMessage',
   })
-  const messageId = await EmailService.sendEmail(mailToSend, {
+  // receive from SES, but not saving to DB
+  const isEmailSent = await EmailService.sendEmail(mailToSend, {
     extraSmtpHeaders: { isTransactional: true },
   })
-  if (!messageId) {
+  if (!isEmailSent) {
     throw new Error('Failed to send transactional email')
   }
 }

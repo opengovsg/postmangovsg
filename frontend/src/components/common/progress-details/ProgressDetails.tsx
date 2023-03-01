@@ -21,7 +21,6 @@ import { CampaignContext } from 'contexts/campaign.context'
 const ProgressDetails = ({
   stats,
   redacted,
-  handlePause,
   handleRetry,
 }: {
   stats: CampaignStats
@@ -65,12 +64,8 @@ const ProgressDetails = ({
     }
 
     if (!isSent) {
-      return (
-        <PrimaryButton className={styles.pause} onClick={handlePause}>
-          Pause sending
-          <i className={cx(styles.icon, 'bx bx-error-circle')}></i>
-        </PrimaryButton>
-      )
+      // removed pause button for the duration of this experiment to see if anyone uses it
+      return null
     }
     if (!isComplete) {
       return (

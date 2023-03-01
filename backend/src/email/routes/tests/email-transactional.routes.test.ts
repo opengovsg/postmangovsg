@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { User } from '@core/models'
 import {
+  CredentialService,
   FileExtensionService,
   UNSUPPORTED_FILE_TYPE_ERROR_CODE,
 } from '@core/services'
@@ -40,7 +41,9 @@ beforeEach(async () => {
     email: userEmail,
     rateLimit: 1, // for ease of testing, so second API call within a second would fail
   } as User)
-  apiKey = await user.regenerateAndSaveApiKey()
+  apiKey = await (
+    app as any as { credentialService: CredentialService }
+  ).credentialService.regenerateApiKey(user.id)
 })
 
 afterEach(async () => {
@@ -101,7 +104,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should send email successfully and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(true)
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -132,7 +135,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should send a message with valid custom from name', async () => {
     const mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(true)
 
     const from = 'Hello <donotreply@mail.postman.gov.sg>'
     const res = await request(app)
@@ -171,7 +174,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should send a message with valid custom from address', async () => {
     const mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(true)
 
     await EmailFromAddress.create({
       email: user.email,
@@ -284,7 +287,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should send email if subject and body are not empty after removing invalid HTML tags and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(true)
     const invalidHtmlTagsSubjectAndBody = {
       subject: 'HELLO',
       body: '<script>alert("hello")</script>',
@@ -327,7 +330,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         body: 'alert("hello")',
         recipients: [validApiCall.recipient],
         replyTo: validApiCall.reply_to,
-        referenceId: (
+        messageId: (
           transactionalEmail as EmailMessageTransactional
         ).id.toString(),
         attachments: undefined,
@@ -530,7 +533,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should send email with a valid attachment and attachment metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(true)
 
     await EmailFromAddress.create({
       email: user.email,
@@ -561,7 +564,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         replyTo: validApiCallAttachment.reply_to,
         subject: validApiCallAttachment.subject,
         recipients: [validApiCallAttachment.recipient],
-        referenceId: expect.any(String),
+        messageId: expect.any(String),
         attachments: [
           {
             cid: '0',
@@ -633,7 +636,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should send email with two valid attachments and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(true)
 
     await EmailFromAddress.create({
       email: user.email,
@@ -664,7 +667,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         replyTo: validApiCallAttachment.reply_to,
         subject: validApiCallAttachment.subject,
         recipients: [validApiCallAttachment.recipient],
-        referenceId: expect.any(String),
+        messageId: expect.any(String),
         attachments: [
           {
             cid: '0',
@@ -750,7 +753,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Requests should be rate limited and metadata and error code is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(true)
     const send = (): Promise<request.Response> => {
       return request(app)
         .post(endpoint)
@@ -790,7 +793,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Requests should not be rate limited after window elasped and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
-      .mockResolvedValue('message_id')
+      .mockResolvedValue(true)
     const send = (): Promise<request.Response> => {
       return request(app)
         .post(endpoint)
@@ -1244,7 +1247,9 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
       id: 2,
       email: 'user_2@agency.gov.sg',
     } as User)
-    const anotherApiKey = await anotherUser.regenerateAndSaveApiKey()
+    const anotherApiKey = await (
+      app as any as { credentialService: CredentialService }
+    ).credentialService.regenerateApiKey(anotherUser.id)
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',
