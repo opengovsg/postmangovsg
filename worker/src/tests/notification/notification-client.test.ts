@@ -127,7 +127,7 @@ describe('notification', () => {
                 mailClient,
                 mail
               )
-              expect(isEmailSent).toBeTruthy()
+              expect(isEmailSent).toEqual(true)
             }
           }
         }
@@ -154,11 +154,11 @@ describe('notification', () => {
 
       // this actually sends out a mail to your mailbox!
       // finally, you can trigger mails on local to test your content!!
-      const mailRes = await NotificationService.sendEmail(
+      const isEmailSent = await NotificationService.sendEmail(
         mailClient,
         mailToSend
       )
-      expect(mailRes).not.toBeNull()
+      expect(isEmailSent).toEqual(true)
     }
   })
 })

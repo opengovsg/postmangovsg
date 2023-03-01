@@ -13,16 +13,17 @@ const sendEmail = async (
   mailClient: MailClient,
   mail: MailToSend,
   opts?: SendEmailOpts
-): Promise<string | void> => {
+): Promise<boolean> => {
   try {
-    return mailClient.sendMail(mail, opts)
+    await mailClient.sendMail(mail, opts)
+    return true
   } catch (e) {
     logger.error({
       message: 'Error while sending notification email',
       error: e,
       action: 'sendEmail',
     })
-    return
+    return false
   }
 }
 

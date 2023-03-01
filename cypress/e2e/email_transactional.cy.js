@@ -54,6 +54,7 @@ describe('Transactional Email Test', () => {
 
       // Somehow if we send requests with formData body the response body won't
       // be automatically parsed as a JSON object
+
       const { id: messageId } = JSON.parse(
         String.fromCharCode.apply(null, new Uint8Array(response.body)),
       );
@@ -70,6 +71,7 @@ describe('Transactional Email Test', () => {
         );
         const requestUrl = new URL(apiUrl);
         requestUrl.pathname = path.join('/v1/transactional/email', messageId);
+        requestUrl.pathname = `/v1/transactional/email/${messageId}`
 
         // This request is being sent from the browser instance, it's working because
         // we have CORs settings to allow our frontend URLs to send requests to APIs
