@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { User } from '@core/models'
+import { ApiKey, User } from '@core/models'
 import { validateDomain } from '@core/utils/validate-domain'
 import { ApiKeyService, MailService, RedisService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
@@ -11,11 +11,17 @@ import { Transaction } from 'sequelize/types'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
+
   sendOtp(email: string, ipAddress: string): Promise<boolean>
+
   verifyOtp(input: VerifyOtpInput): Promise<boolean>
+
   findOrCreateUser(email: string): Promise<User>
+
   findUser(id: number): Promise<User>
+
   checkCookie(req: Request): boolean
+
   getUserForApiKey(req: Request): Promise<User | null>
 }
 
@@ -177,14 +183,24 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    */
   const getUserForApiKey = async (req: Request): Promise<User | null> => {
     const apiKey = getApiKey(req)
-    if (apiKey !== null) {
-      const hash = await ApiKeyService.getApiKeyHash(apiKey)
-      return await User.findOne({
-        where: { apiKeyHash: hash },
-        attributes: ['id', 'email', ['rate_limit', 'rateLimit']],
-      })
+    if (!apiKey) {
+      return null
     }
-    return null
+    const hash = await ApiKeyService.getApiKeyHash(apiKey)
+    // In future, add validity date and status checks as well here
+    const apiKeyRecord = await ApiKey.findOne({
+      where: {
+        hash,
+      },
+    })
+
+    if (!apiKeyRecord) {
+      return null
+    }
+    return await User.findOne({
+      where: { id: apiKeyRecord.userId },
+      attributes: ['id', 'email', ['rate_limit', 'rateLimit']],
+    })
   }
 
   /**
