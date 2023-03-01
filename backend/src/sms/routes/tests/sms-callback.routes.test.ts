@@ -106,16 +106,14 @@ describe('On successful message send, status should update according to Twilio r
       AccountSid: 'ACxxxxxxx',
       From: '+1512xxxyyyy',
       ApiVersion: '2010-04-01',
-      ErrorCode: 'ERRORBOI',
     }
-    sampleTwilioCallback.ErrorCode = ''
 
     jest
       .spyOn(SmsCallbackService, 'isAuthenticatedTransactional')
       .mockReturnValue(true)
     let callbackRes = await request(app)
       .post('/callback/sms')
-      .set('Authorization', `Basic ${1234}`)
+      .set('Authorization', `Basic sampleAuthKey`)
       .send(sampleTwilioCallback)
 
     expect(callbackRes.status).toBe(200)
@@ -127,13 +125,16 @@ describe('On successful message send, status should update according to Twilio r
     expect(postCallbackGetByIdRes.body.status).toBe(
       TransactionalSmsMessageStatus.Sent
     )
+    const sampleTwilioCallbackError = {
+      ...sampleTwilioCallback,
+      MessageStatus: 'failed',
+      ErrorCode: 'ERRORBOI',
+    }
 
-    sampleTwilioCallback.MessageStatus = 'failed'
-    sampleTwilioCallback.ErrorCode = 'ERRORBOI'
     callbackRes = await request(app)
       .post('/callback/sms')
       .set('Authorization', `Basic ${1234}`)
-      .send(sampleTwilioCallback)
+      .send(sampleTwilioCallbackError)
 
     expect(callbackRes.status).toBe(200)
 
@@ -146,12 +147,14 @@ describe('On successful message send, status should update according to Twilio r
       TransactionalSmsMessageStatus.Error
     )
 
-    sampleTwilioCallback.MessageStatus = 'delivered'
-    sampleTwilioCallback.ErrorCode = ''
+    const sampleTwilioCallbackDelivered = {
+      ...sampleTwilioCallback,
+      MessageStatus: 'delivered',
+    }
     callbackRes = await request(app)
       .post('/callback/sms')
       .set('Authorization', `Basic ${1234}`)
-      .send(sampleTwilioCallback)
+      .send(sampleTwilioCallbackDelivered)
 
     expect(callbackRes.status).toBe(200)
 
