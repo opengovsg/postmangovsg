@@ -11,17 +11,11 @@ import { Transaction } from 'sequelize/types'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
-
   sendOtp(email: string, ipAddress: string): Promise<boolean>
-
   verifyOtp(input: VerifyOtpInput): Promise<boolean>
-
   findOrCreateUser(email: string): Promise<User>
-
   findUser(id: number): Promise<User>
-
   checkCookie(req: Request): boolean
-
   getUserForApiKey(req: Request): Promise<User | null>
 }
 
