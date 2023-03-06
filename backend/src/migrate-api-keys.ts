@@ -23,6 +23,7 @@ void (async function main() {
       lastFive: '*****',
       label: 'default',
     } as ApiKey)
+    // eslint-disable-next-line no-console
     console.log(`Created key ${newKey.id} for user ${u.email}`)
   }
   process.exit(0)
