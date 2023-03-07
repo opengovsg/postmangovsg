@@ -156,14 +156,14 @@ const sendEmail = async (
   opts?: SendEmailOpts
 ): Promise<boolean> => {
   try {
-    const channelProviderMessageId = await MailService.mailClient.sendMail(
+    const serviceProviderMessageId = await MailService.mailClient.sendMail(
       mail,
       opts
     )
     logger.info({
       message: 'Message sent to channel provider.',
       nativeMessageId: mail.messageId,
-      channelProviderMessageId: channelProviderMessageId,
+      serviceProviderMessageId: serviceProviderMessageId,
     })
   } catch (e) {
     logger.error({

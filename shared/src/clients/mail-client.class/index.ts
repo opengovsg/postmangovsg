@@ -42,7 +42,7 @@ export default class MailClient {
     input: MailToSend,
     option?: SendEmailOpts
   ): Promise<string | void> {
-    return new Promise<string | void>((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       const username = Math.random().toString(36).substring(2, 15) // random string
       const xSmtpHeader: { [key: string]: any } = {
         auth: {

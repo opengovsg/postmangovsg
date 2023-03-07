@@ -210,10 +210,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    * @param email
    * @param ipAddress originating IP address that requests for OTP.
    */
-  const sendOtp = async (
-    email: string,
-    ipAddress: string
-  ): Promise<string | void> => {
+  const sendOtp = async (email: string, ipAddress: string): Promise<void> => {
     const otp = generateOtp()
     const hashValue = await bcrypt.hash(otp, SALT_ROUNDS)
     const hashedOtp: HashedOtp = {
@@ -224,7 +221,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     await saveHashedOtp(email, hashedOtp)
 
     const appName = config.get('APP_NAME')
-    return MailService.mailClient.sendMail({
+    await MailService.mailClient.sendMail({
       from: config.get('mailFrom'),
       recipients: [email],
       subject: `One-Time Password (OTP) for ${appName}`,
