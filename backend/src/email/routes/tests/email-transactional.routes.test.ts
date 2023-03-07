@@ -370,7 +370,6 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should throw 400 error if body size is too large (URL encoded payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
-    // const body = 'a'.repeat(1000)
     const res = await request(app)
       .post(endpoint)
       .type('form')
@@ -385,7 +384,6 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should throw 413 error if body size is wayy too large (URL encoded payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
-    // const body = 'a'.repeat(1000)
     const res = await request(app)
       .post(endpoint)
       .type('form')
