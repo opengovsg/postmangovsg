@@ -265,6 +265,11 @@ $section-vertical-padding: 4rem;
       p {
         @extend %subtitle-1;
         color: $neutral-light;
+        a {
+          text-decoration: underline;
+          color: inherit;
+          font-size: inherit;
+        }
       }
       h4 {
         color: $primary-light;
@@ -373,7 +378,7 @@ $section-vertical-padding: 4rem;
         align-items: center;
       }
 
-      video {
+      img {
         width: 40%;
         max-width: 550px;
         margin-right: 4rem;
