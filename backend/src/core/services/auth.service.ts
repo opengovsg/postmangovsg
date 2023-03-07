@@ -11,7 +11,7 @@ import { Transaction } from 'sequelize/types'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
-  sendOtp(email: string, ipAddress: string): Promise<boolean>
+  sendOtp(email: string, ipAddress: string): Promise<void>
   verifyOtp(input: VerifyOtpInput): Promise<boolean>
   findOrCreateUser(email: string): Promise<User>
   findUser(id: number): Promise<User>
@@ -220,10 +220,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    * @param email
    * @param ipAddress originating IP address that requests for OTP.
    */
-  const sendOtp = async (
-    email: string,
-    ipAddress: string
-  ): Promise<boolean> => {
+  const sendOtp = async (email: string, ipAddress: string): Promise<void> => {
     const otp = generateOtp()
     const hashValue = await bcrypt.hash(otp, SALT_ROUNDS)
     const hashedOtp: HashedOtp = {
@@ -234,7 +231,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     await saveHashedOtp(email, hashedOtp)
 
     const appName = config.get('APP_NAME')
-    return MailService.mailClient.sendMail({
+    void MailService.mailClient.sendMail({
       from: config.get('mailFrom'),
       recipients: [email],
       subject: `One-Time Password (OTP) for ${appName}`,
