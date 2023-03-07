@@ -11,7 +11,7 @@ import { Transaction } from 'sequelize/types'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
-  sendOtp(email: string, ipAddress: string): Promise<string | void>
+  sendOtp(email: string, ipAddress: string): Promise<void>
   verifyOtp(input: VerifyOtpInput): Promise<boolean>
   findOrCreateUser(email: string): Promise<User>
   findUser(id: number): Promise<User>
@@ -221,7 +221,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     await saveHashedOtp(email, hashedOtp)
 
     const appName = config.get('APP_NAME')
-    await MailService.mailClient.sendMail({
+    void MailService.mailClient.sendMail({
       from: config.get('mailFrom'),
       recipients: [email],
       subject: `One-Time Password (OTP) for ${appName}`,

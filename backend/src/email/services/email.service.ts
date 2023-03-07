@@ -163,7 +163,7 @@ const sendEmail = async (
     logger.info({
       message: 'Message sent to channel provider.',
       nativeMessageId: mail.messageId,
-      serviceProviderMessageId: serviceProviderMessageId,
+      serviceProviderMessageId,
     })
   } catch (e) {
     logger.error({
