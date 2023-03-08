@@ -15,6 +15,7 @@ import {
   Domain,
   List,
   UserList,
+  ApiKey,
 } from '@core/models'
 import {
   EmailBlacklist,
@@ -54,6 +55,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     Domain,
     List,
     UserList,
+    ApiKey,
   ]
   const emailModels = [
     EmailBlacklist,

@@ -24,15 +24,14 @@ jobs:
       commit_message: ${{ steps.extract-message.outputs.commit_message }}
     steps:
       - id: extract-message
-        # toJSON will wrap the value with double quotes, and we don't want that
-        # in the final value, hence we don't add double quotes here to kill 2 birds:
-        #   - double quote to make the string value assignment in bash
-        # . - removing wrapping double quotes from the final value
         run: |
-          message=${{ toJSON(github.event.head_commit.message) }}
-          # taking only the first line and removing double quotes from string value
-          message="$(echo $message | sed -z 's/\\n.*//g; s/"//g')"
+          message=$MESSAGE
+          # taking only the first line and removing double quotes and backslashes from string value
+          message="$(echo $message | sed -z 's/\\n.*//g; s/"//g; s/\\//g')"
+          echo $message
           echo "commit_message=$message" >> $GITHUB_OUTPUT
+        env:
+          MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
 
   slack-started:
     name: Send slack message when deployment starts

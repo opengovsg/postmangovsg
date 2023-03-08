@@ -67,9 +67,8 @@ const parseRecord = async (record: SendgridRecord): Promise<void> => {
     return
   }
   const metadata = {
-    id: record.message_id,
+    messageId: record.message_id,
     timestamp: new Date(record.timestamp * 1000).toISOString(),
-    messageId: record['smtp-id'],
   }
   switch (event) {
     case 'delivered':

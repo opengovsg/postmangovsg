@@ -38,9 +38,6 @@ export class EmailMessage extends Model<EmailMessage> {
   params!: object
 
   @Column({ type: DataType.STRING, allowNull: true })
-  messageId: string | null
-
-  @Column({ type: DataType.STRING, allowNull: true })
   errorCode: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })

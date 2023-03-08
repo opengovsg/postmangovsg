@@ -1,7 +1,6 @@
 export interface Metadata {
-  id: string
+  messageId: string
   timestamp: string
-  messageId?: string
 }
 
 export interface BounceMetadata extends Metadata {

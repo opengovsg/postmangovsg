@@ -21,11 +21,12 @@ import moeAgencyImg from 'assets/img/landing/moe-gray.png'
 import mohAgencyImg from 'assets/img/landing/moh-gray.png'
 import momAgencyImg from 'assets/img/landing/mom-gray.png'
 import onboardingImg from 'assets/img/landing/onboard.png'
+import whyUse1 from 'assets/img/why-use-1.png'
+import whyUse2 from 'assets/img/why-use-2.png'
+import whyUse3 from 'assets/img/why-use-3.png'
 
 import landingAnimation from 'assets/lottie/landing.json'
-import whyUse1 from 'assets/mp4/why-use-1.mp4'
-import whyUse2 from 'assets/mp4/why-use-2.mp4'
-import whyUse3 from 'assets/mp4/why-use-3.mp4'
+
 import { InfoBanner, PrimaryButton } from 'components/common'
 import { LINKS } from 'config'
 
@@ -92,7 +93,7 @@ const Landing = () => {
 
   const reasons = [
     {
-      video: whyUse1,
+      img: whyUse1,
       firstHeader: 'Multichannel',
       firstText:
         'No more switching between your Outlook and SMS portal. You can reach your recipients via SMS and email in the same platform.',
@@ -100,74 +101,18 @@ const Landing = () => {
       secondText: 'Add useful, custom details for your recipients.',
     },
     {
-      video: whyUse2,
-      firstHeader: 'No more typing +65',
+      img: whyUse2,
+      firstHeader: 'Schedule your campaign',
       firstText:
-        "We took care of the country code so you don't have to enter +65 in your Excel file.",
-      secondHeader: 'Send in bulk',
-      secondText:
-        "You don't have to BCC everyone and wait for Outlook to slowly send a batch of 1000 emails. Sit back and let Postman do the work for you.",
+        'Send your messages anytime you want by scheduling them ahead of time.',
+      secondHeader: 'Track delivery of your messages',
+      secondText: 'Understand how many of your messages was sent successfully.',
     },
     {
-      video: whyUse3,
-      firstHeader: 'Stop your campaign',
+      img: whyUse3,
+      firstHeader: 'Automatically triggered API',
       firstText:
-        'You can stop your campaign with a click of a button even when sending is in progress.',
-      secondHeader: "See past campaigns' stats easily",
-      secondText:
-        "You can see summary stats from Postman's campaign landing page for past campaigns.",
-    },
-  ]
-
-  const questions = [
-    {
-      text: 'What can Postman do?',
-      answer: (
-        <p>
-          Postman lets public officers mass send messages to citizens through
-          SMS and email via a user interface, with minimal setup required.
-        </p>
-      ),
-    },
-    {
-      text: 'What problems are Postman solving?',
-      answer: (
-        <ol>
-          <li>
-            <b>Communication is manual: </b>Public officers are still calling
-            and sending individual messages to citizens.
-          </li>
-          <li>
-            <b>Existing tools do not meet users&apos; needs: </b>Outlook does
-            not support mass sending, as it is capped at 1000 emails at a time.
-          </li>
-          <li>
-            <b>No official source of information: </b>Citizens currently receive
-            messages from the government via many channels, and consequently are
-            at risk of being phished.
-          </li>
-        </ol>
-      ),
-    },
-    {
-      text: 'Is Postman free?',
-      answer: (
-        <p>
-          Sending an email is free. SMS will be charged based on Twilio&apos;s
-          SMS rates.
-        </p>
-      ),
-    },
-    {
-      text: 'Is Postman secure?',
-      answer: (
-        <p>
-          We recommend that you do not add any sensitive information to the
-          messages. Some of our users generate a recipient specific unique link
-          that opens up to a locked page. When in doubt, you should follow IM8’s
-          guidelines on data classification.
-        </p>
-      ),
+        'Modern, cost-effective and compliant way to automatically trigger and send your emails. Focus on building your systems and leave email sending to us.',
     },
   ]
 
@@ -240,39 +185,49 @@ const Landing = () => {
           <div className={styles.channelDescription}>
             <span>CHANNELS</span>
 
-            <h4 className={styles.new}>Telegram</h4>
-            <p>
-              Telegram is the #1 messaging app for Singaporeans aged 35 and
-              under. Engage your subscribers regularly through our Telegram bot
-              broadcasting feature. You can easily send private messages to your
-              agency employees for a fitness event or engage citizens for a
-              donation drive.
-            </p>
-
             <h4>Email</h4>
             <p>
               Go digital and send personalized emails. No more letterheads and
               stamps. Use our password-protected feature to send sensitive
-              information like a payslip or personal PIN to your recipients.
+              information like a payslip or personal PIN to your recipients.{' '}
+              <OutboundLink
+                eventLabel="https://go.gov.sg/postman-email"
+                to="https://go.gov.sg/postman-email"
+                target="_blank"
+              >
+                Read more
+              </OutboundLink>
             </p>
 
             <h4>SMS</h4>
             <p>
               Move away from calling. Send transactional SMS easily through our
               Twilio integration. Remind citizens to come for their
-              appointments. The possibilities are endless.
+              appointments. The possibilities are endless.{' '}
+              <OutboundLink
+                eventLabel="https://go.gov.sg/postman-sms"
+                to="https://go.gov.sg/postman-sms"
+                target="_blank"
+              >
+                Read more
+              </OutboundLink>
             </p>
 
-            <OutboundLink
-              className={styles.link}
-              eventLabel={i18n._(LINKS.guideUrl)}
-              to={i18n._(LINKS.guideUrl)}
-              target="_blank"
-            >
-              <PrimaryButton className={styles.button}>
-                Learn More <i className="bx bx-right-arrow-alt" />
-              </PrimaryButton>
-            </OutboundLink>
+            <h4>Telegram</h4>
+            <p>
+              Telegram is the #1 messaging app for Singaporeans aged 35 and
+              under. Engage your subscribers regularly through our Telegram bot
+              broadcasting feature. You can easily send private messages to your
+              agency employees for a fitness event or engage citizens for a
+              donation drive.{' '}
+              <OutboundLink
+                eventLabel="https://go.gov.sg/postman-telegram"
+                to="https://go.gov.sg/postman-telegram"
+                target="_blank"
+              >
+                Read more
+              </OutboundLink>
+            </p>
           </div>
         </div>
       </div>
@@ -282,15 +237,16 @@ const Landing = () => {
           <h1>Why use Postman?</h1>
           <div className={styles.reasons}>
             {reasons.map((reason) => (
-              <div className={styles.reason} key={reason.video}>
-                <video autoPlay loop muted playsInline>
-                  <source src={reason.video} type="video/mp4" />
-                </video>
+              <div className={styles.reason} key={reason.img}>
+                <img
+                  src={reason.img}
+                  alt={`${reason.firstHeader} ${reason.secondHeader}`}
+                />
                 <div className={styles.textContainer}>
                   <h3>{reason.firstHeader}</h3>
                   <p>{reason.firstText}</p>
-                  <h3>{reason.secondHeader}</h3>
-                  <p>{reason.secondText}</p>
+                  {reason.secondHeader && <h3>{reason.secondHeader}</h3>}
+                  {reason.secondText && <p>{reason.secondText}</p>}
                 </div>
               </div>
             ))}
@@ -317,18 +273,6 @@ const Landing = () => {
               &#8221;
             </span>
           </div>
-        </div>
-      </div>
-
-      <div className={styles.faq}>
-        <div className={styles.innerContainer}>
-          <h1>Frequently asked questions</h1>
-          {questions.map((question) => (
-            <div className={styles.question} key={question.text}>
-              <h3>{question.text}</h3>
-              {question.answer}
-            </div>
-          ))}
         </div>
       </div>
 

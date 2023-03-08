@@ -154,17 +154,26 @@ const getCampaignMessage = async (
 const sendEmail = async (
   mail: MailToSend,
   opts?: SendEmailOpts
-): Promise<string | void> => {
+): Promise<boolean> => {
   try {
-    return MailService.mailClient.sendMail(mail, opts)
+    const serviceProviderMessageId = await MailService.mailClient.sendMail(
+      mail,
+      opts
+    )
+    logger.info({
+      message: 'Message sent to channel provider.',
+      nativeMessageId: mail.messageId,
+      serviceProviderMessageId,
+    })
   } catch (e) {
     logger.error({
       message: 'Error while sending test email',
       error: e,
       action: 'sendEmail',
     })
-    return
+    return false
   }
+  return true
 }
 
 /**
