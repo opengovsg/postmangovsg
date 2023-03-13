@@ -53,7 +53,9 @@ const handler = async (event: any): Promise<{ statusCode: number }> => {
         logger.log(`Redaction reminder sent to ${email}`)
       } catch (err) {
         logger.log(
-          `Failed to send redaction reminder to ${email}. Error: ${(err as Error).message}`
+          `Failed to send redaction reminder to ${email}. Error: ${
+            (err as Error).message
+          }`
         )
 
         failedRecipients.push(email)
