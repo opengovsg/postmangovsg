@@ -26,7 +26,7 @@
     "pg": "8.5.1",
     "pg-connection-string": "2.4.0",
     "reflect-metadata": "0.1.13",
-    "sequelize": "6.21.2",
+    "sequelize": "6.29.1",
     "sequelize-typescript": "2.1.3",
     "source-map-support": "0.5.19"
   },

@@ -31,13 +31,12 @@ export const getUserRedactedCampaigns = async (
   const options = {
     useMaster: false,
     replacements: {
-      start: NOTICE_PERIOD,
-      end: NOTICE_PERIOD * 2,
-      retentionPeriod: RETENTION_PERIOD,
+      start: `${NOTICE_PERIOD} days`,
+      end: `${NOTICE_PERIOD * 2} days`,
+      retentionPeriod: `${RETENTION_PERIOD} days`,
       ...(selectedRecipients ? { selectedRecipients } : {}),
     },
   }
-
   const redactedCampaigns = (
     await sequelize?.query(
       `WITH redacted_campaigns AS (
@@ -46,7 +45,7 @@ export const getUserRedactedCampaigns = async (
         json_build_object(
           'id', campaigns.id,
           'name', campaigns.name,
-          'expiry_date', max(job_queue.updated_at) + interval ':retentionPeriod days'
+          'expiry_date', max(job_queue.updated_at) + interval :retentionPeriod
         ) AS campaign_json
       FROM
         campaigns
@@ -59,8 +58,8 @@ export const getUserRedactedCampaigns = async (
       HAVING
         sum(unsent) = 0
         AND every(job_queue.status = 'LOGGED')
-        AND (max(job_queue.updated_at) + interval ':retentionPeriod days') BETWEEN
-            (cast(current_timestamp as date) + interval ':start days') AND (cast(current_timestamp as date) + interval ':end days')
+        AND (max(job_queue.updated_at) + interval :retentionPeriod) BETWEEN
+            (cast(current_timestamp as date) + interval :start) AND (cast(current_timestamp as date) + interval :end)
       ORDER BY
         max(job_queue.updated_at)
     )
@@ -75,6 +74,5 @@ export const getUserRedactedCampaigns = async (
       options
     )
   )?.[0] as Array<UserRedactedCampaigns>
-
   return redactedCampaigns
 }
