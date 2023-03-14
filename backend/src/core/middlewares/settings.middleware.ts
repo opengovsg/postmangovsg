@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction, Handler } from 'express'
+import { Handler, NextFunction, Request, Response } from 'express'
 import { ChannelType } from '@core/constants'
-import { CredentialService } from '@core/services'
+import { ApiKeyService, CredentialService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 
 export interface SettingsMiddleware {
@@ -35,7 +35,7 @@ export const InitSettingsMiddleware = (
         throw new Error('User not found')
       }
       return res.json({
-        has_api_key: userSettings.hasApiKey,
+        has_api_key: ApiKeyService.hasValidApiKey(userId),
         creds: userSettings.creds,
         demo: {
           num_demos_sms: userSettings.demo?.numDemosSms,
