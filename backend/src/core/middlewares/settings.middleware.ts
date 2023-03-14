@@ -35,7 +35,7 @@ export const InitSettingsMiddleware = (
         throw new Error('User not found')
       }
       return res.json({
-        has_api_key: ApiKeyService.hasValidApiKey(userId),
+        has_api_key: await ApiKeyService.hasValidApiKey(userId),
         creds: userSettings.creds,
         demo: {
           num_demos_sms: userSettings.demo?.numDemosSms,
