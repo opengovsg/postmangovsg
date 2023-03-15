@@ -47,6 +47,7 @@ jobs:
         id: playwright
         env:
           API_URL: ${{ github.ref == 'refs/heads/master' && 'https://api.postman.gov.sg' || 'https://api-staging.postman.gov.sg' }}
+          DASHBOARD_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg' || 'https://staging.postman.gov.sg' }}
           # Reusing env var from cypress
           # TODO: rename this once we've migrated away from Cypress
           API_KEY: ${{ secrets.CYPRESS_API_KEY }}
