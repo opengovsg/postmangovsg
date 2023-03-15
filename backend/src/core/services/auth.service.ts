@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { ApiKey, User } from '@core/models'
+import { User } from '@core/models'
 import { validateDomain } from '@core/utils/validate-domain'
 import { ApiKeyService, MailService, RedisService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
@@ -181,12 +181,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
       return null
     }
     const hash = await ApiKeyService.getApiKeyHash(apiKey)
-    // In future, add validity date and status checks as well here
-    const apiKeyRecord = await ApiKey.findOne({
-      where: {
-        hash,
-      },
-    })
+    const apiKeyRecord = await ApiKeyService.getApiKeyRecord(hash)
 
     if (!apiKeyRecord) {
       return null

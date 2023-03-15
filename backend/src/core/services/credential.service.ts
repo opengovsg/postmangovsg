@@ -337,7 +337,6 @@ export const InitCredentialService = (redisService: RedisService) => {
     })
     if (user) {
       return {
-        hasApiKey: !!user.apiKeyHash,
         creds: user.creds,
         demo: user.demo,
         userFeature: user.userFeature,
