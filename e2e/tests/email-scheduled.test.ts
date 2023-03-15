@@ -1,10 +1,9 @@
 import test, { expect } from '@playwright/test';
 import { Page } from 'playwright';
 import path from 'path';
-import { readFileSync, writeFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 
-import { DASHBOARD_URL, MAILBOX, POSTMAN_FROM } from '../config';
-import { checkGmail } from '../gmail-check';
+import { DASHBOARD_URL, MAILBOX } from '../config';
 
 let page: Page;
 test.beforeAll(async ({ browser }) => {
@@ -34,6 +33,7 @@ test.describe.serial('Scheduled email campaign', () => {
     Math.floor(Math.random() * 1000000 + 1).toString(),
   );
   const subjectLine = 'subscheduled_'.concat(dateTime).concat(randomString);
+  const messageContent = `Dear {{ name }} ${randomString}`;
 
   test('should be successfully created', async () => {
     await page.goto('/');
@@ -46,7 +46,7 @@ test.describe.serial('Scheduled email campaign', () => {
 
   test('should be successfully filled with message details', async () => {
     await page.locator('textarea[id="subject"]').fill(subjectLine);
-    await page.locator('div[aria-label="rdw-editor"]').fill('Dear {{ name }}');
+    await page.locator('div[aria-label="rdw-editor"]').fill(messageContent);
     await page.getByRole('button', { name: 'Next' }).click();
     await expect(page.getByText(/Step 2/)).toBeVisible();
   });
@@ -80,9 +80,9 @@ test.describe.serial('Scheduled email campaign', () => {
     await page
       .locator('input[type="date"]')
       .type(
-        `${scheduledDate.getFullYear()}-${
+        `${scheduledDate.getDate()}-${
           scheduledDate.getMonth() + 1
-        }-${scheduledDate.getDate()}`,
+        }-${scheduledDate.getFullYear()}`,
       ); // has to type here to handle single-digit month and date, if we fill value they will be invalid like 2023-3-2 (needs to be 03-02)
     await page
       .locator('input[type="time"]')

@@ -34,6 +34,8 @@ test.describe.serial('Protected email campaign', () => {
     Math.floor(Math.random() * 1000000 + 1).toString(),
   );
   const subjectLine = 'subprotected_'.concat(dateTime).concat(randomString);
+  const messageContent = `Dear {{ name }} ${randomString}`;
+  const messageToVerify = `Dear postman ${randomString}`;
 
   test('should be successfully created', async () => {
     await page.goto('/');
@@ -59,7 +61,7 @@ test.describe.serial('Protected email campaign', () => {
       './email-recipients.csv',
       `recipient,password,name\n${MAILBOX},hello,postman`,
     );
-    await page.locator('div[aria-label="rdw-editor"]').fill('Dear {{ name }}');
+    await page.locator('div[aria-label="rdw-editor"]').fill(messageContent);
     await page
       .locator('input[type="file"]')
       .setInputFiles('./email-recipients.csv');
@@ -110,7 +112,7 @@ test.describe.serial('Protected email campaign', () => {
     pwProtectedPage.goto(link);
     await pwProtectedPage.locator('input[type="password"]').fill('hello');
     await pwProtectedPage.locator('button[type="submit"]').click();
-    await expect(pwProtectedPage.getByText('Dear postman')).toBeVisible();
+    await expect(pwProtectedPage.getByText(messageToVerify)).toBeVisible();
     await pwProtectedPage.close();
   });
 

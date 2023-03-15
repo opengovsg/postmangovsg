@@ -34,6 +34,8 @@ test.describe.serial('Email campaign', () => {
     Math.floor(Math.random() * 1000000 + 1).toString(),
   );
   const subjectLine = 'sub_'.concat(dateTime).concat(randomString);
+  const messageContent = `Dear {{ name }} ${randomString}`;
+  const messageToVerify = `Dear postman ${randomString}`;
 
   test('should be successfully created', async () => {
     await page.goto('/');
@@ -46,7 +48,7 @@ test.describe.serial('Email campaign', () => {
 
   test('should be successfully filled with message details', async () => {
     await page.locator('textarea[id="subject"]').fill(subjectLine);
-    await page.locator('div[aria-label="rdw-editor"]').fill('Dear {{ name }}');
+    await page.locator('div[aria-label="rdw-editor"]').fill(messageContent);
     await page.getByRole('button', { name: 'Next' }).click();
     await expect(page.getByText(/Step 2/)).toBeVisible();
   });
@@ -96,7 +98,7 @@ test.describe.serial('Email campaign', () => {
     expect(emails.length === 1 || emails.length === 2).toBe(true);
     const emailIndex = emails.length === 1 ? 0 : 1;
     const emailContent = emails[emailIndex].body?.html;
-    expect(emailContent).toMatch(/Dear postman/);
+    expect(emailContent).toContain(messageToVerify);
   });
 
   test('should be able to have a report generated', async () => {
