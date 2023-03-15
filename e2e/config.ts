@@ -4,5 +4,5 @@ export const API_KEY = process.env.API_KEY as string;
 export const MAILBOX = process.env.MAIL_BOX || 'internal-testing@open.gov.sg';
 
 export const DASHBOARD_URL =
-  process.env.CYPRESS_BASE_URL || 'http://staging.postman.gov.sg';
+  process.env.DASHBOARD_URL || 'http://staging.postman.gov.sg';
 export const POSTMAN_FROM = 'donotreply@mail.postman.gov.sg';
