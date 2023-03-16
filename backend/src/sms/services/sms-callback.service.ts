@@ -142,6 +142,7 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
       {
         errorCode: twilioErrorCode,
         status: TransactionalSmsMessageStatus.Error,
+        erroredAt: new Date(),
       } as SmsMessageTransactional,
       {
         where: {
@@ -160,18 +161,23 @@ const parseTransactionalEvent = async (req: Request): Promise<void> => {
       mappedStatus === TransactionalSmsMessageStatus.Sent ||
       mappedStatus === TransactionalSmsMessageStatus.Delivered
     ) {
-      await SmsMessageTransactional.update(
-        {
-          updatedAt: new Date(),
-          status: mappedStatus,
-        } as SmsMessageTransactional,
-        {
-          where: {
-            messageId,
-            errorCode: { [Op.eq]: null },
-          },
-        }
-      )
+      const updateData = {
+        status: mappedStatus,
+        updatedAt: new Date(),
+      } as SmsMessageTransactional
+      if (mappedStatus === TransactionalSmsMessageStatus.Sent) {
+        updateData.sentAt = new Date()
+      }
+      if (mappedStatus === TransactionalSmsMessageStatus.Delivered) {
+        updateData.deliveredAt = new Date()
+      }
+
+      await SmsMessageTransactional.update(updateData, {
+        where: {
+          messageId,
+          errorCode: { [Op.eq]: null },
+        },
+      })
     }
   }
 }
